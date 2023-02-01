@@ -1,0 +1,34 @@
+export class TripData{
+    Status:string;
+    TripID:string;
+    TripDate:string;
+    FromCity:string;
+    FromLocationcode:string;
+    FromState:string;
+    ToCity:string;
+    ToLocationcode:string;
+    ToState:string;
+    Consignor:string;
+    Consignee:string;
+    KmDistance:string;
+    Triptype:string;
+    Mode:string;
+    VehicleNumber:string;
+    VehicleModel:string;
+    Fueltype:string;
+    CapacityTon:string;
+    LoadedTon:string;
+    CapacityUtilization:string;
+    Vendorname:string;
+    Productmoved:string;
+    Vehiclemileage:string;
+    Fuelconsumedinliter:string;
+    EmissionFactor:string;
+    EmissioninKg:string;
+    Id:string;
+    EntryBy:string;
+    EntryDate:string;
+    UpdateBy:string;
+    UpdateDate:string;
+
+}

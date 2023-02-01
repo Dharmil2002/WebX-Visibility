@@ -1,0 +1,89 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <!-- breadcrumb -->
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+
+        <div *ngIf="error" class="alert alert-danger mb-3 mt-0">{{error}}</div>
+        <!-- Widgets -->
+        <div class="row">
+            <div class="col-lg-4 col-sm-6">
+                <div class="counter-box text-center">
+                    <div class="text font-17 m-b-5">Order</div>
+                    <h3 class="m-b-10 text-success">
+                        44
+                    </h3>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <div class="counter-box text-center">
+                    <div class="text font-17 m-b-5">Planned</div>
+                    <h3 class="m-b-10 text-info">77
+                    </h3>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <div class="counter-box text-center">
+                    <div *ngIf="displayProgressSpinner==true" class="preloader pl-size-xs" style="float: right;">
+                        <div class="spinner-layer pl-teal">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div>
+                            <div class="circle-clipper right">
+                                <div class="circle"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text font-17 m-b-5">Yet To Plan</div>
+                    <h3 class="m-b-10 text-secondary">
+                        41114
+                    </h3>
+
+                </div>
+            </div>
+        </div>
+        <div class="block-header" *ngFor="let breadscrumsRoute of breadscrumsRoute">
+            <!-- breadcrumb -->
+            <app-breadcrumb [title]="breadscrumsRoute.title">
+            </app-breadcrumb>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-sm-6">
+                <div class="counter-box text-center">
+                    <div class="text font-17 m-b-5">Pending Confirmation</div>
+                    <h3 class="m-b-10 text-success">
+                        44
+                    </h3>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <div class="counter-box text-center">
+                    <div class="text font-17 m-b-5">To Be Allocated</div>
+                    <h3 class="m-b-10 text-info">77
+                    </h3>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <div class="counter-box text-center">
+                    <div *ngIf="displayProgressSpinner==true" class="preloader pl-size-xs" style="float: right;">
+                        <div class="spinner-layer pl-teal">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div>
+                            <div class="circle-clipper right">
+                                <div class="circle"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text font-17 m-b-5">Awaiting Placement</div>
+                    <h3 class="m-b-10 text-secondary">
+                        74
+                    </h3>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

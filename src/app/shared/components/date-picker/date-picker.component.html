@@ -1,0 +1,9 @@
+<mat-form-field class="example-full-width"  appearance="outline">
+    <mat-label>Manufacture Month Year</mat-label>
+    <input matInput [matDatepicker]="dp" (dateChange)="change($event)" [(ngModel)]="date"
+        placeholder="Select Manufacture Month Year">
+    <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+    <mat-datepicker #dp startView="multi-year">
+    </mat-datepicker>
+   
+</mat-form-field>

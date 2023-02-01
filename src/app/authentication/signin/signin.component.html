@@ -1,0 +1,63 @@
+<div class="container-fluid p-0">
+  <div class="row g-0">
+    <div class="col-lg-4" style="border-right: 1px solid #b3b3b3;">
+      <div class="auth-content p-4 d-flex align-items-center min-vh-100">
+        <div class="w-100">
+          <div class="row justify-content-center">
+            <div class="col-lg-9">
+              <div>
+                <div class="text-center">
+                  <div>
+                    <a routerLink="" class="logo-full"><img src="assets/images/banner/DMS.jpg" alt="logo-full"></a>
+                  </div>
+
+                  <h4 class="font-20 mt-4">Welcome Back !</h4>
+                  <p class="text-muted">Sign in to continue to Globe.</p>
+                </div>
+
+                <div class="p-2 mt-5">
+                  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                    <div *ngIf="error" class="alert alert-danger mb-3 mt-0">{{error}}</div>
+                    <div class="form-group auth-form-group mb-4">
+                      <mat-icon matSuffix class="auth-page-icon">Company Code</mat-icon>
+                      <input type="email" formControlName="CompanyAlias" class="form-control auth-control"
+                        id="CompanyId" placeholder="Company Code">
+                      <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                        <div *ngIf="f.CompanyId.errors.required">Company Code is required</div>
+                      </div>
+                    </div>
+                    <div class="form-group auth-form-group mb-4">
+                      <mat-icon matSuffix class="auth-page-icon">email</mat-icon>
+                      <input type="email" formControlName="email"  class="form-control auth-control" id="email"
+                        placeholder="Email" [readonly]="IsRegister" [ngClass]="{ 'is-invalid': submitted && f.email.errors }">
+                      <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                      </div>
+                    </div>
+                    <div class="form-group auth-form-group mb-4">
+                      <mat-icon matSuffix class="auth-page-icon">vpn_key</mat-icon>
+                      <input type="password" formControlName="password" [readonly]="IsRegister" class="form-control auth-control" id="password"
+                        [ngClass]="{ 'is-invalid': submitted && f.password.errors }" placeholder="Password" />
+                      <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+                        <div *ngIf="f.password.errors.required">Password is required</div>
+                      </div>
+                    </div>
+                    <div class="container-login100-form-btn">
+                      <button mat-flat-button color="primary" class="login100-form-btn" type="submit">
+                        Login
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="auth-bg">
+        <div class="bg-overlay"></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="settingSidebar" [ngClass]="isOpenSidebar ? 'showSettingPanel' : ''" >
+  <a href="javascript:void(0)" class="settingPanelToggle" (click)="toggleRightSidebar()">
+    <app-feather-icons [icon]="'filter'" [class]="'setting-sidebar-icon'"></app-feather-icons>
+  </a>
+  <div class="settingSidebar-body ps-container ps-theme-default"  
+    [ngStyle]="{'position' : 'relative', 'max-height' : maxHeight+'px', 'max-width' : maxWidth+'px'}"
+    [perfectScrollbar] >
+    <div class=" fade show active">
+      <div class="setting-panel-header">Select Filter
+      </div>
+      <form class="example-form" [formGroup]='DashboardFilter'>
+        <div class="p-15 border-bottom">
+          <div class="body">
+           
+          </div>
+          <div>
+            <button  style="display: inline-block; margin-bottom: 50px;" mat-raised-button color="primary" (click)="sendfilterdata()">Apply</button>
+          <button  style="display: inline-block; margin: 20px; margin-bottom: 50px;"  mat-stroked-button color="primary" (click)="reset()">Reset</button>
+          </div>
+          
+          <!-- <div class="rightSetting">
+            <button class="msr-3" style="position: absolute!important;" mat-raised-button color="primary" (click)="sendfilterdata()">Apply</button>
+            <button mat-stroked-button color="primary" (click)="reset()">Reset</button>
+          </div> -->
+        </div>
+        <!-- <div class="rightSetting">
+          <button class="msr-1" style="position: absolute!important;" mat-raised-button color="primary" (click)="sendfilterdata()">Apply</button>
+          <button mat-stroked-button color="primary" (click)="reset()">Reset</button>
+        </div> -->
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<div class="file-drop-area">
+  <div class="icon" color="primary">
+    <mat-icon color="primary">cloud_upload </mat-icon>
+  </div>
+  <div class="centered">Drag & Drop to Upload File</div>
+  <div class="centered-sub">OR</div>
+  <button color="primary" *ngIf="myFiles.length == 0">Choose file</button>
+  <span class="file-msg" *ngFor="let file of myFiles">
+    <div class="me-2">{{ file.name }}</div>
+  </span>
+  <input class="file-input" type="file"
+    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" multiple
+    (change)="getFileDetails($event)">
+</div>

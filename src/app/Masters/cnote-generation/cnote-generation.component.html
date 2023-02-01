@@ -1,0 +1,51 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <!-- breadcrumb -->
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+        <!-- Basic Validation -->
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="card">
+                    <div class="header">
+                    </div>
+                    <div class="body">
+                        <form class="register-form m-4" [formGroup]="CnoteForm">
+                            <div class="row">
+                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2" *ngFor="let Cnote of CnoteData">
+                                    <mat-form-field class="example-full-width" appearance="outline"
+                                        *ngIf="Cnote.type=='text'">
+                                        <mat-label>{{Cnote.label}}</mat-label>
+                                        <input matInput type="Cnote.type" (ngModelChange)="callActionFunction(Cnote.ActionFunction,$event)" [formControlName]="Cnote.name"
+                                            autocomplete="off">
+                                            
+                                    </mat-form-field>
+                                    <mat-form-field class="example-full-width" appearance="outline"
+                                        *ngIf="Cnote.type=='date'">
+                                        <mat-label>{{Cnote.label}}</mat-label>
+                                        <input matInput [matDatepicker]="Cnotename" [formControlName]="Cnote.name">
+                                        <mat-datepicker-toggle matSuffix [for]="Cnotename"></mat-datepicker-toggle>
+                                        <mat-datepicker #Cnotename></mat-datepicker>
+                                    </mat-form-field>
+
+                                    <mat-form-field class="example-full-width" appearance="outline"
+                                        *ngIf="Cnote.type=='dropdown'">
+                                        <mat-label>{{Cnote.label}}</mat-label>
+                                        <mat-select [formControlName]="Cnote.name ">
+                                            <mat-option *ngFor="let option of Cnote.dropdown"  [value]="option.value">
+                                                {{ option.label }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- #END# Basic Validation -->
+    </div>
+</section>

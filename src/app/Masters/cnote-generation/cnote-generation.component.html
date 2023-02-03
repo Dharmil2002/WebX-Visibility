@@ -12,6 +12,8 @@
                     <div class="header">
                     </div>
                     <div class="body">
+                        <mat-stepper #stepper>
+                            <mat-step [stepControl]="CnoteForm">
                         <form class="register-form m-4" [formGroup]="CnoteForm">
                             <div class="row">
                                 <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2" *ngFor="let Cnote of CnoteData">
@@ -39,10 +41,40 @@
                                             </mat-option>
                                         </mat-select>
                                     </mat-form-field>
+                                        <mat-slide-toggle color="primary" *ngIf="Cnote.type=='toggle'"  [formControlName]="Cnote.name">{{Cnote.label}}</mat-slide-toggle>
                                 </div>
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                      <div class="example-button-row">
+                                       
+                                          <button type="button" mat-button >Previous</button>
+                                          <button class="msr-3" mat-raised-button color="primary" [disabled]="!CnoteForm.valid"
+                                          (click)="4">Next</button>
+                                      </div>
+                                    </div>
+                                  </div>
                             </div>
                         </form>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel></ng-template>
+                            <div>
+                                <button type="button" mat-button matStepperPrevious>Previous</button>
+                                <button class="msr-3" mat-raised-button color="primary" [disabled]="!CnoteForm.valid"
+                                (click)="4">Next</button>
+                            </div>
+                          </mat-step>
+                          <mat-step>
+                            <ng-template matStepLabel></ng-template>
+                            <div>
+                                <button type="button" mat-button matStepperPrevious>Previous</button>
+                                <button class="msr-3" mat-raised-button color="primary" [disabled]="!CnoteForm.valid"
+                                (click)="4">Next</button>
+                            </div>
+                          </mat-step>
+                    </mat-stepper>
                     </div>
+                    
                 </div>
             </div>
         </div>

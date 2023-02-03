@@ -27,7 +27,7 @@ import { SharedModule } from '../shared/shared.module';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CNoteGenerationComponent } from './cnote-generation/cnote-generation.component';
-
+import { MatStepperModule } from '@angular/material/stepper';
 
 
 @NgModule({
@@ -70,7 +70,8 @@ import { CNoteGenerationComponent } from './cnote-generation/cnote-generation.co
     ComponentsModule,
     SharedModule,
     MatPaginatorModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatStepperModule
 
   ],
   

@@ -1,8 +1,9 @@
 export interface Cnote {
-   loadingSequance:number;
+   Seq:number;
    label:string;
-    name: string;
-    type: string;
-    dropdown:any;
-    ActionFunction:string;
+   name: string;
+   type: string;
+   validation:string;
+   dropdown:any;
+   ActionFunction:string;
   }

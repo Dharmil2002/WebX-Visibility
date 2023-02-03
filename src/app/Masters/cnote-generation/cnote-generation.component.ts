@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+
 import { CNOTEDATA } from './Cnote';
 @Component({
   selector: 'app-cnote-generation',
@@ -7,7 +8,7 @@ import { CNOTEDATA } from './Cnote';
   
 })
 export class CNoteGenerationComponent implements OnInit {
- CnoteForm: UntypedFormGroup;
+ CnoteForm: FormGroup;
  CnoteData:any;
  option:any;
  PaymentType = [
@@ -34,19 +35,21 @@ City = [
   }
 
   ngOnInit(): void {
-    this.CnoteData.sort((a,b) => (a.loadingSequance - b.loadingSequance));
+    this.CnoteData.sort((a,b) => (a.Seq - b.Seq));
   }
 
   createCustomerForm(): UntypedFormGroup {
-    return this.fb.group({ 
-      VehicleNo:[],
-      SpecialInstration:[],
-      PRQNO:[],
-      SourceCNote:[],
-      CnoteDate:[],
-      PaymentType:[],
-      City:[]
-    });}
+    const formControls = {};
+
+    this.CnoteData.forEach(cnote => {
+      let validators = [];
+      if (cnote.validation === 'Required') {
+        validators = [Validators.required];
+      }
+      formControls[cnote.name] = this.fb.control('', validators);
+    });
+    return this.fb.group(formControls);
+  }
 
     callActionFunction(functionName: string,event:any) {
       switch (functionName) {
@@ -60,6 +63,8 @@ City = [
       
     }
     apicall(event){
+    
       console.log(event);
+      console.log(this.CnoteForm.value);
     }   
 }

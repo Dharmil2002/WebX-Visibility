@@ -13,68 +13,162 @@
                     </div>
                     <div class="body">
                         <mat-stepper #stepper>
-                            <mat-step [stepControl]="CnoteForm">
-                        <form class="register-form m-4" [formGroup]="CnoteForm">
-                            <div class="row">
-                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2" *ngFor="let Cnote of CnoteData">
-                                    <mat-form-field class="example-full-width" appearance="outline"
-                                        *ngIf="Cnote.type=='text'">
-                                        <mat-label>{{Cnote.label}}</mat-label>
-                                        <input matInput type="Cnote.type" (ngModelChange)="callActionFunction(Cnote.ActionFunction,$event)" [formControlName]="Cnote.name"
-                                            autocomplete="off">
-                                            
-                                    </mat-form-field>
-                                    <mat-form-field class="example-full-width" appearance="outline"
-                                        *ngIf="Cnote.type=='date'">
-                                        <mat-label>{{Cnote.label}}</mat-label>
-                                        <input matInput [matDatepicker]="Cnotename" [formControlName]="Cnote.name">
-                                        <mat-datepicker-toggle matSuffix [for]="Cnotename"></mat-datepicker-toggle>
-                                        <mat-datepicker #Cnotename></mat-datepicker>
-                                    </mat-form-field>
+                            <div *ngIf="step1Formcontrol">
+                                <mat-step [stepControl]="step1">
+                                    <form class="register-form m-4" [formGroup]="step1">
+                                        <div class="row">
+                                            <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2"
+                                                *ngFor="let step1 of step1Formcontrol">
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step1.type=='text'">
+                                                    <mat-label>{{step1.label}}</mat-label>
+                                                    <input matInput type="step1.type"
+                                                        (ngModelChange)="callActionFunction(step1.ActionFunction,$event)"
+                                                        [formControlName]="step1.name" autocomplete="off">
 
-                                    <mat-form-field class="example-full-width" appearance="outline"
-                                        *ngIf="Cnote.type=='dropdown'">
-                                        <mat-label>{{Cnote.label}}</mat-label>
-                                        <mat-select [formControlName]="Cnote.name ">
-                                            <mat-option *ngFor="let option of Cnote.dropdown"  [value]="option.value">
-                                                {{ option.label }}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                        <mat-slide-toggle color="primary" *ngIf="Cnote.type=='toggle'"  [formControlName]="Cnote.name">{{Cnote.label}}</mat-slide-toggle>
+                                                </mat-form-field>
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step1.type=='date'">
+                                                    <mat-label>{{step1.label}}</mat-label>
+                                                    <input matInput [matDatepicker]="Cnotename"
+                                                        [formControlName]="step1.name">
+                                                    <mat-datepicker-toggle matSuffix
+                                                        [for]="Cnotename"></mat-datepicker-toggle>
+                                                    <mat-datepicker #Cnotename></mat-datepicker>
+                                                </mat-form-field>
+
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step1.type=='dropdown'">
+                                                    <mat-label>{{step1.label}}</mat-label>
+                                                    <mat-select [formControlName]="step1.name ">
+                                                        <mat-option *ngFor="let option of step1.dropdown"
+                                                            [value]="option.value">
+                                                            {{ option.label }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                                <mat-slide-toggle color="primary" *ngIf="step1.type=='toggle'"
+                                                    [formControlName]="step1.name">{{step1.label}}</mat-slide-toggle>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                                    <div class="example-button-row">
+
+                                                        <button type="button" mat-button>Previous</button>
+                                                        <button class="msr-3" mat-raised-button color="primary"
+                                                            (click)="4" [disabled]="!step1.valid">Next</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </mat-step>
+                            </div>
+                            <div *ngIf="step2Formcontrol">
+                                <mat-step [stepControl]="step2">
+                                    <form class="register-form m-4" [formGroup]="step2">
+                                        <div class="row">
+                                            <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2"
+                                                *ngFor="let step2 of step2Formcontrol">
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step2.type=='text'">
+                                                    <mat-label>{{step2.label}}</mat-label>
+                                                    <input matInput type="step2.type"
+                                                        (ngModelChange)="callActionFunction(step2.ActionFunction,$event)"
+                                                        [formControlName]="step2.name" autocomplete="off">
+
+                                                </mat-form-field>
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step2.type=='date'">
+                                                    <mat-label>{{step2.label}}</mat-label>
+                                                    <input matInput [matDatepicker]="Cnotename"
+                                                        [formControlName]="step2.name">
+                                                    <mat-datepicker-toggle matSuffix
+                                                        [for]="Cnotename"></mat-datepicker-toggle>
+                                                    <mat-datepicker #Cnotename></mat-datepicker>
+                                                </mat-form-field>
+
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step2.type=='dropdown'">
+                                                    <mat-label>{{step2.label}}</mat-label>
+                                                    <mat-select [formControlName]="step2.name ">
+                                                        <mat-option *ngFor="let option of step2.dropdown"
+                                                            [value]="option.value">
+                                                            {{ option.label }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                                <mat-slide-toggle color="primary" *ngIf="step2.type=='toggle'"
+                                                    [formControlName]="step2.name">{{step2.label}}</mat-slide-toggle>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                                    <div class="example-button-row">
+
+                                                        <button type="button" mat-button>Previous</button>
+                                                        <button class="msr-3" mat-raised-button color="primary"
+                                                            (click)="4" [disabled]="!step2.valid">Next</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </mat-step>
+                            </div>
+                                <div *ngIf="step3Formcontrol">
+                                    <mat-step [stepControl]="step3">
+                                        <form class="register-form m-4" [formGroup]="step3">
+                                            <div class="row">
+                                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2"
+                                                    *ngFor="let step3 of step3Formcontrol">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="step3.type=='text'">
+                                                        <mat-label>{{step3.label}}</mat-label>
+                                                        <input matInput type="step3.type"
+                                                            (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
+                                                            [formControlName]="step3.name" autocomplete="off">
+    
+                                                    </mat-form-field>
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="step3.type=='date'">
+                                                        <mat-label>{{step3.label}}</mat-label>
+                                                        <input matInput [matDatepicker]="Cnotename"
+                                                            [formControlName]="step3.name">
+                                                        <mat-datepicker-toggle matSuffix
+                                                            [for]="Cnotename"></mat-datepicker-toggle>
+                                                        <mat-datepicker #Cnotename></mat-datepicker>
+                                                    </mat-form-field>
+    
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="step3.type=='dropdown'">
+                                                        <mat-label>{{step3.label}}</mat-label>
+                                                        <mat-select [formControlName]="step3.name ">
+                                                            <mat-option *ngFor="let option of step3.dropdown"
+                                                                [value]="option.value">
+                                                                {{ option.label }}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                    <mat-slide-toggle color="primary" *ngIf="step3.type=='toggle'"
+                                                        [formControlName]="step3.name">{{step3.label}}</mat-slide-toggle>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                                        <div class="example-button-row">
+    
+                                                            <button type="button" mat-button>Previous</button>
+                                                            <button class="msr-3" mat-raised-button color="primary"
+                                                                (click)="4" [disabled]="!step3.valid">Next</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </mat-step>
                                 </div>
-                                <div class="row">
-                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
-                                      <div class="example-button-row">
-                                       
-                                          <button type="button" mat-button >Previous</button>
-                                          <button class="msr-3" mat-raised-button color="primary" [disabled]="!CnoteForm.valid"
-                                          (click)="4">Next</button>
-                                      </div>
-                                    </div>
-                                  </div>
-                            </div>
-                        </form>
-                        </mat-step>
-                        <mat-step>
-                            <ng-template matStepLabel></ng-template>
-                            <div>
-                                <button type="button" mat-button matStepperPrevious>Previous</button>
-                                <button class="msr-3" mat-raised-button color="primary" [disabled]="!CnoteForm.valid"
-                                (click)="4">Next</button>
-                            </div>
-                          </mat-step>
-                          <mat-step>
-                            <ng-template matStepLabel></ng-template>
-                            <div>
-                                <button type="button" mat-button matStepperPrevious>Previous</button>
-                                <button class="msr-3" mat-raised-button color="primary" [disabled]="!CnoteForm.valid"
-                                (click)="4">Next</button>
-                            </div>
-                          </mat-step>
-                    </mat-stepper>
+                        </mat-stepper>
                     </div>
-                    
+
                 </div>
             </div>
         </div>

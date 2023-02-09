@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormArray, FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Cnote } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 @Component({
@@ -23,6 +23,7 @@ export class CNoteGenerationComponent implements OnInit {
   step1Formcontrol: Cnote[];
   step2Formcontrol: Cnote[];
   step3Formcontrol: Cnote[];
+  step3Formarray: Cnote[];
   constructor(private fb: UntypedFormBuilder, private ICnoteService: CnoteService) {
     //  this.CnoteData = CNOTEDATA;
     this.GetCnotecontrols();
@@ -69,6 +70,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   }
   step3Formgrop(): UntypedFormGroup {
+    debugger;
     const formControls = {};
     this.step3Formcontrol = this.CnoteData.filter((x) => x.formgrp == 'step-3')
     if (this.step3Formcontrol.length > 0) {
@@ -77,15 +79,59 @@ export class CNoteGenerationComponent implements OnInit {
         if (cnote.validation === 'Required') {
           validators = [Validators.required];
         }
+        
         formControls[cnote.name] = this.fb.control('', validators);
+        
         // if(cnote.disable=='true'){
         //   formControls[cnote.name].disable();
         // }
       });
-      return this.fb.group(formControls)
+    
     }
-
+    this.step3Formarray = this.CnoteData.filter((x) => x.formgrp == 'formarray')
+    if (this.step3Formarray.length > 0) {
+      const array={}
+      this.step3Formarray.forEach(cnote => {
+        let validators = [];
+        if (cnote.validation === 'Required') {
+          validators = [Validators.required];
+        }
+       
+        array[cnote.name] = this.fb.control('', validators);
+     
+        
+        // if(cnote.disable=='true'){
+        //   formControls[cnote.name].disable();
+        // }
+      });
+      formControls['Farray'] = this.fb.array([
+        this.fb.group(array)
+      ])
+      
+    }
+    return this.fb.group(formControls)
   }
+  
+  addField() {
+    debugger
+    this.step3.value;
+    const array={}
+    const fields = this.step3.get('Farray') as FormArray;
+    this.step3Formarray = this.CnoteData.filter((x) => x.formgrp == 'formarray')
+    if (this.step3Formarray.length > 0) {
+      this.step3Formarray.forEach(cnote => {
+        array[cnote.name] = this.fb.control('');
+       
+      });
+    
+    }
+    fields.push(this.fb.group(array));
+  }
+  removeField(index: number) {
+    const fields = this.step3.get('Farray') as FormArray;
+    fields.removeAt(index);
+  }
+  
   callActionFunction(functionName: string, event: any) {
 
     switch (functionName) {
@@ -106,7 +152,7 @@ export class CNoteGenerationComponent implements OnInit {
     console.log(this.step1.value);
   }
   GetCnotecontrols() {
-
+    
     this.ICnoteService.GetCnoteFormcontrol().subscribe(
       {
         next: (res: any) => {

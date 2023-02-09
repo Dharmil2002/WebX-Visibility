@@ -11,7 +11,7 @@
                 <div class="card">
                     <div class="header">
                     </div>
-                    <div class="body">
+                    <div class="body" *ngIf="CnoteData">
                         <mat-stepper #stepper>
                             <div *ngIf="step1Formcontrol">
                                 <mat-step [stepControl]="step1">
@@ -54,9 +54,8 @@
                                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                                                     <div class="example-button-row">
 
-                                                        <button type="button" mat-button>Previous</button>
                                                         <button class="msr-3" mat-raised-button color="primary"
-                                                            (click)="4" [disabled]="!step1.valid">Next</button>
+                                                            (click)="4" matStepperNext>Next</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -105,9 +104,9 @@
                                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                                                     <div class="example-button-row">
 
-                                                        <button type="button" mat-button>Previous</button>
+                                                        <button mat-button matStepperPrevious>Back</button>
                                                         <button class="msr-3" mat-raised-button color="primary"
-                                                            (click)="4" [disabled]="!step2.valid">Next</button>
+                                                            (click)="4" matStepperNext>Next</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -115,57 +114,136 @@
                                     </form>
                                 </mat-step>
                             </div>
-                                <div *ngIf="step3Formcontrol">
-                                    <mat-step [stepControl]="step3">
-                                        <form class="register-form m-4" [formGroup]="step3">
-                                            <div class="row">
-                                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2"
-                                                    *ngFor="let step3 of step3Formcontrol">
-                                                    <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step3.type=='text'">
-                                                        <mat-label>{{step3.label}}</mat-label>
-                                                        <input matInput type="step3.type"
-                                                            (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
-                                                            [formControlName]="step3.name" autocomplete="off">
-    
-                                                    </mat-form-field>
-                                                    <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step3.type=='date'">
-                                                        <mat-label>{{step3.label}}</mat-label>
-                                                        <input matInput [matDatepicker]="Cnotename"
-                                                            [formControlName]="step3.name">
-                                                        <mat-datepicker-toggle matSuffix
-                                                            [for]="Cnotename"></mat-datepicker-toggle>
-                                                        <mat-datepicker #Cnotename></mat-datepicker>
-                                                    </mat-form-field>
-    
-                                                    <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step3.type=='dropdown'">
-                                                        <mat-label>{{step3.label}}</mat-label>
-                                                        <mat-select [formControlName]="step3.name ">
-                                                            <mat-option *ngFor="let option of step3.dropdown"
-                                                                [value]="option.value">
-                                                                {{ option.label }}
-                                                            </mat-option>
-                                                        </mat-select>
-                                                    </mat-form-field>
-                                                    <mat-slide-toggle color="primary" *ngIf="step3.type=='toggle'"
-                                                        [formControlName]="step3.name">{{step3.label}}</mat-slide-toggle>
+                            <div *ngIf="step3Formcontrol">
+                                <mat-step [stepControl]="step3">
+                                    <form class="register-form m-4" [formGroup]="step3">
+                                        <div class="row">
+                                            <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2"
+                                                *ngFor="let step3 of step3Formcontrol">
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step3.type=='text'">
+                                                    <mat-label>{{step3.label}}</mat-label>
+                                                    <input matInput type="step3.type"
+                                                        (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
+                                                        [formControlName]="step3.name" autocomplete="off">
+
+                                                </mat-form-field>
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step3.type=='date'">
+                                                    <mat-label>{{step3.label}}</mat-label>
+                                                    <input matInput [matDatepicker]="Cnotename"
+                                                        [formControlName]="step3.name">
+                                                    <mat-datepicker-toggle matSuffix
+                                                        [for]="Cnotename"></mat-datepicker-toggle>
+                                                    <mat-datepicker #Cnotename></mat-datepicker>
+                                                </mat-form-field>
+
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step3.type=='dropdown'">
+                                                    <mat-label>{{step3.label}}</mat-label>
+                                                    <mat-select [formControlName]="step3.name">
+                                                        <mat-option *ngFor="let option of step3.dropdown"
+                                                            [value]="option.value">
+                                                            {{ option.label }}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                                <mat-slide-toggle color="primary"  *ngIf="step3.type=='toggle' && step3.name !='SerialScan' && step3.name !='EachScan'"
+                                                    [formControlName]="step3.name">{{step3.label}}</mat-slide-toggle>
+                                            </div>
+
+
+
+                                        </div>
+                                        <hr>
+                                        <div class="row" flex>
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                                <div class="example-button-row">
+
+                                                    <button type="button" (click)="removeField(i)"
+                                                        mat-button>Remove</button>
+                                                    <button class="msr-3" mat-raised-button color="primary"
+                                                        (click)="addField()" [disabled]="!step3.valid">Add
+                                                        Field</button>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
-                                                        <div class="example-button-row">
-    
-                                                            <button type="button" mat-button>Previous</button>
-                                                            <button class="msr-3" mat-raised-button color="primary"
-                                                                (click)="4" [disabled]="!step3.valid">Next</button>
-                                                        </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="step3Formarray">
+                                            <div>
+                                                <div  style="overflow-x: auto">
+                                                    <table class="table">
+                                                        <thead >
+                                                            <tr>
+                                                            <th  *ngFor="let step3 of step3Formarray">{{step3.label}}</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr  formArrayName="Farray"
+                                                        *ngFor="let field of step3.get('Farray').controls; index as i">
+                                                            <td  *ngFor="let step3 of step3Formarray" [formGroupName]="i">
+                                                                
+                                                                <div class="col-md-12" *ngIf="step3.type=='text'">
+                                                                <input style="width: 168px;" type="step3.type" class="form-control"
+                                                                    (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
+                                                                    [formControlName]="step3.name"
+                                                                    autocomplete="off">
+                                                                </div>
+                                                                <div  class="col-md-12" *ngIf="step3.type=='date'">
+                                                                    <input style="width: 168px;"class="form-control"
+                                                                    [formControlName]="step3.name" type="date">
+                                                                </div>
+                                                                <div  class="col-md-12"*ngIf="step3.type=='dropdown'">
+                                                                    <select class="form-control"
+                                                                    [formControlName]="step3.name">
+                                                                    <option *ngFor="let option of step3.dropdown"
+                                                                        [value]="option.value">
+                                                                        {{ option.label }}
+                                                                    </option>
+                                                                </select>
+                                                                </div>
+                                                            </td>
+                                                            <!-- <td *ngIf="step3.type=='date'">
+                                                                {{step3.label}}:
+                                                                <input class="form-control"
+                                                                    [formControlName]="step3.name" type="date">
+                                                            </td>
+                                                            <td *ngIf="step3.type=='dropdown'">
+                                                                {{step3.label}}:
+                                                                <select class="form-control"
+                                                                    [formControlName]="step3.name">
+                                                                    <option *ngFor="let option of step3.dropdown"
+                                                                        [value]="option.value">
+                                                                        {{ option.label }}
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                            <td *ngIf="step3.type=='toggle'">
+                                                                {{step3.label}}:
+                                                                <input type="checkbox"
+                                                                    [formControlName]="step3.name">
+                                                            </td> -->
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                                    <div class="example-button-row">
+
+                                                        <button mat-button matStepperPrevious>Back</button>
+                                                        <button class="msr-3" mat-raised-button color="primary"
+                                                            (click)="4" [disabled]="!step3.valid">Submit</button>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </form>
-                                    </mat-step>
-                                </div>
+                                        </div>
+                                        
+                                    </form>
+
+                                </mat-step>
+                            </div>
                         </mat-stepper>
                     </div>
 

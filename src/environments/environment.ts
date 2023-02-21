@@ -14,7 +14,8 @@ export const environment = {
   DashboardAPIGetway:
     "https://greenxpress-beta-api.azurewebsites.net/api/Dashboard/",
   localHost: " http://localhost:7233/api/DMS/",
-  localNumberFormat: "en-IN"
+  localNumberFormat: "en-IN",
+  APIBaseURL:"http://localhost:3000/api/"
 };
 
 /*

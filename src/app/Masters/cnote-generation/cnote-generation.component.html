@@ -61,12 +61,13 @@
                                                 </mat-form-field>
                                                 <!--Auto Dropdown -->
                                                 <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step1.type=='autodropdown' && step1.name!='FCITY' && step1.name!='TCITY'">
+                                                    *ngIf="step1.type=='autodropdown' && step1.name!='FCITY' && step1.name!='TCITY' && step1.name!='DELLOC'">
                                                     <mat-label>{{step1.label}}</mat-label>
                                                     <input matInput [formControlName]="step1.name" autocomplete="off"
                                                         [matAutocomplete]="autoBiling">
                                                     <mat-autocomplete #autoBiling="matAutocomplete"
-                                                        [displayWith]="displayCnotegropFn" (optionSelected)="callActionFunction(step1.ActionFunction,$event)">
+                                                        [displayWith]="displayCnotegropFn"
+                                                        (optionSelected)="callActionFunction(step1.ActionFunction,$event)">
                                                         <mat-option *ngFor="let option of filteredCnoteBilling | async"
                                                             [value]="option">
                                                             {{option.CodeDesc}}
@@ -76,12 +77,13 @@
                                                 <!----end -->
                                                 <!-- Auto dropdown for City -->
                                                 <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step1.type=='autodropdown' && step1.name=='FCITY'|| step1.name=='TCITY'">
+                                                    *ngIf="step1.type=='autodropdown' && step1.name=='FCITY'|| step1.name=='TCITY' || step1.name=='DELLOC'">
                                                     <mat-label>{{step1.label}}</mat-label>
                                                     <input matInput [formControlName]="step1.name" autocomplete="off"
                                                         [matAutocomplete]="city">
                                                     <mat-autocomplete #city="matAutocomplete"
-                                                        [displayWith]="displayCitygropFn" (optionSelected)="callActionFunction(step1.ActionFunction,$event)">
+                                                        [displayWith]="displayCitygropFn"
+                                                        (optionSelected)="callActionFunction(step1.ActionFunction,$event)">
                                                         <mat-option *ngFor="let option of step1.filteredOptions | async"
                                                             [value]="option">
                                                             {{option.Name}}

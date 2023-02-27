@@ -35,7 +35,17 @@ export class AutoCompleteCommon {
    constructor(public CodeId: string, public CodeDesc: string) { }
 }
 export class AutoCompleteCity{
-  constructor(public Value:string,public Name:string,public LOCATIONS:string,public CITY_CODE:string){
+  constructor(public Value:string,
+   public Name:string,
+   public LOCATIONS:string,
+   public CITY_CODE:string,
+   public codedesc:string,
+   public PincodeZoneId: string,
+   public Area: string,
+   public PincodeZoneLocation: string,
+   public LocCity: string,
+   public pincode: string,
+   public loccode: string){
 
   }
   

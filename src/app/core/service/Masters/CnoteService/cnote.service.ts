@@ -16,6 +16,7 @@ export class CnoteService {
   //   );
   // }
   getCnoteBooking(ApiURL, req) {
+   
     return this.http.get<any>(
       `${environment.APIBaseURL}` + ApiURL + req
     );

@@ -17,6 +17,7 @@ export class CNoteGenerationComponent implements OnInit {
 
 
   //intialization of varible 
+  private billingPartyAutoCompleteLoaded = false;
   isDisabled = true;
   step1: FormGroup;
   step2: FormGroup;
@@ -73,10 +74,13 @@ export class CNoteGenerationComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  
-  ngAfterViewChecked(): void {
-    this.getBillingPartyAutoComplete();
-  }
+
+  // ngAfterViewChecked() {
+  //   if (!this.billingPartyAutoCompleteLoaded) {
+  //     this.getBillingPartyAutoComplete();
+  //     this.billingPartyAutoCompleteLoaded = true;
+  //   }
+  // }
   //step-1 Formgrop 
   step1Formgrop(): UntypedFormGroup {
     const formControls = {};

@@ -141,7 +141,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Api Calling Method on Chaged(ACTION URL)
   callActionFunction(functionName: string, event: any) {
-    debugger;
+   // debugger;
     switch (functionName) {
       case "apicall":
         this.apicall(event);
@@ -169,7 +169,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Get all field and bind
   GetCnotecontrols() {
-    debugger;
+    //debugger;
     this.ICnoteService.getCnoteBooking('cnotefields/', 10065).subscribe(
       {
         next: (res: any) => {
@@ -202,7 +202,7 @@ export class CNoteGenerationComponent implements OnInit {
     })
   }
   getContractDetail() {
-    debugger;
+    //debugger;
     this.ICnoteService.getCnoteBooking('services/getContractDetail/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
@@ -270,7 +270,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //FromCity
   getFromCity() {
-    debugger;
+    //debugger;
     if (this.step1Formcontrol) {
       let bLcode = this.step1Formcontrol.find((x) => x.name == 'FCITY');
       let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
@@ -295,7 +295,7 @@ export class CNoteGenerationComponent implements OnInit {
   //end
   //ToCity
   getToCity() {
-    debugger;
+    //debugger;
     if (this.step1Formcontrol) {
       let custCode = this.step1.value.PRQ_BILLINGPARTY == "" ? "" : this.step1.value.PRQ_BILLINGPARTY.CodeId;
       let ContractId = this.contractDetail.find((x) => x.CustCode == custCode);

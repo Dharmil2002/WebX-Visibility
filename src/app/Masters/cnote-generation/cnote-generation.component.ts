@@ -73,6 +73,7 @@ export class CNoteGenerationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     //this.getBillingPartyAutoComplete();
   }
 
   // ngAfterViewChecked() {

@@ -51,7 +51,8 @@
                                                 <mat-form-field class="example-full-width" appearance="outline"
                                                     *ngIf="step1.type=='dropdown'">
                                                     <mat-label>{{step1.label}}</mat-label>
-                                                    <mat-select [formControlName]="step1.name" (ngModelChange)="callActionFunction(step1.ActionFunction,$event)">
+                                                    <mat-select [formControlName]="step1.name"
+                                                        (ngModelChange)="callActionFunction(step1.ActionFunction,$event)">
                                                         <mat-option *ngFor="let option of step1.dropdown"
                                                             [value]="option.CodeId">
                                                             {{ option.CodeDesc }}
@@ -60,18 +61,34 @@
                                                 </mat-form-field>
                                                 <!--Auto Dropdown -->
                                                 <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step1.type=='autodropdown'">
+                                                    *ngIf="step1.type=='autodropdown' && step1.name!='FCITY' && step1.name!='TCITY'">
                                                     <mat-label>{{step1.label}}</mat-label>
                                                     <input matInput [formControlName]="step1.name" autocomplete="off"
                                                         [matAutocomplete]="autoBiling">
                                                     <mat-autocomplete #autoBiling="matAutocomplete"
-                                                        [displayWith]="displayCnotegropFn">
+                                                        [displayWith]="displayCnotegropFn" (optionSelected)="callActionFunction(step1.ActionFunction,$event)">
                                                         <mat-option *ngFor="let option of filteredCnoteBilling | async"
                                                             [value]="option">
                                                             {{option.CodeDesc}}
                                                         </mat-option>
                                                     </mat-autocomplete>
                                                 </mat-form-field>
+                                                <!----end -->
+                                                <!-- Auto dropdown for City -->
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step1.type=='autodropdown' && step1.name=='FCITY'|| step1.name=='TCITY'">
+                                                    <mat-label>{{step1.label}}</mat-label>
+                                                    <input matInput [formControlName]="step1.name" autocomplete="off"
+                                                        [matAutocomplete]="city">
+                                                    <mat-autocomplete #city="matAutocomplete"
+                                                        [displayWith]="displayCitygropFn" (optionSelected)="callActionFunction(step1.ActionFunction,$event)">
+                                                        <mat-option *ngFor="let option of step1.filteredOptions | async"
+                                                            [value]="option">
+                                                            {{option.Name}}
+                                                        </mat-option>
+                                                    </mat-autocomplete>
+                                                </mat-form-field>
+                                                <!-- End -->
                                                 <!--Toggale  -->
                                                 <mat-slide-toggle color="primary" *ngIf="step1.type=='toggle'"
                                                     [formControlName]="step1.name">{{step1.label}}</mat-slide-toggle>

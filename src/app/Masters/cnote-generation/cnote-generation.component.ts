@@ -73,7 +73,8 @@ export class CNoteGenerationComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  ngOnDestroy(): void {
+  
+  ngAfterViewChecked(): void {
     this.getBillingPartyAutoComplete();
   }
   //step-1 Formgrop 
@@ -202,6 +203,7 @@ export class CNoteGenerationComponent implements OnInit {
       next: (res: any) => {
         if (res) {
           this.Rules = res[0];
+
           let Rules = this.Rules.find((x) => x.code == 'MAP_DLOC_PIN')
           let mapcityRule = this.Rules.find((x) => x.code == `USE_MAPPED_LOCATION_INCITY`)
           if (Rules.defaultvalue == "A") {
@@ -234,7 +236,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //billing Party api
   getBillingPartyAutoComplete() {
-      debugger;
+    debugger;
     if (this.step1Formcontrol) {
       let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.value.PAYTYP);
       if (rulePartyType.defaultvalue == "D") {

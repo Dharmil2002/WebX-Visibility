@@ -28,7 +28,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CNoteGenerationComponent } from './cnote-generation/cnote-generation.component';
 import { MatStepperModule } from '@angular/material/stepper';
-
+import { DatePipe } from '@angular/common';
 
 @NgModule({
  
@@ -71,13 +71,14 @@ import { MatStepperModule } from '@angular/material/stepper';
     SharedModule,
     MatPaginatorModule,
     MatExpansionModule,
-    MatStepperModule
+    MatStepperModule,
+    
 
   ],
   
   declarations: [CNoteGenerationComponent],
   
-  providers: []
+  providers: [DatePipe]
 })
 
   export class MastersModule { }

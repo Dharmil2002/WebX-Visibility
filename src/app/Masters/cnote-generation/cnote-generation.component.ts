@@ -3,7 +3,7 @@ import { FormArray, FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators 
 import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, AutocompleteField, Cnote, ContractDetailList, prqVehicleReq, Rules } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { PLATFORM_ID, Inject } from '@angular/core';
-import { DatePipe, isPlatformBrowser } from '@angular/common';
+import {DatePipe, isPlatformBrowser } from '@angular/common';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map, Observable, startWith } from 'rxjs';
@@ -40,6 +40,8 @@ export class CNoteGenerationComponent implements OnInit {
       active: "CNoteGeneration",
     },
   ]
+  date: Date = new Date();
+  formattedDate: string;
   step1Formcontrol: Cnote[];
   step2Formcontrol: Cnote[];
   step3Formcontrol: Cnote[];
@@ -51,7 +53,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   divcol: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   contractDetail: ContractDetailList[];
-  constructor(private fb: UntypedFormBuilder, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(private fb: UntypedFormBuilder, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     //  this.CnoteData = CNOTEDATA;
     const storedVersion = parseInt(localStorage.getItem('version'), 10);
     if (isPlatformBrowser(this.platformId)) {
@@ -77,6 +79,7 @@ export class CNoteGenerationComponent implements OnInit {
   ngOnInit(): void {
     this.getDaterules();
     this.getContractDetail();
+    this.formattedDate = this.datePipe.transform(this.date, 'dd/MM/yyyy hh:mm a', '+0530');
     //this.getBillingPartyAutoComplete();
   }
 

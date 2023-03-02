@@ -106,9 +106,10 @@
 @import 'browser/_ie10.scss';
 @import 'browser/_ie11.scss';
 
-.tablewidth{
-    max-width: 80px!important;
+.tablewidth {
+  max-width: 80px !important;
 }
+
 .dialog {
   position: absolute;
   top: 50%;
@@ -123,73 +124,86 @@
   flex-direction: column;
   align-items: center;
 }
-.example-tree-invisible {
-    display: none;
-  }
-  
-  .example-tree ul,
-  .example-tree li {
-    margin-top: 0;
-    margin-bottom: 0;
-    list-style-type: none;
-  }
 
-  /*
+.example-tree-invisible {
+  display: none;
+}
+
+.example-tree ul,
+.example-tree li {
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+}
+
+/*
    * This padding sets alignment of the nested nodes.
    */
-  .example-tree .mat-nested-tree-node div[role=group] {
-    padding-left: 40px;
-  }
-  
-  /*
+.example-tree .mat-nested-tree-node div[role=group] {
+  padding-left: 40px;
+}
+
+/*
    * Padding for leaf nodes.
    * Leaf nodes need to have padding so as to align with other non-leaf nodes
    * under the same parent.
    */
-  .example-tree div[role=group] > .mat-tree-node {
-    padding-left: 40px;
-  }
-  .example-tree{
-    margin-top: 29!important;
-    margin-left: 0!important;
-  }
+.example-tree div[role=group]>.mat-tree-node {
+  padding-left: 40px;
+}
+
+.example-tree {
+  margin-top: 29 !important;
+  margin-left: 0 !important;
+}
 
 @media only screen and (max-width: 768px) {
-  .example-tree{
-    margin-top: 0!important;
-    margin-left: 0!important;
+  .example-tree {
+    margin-top: 0 !important;
+    margin-left: 0 !important;
   }
-  .Rangedate{
-    right: 0!important; 
-    position:inherit!important;
+
+  .Rangedate {
+    right: 0 !important;
+    position: inherit !important;
   }
 }
+
 @media only screen and (min-width:768px) {
-  .Rangedate{
-    right: 297px !important; 
-    position:absolute !important;
+  .Rangedate {
+    right: 297px !important;
+    position: absolute !important;
   }
 }
 
 .snackbar-success {
-  background-color: rgba(24, 206, 15, 0.8)!important;
-  color: #ffffff!important;
+  background-color: rgba(24, 206, 15, 0.8) !important;
+  color: #ffffff !important;
 }
 
 .snackbar-info {
-  background-color: rgba(44, 168, 255, 0.8)!important;
-  color: #ffffff!important;
+  background-color: rgba(44, 168, 255, 0.8) !important;
+  color: #ffffff !important;
 }
 
 .snackbar-warning {
-  background-color: rgba(255, 230, 0, 0.8)!important;
-  color: #ffffff!important;
+  background-color: rgba(255, 230, 0, 0.8) !important;
+  color: #ffffff !important;
 }
 
 .snackbar-danger {
-  background-color: rgba(255, 0, 0, 0.8)!important;
-  color: #ffffff!important;
+  background-color: rgba(255, 0, 0, 0.8) !important;
+  color: #ffffff !important;
 }
+.dividerCnote {
+  height: 133%;
+  width: 43%;
+  margin-left: 61%;
+  margin-top: -13%;
+}
+.SpanCnote{
+  height: 37px;
+  }
 
 
 // .w-100{

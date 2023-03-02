@@ -30,52 +30,57 @@ import { CNoteGenerationComponent } from './cnote-generation/cnote-generation.co
 import { MatStepperModule } from '@angular/material/stepper';
 import { DktComponentComponent } from '../components/dkt-component/dkt-component.component';
 
+import { DatePipe } from '@angular/common';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 @NgModule({
-    declarations: [CNoteGenerationComponent,DktComponentComponent],
-    providers: [],
-    imports: [
-        CommonModule,
-        MastersRoutingModule,
-        MatIconModule,
-        MatTreeModule,
-        MatDialogModule,
-        MatSnackBarModule,
-        MatTableModule,
-        MatExpansionModule,
-        MatTableExporterModule,
-        MatMenuModule,
-        CommonModule,
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatTableModule,
-        MatPaginatorModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSnackBarModule,
-        MatButtonModule,
-        MatIconModule,
-        MatRadioModule,
-        MatSelectModule,
-        MatCheckboxModule,
-        MatCardModule,
-        MatAutocompleteModule,
-        MatDatepickerModule,
-        MatDialogModule,
-        MatSortModule,
-        MatToolbarModule,
-        MatMenuModule,
-        MatTooltipModule,
-        MatTableExporterModule,
-        MatProgressSpinnerModule,
-        ComponentsModule,
-        SharedModule,
-        MatPaginatorModule,
-        MatExpansionModule,
-        MatStepperModule,    
-        
-    ]
+ 
+  imports: [
+    CommonModule,
+    MastersRoutingModule,
+    MatIconModule,
+    MatTreeModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatTableModule,
+    MatExpansionModule,
+    MatTableExporterModule,
+    MatMenuModule,
+    CommonModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSnackBarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatCardModule,
+    MatAutocompleteModule,
+    MatDatepickerModule,
+    MatDialogModule,
+    MatSortModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatTooltipModule,
+    MatTableExporterModule,
+    MatProgressSpinnerModule,
+    ComponentsModule,
+    SharedModule,
+    MatPaginatorModule,
+    MatExpansionModule,
+    MatStepperModule
+
+  ],
+  
+  declarations: [CNoteGenerationComponent],
+  
+  providers: []
 })
 
   export class MastersModule { }

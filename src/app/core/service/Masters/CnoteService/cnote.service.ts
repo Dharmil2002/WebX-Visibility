@@ -21,7 +21,7 @@ export class CnoteService {
       `${environment.APIBaseURL}` + ApiURL + req
     );
   }
-  cnotePost(ApiURL, Request) {
+   cnotePost(ApiURL, Request) {
     return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
 }

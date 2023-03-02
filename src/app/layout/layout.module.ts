@@ -9,6 +9,7 @@ import { NgModule } from "@angular/core";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { SharedModule } from "../shared/shared.module";
+import { DashboardLayoutComponent } from "./app-layout/dashboard-layout/dashboard-layout.component";
 
 @NgModule({
   imports: [
@@ -24,6 +25,7 @@ import { SharedModule } from "../shared/shared.module";
   declarations: [
     AuthLayoutComponent,
     MainLayoutComponent,
+    DashboardLayoutComponent
   ],
 })
 export class LayoutModule {}

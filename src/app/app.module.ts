@@ -10,7 +10,6 @@ import {
   PerfectScrollbarModule,
 } from "ngx-perfect-scrollbar";
 import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
-
 import { AppComponent } from "./app.component";
 import { AppRoutingModule } from "./app-routing.module";
 import { AuthLayoutComponent } from "./layout/app-layout/auth-layout/auth-layout.component";

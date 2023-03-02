@@ -14,6 +14,7 @@ export interface Cnote {
    defaultvalue: any;
    dbCodeName:any;
    autocomplete:string;
+   Search:string;
    filteredOptions: Observable<AutoCompleteCity[]>;
 }
 
@@ -50,6 +51,65 @@ export class AutoCompleteCity{
   }
   
 }
+
+   export interface prqVehicleReq {
+       CompanyCode: number;
+       PRQVehicleRequestNo: string;
+       BranchCode: string;
+       PRQNO: string;
+       VehicleNo: string;
+       SmartHubLocationCode: string;
+       Driver1Code: number;
+       Driver2Code: number;
+       Driver1Name: string;
+       Driver2Name: string;
+       PARTY_CODE: string;
+       PARTYNAME: string;
+       CSGNADDRCD: string;
+       CSGNADDR: string;
+       CSGEADDRCD: string;
+       CSGEADDR: string;
+       PKGSNO: number;
+       ATUWT: number;
+       TEMPERATURE: string;
+       FROMCITY: string;
+       TOCITY: string;
+       Destcd: string;
+       CSGECD: string;
+       CSGENM: string;
+       TransModeValue: string;
+       TransModeName: string;
+       FTLName: string;
+       FTLValue: string;
+       PoNo: string;
+       PkgQty: string;
+       TotalWeight_Kgs: string;
+       DeclaredValue: string;
+       EmailIDS: string;
+       MobileNo: string;
+       CSGNTeleNo: string;
+       CSGNEmail: string;
+       CSGETeleNo: string;
+       CSGEEmail: string;
+       CSGNCD: string;
+       CSGNNM: string;
+       Paybas: string;
+       FromPincode: string;
+       DestDeliveryPinCode: string;
+       DeliveryArea: string;
+       ToPincode: number;
+       service_class: string;
+       pkp_dly: string;
+       FTLType: string;
+       FTLTypeValue: string;
+       pkgsty: string;
+       prodcd: string;
+       Freight: number;
+       ContractId: string;
+   }
+
+
+
 
  export class ContractDetailList {
        ContractId: string;

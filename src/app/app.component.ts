@@ -1,5 +1,4 @@
 import { Event, NavigationEnd, NavigationStart, Router } from "@angular/router";
-
 import { AuthService } from "./core/service/auth.service";
 import { Component } from "@angular/core";
 import { NgxSpinnerService } from "ngx-spinner";

@@ -30,18 +30,24 @@
                                                 <mat-form-field class="example-full-width" appearance="outline"
                                                     *ngIf="step1.type=='text'">
                                                     <mat-label>{{step1.label}}</mat-label>
+                                                    <!-- <input matInput type="step1.type"
+                                                        (ngModelChange)="callActionFunction(step1.ActionFunction,$event)"
+                                                        [formControlName]="step1.name" autocomplete="off"> -->
                                                     <input matInput type="step1.type"
                                                         (ngModelChange)="callActionFunction(step1.ActionFunction,$event)"
                                                         [formControlName]="step1.name" autocomplete="off">
-
+                                                    <div class="input-group-append SpanCnote" *ngIf="step1.name=='DKTNO'">
+                                                        <span class="input-group-text dividerCnote" id="basic-addon2">Alloted To</span>
+                                                    </div>
                                                 </mat-form-field>
+                                                
                                                 <!-- date -->
 
                                                 <mat-form-field class="example-full-width" appearance="outline"
                                                     *ngIf="step1.type=='date'">
                                                     <mat-label>{{step1.label}}</mat-label>
                                                     <input matInput [matDatepicker]="Cnotename"
-                                                        [formControlName]="step1.name">
+                                                        [formControlName]="step1.name" [min]="minDate">
                                                     <mat-datepicker-toggle matSuffix
                                                         [for]="Cnotename"></mat-datepicker-toggle>
                                                     <mat-datepicker #Cnotename></mat-datepicker>
@@ -61,26 +67,47 @@
                                                 </mat-form-field>
                                                 <!--Auto Dropdown -->
                                                 <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step1.type=='autodropdown' && step1.name!='FCITY' && step1.name!='TCITY' && step1.name!='DELLOC'">
+                                                    *ngIf="step1.type=='autodropdown' && step1.name=='PRQ_BILLINGPARTY'">
                                                     <mat-label>{{step1.label}}</mat-label>
-                                                    <input matInput [formControlName]="step1.name" autocomplete="off"
-                                                        [matAutocomplete]="autoBiling">
+                                                    <input matInput [formControlName]="step1.name"
+                                                        (input)="callActionFunction(step1.Search,$event)"
+                                                        autocomplete="off" [matAutocomplete]="autoBiling">
                                                     <mat-autocomplete #autoBiling="matAutocomplete"
                                                         [displayWith]="displayCnotegropFn"
                                                         (optionSelected)="callActionFunction(step1.ActionFunction,$event)">
                                                         <mat-option *ngFor="let option of filteredCnoteBilling | async"
                                                             [value]="option">
-                                                            {{option.CodeDesc}}
+                                                            {{option.CodeId +":"+ option.CodeDesc}}
                                                         </mat-option>
                                                     </mat-autocomplete>
                                                 </mat-form-field>
                                                 <!----end -->
+
+                                                <!--Auto Dropdown -->
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step1.type=='autodropdown' && step1.name=='PRQ'">
+                                                    <mat-label>{{step1.label}}</mat-label>
+                                                    <input matInput [formControlName]="step1.name"
+                                                        (input)="callActionFunction(step1.Search,$event)"
+                                                        autocomplete="off" [matAutocomplete]="autoBiling">
+                                                    <mat-autocomplete #autoBiling="matAutocomplete"
+                                                        [displayWith]="displayPRQNoFn"
+                                                        (optionSelected)="callActionFunction(step1.ActionFunction,$event)">
+                                                        <mat-option *ngFor="let option of pReqFilter | async"
+                                                            [value]="option">
+                                                            {{option.PRQNO}}
+                                                        </mat-option>
+                                                    </mat-autocomplete>
+                                                </mat-form-field>
+                                                <!----end -->
+
                                                 <!-- Auto dropdown for City -->
                                                 <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step1.type=='autodropdown' && step1.name=='FCITY'|| step1.name=='TCITY' || step1.name=='DELLOC'">
+                                                    *ngIf="step1.type=='autodropdown' && step1.name!='PRQ_BILLINGPARTY' && step1.name!='PRQ'">
                                                     <mat-label>{{step1.label}}</mat-label>
-                                                    <input matInput [formControlName]="step1.name" autocomplete="off"
-                                                        [matAutocomplete]="city">
+                                                    <input matInput [formControlName]="step1.name"
+                                                        (input)="callActionFunction(step1.Search,$event)"
+                                                        autocomplete="off" [matAutocomplete]="city">
                                                     <mat-autocomplete #city="matAutocomplete"
                                                         [displayWith]="displayCitygropFn"
                                                         (optionSelected)="callActionFunction(step1.ActionFunction,$event)">

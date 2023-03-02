@@ -1,9 +1,9 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { FormArray, FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, AutocompleteField, Cnote, ContractDetailList, Rules } from 'src/app/core/models/Cnote';
+import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, AutocompleteField, Cnote, ContractDetailList, prqVehicleReq, Rules } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { PLATFORM_ID, Inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { DatePipe, isPlatformBrowser } from '@angular/common';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map, Observable, startWith } from 'rxjs';
@@ -17,7 +17,6 @@ export class CNoteGenerationComponent implements OnInit {
 
 
   //intialization of varible 
-  private billingPartyAutoCompleteLoaded = false;
   isDisabled = true;
   step1: FormGroup;
   step2: FormGroup;
@@ -30,9 +29,12 @@ export class CNoteGenerationComponent implements OnInit {
   cnoteAutoComplete: AutoCompleteCommon[];
   Fcity: AutoCompleteCity[];
   Tcity: AutoCompleteCity[];
+  Vehicno: AutoCompleteCity[];
+  prqVehicleReq: prqVehicleReq[];
   Destination: AutoCompleteCity[];
   filteredCity: Observable<AutoCompleteCity[]>;
   filteredCnoteBilling: Observable<AutoCompleteCommon[]>;
+  pReqFilter: Observable<prqVehicleReq[]>;
   breadscrums = [
     {
       title: "CNoteGeneration",
@@ -47,6 +49,8 @@ export class CNoteGenerationComponent implements OnInit {
   BSTformarray: Cnote[];
   SerialScan: number = 1;
   barcodearray: Cnote[];
+  minDate = new Date();
+
   divcol: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   contractDetail: ContractDetailList[];
   constructor(private fb: UntypedFormBuilder, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object) {
@@ -68,12 +72,14 @@ export class CNoteGenerationComponent implements OnInit {
       this.step1 = this.step1Formgrop();
       this.step2 = this.step2Formgrop();
       this.step3 = this.step3Formgrop();
+      this.getRules();
     }
-    this.getContractDetail();
   }
 
   ngOnInit(): void {
-     //this.getBillingPartyAutoComplete();
+    this.getDaterules();
+    this.getContractDetail();
+    //this.getBillingPartyAutoComplete();
   }
 
   // ngAfterViewChecked() {
@@ -92,7 +98,7 @@ export class CNoteGenerationComponent implements OnInit {
         if (cnote.validation === 'Required') {
           validators = [Validators.required];
         }
-        formControls[cnote.name] = this.fb.control(cnote.defaultvalue, validators);
+        formControls[cnote.name] = this.fb.control(cnote.defaultvalue=='TodayDate'?new Date():cnote.defaultvalue, validators);
         // if(cnote.disable=='true'){
         //   formControls[cnote.name].disable();
         // }
@@ -166,6 +172,15 @@ export class CNoteGenerationComponent implements OnInit {
       case "Destination":
         this.GetDestinationDataCompanyWise();
         break
+      case "getVehicleNo":
+        this.getVehicleNo();
+        break;
+      case "Prqdetail":
+        this.prqVehicle()
+        break;
+      case "autoFill":
+        this.autoFill(event);
+        break;
       default:
         break;
     }
@@ -208,7 +223,6 @@ export class CNoteGenerationComponent implements OnInit {
       next: (res: any) => {
         if (res) {
           this.Rules = res[0];
-
           let Rules = this.Rules.find((x) => x.code == 'MAP_DLOC_PIN')
           let mapcityRule = this.Rules.find((x) => x.code == `USE_MAPPED_LOCATION_INCITY`)
           if (Rules.defaultvalue == "A") {
@@ -220,16 +234,94 @@ export class CNoteGenerationComponent implements OnInit {
             if (mapcityRule.defaultvalue === "Y") {
               this.step1.controls['DELLOC'].disable();
             }
+
           }
+          //this.getDaterules();
         }
       }
     })
   }
+  //getDateRules
 
+  getDaterules() {
+    debugger;
+    this.ICnoteService.getCnoteBooking('services/getRuleFordate/', 10065).subscribe({
+      next: (res: any) => {
+        let filterfordate = res.find((x) => x.Rule_Y_N == 'Y');
+        this.minDate.setDate(this.minDate.getDate() - filterfordate.BackDate_Days);
+
+      }
+    })
+  }
+
+  //end
+  autoFill(event) {
+    debugger;
+    //VehicleAutoFill
+    let VehicleNo = {
+      Value: event.option.value.VehicleNo,
+      Name: event.option.value.VehicleNo,
+      Division: ""
+    }
+    this.step1.controls['VEHICLE_NO'].setValue(VehicleNo);
+    //end
+    //Billing PartyAuto
+    let billingParty = {
+      CodeId: event.option.value.PARTY_CODE,
+      CodeDesc: event.option.value.PARTYNAME
+    }
+    this.step1.controls['PRQ_BILLINGPARTY'].setValue(billingParty);
+    //end
+    //FromCity
+    let FromCity = {
+      Value: event.option.value.FROMCITY,
+      Name: event.option.value.FROMCITY,
+      LOCATIONS: "",
+      CITY_CODE: "",
+    }
+    this.step1.controls['FCITY'].setValue(FromCity);
+    //end
+    //ToCity
+    let toCity = {
+      Value: event.option.value.TOCITY,
+      Name: event.option.value.TOCITY,
+      LOCATIONS: "",
+      CITY_CODE: "",
+    }
+    this.step1.controls['TCITY'].setValue(toCity);
+    //end
+    //Paybas
+    this.step1.controls['PAYTYP'].setValue(event.option.value.Paybas);
+    //end
+
+    //FTLTYP
+    this.step1.controls['SVCTYP'].setValue(event.option.value.FTLValue);
+    //end
+
+    //Road
+    this.step1.controls['TRN'].setValue(event.option.value.FTLValue);
+    //end
+
+    //Destination
+    this.GetDestinationDataCompanyWise();
+    //end
+
+    //PKGS
+    this.step1.controls['PKGS'].setValue(event.option.value.pkgsty)
+    //end
+
+    //PICKUPDELIVERY
+    this.step1.controls['PKPDL'].setValue(event.option.value.pkp_dly);
+    //end
+
+    //PROD
+    this.step1.controls['PROD'].setValue(event.option.value.prodcd);
+    //end
+  }
   //GetAllContractCompanywise
 
   getContractDetail() {
-    debugger;
+
     this.ICnoteService.getCnoteBooking('services/getContractDetail/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
@@ -242,10 +334,13 @@ export class CNoteGenerationComponent implements OnInit {
   //billing Party api
   getBillingPartyAutoComplete() {
     debugger;
+    if(this.step1.value.PRQ_BILLINGPARTY.length>3){
     if (this.step1Formcontrol) {
       let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.value.PAYTYP);
       if (rulePartyType.defaultvalue == "D") {
         this.step1.controls['PRQ_BILLINGPARTY'].disable();
+        this.getFromCity();
+        this.getToCity();
       }
       else {
         this.step1.controls['PRQ_BILLINGPARTY'].enable();
@@ -263,12 +358,14 @@ export class CNoteGenerationComponent implements OnInit {
               this.cnoteAutoComplete = res;
               this.getBillingPartyFilter();
               this.getFromCity();
+              this.getToCity();
             }
           }
         })
 
       }
     }
+  }
   }
 
   getBillingPartyFilter() {
@@ -292,18 +389,18 @@ export class CNoteGenerationComponent implements OnInit {
   }
 
   displayCnotegropFn(Cnotegrop: AutoCompleteCommon): string {
-    return Cnotegrop && Cnotegrop.CodeId ? Cnotegrop.CodeDesc : "";
+    return Cnotegrop && Cnotegrop.CodeId ?Cnotegrop.CodeId+":"+ Cnotegrop.CodeDesc : "";
   }
   //End
 
   //FromCity
 
   getFromCity() {
-    debugger;
+
     if (this.step1Formcontrol) {
       let bLcode = this.step1Formcontrol.find((x) => x.name == 'FCITY');
       let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
-      let custCode = this.step1.value.PRQ_BILLINGPARTY == "" ? "" : this.step1.value.PRQ_BILLINGPARTY.CodeId;
+      let custCode = this.step1.value.PRQ_BILLINGPARTY == undefined ? "" : this.step1.value.PRQ_BILLINGPARTY.CodeId;
       let ContractId = this.contractDetail.find((x) => x.CustCode == custCode);
       var req = {
         companyCode: 10065,
@@ -329,7 +426,7 @@ export class CNoteGenerationComponent implements OnInit {
   getToCity() {
     debugger;
     if (this.step1Formcontrol) {
-      let custCode = this.step1.value.PRQ_BILLINGPARTY == "" ? "" : this.step1.value.PRQ_BILLINGPARTY.CodeId;
+      let custCode = this.step1.value.PRQ_BILLINGPARTY == undefined ? "" : this.step1.value.PRQ_BILLINGPARTY.CodeId;
       let ContractId = this.contractDetail.find((x) => x.CustCode == custCode);
       let bLcode = this.step1Formcontrol.find((x) => x.name == 'TCITY');
       let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
@@ -337,7 +434,7 @@ export class CNoteGenerationComponent implements OnInit {
         companyCode: 10065,
         map_dloc_city: rules.defaultvalue,
         DocketMode: "Yes",
-        ContractParty: ContractId.ContractId,
+        ContractParty: ContractId ? ContractId.ContractId : '',
         PaymentType: this.step1.value.PAYTYP,
         FromCity: this.step1.value.FCITY == "" ? "" : this.step1.value.FCITY.Value
 
@@ -355,20 +452,20 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Destination
   GetDestinationDataCompanyWise() {
-
-    let bLcode = this.step1Formcontrol.find((x) => x.name == 'DELLOC');
-    let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
+    debugger
+    //let bLcode = this.step1Formcontrol.find((x) => x.name == 'DELLOC');
+    //let rules = this.Rules.find((x) => x.code.toLowerCase() == bLcode.dbCodeName.toLowerCase());
 
     var req = {
       companyCode: 10065,
-      map_dloc_pin: rules.defaultvalue,
-      OriginLocation: 'MUMB',
-      loc_level: '3'
+      City: this.step1.value.TCITY.Name
     }
-    this.ICnoteService.cnotePost('services/getDelivaryDestination', req).subscribe({
+
+    this.ICnoteService.cnotePost('services/GetMappedLocationFromCityName', req).subscribe({
       next: (res: any) => {
         this.Destination = res;
-        let objDelivaryAuto = this.Destination.find((x) => x.loccode == this.step1.value.TCITY.LOCATIONS);
+        let objDelivaryAuto = this.Destination[0];
+
         this.step1.controls['DELLOC'].setValue(objDelivaryAuto == undefined ? '' : objDelivaryAuto);
         this.getCityFilter()
 
@@ -376,53 +473,125 @@ export class CNoteGenerationComponent implements OnInit {
     })
   }
   //end
+  //prqVehicleReq
+  prqVehicle() {
+    if (this.step1.value.PRQ.length > 1) {
+      let req = {
+        companyCode: 10065,
+        BranchCode: "MUMB",
+        SearchText: this.step1.value.PRQ
+      }
+      this.ICnoteService.cnotePost('services/prqVehicleReq', req).subscribe({
+        next: (res: any) => {
+          this.prqVehicleReq = res;
+          this.prqVehicleFilter();
+        }
+      })
+    }
+  }
+  prqVehicleFilter() {
+    this.pReqFilter = this.step1.controls[
+      "PRQ"
+    ].valueChanges.pipe(
+      startWith(""),
+      map((value) => (typeof value === "string" ? value : value.Name)),
+      map((Name) =>
+        Name ? this._PrqFilter(Name) : this.prqVehicleReq.slice()
+      )
+    );
+  }
+
+  _PrqFilter(prqVehicleReq: string): prqVehicleReq[] {
+    const filterValue = prqVehicleReq.toLowerCase();
+
+    return this.prqVehicleReq.filter(
+      (option) => option.PRQNO.toLowerCase().indexOf(filterValue) === 0
+    );
+  }
+
+  displayPRQNoFn(Cnotegrop: prqVehicleReq): string {
+
+    return Cnotegrop && Cnotegrop.PRQNO ? Cnotegrop.PRQNO : "";
+  }
+  //end
+  //Vehino
+  getVehicleNo() {
+    if (this.step1.value.VEHICLE_NO.length > 1) {
+      let req = {
+        companyCode: 10065,
+        SearchText: this.step1.value.VEHICLE_NO,
+        VendorCode: "",
+        VehicleType: "Toll",
+        IsCheck: 0
+      }
+      this.ICnoteService.cnotePost('services/GetVehicle', req).subscribe(
+        {
+          next: (res: any) => {
+            this.Vehicno = res;
+            console.log(this.Vehicno);
+            this.getCityFilter();
+          }
+
+        })
+    }
+  }
+  //end
   //CityApi
   getCityFilter() {
 
     this.CnoteData.forEach(element => {
-      if (element.name == 'FCITY' || element.name == 'TCITY') {
-        if (element.name == 'FCITY') {
-          element.autocomplete = 'autoFCity',
-            element.filteredOptions = this.step1.controls[
-              "FCITY"
-            ].valueChanges.pipe(
-              startWith(""),
-              map((value) => (typeof value === "string" ? value : value.Name)),
-              map((Name) =>
-                Name ? this._cityFilter(Name, this.Fcity) : this.Fcity.slice()
-              )
-            );
-        }
-        else if (element.name == 'TCITY') {
-          element.autocomplete = 'autoTCity',
-            element.filteredOptions = this.step1.controls[
-              "TCITY"
-            ].valueChanges.pipe(
-              startWith(""),
-              map((value) => (typeof value === "string" ? value : value.Name)),
-              map((Name) =>
-                Name ? this._cityFilter(Name, this.Tcity) : this.Tcity.slice()
-              )
-            );
-        }
-        else if (element.name == 'DELLOC') {
-          element.autocomplete = 'autoDestination',
-            element.filteredOptions = this.step1.controls[
-              "DELLOC"
-            ].valueChanges.pipe(
-              startWith(""),
-              map((value) => (typeof value === "string" ? value : value.Name)),
-              map((Name) =>
-                Name ? this._cityFilter(Name, this.Destination) : this.Destination.slice()
-              )
-            );
-        }
+      if (element.name == 'FCITY' && this.Fcity) {
+        element.autocomplete = 'autoFCity',
+          element.filteredOptions = this.step1.controls[
+            "FCITY"
+          ].valueChanges.pipe(
+            startWith(""),
+            map((value) => (typeof value === "string" ? value : value.Name)),
+            map((Name) =>
+              Name ? this._cityFilter(Name, this.Fcity) : this.Fcity.slice()
+            )
+          );
+      }
+      if (element.name == 'TCITY' && this.Tcity) {
+        element.autocomplete = 'autoTCity',
+          element.filteredOptions = this.step1.controls[
+            "TCITY"
+          ].valueChanges.pipe(
+            startWith(""),
+            map((value) => (typeof value === "string" ? value : value.Name)),
+            map((Name) =>
+              Name ? this._cityFilter(Name, this.Tcity) : this.Tcity.slice()
+            )
+          );
+      }
+      if (element.name == 'DELLOC' && this.Destination) {
+        element.autocomplete = 'autoDestination',
+          element.filteredOptions = this.step1.controls[
+            "DELLOC"
+          ].valueChanges.pipe(
+            startWith(""),
+            map((value) => (typeof value === "string" ? value : value.Name)),
+            map((Name) =>
+              Name ? this._cityFilter(Name, this.Destination) : this.Destination.slice()
+            )
+          );
+      }
+      if (element.name == 'VEHICLE_NO' && this.Vehicno) {
+        element.autocomplete = 'vehicleAutoComplate',
+          element.filteredOptions = this.step1.controls[
+            "VEHICLE_NO"
+          ].valueChanges.pipe(
+            startWith(""),
+            map((value) => (typeof value === "string" ? value : value.Name)),
+            map((Name) =>
+              Name ? this._cityFilter(Name, this.Vehicno) : this.Vehicno.slice()
+            )
+          );
       }
     });
   }
   _cityFilter(name: string, City: AutoCompleteCity[]): AutoCompleteCity[] {
     const filterValue = name.toLowerCase();
-
     return City.filter(
       (option) => option.Name.toLowerCase().indexOf(filterValue) === 0
     );
@@ -431,4 +600,5 @@ export class CNoteGenerationComponent implements OnInit {
     return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Name : "";
   }
   //End
+  
 }

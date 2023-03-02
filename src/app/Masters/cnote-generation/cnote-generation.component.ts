@@ -7,15 +7,21 @@ import { isPlatformBrowser } from '@angular/common';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map, Observable, startWith } from 'rxjs';
-
+import { DktComponentComponent } from 'src/app/components/dkt-component/dkt-component.component';
 @Component({
   selector: 'app-cnote-generation',
   templateUrl: './cnote-generation.component.html'
 
 })
+
+
 export class CNoteGenerationComponent implements OnInit {
 
-
+  myJsonData = [
+    { name: 'Item 1', description: 'This is item 1' },
+    { name: 'Item 2', description: 'This is item 2' },
+    { name: 'Item 3', description: 'This is item 3' }
+  ];
   //intialization of varible 
   private billingPartyAutoCompleteLoaded = false;
   isDisabled = true;
@@ -59,6 +65,7 @@ export class CNoteGenerationComponent implements OnInit {
       this.data = JSON.parse(localStorage.getItem('CnoteData'));
     }
     if (!this.data) {
+      console.log('calling api to fetch company wise controls data');
       this.GetCnotecontrols();
     }
     else {
@@ -68,13 +75,20 @@ export class CNoteGenerationComponent implements OnInit {
       this.step1 = this.step1Formgrop();
       this.step2 = this.step2Formgrop();
       this.step3 = this.step3Formgrop();
+      console.log('loading controls from local storage');
+      this.getBillingPartyAutoComplete();
     }
-    this.getContractDetail();
+   // this.getBillingPartyAutoComplete();
   }
 
   ngOnInit(): void {
      //this.getBillingPartyAutoComplete();
   }
+  ngAfterViewInit():void{
+   // console.log('after view');
+    //this.getBillingPartyAutoComplete();
+  }
+
 
   // ngAfterViewChecked() {
   //   if (!this.billingPartyAutoCompleteLoaded) {
@@ -86,7 +100,7 @@ export class CNoteGenerationComponent implements OnInit {
   step1Formgrop(): UntypedFormGroup {
     const formControls = {};
     this.step1Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '1')
-    if (this.step1Formcontrol.length > 0) {
+    if (this.step1Formcontrol) {
       this.step1Formcontrol.forEach(cnote => {
         let validators = [];
         if (cnote.validation === 'Required') {
@@ -107,7 +121,7 @@ export class CNoteGenerationComponent implements OnInit {
 
     const formControls = {};
     this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2')
-    if (this.step2Formcontrol.length > 0) {
+    if (this.step2Formcontrol) {
       this.step2Formcontrol.forEach(cnote => {
         let validators = [];
         if (cnote.validation === 'Required') {
@@ -128,7 +142,7 @@ export class CNoteGenerationComponent implements OnInit {
 
     const formControls = {};
     this.step3Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '3')
-    if (this.step3Formcontrol.length > 0) {
+    if (this.step3Formcontrol ) {
       this.step3Formcontrol.forEach(cnote => {
         let validators = [];
         if (cnote.validation === 'Required') {
@@ -192,7 +206,7 @@ export class CNoteGenerationComponent implements OnInit {
             this.step1 = this.step1Formgrop();
             this.step2 = this.step2Formgrop();
             this.step3 = this.step3Formgrop();
-            this.getRules();
+            this.getRules();         
           }
 
         },
@@ -221,6 +235,7 @@ export class CNoteGenerationComponent implements OnInit {
               this.step1.controls['DELLOC'].disable();
             }
           }
+          this.getBillingPartyAutoComplete();
         }
       }
     })
@@ -241,7 +256,10 @@ export class CNoteGenerationComponent implements OnInit {
 
   //billing Party api
   getBillingPartyAutoComplete() {
-    debugger;
+    //debugger;
+    console.log('on load ');
+    console.log(this.step1Formcontrol);
+    console.log(this.Rules)
     if (this.step1Formcontrol) {
       let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.value.PAYTYP);
       if (rulePartyType.defaultvalue == "D") {
@@ -257,6 +275,7 @@ export class CNoteGenerationComponent implements OnInit {
           custCat: this.step1.value.PAYTYP,
           partyType: rules.defaultvalue == 'Y' ? 'CP' : ""
         }
+        console.log(req);
         this.ICnoteService.cnotePost('services/billingParty', req).subscribe({
           next: (res: any) => {
             if (res) {
@@ -342,6 +361,7 @@ export class CNoteGenerationComponent implements OnInit {
         FromCity: this.step1.value.FCITY == "" ? "" : this.step1.value.FCITY.Value
 
       }
+      console.log(req);
       this.ICnoteService.cnotePost('services/getToCity', req).subscribe({
         next: (res: any) => {
 
@@ -365,6 +385,7 @@ export class CNoteGenerationComponent implements OnInit {
       OriginLocation: 'MUMB',
       loc_level: '3'
     }
+    console.log(req);
     this.ICnoteService.cnotePost('services/getDelivaryDestination', req).subscribe({
       next: (res: any) => {
         this.Destination = res;

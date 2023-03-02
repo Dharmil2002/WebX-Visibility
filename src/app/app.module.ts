@@ -39,6 +39,7 @@ import { WINDOW_PROVIDERS } from "./core/service/window.service";
 import { environment } from "src/environments/environment";
 import { fakeBackendProvider } from "./core/interceptor/fake-backend";
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { DktComponentComponent } from './components/dkt-component/dkt-component.component';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
   wheelPropagation: false,
@@ -58,6 +59,7 @@ export function createTranslateLoader(http: HttpClient): any {
     AuthLayoutComponent,
     MainLayoutComponent,
     DashboardLayoutComponent,
+  
   ],
   imports: [
     BrowserModule,
@@ -89,6 +91,7 @@ export function createTranslateLoader(http: HttpClient): any {
       },
     }),
   ],
+
   providers: [
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     {

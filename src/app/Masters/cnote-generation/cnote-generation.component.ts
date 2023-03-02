@@ -3,11 +3,11 @@ import { FormArray, FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators 
 import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, AutocompleteField, Cnote, ContractDetailList, prqVehicleReq, Rules } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { PLATFORM_ID, Inject } from '@angular/core';
-import {DatePipe, isPlatformBrowser } from '@angular/common';
+import { DatePipe, isPlatformBrowser } from '@angular/common';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map, Observable, startWith } from 'rxjs';
-
+import Swal from "sweetalert2";
 @Component({
   selector: 'app-cnote-generation',
   templateUrl: './cnote-generation.component.html'
@@ -24,6 +24,7 @@ export class CNoteGenerationComponent implements OnInit {
   option: any;
   isOpen = false;
   version: number = 1;
+  docketallocate = 'Alloted To';
   cnoteAutoComplete: AutoCompleteCommon[];
   Fcity: AutoCompleteCity[];
   Tcity: AutoCompleteCity[];
@@ -55,13 +56,15 @@ export class CNoteGenerationComponent implements OnInit {
   contractDetail: ContractDetailList[];
   constructor(private fb: UntypedFormBuilder, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     //  this.CnoteData = CNOTEDATA;
-    const storedVersion = parseInt(localStorage.getItem('version'), 10);
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.clear();
-    }
-    if (storedVersion === this.version) {
-      this.data = JSON.parse(localStorage.getItem('CnoteData'));
-    }
+    // const storedVersion = parseInt(localStorage.getItem('version'), 10);
+    // this.formattedDate = this.datePipe.transform(this.date, 'dd/MM/yyyy hh:mm a', '+0530');
+    // if (isPlatformBrowser(this.platformId)) {
+    //   localStorage.clear();
+    // }
+    // if (storedVersion === this.version) {
+    //   this.data = JSON.parse(localStorage.getItem('CnoteData'));
+    // }
+    this.data = JSON.parse(localStorage.getItem('CnoteData'));
     if (!this.data) {
       this.GetCnotecontrols();
     }
@@ -79,7 +82,7 @@ export class CNoteGenerationComponent implements OnInit {
   ngOnInit(): void {
     this.getDaterules();
     this.getContractDetail();
-    this.formattedDate = this.datePipe.transform(this.date, 'dd/MM/yyyy hh:mm a', '+0530');
+
     //this.getBillingPartyAutoComplete();
   }
 
@@ -181,6 +184,9 @@ export class CNoteGenerationComponent implements OnInit {
         break;
       case "autoFill":
         this.autoFill(event);
+        break;
+      case "DocketValidation":
+        this.DocketValidation();
         break;
       default:
         break;
@@ -592,6 +598,41 @@ export class CNoteGenerationComponent implements OnInit {
   }
   displayCitygropFn(Cnotegrop: AutoCompleteCity): string {
     return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Name : "";
+  }
+  //End
+  //Docket Validation
+  DocketValidation() {
+    debugger;
+    let req = {
+      companyCode: 10065,
+      DocType: 'DKT',
+      DocNo: this.step1.value.DKTNO,
+      LocCode: "MUMB"
+    }
+    try {
+      this.ICnoteService.cnotePost('services/docketValidation', req).subscribe(
+        {
+          next: (res: any) => {
+            if (res.issuccess) {
+              this.docketallocate = res.result[0].Alloted_To;
+            }
+            else {
+              this.docketallocate = 'Alloted To'
+              Swal.fire({
+                icon: "error",
+                title:
+                  res.originalError.info.message,
+                html: "",
+                showConfirmButton: true,
+              });
+            }
+          }
+        }
+      )
+    }
+    catch (err) {
+
+    }
   }
   //End
 

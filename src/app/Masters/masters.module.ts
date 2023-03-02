@@ -29,6 +29,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CNoteGenerationComponent } from './cnote-generation/cnote-generation.component';
 import { MatStepperModule } from '@angular/material/stepper';
 import { DatePipe } from '@angular/common';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 @NgModule({
  
@@ -78,7 +79,7 @@ import { DatePipe } from '@angular/common';
   
   declarations: [CNoteGenerationComponent],
   
-  providers: [DatePipe]
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }]
 })
 
   export class MastersModule { }

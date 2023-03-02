@@ -4,8 +4,6 @@ import { MastersRoutingModule } from './masters-routing.module';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTableModule } from '@angular/material/table';
-import { MatTableExporterModule } from 'mat-table-exporter';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -28,8 +26,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CNoteGenerationComponent } from './cnote-generation/cnote-generation.component';
 import { MatStepperModule } from '@angular/material/stepper';
-import { DktComponentComponent } from '../components/dkt-component/dkt-component.component';
-
 import { DatePipe } from '@angular/common';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 
@@ -42,15 +38,12 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
     MatTreeModule,
     MatDialogModule,
     MatSnackBarModule,
-    MatTableModule,
     MatExpansionModule,
-    MatTableExporterModule,
     MatMenuModule,
     CommonModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatTableModule,
     MatPaginatorModule,
     MatFormFieldModule,
     MatInputModule,
@@ -68,19 +61,18 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
     MatToolbarModule,
     MatMenuModule,
     MatTooltipModule,
-    MatTableExporterModule,
     MatProgressSpinnerModule,
     ComponentsModule,
     SharedModule,
     MatPaginatorModule,
     MatExpansionModule,
     MatStepperModule
-
+    
   ],
   
   declarations: [CNoteGenerationComponent],
   
-  providers: []
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },]
 })
 
   export class MastersModule { }

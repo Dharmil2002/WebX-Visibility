@@ -14,8 +14,6 @@ import { map, Observable, startWith } from 'rxjs';
 
 })
 export class CNoteGenerationComponent implements OnInit {
-
-
   //intialization of varible 
   isDisabled = true;
   step1: FormGroup;
@@ -98,7 +96,7 @@ export class CNoteGenerationComponent implements OnInit {
         if (cnote.validation === 'Required') {
           validators = [Validators.required];
         }
-        formControls[cnote.name] = this.fb.control(cnote.defaultvalue=='TodayDate'?new Date():cnote.defaultvalue, validators);
+        formControls[cnote.name] = this.fb.control(cnote.defaultvalue == 'TodayDate' ? new Date() : cnote.defaultvalue, validators);
         // if(cnote.disable=='true'){
         //   formControls[cnote.name].disable();
         // }
@@ -155,7 +153,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Api Calling Method on Chaged(ACTION URL)
   callActionFunction(functionName: string, event: any) {
-    debugger;
+
     switch (functionName) {
       case "apicall":
         this.apicall(event);
@@ -195,7 +193,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Get all field and bind
   GetCnotecontrols() {
-    debugger;
     this.ICnoteService.getCnoteBooking('cnotefields/', 10065).subscribe(
       {
         next: (res: any) => {
@@ -218,7 +215,6 @@ export class CNoteGenerationComponent implements OnInit {
   }
   //Bind all rules
   getRules() {
-    debugger
     this.ICnoteService.getCnoteBooking('services/companyWiseRules/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
@@ -244,7 +240,6 @@ export class CNoteGenerationComponent implements OnInit {
   //getDateRules
 
   getDaterules() {
-    debugger;
     this.ICnoteService.getCnoteBooking('services/getRuleFordate/', 10065).subscribe({
       next: (res: any) => {
         let filterfordate = res.find((x) => x.Rule_Y_N == 'Y');
@@ -256,7 +251,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //end
   autoFill(event) {
-    debugger;
     //VehicleAutoFill
     let VehicleNo = {
       Value: event.option.value.VehicleNo,
@@ -333,39 +327,38 @@ export class CNoteGenerationComponent implements OnInit {
 
   //billing Party api
   getBillingPartyAutoComplete() {
-    debugger;
-    if(this.step1.value.PRQ_BILLINGPARTY.length>3){
-    if (this.step1Formcontrol) {
-      let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.value.PAYTYP);
-      if (rulePartyType.defaultvalue == "D") {
-        this.step1.controls['PRQ_BILLINGPARTY'].disable();
-        this.getFromCity();
-        this.getToCity();
-      }
-      else {
-        this.step1.controls['PRQ_BILLINGPARTY'].enable();
-        let bLcode = this.step1Formcontrol.find((x) => x.name == 'PRQ_BILLINGPARTY');
-        let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
-        var req = {
-          companyCode: 10065,
-          custLoc: "MUMB",
-          custCat: this.step1.value.PAYTYP,
-          partyType: rules.defaultvalue == 'Y' ? 'CP' : ""
+    if (this.step1.value.PRQ_BILLINGPARTY.length > 3) {
+      if (this.step1Formcontrol) {
+        let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.value.PAYTYP);
+        if (rulePartyType.defaultvalue == "D") {
+          this.step1.controls['PRQ_BILLINGPARTY'].disable();
+          this.getFromCity();
+          this.getToCity();
         }
-        this.ICnoteService.cnotePost('services/billingParty', req).subscribe({
-          next: (res: any) => {
-            if (res) {
-              this.cnoteAutoComplete = res;
-              this.getBillingPartyFilter();
-              this.getFromCity();
-              this.getToCity();
-            }
+        else {
+          this.step1.controls['PRQ_BILLINGPARTY'].enable();
+          let bLcode = this.step1Formcontrol.find((x) => x.name == 'PRQ_BILLINGPARTY');
+          let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
+          var req = {
+            companyCode: 10065,
+            custLoc: "MUMB",
+            custCat: this.step1.value.PAYTYP,
+            partyType: rules.defaultvalue == 'Y' ? 'CP' : ""
           }
-        })
+          this.ICnoteService.cnotePost('services/billingParty', req).subscribe({
+            next: (res: any) => {
+              if (res) {
+                this.cnoteAutoComplete = res;
+                this.getBillingPartyFilter();
+                this.getFromCity();
+                this.getToCity();
+              }
+            }
+          })
 
+        }
       }
     }
-  }
   }
 
   getBillingPartyFilter() {
@@ -389,7 +382,7 @@ export class CNoteGenerationComponent implements OnInit {
   }
 
   displayCnotegropFn(Cnotegrop: AutoCompleteCommon): string {
-    return Cnotegrop && Cnotegrop.CodeId ?Cnotegrop.CodeId+":"+ Cnotegrop.CodeDesc : "";
+    return Cnotegrop && Cnotegrop.CodeId ? Cnotegrop.CodeId + ":" + Cnotegrop.CodeDesc : "";
   }
   //End
 
@@ -424,7 +417,6 @@ export class CNoteGenerationComponent implements OnInit {
   //ToCity
 
   getToCity() {
-    debugger;
     if (this.step1Formcontrol) {
       let custCode = this.step1.value.PRQ_BILLINGPARTY == undefined ? "" : this.step1.value.PRQ_BILLINGPARTY.CodeId;
       let ContractId = this.contractDetail.find((x) => x.CustCode == custCode);
@@ -452,7 +444,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Destination
   GetDestinationDataCompanyWise() {
-    debugger
     //let bLcode = this.step1Formcontrol.find((x) => x.name == 'DELLOC');
     //let rules = this.Rules.find((x) => x.code.toLowerCase() == bLcode.dbCodeName.toLowerCase());
 
@@ -600,5 +591,5 @@ export class CNoteGenerationComponent implements OnInit {
     return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Name : "";
   }
   //End
-  
+
 }

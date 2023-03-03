@@ -7,6 +7,7 @@ import { DatePipe, isPlatformBrowser } from '@angular/common';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map, Observable, startWith } from 'rxjs';
+
 import Swal from "sweetalert2";
 @Component({
   selector: 'app-cnote-generation',
@@ -29,6 +30,7 @@ export class CNoteGenerationComponent implements OnInit {
   Fcity: AutoCompleteCity[];
   Tcity: AutoCompleteCity[];
   Vehicno: AutoCompleteCity[];
+  Multipickup: AutoCompleteCity[];
   prqVehicleReq: prqVehicleReq[];
   Destination: AutoCompleteCity[];
   filteredCity: Observable<AutoCompleteCity[]>;
@@ -159,7 +161,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Api Calling Method on Chaged(ACTION URL)
   callActionFunction(functionName: string, event: any) {
-
     switch (functionName) {
       case "apicall":
         this.apicall(event);
@@ -187,6 +188,9 @@ export class CNoteGenerationComponent implements OnInit {
         break;
       case "DocketValidation":
         this.DocketValidation();
+        break;
+      case "GetMultiPickupDeliveryDocket":
+        this.GetMultiPickupDeliveryDocket(event)
         break;
       default:
         break;
@@ -468,6 +472,8 @@ export class CNoteGenerationComponent implements OnInit {
 
         this.step1.controls['DELLOC'].setValue(objDelivaryAuto == undefined ? '' : objDelivaryAuto);
         this.getCityFilter()
+        this.GetDetailedBasedOnLocations();
+      
 
       }
     })
@@ -538,58 +544,75 @@ export class CNoteGenerationComponent implements OnInit {
   //end
   //CityApi
   getCityFilter() {
+    for (const element of this.CnoteData) {
+      const { name } = element;
+      let filteredOptions: Observable<AutoCompleteCity[]>;
+      let autocomplete = '';
 
-    this.CnoteData.forEach(element => {
-      if (element.name == 'FCITY' && this.Fcity) {
-        element.autocomplete = 'autoFCity',
-          element.filteredOptions = this.step1.controls[
-            "FCITY"
-          ].valueChanges.pipe(
-            startWith(""),
-            map((value) => (typeof value === "string" ? value : value.Name)),
-            map((Name) =>
-              Name ? this._cityFilter(Name, this.Fcity) : this.Fcity.slice()
-            )
-          );
+      switch (name) {
+        case 'FCITY':
+          if (this.Fcity) {
+            autocomplete = 'autoFCity';
+            filteredOptions = this.step1.controls.FCITY.valueChanges.pipe(
+              startWith(''),
+              map((value) => (typeof value === 'string' ? value : value.Name)),
+              map((Name) => Name ? this._cityFilter(Name, this.Fcity) : this.Fcity.slice())
+            );
+          }
+          break;
+
+        case 'TCITY':
+          if (this.Tcity) {
+            autocomplete = 'autoTCity';
+            filteredOptions = this.step1.controls.TCITY.valueChanges.pipe(
+              startWith(''),
+              map((value) => (typeof value === 'string' ? value : value.Name)),
+              map((Name) => Name ? this._cityFilter(Name, this.Tcity) : this.Tcity.slice())
+            );
+          }
+          break;
+
+        case 'DELLOC':
+          if (this.Destination) {
+            autocomplete = 'autoDestination';
+            filteredOptions = this.step1.controls.DELLOC.valueChanges.pipe(
+              startWith(''),
+              map((value) => (typeof value === 'string' ? value : value.Name)),
+              map((Name) => Name ? this._cityFilter(Name, this.Destination) : this.Destination.slice())
+            );
+          }
+          break;
+        case 'SRCDKT':
+          if (this.Multipickup) {
+            autocomplete = 'autoSRCDKT';
+            filteredOptions = this.step1.controls.SRCDKT.valueChanges.pipe(
+              startWith(''),
+              map((value) => (typeof value === 'string' ? value : value.Name)),
+              map((Name) => Name ? this._cityFilter(Name, this.Multipickup) : this.Multipickup.slice())
+            );
+          }
+          break
+
+        case 'VEHICLE_NO':
+          if (this.Vehicno) {
+            autocomplete = 'vehicleAutoComplate';
+            filteredOptions = this.step1.controls.VEHICLE_NO.valueChanges.pipe(
+              startWith(''),
+              map((value) => (typeof value === 'string' ? value : value.Name)),
+              map((Name) => Name ? this._cityFilter(Name, this.Vehicno) : this.Vehicno.slice())
+            );
+          }
+          break;
+
+        default:
+          break;
       }
-      if (element.name == 'TCITY' && this.Tcity) {
-        element.autocomplete = 'autoTCity',
-          element.filteredOptions = this.step1.controls[
-            "TCITY"
-          ].valueChanges.pipe(
-            startWith(""),
-            map((value) => (typeof value === "string" ? value : value.Name)),
-            map((Name) =>
-              Name ? this._cityFilter(Name, this.Tcity) : this.Tcity.slice()
-            )
-          );
-      }
-      if (element.name == 'DELLOC' && this.Destination) {
-        element.autocomplete = 'autoDestination',
-          element.filteredOptions = this.step1.controls[
-            "DELLOC"
-          ].valueChanges.pipe(
-            startWith(""),
-            map((value) => (typeof value === "string" ? value : value.Name)),
-            map((Name) =>
-              Name ? this._cityFilter(Name, this.Destination) : this.Destination.slice()
-            )
-          );
-      }
-      if (element.name == 'VEHICLE_NO' && this.Vehicno) {
-        element.autocomplete = 'vehicleAutoComplate',
-          element.filteredOptions = this.step1.controls[
-            "VEHICLE_NO"
-          ].valueChanges.pipe(
-            startWith(""),
-            map((value) => (typeof value === "string" ? value : value.Name)),
-            map((Name) =>
-              Name ? this._cityFilter(Name, this.Vehicno) : this.Vehicno.slice()
-            )
-          );
-      }
-    });
+
+      element.autocomplete = autocomplete;
+      element.filteredOptions = filteredOptions;
+    }
   }
+
   _cityFilter(name: string, City: AutoCompleteCity[]): AutoCompleteCity[] {
     const filterValue = name.toLowerCase();
     return City.filter(
@@ -635,5 +658,63 @@ export class CNoteGenerationComponent implements OnInit {
     }
   }
   //End
+  //GetMultiPickupDeliveryDocket 
+  GetMultiPickupDeliveryDocket(event) {
 
+    if (event.checked == true) {
+      let req = {
+        companyCode: 10065,
+        DocType: "DKT",
+        PayBas: this.step1.value.PAYTYP,
+        BookingDate: this.datePipe.transform(this.step1.value.DKTDT, 'd MMM y').toUpperCase()
+      }
+      this.ICnoteService.cnotePost('services/GetMultiPickupDeliveryDocket', req).subscribe({
+        next: (res: any) => {
+          if (res.issuccess == true) {
+            let Detail = res.result
+            let multipickArray = []
+            Detail.map(x => {
+              let Multipickarray = {
+                Name: x.DocketNumber,
+                Value: x.DocketNumber
+              } as AutoCompleteCity
+              multipickArray.push(Multipickarray)
+            });
+            this.Multipickup = multipickArray;
+            this.getCityFilter();
+          }
+        }
+      })
+    }
+    else {
+      this.Multipickup = [];
+      this.getCityFilter();
+    }
+  }
+  //End
+
+  //GetDetailedBasedOnLocations
+  GetDetailedBasedOnLocations(){
+    debugger;
+    let req ={
+      companyCode:10065,
+      Destination:"",
+      ContractId:"",
+      PayBas:this.step1.value.PAYTYP,
+      PartyCode:"",
+      Origin:"MUMB",
+      DestDeliveryPinCode:this.step1.value.DELLOC==undefined?"":this.step1.value.DELLOC.pincode,
+      FromCity:this.step1.value.FCITY.Value==undefined?"":this.step1.value.FCITY.Value,
+      ToCity:this.step1.value.TCITY.Value==undefined?"":this.step1.value.TCITY.Value
+    }
+    this.ICnoteService.cnotePost('services/GetDetailedBasedOnLocations',req).subscribe(
+      {
+       next:(res:any)=>{
+          const ResDetailsBased= res.result[0];
+          this.step1.controls['F_ODA'].setValue(ResDetailsBased.Oda=="Y"?true:false);
+          this.step1.controls['F_LOCAL'].setValue(ResDetailsBased.LocalBooking=="Y"?true:false);
+       }
+    })
+  }
+  //ends
 }

@@ -36,7 +36,8 @@ export class AutoCompleteCommon {
    constructor(public CodeId: string, public CodeDesc: string) { }
 }
 export class AutoCompleteCity{
-  constructor(public Value:string,
+  constructor(
+   public Value:string,
    public Name:string,
    public LOCATIONS:string,
    public CITY_CODE:string,
@@ -46,12 +47,17 @@ export class AutoCompleteCity{
    public PincodeZoneLocation: string,
    public LocCity: string,
    public pincode: string,
-   public loccode: string){
+   public loccode: string)
+   {
 
   }
   
 }
 
+export interface multiPickUp {
+   PL_PARTNER?: any;
+   DocketNumber: string;
+}
    export interface prqVehicleReq {
        CompanyCode: number;
        PRQVehicleRequestNo: string;

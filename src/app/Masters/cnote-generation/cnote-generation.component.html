@@ -134,7 +134,7 @@
                                                 </mat-form-field>
                                                 <!-- End -->
                                                 <!--Toggale  -->
-                                                <mat-slide-toggle color="primary" *ngIf="step1.type=='toggle'"
+                                                <mat-slide-toggle  (change)="callActionFunction(step1.ActionFunction,$event)" color="primary" *ngIf="step1.type=='toggle'"
                                                     [formControlName]="step1.name">{{step1.label}}</mat-slide-toggle>
                                             </div>
                                             <div class="row">

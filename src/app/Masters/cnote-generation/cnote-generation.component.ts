@@ -9,6 +9,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map, Observable, startWith } from 'rxjs';
 
 import Swal from "sweetalert2";
+import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 @Component({
   selector: 'app-cnote-generation',
   templateUrl: './cnote-generation.component.html'
@@ -473,7 +474,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.step1.controls['DELLOC'].setValue(objDelivaryAuto == undefined ? '' : objDelivaryAuto);
         this.getCityFilter()
         this.GetDetailedBasedOnLocations();
-      
+
 
       }
     })
@@ -641,13 +642,7 @@ export class CNoteGenerationComponent implements OnInit {
             }
             else {
               this.docketallocate = 'Alloted To'
-              Swal.fire({
-                icon: "error",
-                title:
-                  res.originalError.info.message,
-                html: "",
-                showConfirmButton: true,
-              });
+              SwalerrorMessage("error", res.originalError.info.message, "", true);
             }
           }
         }
@@ -694,27 +689,34 @@ export class CNoteGenerationComponent implements OnInit {
   //End
 
   //GetDetailedBasedOnLocations
-  GetDetailedBasedOnLocations(){
+  GetDetailedBasedOnLocations() {
     debugger;
-    let req ={
-      companyCode:10065,
-      Destination:"",
-      ContractId:"",
-      PayBas:this.step1.value.PAYTYP,
-      PartyCode:"",
-      Origin:"MUMB",
-      DestDeliveryPinCode:this.step1.value.DELLOC==undefined?"":this.step1.value.DELLOC.pincode,
-      FromCity:this.step1.value.FCITY.Value==undefined?"":this.step1.value.FCITY.Value,
-      ToCity:this.step1.value.TCITY.Value==undefined?"":this.step1.value.TCITY.Value
+    let req = {
+      companyCode: 10065,
+      Destination: "",
+      ContractId: "",
+      PayBas: this.step1.value.PAYTYP,
+      PartyCode: "",
+      Origin: "MUMB",
+      DestDeliveryPinCode: this.step1.value.DELLOC == undefined ? "" : this.step1.value.DELLOC.pincode,
+      FromCity: this.step1.value.FCITY.Value == undefined ? "" : this.step1.value.FCITY.Value,
+      ToCity: this.step1.value.TCITY.Value == undefined ? "" : this.step1.value.TCITY.Value
     }
-    this.ICnoteService.cnotePost('services/GetDetailedBasedOnLocations',req).subscribe(
+    this.ICnoteService.cnotePost('services/GetDetailedBasedOnLocations', req).subscribe(
       {
-       next:(res:any)=>{
-          const ResDetailsBased= res.result[0];
-          this.step1.controls['F_ODA'].setValue(ResDetailsBased.Oda=="Y"?true:false);
-          this.step1.controls['F_LOCAL'].setValue(ResDetailsBased.LocalBooking=="Y"?true:false);
-       }
-    })
+        next: (res: any) => {
+          const ResDetailsBased = res.result[0];
+          if (ResDetailsBased.Oda == "Y") {
+            this.step1.controls['F_ODA'].setValue(ResDetailsBased.Oda == "Y" ? true : false);
+            SwalerrorMessage("info", "Currently To City/Pincode Is Out of delivery are so ODA is marked.", "", true);
+          }
+          if (ResDetailsBased.LocalBooking == "Y") {
+            this.step1.controls['F_LOCAL'].setValue(ResDetailsBased.LocalBooking == "Y" ? true : false);
+            SwalerrorMessage("info", "Currently from city and to city are same so local booking marked.", "", true);
+          }
+        }
+      })
   }
   //ends
+
 }

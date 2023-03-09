@@ -1,15 +1,14 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
-import { FormArray, FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, AutocompleteField, Cnote, ContractDetailList, prqVehicleReq, Rules } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { PLATFORM_ID, Inject } from '@angular/core';
-import { DatePipe, isPlatformBrowser } from '@angular/common';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { DatePipe } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map, Observable, startWith } from 'rxjs';
-
-import Swal from "sweetalert2";
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
+import { cnoteMetaData } from './Cnote';
 @Component({
   selector: 'app-cnote-generation',
   templateUrl: './cnote-generation.component.html'
@@ -21,6 +20,8 @@ export class CNoteGenerationComponent implements OnInit {
   step1: FormGroup;
   step2: FormGroup;
   step3: FormGroup;
+  detail = cnoteMetaData;
+  metaCnote: Cnote[];
   CnoteData: Cnote[];
   Rules: Rules[];
   option: any;
@@ -29,11 +30,13 @@ export class CNoteGenerationComponent implements OnInit {
   docketallocate = 'Alloted To';
   cnoteAutoComplete: AutoCompleteCommon[];
   Fcity: AutoCompleteCity[];
+  ConsignorCity: AutoCompleteCity[];
   Tcity: AutoCompleteCity[];
   Vehicno: AutoCompleteCity[];
   Multipickup: AutoCompleteCity[];
   prqVehicleReq: prqVehicleReq[];
   Destination: AutoCompleteCity[];
+  pinCodeDetail: AutoCompleteCity[];
   filteredCity: Observable<AutoCompleteCity[]>;
   filteredCnoteBilling: Observable<AutoCompleteCommon[]>;
   pReqFilter: Observable<prqVehicleReq[]>;
@@ -57,16 +60,11 @@ export class CNoteGenerationComponent implements OnInit {
 
   divcol: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   contractDetail: ContractDetailList[];
+  Consignee: Cnote[];
+  Consignor: Cnote[];
+
   constructor(private fb: UntypedFormBuilder, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
-    //  this.CnoteData = CNOTEDATA;
-    // const storedVersion = parseInt(localStorage.getItem('version'), 10);
-    // this.formattedDate = this.datePipe.transform(this.date, 'dd/MM/yyyy hh:mm a', '+0530');
-    // if (isPlatformBrowser(this.platformId)) {
-    //   localStorage.clear();
-    // }
-    // if (storedVersion === this.version) {
-    //   this.data = JSON.parse(localStorage.getItem('CnoteData'));
-    // }
+
     this.data = JSON.parse(localStorage.getItem('CnoteData'));
     if (!this.data) {
       this.GetCnotecontrols();
@@ -141,6 +139,8 @@ export class CNoteGenerationComponent implements OnInit {
 
     const formControls = {};
     this.step3Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '3')
+    this.Consignor = this.CnoteData.filter((x) => x.div == 'Consignor')
+    this.Consignee = this.CnoteData.filter((x) => x.div == 'Consignee')
     if (this.step3Formcontrol.length > 0) {
       this.step3Formcontrol.forEach(cnote => {
         let validators = [];
@@ -162,12 +162,13 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Api Calling Method on Chaged(ACTION URL)
   callActionFunction(functionName: string, event: any) {
+    debugger;
     switch (functionName) {
       case "apicall":
         this.apicall(event);
         break;
       case "billingPartyrules":
-        this.getBillingPartyAutoComplete();
+        this.getBillingPartyAutoComplete(event);
         break;
       case "FromCityaction":
         this.getFromCity();
@@ -193,6 +194,12 @@ export class CNoteGenerationComponent implements OnInit {
       case "GetMultiPickupDeliveryDocket":
         this.GetMultiPickupDeliveryDocket(event)
         break;
+      case "ConsignorCity":
+        this.getConsignorCity();
+        break;
+      case "ConsignorPinCode":
+        this.getPincodeDetail();
+        break;
       default:
         break;
     }
@@ -207,10 +214,12 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Get all field and bind
   GetCnotecontrols() {
+    debugger;
     this.ICnoteService.getCnoteBooking('cnotefields/', 10065).subscribe(
       {
         next: (res: any) => {
           if (res) {
+            res.push(...this.detail);
             this.CnoteData = res;
             this.CnoteData.sort((a, b) => (a.Seq - b.Seq));
             localStorage.setItem('CnoteData', JSON.stringify(this.CnoteData));
@@ -340,64 +349,117 @@ export class CNoteGenerationComponent implements OnInit {
   }
 
   //billing Party api
-  getBillingPartyAutoComplete() {
-    if (this.step1.value.PRQ_BILLINGPARTY.length > 3) {
-      if (this.step1Formcontrol) {
-        let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.value.PAYTYP);
-        if (rulePartyType.defaultvalue == "D") {
-          this.step1.controls['PRQ_BILLINGPARTY'].disable();
-          this.getFromCity();
-          this.getToCity();
+  getBillingPartyAutoComplete(event) {
+    debugger;
+    let step = 'step' + this.CnoteData.find((x) => x.name == event).frmgrp;
+    let control;
+    switch (step) {
+      case 'step1':
+        control = this.step1.get(event).value;
+        break;
+      case 'step2':
+        control = this.step2.get(event).value;
+        break;
+      case 'step3':
+        control = this.step3.get(event).value;
+        break;
+    }
+    if (control.length > 3) {
+      let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.value.PAYTYP);
+      if (rulePartyType.defaultvalue == "D") {
+        this.step1.controls['PRQ_BILLINGPARTY'].disable();
+        this.getFromCity();
+        this.getToCity();
+      }
+      else {
+        this.step1.controls['PRQ_BILLINGPARTY'].enable();
+        let bLcode = this.CnoteData.find((x) => x.name == event);
+        let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
+        let Defalutvalue = this.Rules.find((x) => x.code == 'CUST_HRCHY');
+        // var req = {
+        //   companyCode: 10065,
+        //   custLoc: "MUMB",
+        //   custCat: this.step1.value.PAYTYP,
+        //   partyType: rules.defaultvalue == 'Y' ? 'CP' : ""
+        // }
+        let CustomerType = event == 'PRQ_BILLINGPARTY' ? 'CP' : event == 'CST_NM' ? 'CN' : 'CE';
+        let req = {
+          companyCode: 10065,
+          LocCode: "MUMB",
+          searchText: control,
+          CustHierarchy: Defalutvalue.defaultvalue,
+          PayBase: this.step1.value.PAYTYP,
+          BookingDate: this.datePipe.transform(this.step1.value.DKTDT, 'd MMM y').toUpperCase(),
+          CustomerType: rules.defaultvalue == 'Y' ? CustomerType : "",
+          ContractParty: event == 'PRQ_BILLINGPARTY' ? 'BillingParty' : event == 'Consignor' ? 'Consignor' : 'Consignee'
         }
-        else {
-          this.step1.controls['PRQ_BILLINGPARTY'].enable();
-          let bLcode = this.step1Formcontrol.find((x) => x.name == 'PRQ_BILLINGPARTY');
-          let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
-          var req = {
-            companyCode: 10065,
-            custLoc: "MUMB",
-            custCat: this.step1.value.PAYTYP,
-            partyType: rules.defaultvalue == 'Y' ? 'CP' : ""
-          }
-          this.ICnoteService.cnotePost('services/billingParty', req).subscribe({
-            next: (res: any) => {
-              if (res) {
-                this.cnoteAutoComplete = res;
-                this.getBillingPartyFilter();
-                this.getFromCity();
-                this.getToCity();
-              }
+        this.ICnoteService.cnotePost('services/billingParty', req).subscribe({
+          next: (res: any) => {
+            if (res) {
+              this.cnoteAutoComplete = res;
+              this.getBillingPartyFilter(event);
+              this.getFromCity();
+              this.getToCity();
             }
-          })
+          }
+        })
 
-        }
       }
     }
   }
 
-  getBillingPartyFilter() {
-    this.filteredCnoteBilling = this.step1.controls[
-      "PRQ_BILLINGPARTY"
-    ].valueChanges.pipe(
-      startWith(""),
-      map((value) => (typeof value === "string" ? value : value.Name)),
-      map((Name) =>
-        Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice()
-      )
-    );
+  getBillingPartyFilter(event) {
+    let step = 'step' + this.CnoteData.find((x) => x.name == event).frmgrp;
+    switch (step) {
+      case 'step1':
+        this.filteredCnoteBilling = this.step1.controls[
+          event
+        ].valueChanges.pipe(
+          startWith(""),
+          map((value) => (typeof value === "string" ? value : value.Name)),
+          map((Name) =>
+            Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice()
+          )
+        );
+        break;
+      case 'step2':
+        this.filteredCnoteBilling = this.step2.controls[
+          event
+        ].valueChanges.pipe(
+          startWith(""),
+          map((value) => (typeof value === "string" ? value : value.Name)),
+          map((Name) =>
+            Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice()
+          )
+        );
+        break;
+      case 'step3':
+        this.filteredCnoteBilling = this.step3.controls[
+          event
+        ].valueChanges.pipe(
+          startWith(""),
+          map((value) => (typeof value === "string" ? value : value.Name)),
+          map((Name) =>
+            Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice()
+          )
+        );
+        break;
+    }
+
   }
 
   _bilingGropFilter(name: string): AutoCompleteCommon[] {
     const filterValue = name.toLowerCase();
 
     return this.cnoteAutoComplete.filter(
-      (option) => option.CodeDesc.toLowerCase().indexOf(filterValue) === 0
+      (option) => option.Name.toLowerCase().indexOf(filterValue) === 0
     );
   }
 
   displayCnotegropFn(Cnotegrop: AutoCompleteCommon): string {
-    return Cnotegrop && Cnotegrop.CodeId ? Cnotegrop.CodeId + ":" + Cnotegrop.CodeDesc : "";
+    return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Value + ":" + Cnotegrop.Name : "";
   }
+
   //End
 
   //FromCity
@@ -604,7 +666,26 @@ export class CNoteGenerationComponent implements OnInit {
             );
           }
           break;
-
+        case 'ConsignorCity':
+          if (this.ConsignorCity) {
+            autocomplete = 'ConsignorCityAutoComplate';
+            filteredOptions = this.step2.controls.ConsignorCity.valueChanges.pipe(
+              startWith(''),
+              map((value) => (typeof value === 'string' ? value : value.Name)),
+              map((Name) => Name ? this._cityFilter(Name, this.ConsignorCity) : this.ConsignorCity.slice())
+            );
+          }
+          break;
+        case 'ConsignorPinCode':
+          if (this.pinCodeDetail) {
+            autocomplete = 'ConsignorCityAutoComplate';
+            filteredOptions = this.step2.controls.ConsignorPinCode.valueChanges.pipe(
+              startWith(''),
+              map((value) => (typeof value === 'string' ? value : value.Name)),
+              map((Name) => Name ? this._cityFilter(Name, this.pinCodeDetail) : this.pinCodeDetail.slice())
+            );
+          }
+          break;
         default:
           break;
       }
@@ -620,13 +701,14 @@ export class CNoteGenerationComponent implements OnInit {
       (option) => option.Name.toLowerCase().indexOf(filterValue) === 0
     );
   }
+
   displayCitygropFn(Cnotegrop: AutoCompleteCity): string {
     return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Name : "";
   }
   //End
   //Docket Validation
   DocketValidation() {
-    debugger;
+
     let req = {
       companyCode: 10065,
       DocType: 'DKT',
@@ -718,5 +800,60 @@ export class CNoteGenerationComponent implements OnInit {
       })
   }
   //ends
+  //ConsignorCity
+  getConsignorCity() {
+    debugger;
+    if (this.step2.value.ConsignorCity.length > 2) {
+      try {
+        let bLcode = this.step1Formcontrol.find((x) => x.name == 'FCITY');
+        let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
+        let req = {
+          searchText: this.step2.value.ConsignorCity,
+          companyCode: 10065,
+          MAP_DLOC_CITY: rules.defaultvalue
 
+        }
+        this.ICnoteService.cnotePost('services/ConsignorCity', req).subscribe({
+          next: (res: any) => {
+            if (res) {
+              this.ConsignorCity = res;
+              this.getCityFilter();
+            }
+            else {
+              SwalerrorMessage("error", "No Data Found", "", true);
+            }
+          }
+        })
+      }
+      catch (err) {
+        SwalerrorMessage("error", "Please  Try Again", "", true);
+      }
+    }
+  }
+  //end
+  //getpincode
+  getPincodeDetail() {
+    debugger;
+    if (this.step2.value.ConsignorPinCode.length > 1) {
+      try {
+        let req = {
+          searchText: this.step2.value.ConsignorPinCode,
+          companyCode: 10065,
+          city: this.step2.value.ConsignorCity.Value
+        }
+        this.ICnoteService.cnotePost('services/getPincode', req).subscribe({
+          next: (res: any) => {
+            if (res) {
+              this.pinCodeDetail = res;
+              this.getCityFilter();
+            }
+          }
+        })
+      }
+      catch (err) {
+        SwalerrorMessage("error", "Please  Try Again", "", true);
+      }
+    }
+  }
+  //end
 }

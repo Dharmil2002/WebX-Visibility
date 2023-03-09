@@ -15,6 +15,7 @@ export interface Cnote {
    dbCodeName:any;
    autocomplete:string;
    Search:string;
+   div:string;
    filteredOptions: Observable<AutoCompleteCity[]>;
 }
 
@@ -33,7 +34,7 @@ export class AutocompleteField {
  }
 
 export class AutoCompleteCommon {
-   constructor(public CodeId: string, public CodeDesc: string) { }
+   constructor(public Value: string, public Name: string) { }
 }
 export class AutoCompleteCity{
   constructor(

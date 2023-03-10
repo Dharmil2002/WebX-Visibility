@@ -26,7 +26,10 @@ export class Rules {
    defaultvalue: string;
    paybas: string;
 }
-
+export class Dropdown{
+   CodeId:string;
+   CodeDesc:string;
+}
 export class AutocompleteField {
    formControlName: string;
    autocomplete: string;
@@ -58,6 +61,11 @@ export class AutoCompleteCity{
 export interface multiPickUp {
    PL_PARTNER?: any;
    DocketNumber: string;
+}
+export interface Radio{
+   label:string;
+   value:string;
+   name:string;
 }
    export interface prqVehicleReq {
        CompanyCode: number;

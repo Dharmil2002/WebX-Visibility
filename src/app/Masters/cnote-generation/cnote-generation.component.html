@@ -517,7 +517,8 @@
                                                 </mat-form-field>
                                                 <mat-slide-toggle color="primary"
                                                     *ngIf="step3.type=='toggle' && step3.name !='SerialScan' && step3.name !='EachScan'"
-                                                    [formControlName]="step3.name"   (ngModelChange)="callActionFunction(step3.ActionFunction,$event)">{{step3.label}}</mat-slide-toggle>
+                                                    [formControlName]="step3.name"
+                                                    (ngModelChange)="callActionFunction(step3.ActionFunction,$event)">{{step3.label}}</mat-slide-toggle>
                                             </div>
                                         </div>
                                         <hr>

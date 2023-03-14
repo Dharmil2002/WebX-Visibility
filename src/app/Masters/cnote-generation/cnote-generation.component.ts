@@ -22,6 +22,7 @@ export class CNoteGenerationComponent implements OnInit {
   step3: FormGroup;
   detail = cnoteMetaData;
   metaCnote: Cnote[];
+  InvoiceLevalrule: any;
   CnoteData: Cnote[];
   Rules: Rules[];
   option: any;
@@ -294,9 +295,9 @@ export class CNoteGenerationComponent implements OnInit {
       case "displayedAppointment":
         this.displayedAppointment();
         break;
-      case"Volumetric":
-       this.volumetricChanged(event.checked);
-      break;
+      case "Volumetric":
+        this.volumetricChanged();
+        break;
       default:
         break;
     }
@@ -334,13 +335,13 @@ export class CNoteGenerationComponent implements OnInit {
   }
   //Bind all rules
   getRules() {
-  
+
     this.ICnoteService.getCnoteBooking('services/companyWiseRules/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
           this.Rules = res[0];
-          let InvoiceLevalrule = this.Rules.find((x) => x.code == 'INVOICE_LEVEL_CONTRACT_INVOKE');
-          if (InvoiceLevalrule.defaultvalue != "Y") {
+          this.InvoiceLevalrule = this.Rules.find((x) => x.code == 'INVOICE_LEVEL_CONTRACT_INVOKE');
+          if (this.InvoiceLevalrule.defaultvalue != "Y") {
             this.step3Formcontrol = this.step3Formcontrol.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName !== 'INVOICE_LEVEL_CONTRACT_INVOKE');
           }
           let Rules = this.Rules.find((x) => x.code == 'MAP_DLOC_PIN')
@@ -1137,13 +1138,23 @@ export class CNoteGenerationComponent implements OnInit {
   }
 
 
-  volumetricChanged(event){
-  if(event){
-      this.step3Formcontrol= this.CnoteData.filter(x=>x.frmgrp=='3')
-  }
-  else{
-    this.step3Formcontrol= this.step3Formcontrol.filter(x=>x.Class=='Volumetric')
-  }
+  volumetricChanged() {
+    debugger;
+    if (this.step3.value.Volumetric) {
+      this.InvoiceLevalrule = this.Rules.find((x) => x.code == 'INVOICE_LEVEL_CONTRACT_INVOKE');
+      if (this.InvoiceLevalrule.defaultvalue != "Y") {
+        this.step3Formcontrol = this.CnoteData.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName != 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
+        this.InvoiceDetails = this.CnoteData.filter((x) => x.div == 'InvoiceDetails' && x.dbCodeName != 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
+      }
+      else {
+        this.step3Formcontrol = this.CnoteData.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName == 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
+        this.InvoiceDetails = this.CnoteData.filter((x) => x.div == 'InvoiceDetails' && x.dbCodeName == 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
+      }
+    }
+    else {
+      this.step3Formcontrol = this.step3Formcontrol.filter(x => x.Class != 'Volumetric')
+      this.InvoiceDetails = this.InvoiceDetails.filter(x => x.Class != 'Volumetric');
+    }
   }
   //end
 }

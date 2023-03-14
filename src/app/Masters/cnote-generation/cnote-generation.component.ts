@@ -357,6 +357,7 @@ export class CNoteGenerationComponent implements OnInit {
             }
 
           }
+          this.volumetricChanged();
           //this.getDaterules();
         }
       }

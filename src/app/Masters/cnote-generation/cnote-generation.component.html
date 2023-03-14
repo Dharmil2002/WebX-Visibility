@@ -481,6 +481,7 @@
                                     </form>
                                 </mat-step>
                             </div>
+                            <!-- Step 3 -->
                             <div *ngIf="step3Formcontrol">
                                 <mat-step [stepControl]="step3">
                                     <form class="register-form m-4" [formGroup]="step3">
@@ -516,10 +517,80 @@
                                                 </mat-form-field>
                                                 <mat-slide-toggle color="primary"
                                                     *ngIf="step3.type=='toggle' && step3.name !='SerialScan' && step3.name !='EachScan'"
-                                                    [formControlName]="step3.name">{{step3.label}}</mat-slide-toggle>
+                                                    [formControlName]="step3.name"   (ngModelChange)="callActionFunction(step3.ActionFunction,$event)">{{step3.label}}</mat-slide-toggle>
                                             </div>
                                         </div>
                                         <hr>
+                                        <div class="row" flex>
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                                <div *ngIf="InvoiceDetails">
+                                                    <div>
+                                                        <div style="overflow-x: auto">
+                                                            <table class="table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Sr no.</th>
+                                                                        <th *ngFor="let step3 of InvoiceDetails">
+                                                                            {{step3.label}}</th>
+                                                                        <th>Action</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr formArrayName="invoiceArray"
+                                                                        *ngFor="let field of step3.get('invoiceArray').controls; index as i">
+                                                                        <td>{{i+1}}</td>
+                                                                        <td *ngFor="let step3 of InvoiceDetails"
+                                                                            [formGroupName]="i">
+
+                                                                            <div class="col-md-12"
+                                                                                *ngIf="step3.type=='text'">
+                                                                                <input style="width: 168px;"
+                                                                                    type="step3.type"
+                                                                                    class="form-control"
+                                                                                    (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
+                                                                                    [formControlName]="step3.name"
+                                                                                    autocomplete="off">
+                                                                            </div>
+                                                                            <div class="col-md-12"
+                                                                                *ngIf="step3.type=='date'">
+                                                                                <input style="width: 168px;"
+                                                                                    class="form-control"
+                                                                                    [formControlName]="step3.name"
+                                                                                    type="date">
+                                                                            </div>
+                                                                            <div class="col-md-12"
+                                                                                *ngIf="step3.type=='dropdown'">
+                                                                                <select class="form-control"
+                                                                                    [formControlName]="step3.name">
+                                                                                    <option
+                                                                                        *ngFor="let option of step3.dropdown"
+                                                                                        [value]="option.value">
+                                                                                        {{ option.label }}
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <button mat-mini-fab color="primary"
+                                                                                (click)="addField()"
+                                                                                aria-label="Example icon button with a menu icon">
+                                                                                +
+                                                                            </button>
+                                                                            <button mat-mini-fab color="warn"
+                                                                                (click)="removeField(i)"
+                                                                                aria-label="Example icon button with a filter list icon">
+                                                                                -
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
                                         <div class="row">
                                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                                                 <div class="example-button-row">
@@ -530,6 +601,7 @@
                                                 </div>
                                             </div>
                                         </div>
+
                                     </form>
 
                                 </mat-step>

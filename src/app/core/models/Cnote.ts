@@ -16,6 +16,8 @@ export interface Cnote {
    autocomplete:string;
    Search:string;
    div:string;
+   useField:string;
+   Class:string;
    filteredOptions: Observable<AutoCompleteCity[]>;
 }
 

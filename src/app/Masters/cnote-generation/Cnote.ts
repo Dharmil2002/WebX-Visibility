@@ -17,7 +17,8 @@ export const cnoteMetaData = [
         "defaultvalue": true,
         "div": "Consignor",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 200,
@@ -34,7 +35,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "Consignor",
         "Search": "ConsignorCity",
-        "dbCodeName": "MAP_DLOC_CITY"
+        "dbCodeName": "MAP_DLOC_CITY",
+        "useField": "Y"
     },
     {
         "id": 201,
@@ -51,7 +53,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "Consignor",
         "Search": "ConsignorPinCode",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
 
     //Consignee------------------------------------------------------------------------------------------
@@ -70,7 +73,8 @@ export const cnoteMetaData = [
         "defaultvalue": true,
         "div": "Consignee",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 203,
@@ -87,7 +91,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "Consignee",
         "Search": "billingPartyrules",
-        "dbCodeName": "BILLINGPARTY_CSGN_CSGE_MSTR"
+        "dbCodeName": "BILLINGPARTY_CSGN_CSGE_MSTR",
+        "useField": "Y"
     },
     {
         "id": 204,
@@ -104,7 +109,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "Consignee",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 205,
@@ -121,7 +127,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "Consignee",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 206,
@@ -138,7 +145,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "Consignee",
         "Search": "ConsigneeCity",
-        "dbCodeName": "MAP_DLOC_CITY"
+        "dbCodeName": "MAP_DLOC_CITY",
+        "useField": "Y"
     },
     {
         "id": 207,
@@ -155,7 +163,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "Consignee",
         "Search": "ConsigneePinCode",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 208,
@@ -172,7 +181,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "Consignee",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 209,
@@ -189,7 +199,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "Consignee",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 210,
@@ -206,7 +217,8 @@ export const cnoteMetaData = [
         "defaultvalue": "N",
         "div": "AppointmentBasedDelivery",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 211,
@@ -223,7 +235,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 212,
@@ -239,7 +252,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "AppointmentDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 213,
@@ -255,7 +269,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "AppointmentDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 214,
@@ -271,7 +286,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "AppointmentDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 215,
@@ -287,7 +303,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "AppointmentDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 216,
@@ -303,7 +320,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "AppointmentDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 217,
@@ -319,7 +337,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "AppointmentDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
 
 
@@ -338,7 +357,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "ContainerDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 219,
@@ -354,7 +374,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "ContainerDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 220,
@@ -370,7 +391,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "ContainerDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 221,
@@ -386,23 +408,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "ContainerDetails",
         "Search": "",
-        "dbCodeName": ""
-    },
-    {
-        "id": 222,
-        "Seq": 52,
-        "label": "Booking No",
-        "name": "BookingNo",
-        "type": "text",
-        "ActionFunction": "No",
-        "Validation": "",
-        "frmgrp": 2,
-        "display": true,
-        "enable": true,
-        "defaultvalue": "",
-        "div": "ContainerDetails",
-        "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 223,
@@ -418,7 +425,8 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "ContainerDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 224,
@@ -434,105 +442,182 @@ export const cnoteMetaData = [
         "defaultvalue": "",
         "div": "ContainerDetails",
         "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
-    {
-        "id": 225,
-        "Seq": 55,
-        "label": "Seal No",
-        "name": "SealNo",
-        "type": "text",
-        "ActionFunction": "No",
-        "Validation": "",
-        "frmgrp": 2,
-        "display": true,
-        "enable": true,
-        "defaultvalue": "",
-        "div": "ContainerDetails",
-        "Search": "",
-        "dbCodeName": ""
-    },
+    //step3
     {
         "id": 226,
-        "Seq": 56,
-        "label": "Shipping Line",
-        "name": "ShippingLine",
+        "Seq": 48,
+        "label": "Charged No of Pkg.",
+        "name": "TotalChargedNoofPackages",
         "type": "text",
         "ActionFunction": "No",
         "Validation": "",
-        "frmgrp": 2,
+        "frmgrp": 3,
         "display": true,
         "enable": true,
         "defaultvalue": "",
-        "div": "ContainerDetails",
+        "div": "",
         "Search": "",
-        "dbCodeName": ""
-    },
-    {
-        "id": 227,
-        "Seq": 57,
-        "label": "Job Order No",
-        "name": "JobOrderNo",
-        "type": "text",
-        "ActionFunction": "No",
-        "Validation": "",
-        "frmgrp": 2,
-        "display": true,
-        "enable": true,
-        "defaultvalue": "",
-        "div": "ContainerDetails",
-        "Search": "",
-        "dbCodeName": ""
-    },
-    {
-        "id": 228,
-        "Seq": 58,
-        "label": "Port",
-        "name": "Port",
-        "type": "text",
-        "ActionFunction": "No",
-        "Validation": "",
-        "frmgrp": 2,
-        "display": true,
-        "enable": true,
-        "defaultvalue": "",
-        "div": "ContainerDetails",
-        "Search": "",
-        "dbCodeName": ""
-    },
-    {
-        "id": 229,
-        "Seq": 59,
-        "label": "Job Order No 2",
-        "name": "JobOrderNo2",
-        "type": "text",
-        "ActionFunction": "No",
-        "Validation": "",
-        "frmgrp": 2,
-        "display": true,
-        "enable": true,
-        "defaultvalue": "",
-        "div": "ContainerDetails",
-        "Search": "",
-        "dbCodeName": ""
+        "dbCodeName": "",
+        "useField": "Y"
     },
     {
         "id": 230,
-        "Seq": 60,
-        "label": "DEO No",
-        "name": "DEONo",
+        "Seq": 56,
+        "label": "Total Declared Value",
+        "name": "TotalDeclaredValue",
         "type": "text",
         "ActionFunction": "No",
         "Validation": "",
-        "frmgrp": 2,
+        "frmgrp": 3,
         "display": true,
         "enable": true,
         "defaultvalue": "",
-        "div": "ContainerDetails",
+        "div": "",
         "Search": "",
-        "dbCodeName": ""
-    }
+        "dbCodeName": "",
+        "useField": "Y"
+    },
+    {
+        "id": 231,
+        "Seq": 52,
+        "label": "ChargedKM",
+        "name": "ChargedKM",
+        "type": "text",
+        "ActionFunction": "No",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": "",
+        "div": "",
+        "Search": "",
+        "dbCodeName": "",
+        "useField": "Y"
+    },
+    {
+        "id": 232,
+        "Seq": 53,
+        "label": "Total Part Quantity",
+        "name": "TotalPartQuantity",
+        "type": "text",
+        "ActionFunction": "No",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": "",
+        "div": "",
+        "Search": "",
+        "dbCodeName": "",
+        "useField": "Y"
+    },
+    {
+        "id": 234,
+        "Seq": 76,
+        "label": "Charged Weight",
+        "name": "ChargedWeight",
+        "type": "text",
+        "ActionFunction": "No",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": "",
+        "div": "InvoiceDetails",
+        "Search": "",
+        "dbCodeName": "",
+        "useField": "Y"
+    },
+    {
+        "id": 236,
+        "Seq": 76,
+        "label": "Contents",
+        "name": "Contents",
+        "type": "text",
+        "ActionFunction": "No",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": "",
+        "div": "",
+        "Search": "",
+        "dbCodeName": "INVOICE_LEVEL_CONTRACT_INVOKE",
+        "useField": "Y"
+    },
+    {
+        "id": 235,
+        "Seq": 77,
+        "label": "Freight Rate",
+        "name": "FreightRate",
+        "type": "text",
+        "ActionFunction": "No",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": "",
+        "div": "",
+        "Search": "",
+        "dbCodeName": "INVOICE_LEVEL_CONTRACT_INVOKE",
+        "useField": "Y"
+    },
+    {
+        "id": 236,
+        "Seq": 78,
+        "label": "Rate Type",
+        "name": "RateType",
+        "type": "text",
+        "ActionFunction": "No",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": "",
+        "div": "",
+        "Search": "",
+        "dbCodeName": "INVOICE_LEVEL_CONTRACT_INVOKE",
+        "useField": "Y"
+    },
+    {
+        "id": 238,
+        "Seq": 19,
+        "label": "Freight Amount",
+        "name": "FreightAmount",
+        "type": "text",
+        "ActionFunction": "No",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": "",
+        "div": "",
+        "Search": "",
+        "dbCodeName": "INVOICE_LEVEL_CONTRACT_INVOKE",
+        "useField": "Y"
+    },
+    {
+        "id": 239,
+        "Seq": 45,
+        "label": "Volumetric",
+        "name": "Volumetric",
+        "type": "toggle",
+        "ActionFunction": "Volumetric",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": "",
+        "div": "",
+        "Search": "",
+        "dbCodeName": "",
+        "useField": "Y"
+    },
 
+    //end
 
 
 

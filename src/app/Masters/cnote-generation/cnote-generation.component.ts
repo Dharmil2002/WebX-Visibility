@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, AutocompleteField, Cnote, ContractDetailList, Dropdown, prqVehicleReq, Radio, Rules } from 'src/app/core/models/Cnote';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { FormArray, FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, Cnote, ContractDetailList, Dropdown, prqVehicleReq, Radio, Rules } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
-import { PLATFORM_ID, Inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ignoreElements, map, Observable, startWith } from 'rxjs';
+import { map, Observable, startWith } from 'rxjs';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { cnoteMetaData } from './Cnote';
+
 @Component({
   selector: 'app-cnote-generation',
   templateUrl: './cnote-generation.component.html'
@@ -57,7 +57,7 @@ export class CNoteGenerationComponent implements OnInit {
   SerialScan: number = 1;
   barcodearray: Cnote[];
   minDate = new Date();
-
+  InvoiceDetails: Cnote[];
   divcol: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   contractDetail: ContractDetailList[];
   Consignee: Cnote[];
@@ -85,19 +85,7 @@ export class CNoteGenerationComponent implements OnInit {
   autofillflag: boolean = false;
   constructor(private fb: UntypedFormBuilder, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     this.GetActiveGeneralMasterCodeListByTenantId()
-    this.data = JSON.parse(localStorage.getItem('CnoteData'));
-    if (!this.data) {
-      this.GetCnotecontrols();
-    }
-    else {
 
-      this.CnoteData = this.data;
-      this.CnoteData.sort((a, b) => (a.Seq - b.Seq));
-      this.step1 = this.step1Formgrop();
-      this.step2 = this.step2Formgrop();
-      this.step3 = this.step3Formgrop();
-      this.getRules();
-    }
   }
 
   ngOnInit(): void {
@@ -125,9 +113,7 @@ export class CNoteGenerationComponent implements OnInit {
           validators = [Validators.required];
         }
         formControls[cnote.name] = this.fb.control(cnote.defaultvalue == 'TodayDate' ? new Date() : cnote.defaultvalue, validators);
-        // if(cnote.disable=='true'){
-        //   formControls[cnote.name].disable();
-        // }
+
       });
       return this.fb.group(formControls)
     }
@@ -158,18 +144,20 @@ export class CNoteGenerationComponent implements OnInit {
     // pending work beloe radio buttton
     this.AppointmentBasedDelivery = this.CnoteData.filter((x) => x.div == 'AppointmentBasedDelivery')
     this.AppointmentDetails = this.CnoteData.filter((x) => x.div == 'AppointmentDetails');
+    const dropdowns = {
+      'ContainerSize1': this.ContainerSize,
+      'ContainerSize2': this.ContainerSize,
+      'ContainerType': this.ContainerType,
+      'ContainerCapacity': this.ContainerCapacity
+    };
+
     this.ContainerDetails = this.CnoteData.filter((x) => x.div == 'ContainerDetails').map(item => {
-      if (item.name === 'ContainerSize1' || item.name === 'ContainerSize2') {
-        item.dropdown = this.ContainerSize;
-      }
-      if (item.name === 'ContainerType') {
-        item.dropdown = this.ContainerType;
-      }
-      if (item.name === 'ContainerCapacity') {
-        item.dropdown = this.ContainerCapacity;
+      if (dropdowns.hasOwnProperty(item.name)) {
+        item.dropdown = dropdowns[item.name];
       }
       return item;
-    })
+    });
+
 
     if (this.step2Formcontrol.length > 0) {
       this.step2Formcontrol.forEach(cnote => {
@@ -207,10 +195,46 @@ export class CNoteGenerationComponent implements OnInit {
       });
 
     }
+    this.InvoiceDetails = this.CnoteData.filter((x) => x.frmgrp == '3' && x.div == 'InvoiceDetails')
+    if (this.InvoiceDetails.length > 0) {
+      const array = {}
+      this.InvoiceDetails.forEach(Idetail => {
+        let validators = [];
+        if (Idetail.validation === 'Required') {
+          validators = [Validators.required];
+        }
 
+        array[Idetail.name] = this.fb.control('', validators);
+
+      });
+      formControls['invoiceArray'] = this.fb.array([
+        this.fb.group(array)
+      ])
+
+    }
     return this.fb.group(formControls)
   }
+  //start
+  addField() {
+    const array = {}
+    const fields = this.step3.get('invoiceArray') as FormArray;
+    if (this.InvoiceDetails.length > 0) {
+      this.InvoiceDetails.forEach(cnote => {
+        array[cnote.name] = this.fb.control('');
 
+      });
+
+    }
+    fields.push(this.fb.group(array));
+  }
+  removeField(index: number) {
+    const fields = this.step3.get('invoiceArray') as FormArray;
+    if (fields.length > 1) {
+      fields.removeAt(index);
+    }
+  }
+
+  //end
   //Api Calling Method on Chaged(ACTION URL)
   callActionFunction(functionName: string, event: any) {
     switch (functionName) {
@@ -270,7 +294,9 @@ export class CNoteGenerationComponent implements OnInit {
       case "displayedAppointment":
         this.displayedAppointment();
         break;
-
+      case"Volumetric":
+       this.volumetricChanged(event.checked);
+      break;
       default:
         break;
     }
@@ -291,8 +317,7 @@ export class CNoteGenerationComponent implements OnInit {
         next: (res: any) => {
           if (res) {
             res.push(...this.detail);
-            this.CnoteData = res;
-            this.CnoteData.sort((a, b) => (a.Seq - b.Seq));
+            this.CnoteData = res.filter(obj => obj.useField === 'Y').sort((a, b) => a.Seq - b.Seq);
             localStorage.setItem('CnoteData', JSON.stringify(this.CnoteData));
             localStorage.setItem('version', this.version.toString());
             this.step1 = this.step1Formgrop();
@@ -309,10 +334,15 @@ export class CNoteGenerationComponent implements OnInit {
   }
   //Bind all rules
   getRules() {
+  
     this.ICnoteService.getCnoteBooking('services/companyWiseRules/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
           this.Rules = res[0];
+          let InvoiceLevalrule = this.Rules.find((x) => x.code == 'INVOICE_LEVEL_CONTRACT_INVOKE');
+          if (InvoiceLevalrule.defaultvalue != "Y") {
+            this.step3Formcontrol = this.step3Formcontrol.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName !== 'INVOICE_LEVEL_CONTRACT_INVOKE');
+          }
           let Rules = this.Rules.find((x) => x.code == 'MAP_DLOC_PIN')
           let mapcityRule = this.Rules.find((x) => x.code == `USE_MAPPED_LOCATION_INCITY`)
           if (Rules.defaultvalue == "A") {
@@ -561,7 +591,7 @@ export class CNoteGenerationComponent implements OnInit {
     if (this.step1Formcontrol) {
       let bLcode = this.step1Formcontrol.find((x) => x.name == 'FCITY');
       let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
-      var req = {
+      let req = {
         companyCode: 10065,
         map_dloc_city: rules.defaultvalue,
         DocketMode: "Yes",
@@ -584,10 +614,10 @@ export class CNoteGenerationComponent implements OnInit {
 
   getToCity() {
     if (this.step1Formcontrol) {
-      let custCode = this.step1.value.PRQ_BILLINGPARTY == undefined ? "" : this.step1.value.PRQ_BILLINGPARTY.CodeId;
+      // let custCode = this.step1.value.PRQ_BILLINGPARTY == undefined ? "" : this.step1.value.PRQ_BILLINGPARTY.CodeId;
       let bLcode = this.step1Formcontrol.find((x) => x.name == 'TCITY');
       let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
-      var req = {
+      let req = {
         companyCode: 10065,
         map_dloc_city: rules.defaultvalue,
         DocketMode: "Yes",
@@ -1031,20 +1061,11 @@ export class CNoteGenerationComponent implements OnInit {
       }
       this.ICnoteService.cnotePost('services/GetDetailedBasedOnContract', req).subscribe({
         next: (res: any) => {
-          this.step1Formcontrol = this.step1Formcontrol.map(item => {
-            if (item.name === 'FTLTYP') {
-              item.dropdown = res.result.filter((x) => x.CodeType == 'FTLTYP')
+          const codeTypes = ['FTLTYP', 'PKPDL', 'SVCTYP', 'TRN'];
+          this.step1Formcontrol.forEach(item => {
+            if (codeTypes.includes(item.name)) {
+              item.dropdown = res.result.filter(x => x.CodeType === item.name);
             }
-            if (item.name === 'PKPDL') {
-              item.dropdown = res.result.filter((x) => x.CodeType == 'PKPDL')
-            }
-            if (item.name === 'SVCTYP') {
-              item.dropdown = res.result.filter((x) => x.CodeType == 'SVCTYP')
-            }
-            if (item.name === 'TRN') {
-              item.dropdown = res.result.filter((x) => x.CodeType == 'TRN')
-            }
-            return item;
           });
         }
       })
@@ -1072,6 +1093,19 @@ export class CNoteGenerationComponent implements OnInit {
           this.ContainerSize = res.result.filter((x) => x.CodeType == 'CNTSIZE')
           this.ContainerType = res.result.filter((x) => x.CodeType == 'CONTTYP')
           this.ContainerCapacity = res.result.filter((x) => x.CodeType == 'CONTCAP')
+          this.data = JSON.parse(localStorage.getItem('CnoteData'));
+          if (!this.data) {
+            this.GetCnotecontrols();
+          }
+          else {
+
+            this.CnoteData = this.data;
+            this.CnoteData.sort((a, b) => (a.Seq - b.Seq));
+            this.step1 = this.step1Formgrop();
+            this.step2 = this.step2Formgrop();
+            this.step3 = this.step3Formgrop();
+            this.getRules();
+          }
         }
       })
     }
@@ -1103,6 +1137,13 @@ export class CNoteGenerationComponent implements OnInit {
   }
 
 
-
+  volumetricChanged(event){
+  if(event){
+      this.step3Formcontrol= this.CnoteData.filter(x=>x.frmgrp=='3')
+  }
+  else{
+    this.step3Formcontrol= this.step3Formcontrol.filter(x=>x.Class=='Volumetric')
+  }
+  }
   //end
 }

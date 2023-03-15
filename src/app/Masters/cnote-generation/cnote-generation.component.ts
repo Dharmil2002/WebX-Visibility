@@ -1,11 +1,11 @@
-import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject, ViewChild } from '@angular/core';
 import { FormArray, FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, Cnote, ContractDetailList, Dropdown, prqVehicleReq, Radio, Rules } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { map, Observable, startWith } from 'rxjs';
+import { debounceTime, map, Observable, startWith } from 'rxjs';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { cnoteMetaData } from './Cnote';
 
@@ -41,6 +41,8 @@ export class CNoteGenerationComponent implements OnInit {
   filteredCity: Observable<AutoCompleteCity[]>;
   filteredCnoteBilling: Observable<AutoCompleteCommon[]>;
   pReqFilter: Observable<prqVehicleReq[]>;
+  @ViewChild('closebutton') closebutton;
+  displaybarcode: boolean = false;
   breadscrums = [
     {
       title: "CNoteGeneration",
@@ -77,6 +79,17 @@ export class CNoteGenerationComponent implements OnInit {
     name: "IsAppointmentBasedDelivery"
   }
   ]
+  BcSerialTypeRadio: Radio[] = [{
+    label: "Serial Scan",
+    value: "S",
+    name: "SerialScan"
+  },
+  {
+    label: "Each Scan",
+    value: "E",
+    name: "SerialScan"
+  }
+  ]
   AppointmentDetails: Cnote[];
   isappointmentvisble: boolean;
   ContainerDetails: Cnote[];
@@ -84,6 +97,9 @@ export class CNoteGenerationComponent implements OnInit {
   ContainerType: Dropdown[];
   ContainerCapacity: Dropdown[];
   autofillflag: boolean = false;
+  BcSerialType: Cnote[];
+  BcSeries: Cnote[];
+  Consigneeflag: boolean;
   constructor(private fb: UntypedFormBuilder, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     this.GetActiveGeneralMasterCodeListByTenantId()
 
@@ -92,9 +108,6 @@ export class CNoteGenerationComponent implements OnInit {
   ngOnInit(): void {
     this.getDaterules();
     this.getContractDetail();
-
-
-    //this.getBillingPartyAutoComplete();
   }
 
   // ngAfterViewChecked() {
@@ -181,6 +194,7 @@ export class CNoteGenerationComponent implements OnInit {
 
     const formControls = {};
     this.step3Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '3')
+    this.BcSerialType = this.CnoteData.filter((x) => x.div == 'BcSerialType')
     if (this.step3Formcontrol.length > 0) {
       this.step3Formcontrol.forEach(cnote => {
         let validators = [];
@@ -213,9 +227,46 @@ export class CNoteGenerationComponent implements OnInit {
       ])
 
     }
+    this.BcSeries = this.CnoteData.filter(x => x.frmgrp == '3' && x.div == 'BcSeries')
+    if (this.BcSeries.length > 0) {
+      const array = {}
+      this.BcSeries.forEach(BcSeries => {
+        let validators = [];
+        if (BcSeries.validation === 'Required') {
+          validators = [Validators.required];
+        }
+
+        array[BcSeries.name] = this.fb.control('', validators);
+
+      });
+      formControls['BcSeries'] = this.fb.array([
+        this.fb.group(array)
+      ])
+    }
+    this.barcodearray = this.CnoteData.filter((x) => x.div == 'barcodearray')
+    if (this.barcodearray.length > 0) {
+      const array = {}
+      this.barcodearray.forEach(cnote => {
+        let validators = [];
+        if (cnote.validation === 'Required') {
+          validators = [Validators.required];
+        }
+
+        array[cnote.name] = this.fb.control(cnote.defaultvalue, validators);
+
+
+        // if(cnote.disable=='true'){
+        //   formControls[cnote.name].disable();
+        // }
+      });
+      formControls['barcodearray'] = this.fb.array([
+        this.fb.group(array)
+      ])
+
+    }
     return this.fb.group(formControls)
   }
-  //start
+  //start invoiceArray
   addField() {
     const array = {}
     const fields = this.step3.get('invoiceArray') as FormArray;
@@ -234,7 +285,27 @@ export class CNoteGenerationComponent implements OnInit {
       fields.removeAt(index);
     }
   }
+  //end
 
+  //start BcSeries
+  addBcSeriesField() {
+    const array = {}
+    const fields = this.step3.get('BcSeries') as FormArray;
+    if (this.InvoiceDetails.length > 0) {
+      this.InvoiceDetails.forEach(cnote => {
+        array[cnote.name] = this.fb.control('');
+
+      });
+
+    }
+    fields.push(this.fb.group(array));
+  }
+  removeBcSeriesField(index: number) {
+    const fields = this.step3.get('BcSeries') as FormArray;
+    if (fields.length > 1) {
+      fields.removeAt(index);
+    }
+  }
   //end
   //Api Calling Method on Chaged(ACTION URL)
   callActionFunction(functionName: string, event: any) {
@@ -298,6 +369,15 @@ export class CNoteGenerationComponent implements OnInit {
       case "Volumetric":
         this.volumetricChanged();
         break;
+      case "BcSerialType":
+        this.openModal(event)
+        break;
+      case "ConsignorChanged":
+        this.ConsignorAutoFill();
+        break;
+      case "ConsigneeDetail":
+        this.ConsigneeAutoFill();
+        break;
       default:
         break;
     }
@@ -309,7 +389,42 @@ export class CNoteGenerationComponent implements OnInit {
     console.log(event);
     console.log(this.step1.value);
   }
-
+  //ConsignorAutoFill
+  ConsignorAutoFill() {
+    let ConsignorCity = {
+      Value: this.step2.value.CST_NM.city,
+      Name: this.step2.value.CST_NM.city
+    }
+    this.step2.controls['ConsignorCity'].setValue(ConsignorCity)
+    this.step2.controls['GSTINNO'].setValue(this.step2.value.CST_NM.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber)
+    this.step2.controls['CST_ADD'].setValue(this.step2.value.CST_NM.CustAddress)
+    let Pincode = {
+      Value: this.step2.value.CST_NM.pincode,
+      Name: this.step2.value.CST_NM.pincode
+    }
+    this.step2.controls['ConsignorPinCode'].setValue(Pincode)
+    this.step2.controls['CST_PHONE'].setValue(this.step2.value.CST_NM.TelephoneNo)
+    this.step2.controls['CST_MOB'].setValue(this.step2.value.CST_NM.phoneno)
+  }
+  //end
+  //ConsigneeAutoFill
+  ConsigneeAutoFill() {
+    let ConsigneeCST_NM = {
+      Value: this.step2.value.ConsigneeCST_NM.city,
+      Name: this.step2.value.ConsigneeCST_NM.city
+    }
+    this.step2.controls['ConsigneeCity'].setValue(ConsigneeCST_NM)
+    this.step2.controls['ConsigneeGSTINNO'].setValue(this.step2.value.ConsigneeCST_NM.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber)
+    this.step2.controls['ConsigneeCST_ADD'].setValue(this.step2.value.ConsigneeCST_NM.CustAddress)
+    let Pincode = {
+      Value: this.step2.value.ConsigneeCST_NM.pincode,
+      Name: this.step2.value.ConsigneeCST_NM.pincode
+    }
+    this.step2.controls['ConsigneePinCode'].setValue(Pincode)
+    this.step2.controls['ConsigneeCST_PHONE'].setValue(this.step2.value.ConsigneeCST_NM.TelephoneNo)
+    this.step2.controls['ConsigneeCST_MOB'].setValue(this.step2.value.ConsigneeCST_NM.phoneno)
+  }
+  //end
   //Get all field and bind
   GetCnotecontrols() {
 
@@ -377,7 +492,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //end
   autoFill(event) {
-
     //VehicleAutoFill
     let VehicleNo = {
       Value: event.option.value.VehicleNo,
@@ -393,7 +507,20 @@ export class CNoteGenerationComponent implements OnInit {
     }
     this.step1.controls['PRQ_BILLINGPARTY'].setValue(billingParty);
     this.autofillflag = true
-    this.getBillingPartyAutoComplete('PRQ_BILLINGPARTY')
+    //this.getBillingPartyAutoComplete('PRQ_BILLINGPARTY')
+    //end
+    //consginer
+    let consginer = {
+      Value: event.option.value.CSGNCD,
+      Name: event.option.value.CSGNNM
+    }
+    this.step2.controls['CST_NM'].setValue(consginer);
+    //
+    //address
+    this.step2.controls['CST_ADD'].setValue(event.option.value.CSGNADDR);
+    //end
+    //telephone
+    this.step2.controls['CST_PHONE'].setValue(event.option.value.CSGNTeleNo);
     //end
     //FromCity
     let FromCity = {
@@ -414,15 +541,15 @@ export class CNoteGenerationComponent implements OnInit {
     this.step1.controls['TCITY'].setValue(toCity);
     //end
     //Paybas
-    this.step1.controls['PAYTYP'].setValue(event.option.value.Paybas);
+    this.step1.controls['PAYTYP'].setValue(event.option.value.Paybas == null ? this.step1.value.PAYTYP : event.option.value.Paybas);
     //end
 
     //FTLTYP
-    this.step1.controls['SVCTYP'].setValue(event.option.value.FTLValue);
+    this.step1.controls['SVCTYP'].setValue(event.option.value.FTLValue == null ? this.step1.value.SVCTYP : event.option.value.FTLValue);
     //end
 
     //Road
-    this.step1.controls['TRN'].setValue(event.option.value.FTLValue);
+    this.step1.controls['TRN'].setValue(event.option.value.TransModeValue == null ? this.step1.value.TRN : event.option.value.TransModeValue);
     //end
 
     //Destination
@@ -430,15 +557,15 @@ export class CNoteGenerationComponent implements OnInit {
     //end
 
     //PKGS
-    this.step1.controls['PKGS'].setValue(event.option.value.pkgsty)
+    this.step1.controls['PKGS'].setValue(event.option.value.pkgsty == null ? this.step1.value.PKGS : event.option.value.pkgsty)
     //end
 
     //PICKUPDELIVERY
-    this.step1.controls['PKPDL'].setValue(event.option.value.pkp_dly);
+    this.step1.controls['PKPDL'].setValue(event.option.value.pkp_dly == null ? this.step1.value.PKPDL : event.option.value.pkp_dly);
     //end
 
     //PROD
-    this.step1.controls['PROD'].setValue(event.option.value.prodcd);
+    this.step1.controls['PROD'].setValue(event.option.value.prodcd == null ? this.step1.value.PROD : event.option.value.prodcd);
     //end
     //ConsigneeCST_NM
     let ConsigneeCST_NM = {
@@ -449,11 +576,13 @@ export class CNoteGenerationComponent implements OnInit {
     //end
 
     //ConsigneeCST_ADD
-    this.step2.controls['ConsigneeCST_ADD'].setValue(event.option.value.CSGNADDR);
+    this.step2.controls['ConsigneeCST_ADD'].setValue(event.option.value.CSGEADDR);
     //end
-    //Consignor
-    this.step2.controls['CST_NM'].setValue(billingParty)
-    //
+    //ConsigneeCST_PHONE
+    this.step2.controls['ConsigneeCST_PHONE'].setValue(event.option.value.CSGETeleNo);
+    //end
+
+
   }
   //GetAllContractCompanywise
 
@@ -470,7 +599,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //billing Party api
   getBillingPartyAutoComplete(event) {
-
     let step = 'step' + this.CnoteData.find((x) => x.name == event).frmgrp;
     let control;
     switch (step) {
@@ -514,16 +642,33 @@ export class CNoteGenerationComponent implements OnInit {
               this.cnoteAutoComplete = res;
               if (this.autofillflag == true) {
 
-                let Consigner = res.find((x) => x.Value == this.step1.value.PRQ_BILLINGPARTY.Value);
-                this.step2.controls['CST_NM'].setValue(Consigner);
-                this.step2.controls['CST_ADD'].setValue(Consigner.CustAddress)
-                this.step2.controls['CST_PHONE'].setValue(Consigner.TelephoneNo)
-                this.step2.controls['GSTINNO'].setValue(Consigner.GSTINNumber)
+                // let Consigner = res.find((x) => x.Value == this.step1.value.PRQ_BILLINGPARTY.Value);
+
+                // this.step2.controls['CST_NM'].setValue(Consigner);
+                // let ConsignorCity = {
+                //   Value: Consigner.city,
+                //   Name: Consigner.city
+                // }
+                // this.step2.controls['ConsignorCity'].setValue(ConsignorCity)
+                // this.step2.controls['GSTINNO'].setValue(Consigner.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber)
+                // this.step2.controls['CST_ADD'].setValue(Consigner.CustAddress)
+                // let Pincode = {
+                //   Value: Consigner.pincode,
+                //   Name: Consigner.pincode
+                // }
+                // this.step2.controls['ConsignorPinCode'].setValue(Pincode)
+                // this.step2.controls['CST_PHONE'].setValue(Consigner.TelephoneNo)
+                // this.step2.controls['CST_MOB'].setValue(Consigner.phoneno)
                 this.autofillflag = false;
+
+
+              }
+              else {
+                this.getFromCity();
+                this.getToCity();
               }
               this.getBillingPartyFilter(event);
-              this.getFromCity();
-              this.getToCity();
+
             }
           }
         })
@@ -1140,21 +1285,33 @@ export class CNoteGenerationComponent implements OnInit {
 
 
   volumetricChanged() {
-    debugger;
     if (this.step3.value.Volumetric) {
       this.InvoiceLevalrule = this.Rules.find((x) => x.code == 'INVOICE_LEVEL_CONTRACT_INVOKE');
       if (this.InvoiceLevalrule.defaultvalue != "Y") {
-        this.step3Formcontrol = this.CnoteData.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName != 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
+        this.step3Formcontrol = this.CnoteData.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName != 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3' && x.div != 'BcSeries');
         this.InvoiceDetails = this.CnoteData.filter((x) => x.div == 'InvoiceDetails' && x.dbCodeName != 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
       }
       else {
-        this.step3Formcontrol = this.CnoteData.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName == 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
+        this.step3Formcontrol = this.CnoteData.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName == 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3' && x.div != 'BcSeries');
         this.InvoiceDetails = this.CnoteData.filter((x) => x.div == 'InvoiceDetails' && x.dbCodeName == 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
       }
     }
     else {
       this.step3Formcontrol = this.step3Formcontrol.filter(x => x.Class != 'Volumetric')
       this.InvoiceDetails = this.InvoiceDetails.filter(x => x.Class != 'Volumetric');
+    }
+  }
+  openModal(content) {
+    if (this.step3.value.BcSerialType == "E") {
+      this.displaybarcode = true;
+      const modalRef = this.modalService.open(content);
+
+      modalRef.result.then((result) => {
+        console.log(result);
+      });
+    }
+    else {
+      this.displaybarcode = false;
     }
   }
   //end

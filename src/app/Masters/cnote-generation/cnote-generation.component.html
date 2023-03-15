@@ -592,6 +592,160 @@
                                             </div>
 
                                         </div>
+                                        <br>
+                                        <h4>UBI Allocation for Packages</h4>
+                                        <hr>
+                                        <div class="row">
+                                            <h5><b>BC Series Type</b></h5><br>
+                                        </div>
+                                        <div>
+                                            <div class="col" *ngFor="let step3 of BcSerialType">
+                                                <mat-radio-group [formControlName]="step3.name"
+                                                    (change)="callActionFunction(step3.ActionFunction,content)">
+                                                    <mat-radio-button *ngFor="let option of BcSerialTypeRadio"
+                                                        [value]="option.value">
+                                                        {{ option.label }}
+                                                    </mat-radio-button>
+                                                </mat-radio-group>
+                                                <div *ngIf="displaybarcode" class="example-button-container"
+                                                    class="btndocket">
+                                                    <button mat-mini-fab class="my-fab" color="primary"
+                                                        aria-label="Example icon button with a menu icon"
+                                                        (click)="openModal(content)">
+                                                        <mat-icon>menu</mat-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <hr>
+                                        <div class="row" flex *ngIf="!displaybarcode">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                                <div *ngIf="BcSeries">
+                                                    <div>
+                                                        <div style="overflow-x: auto">
+                                                            <table class="table" class="BcSeries">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Sr no.</th>
+                                                                        <th *ngFor="let step3 of BcSeries">
+                                                                            {{step3.label}}</th>
+                                                                        <th>Action</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr formArrayName="BcSeries"
+                                                                        *ngFor="let field of step3.get('BcSeries').controls; index as i">
+                                                                        <td>{{i+1}}</td>
+                                                                        <td *ngFor="let step3 of BcSeries"
+                                                                            [formGroupName]="i">
+
+                                                                            <div class="col-md-12"
+                                                                                *ngIf="step3.type=='text'">
+                                                                                <input style="width: 168px;"
+                                                                                    type="step3.type"
+                                                                                    class="form-control"
+                                                                                    (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
+                                                                                    [formControlName]="step3.name"
+                                                                                    autocomplete="off">
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <button mat-mini-fab color="primary"
+                                                                                (click)="addBcSeriesField()"
+                                                                                aria-label="Example icon button with a menu icon">
+                                                                                +
+                                                                            </button>
+                                                                            <button mat-mini-fab color="warn"
+                                                                                (click)="removeBcSeriesField(i)"
+                                                                                aria-label="Example icon button with a filter list icon">
+                                                                                -
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <ng-template #content let-modal>
+                                            <div *ngIf="displaybarcode">
+                                                <div>
+                                                    <div style="overflow-x: auto">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th *ngFor="let step3 of barcodearray">
+                                                                        {{step3.label}}
+                                                                    </th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr formArrayName="barcodearray"
+                                                                    *ngFor="let field of step3.get('barcodearray').controls; index as i">
+                                                                    <td *ngFor="let step3 of barcodearray"
+                                                                        [formGroupName]="i">
+
+                                                                        <div class="col-md-12"
+                                                                            *ngIf="step3.type=='text'">
+                                                                            <input type="step3.type"
+                                                                                class="form-control"
+                                                                                (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
+                                                                                [formControlName]="step3.name"
+                                                                                autocomplete="off">
+                                                                        </div>
+                                                                        <div class="col-md-12"
+                                                                            *ngIf="step3.type=='date'">
+                                                                            <input class="form-control"
+                                                                                [formControlName]="step3.name"
+                                                                                type="date">
+                                                                        </div>
+                                                                        <div class="col-md-12"
+                                                                            *ngIf="step3.type=='dropdown'">
+                                                                            <select class="form-control"
+                                                                                [formControlName]="step3.name">
+                                                                                <option
+                                                                                    *ngFor="let option of step3.dropdown"
+                                                                                    [value]="option.value">
+                                                                                    {{ option.label }}
+                                                                                </option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td> <button mat-mini-fab color="warn"
+                                                                            (click)="removeBarcodeField(i)"
+                                                                            aria-label="Example mini fab with a heart icon">
+                                                                            -
+                                                                        </button>
+                                                                        <button mat-mini-fab color="primary"
+                                                                            (click)="addBarcodeField()"
+                                                                            aria-label="Example mini fab with a heart icon">
+                                                                            +
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="row">
+                                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                                        <div class="example-button-row">
+
+                                                            <button (click)="modal.close(content)"
+                                                                mat-button>Close</button>
+                                                            <button class="msr-3" mat-raised-button color="primary"
+                                                                (click)="modal.close(content)">Submit</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-template>
                                         <div class="row">
                                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                                                 <div class="example-button-row">
@@ -607,6 +761,7 @@
 
                                 </mat-step>
                             </div>
+
                         </mat-stepper>
                     </div>
 

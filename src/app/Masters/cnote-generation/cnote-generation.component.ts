@@ -5,7 +5,7 @@ import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.se
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { debounceTime, map, Observable, startWith } from 'rxjs';
+import {  map, Observable, startWith } from 'rxjs';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { cnoteMetaData } from './Cnote';
 
@@ -68,6 +68,7 @@ export class CNoteGenerationComponent implements OnInit {
   ConsigneeCity: any;
   DocumentDetails: Cnote[];
   AppointmentBasedDelivery: Cnote[];
+  //Radio button propty
   RadionAppoimentBasedDelivery: Radio[] = [{
     label: "Yes",
     value: "Y",
@@ -90,6 +91,7 @@ export class CNoteGenerationComponent implements OnInit {
     name: "SerialScan"
   }
   ]
+  //end---------------
   AppointmentDetails: Cnote[];
   isappointmentvisble: boolean;
   ContainerDetails: Cnote[];
@@ -100,6 +102,20 @@ export class CNoteGenerationComponent implements OnInit {
   BcSerialType: Cnote[];
   BcSeries: Cnote[];
   Consigneeflag: boolean;
+
+  //step3 hidden field which is use to cal
+  WeightToConsider: string;
+  VolMeasure: string;
+  MaxMeasureValue: number;
+  MinInvoiceValue: number;
+  MaxInvoiceValue: number;
+  MinInvoiceValuePerKG: number;
+  MaxInvoiceValuePerKG: number;
+  DefaultChargeWeight: number;
+  MinChargeWeight: number;
+  MaxChargeWeight: number;
+  //end--------------------------------------
+
   constructor(private fb: UntypedFormBuilder, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     this.GetActiveGeneralMasterCodeListByTenantId()
 
@@ -110,36 +126,40 @@ export class CNoteGenerationComponent implements OnInit {
     this.getContractDetail();
   }
 
-  // ngAfterViewChecked() {
-  //   if (!this.billingPartyAutoCompleteLoaded) {
-  //     this.getBillingPartyAutoComplete();
-  //     this.billingPartyAutoCompleteLoaded = true;
-  //   }
-  // }
-  //step-1 Formgrop 
+
+  // Define a function that creates and returns a FormGroup for step 1 of the form
   step1Formgrop(): UntypedFormGroup {
-    const formControls = {};
-    this.step1Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '1')
+    const formControls = {}; // Initialize an empty object to hold form controls
+    this.step1Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '1'); // Filter the form data to get only the controls for step 1
+
+    // Loop through the step 1 form controls and add them to the form group
     if (this.step1Formcontrol.length > 0) {
       this.step1Formcontrol.forEach(cnote => {
-        let validators = [];
-        if (cnote.validation === 'Required') {
+        let validators = []; // Initialize an empty array to hold validators for this control
+        if (cnote.validation === 'Required') { // If the control is required, add a required validator
           validators = [Validators.required];
         }
+        // Add the control to the form group, using its default value (or the current date if it is a 'TodayDate' control) and any validators
         formControls[cnote.name] = this.fb.control(cnote.defaultvalue == 'TodayDate' ? new Date() : cnote.defaultvalue, validators);
-
       });
+      // Create and return the FormGroup, using the form controls we just created
       return this.fb.group(formControls)
     }
-
   }
+
+
 
   //step-2 Formgrop 
   step2Formgrop(): UntypedFormGroup {
     const formControls = {};
+    // get all the form controls belonging to step 2
     this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2')
+    // get all form controls belonging to Consignor section
     this.Consignor = this.CnoteData.filter((x) => x.div == 'Consignor')
+    // get all form controls belonging to Consignee section
     this.Consignee = this.CnoteData.filter((x) => x.div == 'Consignee')
+    // get all form controls belonging to Document Details section
+    // and add dropdown options to RSKTY control
     this.DocumentDetails = this.CnoteData.filter((x) => x.div == 'DocumentDetails').map(item => {
       if (item.name === 'RSKTY') {
         item.dropdown = [{
@@ -151,28 +171,29 @@ export class CNoteGenerationComponent implements OnInit {
           "CodeDesc": "Owner's Risk"
         }
         ];
-
       }
       return item;
     });
-    // pending work beloe radio buttton
+    // get all form controls belonging to Appointment Based Delivery section
     this.AppointmentBasedDelivery = this.CnoteData.filter((x) => x.div == 'AppointmentBasedDelivery')
+    // get all form controls belonging to Appointment Details section
     this.AppointmentDetails = this.CnoteData.filter((x) => x.div == 'AppointmentDetails');
+    // define dropdown options for certain form controls in Container Details section
     const dropdowns = {
       'ContainerSize1': this.ContainerSize,
       'ContainerSize2': this.ContainerSize,
       'ContainerType': this.ContainerType,
       'ContainerCapacity': this.ContainerCapacity
     };
-
+    // get all form controls belonging to Container Details section
+    // and add dropdown options to applicable controls
     this.ContainerDetails = this.CnoteData.filter((x) => x.div == 'ContainerDetails').map(item => {
       if (dropdowns.hasOwnProperty(item.name)) {
         item.dropdown = dropdowns[item.name];
       }
       return item;
     });
-
-
+    // add form controls to the form group
     if (this.step2Formcontrol.length > 0) {
       this.step2Formcontrol.forEach(cnote => {
         let validators = [];
@@ -186,15 +207,21 @@ export class CNoteGenerationComponent implements OnInit {
       });
       return this.fb.group(formControls)
     }
-
   }
 
-  //step-3 Formgrop 
+
+  // Create a typed form group for step 3
   step3Formgrop(): UntypedFormGroup {
 
     const formControls = {};
+
+    // Get all the form controls that belong to step 3 from CnoteData
     this.step3Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '3')
+
+    // Get all the controls that belong to BcSerialType from CnoteData
     this.BcSerialType = this.CnoteData.filter((x) => x.div == 'BcSerialType')
+
+    // Loop through each control and create form controls with appropriate validators
     if (this.step3Formcontrol.length > 0) {
       this.step3Formcontrol.forEach(cnote => {
         let validators = [];
@@ -208,9 +235,12 @@ export class CNoteGenerationComponent implements OnInit {
         //   formControls[cnote.name].disable();
         // }
       });
-
     }
+
+    // Get all the invoice details from CnoteData
     this.InvoiceDetails = this.CnoteData.filter((x) => x.frmgrp == '3' && x.div == 'InvoiceDetails')
+
+    // Loop through each invoice detail and create form controls with appropriate validators
     if (this.InvoiceDetails.length > 0) {
       const array = {}
       this.InvoiceDetails.forEach(Idetail => {
@@ -222,12 +252,17 @@ export class CNoteGenerationComponent implements OnInit {
         array[Idetail.name] = this.fb.control('', validators);
 
       });
+
+      // Add the array of invoice details form controls to the form group
       formControls['invoiceArray'] = this.fb.array([
         this.fb.group(array)
       ])
-
     }
+
+    // Get all the controls that belong to BcSeries from CnoteData
     this.BcSeries = this.CnoteData.filter(x => x.frmgrp == '3' && x.div == 'BcSeries')
+
+    // Loop through each BcSeries control and create form controls with appropriate validators
     if (this.BcSeries.length > 0) {
       const array = {}
       this.BcSeries.forEach(BcSeries => {
@@ -239,11 +274,17 @@ export class CNoteGenerationComponent implements OnInit {
         array[BcSeries.name] = this.fb.control('', validators);
 
       });
+
+      // Add the array of BcSeries form controls to the form group
       formControls['BcSeries'] = this.fb.array([
         this.fb.group(array)
       ])
     }
+
+    // Get all the controls that belong to barcodearray from CnoteData
     this.barcodearray = this.CnoteData.filter((x) => x.div == 'barcodearray')
+
+    // Loop through each barcode control and create form controls with appropriate validators
     if (this.barcodearray.length > 0) {
       const array = {}
       this.barcodearray.forEach(cnote => {
@@ -254,65 +295,83 @@ export class CNoteGenerationComponent implements OnInit {
 
         array[cnote.name] = this.fb.control(cnote.defaultvalue, validators);
 
-
         // if(cnote.disable=='true'){
         //   formControls[cnote.name].disable();
         // }
       });
+
+      // Add the array of barcode form controls to the form group
       formControls['barcodearray'] = this.fb.array([
         this.fb.group(array)
       ])
-
     }
+
+    // Return the final form group with all the created form
     return this.fb.group(formControls)
   }
+
   //start invoiceArray
   addField() {
-    const array = {}
+    const array = {};
     const fields = this.step3.get('invoiceArray') as FormArray;
+
+    // Iterate through the InvoiceDetails array and create a form control for each item
     if (this.InvoiceDetails.length > 0) {
       this.InvoiceDetails.forEach(cnote => {
         array[cnote.name] = this.fb.control('');
-
       });
-
     }
+
+    // Add the form group to the form array
     fields.push(this.fb.group(array));
   }
+
   removeField(index: number) {
     const fields = this.step3.get('invoiceArray') as FormArray;
+
+    // Only remove the form group if there are more than one
     if (fields.length > 1) {
       fields.removeAt(index);
     }
   }
   //end
 
-  //start BcSeries
+
+
+  // start BcSeries
   addBcSeriesField() {
+    // create an empty object to store form controls
     const array = {}
+    // get the 'BcSeries' form array
     const fields = this.step3.get('BcSeries') as FormArray;
+    // check if there are invoice details available
     if (this.InvoiceDetails.length > 0) {
+      // create a form control for each invoice detail and add it to the object
       this.InvoiceDetails.forEach(cnote => {
         array[cnote.name] = this.fb.control('');
-
       });
-
     }
+    // add the form group with the form controls to the 'BcSeries' form array
     fields.push(this.fb.group(array));
   }
+
   removeBcSeriesField(index: number) {
+    // get the 'BcSeries' form array
     const fields = this.step3.get('BcSeries') as FormArray;
+    // check if there are more than one form group available
     if (fields.length > 1) {
+      // remove the form group at the specified index
       fields.removeAt(index);
     }
   }
-  //end
-  //Api Calling Method on Chaged(ACTION URL)
+  // end
+
+
+
+
+  // Call the appropriate function based on the given function name
   callActionFunction(functionName: string, event: any) {
     switch (functionName) {
-      case "apicall":
-        this.apicall(event);
-        break;
       case "billingPartyrules":
         this.getBillingPartyAutoComplete(event);
         break;
@@ -323,18 +382,19 @@ export class CNoteGenerationComponent implements OnInit {
         this.getFromCity();
         this.GetDetailedBasedOnContract();
         this.autofillCustomer();
+        this.GetInvoiceConfigurationBasedOnTransMode();
         break;
       case "ToCityAction":
         this.getToCity();
         break;
       case "Destination":
         this.GetDestinationDataCompanyWise();
-        break
+        break;
       case "getVehicleNo":
         this.getVehicleNo();
         break;
       case "Prqdetail":
-        this.prqVehicle()
+        this.prqVehicle();
         break;
       case "autoFill":
         this.autoFill(event);
@@ -343,7 +403,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.DocketValidation();
         break;
       case "GetMultiPickupDeliveryDocket":
-        this.GetMultiPickupDeliveryDocket(event)
+        this.GetMultiPickupDeliveryDocket(event);
         break;
       case "ConsignorCity":
         this.getConsignorCity();
@@ -359,7 +419,7 @@ export class CNoteGenerationComponent implements OnInit {
         break;
       case "IsConsignorFromMasterOrWalkin":
         this.isLabelChanged('Consignor', event.checked);
-        break
+        break;
       case "IsConsigneeFromMasterOrWalkin":
         this.isLabelChanged('Consignee', event.checked);
         break;
@@ -370,7 +430,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.volumetricChanged();
         break;
       case "BcSerialType":
-        this.openModal(event)
+        this.openModal(event);
         break;
       case "ConsignorChanged":
         this.ConsignorAutoFill();
@@ -378,119 +438,125 @@ export class CNoteGenerationComponent implements OnInit {
       case "ConsigneeDetail":
         this.ConsigneeAutoFill();
         break;
+      case "InvoiceCubicWeightCalculation":
+        this.InvoiceCubicWeightCalculation(event);
+        break;
       default:
         break;
     }
-
   }
-  //for Testing Purpose
-  apicall(event) {
 
-    console.log(event);
-    console.log(this.step1.value);
-  }
+
+
   //ConsignorAutoFill
   ConsignorAutoFill() {
-    let ConsignorCity = {
-      Value: this.step2.value.CST_NM.city,
-      Name: this.step2.value.CST_NM.city
-    }
-    this.step2.controls['ConsignorCity'].setValue(ConsignorCity)
-    this.step2.controls['GSTINNO'].setValue(this.step2.value.CST_NM.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber)
-    this.step2.controls['CST_ADD'].setValue(this.step2.value.CST_NM.CustAddress)
-    let Pincode = {
-      Value: this.step2.value.CST_NM.pincode,
-      Name: this.step2.value.CST_NM.pincode
-    }
-    this.step2.controls['ConsignorPinCode'].setValue(Pincode)
-    this.step2.controls['CST_PHONE'].setValue(this.step2.value.CST_NM.TelephoneNo)
-    this.step2.controls['CST_MOB'].setValue(this.step2.value.CST_NM.phoneno)
+    //set the value of GSTINNO control to the GSTINNumber of CST_NM control if it is not null, otherwise set it to empty string
+    this.step2.controls['GSTINNO'].setValue(this.step2.value.CST_NM.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber);
+    //set the value of CST_ADD control to the CustAddress of CST_NM control
+    this.step2.controls['CST_ADD'].setValue(this.step2.value.CST_NM.CustAddress);
+    //set the value of CST_PHONE control to the TelephoneNo of CST_NM control
+    this.step2.controls['CST_PHONE'].setValue(this.step2.value.CST_NM.TelephoneNo);
+    //set the value of CST_MOB control to the phoneno of CST_NM control
+    this.step2.controls['CST_MOB'].setValue(this.step2.value.CST_NM.phoneno);
   }
   //end
-  //ConsigneeAutoFill
+
+
+  // ConsigneeAutoFill function to auto-fill Consignee details
   ConsigneeAutoFill() {
-    let ConsigneeCST_NM = {
-      Value: this.step2.value.ConsigneeCST_NM.city,
-      Name: this.step2.value.ConsigneeCST_NM.city
-    }
-    this.step2.controls['ConsigneeCity'].setValue(ConsigneeCST_NM)
-    this.step2.controls['ConsigneeGSTINNO'].setValue(this.step2.value.ConsigneeCST_NM.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber)
-    this.step2.controls['ConsigneeCST_ADD'].setValue(this.step2.value.ConsigneeCST_NM.CustAddress)
-    let Pincode = {
-      Value: this.step2.value.ConsigneeCST_NM.pincode,
-      Name: this.step2.value.ConsigneeCST_NM.pincode
-    }
-    this.step2.controls['ConsigneePinCode'].setValue(Pincode)
-    this.step2.controls['ConsigneeCST_PHONE'].setValue(this.step2.value.ConsigneeCST_NM.TelephoneNo)
-    this.step2.controls['ConsigneeCST_MOB'].setValue(this.step2.value.ConsigneeCST_NM.phoneno)
+    // Set ConsigneeGSTINNO control value to GSTIN number if it exists, otherwise set it to empty string
+    this.step2.controls['ConsigneeGSTINNO'].setValue(this.step2.value.ConsigneeCST_NM.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber);
+
+    // Set ConsigneeCST_ADD control value to Consignee address
+    this.step2.controls['ConsigneeCST_ADD'].setValue(this.step2.value.ConsigneeCST_NM.CustAddress);
+
+    // Set ConsigneeCST_PHONE control value to Consignee telephone number
+    this.step2.controls['ConsigneeCST_PHONE'].setValue(this.step2.value.ConsigneeCST_NM.TelephoneNo);
+
+    // Set ConsigneeCST_MOB control value to Consignee mobile number
+    this.step2.controls['ConsigneeCST_MOB'].setValue(this.step2.value.ConsigneeCST_NM.phoneno);
   }
-  //end
-  //Get all field and bind
+  // End of ConsigneeAutoFill function
+
+
+  // Get all fields and bind
   GetCnotecontrols() {
-
-    this.ICnoteService.getCnoteBooking('cnotefields/', 10065).subscribe(
-      {
-        next: (res: any) => {
-          if (res) {
-            res.push(...this.detail);
-            this.CnoteData = res.filter(obj => obj.useField === 'Y').sort((a, b) => a.Seq - b.Seq);
-            localStorage.setItem('CnoteData', JSON.stringify(this.CnoteData));
-            localStorage.setItem('version', this.version.toString());
-            this.step1 = this.step1Formgrop();
-            this.step2 = this.step2Formgrop();
-            this.step3 = this.step3Formgrop();
-            this.getRules();
-          }
-
-        },
-        error:
-          (error) => {
-          },
-      });
+    this.ICnoteService.getCnoteBooking('cnotefields/', 10065).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Push the details array into the response array and filter based on useField property, sort by Seq property
+          res.push(...this.detail);
+          this.CnoteData = res.filter(obj => obj.useField === 'Y').sort((a, b) => a.Seq - b.Seq);
+          // Store the CnoteData array and version number in local storage
+          localStorage.setItem('CnoteData', JSON.stringify(this.CnoteData));
+          localStorage.setItem('version', this.version.toString());
+          // Initialize the form groups for steps 1, 2, and 3
+          this.step1 = this.step1Formgrop();
+          this.step2 = this.step2Formgrop();
+          this.step3 = this.step3Formgrop();
+          // Get the rules for the current company
+          this.getRules();
+        }
+      },
+      error: (error) => {
+        // Handle error
+      }
+    });
   }
+
   //Bind all rules
   getRules() {
-
     this.ICnoteService.getCnoteBooking('services/companyWiseRules/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
+          // Set the Rules variable to the first element of the response array
           this.Rules = res[0];
+          // Get the Invoice Level Contract Invoke rule and check if its default value is "Y"
           this.InvoiceLevalrule = this.Rules.find((x) => x.code == 'INVOICE_LEVEL_CONTRACT_INVOKE');
           if (this.InvoiceLevalrule.defaultvalue != "Y") {
+            // If the default value of the Invoice Level Contract Invoke rule is not "Y",
+            // filter out the step3Formcontrol items with div "InvoiceDetails" or dbCodeName "INVOICE_LEVEL_CONTRACT_INVOKE"
             this.step3Formcontrol = this.step3Formcontrol.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName !== 'INVOICE_LEVEL_CONTRACT_INVOKE');
           }
+          // Get the MAP_DLOC_PIN rule and USE_MAPPED_LOCATION_INCITY rule
           let Rules = this.Rules.find((x) => x.code == 'MAP_DLOC_PIN')
           let mapcityRule = this.Rules.find((x) => x.code == `USE_MAPPED_LOCATION_INCITY`)
           if (Rules.defaultvalue == "A") {
             if (mapcityRule.defaultvalue === "Y") {
+              // If the default value of MAP_DLOC_PIN is "A" and USE_MAPPED_LOCATION_INCITY is "Y",
+              // disable the DELLOC control in step1
               this.step1.controls['DELLOC'].disable();
             }
           }
           else {
             if (mapcityRule.defaultvalue === "Y") {
+              // If the default value of MAP_DLOC_PIN is not "A" and USE_MAPPED_LOCATION_INCITY is "Y",
+              // disable the DELLOC control in step1
               this.step1.controls['DELLOC'].disable();
             }
-
           }
+          // Call the volumetricChanged function
           this.volumetricChanged();
+          // Call the GetInvoiceConfigurationBasedOnTransMode function
+          this.GetInvoiceConfigurationBasedOnTransMode();
+          // Call the getDaterules function
           //this.getDaterules();
         }
       }
     })
   }
-  //getDateRules
 
+
+  // This function fetches the date rules from the backend and sets the minimum date for the date picker based on the rule.
   getDaterules() {
     this.ICnoteService.getCnoteBooking('services/getRuleFordate/', 10065).subscribe({
       next: (res: any) => {
         let filterfordate = res.find((x) => x.Rule_Y_N == 'Y');
         this.minDate.setDate(this.minDate.getDate() - filterfordate.BackDate_Days);
-
       }
-    })
+    });
   }
 
-  //end
   autoFill(event) {
     //VehicleAutoFill
     let VehicleNo = {
@@ -584,10 +650,12 @@ export class CNoteGenerationComponent implements OnInit {
 
 
   }
-  //GetAllContractCompanywise
 
+
+  /**
+   * Fetches contract details from API and sets it in component variable.
+   */
   getContractDetail() {
-
     this.ICnoteService.getCnoteBooking('services/getContractDetail/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
@@ -597,7 +665,11 @@ export class CNoteGenerationComponent implements OnInit {
     })
   }
 
-  //billing Party api
+
+  /**
+   * Gets the billing party autocomplete options based on the event and step.
+   * @param event The event that triggered the method.
+   */
   getBillingPartyAutoComplete(event) {
     let step = 'step' + this.CnoteData.find((x) => x.name == event).frmgrp;
     let control;
@@ -641,82 +713,54 @@ export class CNoteGenerationComponent implements OnInit {
             if (res) {
               this.cnoteAutoComplete = res;
               if (this.autofillflag == true) {
-
-                // let Consigner = res.find((x) => x.Value == this.step1.value.PRQ_BILLINGPARTY.Value);
-
-                // this.step2.controls['CST_NM'].setValue(Consigner);
-                // let ConsignorCity = {
-                //   Value: Consigner.city,
-                //   Name: Consigner.city
-                // }
-                // this.step2.controls['ConsignorCity'].setValue(ConsignorCity)
-                // this.step2.controls['GSTINNO'].setValue(Consigner.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber)
-                // this.step2.controls['CST_ADD'].setValue(Consigner.CustAddress)
-                // let Pincode = {
-                //   Value: Consigner.pincode,
-                //   Name: Consigner.pincode
-                // }
-                // this.step2.controls['ConsignorPinCode'].setValue(Pincode)
-                // this.step2.controls['CST_PHONE'].setValue(Consigner.TelephoneNo)
-                // this.step2.controls['CST_MOB'].setValue(Consigner.phoneno)
+                // TODO: Implement autofill
                 this.autofillflag = false;
-
-
               }
               else {
                 this.getFromCity();
                 this.getToCity();
               }
               this.getBillingPartyFilter(event);
-
             }
           }
         })
-
       }
     }
   }
 
+  // Filter function for billing party autocomplete
   getBillingPartyFilter(event) {
+    // Determine which step the billing party control is in
     let step = 'step' + this.CnoteData.find((x) => x.name == event).frmgrp;
+
+    // Set filteredCnoteBilling based on which step the control is in
     switch (step) {
       case 'step1':
-        this.filteredCnoteBilling = this.step1.controls[
-          event
-        ].valueChanges.pipe(
+        this.filteredCnoteBilling = this.step1.controls[event].valueChanges.pipe(
           startWith(""),
           map((value) => (typeof value === "string" ? value : value.Name)),
-          map((Name) =>
-            Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice()
-          )
+          map((Name) => Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice())
         );
         break;
       case 'step2':
-        this.filteredCnoteBilling = this.step2.controls[
-          event
-        ].valueChanges.pipe(
+        this.filteredCnoteBilling = this.step2.controls[event].valueChanges.pipe(
           startWith(""),
           map((value) => (typeof value === "string" ? value : value.Name)),
-          map((Name) =>
-            Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice()
-          )
+          map((Name) => Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice())
         );
         break;
       case 'step3':
-        this.filteredCnoteBilling = this.step3.controls[
-          event
-        ].valueChanges.pipe(
+        this.filteredCnoteBilling = this.step3.controls[event].valueChanges.pipe(
           startWith(""),
           map((value) => (typeof value === "string" ? value : value.Name)),
-          map((Name) =>
-            Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice()
-          )
+          map((Name) => Name ? this._bilingGropFilter(Name) : this.cnoteAutoComplete.slice())
         );
         break;
     }
-
   }
 
+
+  // Filter function for billing group autocomplete
   _bilingGropFilter(name: string): AutoCompleteCommon[] {
     const filterValue = name.toLowerCase();
 
@@ -725,6 +769,7 @@ export class CNoteGenerationComponent implements OnInit {
     );
   }
 
+  // Function to display billing group in the input field
   displayCnotegropFn(Cnotegrop: AutoCompleteCommon): string {
     return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Value + ":" + Cnotegrop.Name : "";
   }
@@ -736,150 +781,182 @@ export class CNoteGenerationComponent implements OnInit {
   getFromCity() {
 
     if (this.step1Formcontrol) {
-      let bLcode = this.step1Formcontrol.find((x) => x.name == 'FCITY');
-      let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
-      let req = {
-        companyCode: 10065,
-        map_dloc_city: rules.defaultvalue,
-        DocketMode: "Yes",
-        ContractParty: this.step1.value.PRQ_BILLINGPARTY.ContractId,
-        PaymentType: this.step1.value.PAYTYP
-      }
-      this.ICnoteService.cnotePost('services/getFromCity', req).subscribe({
-        next: (res: any) => {
+      // find FCITY control
+      const cityFormControl = this.step1Formcontrol.find(control => control.name === 'FCITY');
+      // find matching rule based on FCITY control's dbCodeName
+      const matchingRule = this.Rules.find(rule => rule.code === cityFormControl.dbCodeName);
 
-          this.Fcity = res;
+      const request = {
+        companyCode: 10065,
+        map_dloc_city: matchingRule.defaultvalue,
+        DocketMode: "Yes",
+        ContractParty: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
+        PaymentType: this.step1.value.PAYTYP
+      };
+
+      this.ICnoteService.cnotePost('services/getFromCity', request).subscribe({
+        next: (response: any) => {
+          this.Fcity = response;
           this.getCityFilter();
         }
-      })
+      });
     }
+
 
   }
   //end
 
-  //ToCity
 
+
+  // Get the list of destination cities based on the selected values
   getToCity() {
     if (this.step1Formcontrol) {
-      // let custCode = this.step1.value.PRQ_BILLINGPARTY == undefined ? "" : this.step1.value.PRQ_BILLINGPARTY.CodeId;
+      // Get the TCITY control from step1Formcontrol and find the corresponding rule
       let bLcode = this.step1Formcontrol.find((x) => x.name == 'TCITY');
       let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
+
+      // Build the request object with necessary data
       let req = {
         companyCode: 10065,
         map_dloc_city: rules.defaultvalue,
         DocketMode: "Yes",
-        ContractParty: this.step1.value.PRQ_BILLINGPARTY.ContractId,
+        ContractParty: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
         PaymentType: this.step1.value.PAYTYP,
         FromCity: this.step1.value.FCITY == "" ? "" : this.step1.value.FCITY.Value
-
       }
+
+      // Call the API to get the list of destination cities
       this.ICnoteService.cnotePost('services/getToCity', req).subscribe({
         next: (res: any) => {
-
+          // Save the response to the Tcity property and update the city filter
           this.Tcity = res;
           this.getCityFilter();
         }
       })
     }
   }
-  //End
 
-  //Destination
+
+
+  // Get Destination data company wise
   GetDestinationDataCompanyWise() {
+    // Find the BL code from the step1 form control
     //let bLcode = this.step1Formcontrol.find((x) => x.name == 'DELLOC');
+    // Find the rules for the BL code
     //let rules = this.Rules.find((x) => x.code.toLowerCase() == bLcode.dbCodeName.toLowerCase());
 
+    // Create a request object with company code and city name
     var req = {
       companyCode: 10065,
       City: this.step1.value.TCITY.Name
     }
 
+    // Call the API to get the mapped location from city name
     this.ICnoteService.cnotePost('services/GetMappedLocationFromCityName', req).subscribe({
       next: (res: any) => {
+        // Set the Destination property to the response
         this.Destination = res;
+        // Get the first destination auto object
         let objDelivaryAuto = this.Destination[0];
-
+        // Set the DELLOC form control value to the destination auto object
         this.step1.controls['DELLOC'].setValue(objDelivaryAuto == undefined ? '' : objDelivaryAuto);
-        this.getCityFilter()
+        // Get city filter
+        this.getCityFilter();
+        // Get detailed based on locations
         this.GetDetailedBasedOnLocations();
-
-
       }
     })
   }
-  //end
-  //prqVehicleReq
+  // End of GetDestinationDataCompanyWise function
+
+
+  // Function to retrieve PRQ vehicle request
   prqVehicle() {
+    // Check if PRQ value length is greater than 1
     if (this.step1.value.PRQ.length > 1) {
+      // Define request parameters
       let req = {
         companyCode: 10065,
         BranchCode: "MUMB",
         SearchText: this.step1.value.PRQ
-      }
+      };
+      // Send POST request to retrieve PRQ vehicle request
       this.ICnoteService.cnotePost('services/prqVehicleReq', req).subscribe({
         next: (res: any) => {
+          // Save retrieved PRQ vehicle request
           this.prqVehicleReq = res;
+          // Filter PRQ vehicle request for display
           this.prqVehicleFilter();
         }
       })
     }
   }
 
+  // Filters PRQ vehicle based on user input
   prqVehicleFilter() {
-    this.pReqFilter = this.step1.controls[
-      "PRQ"
-    ].valueChanges.pipe(
-      startWith(""),
-      map((value) => (typeof value === "string" ? value : value.Name)),
+    // Create a pipe to listen for changes in the PRQ control
+    this.pReqFilter = this.step1.controls["PRQ"].valueChanges.pipe(
+      startWith(""), // Start with an empty string
+      map((value) => (typeof value === "string" ? value : value.Name)), // Map to the control's value
       map((Name) =>
+        // Filter the PRQ vehicles based on user input
         Name ? this._PrqFilter(Name) : this.prqVehicleReq.slice()
       )
     );
   }
 
+  // Helper function to filter PRQ vehicles
   _PrqFilter(prqVehicleReq: string): prqVehicleReq[] {
     const filterValue = prqVehicleReq.toLowerCase();
 
+    // Filter the PRQ vehicles whose PRQ number starts with the user input
     return this.prqVehicleReq.filter(
       (option) => option.PRQNO.toLowerCase().indexOf(filterValue) === 0
     );
   }
 
+  // Display function for PRQ number and vehicle number
   displayPRQNoFn(Cnotegrop: prqVehicleReq): string {
-
     return Cnotegrop && Cnotegrop.PRQNO ? Cnotegrop.PRQNO + ':' + Cnotegrop.VehicleNo : "";
   }
-  //end
-  //Vehino
+
+
   getVehicleNo() {
+    // Check if the length of VEHICLE_NO value in step1 is greater than 1
     if (this.step1.value.VEHICLE_NO.length > 1) {
+      // Create a request object with required parameters
       let req = {
         companyCode: 10065,
         SearchText: this.step1.value.VEHICLE_NO,
         VendorCode: "",
         VehicleType: "Toll",
         IsCheck: 0
-      }
+      };
+      // Call cnotePost method from ICnoteService with endpoint 'services/GetVehicle' and request object
       this.ICnoteService.cnotePost('services/GetVehicle', req).subscribe(
+        // Handle the response from server
         {
           next: (res: any) => {
+            // Assign the response to Vehicno property
             this.Vehicno = res;
-            console.log(this.Vehicno);
+            // Call getCityFilter() method to update the autocomplete options
             this.getCityFilter();
           }
-
-        })
+        }
+      );
     }
   }
-  //end
+
   //CityApi
   getCityFilter() {
+    // Loop through the CnoteData array to set up autocomplete options for each form field
     for (const element of this.CnoteData) {
       const { name } = element;
       let filteredOptions: Observable<AutoCompleteCity[]>;
       let autocomplete = '';
 
       switch (name) {
+        // Set up autocomplete options for the FCITY form field
         case 'FCITY':
           if (this.Fcity) {
             autocomplete = 'autoFCity';
@@ -891,6 +968,7 @@ export class CNoteGenerationComponent implements OnInit {
           }
           break;
 
+        // Set up autocomplete options for the TCITY form field
         case 'TCITY':
           if (this.Tcity) {
             autocomplete = 'autoTCity';
@@ -902,6 +980,7 @@ export class CNoteGenerationComponent implements OnInit {
           }
           break;
 
+        // Set up autocomplete options for the DELLOC form field
         case 'DELLOC':
           if (this.Destination) {
             autocomplete = 'autoDestination';
@@ -912,6 +991,8 @@ export class CNoteGenerationComponent implements OnInit {
             );
           }
           break;
+
+        // Set up autocomplete options for the SRCDKT form field
         case 'SRCDKT':
           if (this.Multipickup) {
             autocomplete = 'autoSRCDKT';
@@ -921,8 +1002,9 @@ export class CNoteGenerationComponent implements OnInit {
               map((Name) => Name ? this._cityFilter(Name, this.Multipickup) : this.Multipickup.slice())
             );
           }
-          break
+          break;
 
+        // Set up autocomplete options for the VEHICLE_NO form field
         case 'VEHICLE_NO':
           if (this.Vehicno) {
             autocomplete = 'vehicleAutoComplate';
@@ -933,6 +1015,8 @@ export class CNoteGenerationComponent implements OnInit {
             );
           }
           break;
+
+        // Set up autocomplete options for the ConsignorCity form field
         case 'ConsignorCity':
           if (this.ConsignorCity) {
             autocomplete = 'ConsignorCityAutoComplate';
@@ -943,6 +1027,7 @@ export class CNoteGenerationComponent implements OnInit {
             );
           }
           break;
+        // Set up autocomplete options for the ConsignorPinCode form field
         case 'ConsignorPinCode':
           if (this.pinCodeDetail) {
             autocomplete = 'ConsignorCityAutoComplate';
@@ -953,6 +1038,7 @@ export class CNoteGenerationComponent implements OnInit {
             );
           }
           break;
+        // Set up autocomplete options for the ConsigneePinCode form field
         case 'ConsigneePinCode':
           if (this.pinCodeDetail) {
             autocomplete = 'ConsignorCityAutoComplate';
@@ -963,6 +1049,7 @@ export class CNoteGenerationComponent implements OnInit {
             );
           }
           break;
+        // Set up autocomplete options for the ConsigneeCity form field
         case 'ConsigneeCity':
           if (this.ConsigneeCity) {
             autocomplete = 'ConsigneeCityAutoComplate';
@@ -993,48 +1080,67 @@ export class CNoteGenerationComponent implements OnInit {
     return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Name : "";
   }
   //End
+
   //Docket Validation
   DocketValidation() {
-
+    // Create the request object with the necessary parameters
     let req = {
       companyCode: 10065,
       DocType: 'DKT',
       DocNo: this.step1.value.DKTNO,
       LocCode: "MUMB"
     }
+
     try {
-      this.ICnoteService.cnotePost('services/docketValidation', req).subscribe(
-        {
-          next: (res: any) => {
-            if (res.issuccess) {
-              this.docketallocate = res.result[0].Alloted_To;
-            }
-            else {
-              this.docketallocate = 'Alloted To'
-              SwalerrorMessage("error", res.originalError.info.message, "", true);
-            }
+      // Call the docketValidation service and subscribe to the response
+      this.ICnoteService.cnotePost('services/docketValidation', req).subscribe({
+        next: (res: any) => {
+          // If the service returns success, set the docketallocate value
+          if (res.issuccess) {
+            this.docketallocate = res.result[0].Alloted_To;
+          }
+          // Otherwise, display an error message and set the docketallocate value to a default value
+          else {
+            this.docketallocate = 'Alloted To'
+            SwalerrorMessage("error", res.originalError.info.message, "", true);
           }
         }
-      )
+      })
     }
+    // Catch any errors that occur during the service call
     catch (err) {
 
     }
   }
   //End
-  //GetMultiPickupDeliveryDocket 
+
+
+
+  /**
+   * Retrieves a list of multi-pickup/delivery dockets based on the selected criteria.
+   * @param event - The checkbox event triggering the function.
+   */
   GetMultiPickupDeliveryDocket(event) {
 
+    // If the checkbox is checked
     if (event.checked == true) {
+
+      // Prepare the request object with the required parameters
       let req = {
         companyCode: 10065,
         DocType: "DKT",
         PayBas: this.step1.value.PAYTYP,
         BookingDate: this.datePipe.transform(this.step1.value.DKTDT, 'd MMM y').toUpperCase()
       }
+
+      // Send the request to the server to get the list of dockets
       this.ICnoteService.cnotePost('services/GetMultiPickupDeliveryDocket', req).subscribe({
         next: (res: any) => {
+
+          // If the request was successful
           if (res.issuccess == true) {
+
+            // Extract the dockets from the response and format them as required
             let Detail = res.result
             let multipickArray = []
             Detail.map(x => {
@@ -1044,6 +1150,8 @@ export class CNoteGenerationComponent implements OnInit {
               } as AutoCompleteCity
               multipickArray.push(Multipickarray)
             });
+
+            // Update the list of multi-pickup/delivery dockets and update the city filter accordingly
             this.Multipickup = multipickArray;
             this.getCityFilter();
           }
@@ -1051,16 +1159,18 @@ export class CNoteGenerationComponent implements OnInit {
       })
     }
     else {
+      // If the checkbox is unchecked, clear the list of dockets and update the city filter
       this.Multipickup = [];
       this.getCityFilter();
     }
   }
-  //End
+
+
 
   //GetDetailedBasedOnLocations
   GetDetailedBasedOnLocations() {
-
-    let req = {
+    // Prepare the request payload
+    const req = {
       companyCode: 10065,
       Destination: this.step1.controls['DELLOC'].value.Value,
       ContractId: this.step1.value.PRQ_BILLINGPARTY == undefined ? "" : this.step1.value.PRQ_BILLINGPARTY.ContractId,
@@ -1070,35 +1180,47 @@ export class CNoteGenerationComponent implements OnInit {
       DestDeliveryPinCode: this.step1.value.DELLOC == undefined ? "" : this.step1.value.DELLOC.pincode,
       FromCity: this.step1.value.FCITY.Value == undefined ? "" : this.step1.value.FCITY.Value,
       ToCity: this.step1.value.TCITY.Value == undefined ? "" : this.step1.value.TCITY.Value
-    }
-    this.ICnoteService.cnotePost('services/GetDetailedBasedOnLocations', req).subscribe(
-      {
-        next: (res: any) => {
-          const ResDetailsBased = res.result[0];
-          if (ResDetailsBased.Oda == "Y") {
-            this.step1.controls['F_ODA'].setValue(ResDetailsBased.Oda == "Y" ? true : false);
-            SwalerrorMessage("info", "Currently To City/Pincode Is Out of delivery are so ODA is marked.", "", true);
-          }
-          if (ResDetailsBased.LocalBooking == "Y") {
-            this.step1.controls['F_LOCAL'].setValue(ResDetailsBased.LocalBooking == "Y" ? true : false);
-            SwalerrorMessage("info", "Currently from city and to city are same so local booking marked.", "", true);
-          }
-        }
-      })
-  }
-  //ends
-  //ConsignorCity
-  getConsignorCity() {
+    };
 
+    // Call the API
+    this.ICnoteService.cnotePost('services/GetDetailedBasedOnLocations', req).subscribe({
+      next: (res: any) => {
+        // Get the details from the response
+        const ResDetailsBased = res.result[0];
+
+        // Set the F_ODA flag if the destination is out of delivery area
+        if (ResDetailsBased.Oda == "Y") {
+          this.step1.controls['F_ODA'].setValue(ResDetailsBased.Oda == "Y" ? true : false);
+          SwalerrorMessage("info", "Currently To City/Pincode Is Out of delivery are so ODA is marked.", "", true);
+        }
+
+        // Set the F_LOCAL flag if the from city and to city are the same
+        if (ResDetailsBased.LocalBooking == "Y") {
+          this.step1.controls['F_LOCAL'].setValue(ResDetailsBased.LocalBooking == "Y" ? true : false);
+          SwalerrorMessage("info", "Currently from city and to city are same so local booking marked.", "", true);
+        }
+      }
+    });
+  }
+
+  //ends
+
+
+  // Fetches the Consignor City based on the entered search text
+  getConsignorCity() {
     if (this.step2.value.ConsignorCity.length > 2) {
       try {
+        // Fetches the rules for MAP_DLOC_CITY
         let rules = this.Rules.find((x) => x.code == 'MAP_DLOC_CITY');
+
+        // Creates the request object to be sent to the API endpoint
         let req = {
           searchText: this.step2.value.ConsignorCity,
           companyCode: 10065,
           MAP_DLOC_CITY: rules.defaultvalue
-
         }
+
+        // Makes the API call to fetch the Consignor City
         this.ICnoteService.cnotePost('services/ConsignorCity', req).subscribe({
           next: (res: any) => {
             if (res) {
@@ -1116,36 +1238,50 @@ export class CNoteGenerationComponent implements OnInit {
       }
     }
   }
-  //end
-  //getConsigneeCity
-  getConsigneeCity() {
 
-    if (this.step2.value.ConsigneeCity.length > 2) {
+  /**
+   * Gets the list of Consignee cities based on the search text entered by the user.
+   * Uses the API endpoint 'services/consigneeCity'.
+   */
+  getConsigneeCity() {
+    if (this.step2.value.ConsigneeCity.length > 2) { // Check if the search text entered by the user is at least 3 characters long.
       try {
+        // Find the rule with code 'MAP_DLOC_CITY' in the 'Rules' array and get its default value.
         let rules = this.Rules.find((x) => x.code == 'MAP_DLOC_CITY');
+
+        // Prepare the request object.
         let req = {
-          searchText: this.step2.value.ConsigneeCity,
-          companyCode: 10065,
-          MAP_DLOC_CITY: rules.defaultvalue
+          searchText: this.step2.value.ConsigneeCity, // The search text entered by the user.
+          companyCode: 10065, // The company code.
+          MAP_DLOC_CITY: rules.defaultvalue // The default value of the 'MAP_DLOC_CITY' rule.
         }
+
+        // Make a POST request to the 'services/consigneeCity' API endpoint with the request object.
         this.ICnoteService.cnotePost('services/consigneeCity', req).subscribe({
           next: (res: any) => {
+            // Update the 'ConsigneeCity' array with the result returned by the API.
             this.ConsigneeCity = res.result;
             this.getCityFilter()
           }
         })
       }
       catch (err) {
-
+        // Handle errors here.
       }
     }
   }
-  //end
-  //getpincode
+
+
+  // This function is used to fetch the details of a pincode
+  // based on the input provided by the user
+
   getPincodeDetail(event) {
 
+    // Initialize the control and city variables
     let control;
-    let city
+    let city;
+
+    // Switch case to handle the different scenarios
     switch (event) {
       case 'ConsignorPinCode':
         control = this.step2.get(event).value;
@@ -1156,15 +1292,21 @@ export class CNoteGenerationComponent implements OnInit {
         city = this.step2.get("ConsigneeCity").value
         break;
     }
+
+    // If the user has provided a valid input
     if (control.length > 1) {
       try {
+        // Prepare the request object
         let req = {
           searchText: control,
           companyCode: 10065,
           city: city.Value
         }
+
+        // Make a POST request to fetch the details
         this.ICnoteService.cnotePost('services/getPincode', req).subscribe({
           next: (res: any) => {
+            // If the response is not empty
             if (res) {
               this.pinCodeDetail = res;
               this.getCityFilter();
@@ -1173,13 +1315,17 @@ export class CNoteGenerationComponent implements OnInit {
         })
       }
       catch (err) {
+        // Handle errors gracefully
         SwalerrorMessage("error", "Please  Try Again", "", true);
       }
     }
   }
-  //end
-  //isLabelChanged
+
+
+
+  // This function updates the label values of the Consignor or Consignee based on the provided event and value
   isLabelChanged(event, value) {
+    // Helper function to update the labels array
     const updateLabel = (labels, fromLabel, toLabel) => {
       return labels.map(item => {
         if (item.label === fromLabel) {
@@ -1189,27 +1335,34 @@ export class CNoteGenerationComponent implements OnInit {
       });
     };
 
+    // Update the labels array of the Consignor if the event is 'Consignor'
     if (event === 'Consignor') {
+      // If the value is true, update the 'Walk-In' label to 'From Master'; otherwise, update 'From Master' to 'Walk-In'
       this.Consignor = value ? updateLabel(this.Consignor, 'Walk-In', 'From Master') : updateLabel(this.Consignor, 'From Master', 'Walk-In');
-    } else if (event === 'Consignee') {
+    }
+    // Update the labels array of the Consignee if the event is 'Consignee'
+    else if (event === 'Consignee') {
+      // If the value is true, update the 'Walk-In' label to 'From Master'; otherwise, update 'From Master' to 'Walk-In'
       this.Consignee = value ? updateLabel(this.Consignee, 'Walk-In', 'From Master') : updateLabel(this.Consignee, 'From Master', 'Walk-In');
     }
   }
-  //
-  //GetDetailedBasedOnContract
-  GetDetailedBasedOnContract() {
 
+  GetDetailedBasedOnContract() {
     try {
       let req = {
         companyCode: 10065,
         DataType: 2,
         PAYBAS: this.step1.value.PAYTYP,
-        CONTRACTID: this.step1.value.PRQ_BILLINGPARTY.ContractId
+        CONTRACTID: this.step1.value.PRQ_BILLINGPARTY?.ContractId || ""
       }
       this.ICnoteService.cnotePost('services/GetDetailedBasedOnContract', req).subscribe({
         next: (res: any) => {
+          // Define an array of code types that need dropdown data
           const codeTypes = ['FTLTYP', 'PKPDL', 'SVCTYP', 'TRN'];
+
+          // Iterate over each form control in step1Formcontrol
           this.step1Formcontrol.forEach(item => {
+            // If the form control's name is in codeTypes array, update its dropdown property with relevant data from response
             if (codeTypes.includes(item.name)) {
               item.dropdown = res.result.filter(x => x.CodeType === item.name);
             }
@@ -1218,34 +1371,42 @@ export class CNoteGenerationComponent implements OnInit {
       })
     }
     catch (err) {
-      SwalerrorMessage("error", "Please  Try Again", "", true);
+      SwalerrorMessage("error", "Please Try Again", "", true);
     }
   }
-  //end
+
   //displayedAppointment
   displayedAppointment() {
     this.isappointmentvisble = this.step2.value.IsAppointmentBasedDelivery == 'Y' ? true : false;
   }
-  //
-  //GetActiveGeneralMasterCodeListByTenantId
+
+
   GetActiveGeneralMasterCodeListByTenantId() {
+    // Dropdown values to fetch
     let dropdown = ["CNTSIZE", "CONTTYP", "CONTCAP"]
+
     try {
       let req = {
         companyCode: 10065,
         ddArray: dropdown
       }
+
+      // Fetch dropdown values using API
       this.ICnoteService.cnotePost('services/GetcommonActiveGeneralMasterCodeListByTenantId', req).subscribe({
         next: (res: any) => {
+          // Set ContainerSize, ContainerType, and ContainerCapacity arrays with filtered results
           this.ContainerSize = res.result.filter((x) => x.CodeType == 'CNTSIZE')
           this.ContainerType = res.result.filter((x) => x.CodeType == 'CONTTYP')
           this.ContainerCapacity = res.result.filter((x) => x.CodeType == 'CONTCAP')
+
+          // Check if CnoteData is already present in local storage
           this.data = JSON.parse(localStorage.getItem('CnoteData'));
           if (!this.data) {
+            // If not present, get Cnote controls
             this.GetCnotecontrols();
           }
           else {
-
+            // If present, set CnoteData and form groups for step1, step2, and step3
             this.CnoteData = this.data;
             this.CnoteData.sort((a, b) => (a.Seq - b.Seq));
             this.step1 = this.step1Formgrop();
@@ -1257,62 +1418,146 @@ export class CNoteGenerationComponent implements OnInit {
       })
     }
     catch (err) {
-
+      // Handle error
     }
   }
-  //end
-  //autofillCustomer
+
+
+
   autofillCustomer() {
-    //Consignor
+    // Fill Consignor name and value from PRQ_BILLINGPARTY.Name and PRQ_BILLINGPARTY.Value respectively
     let Consignor = {
       Name: this.step1.value.PRQ_BILLINGPARTY.Name,
       Value: this.step1.value.PRQ_BILLINGPARTY.Value
     }
     this.step2.controls['CST_NM'].setValue(Consignor)
-    //end
 
-    //Consignor address
+    // Fill Consignor address from PRQ_BILLINGPARTY.CustAddress
     this.step2.controls['CST_ADD'].setValue(this.step1.value.PRQ_BILLINGPARTY.CustAddress)
-    //end
-    //telephone
-    this.step2.controls['CST_PHONE'].setValue(this.step1.value.PRQ_BILLINGPARTY.TelephoneNo)
-    //end
 
-    //GST
+    // Fill telephone number from PRQ_BILLINGPARTY.TelephoneNo
+    this.step2.controls['CST_PHONE'].setValue(this.step1.value.PRQ_BILLINGPARTY.TelephoneNo)
+
+    // Fill GSTIN number from PRQ_BILLINGPARTY.GSTINNumber
     this.step2.controls['GSTINNO'].setValue(this.step1.value.PRQ_BILLINGPARTY.GSTINNumber)
-    //end
   }
 
 
   volumetricChanged() {
+    // Check if Volumetric is truthy (not undefined, null, false, 0, etc.)
     if (this.step3.value.Volumetric) {
+      // Find the Invoice Level rule with code 'INVOICE_LEVEL_CONTRACT_INVOKE'
       this.InvoiceLevalrule = this.Rules.find((x) => x.code == 'INVOICE_LEVEL_CONTRACT_INVOKE');
       if (this.InvoiceLevalrule.defaultvalue != "Y") {
+        // If the rule's default value is not 'Y', filter the step3Formcontrol and InvoiceDetails arrays
         this.step3Formcontrol = this.CnoteData.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName != 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3' && x.div != 'BcSeries');
         this.InvoiceDetails = this.CnoteData.filter((x) => x.div == 'InvoiceDetails' && x.dbCodeName != 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
       }
       else {
+        // If the rule's default value is 'Y', filter the step3Formcontrol and InvoiceDetails arrays
         this.step3Formcontrol = this.CnoteData.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName == 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3' && x.div != 'BcSeries');
         this.InvoiceDetails = this.CnoteData.filter((x) => x.div == 'InvoiceDetails' && x.dbCodeName == 'INVOICE_LEVEL_CONTRACT_INVOKE' && x.frmgrp == '3');
       }
     }
     else {
+      // If Volumetric is falsy, remove all elements from step3Formcontrol and InvoiceDetails that have a Class of 'Volumetric'
       this.step3Formcontrol = this.step3Formcontrol.filter(x => x.Class != 'Volumetric')
       this.InvoiceDetails = this.InvoiceDetails.filter(x => x.Class != 'Volumetric');
     }
   }
+
+
   openModal(content) {
+    // Check if BcSerialType is "E"
     if (this.step3.value.BcSerialType == "E") {
+      // If it is "E", set displaybarcode to true
       this.displaybarcode = true;
+      // Open a modal using the content parameter passed to the function
       const modalRef = this.modalService.open(content);
 
       modalRef.result.then((result) => {
-        console.log(result);
       });
     }
     else {
+      // If BcSerialType is not "E", set displaybarcode to false
       this.displaybarcode = false;
     }
   }
-  //end
+
+
+
+  // INVOICE SECTION START 
+  /**
+   * Calculates invoice cubic weight.
+   * @param {any} event - The event object.
+   * @returns void
+   */
+  InvoiceCubicWeightCalculation(event) {
+
+    if (this.step3.value.Volumetric) {
+      // Get package dimensions and calculate volume
+      let length = parseInt(event.controls.LENGTH?.value || 0);
+      let breadth = parseInt(event.controls.BREADTH?.value || 0);
+      let height = parseInt(event.controls.HEIGHT?.value || 0);
+      let noOfPackages = parseInt(event.controls.NO_PKGS.value || 0);
+      let volume = 0;
+
+      let cftVolume = length * breadth * height * parseInt(this.step3.value?.CFT_RATIO || 0) * noOfPackages;
+
+      // Calculate volume based on selected unit of measure
+      switch (this.VolMeasure) {
+        case "INCHES":
+          volume = length * breadth * height * parseInt(this.step1.value?.CFT_RATIO || 0) / 1728;
+          break;
+        case "CM":
+          volume = length * breadth * height * parseInt(this.step1.value?.CFT_RATIO || 0) / 27000;
+          break;
+        case "FEET":
+          volume = length * breadth * height * parseInt(this.step1.value?.CFT_RATIO || 0);
+          break;
+      }
+
+      volume = volume * noOfPackages;
+
+      // Update form control values
+      event.controls.CUB_WT.setValue(cftVolume);
+      event.controls.CUB_WT.updateValueAndValidity();
+    }
+  }
+
+
+
+  /**
+ * Gets invoice configuration based on the transport mode.
+ * @returns void
+ */
+  GetInvoiceConfigurationBasedOnTransMode() {
+    // Create request object
+    let req = {
+      companyCode: 10065,
+      contractid: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
+      ServiceType: this.step1.value.SVCTYP,
+      TransMode: this.step1.value.TRN
+    };
+
+    // Call API to get invoice configuration
+    this.ICnoteService.cnotePost('services/GetInvoiceConfigurationBasedOnTransMode', req).subscribe({
+      next: (res: any) => {
+        // Update form controls with received invoice details
+        let invoiceDetail = res.result;
+        this.step3.controls['CFT_RATIO'].setValue(invoiceDetail[0].VolRatio);
+        this.WeightToConsider = invoiceDetail[0].WeightToConsider;
+        this.MaxMeasureValue = invoiceDetail[0].MaxMeasureValue;
+        this.MinInvoiceValue = invoiceDetail[0].MinInvoiceValue;
+        this.MaxInvoiceValue = invoiceDetail[0].MaxInvoiceValue;
+        this.MinInvoiceValuePerKG = invoiceDetail[0].MinInvoiceValuePerKG;
+        this.MaxInvoiceValuePerKG = invoiceDetail[0].MaxInvoiceValuePerKG;
+        this.DefaultChargeWeight = invoiceDetail[0].DefaultChargeWeight;
+        this.MinChargeWeight = invoiceDetail[0].MinChargeWeight;
+        this.MaxChargeWeight = invoiceDetail[0].MaxChargeWeight;
+        this.VolMeasure = invoiceDetail[0].VolMeasure;
+      }
+    });
+  }
+
 }

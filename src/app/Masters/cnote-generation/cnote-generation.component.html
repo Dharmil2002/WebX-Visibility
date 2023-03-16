@@ -488,7 +488,7 @@
                                         <div class="row">
                                             <div [class]="divcol" *ngFor="let step3 of step3Formcontrol">
                                                 <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step3.type=='text'">
+                                                    *ngIf="step3.type=='text' && step3.div !='BcSeries' && step3.div !='barcodearray' ">
                                                     <mat-label>{{step3.label}}</mat-label>
                                                     <input matInput type="step3.type"
                                                         (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
@@ -548,7 +548,7 @@
                                                                                 <input style="width: 168px;"
                                                                                     type="step3.type"
                                                                                     class="form-control"
-                                                                                    (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
+                                                                                    (change)="callActionFunction(step3.ActionFunction,field)"
                                                                                     [formControlName]="step3.name"
                                                                                     autocomplete="off">
                                                                             </div>

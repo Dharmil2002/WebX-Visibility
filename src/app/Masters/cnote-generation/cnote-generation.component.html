@@ -532,7 +532,7 @@
                                                                     <tr>
                                                                         <th>Sr no.</th>
                                                                         <th *ngFor="let step3 of InvoiceDetails">
-                                                                            {{step3.label}}</th>
+                                                                            {{step3.label!='ChargedWeight'?step3.label:''}}</th>
                                                                         <th>Action</th>
                                                                     </tr>
                                                                 </thead>
@@ -544,7 +544,7 @@
                                                                             [formGroupName]="i">
 
                                                                             <div class="col-md-12"
-                                                                                *ngIf="step3.type=='text'">
+                                                                                *ngIf="step3.type=='text' && step3.name!='ChargedWeight'">
                                                                                 <input style="width: 168px;"
                                                                                     type="step3.type"
                                                                                     class="form-control"

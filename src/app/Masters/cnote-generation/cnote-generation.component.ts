@@ -341,7 +341,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   // start BcSeries
   addBcSeriesField() {
-    debugger
     // create an empty object to store form controls
     const array = {}
     // get the 'BcSeries' form array
@@ -441,6 +440,9 @@ export class CNoteGenerationComponent implements OnInit {
         this.ConsigneeAutoFill();
         break;
       case "InvoiceCubicWeightCalculation":
+        this.InvoiceCubicWeightCalculation(event);
+        break;
+      case "CalculateRowLevelChargeWeight":
         this.InvoiceCubicWeightCalculation(event);
         break;
       default:
@@ -1495,7 +1497,6 @@ export class CNoteGenerationComponent implements OnInit {
    * @returns void
    */
   InvoiceCubicWeightCalculation(event) {
-
     if (this.step3.value.Volumetric) {
       // Get package dimensions and calculate volume
       let length = parseInt(event.controls.LENGTH?.value || 0);
@@ -1524,24 +1525,57 @@ export class CNoteGenerationComponent implements OnInit {
       // Update form control values
       event.controls.CUB_WT.setValue(volume);
       event.controls.CUB_WT.updateValueAndValidity();
-
+      this.CalculateRowLevelChargeWeight(event, true, cftVolume)
     }
-    this.CalculateRowLevelChargeWeight(event, true)
+
   }
 
   ///CalculateRowLevelChargeWeight() 
-  CalculateRowLevelChargeWeight(event, FlagCalculateInvoiceTotal) {
-
-    let cubinWeight = parseFloat(event.controls?.CUB_WT || 0);
-    let ActualWeight = parseFloat(event.controls?.ACT_WT || 0);
+  CalculateRowLevelChargeWeight(event, FlagCalculateInvoiceTotal, cftVolume) {
+    let cubinWeight = parseFloat(event.controls.CUB_WT?.value || 0);
+    let ActualWeight = parseFloat(event.controls.ACT_WT?.value || 0);
     switch (this.WeightToConsider) {
       case "A":
+        event.controls.ChargedWeight.setValue(ActualWeight)
+        break;
+      case "V":
+        event.controls.ChargedWeight.setValue(ActualWeight)
+        break;
+      default:
+        event.controls.ChargedWeight.setValue(cubinWeight > ActualWeight ? cubinWeight : ActualWeight)
+        break;
 
+    }
+    if (FlagCalculateInvoiceTotal) {
+      this.CalculateInvoiceTotal(event, cftVolume);
     }
 
   }
   //End
 
+  //CalculateInvoiceTotal
+  CalculateInvoiceTotal(event, cftVolume) {
+    let TotalChargedNoofPackages = 0;
+    let TotalChargedWeight = 0;
+    let TotalDeclaredValue = 0;
+    let CftTotal = 0;
+    let TotalPartQuantity = 0;
+
+    let temp = event.controls.ChargedWeight?.value;
+    //Invoices.CalculateRowLevelChargeWeight(temp, false, isFromChargwt);
+    TotalChargedNoofPackages = + parseFloat(event.value?.NO_PKGS || 0);
+    TotalChargedWeight = + TotalChargedWeight + parseFloat(event.value?.ChargedWeight || 0);
+    TotalDeclaredValue = + TotalDeclaredValue + parseFloat(event.value?.DECLVAL || 0);
+    if (event.value?.CUB_WT) {
+      CftTotal = + parseFloat(event.value.CUB_WT + cftVolume)
+    }
+    this.step3.controls['TotalChargedNoofPackages'].setValue(TotalChargedNoofPackages.toFixed(2));
+    this.step3.controls['CHRGWT'].setValue(TotalChargedWeight.toFixed(2));
+    this.step3.controls['TotalDeclaredValue'].setValue(TotalDeclaredValue.toFixed(2));
+    this.step3.controls['CFT_TOT'].setValue(CftTotal.toFixed(2));
+
+  }
+  //End
 
   addBarcodeField() {
 

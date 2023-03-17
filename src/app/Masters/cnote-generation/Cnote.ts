@@ -702,6 +702,23 @@ export const cnoteMetaData = [
         "Search": "",
         "dbCodeName": "",
         "useField": "Y"
+    },
+    {
+        "id": 246,
+        "Seq": 70,
+        "label": "ChargedWeight",
+        "name": "ChargedWeight",
+        "type": "text",
+        "ActionFunction": "",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": '',
+        "div": "InvoiceDetails",
+        "Search": "",
+        "dbCodeName": "",
+        "useField": "Y"
     }
 
 

@@ -5,9 +5,10 @@ import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.se
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {  map, Observable, startWith } from 'rxjs';
+import { map, Observable, startWith } from 'rxjs';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { cnoteMetaData } from './Cnote';
+import { roundNumber, WebxConvert } from 'src/app/Utility/commonfunction';
 
 @Component({
   selector: 'app-cnote-generation',
@@ -248,8 +249,7 @@ export class CNoteGenerationComponent implements OnInit {
         if (Idetail.validation === 'Required') {
           validators = [Validators.required];
         }
-
-        array[Idetail.name] = this.fb.control('', validators);
+        array[Idetail.name] = this.fb.control(Idetail.defaultvalue == 'TodayDate' ? new Date().toISOString().slice(0, 10) : Idetail.defaultvalue, validators);
 
       });
 
@@ -312,13 +312,14 @@ export class CNoteGenerationComponent implements OnInit {
 
   //start invoiceArray
   addField() {
+
     const array = {};
     const fields = this.step3.get('invoiceArray') as FormArray;
 
     // Iterate through the InvoiceDetails array and create a form control for each item
     if (this.InvoiceDetails.length > 0) {
-      this.InvoiceDetails.forEach(cnote => {
-        array[cnote.name] = this.fb.control('');
+      this.InvoiceDetails.forEach(Idetail => {
+        array[Idetail.name] = this.fb.control(Idetail.defaultvalue == 'TodayDate' ? new Date().toISOString().slice(0, 10) : Idetail.defaultvalue);
       });
     }
 
@@ -340,6 +341,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   // start BcSeries
   addBcSeriesField() {
+    debugger
     // create an empty object to store form controls
     const array = {}
     // get the 'BcSeries' form array
@@ -1502,31 +1504,67 @@ export class CNoteGenerationComponent implements OnInit {
       let noOfPackages = parseInt(event.controls.NO_PKGS.value || 0);
       let volume = 0;
 
-      let cftVolume = length * breadth * height * parseInt(this.step3.value?.CFT_RATIO || 0) * noOfPackages;
+      let cftVolume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0) * WebxConvert.objectToDecimal(noOfPackages, 0);
 
       // Calculate volume based on selected unit of measure
       switch (this.VolMeasure) {
         case "INCHES":
-          volume = length * breadth * height * parseInt(this.step1.value?.CFT_RATIO || 0) / 1728;
+          volume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0) / 1728;
           break;
         case "CM":
-          volume = length * breadth * height * parseInt(this.step1.value?.CFT_RATIO || 0) / 27000;
+          volume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0) / 27000;
           break;
         case "FEET":
-          volume = length * breadth * height * parseInt(this.step1.value?.CFT_RATIO || 0);
+          volume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0);
           break;
       }
 
-      volume = volume * noOfPackages;
+      volume = parseFloat(roundNumber(volume * WebxConvert.objectToDecimal(noOfPackages, 0), 2));
 
       // Update form control values
-      event.controls.CUB_WT.setValue(cftVolume);
+      event.controls.CUB_WT.setValue(volume);
       event.controls.CUB_WT.updateValueAndValidity();
+
     }
+    this.CalculateRowLevelChargeWeight(event, true)
   }
 
+  ///CalculateRowLevelChargeWeight() 
+  CalculateRowLevelChargeWeight(event, FlagCalculateInvoiceTotal) {
+
+    let cubinWeight = parseFloat(event.controls?.CUB_WT || 0);
+    let ActualWeight = parseFloat(event.controls?.ACT_WT || 0);
+    switch (this.WeightToConsider) {
+      case "A":
+
+    }
+
+  }
+  //End
 
 
+  addBarcodeField() {
+
+    this.step3.value;
+    const array = {}
+    const fields = this.step3.get('barcodearray') as FormArray;
+    this.barcodearray = this.CnoteData.filter((x) => x.div == 'barcodearray')
+    if (this.barcodearray.length > 0) {
+      this.barcodearray.forEach(cnote => {
+        array[cnote.name] = this.fb.control(cnote.defaultvalue);
+
+      });
+
+    }
+    fields.push(this.fb.group(array));
+  }
+  removeBarcodeField(index: number) {
+
+    if (index != 0) {
+      const fields = this.step3.get('barcodearray') as FormArray;
+      fields.removeAt(index);
+    }
+  }
   /**
  * Gets invoice configuration based on the transport mode.
  * @returns void
@@ -1559,5 +1597,6 @@ export class CNoteGenerationComponent implements OnInit {
       }
     });
   }
+
 
 }

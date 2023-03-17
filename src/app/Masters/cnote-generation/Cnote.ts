@@ -599,6 +599,7 @@ export const cnoteMetaData = [
         "dbCodeName": "",
         "useField": "Y"
     },
+
     {
         "id": 240,
         "Seq": 70,
@@ -668,7 +669,40 @@ export const cnoteMetaData = [
         "useField": "Y"
     },
     //end
-
+    {
+        "id": 245,
+        "Seq": 68,
+        "label": "EWBDATE",
+        "name": "EWBDATE",
+        "type": "date",
+        "ActionFunction": "",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": 'TodayDate',
+        "div": "InvoiceDetails",
+        "Search": "",
+        "dbCodeName": "",
+        "useField": "Y"
+    },
+    {
+        "id": 246,
+        "Seq": 69,
+        "label": "EWBExpiredDate",
+        "name": "EWBEXPIRED",
+        "type": "date",
+        "ActionFunction": "",
+        "Validation": "",
+        "frmgrp": 3,
+        "display": true,
+        "enable": true,
+        "defaultvalue": 'TodayDate',
+        "div": "InvoiceDetails",
+        "Search": "",
+        "dbCodeName": "",
+        "useField": "Y"
+    }
 
 
 ]

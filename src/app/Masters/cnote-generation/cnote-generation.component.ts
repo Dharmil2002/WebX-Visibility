@@ -9,6 +9,7 @@ import { map, Observable, startWith } from 'rxjs';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { cnoteMetaData } from './Cnote';
 import { roundNumber, WebxConvert } from 'src/app/Utility/commonfunction';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-cnote-generation',
@@ -116,8 +117,11 @@ export class CNoteGenerationComponent implements OnInit {
   MinChargeWeight: number;
   MaxChargeWeight: number;
   //end--------------------------------------
-
-  constructor(private fb: UntypedFormBuilder, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
+//hidden field
+TaxControlType:string;
+  CcmServicesData: any;
+//end
+  constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     this.GetActiveGeneralMasterCodeListByTenantId()
 
   }
@@ -243,6 +247,7 @@ export class CNoteGenerationComponent implements OnInit {
 
     // Loop through each invoice detail and create form controls with appropriate validators
     if (this.InvoiceDetails.length > 0) {
+      debugger;
       const array = {}
       this.InvoiceDetails.forEach(Idetail => {
         let validators = [];
@@ -312,7 +317,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //start invoiceArray
   addField() {
-
+    debugger;
     const array = {};
     const fields = this.step3.get('invoiceArray') as FormArray;
 
@@ -445,6 +450,12 @@ export class CNoteGenerationComponent implements OnInit {
       case "CalculateRowLevelChargeWeight":
         this.InvoiceCubicWeightCalculation(event);
         break;
+      case "ValidateBcSeriesRow":
+        this.ValidateBcSeriesRow(event);
+        break;
+      case"VEHICLE_NO":
+      this.Divisionvalue();
+      break;
       default:
         break;
     }
@@ -510,6 +521,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Bind all rules
   getRules() {
+    debugger;
     this.ICnoteService.getCnoteBooking('services/companyWiseRules/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
@@ -538,6 +550,16 @@ export class CNoteGenerationComponent implements OnInit {
               // disable the DELLOC control in step1
               this.step1.controls['DELLOC'].disable();
             }
+            let ALLOWDEFAULTINVNODECLVAL = this.Rules.find(x => x.code == 'ALLOW_DEFAULT_INVNO_DECLVAL');
+            if (ALLOWDEFAULTINVNODECLVAL.defaultvalue == 'Y') {
+              this.step3.get('invoiceArray').setValue(
+                this.step3.value.invoiceArray.map(x => ({ ...x, INVNO: x.INVNO ? x.INVNO : 'NA' }))
+              );
+              this.cdr.detectChanges();
+            } 
+            //DKT_TAX_CONTROL_TYPE rule
+            this.TaxControlType = this.Rules.find(x => x.code === 'DKT_TAX_CONTROL_TYPE')?.defaultvalue ?? 'N'
+            //end
           }
           // Call the volumetricChanged function
           this.volumetricChanged();
@@ -652,6 +674,9 @@ export class CNoteGenerationComponent implements OnInit {
     this.step2.controls['ConsigneeCST_PHONE'].setValue(event.option.value.CSGETeleNo);
     //end
 
+    //call api GetPrqInvoiceList
+    this.GetPrqInvoiceList();
+    //end
 
   }
 
@@ -926,6 +951,7 @@ export class CNoteGenerationComponent implements OnInit {
 
 
   getVehicleNo() {
+    debugger;
     // Check if the length of VEHICLE_NO value in step1 is greater than 1
     if (this.step1.value.VEHICLE_NO.length > 1) {
       // Create a request object with required parameters
@@ -1532,6 +1558,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   ///CalculateRowLevelChargeWeight() 
   CalculateRowLevelChargeWeight(event, FlagCalculateInvoiceTotal, cftVolume) {
+    debugger
     let cubinWeight = parseFloat(event.controls.CUB_WT?.value || 0);
     let ActualWeight = parseFloat(event.controls.ACT_WT?.value || 0);
     switch (this.WeightToConsider) {
@@ -1555,6 +1582,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //CalculateInvoiceTotal
   CalculateInvoiceTotal(event, cftVolume) {
+    debugger
     let TotalChargedNoofPackages = 0;
     let TotalChargedWeight = 0;
     let TotalDeclaredValue = 0;
@@ -1611,7 +1639,7 @@ export class CNoteGenerationComponent implements OnInit {
       ServiceType: this.step1.value.SVCTYP,
       TransMode: this.step1.value.TRN
     };
-
+    console.log(this.step1.value.PRQ_BILLINGPARTY?.ContractId);
     // Call API to get invoice configuration
     this.ICnoteService.cnotePost('services/GetInvoiceConfigurationBasedOnTransMode', req).subscribe({
       next: (res: any) => {
@@ -1632,5 +1660,85 @@ export class CNoteGenerationComponent implements OnInit {
     });
   }
 
+  //GetPrqInvoiceList
+  GetPrqInvoiceList() {
+    debugger;
+    let req = {
+      companyCode: 10065,
+      PrqNumber: this.step1.value.PRQ.PRQNO
+    }
+
+    this.ICnoteService.cnotePost('services/GetPrqInvoiceList', req).subscribe(
+      {
+        next: (res: any) => {
+          let prqinvoiceDetail = res.result;
+          this.step3.controls.invoiceArray[0].controls.INVDT.setValue(prqinvoiceDetail.InvoiceDate)
+        }
+      })
+  }
+  //end
+  //ValidateBcSeriesRow
+  ValidateBcSeriesRow(event) {
+    debugger;
+    let req = {
+      companyCode: 10065,
+      FROM_SRNO: event.controls.From?.value || 0,
+      TO_SRNO: event.controls.To?.value || 0,
+      Location: 'MUMB'
+    }
+    this.ICnoteService.cnotePost('services/ValidateBcSeriesRow', req).subscribe({
+      next: (res: any) => {
+        if (res.result[0].Flag == 'N') {
+          SwalerrorMessage("error", res.result[0].Reason, "", true);
+        }
+      }
+    })
+  }
+  //end
+  //Divisionvalue changed when vehno select
+  Divisionvalue(){
+     this.step1.controls['DIV'].setValue(this.step1.value.VEHICLE_NO.Division);
+  }
+  //end
+  
+  //GetCcmServices
+  GetCcmServices(){
+    try{
+    let req={
+      CompanyCode:10065,
+      contractid:this.step1.value.PRQ_BILLINGPARTY?.ContractId ||''
+    }
+    this.ICnoteService.cnotePost('services/billingParty',req).subscribe({next:(res:any)=>{
+      this.CcmServicesData= res.result
+    }})
+  }
+  catch(err){
+     SwalerrorMessage("error","something is wrong please try again after some time","",true)
+  }
+
+  }
+  //end
+
+  //InvoiceValidation
+  InvoiceValidation(event){
+
+    let InvoiceValidationRules = {
+      InvoiceNo_DateRule: this.Rules.find(x => x.code === "INV_RULE").defaultvalue,
+      IsInvoiceNoMandatory: this.step3Formcontrol.find((x)=>x.name='INVNO').validation,
+      IsInvoiceDateMandatory: this.step3Formcontrol.find((x)=>x.name='INVDT').validation,
+      IsInvoiceLevelContractInvoke: this.Rules.find(x => x.code === "INVOICE_LEVEL_CONTRACT_INVOKE").defaultvalue,
+  }
+    switch(InvoiceValidationRules.InvoiceNo_DateRule)  {
+      case"CMP":/*Company Level*/
+      if(InvoiceValidationRules.IsInvoiceNoMandatory && WebxConvert.IsStringNullOrEmpty(event)){
+
+      }
+      break;
+
+
+    }
+   //let CcmServicesData =
+  }
+  //end
 
 }

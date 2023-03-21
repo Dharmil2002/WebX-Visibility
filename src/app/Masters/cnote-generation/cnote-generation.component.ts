@@ -117,10 +117,10 @@ export class CNoteGenerationComponent implements OnInit {
   MinChargeWeight: number;
   MaxChargeWeight: number;
   //end--------------------------------------
-//hidden field
-TaxControlType:string;
+  //hidden field
+  TaxControlType: string;
   CcmServicesData: any;
-//end
+  //end
   constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     this.GetActiveGeneralMasterCodeListByTenantId()
 
@@ -453,9 +453,9 @@ TaxControlType:string;
       case "ValidateBcSeriesRow":
         this.ValidateBcSeriesRow(event);
         break;
-      case"VEHICLE_NO":
-      this.Divisionvalue();
-      break;
+      case "VEHICLE_NO":
+        this.Divisionvalue();
+        break;
       default:
         break;
     }
@@ -556,7 +556,7 @@ TaxControlType:string;
                 this.step3.value.invoiceArray.map(x => ({ ...x, INVNO: x.INVNO ? x.INVNO : 'NA' }))
               );
               this.cdr.detectChanges();
-            } 
+            }
             //DKT_TAX_CONTROL_TYPE rule
             this.TaxControlType = this.Rules.find(x => x.code === 'DKT_TAX_CONTROL_TYPE')?.defaultvalue ?? 'N'
             //end
@@ -1523,6 +1523,8 @@ TaxControlType:string;
    * @returns void
    */
   InvoiceCubicWeightCalculation(event) {
+
+    let cftVolume = 0;
     if (this.step3.value.Volumetric) {
       // Get package dimensions and calculate volume
       let length = parseInt(event.controls.LENGTH?.value || 0);
@@ -1531,7 +1533,7 @@ TaxControlType:string;
       let noOfPackages = parseInt(event.controls.NO_PKGS.value || 0);
       let volume = 0;
 
-      let cftVolume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0) * WebxConvert.objectToDecimal(noOfPackages, 0);
+      cftVolume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0) * WebxConvert.objectToDecimal(noOfPackages, 0);
 
       // Calculate volume based on selected unit of measure
       switch (this.VolMeasure) {
@@ -1551,14 +1553,13 @@ TaxControlType:string;
       // Update form control values
       event.controls.CUB_WT.setValue(volume);
       event.controls.CUB_WT.updateValueAndValidity();
-      this.CalculateRowLevelChargeWeight(event, true, cftVolume)
-    }
 
+    }
+    this.CalculateRowLevelChargeWeight(event, true, cftVolume)
   }
 
   ///CalculateRowLevelChargeWeight() 
   CalculateRowLevelChargeWeight(event, FlagCalculateInvoiceTotal, cftVolume) {
-    debugger
     let cubinWeight = parseFloat(event.controls.CUB_WT?.value || 0);
     let ActualWeight = parseFloat(event.controls.ACT_WT?.value || 0);
     switch (this.WeightToConsider) {
@@ -1574,14 +1575,14 @@ TaxControlType:string;
 
     }
     if (FlagCalculateInvoiceTotal) {
-      this.CalculateInvoiceTotal(event, cftVolume);
+      this.CalculateInvoiceTotal(cftVolume);
     }
 
   }
   //End
 
   //CalculateInvoiceTotal
-  CalculateInvoiceTotal(event, cftVolume) {
+  CalculateInvoiceTotal(cftVolume) {
     debugger
     let TotalChargedNoofPackages = 0;
     let TotalChargedWeight = 0;
@@ -1589,14 +1590,17 @@ TaxControlType:string;
     let CftTotal = 0;
     let TotalPartQuantity = 0;
 
-    let temp = event.controls.ChargedWeight?.value;
+    // let temp = event.controls.ChargedWeight?.value;
     //Invoices.CalculateRowLevelChargeWeight(temp, false, isFromChargwt);
-    TotalChargedNoofPackages = + parseFloat(event.value?.NO_PKGS || 0);
-    TotalChargedWeight = + TotalChargedWeight + parseFloat(event.value?.ChargedWeight || 0);
-    TotalDeclaredValue = + TotalDeclaredValue + parseFloat(event.value?.DECLVAL || 0);
-    if (event.value?.CUB_WT) {
-      CftTotal = + parseFloat(event.value.CUB_WT + cftVolume)
-    }
+    this.step3.value.invoiceArray.forEach((x) => {
+      TotalChargedNoofPackages = TotalChargedNoofPackages + parseFloat(x.NO_PKGS || 0);
+      TotalChargedWeight = TotalChargedWeight + parseFloat(x.ChargedWeight || 0);
+      TotalDeclaredValue = TotalDeclaredValue + parseFloat(x.DECLVAL || 0);
+      if (x.CUB_WT) {
+        CftTotal = CftTotal + parseFloat(cftVolume)
+      }
+    })
+
     this.step3.controls['TotalChargedNoofPackages'].setValue(TotalChargedNoofPackages.toFixed(2));
     this.step3.controls['CHRGWT'].setValue(TotalChargedWeight.toFixed(2));
     this.step3.controls['TotalDeclaredValue'].setValue(TotalDeclaredValue.toFixed(2));
@@ -1672,7 +1676,10 @@ TaxControlType:string;
       {
         next: (res: any) => {
           let prqinvoiceDetail = res.result;
-          this.step3.controls.invoiceArray[0].controls.INVDT.setValue(prqinvoiceDetail.InvoiceDate)
+          //this.step3.controls.invoiceArray[0].controls.INVDT.setValue(prqinvoiceDetail.InvoiceDate)
+          this.step3.controls['F_VOL'].setValue(true)
+          this.step3.controls['ACT_WT'].setValue(prqinvoiceDetail[0].ActualWeight);
+          this.step3.controls['CHRGWT'].setValue(prqinvoiceDetail[0].ChargedWeight);
         }
       })
   }
@@ -1696,48 +1703,50 @@ TaxControlType:string;
   }
   //end
   //Divisionvalue changed when vehno select
-  Divisionvalue(){
-     this.step1.controls['DIV'].setValue(this.step1.value.VEHICLE_NO.Division);
+  Divisionvalue() {
+    this.step1.controls['DIV'].setValue(this.step1.value.VEHICLE_NO.Division);
   }
   //end
-  
+
   //GetCcmServices
-  GetCcmServices(){
-    try{
-    let req={
-      CompanyCode:10065,
-      contractid:this.step1.value.PRQ_BILLINGPARTY?.ContractId ||''
+  GetCcmServices() {
+    try {
+      let req = {
+        CompanyCode: 10065,
+        contractid: this.step1.value.PRQ_BILLINGPARTY?.ContractId || ''
+      }
+      this.ICnoteService.cnotePost('services/billingParty', req).subscribe({
+        next: (res: any) => {
+          this.CcmServicesData = res.result
+        }
+      })
     }
-    this.ICnoteService.cnotePost('services/billingParty',req).subscribe({next:(res:any)=>{
-      this.CcmServicesData= res.result
-    }})
-  }
-  catch(err){
-     SwalerrorMessage("error","something is wrong please try again after some time","",true)
-  }
+    catch (err) {
+      SwalerrorMessage("error", "something is wrong please try again after some time", "", true)
+    }
 
   }
   //end
 
   //InvoiceValidation
-  InvoiceValidation(event){
+  InvoiceValidation(event) {
 
     let InvoiceValidationRules = {
       InvoiceNo_DateRule: this.Rules.find(x => x.code === "INV_RULE").defaultvalue,
-      IsInvoiceNoMandatory: this.step3Formcontrol.find((x)=>x.name='INVNO').validation,
-      IsInvoiceDateMandatory: this.step3Formcontrol.find((x)=>x.name='INVDT').validation,
+      IsInvoiceNoMandatory: this.step3Formcontrol.find((x) => x.name = 'INVNO').validation,
+      IsInvoiceDateMandatory: this.step3Formcontrol.find((x) => x.name = 'INVDT').validation,
       IsInvoiceLevelContractInvoke: this.Rules.find(x => x.code === "INVOICE_LEVEL_CONTRACT_INVOKE").defaultvalue,
-  }
-    switch(InvoiceValidationRules.InvoiceNo_DateRule)  {
-      case"CMP":/*Company Level*/
-      if(InvoiceValidationRules.IsInvoiceNoMandatory && WebxConvert.IsStringNullOrEmpty(event)){
+    }
+    switch (InvoiceValidationRules.InvoiceNo_DateRule) {
+      case "CMP":/*Company Level*/
+        if (InvoiceValidationRules.IsInvoiceNoMandatory && WebxConvert.IsStringNullOrEmpty(event)) {
 
-      }
-      break;
+        }
+        break;
 
 
     }
-   //let CcmServicesData =
+    //let CcmServicesData =
   }
   //end
 

@@ -1678,6 +1678,12 @@ export class CNoteGenerationComponent implements OnInit {
       next: (res: any) => {
         // Update form controls with received invoice details
         let invoiceDetail = res.result;
+        this.InvoiceDetails = this.CnoteData.filter((x) => x.frmgrp == '3' && x.div == 'InvoiceDetails').map(item => {
+          if (item.Class === 'Volumetric') {
+              item.label=invoiceDetail[0].VolRatio?item.label+'('+invoiceDetail[0].VolMeasure+')':item.label.replace(/\(.+?\)/g, '');
+          }
+          return item;
+        });
         this.step3.controls['CFT_RATIO'].setValue(invoiceDetail[0].VolRatio);
         this.WeightToConsider = invoiceDetail[0].WeightToConsider;
         this.MaxMeasureValue = invoiceDetail[0].MaxMeasureValue;

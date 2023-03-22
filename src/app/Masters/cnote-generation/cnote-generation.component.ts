@@ -10,6 +10,7 @@ import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { cnoteMetaData } from './Cnote';
 import { roundNumber, WebxConvert } from 'src/app/Utility/commonfunction';
 import { ChangeDetectorRef } from '@angular/core';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cnote-generation',
@@ -45,6 +46,7 @@ export class CNoteGenerationComponent implements OnInit {
   pReqFilter: Observable<prqVehicleReq[]>;
   @ViewChild('closebutton') closebutton;
   displaybarcode: boolean = false;
+  countDktNo: number = 0;
   breadscrums = [
     {
       title: "CNoteGeneration",
@@ -120,6 +122,17 @@ export class CNoteGenerationComponent implements OnInit {
   //hidden field
   TaxControlType: string;
   CcmServicesData: any;
+  //end
+  //hiddden  field for ContractInvokeDependent
+  BasedOn1: string;
+  BasedOn2: string;
+  UseFrom: string;
+  UseTo: string;
+  UseTransMode: string;
+  UseRateType: string;
+  ChargeWeightToHighestDecimal: string;
+  ContractDepth: string;
+  ProceedDuringEntry: string;
   //end
   constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     this.GetActiveGeneralMasterCodeListByTenantId()
@@ -381,6 +394,7 @@ export class CNoteGenerationComponent implements OnInit {
         break;
       case "billingPartyDisble":
         this.getBillingPartyAutoComplete('PRQ_BILLINGPARTY');
+        this.GetConsignorConsigneeRules();
         break;
       case "FromCityaction":
         this.getFromCity();
@@ -453,6 +467,9 @@ export class CNoteGenerationComponent implements OnInit {
         break;
       case "VEHICLE_NO":
         this.Divisionvalue();
+        break;
+      case "ValidateInvoiceNo":
+        this.ValidateInvoiceNo(event);
         break;
       default:
         break;
@@ -669,7 +686,7 @@ export class CNoteGenerationComponent implements OnInit {
     //ConsigneeCST_PHONE
     this.step2.controls['ConsigneeCST_PHONE'].setValue(event.option.value.CSGETeleNo);
     //end
-    
+
     //step 3 
     const invoiceArray = this.step3.value.invoiceArray.map(x => ({
       ...x,
@@ -677,7 +694,7 @@ export class CNoteGenerationComponent implements OnInit {
       NO_PKGS: event.option.value.PKGSNO || x.NO_PKGS
     }));
     this.step3.get('invoiceArray').setValue(invoiceArray);
-    this.cdr.detectChanges(); 
+    this.cdr.detectChanges();
     this.CalculateInvoiceTotal(0);
     //
 
@@ -1375,15 +1392,15 @@ export class CNoteGenerationComponent implements OnInit {
     if (event === 'Consignor') {
       // If the value is true, update the 'Walk-In' label to 'From Master'; otherwise, update 'From Master' to 'Walk-In'
       this.Consignor = value ? updateLabel(this.Consignor, 'Walk-In', 'From Master') : updateLabel(this.Consignor, 'From Master', 'Walk-In');
-        this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2').map(item => {
-          if (item.name === 'CST_NM') {
-              item.type=value?'autodropdown':'text',
-              item.ActionFunction=value?'ConsignorChanged':'',
-              item.Search=value?'billingPartyrules':''
-          }
-          return item;
-        });
-      
+      this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2').map(item => {
+        if (item.name === 'CST_NM') {
+          item.type = value ? 'autodropdown' : 'text',
+            item.ActionFunction = value ? 'ConsignorChanged' : '',
+            item.Search = value ? 'billingPartyrules' : ''
+        }
+        return item;
+      });
+
     }
     // Update the labels array of the Consignee if the event is 'Consignee'
     else if (event === 'Consignee') {
@@ -1391,13 +1408,13 @@ export class CNoteGenerationComponent implements OnInit {
       this.Consignee = value ? updateLabel(this.Consignee, 'Walk-In', 'From Master') : updateLabel(this.Consignee, 'From Master', 'Walk-In');
       this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2').map(item => {
         if (item.name === 'ConsigneeCST_NM') {
-            item.type=value?'autodropdown':'text',
-            item.ActionFunction=value?'ConsignorChanged':'',
-            item.Search=value?'billingPartyrules':''
+          item.type = value ? 'autodropdown' : 'text',
+            item.ActionFunction = value ? 'ConsignorChanged' : '',
+            item.Search = value ? 'billingPartyrules' : ''
         }
         return item;
       });
-    
+
     }
   }
 
@@ -1479,21 +1496,35 @@ export class CNoteGenerationComponent implements OnInit {
 
 
   autofillCustomer() {
-    // Fill Consignor name and value from PRQ_BILLINGPARTY.Name and PRQ_BILLINGPARTY.Value respectively
-    let Consignor = {
-      Name: this.step1.value.PRQ_BILLINGPARTY.Name,
-      Value: this.step1.value.PRQ_BILLINGPARTY.Value
+    if (this.step1.value.PAYTYP == "P02" || !this.step2.value.CST_NM) {
+      // Fill Consignor name and value from PRQ_BILLINGPARTY.Name and PRQ_BILLINGPARTY.Value respectively
+      let Consignor = {
+        Name: this.step1.value.PRQ_BILLINGPARTY.Name,
+        Value: this.step1.value.PRQ_BILLINGPARTY.Value
+      }
+      this.step2.controls['CST_NM'].setValue(Consignor)
+
+      // Fill Consignor address from PRQ_BILLINGPARTY.CustAddress
+      this.step2.controls['CST_ADD'].setValue(this.step1.value.PRQ_BILLINGPARTY.CustAddress)
+
+      // Fill telephone number from PRQ_BILLINGPARTY.TelephoneNo
+      this.step2.controls['CST_PHONE'].setValue(this.step1.value.PRQ_BILLINGPARTY.TelephoneNo)
+
+      // Fill GSTIN number from PRQ_BILLINGPARTY.GSTINNumber
+      this.step2.controls['GSTINNO'].setValue(this.step1.value.PRQ_BILLINGPARTY.GSTINNumber)
     }
-    this.step2.controls['CST_NM'].setValue(Consignor)
+    else {
+      this.step2.controls['CST_NM'].setValue("")
 
-    // Fill Consignor address from PRQ_BILLINGPARTY.CustAddress
-    this.step2.controls['CST_ADD'].setValue(this.step1.value.PRQ_BILLINGPARTY.CustAddress)
+      // Fill Consignor address from PRQ_BILLINGPARTY.CustAddress
+      this.step2.controls['CST_ADD'].setValue("")
 
-    // Fill telephone number from PRQ_BILLINGPARTY.TelephoneNo
-    this.step2.controls['CST_PHONE'].setValue(this.step1.value.PRQ_BILLINGPARTY.TelephoneNo)
+      // Fill telephone number from PRQ_BILLINGPARTY.TelephoneNo
+      this.step2.controls['CST_PHONE'].setValue("")
 
-    // Fill GSTIN number from PRQ_BILLINGPARTY.GSTINNumber
-    this.step2.controls['GSTINNO'].setValue(this.step1.value.PRQ_BILLINGPARTY.GSTINNumber)
+      // Fill GSTIN number from PRQ_BILLINGPARTY.GSTINNumber
+      this.step2.controls['GSTINNO'].setValue("")
+    }
   }
 
 
@@ -1607,7 +1638,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //CalculateInvoiceTotal
   CalculateInvoiceTotal(cftVolume) {
-   
+
     let TotalChargedNoofPackages = 0;
     let TotalChargedWeight = 0;
     let TotalDeclaredValue = 0;
@@ -1623,8 +1654,8 @@ export class CNoteGenerationComponent implements OnInit {
       if (x.CUB_WT) {
         CftTotal = CftTotal + parseFloat(cftVolume)
       }
-      if(x.PARTQUANTITY){
-        TotalPartQuantity=TotalPartQuantity+x.PARTQUANTITY;
+      if (x.PARTQUANTITY) {
+        TotalPartQuantity = TotalPartQuantity + x.PARTQUANTITY;
       }
     })
 
@@ -1672,7 +1703,7 @@ export class CNoteGenerationComponent implements OnInit {
       ServiceType: this.step1.value.SVCTYP,
       TransMode: this.step1.value.TRN
     };
-    
+
     // Call API to get invoice configuration
     this.ICnoteService.cnotePost('services/GetInvoiceConfigurationBasedOnTransMode', req).subscribe({
       next: (res: any) => {
@@ -1680,7 +1711,7 @@ export class CNoteGenerationComponent implements OnInit {
         let invoiceDetail = res.result;
         this.InvoiceDetails = this.CnoteData.filter((x) => x.frmgrp == '3' && x.div == 'InvoiceDetails').map(item => {
           if (item.Class === 'Volumetric') {
-              item.label=invoiceDetail[0].VolRatio?item.label+'('+invoiceDetail[0].VolMeasure+')':item.label.replace(/\(.+?\)/g, '');
+            item.label = invoiceDetail[0].VolRatio ? item.label + '(' + invoiceDetail[0].VolMeasure + ')' : item.label.replace(/\(.+?\)/g, '');
           }
           return item;
         });
@@ -1711,7 +1742,7 @@ export class CNoteGenerationComponent implements OnInit {
         next: (res: any) => {
           let prqinvoiceDetail = res.result;
           this.step3.get('invoiceArray').setValue(
-            this.step3.value.invoiceArray.map(x => ({ ...x, INVDT: prqinvoiceDetail[0].InvoiceDate ? new Date(prqinvoiceDetail[0].InvoiceDate).toISOString().slice(0,10) : new Date().toISOString().slice(0, 10) }))
+            this.step3.value.invoiceArray.map(x => ({ ...x, INVDT: prqinvoiceDetail[0].InvoiceDate ? new Date(prqinvoiceDetail[0].InvoiceDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10) }))
           );
           this.step3.controls['Volumetric'].setValue(true);
           this.step3.controls['CHRGWT'].setValue(prqinvoiceDetail[0].ChargedWeight);
@@ -1762,6 +1793,42 @@ export class CNoteGenerationComponent implements OnInit {
 
   }
   //end
+  //ValidateInvoiceNo
+  ValidateInvoiceNo(event) {
+    debugger;
+    let req = {
+      companyCode: 10065,
+      InvoiceNumber: event.value.INVNO,
+      DocketNo: this.step1.value.DKTNO,
+      FinYear: 2023
+    }
+    this.ICnoteService.cnotePost('services/ValidateInvoiceNo', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          let docketNoexist = res.result[0].length > 0 ? res.result[0][0].InvoiceNo : '';
+          if (docketNoexist) {
+            SwalerrorMessage("error", "Invoice no is already exist with another docket.!", "", true)
+            event.controls.INVNO.setValue('')
+          } else {
+            this.CheckDockno(event)
+          }
+        }
+      }
+    })
+  }
+  CheckDockno(event) {
+    this.countDktNo = 0;
+    this.step3.value.invoiceArray.forEach((x) => {
+      if (x.INVNO == event.value.INVNO) {
+        if (this.countDktNo > 0) {
+          SwalerrorMessage("error", "Duplicate Invoice No.!", "", true);
+          event.controls.INVNO.setValue('')
+        }
+        this.countDktNo = this.countDktNo + 1
+      }
+    })
+  }
+  //end
 
   //InvoiceValidation
   InvoiceValidation(event) {
@@ -1784,5 +1851,105 @@ export class CNoteGenerationComponent implements OnInit {
     //let CcmServicesData =
   }
   //end
+  //GetConsignorConsigneeRules
+  GetConsignorConsigneeRules() {
+    debugger;
+    let req = {
+      companyCode: 10065,
+      PayBase: this.step1.value.PAYTYP
+    }
+    this.ICnoteService.cnotePost('services/GetConsignorConsigneeRules', req).subscribe({
+      next: (res: any) => {
+        if (res.result[0].ConsignorFromMaster == "N") {
+          this.step2.controls['IsConsignorFromMasterOrWalkin'].enable();
+          if (res.result[0].ConsignorSelection == "M") {
+            this.step2.controls['IsConsignorFromMasterOrWalkin'].setValue(true);
+          }
+          else {
+            this.step2.controls['IsConsignorFromMasterOrWalkin'].setValue(false);
+          }
+        }
+        else {
+          this.step2.controls['IsConsignorFromMasterOrWalkin'].disable();
+          this.step2.controls['IsConsignorFromMasterOrWalkin'].setValue(true);
+        }
+        this.isLabelChanged('Consignor', this.step2.controls['IsConsignorFromMasterOrWalkin'].value);
 
+        if (res.result[0].ConsigneeFromMaster == "N") {
+          this.step2.controls['IsConsigneeFromMasterOrWalkin'].enable();
+          if (res.result[0].ConsigneeSelection == "M") {
+            this.step2.controls['IsConsigneeFromMasterOrWalkin'].setValue(true);
+          }
+          else {
+            this.step2.controls['IsConsigneeFromMasterOrWalkin'].setValue(false);
+          }
+        }
+        else {
+          this.step2.controls['IsConsigneeFromMasterOrWalkin'].disable();
+          this.step2.controls['IsConsigneeFromMasterOrWalkin'].setValue(true);
+        }
+        this.isLabelChanged('Consignee', this.step2.controls['IsConsigneeFromMasterOrWalkin'].value);
+      }
+    })
+  }
+  //End
+  //GetContractInvokeDependent
+  GetContractInvokeDependent() {
+    try {
+      let req = {
+        companyCode: 10065,
+        ServiceType: this.step1.value.SVCTYP,
+        ContractID: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
+        ChargeType: "BKG",
+        PayBase: this.step1.value.PAYTYP,
+      }
+      this.ICnoteService.cnotePost("services/GetContractInvokeDependent", req).subscribe({
+        next: (res: any) => {
+          if (res) {
+            this.BasedOn1 = res.result[0].BasedOn1;
+            this.BasedOn2 = res.result[0].BasedOn2;
+            this.UseFrom = res.result[0].UseFrom;
+            this.UseTo = res.result[0].UseTo;
+            this.UseTransMode = res.result[0].UseTransMode;
+            this.UseRateType = res.result[0].UseRateType;
+            this.ChargeWeightToHighestDecimal = res.result[0].ChargeWeightToHighestDecimal;
+            this.ContractDepth = res.result[0].ContractDepth;
+            this.ProceedDuringEntry = res.result[0].ProceedDuringEntry;
+            this.SetBaseCodeValues();
+          }
+        }
+      })
+    }
+    catch (err) {
+      SwalerrorMessage("error", "Something is Wrong Please Try again Later", "", true);
+    }
+  }
+  SetBaseCodeValues() {
+    switch (this.BasedOn1) {
+      case "SVCTYP":
+        this.BasedOn1 = this.step1.value.SVCTYP;
+        break;
+      case "BUT":
+        this.BasedOn1 = this.step1.value.BUT;
+        break;
+      case "NONE":
+        this.BasedOn1 = "NONE";
+        break;
+    }
+    switch (this.BasedOn2) {
+      case "PROD":
+        this.BasedOn2 = this.step1.value.PROD;
+        break;
+      case "PKGS":
+        this.BasedOn2 = this.step1.value.PKGS;
+        break;
+      case "PKGS":
+        this.BasedOn2 = this.step1.value.PKGS;
+        break;
+      case "NONE":
+        this.BasedOn2 = "NONE";
+        break;
+    }
+  }
+  //end
 }

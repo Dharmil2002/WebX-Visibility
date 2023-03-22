@@ -247,7 +247,6 @@ export class CNoteGenerationComponent implements OnInit {
 
     // Loop through each invoice detail and create form controls with appropriate validators
     if (this.InvoiceDetails.length > 0) {
-      debugger;
       const array = {}
       this.InvoiceDetails.forEach(Idetail => {
         let validators = [];
@@ -317,7 +316,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //start invoiceArray
   addField() {
-    debugger;
     const array = {};
     const fields = this.step3.get('invoiceArray') as FormArray;
 
@@ -521,7 +519,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Bind all rules
   getRules() {
-    debugger;
     this.ICnoteService.getCnoteBooking('services/companyWiseRules/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
@@ -555,7 +552,6 @@ export class CNoteGenerationComponent implements OnInit {
               this.step3.get('invoiceArray').setValue(
                 this.step3.value.invoiceArray.map(x => ({ ...x, INVNO: x.INVNO ? x.INVNO : 'NA' }))
               );
-              this.cdr.detectChanges();
             }
             //DKT_TAX_CONTROL_TYPE rule
             this.TaxControlType = this.Rules.find(x => x.code === 'DKT_TAX_CONTROL_TYPE')?.defaultvalue ?? 'N'
@@ -673,6 +669,17 @@ export class CNoteGenerationComponent implements OnInit {
     //ConsigneeCST_PHONE
     this.step2.controls['ConsigneeCST_PHONE'].setValue(event.option.value.CSGETeleNo);
     //end
+    
+    //step 3 
+    const invoiceArray = this.step3.value.invoiceArray.map(x => ({
+      ...x,
+      ACT_WT: event.option.value.ATUWT || x.ACT_WT,
+      NO_PKGS: event.option.value.PKGSNO || x.NO_PKGS
+    }));
+    this.step3.get('invoiceArray').setValue(invoiceArray);
+    this.cdr.detectChanges(); 
+    this.CalculateInvoiceTotal(0);
+    //
 
     //call api GetPrqInvoiceList
     this.GetPrqInvoiceList();
@@ -951,7 +958,6 @@ export class CNoteGenerationComponent implements OnInit {
 
 
   getVehicleNo() {
-    debugger;
     // Check if the length of VEHICLE_NO value in step1 is greater than 1
     if (this.step1.value.VEHICLE_NO.length > 1) {
       // Create a request object with required parameters
@@ -1369,11 +1375,29 @@ export class CNoteGenerationComponent implements OnInit {
     if (event === 'Consignor') {
       // If the value is true, update the 'Walk-In' label to 'From Master'; otherwise, update 'From Master' to 'Walk-In'
       this.Consignor = value ? updateLabel(this.Consignor, 'Walk-In', 'From Master') : updateLabel(this.Consignor, 'From Master', 'Walk-In');
+        this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2').map(item => {
+          if (item.name === 'CST_NM') {
+              item.type=value?'autodropdown':'text',
+              item.ActionFunction=value?'ConsignorChanged':'',
+              item.Search=value?'billingPartyrules':''
+          }
+          return item;
+        });
+      
     }
     // Update the labels array of the Consignee if the event is 'Consignee'
     else if (event === 'Consignee') {
       // If the value is true, update the 'Walk-In' label to 'From Master'; otherwise, update 'From Master' to 'Walk-In'
       this.Consignee = value ? updateLabel(this.Consignee, 'Walk-In', 'From Master') : updateLabel(this.Consignee, 'From Master', 'Walk-In');
+      this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2').map(item => {
+        if (item.name === 'ConsigneeCST_NM') {
+            item.type=value?'autodropdown':'text',
+            item.ActionFunction=value?'ConsignorChanged':'',
+            item.Search=value?'billingPartyrules':''
+        }
+        return item;
+      });
+    
     }
   }
 
@@ -1583,7 +1607,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //CalculateInvoiceTotal
   CalculateInvoiceTotal(cftVolume) {
-    debugger
+   
     let TotalChargedNoofPackages = 0;
     let TotalChargedWeight = 0;
     let TotalDeclaredValue = 0;
@@ -1599,12 +1623,17 @@ export class CNoteGenerationComponent implements OnInit {
       if (x.CUB_WT) {
         CftTotal = CftTotal + parseFloat(cftVolume)
       }
+      if(x.PARTQUANTITY){
+        TotalPartQuantity=TotalPartQuantity+x.PARTQUANTITY;
+      }
     })
 
     this.step3.controls['TotalChargedNoofPackages'].setValue(TotalChargedNoofPackages.toFixed(2));
     this.step3.controls['CHRGWT'].setValue(TotalChargedWeight.toFixed(2));
     this.step3.controls['TotalDeclaredValue'].setValue(TotalDeclaredValue.toFixed(2));
     this.step3.controls['CFT_TOT'].setValue(CftTotal.toFixed(2));
+    this.step3.controls['TotalPartQuantity'].setValue(TotalPartQuantity);
+    //TotalPartQuantity calucation parts are pending 
 
   }
   //End
@@ -1643,7 +1672,7 @@ export class CNoteGenerationComponent implements OnInit {
       ServiceType: this.step1.value.SVCTYP,
       TransMode: this.step1.value.TRN
     };
-    console.log(this.step1.value.PRQ_BILLINGPARTY?.ContractId);
+    
     // Call API to get invoice configuration
     this.ICnoteService.cnotePost('services/GetInvoiceConfigurationBasedOnTransMode', req).subscribe({
       next: (res: any) => {
@@ -1666,7 +1695,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //GetPrqInvoiceList
   GetPrqInvoiceList() {
-    debugger;
     let req = {
       companyCode: 10065,
       PrqNumber: this.step1.value.PRQ.PRQNO
@@ -1676,17 +1704,18 @@ export class CNoteGenerationComponent implements OnInit {
       {
         next: (res: any) => {
           let prqinvoiceDetail = res.result;
-          //this.step3.controls.invoiceArray[0].controls.INVDT.setValue(prqinvoiceDetail.InvoiceDate)
-          this.step3.controls['F_VOL'].setValue(true)
-          this.step3.controls['ACT_WT'].setValue(prqinvoiceDetail[0].ActualWeight);
+          this.step3.get('invoiceArray').setValue(
+            this.step3.value.invoiceArray.map(x => ({ ...x, INVDT: prqinvoiceDetail[0].InvoiceDate ? new Date(prqinvoiceDetail[0].InvoiceDate).toISOString().slice(0,10) : new Date().toISOString().slice(0, 10) }))
+          );
+          this.step3.controls['Volumetric'].setValue(true);
           this.step3.controls['CHRGWT'].setValue(prqinvoiceDetail[0].ChargedWeight);
+          this.volumetricChanged();
         }
       })
   }
   //end
   //ValidateBcSeriesRow
   ValidateBcSeriesRow(event) {
-    debugger;
     let req = {
       companyCode: 10065,
       FROM_SRNO: event.controls.From?.value || 0,

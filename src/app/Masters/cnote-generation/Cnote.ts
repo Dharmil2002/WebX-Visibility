@@ -18,7 +18,8 @@ export const cnoteMetaData = [
         "div": "Consignor",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 200,
@@ -36,7 +37,8 @@ export const cnoteMetaData = [
         "div": "Consignor",
         "Search": "ConsignorCity",
         "dbCodeName": "MAP_DLOC_CITY",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 201,
@@ -54,7 +56,8 @@ export const cnoteMetaData = [
         "div": "Consignor",
         "Search": "ConsignorPinCode",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
 
     //Consignee------------------------------------------------------------------------------------------
@@ -74,7 +77,8 @@ export const cnoteMetaData = [
         "div": "Consignee",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 203,
@@ -92,7 +96,8 @@ export const cnoteMetaData = [
         "div": "Consignee",
         "Search": "billingPartyrules",
         "dbCodeName": "BILLINGPARTY_CSGN_CSGE_MSTR",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 204,
@@ -110,7 +115,8 @@ export const cnoteMetaData = [
         "div": "Consignee",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 205,
@@ -128,7 +134,8 @@ export const cnoteMetaData = [
         "div": "Consignee",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 206,
@@ -146,7 +153,8 @@ export const cnoteMetaData = [
         "div": "Consignee",
         "Search": "ConsigneeCity",
         "dbCodeName": "MAP_DLOC_CITY",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 207,
@@ -164,7 +172,8 @@ export const cnoteMetaData = [
         "div": "Consignee",
         "Search": "ConsigneePinCode",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 208,
@@ -182,7 +191,8 @@ export const cnoteMetaData = [
         "div": "Consignee",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 209,
@@ -200,7 +210,8 @@ export const cnoteMetaData = [
         "div": "Consignee",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 210,
@@ -218,7 +229,8 @@ export const cnoteMetaData = [
         "div": "AppointmentBasedDelivery",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 211,
@@ -236,7 +248,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 212,
@@ -253,7 +266,8 @@ export const cnoteMetaData = [
         "div": "AppointmentDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 213,
@@ -270,7 +284,8 @@ export const cnoteMetaData = [
         "div": "AppointmentDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 214,
@@ -287,7 +302,8 @@ export const cnoteMetaData = [
         "div": "AppointmentDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 215,
@@ -304,7 +320,8 @@ export const cnoteMetaData = [
         "div": "AppointmentDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 216,
@@ -321,7 +338,8 @@ export const cnoteMetaData = [
         "div": "AppointmentDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 217,
@@ -338,7 +356,8 @@ export const cnoteMetaData = [
         "div": "AppointmentDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
 
 
@@ -358,7 +377,8 @@ export const cnoteMetaData = [
         "div": "ContainerDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 219,
@@ -375,7 +395,8 @@ export const cnoteMetaData = [
         "div": "ContainerDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 220,
@@ -392,7 +413,8 @@ export const cnoteMetaData = [
         "div": "ContainerDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 221,
@@ -409,7 +431,8 @@ export const cnoteMetaData = [
         "div": "ContainerDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 223,
@@ -426,7 +449,8 @@ export const cnoteMetaData = [
         "div": "ContainerDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 224,
@@ -443,7 +467,8 @@ export const cnoteMetaData = [
         "div": "ContainerDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     //step3
     {
@@ -461,7 +486,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 230,
@@ -478,7 +504,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 231,
@@ -495,7 +522,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 232,
@@ -512,7 +540,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 236,
@@ -529,7 +558,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "INVOICE_LEVEL_CONTRACT_INVOKE",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 235,
@@ -546,7 +576,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "INVOICE_LEVEL_CONTRACT_INVOKE",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 236,
@@ -563,7 +594,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "INVOICE_LEVEL_CONTRACT_INVOKE",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 238,
@@ -580,7 +612,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "INVOICE_LEVEL_CONTRACT_INVOKE",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 239,
@@ -597,7 +630,8 @@ export const cnoteMetaData = [
         "div": "",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
 
     {
@@ -615,7 +649,8 @@ export const cnoteMetaData = [
         "div": "BcSerialType",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 241,
@@ -632,7 +667,8 @@ export const cnoteMetaData = [
         "div": "BcSeries",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 242,
@@ -649,7 +685,8 @@ export const cnoteMetaData = [
         "div": "BcSeries",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 243,
@@ -666,7 +703,8 @@ export const cnoteMetaData = [
         "div": "barcodearray",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     //end
     {
@@ -684,7 +722,8 @@ export const cnoteMetaData = [
         "div": "InvoiceDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 246,
@@ -701,7 +740,8 @@ export const cnoteMetaData = [
         "div": "InvoiceDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
+        "useField": "Y",
+        "Class": ""
     },
     {
         "id": 246,
@@ -718,9 +758,227 @@ export const cnoteMetaData = [
         "div": "InvoiceDetails",
         "Search": "",
         "dbCodeName": "",
-        "useField": "Y"
-    }
-
-
+        "useField": "Y",
+        "Class": ""
+    },
+//Invoice Other Details,
+{
+    "id": 246,
+    "Seq": 71,
+    "label": "Freight Rate",
+    "name": "FreightRate",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 247,
+    "Seq": 72,
+    "label": "FreightRateType",
+    "name": "FreightRateType",
+    "type": "dropdown",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 248,
+    "Seq": 73,
+    "label": "Freight Charges",
+    "name": "FreightCharge",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 249,
+    "Seq": 74,
+    "label": "Discount Rate",
+    "name": "DiscountRate",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 249,
+    "Seq": 74,
+    "label": "Discount Rate",
+    "name": "DiscountRate",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 250,
+    "Seq": 77,
+    "label": "Discount Amount",
+    "name": "DiscountAmount",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 251,
+    "Seq": 78,
+    "label": "FOV Rate",
+    "name": "FOVRate",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 251,
+    "Seq": 79,
+    "label": "FOV Calculated",
+    "name": "FOVCalculated",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 252,
+    "Seq": 80,
+    "label": "FOV Charged",
+    "name": "FOVCharged",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 253,
+    "Seq": 81,
+    "label": "EddDate",
+    "name": "EddDate",
+    "type": "date",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": ""
+},
+{
+    "id": 254,
+    "Seq": 86,
+    "label": "COD/DOD Charged",
+    "name": "CODDODCharged",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": "CodDodPortion",
+    
+},
+{
+    "id": 255,
+    "Seq": 87,
+    "label": "COD/DOD To be Collected",
+    "name": "CODDODTobeCollected",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": "CodDodPortion",
+    
+}
 ]
 

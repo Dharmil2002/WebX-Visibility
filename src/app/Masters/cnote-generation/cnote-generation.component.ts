@@ -10,8 +10,6 @@ import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { cnoteMetaData } from './Cnote';
 import { roundNumber, WebxConvert } from 'src/app/Utility/commonfunction';
 import { ChangeDetectorRef } from '@angular/core';
-import Swal from 'sweetalert2';
-
 @Component({
   selector: 'app-cnote-generation',
   templateUrl: './cnote-generation.component.html'
@@ -47,6 +45,7 @@ export class CNoteGenerationComponent implements OnInit {
   @ViewChild('closebutton') closebutton;
   displaybarcode: boolean = false;
   countDktNo: number = 0;
+  invoke:boolean=false;
   breadscrums = [
     {
       title: "CNoteGeneration",
@@ -133,7 +132,23 @@ export class CNoteGenerationComponent implements OnInit {
   ChargeWeightToHighestDecimal: string;
   ContractDepth: string;
   ProceedDuringEntry: string;
+  rowBillingParty: boolean;
+  isBillingPartysName: boolean;
   //end
+  //otherchargeHiddenField
+  MinFreightRate:number;
+  hdnDistanceInvoke:number;
+  BrimApiRule:string;
+  BrimGST:number;
+  BrimKFC:number;
+  BrimTotalAmount:number;
+  DiscountRateType:string;
+  FOVRateType:string;
+  CODRateType:string;
+  BaseCode1: any;
+  BaseCode2: any;
+  otherCharges: Cnote[];
+  //End
   constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     this.GetActiveGeneralMasterCodeListByTenantId()
 
@@ -322,7 +337,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.fb.group(array)
       ])
     }
-
+    this.otherCharges= this.CnoteData.filter((x)=>x.div=='otherCharges');
     // Return the final form group with all the created form
     return this.fb.group(formControls)
   }
@@ -1610,6 +1625,9 @@ export class CNoteGenerationComponent implements OnInit {
       event.controls.CUB_WT.updateValueAndValidity();
 
     }
+    else{
+
+    }
     this.CalculateRowLevelChargeWeight(event, true, cftVolume)
   }
 
@@ -1665,7 +1683,7 @@ export class CNoteGenerationComponent implements OnInit {
     this.step3.controls['CFT_TOT'].setValue(CftTotal.toFixed(2));
     this.step3.controls['TotalPartQuantity'].setValue(TotalPartQuantity);
     //TotalPartQuantity calucation parts are pending 
-
+    this .GetContractInvokeDependent();
   }
   //End
 
@@ -1715,6 +1733,7 @@ export class CNoteGenerationComponent implements OnInit {
           }
           return item;
         });
+        this.InvoiceDetails = this.CnoteData.filter((x) => x.Class != 'Volumetric' && x.div == 'InvoiceDetails')
         this.step3.controls['CFT_RATIO'].setValue(invoiceDetail[0].VolRatio);
         this.WeightToConsider = invoiceDetail[0].WeightToConsider;
         this.MaxMeasureValue = invoiceDetail[0].MaxMeasureValue;
@@ -1927,29 +1946,123 @@ export class CNoteGenerationComponent implements OnInit {
   SetBaseCodeValues() {
     switch (this.BasedOn1) {
       case "SVCTYP":
-        this.BasedOn1 = this.step1.value.SVCTYP;
+        this.BaseCode1 = this.step1.value.SVCTYP;
         break;
       case "BUT":
-        this.BasedOn1 = this.step1.value.BUT;
+        this.BaseCode1 = this.step1.value.BUT;
         break;
       case "NONE":
-        this.BasedOn1 = "NONE";
+        this.BaseCode1 = "NONE";
         break;
     }
     switch (this.BasedOn2) {
       case "PROD":
-        this.BasedOn2 = this.step1.value.PROD;
+        this.BaseCode2 = this.step1.value.PROD;
         break;
       case "PKGS":
-        this.BasedOn2 = this.step1.value.PKGS;
+        this.BaseCode2 = this.step1.value.PKGS;
         break;
       case "PKGS":
-        this.BasedOn2 = this.step1.value.PKGS;
+        this.BaseCode2 = this.step1.value.PKGS;
         break;
       case "NONE":
-        this.BasedOn2 = "NONE";
+        this.BaseCode2 = "NONE";
         break;
     }
+    this.InvokeInvoice();
   }
   //end
+
+  //SetBillingParty
+  SetBillingParty(){
+    let WHO_IS_PARTY = this.Rules.find(x=>x.code=='WHO_IS_PARTY' && x.paybas==this.step1.value.PAYTYP);
+    this.rowBillingParty=true;
+    switch(WHO_IS_PARTY.defaultvalue){
+      case"1":
+      if(!WebxConvert.IsObjectNullOrEmpty(this.step1.value.PRQ_BILLINGPARTY)){
+        this.step3.controls['BillingPartys_3'].setValue(true);
+      }
+      else{
+        this.step3.controls['BillingPartys_4'].setValue(true);
+      }
+      break;
+      case"3":
+        this.step3.controls['BillingPartys_1'].setValue(true);
+        this.rowBillingParty=false;
+      break;
+      case"4":
+        this.step3.controls['BillingPartys_2'].setValue(true);
+        this.rowBillingParty=false;
+      break; 
+      case"5":
+        if(!WebxConvert.IsStringNullOrEmpty(this.step1.value.PRQ_BILLINGPARTY)){
+          this.step3.controls['BillingPartys_3'].setValue(true);
+          this.rowBillingParty=false;
+        }
+        else{
+          this.step3.controls['BillingPartys_4'].setValue(true);
+        }
+      break;
+      default:
+        break;
+    } 
+    this.BillingPartyChange(this.step1.value.BillingPartys_3)
+  }
+  BillingPartyChange(billingParty){
+    if(billingParty){
+      this.isBillingPartysName=true
+    }
+    else{
+      this.isBillingPartysName=false;
+    }
+
+  }
+  InvokeInvoice(){
+    debugger;
+    let req={
+      companyCode:10065,
+      ContractKeys:{
+      CompanyCode:10065,
+      BasedOn1:this.BasedOn1,
+      BaseCode1:this.BaseCode2,
+      BasedOn2:this.BasedOn2,
+      BaseCode2:this.BaseCode2,
+      ChargedWeight:this.step3.value.CHRGWT,
+      ContractId:this.step1.value.PRQ_BILLINGPARTY.ContractId,
+      DelLoc: this.step1.controls['DELLOC'].value.Value,
+      Depth: this.ContractDepth ,
+      FromCity: this.step1.value.FCITY.Value, 
+      FTLType: this.step1.value.FTLTYP, 
+      NoOfPkgs: this.step3.value.TotalChargedNoofPackages?this.step3.value.TotalChargedNoofPackages:0, 
+      Quantity: this.step3.value.TotalPartQuantity?this.step3.value.TotalPartQuantity:0, 
+      OrgnLoc:"MUMB", 
+      PayBase: this.step1.value.PAYTYP?this.step1.value.PAYTYP:"", 
+      ServiceType: this.step1.value.SVCTYP , 
+      ToCity: this.step1.value.TCITY.Value, 
+      TransMode: this.step1.value.TRN, 
+      OrderID: "01",
+      InvAmt: this.step3.value.TotalDeclaredValue?this.step3.value.TotalDeclaredValue:0, 
+      DeliveryZone:0, 
+      DestDeliveryPinCode: 140402, 
+      DestDeliveryArea: "RAJPURA", 
+      DocketDate:'2023-01-31T12:00:00' 
+      }
+    }
+    this.ICnoteService.cnotePost('services/InvokeFreight',req).subscribe({
+      next:(res:any)=>{
+        if(res){
+          let InvokeFreigh =res.result.root;
+        }
+      }
+    })
+  }
+  paymentDetail(event){
+    if(event=='PaymentDetail'){
+      this.invoke=true
+    }
+     else{
+      this.invoke=false
+     }
+  }
+  //End
 }

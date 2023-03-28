@@ -136,3 +136,144 @@ export interface Radio{
        custcat: string;
        Contract_Type: string;
    }
+   export class DocketChargeRequest {
+      CHANNEL_TYPE_ID: string;
+      PAY_BASIS: string;
+      CUSTOMER_ID: string;
+      BOOKING_DATE: string;
+      BOOKING_TIME: string;
+      SERVICE: string;
+      BOOKING_TYPE: string;
+      CHARGE_WEIGHT: number;
+      NO_OF_PIECES: number;
+      FOD_AMOUNT: number;
+      COD_AMOUNT: number;
+      CONSIGNER_GSTNUMBER: string;
+      CONSIGNEE_GSTNUMBER: string;
+      INSURED: string;
+      INSURED_BY: string;
+      BRNCH_OFF: string;
+      INV_VALUE: number;
+      DEST_PINCODE: string;
+      APP_BOOKING: string;
+      SBU: string;
+      DEST_BRANCH: string;
+      DOCUMENT_CODE: string;
+      VAS_PROD_CODE: string;
+      RATE_CUST_CODE: string;
+      DACC: string;
+      CONSGMNT_STATUS: string;
+  }
+  export class RequestContractKeys {
+   companyCode: number
+   ContractKeys: ContractKeys
+   constructor() {
+      this.ContractKeys = new ContractKeys();
+    }
+ }
+ 
+ export class ContractKeys {
+   CompanyCode: number
+   BasedOn1: string
+   BaseCode1: string
+   BasedOn2: string
+   BaseCode2: string
+   ChargedWeight: string
+   ContractId: string
+   DelLoc: string
+   Depth: string
+   FromCity: string
+   FTLType: string
+   NoOfPkgs: string
+   Quantity: number
+   OrgnLoc: string
+   PayBase: string
+   ServiceType: string
+   ToCity: string
+   TransMode: string
+   OrderID: string
+   InvAmt: string
+   DeliveryZone: number
+   DestDeliveryPinCode: number
+   DestDeliveryArea: string
+   DocketDate: string
+ }
+ export class DocketOtherChargesCriteria {
+   ChargeRule: string;
+   ChargeType: string;
+   CompanyCode: number;
+   BasedOn1: string;
+   BaseCode1: string;
+   BasedOn2: string;
+   BaseCode2: string;
+   ContractID: string;
+   FromCity: string;
+   ToCity: string;
+   FromPincode: string;
+   ToPincode: string;
+   OrgnLoc: string;
+   DelLoc: string;
+   PayBase: string;
+   ServiceType: string;
+   FTLType: string;
+   TransMode: string;
+   ProdType: string;
+   PackType: string;
+   FlagMultiPickUp: string;
+   FlagMultiDelivery: string;
+   RiskType: string;
+   ChargedWeight: number;
+   NoOfPkgs: number;
+   DeclaredValue: number;
+   FreightCharge: number;
+   DocketDate: string;
+   InvokeFor: string;
+   FuelRateMethod: string;
+   Distance: number;
+   AvgSpeed: number;
+   AbsoluteRate: number;
+   ThresHold: number;
+   FreightChargePercentage: number;
+   FromCityFuelPrice: number;
+   ToCityFuelPrice: number;
+   ContractedFuelRate: number;
+   DestDeliveryPinCode: string;
+   DocketNo: string;
+   IsDocketEdit: string;
+   InvokeNewContract: string;
+   ChargedKM: number;
+   IsAppointmentBasedDelivery: string;
+   IsMallBasedDelivery: string;
+   IsCSDBasedDelivery: string;
+   Depth: string;
+   Quantity: number;
+}
+export class FOVCharge {
+   CompanyCode: number;
+   FlagFOV: string;
+   ContractId: string;
+   ChargeRule: string;
+   BaseCode: string;
+   RiskType: string;
+   FOVRateType: string;
+   DeclareValue: number;
+   FOVCharged: number;
+   FOVRate: number;
+}
+export class FuelCharge {
+   ContractID: string;
+   TransMode: string;
+   FuelRateType: string;
+   FuelRate: number;
+   MinFuleCharge: number;
+   MaxFuelCharge: number;
+   RevisionRate: number;
+   FuelRateMethod: string;
+   AbsoluteRate: number;
+   ThresHold: number;
+   FreightChargePercentage: number;
+   Distance: number;
+   AvgSpeed: number;
+   FromCityFuelPrice: number;
+   ToCityFuelPrice: number;
+}

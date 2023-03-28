@@ -1,6 +1,6 @@
 import { Component, OnInit, PLATFORM_ID, Inject, ViewChild } from '@angular/core';
 import { FormArray, FormGroup, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, Cnote, ContractDetailList, Dropdown, prqVehicleReq, Radio, Rules } from 'src/app/core/models/Cnote';
+import { AutoCompleteCity, AutoCompleteCommon as AutoCompleteCommon, Cnote, ContractDetailList, DocketChargeRequest, DocketOtherChargesCriteria, Dropdown, FOVCharge, FuelCharge, prqVehicleReq, Radio, RequestContractKeys, Rules } from 'src/app/core/models/Cnote';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
@@ -18,6 +18,10 @@ import { ChangeDetectorRef } from '@angular/core';
 export class CNoteGenerationComponent implements OnInit {
   //intialization of varible 
   isDisabled = true;
+  RequestContractKeysDetail = new RequestContractKeys();
+  DocketOtherChargesCriteria = new DocketOtherChargesCriteria();
+  FuelCharge = new FuelCharge();
+  FOVCharge = new FOVCharge();
   step1: FormGroup;
   step2: FormGroup;
   step3: FormGroup;
@@ -41,11 +45,33 @@ export class CNoteGenerationComponent implements OnInit {
   pinCodeDetail: AutoCompleteCity[];
   filteredCity: Observable<AutoCompleteCity[]>;
   filteredCnoteBilling: Observable<AutoCompleteCommon[]>;
+  //---Freight Charges---//
+  FreightRate:number;
+  FreightCharge:number; 
+  FreightRateType:string;
+  //---End----//
+  /*Discount Rate*/
+  DiscountRate:number;
+  DiscountRateType:string;
+  DiscountAmount:number;
+  //end//
+  /*FOV Rate*/
+  FOVRate:number; 
+  FOVRateType:string;
+  FOVCalculated:number;
+  FOVCharged:number;
+  //end
+   /*COD/DOD Charges*/
+   CODDODCharged:number;
+   CODDODTobeCollected:number;
+   CODRateType:string;
+   //end
   pReqFilter: Observable<prqVehicleReq[]>;
   @ViewChild('closebutton') closebutton;
   displaybarcode: boolean = false;
   countDktNo: number = 0;
-  invoke:boolean=false;
+  invoke: boolean = false;
+  DocketChargeRequest: DocketChargeRequest;
   breadscrums = [
     {
       title: "CNoteGeneration",
@@ -136,18 +162,21 @@ export class CNoteGenerationComponent implements OnInit {
   isBillingPartysName: boolean;
   //end
   //otherchargeHiddenField
-  MinFreightRate:number;
-  hdnDistanceInvoke:number;
-  BrimApiRule:string;
-  BrimGST:number;
-  BrimKFC:number;
-  BrimTotalAmount:number;
-  DiscountRateType:string;
-  FOVRateType:string;
-  CODRateType:string;
+  MinFreightRate: number;
+  hdnDistanceInvoke: number;
+  BrimApiRule: string;
+  BrimGST: number;
+  BrimKFC: number;
+  BrimTotalAmount: number;
   BaseCode1: any;
   BaseCode2: any;
   otherCharges: Cnote[];
+  contractKeysInvoke: any;
+  FOVChargeInvoke: any;
+  FOVFlag: any;
+  FOVCharges: any;
+  IsDocketEdit: string;
+  InvokeNewContract: string;
   //End
   constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     this.GetActiveGeneralMasterCodeListByTenantId()
@@ -337,7 +366,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.fb.group(array)
       ])
     }
-    this.otherCharges= this.CnoteData.filter((x)=>x.div=='otherCharges');
+    this.otherCharges = this.CnoteData.filter((x) => x.div == 'otherCharges');
     // Return the final form group with all the created form
     return this.fb.group(formControls)
   }
@@ -1625,7 +1654,7 @@ export class CNoteGenerationComponent implements OnInit {
       event.controls.CUB_WT.updateValueAndValidity();
 
     }
-    else{
+    else {
 
     }
     this.CalculateRowLevelChargeWeight(event, true, cftVolume)
@@ -1683,7 +1712,7 @@ export class CNoteGenerationComponent implements OnInit {
     this.step3.controls['CFT_TOT'].setValue(CftTotal.toFixed(2));
     this.step3.controls['TotalPartQuantity'].setValue(TotalPartQuantity);
     //TotalPartQuantity calucation parts are pending 
-    this .GetContractInvokeDependent();
+    this.GetContractInvokeDependent();
   }
   //End
 
@@ -1925,15 +1954,15 @@ export class CNoteGenerationComponent implements OnInit {
       this.ICnoteService.cnotePost("services/GetContractInvokeDependent", req).subscribe({
         next: (res: any) => {
           if (res) {
-            this.BasedOn1 = res.result[0].BasedOn1;
-            this.BasedOn2 = res.result[0].BasedOn2;
-            this.UseFrom = res.result[0].UseFrom;
-            this.UseTo = res.result[0].UseTo;
-            this.UseTransMode = res.result[0].UseTransMode;
-            this.UseRateType = res.result[0].UseRateType;
-            this.ChargeWeightToHighestDecimal = res.result[0].ChargeWeightToHighestDecimal;
-            this.ContractDepth = res.result[0].ContractDepth;
-            this.ProceedDuringEntry = res.result[0].ProceedDuringEntry;
+            this.BasedOn1 = res.result[0]?.BasedOn1 || "";
+            this.BasedOn2 = res.result[0]?.BasedOn2 || "";
+            this.UseFrom = res.result[0]?.UseFrom || "";
+            this.UseTo = res.result[0]?.UseTo || "";
+            this.UseTransMode = res.result[0]?.UseTransMode || "";
+            this.UseRateType = res.result[0]?.UseRateType || "";
+            this.ChargeWeightToHighestDecimal = res.result[0]?.ChargeWeightToHighestDecimal || "";
+            this.ContractDepth = res.result[0]?.ContractDepth || "";
+            this.ProceedDuringEntry = res.result[0]?.ProceedDuringEntry || "";
             this.SetBaseCodeValues();
           }
         }
@@ -1974,95 +2003,286 @@ export class CNoteGenerationComponent implements OnInit {
   //end
 
   //SetBillingParty
-  SetBillingParty(){
-    let WHO_IS_PARTY = this.Rules.find(x=>x.code=='WHO_IS_PARTY' && x.paybas==this.step1.value.PAYTYP);
-    this.rowBillingParty=true;
-    switch(WHO_IS_PARTY.defaultvalue){
-      case"1":
-      if(!WebxConvert.IsObjectNullOrEmpty(this.step1.value.PRQ_BILLINGPARTY)){
-        this.step3.controls['BillingPartys_3'].setValue(true);
-      }
-      else{
-        this.step3.controls['BillingPartys_4'].setValue(true);
-      }
-      break;
-      case"3":
-        this.step3.controls['BillingPartys_1'].setValue(true);
-        this.rowBillingParty=false;
-      break;
-      case"4":
-        this.step3.controls['BillingPartys_2'].setValue(true);
-        this.rowBillingParty=false;
-      break; 
-      case"5":
-        if(!WebxConvert.IsStringNullOrEmpty(this.step1.value.PRQ_BILLINGPARTY)){
+  SetBillingParty() {
+    let WHO_IS_PARTY = this.Rules.find(x => x.code == 'WHO_IS_PARTY' && x.paybas == this.step1.value.PAYTYP);
+    this.rowBillingParty = true;
+    switch (WHO_IS_PARTY.defaultvalue) {
+      case "1":
+        if (!WebxConvert.IsObjectNullOrEmpty(this.step1.value.PRQ_BILLINGPARTY)) {
           this.step3.controls['BillingPartys_3'].setValue(true);
-          this.rowBillingParty=false;
         }
-        else{
+        else {
           this.step3.controls['BillingPartys_4'].setValue(true);
         }
-      break;
+        break;
+      case "3":
+        this.step3.controls['BillingPartys_1'].setValue(true);
+        this.rowBillingParty = false;
+        break;
+      case "4":
+        this.step3.controls['BillingPartys_2'].setValue(true);
+        this.rowBillingParty = false;
+        break;
+      case "5":
+        if (!WebxConvert.IsStringNullOrEmpty(this.step1.value.PRQ_BILLINGPARTY)) {
+          this.step3.controls['BillingPartys_3'].setValue(true);
+          this.rowBillingParty = false;
+        }
+        else {
+          this.step3.controls['BillingPartys_4'].setValue(true);
+        }
+        break;
       default:
         break;
-    } 
+    }
     this.BillingPartyChange(this.step1.value.BillingPartys_3)
   }
-  BillingPartyChange(billingParty){
-    if(billingParty){
-      this.isBillingPartysName=true
+  BillingPartyChange(billingParty) {
+    if (billingParty) {
+      this.isBillingPartysName = true
     }
-    else{
-      this.isBillingPartysName=false;
+    else {
+      this.isBillingPartysName = false;
     }
 
   }
-  InvokeInvoice(){
+  InvokeInvoice() {
     debugger;
-    let req={
-      companyCode:10065,
-      ContractKeys:{
-      CompanyCode:10065,
-      BasedOn1:this.BasedOn1,
-      BaseCode1:this.BaseCode2,
-      BasedOn2:this.BasedOn2,
-      BaseCode2:this.BaseCode2,
-      ChargedWeight:this.step3.value.CHRGWT,
-      ContractId:this.step1.value.PRQ_BILLINGPARTY.ContractId,
-      DelLoc: this.step1.controls['DELLOC'].value.Value,
-      Depth: this.ContractDepth ,
-      FromCity: this.step1.value.FCITY.Value, 
-      FTLType: this.step1.value.FTLTYP, 
-      NoOfPkgs: this.step3.value.TotalChargedNoofPackages?this.step3.value.TotalChargedNoofPackages:0, 
-      Quantity: this.step3.value.TotalPartQuantity?this.step3.value.TotalPartQuantity:0, 
-      OrgnLoc:"MUMB", 
-      PayBase: this.step1.value.PAYTYP?this.step1.value.PAYTYP:"", 
-      ServiceType: this.step1.value.SVCTYP , 
-      ToCity: this.step1.value.TCITY.Value, 
-      TransMode: this.step1.value.TRN, 
-      OrderID: "01",
-      InvAmt: this.step3.value.TotalDeclaredValue?this.step3.value.TotalDeclaredValue:0, 
-      DeliveryZone:0, 
-      DestDeliveryPinCode: 140402, 
-      DestDeliveryArea: "RAJPURA", 
-      DocketDate:'2023-01-31T12:00:00' 
+    let FoundContract = "";
+    let MinFreightBase = "";
+    let MinFreightType = "";
+    let MinFreightBaseRate = "";
+    let FreightCharge = 0;
+    let FreightRate = 0;
+    let ruleContractType = this.Rules.find((x) => x.code == this.step1.value.PAYTYP + 'CONTRACT' && x.paybas == this.step1.value.PAYTYP);;
+    let ruleProceed = this.Rules.find((x) => x.code == this.step1.value.PAYTYP + 'PROCEED' && x.paybas == this.step1.value.PAYTYP);
+    this.RequestContractKeysDetail.companyCode = 10065
+    this.RequestContractKeysDetail.ContractKeys.CompanyCode = 10065,
+      this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1;
+    this.RequestContractKeysDetail.ContractKeys.BaseCode1 = this.BaseCode2;
+    this.RequestContractKeysDetail.ContractKeys.BasedOn2 = this.BasedOn2;
+    this.RequestContractKeysDetail.ContractKeys.BaseCode2 = this.BaseCode2;
+    this.RequestContractKeysDetail.ContractKeys.ChargedWeight = this.step3.value.CHRGWT;
+    this.RequestContractKeysDetail.ContractKeys.ContractId = this.step1.value.PRQ_BILLINGPARTY.ContractId;
+    this.RequestContractKeysDetail.ContractKeys.DelLoc = this.step1.controls['DELLOC'].value.Value;
+    this.RequestContractKeysDetail.ContractKeys.Depth = this.ContractDepth;
+    this.RequestContractKeysDetail.ContractKeys.FromCity = this.step1.value.FCITY.Value,
+      this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.value.FTLTYP;
+    this.RequestContractKeysDetail.ContractKeys.NoOfPkgs = this.step3.value.TotalChargedNoofPackages ? this.step3.value.TotalChargedNoofPackages : 0;
+    this.RequestContractKeysDetail.ContractKeys.Quantity = this.step3.value.TotalPartQuantity ? this.step3.value.TotalPartQuantity : 0;
+    this.RequestContractKeysDetail.ContractKeys.OrgnLoc = "MUMB";
+    this.RequestContractKeysDetail.ContractKeys.PayBase = this.step1.value.PAYTYP ? this.step1.value.PAYTYP : "";
+    this.RequestContractKeysDetail.ContractKeys.ServiceType = this.step1.value.SVCTYP ? this.step1.value.SVCTYP : "";
+    this.RequestContractKeysDetail.ContractKeys.ToCity = this.step1.value.TCITY.Value;
+    this.RequestContractKeysDetail.ContractKeys.TransMode = this.step1.value.TRN;
+    this.RequestContractKeysDetail.ContractKeys.OrderID = "01";
+    this.RequestContractKeysDetail.ContractKeys.InvAmt = this.step3.value.TotalDeclaredValue ? this.step3.value.TotalDeclaredValue : 0;
+    this.RequestContractKeysDetail.ContractKeys.DeliveryZone = 0;
+    this.RequestContractKeysDetail.ContractKeys.DestDeliveryPinCode = 140402;
+    this.RequestContractKeysDetail.ContractKeys.DestDeliveryArea = "RAJPURA";
+    this.RequestContractKeysDetail.ContractKeys.DocketDate = this.step1.value.DKTDT;
+
+
+    if (ruleContractType.defaultvalue == "C") {
+      if (this.RequestContractKeysDetail.ContractKeys.ContractId != this.RequestContractKeysDetail.ContractKeys.PayBase + "8888" && this.RequestContractKeysDetail.ContractKeys.ContractId) {
+        this.ICnoteService.cnotePost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
+          next: (res: any) => {
+            if (res) {
+              this.contractKeysInvoke = res.result.root;
+            }
+          }
+        })
       }
-    }
-    this.ICnoteService.cnotePost('services/InvokeFreight',req).subscribe({
-      next:(res:any)=>{
-        if(res){
-          let InvokeFreigh =res.result.root;
+      else {
+        if (ruleProceed.defaultvalue == "S" || ruleProceed.defaultvalue == "T") {
+          let Status = "NIL_CONTRACT";
+          let Description = "Contract ID is NIL in Customer Wise Contract. Can't Enter ";
+        }
+        else {
+          this.RequestContractKeysDetail.ContractKeys.ContractId = this.RequestContractKeysDetail.ContractKeys.PayBase + "8888";
+          this.ICnoteService.cnotePost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
+            next: (res: any) => {
+              if (res) {
+                this.contractKeysInvoke = res.result.root;
+              }
+            }
+          })
+
+
+          FoundContract = "D"
         }
       }
-    })
-  }
-  paymentDetail(event){
-    if(event=='PaymentDetail'){
-      this.invoke=true
+      FoundContract = "C";
     }
-     else{
-      this.invoke=false
-     }
+    else if (ruleContractType.defaultvalue == "CD") {
+      if (this.RequestContractKeysDetail.ContractKeys.ContractId != this.RequestContractKeysDetail.ContractKeys.PayBase + "8888" && this.RequestContractKeysDetail.ContractKeys.ContractId) {
+        FoundContract = "C";
+      }
+      if (FreightCharge == 0 || FreightRate == 0) {
+        this.RequestContractKeysDetail.ContractKeys.ContractId = this.RequestContractKeysDetail.ContractKeys.PayBase + "8888";
+        this.ICnoteService.cnotePost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
+          next: (res: any) => {
+            if (res) {
+              this.contractKeysInvoke = res.result.root;
+            }
+          }
+        })
+        FoundContract = "D";
+      }
+    }
+    else if (ruleContractType.defaultvalue == "D") {
+      this.RequestContractKeysDetail.ContractKeys.ContractId = this.RequestContractKeysDetail.ContractKeys.PayBase + "8888";
+
+      this.ICnoteService.cnotePost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
+        next: (res: any) => {
+          if (res) {
+            this.contractKeysInvoke = res.result.root;
+          }
+        }
+      })
+      FoundContract = "D";
+    }
+    else if (ruleContractType.defaultvalue == "W") {
+      FoundContract = "W";
+    }
+    this.BrimApiRuleDetail();
+  }
+  BrimApiRuleDetail() {
+    debugger
+    this.BrimApiRule = this.Rules.find((x) => x.code == 'BRIM_API').defaultvalue;
+    if (this.BrimApiRule == "Y" && this.step1.value.PAYTYP) {
+      this.DocketChargeRequest.CHANNEL_TYPE_ID = "5";
+      this.DocketChargeRequest.PAY_BASIS = "PAID";
+      this.DocketChargeRequest.CUSTOMER_ID = "";
+      this.DocketChargeRequest.BOOKING_DATE = this.step1.value.DKTDT;
+      this.DocketChargeRequest.BOOKING_TIME = this.step1.value.DKTDT;
+      this.DocketChargeRequest.SERVICE = "EXPRESS";
+      this.DocketChargeRequest.BOOKING_TYPE = "FORWARD";
+      this.DocketChargeRequest.CHARGE_WEIGHT = this.step3.value.CHRGWT;
+      this.DocketChargeRequest.NO_OF_PIECES = this.step3.value.NO_PKGS;
+      this.DocketChargeRequest.FOD_AMOUNT = 0;
+      this.DocketChargeRequest.COD_AMOUNT = 0;
+      this.DocketChargeRequest.CONSIGNER_GSTNUMBER = this.step2.value.GSTINNO;
+      this.DocketChargeRequest.CONSIGNEE_GSTNUMBER = this.step2.value.ConsigneeGSTINNO;
+      this.DocketChargeRequest.INSURED = this.step2.value.RSKTY == "C" ? "Y" : this.step2.value.RSKTY == "0" ? "Y" : "N";
+      this.DocketChargeRequest.INSURED_BY = this.step2.value.RSKTY == "C" ? "Carrier" : this.step2.value.RSKTY == "0" ? "Owner" : "";
+      this.DocketChargeRequest.BRNCH_OFF = "LKO";
+      this.DocketChargeRequest.INV_VALUE = this.step3.value.DECLVAL;
+      this.DocketChargeRequest.DEST_PINCODE = "500002";
+      this.DocketChargeRequest.APP_BOOKING = "NON APP";
+      this.DocketChargeRequest.SBU = "LTL";
+      this.DocketChargeRequest.DEST_BRANCH = "HYD";
+      this.DocketChargeRequest.DOCUMENT_CODE = "2";
+      this.DocketChargeRequest.VAS_PROD_CODE = 1 == 1 ? "COD" : 1 == 1 ? "FOD" : " ";
+      this.DocketChargeRequest.CONSGMNT_STATUS = "BOOKED";
+      let PayBaseText = this.step1Formcontrol.find((x) => x.name == 'PAYTYP').dropdown.find((x) => x.CodeId == this.step1.value.PAYTYP).CodeDesc;
+      if (PayBaseText == "PAID" || PayBaseText == "TOPAY") {
+        this.DocketChargeRequest.RATE_CUST_CODE = "";
+      }
+      else {
+        this.DocketChargeRequest.RATE_CUST_CODE = "";
+      }
+      //BHIMAPI IS PENDING 
+    }
+    if (this.BrimApiRule == "N" || this.step1.value.PAYTYP) {
+      let req = {
+        companyCode: 10065,
+        contractid: this.step1.value.PRQ_BILLINGPARTY?.ContractId,
+        transmode: this.step1.value.TRN,
+        dockdt: this.step1.value.DKTDT,
+        ContractKeys: this.RequestContractKeysDetail.ContractKeys
+      }
+      this.ICnoteService.cnotePost('services/GetFuelCharge', req).subscribe({
+        next: (res: any) => {
+          if (res) {
+            //----------------------------FuelSurcharge---------------------------------//
+            this.FuelCharge.FuelRateType = res.result[0][0]?.fuelsurchrgbas || '';
+            this.FuelCharge.FuelRate = res.result[0][0]?.fuelsurchrg || '';
+            this.FuelCharge.MinFuleCharge = res.result[0][0]?.MinFuleCharge || '';
+            this.FuelCharge.MaxFuelCharge = res.result[0][0]?.MaxFuelCharge || '';
+            this.FuelCharge.FuelRateMethod = res.result[0][0]?.FuelRateMethod || '';
+            this.FuelCharge.AbsoluteRate = res.result[0][0]?.AbsoluteRate || '';
+            this.FuelCharge.ThresHold = res.result[0][0]?.ThresHold || '';
+            this.FuelCharge.FreightChargePercentage = res.result[0][0]?.FreightChargePercentage || '';
+            //---------------------------End--------------------------------------------//
+            //----------------------------RevisionRate---------------------------------//
+            this.FuelCharge.RevisionRate = res.result[1][0]?.RevisionRate || '';
+            //----------------------------End------------------------------------------//
+            //----------------------------------FUEL-----------------------------------//
+            this.FuelCharge.Distance = res.result[2][0]?.Distance || '';
+            this.FuelCharge.AvgSpeed = res.result[2][0]?.AvgSpeed || '';
+            this.FuelCharge.FromCityFuelPrice = res.result[2][0].FromCityFuelPrice || '';
+            this.FuelCharge.ToCityFuelPrice = res.result[2][0].ToCityFuelPrice || '';
+            //---------------------------End--------------------------------------------//
+
+          };
+        }
+      })
+      let reqFOVChargeCriteria = {
+        CompanyCode: 10065,
+        ContractId: this.step1.value.PRQ_BILLINGPARTY?.ContractId,
+        basedon: this.Rules.find(x => x.code == 'CHRG_RULE').defaultvalue,
+        BaseCode: this.BaseCode1,
+        DeclareValue: this.step3.value.TotalDeclaredValue,
+        RiskType: this.step2.value.RSKTY,
+        ServiceType: this.step1.value.SVCTYP
+      }
+      this.ICnoteService.cnotePost('services/GetFOVCharge', reqFOVChargeCriteria).subscribe({
+        next: (res: any) => {
+          if (res) {
+            debugger;
+            this.FOVFlag = res.result[0];
+            this.FOVCharges = res.result[1];
+            if (this.FOVFlag) {
+              this.FOVCharge.FlagFOV = this.FOVFlag[0]?.activeflag || "";
+            }
+            this.FOVCharge.FOVRate = this.FOVCharges[0]?.fovrate || 0;
+            this.FOVCharge.FOVCharged = this.FOVCharges[0]?.fovcharge || 0;
+            this.FOVCharge.FOVRateType = this.FOVCharges[0]?.ratetype || "F";
+
+          }
+        }
+      })
+      let reqCod={
+       companyCode:10065,
+       CODCriteria:"<root><ContractID>"+this.step1.value.PRQ_BILLINGPARTY.ContractId+ "</ContractID><InvoiceAmount>"+ this.step3.value.TotalDeclaredValue+ "</InvoiceAmount></root>"
+      }
+      this.ICnoteService.cnotePost('services/GetCodeDodCharges',reqCod).subscribe({
+        next:(res:any)=>{
+          if(res){
+             
+          }
+        }
+      })
+      let reqDacc={
+        companyCode:10065,
+        DACCCriteria:"<root><ContractID>"+this.step1.value.PRQ_BILLINGPARTY.ContractId+"</ContractID><InvoiceAmount>"+this.step3.value.TotalDeclaredValue+ "</InvoiceAmount></root>",
+        DACCCharged:0,
+        DACCRateType:""
+      }
+      this.ICnoteService.cnotePost('services/GetCodeDodCharges',reqDacc).subscribe({next:(res:any)=>{
+        if(res){
+
+        }
+      }})
+      if (this.IsDocketEdit == "Y"){
+
+      }
+      if(this.IsDocketEdit == "Y" && this.InvokeNewContract == "N"){
+
+      }
+      else{
+
+      }
+    }
+  }
+  paymentDetail(event) {
+    if (event == 'PaymentDetail') {
+      this.invoke = true
+    }
+    else {
+      this.invoke = false
+    }
   }
   //End
 }

@@ -487,41 +487,42 @@
                                     <form class="register-form m-4" [formGroup]="step3">
                                         <div class="row">
                                             <div [class]="divcol" *ngFor="let step3 of step3Formcontrol">
-                                                <div *ngIf=" step3.div !='BcSeries' && step3.div !='barcodearray' && step3.div !='otherCharges'">
-                                                <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step3.type=='text'">
-                                                    <mat-label>{{step3.label}}</mat-label>
-                                                    <input matInput type="step3.type"
-                                                        (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
-                                                        [formControlName]="step3.name" autocomplete="off">
+                                                <div
+                                                    *ngIf=" step3.div !='BcSeries' && step3.div !='barcodearray' && step3.div !='otherCharges'">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="step3.type=='text'">
+                                                        <mat-label>{{step3.label}}</mat-label>
+                                                        <input matInput type="step3.type"
+                                                            (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
+                                                            [formControlName]="step3.name" autocomplete="off">
 
-                                                </mat-form-field>
-                                                <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step3.type=='date'">
-                                                    <mat-label>{{step3.label}}</mat-label>
-                                                    <input matInput [matDatepicker]="Cnotename"
-                                                        [formControlName]="step3.name">
-                                                    <mat-datepicker-toggle matSuffix
-                                                        [for]="Cnotename"></mat-datepicker-toggle>
-                                                    <mat-datepicker #Cnotename></mat-datepicker>
-                                                </mat-form-field>
+                                                    </mat-form-field>
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="step3.type=='date'">
+                                                        <mat-label>{{step3.label}}</mat-label>
+                                                        <input matInput [matDatepicker]="Cnotename"
+                                                            [formControlName]="step3.name">
+                                                        <mat-datepicker-toggle matSuffix
+                                                            [for]="Cnotename"></mat-datepicker-toggle>
+                                                        <mat-datepicker #Cnotename></mat-datepicker>
+                                                    </mat-form-field>
 
-                                                <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step3.type=='dropdown'">
-                                                    <mat-label>{{step3.label}}</mat-label>
-                                                    <mat-select [formControlName]="step3.name">
-                                                        <mat-option *ngFor="let option of step3.dropdown"
-                                                            [value]="option.CodeId">
-                                                            {{ option.CodeDesc }}
-                                                        </mat-option>
-                                                    </mat-select>
-                                                </mat-form-field>
-                                                <mat-slide-toggle color="primary"
-                                                    *ngIf="step3.type=='toggle' && step3.name !='SerialScan' && step3.name !='EachScan'"
-                                                    [formControlName]="step3.name"
-                                                    (ngModelChange)="callActionFunction(step3.ActionFunction,$event)">{{step3.label}}</mat-slide-toggle>
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="step3.type=='dropdown'">
+                                                        <mat-label>{{step3.label}}</mat-label>
+                                                        <mat-select [formControlName]="step3.name">
+                                                            <mat-option *ngFor="let option of step3.dropdown"
+                                                                [value]="option.CodeId">
+                                                                {{ option.CodeDesc }}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                    <mat-slide-toggle color="primary"
+                                                        *ngIf="step3.type=='toggle' && step3.name !='SerialScan' && step3.name !='EachScan'"
+                                                        [formControlName]="step3.name"
+                                                        (ngModelChange)="callActionFunction(step3.ActionFunction,$event)">{{step3.label}}</mat-slide-toggle>
                                                 </div>
-                                                </div>
+                                            </div>
                                         </div>
                                         <hr>
                                         <div class="row" flex>
@@ -534,7 +535,8 @@
                                                                     <tr>
                                                                         <th>Sr no.</th>
                                                                         <th *ngFor="let step3 of InvoiceDetails">
-                                                                            {{step3.label!='ChargedWeight'?step3.label:''}}</th>
+                                                                            {{step3.label!='ChargedWeight'?step3.label:''}}
+                                                                        </th>
                                                                         <th>Action</th>
                                                                     </tr>
                                                                 </thead>
@@ -752,8 +754,13 @@
                                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                                                 <div class="example-button-row" style="margin-left: 90%">
 
-                                                    <button class="msr-3" *ngIf="!invoke" mat-raised-button color="primary" (click)="paymentDetail('PaymentDetail')">Payment Detail</button>
-                                                    <button class="msr-3"*ngIf="invoke"  mat-raised-button color="primary"(click)="paymentDetail('invokeDetails')">Re-invoke Details</button>
+                                                    <button class="msr-3" *ngIf="!invoke" mat-raised-button
+                                                        color="primary" (click)="paymentDetail('PaymentDetail')">Payment
+                                                        Detail</button>
+                                                    <button class="msr-3" *ngIf="invoke" mat-raised-button
+                                                        color="primary"
+                                                        (click)="paymentDetail('invokeDetails')">Re-invoke
+                                                        Details</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -794,13 +801,25 @@
                                                     (ngModelChange)="callActionFunction(step3.ActionFunction,$event)">{{step3.label}}</mat-slide-toggle>
                                             </div>
                                         </div>
+                                        <div class="row" *ngIf="invoke && newDocketChanged">
+                                            <div [class]="divcol" *ngFor="let step3 of docketOtherCharge">
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step3.type=='text'">
+                                                    <mat-label>{{step3.label}}</mat-label>
+                                                    <input matInput type="step3.type"
+                                                        (ngModelChange)="callActionFunction(step3.ActionFunction,$event)"
+                                                        [formControlName]="step3.name" autocomplete="off">
+
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                                                 <div class="example-button-row">
 
                                                     <button mat-button matStepperPrevious>Back</button>
-                                                    <button class="msr-3" mat-raised-button color="primary" (click)="4"
-                                                       >Submit</button>
+                                                    <button class="msr-3" mat-raised-button color="primary"
+                                                        (click)="4">Submit</button>
                                                 </div>
                                             </div>
                                         </div>

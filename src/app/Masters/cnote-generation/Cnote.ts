@@ -788,6 +788,7 @@ export const cnoteMetaData = [
     "type": "dropdown",
     "ActionFunction": "",
     "Validation": "",
+    "dropdown":[],
     "frmgrp": 3,
     "display": true,
     "enable": true,
@@ -925,24 +926,6 @@ export const cnoteMetaData = [
     "Class": ""
 },
 {
-    "id": 253,
-    "Seq": 81,
-    "label": "EddDate",
-    "name": "EddDate",
-    "type": "date",
-    "ActionFunction": "",
-    "Validation": "",
-    "frmgrp": 3,
-    "display": true,
-    "enable": true,
-    "defaultvalue": '',
-    "div": "otherCharges",
-    "Search": "",
-    "dbCodeName": "",
-    "useField": "Y",
-    "Class": ""
-},
-{
     "id": 254,
     "Seq": 86,
     "label": "COD/DOD Charged",
@@ -979,6 +962,26 @@ export const cnoteMetaData = [
     "useField": "Y",
     "Class": "CodDodPortion",
     
-}
+},
+{
+    "id": 256,
+    "Seq": 105,
+    "label": "Other Charges Remarks",
+    "name": "OtherChargesRemarks",
+    "type": "text",
+    "ActionFunction": "",
+    "Validation": "",
+    "frmgrp": 3,
+    "display": true,
+    "enable": true,
+    "defaultvalue": '',
+    "div": "otherCharges",
+    "Search": "",
+    "dbCodeName": "",
+    "useField": "Y",
+    "Class": "extraOtherCharge",
+    
+},
+
 ]
 

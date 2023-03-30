@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
 
-export interface Cnote {
+export class Cnote {
    Seq: number;
    label: string;
    name: string;
@@ -27,6 +27,7 @@ export class Rules {
    description: string;
    defaultvalue: string;
    paybas: string;
+   enabled:string;
 }
 export class Dropdown{
    CodeId:string;
@@ -179,7 +180,7 @@ export interface Radio{
    BasedOn2: string
    BaseCode2: string
    ChargedWeight: string
-   ContractId: string
+   ContractID: string
    DelLoc: string
    Depth: string
    FromCity: string
@@ -276,4 +277,13 @@ export class FuelCharge {
    AvgSpeed: number;
    FromCityFuelPrice: number;
    ToCityFuelPrice: number;
+}
+export class DocketCharges {
+   ChargeCode: string;
+   ChargeName: string;
+   ChargeValue: number;
+   Operator: string;
+   Enabled: string;
+   ActiveFlag: string;
+   VarybyLoc: string;
 }

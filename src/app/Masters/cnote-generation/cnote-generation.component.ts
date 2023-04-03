@@ -206,6 +206,7 @@ export class CNoteGenerationComponent implements OnInit {
   Distance: any;
   newDocketChanged: boolean=false;
   docketOtherCharge: any[];
+
   //End
   constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
     this.GetActiveGeneralMasterCodeListByTenantId()
@@ -230,6 +231,7 @@ export class CNoteGenerationComponent implements OnInit {
         if (cnote.validation === 'Required') { // If the control is required, add a required validator
           validators = [Validators.required];
         }
+        
         // Add the control to the form group, using its default value (or the current date if it is a 'TodayDate' control) and any validators
         formControls[cnote.name] = this.fb.control(cnote.defaultvalue == 'TodayDate' ? new Date() : cnote.defaultvalue, validators);
       });
@@ -395,7 +397,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.fb.group(array)
       ])
     }
-    this.otherCharges = this.CnoteData.filter((x) => x.div == 'otherCharges' && x.Class !='extraOtherCharge');
+    this.otherCharges = this.CnoteData.filter((x) => x.div == 'otherCharges' && x.Class !='extraOtherCharge' && x.Class !='CodDodPortion');
     // Return the final form group with all the created form
     return this.fb.group(formControls)
   }
@@ -461,6 +463,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Call the appropriate function based on the given function name
   callActionFunction(functionName: string, event: any) {
+    debugger;
     switch (functionName) {
       case "billingPartyrules":
         this.getBillingPartyAutoComplete(event);
@@ -544,6 +547,12 @@ export class CNoteGenerationComponent implements OnInit {
       case "ValidateInvoiceNo":
         this.ValidateInvoiceNo(event);
         break;
+      case "codeChanged":
+        this.codeChanged();
+        break;
+      case "DisbledTypeOfmovement":
+        this.DisbleTypeOFmovent();
+      break;
       default:
         break;
     }
@@ -1651,7 +1660,7 @@ export class CNoteGenerationComponent implements OnInit {
    * @returns void
    */
   InvoiceCubicWeightCalculation(event) {
-
+    debugger;
     let cftVolume = 0;
     if (this.step3.value.Volumetric) {
       // Get package dimensions and calculate volume
@@ -1717,7 +1726,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //CalculateInvoiceTotal
   CalculateInvoiceTotal(cftVolume) {
-
+   debugger;
     let TotalChargedNoofPackages = 0;
     let TotalChargedWeight = 0;
     let TotalDeclaredValue = 0;
@@ -1730,7 +1739,7 @@ export class CNoteGenerationComponent implements OnInit {
       TotalChargedNoofPackages = TotalChargedNoofPackages + parseFloat(x.NO_PKGS || 0);
       TotalChargedWeight = TotalChargedWeight + parseFloat(x.ChargedWeight || 0);
       TotalDeclaredValue = TotalDeclaredValue + parseFloat(x.DECLVAL || 0);
-      if (x.CUB_WT) {
+      if (x.CUB_WT>0) {
         CftTotal = CftTotal + parseFloat(cftVolume)
       }
       if (x.PARTQUANTITY) {
@@ -1775,6 +1784,7 @@ export class CNoteGenerationComponent implements OnInit {
  * @returns void
  */
   GetInvoiceConfigurationBasedOnTransMode() {
+    debugger
     // Create request object
     let req = {
       companyCode: 10065,
@@ -2137,6 +2147,7 @@ export class CNoteGenerationComponent implements OnInit {
           next: (res: any) => {
             if (res) {
               this.contractKeysInvoke = res.result.root;
+              this.FreightDetail()
 
             }
           }
@@ -2153,6 +2164,7 @@ export class CNoteGenerationComponent implements OnInit {
             next: (res: any) => {
               if (res) {
                 this.contractKeysInvoke = res.result.root;
+                this.FreightDetail()
               }
             }
           })
@@ -2173,6 +2185,7 @@ export class CNoteGenerationComponent implements OnInit {
           next: (res: any) => {
             if (res) {
               this.contractKeysInvoke = res.result.root;
+              this.FreightDetail()
             }
           }
         })
@@ -2186,6 +2199,7 @@ export class CNoteGenerationComponent implements OnInit {
         next: (res: any) => {
           if (res) {
             this.contractKeysInvoke = res.result.root;
+            this.FreightDetail()
           }
         }
       })
@@ -2322,18 +2336,7 @@ export class CNoteGenerationComponent implements OnInit {
 
       }
       else {
-        /*Freight Charges*/
-        this.FreightRate = this.contractKeysInvoke?.FreightRate[0] || 0;
-        this.FreightCharge = this.contractKeysInvoke?.FreightCharge[0] || 0;
-        this.FreightRateType = this.contractKeysInvoke?.RateType[0] || '';
-        this.DiscountRate = 0;
-        this.DiscountRateType = "";
-        this.DiscountAmount = 0;
-        this.step3.controls['FreightRate'].setValue(this.FreightRate ? this.FreightRate : 0);
-        this.step3.controls['FreightCharge'].setValue(this.FreightCharge ? this.FreightCharge : 0);
-        this.step3.controls['DiscountRate'].setValue(this.DiscountRate ? this.DiscountRate : 0);
-        this.step3.controls['DiscountAmount'].setValue(this.DiscountAmount ? this.DiscountAmount : 0);
-        /*End*/
+      
 
         /*FOV Rate*/
         this.FOVRate = this.FOVCharge.FOVRate;
@@ -2562,4 +2565,40 @@ export class CNoteGenerationComponent implements OnInit {
     }
   }
   //End
+  //CodeChanged
+  codeChanged() {
+    // Check if Volumetric is truthy (not undefined, null, false, 0, etc.)
+    if (this.step3.value.F_COD) {
+      this.otherCharges = this.CnoteData.filter((x) => x.div == 'otherCharges' && x.Class !='extraOtherCharge');
+      }
+      else {
+        this.otherCharges = this.otherCharges.filter(x => x.Class != 'CodDodPortion')
+      }
+    }
+    FreightDetail(){
+        /*Freight Charges*/
+        this.FreightRate = this.contractKeysInvoke?.FreightRate[0] || 0;
+        this.FreightCharge = this.contractKeysInvoke?.FreightCharge[0] || 0;
+        this.FreightRateType = this.contractKeysInvoke?.RateType[0] || '';
+        this.DiscountRate = 0;
+        this.DiscountRateType = "";
+        this.DiscountAmount = 0;
+        this.step3.controls['FreightRate'].setValue(this.FreightRate ? this.FreightRate : 0);
+        this.step3.controls['FreightCharge'].setValue(this.FreightCharge ? this.FreightCharge : 0);
+        this.step3.controls['DiscountRate'].setValue(this.DiscountRate ? this.DiscountRate : 0);
+        this.step3.controls['DiscountAmount'].setValue(this.DiscountAmount ? this.DiscountAmount : 0);
+        /*End*/
+    }
+    //Disbled Type oF movment
+DisbleTypeOFmovent(){
+  debugger
+   if(this.step1.value.SVCTYP=='1'){
+    this.step1.controls['FTLTYP'].disable();
+    this.step1.controls['FTLTYP'].setValue('');
+   }
+   else{
+    this.step1.controls['FTLTYP'].enable();
+   }
+}
+//end
 }

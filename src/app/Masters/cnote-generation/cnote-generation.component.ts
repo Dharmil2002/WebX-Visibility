@@ -206,6 +206,12 @@ export class CNoteGenerationComponent implements OnInit {
   Distance: any;
   newDocketChanged: boolean=false;
   docketOtherCharge: any[];
+  ContractData: any;
+  ContractId: any;
+  IsDeferment: any;
+  FlagCutoffApplied: any;
+  FlagHolidayBooked: any;
+  FlagHolidayApplied: any;
 
   //End
   constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
@@ -618,6 +624,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Bind all rules
   getRules() {
+    debugger
     this.ICnoteService.getCnoteBooking('services/companyWiseRules/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
@@ -998,7 +1005,7 @@ export class CNoteGenerationComponent implements OnInit {
         // Get city filter
         this.getCityFilter();
         // Get detailed based on locations
-        this.GetDetailedBasedOnLocations();
+        //this.GetDetailedBasedOnLocations();
       }
     })
   }
@@ -1501,6 +1508,7 @@ export class CNoteGenerationComponent implements OnInit {
   }
 
   GetDetailedBasedOnContract() {
+    debugger
     try {
       let req = {
         companyCode: 10065,
@@ -1512,14 +1520,24 @@ export class CNoteGenerationComponent implements OnInit {
         next: (res: any) => {
           // Define an array of code types that need dropdown data
           const codeTypes = ['FTLTYP', 'PKPDL', 'SVCTYP', 'TRN'];
-
+          
           // Iterate over each form control in step1Formcontrol
           this.step1Formcontrol.forEach(item => {
             // If the form control's name is in codeTypes array, update its dropdown property with relevant data from response
             if (codeTypes.includes(item.name)) {
-              item.dropdown = res.result.filter(x => x.CodeType === item.name);
+              item.dropdown = res.MASTER.filter(x => x.CodeType === item.name);
             }
           });
+          this.ContractData=res.CONTRACT;
+          if(this.ContractData){
+          this.ContractId=this.ContractData.CONTRACTID;
+          this.step1.controls['TRN'].setValue(this.ContractData.DEFAULTPRODUCTSET);
+          this.step1.controls['PKGS'].setValue(this.ContractData.Defaultmodeset);
+          this.step3.controls['CODDODCharged'].setValue(this.ContractData.FlagCODDODEnable=="Y"?true:false);
+          this.step3.controls['Volumetric'].setValue(this.ContractData.FlagVolumetric=="Y"?true:false) 
+          this.IsDeferment=this.ContractData.FlagDeferment=="Y"?true:false;
+          this.GetContractInvokeDependent();
+        }
         }
       })
     }
@@ -2040,7 +2058,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.BaseCode2 = "NONE";
         break;
     }
-
+  this.CalucateEdd();
   }
   //end
 
@@ -2090,7 +2108,6 @@ export class CNoteGenerationComponent implements OnInit {
   }
   InvokeInvoice() {
 
-    debugger;
     let req = {
       companyCode: 10065,
       contractid: this.step1.value.PRQ_BILLINGPARTY.ContractId,
@@ -2115,31 +2132,7 @@ export class CNoteGenerationComponent implements OnInit {
     let FreightCharge = 0;
     let ruleContractType = this.Rules.find((x) => x.code == this.step1.value.PAYTYP + 'CONTRACT' && x.paybas == this.step1.value.PAYTYP);;
     let ruleProceed = this.Rules.find((x) => x.code == this.step1.value.PAYTYP + 'PROCEED' && x.paybas == this.step1.value.PAYTYP);
-    this.RequestContractKeysDetail.companyCode = 10065
-    this.RequestContractKeysDetail.ContractKeys.CompanyCode = 10065,
-      this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1;
-    this.RequestContractKeysDetail.ContractKeys.BaseCode1 = this.BaseCode2;
-    this.RequestContractKeysDetail.ContractKeys.BasedOn2 = this.BasedOn2;
-    this.RequestContractKeysDetail.ContractKeys.BaseCode2 = this.BaseCode2;
-    this.RequestContractKeysDetail.ContractKeys.ChargedWeight = this.step3.value.CHRGWT ? this.step3.value.CHRGWT : '0.00';
-    this.RequestContractKeysDetail.ContractKeys.ContractID = this.step1.value.PRQ_BILLINGPARTY.ContractId;
-    this.RequestContractKeysDetail.ContractKeys.DelLoc = this.step1.controls['DELLOC'].value.Value;
-    this.RequestContractKeysDetail.ContractKeys.Depth = this.ContractDepth;
-    this.RequestContractKeysDetail.ContractKeys.FromCity = this.step1.value.FCITY.Value,
-      this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.value.FTLTYP;
-    this.RequestContractKeysDetail.ContractKeys.NoOfPkgs = this.step3.value.TotalChargedNoofPackages ? this.step3.value.TotalChargedNoofPackages : '0.00';
-    this.RequestContractKeysDetail.ContractKeys.Quantity = this.step3.value.TotalPartQuantity ? this.step3.value.TotalPartQuantity : '0.00';
-    this.RequestContractKeysDetail.ContractKeys.OrgnLoc = "MUMB";
-    this.RequestContractKeysDetail.ContractKeys.PayBase = this.step1.value.PAYTYP ? this.step1.value.PAYTYP : "";
-    this.RequestContractKeysDetail.ContractKeys.ServiceType = this.step1.value.SVCTYP ? this.step1.value.SVCTYP : "";
-    this.RequestContractKeysDetail.ContractKeys.ToCity = this.step1.value.TCITY.Value;
-    this.RequestContractKeysDetail.ContractKeys.TransMode = this.step1.value.TRN;
-    this.RequestContractKeysDetail.ContractKeys.OrderID = "01";
-    this.RequestContractKeysDetail.ContractKeys.InvAmt = this.step3.value.TotalDeclaredValue ? this.step3.value.TotalDeclaredValue : '0.00';
-    this.RequestContractKeysDetail.ContractKeys.DeliveryZone = 0;
-    this.RequestContractKeysDetail.ContractKeys.DestDeliveryPinCode = 140402;
-    this.RequestContractKeysDetail.ContractKeys.DestDeliveryArea = "RAJPURA";
-    this.RequestContractKeysDetail.ContractKeys.DocketDate = this.step1.value.DKTDT;
+   
     debugger
     if (ruleContractType.defaultvalue == "C") {
       if (this.RequestContractKeysDetail.ContractKeys.ContractID != this.RequestContractKeysDetail.ContractKeys.PayBase + "8888" && this.RequestContractKeysDetail.ContractKeys.ContractID) {
@@ -2559,9 +2552,7 @@ export class CNoteGenerationComponent implements OnInit {
   paymentDetail(event) {
     if (event == 'PaymentDetail') {
       this.invoke = true
-    }
-    else {
-      this.invoke = false
+      this.InvokeInvoice();
     }
   }
   //End
@@ -2580,9 +2571,11 @@ export class CNoteGenerationComponent implements OnInit {
         this.FreightRate = this.contractKeysInvoke?.FreightRate[0] || 0;
         this.FreightCharge = this.contractKeysInvoke?.FreightCharge[0] || 0;
         this.FreightRateType = this.contractKeysInvoke?.RateType[0] || '';
+        this.RequestContractKeysDetail.ContractKeys.TRDays=this.contractKeysInvoke?.TRDays[0] || 0;
         this.DiscountRate = 0;
         this.DiscountRateType = "";
         this.DiscountAmount = 0;
+        this.step3.controls['FreightRateType'].setValue(this.FreightRateType);
         this.step3.controls['FreightRate'].setValue(this.FreightRate ? this.FreightRate : 0);
         this.step3.controls['FreightCharge'].setValue(this.FreightCharge ? this.FreightCharge : 0);
         this.step3.controls['DiscountRate'].setValue(this.DiscountRate ? this.DiscountRate : 0);
@@ -2591,7 +2584,6 @@ export class CNoteGenerationComponent implements OnInit {
     }
     //Disbled Type oF movment
 DisbleTypeOFmovent(){
-  debugger
    if(this.step1.value.SVCTYP=='1'){
     this.step1.controls['FTLTYP'].disable();
     this.step1.controls['FTLTYP'].setValue('');
@@ -2599,6 +2591,53 @@ DisbleTypeOFmovent(){
    else{
     this.step1.controls['FTLTYP'].enable();
    }
+}
+CalucateEdd(){
+  debugger;
+  this.RequestContractKeysDetail.companyCode = 10065
+  this.RequestContractKeysDetail.ContractKeys.CompanyCode = 10065,
+    this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1;
+  this.RequestContractKeysDetail.ContractKeys.BaseCode1 = this.BaseCode2;
+  this.RequestContractKeysDetail.ContractKeys.BasedOn2 = this.BasedOn2;
+  this.RequestContractKeysDetail.ContractKeys.BaseCode2 = this.BaseCode2;
+  this.RequestContractKeysDetail.ContractKeys.ChargedWeight = this.step3.value.CHRGWT ? this.step3.value.CHRGWT : '0.00';
+  this.RequestContractKeysDetail.ContractKeys.ContractID = this.step1.value.PRQ_BILLINGPARTY.ContractId;
+  this.RequestContractKeysDetail.ContractKeys.DelLoc = this.step1.controls['DELLOC'].value.Value;
+  this.RequestContractKeysDetail.ContractKeys.Depth = this.ContractDepth;
+  this.RequestContractKeysDetail.ContractKeys.FromCity = this.step1.value.FCITY.Value,
+    this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.value.FTLTYP;
+  this.RequestContractKeysDetail.ContractKeys.NoOfPkgs = this.step3.value.TotalChargedNoofPackages ? this.step3.value.TotalChargedNoofPackages : '0.00';
+  this.RequestContractKeysDetail.ContractKeys.Quantity = this.step3.value.TotalPartQuantity ? this.step3.value.TotalPartQuantity : '0.00';
+  this.RequestContractKeysDetail.ContractKeys.OrgnLoc = "MUMB";
+  this.RequestContractKeysDetail.ContractKeys.PayBase = this.step1.value.PAYTYP ? this.step1.value.PAYTYP : "";
+  this.RequestContractKeysDetail.ContractKeys.ServiceType = this.step1.value.SVCTYP ? this.step1.value.SVCTYP : "";
+  this.RequestContractKeysDetail.ContractKeys.ToCity = this.step1.value.TCITY.Value;
+  this.RequestContractKeysDetail.ContractKeys.TransMode = this.step1.value.TRN;
+  this.RequestContractKeysDetail.ContractKeys.OrderID = "01";
+  this.RequestContractKeysDetail.ContractKeys.InvAmt = this.step3.value.TotalDeclaredValue ? this.step3.value.TotalDeclaredValue : '0.00';
+  this.RequestContractKeysDetail.ContractKeys.DeliveryZone = 0;
+  this.RequestContractKeysDetail.ContractKeys.DestDeliveryPinCode = 140402;
+  this.RequestContractKeysDetail.ContractKeys.DestDeliveryArea = "RAJPURA";
+  this.RequestContractKeysDetail.ContractKeys.DocketDate = this.step1.value.DKTDT;
+  this.RequestContractKeysDetail.ContractKeys.FlagDeferment=this.IsDeferment;
+  let reqbody={
+    companyCode:10065,
+    EDD_TRANSIT:this.Rules.find((x)=>x.code=='EDD_TRANSIT').defaultvalue,
+    FLAG_CUTOFF:this.Rules.find((x)=>x.code=='FLAG_CUTOFF').defaultvalue,
+    EDD_NDAYS:this.Rules.find((x)=>x.code=='EDD_NDAYS').defaultvalue,
+    EDD_LOCAL:this.Rules.find((x)=>x.code=='EDD_LOCAL').defaultvalue,
+    EDD_ADD_HDAYS:this.Rules.find((x)=>x.code=='EDD_ADD_HDAYS').defaultvalue,
+    ContractKeys:this.RequestContractKeysDetail.ContractKeys
+  }
+  this.ICnoteService.cnotePost('services/CalculatEdd',reqbody).subscribe({next:(res:any)=>{
+    if(res){
+       this.step3.controls['EDD'].setValue(res.result.Date);
+       this.step3.controls['EEDD'].setValue(res.result.Date);
+       this.FlagCutoffApplied=res.result.FlagCutoffApplied;
+       this.FlagHolidayApplied=res.result.FlagHolidayApplied
+       this.FlagHolidayBooked=res.result.FlagHolidayBooked
+    }
+  }})
 }
 //end
 }

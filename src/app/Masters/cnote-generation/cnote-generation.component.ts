@@ -684,6 +684,9 @@ export class CNoteGenerationComponent implements OnInit {
           this.GetInvoiceConfigurationBasedOnTransMode();
           // Call the getDaterules function
           //this.getDaterules();
+          //Step1 Basic Detaill
+          this.GetDetailedBasedOnCStep1();
+          //End
         }
       }
     })
@@ -1240,7 +1243,7 @@ export class CNoteGenerationComponent implements OnInit {
   }
 
   displayCitygropFn(Cnotegrop: AutoCompleteCity): string {
-    return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Name : "";
+    return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Value : "";
   }
   //End
 
@@ -1857,6 +1860,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.VolMeasure = invoiceDetail[0].VolMeasure;
       }
     });
+    
   }
 
   //GetPrqInvoiceList
@@ -2058,15 +2062,12 @@ export class CNoteGenerationComponent implements OnInit {
     switch (this.BasedOn1) {
       case "SVCTYP":
         this.BaseCode1 = this.step1.value.SVCTYP;
-        this.CalucateEdd();
         break;
       case "BUT":
         this.BaseCode1 = this.step1.value.BUT;
-        this.CalucateEdd();
         break;
       case "NONE":
         this.BaseCode1 = "NONE";
-        this.CalucateEdd();
         break;
     }
     switch (this.BasedOn2) {
@@ -2300,16 +2301,18 @@ export class CNoteGenerationComponent implements OnInit {
         }
       })
       let reqFOVChargeCriteria = {
-        CompanyCode: 10065,
-        ContractId: this.step1.value.PRQ_BILLINGPARTY?.ContractId,
+        companyCode: 10065,
+        contractid: this.step1.value.PRQ_BILLINGPARTY?.ContractId,
         basedon: this.Rules.find(x => x.code == 'CHRG_RULE').defaultvalue,
-        BaseCode: this.BaseCode1,
+        basecode: this.BaseCode1,
         DeclareValue: this.step3.value.TotalDeclaredValue,
         RiskType: this.step2.value.RSKTY,
         ServiceType: this.step1.value.SVCTYP
       }
+      console.log(reqFOVChargeCriteria);
       this.ICnoteService.cnotePost('services/GetFOVCharge', reqFOVChargeCriteria).subscribe({
         next: (res: any) => {
+          debugger;
           if (res) {
             this.FOVFlag = res.result[0];
             this.FOVCharges = res.result[1];
@@ -2319,6 +2322,9 @@ export class CNoteGenerationComponent implements OnInit {
             this.FOVCharge.FOVRate = this.FOVCharges[0]?.fovrate || 0;
             this.FOVCharge.FOVCharged = this.FOVCharges[0]?.fovcharge || 0;
             this.FOVCharge.FOVRateType = this.FOVCharges[0]?.ratetype || "F";
+            this.step3.controls['FOVRate'].setValue(this.FOVCharges[0]?.fovrate);
+            this.step3.controls['FOVCharged'].setValue(this.FOVCharges[0]?.fovcharge);
+            this.step3.controls['FOVCalculated'].setValue(this.FOVCharges[0]?.fovcharge)
 
           }
         }
@@ -2706,6 +2712,32 @@ export class CNoteGenerationComponent implements OnInit {
     this.DestDeliveryPinCode=this.destionationNestedDate[0]?.PinCode||"";
     this.DestDeliveryArea=this.destionationNestedDate[0]?.Area||"";
     this.PincodeZoneLocation=this.destionationNestedDate[0]?.PincodeZoneLocation||"";
+  }
+  GetDetailedBasedOnCStep1(){
+    debugger;
+    let reqbody={
+      companyCode:10065,
+      Origin:"MUMB",
+      DocketNumber:this.step1.value.DKTNO
+    }
+    this.ICnoteService.cnotePost('services/GetDetailedBasedOnCStep1',reqbody).subscribe({
+      next:(res:any)=>{
+        if(res){
+          //MArk that this is temapory res.Result[0]?.ORIGIN||"" bcz in this time Virtual login and Location is not available so i jst working using static location if the varitual login is done this condtion shold be changed
+          this.step1.controls['ORGNLOC'].setValue(res.Result[0]?.ORIGIN||"");
+          let FromCity = {
+            Value: res.Result[0]?.FROMCITY||"",
+            Name: res.Result[0]?.FROMCITY||"",
+            LOCATIONS: "",
+            CITY_CODE: "",
+          }
+          this.step1.controls['FCITY'].setValue(FromCity);
+          this.step1.controls['PAYTYP'].setValue(res.Result[0]?.DEFAULTPAYBASE||"");
+          // this.step1.controls['PROD'].setValue(res.Result[0]?.DEFAULTPRODUCT||"");
+          // this.step1.controls['TRN'].setValue(res.Result[0]?.DEFAULTMODE||"");
+        }
+      }
+    })
   }
   //End
 }

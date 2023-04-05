@@ -170,6 +170,12 @@ export class CNoteGenerationComponent implements OnInit {
   rowBillingParty: boolean;
   isBillingPartysName: boolean;
   //end
+  //HiddenFieldforStep1
+  DeliveryZone:string;
+  DestDeliveryPinCode:string;
+  DestDeliveryArea:string;
+  PincodeZoneLocation:string;
+  //End
   //otherchargeHiddenField
   MinFreightRate: number;
   hdnDistanceInvoke: number;
@@ -213,6 +219,7 @@ export class CNoteGenerationComponent implements OnInit {
   FlagHolidayBooked: any;
   FlagHolidayApplied: any;
   mapcityRule: string;
+  destionationNestedDate: any;
 
   //End
   constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
@@ -2017,6 +2024,7 @@ export class CNoteGenerationComponent implements OnInit {
   //End
   //GetContractInvokeDependent
   GetContractInvokeDependent() {
+    debugger;
     try {
       let req = {
         companyCode: 10065,
@@ -2050,12 +2058,15 @@ export class CNoteGenerationComponent implements OnInit {
     switch (this.BasedOn1) {
       case "SVCTYP":
         this.BaseCode1 = this.step1.value.SVCTYP;
+        this.CalucateEdd();
         break;
       case "BUT":
         this.BaseCode1 = this.step1.value.BUT;
+        this.CalucateEdd();
         break;
       case "NONE":
         this.BaseCode1 = "NONE";
+        this.CalucateEdd();
         break;
     }
     switch (this.BasedOn2) {
@@ -2072,7 +2083,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.BaseCode2 = "NONE";
         break;
     }
-    this.CalucateEdd();
+
   }
   //end
 
@@ -2568,6 +2579,9 @@ export class CNoteGenerationComponent implements OnInit {
       this.invoke = true
       this.InvokeInvoice();
     }
+    else{
+      this.InvokeInvoice();
+    }
   }
   //End
   //CodeChanged
@@ -2628,9 +2642,9 @@ export class CNoteGenerationComponent implements OnInit {
     this.RequestContractKeysDetail.ContractKeys.TransMode = this.step1.value.TRN;
     this.RequestContractKeysDetail.ContractKeys.OrderID = "01";
     this.RequestContractKeysDetail.ContractKeys.InvAmt = this.step3.value.TotalDeclaredValue ? this.step3.value.TotalDeclaredValue : '0.00';
-    this.RequestContractKeysDetail.ContractKeys.DeliveryZone = 0;
-    this.RequestContractKeysDetail.ContractKeys.DestDeliveryPinCode = 140402;
-    this.RequestContractKeysDetail.ContractKeys.DestDeliveryArea = "RAJPURA";
+    this.RequestContractKeysDetail.ContractKeys.DeliveryZone = this.DeliveryZone?parseInt(this.DeliveryZone):0;
+    this.RequestContractKeysDetail.ContractKeys.DestDeliveryPinCode = this.DestDeliveryPinCode?parseInt(this.DestDeliveryPinCode):0;
+    this.RequestContractKeysDetail.ContractKeys.DestDeliveryArea = this.DestDeliveryArea?this.DestDeliveryArea:'';
     this.RequestContractKeysDetail.ContractKeys.DocketDate = this.step1.value.DKTDT; this.RequestContractKeysDetail.ContractKeys.FlagDeferment = this.IsDeferment;
   }
   CalucateEdd() {
@@ -2672,7 +2686,8 @@ export class CNoteGenerationComponent implements OnInit {
       this.ICnoteService.cnotePost('services/GetDestination', reqbody).subscribe({
         next: (res: any) => {
           if (res) {
-            this.Destination = res.result
+            this.Destination = res.result;
+            this.destionationNestedDate= res.result;
             this.getCityFilter();
           }
         }
@@ -2681,12 +2696,16 @@ export class CNoteGenerationComponent implements OnInit {
   }
   toCityAutofill() {
     let toCity = {
-      Value: this.Destination[0].LocCity,
-      Name: this.Destination[0].LocCity,
+      Value: this.destionationNestedDate[0].LocCity,
+      Name:this.destionationNestedDate[0].LocCity,
       LOCATIONS: "",
       CITY_CODE: "",
     }
     this.step1.controls['TCITY'].setValue(toCity);
+    this.DeliveryZone=this.destionationNestedDate[0]?.PincodeZoneId||"";
+    this.DestDeliveryPinCode=this.destionationNestedDate[0]?.PinCode||"";
+    this.DestDeliveryArea=this.destionationNestedDate[0]?.Area||"";
+    this.PincodeZoneLocation=this.destionationNestedDate[0]?.PincodeZoneLocation||"";
   }
   //End
 }

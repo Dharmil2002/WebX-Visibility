@@ -198,6 +198,8 @@ export interface Radio{
    DestDeliveryPinCode: number
    DestDeliveryArea: string
    DocketDate: string
+   TRDays: number
+   FlagDeferment:boolean
  }
  export class DocketOtherChargesCriteria {
    ChargeRule: string;

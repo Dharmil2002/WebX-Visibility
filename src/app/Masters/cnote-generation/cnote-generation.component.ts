@@ -204,7 +204,7 @@ export class CNoteGenerationComponent implements OnInit {
   DPHRate: any;
   DPHAmount: any;
   Distance: any;
-  newDocketChanged: boolean=false;
+  newDocketChanged: boolean = false;
   docketOtherCharge: any[];
   ContractData: any;
   ContractId: any;
@@ -212,6 +212,7 @@ export class CNoteGenerationComponent implements OnInit {
   FlagCutoffApplied: any;
   FlagHolidayBooked: any;
   FlagHolidayApplied: any;
+  mapcityRule: string;
 
   //End
   constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
@@ -237,7 +238,7 @@ export class CNoteGenerationComponent implements OnInit {
         if (cnote.validation === 'Required') { // If the control is required, add a required validator
           validators = [Validators.required];
         }
-        
+
         // Add the control to the form group, using its default value (or the current date if it is a 'TodayDate' control) and any validators
         formControls[cnote.name] = this.fb.control(cnote.defaultvalue == 'TodayDate' ? new Date() : cnote.defaultvalue, validators);
       });
@@ -403,7 +404,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.fb.group(array)
       ])
     }
-    this.otherCharges = this.CnoteData.filter((x) => x.div == 'otherCharges' && x.Class !='extraOtherCharge' && x.Class !='CodDodPortion');
+    this.otherCharges = this.CnoteData.filter((x) => x.div == 'otherCharges' && x.Class != 'extraOtherCharge' && x.Class != 'CodDodPortion');
     // Return the final form group with all the created form
     return this.fb.group(formControls)
   }
@@ -558,7 +559,13 @@ export class CNoteGenerationComponent implements OnInit {
         break;
       case "DisbledTypeOfmovement":
         this.DisbleTypeOFmovent();
-      break;
+        break;
+      case "GetDestination":
+        this.GetDestination();
+        break;
+      case "DestinationAutofill":
+        this.toCityAutofill();
+        break;
       default:
         break;
     }
@@ -640,6 +647,7 @@ export class CNoteGenerationComponent implements OnInit {
           // Get the MAP_DLOC_PIN rule and USE_MAPPED_LOCATION_INCITY rule
           let Rules = this.Rules.find((x) => x.code == 'MAP_DLOC_PIN')
           let mapcityRule = this.Rules.find((x) => x.code == `USE_MAPPED_LOCATION_INCITY`)
+          this.mapcityRule = mapcityRule.defaultvalue
           if (Rules.defaultvalue == "A") {
             if (mapcityRule.defaultvalue === "Y") {
               // If the default value of MAP_DLOC_PIN is "A" and USE_MAPPED_LOCATION_INCITY is "Y",
@@ -982,32 +990,38 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Get Destination data company wise
   GetDestinationDataCompanyWise() {
-    // Find the BL code from the step1 form control
-    //let bLcode = this.step1Formcontrol.find((x) => x.name == 'DELLOC');
-    // Find the rules for the BL code
-    //let rules = this.Rules.find((x) => x.code.toLowerCase() == bLcode.dbCodeName.toLowerCase());
+    if (this.mapcityRule == "Y") {
+      // Find the BL code from the step1 form control
+      //let bLcode = this.step1Formcontrol.find((x) => x.name == 'DELLOC');
+      // Find the rules for the BL code
+      //let rules = this.Rules.find((x) => x.code.toLowerCase() == bLcode.dbCodeName.toLowerCase());
 
-    // Create a request object with company code and city name
-    var req = {
-      companyCode: 10065,
-      City: this.step1.value.TCITY.Name
-    }
-
-    // Call the API to get the mapped location from city name
-    this.ICnoteService.cnotePost('services/GetMappedLocationFromCityName', req).subscribe({
-      next: (res: any) => {
-        // Set the Destination property to the response
-        this.Destination = res;
-        // Get the first destination auto object
-        let objDelivaryAuto = this.Destination[0];
-        // Set the DELLOC form control value to the destination auto object
-        this.step1.controls['DELLOC'].setValue(objDelivaryAuto == undefined ? '' : objDelivaryAuto);
-        // Get city filter
-        this.getCityFilter();
-        // Get detailed based on locations
-        //this.GetDetailedBasedOnLocations();
+      // Create a request object with company code and city name
+      var req = {
+        companyCode: 10065,
+        City: this.step1.value.TCITY.Name
       }
-    })
+
+      // Call the API to get the mapped location from city name
+      this.ICnoteService.cnotePost('services/GetMappedLocationFromCityName', req).subscribe({
+        next: (res: any) => {
+          // Set the Destination property to the response
+          this.Destination = res;
+          // Get the first destination auto object
+          let objDelivaryAuto = this.Destination[0];
+          // Set the DELLOC form control value to the destination auto object
+          this.step1.controls['DELLOC'].setValue(objDelivaryAuto == undefined ? '' : objDelivaryAuto);
+          // Get city filter
+          this.getCityFilter();
+          // Get detailed based on locations
+
+        }
+      })
+    }
+    else {
+      this.GetDestination();
+    }
+    this.GetDetailedBasedOnLocations();
   }
   // End of GetDestinationDataCompanyWise function
 
@@ -1520,7 +1534,7 @@ export class CNoteGenerationComponent implements OnInit {
         next: (res: any) => {
           // Define an array of code types that need dropdown data
           const codeTypes = ['FTLTYP', 'PKPDL', 'SVCTYP', 'TRN'];
-          
+
           // Iterate over each form control in step1Formcontrol
           this.step1Formcontrol.forEach(item => {
             // If the form control's name is in codeTypes array, update its dropdown property with relevant data from response
@@ -1528,16 +1542,16 @@ export class CNoteGenerationComponent implements OnInit {
               item.dropdown = res.MASTER.filter(x => x.CodeType === item.name);
             }
           });
-          this.ContractData=res.CONTRACT;
-          if(this.ContractData){
-          this.ContractId=this.ContractData.CONTRACTID;
-          this.step1.controls['TRN'].setValue(this.ContractData.DEFAULTPRODUCTSET);
-          this.step1.controls['PKGS'].setValue(this.ContractData.Defaultmodeset);
-          this.step3.controls['CODDODCharged'].setValue(this.ContractData.FlagCODDODEnable=="Y"?true:false);
-          this.step3.controls['Volumetric'].setValue(this.ContractData.FlagVolumetric=="Y"?true:false) 
-          this.IsDeferment=this.ContractData.FlagDeferment=="Y"?true:false;
-          this.GetContractInvokeDependent();
-        }
+          this.ContractData = res.CONTRACT;
+          if (this.ContractData) {
+            this.ContractId = this.ContractData.CONTRACTID;
+            this.step1.controls['TRN'].setValue(this.ContractData.DEFAULTPRODUCTSET);
+            this.step1.controls['PKGS'].setValue(this.ContractData.Defaultmodeset);
+            this.step3.controls['CODDODCharged'].setValue(this.ContractData.FlagCODDODEnable == "Y" ? true : false);
+            this.step3.controls['Volumetric'].setValue(this.ContractData.FlagVolumetric == "Y" ? true : false)
+            this.IsDeferment = this.ContractData.FlagDeferment == "Y" ? true : false;
+            this.GetContractInvokeDependent();
+          }
         }
       })
     }
@@ -1735,7 +1749,7 @@ export class CNoteGenerationComponent implements OnInit {
     if (FlagCalculateInvoiceTotal) {
       this.CalculateInvoiceTotal(cftVolume);
     }
-    if(ActualWeight){
+    if (ActualWeight) {
       this.InvokeInvoice();
     }
 
@@ -1744,7 +1758,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //CalculateInvoiceTotal
   CalculateInvoiceTotal(cftVolume) {
-   debugger;
+    debugger;
     let TotalChargedNoofPackages = 0;
     let TotalChargedWeight = 0;
     let TotalDeclaredValue = 0;
@@ -1757,7 +1771,7 @@ export class CNoteGenerationComponent implements OnInit {
       TotalChargedNoofPackages = TotalChargedNoofPackages + parseFloat(x.NO_PKGS || 0);
       TotalChargedWeight = TotalChargedWeight + parseFloat(x.ChargedWeight || 0);
       TotalDeclaredValue = TotalDeclaredValue + parseFloat(x.DECLVAL || 0);
-      if (x.CUB_WT>0) {
+      if (x.CUB_WT > 0) {
         CftTotal = CftTotal + parseFloat(cftVolume)
       }
       if (x.PARTQUANTITY) {
@@ -1802,7 +1816,7 @@ export class CNoteGenerationComponent implements OnInit {
  * @returns void
  */
   GetInvoiceConfigurationBasedOnTransMode() {
-    debugger
+
     // Create request object
     let req = {
       companyCode: 10065,
@@ -2058,7 +2072,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.BaseCode2 = "NONE";
         break;
     }
-  this.CalucateEdd();
+    this.CalucateEdd();
   }
   //end
 
@@ -2132,7 +2146,7 @@ export class CNoteGenerationComponent implements OnInit {
     let FreightCharge = 0;
     let ruleContractType = this.Rules.find((x) => x.code == this.step1.value.PAYTYP + 'CONTRACT' && x.paybas == this.step1.value.PAYTYP);;
     let ruleProceed = this.Rules.find((x) => x.code == this.step1.value.PAYTYP + 'PROCEED' && x.paybas == this.step1.value.PAYTYP);
-   
+    this.Invoiceinit()
     debugger
     if (ruleContractType.defaultvalue == "C") {
       if (this.RequestContractKeysDetail.ContractKeys.ContractID != this.RequestContractKeysDetail.ContractKeys.PayBase + "8888" && this.RequestContractKeysDetail.ContractKeys.ContractID) {
@@ -2329,7 +2343,7 @@ export class CNoteGenerationComponent implements OnInit {
 
       }
       else {
-      
+
 
         /*FOV Rate*/
         this.FOVRate = this.FOVCharge.FOVRate;
@@ -2365,7 +2379,7 @@ export class CNoteGenerationComponent implements OnInit {
           companyCode: 10065,
           ContractKeys: this.RequestContractKeysDetail.ContractKeys
         }
-     
+
         this.ICnoteService.cnotePost('services/GetDocketchargeValues', reqchargeValues).subscribe({
           next: (res: any) => {
             this.chargeValues = res.result;
@@ -2411,9 +2425,9 @@ export class CNoteGenerationComponent implements OnInit {
               for (const control of NewControls) {
                 this.step3.addControl(control.name, new FormControl(control.defaultvalue));
               }
-            
-              this.docketOtherCharge=this.step3Formcontrol.filter((x)=>x.Class=='DocketotherCharges' || x.Class=='extraOtherCharge').sort((a, b) => a.Seq - b.Seq);
-              this.newDocketChanged=true;
+
+              this.docketOtherCharge = this.step3Formcontrol.filter((x) => x.Class == 'DocketotherCharges' || x.Class == 'extraOtherCharge').sort((a, b) => a.Seq - b.Seq);
+              this.newDocketChanged = true;
               //  const formControls = {};
               // this.step3Formcontrol.forEach(cnote => {
               //   let validators = [];
@@ -2560,84 +2574,119 @@ export class CNoteGenerationComponent implements OnInit {
   codeChanged() {
     // Check if Volumetric is truthy (not undefined, null, false, 0, etc.)
     if (this.step3.value.F_COD) {
-      this.otherCharges = this.CnoteData.filter((x) => x.div == 'otherCharges' && x.Class !='extraOtherCharge');
-      }
-      else {
-        this.otherCharges = this.otherCharges.filter(x => x.Class != 'CodDodPortion')
-      }
+      this.otherCharges = this.CnoteData.filter((x) => x.div == 'otherCharges' && x.Class != 'extraOtherCharge');
     }
-    FreightDetail(){
-        /*Freight Charges*/
-        this.FreightRate = this.contractKeysInvoke?.FreightRate[0] || 0;
-        this.FreightCharge = this.contractKeysInvoke?.FreightCharge[0] || 0;
-        this.FreightRateType = this.contractKeysInvoke?.RateType[0] || '';
-        this.RequestContractKeysDetail.ContractKeys.TRDays=this.contractKeysInvoke?.TRDays[0] || 0;
-        this.DiscountRate = 0;
-        this.DiscountRateType = "";
-        this.DiscountAmount = 0;
-        this.step3.controls['FreightRateType'].setValue(this.FreightRateType);
-        this.step3.controls['FreightRate'].setValue(this.FreightRate ? this.FreightRate : 0);
-        this.step3.controls['FreightCharge'].setValue(this.FreightCharge ? this.FreightCharge : 0);
-        this.step3.controls['DiscountRate'].setValue(this.DiscountRate ? this.DiscountRate : 0);
-        this.step3.controls['DiscountAmount'].setValue(this.DiscountAmount ? this.DiscountAmount : 0);
-        /*End*/
+    else {
+      this.otherCharges = this.otherCharges.filter(x => x.Class != 'CodDodPortion')
     }
-    //Disbled Type oF movment
-DisbleTypeOFmovent(){
-   if(this.step1.value.SVCTYP=='1'){
-    this.step1.controls['FTLTYP'].disable();
-    this.step1.controls['FTLTYP'].setValue('');
-   }
-   else{
-    this.step1.controls['FTLTYP'].enable();
-   }
-}
-CalucateEdd(){
-  debugger;
-  this.RequestContractKeysDetail.companyCode = 10065
-  this.RequestContractKeysDetail.ContractKeys.CompanyCode = 10065,
-    this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1;
-  this.RequestContractKeysDetail.ContractKeys.BaseCode1 = this.BaseCode2;
-  this.RequestContractKeysDetail.ContractKeys.BasedOn2 = this.BasedOn2;
-  this.RequestContractKeysDetail.ContractKeys.BaseCode2 = this.BaseCode2;
-  this.RequestContractKeysDetail.ContractKeys.ChargedWeight = this.step3.value.CHRGWT ? this.step3.value.CHRGWT : '0.00';
-  this.RequestContractKeysDetail.ContractKeys.ContractID = this.step1.value.PRQ_BILLINGPARTY.ContractId;
-  this.RequestContractKeysDetail.ContractKeys.DelLoc = this.step1.controls['DELLOC'].value.Value;
-  this.RequestContractKeysDetail.ContractKeys.Depth = this.ContractDepth;
-  this.RequestContractKeysDetail.ContractKeys.FromCity = this.step1.value.FCITY.Value,
-    this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.value.FTLTYP;
-  this.RequestContractKeysDetail.ContractKeys.NoOfPkgs = this.step3.value.TotalChargedNoofPackages ? this.step3.value.TotalChargedNoofPackages : '0.00';
-  this.RequestContractKeysDetail.ContractKeys.Quantity = this.step3.value.TotalPartQuantity ? this.step3.value.TotalPartQuantity : '0.00';
-  this.RequestContractKeysDetail.ContractKeys.OrgnLoc = "MUMB";
-  this.RequestContractKeysDetail.ContractKeys.PayBase = this.step1.value.PAYTYP ? this.step1.value.PAYTYP : "";
-  this.RequestContractKeysDetail.ContractKeys.ServiceType = this.step1.value.SVCTYP ? this.step1.value.SVCTYP : "";
-  this.RequestContractKeysDetail.ContractKeys.ToCity = this.step1.value.TCITY.Value;
-  this.RequestContractKeysDetail.ContractKeys.TransMode = this.step1.value.TRN;
-  this.RequestContractKeysDetail.ContractKeys.OrderID = "01";
-  this.RequestContractKeysDetail.ContractKeys.InvAmt = this.step3.value.TotalDeclaredValue ? this.step3.value.TotalDeclaredValue : '0.00';
-  this.RequestContractKeysDetail.ContractKeys.DeliveryZone = 0;
-  this.RequestContractKeysDetail.ContractKeys.DestDeliveryPinCode = 140402;
-  this.RequestContractKeysDetail.ContractKeys.DestDeliveryArea = "RAJPURA";
-  this.RequestContractKeysDetail.ContractKeys.DocketDate = this.step1.value.DKTDT;
-  this.RequestContractKeysDetail.ContractKeys.FlagDeferment=this.IsDeferment;
-  let reqbody={
-    companyCode:10065,
-    EDD_TRANSIT:this.Rules.find((x)=>x.code=='EDD_TRANSIT').defaultvalue,
-    FLAG_CUTOFF:this.Rules.find((x)=>x.code=='FLAG_CUTOFF').defaultvalue,
-    EDD_NDAYS:this.Rules.find((x)=>x.code=='EDD_NDAYS').defaultvalue,
-    EDD_LOCAL:this.Rules.find((x)=>x.code=='EDD_LOCAL').defaultvalue,
-    EDD_ADD_HDAYS:this.Rules.find((x)=>x.code=='EDD_ADD_HDAYS').defaultvalue,
-    ContractKeys:this.RequestContractKeysDetail.ContractKeys
   }
-  this.ICnoteService.cnotePost('services/CalculatEdd',reqbody).subscribe({next:(res:any)=>{
-    if(res){
-       this.step3.controls['EDD'].setValue(res.result.Date);
-       this.step3.controls['EEDD'].setValue(res.result.Date);
-       this.FlagCutoffApplied=res.result.FlagCutoffApplied;
-       this.FlagHolidayApplied=res.result.FlagHolidayApplied
-       this.FlagHolidayBooked=res.result.FlagHolidayBooked
+  FreightDetail() {
+    /*Freight Charges*/
+    this.FreightRate = this.contractKeysInvoke?.FreightRate[0] || 0;
+    this.FreightCharge = this.contractKeysInvoke?.FreightCharge[0] || 0;
+    this.FreightRateType = this.contractKeysInvoke?.RateType[0] || '';
+    this.RequestContractKeysDetail.ContractKeys.TRDays = this.contractKeysInvoke?.TRDays[0] || 0;
+    this.DiscountRate = 0;
+    this.DiscountRateType = "";
+    this.DiscountAmount = 0;
+    this.step3.controls['FreightRateType'].setValue(this.FreightRateType);
+    this.step3.controls['FreightRate'].setValue(this.FreightRate ? this.FreightRate : 0);
+    this.step3.controls['FreightCharge'].setValue(this.FreightCharge ? this.FreightCharge : 0);
+    this.step3.controls['DiscountRate'].setValue(this.DiscountRate ? this.DiscountRate : 0);
+    this.step3.controls['DiscountAmount'].setValue(this.DiscountAmount ? this.DiscountAmount : 0);
+    /*End*/
+  }
+  //Disbled Type oF movment
+  DisbleTypeOFmovent() {
+    if (this.step1.value.SVCTYP == '1') {
+      this.step1.controls['FTLTYP'].disable();
+      this.step1.controls['FTLTYP'].setValue('');
     }
-  }})
-}
-//end
+    else {
+      this.step1.controls['FTLTYP'].enable();
+    }
+  }
+  Invoiceinit() {
+    this.RequestContractKeysDetail.companyCode = 10065
+    this.RequestContractKeysDetail.ContractKeys.CompanyCode = 10065,
+      this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1;
+    this.RequestContractKeysDetail.ContractKeys.BaseCode1 = this.BaseCode2;
+    this.RequestContractKeysDetail.ContractKeys.BasedOn2 = this.BasedOn2;
+    this.RequestContractKeysDetail.ContractKeys.BaseCode2 = this.BaseCode2;
+    this.RequestContractKeysDetail.ContractKeys.ChargedWeight = this.step3.value.CHRGWT ? this.step3.value.CHRGWT : '0.00';
+    this.RequestContractKeysDetail.ContractKeys.ContractID = this.step1.value.PRQ_BILLINGPARTY.ContractId;
+    this.RequestContractKeysDetail.ContractKeys.DelLoc = this.step1.controls['DELLOC'].value.Value;
+    this.RequestContractKeysDetail.ContractKeys.Depth = this.ContractDepth;
+    this.RequestContractKeysDetail.ContractKeys.FromCity = this.step1.value.FCITY.Value,
+      this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.value.FTLTYP;
+    this.RequestContractKeysDetail.ContractKeys.NoOfPkgs = this.step3.value.TotalChargedNoofPackages ? this.step3.value.TotalChargedNoofPackages : '0.00';
+    this.RequestContractKeysDetail.ContractKeys.Quantity = this.step3.value.TotalPartQuantity ? this.step3.value.TotalPartQuantity : '0.00';
+    this.RequestContractKeysDetail.ContractKeys.OrgnLoc = "MUMB";
+    this.RequestContractKeysDetail.ContractKeys.PayBase = this.step1.value.PAYTYP ? this.step1.value.PAYTYP : "";
+    this.RequestContractKeysDetail.ContractKeys.ServiceType = this.step1.value.SVCTYP ? this.step1.value.SVCTYP : "";
+    this.RequestContractKeysDetail.ContractKeys.ToCity = this.step1.value.TCITY.Value;
+    this.RequestContractKeysDetail.ContractKeys.TransMode = this.step1.value.TRN;
+    this.RequestContractKeysDetail.ContractKeys.OrderID = "01";
+    this.RequestContractKeysDetail.ContractKeys.InvAmt = this.step3.value.TotalDeclaredValue ? this.step3.value.TotalDeclaredValue : '0.00';
+    this.RequestContractKeysDetail.ContractKeys.DeliveryZone = 0;
+    this.RequestContractKeysDetail.ContractKeys.DestDeliveryPinCode = 140402;
+    this.RequestContractKeysDetail.ContractKeys.DestDeliveryArea = "RAJPURA";
+    this.RequestContractKeysDetail.ContractKeys.DocketDate = this.step1.value.DKTDT; this.RequestContractKeysDetail.ContractKeys.FlagDeferment = this.IsDeferment;
+  }
+  CalucateEdd() {
+    debugger;
+    this.Invoiceinit();
+    let reqbody = {
+      companyCode: 10065,
+      EDD_TRANSIT: this.Rules.find((x) => x.code == 'EDD_TRANSIT').defaultvalue,
+      FLAG_CUTOFF: this.Rules.find((x) => x.code == 'FLAG_CUTOFF').defaultvalue,
+      EDD_NDAYS: this.Rules.find((x) => x.code == 'EDD_NDAYS').defaultvalue,
+      EDD_LOCAL: this.Rules.find((x) => x.code == 'EDD_LOCAL').defaultvalue,
+      EDD_ADD_HDAYS: this.Rules.find((x) => x.code == 'EDD_ADD_HDAYS').defaultvalue,
+      ContractKeys: this.RequestContractKeysDetail.ContractKeys
+    }
+    this.ICnoteService.cnotePost('services/CalculatEdd', reqbody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.step3.controls['EDD'].setValue(res.result.Date);
+          this.step3.controls['EEDD'].setValue(res.result.Date);
+          this.FlagCutoffApplied = res.result.FlagCutoffApplied;
+          this.FlagHolidayApplied = res.result.FlagHolidayApplied
+          this.FlagHolidayBooked = res.result.FlagHolidayBooked
+        }
+      }
+    })
+  }
+  //end
+  //GetDestination
+  GetDestination() {
+    debugger;
+    if (this.step1.value.DELLOC.length > 3) {
+      let reqbody = {
+        companyCode: 10065,
+        map_dloc_pin: this.Rules.find((x) => x.code == 'MAP_DLOC_PIN').defaultvalue,
+        OriginLocation: "MUMB",
+        loc_level: "234",
+        searchText: this.step1.value.DELLOC
+      }
+      this.ICnoteService.cnotePost('services/GetDestination', reqbody).subscribe({
+        next: (res: any) => {
+          if (res) {
+            this.Destination = res.result
+            this.getCityFilter();
+          }
+        }
+      })
+    }
+  }
+  toCityAutofill() {
+    let toCity = {
+      Value: this.Destination[0].LocCity,
+      Name: this.Destination[0].LocCity,
+      LOCATIONS: "",
+      CITY_CODE: "",
+    }
+    this.step1.controls['TCITY'].setValue(toCity);
+  }
+  //End
 }

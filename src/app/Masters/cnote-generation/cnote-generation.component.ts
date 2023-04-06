@@ -1557,10 +1557,14 @@ export class CNoteGenerationComponent implements OnInit {
             this.ContractId = this.ContractData.CONTRACTID;
             this.step1.controls['TRN'].setValue(this.ContractData.DEFAULTPRODUCTSET);
             this.step1.controls['PKGS'].setValue(this.ContractData.Defaultmodeset);
-            this.step3.controls['CODDODCharged'].setValue(this.ContractData.FlagCODDODEnable == "Y" ? true : false);
+            this.step3.controls['CODDODCharged'].setValue(this.ContractData?.CODDODCharged||"");
+            this.step3.controls['CODDODTobeCollected'].setValue(this.ContractData?.CODDODCharged||"");
+            this.step3.controls['F_COD'].setValue(this.ContractData.FlagCODDODEnable=="Y"?true:false);
             this.step3.controls['Volumetric'].setValue(this.ContractData.FlagVolumetric == "Y" ? true : false)
             this.IsDeferment = this.ContractData.FlagDeferment == "Y" ? true : false;
             this.GetContractInvokeDependent();
+            this.volumetricChanged();
+            this.codeChanged();
           }
         }
       })

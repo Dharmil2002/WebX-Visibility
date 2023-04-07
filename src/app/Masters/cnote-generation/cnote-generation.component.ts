@@ -258,13 +258,16 @@ export class CNoteGenerationComponent implements OnInit {
 
   //step-2 Formgrop 
   step2Formgrop(): UntypedFormGroup {
+    debugger;
     const formControls = {};
     // get all the form controls belonging to step 2
     this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2')
     // get all form controls belonging to Consignor section
     this.Consignor = this.CnoteData.filter((x) => x.div == 'Consignor')
+    console.log(this.Consignor);
     // get all form controls belonging to Consignee section
     this.Consignee = this.CnoteData.filter((x) => x.div == 'Consignee')
+    console.log(this.Consignee);
     // get all form controls belonging to Document Details section
     // and add dropdown options to RSKTY control
     this.DocumentDetails = this.CnoteData.filter((x) => x.div == 'DocumentDetails').map(item => {
@@ -581,6 +584,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //ConsignorAutoFill
   ConsignorAutoFill() {
+    debugger;
     //set the value of GSTINNO control to the GSTINNumber of CST_NM control if it is not null, otherwise set it to empty string
     this.step2.controls['GSTINNO'].setValue(this.step2.value.CST_NM.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber);
     //set the value of CST_ADD control to the CustAddress of CST_NM control
@@ -595,8 +599,9 @@ export class CNoteGenerationComponent implements OnInit {
 
   // ConsigneeAutoFill function to auto-fill Consignee details
   ConsigneeAutoFill() {
+    debugger;
     // Set ConsigneeGSTINNO control value to GSTIN number if it exists, otherwise set it to empty string
-    this.step2.controls['ConsigneeGSTINNO'].setValue(this.step2.value.ConsigneeCST_NM.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber);
+    this.step2.controls['ConsigneeGSTINNO'].setValue(this.step2.value.ConsigneeCST_NM.GSTINNumber == null ? '' : this.step2.value.ConsigneeCST_NM.GSTINNumber);
 
     // Set ConsigneeCST_ADD control value to Consignee address
     this.step2.controls['ConsigneeCST_ADD'].setValue(this.step2.value.ConsigneeCST_NM.CustAddress);
@@ -612,6 +617,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Get all fields and bind
   GetCnotecontrols() {
+    debugger;
     this.ICnoteService.getCnoteBooking('cnotefields/', 10065).subscribe({
       next: (res: any) => {
         if (res) {
@@ -829,6 +835,7 @@ export class CNoteGenerationComponent implements OnInit {
    * @param event The event that triggered the method.
    */
   getBillingPartyAutoComplete(event) {
+    debugger;
     let step = 'step' + this.CnoteData.find((x) => x.name == event).frmgrp;
     let control;
     switch (step) {
@@ -888,6 +895,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Filter function for billing party autocomplete
   getBillingPartyFilter(event) {
+    debugger;
     // Determine which step the billing party control is in
     let step = 'step' + this.CnoteData.find((x) => x.name == event).frmgrp;
 
@@ -1520,7 +1528,7 @@ export class CNoteGenerationComponent implements OnInit {
       this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2').map(item => {
         if (item.name === 'ConsigneeCST_NM') {
           item.type = value ? 'autodropdown' : 'text',
-            item.ActionFunction = value ? 'ConsignorChanged' : '',
+            item.ActionFunction = value ? 'ConsigneeDetail' : '',
             item.Search = value ? 'billingPartyrules' : ''
         }
         return item;
@@ -2569,7 +2577,7 @@ export class CNoteGenerationComponent implements OnInit {
       this.DPHRate = 0;
       this.DPHAmount = 0;
     }
-
+    this.CalucateEdd()
   }
   /*COD/DOD CHARGE*/
 
@@ -2621,9 +2629,10 @@ export class CNoteGenerationComponent implements OnInit {
     }
   }
   Invoiceinit() {
+    console.log(this.contractKeysInvoke);
     this.RequestContractKeysDetail.companyCode = 10065
     this.RequestContractKeysDetail.ContractKeys.CompanyCode = 10065,
-      this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1?this.BasedOn1:'';
+    this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1?this.BasedOn1:'';
     this.RequestContractKeysDetail.ContractKeys.BaseCode1 = this.BaseCode1?this.BaseCode1:'';
     this.RequestContractKeysDetail.ContractKeys.BasedOn2 = this.BasedOn2?this.BasedOn2:'';
     this.RequestContractKeysDetail.ContractKeys.BaseCode2 = this.BaseCode2?this.BaseCode2:'';
@@ -2632,7 +2641,7 @@ export class CNoteGenerationComponent implements OnInit {
     this.RequestContractKeysDetail.ContractKeys.DelLoc = this.step1.controls['DELLOC'].value.Value;
     this.RequestContractKeysDetail.ContractKeys.Depth = this.ContractDepth;
     this.RequestContractKeysDetail.ContractKeys.FromCity = this.step1.value.FCITY.Value,
-      this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.controls['FTLTYP'].value;
+    this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.controls['FTLTYP'].value;
     this.RequestContractKeysDetail.ContractKeys.NoOfPkgs = this.step3.value.TotalChargedNoofPackages ? this.step3.value.TotalChargedNoofPackages : '0.00';
     this.RequestContractKeysDetail.ContractKeys.Quantity = this.step3.value.TotalPartQuantity ? this.step3.value.TotalPartQuantity : '0.00';
     this.RequestContractKeysDetail.ContractKeys.OrgnLoc = "MUMB";
@@ -2646,6 +2655,7 @@ export class CNoteGenerationComponent implements OnInit {
     this.RequestContractKeysDetail.ContractKeys.DestDeliveryPinCode = this.DestDeliveryPinCode ? parseInt(this.DestDeliveryPinCode) : 0;
     this.RequestContractKeysDetail.ContractKeys.DestDeliveryArea = this.DestDeliveryArea ? this.DestDeliveryArea : '';
     this.RequestContractKeysDetail.ContractKeys.DocketDate = this.step1.value.DKTDT; this.RequestContractKeysDetail.ContractKeys.FlagDeferment = this.IsDeferment;
+    this.RequestContractKeysDetail.ContractKeys.TRDays = this.contractKeysInvoke?.TRDays[0] || 0;
   }
   CalucateEdd() {
     this.Invoiceinit();
@@ -2658,6 +2668,7 @@ export class CNoteGenerationComponent implements OnInit {
       EDD_ADD_HDAYS: this.Rules.find((x) => x.code == 'EDD_ADD_HDAYS').defaultvalue,
       ContractKeys: this.RequestContractKeysDetail.ContractKeys
     }
+    console.log(reqbody);
     this.ICnoteService.cnotePost('services/CalculatEdd', reqbody).subscribe({
       next: (res: any) => {
         if (res) {

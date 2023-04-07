@@ -162,33 +162,33 @@
                                         <h4 class="card-title">Consignor Details</h4>
                                         <hr>
                                         <div class="row">
-                                            <div [class]="divcol" *ngFor="let step2 of Consignor">
+                                            <div [class]="divcol" *ngFor="let csgn of Consignor">
 
-                                                <div *ngIf="step2.div=='Consignor'">
+                                                <div *ngIf="csgn.div=='Consignor'">
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='text'">
-                                                        <mat-label>{{step2.label}}</mat-label>
-                                                        <input matInput type="step2.type"
-                                                            (ngModelChange)="callActionFunction(step2.ActionFunction,$event)"
-                                                            [formControlName]="step2.name" autocomplete="off">
+                                                        *ngIf="csgn.type=='text'">
+                                                        <mat-label>{{csgn.label}}</mat-label>
+                                                        <input matInput type="csgn.type"
+                                                            (ngModelChange)="callActionFunction(csgn.ActionFunction,$event)"
+                                                            [formControlName]="csgn.name" autocomplete="off">
 
                                                     </mat-form-field>
 
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='date'">
-                                                        <mat-label>{{step2.label}}</mat-label>
+                                                        *ngIf="csgn.type=='date'">
+                                                        <mat-label>{{csgn.label}}</mat-label>
                                                         <input matInput [matDatepicker]="Cnotename"
-                                                            [formControlName]="step2.name">
+                                                            [formControlName]="csgn.name">
                                                         <mat-datepicker-toggle matSuffix
                                                             [for]="Cnotename"></mat-datepicker-toggle>
                                                         <mat-datepicker #Cnotename></mat-datepicker>
                                                     </mat-form-field>
 
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='dropdown'">
-                                                        <mat-label>{{step2.label}}</mat-label>
-                                                        <mat-select [formControlName]="step2.name ">
-                                                            <mat-option *ngFor="let option of step2.dropdown"
+                                                        *ngIf="csgn.type=='dropdown'">
+                                                        <mat-label>{{csgn.label}}</mat-label>
+                                                        <mat-select [formControlName]="csgn.name ">
+                                                            <mat-option *ngFor="let option of csgn.dropdown"
                                                                 [value]="option.CodeId">
                                                                 {{ option.CodeDesc }}
                                                             </mat-option>
@@ -196,14 +196,14 @@
                                                     </mat-form-field>
                                                     <!--billing AutoCompalate-->
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='autodropdown' && step2.name=='CST_NM'">
-                                                        <mat-label>{{step2.label}}</mat-label>
-                                                        <input matInput [formControlName]="step2.name"
-                                                            (input)="callActionFunction(step2.Search,'CST_NM')"
+                                                        *ngIf="csgn.type=='autodropdown' && csgn.name=='CST_NM'">
+                                                        <mat-label>{{csgn.label}}</mat-label>
+                                                        <input matInput [formControlName]="csgn.name"
+                                                            (input)="callActionFunction(csgn.Search,'CST_NM')"
                                                             autocomplete="off" [matAutocomplete]="city">
                                                         <mat-autocomplete #city="matAutocomplete"
                                                             [displayWith]="displayCnotegropFn"
-                                                            (optionSelected)="callActionFunction(step2.ActionFunction,$event)">
+                                                            (optionSelected)="callActionFunction(csgn.ActionFunction,$event)">
                                                             <mat-option
                                                                 *ngFor="let option of filteredCnoteBilling | async"
                                                                 [value]="option">
@@ -215,59 +215,59 @@
 
                                                     <!--other AutoCompalate-->
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='autodropdown' && step2.name!='CST_NM'">
-                                                        <mat-label>{{step2.label}}</mat-label>
-                                                        <input matInput [formControlName]="step2.name"
-                                                            (input)="callActionFunction(step2.Search,$event)"
+                                                        *ngIf="csgn.type=='autodropdown' && csgn.name!='CST_NM'">
+                                                        <mat-label>{{csgn.label}}</mat-label>
+                                                        <input matInput [formControlName]="csgn.name"
+                                                            (input)="callActionFunction(csgn.Search,$event)"
                                                             autocomplete="off" [matAutocomplete]="city">
                                                         <mat-autocomplete #city="matAutocomplete"
-                                                            [displayWith]="step2.name === 'ConsignorPinCode' ? displayCnotegropFn : displayCitygropFn"
-                                                            (optionSelected)="callActionFunction(step2.ActionFunction,$event)">
+                                                            [displayWith]="csgn.name === 'ConsignorPinCode' ? displayCnotegropFn : displayCitygropFn"
+                                                            (optionSelected)="callActionFunction(csgn.ActionFunction,$event)">
                                                             <mat-option
-                                                                *ngFor="let option of step2.filteredOptions | async"
+                                                                *ngFor="let option of csgn.filteredOptions | async"
                                                                 [value]="option">
-                                                                {{step2.name === 'ConsignorPinCode' ? option.Value + ' -
+                                                                {{csgn.name === 'ConsignorPinCode' ? option.Value + ' -
                                                                 ' +
                                                                 option.Name : option.Value}}
                                                             </mat-option>
                                                         </mat-autocomplete>
                                                     </mat-form-field>
                                                     <!-- end -->
-                                                    <mat-slide-toggle color="primary" *ngIf="step2.type=='toggle'"
-                                                        [formControlName]="step2.name"
-                                                        (change)="callActionFunction(step2.ActionFunction,$event)">{{step2.label}}</mat-slide-toggle>
+                                                    <mat-slide-toggle color="primary" *ngIf="csgn.type=='toggle'"
+                                                        [formControlName]="csgn.name"
+                                                        (change)="callActionFunction(csgn.ActionFunction,$event)">{{csgn.label}}</mat-slide-toggle>
                                                 </div>
                                             </div>
                                         </div>
                                         <h4 class="card-title">Consignee Details</h4>
                                         <hr>
                                         <div class="row">
-                                            <div [class]="divcol" *ngFor="let step2 of Consignee">
-                                                <div *ngIf="step2.div=='Consignee'">
+                                            <div [class]="divcol" *ngFor="let csge of Consignee">
+                                                <div *ngIf="csge.div=='Consignee'">
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='text'">
-                                                        <mat-label>{{step2.label}}</mat-label>
-                                                        <input matInput type="step2.type"
-                                                            (ngModelChange)="callActionFunction(step2.ActionFunction,$event)"
-                                                            [formControlName]="step2.name" autocomplete="off">
+                                                        *ngIf="csge.type=='text'">
+                                                        <mat-label>{{csge.label}}</mat-label>
+                                                        <input matInput type="csge.type"
+                                                            (ngModelChange)="callActionFunction(csge.ActionFunction,$event)"
+                                                            [formControlName]="csge.name" autocomplete="off">
 
                                                     </mat-form-field>
 
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='date'">
-                                                        <mat-label>{{step2.label}}</mat-label>
+                                                        *ngIf="csge.type=='date'">
+                                                        <mat-label>{{csge.label}}</mat-label>
                                                         <input matInput [matDatepicker]="Cnotename"
-                                                            [formControlName]="step2.name">
+                                                            [formControlName]="csge.name">
                                                         <mat-datepicker-toggle matSuffix
                                                             [for]="Cnotename"></mat-datepicker-toggle>
                                                         <mat-datepicker #Cnotename></mat-datepicker>
                                                     </mat-form-field>
 
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='dropdown'">
-                                                        <mat-label>{{step2.label}}</mat-label>
-                                                        <mat-select [formControlName]="step2.name ">
-                                                            <mat-option *ngFor="let option of step2.dropdown"
+                                                        *ngIf="csge.type=='dropdown'">
+                                                        <mat-label>{{csge.label}}</mat-label>
+                                                        <mat-select [formControlName]="csge.name ">
+                                                            <mat-option *ngFor="let option of csge.dropdown"
                                                                 [value]="option.CodeId">
                                                                 {{ option.CodeDesc }}
                                                             </mat-option>
@@ -275,14 +275,14 @@
                                                     </mat-form-field>
                                                     <!--billing AutoCompalate-->
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='autodropdown' && step2.name=='ConsigneeCST_NM'">
-                                                        <mat-label>{{step2.label}}</mat-label>
-                                                        <input matInput [formControlName]="step2.name"
-                                                            (input)="callActionFunction(step2.Search,'ConsigneeCST_NM')"
-                                                            autocomplete="off" [matAutocomplete]="city">
-                                                        <mat-autocomplete #city="matAutocomplete"
+                                                        *ngIf="csge.type=='autodropdown' && csge.name=='ConsigneeCST_NM'">
+                                                        <mat-label>{{csge.label}}</mat-label>
+                                                        <input matInput [formControlName]="csge.name"
+                                                            (input)="callActionFunction(csge.Search,'ConsigneeCST_NM')"
+                                                            autocomplete="off" [matAutocomplete]="Consig">
+                                                        <mat-autocomplete #Consig="matAutocomplete"
                                                             [displayWith]="displayCnotegropFn"
-                                                            (optionSelected)="callActionFunction(step2.ActionFunction,$event)">
+                                                            (optionSelected)="callActionFunction(csge.ActionFunction,$event)">
                                                             <mat-option
                                                                 *ngFor="let option of filteredCnoteBilling | async"
                                                                 [value]="option">
@@ -294,27 +294,27 @@
 
                                                     <!--other AutoCompalate-->
                                                     <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="step2.type=='autodropdown' && step2.name!='ConsigneeCST_NM'">
-                                                        <mat-label>{{step2.label}}</mat-label>
-                                                        <input matInput [formControlName]="step2.name"
-                                                            (input)="callActionFunction(step2.Search,$event)"
+                                                        *ngIf="csge.type=='autodropdown' && csge.name!='ConsigneeCST_NM'">
+                                                        <mat-label>{{csge.label}}</mat-label>
+                                                        <input matInput [formControlName]="csge.name"
+                                                            (input)="callActionFunction(csge.Search,$event)"
                                                             autocomplete="off" [matAutocomplete]="city">
                                                         <mat-autocomplete #city="matAutocomplete"
-                                                            [displayWith]="step2.name === 'ConsigneePinCode' ? displayCnotegropFn : displayCitygropFn"
-                                                            (optionSelected)="callActionFunction(step2.ActionFunction,$event)">
+                                                            [displayWith]="csge.name === 'ConsigneePinCode' ? displayCnotegropFn : displayCitygropFn"
+                                                            (optionSelected)="callActionFunction(csge.ActionFunction,$event)">
                                                             <mat-option
-                                                                *ngFor="let option of step2.filteredOptions | async"
+                                                                *ngFor="let option of csge.filteredOptions | async"
                                                                 [value]="option">
-                                                                {{step2.name === 'ConsigneePinCode' ? option.Value + ' -
+                                                                {{csge.name === 'ConsigneePinCode' ? option.Value + ' -
                                                                 ' +
                                                                 option.Name : option.Name}}
                                                             </mat-option>
                                                         </mat-autocomplete>
                                                     </mat-form-field>
                                                     <!-- end -->
-                                                    <mat-slide-toggle color="primary" *ngIf="step2.type=='toggle'"
-                                                        [formControlName]="step2.name"
-                                                        (change)="callActionFunction(step2.ActionFunction,$event)">{{step2.label}}</mat-slide-toggle>
+                                                    <mat-slide-toggle color="primary" *ngIf="csge.type=='toggle'"
+                                                        [formControlName]="csge.name"
+                                                        (change)="callActionFunction(csge.ActionFunction,$event)">{{csge.label}}</mat-slide-toggle>
 
 
                                                 </div>

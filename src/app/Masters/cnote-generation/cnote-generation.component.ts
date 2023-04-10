@@ -264,10 +264,8 @@ export class CNoteGenerationComponent implements OnInit {
     this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2')
     // get all form controls belonging to Consignor section
     this.Consignor = this.CnoteData.filter((x) => x.div == 'Consignor')
-    console.log(this.Consignor);
     // get all form controls belonging to Consignee section
     this.Consignee = this.CnoteData.filter((x) => x.div == 'Consignee')
-    console.log(this.Consignee);
     // get all form controls belonging to Document Details section
     // and add dropdown options to RSKTY control
     this.DocumentDetails = this.CnoteData.filter((x) => x.div == 'DocumentDetails').map(item => {
@@ -498,6 +496,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.getToCity();
         break;
       case "Destination":
+        this.GetDetailedBasedOnLocations();
         this.GetDestinationDataCompanyWise();
         break;
       case "getVehicleNo":
@@ -573,8 +572,15 @@ export class CNoteGenerationComponent implements OnInit {
         this.GetDestination();
         break;
       case "DestinationAutofill":
-        this.toCityAutofill();
+        this.toCityAutofill(event);
+        this.GetDetailedBasedOnLocations();
         break;
+      case "getFromCity":
+       this.getFromCity();  
+      break;
+      case "getTocity":
+        this.getToCity();  
+       break;
       default:
         break;
     }
@@ -655,6 +661,7 @@ export class CNoteGenerationComponent implements OnInit {
             // filter out the step3Formcontrol items with div "InvoiceDetails" or dbCodeName "INVOICE_LEVEL_CONTRACT_INVOKE"
             this.step3Formcontrol = this.step3Formcontrol.filter((x) => x.div != 'InvoiceDetails' && x.dbCodeName !== 'INVOICE_LEVEL_CONTRACT_INVOKE');
           }
+          this.step1.controls['F_ODA'].disable();
           // Get the MAP_DLOC_PIN rule and USE_MAPPED_LOCATION_INCITY rule
           let Rules = this.Rules.find((x) => x.code == 'MAP_DLOC_PIN')
           let mapcityRule = this.Rules.find((x) => x.code == `USE_MAPPED_LOCATION_INCITY`)
@@ -853,8 +860,7 @@ export class CNoteGenerationComponent implements OnInit {
     let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.value.PAYTYP);
     if (rulePartyType.defaultvalue == "D") {
       this.step1.controls['PRQ_BILLINGPARTY'].disable();
-      this.getFromCity();
-      this.getToCity();
+     
     }
     else {
       this.step1.controls['PRQ_BILLINGPARTY'].enable();
@@ -951,22 +957,25 @@ export class CNoteGenerationComponent implements OnInit {
       const cityFormControl = this.step1Formcontrol.find(control => control.name === 'FCITY');
       // find matching rule based on FCITY control's dbCodeName
       const matchingRule = this.Rules.find(rule => rule.code === cityFormControl.dbCodeName);
-
+       if(this.step1.controls['FCITY'].value.length>2){
       const request = {
         companyCode: 10065,
-        map_dloc_city: matchingRule.defaultvalue,
-        DocketMode: "Yes",
+        ruleValue: matchingRule.defaultvalue,
+        searchText: this.step1.controls['FCITY'].value,
+        docketMode: "Yes",
         ContractParty: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
         PaymentType: this.step1.value.PAYTYP
       };
 
-      this.ICnoteService.cnotePost('services/getFromCity', request).subscribe({
+      this.ICnoteService.cnotePost('services/GetFromCityDetails', request).subscribe({
         next: (response: any) => {
-          this.Fcity = response;
+          this.Fcity = response.result;
           this.getCityFilter();
         }
       });
     }
+  }
+
 
 
   }
@@ -980,25 +989,27 @@ export class CNoteGenerationComponent implements OnInit {
       // Get the TCITY control from step1Formcontrol and find the corresponding rule
       let bLcode = this.step1Formcontrol.find((x) => x.name == 'TCITY');
       let rules = this.Rules.find((x) => x.code == bLcode.dbCodeName);
-
-      // Build the request object with necessary data
-      let req = {
-        companyCode: 10065,
-        map_dloc_city: rules.defaultvalue,
-        DocketMode: "Yes",
-        ContractParty: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
-        PaymentType: this.step1.value.PAYTYP,
-        FromCity: this.step1.value.FCITY == "" ? "" : this.step1.value.FCITY.Value
-      }
-
-      // Call the API to get the list of destination cities
-      this.ICnoteService.cnotePost('services/getToCity', req).subscribe({
-        next: (res: any) => {
-          // Save the response to the Tcity property and update the city filter
-          this.Tcity = res;
-          this.getCityFilter();
+      if (this.step1.controls['TCITY'].value.length > 2) {
+        // Build the request object with necessary data
+        let req = {
+          companyCode: 10065,
+          ruleValue: rules.defaultvalue,
+          searchText: this.step1.controls['TCITY'].value,
+          docketMode: "Yes",
+          ContractParty: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
+          PaymentType: this.step1.value.PAYTYP,
+          FromCity: this.step1.value.FCITY == "" ? "" : this.step1.value.FCITY.Value
         }
-      })
+
+        // Call the API to get the list of destination cities
+        this.ICnoteService.cnotePost('services/GetToCityDetails', req).subscribe({
+          next: (res: any) => {
+            // Save the response to the Tcity property and update the city filter
+            this.Tcity = res.result;
+            this.getCityFilter();
+          }
+        })
+      }
     }
   }
 
@@ -1570,7 +1581,7 @@ export class CNoteGenerationComponent implements OnInit {
             this.GetContractInvokeDependent();
             this.volumetricChanged();
             this.codeChanged();
-           
+
           }
         }
       })
@@ -2090,7 +2101,7 @@ export class CNoteGenerationComponent implements OnInit {
         break;
     }
     this.CalucateEdd();
-  } 
+  }
   //end
 
   //SetBillingParty
@@ -2629,19 +2640,19 @@ export class CNoteGenerationComponent implements OnInit {
     }
   }
   Invoiceinit() {
-    console.log(this.contractKeysInvoke);
+
     this.RequestContractKeysDetail.companyCode = 10065
     this.RequestContractKeysDetail.ContractKeys.CompanyCode = 10065,
-    this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1?this.BasedOn1:'';
-    this.RequestContractKeysDetail.ContractKeys.BaseCode1 = this.BaseCode1?this.BaseCode1:'';
-    this.RequestContractKeysDetail.ContractKeys.BasedOn2 = this.BasedOn2?this.BasedOn2:'';
-    this.RequestContractKeysDetail.ContractKeys.BaseCode2 = this.BaseCode2?this.BaseCode2:'';
+      this.RequestContractKeysDetail.ContractKeys.BasedOn1 = this.BasedOn1 ? this.BasedOn1 : '';
+    this.RequestContractKeysDetail.ContractKeys.BaseCode1 = this.BaseCode1 ? this.BaseCode1 : '';
+    this.RequestContractKeysDetail.ContractKeys.BasedOn2 = this.BasedOn2 ? this.BasedOn2 : '';
+    this.RequestContractKeysDetail.ContractKeys.BaseCode2 = this.BaseCode2 ? this.BaseCode2 : '';
     this.RequestContractKeysDetail.ContractKeys.ChargedWeight = this.step3.value.CHRGWT ? this.step3.value.CHRGWT : '0.00';
     this.RequestContractKeysDetail.ContractKeys.ContractID = this.step1.value.PRQ_BILLINGPARTY.ContractId;
     this.RequestContractKeysDetail.ContractKeys.DelLoc = this.step1.controls['DELLOC'].value.Value;
     this.RequestContractKeysDetail.ContractKeys.Depth = this.ContractDepth;
     this.RequestContractKeysDetail.ContractKeys.FromCity = this.step1.value.FCITY.Value,
-    this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.controls['FTLTYP'].value;
+      this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.controls['FTLTYP'].value;
     this.RequestContractKeysDetail.ContractKeys.NoOfPkgs = this.step3.value.TotalChargedNoofPackages ? this.step3.value.TotalChargedNoofPackages : '0.00';
     this.RequestContractKeysDetail.ContractKeys.Quantity = this.step3.value.TotalPartQuantity ? this.step3.value.TotalPartQuantity : '0.00';
     this.RequestContractKeysDetail.ContractKeys.OrgnLoc = "MUMB";
@@ -2668,7 +2679,6 @@ export class CNoteGenerationComponent implements OnInit {
       EDD_ADD_HDAYS: this.Rules.find((x) => x.code == 'EDD_ADD_HDAYS').defaultvalue,
       ContractKeys: this.RequestContractKeysDetail.ContractKeys
     }
-    console.log(reqbody);
     this.ICnoteService.cnotePost('services/CalculatEdd', reqbody).subscribe({
       next: (res: any) => {
         if (res) {
@@ -2704,18 +2714,19 @@ export class CNoteGenerationComponent implements OnInit {
       })
     }
   }
-  toCityAutofill() {
+  toCityAutofill(event) {
+    debugger;
     let toCity = {
-      Value: this.destionationNestedDate[0].LocCity,
-      Name: this.destionationNestedDate[0].LocCity,
+      Value: event.option.value.LocCity,
+      Name: event.option.value.LocCity,
       LOCATIONS: "",
       CITY_CODE: "",
     }
     this.step1.controls['TCITY'].setValue(toCity);
-    this.DeliveryZone = this.destionationNestedDate[0]?.PincodeZoneId || "";
-    this.DestDeliveryPinCode = this.destionationNestedDate[0]?.PinCode || "";
-    this.DestDeliveryArea = this.destionationNestedDate[0]?.Area || "";
-    this.PincodeZoneLocation = this.destionationNestedDate[0]?.PincodeZoneLocation || "";
+    this.DeliveryZone = event.option.value.PincodeZoneId || "";
+    this.DestDeliveryPinCode = event.option.value.pincode || "";
+    this.DestDeliveryArea = event.option.value.Area || "";
+    this.PincodeZoneLocation =event.option.value.PincodeZoneLocation || "";
   }
   GetDetailedBasedOnCStep1() {
     let reqbody = {

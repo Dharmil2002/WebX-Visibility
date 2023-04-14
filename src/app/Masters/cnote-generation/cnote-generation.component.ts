@@ -1356,6 +1356,7 @@ export class CNoteGenerationComponent implements OnInit {
     else {
       // If the checkbox is unchecked, clear the list of dockets and update the city filter
       this.Multipickup = [];
+      this.step1.controls['SRCDKT'].setValue('');
       this.getCityFilter();
     }
   }
@@ -2855,7 +2856,8 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.IsMutidelivery = this.step1.controls['F_MDEL']?.value || null;
       this.DocketEntity.IsMutipickup = this.step1.controls['F_MPKP']?.value || null;
       this.DocketEntity.SourceCNote = this.step1.controls['SRCDKT']?.value || '';
-      this.DocketEntity.ConsignorName = this.step2.controls['CST_NM']?.value.Value || '';
+      this.DocketEntity.ConsignorCode = this.step2.controls['CST_NM']?.value.Value || '';
+      this.DocketEntity.ConsignorName = this.step2.controls['CST_NM']?.value.Name || '';
       this.DocketEntity.ConsignorCity = this.step2.controls['ConsignorCity']?.value.Value || '';
       this.DocketEntity.ConsignorPinCode = this.step2.controls['ConsignorPinCode']?.value.Value || '';
       this.DocketEntity.ConsignorTelephoneNo = this.step2.controls['CST_PHONE']?.value || '';
@@ -2897,9 +2899,10 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.IsVolumetric = this.step3.controls['Volumetric']?.value || null;
       this.DocketEntity.CftTotal = this.step3.controls['CFT_TOT']?.value || 0;
       this.DocketEntity.VolRatio = this.step3.controls['CFT_RATIO']?.value || 0;
-      this.DocketEntity.TotalChargedWeight = this.step3.controls['ChargedWeight']?.value || 0;
+      this.DocketEntity.TotalChargedWeight = this.step3.controls['CHRGWT']?.value || 0;
       this.DocketEntity.TotalChargedNoofPackages = this.step3.controls['TotalChargedNoofPackages']?.value || 0;
       this.DocketEntity.TotalDeclaredValue = this.step3.controls['TotalDeclaredValue']?.value || 0;
+      this.DocketEntity.TotalActualWeight= this.step3.value.invoiceArray.reduce((total, item) => total + item.ActualWeight, 0);
       this.DocketEntity.ChargedKM = this.step3.controls['ChargedKM']?.value || 0;
       this.DocketEntity.TotalPartQuantity = this.step3.controls['TotalPartQuantity']?.value || 0;
       this.DocketEntity.EddDate = this.step3.controls['EDD']?.value || new Date();
@@ -3019,7 +3022,7 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.EntryBy = 'Dhaval'
       this.DocketEntity.CompanyCode = 10065
       this.DocketEntity.IsConsigneeFromMasterOrWalkin = this.step2.controls['IsConsigneeFromMasterOrWalkin']?.value || '';
-      this.DocketEntity.ConsigneeCode = this.step2.controls['ConsigneeCST_NM']?.value.Name || ''
+      this.DocketEntity.ConsigneeCode = this.step2.controls['ConsigneeCST_NM']?.value.Value || ''
       // this.DocketEntity.EntryTypes = this.DocketEntity.EntryTypes;
       //End
       if (!this.DocketEntity.StateDocumentDetails) {

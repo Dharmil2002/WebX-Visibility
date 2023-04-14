@@ -1,5 +1,4 @@
 //this data is not generated and it is hardcoded
-
 export const cnoteMetaData = [
     //Consignor------------------------------------------------------------------------------------------
     {

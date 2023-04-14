@@ -2855,22 +2855,22 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.IsMutidelivery = this.step1.controls['F_MDEL']?.value || null;
       this.DocketEntity.IsMutipickup = this.step1.controls['F_MPKP']?.value || null;
       this.DocketEntity.SourceCNote = this.step1.controls['SRCDKT']?.value || '';
-      this.DocketEntity.ConsignorName = this.step2.controls['CST_NM']?.value || '';
-      this.DocketEntity.ConsignorCity = this.step2.controls['ConsignorCity']?.value || '';
-      this.DocketEntity.ConsignorPinCode = this.step2.controls['ConsignorPinCode']?.value || '';
+      this.DocketEntity.ConsignorName = this.step2.controls['CST_NM']?.value.Value || '';
+      this.DocketEntity.ConsignorCity = this.step2.controls['ConsignorCity']?.value.Value || '';
+      this.DocketEntity.ConsignorPinCode = this.step2.controls['ConsignorPinCode']?.value.Value || '';
       this.DocketEntity.ConsignorTelephoneNo = this.step2.controls['CST_PHONE']?.value || '';
       this.DocketEntity.ConsignorMobileNo = this.step2.controls['CST_MOB']?.value || '';
       this.DocketEntity.IsConsignorFromMasterOrWalkin = this.step2.controls['IsConsignorFromMasterOrWalkin']?.value || null;
-      this.DocketEntity.ConsigneeName = this.step2.controls['ConsigneeCST_NM']?.value || '';
-      this.DocketEntity.ConsigneeCity = this.step2.controls['ConsigneeCity']?.value || '';
+      this.DocketEntity.ConsigneeName = this.step2.controls['ConsigneeCST_NM']?.value.Name || '';
+      this.DocketEntity.ConsigneeCity = this.step2.controls['ConsigneeCity']?.value.Value || '';
       this.DocketEntity.ConsigneeGstin = this.step2.controls['ConsigneeGSTINNO']?.value || '';
       this.DocketEntity.ConsigneeMobileNo = this.step2.controls['ConsigneeCST_MOB']?.value || '';
       this.DocketEntity.ConsigneeEmail = this.step2.controls['CST_EMAIL']?.value || '';
       this.DocketEntity.ConsigneeTinNumber = this.step2.controls['CST_TIN']?.value || '';
       this.DocketEntity.ConsigneeCstNumber = this.step2.controls['CST_CST']?.value || '';
       this.DocketEntity.ConsigneeTelephoneNo = this.step2.controls['ConsigneeCST_PHONE']?.value || '';
-      this.DocketEntity.ConsigneePinCode = this.step2.controls['ConsigneePinCode']?.value || '';
-      this.DocketEntity.ConsigneeCity = this.step2.controls['ConsigneeCity']?.value || '';
+      this.DocketEntity.ConsigneePinCode = this.step2.controls['ConsigneePinCode']?.value.Value || '';
+      this.DocketEntity.ConsigneeCity = this.step2.controls['ConsigneeCity']?.value.Value || '';
       this.DocketEntity.ConsigneeAddress = this.step2.controls['ConsigneeCST_ADD']?.value || '';
       this.DocketEntity.RiskType = this.step2.controls['RSKTY']?.value || '';
       this.DocketEntity.CustomerRefNo = this.step2.controls['CTR_NO']?.value || '';
@@ -2962,30 +2962,31 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.FOVCharged = this.step3.controls['FOVCharged']?.value || 0;
       this.DocketEntity.FOVRate = this.step3.controls['FOVRate']?.value || 0;
       this.DocketEntity.FreightRateType = this.step3.controls['FreightRateType']?.value || '';
-      this.DocketEntity.DiscountRate = this.step3.controls['DiscountRate']?.value || '';
-      this.DocketEntity.DiscountAmount = this.step3.controls['DiscountAmount']?.value || '';
+      this.DocketEntity.DiscountRate = this.step3.controls['DiscountRate']?.value || 0;
+      this.DocketEntity.DiscountAmount = this.step3.controls['DiscountAmount']?.value || 0;
       this.DocketEntity.EeddDate = this.step3.controls['EEDD']?.value || '';
       this.DocketEntity.CODDODCharged = this.step3.controls['CODDODCharged']?.value || 0;
       this.DocketEntity.CODDODTobeCollected = this.step3.controls['CODDODTobeCollected']?.value || 0;
       this.DocketEntity.IsCodDod = this.step3.controls['F_COD']?.value || null;
-      this.DocketEntity.BasedOn1 = this.BaseCode1;
-      this.DocketEntity.BasedOn2 = this.BasedOn2;
-      this.DocketEntity.UseFrom = this.UseFrom;
-      this.DocketEntity.UseTo = this.UseTo;
-      this.DocketEntity.UseTransMode = this.UseTransMode;
-      this.DocketEntity.UseRateType = this.UseRateType;
-      this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal;
-      this.DocketEntity.ContractDepth = this.ContractDepth;
-      this.DocketEntity.ProceedDuringEntry = this.ProceedDuringEntry;
-      this.DocketEntity.BaseCode1 = this.BaseCode1;
-      this.DocketEntity.BaseCode2 = this.BaseCode2;
-      this.DocketEntity.FlagCutoffApplied = this.FlagCutoffApplied;
-      this.DocketEntity.FlagHolidayApplied = this.FlagHolidayApplied;
-      this.DocketEntity.FlagHolidayBooked = this.FlagHolidayBooked;
-      this.DocketEntity.DeliveryZone = this.DeliveryZone;
-      this.DocketEntity.DestDeliveryPinCode = this.DestDeliveryPinCode;
-      this.DocketEntity.DestDeliveryArea = this.DestDeliveryArea;
-      this.DocketEntity.PincodeZoneLocation = this.PincodeZoneLocation;
+      this.DocketEntity.BasedOn1 = this.BaseCode1?this.BaseCode1:'';
+      this.DocketEntity.BasedOn2 = this.BasedOn2?this.BasedOn2:'';
+      this.DocketEntity.UseFrom = this.UseFrom?this.UseFrom:'';
+      this.DocketEntity.Origin = 'MUMB';
+      this.DocketEntity.UseTo = this.UseTo?this.UseTo:'';
+      this.DocketEntity.UseTransMode = this.UseTransMode?this.UseTransMode:'';
+      this.DocketEntity.UseRateType = this.UseRateType?this.UseRateType:'';
+      this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal?this.ChargeWeightToHighestDecimal:'';
+      this.DocketEntity.ContractDepth = this.ContractDepth?this.ContractDepth:'';
+      this.DocketEntity.ProceedDuringEntry = this.ProceedDuringEntry?this.ProceedDuringEntry:'';
+      this.DocketEntity.BaseCode1 = this.BaseCode1?this.BaseCode1:'';
+      this.DocketEntity.BaseCode2 = this.BaseCode2?this.BaseCode2:'';
+      this.DocketEntity.FlagCutoffApplied = this.FlagCutoffApplied?this.FlagCutoffApplied:'';
+      this.DocketEntity.FlagHolidayApplied = this.FlagHolidayApplied?this.FlagHolidayApplied:'';
+      this.DocketEntity.FlagHolidayBooked = this.FlagHolidayBooked?this.FlagHolidayBooked:'';
+      this.DocketEntity.DeliveryZone = this.DeliveryZone?this.DeliveryZone:'';
+      this.DocketEntity.DestDeliveryPinCode = this.DestDeliveryPinCode?this.DestDeliveryPinCode:'';
+      this.DocketEntity.DestDeliveryArea = this.DestDeliveryArea?this.DestDeliveryArea:'';
+      this.DocketEntity.PincodeZoneLocation = this.PincodeZoneLocation?this.PincodeZoneLocation:'';
       //GSTDETAILS
       let GstDetails = new DocketGstEntity();
       GstDetails.IsGSTExempted = false
@@ -3034,7 +3035,9 @@ export class CNoteGenerationComponent implements OnInit {
       newDoc.StateName = '';
 
       this.DocketEntity.StateDocumentDetails.push(newDoc);
-
+      if (!this.DocketEntity.ViaCityDetails) {
+        this.DocketEntity.ViaCityDetails = [];
+      }
       let CityDetailEntity: ViaCityDetailEntity = new ViaCityDetailEntity();
       CityDetailEntity.Address = ''
       CityDetailEntity.ContactNumber = ''
@@ -3086,18 +3089,18 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.CHRGDESC2 = this.step3.controls['CHRG_DESC2']?.value || '';
       this.DocketEntity.CHRGDESC3 = this.step3.controls['CHRG_DESC3']?.value || '';
       this.DocketEntity.CHRGDESC4 = this.step3.controls['CHRG_DESC4']?.value || '';
-      this.DocketEntity.DPHRateType = this.DPHRateType;
-      this.DocketEntity.DPHRate = this.DPHRate;
-      this.DocketEntity.DPHAmount = this.DPHAmount;
+      this.DocketEntity.DPHRateType = this.DPHRateType?this.DPHRateType:'';
+      this.DocketEntity.DPHRate = this.DPHRate?this.DPHRate:0;
+      this.DocketEntity.DPHAmount = this.DPHAmount?this.DPHAmount:0;
       this.DocketEntity.PaymentType = this.step1.controls['PAYTYP'].value
-      this.DocketEntity.IsDacc = this.IsDaccReadOnly;
-      this.DocketEntity.DPHRateType = this.DPHRateType;
-      this.DocketEntity.UseFrom = this.UseFrom;
-      this.DocketEntity.UseTo = this.UseTo;
-      this.DocketEntity.UseTransMode = this.UseTransMode;
-      this.DocketEntity.UseRateType = this.UseRateType;
-      this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal;
-      this.DocketEntity.EnableReverseCalculation = this.CcmServicesData.FlagEnableReverseCalculation;
+      this.DocketEntity.IsDacc = this.IsDaccReadOnly?this.IsDaccReadOnly:false;
+      this.DocketEntity.DPHRateType = this.DPHRateType?this.DPHRateType:'';
+      this.DocketEntity.UseFrom = this.UseFrom?this.UseFrom:'';
+      this.DocketEntity.UseTo = this.UseTo?this.UseTo:'';
+      this.DocketEntity.UseTransMode = this.UseTransMode?this.UseTransMode:'';
+      this.DocketEntity.UseRateType = this.UseRateType? this.UseRateType:'';
+      this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal?this.ChargeWeightToHighestDecimal:'';
+      this.DocketEntity.EnableReverseCalculation = this.CcmServicesData?.FlagEnableReverseCalculation||'';
       this.DocketEntity.ContainerId = "0"
       this.DocketEntity.ContainerNo = "0"
       this.DocketEntity.ContainerSealNo = ""
@@ -3132,6 +3135,7 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.ConsignorCstNumber = this.step2.controls['ConsignorCstNumber']?.value || '';
       this.DocketEntity.ConsignorEmail = this.step2.controls['ConsignorEmail']?.value || '';
       this.DocketEntity.ConsignorEmail = this.step2.controls['ConsignorEmail']?.value || '';
+      this.DocketEntity.PickupDelivery=this.step1.controls['PKPDL']?.value||'';
       this.DocketEntity.ConsigneeDeliveryAddress = ""
       this.DocketEntity.PolicyNo = ""
       this.DocketEntity.PolicyDate = ""
@@ -3151,27 +3155,29 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.CustomerRefrenceEnginNo = ""
       this.DocketEntity.PermitReceivedAt = ""
       this.DocketEntity.PermitNumber = ""
+      this.DocketEntity.OctroiAmount = 0
       this.DocketEntity.PermitDate = '0001-01-01T00:00:00'
       this.DocketEntity.PermitReceivedDate = '0001-01-01T00:00:00'
       this.DocketEntity.ContainerType = this.step2.controls['CONTTYP']?.value || ''
       this.DocketEntity.StuffingDate = '0001-01-01T00:00:00'
       this.DocketEntity.StandardFreightRate = 0
-      this.DocketEntity.WeightToConsider = this.WeightToConsider
-      this.DocketEntity.MaxMeasureValue = this.MaxMeasureValue
-      this.DocketEntity.MinInvoiceValue = this.MinInvoiceValue
-      this.DocketEntity.MaxInvoiceValue = this.MaxInvoiceValue
-      this.DocketEntity.MinInvoiceValuePerKG = this.MinInvoiceValuePerKG
-      this.DocketEntity.MaxInvoiceValuePerKG = this.MaxInvoiceValuePerKG
-      this.DocketEntity.DefaultChargeWeight = this.DefaultChargeWeight
-      this.DocketEntity.MinChargeWeight = this.MinChargeWeight
-      this.DocketEntity.MaxChargeWeight = this.MaxChargeWeight
-      this.DocketEntity.VolMeasure = this.VolMeasure
+      this.DocketEntity.WeightToConsider = this.WeightToConsider?this.WeightToConsider:''
+      this.DocketEntity.MaxMeasureValue = this.MaxMeasureValue?this.MaxMeasureValue:0
+      this.DocketEntity.MinInvoiceValue = this.MinInvoiceValue?this.MinInvoiceValue:0
+      this.DocketEntity.MaxInvoiceValue = this.MaxInvoiceValue?this.MaxInvoiceValue:0
+      this.DocketEntity.MinInvoiceValuePerKG = this.MinInvoiceValuePerKG?this.MinInvoiceValuePerKG:0
+      this.DocketEntity.MaxInvoiceValuePerKG = this.MaxInvoiceValuePerKG?this.MaxInvoiceValuePerKG:0
+      this.DocketEntity.DefaultChargeWeight = this.DefaultChargeWeight?this.DefaultChargeWeight:0
+      this.DocketEntity.MinChargeWeight = this.MinChargeWeight?this.MinChargeWeight:0
+      this.DocketEntity.MaxChargeWeight = this.MaxChargeWeight?this.MaxChargeWeight:0
+      this.DocketEntity.VolMeasure = this.VolMeasure?this.VolMeasure:''
       this.DocketEntity.TotalChargedNoofPkgsQuickCnot = 0
       this.DocketEntity.BillingPartysCode = this.step1.controls['PRQ_BILLINGPARTY']?.value.Value || ''
       this.DocketEntity.BillingPartysName = this.step1.controls['PRQ_BILLINGPARTY']?.value.Name || ''
+      console.log( this.DocketEntity);
       this.ICnoteService.cnotePost('services/BookDocket', this.DocketEntity).subscribe({
         next: (res: any) => {
-          console.log(res);
+          SwalerrorMessage("success", "DocketNo:"+res.result[0].DocketNumber, "", true);
         }
       })
       //this.DocketEntity.BillingPartys=  0

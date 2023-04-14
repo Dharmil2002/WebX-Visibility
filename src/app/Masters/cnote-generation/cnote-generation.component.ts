@@ -10,9 +10,17 @@ import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { cnoteMetaData } from './Cnote';
 import { roundNumber, WebxConvert } from 'src/app/Utility/commonfunction';
 import { ChangeDetectorRef } from '@angular/core';
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
+import { DocketChargesEntity, DocketEntity, DocketGstEntity, InvoiceEntity, StateDocumentDetailEntity, ViaCityDetailEntity } from 'src/app/core/models/docketModel';
 @Component({
   selector: 'app-cnote-generation',
-  templateUrl: './cnote-generation.component.html'
+  templateUrl: './cnote-generation.component.html',
+  providers: [
+    {
+      provide: STEPPER_GLOBAL_OPTIONS,
+      useValue: { displayDefaultIndicatorType: false },
+    },
+  ],
 
 })
 export class CNoteGenerationComponent implements OnInit {
@@ -36,6 +44,7 @@ export class CNoteGenerationComponent implements OnInit {
   docketallocate = 'Alloted To';
   cnoteAutoComplete: AutoCompleteCommon[];
   Fcity: AutoCompleteCity[];
+  DocketEntity = new DocketEntity();
   ConsignorCity: AutoCompleteCity[];
   Tcity: AutoCompleteCity[];
   Vehicno: AutoCompleteCity[];
@@ -220,6 +229,9 @@ export class CNoteGenerationComponent implements OnInit {
   FlagHolidayApplied: any;
   mapcityRule: string;
   destionationNestedDate: any;
+  isLinear = true;
+  ChargeKm: any;
+  IsQuickCompletion: string;
 
   //End
   constructor(private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
@@ -242,7 +254,7 @@ export class CNoteGenerationComponent implements OnInit {
     if (this.step1Formcontrol.length > 0) {
       this.step1Formcontrol.forEach(cnote => {
         let validators = []; // Initialize an empty array to hold validators for this control
-        if (cnote.validation === 'Required') { // If the control is required, add a required validator
+        if (cnote.Validation === 'Required') { // If the control is required, add a required validator
           validators = [Validators.required];
         }
 
@@ -305,7 +317,7 @@ export class CNoteGenerationComponent implements OnInit {
     if (this.step2Formcontrol.length > 0) {
       this.step2Formcontrol.forEach(cnote => {
         let validators = [];
-        if (cnote.validation === 'Required') {
+        if (cnote.Validation === 'Required') {
           validators = [Validators.required];
         }
         formControls[cnote.name] = this.fb.control(cnote.defaultvalue, validators);
@@ -333,15 +345,15 @@ export class CNoteGenerationComponent implements OnInit {
     if (this.step3Formcontrol.length > 0) {
       this.step3Formcontrol.forEach(cnote => {
         let validators = [];
-        if (cnote.validation === 'Required') {
+        if (cnote.Validation === 'Required') {
           validators = [Validators.required];
         }
 
         formControls[cnote.name] = this.fb.control(cnote.defaultvalue, validators);
 
-        // if(cnote.disable=='true'){
-        //   formControls[cnote.name].disable();
-        // }
+        if (!cnote.enable) {
+          formControls[cnote.name].disable();
+        }
       });
     }
 
@@ -353,7 +365,7 @@ export class CNoteGenerationComponent implements OnInit {
       const array = {}
       this.InvoiceDetails.forEach(Idetail => {
         let validators = [];
-        if (Idetail.validation === 'Required') {
+        if (Idetail.Validation === 'Required') {
           validators = [Validators.required];
         }
         array[Idetail.name] = this.fb.control(Idetail.defaultvalue == 'TodayDate' ? new Date().toISOString().slice(0, 10) : Idetail.defaultvalue, validators);
@@ -374,7 +386,7 @@ export class CNoteGenerationComponent implements OnInit {
       const array = {}
       this.BcSeries.forEach(BcSeries => {
         let validators = [];
-        if (BcSeries.validation === 'Required') {
+        if (BcSeries.Validation === 'Required') {
           validators = [Validators.required];
         }
 
@@ -396,7 +408,7 @@ export class CNoteGenerationComponent implements OnInit {
       const array = {}
       this.barcodearray.forEach(cnote => {
         let validators = [];
-        if (cnote.validation === 'Required') {
+        if (cnote.Validation === 'Required') {
           validators = [Validators.required];
         }
 
@@ -576,11 +588,11 @@ export class CNoteGenerationComponent implements OnInit {
         this.GetDetailedBasedOnLocations();
         break;
       case "getFromCity":
-       this.getFromCity();  
-      break;
+        this.getFromCity();
+        break;
       case "getTocity":
-        this.getToCity();  
-       break;
+        this.getToCity();
+        break;
       default:
         break;
     }
@@ -592,13 +604,13 @@ export class CNoteGenerationComponent implements OnInit {
   ConsignorAutoFill() {
     debugger;
     //set the value of GSTINNO control to the GSTINNumber of CST_NM control if it is not null, otherwise set it to empty string
-    this.step2.controls['GSTINNO'].setValue(this.step2.value.CST_NM.GSTINNumber == null ? '' : this.step2.value.CST_NM.GSTINNumber);
+    this.step2.controls['GSTINNO'].setValue(this.step2.controls['CST_NM'].value == null ? '' : this.step2.controls['CST_NM'].value.GSTINNumber);
     //set the value of CST_ADD control to the CustAddress of CST_NM control
-    this.step2.controls['CST_ADD'].setValue(this.step2.value.CST_NM.CustAddress);
+    this.step2.controls['CST_ADD'].setValue(this.step2.controls['CST_NM'].value.CustAddress);
     //set the value of CST_PHONE control to the TelephoneNo of CST_NM control
-    this.step2.controls['CST_PHONE'].setValue(this.step2.value.CST_NM.TelephoneNo);
+    this.step2.controls['CST_PHONE'].setValue(this.step2.controls['CST_NM'].value.TelephoneNo);
     //set the value of CST_MOB control to the phoneno of CST_NM control
-    this.step2.controls['CST_MOB'].setValue(this.step2.value.CST_NM.phoneno);
+    this.step2.controls['CST_MOB'].setValue(this.step2.controls['CST_NM'].value.phoneno);
   }
   //end
 
@@ -607,16 +619,16 @@ export class CNoteGenerationComponent implements OnInit {
   ConsigneeAutoFill() {
     debugger;
     // Set ConsigneeGSTINNO control value to GSTIN number if it exists, otherwise set it to empty string
-    this.step2.controls['ConsigneeGSTINNO'].setValue(this.step2.value.ConsigneeCST_NM.GSTINNumber == null ? '' : this.step2.value.ConsigneeCST_NM.GSTINNumber);
+    this.step2.controls['ConsigneeGSTINNO'].setValue(this.step2.controls['ConsigneeCST_NM'].value.GSTINNumber == null ? '' : this.step2.controls['ConsigneeCST_NM'].value.GSTINNumber);
 
     // Set ConsigneeCST_ADD control value to Consignee address
-    this.step2.controls['ConsigneeCST_ADD'].setValue(this.step2.value.ConsigneeCST_NM.CustAddress);
+    this.step2.controls['ConsigneeCST_ADD'].setValue(this.step2.controls['ConsigneeCST_NM'].value.CustAddress);
 
     // Set ConsigneeCST_PHONE control value to Consignee telephone number
-    this.step2.controls['ConsigneeCST_PHONE'].setValue(this.step2.value.ConsigneeCST_NM.TelephoneNo);
+    this.step2.controls['ConsigneeCST_PHONE'].setValue(this.step2.controls['ConsigneeCST_NM'].value.TelephoneNo);
 
     // Set ConsigneeCST_MOB control value to Consignee mobile number
-    this.step2.controls['ConsigneeCST_MOB'].setValue(this.step2.value.ConsigneeCST_NM.phoneno);
+    this.step2.controls['ConsigneeCST_MOB'].setValue(this.step2.controls['ConsigneeCST_NM'].value.phoneno);
   }
   // End of ConsigneeAutoFill function
 
@@ -764,15 +776,15 @@ export class CNoteGenerationComponent implements OnInit {
     this.step1.controls['TCITY'].setValue(toCity);
     //end
     //Paybas
-    this.step1.controls['PAYTYP'].setValue(event.option.value.Paybas == null ? this.step1.value.PAYTYP : event.option.value.Paybas);
+    this.step1.controls['PAYTYP'].setValue(event.option.value.Paybas == null ? this.step1.controls['PAYTYP'].value : event.option.value.Paybas);
     //end
 
     //FTLTYP
-    this.step1.controls['SVCTYP'].setValue(event.option.value.FTLValue == null ? this.step1.value.SVCTYP : event.option.value.FTLValue);
+    this.step1.controls['SVCTYP'].setValue(event.option.value.FTLValue == null ? this.step1.controls['SVCTYP'].value : event.option.value.FTLValue);
     //end
 
     //Road
-    this.step1.controls['TRN'].setValue(event.option.value.TransModeValue == null ? this.step1.value.TRN : event.option.value.TransModeValue);
+    this.step1.controls['TRN'].setValue(event.option.value.TransModeValue == null ? this.step1.controls['TRN'].value : event.option.value.TransModeValue);
     //end
 
     //Destination
@@ -780,15 +792,15 @@ export class CNoteGenerationComponent implements OnInit {
     //end
 
     //PKGS
-    this.step1.controls['PKGS'].setValue(event.option.value.pkgsty == null ? this.step1.value.PKGS : event.option.value.pkgsty)
+    this.step1.controls['PKGS'].setValue(event.option.value.pkgsty == null ? this.step1.controls['PKGS'].value : event.option.value.pkgsty)
     //end
 
     //PICKUPDELIVERY
-    this.step1.controls['PKPDL'].setValue(event.option.value.pkp_dly == null ? this.step1.value.PKPDL : event.option.value.pkp_dly);
+    this.step1.controls['PKPDL'].setValue(event.option.value.pkp_dly == null ? this.step1.controls['PKPDL'].value : event.option.value.pkp_dly);
     //end
 
     //PROD
-    this.step1.controls['PROD'].setValue(event.option.value.prodcd == null ? this.step1.value.PROD : event.option.value.prodcd);
+    this.step1.controls['PROD'].setValue(event.option.value.prodcd == null ? this.step1.controls['PROD'].value : event.option.value.prodcd);
     //end
     //ConsigneeCST_NM
     let ConsigneeCST_NM = {
@@ -813,7 +825,7 @@ export class CNoteGenerationComponent implements OnInit {
     }));
     this.step3.get('invoiceArray').setValue(invoiceArray);
     this.cdr.detectChanges();
-    this.CalculateInvoiceTotal(0);
+    this.CalculateInvoiceTotal();
     //
 
     //call api GetPrqInvoiceList
@@ -857,10 +869,10 @@ export class CNoteGenerationComponent implements OnInit {
         break;
     }
 
-    let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.value.PAYTYP);
+    let rulePartyType = this.Rules.find((x) => x.code == 'PARTY' && x.paybas == this.step1.controls['PAYTYP'].value);
     if (rulePartyType.defaultvalue == "D") {
       this.step1.controls['PRQ_BILLINGPARTY'].disable();
-     
+
     }
     else {
       this.step1.controls['PRQ_BILLINGPARTY'].enable();
@@ -874,8 +886,8 @@ export class CNoteGenerationComponent implements OnInit {
           LocCode: "MUMB",
           searchText: control,
           CustHierarchy: Defalutvalue.defaultvalue,
-          PayBase: this.step1.value.PAYTYP,
-          BookingDate: this.datePipe.transform(this.step1.value.DKTDT, 'd MMM y').toUpperCase(),
+          PayBase: this.step1.controls['PAYTYP'].value,
+          BookingDate: this.datePipe.transform(this.step1.controls['DKTDT'].value, 'd MMM y').toUpperCase(),
           CustomerType: rules.defaultvalue == 'Y' ? CustomerType : "",
           ContractParty: event == 'PRQ_BILLINGPARTY' ? 'BillingParty' : event == 'Consignor' ? 'Consignor' : 'Consignee'
         }
@@ -957,24 +969,24 @@ export class CNoteGenerationComponent implements OnInit {
       const cityFormControl = this.step1Formcontrol.find(control => control.name === 'FCITY');
       // find matching rule based on FCITY control's dbCodeName
       const matchingRule = this.Rules.find(rule => rule.code === cityFormControl.dbCodeName);
-       if(this.step1.controls['FCITY'].value.length>2){
-      const request = {
-        companyCode: 10065,
-        ruleValue: matchingRule.defaultvalue,
-        searchText: this.step1.controls['FCITY'].value,
-        docketMode: "Yes",
-        ContractParty: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
-        PaymentType: this.step1.value.PAYTYP
-      };
+      if (this.step1.controls['FCITY'].value.length > 2) {
+        const request = {
+          companyCode: 10065,
+          ruleValue: matchingRule.defaultvalue,
+          searchText: this.step1.controls['FCITY'].value,
+          docketMode: "Yes",
+          ContractParty: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId || "",
+          PaymentType: this.step1.controls['PAYTYP'].value
+        };
 
-      this.ICnoteService.cnotePost('services/GetFromCityDetails', request).subscribe({
-        next: (response: any) => {
-          this.Fcity = response.result;
-          this.getCityFilter();
-        }
-      });
+        this.ICnoteService.cnotePost('services/GetFromCityDetails', request).subscribe({
+          next: (response: any) => {
+            this.Fcity = response.result;
+            this.getCityFilter();
+          }
+        });
+      }
     }
-  }
 
 
 
@@ -996,9 +1008,9 @@ export class CNoteGenerationComponent implements OnInit {
           ruleValue: rules.defaultvalue,
           searchText: this.step1.controls['TCITY'].value,
           docketMode: "Yes",
-          ContractParty: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
-          PaymentType: this.step1.value.PAYTYP,
-          FromCity: this.step1.value.FCITY == "" ? "" : this.step1.value.FCITY.Value
+          ContractParty: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId || "",
+          PaymentType: this.step1.controls['PAYTYP'].value,
+          FromCity: this.step1.controls['FCITY'].value == "" ? "" : this.step1.controls['FCITY'].value.Value
         }
 
         // Call the API to get the list of destination cities
@@ -1026,7 +1038,7 @@ export class CNoteGenerationComponent implements OnInit {
       // Create a request object with company code and city name
       var req = {
         companyCode: 10065,
-        City: this.step1.value.TCITY.Name
+        City: this.step1.controls['TCITY'].value.Name
       }
 
       // Call the API to get the mapped location from city name
@@ -1056,12 +1068,12 @@ export class CNoteGenerationComponent implements OnInit {
   // Function to retrieve PRQ vehicle request
   prqVehicle() {
     // Check if PRQ value length is greater than 1
-    if (this.step1.value.PRQ.length > 1) {
+    if (this.step1.controls['PRQ'].value.length > 1) {
       // Define request parameters
       let req = {
         companyCode: 10065,
         BranchCode: "MUMB",
-        SearchText: this.step1.value.PRQ
+        SearchText: this.step1.controls['PRQ'].value
       };
       // Send POST request to retrieve PRQ vehicle request
       this.ICnoteService.cnotePost('services/prqVehicleReq', req).subscribe({
@@ -1106,11 +1118,11 @@ export class CNoteGenerationComponent implements OnInit {
 
   getVehicleNo() {
     // Check if the length of VEHICLE_NO value in step1 is greater than 1
-    if (this.step1.value.VEHICLE_NO.length > 1) {
+    if (this.step1.controls['VEHICLE_NO'].value.length > 1) {
       // Create a request object with required parameters
       let req = {
         companyCode: 10065,
-        SearchText: this.step1.value.VEHICLE_NO,
+        SearchText: this.step1.controls['VEHICLE_NO'].value,
         VendorCode: "",
         VehicleType: "Toll",
         IsCheck: 0
@@ -1270,7 +1282,7 @@ export class CNoteGenerationComponent implements OnInit {
     let req = {
       companyCode: 10065,
       DocType: 'DKT',
-      DocNo: this.step1.value.DKTNO,
+      DocNo: this.step1.controls['DKTNO'].value,
       LocCode: "MUMB"
     }
 
@@ -1312,8 +1324,8 @@ export class CNoteGenerationComponent implements OnInit {
       let req = {
         companyCode: 10065,
         DocType: "DKT",
-        PayBas: this.step1.value.PAYTYP,
-        BookingDate: this.datePipe.transform(this.step1.value.DKTDT, 'd MMM y').toUpperCase()
+        PayBas: this.step1.controls['PAYTYP'].value,
+        BookingDate: this.datePipe.transform(this.step1.controls['DKTDT'].value, 'd MMM y').toUpperCase()
       }
 
       // Send the request to the server to get the list of dockets
@@ -1356,13 +1368,13 @@ export class CNoteGenerationComponent implements OnInit {
     const req = {
       companyCode: 10065,
       Destination: this.step1.controls['DELLOC'].value.Value,
-      ContractId: this.step1.value.PRQ_BILLINGPARTY == undefined ? "" : this.step1.value.PRQ_BILLINGPARTY.ContractId,
-      PayBas: this.step1.value.PAYTYP,
+      ContractId: this.step1.controls['PRQ_BILLINGPARTY'].value == undefined ? "" : this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId,
+      PayBas: this.step1.controls['PAYTYP'].value,
       PartyCode: "",
       Origin: "MUMB",
-      DestDeliveryPinCode: this.step1.value.DELLOC == undefined ? "" : this.step1.value.DELLOC.pincode,
-      FromCity: this.step1.value.FCITY.Value == undefined ? "" : this.step1.value.FCITY.Value,
-      ToCity: this.step1.value.TCITY.Value == undefined ? "" : this.step1.value.TCITY.Value
+      DestDeliveryPinCode: this.step1.controls['DELLOC'].value.Value == undefined ? "" : this.step1.controls['DELLOC'].value.pincode,
+      FromCity: this.step1.controls['FCITY'].value.Value == undefined ? "" : this.step1.controls['FCITY'].value.Value,
+      ToCity: this.step1.controls['TCITY'].value.Value == undefined ? "" : this.step1.controls['TCITY'].value.Value
     };
 
     // Call the API
@@ -1374,13 +1386,19 @@ export class CNoteGenerationComponent implements OnInit {
         // Set the F_ODA flag if the destination is out of delivery area
         if (ResDetailsBased.Oda == "Y") {
           this.step1.controls['F_ODA'].setValue(ResDetailsBased.Oda == "Y" ? true : false);
+          this.step1.controls['F_ODA'].enable();
           SwalerrorMessage("info", "Currently To City/Pincode Is Out of delivery are so ODA is marked.", "", true);
         }
 
         // Set the F_LOCAL flag if the from city and to city are the same
         if (ResDetailsBased.LocalBooking == "Y") {
+          this.step1.controls['F_LOCAL'].disable();
           this.step1.controls['F_LOCAL'].setValue(ResDetailsBased.LocalBooking == "Y" ? true : false);
           SwalerrorMessage("info", "Currently from city and to city are same so local booking marked.", "", true);
+        }
+        else {
+          this.step1.controls['F_LOCAL'].enable();
+          this.step1.controls['F_LOCAL'].setValue(false);
         }
       }
     });
@@ -1391,14 +1409,14 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Fetches the Consignor City based on the entered search text
   getConsignorCity() {
-    if (this.step2.value.ConsignorCity.length > 2) {
+    if (this.step2.controls['ConsignorCity'].value.length > 2) {
       try {
         // Fetches the rules for MAP_DLOC_CITY
         let rules = this.Rules.find((x) => x.code == 'MAP_DLOC_CITY');
 
         // Creates the request object to be sent to the API endpoint
         let req = {
-          searchText: this.step2.value.ConsignorCity,
+          searchText: this.step2.controls['ConsignorCity'].value,
           companyCode: 10065,
           MAP_DLOC_CITY: rules.defaultvalue
         }
@@ -1427,14 +1445,14 @@ export class CNoteGenerationComponent implements OnInit {
    * Uses the API endpoint 'services/consigneeCity'.
    */
   getConsigneeCity() {
-    if (this.step2.value.ConsigneeCity.length > 2) { // Check if the search text entered by the user is at least 3 characters long.
+    if (this.step2.controls['ConsigneeCity'].value.length > 2) { // Check if the search text entered by the user is at least 3 characters long.
       try {
         // Find the rule with code 'MAP_DLOC_CITY' in the 'Rules' array and get its default value.
         let rules = this.Rules.find((x) => x.code == 'MAP_DLOC_CITY');
 
         // Prepare the request object.
         let req = {
-          searchText: this.step2.value.ConsigneeCity, // The search text entered by the user.
+          searchText: this.step2.controls['ConsigneeCity'].value, // The search text entered by the user.
           companyCode: 10065, // The company code.
           MAP_DLOC_CITY: rules.defaultvalue // The default value of the 'MAP_DLOC_CITY' rule.
         }
@@ -1527,6 +1545,10 @@ export class CNoteGenerationComponent implements OnInit {
           item.type = value ? 'autodropdown' : 'text',
             item.ActionFunction = value ? 'ConsignorChanged' : '',
             item.Search = value ? 'billingPartyrules' : ''
+          //when the event is changed from master to i walk that time the value of Consginor sholud be empty
+          if (item.type == 'text') {
+            this.step2.controls['CST_NM'].setValue('')
+          }
         }
         return item;
       });
@@ -1541,6 +1563,10 @@ export class CNoteGenerationComponent implements OnInit {
           item.type = value ? 'autodropdown' : 'text',
             item.ActionFunction = value ? 'ConsigneeDetail' : '',
             item.Search = value ? 'billingPartyrules' : ''
+          //when the event is changed from master to i walk that time the value of Consignee sholud be empty
+          if (item.type == 'text') {
+            this.step2.controls['ConsigneeCST_NM'].setValue('')
+          }
         }
         return item;
       });
@@ -1553,8 +1579,8 @@ export class CNoteGenerationComponent implements OnInit {
       let req = {
         companyCode: 10065,
         DataType: 2,
-        PAYBAS: this.step1.value.PAYTYP,
-        CONTRACTID: this.step1.value.PRQ_BILLINGPARTY?.ContractId || ""
+        PAYBAS: this.step1.controls['PAYTYP'].value,
+        CONTRACTID: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId || ""
       }
       this.ICnoteService.cnotePost('services/GetDetailedBasedOnContract', req).subscribe({
         next: (res: any) => {
@@ -1593,7 +1619,19 @@ export class CNoteGenerationComponent implements OnInit {
 
   //displayedAppointment
   displayedAppointment() {
-    this.isappointmentvisble = this.step2.value.IsAppointmentBasedDelivery == 'Y' ? true : false;
+    this.isappointmentvisble = this.step2.controls['IsAppointmentBasedDelivery'].value == 'Y' ? true : false;
+    if (this.isappointmentvisble) {
+      this.AppointmentDetails.forEach((x) => {
+        this.step2.controls[x.name].setValidators(Validators.required)
+        this.step2.controls[x.name].updateValueAndValidity()
+      })
+    }
+    else {
+      this.AppointmentDetails.forEach((x) => {
+        this.step2.controls[x.name].clearValidators()
+        this.step2.controls[x.name].updateValueAndValidity()
+      })
+    }
   }
 
 
@@ -1641,22 +1679,25 @@ export class CNoteGenerationComponent implements OnInit {
 
 
   autofillCustomer() {
-    if (this.step1.value.PAYTYP == "P02" || !this.step2.value.CST_NM) {
+    if (this.step1.controls['PAYTYP'].value == "P02" || !this.step2.controls['CST_NM'].value) {
       // Fill Consignor name and value from PRQ_BILLINGPARTY.Name and PRQ_BILLINGPARTY.Value respectively
       let Consignor = {
-        Name: this.step1.value.PRQ_BILLINGPARTY.Name,
-        Value: this.step1.value.PRQ_BILLINGPARTY.Value
+        Name: this.step1.controls['PRQ_BILLINGPARTY'].value.Name,
+        Value: this.step1.controls['PRQ_BILLINGPARTY'].value.Value
       }
       this.step2.controls['CST_NM'].setValue(Consignor)
 
       // Fill Consignor address from PRQ_BILLINGPARTY.CustAddress
-      this.step2.controls['CST_ADD'].setValue(this.step1.value.PRQ_BILLINGPARTY.CustAddress)
+      this.step2.controls['CST_ADD'].setValue(this.step1.controls['PRQ_BILLINGPARTY'].value.CustAddress)
 
       // Fill telephone number from PRQ_BILLINGPARTY.TelephoneNo
-      this.step2.controls['CST_PHONE'].setValue(this.step1.value.PRQ_BILLINGPARTY.TelephoneNo)
+      this.step2.controls['CST_MOB'].setValue(this.step1.controls['PRQ_BILLINGPARTY'].value.phoneno)
+      //Fill Mobile No 
+      this.step2.controls['CST_PHONE'].setValue(this.step1.controls['PRQ_BILLINGPARTY'].value.TelephoneNo)
+      //End
 
       // Fill GSTIN number from PRQ_BILLINGPARTY.GSTINNumber
-      this.step2.controls['GSTINNO'].setValue(this.step1.value.PRQ_BILLINGPARTY.GSTINNumber)
+      this.step2.controls['GSTINNO'].setValue(this.step1.controls['PRQ_BILLINGPARTY'].value.GSTINNumber)
     }
     else {
       this.step2.controls['CST_NM'].setValue("")
@@ -1669,13 +1710,17 @@ export class CNoteGenerationComponent implements OnInit {
 
       // Fill GSTIN number from PRQ_BILLINGPARTY.GSTINNumber
       this.step2.controls['GSTINNO'].setValue("")
+      // File Cust MobNo
+      this.step2.controls['CST_MOB'].setValue("")
+      //Fill Mobile No 
     }
   }
 
 
   volumetricChanged() {
+    debugger;
     // Check if Volumetric is truthy (not undefined, null, false, 0, etc.)
-    if (this.step3.value.Volumetric) {
+    if (this.step3.controls['Volumetric'].value) {
       // Find the Invoice Level rule with code 'INVOICE_LEVEL_CONTRACT_INVOKE'
       this.InvoiceLevalrule = this.Rules.find((x) => x.code == 'INVOICE_LEVEL_CONTRACT_INVOKE');
       if (this.InvoiceLevalrule.defaultvalue != "Y") {
@@ -1699,7 +1744,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   openModal(content) {
     // Check if BcSerialType is "E"
-    if (this.step3.value.BcSerialType == "E") {
+    if (this.step3.controls['BcSerialType'].value == "E") {
       // If it is "E", set displaybarcode to true
       this.displaybarcode = true;
       // Open a modal using the content parameter passed to the function
@@ -1724,7 +1769,7 @@ export class CNoteGenerationComponent implements OnInit {
    */
   InvoiceCubicWeightCalculation(event) {
     let cftVolume = 0;
-    if (this.step3.value.Volumetric) {
+    if (this.step3.controls['Volumetric'].value) {
       // Get package dimensions and calculate volume
       let length = parseInt(event.controls.LENGTH?.value || 0);
       let breadth = parseInt(event.controls.BREADTH?.value || 0);
@@ -1732,18 +1777,18 @@ export class CNoteGenerationComponent implements OnInit {
       let noOfPackages = parseInt(event.controls.NO_PKGS.value || 0);
       let volume = 0;
 
-      cftVolume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0) * WebxConvert.objectToDecimal(noOfPackages, 0);
+      cftVolume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.controls['CFT_RATIO']?.value, 0) * WebxConvert.objectToDecimal(noOfPackages, 0);
 
       // Calculate volume based on selected unit of measure
       switch (this.VolMeasure) {
         case "INCHES":
-          volume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0) / 1728;
+          volume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.controls['CFT_RATIO']?.value || 0, 0) / 1728;
           break;
         case "CM":
-          volume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0) / 27000;
+          volume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.controls['CFT_RATIO']?.value || 0, 0) / 27000;
           break;
         case "FEET":
-          volume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.value?.CFT_RATIO, 0);
+          volume = length * breadth * height * WebxConvert.objectToDecimal(this.step3.controls['CFT_RATIO']?.value || 0, 0);
           break;
       }
 
@@ -1751,17 +1796,18 @@ export class CNoteGenerationComponent implements OnInit {
 
       // Update form control values
       event.controls.CUB_WT.setValue(volume);
+      event.controls.cft.setValue(cftVolume)
       event.controls.CUB_WT.updateValueAndValidity();
 
     }
     else {
 
     }
-    this.CalculateRowLevelChargeWeight(event, true, cftVolume)
+    this.CalculateRowLevelChargeWeight(event, true)
   }
 
   ///CalculateRowLevelChargeWeight() 
-  CalculateRowLevelChargeWeight(event, FlagCalculateInvoiceTotal, cftVolume) {
+  CalculateRowLevelChargeWeight(event, FlagCalculateInvoiceTotal) {
     let cubinWeight = parseFloat(event.controls.CUB_WT?.value || 0);
     let ActualWeight = parseFloat(event.controls.ACT_WT?.value || 0);
     switch (this.WeightToConsider) {
@@ -1777,7 +1823,7 @@ export class CNoteGenerationComponent implements OnInit {
 
     }
     if (FlagCalculateInvoiceTotal) {
-      this.CalculateInvoiceTotal(cftVolume);
+      this.CalculateInvoiceTotal();
     }
     if (ActualWeight) {
       this.InvokeInvoice();
@@ -1787,7 +1833,8 @@ export class CNoteGenerationComponent implements OnInit {
   //End
 
   //CalculateInvoiceTotal
-  CalculateInvoiceTotal(cftVolume) {
+  CalculateInvoiceTotal() {
+    debugger;
     let TotalChargedNoofPackages = 0;
     let TotalChargedWeight = 0;
     let TotalDeclaredValue = 0;
@@ -1801,7 +1848,7 @@ export class CNoteGenerationComponent implements OnInit {
       TotalChargedWeight = TotalChargedWeight + parseFloat(x.ChargedWeight || 0);
       TotalDeclaredValue = TotalDeclaredValue + parseFloat(x.DECLVAL || 0);
       if (x.CUB_WT > 0) {
-        CftTotal = CftTotal + parseFloat(cftVolume)
+        CftTotal = CftTotal + parseFloat(x.cft)
       }
       if (x.PARTQUANTITY) {
         TotalPartQuantity = TotalPartQuantity + x.PARTQUANTITY;
@@ -1820,7 +1867,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   addBarcodeField() {
 
-    this.step3.value;
+    //this.step3.controls['PROD'].value;
     const array = {}
     const fields = this.step3.get('barcodearray') as FormArray;
     this.barcodearray = this.CnoteData.filter((x) => x.div == 'barcodearray')
@@ -1849,9 +1896,9 @@ export class CNoteGenerationComponent implements OnInit {
     // Create request object
     let req = {
       companyCode: 10065,
-      contractid: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
-      ServiceType: this.step1.value.SVCTYP,
-      TransMode: this.step1.value.TRN
+      contractid: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId || "",
+      ServiceType: this.step1.controls['SVCTYP'].value,
+      TransMode: this.step1.controls['TRN'].value
     };
 
     // Call API to get invoice configuration
@@ -1886,7 +1933,7 @@ export class CNoteGenerationComponent implements OnInit {
   GetPrqInvoiceList() {
     let req = {
       companyCode: 10065,
-      PrqNumber: this.step1.value.PRQ.PRQNO
+      PrqNumber: this.step1.controls['PRQ'].value.PRQNO
     }
 
     this.ICnoteService.cnotePost('services/GetPrqInvoiceList', req).subscribe(
@@ -1922,7 +1969,7 @@ export class CNoteGenerationComponent implements OnInit {
   //end
   //Divisionvalue changed when vehno select
   Divisionvalue() {
-    this.step1.controls['DIV'].setValue(this.step1.value.VEHICLE_NO.Division);
+    this.step1.controls['DIV'].setValue(this.step1.controls['VEHICLE_NO'].value.Division);
   }
   //end
 
@@ -1931,7 +1978,7 @@ export class CNoteGenerationComponent implements OnInit {
     try {
       let req = {
         CompanyCode: 10065,
-        contractid: this.step1.value.PRQ_BILLINGPARTY?.ContractId || ''
+        contractid: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId || ''
       }
       this.ICnoteService.cnotePost('services/billingParty', req).subscribe({
         next: (res: any) => {
@@ -1950,7 +1997,7 @@ export class CNoteGenerationComponent implements OnInit {
     let req = {
       companyCode: 10065,
       InvoiceNumber: event.value.INVNO,
-      DocketNo: this.step1.value.DKTNO,
+      DocketNo: this.step1.controls['DKTNO'].value,
       FinYear: 2023
     }
     this.ICnoteService.cnotePost('services/ValidateInvoiceNo', req).subscribe({
@@ -1986,8 +2033,8 @@ export class CNoteGenerationComponent implements OnInit {
 
     let InvoiceValidationRules = {
       InvoiceNo_DateRule: this.Rules.find(x => x.code === "INV_RULE").defaultvalue,
-      IsInvoiceNoMandatory: this.step3Formcontrol.find((x) => x.name = 'INVNO').validation,
-      IsInvoiceDateMandatory: this.step3Formcontrol.find((x) => x.name = 'INVDT').validation,
+      IsInvoiceNoMandatory: this.step3Formcontrol.find((x) => x.name = 'INVNO').Validation,
+      IsInvoiceDateMandatory: this.step3Formcontrol.find((x) => x.name = 'INVDT').Validation,
       IsInvoiceLevelContractInvoke: this.Rules.find(x => x.code === "INVOICE_LEVEL_CONTRACT_INVOKE").defaultvalue,
     }
     switch (InvoiceValidationRules.InvoiceNo_DateRule) {
@@ -2006,7 +2053,7 @@ export class CNoteGenerationComponent implements OnInit {
   GetConsignorConsigneeRules() {
     let req = {
       companyCode: 10065,
-      PayBase: this.step1.value.PAYTYP
+      PayBase: this.step1.controls['PAYTYP'].value
     }
     this.ICnoteService.cnotePost('services/GetConsignorConsigneeRules', req).subscribe({
       next: (res: any) => {
@@ -2048,10 +2095,10 @@ export class CNoteGenerationComponent implements OnInit {
     try {
       let req = {
         companyCode: 10065,
-        ServiceType: this.step1.value.SVCTYP,
-        ContractID: this.step1.value.PRQ_BILLINGPARTY?.ContractId || "",
+        ServiceType: this.step1.controls['SVCTYP'].value,
+        ContractID: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId || "",
         ChargeType: "BKG",
-        PayBase: this.step1.value.PAYTYP,
+        PayBase: this.step1.controls['PAYTYP'].value,
       }
       this.ICnoteService.cnotePost("services/GetContractInvokeDependent", req).subscribe({
         next: (res: any) => {
@@ -2077,10 +2124,10 @@ export class CNoteGenerationComponent implements OnInit {
   SetBaseCodeValues() {
     switch (this.BasedOn1) {
       case "SVCTYP":
-        this.BaseCode1 = this.step1.value.SVCTYP;
+        this.BaseCode1 = this.step1.controls['SVCTYP'].value
         break;
       case "BUT":
-        this.BaseCode1 = this.step1.value.BUT;
+        this.BaseCode1 = this.step1.controls['BUT'].value;
         break;
       case "NONE":
         this.BaseCode1 = "NONE";
@@ -2088,13 +2135,13 @@ export class CNoteGenerationComponent implements OnInit {
     }
     switch (this.BasedOn2) {
       case "PROD":
-        this.BaseCode2 = this.step1.value.PROD;
+        this.BaseCode2 = this.step1.controls['PROD'].value;
         break;
       case "PKGS":
-        this.BaseCode2 = this.step1.value.PKGS;
+        this.BaseCode2 = this.step1.controls['PKGS'].value;
         break;
       case "PKGS":
-        this.BaseCode2 = this.step1.value.PKGS;
+        this.BaseCode2 = this.step1.controls['PKGS'].value;
         break;
       case "NONE":
         this.BaseCode2 = "NONE";
@@ -2106,11 +2153,11 @@ export class CNoteGenerationComponent implements OnInit {
 
   //SetBillingParty
   SetBillingParty() {
-    let WHO_IS_PARTY = this.Rules.find(x => x.code == 'WHO_IS_PARTY' && x.paybas == this.step1.value.PAYTYP);
+    let WHO_IS_PARTY = this.Rules.find(x => x.code == 'WHO_IS_PARTY' && x.paybas == this.step1.controls['PAYTYP'].value);
     this.rowBillingParty = true;
     switch (WHO_IS_PARTY.defaultvalue) {
       case "1":
-        if (!WebxConvert.IsObjectNullOrEmpty(this.step1.value.PRQ_BILLINGPARTY)) {
+        if (!WebxConvert.IsObjectNullOrEmpty(this.step1.controls['PRQ_BILLINGPARTY'].value)) {
           this.step3.controls['BillingPartys_3'].setValue(true);
         }
         else {
@@ -2126,7 +2173,7 @@ export class CNoteGenerationComponent implements OnInit {
         this.rowBillingParty = false;
         break;
       case "5":
-        if (!WebxConvert.IsStringNullOrEmpty(this.step1.value.PRQ_BILLINGPARTY)) {
+        if (!WebxConvert.IsStringNullOrEmpty(this.step1.controls['PRQ_BILLINGPARTY'].value)) {
           this.step3.controls['BillingPartys_3'].setValue(true);
           this.rowBillingParty = false;
         }
@@ -2137,7 +2184,7 @@ export class CNoteGenerationComponent implements OnInit {
       default:
         break;
     }
-    this.BillingPartyChange(this.step1.value.BillingPartys_3)
+    this.BillingPartyChange(this.step1.controls['BillingPartys_3'].value)
   }
   BillingPartyChange(billingParty) {
     if (billingParty) {
@@ -2152,17 +2199,18 @@ export class CNoteGenerationComponent implements OnInit {
 
     let req = {
       companyCode: 10065,
-      contractid: this.step1.value.PRQ_BILLINGPARTY.ContractId,
-      FromCity: this.step1.value.FCITY.Value,
-      ToCity: this.step1.value.TCITY.Value,
+      contractid: this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId,
+      FromCity: this.step1.controls['FCITY'].value.Value,
+      ToCity: this.step1.controls['TCITY'].value.Value,
       Origin: "mumb",
       Destination: this.step1.controls['DELLOC'].value.Value,
-      TransMode: this.step1.value.TRN
+      TransMode: this.step1.controls['TRN'].value
     }
     this.ICnoteService.cnotePost('services/GetDistanceFromContract', req).subscribe({
       next: (res: any) => {
         if (res.result) {
           this.Distance = res.result[0];
+          //this.ChargeKm= this.Distance ;
         }
       }
 
@@ -2172,8 +2220,8 @@ export class CNoteGenerationComponent implements OnInit {
     let MinFreightType = "";
     let MinFreightBaseRate = "";
     let FreightCharge = 0;
-    let ruleContractType = this.Rules.find((x) => x.code == this.step1.value.PAYTYP + 'CONTRACT' && x.paybas == this.step1.value.PAYTYP);;
-    let ruleProceed = this.Rules.find((x) => x.code == this.step1.value.PAYTYP + 'PROCEED' && x.paybas == this.step1.value.PAYTYP);
+    let ruleContractType = this.Rules.find((x) => x.code == this.step1.controls['PAYTYP'].value + 'CONTRACT' && x.paybas == this.step1.controls['PAYTYP'].value);;
+    let ruleProceed = this.Rules.find((x) => x.code == this.step1.controls['PAYTYP'].value + 'PROCEED' && x.paybas == this.step1.controls['PAYTYP'].value);
     this.Invoiceinit()
     if (ruleContractType.defaultvalue == "C") {
       if (this.RequestContractKeysDetail.ContractKeys.ContractID != this.RequestContractKeysDetail.ContractKeys.PayBase + "8888" && this.RequestContractKeysDetail.ContractKeys.ContractID) {
@@ -2246,24 +2294,24 @@ export class CNoteGenerationComponent implements OnInit {
   }
   BrimApiRuleDetail() {
     this.BrimApiRule = this.Rules.find((x) => x.code == 'BRIM_API').defaultvalue;
-    if (this.BrimApiRule == "Y" && this.step1.value.PAYTYP) {
+    if (this.BrimApiRule == "Y" && this.step1.controls['PAYTYP'].value) {
       this.DocketChargeRequest.CHANNEL_TYPE_ID = "5";
       this.DocketChargeRequest.PAY_BASIS = "PAID";
       this.DocketChargeRequest.CUSTOMER_ID = "";
-      this.DocketChargeRequest.BOOKING_DATE = this.step1.value.DKTDT;
-      this.DocketChargeRequest.BOOKING_TIME = this.step1.value.DKTDT;
+      this.DocketChargeRequest.BOOKING_DATE = this.step1.controls['DKTDT'].value;
+      this.DocketChargeRequest.BOOKING_TIME = this.step1.controls['DKTDT'].value;
       this.DocketChargeRequest.SERVICE = "EXPRESS";
       this.DocketChargeRequest.BOOKING_TYPE = "FORWARD";
-      this.DocketChargeRequest.CHARGE_WEIGHT = this.step3.value.CHRGWT;
-      this.DocketChargeRequest.NO_OF_PIECES = this.step3.value.NO_PKGS;
+      this.DocketChargeRequest.CHARGE_WEIGHT = this.step3.controls['CHRGWT'].value;
+      this.DocketChargeRequest.NO_OF_PIECES = this.step3.controls['NO_PKGS'].value;
       this.DocketChargeRequest.FOD_AMOUNT = 0;
       this.DocketChargeRequest.COD_AMOUNT = 0;
-      this.DocketChargeRequest.CONSIGNER_GSTNUMBER = this.step2.value.GSTINNO;
-      this.DocketChargeRequest.CONSIGNEE_GSTNUMBER = this.step2.value.ConsigneeGSTINNO;
-      this.DocketChargeRequest.INSURED = this.step2.value.RSKTY == "C" ? "Y" : this.step2.value.RSKTY == "0" ? "Y" : "N";
-      this.DocketChargeRequest.INSURED_BY = this.step2.value.RSKTY == "C" ? "Carrier" : this.step2.value.RSKTY == "0" ? "Owner" : "";
+      this.DocketChargeRequest.CONSIGNER_GSTNUMBER = this.step2.controls['GSTINNO'].value;
+      this.DocketChargeRequest.CONSIGNEE_GSTNUMBER = this.step2.controls['ConsigneeGSTINNO'].value;
+      this.DocketChargeRequest.INSURED = this.step2.controls['RSKTY'].value == "C" ? "Y" : this.step2.controls['RSKTY'].value == "0" ? "Y" : "N";
+      this.DocketChargeRequest.INSURED_BY = this.step2.controls['RSKTY'].value == "C" ? "Carrier" : this.step2.controls['RSKTY'].value == "0" ? "Owner" : "";
       this.DocketChargeRequest.BRNCH_OFF = "LKO";
-      this.DocketChargeRequest.INV_VALUE = this.step3.value.DECLVAL;
+      this.DocketChargeRequest.INV_VALUE = this.step3.controls['DECLVAL'].value;
       this.DocketChargeRequest.DEST_PINCODE = "500002";
       this.DocketChargeRequest.APP_BOOKING = "NON APP";
       this.DocketChargeRequest.SBU = "LTL";
@@ -2271,7 +2319,7 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketChargeRequest.DOCUMENT_CODE = "2";
       this.DocketChargeRequest.VAS_PROD_CODE = 1 == 1 ? "COD" : 1 == 1 ? "FOD" : " ";
       this.DocketChargeRequest.CONSGMNT_STATUS = "BOOKED";
-      let PayBaseText = this.step1Formcontrol.find((x) => x.name == 'PAYTYP').dropdown.find((x) => x.CodeId == this.step1.value.PAYTYP).CodeDesc;
+      let PayBaseText = this.step1Formcontrol.find((x) => x.name == 'PAYTYP').dropdown.find((x) => x.CodeId == this.step1.controls['PAYTYP'].value).CodeDesc;
       if (PayBaseText == "PAID" || PayBaseText == "TOPAY") {
         this.DocketChargeRequest.RATE_CUST_CODE = "";
       }
@@ -2280,12 +2328,12 @@ export class CNoteGenerationComponent implements OnInit {
       }
       //BHIMAPI IS PENDING 
     }
-    if (this.BrimApiRule == "N" || this.step1.value.PAYTYP) {
+    if (this.BrimApiRule == "N" || this.step1.controls['PAYTYP'].value) {
       let req = {
         companyCode: 10065,
-        contractid: this.step1.value.PRQ_BILLINGPARTY?.ContractId,
-        transmode: this.step1.value.TRN,
-        dockdt: this.step1.value.DKTDT,
+        contractid: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId,
+        transmode: this.step1.controls['TRN'].value,
+        dockdt: this.step1.controls['DKTDT'].value,
         ContractKeys: this.RequestContractKeysDetail.ContractKeys
       }
       this.ICnoteService.cnotePost('services/GetFuelCharge', req).subscribe({
@@ -2316,12 +2364,12 @@ export class CNoteGenerationComponent implements OnInit {
       })
       let reqFOVChargeCriteria = {
         companyCode: 10065,
-        contractid: this.step1.value.PRQ_BILLINGPARTY?.ContractId,
+        contractid: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId,
         basedon: this.Rules.find(x => x.code == 'CHRG_RULE').defaultvalue,
         basecode: this.BaseCode1,
-        DeclareValue: this.step3.value.TotalDeclaredValue,
-        RiskType: this.step2.value.RSKTY,
-        ServiceType: this.step1.value.SVCTYP
+        DeclareValue: this.step3.controls['TotalDeclaredValue'].value,
+        RiskType: this.step2.controls['RSKTY'].value,
+        ServiceType: this.step1.controls['SVCTYP'].value
       }
 
       this.ICnoteService.cnotePost('services/GetFOVCharge', reqFOVChargeCriteria).subscribe({
@@ -2344,7 +2392,7 @@ export class CNoteGenerationComponent implements OnInit {
       })
       let reqCod = {
         companyCode: 10065,
-        CODCriteria: "<root><ContractID>" + this.step1.value.PRQ_BILLINGPARTY.ContractId + "</ContractID><InvoiceAmount>" + this.step3.value.TotalDeclaredValue + "</InvoiceAmount></root>"
+        CODCriteria: "<root><ContractID>" + this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId + "</ContractID><InvoiceAmount>" + this.step3.controls['TotalDeclaredValue'].value + "</InvoiceAmount></root>"
       }
       this.ICnoteService.cnotePost('services/GetCodeDodCharges', reqCod).subscribe({
         next: (res: any) => {
@@ -2355,7 +2403,7 @@ export class CNoteGenerationComponent implements OnInit {
       })
       let reqDacc = {
         companyCode: 10065,
-        DACCCriteria: "<root><ContractID>" + this.step1.value.PRQ_BILLINGPARTY.ContractId + "</ContractID><InvoiceAmount>" + this.step3.value.TotalDeclaredValue + "</InvoiceAmount></root>",
+        DACCCriteria: "<root><ContractID>" + this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId + "</ContractID><InvoiceAmount>" + this.step3.controls['TotalDeclaredValue'].value + "</InvoiceAmount></root>",
         DACCCharged: 0,
         DACCRateType: ""
       }
@@ -2396,7 +2444,7 @@ export class CNoteGenerationComponent implements OnInit {
         let reqDocketchargeList = {
           companyCode: 10065,
           chargerule: formattedChargeRule,
-          paybas: this.step1.value.PAYTYP,
+          paybas: this.step1.controls['PAYTYP'].value,
           basedon: this.Rules.find(x => x.code == 'CHRG_RULE').defaultvalue,
           basecode: this.BaseCode1
         }
@@ -2436,7 +2484,7 @@ export class CNoteGenerationComponent implements OnInit {
                   type: "text",
                   dropdown: [],
                   ActionFunction: "",
-                  validation: "",
+                  Validation: "",
                   frmgrp: "3",
                   display: true,
                   enable: false,
@@ -2461,7 +2509,7 @@ export class CNoteGenerationComponent implements OnInit {
               //  const formControls = {};
               // this.step3Formcontrol.forEach(cnote => {
               //   let validators = [];
-              //   if (cnote.validation === 'Required') {
+              //   if (cnote.Validation === 'Required') {
               //     validators = [Validators.required];
               //   }
 
@@ -2496,28 +2544,28 @@ export class CNoteGenerationComponent implements OnInit {
         })
       }
     }
-    let fovCharge = this.Rules.find(x => x.code == this.BaseCode1 + "," + this.BaseCode1 + "," + "SCHG11" && x.paybas == this.step1.value.PAYTYP)
+    let fovCharge = this.Rules.find(x => x.code == this.BaseCode1 + "," + this.BaseCode1 + "," + "SCHG11" && x.paybas == this.step1.controls['PAYTYP'].value)
     if (fovCharge) {
       this.IsFovChargeReadOnly = false;
     }
     else {
       this.IsFovChargeReadOnly = (fovCharge.enabled == "Y" ? false : true);
     }
-    let codDodCharge = this.Rules.find(x => x.code == this.BaseCode1 + "," + this.BaseCode1 + "," + "SCHG11" && x.paybas == this.step1.value.PAYTYP);
+    let codDodCharge = this.Rules.find(x => x.code == this.BaseCode1 + "," + this.BaseCode1 + "," + "SCHG11" && x.paybas == this.step1.controls['PAYTYP'].value);
     if (codDodCharge) {
       this.IsCodDodChargeReadOnly = false;
     }
     else {
       this.IsCodDodChargeReadOnly = (codDodCharge.enabled == "Y" ? false : true);
     }
-    let daccCharge = this.Rules.find(x => x.paybas == this.step1.value.PAYTYP && x.code == this.BaseCode1 + "," + this.BaseCode1 + "," + "SCHG11")
+    let daccCharge = this.Rules.find(x => x.paybas == this.step1.controls['PAYTYP'].value && x.code == this.BaseCode1 + "," + this.BaseCode1 + "," + "SCHG11")
     if (daccCharge) {
       this.IsDaccReadOnly = false;
     }
     else {
       this.IsDaccReadOnly = (daccCharge.enabled == "Y" ? false : true);
     }
-    this.WhoIsParty = this.Rules.find(x => x.code == 'WHO_IS_PARTY' && x.paybas == this.step1.value.PAYTYP);
+    this.WhoIsParty = this.Rules.find(x => x.code == 'WHO_IS_PARTY' && x.paybas == this.step1.controls['PAYTYP'].value);
     this.AdvanceGivenTo = [{
       CodeId: 'Driver',
       CodeDesc: 'Driver'
@@ -2543,7 +2591,7 @@ export class CNoteGenerationComponent implements OnInit {
     ]
     let reqCheckDPHBillingRule = {
       companyCode: 10065,
-      ContractId: this.step1.value.PRQ_BILLINGPARTY.ContractId
+      ContractId: this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId
     }
     this.ICnoteService.cnotePost('services/CheckDPHBillingRule', reqCheckDPHBillingRule).subscribe({
       next(res: any) {
@@ -2555,8 +2603,8 @@ export class CNoteGenerationComponent implements OnInit {
 
     let reqDPHBilling = {
       companyCode: 10065,
-      ContractId: this.step1.value.PRQ_BILLINGPARTY.ContractId,
-      TransMode: this.step1.value.TRN
+      ContractId: this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId,
+      TransMode: this.step1.controls['TRN'].value
     }
     this.ICnoteService.cnotePost('services/CheckDPHBillingReadOnly', reqDPHBilling).subscribe({
       next(res: any) {
@@ -2568,8 +2616,8 @@ export class CNoteGenerationComponent implements OnInit {
 
     let reqDPHCharge = {
       companyCode: 10065,
-      ContractId: this.step1.value.PRQ_BILLINGPARTY.ContractId,
-      TransMode: this.step1.value.TRN
+      ContractId: this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId,
+      TransMode: this.step1.controls['TRN'].value
     }
     this.ICnoteService.cnotePost('services/GetDPHCharge', reqDPHCharge).subscribe({
       next(res: any) {
@@ -2606,7 +2654,7 @@ export class CNoteGenerationComponent implements OnInit {
   //CodeChanged
   codeChanged() {
     // Check if Volumetric is truthy (not undefined, null, false, 0, etc.)
-    if (this.step3.value.F_COD) {
+    if (this.step3.controls['F_COD'].value) {
       this.otherCharges = this.CnoteData.filter((x) => x.div == 'otherCharges' && x.Class != 'extraOtherCharge');
     }
     else {
@@ -2631,7 +2679,7 @@ export class CNoteGenerationComponent implements OnInit {
   }
   //Disbled Type oF movment
   DisbleTypeOFmovent() {
-    if (this.step1.value.SVCTYP == '1') {
+    if (this.step1.controls['SVCTYP'].value == '1') {
       this.step1.controls['FTLTYP'].disable();
       this.step1.controls['FTLTYP'].setValue('');
     }
@@ -2647,25 +2695,25 @@ export class CNoteGenerationComponent implements OnInit {
     this.RequestContractKeysDetail.ContractKeys.BaseCode1 = this.BaseCode1 ? this.BaseCode1 : '';
     this.RequestContractKeysDetail.ContractKeys.BasedOn2 = this.BasedOn2 ? this.BasedOn2 : '';
     this.RequestContractKeysDetail.ContractKeys.BaseCode2 = this.BaseCode2 ? this.BaseCode2 : '';
-    this.RequestContractKeysDetail.ContractKeys.ChargedWeight = this.step3.value.CHRGWT ? this.step3.value.CHRGWT : '0.00';
-    this.RequestContractKeysDetail.ContractKeys.ContractID = this.step1.value.PRQ_BILLINGPARTY.ContractId;
+    this.RequestContractKeysDetail.ContractKeys.ChargedWeight = this.step3.controls['CHRGWT'].value ? this.step3.controls['CHRGWT'].value : '0.00';
+    this.RequestContractKeysDetail.ContractKeys.ContractID = this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId;
     this.RequestContractKeysDetail.ContractKeys.DelLoc = this.step1.controls['DELLOC'].value.Value;
     this.RequestContractKeysDetail.ContractKeys.Depth = this.ContractDepth;
-    this.RequestContractKeysDetail.ContractKeys.FromCity = this.step1.value.FCITY.Value,
+    this.RequestContractKeysDetail.ContractKeys.FromCity = this.step1.controls['FCITY'].value.Value,
       this.RequestContractKeysDetail.ContractKeys.FTLType = this.step1.controls['FTLTYP'].value;
-    this.RequestContractKeysDetail.ContractKeys.NoOfPkgs = this.step3.value.TotalChargedNoofPackages ? this.step3.value.TotalChargedNoofPackages : '0.00';
-    this.RequestContractKeysDetail.ContractKeys.Quantity = this.step3.value.TotalPartQuantity ? this.step3.value.TotalPartQuantity : '0.00';
+    this.RequestContractKeysDetail.ContractKeys.NoOfPkgs = this.step3.controls['TotalChargedNoofPackages'].value ? this.step3.controls['TotalChargedNoofPackages'].value : '0.00';
+    this.RequestContractKeysDetail.ContractKeys.Quantity = this.step3.controls['TotalPartQuantity'].value ? this.step3.controls['TotalPartQuantity'].value : '0.00';
     this.RequestContractKeysDetail.ContractKeys.OrgnLoc = "MUMB";
-    this.RequestContractKeysDetail.ContractKeys.PayBase = this.step1.value.PAYTYP ? this.step1.value.PAYTYP : "";
-    this.RequestContractKeysDetail.ContractKeys.ServiceType = this.step1.value.SVCTYP ? this.step1.value.SVCTYP : "";
-    this.RequestContractKeysDetail.ContractKeys.ToCity = this.step1.value.TCITY.Value;
-    this.RequestContractKeysDetail.ContractKeys.TransMode = this.step1.value.TRN;
+    this.RequestContractKeysDetail.ContractKeys.PayBase = this.step1.controls['PAYTYP'].value ? this.step1.controls['PAYTYP'].value : "";
+    this.RequestContractKeysDetail.ContractKeys.ServiceType = this.step1.controls['SVCTYP'].value ? this.step1.controls['SVCTYP'].value : "";
+    this.RequestContractKeysDetail.ContractKeys.ToCity = this.step1.controls['TCITY'].value.Value;
+    this.RequestContractKeysDetail.ContractKeys.TransMode = this.step1.controls['TRN'].value;
     this.RequestContractKeysDetail.ContractKeys.OrderID = "01";
-    this.RequestContractKeysDetail.ContractKeys.InvAmt = this.step3.value.TotalDeclaredValue ? this.step3.value.TotalDeclaredValue : '0.00';
+    this.RequestContractKeysDetail.ContractKeys.InvAmt = this.step3.controls['TotalDeclaredValue'].value ? this.step3.controls['TotalDeclaredValue'].value : '0.00';
     this.RequestContractKeysDetail.ContractKeys.DeliveryZone = this.DeliveryZone ? parseInt(this.DeliveryZone) : 0;
     this.RequestContractKeysDetail.ContractKeys.DestDeliveryPinCode = this.DestDeliveryPinCode ? parseInt(this.DestDeliveryPinCode) : 0;
     this.RequestContractKeysDetail.ContractKeys.DestDeliveryArea = this.DestDeliveryArea ? this.DestDeliveryArea : '';
-    this.RequestContractKeysDetail.ContractKeys.DocketDate = this.step1.value.DKTDT; this.RequestContractKeysDetail.ContractKeys.FlagDeferment = this.IsDeferment;
+    this.RequestContractKeysDetail.ContractKeys.DocketDate = this.step1.controls['DKTDT'].value; this.RequestContractKeysDetail.ContractKeys.FlagDeferment = this.IsDeferment;
     this.RequestContractKeysDetail.ContractKeys.TRDays = this.contractKeysInvoke?.TRDays[0] || 0;
   }
   CalucateEdd() {
@@ -2695,13 +2743,13 @@ export class CNoteGenerationComponent implements OnInit {
   //end
   //GetDestination
   GetDestination() {
-    if (this.step1.value.DELLOC.length > 3) {
+    if (this.step1.controls['DELLOC'].value.length > 3) {
       let reqbody = {
         companyCode: 10065,
         map_dloc_pin: this.Rules.find((x) => x.code == 'MAP_DLOC_PIN').defaultvalue,
         OriginLocation: "MUMB",
         loc_level: "234",
-        searchText: this.step1.value.DELLOC
+        searchText: this.step1.controls['DELLOC'].value
       }
       this.ICnoteService.cnotePost('services/GetDestination', reqbody).subscribe({
         next: (res: any) => {
@@ -2726,13 +2774,13 @@ export class CNoteGenerationComponent implements OnInit {
     this.DeliveryZone = event.option.value.PincodeZoneId || "";
     this.DestDeliveryPinCode = event.option.value.pincode || "";
     this.DestDeliveryArea = event.option.value.Area || "";
-    this.PincodeZoneLocation =event.option.value.PincodeZoneLocation || "";
+    this.PincodeZoneLocation = event.option.value.PincodeZoneLocation || "";
   }
   GetDetailedBasedOnCStep1() {
     let reqbody = {
       companyCode: 10065,
       Origin: "MUMB",
-      DocketNumber: this.step1.value.DKTNO
+      DocketNumber: this.step1.controls['DKTNO'].value
     }
     this.ICnoteService.cnotePost('services/GetDetailedBasedOnCStep1', reqbody).subscribe({
       next: (res: any) => {
@@ -2754,4 +2802,386 @@ export class CNoteGenerationComponent implements OnInit {
     })
   }
   //End
+  // //start
+  // Validationchecked(Formcontrol,step) {
+  //   debugger
+  //    const requiredStepNames = Formcontrol
+  //   .filter(step => step.Validation === 'Required' && step.type!="toggle")
+  //   .map(step => step.name);
+  //   this.isLinear = this.areFieldsFilled(step, requiredStepNames);
+  //   //;
+  // }
+
+  // areFieldsFilled(form: FormGroup, fields: string[]): boolean {
+
+  //   for (const field of fields) {
+  //     if (!form.get(field)?.value && !form.get(field)?.disabled) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
+
+
+  //  end
+  Onsubmit() {
+    debugger
+    if (this.IsDocketEdit == "Y") {
+
+    }
+    else if (this.IsQuickCompletion == "Y") {
+
+    }
+    else {
+      this.DocketEntity.ContractId = this.step1.controls['PRQ_BILLINGPARTY']?.value.ContractId || "";
+      this.DocketEntity.FromCity = this.step1.controls['FCITY']?.value.Value || '';
+      this.DocketEntity.ToCity = this.step1.controls['TCITY']?.value.Value || '';
+      this.DocketEntity.Destination = this.step1.controls['DELLOC']?.value.Value || '';
+      this.DocketEntity.PrqNumber = this.step1.controls['PRQ']?.value.PRQNO || '';
+      this.DocketEntity.DocketNumber = this.step1.controls['DKTNO']?.value || '';
+      this.DocketEntity.DocketDate = this.step1.controls['DKTDT']?.value || new Date();
+      this.DocketEntity.PackagingType = this.step1.controls['PKGS']?.value || '';
+      this.DocketEntity.ProductType = this.step1.controls['PROD']?.value || '';
+      this.DocketEntity.ServiceType = this.step1.controls['SVCTYP']?.value || '';
+      this.DocketEntity.TransportMode = this.step1.controls['PROD']?.value || '';
+      this.DocketEntity.FtlType = this.step1.controls['FTLTYP']?.value || '';
+      this.DocketEntity.IsMarketVehicle = this.step1.controls['IsMarketVehicle']?.value || null;
+      this.DocketEntity.VehicleNo = this.step1.controls['VEHICLE_NO']?.value || '';
+      this.DocketEntity.IsOda = this.step1.controls['F_ODA']?.value || null;
+      this.DocketEntity.IsLocalCNote = this.step1.controls['F_LOCAL']?.value || null;
+      this.DocketEntity.Division = this.step1.controls['DIV']?.value || ''
+      this.DocketEntity.SpecialInstructions = this.step1.controls['RMRK']?.value || ''
+      this.DocketEntity.BusinessType = this.step1.controls['BUT']?.value || ''
+      this.DocketEntity.IsMutidelivery = this.step1.controls['F_MDEL']?.value || null;
+      this.DocketEntity.IsMutipickup = this.step1.controls['F_MPKP']?.value || null;
+      this.DocketEntity.SourceCNote = this.step1.controls['SRCDKT']?.value || '';
+      this.DocketEntity.ConsignorName = this.step2.controls['CST_NM']?.value || '';
+      this.DocketEntity.ConsignorCity = this.step2.controls['ConsignorCity']?.value || '';
+      this.DocketEntity.ConsignorPinCode = this.step2.controls['ConsignorPinCode']?.value || '';
+      this.DocketEntity.ConsignorTelephoneNo = this.step2.controls['CST_PHONE']?.value || '';
+      this.DocketEntity.ConsignorMobileNo = this.step2.controls['CST_MOB']?.value || '';
+      this.DocketEntity.IsConsignorFromMasterOrWalkin = this.step2.controls['IsConsignorFromMasterOrWalkin']?.value || null;
+      this.DocketEntity.ConsigneeName = this.step2.controls['ConsigneeCST_NM']?.value || '';
+      this.DocketEntity.ConsigneeCity = this.step2.controls['ConsigneeCity']?.value || '';
+      this.DocketEntity.ConsigneeGstin = this.step2.controls['ConsigneeGSTINNO']?.value || '';
+      this.DocketEntity.ConsigneeMobileNo = this.step2.controls['ConsigneeCST_MOB']?.value || '';
+      this.DocketEntity.ConsigneeEmail = this.step2.controls['CST_EMAIL']?.value || '';
+      this.DocketEntity.ConsigneeTinNumber = this.step2.controls['CST_TIN']?.value || '';
+      this.DocketEntity.ConsigneeCstNumber = this.step2.controls['CST_CST']?.value || '';
+      this.DocketEntity.ConsigneeTelephoneNo = this.step2.controls['ConsigneeCST_PHONE']?.value || '';
+      this.DocketEntity.ConsigneePinCode = this.step2.controls['ConsigneePinCode']?.value || '';
+      this.DocketEntity.ConsigneeCity = this.step2.controls['ConsigneeCity']?.value || '';
+      this.DocketEntity.ConsigneeAddress = this.step2.controls['ConsigneeCST_ADD']?.value || '';
+      this.DocketEntity.RiskType = this.step2.controls['RSKTY']?.value || '';
+      this.DocketEntity.CustomerRefNo = this.step2.controls['CTR_NO']?.value || '';
+      this.DocketEntity.IsAppointmentBasedDelivery = this.step2.controls['IsAppointmentBasedDelivery']?.value || ''
+      this.DocketEntity.AppointmentDate = this.step2.controls['AppointmentDate']?.value || ''
+      this.DocketEntity.NameOfPerson = this.step2.controls['NameOfPerson']?.value;
+      this.DocketEntity.AppointmentContactNumber = this.step2.controls['AppointmentContactNumber']?.value;
+      this.DocketEntity.AppointmentRemarks = this.step2.controls['Remarks']?.value;
+      this.DocketEntity.AppointmentFromTime = this.step2.controls['AppointmentFromTime']?.value;
+      this.DocketEntity.AppointmentToTime = this.step2.controls['AppointmentToTime']?.value || ' '
+      this.DocketEntity.ContainerNo1 = this.step2.controls['ContainerNo1']?.value || '';
+      this.DocketEntity.ContainerNo2 = this.step2.controls['ContainerNo2']?.value || '';
+      this.DocketEntity.ContainerSize1 = this.step2.controls['ContainerSize1']?.value;
+      this.DocketEntity.ContainerSize2 = this.step2.controls['ContainerSize2']?.value;
+      this.DocketEntity.ContainerField1 = this.step2.controls['FIELD1']?.value || "";
+      this.DocketEntity.ContainerField2 = this.step2.controls['FIELD2']?.value || "";
+      this.DocketEntity.ContainerField3 = this.step2.controls['FIELD3']?.value || "";
+      this.DocketEntity.ContainerField4 = this.step2.controls['FIELD4']?.value || "";
+      this.DocketEntity.ContainerField5 = this.step2.controls['FIELD5']?.value || "";
+      this.DocketEntity.ContainerField6 = this.step2.controls['FIELD6']?.value || "";
+      this.DocketEntity.ContainerField7 = this.step2.controls['FIELD7']?.value || "";
+      this.DocketEntity.ContainerField8 = this.step2.controls['FIELD8']?.value || "";
+      this.DocketEntity.ContainerField9 = this.step2.controls['FIELD9']?.value || "";
+      this.DocketEntity.IsVolumetric = this.step3.controls['Volumetric']?.value || null;
+      this.DocketEntity.CftTotal = this.step3.controls['CFT_TOT']?.value || 0;
+      this.DocketEntity.VolRatio = this.step3.controls['CFT_RATIO']?.value || 0;
+      this.DocketEntity.TotalChargedWeight = this.step3.controls['ChargedWeight']?.value || 0;
+      this.DocketEntity.TotalChargedNoofPackages = this.step3.controls['TotalChargedNoofPackages']?.value || 0;
+      this.DocketEntity.TotalDeclaredValue = this.step3.controls['TotalDeclaredValue']?.value || 0;
+      this.DocketEntity.ChargedKM = this.step3.controls['ChargedKM']?.value || 0;
+      this.DocketEntity.TotalPartQuantity = this.step3.controls['TotalPartQuantity']?.value || 0;
+      this.DocketEntity.EddDate = this.step3.controls['EDD']?.value || new Date();
+      let newInvoicesList: InvoiceEntity[] = [];
+
+      this.step3.value.invoiceArray.forEach(z => {
+        let newInvoice: InvoiceEntity = {
+          EwbNumber: z.EWBNO,
+          EWBDate: z.EWBDATE,
+          InvoiceNo: z.INVNO,
+          InvoiceDate: z.INVDT,
+          Length: z.LENGTH,
+          Height: z.HEIGHT,
+          Breadth: z.BREADTH,
+          DeclaredValue: z.DECLVAL,
+          NoOfPackages: z.NO_PKGS,
+          CubicWeight: z.CUB_WT,
+          ActualWeight: z.ACT_WT,
+          Product: z.Invoice_Product,
+          HsnCode: z.HSN_CODE,
+          PartNumber: '',
+          PartDescription: '',
+          PartQuantity: 0.0,
+          TypeofPackage: '',
+          ChargedWeight: 0,
+          FreightRate: 0,
+          RateType: '',
+          FreightAmount: 0,
+          EWBExpiredDate: z.EWBEXPIRED,
+          Contents: ''
+        };
+
+        newInvoicesList.push(newInvoice);
+      });
+
+      this.DocketEntity.Invoices = newInvoicesList;
+
+
+      this.DocketEntity.BcSerialType = this.step3.controls['BcSerialType']?.value || '';
+      //  this.DocketEntity.BcSeriess.forEach(m=>{
+      //   this.step3.value.barcodearray.forEach(o=>{
+      //     m.BarCode=o.barcode
+      //   })
+      //  })
+      let DocketOtherCharges: DocketChargesEntity[] = [];
+      this.chargeList.forEach(h => {
+        let newInvoice: DocketChargesEntity = {
+          ChargeCode: h.chargecode,
+          ChargeName: h.chargename,
+          ChargeValue: h.chargevalue,
+          Operator: h.operator,
+          Enabled: h.enabled,
+          ActiveFlag: h.activeflag,
+          VarybyLoc: h.varybyloc
+        };
+        DocketOtherCharges.push(newInvoice);
+      })
+      this.DocketEntity.DocketOtherCharges = DocketOtherCharges;
+      this.DocketEntity.FOVCalculated = this.step3.controls['FOVCalculated']?.value || 0;
+      this.DocketEntity.FOVCharged = this.step3.controls['FOVCharged']?.value || 0;
+      this.DocketEntity.FOVRate = this.step3.controls['FOVRate']?.value || 0;
+      this.DocketEntity.FreightRateType = this.step3.controls['FreightRateType']?.value || '';
+      this.DocketEntity.DiscountRate = this.step3.controls['DiscountRate']?.value || '';
+      this.DocketEntity.DiscountAmount = this.step3.controls['DiscountAmount']?.value || '';
+      this.DocketEntity.EeddDate = this.step3.controls['EEDD']?.value || '';
+      this.DocketEntity.CODDODCharged = this.step3.controls['CODDODCharged']?.value || 0;
+      this.DocketEntity.CODDODTobeCollected = this.step3.controls['CODDODTobeCollected']?.value || 0;
+      this.DocketEntity.IsCodDod = this.step3.controls['F_COD']?.value || null;
+      this.DocketEntity.BasedOn1 = this.BaseCode1;
+      this.DocketEntity.BasedOn2 = this.BasedOn2;
+      this.DocketEntity.UseFrom = this.UseFrom;
+      this.DocketEntity.UseTo = this.UseTo;
+      this.DocketEntity.UseTransMode = this.UseTransMode;
+      this.DocketEntity.UseRateType = this.UseRateType;
+      this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal;
+      this.DocketEntity.ContractDepth = this.ContractDepth;
+      this.DocketEntity.ProceedDuringEntry = this.ProceedDuringEntry;
+      this.DocketEntity.BaseCode1 = this.BaseCode1;
+      this.DocketEntity.BaseCode2 = this.BaseCode2;
+      this.DocketEntity.FlagCutoffApplied = this.FlagCutoffApplied;
+      this.DocketEntity.FlagHolidayApplied = this.FlagHolidayApplied;
+      this.DocketEntity.FlagHolidayBooked = this.FlagHolidayBooked;
+      this.DocketEntity.DeliveryZone = this.DeliveryZone;
+      this.DocketEntity.DestDeliveryPinCode = this.DestDeliveryPinCode;
+      this.DocketEntity.DestDeliveryArea = this.DestDeliveryArea;
+      this.DocketEntity.PincodeZoneLocation = this.PincodeZoneLocation;
+      //GSTDETAILS
+      let GstDetails = new DocketGstEntity();
+      GstDetails.IsGSTExempted = false
+      GstDetails.ExemptionCategory = ''
+      GstDetails.GstPartyName = ''
+      GstDetails.GstPartyCode = ''
+      GstDetails.ServiceCodeDetails = ''
+      GstDetails.ServiceCode = ''
+      GstDetails.StateOfSupply = ''
+      GstDetails.PlaceOfSupply = ''
+      GstDetails.Gstin = ''
+      GstDetails.Address = ''
+      GstDetails.BilledAt = ''
+      GstDetails.DocketSubTotal = 0.00
+      GstDetails.ActualGSTRate = 0.00
+      GstDetails.GSTRate = 0.00
+      GstDetails.RcmApplicableActual = ''
+      GstDetails.RcmApplicable = ''
+      GstDetails.RcmApplicableText = ''
+      GstDetails.GSTCharged = 0.00
+      GstDetails.DocketTotal = 0.00
+      GstDetails.RoundOffDifference = 0.00
+      GstDetails.GSTRemark = ''
+      GstDetails.EnableGSTRCMLogic = ''
+      GstDetails.SacCode = ''
+      GstDetails.SacCategory = ''
+      GstDetails.VATRate = 0.00
+      GstDetails.TaxControlType = ''
+      this.DocketEntity.GstDetails = GstDetails;
+      this.DocketEntity.EntryBy = 'Dhaval'
+      this.DocketEntity.CompanyCode = 10065
+      this.DocketEntity.IsConsigneeFromMasterOrWalkin = this.step2.controls['IsConsigneeFromMasterOrWalkin']?.value || '';
+      this.DocketEntity.ConsigneeCode = this.step2.controls['ConsigneeCST_NM']?.value.Name || ''
+      // this.DocketEntity.EntryTypes = this.DocketEntity.EntryTypes;
+      //End
+      if (!this.DocketEntity.StateDocumentDetails) {
+        this.DocketEntity.StateDocumentDetails = [];
+      }
+      let newDoc = new StateDocumentDetailEntity();
+      newDoc.DocSrno = '';
+      newDoc.DocumentName = '';
+      newDoc.EnclosedDocumentNumber = '';
+      newDoc.IsRequired = '';
+      newDoc.IsStaxExmpt = '';
+      newDoc.StateCode = '';
+      newDoc.StateName = '';
+
+      this.DocketEntity.StateDocumentDetails.push(newDoc);
+
+      let CityDetailEntity: ViaCityDetailEntity = new ViaCityDetailEntity();
+      CityDetailEntity.Address = ''
+      CityDetailEntity.ContactNumber = ''
+      CityDetailEntity.ContactPerson = ''
+      CityDetailEntity.ViaCity = ''
+
+      this.DocketEntity.ViaCityDetails.push(CityDetailEntity);
+      if (this.step3.value.BcSeries != null) {
+        for (const item of this.step3.value.BcSeries) {
+          if (!!item.From && !!item.To) {
+            let from = 0, to = 0;
+            let numlen: number;
+            let arrfrom: string[], arrto: string[];
+            let numstrfrom = '', numstrto = '', alfafrom = '', alfato = '', bcserialno = '';
+            arrfrom = item.From.split('');
+            arrto = item.To.split('');
+            for (let j = 0; j < arrfrom.length; j++) {
+              const charCode = arrfrom[j].charCodeAt(0);
+              if (charCode > 47 && charCode < 58) {
+                numstrfrom = numstrfrom + arrfrom[j];
+                numstrto = numstrto + arrto[j];
+              } else {
+                alfafrom = alfafrom + arrfrom[j];
+                alfato = alfato + arrto[j];
+              }
+            }
+            numlen = numstrfrom.length;
+            from = parseFloat(numstrfrom);
+            to = parseFloat(numstrto);
+            for (let num = from; num <= to; num++) {
+              bcserialno = alfafrom + num.toString().split('.')[0].padStart(numlen, '0');
+              this.DocketEntity.BcSeriess.push({
+                BarCode: bcserialno
+              });
+            }
+          }
+        }
+      }
+      if (this.step3.value.barcodearray != null) {
+        for (const item of this.step3.value.barcodearray) {
+          if (!!item.BarCode) {
+            this.DocketEntity.BcSeriess.push({
+              BarCode: item.BarCode
+            });
+          }
+        }
+      }
+      this.DocketEntity.CHRGDESC1 = this.step3.controls['CHRG_DESC1']?.value || '';
+      this.DocketEntity.CHRGDESC2 = this.step3.controls['CHRG_DESC2']?.value || '';
+      this.DocketEntity.CHRGDESC3 = this.step3.controls['CHRG_DESC3']?.value || '';
+      this.DocketEntity.CHRGDESC4 = this.step3.controls['CHRG_DESC4']?.value || '';
+      this.DocketEntity.DPHRateType = this.DPHRateType;
+      this.DocketEntity.DPHRate = this.DPHRate;
+      this.DocketEntity.DPHAmount = this.DPHAmount;
+      this.DocketEntity.PaymentType = this.step1.controls['PAYTYP'].value
+      this.DocketEntity.IsDacc = this.IsDaccReadOnly;
+      this.DocketEntity.DPHRateType = this.DPHRateType;
+      this.DocketEntity.UseFrom = this.UseFrom;
+      this.DocketEntity.UseTo = this.UseTo;
+      this.DocketEntity.UseTransMode = this.UseTransMode;
+      this.DocketEntity.UseRateType = this.UseRateType;
+      this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal;
+      this.DocketEntity.EnableReverseCalculation = this.CcmServicesData.FlagEnableReverseCalculation;
+      this.DocketEntity.ContainerId = "0"
+      this.DocketEntity.ContainerNo = "0"
+      this.DocketEntity.ContainerSealNo = ""
+      this.DocketEntity.TAMNo = ""
+      this.DocketEntity.QuotationNumber = ""
+      this.DocketEntity.AgendaNumber = ""
+      this.DocketEntity.VehicleNo = ""
+      this.DocketEntity.TrailerNumber = ""
+      this.DocketEntity.DriverName1 = ""
+      this.DocketEntity.Direct = null
+      this.DocketEntity.ManualThcNumber = ""
+      this.DocketEntity.Temperature1 = 0
+      this.DocketEntity.Temperature2 = 0
+      this.DocketEntity.Temperature3 = 0
+      this.DocketEntity.Temperature4 = 0
+      this.DocketEntity.AverageTemperature = 0
+      this.DocketEntity.LoadPlanNumber = ""
+      this.DocketEntity.LoadType = ""
+      this.DocketEntity.Industry = ""
+      this.DocketEntity.IsRto = false
+      this.DocketEntity.RtoDockNo = ""
+      this.DocketEntity.IsPermitApplicable = null
+      this.DocketEntity.IsDeferment = null
+      this.DocketEntity.IsPod = null
+      this.DocketEntity.WeightType = ""
+      this.DocketEntity.PlPartner = ""
+      this.DocketEntity.ConsignorAddressCode = ""
+      this.DocketEntity.ConsignorAddress = this.step2.controls['CST_ADD']?.value;
+      this.DocketEntity.ConsignorAddress = this.step2.controls['CST_ADD']?.value;
+      this.DocketEntity.ConsignorGstin = this.step2.controls['GSTINNO']?.value;
+      this.DocketEntity.ConsignorTinNumber = this.step2.controls['ConsignorTinNumber']?.value || '';
+      this.DocketEntity.ConsignorCstNumber = this.step2.controls['ConsignorCstNumber']?.value || '';
+      this.DocketEntity.ConsignorEmail = this.step2.controls['ConsignorEmail']?.value || '';
+      this.DocketEntity.ConsignorEmail = this.step2.controls['ConsignorEmail']?.value || '';
+      this.DocketEntity.ConsigneeDeliveryAddress = ""
+      this.DocketEntity.PolicyNo = ""
+      this.DocketEntity.PolicyDate = ""
+      this.DocketEntity.PolicyValidUpto = ""
+      this.DocketEntity.InternalCovers = 0
+      this.DocketEntity.ModvatCovers = 0
+      this.DocketEntity.PrivateMark = ""
+      this.DocketEntity.TpNumber = ""
+      this.DocketEntity.CustomerRefrenceBatchNo = ""
+      this.DocketEntity.CustomerRefrenceDeliveryNo = ""
+      this.DocketEntity.CustomerRefrenceModelNumber = ""
+      this.DocketEntity.CustomerRefrenceGpsNumber = ""
+      this.DocketEntity.CustomerRefrenceChasisNumber = ""
+      this.DocketEntity.PurchaseOrderNo = ""
+      this.DocketEntity.CustomerRefrenceNo1 = ""
+      this.DocketEntity.CustomerRefrenceNo2 = ""
+      this.DocketEntity.CustomerRefrenceEnginNo = ""
+      this.DocketEntity.PermitReceivedAt = ""
+      this.DocketEntity.PermitNumber = ""
+      this.DocketEntity.PermitDate = '0001-01-01T00:00:00'
+      this.DocketEntity.PermitReceivedDate = '0001-01-01T00:00:00'
+      this.DocketEntity.ContainerType = this.step2.controls['CONTTYP']?.value || ''
+      this.DocketEntity.StuffingDate = '0001-01-01T00:00:00'
+      this.DocketEntity.StandardFreightRate = 0
+      this.DocketEntity.WeightToConsider = this.WeightToConsider
+      this.DocketEntity.MaxMeasureValue = this.MaxMeasureValue
+      this.DocketEntity.MinInvoiceValue = this.MinInvoiceValue
+      this.DocketEntity.MaxInvoiceValue = this.MaxInvoiceValue
+      this.DocketEntity.MinInvoiceValuePerKG = this.MinInvoiceValuePerKG
+      this.DocketEntity.MaxInvoiceValuePerKG = this.MaxInvoiceValuePerKG
+      this.DocketEntity.DefaultChargeWeight = this.DefaultChargeWeight
+      this.DocketEntity.MinChargeWeight = this.MinChargeWeight
+      this.DocketEntity.MaxChargeWeight = this.MaxChargeWeight
+      this.DocketEntity.VolMeasure = this.VolMeasure
+      this.DocketEntity.TotalChargedNoofPkgsQuickCnot = 0
+      this.DocketEntity.BillingPartysCode = this.step1.controls['PRQ_BILLINGPARTY']?.value.Value || ''
+      this.DocketEntity.BillingPartysName = this.step1.controls['PRQ_BILLINGPARTY']?.value.Name || ''
+      this.ICnoteService.cnotePost('services/BookDocket', this.DocketEntity).subscribe({
+        next: (res: any) => {
+          console.log(res);
+        }
+      })
+      //this.DocketEntity.BillingPartys=  0
+
+
+
+
+    }
+
+
+
+  }
 }

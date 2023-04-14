@@ -7,7 +7,7 @@ export class Cnote {
    type: string;
    dropdown: any;
    ActionFunction: string;
-   validation: string;
+   Validation: string;
    frmgrp: string;
    display: boolean;
    enable: boolean;

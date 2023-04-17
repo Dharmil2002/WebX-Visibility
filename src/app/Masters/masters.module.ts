@@ -28,6 +28,7 @@ import { CNoteGenerationComponent } from './cnote-generation/cnote-generation.co
 import { MatStepperModule } from '@angular/material/stepper';
 import { DatePipe } from '@angular/common';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { EwaybillConfigComponent } from './ewaybill-config/ewaybill-config.component';
 
 @NgModule({
  
@@ -70,7 +71,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
     
   ],
   
-  declarations: [CNoteGenerationComponent],
+  declarations: [CNoteGenerationComponent, EwaybillConfigComponent],
   
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },]
 })

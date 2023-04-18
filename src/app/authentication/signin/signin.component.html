@@ -20,25 +20,25 @@
                     <div *ngIf="error" class="alert alert-danger mb-3 mt-0">{{error}}</div>
                     <div class="form-group auth-form-group mb-4">
                       <mat-icon matSuffix class="auth-page-icon">Company Code</mat-icon>
-                      <input type="email" formControlName="CompanyAlias" class="form-control auth-control"
-                        id="CompanyId" placeholder="Company Code">
-                      <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
-                        <div *ngIf="f.CompanyId.errors.required">Company Code is required</div>
+                      <input type="text" formControlName="companyCode" class="form-control auth-control"
+                        id="companyCode" placeholder="Company Code">
+                      <div *ngIf="submitted && f.companyCode.errors" class="invalid-feedback">
+                        <div *ngIf="f.companyCode.errors.required">Company Code is required</div>
                       </div>
                     </div>
                     <div class="form-group auth-form-group mb-4">
-                      <mat-icon matSuffix class="auth-page-icon">email</mat-icon>
-                      <input type="email" formControlName="email"  class="form-control auth-control" id="email"
-                        placeholder="Email" [readonly]="IsRegister" [ngClass]="{ 'is-invalid': submitted && f.email.errors }">
-                      <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                      <mat-icon matSuffix class="auth-page-icon">Username</mat-icon>
+                      <input type="Username" formControlName="Username"  class="form-control auth-control" id="Username"
+                        placeholder="User Name"  [ngClass]="{ 'is-invalid': submitted && f.Username.errors }">
+                      <div *ngIf="submitted && f.Username.errors" class="invalid-feedback">
                       </div>
                     </div>
                     <div class="form-group auth-form-group mb-4">
-                      <mat-icon matSuffix class="auth-page-icon">vpn_key</mat-icon>
-                      <input type="password" formControlName="password" [readonly]="IsRegister" class="form-control auth-control" id="password"
-                        [ngClass]="{ 'is-invalid': submitted && f.password.errors }" placeholder="Password" />
-                      <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
-                        <div *ngIf="f.password.errors.required">Password is required</div>
+                      <mat-icon  matSuffix class="auth-page-icon" fontIcon="home"></mat-icon>
+                      <input type="text" formControlName="Branch"  class="form-control auth-control" id="Branch"
+                        [ngClass]="{ 'is-invalid': submitted && f.Branch.errors }" placeholder="Branch" />
+                      <div *ngIf="submitted && f.Branch.errors" class="invalid-feedback">
+                        <div *ngIf="f.Branch.errors.required">Branch is required</div>
                       </div>
                     </div>
                     <div class="container-login100-form-btn">

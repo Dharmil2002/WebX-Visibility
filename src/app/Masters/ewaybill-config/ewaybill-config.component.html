@@ -1,8 +1,63 @@
 <section class="content">
     <div class="container-fluid">
-        <p>ewaybill-config works!</p>
-        <button class="msr-3" mat-raised-button color="primary"(click)="getEWayBill()">Fetch E-wayBillDetails</button>
+    
+    <div>
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <!-- breadcrumb -->
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
     </div>
+</div>
+<form class="register-form m-4" [formGroup]="EwayBillFrom">
+    <div class="row">
+        <div [class]="divcol" >
+            <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>User Name</mat-label>
+            <input matInput type="text"
+                formControlName="UserName" autocomplete="off">
+        </mat-form-field>
+        </div>
+        <div [class]="divcol" >
+            <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput type="password"
+                formControlName="Password" autocomplete="off">
+        </mat-form-field>
+        </div>
+        <div [class]="divcol" >
+            <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Customer Id</mat-label>
+            <input matInput type="text"
+                formControlName="CustomerId" autocomplete="off">
+        </mat-form-field>
+        </div>
+        <div [class]="divcol" >
+            <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>LoginGSTIN</mat-label>
+            <input matInput type="text"
+                formControlName="LoginGSTIN" autocomplete="off">
+        </mat-form-field>
+        </div>
+        <div [class]="divcol" >
+            <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>TransGSTIN</mat-label>
+            <input matInput type="text"
+                formControlName="TransGSTIN" autocomplete="off">
+        </mat-form-field>
+        </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                <div class="example-button-row  d-flex justify-content-end">
+              <button class="msr-3" mat-raised-button color="primary"
+                [disabled]="!EwayBillFrom.valid" (click)="getEWayBill()">Submit</button>
+            </div>
+            </div>
+            
+          </div>
+    </form>
 </section>
+
 
 

@@ -1,0 +1,40 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <!-- breadcrumb -->
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-xl-3">
+            <div class="card bg-c-yellow order-card">
+                <div class="card-block" (click)="docketBooking('EwaybillNo')">
+                    <h6 class="m-b-20"></h6>
+                    <h2 class="text-right"><i class="fa fa-cart-plus f-left"></i><span></span></h2>
+                    <p class="m-b-0"><span class="f-right">Eway-Bill</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-xl-3">
+            <div class="card bg-c-pink order-card">
+                <div class="card-block" (click)="docketBooking('Docket')">
+                    <h6 class="m-b-20"></h6>
+                    <h2 class="text-right"><i class="fa fa-credit-card f-left"></i><span></span></h2>
+                    <p class="m-b-0"><span class="f-right">Manual Docket</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-xl-3">
+            <div class="card bg-c-green order-card">
+                <div class="card-block" (click)="docketBooking('Ewaybill')">
+                    <h6 class="m-b-20"></h6>
+                    <h2 class="text-right"><i class="fa fa-rocket f-left"></i><span></span></h2>
+                    <p class="m-b-0"><span class="f-right">Eway-bill Config</span></p>
+                </div>
+            </div>
+        </div>
+	</div>
+</div>
+</div>
+</section>

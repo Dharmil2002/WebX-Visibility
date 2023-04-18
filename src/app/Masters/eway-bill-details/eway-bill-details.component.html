@@ -1,0 +1,44 @@
+<section class="content">
+    <div class="container-fluid">
+    
+    <div>
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <!-- breadcrumb -->
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+    </div>
+</div>
+<form class="register-form m-4" [formGroup]="EwayBill">
+    <div class="row">
+        <div [class]="divcol" >
+            <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>EWB Number</mat-label>
+            <input matInput type="text"
+                formControlName="EWBNo" autocomplete="off">
+        </mat-form-field>
+        </div>
+        </div>
+        <div class="row">
+            <div [class]="divcol" >
+                <mat-form-field class="example-full-width" appearance="outline">
+                <mat-label>Service Type</mat-label>
+                <mat-select  formControlName="Serivestype">
+                    <mat-option *ngFor="let option of ServiceTypeDetail"  [value]="option.CodeDesc"> {{ option.CodeDesc }}</mat-option>
+                  </mat-select>
+            </mat-form-field>
+            </div>
+            </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                <div class="example-button-row">
+              <button class="msr-3" mat-raised-button color="primary" (click)="onSubmit()">Submit</button>
+            </div>
+            </div>
+            
+          </div>
+    </form>
+</section>
+
+
+

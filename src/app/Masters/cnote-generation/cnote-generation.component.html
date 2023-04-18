@@ -23,6 +23,7 @@
                             <div *ngIf="step1Formcontrol">
                                 <mat-step [stepControl]="step1">
                                     <form class="register-form m-4" [formGroup]="step1">
+                                        <ng-template matStepLabel>Basic Info</ng-template>
                                         <div class="row">
                                             <div [class]="divcol" *ngFor="let step1Detail of step1Formcontrol">
                                                 <!-- Textbox -->
@@ -176,6 +177,7 @@
                             <div *ngIf="step2Formcontrol">
                                 <mat-step [stepControl]="step2">
                                     <form class="register-form m-4" [formGroup]="step2">
+                                        <ng-template matStepLabel>Consign(or/ee) Details</ng-template>
                                         <h4 class="card-title">Consignor Details</h4>
                                         <hr>
                                         <div class="row">
@@ -401,6 +403,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                       <div  *ngIf="showOtherAppointment">
                                         <h4>Appointment Based Delivery</h4><br>
                                         <div *ngFor="let Appointment of AppointmentBasedDelivery">
                                             <mat-radio-group [formControlName]="Appointment.name"
@@ -443,6 +446,8 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        </div>
+                                        <div *ngIf="showOtherContainer">
                                         <h4>Container Details</h4>
                                         <hr>
                                         <!-- ContainerDetails -->
@@ -470,7 +475,7 @@
                                                 </div>
                                             </div>
                                         </div>
-
+                                    </div>
                                         <!-- End -->
                                         <div class="row">
                                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
@@ -481,7 +486,7 @@
                                             </div>
                                         </div>
                                         <!-- End -->
-
+                                 
                                     </form>
                                 </mat-step>
                             </div>
@@ -489,6 +494,7 @@
                             <div *ngIf="step3Formcontrol">
                                 <mat-step [stepControl]="step3">
                                     <form class="register-form m-4" [formGroup]="step3">
+                                        <ng-template matStepLabel>Billing</ng-template>
                                         <div class="row">
                                             <div [class]="divcol" *ngFor="let step3FormDetail of step3Formcontrol">
                                                 <div

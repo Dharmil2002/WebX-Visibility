@@ -22,9 +22,11 @@ import { MatSortModule } from "@angular/material/sort";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { LoadPlanningComponent } from './load-planning/load-planning.component';
+import { DocketDashboardComponent } from './docket-dashboard/docket-dashboard.component';
 @NgModule({
   declarations: [
     LoadPlanningComponent,
+    DocketDashboardComponent,
   ],
   imports: [
     CommonModule,

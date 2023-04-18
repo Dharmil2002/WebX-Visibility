@@ -12,14 +12,13 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms
 })
 export class SigninComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit
-{
+  implements OnInit {
   loginForm: UntypedFormGroup;
   submitted = false;
-  MenuDetails:any;
+  MenuDetails: any;
   error = "";
-  IsRegister=true;
-  Menudetailarray:any;
+  IsRegister = true;
+  Menudetailarray: any;
   hide = true;
   Menulist: any;
   constructor(
@@ -31,19 +30,23 @@ export class SigninComponent
   }
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
-     CompanyAlias:['',Validators.required],
-      email: [
+      companyCode: ['', Validators.required],
+      Username: [
         "",
         [Validators.required],
       ],
-      password: ["", Validators.required],
+      Branch: ["", Validators.required],
     });
   }
   get f() {
     return this.loginForm.controls;
   }
- 
+
   onSubmit() {
+    localStorage.setItem("companyCode", this.loginForm.value.companyCode)
+    localStorage.setItem("Username", this.loginForm.value.Username);
+    localStorage.setItem("Branch", this.loginForm.value.Branch);
+    this.router.navigate(["/dashboard/DocketDashboard"]);
   }
-  
+
 }

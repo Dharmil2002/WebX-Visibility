@@ -29,6 +29,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { DatePipe } from '@angular/common';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { EwaybillConfigComponent } from './ewaybill-config/ewaybill-config.component';
+import { EwayBillDetailsComponent } from './eway-bill-details/eway-bill-details.component';
 
 @NgModule({
  
@@ -41,8 +42,6 @@ import { EwaybillConfigComponent } from './ewaybill-config/ewaybill-config.compo
     MatSnackBarModule,
     MatExpansionModule,
     MatMenuModule,
-    CommonModule,
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MatPaginatorModule,
@@ -71,7 +70,7 @@ import { EwaybillConfigComponent } from './ewaybill-config/ewaybill-config.compo
     
   ],
   
-  declarations: [CNoteGenerationComponent, EwaybillConfigComponent],
+  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent],
   
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },]
 })

@@ -19,7 +19,7 @@
                     <div class="header">
                     </div>
                     <div class="body" *ngIf="CnoteData">
-                        <mat-stepper [linear]="isLinear"  #stepper>
+                        <mat-stepper [linear]="isLinear" #stepper>
                             <div *ngIf="step1Formcontrol">
                                 <mat-step [stepControl]="step1">
                                     <form class="register-form m-4" [formGroup]="step1">
@@ -166,7 +166,8 @@
                                             <div class="row">
                                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                                                     <div class="example-button-row d-flex justify-content-end">
-                                                        <button class="msr-3" mat-raised-button color="primary" (click)="testing()" matStepperNext>Next</button>
+                                                        <button class="msr-3" mat-raised-button color="primary"
+                                                            (click)="testing()" matStepperNext>Next</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -190,9 +191,9 @@
                                                         <input matInput type="csgn.type"
                                                             (ngModelChange)="callActionFunction(csgn.ActionFunction,$event)"
                                                             [formControlName]="csgn.name" autocomplete="off">
-                                                            <mat-error *ngIf="step2.get(csgn.name).hasError('required')">
-                                                                {{csgn.label+"is Required"}}
-                                                            </mat-error>
+                                                        <mat-error *ngIf="step2.get(csgn.name).hasError('required')">
+                                                            {{csgn.label+"is Required"}}
+                                                        </mat-error>
                                                     </mat-form-field>
 
                                                     <mat-form-field class="example-full-width" appearance="outline"
@@ -283,9 +284,9 @@
                                                         <input matInput type="csge.type"
                                                             (ngModelChange)="callActionFunction(csge.ActionFunction,$event)"
                                                             [formControlName]="csge.name" autocomplete="off">
-                                                            <mat-error *ngIf="step2.get(csge.name).hasError('required')">
-                                                                {{csge.label+"is Required"}}
-                                                            </mat-error>
+                                                        <mat-error *ngIf="step2.get(csge.name).hasError('required')">
+                                                            {{csge.label+"is Required"}}
+                                                        </mat-error>
                                                     </mat-form-field>
 
                                                     <mat-form-field class="example-full-width" appearance="outline"
@@ -378,9 +379,9 @@
                                                         <input matInput type="Doc.type"
                                                             (ngModelChange)="callActionFunction(Doc.ActionFunction,$event)"
                                                             [formControlName]="Doc.name" autocomplete="off">
-                                                            <mat-error *ngIf="step2.get(Doc.name).hasError('required')">
-                                                                {{Doc.label+"is Required"}}
-                                                            </mat-error>
+                                                        <mat-error *ngIf="step2.get(Doc.name).hasError('required')">
+                                                            {{Doc.label+"is Required"}}
+                                                        </mat-error>
                                                     </mat-form-field>
 
                                                     <mat-form-field class="example-full-width" appearance="outline"
@@ -403,90 +404,94 @@
                                                 </div>
                                             </div>
                                         </div>
-                                       <div  *ngIf="showOtherAppointment">
-                                        <h4>Appointment Based Delivery</h4><br>
-                                        <div *ngFor="let Appointment of AppointmentBasedDelivery">
-                                            <mat-radio-group [formControlName]="Appointment.name"
-                                                (change)="callActionFunction(Appointment.ActionFunction,$event)">
-                                                <mat-radio-button *ngFor="let option of RadionAppoimentBasedDelivery"
-                                                    [value]="option.value">
-                                                    {{ option.label }}
-                                                </mat-radio-button>
-                                            </mat-radio-group>
-                                        </div>
-                                        <br>
-                                        <!-- Appointment Details -->
-                                        <div class="row" *ngIf="isappointmentvisble">
-                                            <h4>Appointment Details</h4>
-                                            <hr>
-                                            <div [class]="divcol" *ngFor="let Appointment of AppointmentDetails">
-                                                <div>
-                                                    <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="Appointment.type=='text'">
-                                                        <mat-label>{{Appointment.label}}</mat-label>
-                                                        <input matInput type="Appointment.type"
-                                                            (ngModelChange)="callActionFunction(Appointment.ActionFunction,$event)"
-                                                            [formControlName]="Appointment.name" autocomplete="off">
-                                                            <mat-error *ngIf="step2.get(Appointment.name).hasError('required')">
+                                        <div *ngIf="showOtherAppointment">
+                                            <h4>Appointment Based Delivery</h4><br>
+                                            <div *ngFor="let Appointment of AppointmentBasedDelivery">
+                                                <mat-radio-group [formControlName]="Appointment.name"
+                                                    (change)="callActionFunction(Appointment.ActionFunction,$event)">
+                                                    <mat-radio-button
+                                                        *ngFor="let option of RadionAppoimentBasedDelivery"
+                                                        [value]="option.value">
+                                                        {{ option.label }}
+                                                    </mat-radio-button>
+                                                </mat-radio-group>
+                                            </div>
+                                            <br>
+                                            <!-- Appointment Details -->
+                                            <div class="row" *ngIf="isappointmentvisble">
+                                                <h4>Appointment Details</h4>
+                                                <hr>
+                                                <div [class]="divcol" *ngFor="let Appointment of AppointmentDetails">
+                                                    <div>
+                                                        <mat-form-field class="example-full-width" appearance="outline"
+                                                            *ngIf="Appointment.type=='text'">
+                                                            <mat-label>{{Appointment.label}}</mat-label>
+                                                            <input matInput type="Appointment.type"
+                                                                (ngModelChange)="callActionFunction(Appointment.ActionFunction,$event)"
+                                                                [formControlName]="Appointment.name" autocomplete="off">
+                                                            <mat-error
+                                                                *ngIf="step2.get(Appointment.name).hasError('required')">
                                                                 {{Appointment.label+"is Required"}}
                                                             </mat-error>
-                                                    </mat-form-field>
-                                                    <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="Appointment.type=='date'">
-                                                        <mat-label>{{Appointment.label}}</mat-label>
-                                                        <input matInput [matDatepicker]="Cnotename"
-                                                            [formControlName]="Appointment.name">
-                                                        <mat-datepicker-toggle matSuffix
-                                                            [for]="Cnotename"></mat-datepicker-toggle>
-                                                        <mat-datepicker #Cnotename></mat-datepicker>
-                                                        <mat-error *ngIf="step2.get(Appointment.name).hasError('required')">
-                                                            {{Appointment.label+"is Required"}}
-                                                        </mat-error>
-                                                    </mat-form-field>
+                                                        </mat-form-field>
+                                                        <mat-form-field class="example-full-width" appearance="outline"
+                                                            *ngIf="Appointment.type=='date'">
+                                                            <mat-label>{{Appointment.label}}</mat-label>
+                                                            <input matInput [matDatepicker]="Cnotename"
+                                                                [formControlName]="Appointment.name">
+                                                            <mat-datepicker-toggle matSuffix
+                                                                [for]="Cnotename"></mat-datepicker-toggle>
+                                                            <mat-datepicker #Cnotename></mat-datepicker>
+                                                            <mat-error
+                                                                *ngIf="step2.get(Appointment.name).hasError('required')">
+                                                                {{Appointment.label+"is Required"}}
+                                                            </mat-error>
+                                                        </mat-form-field>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
                                         </div>
                                         <div *ngIf="showOtherContainer">
-                                        <h4>Container Details</h4>
-                                        <hr>
-                                        <!-- ContainerDetails -->
-                                        <div class="row">
+                                            <h4>Container Details</h4>
+                                            <hr>
+                                            <!-- ContainerDetails -->
+                                            <div class="row">
 
-                                            <div [class]="divcol" *ngFor="let Container of ContainerDetails">
-                                                <div>
-                                                    <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="Container.type=='text'">
-                                                        <mat-label>{{Container.label}}</mat-label>
-                                                        <input matInput type="Container.type"
-                                                            (ngModelChange)="callActionFunction(Container.ActionFunction,$event)"
-                                                            [formControlName]="Container.name" autocomplete="off">
-                                                    </mat-form-field>
-                                                    <mat-form-field class="example-full-width" appearance="outline"
-                                                        *ngIf="Container.type=='dropdown'">
-                                                        <mat-label>{{Container.label}}</mat-label>
-                                                        <mat-select [formControlName]="Container.name">
-                                                            <mat-option *ngFor="let option of Container.dropdown"
-                                                                [value]="option.CodeId">
-                                                                {{ option.CodeDesc }}
-                                                            </mat-option>
-                                                        </mat-select>
-                                                    </mat-form-field>
+                                                <div [class]="divcol" *ngFor="let Container of ContainerDetails">
+                                                    <div>
+                                                        <mat-form-field class="example-full-width" appearance="outline"
+                                                            *ngIf="Container.type=='text'">
+                                                            <mat-label>{{Container.label}}</mat-label>
+                                                            <input matInput type="Container.type"
+                                                                (ngModelChange)="callActionFunction(Container.ActionFunction,$event)"
+                                                                [formControlName]="Container.name" autocomplete="off">
+                                                        </mat-form-field>
+                                                        <mat-form-field class="example-full-width" appearance="outline"
+                                                            *ngIf="Container.type=='dropdown'">
+                                                            <mat-label>{{Container.label}}</mat-label>
+                                                            <mat-select [formControlName]="Container.name">
+                                                                <mat-option *ngFor="let option of Container.dropdown"
+                                                                    [value]="option.CodeId">
+                                                                    {{ option.CodeDesc }}
+                                                                </mat-option>
+                                                            </mat-select>
+                                                        </mat-form-field>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                         <!-- End -->
                                         <div class="row">
                                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                                                 <div class="example-button-row d-flex justify-content-end">
                                                     <button mat-button matStepperPrevious>Back</button>
-                                                    <button class="msr-3" mat-raised-button color="primary"  matStepperNext>Next</button>
+                                                    <button class="msr-3" mat-raised-button color="primary"
+                                                        matStepperNext>Next</button>
                                                 </div>
                                             </div>
                                         </div>
                                         <!-- End -->
-                                 
+
                                     </form>
                                 </mat-step>
                             </div>
@@ -829,7 +834,7 @@
 
                                                     <button mat-button matStepperPrevious>Back</button>
                                                     <button class="msr-3" mat-raised-button color="primary"
-                                                        (click)="Onsubmit()"  *ngIf="invoke">Submit</button>
+                                                        (click)="Onsubmit()" *ngIf="invoke">Submit</button>
                                                 </div>
                                             </div>
                                         </div>

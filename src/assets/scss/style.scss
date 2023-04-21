@@ -281,6 +281,19 @@ body{
 .f-right {
   float: right;
 }
+.marquee {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  bottom: -5;
+  position: absolute;
+}
+
+// @keyframes marquee {
+//   from { transform: translateX(0); }
+//   to { transform: translateX(-100%); }
+// }
+
 // .w-100{
 //     max-width: 100px!important;
 // }

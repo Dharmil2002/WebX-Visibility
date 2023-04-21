@@ -12,8 +12,8 @@ import { roundNumber, WebxConvert } from 'src/app/Utility/commonfunction';
 import { ChangeDetectorRef } from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { DocketChargesEntity, DocketEntity, DocketGstEntity, InvoiceEntity, StateDocumentDetailEntity, ViaCityDetailEntity } from 'src/app/core/models/docketModel';
-import { Route, Router } from '@angular/router';
-import { debug } from 'console';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-cnote-generation',
   templateUrl: './cnote-generation.component.html',
@@ -742,37 +742,38 @@ export class CNoteGenerationComponent implements OnInit {
   EwayBillDetailAutoFill() {
     debugger;
     let fromcity = {
-      Name: this.EwayBillDetail?.fromPlace || '',
-      Value: this.EwayBillDetail?.fromPlace || '',
+      Name: this.EwayBillDetail[1].FromMaster.city || '',
+      Value: this.EwayBillDetail[1].FromMaster.city || '',
     }
     let billingparty = {
-      Name: this.EwayBillDetail?.fromTrdName || '',
-      Value: this.EwayBillDetail?.fromTrdName || '',
+      Name: this.EwayBillDetail[1].FromMaster.CUSTCD || '',
+      Value: this.EwayBillDetail[1].FromMaster.CUSTNM || '',
     }
     let ConsignorPinCode = {
-      Name: this.EwayBillDetail?.fromPincode || '',
-      Value: this.EwayBillDetail?.fromPincode || '',
+      Name: this.EwayBillDetail[1].FromMaster.city || '',
+      Value: this.EwayBillDetail[1].FromMaster.pincode || '',
     }
     this.step1.controls['FCITY'].setValue(fromcity);
     this.step2.controls['ConsignorCity'].setValue(fromcity);
     this.step2.controls['CST_NM'].setValue(billingparty);
     this.step1.controls['PRQ_BILLINGPARTY'].setValue(billingparty);
-    this.step2.controls['CST_ADD'].setValue(this.EwayBillDetail?.fromAddr1 || '');
+    this.step2.controls['CST_ADD'].setValue(this.EwayBillDetail[1].FromMaster.CustAddress || '');
     this.step2.controls['ConsignorPinCode'].setValue(ConsignorPinCode);
     this.step2.controls['GSTINNO'].setValue(this.EwayBillDetail?.fromGstin || '');
     let Tocity = {
-      Name: this.EwayBillDetail?.toPlace || '',
-      Value: this.EwayBillDetail?.toPlace || '',
+      Name: this.EwayBillDetail[0].data?.toPlace || '',
+      Value: this.EwayBillDetail[0].data?.toPlace || '',
     }
     let Consignee = {
-      Name: this.EwayBillDetail?.toTrdName || '',
-      Value: this.EwayBillDetail?.toTrdName || '',
+      Name: this.EwayBillDetail[0].data?.toTrdName || '',
+      Value: this.EwayBillDetail[0].data?.toTrdName || '',
     }
     let Pincode = {
-      Name: this.EwayBillDetail?.toPincode || '',
+      Name: this.EwayBillDetail[0].data?.toPlace || '',
       Value: this.EwayBillDetail?.toPincode || '',
     }
     this.step1.controls['TCITY'].setValue(Tocity);
+    this.GetDestinationDataCompanyWise()
     this.step2.controls['ConsigneeCity'].setValue(Tocity);
     this.step2.controls['ConsigneeCST_NM'].setValue(Consignee);
     this.step2.controls['ConsigneeCST_ADD'].setValue(this.EwayBillDetail?.toAddr1 || '');
@@ -1117,7 +1118,8 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Get Destination data company wise
   GetDestinationDataCompanyWise() {
-    if (this.mapcityRule == "Y") {
+    debugger;
+    if (this.mapcityRule == "Y" || this.EwayBill) {
       // Find the BL code from the step1 form control
       //let bLcode = this.step1Formcontrol.find((x) => x.name == 'DELLOC');
       // Find the rules for the BL code
@@ -1900,6 +1902,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   ///CalculateRowLevelChargeWeight() 
   CalculateRowLevelChargeWeight(event, FlagCalculateInvoiceTotal) {
+    debugger
     let cubinWeight = parseFloat(event.controls.CUB_WT?.value || 0);
     let ActualWeight = parseFloat(event.controls.ACT_WT?.value || 0);
     switch (this.WeightToConsider) {

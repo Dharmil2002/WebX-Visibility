@@ -30,6 +30,7 @@ import { DatePipe } from '@angular/common';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { EwaybillConfigComponent } from './ewaybill-config/ewaybill-config.component';
 import { EwayBillDetailsComponent } from './eway-bill-details/eway-bill-details.component';
+import { EwayBillDocketBookingComponent } from './eway-bill-docket-booking/eway-bill-docket-booking.component';
 
 @NgModule({
  
@@ -70,7 +71,7 @@ import { EwayBillDetailsComponent } from './eway-bill-details/eway-bill-details.
     
   ],
   
-  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent],
+  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent],
   
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },]
 })

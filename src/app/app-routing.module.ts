@@ -13,7 +13,7 @@ const routes: Routes = [
     component: MainLayoutComponent,
     //canActivate: [AuthGuard],
     children: [
-      { path: "", redirectTo: "Masters/Docket/Create", pathMatch: "full" },
+      { path: "", redirectTo: "authentication/signin", pathMatch: "full" },
       {
         path: "dashboard",
         component: DashboardLayoutComponent,

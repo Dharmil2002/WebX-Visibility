@@ -19,6 +19,7 @@
                     </div>
                     <div class="body" *ngIf="EwayBillField">
                         <mat-stepper [linear]="isLinear" #stepper>
+                            <!-- Step 1 Details -->
                             <div *ngIf="step1Formcontrol">
                                 <mat-step [stepControl]="step1">
                                     <form class="register-form m-4" [formGroup]="step1">
@@ -26,6 +27,21 @@
                                         <div class="row">
 
                                             <div [class]="divcol" *ngFor="let step1Detail of step1Formcontrol">
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                *ngIf="step1Detail.type=='text' &&  step1Detail.name =='DKTNO'">
+                                                <mat-label>{{step1Detail.label}}</mat-label>
+                                                <!-- <input matInput type="step1Detail.type"
+                                                 (ngModelChange)="callActionFunction(step1Detail.ActionFunction,$event)"
+                                                 [formControlName]="step1Detail.name" autocomplete="off"> -->
+                                                <input matInput type="step1Detail.type"
+                                                    (change)="callActionFunction(step1Detail.ActionFunction,$event)"
+                                                    [formControlName]="step1Detail.name" autocomplete="off">
+                                                <div class="input-group-append SpanCnote">
+                                                    <span class="input-group-text dividerCnote"
+                                                        id="basic-addon2">{{docketallocate}}</span>
+                                                </div>
+
+                                            </mat-form-field>
                                                 <mat-form-field class="example-full-width" appearance="outline"
                                                     *ngIf="step1Detail.type=='text' &&  step1Detail.name !='DKTNO' ">
                                                     <mat-label>{{step1Detail.label}}</mat-label>
@@ -118,7 +134,9 @@
                                                 <!-- <mat-slide-toggle  (change)="callActionFunction(step1Detail.ActionFunction,$event)" color="primary" *ngIf="step1Detail.type=='toggle'"
                                                     [formControlName]="step1Detail.name">{{step1Detail.label}}</mat-slide-toggle> -->
                                             </div>
+                                             <!-- Consignor Details  -->
                                             <div class="row">
+                                                
                                                 <h4 class="card-title">Consignor Details</h4>
                                                 <hr>
                                                 <div class="row">
@@ -206,6 +224,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <!-- End -->
+
+                                              <!-- Consignee Details -->
                                                 <h4 class="card-title">Consignee Details</h4>
                                                 <hr>
                                                 <div class="row">
@@ -294,6 +315,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                    <!-- End -->
                                             </div>
                                             <div class="row">
                                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
@@ -307,7 +329,9 @@
                                     </form>
                                 </mat-step>
                             </div>
+                            <!----END--->
 
+                            <!-- Step 2 Details -->
                             <div *ngIf="step2Formcontrol">
                                 <mat-step [stepControl]="step2">
                                     <form class="register-form m-4" [formGroup]="step2">
@@ -387,6 +411,162 @@
                                                 <!-- <mat-slide-toggle  (change)="callActionFunction(step1Detail.ActionFunction,$event)" color="primary" *ngIf="step1Detail.type=='toggle'"
                                                     [formControlName]="step1Detail.name">{{step1Detail.label}}</mat-slide-toggle> -->
                                             </div>
+                                            <h4 class="card-title">Total Summary</h4>
+                                            <hr>
+                                            <div class="row">
+                                                <div [class]="divcol" *ngFor="let subDetail of summaryDetail">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="subDetail.type=='text' &&  subDetail.name !='DKTNO' ">
+                                                        <mat-label>{{subDetail.label}}</mat-label>
+                                                        <!-- <input matInput type="step1Detail.type"
+                                                            (ngModelChange)="callActionFunction(step1Detail.ActionFunction,$event)"
+                                                            [formControlName]="step1Detail.name" autocomplete="off"> -->
+                                                        <input matInput type="subDetail.type"
+                                                            (ngModelChange)="callActionFunction(subDetail.ActionFunction,$event)"
+                                                            [formControlName]="subDetail.name" autocomplete="off">
+                                                        <mat-error *ngIf="step2.get(subDetail.name).hasError('required')">
+                                                            {{subDetail.label+"is Required"}}
+                                                        </mat-error>
+                                                    </mat-form-field>
+                                                    <!-- End -->
+                                                    <!-- date -->
+    
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="subDetail.type=='date'">
+                                                        <mat-label>{{subDetail.label}}</mat-label>
+                                                        <input matInput [matDatepicker]="Cnotename"
+                                                            [formControlName]="subDetail.name" [min]="minDate">
+                                                        <mat-datepicker-toggle matSuffix
+                                                            [for]="Cnotename"></mat-datepicker-toggle>
+                                                        <mat-datepicker #Cnotename></mat-datepicker>
+                                                        <mat-error *ngIf="step2.get(subDetail.name).hasError('required')">
+                                                            {{subDetail.label+"is Required"}}
+                                                        </mat-error>
+                                                    </mat-form-field>
+    
+                                                    <!-- Dropdown -->
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="subDetail.type=='dropdown'">
+                                                        <mat-label>{{subDetail.label}}</mat-label>
+                                                        <mat-select [formControlName]="subDetail.name"
+                                                            (ngModelChange)="callActionFunction(subDetail.ActionFunction,$event)">
+                                                            <mat-option *ngFor="let option of subDetail.dropdown"
+                                                                [value]="option.CodeId">
+                                                                {{ option.CodeDesc }}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                        <mat-error *ngIf="step2.get(subDetail.name).hasError('required')">
+                                                            {{subDetail.label+"is Required"}}
+                                                        </mat-error>
+                                                    </mat-form-field>
+    
+                                                    <!--Toggale  -->
+                                                    <mat-checkbox class="example-margin"
+                                                        (change)="callActionFunction(subDetail.ActionFunction,$event)"
+                                                        color="primary" *ngIf="subDetail.type=='toggle'"
+                                                        [formControlName]="subDetail.name">{{subDetail.label}}</mat-checkbox>
+                                                    <!-- Auto dropdown for City -->
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="subDetail.type=='autodropdown'">
+                                                        <mat-label>{{subDetail.label}}</mat-label>
+                                                        <input matInput [formControlName]="subDetail.name"
+                                                            (input)="callActionFunction(subDetail.Search,$event)"
+                                                            autocomplete="off" [matAutocomplete]="city">
+                                                        <mat-autocomplete #city="matAutocomplete"
+                                                            [displayWith]="subDetail.name === 'Destination' ? displayCnotegropFn : displayCitygropFn"
+                                                            (optionSelected)="callActionFunction(subDetail.ActionFunction,$event)">
+                                                            <mat-option
+                                                                *ngFor="let option of subDetail.filteredOptions | async"
+                                                                [value]="option">
+                                                                {{subDetail.name === 'Destination' ? option.Value + ' -
+                                                                ' +
+                                                                option.Name : option.Value}}
+                                                            </mat-option>
+                                                        </mat-autocomplete>
+                                                    </mat-form-field>
+                                                    <!-- End -->
+                                                    <!-- <mat-slide-toggle  (change)="callActionFunction(step1Detail.ActionFunction,$event)" color="primary" *ngIf="step1Detail.type=='toggle'"
+                                                        [formControlName]="step1Detail.name">{{step1Detail.label}}</mat-slide-toggle> -->
+                                                </div>
+                                            </div>
+                                            <h4 class="card-title">Eway-Bill Details</h4>
+                                            <hr>
+                                            <div class="row">
+                                                <div [class]="divcol" *ngFor="let eBillDetail of EwayBillDetailSummary">
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="eBillDetail.type=='text' &&  eBillDetail.name !='DKTNO' ">
+                                                        <mat-label>{{eBillDetail.label}}</mat-label>
+                                                        <!-- <input matInput type="step1Detail.type"
+                                                            (ngModelChange)="callActionFunction(step1Detail.ActionFunction,$event)"
+                                                            [formControlName]="step1Detail.name" autocomplete="off"> -->
+                                                        <input matInput type="eBillDetail.type"
+                                                            (ngModelChange)="callActionFunction(eBillDetail.ActionFunction,$event)"
+                                                            [formControlName]="eBillDetail.name" autocomplete="off">
+                                                        <mat-error *ngIf="step2.get(eBillDetail.name).hasError('required')">
+                                                            {{eBillDetail.label+"is Required"}}
+                                                        </mat-error>
+                                                    </mat-form-field>
+                                                    <!-- End -->
+                                                    <!-- date -->
+    
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="eBillDetail.type=='date'">
+                                                        <mat-label>{{eBillDetail.label}}</mat-label>
+                                                        <input matInput [matDatepicker]="Cnotename"
+                                                            [formControlName]="eBillDetail.name" [min]="minDate">
+                                                        <mat-datepicker-toggle matSuffix
+                                                            [for]="Cnotename"></mat-datepicker-toggle>
+                                                        <mat-datepicker #Cnotename></mat-datepicker>
+                                                        <mat-error *ngIf="step2.get(eBillDetail.name).hasError('required')">
+                                                            {{eBillDetail.label+"is Required"}}
+                                                        </mat-error>
+                                                    </mat-form-field>
+    
+                                                    <!-- Dropdown -->
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="eBillDetail.type=='dropdown'">
+                                                        <mat-label>{{eBillDetail.label}}</mat-label>
+                                                        <mat-select [formControlName]="eBillDetail.name"
+                                                            (ngModelChange)="callActionFunction(eBillDetail.ActionFunction,$event)">
+                                                            <mat-option *ngFor="let option of eBillDetail.dropdown"
+                                                                [value]="option.CodeId">
+                                                                {{ option.CodeDesc }}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                        <mat-error *ngIf="step2.get(eBillDetail.name).hasError('required')">
+                                                            {{step2Detail.label+"is Required"}}
+                                                        </mat-error>
+                                                    </mat-form-field>
+    
+                                                    <!--Toggale  -->
+                                                    <mat-checkbox class="example-margin"
+                                                        (change)="callActionFunction(eBillDetail.ActionFunction,$event)"
+                                                        color="primary" *ngIf="eBillDetail.type=='toggle'"
+                                                        [formControlName]="eBillDetail.name">{{eBillDetail.label}}</mat-checkbox>
+                                                    <!-- Auto dropdown for City -->
+                                                    <mat-form-field class="example-full-width" appearance="outline"
+                                                        *ngIf="eBillDetail.type=='autodropdown'">
+                                                        <mat-label>{{eBillDetail.label}}</mat-label>
+                                                        <input matInput [formControlName]="eBillDetail.name"
+                                                            (input)="callActionFunction(eBillDetail.Search,$event)"
+                                                            autocomplete="off" [matAutocomplete]="city">
+                                                        <mat-autocomplete #city="matAutocomplete"
+                                                            [displayWith]="eBillDetail.name === 'Destination' ? displayCnotegropFn : displayCitygropFn"
+                                                            (optionSelected)="callActionFunction(eBillDetail.ActionFunction,$event)">
+                                                            <mat-option
+                                                                *ngFor="let option of eBillDetail.filteredOptions | async"
+                                                                [value]="option">
+                                                                {{eBillDetail.name === 'Destination' ? option.Value + ' -
+                                                                ' +
+                                                                option.Name : option.Value}}
+                                                            </mat-option>
+                                                        </mat-autocomplete>
+                                                    </mat-form-field>
+                                                    <!-- End -->
+                                                    <!-- <mat-slide-toggle  (change)="callActionFunction(step1Detail.ActionFunction,$event)" color="primary" *ngIf="step1Detail.type=='toggle'"
+                                                        [formControlName]="step1Detail.name">{{step1Detail.label}}</mat-slide-toggle> -->
+                                                </div>
+                                            </div>
                                             <hr>
                                             <div class="row" flex>
                                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
@@ -437,6 +617,18 @@
                                                                                     </select>
                                                                                 </div>
                                                                             </td>
+                                                                            <td *ngIf="isMultiple">
+                                                                                <button mat-icon-button color="primary"
+                                                                                    (click)="addField()"
+                                                                                    aria-label="Add">
+                                                                                    <mat-icon>add</mat-icon>
+                                                                                </button>
+                                                                                <button mat-icon-button color="warn"
+                                                                                    (click)="removeField(i)"
+                                                                                    aria-label="Remove">
+                                                                                    <mat-icon>remove</mat-icon>
+                                                                                </button>
+                                                                            </td>
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
@@ -450,7 +642,7 @@
                                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                                                     <div class="example-button-row d-flex justify-content-end">
                                                         <button class="msr-3" mat-raised-button color="primary"
-                                                            (click)="testing()" matStepperNext>Next</button>
+                                                            (click)="Onsubmit()" matStepperNext>Book Docket</button>
                                                     </div>
                                                 </div>
                                             </div>

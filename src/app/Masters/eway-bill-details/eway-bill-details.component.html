@@ -36,7 +36,10 @@
             <div class="row" *ngIf="!HideSubmit">
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                     <div class="example-button-row">
-                        <button class="msr-3" mat-raised-button="mat-raised-button" color="primary" (click)="onFetchData()">Next</button>
+                        <button class="msr-3" mat-raised-button="mat-raised-button"  [disabled]="isLoading" color="primary" (click)="onFetchData()">  <span *ngIf="!isLoading">Next</span>
+                        <span  *ngIf="isLoading" class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        <span *ngIf="isLoading">Loading...</span>
+                        </button>
                     </div>
                 </div>
 

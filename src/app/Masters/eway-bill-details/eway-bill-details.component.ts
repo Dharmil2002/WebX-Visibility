@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 
 @Component({
@@ -12,6 +13,7 @@ export class EwayBillDetailsComponent implements OnInit {
   EwayBill: FormGroup;
   FlagHide: boolean = false;
   HideSubmit: boolean = false;
+  isLoading:boolean = false;
   breadscrums = [
     {
       title: "Eway-bill Detail",
@@ -55,11 +57,11 @@ export class EwayBillDetailsComponent implements OnInit {
       })
     }
     catch (err) {
-
+          SwalerrorMessage("error","Not Data Found in Master or E-Way Bill","",true);
     }
   }
   onFetchData() {
-    debugger;
+    this.isLoading = true;
     this.ICnoteService.cnotePost('courses/ewaybill', this.EwayBill.value).subscribe({
       next: (res: any) => {
         if (res) {
@@ -82,17 +84,22 @@ export class EwayBillDetailsComponent implements OnInit {
       next: (res: any) => {
         if (res) {
           this.ContractDetails = res;
+          this.isLoading = false;
           if (res.MASTER.length > 0) {
             debugger;
             this.ServiceTypeDetail = res.MASTER.filter((x)=>x.CodeType=='SVCTYP');
            if( this.ServiceTypeDetail.length>1){
             this.FlagHide = true;
+             this.HideSubmit = true;
            }
            else{
             this.EwayBill.controls['SVCTYP'].setValue(this.ServiceTypeDetail[0].CodeId);
-           }
+            this.isLoading = true;
+            setTimeout(() => {
+             this.onSubmit();
+            }, 2000);
           }
-          this.HideSubmit = true;
+          }
 
         }
       }
@@ -100,7 +107,7 @@ export class EwayBillDetailsComponent implements OnInit {
   }
 
   onSubmit() {
-
+    this.isLoading=false;
     this.Route.navigate(['/Masters/Docket/EwayBillDocketBooking'], {
       state: { Ewddata: this.ewayBillDetail, contractDetail: this.ContractDetails,ServiceType:this.EwayBill.value.SVCTYP }
     })

@@ -1,0 +1,43 @@
+<section class="content">
+    <div class="container-fluid">
+        <div >
+            <div class="block-header">
+             
+            </div>
+        </div>
+        <!-- Basic Validation -->
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="card">
+                    <div class="header">
+                    </div>
+                    <div class="body">
+<form #myForm="ngForm" (ngSubmit)="onSubmit()">
+    <label for="username">Username:</label>
+    <input type="text" id="username"  [(ngModel)]="username" required>
+    
+    <label for="password">Password:</label>
+    <input type="password" id="password"  [(ngModel)]="password" required>
+    
+    <label for="customerId">Customer ID:</label>
+    <input type="text" id="customerId"  [(ngModel)]="customerId"  required>
+    
+    <label for="loginGSTIN">Login GSTIN:</label>
+    <input type="text" id="loginGSTIN" [(ngModel)]="loginGSTIN"  required>
+    
+    <label for="ewbNo">E-way Bill Number:</label>
+    <input type="text" id="ewbNo" [(ngModel)]="ewbNo" required>
+    
+    <label for="transGSTIN">Transporter GSTIN:</label>
+    <input type="text" id="transGSTIN"  [(ngModel)]="transGSTIN"  required>
+    
+    <label for="ewbDate">E-way Bill Date:</label>
+    <input type="text" id="ewbDate" [(ngModel)]="ewbDate" ngModel required>
+    
+    <button type="submit">Submit</button>
+  </form>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>

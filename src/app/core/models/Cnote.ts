@@ -289,3 +289,11 @@ export class DocketCharges {
    ActiveFlag: string;
    VarybyLoc: string;
 }
+export class Employee {  
+   photo: string;  
+   name: string;  
+   email: string;  
+   address: string;  
+   dob: string;  
+   gender: string;  
+}  

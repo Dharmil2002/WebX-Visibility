@@ -1,5 +1,5 @@
 import { DatePipe } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import {
   FormArray,
   FormGroup,
@@ -13,9 +13,14 @@ import { ResultchargeList } from "src/app/core/Json/OtherCharges";
 import {
   AutoCompleteCity,
   AutoCompleteCommon,
+  Cnote,
+  Dropdown,
+  prqVehicleReq,
+  Radio,
   RequestContractKeys,
 } from "src/app/core/models/Cnote";
 import { DocketChargesEntity, DocketEntity, DocketGstEntity, InvoiceEntity, StateDocumentDetailEntity, ViaCityDetailEntity } from "src/app/core/models/docketModel";
+import { DocketMongoDetails, InvoiceArray } from "src/app/core/models/Docketmongos";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { roundNumber, WebxConvert } from "src/app/Utility/commonfunction";
 import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
@@ -32,6 +37,8 @@ export class EwayBillDocketBookingComponent implements OnInit {
   step2: FormGroup;
   step2Formcontrol: any;
   DocketEntity = new DocketEntity();
+  DocketMongoDetails = new DocketMongoDetails();
+  pReqFilter: Observable<prqVehicleReq[]>;
   docketallocate = 'Alloted To';
   breadscrums = [
     {
@@ -40,6 +47,25 @@ export class EwayBillDocketBookingComponent implements OnInit {
       active: "CNoteGeneration",
     },
   ];
+  AppointmentBasedDelivery: Cnote[];
+  //Radio button propty
+  RadionAppoimentBasedDelivery: Radio[] = [{
+    label: "Yes",
+    value: "Y",
+    name: "IsAppointmentBasedDelivery"
+  },
+  {
+    label: "No",
+    value: "N",
+    name: "IsAppointmentBasedDelivery"
+  }
+  ]
+  isLinear = true;
+  ContainerDetails: Cnote[];
+  ContainerSize: Dropdown[];
+  ContainerType: Dropdown[];
+  ContainerCapacity: Dropdown[];
+  prqVehicleReq: prqVehicleReq[];
   Rules: any;
   InvoiceLevalrule: any;
   ServiceType: any;
@@ -48,6 +74,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   Tcity: any;
   cnoteAutoComplete: any;
   autofillflag: boolean;
+  isappointmentvisble: boolean;
   filteredCnoteBilling: Observable<any>;
   Consignor: any;
   Consignee: any;
@@ -80,6 +107,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   BasedOn1: any;
   BaseCode1: any;
   BasedOn2: any;
+  Vehicno: AutoCompleteCity[];
   BaseCode2: any;
   ContractDepth: string;
   DeliveryZone: any;
@@ -104,11 +132,14 @@ export class EwayBillDocketBookingComponent implements OnInit {
   DPHRate: any;
   IsDaccReadOnly: any;
   CcmServicesData: any;
+  AppointmentDetails: Cnote[];
+  DocketField: any;
   constructor(
     private ICnoteService: CnoteService,
     private fb: UntypedFormBuilder,
     private datePipe: DatePipe,
-    private Route: Router
+    private Route: Router,
+    private cdr: ChangeDetectorRef
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.EwayBillDetail =
@@ -121,7 +152,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
       this.showOtherContainer = true;
       this.showOtherAppointment = true;
     }
-    this.DocketBooking();
+    this.GetActiveGeneralMasterCodeListByTenantId();
   }
 
   // Call the appropriate function based on the given function name
@@ -154,6 +185,15 @@ export class EwayBillDocketBookingComponent implements OnInit {
       case "GetDestination":
         this.GetDestination();
         break;
+      case "Prqdetail":
+        this.prqVehicle();
+        break;
+      case "autoFill":
+        this.autoFill(event);
+        break
+      case "getVehicleNo":
+        this.getVehicleNo();
+        break;
       case "ServiceDetails":
         this.GetInvoiceConfigurationBasedOnTransMode();
         break;
@@ -169,6 +209,9 @@ export class EwayBillDocketBookingComponent implements OnInit {
       case "DocketValidation":
         this.DocketValidation();
         break;
+      case "displayedAppointment":
+        this.displayedAppointment();
+        break;
       default:
         break;
     }
@@ -181,7 +224,6 @@ export class EwayBillDocketBookingComponent implements OnInit {
     ).subscribe({
       next: (res: any) => {
         if (res) {
-          debugger;
           // Set the Rules variable to the first element of the response array
           this.Rules = res[0];
           this.step2Formcontrol = this.step2Formcontrol
@@ -200,6 +242,9 @@ export class EwayBillDocketBookingComponent implements OnInit {
               }
               return item;
             });
+          if (this.ServiceType) {
+            this.CNoteFieldChecked()
+          }
           this.step2Formcontrol = this.step2Formcontrol.filter(
             (x) => x.div != "InvoiceSummary" && x.Class != "EWBDetails"
           );
@@ -252,39 +297,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
             this.removeField(0);
           }
           this.step2.controls["RSKTY"].setValue("C");
-          // // Get the Invoice Level Contract Invoke rule and check if its default value is "Y"
-          // this.InvoiceLevalrule = this.Rules.find((x) => x.code == 'INVOICE_LEVEL_CONTRACT_INVOKE');
-          // if (this.InvoiceLevalrule.defaultvalue != "Y") {
-          //   // If the default value of the Invoice Level Contract Invoke rule is not "Y",
-          //   // filter out the step2Formcontrol items with div "InvoiceDetails" or dbCodeName "INVOICE_LEVEL_CONTRACT_INVOKE"
-          // }
-          // if (!this.ServiceType) { this.step1.controls['F_ODA'].disable(); }
 
-          // // Get the MAP_DLOC_PIN rule and USE_MAPPED_LOCATION_INCITY rule
-          // let Rules = this.Rules.find((x) => x.code == 'MAP_DLOC_PIN')
-          // let mapcityRule = this.Rules.find((x) => x.code == `USE_MAPPED_LOCATION_INCITY`)
-          // this.mapcityRule = mapcityRule.defaultvalue
-          // if (Rules.defaultvalue == "A") {
-          //   if (mapcityRule.defaultvalue === "Y") {
-          //     // If the default value of MAP_DLOC_PIN is "A" and USE_MAPPED_LOCATION_INCITY is "Y",
-          //     // disable the DELLOC control in step1
-          //     this.step1.controls['DELLOC'].disable();
-          //   }
-          // }
-          // else {
-          //   if (mapcityRule.defaultvalue === "Y") {
-          //     // If the default value of MAP_DLOC_PIN is not "A" and USE_MAPPED_LOCATION_INCITY is "Y",
-          //     // disable the DELLOC control in step1
-          //     this.step1.controls['DELLOC'].disable();
-          //   }
-
-          //   let ALLOWDEFAULTINVNODECLVAL = this.Rules.find(x => x.code == 'ALLOW_DEFAULT_INVNO_DECLVAL');
-          //   if (ALLOWDEFAULTINVNODECLVAL.defaultvalue == 'Y') {
-
-          //   }
-          //DKT_TAX_CONTROL_TYPE rule
-          //end
-          // }
         }
       },
     });
@@ -309,9 +322,16 @@ export class EwayBillDocketBookingComponent implements OnInit {
   step1Formgrop(): UntypedFormGroup {
     const formControls = {}; // Initialize an empty object to hold form controls
     this.step1Formcontrol = this.EwayBillField.filter((x) => x.frmgrp == "1");
+    this.DocketField = this.EwayBillField.filter((x) => x.div == "DocketField");
     this.Consignor = this.EwayBillField.filter((x) => x.div == "Consignor");
     // get all form controls belonging to Consignee section
     this.Consignee = this.EwayBillField.filter((x) => x.div == "Consignee");
+    // get all form controls belonging to Appointment Based Delivery section
+    this.AppointmentBasedDelivery = this.EwayBillField.filter((x) => x.div == 'AppointmentBasedDelivery')
+    // get all form controls belonging to Appointment Details section
+    this.AppointmentDetails = this.EwayBillField.filter((x) => x.div == 'AppointmentDetails');
+    // define dropdown options for certain form controls in Container Details section
+
     // Filter the form data to get only the controls for step 1
     // Loop through the step 1 form controls and add them to the form group
     if (this.step1Formcontrol.length > 0) {
@@ -321,13 +341,17 @@ export class EwayBillDocketBookingComponent implements OnInit {
           // If the control is required, add a required validator
           validators = [Validators.required];
         }
-
+        this.containorDropdown()
         // Add the control to the form group, using its default value (or the current date if it is a 'TodayDate' control) and any validators
         formControls[cnote.name] = this.fb.control(
           cnote.defaultvalue == "TodayDate" ? new Date() : cnote.defaultvalue,
           validators
         );
+        if (!cnote.enable) {
+          formControls[cnote.name].disable();
+        }
       });
+
       // Create and return the FormGroup, using the form controls we just created
       return this.fb.group(formControls);
     }
@@ -802,7 +826,11 @@ export class EwayBillDocketBookingComponent implements OnInit {
     return Cnotegrop && Cnotegrop.Value ? Cnotegrop.Value : "";
   }
   ngOnInit(): void {
-    this.getRules();
+    setTimeout(() => {
+      this.getRules();
+
+    }, 3000);
+
   }
   //GetDestination
   GetDestination() {
@@ -1120,7 +1148,6 @@ export class EwayBillDocketBookingComponent implements OnInit {
 
   //E-wayBillDetail
   EwayBillDetailAutoFill() {
-    debugger;
     let fromcity = {
       Name: this.EwayBillDetail[0][1].Consignor.city || "",
       Value: this.EwayBillDetail[0][1].Consignor.city || "",
@@ -1157,8 +1184,8 @@ export class EwayBillDocketBookingComponent implements OnInit {
       Value: this.EwayBillDetail[0][0].data?.toPlace || "",
     };
     let Consignee = {
-      Name: this.EwayBillDetail[0][0].data?.toTrdName || "",
-      Value: this.EwayBillDetail[0][0].data?.toTrdName || "",
+      Name: this.EwayBillDetail[1].Consginee?.CUSTNM || "",
+      Value: this.EwayBillDetail[1].Consginee?.CUSTCD || "",
     };
     let Pincode = {
       Name: this.EwayBillDetail[0][0].data?.toPlace || "",
@@ -1174,9 +1201,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
     this.step2.controls["TotalDeclaredValue"].setValue(
       this.EwayBillDetail[0][0]?.data.totalValue || 0
     );
-    this.step2.controls["OrgLoc"].setValue(
-      this.EwayBillDetail[0][1].Consignor.city
-    );
+
     this.step1.controls["ConsigneeMobNo"].setValue(
       this.EwayBillDetail[1].Consginee.MOBILENO || ""
     );
@@ -1224,8 +1249,28 @@ export class EwayBillDocketBookingComponent implements OnInit {
     this.step2.controls["TotalChargedNoofPackages"].setValue(noofpkg);
     this.GetDestinationDataCompanyWise();
     this.GetInvoiceConfigurationBasedOnTransMode();
+    this.GetLocationDetail();
     //let setSVCTYPE = this.step1Formcontrol.find((x) => x.name == 'SVCTYP').dropdown;
     //this.step1.controls['SVCTYP'].setValue(setSVCTYPE.find((x) => x.CodeDesc == this.ServiceType).CodeId);
+  }
+  GetLocationDetail() {
+    let req = {
+      companyCode: parseInt(localStorage.getItem('companyCode')),
+      locName: this.EwayBillDetail[0][1].Consignor.city
+    }
+    this.ICnoteService.cnotePost("services/GetLocationDetails", req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.step2.controls["OrgLoc"].setValue(
+            res.result[0].Value + ':' + res.result[0].Name
+          );
+        }
+        else {
+          SwalerrorMessage("error", "Location is Not Available in Masters", "", true);
+        }
+      }
+    })
+
   }
   //DestionationMapping
   GetDestinationDataCompanyWise() {
@@ -1483,353 +1528,639 @@ export class EwayBillDocketBookingComponent implements OnInit {
       this.isMultiple = false;
     }
   }
-
-  //Docket Booking
-  Onsubmit() {
-    debugger
-    if (this.IsDocketEdit == "Y") {
-
+  CNoteFieldChecked() {
+    let ServiceType = this.step2Formcontrol.filter((x) => x.name == 'SVCTYP')[0].dropdown.filter((x) => x.CodeId == this.ServiceType)[0].CodeDesc
+    if (ServiceType == 'FTL') {
+      const excludedValues = ['DKTNO', 'ContainerDetails', 'AppointmentBasedDelivery'];
+      this.EwayBillField = this.EwayBillField.filter((x) => !excludedValues.includes(x.name) && !excludedValues.includes(x.div));
+      this.showOtherContainer = false;
+      this.showOtherAppointment = false;
     }
-    else if (this.IsQuickCompletion == "Y") {
-
+    else if (ServiceType == 'LTL') {
+      const excludedValues = ['DKTNO', 'PRQ', 'IsMarketVehicle', 'F_ODA', 'F_LOCAL', 'VEHICLE_NO', 'F_MDEL', 'F_MPKP', 'SRCDKT'];
+      this.EwayBillField = this.EwayBillField.filter((x) => !excludedValues.includes(x.name) && !excludedValues.includes(x.div));
+      this.containorDropdown();
+      this.showOtherContainer = true;
+      this.showOtherAppointment = true;
+    }
+    else if (ServiceType == 'FCL') {
+      const excludedValues = ['F_LOCAL', 'VEHICLE_NO', 'F_MDEL', 'F_MPKP', 'SRCDKT', 'AppointmentBasedDelivery'];
+      this.EwayBillField = this.EwayBillField.filter((x) => !excludedValues.includes(x.name) && !excludedValues.includes(x.div));
+      this.showOtherAppointment = false;
+    }
+  }
+  //displayedAppointment
+  displayedAppointment() {
+    this.isappointmentvisble = this.step1.controls['IsAppointmentBasedDelivery'].value == 'Y' ? true : false;
+    if (this.isappointmentvisble) {
+      this.AppointmentDetails.forEach((x) => {
+        this.step1.controls[x.name].setValidators(Validators.required)
+        this.step1.controls[x.name].updateValueAndValidity()
+      })
     }
     else {
-      this.DocketEntity.ContractId = this.step1.controls['billingParty']?.value.ContractId || "";
-      this.DocketEntity.FromCity = this.step1.controls['FromCity']?.value.Value || '';
-      this.DocketEntity.ToCity = this.step1.controls['ToCity']?.value.Value || '';
-      this.DocketEntity.Destination = this.step1.controls['Destination']?.value.Value || '';
-      this.DocketEntity.PrqNumber = this.step1.controls['PRQ']?.value.PRQNO || '';
-      this.DocketEntity.DocketNumber = this.step1.controls['DKTNO']?.value || '';
-      this.DocketEntity.DocketDate = this.step1.controls['cnoteDate']?.value || new Date();
-      this.DocketEntity.PackagingType = this.step2.controls['PKGS']?.value || '';
-      this.DocketEntity.ProductType = this.step2.controls['TRN']?.value || '';
-      this.DocketEntity.ServiceType = this.step2.controls['SVCTYP']?.value || '';
-      this.DocketEntity.TransportMode = this.step2.controls['TRN']?.value || '';
-      this.DocketEntity.FtlType = this.step2.controls['FTLTYP']?.value || '';
-      this.DocketEntity.IsMarketVehicle = this.step1.controls['IsMarketVehicle']?.value || null;
-      this.DocketEntity.VehicleNo = this.step1.controls['VEHICLE_NO']?.value || '';
-      this.DocketEntity.IsOda = this.step2.controls['ODA']?.value || null;
-      this.DocketEntity.IsLocalCNote = this.step2.controls['Local']?.value || null;
-      this.DocketEntity.Division = this.step2.controls['DIV']?.value || ''
-      this.DocketEntity.SpecialInstructions = this.step2.controls['RMRK']?.value || ''
-      this.DocketEntity.BusinessType = this.step2.controls['BUT']?.value || ''
-      this.DocketEntity.IsMutidelivery = this.step1.controls['F_MDEL']?.value || null;
-      this.DocketEntity.IsMutipickup = this.step1.controls['F_MPKP']?.value || null;
-      this.DocketEntity.SourceCNote = this.step1.controls['SRCDKT']?.value || '';
-      this.DocketEntity.ConsignorCode = this.step1.controls['ConsignorName']?.value.Value || '';
-      this.DocketEntity.ConsignorName = this.step1.controls['ConsignorName']?.value.Name || '';
-      this.DocketEntity.ConsignorCity = this.step1.controls['ConsignorCity']?.value.Value || '';
-      this.DocketEntity.ConsignorPinCode = this.step1.controls['ConsignorPinCode']?.value.Value || '';
-      this.DocketEntity.ConsignorTelephoneNo = this.step1.controls['ConsignorTelNo']?.value || '';
-      this.DocketEntity.ConsignorMobileNo = this.step1.controls['ConsignorMobNo']?.value || '';
-      this.DocketEntity.IsConsignorFromMasterOrWalkin = this.step1.controls['IsConsignorFromMasterOrWalkin']?.value || null;
-      this.DocketEntity.ConsigneeName = this.step1.controls['ConsigneeName']?.value.Name || '';
-      this.DocketEntity.ConsigneeCity = this.step1.controls['ConsigneeCity']?.value.Value || '';
-      this.DocketEntity.ConsigneeGstin = this.step1.controls['ConsigneeGSTINNO']?.value || '';
-      this.DocketEntity.ConsigneeMobileNo = this.step1.controls['ConsigneeMobNo']?.value || '';
-      this.DocketEntity.ConsigneeEmail = this.step1.controls['CST_EMAIL']?.value || '';
-      this.DocketEntity.ConsigneeTinNumber = this.step1.controls['CST_TIN']?.value || '';
-      this.DocketEntity.ConsigneeCstNumber = this.step1.controls['CST_CST']?.value || '';
-      this.DocketEntity.ConsigneeTelephoneNo = this.step1.controls['ConsigneeTelNo']?.value || '';
-      this.DocketEntity.ConsigneePinCode = this.step1.controls['ConsigneePinCode']?.value.Value || '';
-      this.DocketEntity.ConsigneeCity = this.step1.controls['ConsigneeCity']?.value.Value || '';
-      this.DocketEntity.ConsigneeAddress = this.step1.controls['ConsigneeAddress']?.value || '';
-      this.DocketEntity.RiskType = this.step2.controls['RSKTY']?.value || '';
-      this.DocketEntity.CustomerRefNo = this.step2.controls['CTR_NO']?.value || '';
-      this.DocketEntity.IsAppointmentBasedDelivery = this.step2.controls['IsAppointmentBasedDelivery']?.value || ''
-      this.DocketEntity.AppointmentDate = this.step2.controls['AppointmentDate']?.value || ''
-      this.DocketEntity.NameOfPerson = this.step2.controls['NameOfPerson']?.value;
-      this.DocketEntity.AppointmentContactNumber = this.step2.controls['AppointmentContactNumber']?.value;
-      this.DocketEntity.AppointmentRemarks = this.step2.controls['Remarks']?.value;
-      this.DocketEntity.AppointmentFromTime = this.step2.controls['AppointmentFromTime']?.value;
-      this.DocketEntity.AppointmentToTime = this.step2.controls['AppointmentToTime']?.value || ' '
-      this.DocketEntity.ContainerNo1 = this.step2.controls['ContainerNo1']?.value || '';
-      this.DocketEntity.ContainerNo2 = this.step2.controls['ContainerNo2']?.value || '';
-      this.DocketEntity.ContainerSize1 = this.step2.controls['ContainerSize1']?.value || '';
-      this.DocketEntity.ContainerSize2 = this.step2.controls['ContainerSize2']?.value || '';
-      this.DocketEntity.ContainerField1 = this.step2.controls['FIELD1']?.value || "";
-      this.DocketEntity.ContainerField2 = this.step2.controls['FIELD2']?.value || "";
-      this.DocketEntity.ContainerField3 = this.step2.controls['FIELD3']?.value || "";
-      this.DocketEntity.ContainerField4 = this.step2.controls['FIELD4']?.value || "";
-      this.DocketEntity.ContainerField5 = this.step2.controls['FIELD5']?.value || "";
-      this.DocketEntity.ContainerField6 = this.step2.controls['FIELD6']?.value || "";
-      this.DocketEntity.ContainerField7 = this.step2.controls['FIELD7']?.value || "";
-      this.DocketEntity.ContainerField8 = this.step2.controls['FIELD8']?.value || "";
-      this.DocketEntity.ContainerField9 = this.step2.controls['FIELD9']?.value || "";
-      this.DocketEntity.IsVolumetric = this.step2.controls['F_VOL']?.value || null;
-      this.DocketEntity.CftTotal = this.step2.controls['CFT_TOT']?.value || 0;
-      this.DocketEntity.VolRatio = this.step2.controls['CFT_RATIO']?.value || 0;
-      this.DocketEntity.TotalChargedWeight = this.step2.controls['CHRGWT']?.value || 0;
-      this.DocketEntity.TotalChargedNoofPackages = this.step2.controls['TotalChargedNoofPackages']?.value || 0;
-      this.DocketEntity.TotalDeclaredValue = this.step2.controls['TotalDeclaredValue']?.value || 0;
-      this.DocketEntity.TotalActualWeight = this.step2.value.invoiceArray.reduce((total, item) => total + item.ActualWeight, 0);
-      this.DocketEntity.ChargedKM = this.step2.controls['ChargedKM']?.value || 0;
-      this.DocketEntity.TotalPartQuantity = this.step2.controls['TotalPartQuantity']?.value || 0;
-      this.DocketEntity.EddDate = this.step2.controls['EDD']?.value || new Date();
-      let newInvoicesList: InvoiceEntity[] = [];
+      this.AppointmentDetails.forEach((x) => {
+        this.step1.controls[x.name].clearValidators()
+        this.step1.controls[x.name].updateValueAndValidity()
+      })
+    }
+  }
+  // Function to retrieve PRQ vehicle request
+  prqVehicle() {
+    // Check if PRQ value length is greater than 1
+    if (this.step2.controls['PRQ'].value.length > 1) {
+      // Define request parameters
+      let req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        BranchCode: localStorage.getItem("Branch"),
+        SearchText: this.step2.controls['PRQ'].value
+      };
+      // Send POST request to retrieve PRQ vehicle request
+      this.ICnoteService.cnotePost('services/prqVehicleReq', req).subscribe({
+        next: (res: any) => {
+          // Save retrieved PRQ vehicle request
+          this.prqVehicleReq = res;
+          // Filter PRQ vehicle request for display
+          this.prqVehicleFilter();
+        }
+      })
+    }
+  }
 
-      this.step2.value.invoiceArray.forEach(z => {
-        let newInvoice: InvoiceEntity = {
-          EwbNumber: z.EWBNO,
-          EWBDate: z.EWBDATE,
-          InvoiceNo: z.INVNO,
-          InvoiceDate: z.INVDT,
-          Length: z.LENGTH,
-          Height: z.HEIGHT,
-          Breadth: z.BREADTH,
-          DeclaredValue: z.DECLVAL,
-          NoOfPackages: z.NO_PKGS,
-          CubicWeight: z.CUB_WT,
-          ActualWeight: z.ACT_WT,
-          Product: z.Invoice_Product,
-          HsnCode: z.HSN_CODE,
-          PartNumber: '',
-          PartDescription: '',
-          PartQuantity: 0.0,
-          TypeofPackage: '',
-          ChargedWeight: 0,
-          FreightRate: 0,
-          RateType: '',
-          FreightAmount: 0,
-          EWBExpiredDate: z.EWBEXPIRED,
-          Contents: ''
-        };
+  // Filters PRQ vehicle based on user input
+  prqVehicleFilter() {
+    // Create a pipe to listen for changes in the PRQ control
+    this.pReqFilter = this.step2.controls["PRQ"].valueChanges.pipe(
+      startWith(""), // Start with an empty string
+      map((value) => (typeof value === "string" ? value : value.Name)), // Map to the control's value
+      map((Name) =>
+        // Filter the PRQ vehicles based on user input
+        Name ? this._PrqFilter(Name) : this.prqVehicleReq.slice()
+      )
+    );
+  }
 
-        newInvoicesList.push(newInvoice);
-      });
+  // Helper function to filter PRQ vehicles
+  _PrqFilter(prqVehicleReq: string): prqVehicleReq[] {
+    const filterValue = prqVehicleReq.toLowerCase();
 
-      this.DocketEntity.Invoices = newInvoicesList;
-      this.DocketEntity.DocketOtherCharges = ResultchargeList;
-      this.DocketEntity.FOVCalculated = this.step2.controls['FOVCalculated']?.value || 0;
-      this.DocketEntity.FOVCharged = this.step2.controls['FOVCharged']?.value || 0;
-      this.DocketEntity.FOVRate = this.step2.controls['FOVRate']?.value || 0;
-      this.DocketEntity.FreightRateType = this.step2.controls['FreightRateType']?.value || '';
-      this.DocketEntity.DiscountRate = this.step2.controls['DiscountRate']?.value || 0;
-      this.DocketEntity.DiscountAmount = this.step2.controls['DiscountAmount']?.value || 0;
-      this.DocketEntity.EeddDate = this.step2.controls['EEDD']?.value || '';
-      this.DocketEntity.CODDODCharged = this.step2.controls['CODDODCharged']?.value || 0;
-      this.DocketEntity.CODDODTobeCollected = this.step2.controls['CODDODTobeCollected']?.value || 0;
-      this.DocketEntity.IsCodDod = this.step2.controls['F_COD']?.value || null;
-      this.DocketEntity.BasedOn1 = this.BaseCode1 ? this.BaseCode1 : '';
-      this.DocketEntity.BasedOn2 = this.BasedOn2 ? this.BasedOn2 : '';
-      this.DocketEntity.UseFrom = this.UseFrom ? this.UseFrom : '';
-      this.DocketEntity.Origin = 'MUMB';
-      this.DocketEntity.UseTo = this.UseTo ? this.UseTo : '';
-      this.DocketEntity.UseTransMode = this.UseTransMode ? this.UseTransMode : '';
-      this.DocketEntity.UseRateType = this.UseRateType ? this.UseRateType : '';
-      this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal ? this.ChargeWeightToHighestDecimal : '';
-      this.DocketEntity.ContractDepth = this.ContractDepth ? this.ContractDepth : '';
-      this.DocketEntity.ProceedDuringEntry = this.ProceedDuringEntry ? this.ProceedDuringEntry : '';
-      this.DocketEntity.BaseCode1 = this.BaseCode1 ? this.BaseCode1 : '';
-      this.DocketEntity.BaseCode2 = this.BaseCode2 ? this.BaseCode2 : '';
-      this.DocketEntity.FlagCutoffApplied = this.FlagCutoffApplied ? this.FlagCutoffApplied : '';
-      this.DocketEntity.FlagHolidayApplied = this.FlagHolidayApplied ? this.FlagHolidayApplied : '';
-      this.DocketEntity.FlagHolidayBooked = this.FlagHolidayBooked ? this.FlagHolidayBooked : '';
-      this.DocketEntity.DeliveryZone = this.DeliveryZone ? this.DeliveryZone : '';
-      this.DocketEntity.DestDeliveryPinCode = this.DestDeliveryPinCode ? this.DestDeliveryPinCode : '';
-      this.DocketEntity.DestDeliveryArea = this.DestDeliveryArea ? this.DestDeliveryArea : '';
-      this.DocketEntity.PincodeZoneLocation = this.PincodeZoneLocation ? this.PincodeZoneLocation : '';
-      //GSTDETAILS
-      let GstDetails = new DocketGstEntity();
-      GstDetails.IsGSTExempted = false
-      GstDetails.ExemptionCategory = ''
-      GstDetails.GstPartyName = ''
-      GstDetails.GstPartyCode = ''
-      GstDetails.ServiceCodeDetails = ''
-      GstDetails.ServiceCode = ''
-      GstDetails.StateOfSupply = ''
-      GstDetails.PlaceOfSupply = ''
-      GstDetails.Gstin = ''
-      GstDetails.Address = ''
-      GstDetails.BilledAt = ''
-      GstDetails.DocketSubTotal = 0.00
-      GstDetails.ActualGSTRate = 0.00
-      GstDetails.GSTRate = 0.00
-      GstDetails.RcmApplicableActual = ''
-      GstDetails.RcmApplicable = ''
-      GstDetails.RcmApplicableText = ''
-      GstDetails.GSTCharged = 0.00
-      GstDetails.DocketTotal = 0.00
-      GstDetails.RoundOffDifference = 0.00
-      GstDetails.GSTRemark = ''
-      GstDetails.EnableGSTRCMLogic = ''
-      GstDetails.SacCode = ''
-      GstDetails.SacCategory = ''
-      GstDetails.VATRate = 0.00
-      GstDetails.TaxControlType = ''
-      this.DocketEntity.GstDetails = GstDetails;
-      this.DocketEntity.EntryBy = 'Dhaval'
-      this.DocketEntity.CompanyCode = parseInt(localStorage.getItem("companyCode"))
-      this.DocketEntity.IsConsigneeFromMasterOrWalkin = this.step2.controls['IsConsigneeFromMasterOrWalkin']?.value || '';
-      this.DocketEntity.ConsigneeCode = '8888'//this.step1.controls['ConsigneeName']?.value.Value || ''
-      // this.DocketEntity.EntryTypes = this.DocketEntity.EntryTypes;
-      //End
-      if (!this.DocketEntity.StateDocumentDetails) {
-        this.DocketEntity.StateDocumentDetails = [];
+    // Filter the PRQ vehicles whose PRQ number starts with the user input
+    return this.prqVehicleReq.filter(
+      (option) => option.PRQNO.toLowerCase().indexOf(filterValue) === 0
+    );
+  }
+
+  // Display function for PRQ number and vehicle number
+  displayPRQNoFn(Cnotegrop: prqVehicleReq): string {
+    return Cnotegrop && Cnotegrop.PRQNO ? Cnotegrop.PRQNO + ':' + Cnotegrop.VehicleNo : "";
+  }
+
+
+  autoFill(event) {
+    //VehicleAutoFill
+    let VehicleNo = {
+      Value: event.option.value.VehicleNo,
+      Name: event.option.value.VehicleNo,
+      Division: ""
+    }
+    this.step2.controls['VEHICLE_NO'].setValue(VehicleNo);
+    //end
+    //Billing PartyAuto
+    let billingParty = {
+      Value: event.option.value.PARTY_CODE,
+      Name: event.option.value.PARTYNAME
+    }
+    this.step1.controls['billingParty'].setValue(billingParty);
+    this.autofillflag = true
+    //this.getBillingPartyAutoComplete('PRQ_BILLINGPARTY')
+    //end
+    //consginer
+    let consginer = {
+      Value: event.option.value.CSGNCD,
+      Name: event.option.value.CSGNNM
+    }
+    this.step1.controls['ConsignorName'].setValue(consginer);
+    //
+    //address
+    this.step1.controls['ConsignorAddress'].setValue(event.option.value.CSGNADDR);
+    //end
+    //telephone
+    this.step1.controls['ConsignorTelNo'].setValue(event.option.value.CSGNTeleNo);
+    //end
+    //FromCity
+    let FromCity = {
+      Value: event.option.value.FROMCITY,
+      Name: event.option.value.FROMCITY,
+      LOCATIONS: "",
+      CITY_CODE: "",
+    }
+    this.step1.controls['FromCity'].setValue(FromCity);
+    //end
+    //ToCity
+    let toCity = {
+      Value: event.option.value.TOCITY,
+      Name: event.option.value.TOCITY,
+      LOCATIONS: "",
+      CITY_CODE: "",
+    }
+    this.step1.controls['ToCity'].setValue(toCity);
+    //end
+    //Paybas
+    this.step2.controls['PAYTYP'].setValue(event.option.value.Paybas == null ? this.step1.controls['PAYTYP'].value : event.option.value.Paybas);
+    //end
+
+    //FTLTYP
+    this.step2.controls['SVCTYP'].setValue(event.option.value.FTLValue == null ? this.step1.controls['SVCTYP'].value : event.option.value.FTLValue);
+    //end
+
+    //Road
+    this.step2.controls['TRN'].setValue(event.option.value.TransModeValue == null ? this.step1.controls['TRN'].value : event.option.value.TransModeValue);
+    //end
+
+    //Destination
+    this.GetDestinationDataCompanyWise();
+    //end
+
+    //PKGS
+    this.step2.controls['PKGS'].setValue(event.option.value.pkgsty == null ? this.step1.controls['PKGS'].value : event.option.value.pkgsty)
+    //end
+
+    //PICKUPDELIVERY
+    // this.step2.controls['PKPDL'].setValue(event.option.value.pkp_dly == null ? this.step1.controls['PKPDL'].value : event.option.value.pkp_dly);
+    //end
+
+    //PROD
+    // this.step2.controls['PROD'].setValue(event.option.value.prodcd == null ? this.step1.controls['PROD'].value : event.option.value.prodcd);
+    //end
+    //ConsigneeCST_NM
+    let ConsigneeCST_NM = {
+      Name: event.option.value.CSGENM,
+      Value: event.option.value.CSGECD,
+    }
+    this.step1.controls['ConsigneeName'].setValue(ConsigneeCST_NM);
+    //end
+
+    //ConsigneeCST_ADD
+    this.step1.controls['ConsigneeAddress'].setValue(event.option.value.CSGEADDR);
+    //end
+    //ConsigneeCST_PHONE
+    this.step1.controls['ConsigneeTelNo'].setValue(event.option.value.CSGETeleNo);
+    //end
+
+    //step 3 
+    const invoiceArray = this.step2.value.invoiceArray.map(x => ({
+      ...x,
+      ACT_WT: event.option.value.ATUWT || x.ACT_WT,
+      NO_PKGS: event.option.value.PKGSNO || x.NO_PKGS
+    }));
+    this.step2.get('invoiceArray').setValue(invoiceArray);
+    this.cdr.detectChanges();
+    this.CalculateInvoiceTotal();
+    //
+
+    //call api GetPrqInvoiceList
+    this.GetPrqInvoiceList();
+    //end
+
+  }
+  getVehicleNo() {
+    // Check if the length of VEHICLE_NO value in step1 is greater than 1
+    if (this.step1.controls['VEHICLE_NO'].value.length > 1) {
+      // Create a request object with required parameters
+      let req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        SearchText: this.step1.controls['VEHICLE_NO'].value,
+        VendorCode: "",
+        VehicleType: "Toll",
+        IsCheck: 0
+      };
+      // Call cnotePost method from ICnoteService with endpoint 'services/GetVehicle' and request object
+      this.ICnoteService.cnotePost('services/GetVehicle', req).subscribe(
+        // Handle the response from server
+        {
+          next: (res: any) => {
+            // Assign the response to Vehicno property
+            this.Vehicno = res;
+            // Call getCityFilter() method to update the autocomplete options
+            this.getCityFilter();
+          }
+        }
+      );
+    }
+  }
+
+  //GetPrqInvoiceList
+  GetPrqInvoiceList() {
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      PrqNumber: this.step2.controls['PRQ'].value.PRQNO
+    }
+
+    this.ICnoteService.cnotePost('services/GetPrqInvoiceList', req).subscribe(
+      {
+        next: (res: any) => {
+          let prqinvoiceDetail = res.result;
+          this.step2.get('invoiceArray').setValue(
+            this.step2.value.invoiceArray.map(x => ({ ...x, INVDT: prqinvoiceDetail[0].InvoiceDate ? new Date(prqinvoiceDetail[0].InvoiceDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10) }))
+          );
+          this.step2.controls['CHRGWT'].setValue(prqinvoiceDetail[0].ChargedWeight);
+        }
+      })
+  }
+  GetActiveGeneralMasterCodeListByTenantId() {
+    // Dropdown values to fetch
+    let dropdown = ["CNTSIZE", "CONTTYP", "CONTCAP"]
+
+    try {
+      let req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        ddArray: dropdown
       }
-      let newDoc = new StateDocumentDetailEntity();
-      newDoc.DocSrno = '';
-      newDoc.DocumentName = '';
-      newDoc.EnclosedDocumentNumber = '';
-      newDoc.IsRequired = '';
-      newDoc.IsStaxExmpt = '';
-      newDoc.StateCode = '';
-      newDoc.StateName = '';
 
-      this.DocketEntity.StateDocumentDetails.push(newDoc);
-      if (!this.DocketEntity.ViaCityDetails) {
-        this.DocketEntity.ViaCityDetails = [];
+      // Fetch dropdown values using API
+      this.ICnoteService.cnotePost('services/GetcommonActiveGeneralMasterCodeListByTenantId', req).subscribe({
+        next: (res: any) => {
+          // Set ContainerSize, ContainerType, and ContainerCapacity arrays with filtered results
+          this.ContainerSize = res.result.filter((x) => x.CodeType == 'CNTSIZE')
+          this.ContainerType = res.result.filter((x) => x.CodeType == 'CONTTYP')
+          this.ContainerCapacity = res.result.filter((x) => x.CodeType == 'CONTCAP')
+
+          // Check if CnoteData is already present in local storage
+            // If not present, get Cnote controls
+            this.DocketBooking();
+         
+        },
+        error:(err)=>{
+          this.DocketBooking();
+        }
+      })
+    }
+    catch (err) {
+      // Handle error
+    }
+  }
+
+    Onsubmit() {
+      if (this.IsDocketEdit == "Y") {
+  
       }
-      let CityDetailEntity: ViaCityDetailEntity = new ViaCityDetailEntity();
-      CityDetailEntity.Address = ''
-      CityDetailEntity.ContactNumber = ''
-      CityDetailEntity.ContactPerson = ''
-      CityDetailEntity.ViaCity = ''
-
-      this.DocketEntity.ViaCityDetails.push(CityDetailEntity);
-      if (this.step2.value.BcSeries != null) {
-        for (const item of this.step2.value.BcSeries) {
-          if (!!item.From && !!item.To) {
-            let from = 0, to = 0;
-            let numlen: number;
-            let arrfrom: string[], arrto: string[];
-            let numstrfrom = '', numstrto = '', alfafrom = '', alfato = '', bcserialno = '';
-            arrfrom = item.From.split('');
-            arrto = item.To.split('');
-            for (let j = 0; j < arrfrom.length; j++) {
-              const charCode = arrfrom[j].charCodeAt(0);
-              if (charCode > 47 && charCode < 58) {
-                numstrfrom = numstrfrom + arrfrom[j];
-                numstrto = numstrto + arrto[j];
-              } else {
-                alfafrom = alfafrom + arrfrom[j];
-                alfato = alfato + arrto[j];
+      else if (this.IsQuickCompletion == "Y") {
+  
+      }
+      else {
+        this.DocketEntity.ContractId = this.step1.controls['billingParty']?.value.ContractId || "";
+        this.DocketEntity.FromCity = this.step1.controls['FromCity']?.value.Value || '';
+        this.DocketEntity.ToCity = this.step1.controls['ToCity']?.value.Value || '';
+        this.DocketEntity.Destination = this.step1.controls['Destination']?.value.Value || '';
+        this.DocketEntity.PrqNumber = this.step1.controls['PRQ']?.value.PRQNO || '';
+        this.DocketEntity.DocketNumber = this.step1.controls['DKTNO']?.value || '';
+        this.DocketEntity.DocketDate = this.step1.controls['cnoteDate']?.value || new Date();
+        this.DocketEntity.PackagingType = this.step2.controls['PKGS']?.value || '';
+        this.DocketEntity.ProductType = this.step2.controls['TRN']?.value || '';
+        this.DocketEntity.ServiceType = this.step2.controls['SVCTYP']?.value || '';
+        this.DocketEntity.TransportMode = this.step2.controls['TRN']?.value || '';
+        this.DocketEntity.FtlType = this.step2.controls['FTLTYP']?.value || '';
+        this.DocketEntity.IsMarketVehicle = this.step1.controls['IsMarketVehicle']?.value || null;
+        this.DocketEntity.VehicleNo = this.step1.controls['VEHICLE_NO']?.value || '';
+        this.DocketEntity.IsOda = this.step2.controls['ODA']?.value || null;
+        this.DocketEntity.IsLocalCNote = this.step2.controls['Local']?.value || null;
+        this.DocketEntity.Division = this.step2.controls['DIV']?.value || ''
+        this.DocketEntity.SpecialInstructions = this.step2.controls['RMRK']?.value || ''
+        this.DocketEntity.BusinessType = this.step2.controls['BUT']?.value || ''
+        this.DocketEntity.IsMutidelivery = this.step1.controls['F_MDEL']?.value || null;
+        this.DocketEntity.IsMutipickup = this.step1.controls['F_MPKP']?.value || null;
+        this.DocketEntity.SourceCNote = this.step1.controls['SRCDKT']?.value || '';
+        this.DocketEntity.ConsignorCode = this.step1.controls['ConsignorName']?.value.Value || '';
+        this.DocketEntity.ConsignorName = this.step1.controls['ConsignorName']?.value.Name || '';
+        this.DocketEntity.ConsignorCity = this.step1.controls['ConsignorCity']?.value.Value || '';
+        this.DocketEntity.ConsignorPinCode = this.step1.controls['ConsignorPinCode']?.value.Value || '';
+        this.DocketEntity.ConsignorTelephoneNo = this.step1.controls['ConsignorTelNo']?.value || '';
+        this.DocketEntity.ConsignorMobileNo = this.step1.controls['ConsignorMobNo']?.value || '';
+        this.DocketEntity.IsConsignorFromMasterOrWalkin = this.step1.controls['IsConsignorFromMasterOrWalkin']?.value || null;
+        this.DocketEntity.ConsigneeName = this.step1.controls['ConsigneeName']?.value.Name || '';
+        this.DocketEntity.ConsigneeCity = this.step1.controls['ConsigneeCity']?.value.Value || '';
+        this.DocketEntity.ConsigneeGstin = this.step1.controls['ConsigneeGSTINNO']?.value || '';
+        this.DocketEntity.ConsigneeMobileNo = this.step1.controls['ConsigneeMobNo']?.value || '';
+        this.DocketEntity.ConsigneeEmail = this.step1.controls['CST_EMAIL']?.value || '';
+        this.DocketEntity.ConsigneeTinNumber = this.step1.controls['CST_TIN']?.value || '';
+        this.DocketEntity.ConsigneeCstNumber = this.step1.controls['CST_CST']?.value || '';
+        this.DocketEntity.ConsigneeTelephoneNo = this.step1.controls['ConsigneeTelNo']?.value || '';
+        this.DocketEntity.ConsigneePinCode = this.step1.controls['ConsigneePinCode']?.value.Value || '';
+        this.DocketEntity.ConsigneeCity = this.step1.controls['ConsigneeCity']?.value.Value || '';
+        this.DocketEntity.ConsigneeAddress = this.step1.controls['ConsigneeAddress']?.value || '';
+        this.DocketEntity.RiskType = this.step2.controls['RSKTY']?.value || '';
+        this.DocketEntity.CustomerRefNo = this.step2.controls['CTR_NO']?.value || '';
+        this.DocketEntity.IsAppointmentBasedDelivery = this.step2.controls['IsAppointmentBasedDelivery']?.value || ''
+        this.DocketEntity.AppointmentDate = this.step2.controls['AppointmentDate']?.value || ''
+        this.DocketEntity.NameOfPerson = this.step2.controls['NameOfPerson']?.value;
+        this.DocketEntity.AppointmentContactNumber = this.step2.controls['AppointmentContactNumber']?.value;
+        this.DocketEntity.AppointmentRemarks = this.step2.controls['Remarks']?.value;
+        this.DocketEntity.AppointmentFromTime = this.step2.controls['AppointmentFromTime']?.value;
+        this.DocketEntity.AppointmentToTime = this.step2.controls['AppointmentToTime']?.value || ' '
+        this.DocketEntity.ContainerNo1 = this.step2.controls['ContainerNo1']?.value || '';
+        this.DocketEntity.ContainerNo2 = this.step2.controls['ContainerNo2']?.value || '';
+        this.DocketEntity.ContainerSize1 = this.step2.controls['ContainerSize1']?.value || '';
+        this.DocketEntity.ContainerSize2 = this.step2.controls['ContainerSize2']?.value || '';
+        this.DocketEntity.ContainerField1 = this.step2.controls['FIELD1']?.value || "";
+        this.DocketEntity.ContainerField2 = this.step2.controls['FIELD2']?.value || "";
+        this.DocketEntity.ContainerField3 = this.step2.controls['FIELD3']?.value || "";
+        this.DocketEntity.ContainerField4 = this.step2.controls['FIELD4']?.value || "";
+        this.DocketEntity.ContainerField5 = this.step2.controls['FIELD5']?.value || "";
+        this.DocketEntity.ContainerField6 = this.step2.controls['FIELD6']?.value || "";
+        this.DocketEntity.ContainerField7 = this.step2.controls['FIELD7']?.value || "";
+        this.DocketEntity.ContainerField8 = this.step2.controls['FIELD8']?.value || "";
+        this.DocketEntity.ContainerField9 = this.step2.controls['FIELD9']?.value || "";
+        this.DocketEntity.IsVolumetric = this.step2.controls['F_VOL']?.value || null;
+        this.DocketEntity.CftTotal = this.step2.controls['CFT_TOT']?.value || 0;
+        this.DocketEntity.VolRatio = this.step2.controls['CFT_RATIO']?.value || 0;
+        this.DocketEntity.TotalChargedWeight = this.step2.controls['CHRGWT']?.value || 0;
+        this.DocketEntity.TotalChargedNoofPackages = this.step2.controls['TotalChargedNoofPackages']?.value || 0;
+        this.DocketEntity.TotalDeclaredValue = this.step2.controls['TotalDeclaredValue']?.value || 0;
+        this.DocketEntity.TotalActualWeight = this.step2.value.invoiceArray.reduce((total, item) => total + item.ActualWeight, 0);
+        this.DocketEntity.ChargedKM = this.step2.controls['ChargedKM']?.value || 0;
+        this.DocketEntity.TotalPartQuantity = this.step2.controls['TotalPartQuantity']?.value || 0;
+        this.DocketEntity.EddDate = this.step2.controls['EDD']?.value || new Date();
+        let newInvoicesList: InvoiceEntity[] = [];
+  
+        this.step2.value.invoiceArray.forEach(z => {
+          let newInvoice: InvoiceEntity = {
+            EwbNumber: z.EWBNO,
+            EWBDate: z.EWBDATE,
+            InvoiceNo: z.INVNO,
+            InvoiceDate: z.INVDT,
+            Length: z.LENGTH,
+            Height: z.HEIGHT,
+            Breadth: z.BREADTH,
+            DeclaredValue: z.DECLVAL,
+            NoOfPackages: z.NO_PKGS,
+            CubicWeight: z.CUB_WT,
+            ActualWeight: z.ACT_WT,
+            Product: z.Invoice_Product,
+            HsnCode: z.HSN_CODE,
+            PartNumber: '',
+            PartDescription: '',
+            PartQuantity: 0.0,
+            TypeofPackage: '',
+            ChargedWeight: 0,
+            FreightRate: 0,
+            RateType: '',
+            FreightAmount: 0,
+            EWBExpiredDate: z.EWBEXPIRED,
+            Contents: ''
+          };
+  
+          newInvoicesList.push(newInvoice);
+        });
+  
+        this.DocketEntity.Invoices = newInvoicesList;
+        this.DocketEntity.DocketOtherCharges = ResultchargeList;
+        this.DocketEntity.FOVCalculated = this.step2.controls['FOVCalculated']?.value || 0;
+        this.DocketEntity.FOVCharged = this.step2.controls['FOVCharged']?.value || 0;
+        this.DocketEntity.FOVRate = this.step2.controls['FOVRate']?.value || 0;
+        this.DocketEntity.FreightRateType = this.step2.controls['FreightRateType']?.value || '';
+        this.DocketEntity.DiscountRate = this.step2.controls['DiscountRate']?.value || 0;
+        this.DocketEntity.DiscountAmount = this.step2.controls['DiscountAmount']?.value || 0;
+        this.DocketEntity.EeddDate = this.step2.controls['EEDD']?.value || '';
+        this.DocketEntity.CODDODCharged = this.step2.controls['CODDODCharged']?.value || 0;
+        this.DocketEntity.CODDODTobeCollected = this.step2.controls['CODDODTobeCollected']?.value || 0;
+        this.DocketEntity.IsCodDod = this.step2.controls['F_COD']?.value || null;
+        this.DocketEntity.BasedOn1 = this.BaseCode1 ? this.BaseCode1 : '';
+        this.DocketEntity.BasedOn2 = this.BasedOn2 ? this.BasedOn2 : '';
+        this.DocketEntity.UseFrom = this.UseFrom ? this.UseFrom : '';
+        this.DocketEntity.Origin = 'MUMB';
+        this.DocketEntity.UseTo = this.UseTo ? this.UseTo : '';
+        this.DocketEntity.UseTransMode = this.UseTransMode ? this.UseTransMode : '';
+        this.DocketEntity.UseRateType = this.UseRateType ? this.UseRateType : '';
+        this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal ? this.ChargeWeightToHighestDecimal : '';
+        this.DocketEntity.ContractDepth = this.ContractDepth ? this.ContractDepth : '';
+        this.DocketEntity.ProceedDuringEntry = this.ProceedDuringEntry ? this.ProceedDuringEntry : '';
+        this.DocketEntity.BaseCode1 = this.BaseCode1 ? this.BaseCode1 : '';
+        this.DocketEntity.BaseCode2 = this.BaseCode2 ? this.BaseCode2 : '';
+        this.DocketEntity.FlagCutoffApplied = this.FlagCutoffApplied ? this.FlagCutoffApplied : '';
+        this.DocketEntity.FlagHolidayApplied = this.FlagHolidayApplied ? this.FlagHolidayApplied : '';
+        this.DocketEntity.FlagHolidayBooked = this.FlagHolidayBooked ? this.FlagHolidayBooked : '';
+        this.DocketEntity.DeliveryZone = this.DeliveryZone ? this.DeliveryZone : '';
+        this.DocketEntity.DestDeliveryPinCode = this.DestDeliveryPinCode ? this.DestDeliveryPinCode : '';
+        this.DocketEntity.DestDeliveryArea = this.DestDeliveryArea ? this.DestDeliveryArea : '';
+        this.DocketEntity.PincodeZoneLocation = this.PincodeZoneLocation ? this.PincodeZoneLocation : '';
+        //GSTDETAILS
+        let GstDetails = new DocketGstEntity();
+        GstDetails.IsGSTExempted = false
+        GstDetails.ExemptionCategory = ''
+        GstDetails.GstPartyName = ''
+        GstDetails.GstPartyCode = ''
+        GstDetails.ServiceCodeDetails = ''
+        GstDetails.ServiceCode = ''
+        GstDetails.StateOfSupply = ''
+        GstDetails.PlaceOfSupply = ''
+        GstDetails.Gstin = ''
+        GstDetails.Address = ''
+        GstDetails.BilledAt = ''
+        GstDetails.DocketSubTotal = 0.00
+        GstDetails.ActualGSTRate = 0.00
+        GstDetails.GSTRate = 0.00
+        GstDetails.RcmApplicableActual = ''
+        GstDetails.RcmApplicable = ''
+        GstDetails.RcmApplicableText = ''
+        GstDetails.GSTCharged = 0.00
+        GstDetails.DocketTotal = 0.00
+        GstDetails.RoundOffDifference = 0.00
+        GstDetails.GSTRemark = ''
+        GstDetails.EnableGSTRCMLogic = ''
+        GstDetails.SacCode = ''
+        GstDetails.SacCategory = ''
+        GstDetails.VATRate = 0.00
+        GstDetails.TaxControlType = ''
+        this.DocketEntity.GstDetails = GstDetails;
+        this.DocketEntity.EntryBy = localStorage.getItem('Username');
+        this.DocketEntity.CompanyCode = parseInt(localStorage.getItem("companyCode"))
+        this.DocketEntity.IsConsigneeFromMasterOrWalkin = this.step2.controls['IsConsigneeFromMasterOrWalkin']?.value || '';
+        this.DocketEntity.ConsigneeCode = '8888'//this.step1.controls['ConsigneeName']?.value.Value || ''
+        // this.DocketEntity.EntryTypes = this.DocketEntity.EntryTypes;
+        //End
+        if (!this.DocketEntity.StateDocumentDetails) {
+          this.DocketEntity.StateDocumentDetails = [];
+        }
+        let newDoc = new StateDocumentDetailEntity();
+        newDoc.DocSrno = '';
+        newDoc.DocumentName = '';
+        newDoc.EnclosedDocumentNumber = '';
+        newDoc.IsRequired = '';
+        newDoc.IsStaxExmpt = '';
+        newDoc.StateCode = '';
+        newDoc.StateName = '';
+  
+        this.DocketEntity.StateDocumentDetails.push(newDoc);
+        if (!this.DocketEntity.ViaCityDetails) {
+          this.DocketEntity.ViaCityDetails = [];
+        }
+        let CityDetailEntity: ViaCityDetailEntity = new ViaCityDetailEntity();
+        CityDetailEntity.Address = ''
+        CityDetailEntity.ContactNumber = ''
+        CityDetailEntity.ContactPerson = ''
+        CityDetailEntity.ViaCity = ''
+  
+        this.DocketEntity.ViaCityDetails.push(CityDetailEntity);
+        if (this.step2.value.BcSeries != null) {
+          for (const item of this.step2.value.BcSeries) {
+            if (!!item.From && !!item.To) {
+              let from = 0, to = 0;
+              let numlen: number;
+              let arrfrom: string[], arrto: string[];
+              let numstrfrom = '', numstrto = '', alfafrom = '', alfato = '', bcserialno = '';
+              arrfrom = item.From.split('');
+              arrto = item.To.split('');
+              for (let j = 0; j < arrfrom.length; j++) {
+                const charCode = arrfrom[j].charCodeAt(0);
+                if (charCode > 47 && charCode < 58) {
+                  numstrfrom = numstrfrom + arrfrom[j];
+                  numstrto = numstrto + arrto[j];
+                } else {
+                  alfafrom = alfafrom + arrfrom[j];
+                  alfato = alfato + arrto[j];
+                }
+              }
+              numlen = numstrfrom.length;
+              from = parseFloat(numstrfrom);
+              to = parseFloat(numstrto);
+              for (let num = from; num <= to; num++) {
+                bcserialno = alfafrom + num.toString().split('.')[0].padStart(numlen, '0');
+                this.DocketEntity.BcSeriess.push({
+                  BarCode: bcserialno
+                });
               }
             }
-            numlen = numstrfrom.length;
-            from = parseFloat(numstrfrom);
-            to = parseFloat(numstrto);
-            for (let num = from; num <= to; num++) {
-              bcserialno = alfafrom + num.toString().split('.')[0].padStart(numlen, '0');
+          }
+        }
+        if (this.step2.value.barcodearray != null) {
+          for (const item of this.step2.value.barcodearray) {
+            if (!!item.BarCode) {
               this.DocketEntity.BcSeriess.push({
-                BarCode: bcserialno
+                BarCode: item.BarCode
               });
             }
           }
         }
-      }
-      if (this.step2.value.barcodearray != null) {
-        for (const item of this.step2.value.barcodearray) {
-          if (!!item.BarCode) {
-            this.DocketEntity.BcSeriess.push({
-              BarCode: item.BarCode
-            });
+        this.DocketEntity.CHRGDESC1 = this.step2.controls['CHRG_DESC1']?.value || '';
+        this.DocketEntity.CHRGDESC2 = this.step2.controls['CHRG_DESC2']?.value || '';
+        this.DocketEntity.CHRGDESC3 = this.step2.controls['CHRG_DESC3']?.value || '';
+        this.DocketEntity.CHRGDESC4 = this.step2.controls['CHRG_DESC4']?.value || '';
+        this.DocketEntity.DPHRateType = this.DPHRateType ? this.DPHRateType : '';
+        this.DocketEntity.DPHRate = this.DPHRate ? this.DPHRate : 0;
+        this.DocketEntity.DPHAmount = this.DPHAmount ? this.DPHAmount : 0;
+        this.DocketEntity.PaymentType = this.step2.controls['PAYTYP'].value
+        this.DocketEntity.IsDacc = this.IsDaccReadOnly ? this.IsDaccReadOnly : false;
+        this.DocketEntity.DPHRateType = this.DPHRateType ? this.DPHRateType : '';
+        this.DocketEntity.UseFrom = this.UseFrom ? this.UseFrom : '';
+        this.DocketEntity.UseTo = this.UseTo ? this.UseTo : '';
+        this.DocketEntity.UseTransMode = this.UseTransMode ? this.UseTransMode : '';
+        this.DocketEntity.UseRateType = this.UseRateType ? this.UseRateType : '';
+        this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal ? this.ChargeWeightToHighestDecimal : '';
+        this.DocketEntity.EnableReverseCalculation = this.CcmServicesData?.FlagEnableReverseCalculation || '';
+        this.DocketEntity.ContainerId = "0"
+        this.DocketEntity.ContainerNo = "0"
+        this.DocketEntity.ContainerSealNo = ""
+        this.DocketEntity.TAMNo = ""
+        this.DocketEntity.QuotationNumber = ""
+        this.DocketEntity.AgendaNumber = ""
+        this.DocketEntity.VehicleNo = ""
+        this.DocketEntity.TrailerNumber = ""
+        this.DocketEntity.DriverName1 = ""
+        this.DocketEntity.Direct = null
+        this.DocketEntity.ManualThcNumber = ""
+        this.DocketEntity.Temperature1 = 0
+        this.DocketEntity.Temperature2 = 0
+        this.DocketEntity.Temperature3 = 0
+        this.DocketEntity.Temperature4 = 0
+        this.DocketEntity.AverageTemperature = 0
+        this.DocketEntity.LoadPlanNumber = ""
+        this.DocketEntity.LoadType = ""
+        this.DocketEntity.Industry = ""
+        this.DocketEntity.IsRto = false
+        this.DocketEntity.RtoDockNo = ""
+        this.DocketEntity.IsPermitApplicable = null
+        this.DocketEntity.IsDeferment = null
+        this.DocketEntity.IsPod = null
+        this.DocketEntity.WeightType = ""
+        this.DocketEntity.PlPartner = ""
+        this.DocketEntity.ConsignorAddressCode = ""
+        this.DocketEntity.ConsignorAddress = this.step2.controls['ConsignorAddress']?.value;
+        this.DocketEntity.ConsignorGstin = this.step2.controls['ConsignorGSTINNO']?.value;
+        this.DocketEntity.ConsignorTinNumber = this.step1.controls['ConsignorTinNumber']?.value || '';
+        this.DocketEntity.ConsignorCstNumber = this.step1.controls['ConsignorCstNumber']?.value || '';
+        this.DocketEntity.ConsignorEmail = this.step1.controls['ConsignorEmail']?.value || '';
+        this.DocketEntity.ConsignorEmail = this.step1.controls['ConsignorEmail']?.value || '';
+        this.DocketEntity.PickupDelivery = this.step1.controls['PKPDL']?.value || '';
+        this.DocketEntity.ConsigneeDeliveryAddress = ""
+        this.DocketEntity.PolicyNo = ""
+        this.DocketEntity.PolicyDate = ""
+        this.DocketEntity.PolicyValidUpto = ""
+        this.DocketEntity.InternalCovers = 0
+        this.DocketEntity.ModvatCovers = 0
+        this.DocketEntity.PrivateMark = ""
+        this.DocketEntity.TpNumber = ""
+        this.DocketEntity.CustomerRefrenceBatchNo = ""
+        this.DocketEntity.CustomerRefrenceDeliveryNo = ""
+        this.DocketEntity.CustomerRefrenceModelNumber = ""
+        this.DocketEntity.CustomerRefrenceGpsNumber = ""
+        this.DocketEntity.CustomerRefrenceChasisNumber = ""
+        this.DocketEntity.PurchaseOrderNo = ""
+        this.DocketEntity.CustomerRefrenceNo1 = ""
+        this.DocketEntity.CustomerRefrenceNo2 = ""
+        this.DocketEntity.CustomerRefrenceEnginNo = ""
+        this.DocketEntity.PermitReceivedAt = ""
+        this.DocketEntity.PermitNumber = ""
+        this.DocketEntity.OctroiAmount = 0
+        this.DocketEntity.PermitDate = '0001-01-01T00:00:00'
+        this.DocketEntity.PermitReceivedDate = '0001-01-01T00:00:00'
+        this.DocketEntity.ContainerType = this.step2.controls['CONTTYP']?.value || ''
+        this.DocketEntity.StuffingDate = '0001-01-01T00:00:00'
+        this.DocketEntity.StandardFreightRate = 0
+        this.DocketEntity.WeightToConsider = this.WeightToConsider ? this.WeightToConsider : ''
+        this.DocketEntity.MaxMeasureValue = this.MaxMeasureValue ? this.MaxMeasureValue : 0
+        this.DocketEntity.MinInvoiceValue = this.MinInvoiceValue ? this.MinInvoiceValue : 0
+        this.DocketEntity.MaxInvoiceValue = this.MaxInvoiceValue ? this.MaxInvoiceValue : 0
+        this.DocketEntity.MinInvoiceValuePerKG = this.MinInvoiceValuePerKG ? this.MinInvoiceValuePerKG : 0
+        this.DocketEntity.MaxInvoiceValuePerKG = this.MaxInvoiceValuePerKG ? this.MaxInvoiceValuePerKG : 0
+        this.DocketEntity.DefaultChargeWeight = this.DefaultChargeWeight ? this.DefaultChargeWeight : 0
+        this.DocketEntity.MinChargeWeight = this.MinChargeWeight ? this.MinChargeWeight : 0
+        this.DocketEntity.MaxChargeWeight = this.MaxChargeWeight ? this.MaxChargeWeight : 0
+        this.DocketEntity.VolMeasure = this.VolMeasure ? this.VolMeasure : ''
+        this.DocketEntity.TotalChargedNoofPkgsQuickCnot = 0
+        this.DocketEntity.BillingPartysCode = this.step1.controls['PRQ_BILLINGPARTY']?.value.Value || ''
+        this.DocketEntity.BillingPartysName = this.step1.controls['PRQ_BILLINGPARTY']?.value.Name || ''
+        console.log(this.DocketEntity);
+        this.ICnoteService.cnotePost('services/BookDocket', this.DocketEntity).subscribe({
+          next: (res: any) => {
+            SwalerrorMessage("success", "DocketNo:" + res.result[0].DocketNumber, "", true);
           }
-        }
+        })
+  
+  
       }
-      this.DocketEntity.CHRGDESC1 = this.step2.controls['CHRG_DESC1']?.value || '';
-      this.DocketEntity.CHRGDESC2 = this.step2.controls['CHRG_DESC2']?.value || '';
-      this.DocketEntity.CHRGDESC3 = this.step2.controls['CHRG_DESC3']?.value || '';
-      this.DocketEntity.CHRGDESC4 = this.step2.controls['CHRG_DESC4']?.value || '';
-      this.DocketEntity.DPHRateType = this.DPHRateType ? this.DPHRateType : '';
-      this.DocketEntity.DPHRate = this.DPHRate ? this.DPHRate : 0;
-      this.DocketEntity.DPHAmount = this.DPHAmount ? this.DPHAmount : 0;
-      this.DocketEntity.PaymentType = this.step2.controls['PAYTYP'].value
-      this.DocketEntity.IsDacc = this.IsDaccReadOnly ? this.IsDaccReadOnly : false;
-      this.DocketEntity.DPHRateType = this.DPHRateType ? this.DPHRateType : '';
-      this.DocketEntity.UseFrom = this.UseFrom ? this.UseFrom : '';
-      this.DocketEntity.UseTo = this.UseTo ? this.UseTo : '';
-      this.DocketEntity.UseTransMode = this.UseTransMode ? this.UseTransMode : '';
-      this.DocketEntity.UseRateType = this.UseRateType ? this.UseRateType : '';
-      this.DocketEntity.ChargeWeightToHighestDecimal = this.ChargeWeightToHighestDecimal ? this.ChargeWeightToHighestDecimal : '';
-      this.DocketEntity.EnableReverseCalculation = this.CcmServicesData?.FlagEnableReverseCalculation || '';
-      this.DocketEntity.ContainerId = "0"
-      this.DocketEntity.ContainerNo = "0"
-      this.DocketEntity.ContainerSealNo = ""
-      this.DocketEntity.TAMNo = ""
-      this.DocketEntity.QuotationNumber = ""
-      this.DocketEntity.AgendaNumber = ""
-      this.DocketEntity.VehicleNo = ""
-      this.DocketEntity.TrailerNumber = ""
-      this.DocketEntity.DriverName1 = ""
-      this.DocketEntity.Direct = null
-      this.DocketEntity.ManualThcNumber = ""
-      this.DocketEntity.Temperature1 = 0
-      this.DocketEntity.Temperature2 = 0
-      this.DocketEntity.Temperature3 = 0
-      this.DocketEntity.Temperature4 = 0
-      this.DocketEntity.AverageTemperature = 0
-      this.DocketEntity.LoadPlanNumber = ""
-      this.DocketEntity.LoadType = ""
-      this.DocketEntity.Industry = ""
-      this.DocketEntity.IsRto = false
-      this.DocketEntity.RtoDockNo = ""
-      this.DocketEntity.IsPermitApplicable = null
-      this.DocketEntity.IsDeferment = null
-      this.DocketEntity.IsPod = null
-      this.DocketEntity.WeightType = ""
-      this.DocketEntity.PlPartner = ""
-      this.DocketEntity.ConsignorAddressCode = ""
-      this.DocketEntity.ConsignorAddress = this.step2.controls['ConsignorAddress']?.value;
-      this.DocketEntity.ConsignorGstin = this.step2.controls['ConsignorGSTINNO']?.value;
-      this.DocketEntity.ConsignorTinNumber = this.step1.controls['ConsignorTinNumber']?.value || '';
-      this.DocketEntity.ConsignorCstNumber = this.step1.controls['ConsignorCstNumber']?.value || '';
-      this.DocketEntity.ConsignorEmail = this.step1.controls['ConsignorEmail']?.value || '';
-      this.DocketEntity.ConsignorEmail = this.step1.controls['ConsignorEmail']?.value || '';
-      this.DocketEntity.PickupDelivery = this.step1.controls['PKPDL']?.value || '';
-      this.DocketEntity.ConsigneeDeliveryAddress = ""
-      this.DocketEntity.PolicyNo = ""
-      this.DocketEntity.PolicyDate = ""
-      this.DocketEntity.PolicyValidUpto = ""
-      this.DocketEntity.InternalCovers = 0
-      this.DocketEntity.ModvatCovers = 0
-      this.DocketEntity.PrivateMark = ""
-      this.DocketEntity.TpNumber = ""
-      this.DocketEntity.CustomerRefrenceBatchNo = ""
-      this.DocketEntity.CustomerRefrenceDeliveryNo = ""
-      this.DocketEntity.CustomerRefrenceModelNumber = ""
-      this.DocketEntity.CustomerRefrenceGpsNumber = ""
-      this.DocketEntity.CustomerRefrenceChasisNumber = ""
-      this.DocketEntity.PurchaseOrderNo = ""
-      this.DocketEntity.CustomerRefrenceNo1 = ""
-      this.DocketEntity.CustomerRefrenceNo2 = ""
-      this.DocketEntity.CustomerRefrenceEnginNo = ""
-      this.DocketEntity.PermitReceivedAt = ""
-      this.DocketEntity.PermitNumber = ""
-      this.DocketEntity.OctroiAmount = 0
-      this.DocketEntity.PermitDate = '0001-01-01T00:00:00'
-      this.DocketEntity.PermitReceivedDate = '0001-01-01T00:00:00'
-      this.DocketEntity.ContainerType = this.step2.controls['CONTTYP']?.value || ''
-      this.DocketEntity.StuffingDate = '0001-01-01T00:00:00'
-      this.DocketEntity.StandardFreightRate = 0
-      this.DocketEntity.WeightToConsider = this.WeightToConsider ? this.WeightToConsider : ''
-      this.DocketEntity.MaxMeasureValue = this.MaxMeasureValue ? this.MaxMeasureValue : 0
-      this.DocketEntity.MinInvoiceValue = this.MinInvoiceValue ? this.MinInvoiceValue : 0
-      this.DocketEntity.MaxInvoiceValue = this.MaxInvoiceValue ? this.MaxInvoiceValue : 0
-      this.DocketEntity.MinInvoiceValuePerKG = this.MinInvoiceValuePerKG ? this.MinInvoiceValuePerKG : 0
-      this.DocketEntity.MaxInvoiceValuePerKG = this.MaxInvoiceValuePerKG ? this.MaxInvoiceValuePerKG : 0
-      this.DocketEntity.DefaultChargeWeight = this.DefaultChargeWeight ? this.DefaultChargeWeight : 0
-      this.DocketEntity.MinChargeWeight = this.MinChargeWeight ? this.MinChargeWeight : 0
-      this.DocketEntity.MaxChargeWeight = this.MaxChargeWeight ? this.MaxChargeWeight : 0
-      this.DocketEntity.VolMeasure = this.VolMeasure ? this.VolMeasure : ''
-      this.DocketEntity.TotalChargedNoofPkgsQuickCnot = 0
-      this.DocketEntity.BillingPartysCode = this.step1.controls['PRQ_BILLINGPARTY']?.value.Value || ''
-      this.DocketEntity.BillingPartysName = this.step1.controls['PRQ_BILLINGPARTY']?.value.Name || ''
-      console.log(this.DocketEntity);
-      this.ICnoteService.cnotePost('services/BookDocket', this.DocketEntity).subscribe({
-        next: (res: any) => {
-          SwalerrorMessage("success", "DocketNo:" + res.result[0].DocketNumber, "", true);
-        }
-      })
-      //this.DocketEntity.BillingPartys=  0
-
-
-
-
+  
+  
     }
+  
 
 
 
+
+  containorDropdown(){
+    const dropdowns = {
+      'ContainerSize1': this.ContainerSize,
+      'ContainerSize2': this.ContainerSize,
+      'ContainerType': this.ContainerType,
+      'ContainerCapacity': this.ContainerCapacity
+    };
+    // get all form controls belonging to Container Details section
+    // and add dropdown options to applicable controls
+    this.ContainerDetails = this.EwayBillField.filter((x) => x.div == 'ContainerDetails').map(item => {
+      if (dropdowns.hasOwnProperty(item.name)) {
+        item.dropdown = dropdowns[item.name];
+      }
+      return item;
+    });
   }
 
 }

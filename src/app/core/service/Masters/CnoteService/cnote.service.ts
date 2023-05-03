@@ -10,18 +10,17 @@ import { environment } from 'src/environments/environment';
 export class CnoteService {
 
   constructor(private http: HttpClient) { }
-  // GetCnoteFormcontrol() {
-  //   return this.http.get<any>(
-  //     `http://localhost:3000/api/`
-  //   );
-  // }
+
   getCnoteBooking(ApiURL, req) {
    
     return this.http.get<any>(
-      `${environment.APIBaseURL}` + ApiURL + req
+      `${environment.APIBaseBetaURL}` + ApiURL + req
     );
   }
    cnotePost(ApiURL, Request) {
-    return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+    return this.http.post<any>(`${environment.APIBaseBetaURL}` + ApiURL, Request);
+  }
+  CnoteMongoPost(ApiURL,Request){
+    return this.http.post<any>(`${environment.APIMongoUrl}` + ApiURL, Request);
   }
 }

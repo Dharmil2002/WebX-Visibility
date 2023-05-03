@@ -2978,7 +2978,7 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.ConsignorCode = this.step2.controls['CST_NM']?.value.Value || '';
       this.DocketEntity.ConsignorName = this.step2.controls['CST_NM']?.value.Name || '';
       this.DocketEntity.ConsignorCity = this.step2.controls['ConsignorCity']?.value.Value || '';
-      this.DocketEntity.ConsignorPinCode = this.step2.controls['ConsignorPinCode']?.value.Value || this.step2.controls['ConsignorPinCode']?.value||'';
+      this.DocketEntity.ConsignorPinCode = this.step2.controls['ConsignorPinCode']?.value.Value || this.step2.controls['ConsignorPinCode']?.value || '';
       this.DocketEntity.ConsignorTelephoneNo = this.step2.controls['CST_PHONE']?.value || '';
       this.DocketEntity.ConsignorMobileNo = this.step2.controls['CST_MOB']?.value || '';
       this.DocketEntity.IsConsignorFromMasterOrWalkin = this.step2.controls['IsConsignorFromMasterOrWalkin']?.value || null;
@@ -2990,8 +2990,8 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.ConsigneeTinNumber = this.step2.controls['CST_TIN']?.value || '';
       this.DocketEntity.ConsigneeCstNumber = this.step2.controls['CST_CST']?.value || '';
       this.DocketEntity.ConsigneeTelephoneNo = this.step2.controls['ConsigneeCST_PHONE']?.value || '';
-      this.DocketEntity.ConsigneePinCode = this.step2.controls['ConsigneePinCode']?.value.Value ||this.step2.controls['ConsigneePinCode']?.value||'';
-      this.DocketEntity.ConsigneeCity = this.step2.controls['ConsigneeCity']?.value.Value || this.step2.controls['ConsigneeCity']?.value||'';
+      this.DocketEntity.ConsigneePinCode = this.step2.controls['ConsigneePinCode']?.value.Value || this.step2.controls['ConsigneePinCode']?.value || '';
+      this.DocketEntity.ConsigneeCity = this.step2.controls['ConsigneeCity']?.value.Value || this.step2.controls['ConsigneeCity']?.value || '';
       this.DocketEntity.ConsigneeAddress = this.step2.controls['ConsigneeCST_ADD']?.value || '';
       this.DocketEntity.RiskType = this.step2.controls['RSKTY']?.value || '';
       this.DocketEntity.CustomerRefNo = this.step2.controls['CTR_NO']?.value || '';

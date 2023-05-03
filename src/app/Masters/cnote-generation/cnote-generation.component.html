@@ -447,6 +447,17 @@
                                                                 {{Appointment.label+"is Required"}}
                                                             </mat-error>
                                                         </mat-form-field>
+                                                        <mat-form-field class="example-full-width" appearance="outline"
+                                                            *ngIf="Appointment.type=='time'">
+                                                            <mat-label>{{Appointment.label}}</mat-label>
+                                                            <input matInput [ngxTimepicker]="picker">
+                                                            <mat-icon matPrefix>access_time</mat-icon>
+                                                            <ngx-material-timepicker #picker></ngx-material-timepicker>
+                                                            <mat-error
+                                                            *ngIf="step2.get(Appointment.name).hasError('required')">
+                                                            {{Appointment.label+"is Required"}}
+                                                        </mat-error>
+                                                        </mat-form-field>
                                                     </div>
                                                 </div>
                                             </div>
@@ -852,10 +863,6 @@
         </div>
         <!-- #END# Basic Validation -->
     </div>
-
-
-
-
 
 
 </section>

@@ -15,7 +15,9 @@ export const environment = {
     "https://greenxpress-beta-api.azurewebsites.net/api/Dashboard/",
   localHost: " http://localhost:7233/api/DMS/",
   localNumberFormat: "en-IN",
-  APIBaseURL:"http://localhost:3000/api/"
+  APIBaseURL:"http://localhost:3000/api/",
+  APIBaseBetaURL:"https://cnoteentry.azurewebsites.net/api/",
+  APIMongoUrl:"http://localhost:5000/v1/"
 };
 
 /*

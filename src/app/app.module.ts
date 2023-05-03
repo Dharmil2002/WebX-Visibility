@@ -38,7 +38,6 @@ import { WINDOW_PROVIDERS } from "./core/service/window.service";
 import { environment } from "src/environments/environment";
 import { fakeBackendProvider } from "./core/interceptor/fake-backend";
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-import { DktComponentComponent } from './components/dkt-component/dkt-component.component';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
   wheelPropagation: false,

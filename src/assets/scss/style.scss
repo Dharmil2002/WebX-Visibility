@@ -16,6 +16,7 @@
                 
 /*                 [1. Common ]                   			*/
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import "~ng-pick-datetime/assets/style/picker.min.css";
 /* Importing Bootstrap SCSS file. */
 @import '~bootstrap/scss/bootstrap';
 @import '~perfect-scrollbar/css/perfect-scrollbar.css';
@@ -288,12 +289,29 @@ body{
   bottom: -5;
   position: absolute;
 }
+.mat-input-element:disabled, 
+.mat-form-field-type-mat-native-select.mat-form-field-disabled .mat-form-field-infix::after {
+    color: #2d353c!important;
+}
 
-// @keyframes marquee {
-//   from { transform: translateX(0); }
-//   to { transform: translateX(-100%); }
-// }
+header {
+    height: 100px;
+    line-height: 25px;
+    text-align: center;
+    background: #303e49;
+}
+button,
+input,
+select,
+a {
+  outline: none !important;
+  font-size: none !important;
+  text-decoration: none;
 
-// .w-100{
-//     max-width: 100px!important;
-// }
+  &:hover {
+    text-decoration: none;
+  }
+}
+.timepicker-dial__control{
+  font-size: 50px !important;
+}

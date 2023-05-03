@@ -26,34 +26,31 @@
                                         <ng-template matStepLabel>Details From Eway-Bill</ng-template>
                                         <div class="row">
 
-                                            <div [class]="divcol" *ngFor="let step1Detail of step1Formcontrol">
+                                            <div [class]="divcol" *ngFor="let step1Detail of DocketField">
                                                 <mat-form-field class="example-full-width" appearance="outline"
-                                                *ngIf="step1Detail.type=='text' &&  step1Detail.name =='DKTNO'">
-                                                <mat-label>{{step1Detail.label}}</mat-label>
-                                                <!-- <input matInput type="step1Detail.type"
+                                                    *ngIf="step1Detail.type=='text' &&  step1Detail.name =='DKTNO'">
+                                                    <mat-label>{{step1Detail.label}}</mat-label>
+                                                    <!-- <input matInput type="step1Detail.type"
                                                  (ngModelChange)="callActionFunction(step1Detail.ActionFunction,$event)"
                                                  [formControlName]="step1Detail.name" autocomplete="off"> -->
-                                                <input matInput type="step1Detail.type"
-                                                    (change)="callActionFunction(step1Detail.ActionFunction,$event)"
-                                                    [formControlName]="step1Detail.name" autocomplete="off">
-                                                <div class="input-group-append SpanCnote">
-                                                    <span class="input-group-text dividerCnote"
-                                                        id="basic-addon2">{{docketallocate}}</span>
-                                                </div>
+                                                    <input matInput type="step1Detail.type"
+                                                        (change)="callActionFunction(step1Detail.ActionFunction,$event)"
+                                                        [formControlName]="step1Detail.name" autocomplete="off">
+                                                    <div class="input-group-append SpanCnote">
+                                                        <span class="input-group-text dividerCnote"
+                                                            id="basic-addon2">{{docketallocate}}</span>
+                                                    </div>
 
-                                            </mat-form-field>
+                                                </mat-form-field>
                                                 <mat-form-field class="example-full-width" appearance="outline"
                                                     *ngIf="step1Detail.type=='text' &&  step1Detail.name !='DKTNO' ">
                                                     <mat-label>{{step1Detail.label}}</mat-label>
-                                                    <!-- <input matInput type="step1Detail.type"
-                                                        (ngModelChange)="callActionFunction(step1Detail.ActionFunction,$event)"
-                                                        [formControlName]="step1Detail.name" autocomplete="off"> -->
                                                     <input matInput type="step1Detail.type"
                                                         (ngModelChange)="callActionFunction(step1Detail.ActionFunction,$event)"
                                                         [formControlName]="step1Detail.name" autocomplete="off">
-                                                    <mat-error *ngIf="step1.get(step1Detail.name).hasError('required')">
+                                                    <!-- <mat-error *ngIf="step1.get(step1Detail.name).hasError('required')">
                                                         {{step1Detail.label+"is Required"}}
-                                                    </mat-error>
+                                                    </mat-error> -->
                                                 </mat-form-field>
 
                                                 <mat-form-field class="example-full-width" appearance="outline"
@@ -133,10 +130,16 @@
                                                     [formControlName]="step1Detail.name">{{step1Detail.label}}</mat-checkbox>
                                                 <!-- <mat-slide-toggle  (change)="callActionFunction(step1Detail.ActionFunction,$event)" color="primary" *ngIf="step1Detail.type=='toggle'"
                                                     [formControlName]="step1Detail.name">{{step1Detail.label}}</mat-slide-toggle> -->
+                                                <mat-form-field class="example-full-width" floatLabel="never"
+                                                    appearance="outline" *ngIf="step1Detail.type=='textarea'">
+                                                    <mat-label>{{step1Detail.label}}</mat-label>
+                                                    <textarea matInput [formControlName]="step1Detail.name"></textarea>
+                                                </mat-form-field>
+
                                             </div>
-                                             <!-- Consignor Details  -->
+                                            <!-- Consignor Details  -->
                                             <div class="row">
-                                                
+
                                                 <h4 class="card-title">Consignor Details</h4>
                                                 <hr>
                                                 <div class="row">
@@ -217,6 +220,14 @@
                                                                 </mat-autocomplete>
                                                             </mat-form-field>
                                                             <!-- end -->
+                                                            <mat-form-field class="example-full-width"
+                                                                floatLabel="never" appearance="outline"
+                                                                *ngIf="csgn.type=='textarea'">
+                                                                <mat-label>{{csgn.label}}</mat-label>
+                                                                <textarea matInput
+                                                                    [formControlName]="csgn.name"></textarea>
+                                                            </mat-form-field>
+
                                                             <mat-slide-toggle color="primary"
                                                                 *ngIf="csgn.type=='toggle'"
                                                                 [formControlName]="csgn.name"
@@ -226,7 +237,7 @@
                                                 </div>
                                                 <!-- End -->
 
-                                              <!-- Consignee Details -->
+                                                <!-- Consignee Details -->
                                                 <h4 class="card-title">Consignee Details</h4>
                                                 <hr>
                                                 <div class="row">
@@ -305,6 +316,13 @@
                                                                     </mat-option>
                                                                 </mat-autocomplete>
                                                             </mat-form-field>
+                                                            <mat-form-field class="example-full-width"
+                                                                floatLabel="never" appearance="outline"
+                                                                *ngIf="csge.type=='textarea'">
+                                                                <mat-label>{{csge.label}}</mat-label>
+                                                                <textarea matInput
+                                                                    [formControlName]="csge.name"></textarea>
+                                                            </mat-form-field>
                                                             <!-- end -->
                                                             <mat-slide-toggle color="primary"
                                                                 *ngIf="csge.type=='toggle'"
@@ -315,7 +333,99 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                    <!-- End -->
+                                                <!-- End -->
+                                            </div>
+                                            <div *ngIf="showOtherAppointment">
+                                                <h4>Appointment Based Delivery</h4><br>
+                                                <div *ngFor="let Appointment of AppointmentBasedDelivery">
+                                                    <mat-radio-group [formControlName]="Appointment.name"
+                                                        (change)="callActionFunction(Appointment.ActionFunction,$event)">
+                                                        <mat-radio-button
+                                                            *ngFor="let option of RadionAppoimentBasedDelivery"
+                                                            [value]="option.value">
+                                                            {{ option.label }}
+                                                        </mat-radio-button>
+                                                    </mat-radio-group>
+                                                </div>
+                                                <br>
+                                                <!-- Appointment Details -->
+                                                <div class="row" *ngIf="isappointmentvisble">
+                                                    <h4>Appointment Details</h4>
+                                                    <hr>
+                                                    <div [class]="divcol"
+                                                        *ngFor="let Appointment of AppointmentDetails">
+                                                        <div>
+                                                            <mat-form-field class="example-full-width"
+                                                                appearance="outline" *ngIf="Appointment.type=='text'">
+                                                                <mat-label>{{Appointment.label}}</mat-label>
+                                                                <input matInput type="Appointment.type"
+                                                                    (ngModelChange)="callActionFunction(Appointment.ActionFunction,$event)"
+                                                                    [formControlName]="Appointment.name"
+                                                                    autocomplete="off">
+                                                                <mat-error
+                                                                    *ngIf="step1.get(Appointment.name).hasError('required')">
+                                                                    {{Appointment.label+"is Required"}}
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                            <mat-form-field class="example-full-width"
+                                                                appearance="outline" *ngIf="Appointment.type=='date'">
+                                                                <mat-label>{{Appointment.label}}</mat-label>
+                                                                <input matInput [matDatepicker]="Cnotename"
+                                                                    [formControlName]="Appointment.name">
+                                                                <mat-datepicker-toggle matSuffix
+                                                                    [for]="Cnotename"></mat-datepicker-toggle>
+                                                                <mat-datepicker #Cnotename></mat-datepicker>
+                                                                <mat-error
+                                                                    *ngIf="step1.get(Appointment.name).hasError('required')">
+                                                                    {{Appointment.label+"is Required"}}
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                            <mat-form-field class="example-full-width"
+                                                                appearance="outline" *ngIf="Appointment.type=='time'">
+                                                                <mat-label>{{Appointment.label}}</mat-label>
+                                                                <input matInput [ngxTimepicker]="picker">
+                                                                <mat-icon matPrefix>access_time</mat-icon>
+                                                                <ngx-material-timepicker
+                                                                    #picker></ngx-material-timepicker>
+                                                                <mat-error
+                                                                    *ngIf="step1.get(Appointment.name).hasError('required')">
+                                                                    {{Appointment.label+"is Required"}}
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="showOtherContainer">
+                                                <h4>Container Details</h4>
+                                                <hr>
+                                                <!-- ContainerDetails -->
+                                                <div class="row">
+
+                                                    <div [class]="divcol" *ngFor="let Container of ContainerDetails">
+                                                        <div>
+                                                            <mat-form-field class="example-full-width"
+                                                                appearance="outline" *ngIf="Container.type=='text'">
+                                                                <mat-label>{{Container.label}}</mat-label>
+                                                                <input matInput type="Container.type"
+                                                                    (ngModelChange)="callActionFunction(Container.ActionFunction,$event)"
+                                                                    [formControlName]="Container.name"
+                                                                    autocomplete="off">
+                                                            </mat-form-field>
+                                                            <mat-form-field class="example-full-width"
+                                                                appearance="outline" *ngIf="Container.type=='dropdown'">
+                                                                <mat-label>{{Container.label}}</mat-label>
+                                                                <mat-select [formControlName]="Container.name">
+                                                                    <mat-option
+                                                                        *ngFor="let option of Container.dropdown"
+                                                                        [value]="option.CodeId">
+                                                                        {{ option.CodeDesc }}
+                                                                    </mat-option>
+                                                                </mat-select>
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
@@ -390,7 +500,7 @@
                                                     [formControlName]="step2Detail.name">{{step2Detail.label}}</mat-checkbox>
                                                 <!-- Auto dropdown for City -->
                                                 <mat-form-field class="example-full-width" appearance="outline"
-                                                    *ngIf="step2Detail.type=='autodropdown'">
+                                                    *ngIf="step2Detail.type=='autodropdown' && step2Detail.name!='PRQ'">
                                                     <mat-label>{{step2Detail.label}}</mat-label>
                                                     <input matInput [formControlName]="step2Detail.name"
                                                         (input)="callActionFunction(step2Detail.Search,$event)"
@@ -407,6 +517,23 @@
                                                         </mat-option>
                                                     </mat-autocomplete>
                                                 </mat-form-field>
+                                                <!--Auto Dropdown -->
+                                                <mat-form-field class="example-full-width" appearance="outline"
+                                                    *ngIf="step2Detail.type=='autodropdown' && step2Detail.name=='PRQ'">
+                                                    <mat-label>{{step2Detail.label}}</mat-label>
+                                                    <input matInput [formControlName]="step2Detail.name"
+                                                        (input)="callActionFunction(step2Detail.Search,$event)"
+                                                        autocomplete="off" [matAutocomplete]="autoBiling">
+                                                    <mat-autocomplete #autoBiling="matAutocomplete"
+                                                        [displayWith]="displayPRQNoFn"
+                                                        (optionSelected)="callActionFunction(step2Detail.ActionFunction,$event)">
+                                                        <mat-option *ngFor="let option of pReqFilter | async"
+                                                            [value]="option">
+                                                            {{option.PRQNO +":"+ option.VehicleNo }}
+                                                        </mat-option>
+                                                    </mat-autocomplete>
+                                                </mat-form-field>
+                                                <!----end -->
                                                 <!-- End -->
                                                 <!-- <mat-slide-toggle  (change)="callActionFunction(step1Detail.ActionFunction,$event)" color="primary" *ngIf="step1Detail.type=='toggle'"
                                                     [formControlName]="step1Detail.name">{{step1Detail.label}}</mat-slide-toggle> -->
@@ -424,13 +551,14 @@
                                                         <input matInput type="subDetail.type"
                                                             (ngModelChange)="callActionFunction(subDetail.ActionFunction,$event)"
                                                             [formControlName]="subDetail.name" autocomplete="off">
-                                                        <mat-error *ngIf="step2.get(subDetail.name).hasError('required')">
+                                                        <mat-error
+                                                            *ngIf="step2.get(subDetail.name).hasError('required')">
                                                             {{subDetail.label+"is Required"}}
                                                         </mat-error>
                                                     </mat-form-field>
                                                     <!-- End -->
                                                     <!-- date -->
-    
+
                                                     <mat-form-field class="example-full-width" appearance="outline"
                                                         *ngIf="subDetail.type=='date'">
                                                         <mat-label>{{subDetail.label}}</mat-label>
@@ -439,11 +567,12 @@
                                                         <mat-datepicker-toggle matSuffix
                                                             [for]="Cnotename"></mat-datepicker-toggle>
                                                         <mat-datepicker #Cnotename></mat-datepicker>
-                                                        <mat-error *ngIf="step2.get(subDetail.name).hasError('required')">
+                                                        <mat-error
+                                                            *ngIf="step2.get(subDetail.name).hasError('required')">
                                                             {{subDetail.label+"is Required"}}
                                                         </mat-error>
                                                     </mat-form-field>
-    
+
                                                     <!-- Dropdown -->
                                                     <mat-form-field class="example-full-width" appearance="outline"
                                                         *ngIf="subDetail.type=='dropdown'">
@@ -455,11 +584,12 @@
                                                                 {{ option.CodeDesc }}
                                                             </mat-option>
                                                         </mat-select>
-                                                        <mat-error *ngIf="step2.get(subDetail.name).hasError('required')">
+                                                        <mat-error
+                                                            *ngIf="step2.get(subDetail.name).hasError('required')">
                                                             {{subDetail.label+"is Required"}}
                                                         </mat-error>
                                                     </mat-form-field>
-    
+
                                                     <!--Toggale  -->
                                                     <mat-checkbox class="example-margin"
                                                         (change)="callActionFunction(subDetail.ActionFunction,$event)"
@@ -502,13 +632,14 @@
                                                         <input matInput type="eBillDetail.type"
                                                             (ngModelChange)="callActionFunction(eBillDetail.ActionFunction,$event)"
                                                             [formControlName]="eBillDetail.name" autocomplete="off">
-                                                        <mat-error *ngIf="step2.get(eBillDetail.name).hasError('required')">
+                                                        <mat-error
+                                                            *ngIf="step2.get(eBillDetail.name).hasError('required')">
                                                             {{eBillDetail.label+"is Required"}}
                                                         </mat-error>
                                                     </mat-form-field>
                                                     <!-- End -->
                                                     <!-- date -->
-    
+
                                                     <mat-form-field class="example-full-width" appearance="outline"
                                                         *ngIf="eBillDetail.type=='date'">
                                                         <mat-label>{{eBillDetail.label}}</mat-label>
@@ -517,11 +648,12 @@
                                                         <mat-datepicker-toggle matSuffix
                                                             [for]="Cnotename"></mat-datepicker-toggle>
                                                         <mat-datepicker #Cnotename></mat-datepicker>
-                                                        <mat-error *ngIf="step2.get(eBillDetail.name).hasError('required')">
+                                                        <mat-error
+                                                            *ngIf="step2.get(eBillDetail.name).hasError('required')">
                                                             {{eBillDetail.label+"is Required"}}
                                                         </mat-error>
                                                     </mat-form-field>
-    
+
                                                     <!-- Dropdown -->
                                                     <mat-form-field class="example-full-width" appearance="outline"
                                                         *ngIf="eBillDetail.type=='dropdown'">
@@ -533,11 +665,12 @@
                                                                 {{ option.CodeDesc }}
                                                             </mat-option>
                                                         </mat-select>
-                                                        <mat-error *ngIf="step2.get(eBillDetail.name).hasError('required')">
-                                                            {{step2Detail.label+"is Required"}}
+                                                        <mat-error
+                                                            *ngIf="step2.get(eBillDetail.name).hasError('required')">
+                                                            {{eBillDetail.label+"is Required"}}
                                                         </mat-error>
                                                     </mat-form-field>
-    
+
                                                     <!--Toggale  -->
                                                     <mat-checkbox class="example-margin"
                                                         (change)="callActionFunction(eBillDetail.ActionFunction,$event)"
@@ -556,7 +689,8 @@
                                                             <mat-option
                                                                 *ngFor="let option of eBillDetail.filteredOptions | async"
                                                                 [value]="option">
-                                                                {{eBillDetail.name === 'Destination' ? option.Value + ' -
+                                                                {{eBillDetail.name === 'Destination' ? option.Value + '
+                                                                -
                                                                 ' +
                                                                 option.Name : option.Value}}
                                                             </mat-option>
@@ -588,7 +722,7 @@
                                                                             <td>{{i+1}}</td>
                                                                             <td *ngFor="let Invoice of InvoiceDetails"
                                                                                 [formGroupName]="i">
-    
+
                                                                                 <div class="col-md-12"
                                                                                     *ngIf="Invoice.type=='text' && Invoice.name!='ChargedWeight'">
                                                                                     <input style="width: 168px;"
@@ -636,7 +770,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-    
+
                                             </div>
                                             <div class="row">
                                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
@@ -658,6 +792,5 @@
         </div>
     </div>
     <div class="marquee">
-        <h1>This GUI is For Flow & Data Testing Purpose Only</h1>
-    </div>   
+    </div>
 </section>

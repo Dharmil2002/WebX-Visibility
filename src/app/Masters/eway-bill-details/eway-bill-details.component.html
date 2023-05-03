@@ -2,58 +2,66 @@
     <div class="container-fluid">
 
         <div>
-            <div
-                class="block-header" *ngFor="let breadscrum of breadscrums">
+            <div class="block-header" *ngFor="let breadscrum of breadscrums">
                 <!-- breadcrumb -->
-                <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active"></app-breadcrumb>
+                <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items"
+                    [active_item]="breadscrum.active"></app-breadcrumb>
             </div>
         </div>
     </div>
     <form class="register-form m-4" [formGroup]="EwayBill">
-           <!-- Eway Bill No -->
+        <!-- Eway Bill No -->
         <div class="row">
             <div [class]="divcol">
                 <mat-form-field class="example-full-width" appearance="outline">
                     <mat-label>EWB Number</mat-label>
                     <input matInput="matInput" type="text" formControlName="EWBNo" autocomplete="off"></mat-form-field>
-                </div>
             </div>
-           <!-- End -->
-
-            <!-- Service Type -->
-            <div class="row" *ngIf="FlagHide">
-                <div [class]="divcol">
-                    <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Service Type</mat-label>
-                        <mat-select formControlName="SVCTYP">
-                            <mat-option *ngFor="let option of ServiceTypeDetail" [value]="option.CodeId">
-                                {{option.CodeDesc }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
-            </div>
-            <!-- End -->
-            <div class="row" *ngIf="!HideSubmit">
-                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
-                    <div class="example-button-row">
-                        <button class="msr-3" mat-raised-button="mat-raised-button"  [disabled]="isLoading" color="primary" (click)="onFetchData()">  <span *ngIf="!isLoading">Next</span>
-                        <span  *ngIf="isLoading" class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                        <span *ngIf="isLoading">Loading...</span>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-            <div class="row" *ngIf="HideSubmit">
-                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
-                    <div class="example-button-row">
-                        <button class="msr-3" mat-raised-button="mat-raised-button" color="primary" (click)="onSubmit()">Submit</button>
-                    </div>
-                </div>
-
-            </div>
-        </form>
-        <div class="marquee">
-            <h1>This GUI is For Flow & Data Testing Purpose Only</h1>
         </div>
-    </section>
+        <!-- End -->
+
+        <!-- Service Type -->
+        <div class="row" *ngIf="FlagHide">
+            <div [class]="divcol">
+                <mat-form-field class="example-full-width" appearance="outline">
+                    <mat-label>Service Type</mat-label>
+                    <mat-select formControlName="SVCTYP">
+                        <mat-option *ngFor="let option of ServiceTypeDetail" [value]="option.CodeId">
+                            {{option.CodeDesc }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <!-- End -->
+        <div class="row" *ngIf="!HideSubmit">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                <div class="example-button-row">
+                    <button class="msr-3" mat-raised-button="mat-raised-button" [disabled]="isLoading" color="primary"
+                        (click)="onFetchData()"> <span *ngIf="!isLoading">Next</span>
+                        <span *ngIf="isLoading" class="spinner-grow spinner-grow-sm" role="status"
+                            aria-hidden="true"></span>
+                        <span *ngIf="isLoading">Loading...</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        <div class="row" *ngIf="HideSubmit">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                <div class="example-button-row">
+                    <button class="msr-3" mat-raised-button="mat-raised-button" color="primary"
+                        (click)="onSubmit()">Submit</button>
+                </div>
+               
+
+            </div>
+
+        </div>
+    </form>
+    <div class="marquee">
+        <!-- <ngx-datetime-picker ></ngx-datetime-picker> -->
+        <div class="form-group col-sm-6">
+        <h1>This GUI is For Flow & Data Testing Purpose Only</h1>
+        </div>
+    </div>
+</section>

@@ -31,13 +31,16 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { EwaybillConfigComponent } from './ewaybill-config/ewaybill-config.component';
 import { EwayBillDetailsComponent } from './eway-bill-details/eway-bill-details.component';
 import { EwayBillDocketBookingComponent } from './eway-bill-docket-booking/eway-bill-docket-booking.component';
-
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
+import { MatTableModule } from '@angular/material/table';
 @NgModule({
  
   imports: [
     CommonModule,
     MastersRoutingModule,
     MatIconModule,
+    NgbModule,
     MatTreeModule,
     MatDialogModule,
     MatSnackBarModule,
@@ -49,6 +52,7 @@ import { EwayBillDocketBookingComponent } from './eway-bill-docket-booking/eway-
     MatFormFieldModule,
     MatInputModule,
     MatSnackBarModule,
+    MatTableModule,
     MatButtonModule,
     MatIconModule,
     MatRadioModule,
@@ -67,11 +71,13 @@ import { EwayBillDocketBookingComponent } from './eway-bill-docket-booking/eway-
     SharedModule,
     MatPaginatorModule,
     MatExpansionModule,
-    MatStepperModule
+    MatStepperModule,
+    NgxMaterialTimepickerModule,
+    ReactiveFormsModule
     
   ],
   
-  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent],
+  declarations: [CNoteGenerationComponent,EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent],
   
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },]
 })

@@ -2,7 +2,12 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: Build and deploy Node.js app to Azure Web App - webx-velocity-docket
-
+env:
+  APP_NAME: velocity-docket
+  AZURE_WEBAPP_NAME: webx-velocity-docket
+  AZURE_WEBAPP_PACKAGE_PATH: './dist/main'
+  NODE_VERSION: '16.x'
+    
 on:
   push:
     branches:
@@ -15,24 +20,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Set up Node.js version
-        uses: actions/setup-node@v1
+      
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: npm install, build
         run: |
-          npm install -- force
+          npm install --force
           npm run build --if-present
-       
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
-          name: node-app
-          path: .
-
+          name: ${{ env.APP_NAME }}
+          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -44,13 +48,13 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
-          name: node-app
+          name: ${{ env.APP_NAME }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'webx-velocity-docket'
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BF78391891F54C2B983693B7672A5C15 }}
           package: .

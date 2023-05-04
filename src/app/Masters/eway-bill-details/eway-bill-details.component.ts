@@ -54,7 +54,7 @@ export class EwayBillDetailsComponent implements OnInit {
   ngOnInit(): void {
   }
   getGenaralMaster() {
-    debugger;
+    ;
       let reqBody = {
         companyCode: parseInt(localStorage.getItem("companyCode")),
         ddArray: ['SVCTYP']
@@ -74,16 +74,21 @@ export class EwayBillDetailsComponent implements OnInit {
    
   }
   onFetchData() {
-    debugger;
     this.isLoading = true;
     if(this.EwayBill.value.EWBNo){
     this.ICnoteService.cnotePost('courses/ewaybill', this.EwayBill.value).subscribe({
       next: (res: any) => {
         if (res) {
+          if(res[0][1].Consignor){
           this.ewayBillDetail = res;
           this.contractNo =res[0][1]?.Consignor.ContractId || '';
           this.EwayBill.controls['PayBasis'].setValue(res[0][1].Consignor.Contract_Type || '');
           this.GetContractDetail();
+          }
+          else{
+            SwalerrorMessage("Warn","No Contract Found in Master","",true);
+            this.isLoading = false;
+          }
         }
         else{
           SwalerrorMessage("Warn","No Data Fetch From Api","",true);
@@ -92,7 +97,7 @@ export class EwayBillDetailsComponent implements OnInit {
       },
       error: (err: any) => {
         this.isLoading = false;
-        SwalerrorMessage("error","Not Data Found in  E-Way Bill Please Try Another EwayBill No","",true);
+        SwalerrorMessage("error","The Eway Bill number you entered is invalid or does not exist in our records. Please verify the number and try again","",true);
       }
     })
   }
@@ -106,7 +111,6 @@ export class EwayBillDetailsComponent implements OnInit {
   
 
   GetContractDetail() {
-    debugger;
     let reqBody = {
       companyCode: parseInt(localStorage.getItem('companyCode')),
       PAYBAS: this.EwayBill.value.PayBasis,

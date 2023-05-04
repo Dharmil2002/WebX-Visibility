@@ -243,7 +243,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //End
   constructor(private fb: UntypedFormBuilder, private Route: Router, private cdr: ChangeDetectorRef, private modalService: NgbModal, private dialog: MatDialog, private ICnoteService: CnoteService, @Inject(PLATFORM_ID) private platformId: Object, private datePipe: DatePipe) {
-    debugger
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.EwayBillDetail = this.Route.getCurrentNavigation()?.extras?.state.Ewddata;
       this.EwayBill = true;
@@ -263,7 +262,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Define a function that creates and returns a FormGroup for step 1 of the form
   step1Formgrop(): UntypedFormGroup {
-    debugger;
     const formControls = {}; // Initialize an empty object to hold form controls
     this.step1Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '1'); // Filter the form data to get only the controls for step 1
     // Loop through the step 1 form controls and add them to the form group
@@ -286,7 +284,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //step-2 Formgrop 
   step2Formgrop(): UntypedFormGroup {
-    debugger;
     const formControls = {};
     // get all the form controls belonging to step 2
     this.step2Formcontrol = this.CnoteData.filter((x) => x.frmgrp == '2')
@@ -618,7 +615,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //ConsignorAutoFill
   ConsignorAutoFill() {
-    debugger;
     //set the value of GSTINNO control to the GSTINNumber of CST_NM control if it is not null, otherwise set it to empty string
     this.step2.controls['GSTINNO'].setValue(this.step2.controls['CST_NM'].value == null ? '' : this.step2.controls['CST_NM'].value.GSTINNumber);
     //set the value of CST_ADD control to the CustAddress of CST_NM control
@@ -633,7 +629,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   // ConsigneeAutoFill function to auto-fill Consignee details
   ConsigneeAutoFill() {
-    debugger;
     // Set ConsigneeGSTINNO control value to GSTIN number if it exists, otherwise set it to empty string
     this.step2.controls['ConsigneeGSTINNO'].setValue(this.step2.controls['ConsigneeCST_NM'].value.GSTINNumber == null ? '' : this.step2.controls['ConsigneeCST_NM'].value.GSTINNumber);
 
@@ -651,7 +646,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Get all fields and bind
   GetCnotecontrols() {
-    debugger;
     this.ICnoteService.getCnoteBooking('cnotefields/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         if (res) {
@@ -684,7 +678,6 @@ export class CNoteGenerationComponent implements OnInit {
     this.ICnoteService.getCnoteBooking('services/companyWiseRules/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         if (res) {
-          debugger;
           // Set the Rules variable to the first element of the response array
           this.Rules = res[0];
           // Get the Invoice Level Contract Invoke rule and check if its default value is "Y"
@@ -740,7 +733,6 @@ export class CNoteGenerationComponent implements OnInit {
   }
   //E-wayBillDetail
   EwayBillDetailAutoFill() {
-    debugger;
     let fromcity = {
       Name: this.EwayBillDetail[1].FromMaster.city || '',
       Value: this.EwayBillDetail[1].FromMaster.city || '',
@@ -943,7 +935,6 @@ export class CNoteGenerationComponent implements OnInit {
    * @param event The event that triggered the method.
    */
   getBillingPartyAutoComplete(event) {
-    debugger;
     let step = 'step' + this.CnoteData.find((x) => x.name == event).frmgrp;
     let control;
     switch (step) {
@@ -1002,7 +993,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Filter function for billing party autocomplete
   getBillingPartyFilter(event) {
-    debugger;
     // Determine which step the billing party control is in
     let step = 'step' + this.CnoteData.find((x) => x.name == event).frmgrp;
 
@@ -1118,7 +1108,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Get Destination data company wise
   GetDestinationDataCompanyWise() {
-    debugger;
     if (this.mapcityRule == "Y" || this.EwayBill) {
       // Find the BL code from the step1 form control
       //let bLcode = this.step1Formcontrol.find((x) => x.name == 'DELLOC');
@@ -1902,7 +1891,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   ///CalculateRowLevelChargeWeight() 
   CalculateRowLevelChargeWeight(event, FlagCalculateInvoiceTotal) {
-    debugger
     let cubinWeight = parseFloat(event.controls.CUB_WT?.value || 0);
     let ActualWeight = parseFloat(event.controls.ACT_WT?.value || 0);
     switch (this.WeightToConsider) {
@@ -1929,7 +1917,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //CalculateInvoiceTotal
   CalculateInvoiceTotal() {
-    debugger;
     let TotalChargedNoofPackages = 0;
     let TotalChargedWeight = 0;
     let TotalDeclaredValue = 0;
@@ -2880,7 +2867,6 @@ export class CNoteGenerationComponent implements OnInit {
     }
   }
   toCityAutofill(event) {
-    debugger;
     let toCity = {
       Value: event.option.value.LocCity,
       Name: event.option.value.LocCity,
@@ -2945,7 +2931,6 @@ export class CNoteGenerationComponent implements OnInit {
 
   //  end
   Onsubmit() {
-    debugger
     if (this.IsDocketEdit == "Y") {
 
     }

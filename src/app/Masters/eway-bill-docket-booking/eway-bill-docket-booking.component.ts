@@ -22,8 +22,10 @@ import {
 import { DocketChargesEntity, DocketEntity, DocketGstEntity, InvoiceEntity, StateDocumentDetailEntity, ViaCityDetailEntity } from "src/app/core/models/docketModel";
 import { DocketMongoDetails, InvoiceArray } from "src/app/core/models/Docketmongos";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
+import { jsonDataServiceService } from "src/app/core/service/Utility/json-data-service.service";
 import { roundNumber, WebxConvert } from "src/app/Utility/commonfunction";
 import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
+import Swal from "sweetalert2";
 @Component({
   selector: "app-eway-bill-docket-booking",
   templateUrl: "./eway-bill-docket-booking.component.html",
@@ -134,12 +136,14 @@ export class EwayBillDocketBookingComponent implements OnInit {
   CcmServicesData: any;
   AppointmentDetails: Cnote[];
   DocketField: any;
+  gDockNo: any;
   constructor(
     private ICnoteService: CnoteService,
     private fb: UntypedFormBuilder,
     private datePipe: DatePipe,
     private Route: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private IjsonDataServiceService:jsonDataServiceService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.EwayBillDetail =
@@ -830,8 +834,9 @@ export class EwayBillDocketBookingComponent implements OnInit {
       this.getRules();
 
     }, 3000);
-
+    
   }
+
   //GetDestination
   GetDestination() {
     if (this.step2.controls["Destination"].value.length > 3) {
@@ -1927,7 +1932,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         this.DocketEntity.BasedOn1 = this.BaseCode1 ? this.BaseCode1 : '';
         this.DocketEntity.BasedOn2 = this.BasedOn2 ? this.BasedOn2 : '';
         this.DocketEntity.UseFrom = this.UseFrom ? this.UseFrom : '';
-        this.DocketEntity.Origin = 'MUMB';
+        this.DocketEntity.Origin = this.step2.controls['OrgLoc']?.value.split(':')[0]||'MUMB';
         this.DocketEntity.UseTo = this.UseTo ? this.UseTo : '';
         this.DocketEntity.UseTransMode = this.UseTransMode ? this.UseTransMode : '';
         this.DocketEntity.UseRateType = this.UseRateType ? this.UseRateType : '';
@@ -2129,10 +2134,23 @@ export class EwayBillDocketBookingComponent implements OnInit {
         this.DocketEntity.TotalChargedNoofPkgsQuickCnot = 0
         this.DocketEntity.BillingPartysCode = this.step1.controls['PRQ_BILLINGPARTY']?.value.Value || ''
         this.DocketEntity.BillingPartysName = this.step1.controls['PRQ_BILLINGPARTY']?.value.Name || ''
-        console.log(this.DocketEntity);
         this.ICnoteService.cnotePost('services/BookDocket', this.DocketEntity).subscribe({
           next: (res: any) => {
-            SwalerrorMessage("success", "DocketNo:" + res.result[0].DocketNumber, "", true);
+            this.gDockNo= res.result[0].DocketNumber
+            Swal.fire({
+              icon:"success",
+              title:"DocketNo:" + res.result[0].DocketNumber,
+              html: "",
+              showConfirmButton: true,
+              showCancelButton: true,
+              confirmButtonText: 'DocketDetails',  
+              cancelButtonText: 'Done'
+            }).then((result)=>{
+             if(result.value){
+               this.ExportJson();
+             }
+             
+            })
           }
         })
   
@@ -2162,5 +2180,52 @@ export class EwayBillDocketBookingComponent implements OnInit {
       return item;
     });
   }
+  ExportJson(){
+    console.log("hellow");
+  let ewayBillJsonDetail={
+     "DocketNumber": this.gDockNo,
+     "DocketDate":this.DocketEntity.DocketDate,
+     "Billing Party":this.DocketEntity.BillingPartys,
+     "From City":this.DocketEntity.FromCity,
+     "To City":this.DocketEntity.ToCity,
+     "Consignor Name":this.DocketEntity.ConsignorName,
+     "Consignor GSTIN No":this.DocketEntity.ConsignorGstin,
+     "Consignor City":this.DocketEntity.ConsignorCity,
+     "Consignor PinCode":this.DocketEntity.ConsignorPinCode,
+     "Consignor TelephoneNo":this.DocketEntity.ConsigneeTelephoneNo,
+     "Consignor MobileNo":this.DocketEntity.ConsignorMobileNo,
+     "Consignor Address":this.DocketEntity.ConsignorAddress,
+     "Consignee Name":this.DocketEntity.ConsigneeName,
+     "Consignee GSTIN No":this.DocketEntity.ConsigneeGstin,
+     "Consignee City":this.DocketEntity.ConsigneeCity,
+     "Consignee PinCode":this.DocketEntity.ConsigneePinCode,
+     "Consignee TelephoneNo":this.DocketEntity.ConsigneeTelephoneNo,
+     "Consignee MobileNo":this.DocketEntity.ConsigneeMobileNo,
+     "Consignee Address":this.DocketEntity.ConsigneeAddress,
+     "Booking Branch":this.DocketEntity.Origin,
+     "Destination":this.DocketEntity.Destination,
+     "Payment Type":this.DocketEntity.PaymentType,
+     "Service Type":this.DocketEntity.ServiceType,
+     "Local":this.DocketEntity.IsLocalCNote,
+     "Oda":this.DocketEntity.IsOda,
+     "RiskType":this.DocketEntity.RiskType,
+     "Packaging Type":this.DocketEntity.PackagingType,
+     "Product":this.DocketField.prod,
+     "PRQNO":this.DocketEntity.PrqNumber,
+     "Is Market Vehicle":this.DocketEntity.IsMarketVehicle,
+     "Vehicle No":this.DocketEntity.VehicleNo,
+     "Source Cnote":this.DocketEntity.SourceCNote,
+     "CFT Ration":this.DocketEntity.VolRatio,
+     "CFT Total":this.DocketEntity.CftTotal,
+     "Charged Weight":this.DocketEntity.TotalChargedWeight,
+     "EDD":this.DocketEntity.EddDate,
+     "Volumetic":this.DocketEntity.IsVolumetric,
+     "Total Declared Value":this.DocketEntity.TotalDeclaredValue,
+     "Charged No of Pkg":this.DocketEntity.TotalChargedNoofPackages,
+     "Total Part Quantity":this.DocketEntity.TotalPartQuantity,
+     "Invoice Details":  this.DocketEntity.Invoices
 
+  }
+ this.IjsonDataServiceService.exportData(ewayBillJsonDetail); 
+  }
 }

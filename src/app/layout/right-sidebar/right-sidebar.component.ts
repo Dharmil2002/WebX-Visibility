@@ -312,7 +312,6 @@ export class RightSidebarComponent
 
 
   sendfilterdata() {
-    debugger
     this.toggleRightSidebar();
     var fromdate = this.range.controls.start.value;
     var todate = this.range.controls.end.value;

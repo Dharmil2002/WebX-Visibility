@@ -22,7 +22,6 @@ export class DocketDashboardComponent implements OnInit {
     this.ewayBillDetail=localStorage.getItem("EwayBillDetail");
   }
   docketBooking(event){
-    debugger;
     if(event=='Docket'){
     this.router.navigate(["/Masters/Docket/Create"]);
     }

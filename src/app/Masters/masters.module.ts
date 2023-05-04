@@ -34,6 +34,7 @@ import { EwayBillDocketBookingComponent } from './eway-bill-docket-booking/eway-
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 import { MatTableModule } from '@angular/material/table';
+import { jsonDataServiceService } from '../core/service/Utility/json-data-service.service';
 @NgModule({
  
   imports: [
@@ -79,7 +80,7 @@ import { MatTableModule } from '@angular/material/table';
   
   declarations: [CNoteGenerationComponent,EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent],
   
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },]
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },jsonDataServiceService]
 })
 
   export class MastersModule { }

@@ -35,6 +35,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 import { MatTableModule } from '@angular/material/table';
 import { jsonDataServiceService } from '../core/service/Utility/json-data-service.service';
+import { LoadingsheetComponent } from './loadingsheet/loadingsheet.component';
+import { GridListComponent } from '../components/grid-list/grid-list.component';
 @NgModule({
  
   imports: [
@@ -78,7 +80,7 @@ import { jsonDataServiceService } from '../core/service/Utility/json-data-servic
     
   ],
   
-  declarations: [CNoteGenerationComponent,EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent],
+  declarations: [CNoteGenerationComponent,EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent,GridListComponent],
   
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },jsonDataServiceService]
 })

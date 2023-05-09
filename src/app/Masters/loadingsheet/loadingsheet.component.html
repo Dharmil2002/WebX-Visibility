@@ -1,0 +1,50 @@
+<section class="content">
+    <div class="container-fluid">
+        <div>
+            <div class="block-header" *ngFor="let breadscrum of breadscrums">
+                <!-- breadcrumb -->
+                <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+                </app-breadcrumb>
+            </div>
+            <div *ngIf="this.index==0">
+                <div class="row">
+                    <ng-container *ngFor="let item of selectItems">
+                        <div [class]="divcol">
+                            <mat-form-field class="example-full-width" appearance="outline">
+                                <mat-label>{{ item.label }}</mat-label>
+                                <mat-select>
+                                    <mat-option *ngFor="let option of item.options" [value]="option">{{ option
+                                        }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                        <div class="example-button-row d-flex">
+                            <button class="msr-3" mat-raised-button color="primary" (click)="Showlist()">Show Docket
+                                List</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="this.index==1">
+            <div>
+                <app-grid-list class="w-100" *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+                    [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
+                    [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)"
+                    [metaData]="METADATA"></app-grid-list>
+            </div>
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+                    <div class="example-button-row d-flex justify-content-end">
+                        <button class="msr-3" mat-raised-button color="primary" (click)="generatels()">Generate
+                            LoadingSheet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

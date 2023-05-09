@@ -28,6 +28,9 @@ export class DocketDashboardComponent implements OnInit {
     else if(event=='EwaybillNo'){
       this.router.navigate(["/Masters/Docket/Ewaybill"]);
     }
+    else if(event=='LoadingSheet'){
+      this.router.navigate(["/Masters/Docket/LoadingSheet"]);
+    }
     else{
       this.router.navigate(["/Masters/Docket/Ewaybill-Config"])}
      

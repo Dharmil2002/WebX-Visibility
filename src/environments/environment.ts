@@ -16,6 +16,7 @@ export const environment = {
   localHost: " http://localhost:7233/api/DMS/",
   localNumberFormat: "en-IN",
   APIBaseURL:"http://localhost:3000/api/",
+  APIBaseNewURL:"http://localhost:3000/v1/",
   APIBaseBetaURL:"https://cnoteentry.azurewebsites.net/api/",
   APIMongoUrl:"http://localhost:5000/v1/"
 };

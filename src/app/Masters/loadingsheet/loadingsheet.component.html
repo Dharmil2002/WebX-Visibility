@@ -6,19 +6,36 @@
                 <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
                 </app-breadcrumb>
             </div>
-            <div *ngIf="this.index==0">
+            <div>
                 <div class="row">
+                    <form class="register-form m-4" [formGroup]="formGrop">
                     <ng-container *ngFor="let item of selectItems">
                         <div [class]="divcol">
-                            <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-form-field class="example-full-width" appearance="outline"  *ngIf="item.type=='text'">
                                 <mat-label>{{ item.label }}</mat-label>
-                                <mat-select>
-                                    <mat-option *ngFor="let option of item.options" [value]="option">{{ option
-                                        }}</mat-option>
-                                </mat-select>
+                                <input matInput type="item.type"
+                                (change)="callActionFunction(item.ActionFunction,$event)"
+                                [formControlName]="item.Name" autocomplete="off">
+                            </mat-form-field>
+                        </div>
+                        <div [class]="divcol">
+                            <mat-form-field class="example-full-width" appearance="outline"  *ngIf="item.type=='autodropdown'">
+                                <mat-label>{{ item.label }}</mat-label>
+                                <input matInput [formControlName]="item.Name"
+                                (input)="callActionFunction(item.Search)"
+                                autocomplete="off" [matAutocomplete]="auto">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                [displayWith]="displaycommonFn"
+                                (optionSelected)="callActionFunction(item.ActionFunction,$event)">
+                                <mat-option *ngFor="let option of item.filteredcommon | async"
+                                    [value]="option">
+                                    {{option.Value+":"+option.Name}}
+                                </mat-option>
+                            </mat-autocomplete>
                             </mat-form-field>
                         </div>
                     </ng-container>
+                </form>
                 </div>
                 <div class="row">
                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
@@ -34,7 +51,7 @@
             <div>
                 <app-grid-list class="w-100" *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
                     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
-                    [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)"
+                    [csvFileName]="csvFileName" [csvData]="csv" (onFlagChange)="IsActiveFuntion($event)"
                     [metaData]="METADATA"></app-grid-list>
             </div>
             <div class="row">

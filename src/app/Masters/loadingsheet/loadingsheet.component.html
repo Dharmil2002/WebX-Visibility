@@ -52,13 +52,13 @@
                 <app-grid-list class="w-100" *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
                     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
                     [csvFileName]="csvFileName" [csvData]="csv" (onFlagChange)="IsActiveFuntion($event)"
-                    [metaData]="METADATA"></app-grid-list>
+                    [metaData]="METADATA"[dropDownValue]='formGrop.value?.ruteCode'></app-grid-list>
             </div>
             <div class="row">
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
                     <div class="example-button-row d-flex justify-content-end">
-                        <button class="msr-3" mat-raised-button color="primary" (click)="generatels()">Generate
-                            LoadingSheet</button>
+                       <!-- <button class="msr-3" mat-raised-button color="primary" (click)="generatels()">Generate
+                            LoadingSheet</button>  -->
                     </div>
                 </div>
             </div>

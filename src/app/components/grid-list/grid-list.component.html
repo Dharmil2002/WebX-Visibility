@@ -126,11 +126,12 @@
                                 <mat-checkbox *ngIf="tableData=='checkBoxRequired'" color="primary"
                                     [(ngModel)]="element.isSelected" (change)="getCheckData($event)"
                                     class="example-margin"></mat-checkbox>
-                                {{tableData !== 'activeFlag' && tableData !== 'isActive' ? formatData(element[tableData]
+                                {{tableData !== 'activeFlag' && tableData !== 'isActive' && tableData !== 'link' ? formatData(element[tableData]
                                 , tableData ): '' }}
                                 <mat-slide-toggle *ngIf="tableData=='activeFlag'" color="primary"
                                     (change)="isActive(element)" [(ngModel)]="element.activeFlag">
                                 </mat-slide-toggle>
+                                <a *ngIf="tableData === 'link'" (click)="onChanged(element)"><u>{{ formatData(element[tableData], tableData) }}</u></a>
                                 <mat-slide-toggle *ngIf="tableData=='isActive'" color="primary"
                                     (change)="isActive(element)" [(ngModel)]="element.isActive"> </mat-slide-toggle>
                                 <button mat-icon-button *ngIf="tableData=='actions'" (click)="$event.stopPropagation()"

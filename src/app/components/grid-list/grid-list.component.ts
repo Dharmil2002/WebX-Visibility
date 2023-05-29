@@ -33,6 +33,7 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   // ];
   @Input() dataSource: MatTableDataSource<any>;
   @Input() tableData;
+  @Input() dropDownValue;
   @Input() csvData;
   @Input() columnHeader;
   @Input() addAndEditPath;
@@ -54,6 +55,7 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   @Input() activeFunction: Function;
   tableLoad: boolean = true;
   @Output() onFlagChange: EventEmitter<any> = new EventEmitter();
+  @Output() onChecked: EventEmitter<any> = new EventEmitter();
   @Output() dialogClosed = new EventEmitter<any>();
   selectedItems: any[] = [];
 
@@ -256,8 +258,14 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
     return this.dataSource.filteredData.filter(item => item['isSelected'] == true);
   }
 
-  getCheckData(data) {
-    console.log(this.getSelecteditems());//get data on single selection
+  getCheckData() {
+    this.onChecked.emit(this.getSelecteditems())
   }
-
+  onChanged(item){
+    this.router.navigate([this.addAndEditPath], {
+      state: {
+        data: {data:item,dropDownValue:this.dropDownValue},
+      },
+    });
+  }
 }

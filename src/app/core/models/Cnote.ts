@@ -21,7 +21,15 @@ export class Cnote {
    filteredOptions: Observable<AutoCompleteCity[]>;
 }
 
-
+export class DyanmicControl{
+   label: string
+   Name:string
+   type:string
+   Search:string
+   ActionFunction:string
+   autocomplete:string
+   filteredcommon: Observable<AutoCompleteCity[]>
+}
 export class Rules {
    code: string;
    description: string;

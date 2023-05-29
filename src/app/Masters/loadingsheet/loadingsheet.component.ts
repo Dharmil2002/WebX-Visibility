@@ -6,6 +6,7 @@ import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.se
 import { Observable, map, startWith } from 'rxjs';
 import { AutoCompleteCity, DyanmicControl } from 'src/app/core/models/Cnote';
 import { DatePipe } from '@angular/common';
+import { getArrayAfterMatch } from 'src/app/Utility/commonfunction';
 @Component({
   selector: 'app-loadingsheet',
   templateUrl: './loadingsheet.component.html'
@@ -25,11 +26,11 @@ export class LoadingsheetComponent {
   columnHeader = {
     "checkBoxRequired": "",
     "Docket": "Docket Dest Loc",
-    "Count": "Count",
+    "link": "Count",
     "TotalPackage": "TotalPackage",
     "TotalWeight": "TotalWeight",
     "TotalCFT": "TotalCFT",
-    "VehicleCapacity": "VehicleCapacity"
+    "VehicleCapacity": "VehicleCapacity",
   }
   filteredcharge: Observable<AutoCompleteCity[]>;
   METADATA = {
@@ -38,7 +39,9 @@ export class LoadingsheetComponent {
     noColumnSort: ['checkBoxRequired']
   }
   //#endregion
+  
   IscheckBoxRequired: boolean;
+  addAndEditPath:string;
   selectItems:DyanmicControl[];
   divcol: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   breadscrums = [
@@ -64,7 +67,7 @@ export class LoadingsheetComponent {
     // super();
     this.IscheckBoxRequired = true;
     this.formGrop = this.createUserForm()
-  
+    this.addAndEditPath='/Masters/Docket/LoadingSheetDetails'
     
   }
   ngOnInit(): void {
@@ -107,7 +110,6 @@ export class LoadingsheetComponent {
         this.ICnoteService.cnoteNewPost("docket/getRoutedropdown", req).subscribe({
           next: (res: any) => {
             if (res) {
-              console.log(res);
               this.ruteDetails = res;
               this.getRuteFilter();
             } else {
@@ -187,7 +189,7 @@ export class LoadingsheetComponent {
   }
   getDetails(){
     let ruteHlocation= this.formGrop.value?.ruteCode.Name.split("-");
-    let routeRlocation= this.getArrayAfterMatch(ruteHlocation,this.orgBranch);
+    let routeRlocation= getArrayAfterMatch(ruteHlocation,this.orgBranch);
     try {
       // Creates the request object to be sent to the API endpoint
       let req = {
@@ -200,7 +202,6 @@ export class LoadingsheetComponent {
       this.ICnoteService.cnoteNewPost("docket/getRouteWiseDocketDetails", req).subscribe({
         next: (res: any) => {
           if (res) {
-            debugger;
               this.index = 1;
               const countsObj = res.reduce((acc, obj) => {
                 const key = obj.DESTCD;
@@ -214,14 +215,13 @@ export class LoadingsheetComponent {
                 const totalCFT = filteredObjects.reduce((acc, obj) => acc + obj.CHRGWT, 0);
                 return {
                   Docket: key,
-                  Count: countsObj[key],
+                  link: countsObj[key],
                   TotalPackage: totalPackage,
                   TotalWeight: totalWeight,
                   TotalCFT: totalCFT,
                   VehicleCapacity:''
                 };
               });
-              console.log("countOBJ"+this.myArray);
               this.data = this.myArray;
               this.csv = this.data;
               this.tableload = false;
@@ -240,11 +240,5 @@ export class LoadingsheetComponent {
     this.getDetails();
   }
   /* return locations on the route which comes after origin branch  */
-  getArrayAfterMatch(arr, element) {
-      const index = arr.indexOf(element);
-      if (index === -1) {
-        return [];
-      }
-      return arr.slice(index + 1);
-    }
+
 }

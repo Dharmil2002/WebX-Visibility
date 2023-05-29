@@ -37,6 +37,8 @@ import { MatTableModule } from '@angular/material/table';
 import { jsonDataServiceService } from '../core/service/Utility/json-data-service.service';
 import { LoadingsheetComponent } from './loadingsheet/loadingsheet.component';
 import { GridListComponent } from '../components/grid-list/grid-list.component';
+import { LoadingSheetDetailsComponent } from './loading-sheet-details/loading-sheet-details.component';
+import { LoadingsheetgenerateComponent } from './loadingsheetgenerate/loadingsheetgenerate.component';
 @NgModule({
  
   imports: [
@@ -80,7 +82,7 @@ import { GridListComponent } from '../components/grid-list/grid-list.component';
     
   ],
   
-  declarations: [CNoteGenerationComponent,EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent,GridListComponent],
+  declarations: [CNoteGenerationComponent,EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent,GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent],
   
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },jsonDataServiceService]
 })

@@ -6,6 +6,10 @@
                 <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
                 </app-breadcrumb>
             </div>
+            <div *ngIf="tableload==true" class="tbl-spinner">
+                <mat-progress-spinner color="primary" [diameter]="100" mode="indeterminate">
+                </mat-progress-spinner>
+            </div>
         </div>
         <div >
             <div>
@@ -14,7 +18,7 @@
                     [csvFileName]="csvFileName" [csvData]="csv" (onFlagChange)="IsActiveFuntion($event)" (onChecked)="onFlagChange($event)" 
                     [metaData]="METADATA"></app-grid-list>
             </div>
-            <div class="row">
+            <div class="row"  *ngIf="!tableload">
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
                     <div class="example-button-row d-flex justify-content-end">
                         <button class="msr-3" mat-raised-button color="primary" (click)="loadingSheetGenerate()">Generate

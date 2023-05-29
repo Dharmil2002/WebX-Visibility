@@ -107,7 +107,7 @@ export class LoadingsheetComponent {
         };
 
         // Makes the API call to fetch the Consignor City
-        this.ICnoteService.cnoteNewPost("docket/getRoutedropdown", req).subscribe({
+        this.ICnoteService.cnotePost("docket/getRoutedropdown", req).subscribe({
           next: (res: any) => {
             if (res) {
               this.ruteDetails = res;
@@ -199,7 +199,7 @@ export class LoadingsheetComponent {
       };
     
       // Makes the API call to fetch the Consignor City
-      this.ICnoteService.cnoteNewPost("docket/getRouteWiseDocketDetails", req).subscribe({
+      this.ICnoteService.cnotePost("docket/getRouteWiseDocketDetails", req).subscribe({
         next: (res: any) => {
           if (res) {
               this.index = 1;

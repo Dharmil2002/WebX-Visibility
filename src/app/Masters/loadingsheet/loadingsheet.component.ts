@@ -132,7 +132,7 @@ export class LoadingsheetComponent {
 
       // Makes the API call to fetch the Consignor City
       console.log(req);
-      this.ICnoteService.cnoteNewPost("docket/getRouteDetails", req).subscribe({
+      this.ICnoteService.cnotePost("docket/getRouteDetails", req).subscribe({
         next: (res: any) => {
           if (res) {
             const currentDate = new Date();

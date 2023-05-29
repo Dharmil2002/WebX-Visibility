@@ -25,7 +25,7 @@ export class LoadingSheetDetailsComponent implements OnInit {
   columnHeader = {
     "checkBoxRequired": "",
     "DKTNO":"Docket No",
-    "party_name":"Party Name",
+    "CSGNNM":"Party Name",
     "ORGNCD": "Orginal Branch",
     "DESTCD": "Destionation Branch",
     "FROMLOC": "From Location",

@@ -113,3 +113,12 @@ export class WebxConvert {
     return formattedNum;
   }
   
+/*Below the function which split the dropdown option*/
+export function getArrayAfterMatch(arr, element) {
+    const index = arr.indexOf(element);
+    if (index === -1) {
+      return [];
+    }
+    return arr.slice(index + 1);
+  }
+/* End */

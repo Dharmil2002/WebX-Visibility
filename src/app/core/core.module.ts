@@ -7,7 +7,8 @@ import { DynamicScriptLoaderService } from './service/dynamic-script-loader.serv
 import { throwIfAlreadyLoaded } from './guard/module-import.guard';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+  ],
   imports: [CommonModule],
   providers: [
     RightSidebarService,

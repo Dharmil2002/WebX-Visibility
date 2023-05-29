@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { error } from 'console';
 
 
 @Component({
@@ -35,20 +36,20 @@ export class EwaybillConfigComponent implements OnInit {
   }
 
   getEWayBill() {
-    const url = 'http://localhost:3000/api/courses/ewaybill';
-    const headers = {
-      'Ocp-Apim-Subscription-Key': 'd141e1390212494bb9a577af2d4ccb74',
-      'Content-Type': 'application/json'
-    };
-   
-    this.http.post(url,this.EwayBillFrom.value).subscribe(response => {
-       localStorage.setItem("EwayBillDetail",this.EwayBillFrom.value);
-      this.Route.navigate(['/Masters/Docket/Create'], {
-        state: {
-          UserTable: response,
-        },
-      });
-    });
+    const url = 'https://webx-tms-api.azurewebsites.net/v1/auth/login';
+    const reqBody = {
+      "companycode":10065,
+      "username": "ABHISHEK",
+      "password":"User@123"
+  }
+    this.http.post(url,reqBody).subscribe({next:(res:any)=>{
+      
+    }
+    ,error: (err:any)=>{
+       console.log(err);
+    }
+  })
+ 
    
   }
   

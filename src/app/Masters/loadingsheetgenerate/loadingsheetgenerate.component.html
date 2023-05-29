@@ -1,0 +1,15 @@
+<mat-dialog-content>
+    <div>
+        <app-grid-list class="w-100" [columnHeader]="tripcolumnHeader" [tableData]="LsDetails" [csvData]="LsDetails"
+            [metaData]="METADATA" (onChecked)="onFlagChange($event)"></app-grid-list>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+        <div class="example-button-row d-flex justify-content-end">
+            <button mat-button mat-dialog-close>Close</button>
+            <button class="msr-3" mat-raised-button color="primary" (click)="generateLoadingSheet()">Generate
+            </button>
+        </div>
+    </div>
+</mat-dialog-actions>

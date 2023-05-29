@@ -19,7 +19,7 @@ import {
   Radio,
   RequestContractKeys,
 } from "src/app/core/models/Cnote";
-import { DocketChargesEntity, DocketEntity, DocketGstEntity, InvoiceEntity, StateDocumentDetailEntity, ViaCityDetailEntity } from "src/app/core/models/docketModel";
+import { DocketEntity, DocketGstEntity, InvoiceEntity, StateDocumentDetailEntity, ViaCityDetailEntity } from "src/app/core/models/docketModel";
 import { DocketMongoDetails, InvoiceArray } from "src/app/core/models/Docketmongos";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { jsonDataServiceService } from "src/app/core/service/Utility/json-data-service.service";
@@ -833,7 +833,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
     setTimeout(() => {
       this.getRules();
 
-    }, 3000);
+    }, 1000);
     
   }
 
@@ -2181,7 +2181,6 @@ export class EwayBillDocketBookingComponent implements OnInit {
     });
   }
   ExportJson(){
-    console.log("hellow");
   let ewayBillJsonDetail={
      "DocketNumber": this.gDockNo,
      "DocketDate":this.DocketEntity.DocketDate,

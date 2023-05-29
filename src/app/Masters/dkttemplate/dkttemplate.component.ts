@@ -26,7 +26,6 @@ export class DKTTemplateComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   onSubmit() {
-    debugger;
     const headers = new HttpHeaders()
     //.set('Origin', 'http://localhost:4200') // Replace with your application's domain
     .set('Ocp-Apim-Subscription-Key', 'd141e1390212494bb9a577af2d4ccb74')

@@ -45,7 +45,6 @@ export class AuthService {
   }
 
   public get currentUserValue(): User {
-    debugger
     return this.currentUserSubject.value;
   }
   GetCompany(CompanyCode) {

@@ -72,7 +72,7 @@ export class LoadingsheetgenerateComponent implements OnInit {
 
  /*End*/
 
- /*generate a loadingSheet as Per User Selection*/
+ /*generate a  loadingSheet as Per User Selection*/
   generateLoadingSheet(){
     if(this.dataDetails && this.dataDetails.length>0){
     const result = this.docketNestedDetails.map(obj => obj.DOCKNO).join(',');

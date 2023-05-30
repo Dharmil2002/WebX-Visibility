@@ -1,39 +1,26 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { MatCheckboxChange } from '@angular/material/checkbox';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import moment from 'moment';
 import { fromEvent } from 'rxjs';
-import { CsvDataServiceService } from 'src/app/core/service/Utility/csv-data-service.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
+import moment from 'moment';
+import { CsvDataServiceService } from 'src/app/core/service/Utility/csv-data-service.service';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
-  selector: 'app-grid-list',
-  templateUrl: './grid-list.component.html'
+  selector: 'generic-table-webxpress',
+  templateUrl: './generic-table.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GridListComponent extends UnsubscribeOnDestroyAdapter implements AfterViewInit {
+export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implements AfterViewInit {
 
-  // divcol: string = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
-  // displayedColumns: string[] = ['Docket', 'Count', 'TotalPackage', 'TotalWeight', 'TotalCFT', 'VehicleCapacity'];
-  // dataSource = [
-  //   { Docket: 'Docket 1', Count: 10, TotalPackage: 20, TotalWeight: 200, TotalCFT: 50, VehicleCapacity: '50 tons' },
-  //   { Docket: '4553', Count: 'Hydrogen', TotalPackage: 1.0079, TotalWeight: 4, TotalCFT: 56, VehicleCapacity: 'H' },
-  //   { Docket: '546', Count: 'Helium', TotalPackage: 4.0026, TotalWeight: 5, TotalCFT: 56, VehicleCapacity: 'He' },
-  // ];
-  // columnDefinitions = [
-  //   { columnDef: 'Docket', header: 'Docket' },
-  //   { columnDef: 'Count', header: 'Count' },
-  //   { columnDef: 'TotalPackage', header: 'Total Package' },
-  //   { columnDef: 'TotalWeight', header: 'Total Weight' },
-  //   { columnDef: 'TotalCFT', header: 'Total CFT' },
-  //   { columnDef: 'VehicleCapacity', header: 'Vehicle Capacity' }
-  // ];
+  // properties declaration to receive data from parent component
   @Input() dataSource: MatTableDataSource<any>;
   @Input() tableData;
-  @Input() dropDownValue;
   @Input() csvData;
   @Input() columnHeader;
   @Input() addAndEditPath;
@@ -42,11 +29,18 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   @Input() viewComponent;
   @Input() csvFileName;
   @Input() headercode;
+  @Input()IscheckBoxRequired;
+  @Input()Link;
+  @Input()toggleArray;
+  @Input()dynamicControls;
+  @Input() menuItems: { label: string }[] = [];
+  @Input()menuItemFlag;
+  @Output() menuItemClicked = new EventEmitter<string>();
+  triggered: boolean = false;
   objectKeys = Object.keys;
+  // @Input() checkBoxRequired;
+  // @Input() selectAllorRenderedData;
   @Input() metaData;
-
-
-
   @ViewChild('table') table1: any;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild("filter", { static: true }) filter: ElementRef;
@@ -55,14 +49,17 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   @Input() activeFunction: Function;
   tableLoad: boolean = true;
   @Output() onFlagChange: EventEmitter<any> = new EventEmitter();
-  @Output() onChecked: EventEmitter<any> = new EventEmitter();
   @Output() dialogClosed = new EventEmitter<any>();
   selectedItems: any[] = [];
 
-  constructor(
+  ngOnChanges(changes: SimpleChanges) {
+    this.dynamicControls=changes.dynamicControls.currentValue
+  }
+  constructor(public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router, public dialog: MatDialog) {
     super();
   }
+
 
   ngOnInit() {
 
@@ -75,7 +72,7 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
     if (this.metaData.checkBoxRequired) {
 
       this.tableData = this.tableData.map(obj => {
-        obj['isSelected'] = false;
+       // obj['isSelected'] = false;
         return obj;
       })
     }
@@ -84,6 +81,8 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
     // "tableData" in this case.
     this.dataSource = new MatTableDataSource(this.tableData);
     this.dataSource.sort = this.sort;
+
+
   }
 
   ngAfterViewInit() {
@@ -190,13 +189,34 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   //#endregion
   //#region Funtion to send data for edit
   editCall(item) {
+    if(!this.menuItemFlag){
     this.router.navigate([this.addAndEditPath], {
       state: {
         data: item,
       },
     });
   }
+  }
   //#endregion
+  shouldDisplayLink(tableData: string): boolean {
+    if (this.triggered) {
+      return false;
+    }
+    
+    return this.Link && this.Link.some(item => item.Row && item.Row.includes(tableData));
+  }
+  
+  
+  //#region Funtion to send data for edit
+  drillDownData(item,tableData){
+      let drillDownLink=this.Link.find((x)=>x.Row==tableData)
+    this.router.navigate([drillDownLink.Path], {
+      state: {
+        data: item,
+      },
+    });
+  }
+  //#endregion  
   // #region  to Convert to Csv File 
   // csvData is 2D array , where first list id of csv headers and later whole table data is pushed row wise.
   ExportToCsv() {
@@ -219,7 +239,6 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   //#endregion
   //#region  Function to select all rows on table by selecting checkbox
   selectAll(event: MatCheckboxChange) {
-    debugger
     // Get the current page size and index from the paginator
     const pageSize = this.paginator.pageSize;
     const pageIndex = this.paginator.pageIndex;
@@ -230,32 +249,26 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
 
     // Check or uncheck all rows based on the header checkbox state
     if (event.checked) {
-      
       // Check if selectAllorRenderedData is true (both checkboxes enabled)
-      if (this.metaData?.checkBoxRequired && this.metaData?.selectAllorRenderedData) {
+      if (this.metaData?.checkBoxRequired && !this.metaData?.selectAllorRenderedData) {
         // Only select the data rendered on the current page
         for (let i = startIndex; i < endIndex; i++) {
           this.dataSource.filteredData[i]['isSelected'] = true;
         }
-
         console.log(this.dataSource.filteredData);//selected/deselected data
       } else {
-      
         // Select all rows in the data source
         this.dataSource.filteredData = this.dataSource.filteredData.map(obj => {
           obj['isSelected'] = true;
           return obj;
         });
-        this.getCheckData()
       }
     } else {
-      
       // Deselect all rows in the data source
       this.dataSource.filteredData = this.dataSource.filteredData.map(obj => {
         obj['isSelected'] = false;
         return obj;
       });
-      this.getCheckData()
     }
   }
 
@@ -265,15 +278,18 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
     return this.dataSource.filteredData.filter(item => item['isSelected'] == true);
   }
 
-  getCheckData() {
-    debugger;
-    this.onChecked.emit(this.getSelecteditems())
+  getCheckData(data) {
+    this.onFlagChange.emit(data)
+    console.log(this.getSelecteditems());//get data on single selection
   }
-  onChanged(item){
-    this.router.navigate([this.addAndEditPath], {
-      state: {
-        data: {data:item,dropDownValue:this.dropDownValue},
-      },
-    });
+  handleMenuItemClick(label: string,element) {
+    this.menuItemClicked.emit(label);
+    // if(label=='Add'){
+    //   this.addNew()
+    // }
+    // else{
+    //  this.editCall(element)
+    // }
+    // Perform some action when a menu item is clicked in the child component
   }
 }

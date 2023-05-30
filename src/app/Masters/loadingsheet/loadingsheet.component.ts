@@ -27,8 +27,8 @@ export class LoadingsheetComponent {
     "checkBoxRequired": "",
     "Docket": "Docket Dest Loc",
     "link": "Count",
-    "TotalPackage": "TotalPackage",
-    "TotalWeight": "TotalWeight",
+    "TotalPackage": "TotalPackage(kg)",
+    "TotalWeight": "TotalWeight(kg)",
     "TotalCFT": "TotalCFT",
     "VehicleCapacity": "VehicleCapacity",
   }

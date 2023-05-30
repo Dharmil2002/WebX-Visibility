@@ -131,7 +131,7 @@
                                 <mat-slide-toggle *ngIf="tableData=='activeFlag'" color="primary"
                                     (change)="isActive(element)" [(ngModel)]="element.activeFlag">
                                 </mat-slide-toggle>
-                                <a *ngIf="tableData === 'link'" (click)="onChanged(element)"><u>{{ formatData(element[tableData], tableData) }}</u></a>
+                                <a *ngIf="tableData === 'link'" class="pointer" (click)="onChanged(element)"><u>{{ formatData(element[tableData], tableData) }}</u></a>
                                 <mat-slide-toggle *ngIf="tableData=='isActive'" color="primary"
                                     (change)="isActive(element)" [(ngModel)]="element.isActive"> </mat-slide-toggle>
                                 <button mat-icon-button *ngIf="tableData=='actions'" (click)="$event.stopPropagation()"

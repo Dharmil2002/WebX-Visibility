@@ -1,0 +1,130 @@
+<section class="content">
+  <div class="container-fluid">
+    <!-- This is the heading of the dashboard -->
+    <h3 class="pl-1 CONTROLTOWER">Dashboard</h3>
+
+    <!-- This row holds the boxes of the dashboard -->
+    <div class="row clearfix">
+
+      <!-- This loop creates a box for each item in the boxData array -->
+      <div *ngFor="let box of boxData" class="col-lg-4 col-sm-6">
+
+        <!-- This box is a clickable item -->
+          <div class="counter-box text-center">
+              <div class="text font-17 m-b-5">{{box.title}}</div>
+              <h3 [class]="box.class">{{box.count}}
+              </h3>
+          </div>
+      </div>
+      </div>
+    <div class="row">
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>Docket Chart</h2>
+          </div>
+          <div class="body">
+      <div id="chart">
+        <apx-chart
+          [series]="pieNewChartOptions.series"
+          [chart]="pieNewChartOptions.chart"
+          [labels]="pieNewChartOptions.labels"
+          [responsive]="pieNewChartOptions.responsive"
+        ></apx-chart>
+      </div>
+      </div>
+      </div>
+      </div>
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>Docket Chart</h2>
+          </div>
+          <div class="body">
+            <div id="chart">
+              <apx-chart [series]="avgLecChartOptions.series" [chart]="avgLecChartOptions.chart"
+                [xaxis]="avgLecChartOptions.xaxis" [stroke]="avgLecChartOptions.stroke"
+                [colors]="avgLecChartOptions.colors" [dataLabels]="avgLecChartOptions.dataLabels"
+                [legend]="avgLecChartOptions.legend" [markers]="avgLecChartOptions.markers"
+                [grid]="avgLecChartOptions.grid" [yaxis]="avgLecChartOptions.yaxis"
+                [tooltip]="avgLecChartOptions.tooltip" [title]="avgLecChartOptions.title"
+                [fill]="avgLecChartOptions.fill">
+              </apx-chart>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>Docket Chart</h2>
+          </div>
+          <div class="body">
+            <div id="chart">
+              <apx-chart [series]="pieChartOptions.series" [chart]="pieChartOptions.chart"
+                [labels]="pieChartOptions.labels" [responsive]="pieChartOptions.responsive"
+                [dataLabels]="pieChartOptions.dataLabels" [legend]="pieChartOptions.legend" class="apex-pie-center">
+              </apx-chart>
+            </div>
+            <div class="table-responsive m-t-15">
+              <table class="table align-items-center">
+                <tbody *ngFor="let pieData of pieCharData">
+                  <tr>
+                    <td><i [class]="pieData.class"></i> {{pieData.category}}</td>
+                    <td class="col-green">{{pieData.count}}</td>
+                    <!-- <td class="col-green">+32%</td> -->
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+       
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>Docket Column Chart</h2>
+          </div>
+          <div class="body">
+      <div id="chart">
+        <apx-chart
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [dataLabels]="chartOptions.dataLabels"
+        [plotOptions]="chartOptions.plotOptions"
+        [yaxis]="chartOptions.yaxis"
+        [legend]="chartOptions.legend"
+        [fill]="chartOptions.fill"
+        [stroke]="chartOptions.stroke"
+        [tooltip]="chartOptions.tooltip"
+        [xaxis]="chartOptions.xaxis"
+      ></apx-chart>
+      </div>
+      </div>
+      </div>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>Docket TimeLine Column Chart</h2>
+          </div>
+          <div class="body">
+      <div id="chart">
+        <apx-chart
+        [series]="timeLinechartOptions.series"
+        [chart]="timeLinechartOptions.chart"
+        [xaxis]="timeLinechartOptions.xaxis"
+        [dataLabels]="timeLinechartOptions.dataLabels"
+        [grid]="timeLinechartOptions.grid"
+        [stroke]="timeLinechartOptions.stroke"
+        [title]="timeLinechartOptions.title"
+      ></apx-chart>
+      </div>
+      </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>

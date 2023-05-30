@@ -7,6 +7,7 @@ import { EwayBillDetailsComponent } from './eway-bill-details/eway-bill-details.
 import { EwayBillDocketBookingComponent } from './eway-bill-docket-booking/eway-bill-docket-booking.component';
 import { LoadingsheetComponent } from './loadingsheet/loadingsheet.component';
 import { LoadingSheetDetailsComponent } from './loading-sheet-details/loading-sheet-details.component';
+import { DispatchVehicleComponent } from './dispatch-vehicle/dispatch-vehicle.component';
 
 const routes: Routes = [
   {path:'Docket/Create',component:CNoteGenerationComponent},
@@ -14,7 +15,8 @@ const routes: Routes = [
   {path:'Docket/Ewaybill',component:EwayBillDetailsComponent},
   {path:'Docket/EwayBillDocketBooking',component:EwayBillDocketBookingComponent},
   {path:'Docket/LoadingSheet',component:LoadingsheetComponent},
-  {path:'Docket/LoadingSheetDetails',component:LoadingSheetDetailsComponent}
+  {path:'Docket/LoadingSheetDetails',component:LoadingSheetDetailsComponent},
+  {path:'Docket/DispatchVehicle',component:DispatchVehicleComponent}
 
 ];
 

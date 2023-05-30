@@ -1,0 +1,19 @@
+
+      <!-- This row holds the boxes of the dashboard -->
+      <div class="row clearfix dashboardcard">
+        <!-- This loop creates a box for each item in the boxData array -->
+           <div class="col-lg-3 col-sm-3" *ngFor="let box of boxData"  [style]="style">
+          <!-- This box is a clickable item -->
+              <div [class]="box.class">
+                <div class="info-box7-block">
+                    <h6 class="m-b-10">{{box.title}}</h6>
+                    <h2 class="text-end"><i
+                            [class]="box.icon"></i><span>{{box.count}}</span>
+                    </h2>
+            </div>
+        </div>
+        <div>
+        </div>
+</div>
+</div>
+

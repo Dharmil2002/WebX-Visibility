@@ -1,0 +1,17 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" [loadTable]="tableload"> 
+
+    <form [formGroup]="disPatchTableForm">
+        <app-form-without-auto-complete-webxpress 
+        [formData]="jsonControlParent" 
+        [form]="disPatchTableForm"
+       (functionCallEmitter)="functionCallHandler($event)">
+        </app-form-without-auto-complete-webxpress>
+        <h5>Vehicle details</h5>
+        <hr>
+        <app-form-without-auto-complete-webxpress 
+        [formData]="jsonControlchild" 
+        [form]="disPatchTableForm"
+        [showSaveAndCancelButton]="showSaveAndCancelButton" (functionCallEmitter)="functionCallHandler($event)">
+        </app-form-without-auto-complete-webxpress>
+    </form> 
+</app-common-wrapper-webxpress>

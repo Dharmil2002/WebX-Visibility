@@ -1,0 +1,76 @@
+
+<div class="row">
+    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12" *ngFor="let controls of DashboadChartsdata">
+      <div class="card">
+        <div class="header">
+          <h2>{{controls.label}}</h2>
+        </div>
+        <div class="body">
+          <div id="chart" *ngIf="controls.Type=='pieChart'&& pieChartData">
+            <apx-chart
+              [series]="pieNewChartOptions.series"
+              [chart]="pieNewChartOptions.chart"
+              [labels]="pieNewChartOptions.labels"
+              [responsive]="pieNewChartOptions.responsive"
+            ></apx-chart>
+          </div>
+  
+          <div id="chart" *ngIf="controls.Type=='lineChart'&& lineChartData">
+            <apx-chart
+              [series]="avgLecChartOptions.series"
+              [chart]="avgLecChartOptions.chart"
+              [xaxis]="avgLecChartOptions.xaxis"
+              [stroke]="avgLecChartOptions.stroke"
+              [colors]="avgLecChartOptions.colors"
+              [dataLabels]="avgLecChartOptions.dataLabels"
+              [legend]="avgLecChartOptions.legend"
+              [markers]="avgLecChartOptions.markers"
+              [grid]="avgLecChartOptions.grid"
+              [yaxis]="avgLecChartOptions.yaxis"
+              [tooltip]="avgLecChartOptions.tooltip"
+              [title]="avgLecChartOptions.title"
+              [fill]="avgLecChartOptions.fill"
+            ></apx-chart>
+          </div>
+  
+          <div id="chart" *ngIf="controls.Type=='advancePieChart'&& lineChartData">
+            <apx-chart
+              [series]="pieChartOptions.series"
+              [chart]="pieChartOptions.chart"
+              [labels]="pieChartOptions.labels"
+              [responsive]="pieChartOptions.responsive"
+              [dataLabels]="pieChartOptions.dataLabels"
+              [legend]="pieChartOptions.legend"
+              class="apex-pie-center"
+            ></apx-chart>
+          </div>
+          <div class="table-responsive m-t-15" *ngIf="controls.Type=='advancePieChart'&& advancePieChart">
+            <table class="table align-items-center">
+              <tbody *ngFor="let pieData of advancePieChart">
+                <tr>
+                  <td><i [class]="pieData.class"></i> {{pieData.category}}</td>
+                  <td class="col-green">{{pieData.count}}</td>
+                  <!-- <td class="col-green">+32%</td> -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+  
+          <div id="chart" *ngIf="controls.Type=='barChart'&& columnData">
+            <apx-chart
+              [series]="chartOptions.series"
+              [chart]="chartOptions.chart"
+              [dataLabels]="chartOptions.dataLabels"
+              [plotOptions]="chartOptions.plotOptions"
+              [yaxis]="chartOptions.yaxis"
+              [legend]="chartOptions.legend"
+              [fill]="chartOptions.fill"
+              [stroke]="chartOptions.stroke"
+              [tooltip]="chartOptions.tooltip"
+              [xaxis]="chartOptions.xaxis"
+            ></apx-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

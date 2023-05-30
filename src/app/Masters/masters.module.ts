@@ -31,16 +31,19 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { EwaybillConfigComponent } from './ewaybill-config/ewaybill-config.component';
 import { EwayBillDetailsComponent } from './eway-bill-details/eway-bill-details.component';
 import { EwayBillDocketBookingComponent } from './eway-bill-docket-booking/eway-bill-docket-booking.component';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { MatTableModule } from '@angular/material/table';
 import { jsonDataServiceService } from '../core/service/Utility/json-data-service.service';
 import { LoadingsheetComponent } from './loadingsheet/loadingsheet.component';
 import { GridListComponent } from '../components/grid-list/grid-list.component';
 import { LoadingSheetDetailsComponent } from './loading-sheet-details/loading-sheet-details.component';
 import { LoadingsheetgenerateComponent } from './loadingsheetgenerate/loadingsheetgenerate.component';
+import { SharedComponentsModule } from '../shared-components/shared-components.module';
+import { DispatchVehicleComponent } from './dispatch-vehicle/dispatch-vehicle.component';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 @NgModule({
- 
+
   imports: [
     CommonModule,
     MastersRoutingModule,
@@ -68,7 +71,7 @@ import { LoadingsheetgenerateComponent } from './loadingsheetgenerate/loadingshe
     MatDatepickerModule,
     MatDialogModule,
     MatSortModule,
-    MatToolbarModule,
+    MatToolbarModule, SharedComponentsModule,
     MatMenuModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
@@ -79,13 +82,12 @@ import { LoadingsheetgenerateComponent } from './loadingsheetgenerate/loadingshe
     MatStepperModule,
     NgxMaterialTimepickerModule,
     ReactiveFormsModule
-    
+
   ],
-  
-  declarations: [CNoteGenerationComponent,EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent,GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent],
-  
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },jsonDataServiceService]
+
+  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent, GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent, DispatchVehicleComponent],
+
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, jsonDataServiceService,FilterUtils]
 })
 
-  export class MastersModule { }
-  
+export class MastersModule { }

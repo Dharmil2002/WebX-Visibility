@@ -45,7 +45,6 @@ export class DispatchVehicleComponent implements OnInit {
   }
     //#region  to initialize form Control
     InitializeFormControl() {
-      debugger;
        /**
      * this function sets validation for different fields, dynamically.
      */
@@ -72,7 +71,6 @@ export class DispatchVehicleComponent implements OnInit {
 
     }
  getDispatch(){
-  debugger;
   this.http.get(this.jsonUrl).subscribe(res => {
     this.data=res;
     let tableArray= this.data.loadingdata;
@@ -109,7 +107,6 @@ export class DispatchVehicleComponent implements OnInit {
 
   //#region this function listen to the values emitted by 'add-form-webxpress'
   functionCallHandler($event) {
-    debugger
     // console.log("fn handler called" , $event);
 
     let field = $event.field;                   // the actual formControl instance

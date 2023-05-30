@@ -219,7 +219,6 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   //#endregion
   //#region  Function to select all rows on table by selecting checkbox
   selectAll(event: MatCheckboxChange) {
-    debugger
     // Get the current page size and index from the paginator
     const pageSize = this.paginator.pageSize;
     const pageIndex = this.paginator.pageIndex;
@@ -266,7 +265,6 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   }
 
   getCheckData() {
-    debugger;
     this.onChecked.emit(this.getSelecteditems())
   }
   onChanged(item){

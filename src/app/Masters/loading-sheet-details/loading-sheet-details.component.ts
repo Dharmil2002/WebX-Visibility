@@ -121,7 +121,6 @@ classDashboard=[
     }
 }
 onFlagChange(data){
-  debugger;
 this.dataDetails=data;
 let loadingData=[];
 let PKGSNO=0;

@@ -32,7 +32,6 @@ export class FormWithoutAutoCompleteComponent implements OnInit {
 
   // handles functioncall
   functionCalled(context) {
-    debugger
     // console.log(context, "from form components");
     if ((context.functionName !== undefined || context.functionName != null) && context.functionName?.length > 0) {      
       this.functionCallEmitter.emit(context)

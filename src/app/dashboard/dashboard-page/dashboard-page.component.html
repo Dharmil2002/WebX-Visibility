@@ -22,8 +22,8 @@
                                 Arrivals
 
                             </ng-template>
-                           <app-arrival-dashboard-page *ngIf="myTabGroup.selectedIndex== 1"
-                           (CurrentIndex)="GetSelectedIndex($event)"></app-arrival-dashboard-page>
+                            <app-arrival-dashboard-page *ngIf="myTabGroup.selectedIndex== 1"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-arrival-dashboard-page>
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>
@@ -31,7 +31,8 @@
                                 Departures
 
                             </ng-template>
-
+                            <app-departure-dashboard-page *ngIf="myTabGroup.selectedIndex==2"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-departure-dashboard-page>
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>

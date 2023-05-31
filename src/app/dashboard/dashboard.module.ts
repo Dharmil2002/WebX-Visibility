@@ -32,13 +32,14 @@ import { SnackBarUtilityService } from "../Utility/SnackBarUtility.service";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MarkArrivalComponent } from './ActionPages/mark-arrival/mark-arrival.component';
 import { UpdateStockComponent } from './ActionPages/update-stock/update-stock.component';
+import { DepartureDashboardPageComponent } from "./tabs/departure-dashboard-page/departure-dashboard-page.component";
 @NgModule({
   declarations: [
     LoadPlanningComponent,
     DocketDashboardComponent,
     DashboardPageComponent,
     DashboardCountPageComponent,
-    ArrivalDashboardPageComponent,
+    ArrivalDashboardPageComponent,DepartureDashboardPageComponent,
     MarkArrivalComponent,
     UpdateStockComponent,
   ],

@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { MarkArrivalComponent } from '../../ActionPages/mark-arrival/mark-arrival.component';
 import { UpdateStockComponent } from '../../ActionPages/update-stock/update-stock.component';
-import { MarkArrivalControl } from 'src/assets/FormControls/MarkArrival';
 
 @Component({
   selector: 'app-arrival-dashboard-page',

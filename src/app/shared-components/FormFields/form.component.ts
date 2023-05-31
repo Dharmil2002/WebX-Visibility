@@ -9,22 +9,24 @@ import { CustomeDatePickerComponent } from '../custome-date-picker/custome-date-
   templateUrl: './form.component.html',
 })
 export class FormComponent {
-  @Input() formItem!: FormControls
-  form!: UntypedFormGroup
+  @Input() formData
+  @Input() form!: UntypedFormGroup
   locationIsupdate: boolean;
   minDate: Date;
   maxDate: Date
   @Output() callFunction = new EventEmitter();
+  @Input() showSaveAndCancelButton : boolean
+  @Output() functionCallEmitter = new EventEmitter();
+
   selectedValue: any; 
   isTouchUIActivated = false;
   // field required for password input.
   showPassword: boolean = false;
   ConfirmshowPassword: boolean = false;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
-  ngOnChanges(changes: SimpleChanges) {
-    this.formItem=changes.formItem.currentValue
-
-    }
+  // ngOnChanges(changes: SimpleChanges) {
+  //   this.formData=changes.formData.currentValue
+  //   }
   constructor(private rootFormGroup: FormGroupDirective) {
     this.form = this.rootFormGroup.control  // get parent form control
 
@@ -52,9 +54,21 @@ export class FormComponent {
    }
 
   }
-  optionSelected(value: any, formItem: any) {
-    this.form.get(formItem.name)?.setValue(value);
+  optionSelected(value: any, formData: any) {
+    this.form.get(formData.name)?.setValue(value);
     this.selectedValue = value;
   }
-
+ // it passes save function call to parent component, where it should be handled.
+ save(){
+  let context = {};
+  context['functionName'] = 'save';
+  // console.log("called Save",context);
+  this.functionCallEmitter.emit(context)
+}
+// it passes cancel function call to parent component, where it should be handled.
+cancel(){
+  let context = {};
+  context['functionName'] = 'cancel';
+  this.functionCallEmitter.emit(context)
+}
 }

@@ -83,7 +83,7 @@
                     <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
                 </button>
                 <mat-menu #menu="matMenu">
-                    <button mat-menu-item *ngFor="let item of menuItems" (click)="handleMenuItemClick(item.label,element)">
+                    <button mat-menu-item *ngFor="let item of menuItems" (click)="handleMenuItemClick(item,element)">
                       {{ item.label }}
                     </button>
                   </mat-menu>

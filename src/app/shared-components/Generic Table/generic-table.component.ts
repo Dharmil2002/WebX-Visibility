@@ -29,13 +29,15 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() viewComponent;
   @Input() csvFileName;
   @Input() headercode;
-  @Input()IscheckBoxRequired;
-  @Input()Link;
-  @Input()toggleArray;
-  @Input()dynamicControls;
+  @Input() IscheckBoxRequired;
+  @Input() Link;
+  @Input() toggleArray;
+  @Input() dynamicControls;
   @Input() menuItems: { label: string }[] = [];
-  @Input()menuItemFlag;
-  @Output() menuItemClicked = new EventEmitter<string>();
+  @Input() menuItemFlag;
+  @Output() menuItemClicked = new EventEmitter<any>();
+  @Input() height;
+  @Input() width;
   triggered: boolean = false;
   objectKeys = Object.keys;
   // @Input() checkBoxRequired;
@@ -53,7 +55,8 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   selectedItems: any[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
-    this.dynamicControls=changes.dynamicControls.currentValue
+    this.dynamicControls = changes.dynamicControls.currentValue;
+    this.tableData = changes.tableData.currentValue;
   }
   constructor(public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router, public dialog: MatDialog) {
@@ -63,7 +66,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
 
   ngOnInit() {
 
-    if(this.metaData == undefined){
+    if (this.metaData == undefined) {
       this.metaData = {};
       this.metaData['noColumnSort'] = [];
       this.metaData['checkBoxRequired'] = false;
@@ -72,7 +75,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     if (this.metaData.checkBoxRequired) {
 
       this.tableData = this.tableData.map(obj => {
-       // obj['isSelected'] = false;
+        // obj['isSelected'] = false;
         return obj;
       })
     }
@@ -189,27 +192,27 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   //#endregion
   //#region Funtion to send data for edit
   editCall(item) {
-    if(!this.menuItemFlag){
-    this.router.navigate([this.addAndEditPath], {
-      state: {
-        data: item,
-      },
-    });
-  }
+    if (!this.menuItemFlag) {
+      this.router.navigate([this.addAndEditPath], {
+        state: {
+          data: item,
+        },
+      });
+    }
   }
   //#endregion
   shouldDisplayLink(tableData: string): boolean {
     if (this.triggered) {
       return false;
     }
-    
+
     return this.Link && this.Link.some(item => item.Row && item.Row.includes(tableData));
   }
-  
-  
+
+
   //#region Funtion to send data for edit
-  drillDownData(item,tableData){
-      let drillDownLink=this.Link.find((x)=>x.Row==tableData)
+  drillDownData(item, tableData) {
+    let drillDownLink = this.Link.find((x) => x.Row == tableData)
     this.router.navigate([drillDownLink.Path], {
       state: {
         data: item,
@@ -282,14 +285,25 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     this.onFlagChange.emit(data)
     console.log(this.getSelecteditems());//get data on single selection
   }
-  handleMenuItemClick(label: string,element) {
-    this.menuItemClicked.emit(label);
-    // if(label=='Add'){
-    //   this.addNew()
-    // }
-    // else{
-    //  this.editCall(element)
-    // }
-    // Perform some action when a menu item is clicked in the child component
-  }
+  handleMenuItemClick(item,element) {
+    let functionName = item.function;  
+    let Data={label:item,data:element}
+    if(!functionName){
+     this.menuItemClicked.emit(Data);
+    }
+    else{
+     this[functionName](element,item.componentDetails);
+    }
+}
+GeneralMultipleView(item,viewComponent) {
+  const dialogref = this.dialog.open(
+    viewComponent,
+    {
+      width: this.width,
+      height: this.height, data: item
+    });
+  dialogref.afterClosed().subscribe(result => {
+    this.dialogClosed.emit(result);
+  })
+}
 }

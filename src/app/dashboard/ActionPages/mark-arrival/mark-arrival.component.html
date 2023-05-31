@@ -1,0 +1,5 @@
+<form [formGroup]="MarkArrivalTableForm">
+    <app-form-webxpress [form]="MarkArrivalTableForm" [formData]="jsonControlArray"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+    </app-form-webxpress>
+</form>

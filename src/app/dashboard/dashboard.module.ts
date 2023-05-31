@@ -1,4 +1,4 @@
-import { CommonModule } from "@angular/common";
+import { CommonModule, DatePipe } from "@angular/common";
 import { ComponentsModule } from "../shared/components/components.module";
 import { DashboardRoutingModule } from "./dashboard-routing.module";
 import { GaugeModule } from "angular-gauge";
@@ -23,10 +23,24 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { LoadPlanningComponent } from './load-planning/load-planning.component';
 import { DocketDashboardComponent } from './docket-dashboard/docket-dashboard.component';
+import { DashboardPageComponent } from './dashboard-page/dashboard-page.component';
+import { MatTabsModule } from "@angular/material/tabs";
+import { DashboardCountPageComponent } from './tabs/dashboard-count-page/dashboard-count-page.component';
+import { ArrivalDashboardPageComponent } from './tabs/arrival-dashboard-page/arrival-dashboard-page.component';
+import { SharedComponentsModule } from "../shared-components/shared-components.module";
+import { SnackBarUtilityService } from "../Utility/SnackBarUtility.service";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MarkArrivalComponent } from './ActionPages/mark-arrival/mark-arrival.component';
+import { UpdateStockComponent } from './ActionPages/update-stock/update-stock.component';
 @NgModule({
   declarations: [
     LoadPlanningComponent,
     DocketDashboardComponent,
+    DashboardPageComponent,
+    DashboardCountPageComponent,
+    ArrivalDashboardPageComponent,
+    MarkArrivalComponent,
+    UpdateStockComponent,
   ],
   imports: [
     CommonModule,
@@ -52,6 +66,10 @@ import { DocketDashboardComponent } from './docket-dashboard/docket-dashboard.co
     MatSortModule,
     MatTableExporterModule,
     MatProgressSpinnerModule,
+    MatTabsModule,
+    SharedComponentsModule,
+    MatDialogModule
   ],
+  providers:[SnackBarUtilityService,DatePipe]
 })
 export class DashboardModule {}

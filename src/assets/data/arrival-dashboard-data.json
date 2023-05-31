@@ -1,0 +1,59 @@
+{
+  "data": [
+    {
+      "VehicleNo": "MH02CB5544",
+      "Route": "S003: BLR-BHW-AMD",
+      "TripID": "THBLR000343",
+      "Location": "234 Km | View 3.5 km from Panvel",
+      "STA": "29-05-2023 11:30:00",
+      "ETAATA": "29-05-2023 14:00:00",
+      "Status": "LATE",
+      "Hrs": "02:30:00",
+      "Action": "Mark Arrival"
+    },
+    {
+      "VehicleNo": "HR0UY6646",
+      "Route": "S003: PNQ-BHW-VPI",
+      "TripID": "THPNQ000125",
+      "Location": "At BHW",
+      "STA": "29-05-2023 11:00:00",
+      "ETAATA": "29-05-2023 11:55:00",
+      "Status": "ARRIVED",
+      "Hrs": "00:05:00",
+      "Action": "Update Stock"
+    },
+    {
+      "VehicleNo": "KA05RE5564",
+      "Route": "S012: MAA-HYD-PNQ-BHW",
+      "TripID": "THMAA00837",
+      "Location": "320 Km | View 1.5 km from Kolhapur",
+      "STA": "29-05-2023 12:30:00",
+      "ETAATA": "29-05-2023 15:00:00",
+      "Status": "LATE",
+      "Hrs": "02:30:00",
+      "Action": "Mark Arrival"
+    }
+  ],
+  "ArrivalCountData": [
+    {
+      "count": 35,
+      "title": "Vehicles",
+      "class": "info-box7 bg-danger order-info-box7"
+    },
+    {
+      "count": 30,
+      "title": "Routes",
+      "class": "info-box7 bg-info order-info-box7"
+    },
+    {
+      "count": 2111,
+      "title": "Shipments",
+      "class": "info-box7 bg-warning order-info-box7"
+    },
+    {
+      "count": 56900,
+      "title": "Packages",
+      "class": "info-box7 bg-primary order-info-box7"
+    }
+  ]
+}

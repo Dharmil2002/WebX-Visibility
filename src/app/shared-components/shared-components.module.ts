@@ -43,6 +43,7 @@ import { GenericCardComponent } from './generic-card/generic-card.component';
 import { DecimaRangeValidatorDirective } from '../core/Directives/decimal-range-validator';
 import { MatTabsModule } from '@angular/material/tabs';
 import { GenericTableComponent } from './Generic Table/generic-table.component';
+import { FilterUtils } from '../Utility/Form Utilities/dropdownFilter';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -92,8 +93,10 @@ const MY_DATE_FORMAT = {
       provide: DateAdapter,
       useClass: MomentDateAdapter,
       deps: [MAT_DATE_LOCALE],
+     
     },
-    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },,
+    FilterUtils
   ],
   
   exports: [GenericAccordionComponent,

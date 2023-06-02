@@ -55,8 +55,10 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   selectedItems: any[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
-    this.dynamicControls = changes.dynamicControls.currentValue;
     this.tableData = changes.tableData.currentValue;
+   if(this.tableData){
+    this.refresh();
+   }
   }
   constructor(public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router, public dialog: MatDialog) {
@@ -282,8 +284,10 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   }
 
   getCheckData(data) {
-    this.onFlagChange.emit(data)
-    console.log(this.getSelecteditems());//get data on single selection
+    //this.onFlagChange.emit(data)
+    this.onFlagChange.emit(this.getSelecteditems())
+   // console.log(this.getSelecteditems());
+   //get data on single selection
   }
   handleMenuItemClick(item,element) {
     let functionName = item.function;  

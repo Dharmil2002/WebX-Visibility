@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -58,7 +58,10 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   @Output() onChecked: EventEmitter<any> = new EventEmitter();
   @Output() dialogClosed = new EventEmitter<any>();
   selectedItems: any[] = [];
-
+  ngOnChanges(changes: SimpleChanges) {
+    this.tableData = changes.tableData.currentValue;
+    this.refresh();
+  }
   constructor(
     private router: Router, public dialog: MatDialog) {
     super();

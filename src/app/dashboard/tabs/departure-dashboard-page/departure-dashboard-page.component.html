@@ -1,5 +1,5 @@
 <section class="content">
-    <app-generic-card-webxpress [boxData]="this.data?.DepartureCountData" ></app-generic-card-webxpress>
+    <app-generic-card-webxpress [boxData]="this.data?.DepartureCountData"></app-generic-card-webxpress>
     <!-- Loading Generic table as parent component and passing  required data-->
     <!--
         columnHeader: a object that contains only that pair of column id:title that are to be shown on dashBoard.
@@ -10,11 +10,9 @@
         csvFileName : Name of the csv File.
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
-         <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
-         [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA"
-         [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems"  (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls"
-          >
-     </generic-table-webxpress>
+    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+        [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
+        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
+    </generic-table-webxpress>
 </section>
-    
-

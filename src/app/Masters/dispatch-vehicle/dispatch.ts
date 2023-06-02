@@ -56,7 +56,8 @@ export class disPatchControl {
                         }
                     ],
                     functions: {
-                        onToggleAll: 'toggleSelectAll'
+                        onToggleAll: 'toggleSelectAll',
+                        onChange: 'AddCostData'
                     },
                     additionalData: {
                         showNameAndValue: true,
@@ -85,6 +86,9 @@ export class disPatchControl {
                     ],
                     functions: {
                         onKeyUp: '',
+                    },
+                    additionalData:{
+                        isVehicle:'true'
                     }
 
                 },

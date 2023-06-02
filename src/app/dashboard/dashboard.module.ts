@@ -33,6 +33,7 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { MarkArrivalComponent } from './ActionPages/mark-arrival/mark-arrival.component';
 import { UpdateStockComponent } from './ActionPages/update-stock/update-stock.component';
 import { DepartureDashboardPageComponent } from "./tabs/departure-dashboard-page/departure-dashboard-page.component";
+import { LoadingSheetViewComponent } from "../operation/loading-sheet-view/loading-sheet-view.component";
 @NgModule({
   declarations: [
     LoadPlanningComponent,
@@ -42,6 +43,7 @@ import { DepartureDashboardPageComponent } from "./tabs/departure-dashboard-page
     ArrivalDashboardPageComponent,DepartureDashboardPageComponent,
     MarkArrivalComponent,
     UpdateStockComponent,
+    LoadingSheetViewComponent
   ],
   imports: [
     CommonModule,

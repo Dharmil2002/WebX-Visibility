@@ -22,19 +22,18 @@ export class DocketDashboardComponent implements OnInit {
     this.ewayBillDetail=localStorage.getItem("EwayBillDetail");
   }
   docketBooking(event){
-    if(event=='Docket'){
-    this.router.navigate(["/Masters/Docket/Create"]);
-    }
-    else if(event=='EwaybillNo'){
-      this.router.navigate(["/Masters/Docket/Ewaybill"]);
-    }
-    else if(event=='LoadingSheet'){
-      this.router.navigate(["/Masters/Docket/LoadingSheet"]);
-    }
-    else{
-      this.router.navigate(["/Masters/Docket/Ewaybill-Config"])}
-     
-    }
+    const routeMap = {
+      'Docket': '/Masters/Docket/Create',
+      'EwaybillNo': '/Masters/Docket/Ewaybill',
+      'LoadingSheet': '/Masters/Docket/LoadingSheet',
+      'Manifest': '/Masters/Docket/ManifestGeneration',
+      'GlobeDashboardPage': 'dashboard/GlobeDashboardPage',
+      'default': '/Masters/Docket/Ewaybill-Config'
+    };
+    
+    const route = routeMap[event] || routeMap['default'];
+    this.router.navigate([route]);
+  }    
   
 
 }

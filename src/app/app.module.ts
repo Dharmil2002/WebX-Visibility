@@ -56,7 +56,7 @@ export function createTranslateLoader(http: HttpClient): any {
     RightSidebarComponent,
     AuthLayoutComponent,
     MainLayoutComponent,
-    DashboardLayoutComponent,
+    DashboardLayoutComponent
   
   ],
   imports: [

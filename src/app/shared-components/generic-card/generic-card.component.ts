@@ -11,7 +11,6 @@ export class GenericCardComponent implements OnInit {
 
     }
   constructor() {
-    console.log(this.boxData);
    }
 
   ngOnInit(): void {

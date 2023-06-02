@@ -42,6 +42,8 @@ import { LoadingsheetgenerateComponent } from './loadingsheetgenerate/loadingshe
 import { SharedComponentsModule } from '../shared-components/shared-components.module';
 import { DispatchVehicleComponent } from './dispatch-vehicle/dispatch-vehicle.component';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { ManifestGenerationComponent } from './manifest-generation/manifest-generation.component';
+import { SnackBarUtilityService } from '../Utility/SnackBarUtility.service';
 @NgModule({
 
   imports: [
@@ -85,9 +87,9 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 
   ],
 
-  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent, GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent, DispatchVehicleComponent],
+  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent, GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent, DispatchVehicleComponent, ManifestGenerationComponent],
 
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, jsonDataServiceService,FilterUtils]
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, jsonDataServiceService,FilterUtils,SnackBarUtilityService]
 })
 
 export class MastersModule { }

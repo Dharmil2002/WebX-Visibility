@@ -1,7 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-loadingsheetgenerate',
@@ -30,7 +32,7 @@ export class LoadingsheetgenerateComponent implements OnInit {
   companyCode:number=parseInt(localStorage.getItem('companyCode'));
   dayName: any;
   dataDetails: any;
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,private ICnoteService: CnoteService) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any,public dialogRef: MatDialogRef<LoadingsheetgenerateComponent>,public Route:Router,private ICnoteService: CnoteService) {
      let loadingList=[];
     data.data.forEach(element => {
       let loadingSheetData={
@@ -75,7 +77,7 @@ export class LoadingsheetgenerateComponent implements OnInit {
  /*generate a  loadingSheet as Per User Selection*/
   generateLoadingSheet(){
     if(this.dataDetails && this.dataDetails.length>0){
-    const result = this.docketNestedDetails.map(obj => obj.DOCKNO).join(',');
+    const result = this.docketNestedDetails.map(obj => obj.DKTNO).join(',');
     let req={
       finYear:2223,
       companyCode:this.companyCode,
@@ -108,9 +110,20 @@ export class LoadingsheetgenerateComponent implements OnInit {
     }
     this.ICnoteService.cnotePost("docket/createLoadingSheet",req).subscribe({
       next:(res:any)=>{
-      if(res){
-        SwalerrorMessage("success", "LoadingSheetNumber:" + res.loadingSheetNumber, "", true);
-      }
+        if (res) {
+          Swal.fire({
+            icon: "success",
+            title: "LoadingSheetNumber:" + res.loadingSheetNumber,
+            html:  "",
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.dialogRef.close();
+              // Call your function here
+             this.Route.navigate(["Masters/Docket/DispatchVehicle"]);
+            }
+          });
+        }
     }
       
   })

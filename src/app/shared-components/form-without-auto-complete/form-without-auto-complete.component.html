@@ -84,7 +84,7 @@
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
                 <mat-label>{{formItem.label}}</mat-label>
-                <mat-select [formControlName]="formItem.additionalData.support" placeholder={{formItem.placeholder}}
+                <mat-select [formControlName]="formItem.additionalData.support"  (selectionChange)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })" placeholder={{formItem.placeholder}}
                     [multiple]="true" #singleSelect>
                     <mat-option>
                         <ngx-mat-select-search formControlName={{formItem.name}}

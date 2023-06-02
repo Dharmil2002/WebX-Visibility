@@ -1,0 +1,579 @@
+{
+    "shipmentData":[
+        {
+          "RouteandSchedule": "S003: BHW-BLR",
+          "Shipments": 84,
+          "Packages": 464,
+          "WeightKg": 170,
+          "VolumeCFT": 411,
+          "lag": "BHW-BLR"
+        },
+        {
+          "RouteandSchedule": "S003: BLR-BHW-AMD",
+          "Shipments": 40,
+          "Packages": 345,
+          "WeightKg": 375,
+          "VolumeCFT": 428,
+          "lag": "BLR-BHW-AMD"
+        },
+        {
+          "RouteandSchedule": "S003: PNQ-BHW-VPI",
+          "Shipments": 25,
+          "Packages": 436,
+          "WeightKg": 268,
+          "VolumeCFT": 347,
+          "lag": "PNQ-BHW-VPI"
+        },
+        {
+          "RouteandSchedule": "S0010 : AMDB-BRDB-MUMB",
+          "Shipments": 76,
+          "Packages": 195,
+          "WeightKg": 315,
+          "VolumeCFT": 207,
+          "lag": "AMDB-BRDB-MUMB"
+        },
+        {
+          "RouteandSchedule": "S0003: AMDB-JAIB-DELB",
+          "Shipments": 54,
+          "Packages": 353,
+          "WeightKg": 345,
+          "VolumeCFT": 469,
+          "lag": " AMDB-JAIB-DELB"
+        },
+        {
+          "RouteandSchedule": "S0002 : MUMB-BRDB-AMDB",
+          "Shipments": 64,
+          "Packages": 368,
+          "WeightKg": 433,
+          "VolumeCFT": 270,
+          "lag": " MUMB-BRDB-AMDB"
+        },
+        {
+          "RouteandSchedule": "S0037: NAGM-PNQM-MUMB",
+          "Shipments": 56,
+          "Packages": 198,
+          "WeightKg": 309,
+          "VolumeCFT": 156,
+          "lag": " NAGM-PNQM-MUMB"
+        },
+        {
+          "RouteandSchedule": "S0008: MUMB-BNGB",
+          "Shipments": 76,
+          "Packages": 178,
+          "WeightKg": 298,
+          "VolumeCFT": 266,
+          "lag": "MUMB-BNGB"
+        },
+        {
+          "RouteandSchedule": "S0026 : MUMB-PNQB-BNGB",
+          "Shipments": 68,
+          "Packages": 243,
+          "WeightKg": 346,
+          "VolumeCFT": 401,
+          "lag": " MUMB-PNQB-BNGB"
+        },
+        {
+          "RouteandSchedule": "S0018:MUMB-CHNB",
+          "Shipments": 70,
+          "Packages": 354,
+          "WeightKg": 287,
+          "VolumeCFT": 415,
+          "lag": "MUMB-CHNB"
+        },
+        {
+          "RouteandSchedule": "S0070: MUMB-SRTB",
+          "Shipments": 16,
+          "Packages": 400,
+          "WeightKg": 311,
+          "VolumeCFT": 361,
+          "lag": " MUMB-SRTB"
+        },
+        {
+          "RouteandSchedule": "S0097: SRT-MAL",
+          "Shipments": 89,
+          "Packages": 214,
+          "WeightKg": 221,
+          "VolumeCFT": 378,
+          "lag": "SRT-MAL"
+        },
+        {
+          "RouteandSchedule": "S0111: MUMB-MAAM",
+          "Shipments": 35,
+          "Packages": 178,
+          "WeightKg": 131,
+          "VolumeCFT": 153,
+          "lag": "MUMB-MAAM"
+        },
+        {
+          "RouteandSchedule": "S0019: MUMB-HUBB",
+          "Shipments": 74,
+          "Packages": 229,
+          "WeightKg": 160,
+          "VolumeCFT": 453,
+          "lag": "MUMB-HUBB"
+        },
+        {
+          "RouteandSchedule": "S0060:MUMB-AMDB-JAIB",
+          "Shipments": 61,
+          "Packages": 309,
+          "WeightKg": 309,
+          "VolumeCFT": 319,
+          "lag": "MUMB-AMDB-JAIB"
+        },
+        {
+          "RouteandSchedule": "S0123: MUMB-BNGB",
+          "Shipments": 28,
+          "Packages": 128,
+          "WeightKg": 129,
+          "VolumeCFT": 126,
+          "lag": " MUMB-BNGB"
+        },
+        {
+          "RouteandSchedule": "S0124: MUMB-SRT",
+          "Shipments": 63,
+          "Packages": 264,
+          "WeightKg": 477,
+          "VolumeCFT": 317,
+          "lag": " MUMB-SRT"
+        },
+        {
+          "RouteandSchedule": "S0125:MUMB-401107",
+          "Shipments": 87,
+          "Packages": 163,
+          "WeightKg": 321,
+          "VolumeCFT": 214,
+          "lag": "MUMB-401107"
+        },
+        {
+          "RouteandSchedule": "S0049: MUMB-PNQB",
+          "Shipments": 55,
+          "Packages": 370,
+          "WeightKg": 182,
+          "VolumeCFT": 366,
+          "lag": " MUMB-PNQB"
+        }
+       
+   ],
+   "NestedSingmentData":[
+    {
+      "Shipment": "MH98AA1112",
+      "Customer": "Anz Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 45,
+      "Weight": 567,
+      "Volume": 320,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1113",
+      "Customer": "Pefect Foods",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 46,
+      "Weight": 568,
+      "Volume": 321,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1114",
+      "Customer": "Savla Auto parts",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 47,
+      "Weight": 569,
+      "Volume": 322,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1115",
+      "Customer": "L&T switchgear",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 48,
+      "Weight": 570,
+      "Volume": 323,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1116",
+      "Customer": "Singh Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 49,
+      "Weight": 571,
+      "Volume": 324,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1117",
+      "Customer": "Anz Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 50,
+      "Weight": 572,
+      "Volume": 325,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1118",
+      "Customer": "Pefect Foods",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 51,
+      "Weight": 573,
+      "Volume": 326,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1119",
+      "Customer": "Savla Auto parts",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 52,
+      "Weight": 574,
+      "Volume": 327,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1120",
+      "Customer": "L&T switchgear",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 53,
+      "Weight": 575,
+      "Volume": 328,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1121",
+      "Customer": "Singh Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 54,
+      "Weight": 576,
+      "Volume": 329,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1122",
+      "Customer": "Anz Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 55,
+      "Weight": 577,
+      "Volume": 330,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1123",
+      "Customer": "Pefect Foods",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 56,
+      "Weight": 578,
+      "Volume": 331,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1124",
+      "Customer": "Savla Auto parts",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 57,
+      "Weight": 579,
+      "Volume": 332,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1125",
+      "Customer": "L&T switchgear",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 58,
+      "Weight": 580,
+      "Volume": 333,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1126",
+      "Customer": "Singh Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 59,
+      "Weight": 581,
+      "Volume": 334,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1127",
+      "Customer": "Anz Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 60,
+      "Weight": 582,
+      "Volume": 335,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1128",
+      "Customer": "Pefect Foods",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 61,
+      "Weight": 583,
+      "Volume": 336,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1129",
+      "Customer": "Savla Auto parts",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 62,
+      "Weight": 584,
+      "Volume": 337,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1130",
+      "Customer": "L&T switchgear",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 63,
+      "Weight": 585,
+      "Volume": 338,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1131",
+      "Customer": "Singh Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 64,
+      "Weight": 586,
+      "Volume": 339,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1132",
+      "Customer": "Anz Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 65,
+      "Weight": 587,
+      "Volume": 340,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1133",
+      "Customer": "Pefect Foods",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 66,
+      "Weight": 588,
+      "Volume": 341,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1134",
+      "Customer": "Savla Auto parts",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 67,
+      "Weight": 589,
+      "Volume": 342,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1135",
+      "Customer": "L&T switchgear",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 68,
+      "Weight": 590,
+      "Volume": 343,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1136",
+      "Customer": "Singh Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 69,
+      "Weight": 591,
+      "Volume": 344,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1137",
+      "Customer": "Anz Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 70,
+      "Weight": 592,
+      "Volume": 345,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1138",
+      "Customer": "Pefect Foods",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 71,
+      "Weight": 593,
+      "Volume": 346,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1139",
+      "Customer": "Savla Auto parts",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 72,
+      "Weight": 594,
+      "Volume": 347,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1140",
+      "Customer": "L&T switchgear",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 73,
+      "Weight": 595,
+      "Volume": 348,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1141",
+      "Customer": "Singh Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 74,
+      "Weight": 596,
+      "Volume": 349,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1142",
+      "Customer": "Anz Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 75,
+      "Weight": 597,
+      "Volume": 350,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1143",
+      "Customer": "Pefect Foods",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 76,
+      "Weight": 598,
+      "Volume": 351,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1144",
+      "Customer": "Savla Auto parts",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 77,
+      "Weight": 599,
+      "Volume": 352,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1145",
+      "Customer": "L&T switchgear",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 78,
+      "Weight": 600,
+      "Volume": 353,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1146",
+      "Customer": "Singh Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 79,
+      "Weight": 601,
+      "Volume": 354,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1147",
+      "Customer": "Anz Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 80,
+      "Weight": 602,
+      "Volume": 355,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1148",
+      "Customer": "Pefect Foods",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 81,
+      "Weight": 603,
+      "Volume": 356,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1149",
+      "Customer": "Savla Auto parts",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 82,
+      "Weight": 604,
+      "Volume": 357,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1150",
+      "Customer": "L&T switchgear",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 83,
+      "Weight": 605,
+      "Volume": 358,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1151",
+      "Customer": "Singh Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 84,
+      "Weight": 606,
+      "Volume": 359,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1152",
+      "Customer": "Anz Motors",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 85,
+      "Weight": 607,
+      "Volume": 360,
+      "route": "S003: BHW-BLR"
+    },
+    {
+      "Shipment": "MH98AA1153",
+      "Customer": "Pefect Foods",
+      "Origin": "BHW",
+      "Destination": "BLR",
+      "Packages": 86,
+      "Weight": 608,
+      "Volume": 361,
+      "route": "S003: BHW-BLR"
+    }
+   ]
+}

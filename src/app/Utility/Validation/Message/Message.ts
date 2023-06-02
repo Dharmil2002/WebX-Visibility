@@ -5,5 +5,5 @@ export function SwalerrorMessage(icon,title,html,showConfirmButton){
         title:title,
         html: html,
         showConfirmButton: showConfirmButton,
-      });
+      })
 }

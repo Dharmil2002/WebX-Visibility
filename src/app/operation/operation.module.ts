@@ -18,10 +18,12 @@ import { CreateLoadingSheetComponent } from './create-loading-sheet/create-loadi
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { LodingSheetGenerateSuccessComponent } from './loding-sheet-generate-success/loding-sheet-generate-success.component';
+import { DepartVehicleComponent } from "./depart-vehicle/depart-vehicle/depart-vehicle.component";
 @NgModule({
   declarations: [
     CreateLoadingSheetComponent,
-    LodingSheetGenerateSuccessComponent
+    LodingSheetGenerateSuccessComponent,
+    DepartVehicleComponent
   ],
   imports: [
     CommonModule,

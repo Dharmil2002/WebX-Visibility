@@ -1,5 +1,5 @@
 import { UntypedFormBuilder, Validators } from "@angular/forms";
-import { autocompleteValidator } from "../Validation/AutoComplateValidation";
+//import { autocompleteValidator } from "../Validation/AutoComplateValidation";
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 
 // function return a untyped for group 
@@ -19,9 +19,9 @@ export function formGroupBuilder(fb: UntypedFormBuilder, arrayOfJsonData: any[])
                 } else if (errorName == 'email') {
                     validators.push(Validators.email)
                 }
-                else if (errorName == 'autocomplete') {
-                    validators.push(autocompleteValidator())
-                }
+                // else if (errorName == 'autocomplete') {
+                //     validators.push(autocompleteValidator())
+                // }
             }
             if (field.type == 'dropdown') {
                 if (field.additionalData.showNameAndValue) {

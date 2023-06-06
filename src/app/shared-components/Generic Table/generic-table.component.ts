@@ -38,6 +38,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Output() menuItemClicked = new EventEmitter<any>();
   @Input() height;
   @Input() width;
+  @Input() extraData;
   triggered: boolean = false;
   objectKeys = Object.keys;
   // @Input() checkBoxRequired;
@@ -56,6 +57,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
 
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData.currentValue;
+    this.extraData = changes.extraData.currentValue;
    if(this.tableData){
     this.refresh();
    }
@@ -198,6 +200,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
       this.router.navigate([this.addAndEditPath], {
         state: {
           data: item,
+          
         },
       });
     }
@@ -217,7 +220,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     let drillDownLink = this.Link.find((x) => x.Row == tableData)
     this.router.navigate([drillDownLink.Path], {
       state: {
-        data: item,
+        data: {columnData:item,extraData:this.extraData}
       },
     });
   }

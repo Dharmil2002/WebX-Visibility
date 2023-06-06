@@ -7,7 +7,7 @@
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
 [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
 [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA"
- [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems"  (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls"
+ [Link]="linkArray" [toggleArray]="toggleArray"[extraData]="extraData" [menuItems]="menuItems"  (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls"
  >
 </generic-table-webxpress>
 <div class="row"  *ngIf="!tableload">

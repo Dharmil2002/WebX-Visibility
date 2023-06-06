@@ -12,6 +12,7 @@ import { LodingSheetGenerateSuccessComponent } from '../loding-sheet-generate-su
   templateUrl: './create-loading-sheet.component.html'
 })
 export class CreateLoadingSheetComponent implements OnInit {
+  departureJsonUrl = '../../../assets/data/departureDetails.json'
   loadingJsonUrl = '../../../assets/data/vehicleType.json'
   loadingSheetJsonUrl = '../../../assets/data/shipmentDetails.json'
   tableload = true;
@@ -27,7 +28,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     csv: true
   }
   linkArray = [
-    { Row: 'Shipments', Path: 'Operation/LoadingSheetView' }
+    { Row: 'Shipment', Path: 'Operation/LoadingSheetView' }
   ]
   //declaring breadscrum
   breadscrums = [
@@ -41,10 +42,11 @@ export class CreateLoadingSheetComponent implements OnInit {
   toggleArray = []
   IscheckBoxRequired: boolean;
   menuItemflag: boolean = true;
-
+  isShipmentUpdate:boolean = false;
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   tripData: any;
+  extraData:any;
   vehicleType: any;
   vehicleTypeStatus: any;
   orgBranch: string = localStorage.getItem("Branch");
@@ -53,7 +55,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   columnHeader = {
     "checkBoxRequired": "",
     "lag": "Leg",
-    "Shipments": "Shipments",
+    "Shipment": "Shipments",
     "Packages": "Packages",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT"
@@ -73,6 +75,8 @@ export class CreateLoadingSheetComponent implements OnInit {
     noColumnSort: ['checkBoxRequired']
   }
   loadingData: any;
+  shippingData: any;
+  listDepartueDetail: any;
   //#endregion
 
 
@@ -82,7 +86,10 @@ export class CreateLoadingSheetComponent implements OnInit {
     // }
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
-
+      this.shippingData = this.Route.getCurrentNavigation()?.extras?.state.shipping;
+     if(this.shippingData){
+      this.isShipmentUpdate=true;
+     }
     }
     this.IntializeFormControl()
     this.autoBindData()
@@ -157,14 +164,62 @@ export class CreateLoadingSheetComponent implements OnInit {
     });
     this.getshipmentData()
   }
+  getDepartueDetail(route){
+    this.http.get(this.departureJsonUrl).subscribe(res => {
+      this.listDepartueDetail=res;
+      this.tripData= this.listDepartueDetail.data.find((x)=>x.RouteandSchedule==route);
+      this.autoBindData()
+     
+    })
+  }
   getshipmentData() {
-
+  if(!this.isShipmentUpdate){
     let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
     routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
+  }
     this.http.get(this.loadingSheetJsonUrl).subscribe(res => {
-
+     let  filterData=[]
+      if(!this.isShipmentUpdate)
+      {
       this.shipmentData = res;
-      this.csv = this.shipmentData.shipmentData.filter((x)=>x.RouteandSchedule==this.tripData.RouteandSchedule);
+       filterData=this.shipmentData.NestedSingmentData.filter((x)=>x.route==this.tripData.RouteandSchedule);
+       this.extraData= filterData;
+
+      }
+      else{
+        filterData=this.shippingData
+        this.getDepartueDetail(this.shippingData[0].route)
+        this.extraData= filterData;
+        
+      }
+      const groupedData = {};
+
+      // Group shipments by route
+       filterData.forEach(shipment => {
+        const { route, Packages, Weight,Volume} = shipment;
+      
+        if (!groupedData[route]) {
+          // If the route doesn't exist in groupedData, initialize it
+          groupedData[route] = {
+            Shipment: 0,
+            lag: route,
+            Packages: 0,
+            WeightKg: 0,
+            VolumeCFT: 0,
+          };
+        }
+      
+        // Increment the count of shipments and update the packages and weight
+        groupedData[route].Shipment++;
+        groupedData[route].Packages += Packages;
+        groupedData[route].WeightKg += Weight;
+        groupedData[route].VolumeCFT += Volume;
+      });
+      
+      // Convert the grouped data to an array
+      let groupedShipments = Object.values(groupedData);
+      
+      this.csv = groupedShipments
       this.tableload = false;
     })
   }
@@ -181,6 +236,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.loadingSheetTableForm.controls['WeightUtilization'].setValue(loadingSheetDetails?.WeightUtilization || '')
   }
   loadingSheetGenerate() {
+    
   // Check if BcSerialType is "E"
     // If it is "E", set displaybarcode to true
     // Open a modal using the content parameter passed to the function
@@ -197,28 +253,5 @@ export class CreateLoadingSheetComponent implements OnInit {
     });
   }
 
-  groupShipmentsByDestination(data) {
-    const groupedShipments = {};
-
-    for (const shipment of data) {
-      const destination = shipment.Destination;
-
-      if (!groupedShipments[destination]) {
-        groupedShipments[destination] = {
-          shipmentCount: 1,
-          packageCount: shipment.Packages,
-          totalWeight: shipment.Weight,
-          totalVolume: shipment.Volume
-        };
-      } else {
-        groupedShipments[destination].shipmentCount++;
-        groupedShipments[destination].packageCount += shipment.Packages;
-        groupedShipments[destination].totalWeight += shipment.Weight;
-        groupedShipments[destination].totalVolume += shipment.Volume;
-      }
-    }
-
-    return groupedShipments;
-  }
 
 }

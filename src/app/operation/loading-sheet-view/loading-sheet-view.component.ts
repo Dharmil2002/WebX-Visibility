@@ -15,6 +15,7 @@ export class LoadingSheetViewComponent implements OnInit {
   csv: any[];
   addAndEditPath: string
   drillDownPath: string
+  extraData:any
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
   companyCode: number;
@@ -69,13 +70,17 @@ export class LoadingSheetViewComponent implements OnInit {
     noColumnSort: ['checkBoxRequired']
   }
   loadinSheet: any;
+  dataDetails: any;
   //#endregion
 
 
   constructor(private http: HttpClient,private Route: Router) {
     debugger
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.loadinSheet = this.Route.getCurrentNavigation()?.extras?.state.data;
+      debugger
+      this.loadinSheet = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
+      this.extraData=this.Route.getCurrentNavigation()?.extras?.state.data.extraData;
+      
       this.IscheckBoxRequired=true;
     }
     this.getLoadingSheetDetails()
@@ -92,13 +97,34 @@ export class LoadingSheetViewComponent implements OnInit {
     }
     // Perform some action when a menu item is clicked in the child component
   }
+  IsActiveFuntion(data) {
+    debugger
+    this.dataDetails = data;
+  }
   updateShipping(){
-    this.Route.navigate(['dashboard/GlobeDashboardPage']);
+      this.Route.navigate(['Operation/CreateLoadingSheet'], {
+        state: {
+          shipping: this.dataDetails?this.dataDetails:this.csv.filter((x)=>x.isSelected==true),
+        },
+      });
   }
   getLoadingSheetDetails() {
+    debugger
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
-      let tableArray = this.data.NestedSingmentData.filter((x)=>x.route==this.loadinSheet.RouteandSchedule);
+      let tableArray = this.data.NestedSingmentData.filter((x)=>x.route==this.loadinSheet.lag);
+     let Shipment=[]
+      this.extraData.forEach(element => {
+        Shipment.push(element.Shipment)
+      });
+      if (Shipment) {
+        tableArray.forEach((element) => {
+          if (Shipment.includes(element.Shipment)) {
+            element.isSelected = true;
+          }
+        });
+      }
+      
       this.csv = tableArray;
       // console.log(this.csv);
       this.tableload = false;

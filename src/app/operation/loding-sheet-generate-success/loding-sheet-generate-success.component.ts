@@ -18,7 +18,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   dynamicControls = {
     add: false,
     edit: false,
-    csv: true
+    csv: false
   }
   IscheckBoxRequired: boolean;
   menuItemflag: boolean = true;
@@ -34,7 +34,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   columnHeader = {
     "LoadingSheet": "Loading Sheet",
     "lag": "Leg",
-    "Shipments": "Shipments",
+    "Shipment": "Shipments",
     "Packages": "Packages",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
@@ -42,7 +42,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   headerForCsv = {
     "LoadingSheet": "Loading Sheet",
     "lag": "Leg",
-    "Shipments": "Shipments",
+    "Shipment": "Shipments",
     "Packages": "Packages",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
@@ -55,7 +55,6 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     noColumnSort: ['checkBoxRequired']
   }
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,public dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent>,public Route:Router) { 
-    debugger
     const randomNumber = "Ls/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
     this.data.forEach(obj => {
       obj.LoadingSheet = randomNumber;

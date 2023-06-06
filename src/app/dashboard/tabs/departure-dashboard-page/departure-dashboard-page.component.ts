@@ -119,7 +119,6 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
 
   }
   handleMenuItemClick(label: any, element) {
-    debugger
       this.Route.navigate(['Operation/CreateLoadingSheet'], {
         state: {
           data: label.data,

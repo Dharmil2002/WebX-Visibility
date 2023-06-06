@@ -3,6 +3,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { utilityService } from 'src/app/Utility/utility.service';
 import { MarkArrivalControl } from 'src/assets/FormControls/MarkArrival';
 
 @Component({
@@ -12,7 +13,7 @@ import { MarkArrivalControl } from 'src/assets/FormControls/MarkArrival';
 export class MarkArrivalComponent implements OnInit {
   MarkArrivalTableForm: UntypedFormGroup;
   MarkArrivalTable: any;
-  constructor(public dialogRef: MatDialogRef<any>,
+  constructor(public dialogRef: MatDialogRef<any>, private service: utilityService,
     private http: HttpClient, @Inject(MAT_DIALOG_DATA) public item: any, private fb: UntypedFormBuilder,) {
     this.MarkArrivalTable = item;
   }
@@ -47,27 +48,12 @@ export class MarkArrivalComponent implements OnInit {
     }
   }
   save() {
-    console.log(JSON.stringify(this.MarkArrivalTableForm.value));
-    const jsonUrl = '../../../assets/data/arrival-dashboard-data.json';
-
-    // Get the existing JSON data from the file
-    this.http.get(jsonUrl)
-      .subscribe(
-        (responseData: any) => {
-          // Update the 'data' property with the new data
-          responseData.data.push(this.MarkArrivalTableForm.value);
-          console.log(responseData);
-          this.dialogRef.close();
-        },
-        error => {
-          console.error('Error retrieving existing data:', error);
-          // Handle error cases or display error messages
-        }
-      );
+    this.service.exportData(this.MarkArrivalTableForm.value)
+    this.dialogRef.close()
   }
 
   cancel() {
-    window.location.reload()
+    this.dialogRef.close()
   }
 
 }

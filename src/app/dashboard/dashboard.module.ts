@@ -34,13 +34,14 @@ import { MarkArrivalComponent } from './ActionPages/mark-arrival/mark-arrival.co
 import { UpdateStockComponent } from './ActionPages/update-stock/update-stock.component';
 import { DepartureDashboardPageComponent } from "./tabs/departure-dashboard-page/departure-dashboard-page.component";
 import { LoadingSheetViewComponent } from "../operation/loading-sheet-view/loading-sheet-view.component";
+import { utilityService } from "../Utility/utility.service";
 @NgModule({
   declarations: [
     LoadPlanningComponent,
     DocketDashboardComponent,
     DashboardPageComponent,
     DashboardCountPageComponent,
-    ArrivalDashboardPageComponent,DepartureDashboardPageComponent,
+    ArrivalDashboardPageComponent, DepartureDashboardPageComponent,
     MarkArrivalComponent,
     UpdateStockComponent,
     LoadingSheetViewComponent
@@ -73,6 +74,6 @@ import { LoadingSheetViewComponent } from "../operation/loading-sheet-view/loadi
     SharedComponentsModule,
     MatDialogModule
   ],
-  providers:[SnackBarUtilityService,DatePipe]
+  providers: [SnackBarUtilityService, DatePipe, utilityService]
 })
-export class DashboardModule {}
+export class DashboardModule { }

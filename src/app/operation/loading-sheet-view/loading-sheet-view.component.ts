@@ -75,9 +75,7 @@ export class LoadingSheetViewComponent implements OnInit {
 
 
   constructor(private http: HttpClient,private Route: Router) {
-    debugger
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      debugger
       this.loadinSheet = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
       this.extraData=this.Route.getCurrentNavigation()?.extras?.state.data.extraData;
       
@@ -98,7 +96,6 @@ export class LoadingSheetViewComponent implements OnInit {
     // Perform some action when a menu item is clicked in the child component
   }
   IsActiveFuntion(data) {
-    debugger
     this.dataDetails = data;
   }
   updateShipping(){
@@ -109,7 +106,6 @@ export class LoadingSheetViewComponent implements OnInit {
       });
   }
   getLoadingSheetDetails() {
-    debugger
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data.NestedSingmentData.filter((x)=>x.route==this.loadinSheet.lag);

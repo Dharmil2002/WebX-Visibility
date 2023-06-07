@@ -3,6 +3,7 @@ import { NgModule } from "@angular/core";
 import { LoadPlanningComponent } from "./load-planning/load-planning.component";
 import { DocketDashboardComponent } from './docket-dashboard/docket-dashboard.component';
 import { DashboardPageComponent } from "./dashboard-page/dashboard-page.component";
+import { PickupDeliveryPlannerComponent } from "./tabs/pickup-delivery-planner/pickup-delivery-planner.component";
 const routes: Routes = [
   {
     path: "",
@@ -20,6 +21,10 @@ const routes: Routes = [
   {
     path:"GlobeDashboardPage",
     component:DashboardPageComponent
+  },
+  {
+    path:"DeliveryPlanner",
+    component:PickupDeliveryPlannerComponent
   }
 ];
 

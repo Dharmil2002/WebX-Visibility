@@ -1,0 +1,60 @@
+{
+    "formdata": [
+        {
+            "Vehicle": "MH02CB5544",
+            "Route": "S003: BLR-BHW-AMD",
+            "TripID": "THBLR000343",
+            "LoadingLocation": "BHW",
+            "LoadingSheet": "LSMUM001334",
+            "Leg": "BHW-AMD"
+        }
+    ],
+    "shipments": [
+        {
+            "shipment_id": 12335835,
+            "packages": 200,
+            "loaded": 130,
+            "pending": 70
+        },
+        {
+            "shipment_id": 23737388,
+            "packages": 130,
+            "loaded": 110,
+            "pending": 20
+        },
+        {
+            "shipment_id": 39884849,
+            "packages": 340,
+            "loaded": 340,
+            "pending": 0
+        },
+        {
+            "shipment_id": 39939393,
+            "packages": 260,
+            "loaded": 230,
+            "pending": 30
+        }
+    ],
+    "ArrivalCountData": [
+        {
+            "count": 124,
+            "title": "Shipments",
+            "class": "info-box7 bg-danger order-info-box7"
+        },
+        {
+            "count": 375,
+            "title": "Packages",
+            "class": "info-box7 bg-info order-info-box7"
+        },
+        {
+            "count": 124,
+            "title": "Shipments Loaded",
+            "class": "info-box7 bg-warning order-info-box7"
+        },
+        {
+            "count": 375,
+            "title": "Packages Loaded",
+            "class": "info-box7 bg-primary order-info-box7"
+        }
+    ]
+}

@@ -14,43 +14,38 @@ import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet
   templateUrl: './update-loading-sheet.component.html'
 })
 export class UpdateLoadingSheetComponent implements OnInit {
-  jsonUrl = '../../../assets/data/manifestGenerated.json'
+  jsonUrl = '../../../assets/data/uploadLodingSheet.json'
   tableload = false;
   csv: any[];
   data: [] | any;
   tripData: any;
   tabledata: any;
-  loadingSheetTableForm:UntypedFormGroup
-  jsonControlArray:any;
+  loadingSheetTableForm: UntypedFormGroup
+  jsonControlArray: any;
   columnHeader = {
-    "MFNumber": "MF Number",
-    "Leg": "Leg",
-    "ShipmentsLoadedBooked": "Shipments- Loaded/Booked",
-    "PackagesLoadedBooked": "Packages Loaded/Booked",
-    "WeightKg": "Weight Kg",
-    "VolumeCFT": "Volume CFT",
-    "Print": "Print"
+    "shipment_id": "Shipment",
+    "packages": "Packages",
+    "loaded": "Loaded",
+    "pending": "Pending",
   }
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
-    "MFNumber": "MF Number",
-    "Leg": "Leg",
-    "ShipmentsLoadedBooked": "Shipments- Loaded/Booked",
-    "PackagesLoadedBooked": "Packages Loaded/Booked",
-    "WeightKg": "Weight Kg",
-    "VolumeCFT": "Volume CFT"
+    "shipment_id": "Shipment",
+    "packages": "Packages",
+    "loaded": "Loaded",
+    "pending": "Pending",
   }
   //declaring breadscrum
   breadscrums = [
     {
-      title: "Manifest Generated",
+      title: "Update Loading Sheet",
       items: ["Home"],
-      active: "Manifest Generated"
+      active: "Update Loading Sheet"
     }
   ]
-  toggleArray=[]
-  menuItems=[]
-  linkArray=[]
+  toggleArray = []
+  menuItems = []
+  linkArray = []
   dynamicControls = {
     add: false,
     edit: false,
@@ -66,7 +61,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
-      let tableArray = this.data['tabledata'];
+      debugger
+      let tableArray = this.data['shipments'];
       this.formdata = this.data['formdata'];
       this.autoBindData();
       const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));

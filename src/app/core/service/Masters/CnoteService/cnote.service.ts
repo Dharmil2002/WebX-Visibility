@@ -8,7 +8,13 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class CnoteService {
-
+  private savedData: any;
+  getData(): any {
+    return this.savedData;
+  }
+  setData(data: any): void {
+    this.savedData = data;
+  }  
   constructor(private http: HttpClient) { }
   // GetCnoteFormcontrol() {
   //   return this.http.get<any>(

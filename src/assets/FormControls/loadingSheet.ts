@@ -37,7 +37,7 @@ export class loadingControl {
                 Validations: [
                 ],
                 functions: {
-                    onChange: 'loadingSheetDetails'
+                    onChange: 'vehicleTypeDataAutofill'
                 },
                 additionalData: {
                     isIndeterminate: false,

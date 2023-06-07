@@ -127,4 +127,9 @@ export class LoadingSheetViewComponent implements OnInit {
 
     });
   }
+
+    goBack(): void {
+      window.history.back();
+    }
+
 }

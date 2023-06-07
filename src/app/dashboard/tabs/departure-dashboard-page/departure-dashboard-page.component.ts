@@ -1,9 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
-import { MarkArrivalComponent } from '../../ActionPages/mark-arrival/mark-arrival.component';
-import { UpdateStockComponent } from '../../ActionPages/update-stock/update-stock.component';
-import { CreateLoadingSheetComponent } from 'src/app/operation/create-loading-sheet/create-loading-sheet.component';
 import { Router } from '@angular/router';
 
 @Component({
@@ -37,9 +34,9 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
   /*Below is Link Array it will Used When We Want a DrillDown
    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
    want hyper link and add Path which you want to redirect*/
-  linkArray = [
+   linkArray = [
+    { Row: 'Action', Path: 'Operation/CreateLoadingSheet' }
   ]
-
   menuItems = [
     { label: 'Create Trip'},
     { label: 'Update Trip'},
@@ -64,7 +61,7 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
     "Expected": "Expected",
     "Status": "Status",
     "Hrs": "Hrs.",
-    "actions": "Action"
+    "Action": "Action "
   }
 
   METADATA = {
@@ -102,6 +99,7 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
   }
 
   ngOnInit(): void {
+    
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['data'];
@@ -119,6 +117,7 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
 
   }
   handleMenuItemClick(label: any, element) {
+  
       this.Route.navigate(['Operation/CreateLoadingSheet'], {
         state: {
           data: label.data,

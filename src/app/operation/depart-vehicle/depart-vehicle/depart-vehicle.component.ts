@@ -99,18 +99,11 @@ export class DepartVehicleComponent implements OnInit {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
 
     }
-    debugger
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shipments'];
       this.vendordetails = this.data['vendordetails'];
       this.advancebalance = this.data['advancebalance'];
-
-      console.log(res);
-      console.log(this.advancebalance);
-      
-      
-      debugger
       this.autoBindData();
       const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
       this.csv = newArray;
@@ -120,7 +113,6 @@ export class DepartVehicleComponent implements OnInit {
     // this.autoBindData()
   }
   autoBindData() {
-    debugger
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.tripData?.VehicleNo || '')
     this.loadingSheetTableForm.controls['Route'].setValue(this.tripData?.RouteandSchedule || '')
     this.loadingSheetTableForm.controls['tripID'].setValue(this.tripData?.TripID || '')

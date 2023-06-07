@@ -56,8 +56,12 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   selectedItems: any[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
+    if(changes.tableData.currentValue){
     this.tableData = changes.tableData.currentValue;
+    }
+    if(changes.extraData.currentValue){
     this.extraData = changes.extraData.currentValue;
+    }
    if(this.tableData){
     this.refresh();
    }

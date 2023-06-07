@@ -1,6 +1,14 @@
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
-[addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
-[csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA"
- [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems"  (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls"
- >
+    [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
+    [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
+    [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+    [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
 </generic-table-webxpress>
+<mat-dialog-actions>
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+        <div class="example-button-row d-flex justify-content-end">
+            <button mat-button mat-dialog-close>Close</button>
+
+        </div>
+    </div>
+</mat-dialog-actions>

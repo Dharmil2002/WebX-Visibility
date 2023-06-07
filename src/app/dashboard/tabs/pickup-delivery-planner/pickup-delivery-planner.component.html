@@ -1,18 +1,26 @@
-<section class="content">
-    <app-generic-card-webxpress [boxData]="this.data?.DeliveryCountData"></app-generic-card-webxpress>
-    <!-- Loading Generic table as parent component and passing  required data-->
-    <!--
-        columnHeader: a object that contains only that pair of column id:title that are to be shown on dashBoard.
-        tableData : api Response.
-        addAndEditPath : path of the page where Add and edit is handled.
-        uploadComponent : REference of component, which is to be opened in dialog box.
-        csvHeaders : a object that contains ordered pair of column id:title that are to be shown in csv file.
-        csvFileName : Name of the csv File.
-        activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
-         -->
-    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
-        [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
-        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
-    </generic-table-webxpress>
-</section>
+<div class="container-fluid">
+    <div class="row clearfix">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <mat-tab-group (selectedIndexChange)="GetSelectedIndex($event)" #myTabGroup>
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <!-- <mat-icon class="example-tab-icon msr-2">home</mat-icon> -->
+                            Pickup and Delivery Planner
+                        </ng-template>
+                        <app-pickup-del-page *ngIf="myTabGroup.selectedIndex== 0"
+                            (CurrentIndex)="GetSelectedIndex($event)"></app-pickup-del-page>
+                    </mat-tab>
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
+                            Manage Run Sheets
+                        </ng-template>
+                        <!-- <app-arrival-dashboard-page *ngIf="myTabGroup.selectedIndex== 1"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-arrival-dashboard-page> -->
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+        </div>
+    </div>
+</div>

@@ -40,7 +40,8 @@
                                 Delivery
 
                             </ng-template>
-
+                            <app-pickup-delivery-planner *ngIf="myTabGroup.selectedIndex==3"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-pickup-delivery-planner>
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>

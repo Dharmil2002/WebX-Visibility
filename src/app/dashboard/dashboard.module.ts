@@ -36,6 +36,7 @@ import { DepartureDashboardPageComponent } from "./tabs/departure-dashboard-page
 import { LoadingSheetViewComponent } from "../operation/loading-sheet-view/loading-sheet-view.component";
 import { utilityService } from "../Utility/utility.service";
 import { PickupDeliveryPlannerComponent } from './tabs/pickup-delivery-planner/pickup-delivery-planner.component';
+import { PickupDelPageComponent } from './tabs/pickup-del-page/pickup-del-page.component';
 @NgModule({
   declarations: [
     LoadPlanningComponent,
@@ -46,7 +47,8 @@ import { PickupDeliveryPlannerComponent } from './tabs/pickup-delivery-planner/p
     MarkArrivalComponent,
     UpdateStockComponent,
     LoadingSheetViewComponent,
-    PickupDeliveryPlannerComponent
+    PickupDeliveryPlannerComponent,
+    PickupDelPageComponent
   ],
   imports: [
     CommonModule,

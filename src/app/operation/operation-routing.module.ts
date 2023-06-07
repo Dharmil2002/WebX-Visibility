@@ -4,6 +4,8 @@ import { LoadingSheetViewComponent } from "./loading-sheet-view/loading-sheet-vi
 import { CreateLoadingSheetComponent } from "./create-loading-sheet/create-loading-sheet.component";
 import { LodingSheetGenerateSuccessComponent } from "./loding-sheet-generate-success/loding-sheet-generate-success.component";
 import { DepartVehicleComponent } from "./depart-vehicle/depart-vehicle/depart-vehicle.component";
+import { ManifestGeneratedComponent } from "./manifest-generated/manifest-generated/manifest-generated.component";
+import { RunsheetGeneratedComponent } from "./runsheet-generated/runsheet-generated/runsheet-generated.component";
 
 const routes: Routes = [
     {
@@ -21,6 +23,14 @@ const routes: Routes = [
       {
         path: "DepartVehicle",
         component: DepartVehicleComponent,
+      },
+      {
+        path: "ManifestGenerated",
+        component: ManifestGeneratedComponent,
+      },
+      {
+        path: "RunSheetGenerated",
+        component: RunsheetGeneratedComponent,
       }
     ]
     

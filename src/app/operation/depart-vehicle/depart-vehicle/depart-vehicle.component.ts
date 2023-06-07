@@ -23,7 +23,7 @@ export class DepartVehicleComponent implements OnInit {
   drillDownPath: string
   uploadComponent: any;
   loadingSheetData: any;
-  csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
+  csvFileName: string; //name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
   companyCode: number;
   dynamicControls = {
     add: false,
@@ -36,9 +36,9 @@ export class DepartVehicleComponent implements OnInit {
   //declaring breadscrum
   breadscrums = [
     {
-      title: "Depart-Vehicle",
+      title: "Depart Vehicle",
       items: ["Home"],
-      active: "Depart-Vehicle"
+      active: "Depart Vehicle"
     }
   ]
   menuItems = []
@@ -50,13 +50,11 @@ export class DepartVehicleComponent implements OnInit {
   advanceTableForm: UntypedFormGroup;
   balanceTableForm: UntypedFormGroup;
   departureTableForm: UntypedFormGroup;
-
   jsonControlArray: any;
   departControlArray: any;
   advanceControlArray: any;
   balanceControlArray: any;
   departureControlArray: any;
-
   tripData: any;
   vehicleType: any;
   vehicleTypeStatus: any;
@@ -91,13 +89,15 @@ export class DepartVehicleComponent implements OnInit {
   advancebalance: any;
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
-  constructor(private Route: Router, private dialog: MatDialog, private http: HttpClient, private fb: UntypedFormBuilder, private filter: FilterUtils) {
+  constructor(private Route: Router, private dialog: MatDialog, 
+    private http: HttpClient, private fb: UntypedFormBuilder, 
+    private filter: FilterUtils) 
+    {
     // if (data) {
     //   this.tripData = data
     // }
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
-
     }
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
@@ -130,16 +130,12 @@ export class DepartVehicleComponent implements OnInit {
     this.advanceTableForm.controls['Unloading'].setValue(this.advancebalance[0].Othercharges.Unloading)
     this.advanceTableForm.controls['Enroute'].setValue(this.advancebalance[0].Othercharges.Enroute)
     this.advanceTableForm.controls['Misc'].setValue(this.advancebalance[0].Othercharges.Misc)
-
     this.balanceTableForm.controls['TotalAdv'].setValue(this.advancebalance[0].TotalAdvance)
     this.balanceTableForm.controls['BalanceAmt'].setValue(this.advancebalance[0].BalanceAmount)
     this.balanceTableForm.controls['PaidByCash'].setValue(this.advancebalance[0].AdvancePaid.PaidbyCash)
     this.balanceTableForm.controls['PaidbyBank'].setValue(this.advancebalance[0].AdvancePaid.PaidbyBank)
     this.balanceTableForm.controls['PaidbyFuel'].setValue(this.advancebalance[0].AdvancePaid.PaidbyFuel)
     this.balanceTableForm.controls['PaidbyCard'].setValue(this.advancebalance[0].AdvancePaid.PaidbyCard)
-
-
-    
   }
   IntializeFormControl() {
     const loadingControlFormControls = new loadingControl();
@@ -152,7 +148,6 @@ export class DepartVehicleComponent implements OnInit {
     this.balanceControlArray = BalanceControls.getBalanceFormControls();
     const DepartureControls = new DepartureControl();
     this.departureControlArray = DepartureControls.getDepartureFormControls();
-
     this.jsonControlArray.forEach(data => {
       if (data.name === 'vehicleTypecontrolHandler') {
         this.vehicleType = data.name;
@@ -227,7 +222,6 @@ export class DepartVehicleComponent implements OnInit {
     })
   }
   loadingSheetDetails() {
-    //let routeRlocation = getArrayAfterMatch(ruteHlocation, this.orgBranch);
     let loadingSheetDetails = this.loadingSheetData.data[0].find((x) => x.Type_Code == this.loadingSheetTableForm.value?.vehicleType.value || '')
     this.loadingSheetTableForm.controls['CapacityKg'].setValue(loadingSheetDetails?.CapacityKg || '')
     this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(loadingSheetDetails?.CapacityVolumeCFT || '')
@@ -243,8 +237,6 @@ export class DepartVehicleComponent implements OnInit {
     //Check if BcSerialType is "E"
     // If it is "E", set displaybarcode to true
     //Open a modal using the content parameter passed to the function
-
-
     const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> = this.dialog.open(LodingSheetGenerateSuccessComponent, {
       width: '100%', // Set the desired width
       data: this.loadingData // Pass the data object
@@ -258,10 +250,8 @@ export class DepartVehicleComponent implements OnInit {
 
   groupShipmentsByDestination(data) {
     const groupedShipments = {};
-
     for (const shipment of data) {
       const destination = shipment.Destination;
-
       if (!groupedShipments[destination]) {
         groupedShipments[destination] = {
           shipmentCount: 1,
@@ -276,10 +266,9 @@ export class DepartVehicleComponent implements OnInit {
         groupedShipments[destination].totalVolume += shipment.Volume;
       }
     }
-
     return groupedShipments;
   }
-  cancel() {
+  Close() {
     window.history.back();
   } 
 

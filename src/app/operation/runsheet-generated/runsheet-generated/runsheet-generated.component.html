@@ -1,0 +1,14 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+        [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
+        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
+    </generic-table-webxpress>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+            <div class="example-button-row d-flex justify-content-end">
+                <button class="msr-3" mat-raised-button color="primary" (click)="Close()">Close</button>
+            </div>
+        </div>
+    </div>
+</app-common-wrapper-webxpress>

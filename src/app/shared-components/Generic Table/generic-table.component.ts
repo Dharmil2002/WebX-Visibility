@@ -56,15 +56,11 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   selectedItems: any[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
-    if(changes.tableData.currentValue){
-    this.tableData = changes.tableData.currentValue;
+    this.tableData = changes.tableData?.currentValue ?? this.tableData;
+    this.extraData = changes.extraData?.currentValue ?? this.extraData;
+    if (changes.tableData?.currentValue) {
+      this.refresh();
     }
-    if(changes.extraData.currentValue){
-    this.extraData = changes.extraData.currentValue;
-    }
-   if(this.tableData){
-    this.refresh();
-   }
   }
   constructor(public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router, public dialog: MatDialog) {
@@ -107,7 +103,9 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   //#region Refresh funtion to reload tha data
   refresh() {
     const sortState: MatSortable = { id: '', start: 'asc', disableClear: false };
-    this.sort.sort(sortState);
+    if (this.sort) {
+      this.sort.sort(sortState);
+    }
     this.loadData();
   }
   //#endregion

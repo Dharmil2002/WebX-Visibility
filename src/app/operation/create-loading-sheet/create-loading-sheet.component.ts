@@ -99,16 +99,12 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.autoBindData()
   }
   autoBindData() {
-    debugger
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.tripData?.VehicleNo || this.getloadingFormData?.vehicle || '')
     this.loadingSheetTableForm.controls['Route'].setValue(this.tripData?.RouteandSchedule || this.getloadingFormData?.Route || '')
     this.loadingSheetTableForm.controls['tripID'].setValue(this.tripData?.TripID || this.getloadingFormData?.TripID || '')
     this.loadingSheetTableForm.controls['Expected'].setValue(this.tripData?.Expected || this.getloadingFormData?.Expected || '')
     this.loadingSheetTableForm.controls['LoadingLocation'].setValue(localStorage.getItem('Branch') || '')
-    if (this.getloadingFormData) {
-       this.vehicleTypeDropdown()
-
-    }
+    this.vehicleTypeDropdown();
   }
   IntializeFormControl() {
     const loadingControlFormControls = new loadingControl();
@@ -122,9 +118,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
   }
   ngOnInit(): void {
-    if(!this.getloadingFormData) {
-    this.vehicleTypeDropdown();
-    }
+   
   }
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
@@ -171,17 +165,10 @@ export class CreateLoadingSheetComponent implements OnInit {
       if (vehicleTypeDetails) {
         this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleTypeDetails)
         this.vehicleTypeDataAutofill()
-      }else{
+      } else {
         this.loadingSheetTableForm.controls['vehicleType'].setValue(this.getloadingFormData?.vehicleType || '')
         this.vehicleTypeDataAutofill();
       }
-      
-      //this.tripData.VehicleType
-      //let tableArray = this.data['data'];
-      //.this.csv = tableArray;
-      // console.log(this.csv);
-      //this.tableload = false;
-
     });
     this.getshipmentData()
   }
@@ -189,9 +176,9 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.http.get(this.departureJsonUrl).subscribe(res => {
       this.listDepartueDetail = res;
       this.tripData = this.listDepartueDetail.data.find((x) => x.RouteandSchedule == route);
-    if(!this.getloadingFormData){
-      this.autoBindData()
-    }
+      if (!this.getloadingFormData) {
+        this.autoBindData()
+      }
 
     })
   }
@@ -246,7 +233,6 @@ export class CreateLoadingSheetComponent implements OnInit {
     })
   }
   vehicleTypeDataAutofill() {
-
     //let routeRlocation = getArrayAfterMatch(ruteHlocation, this.orgBranch);
     let loadingSheetDetails = this.loadingSheetData.data[0].find((x) => x.Type_Code == this.loadingSheetTableForm.value?.vehicleType.value || '')
     if (loadingSheetDetails) {

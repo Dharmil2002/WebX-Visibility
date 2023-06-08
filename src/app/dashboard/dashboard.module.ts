@@ -37,6 +37,7 @@ import { LoadingSheetViewComponent } from "../operation/loading-sheet-view/loadi
 import { utilityService } from "../Utility/utility.service";
 import { PickupDeliveryPlannerComponent } from './tabs/pickup-delivery-planner/pickup-delivery-planner.component';
 import { PickupDelPageComponent } from './tabs/pickup-del-page/pickup-del-page.component';
+import { ManageRunsheetComponent } from './tabs/manage-runsheet/manage-runsheet.component';
 @NgModule({
   declarations: [
     LoadPlanningComponent,
@@ -48,7 +49,8 @@ import { PickupDelPageComponent } from './tabs/pickup-del-page/pickup-del-page.c
     UpdateStockComponent,
     LoadingSheetViewComponent,
     PickupDeliveryPlannerComponent,
-    PickupDelPageComponent
+    PickupDelPageComponent,
+    ManageRunsheetComponent
   ],
   imports: [
     CommonModule,

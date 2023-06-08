@@ -16,8 +16,8 @@
                             <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
                             Manage Run Sheets
                         </ng-template>
-                        <!-- <app-arrival-dashboard-page *ngIf="myTabGroup.selectedIndex== 1"
-                                (CurrentIndex)="GetSelectedIndex($event)"></app-arrival-dashboard-page> -->
+                        <app-manage-runsheet *ngIf="myTabGroup.selectedIndex== 1"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-manage-runsheet>
                     </mat-tab>
                 </mat-tab-group>
             </div>

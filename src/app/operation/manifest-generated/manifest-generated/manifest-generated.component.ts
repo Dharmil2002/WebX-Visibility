@@ -25,7 +25,7 @@ export class ManifestGeneratedComponent implements OnInit {
     "PackagesLoadedBooked": "Packages Loaded/Booked",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
-    "Print": "Print"
+    "Action": "Print"
   }
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
@@ -46,7 +46,10 @@ export class ManifestGeneratedComponent implements OnInit {
   ]
   toggleArray=[]
   menuItems=[]
-  linkArray=[]
+  linkArray=[
+    { Row: 'Action', Path: 'Operation/' }
+
+  ]
   dynamicControls = {
     add: false,
     edit: false,

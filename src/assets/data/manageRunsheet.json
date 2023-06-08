@@ -1,0 +1,41 @@
+{
+  "tabledata": [
+    {
+      "RunSheet": "PDNHW00303",
+      "Cluster": "CL002: Mahim-Dadar cluster",
+      "Shipments": 345,
+      "Packages": 2300,
+      "WeightKg": 1800,
+      "VolumeCFT": 789,
+      "Action": "Depart"
+
+    },
+    {
+      "RunSheet": "PDNHW00312",
+      "Cluster": "CL003: North Mumbai",
+      "Shipments": 189,
+      "Packages": 1890,
+      "WeightKg": 2130,
+      "VolumeCFT": 890,
+      "Action": "Update Delivery"
+
+    }
+  ],
+  "DeliveryCountData": [
+    {
+      "count": 8,
+      "title": "Run Sheets Generated",
+      "class": "info-box7 bg-danger order-info-box7"
+    },
+    {
+      "count": 7,
+      "title": "Vehicles Departed",
+      "class": "info-box7 bg-info order-info-box7"
+    },
+    {
+      "count": 120,
+      "title": "Pickup Requests",
+      "class": "info-box7 bg-warning order-info-box7"
+    }
+  ]
+}

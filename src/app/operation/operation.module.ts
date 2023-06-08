@@ -28,7 +28,7 @@ import { UpdateLoadingSheetComponent } from "./update-loading-sheet/update-loadi
     LodingSheetGenerateSuccessComponent,
     DepartVehicleComponent,
     ManifestGeneratedComponent,
-    RunsheetGeneratedComponent, UpdateLoadingSheetComponent
+    RunsheetGeneratedComponent, UpdateLoadingSheetComponent 
   ],
   imports: [
     CommonModule,

@@ -232,7 +232,6 @@ export class DepartVehicleComponent implements OnInit {
     this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(loadingSheetDetails?.VolumeUtilization || '')
     this.loadingSheetTableForm.controls['WeightUtilization'].setValue(loadingSheetDetails?.WeightUtilization || '')
   }
-
   loadingSheetGenerate() {
     //Check if BcSerialType is "E"
     // If it is "E", set displaybarcode to true
@@ -247,7 +246,6 @@ export class DepartVehicleComponent implements OnInit {
       // Handle the result after the dialog is closed
     });
   }
-
   groupShipmentsByDestination(data) {
     const groupedShipments = {};
     for (const shipment of data) {

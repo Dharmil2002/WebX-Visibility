@@ -18,7 +18,7 @@
             "PackagesLoadedBooked": "360/370",
             "WeightKg": 12000,
             "VolumeCFT": 1300,
-            "Print": "Print"
+            "Action": "Print"
           }
     ]
 }

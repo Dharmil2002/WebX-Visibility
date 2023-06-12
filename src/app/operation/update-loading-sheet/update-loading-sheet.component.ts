@@ -3,18 +3,16 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
-import { loadingControl } from 'src/assets/FormControls/loadingSheet';
 import { Router } from '@angular/router';
-import { LodingSheetGenerateSuccessComponent } from '../loding-sheet-generate-success/loding-sheet-generate-success.component';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
+import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival/mark-arrival.component';
 
 @Component({
   selector: 'app-update-loading-sheet',
   templateUrl: './update-loading-sheet.component.html'
 })
 export class UpdateLoadingSheetComponent implements OnInit {
-  jsonUrl = '../../../assets/data/uploadLodingSheet.json'
+  jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
   tableload = false;
   csv: any[];
   data: [] | any;
@@ -23,17 +21,23 @@ export class UpdateLoadingSheetComponent implements OnInit {
   loadingSheetTableForm: UntypedFormGroup
   jsonControlArray: any;
   columnHeader = {
-    "shipment_id": "Shipment",
-    "packages": "Packages",
-    "loaded": "Loaded",
-    "pending": "Pending",
+    "Shipment": "Shipment",
+    "Origin": "Origin",
+    "Destination": "Destination",
+    "Packages": "Packages",
+    "Unloaded": "Unloaded",
+    "Pending": "Pending",
+    "Leg": "Leg",
   }
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
-    "shipment_id": "Shipment",
-    "packages": "Packages",
-    "loaded": "Loaded",
-    "pending": "Pending",
+    "Shipment": "Shipment",
+    "Origin": "Origin",
+    "Destination": "Destination",
+    "Packages": "Packages",
+    "Unloaded": "Unloaded",
+    "Pending": "Pending",
+    "Leg": "Leg"
   }
   //declaring breadscrum
   breadscrums = [
@@ -53,31 +57,39 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   loadingData: any;
   formdata: any;
-  constructor(private Route: Router,
+  arrivalData: any;
+  constructor(private Route: Router,public dialogRef: MatDialogRef<MarkArrivalComponent>,
+    @Inject(MAT_DIALOG_DATA) public item: any,
     private http: HttpClient, private fb: UntypedFormBuilder) {
-
+  
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
-    this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
-      debugger
-      let tableArray = this.data['shipments'];
-      this.formdata = this.data['formdata'];
-      this.autoBindData();
-      const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      this.csv = newArray;
-      this.tableload = false;
-    });
+    if(item){
+      this.arrivalData=item;
+    }
+   this.getShippningData();
     this.IntializeFormControl()
   }
+  getShippningData() {
+    this.http.get(this.jsonUrl).subscribe(res => {
+      debugger
+      this.data = res;
+      let tableArray = this.data['shippingData'];
+      this.csv = tableArray.filter((item)=>item.routes==this.arrivalData.Route && item.Leg==this.arrivalData.Leg);
+      this.tableload = false;
+    });
+  }
   autoBindData() {
-    this.loadingSheetTableForm.controls['vehicle'].setValue(this.formdata[0].Vehicle)
-    this.loadingSheetTableForm.controls['Route'].setValue(this.formdata[0].Route)
-    this.loadingSheetTableForm.controls['tripID'].setValue(this.formdata[0].TripID)
-    this.loadingSheetTableForm.controls['LoadingLocation'].setValue(this.formdata[0].LoadingLocation)
-    this.loadingSheetTableForm.controls['LoadingSheet'].setValue(this.formdata[0].LoadingSheet)
-    this.loadingSheetTableForm.controls['Leg'].setValue(this.formdata[0].Leg)
+    const vehicleControl = this.loadingSheetTableForm.get('vehicle');
+    vehicleControl?.patchValue(this.arrivalData?.VehicleNo || '');
+    
+    this.loadingSheetTableForm.controls['vehicle'].setValue(this.arrivalData?.VehicleNo||'')
+    this.loadingSheetTableForm.controls['Route'].setValue(this.arrivalData?.Route||'')
+    this.loadingSheetTableForm.controls['tripID'].setValue(this.arrivalData?.TripID||'')
+    this.loadingSheetTableForm.controls['LoadingLocation'].setValue(this.arrivalData?.ArrivalLocation||'')
+    this.loadingSheetTableForm.controls['Unoadingsheet'].setValue(this.arrivalData?.Unoadingsheet||'')
+    this.loadingSheetTableForm.controls['Leg'].setValue(this.arrivalData?.Leg||'')
   }
   ngOnInit(): void {
   }
@@ -85,6 +97,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const ManifestGeneratedFormControl = new UpdateloadingControl();
     this.jsonControlArray = ManifestGeneratedFormControl.getupdatelsFormControls();
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
+    this.autoBindData() ;
   }
   IsActiveFuntion($event) {
     this.loadingData = $event
@@ -103,7 +116,11 @@ export class UpdateLoadingSheetComponent implements OnInit {
       console.log("failed");
     }
   }
+  CompleteScan(){
+    this.dialogRef.close(this.loadingSheetTableForm.value)
+   
+  }
   Close(): void {
-    window.history.back();
+    this.dialogRef.close()
   }
 }

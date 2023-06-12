@@ -1,59 +1,547 @@
-{
-  "data": [
-    {
-      "VehicleNo": "MH02CB5544",
-      "Route": "S003: BLR-BHW-AMD",
-      "TripID": "THBLR000343",
-      "Location": "234 Km | View 3.5 km from Panvel",
-      "STA": "29-05-2023 11:30:00",
-      "ETAATA": "29-05-2023 14:00:00",
-      "Status": "LATE",
-      "Hrs": "02:30:00",
-      "Action": "Mark Arrival"
-    },
-    {
-      "VehicleNo": "HR0UY6646",
-      "Route": "S003: PNQ-BHW-VPI",
-      "TripID": "THPNQ000125",
-      "Location": "At BHW",
-      "STA": "29-05-2023 11:00:00",
-      "ETAATA": "29-05-2023 11:55:00",
-      "Status": "ARRIVED",
-      "Hrs": "00:05:00",
-      "Action": "Update Stock"
-    },
-    {
-      "VehicleNo": "KA05RE5564",
-      "Route": "S012: MAA-HYD-PNQ-BHW",
-      "TripID": "THMAA00837",
-      "Location": "320 Km | View 1.5 km from Kolhapur",
-      "STA": "29-05-2023 12:30:00",
-      "ETAATA": "29-05-2023 15:00:00",
-      "Status": "LATE",
-      "Hrs": "02:30:00",
-      "Action": "Mark Arrival"
+   {
+ "arrivalData":
+    [
+      {
+        "Route": "S003: BHW-BLR",
+        "VehicleNo": "MH02CB5544",
+        "TripID": "THBLR000343",
+        "Location": "234 Km | View\n3.5 km from BLR",
+        "Scheduled": "29-05-2023 11:30",
+        "ETAATA": "29-05-2023 14:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "02:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "BLR",
+        "Unoadingsheet": "USBHW001334",
+        "Leg":"BHW-BLR"
+      },
+      {
+        "Route": "S004: BLR-BHW-AMD",
+        "VehicleNo": "HR0UY6646",
+        "TripID": "THPNQ000125",
+        "Location": "At BHW",
+        "Scheduled": "29-05-2023 11:00",
+        "ETAATA": "29-05-2023 11:55",
+        "Status": "ARRIVED",
+        "Hrs.": "00:05",
+        "Action": "Arrival Scan",
+        "ArrivalLocation": "BHW",
+        "Unoadingsheet": "USBHW001335",
+        "Leg":"BHW-AMD"
+      },
+      {
+        "Route": "S005: PNQ-BHW-VPI",
+        "VehicleNo": "KA05RE5564",
+        "TripID": "THMAA00837",
+        "Location": "320 Km | View\n1.5 km from panvel",
+        "Scheduled": "29-05-2023 12:30",
+        "ETAATA": "29-05-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "02:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "PNQ",
+        "Unoadingsheet": "USBHW001336",
+        "Leg":"PNQ-BHW"
+      },
+      {
+        "Route": "S0010 : AMDB-BRDB-MUMB",
+        "VehicleNo": "HR0UY6646",
+        "TripID": "THMAA00838",
+        "Location": "320 Km | View\n1.6 km from ahmedabad ",
+        "Scheduled": "30-05-2023 12:30",
+        "ETAATA": "30-05-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "03:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "AMDB",
+        "Unoadingsheet": "USBHW001337",
+        "Leg":"AMDB-BRDB"
+      },
+      {
+        "Route": "S0006: AMDB-JAIB-DELB",
+        "VehicleNo": "KA05RE5564",
+        "TripID": "THMAA00839",
+        "Location": "320 Km | View\n1.7 km from ahmedabad",
+        "Scheduled": "31-05-2023 12:30",
+        "ETAATA": "31-05-2023 15:00",
+        "Status": "ARRIVED",
+        "Hrs.": "04:30",
+        "Action": "Arrival Scan",
+        "ArrivalLocation": "AMDB",
+        "Unoadingsheet": "USBHW001338",
+        "Leg":"AMDB-JAIB"
+      },
+      {
+        "Route": "S0002 : MUMB-BRDB-AMDB",
+        "VehicleNo": "KA05RE5565",
+        "TripID": "THMAA00840",
+        "Location": "320 Km | View\n1.8 km from Baroda",
+        "Scheduled": "01-06-2023 12:30",
+        "ETAATA": "01-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "05:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "BRDB",
+        "Unoadingsheet": "USBHW001339",
+        "Leg":"MUMB-AMDB"
+      },
+      {
+        "Route": "S0037: NAGM-PNQM-MUMB",
+        "VehicleNo": "KA05RE5566",
+        "TripID": "THMAA00841",
+        "Location": "320 Km | View\n1.9 km from NAGM",
+        "Scheduled": "02-06-2023 12:30",
+        "ETAATA": "02-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "06:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "NAGM",
+        "Unoadingsheet": "USBHW001340",
+        "Leg":"NAGM-PNQM"
+      },
+      {
+        "Route": "S0008: MUMB-BNGB",
+        "VehicleNo": "KA05RE5567",
+        "TripID": "THMAA00842",
+        "Location": "320 Km | View\n1.10 km from BNGB",
+        "Scheduled": "03-06-2023 12:30",
+        "ETAATA": "03-06-2023 15:00",
+        "Status": "ARRIVED",
+        "Hrs.": "07:30",
+        "Action": "Arrival Scan",
+        "ArrivalLocation": "BNGB",
+        "Unoadingsheet": "USBHW001341",
+        "Leg":"MUMB-BNGB"
+      },
+      {
+        "Route": "S0026 : MUMB-PNQB-BNGB",
+        "VehicleNo": "KA05RE5568",
+        "TripID": "THMAA00843",
+        "Location": "320 Km | View\n1.11 km from PNQB",
+        "Scheduled": "04-06-2023 12:30",
+        "ETAATA": "04-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "08:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "PNQB",
+        "Unoadingsheet": "USBHW001342",
+        "Leg":"MUMB-PNQB"
+      },
+      {
+        "Route": "S0018:MUMB-CHNB",
+        "VehicleNo": "MH02CB5544",
+        "TripID": "THMAA00844",
+        "Location": "320 Km | View\n1.12 km from CHNB",
+        "Scheduled": "05-06-2023 12:30",
+        "ETAATA": "05-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "09:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "CHNB",
+        "Unoadingsheet": "USBHW001343",
+        "Leg":"MUMB-CHNB"
+        
+      },
+      {
+        "Route": "S0070: MUMB-SRTB",
+        "VehicleNo": "MH02CB5545",
+        "TripID": "THMAA00845",
+        "Location": "320 Km | View\n1.13 km from SRTB",
+        "Scheduled": "06-06-2023 12:30",
+        "ETAATA": "06-06-2023 15:00",
+        "Status": "ARRIVED",
+        "Hrs.": "10:30",
+        "Action": "Arrival Scan",
+        "ArrivalLocation": "SRTB",
+        "Unoadingsheet": "USBHW001344",
+        "Leg":"MUMB-SRTB"
+      },
+      {
+        "Route": "S0097: SRT-MAL",
+        "VehicleNo": "HR0UY6646",
+        "TripID": "THMAA00846",
+        "Location": "320 Km | View\n1.14 km from Kolhapur",
+        "Scheduled": "07-06-2023 12:30",
+        "ETAATA": "07-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "11:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "MAL",
+        "Unoadingsheet": "USBHW001345",
+        "Leg":"SRT-MAL"
+      },
+      {
+        "Route": "S0111: MUMB-MAAM",
+        "VehicleNo": "KA05RE5564",
+        "TripID": "THMAA00847",
+        "Location": "320 Km | View\n1.15 km from MAAM",
+        "Scheduled": "08-06-2023 12:30",
+        "ETAATA": "08-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "12:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "MAAM",
+        "Unoadingsheet": "USBHW001346",
+        "Leg":"MUMB-MAAM"
+      },
+      {
+        "Route": "S0019: MUMB-HUBB",
+        "VehicleNo": "KA05RE5565",
+        "TripID": "THMAA00848",
+        "Location": "320 Km | View\n1.16 km from HUBB",
+        "Scheduled": "09-06-2023 12:30",
+        "ETAATA": "09-06-2023 15:00",
+        "Status": "ARRIVED",
+        "Hrs.": "13:30",
+        "Action": "Arrival Scan",
+        "ArrivalLocation": "HUBB",
+        "Unoadingsheet": "USBHW001347",
+        "Leg":"MUMB-HUBB"
+      },
+      {
+        "Route": "S0060:MUMB-AMDB-JAIB",
+        "VehicleNo": "KA05RE5566",
+        "TripID": "THMAA00849",
+        "Location": "320 Km | View\n1.17 km from AMDB",
+        "Scheduled": "10-06-2023 12:30",
+        "ETAATA": "10-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "14:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "AMDB",
+        "Unoadingsheet": "USBHW001348",
+        "Leg":"MUMB-AMDB"
+      },
+      {
+        "Route": "S0123: MUMB-BNGB",
+        "VehicleNo": "KA05RE5567",
+        "TripID": "THMAA00850",
+        "Location": "320 Km | View\n1.18 km from BNGB",
+        "Scheduled": "11-06-2023 12:30",
+        "ETAATA": "11-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "15:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "BNGB",
+        "Unoadingsheet": "USBHW001349",
+        "Leg":"MUMB-BNGB"
+      },
+      {
+        "Route": "S0124: MUMB-SRT",
+        "VehicleNo": "KA05RE5568",
+        "TripID": "THMAA00851",
+        "Location": "320 Km | View\n1.19 km from SRT",
+        "Scheduled": "12-06-2023 12:30",
+        "ETAATA": "12-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "16:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "SRT",
+        "Unoadingsheet": "USBHW001350",
+        "Leg":"MUMB-SRT"
+      },
+      {
+        "Route": "S0125:MUMB-401107",
+        "VehicleNo": "KA05RE5569",
+        "TripID": "THMAA00852",
+        "Location": "320 Km | View\n1.20 km from Kolhapur",
+        "Scheduled": "13-06-2023 12:30",
+        "ETAATA": "13-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "17:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "401107",
+        "Unoadingsheet": "USBHW001351",
+        "Leg":"MUMB-401107"
+      },
+      {
+        "Route": "S0049: MUMB-PNQB",
+        "VehicleNo": "KA05RE5570",
+        "TripID": "THMAA00853",
+        "Location": "320 Km | View\n1.21 km from PNQB",
+        "Scheduled": "14-06-2023 12:30",
+        "ETAATA": "14-06-2023 15:00",
+        "Status": "RUNNING LATE",
+        "Hrs.": "18:30",
+        "Action": "Vehicle Arrival",
+        "ArrivalLocation": "PNQB",
+        "Unoadingsheet": "USBHW001352",
+        "Leg":"MUMB-PNQB"
+      }
+    ]
+ ,
+ "shippingData":
+ [
+  {
+    "Shipment": 12335835,
+    "Origin": "BHW",
+    "Destination": "BLR",
+    "Packages": 200,
+    "Unloaded": 130,
+    "Pending": 70,
+    "routes": "S003: BHW-BLR",
+    "Leg": "BHW-BLR"
+  },
+  {
+    "Shipment": 23737388,
+    "Origin": "BLR",
+    "Destination": "BHW",
+    "Packages": 130,
+    "Unloaded": 110,
+    "Pending": 20,
+    "routes": "S004: BLR-BHW-AMD",
+    "Leg": "BLR-BHW"
+  },
+  {
+    "Shipment": 39884849,
+    "Origin": "BLR",
+    "Destination": "AMD",
+    "Packages": 340,
+    "Unloaded": 340,
+    "Pending": 0,
+    "routes": "S004: BLR-BHW-AMD",
+    "Leg": "BHW-AMD"
+  },
+  {
+    "Shipment": 39939393,
+    "Origin": "PNQ",
+    "Destination": "BHW",
+    "Packages": 260,
+    "Unloaded": 230,
+    "Pending": 30,
+    "routes": "S005: PNQ-BHW-VPI",
+    "Leg": " PNQ-BHW"
+  },
+  {
+    "Shipment": 39939394,
+    "Origin": "PNQ",
+    "Destination": "VPI",
+    "Packages": 261,
+    "Unloaded": 231,
+    "Pending": 31,
+    "routes": "S005: PNQ-BHW-VPI",
+    "Leg": " PNQ-VPI"
+  },
+  {
+    "Shipment": 39939395,
+    "Origin": "AMDB",
+    "Destination": "BRDB",
+    "Packages": 262,
+    "Unloaded": 232,
+    "Pending": 32,
+    "routes": "S0010 : AMDB-BRDB-MUMB",
+    "Leg": " AMDB-BRDB"
+  },
+  {
+    "Shipment": 39939396,
+    "Origin": "AMDB",
+    "Destination": "MUMB",
+    "Packages": 263,
+    "Unloaded": 233,
+    "Pending": 33,
+    "routes": "S0010 : AMDB-BRDB-MUMB",
+    "Leg": " AMDB-MUMB"
+  },
+  {
+    "Shipment": 39939397,
+    "Origin": "AMDB",
+    "Destination": "JAIB",
+    "Packages": 264,
+    "Unloaded": 234,
+    "Pending": 34,
+    "routes": "S0006: AMDB-JAIB-DELB",
+    "Leg": "AMDB-JAIB"
+  },
+  {
+    "Shipment": 39939398,
+    "Origin": "AMDB",
+    "Destination": "DELB",
+    "Packages": 265,
+    "Unloaded": 235,
+    "Pending": 35,
+    "routes": "S0006: AMDB-JAIB-DELB",
+    "Leg": "AMDB-DELB"
+  },
+  {
+    "Shipment": 39939399,
+    "Origin": "MUMB",
+    "Destination": "BRDB",
+    "Packages": 266,
+    "Unloaded": 236,
+    "Pending": 36,
+    "routes": "S0002 : MUMB-BRDB-AMDB",
+    "Leg": " MUMB-BRDB"
+  },
+  {
+    "Shipment": 39939400,
+    "Origin": "MUMB",
+    "Destination": "AMDB",
+    "Packages": 267,
+    "Unloaded": 237,
+    "Pending": 37,
+    "routes": "S0003 : MUMB-BRDB-AMDB",
+    "Leg": "BRDB-AMDB"
+  },
+  {
+    "Shipment": 39939401,
+    "Origin": "NAGM",
+    "Destination": "PNQM",
+    "Packages": 268,
+    "Unloaded": 238,
+    "Pending": 38,
+    "routes": "S0037: NAGM-PNQM-MUMB",
+    "Leg": " NAGM-PNQM"
+  },
+  {
+    "Shipment": 39939402,
+    "Origin": "NAGM",
+    "Destination": "MUMB",
+    "Packages": 269,
+    "Unloaded": 239,
+    "Pending": 39,
+    "routes": "S0038: NAGM-PNQM-MUMB",
+    "Leg": " NAGM-MUMB"
+  },
+  {
+    "Shipment": 39939403,
+    "Origin": "MUMB",
+    "Destination": "BNGB",
+    "Packages": 270,
+    "Unloaded": 240,
+    "Pending": 40,
+    "routes": "S0008: MUMB-BNGB",
+    "Leg": "MUMB-BNGB"
+  },
+  {
+    "Shipment": 39939404,
+    "Origin": "MUMB",
+    "Destination": "PNQB",
+    "Packages": 271,
+    "Unloaded": 241,
+    "Pending": 41,
+    "routes": "S0026 : MUMB-PNQB-BNGB",
+    "Leg": " MUMB-PNQB"
+  },
+  {
+    "Shipment": 39939405,
+    "Origin": "MUMB",
+    "Destination": "BNGB",
+    "Packages": 272,
+    "Unloaded": 242,
+    "Pending": 42,
+    "routes": "S0027 : MUMB-PNQB-BNGB",
+    "Leg": " MUMB-BNGB"
+  },
+  {
+    "Shipment": 39939406,
+    "Origin": "MUMB",
+    "Destination": "CHNB",
+    "Packages": 273,
+    "Unloaded": 243,
+    "Pending": 43,
+    "routes": "S0018:MUMB-CHNB",
+    "Leg": "MUMB-CHNB"
+  },
+  {
+    "Shipment": 39939407,
+    "Origin": "MUMB",
+    "Destination": "SRTB",
+    "Packages": 274,
+    "Unloaded": 244,
+    "Pending": 44,
+    "routes": "S0070: MUMB-SRTB",
+    "Leg": " MUMB-SRTB"
+  },
+  {
+    "Shipment": 39939408,
+    "Origin": "SRT",
+    "Destination": "MAL",
+    "Packages": 275,
+    "Unloaded": 245,
+    "Pending": 45,
+    "routes": "S0097: SRT-MAL",
+    "Leg": "SRT-MAL"
+  },
+  {
+    "Shipment": 39939409,
+    "Origin": "MUMB",
+    "Destination": "MAAM",
+    "Packages": 276,
+    "Unloaded": 246,
+    "Pending": 46,
+    "routes": "S0111: MUMB-MAAM",
+    "Leg": " MUMB-MAAM"
+  },
+  {
+    "Shipment": 39939410,
+    "Origin": "MUMB",
+    "Destination": "HUBB",
+    "Packages": 277,
+    "Unloaded": 247,
+    "Pending": 47,
+    "routes": "S0019: MUMB-HUBB",
+    "Leg": " MUMB-HUBB"
+  },
+  {
+    "Shipment": 39939411,
+    "Origin": "MUMB",
+    "Destination": "AMDB",
+    "Packages": 278,
+    "Unloaded": 248,
+    "Pending": 48,
+    "routes": "S0060:MUMB-AMDB-JAIB",
+    "Leg": "MUMB-AMDB"
+  },
+  {
+    "Shipment": 39939412,
+    "Origin": "MUMB",
+    "Destination": "JAIB",
+    "Packages": 279,
+    "Unloaded": 249,
+    "Pending": 49,
+    "routes": "S0060:MUMB-AMDB-JAIB",
+    "Leg": "MUMB-JAIB"
+  },
+  {
+    "Shipment": 39939420,
+    "Origin": "MUMB",
+    "Destination": "BNGB",
+    "Packages": 287,
+    "Unloaded": 257,
+    "Pending": 57,
+    "routes": "S0123: MUMB-BNGB",
+    "Leg": " MUMB-BNGB"
+  },
+  {
+    "Shipment": 39939421,
+    "Origin": "MUMB",
+    "Destination": "SRTB",
+    "Packages": 288,
+    "Unloaded": 258,
+    "Pending": 58,
+    "routes": "S0124: MUMB-SRT",
+    "Leg": " MUMB-SRTB"
+  },
+  {
+    "Shipment": 39939422,
+    "Origin": "MUMB",
+    "Destination": "401107",
+    "Packages": 289,
+    "Unloaded": 259,
+    "Pending": 59,
+    "routes": "S0125:MUMB-401107",
+    "Leg": "MUMB-401107"
+  },
+  {
+    "Shipment": 39939423,
+    "Origin": "MUMB",
+    "Destination": "PNQB",
+    "Packages": 290,
+    "Unloaded": 260,
+    "Pending": 60,
+    "routes": "S0049: MUMB-PNQB",
+    "Leg": " MUMB-PNQB"
+  }
+ ]
+
     }
-  ],
-  "ArrivalCountData": [
-    {
-      "count": 35,
-      "title": "Vehicles",
-      "class": "info-box7 bg-danger order-info-box7"
-    },
-    {
-      "count": 30,
-      "title": "Routes",
-      "class": "info-box7 bg-info order-info-box7"
-    },
-    {
-      "count": 2111,
-      "title": "Shipments",
-      "class": "info-box7 bg-warning order-info-box7"
-    },
-    {
-      "count": 56900,
-      "title": "Packages",
-      "class": "info-box7 bg-primary order-info-box7"
-    }
-  ]
-}

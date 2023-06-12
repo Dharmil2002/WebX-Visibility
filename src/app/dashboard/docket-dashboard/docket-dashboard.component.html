@@ -7,7 +7,7 @@
         </div>
 <div class="container">
     <div class="row">
-        <div class="col-md-4 col-xl-3">
+        <div class="col-md-4 col-xl-3" *ngIf="docket">
             <div class="card bg-c-yellow order-card pointer">
                 <div class="card-block" (click)="docketBooking('EwaybillNo')">
                     <h6 class="m-b-20"></h6>
@@ -16,7 +16,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 col-xl-3">
+        <div class="col-md-4 col-xl-3" *ngIf="docket">
             <div class="card bg-c-pink order-card pointer">
                 <div class="card-block" (click)="docketBooking('Docket')">
                     <h6 class="m-b-20"></h6>
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 col-xl-3">
+        <div class="col-md-4 col-xl-3" *ngIf="docket">
             <div class="card bg-c-green order-card pointer">
                 <div class="card-block" (click)="docketBooking('Ewaybill')">
                     <h6 class="m-b-20"></h6>

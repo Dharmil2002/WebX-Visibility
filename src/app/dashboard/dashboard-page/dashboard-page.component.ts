@@ -1,11 +1,13 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
-
+import { ActivatedRoute, Router } from '@angular/router';
+import{CnoteService} from 'src/app/core/service/Masters/CnoteService/cnote.service'
 @Component({
   selector: 'app-dashboard-page',
   templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent implements OnInit {
+  @ViewChild('myTabGroup') tabGroup!: MatTabGroup;
 
   breadscrums = [
     {
@@ -15,7 +17,13 @@ export class DashboardPageComponent implements OnInit {
     }
   ]
   @ViewChild('myTabGroup') myTabGroup: MatTabGroup;
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  detailtab: number;
+  constructor(private changeDetectorRef: ChangeDetectorRef,private activeRoute: ActivatedRoute,private Route:Router,private ICnoteServicevice: CnoteService) {
+    if (this.Route.getCurrentNavigation()?.extras?.state != null) {
+    
+    }
+   }
+
   ngOnInit() {
    
   }
@@ -23,6 +31,20 @@ export class DashboardPageComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
   GetSelectedIndex(Index: number) {
+    if(Index==2){
+   
+  }
     this.myTabGroup.selectedIndex = Index;
   }
+
+  ngAfterViewInit(): void {
+    this.activeRoute.queryParams.subscribe(params => {
+      const selectedTabIndex = params['tab'];
+      if (selectedTabIndex) {
+        const index = Number(selectedTabIndex);
+        this.tabGroup.selectedIndex = index;
+      }
+    });
+  }
+
 }

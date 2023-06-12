@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { MarkArrivalComponent } from '../../ActionPages/mark-arrival/mark-arrival.component';
-import { UpdateStockComponent } from '../../ActionPages/update-stock/update-stock.component';
-
+import { UpdateLoadingSheetComponent } from 'src/app/operation/update-loading-sheet/update-loading-sheet.component';
+import{CnoteService}from 'src/app/core/service/Masters/CnoteService/cnote.service';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -12,6 +12,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   jsonUrl = '../../../assets/data/arrival-dashboard-data.json';
   viewComponent: any;
   advancdeDetails: any;
+  arrivalChanged:any;
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   csv: any[];
@@ -28,6 +29,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       active: "Arrival Details"
     }
   ]
+  height='100vw';
+  width='100vw';
+  maxWidth:'232vw'
   dynamicControls = {
     add: false,
     edit: true,
@@ -37,8 +41,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   /*Below is Link Array it will Used When We Want a DrillDown
  Table it's Jst for set A Hyper Link on same You jst add row Name Which You
  want hyper link and add Path which you want to redirect*/
-  linkArray = [
-  ]
+ linkArray = [
+  { Row: 'Action',Path:'',componentDetails: MarkArrivalComponent }
+]
   //Warning--It`s Used is not compasary if you does't add any link you just pass blank array
   /*End*/
   toggleArray = [
@@ -59,7 +64,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     "ETAATA": "ETA/ ATA",
     "Status": "Status",
     "Hrs": "Hrs.",
-    "actions": "Action"
+    "Action": "Action"
   }
   METADATA = {
     checkBoxRequired: true,
@@ -79,39 +84,75 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   };
   //#endregion
   menuItems = [
-    { label: 'Mark Arrival', componentDetails: MarkArrivalComponent, function: "GeneralMultipleView" },
-    { label: 'Update Stock', componentDetails: UpdateStockComponent, function: "GeneralMultipleView" },
+    { label: 'Vehicle Arrival', componentDetails: MarkArrivalComponent, function: "GeneralMultipleView" },
+    { label: 'Arrival Scan', componentDetails: UpdateLoadingSheetComponent, function: "GeneralMultipleView" },
     // Add more menu items as needed
   ];
   IscheckBoxRequired: boolean;
-  width: string;
-  height: string;
+  boxData: { count: any; title: any; class: string; }[];
+  departureDetails: any;
   // declararing properties
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,private CnoteService:CnoteService) {
+    debugger
     super();
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
     this.IscheckBoxRequired = true;
     this.drillDownPath = 'example/drillDown'
+    this.getArrivalDetails();
   }
   ngOnInit(): void {
-    this.width = "800px"
-    this.height = "400px"
     this.viewComponent = MarkArrivalComponent //setting Path to add data
-    this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
-      let tableArray = this.data['data'];
-      const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      this.csv = newArray;
-      this.tableload = false;
-    });
+
     try {
       this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
     } catch (error) {
       // if companyCode is not found , we should logout immmediately.
     }
   }
+  getArrivalDetails() {
+    debugger
+    this.http.get(this.jsonUrl).subscribe(res => {
+      this.data = res;
+      let tableArray = this.data;
+      const newArray = tableArray.arrivalData.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
+      this.csv = newArray;
+      let shipDataDetails=0;
+      let packages=0;
+      this.data.shippingData.forEach((element,index) => {
+        packages=element.Packages+packages
+      });
+    
+      const createShipDataObject = (count, title, className) => ({
+        count,
+        title,
+        class: `info-box7 ${className} order-info-box7`
+      });
+      
+      const shipData = [
+        createShipDataObject(this.csv.length, "Vehicles", "bg-danger"),
+        createShipDataObject(this.csv.length, "Routes", "bg-info"),
+        createShipDataObject(this.data.shippingData.length, "Shipments", "bg-warning"),
+        createShipDataObject(packages, "Packages", "bg-warning")
+      ];
+      
+      this.boxData = shipData;
+      
+      this.tableload = false;
 
+    });
+
+  }
+  updateDepartureData(event){
+ const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
+ const action = result?.Action ?? '';
+    if(action){
+      this.csv=event;
+    }
+   else{
+       this.CnoteService.setDeparture(event)
+   }
+  }
   handleMenuItemClick(label: string, element) {
     let Data = { label: label, data: element }
     //  this.menuItemClicked.emit(Data);

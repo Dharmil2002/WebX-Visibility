@@ -9,12 +9,20 @@ import { environment } from 'src/environments/environment';
 })
 export class CnoteService {
   private savedData: any;
+  private Departure:any;
+  //tab:number;
   getData(): any {
     return this.savedData;
   }
   setData(data: any): void {
-    this.savedData = data;
-  }  
+    this.Departure = data;
+  } 
+  getDeparture():any{
+    return this.Departure;
+  }
+  setDeparture(data: any): void {
+    this.Departure = data;
+  } 
   constructor(private http: HttpClient) { }
   // GetCnoteFormcontrol() {
   //   return this.http.get<any>(

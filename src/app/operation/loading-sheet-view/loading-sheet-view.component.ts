@@ -99,16 +99,12 @@ export class LoadingSheetViewComponent implements OnInit {
     this.dataDetails = data;
   }
   updateShipping(){
-      this.Route.navigate(['Operation/CreateLoadingSheet'], {
-        state: {
-          shipping: this.dataDetails?this.dataDetails:this.csv.filter((x)=>x.isSelected==true),
-        },
-      });
+    this.createLoadingSheetData()
   }
   getLoadingSheetDetails() {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
-      let tableArray = this.data.NestedSingmentData.filter((x)=>x.route==this.loadinSheet.lag);
+      let tableArray = this.data.NestedSingmentData.filter((x)=>x.leg==this.loadinSheet.lag);
      let Shipment=[]
       this.extraData.forEach(element => {
         Shipment.push(element.Shipment)
@@ -127,9 +123,15 @@ export class LoadingSheetViewComponent implements OnInit {
 
     });
   }
-
+createLoadingSheetData(){
+  this.Route.navigate(['Operation/CreateLoadingSheet'], {
+    state: {
+      shipping: this.dataDetails?this.dataDetails:this.csv.filter((x)=>x.isSelected==true),
+    },
+  });
+}
     goBack(): void {
-      window.history.back();
+      this.createLoadingSheetData()
     }
 
 }

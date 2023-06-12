@@ -33,11 +33,12 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() Link;
   @Input() toggleArray;
   @Input() dynamicControls;
-  @Input() menuItems: { label: string }[] = [];
+  @Input() menuItems:any;
   @Input() menuItemFlag;
   @Output() menuItemClicked = new EventEmitter<any>();
   @Input() height;
   @Input() width;
+  @Input() maxWidth;
   @Input() extraData;
   triggered: boolean = false;
   objectKeys = Object.keys;
@@ -58,6 +59,10 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
+    this.maxWidth = changes.extraData?.currentValue ?? this.maxWidth;
+    this.width = changes.width?.currentValue ?? this.width;
+    this.height = changes.height?.currentValue ?? this.height;
+    this.maxWidth = changes.height?.currentValue ?? this.maxWidth;
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
@@ -220,11 +225,19 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   //#region Funtion to send data for edit
   drillDownData(item, tableData) {
     let drillDownLink = this.Link.find((x) => x.Row == tableData)
+    if(drillDownLink.Path){
     this.router.navigate([drillDownLink.Path], {
       state: {
         data: {columnData:item,extraData:this.extraData}
       },
     });
+  }
+    else{
+      if(this.menuItems){
+        let navigateTopopUp=this.menuItems.find((x)=>x.label===item.Action)
+      this.GeneralMultipleView(item,navigateTopopUp.componentDetails)       
+      }
+    }
   }
   //#endregion  
   // #region  to Convert to Csv File 
@@ -309,7 +322,9 @@ GeneralMultipleView(item,viewComponent) {
     viewComponent,
     {
       width: this.width,
-      height: this.height, data: item
+      height: this.height,
+      maxWidth: this.maxWidth,
+       data: item
     });
   dialogref.afterClosed().subscribe(result => {
     this.dialogClosed.emit(result);

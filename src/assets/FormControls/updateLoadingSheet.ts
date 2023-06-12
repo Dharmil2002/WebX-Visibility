@@ -41,8 +41,8 @@ export class UpdateloadingControl {
                 generatecontrol: true, disable: true
             },
             {
-                name: "LoadingSheet",
-                label: "Loading Sheet",
+                name: "Unoadingsheet",
+                label: "Unoading sheet",
                 placeholder: '',
                 type: "text",
                 value: '',

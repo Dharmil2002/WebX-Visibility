@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { Router } from '@angular/router';
-
+import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 @Component({
   selector: 'app-departure-dashboard-page',
   templateUrl: './departure-dashboard-page.component.html'
@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 
 export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   jsonUrl = '../../../assets/data/departureDetails.json'
+  loadingSheetJsonUrl = '../../../assets/data/shipmentDetails.json'
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
   csv: any[];
@@ -19,6 +20,9 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
   companyCode: number;
   menuItemflag: boolean = true;
+  departure: any;
+  @Input() arrivaldeparture: any;
+  orgBranch: string = localStorage.getItem("Branch");
   breadscrums = [
     {
       title: "Departure Details",
@@ -31,15 +35,16 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
     edit: true,
     csv: false
   }
+
   /*Below is Link Array it will Used When We Want a DrillDown
    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
    want hyper link and add Path which you want to redirect*/
-   linkArray = [
+  linkArray = [
     { Row: 'Action', Path: 'Operation/CreateLoadingSheet' }
   ]
   menuItems = [
-    { label: 'Create Trip'},
-    { label: 'Update Trip'},
+    { label: 'Create Trip' },
+    { label: 'Update Trip' },
     // Add more menu items as needed
   ];
   //Warning--It`s Used is not compasary if you does't add any link you just pass blank array
@@ -85,30 +90,25 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
   IscheckBoxRequired: boolean;
   advancdeDetails: { data: { label: string; data: any; }; viewComponent: any; };
   viewComponent: any;
+  shipmentData: any;
+  boxData = [];
   // declararing properties
 
-  constructor(private http: HttpClient,private Route: Router) {
+  constructor(private http: HttpClient, private Route: Router, private CnoteService: CnoteService) {
     super();
+    debugger
+    this.departure = this.CnoteService.getDeparture();
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
     this.IscheckBoxRequired = true;
     this.drillDownPath = 'example/drillDown'
+
     //.uploadComponent = undefined;
-
-
+    this.getdepartureDetail()
   }
 
   ngOnInit(): void {
-    
-    this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
-      let tableArray = this.data['data'];
-      const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      this.csv = newArray;
-      // console.log(this.csv);
-      this.tableload = false;
 
-    });
     try {
       this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
     } catch (error) {
@@ -116,15 +116,82 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
     }
 
   }
-  handleMenuItemClick(label: any, element) {
-  
-      this.Route.navigate(['Operation/CreateLoadingSheet'], {
-        state: {
-          data: label.data,
-        },
-      });
-   
+
+  getdepartureDetail() {
+    this.http.get(this.jsonUrl).subscribe(res => {
+      this.data = res;
+      let tableArray = this.data['data'];
+      const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
+      this.csv = newArray.filter((x) => x.location === this.orgBranch);
+
+
+      if (this.departure) {
+        let currentDate = new Date();
+        let formattedDate = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear();
+        let formattedTime = currentDate.getHours() + ':' + currentDate.getMinutes();
+
+        let formattedDateTime = formattedDate + ' ' + formattedTime;
+        let jsonDeparture = {
+          RouteandSchedule: this.departure?.Route || '',
+          VehicleNo: this.departure?.vehicle || '',
+          TripID: this.departure?.tripID || '',
+          Scheduled:formattedDateTime,
+          Expected: formattedDateTime,
+          Status: "SCHEDULED",
+          Hrs: "17:30",
+          VehicleType: "CANTER 1080",
+          Action: "Update Trip",
+          location: this.departure?.LoadingLocation || ''
+        }
+        this.csv.push(jsonDeparture)
+      }
+      this.getshipmentData();
+      this.tableload = false;
+
+    });
   }
+  handleMenuItemClick(label: any, element) {
+
+    this.Route.navigate(['Operation/CreateLoadingSheet'], {
+      state: {
+        data: label.data,
+      },
+    });
+
+  }
+  getshipmentData() {
+    this.http.get(this.loadingSheetJsonUrl).subscribe(res => {
+      this.shipmentData = res;
+      let totalCount = []
+      let shipPackage = 0
+      let shipmat = 0
+      let shipmentFilter = this.shipmentData.NestedSingmentData.filter((x) => x.Origin === this.orgBranch);
+      shipmentFilter.forEach((element, index) => {
+        shipPackage = element.Packages + shipPackage
+        shipmat = index + shipmat
+      });
+
+      const createShipDataObject = (count, title, className) => ({
+        count,
+        title,
+        class: `info-box7 ${className} order-info-box7`
+      });
+
+      const shipData = [
+        createShipDataObject(this.csv.length, "Vehicles", "bg-danger"),
+        createShipDataObject(this.csv.length, "Routes", "bg-info"),
+        createShipDataObject(shipmat, "Shipments", "bg-warning"),
+        createShipDataObject(shipPackage, "Packages", "bg-warning")
+      ];
+
+      this.boxData = shipData;
+
+      //this.csv = this.shipmentData.shipmentData.filter((x) => x.RouteandSchedule == this.tripData.RouteandSchedule);
+      //this.csv 
+      this.tableload = false;
+    })
+  }
+
   //   let Data = { label: label, data: element }
   //   //  this.menuItemClicked.emit(Data);
   //   this.advancdeDetails = {

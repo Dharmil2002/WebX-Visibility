@@ -23,7 +23,7 @@
 
                             </ng-template>
                             <app-arrival-dashboard-page *ngIf="myTabGroup.selectedIndex== 1"
-                                (CurrentIndex)="GetSelectedIndex($event)"></app-arrival-dashboard-page>
+                                (CurrentIndex)="GetSelectedIndex($event)" (departure)="departureDetails"></app-arrival-dashboard-page>
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>
@@ -32,7 +32,7 @@
 
                             </ng-template>
                             <app-departure-dashboard-page *ngIf="myTabGroup.selectedIndex==2"
-                                (CurrentIndex)="GetSelectedIndex($event)"></app-departure-dashboard-page>
+                                (CurrentIndex)="GetSelectedIndex($event)" [arrivaldeparture]="departure"></app-departure-dashboard-page>
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>

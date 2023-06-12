@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
   templateUrl: './docket-dashboard.component.html'
 })
 export class DocketDashboardComponent implements OnInit {
+  docket=false;
   breadscrums = [
     {
       title: "Docket Dashboard",

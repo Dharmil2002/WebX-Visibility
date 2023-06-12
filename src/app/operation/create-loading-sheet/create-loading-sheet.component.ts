@@ -163,10 +163,17 @@ export class CreateLoadingSheetComponent implements OnInit {
       );
       let vehicleTypeDetails = vehicleType.find((x) => x.name.trim() == this.tripData?.VehicleType.trim() || '')
       if (vehicleTypeDetails) {
+        console.log('2');
         this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleTypeDetails)
         this.vehicleTypeDataAutofill()
       } else {
-        this.loadingSheetTableForm.controls['vehicleType'].setValue(this.getloadingFormData?.vehicleType || '')
+        console.log('1');
+        let vehicleDropValue={
+          name:this.getloadingFormData?.vehicleType.name,
+          value:this.getloadingFormData?.vehicleType.value
+        }
+        this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleDropValue)
+        console.log("VehicleType"+JSON.stringify(this.loadingSheetTableForm.value.vehicleType));
         this.vehicleTypeDataAutofill();
       }
     });
@@ -191,7 +198,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       let filterData = []
       if (!this.isShipmentUpdate) {
         this.shipmentData = res;
-        filterData = this.shipmentData.NestedSingmentData.filter((x) => x.route == this.tripData.RouteandSchedule);
+        filterData = this.shipmentData.NestedSingmentData.filter((x) => x.route.trim() == this.tripData.RouteandSchedule.trim());
         this.extraData = filterData;
 
       }
@@ -205,13 +212,13 @@ export class CreateLoadingSheetComponent implements OnInit {
 
       // Group shipments by route
       filterData.forEach(shipment => {
-        const { route, Packages, Weight, Volume } = shipment;
+        const { leg, Packages, Weight, Volume } = shipment;
 
-        if (!groupedData[route]) {
+        if (!groupedData[leg]) {
           // If the route doesn't exist in groupedData, initialize it
-          groupedData[route] = {
+          groupedData[leg] = {
             Shipment: 0,
-            lag: route,
+            lag: leg,
             Packages: 0,
             WeightKg: 0,
             VolumeCFT: 0,
@@ -219,10 +226,10 @@ export class CreateLoadingSheetComponent implements OnInit {
         }
 
         // Increment the count of shipments and update the packages and weight
-        groupedData[route].Shipment++;
-        groupedData[route].Packages += Packages;
-        groupedData[route].WeightKg += Weight;
-        groupedData[route].VolumeCFT += Volume;
+        groupedData[leg].Shipment++;
+        groupedData[leg].Packages += Packages;
+        groupedData[leg].WeightKg += Weight;
+        groupedData[leg].VolumeCFT += Volume;
       });
 
       // Convert the grouped data to an array
@@ -233,6 +240,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     })
   }
   vehicleTypeDataAutofill() {
+    console.log("VehicleType 1"+this.loadingSheetTableForm.value);
     //let routeRlocation = getArrayAfterMatch(ruteHlocation, this.orgBranch);
     let loadingSheetDetails = this.loadingSheetData.data[0].find((x) => x.Type_Code == this.loadingSheetTableForm.value?.vehicleType.value || '')
     if (loadingSheetDetails) {
@@ -268,8 +276,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       SwalerrorMessage("error", "Please Select Any one Record", "", true);
     }
   }
-  goBack(): void {
-    window.history.back();
+  goBack(tabIndex: number): void {
+    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
-
 }

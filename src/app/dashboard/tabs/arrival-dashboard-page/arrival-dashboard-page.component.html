@@ -1,5 +1,5 @@
 <section class="content">
-    <app-generic-card-webxpress [boxData]="this.data?.ArrivalCountData"></app-generic-card-webxpress>
+    <app-generic-card-webxpress [boxData]="this.boxData"></app-generic-card-webxpress>
     <!-- Loading Generic table as parent component and passing required data-->
 
     <!--
@@ -11,12 +11,14 @@
         csvFileName : Name of the csv File.
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
         -->
+        <div class="verticalScrollbar">
     <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"[width]="width"
     [height]="height"   [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
         [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
-        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
+        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" (dialogClosed)="updateDepartureData($event)" [height]="height"[width]="width"[maxWidth]="maxWidth">
 
     </generic-table-webxpress>
+</div>
 
 </section>
 

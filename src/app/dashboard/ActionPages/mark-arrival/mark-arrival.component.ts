@@ -22,7 +22,6 @@ export class MarkArrivalComponent implements OnInit {
   departature: any;
   constructor(public dialogRef: MatDialogRef<GenericTableComponent>,public dialog: MatDialog,private service: utilityService,
     private http: HttpClient, @Inject(MAT_DIALOG_DATA) public item: any, private fb: UntypedFormBuilder,private Route:Router,private CnoteService:CnoteService) {
-      debugger;
     this.MarkArrivalTable = item;
   }
   jsonControlArray: any;

@@ -73,7 +73,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   getShippningData() {
     this.http.get(this.jsonUrl).subscribe(res => {
-      debugger
       this.data = res;
       let tableArray = this.data['shippingData'];
       this.csv = tableArray.filter((item)=>item.routes==this.arrivalData.Route && item.Leg==this.arrivalData.Leg);

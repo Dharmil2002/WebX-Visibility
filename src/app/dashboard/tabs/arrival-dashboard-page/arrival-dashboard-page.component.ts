@@ -93,7 +93,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   departureDetails: any;
   // declararing properties
   constructor(private http: HttpClient,private CnoteService:CnoteService) {
-    debugger
+    
     super();
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
@@ -111,7 +111,6 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     }
   }
   getArrivalDetails() {
-    debugger
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data;

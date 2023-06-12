@@ -96,7 +96,6 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
 
   constructor(private http: HttpClient, private Route: Router, private CnoteService: CnoteService) {
     super();
-    debugger
     this.departure = this.CnoteService.getDeparture();
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';

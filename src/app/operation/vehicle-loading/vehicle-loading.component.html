@@ -1,0 +1,14 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+   
+    <form [formGroup]="vehicleLoadingTableForm">
+        <app-form-without-auto-complete-webxpress [form]="vehicleLoadingTableForm" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-without-auto-complete-webxpress>
+    </form>
+    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+    [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
+    [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA"
+     [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems" [height]="height"[width]="width"[maxWidth]="maxWidth"  (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls"
+     >
+</generic-table-webxpress>
+    </app-common-wrapper-webxpress>

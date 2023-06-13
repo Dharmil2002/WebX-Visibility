@@ -3,6 +3,7 @@ import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { Router } from '@angular/router';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
+import { debug } from 'console';
 @Component({
   selector: 'app-departure-dashboard-page',
   templateUrl: './departure-dashboard-page.component.html'
@@ -10,6 +11,7 @@ import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.se
 
 export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   jsonUrl = '../../../assets/data/departureDetails.json'
+  jsonDeparturUrl = '../../../assets/data/arrival-dashboard-data.json';
   loadingSheetJsonUrl = '../../../assets/data/shipmentDetails.json'
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
@@ -66,6 +68,7 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
     "Expected": "Expected",
     "Status": "Status",
     "Hrs": "Hrs.",
+    "Leg":"",
     "Action": "Action "
   }
 
@@ -92,11 +95,19 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
   viewComponent: any;
   shipmentData: any;
   boxData = [];
+  loadingSheetData: any;
   // declararing properties
 
   constructor(private http: HttpClient, private Route: Router, private CnoteService: CnoteService) {
     super();
-    this.departure = this.CnoteService.getDeparture();
+    this.loadingSheetData=this.CnoteService.getLsData();
+    if(this.loadingSheetData){
+      this.csv=this.loadingSheetData;
+    }
+    else{
+      this.departure = this.CnoteService.getDeparture();
+    
+    }
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
     this.IscheckBoxRequired = true;
@@ -115,39 +126,70 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
     }
 
   }
+  dailogData(event){
+    
 
+  }
   getdepartureDetail() {
-    this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
-      let tableArray = this.data['data'];
-      const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      this.csv = newArray.filter((x) => x.location === this.orgBranch);
+    // this.http.get(this.jsonUrl).subscribe(res => {
+    //   this.data = res;
+    //   let tableArray = this.data['data'];
+    //   const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
+    //   this.csv = newArray.filter((x) => x.location === this.orgBranch);
 
 
-      if (this.departure) {
-        let currentDate = new Date();
-        let formattedDate = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear();
-        let formattedTime = currentDate.getHours() + ':' + currentDate.getMinutes();
+    //   if (this.departure) {
+    //     let currentDate = new Date();
+    //     let formattedDate = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear();
+    //     let formattedTime = currentDate.getHours() + ':' + currentDate.getMinutes();
 
-        let formattedDateTime = formattedDate + ' ' + formattedTime;
-        let jsonDeparture = {
-          RouteandSchedule: this.departure?.Route || '',
-          VehicleNo: this.departure?.vehicle || '',
-          TripID: this.departure?.tripID || '',
-          Scheduled:formattedDateTime,
-          Expected: formattedDateTime,
-          Status: "SCHEDULED",
-          Hrs: "17:30",
-          VehicleType: "CANTER 1080",
-          Action: "Update Trip",
-          location: this.departure?.LoadingLocation || ''
-        }
-        this.csv.push(jsonDeparture)
+    //     let formattedDateTime = formattedDate + ' ' + formattedTime;
+    //     let jsonDeparture = {
+    //       RouteandSchedule: this.departure?.Route || '',
+    //       VehicleNo: this.departure?.vehicle || '',
+    //       TripID: this.departure?.tripID || '',
+    //       Scheduled:formattedDateTime,
+    //       Expected: formattedDateTime,
+    //       Status: "SCHEDULED",
+    //       Hrs: "17:30",
+    //       VehicleType: "CANTER 1080",
+    //       Action: "Update Trip",
+    //       location: this.departure?.LoadingLocation || ''
+    //     }
+    //     this.csv.push(jsonDeparture)
+    //   }
+    //   this.getshipmentData();
+    //   this.tableload = false;
+
+    // });
+    
+    if (this.departure) {
+      let currentDate = new Date();
+      let formattedDate = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear();
+      let formattedTime = currentDate.getHours() + ':' + currentDate.getMinutes();
+
+      let formattedDateTime = formattedDate + ' ' + formattedTime;
+      if (!this.csv) {
+        this.csv = [];
       }
-      this.getshipmentData();
-      this.tableload = false;
+      let jsonDeparture = {
+        RouteandSchedule: this.departure?.Route || '',
+        VehicleNo: this.departure?.vehicle || '',
+        TripID: this.departure?.tripID || '',
+        Scheduled:formattedDateTime,
+        Expected: formattedDateTime,
+        Status: "SCHEDULED",
+        Hrs: "17:30",
+        VehicleType: "CANTER 1080",
+        Action: "Update Trip",
+        location: this.departure?.LoadingLocation || '',
+        Leg:this.departure?.Leg || ''
+      }
+      this.csv.push(jsonDeparture)
+    }
+    this.getshipmentData() ;
+    this.tableload = false;
 
-    });
   }
   handleMenuItemClick(label: any, element) {
 
@@ -159,12 +201,12 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
 
   }
   getshipmentData() {
-    this.http.get(this.loadingSheetJsonUrl).subscribe(res => {
+    this.http.get(this.jsonDeparturUrl).subscribe(res => {
       this.shipmentData = res;
-      let totalCount = []
       let shipPackage = 0
       let shipmat = 0
-      let shipmentFilter = this.shipmentData.NestedSingmentData.filter((x) => x.Origin === this.orgBranch);
+      let shipmentFilter = this.shipmentData.shippingData.filter(x => x.Origin === (this.departure ? this.departure.LoadingLocation : this.loadingSheetData[0]?.location) && x.Leg === (this.departure ? this.departure.Leg : this.loadingSheetData[0]?.Leg));
+
       shipmentFilter.forEach((element, index) => {
         shipPackage = element.Packages + shipPackage
         shipmat = index + shipmat
@@ -179,7 +221,7 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
       const shipData = [
         createShipDataObject(this.csv.length, "Vehicles", "bg-danger"),
         createShipDataObject(this.csv.length, "Routes", "bg-info"),
-        createShipDataObject(shipmat, "Shipments", "bg-warning"),
+        createShipDataObject(this.csv.length, "Shipments", "bg-warning"),
         createShipDataObject(shipPackage, "Packages", "bg-warning")
       ];
 

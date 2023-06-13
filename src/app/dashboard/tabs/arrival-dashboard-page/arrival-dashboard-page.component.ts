@@ -93,7 +93,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   departureDetails: any;
   // declararing properties
   constructor(private http: HttpClient,private CnoteService:CnoteService) {
-    
+
     super();
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
@@ -116,7 +116,6 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       let tableArray = this.data;
       const newArray = tableArray.arrivalData.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
       this.csv = newArray;
-      let shipDataDetails=0;
       let packages=0;
       this.data.shippingData.forEach((element,index) => {
         packages=element.Packages+packages
@@ -143,6 +142,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
 
   }
   updateDepartureData(event){
+
  const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
  const action = result?.Action ?? '';
     if(action){
@@ -150,6 +150,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     }
    else{
        this.CnoteService.setDeparture(event)
+    this.csv=this.csv.filter((x)=>x.TripID!=event.tripID);
+
    }
   }
   handleMenuItemClick(label: string, element) {

@@ -280,7 +280,10 @@
     "Unloaded": 130,
     "Pending": 70,
     "routes": "S003: BHW-BLR",
-    "Leg": "BHW-BLR"
+    "Leg": "BHW-BLR",
+    "WeightKg": 150,
+    "VolumeCFT": 786,
+    "Customer": "Anz Motors"
   },
   {
     "Shipment": 23737388,
@@ -290,7 +293,10 @@
     "Unloaded": 110,
     "Pending": 20,
     "routes": "S004: BLR-BHW-AMD",
-    "Leg": "BLR-BHW"
+    "Leg": "BLR-BHW",
+    "WeightKg": 153,
+    "VolumeCFT": 781,
+    "Customer": "Pefect Foods"
   },
   {
     "Shipment": 39884849,
@@ -300,7 +306,10 @@
     "Unloaded": 340,
     "Pending": 0,
     "routes": "S004: BLR-BHW-AMD",
-    "Leg": "BHW-AMD"
+    "Leg": "BHW-AMD",
+    "WeightKg": 185,
+    "VolumeCFT": 210,
+    "Customer": "Savla Auto parts"
   },
   {
     "Shipment": 39939393,
@@ -310,7 +319,10 @@
     "Unloaded": 230,
     "Pending": 30,
     "routes": "S005: PNQ-BHW-VPI",
-    "Leg": " PNQ-BHW"
+    "Leg": " PNQ-BHW",
+    "WeightKg": 137,
+    "VolumeCFT": 377,
+    "Customer": "L&T switchgear"
   },
   {
     "Shipment": 39939394,
@@ -320,7 +332,10 @@
     "Unloaded": 231,
     "Pending": 31,
     "routes": "S005: PNQ-BHW-VPI",
-    "Leg": " PNQ-VPI"
+    "Leg": " PNQ-VPI",
+    "WeightKg": 221,
+    "VolumeCFT": 633,
+    "Customer": "Singh Motors"
   },
   {
     "Shipment": 39939395,
@@ -330,7 +345,10 @@
     "Unloaded": 232,
     "Pending": 32,
     "routes": "S0010 : AMDB-BRDB-MUMB",
-    "Leg": " AMDB-BRDB"
+    "Leg": " AMDB-BRDB",
+    "WeightKg": 108,
+    "VolumeCFT": 214,
+    "Customer": "Anz Motors"
   },
   {
     "Shipment": 39939396,
@@ -340,7 +358,10 @@
     "Unloaded": 233,
     "Pending": 33,
     "routes": "S0010 : AMDB-BRDB-MUMB",
-    "Leg": " AMDB-MUMB"
+    "Leg": " AMDB-MUMB",
+    "WeightKg": 157,
+    "VolumeCFT": 649,
+    "Customer": "Pefect Foods"
   },
   {
     "Shipment": 39939397,
@@ -350,7 +371,10 @@
     "Unloaded": 234,
     "Pending": 34,
     "routes": "S0006: AMDB-JAIB-DELB",
-    "Leg": "AMDB-JAIB"
+    "Leg": "AMDB-JAIB",
+    "WeightKg": 111,
+    "VolumeCFT": 781,
+    "Customer": "Savla Auto parts"
   },
   {
     "Shipment": 39939398,
@@ -360,7 +384,10 @@
     "Unloaded": 235,
     "Pending": 35,
     "routes": "S0006: AMDB-JAIB-DELB",
-    "Leg": "AMDB-DELB"
+    "Leg": "AMDB-DELB",
+    "WeightKg": 187,
+    "VolumeCFT": 371,
+    "Customer": "L&T switchgear"
   },
   {
     "Shipment": 39939399,
@@ -370,7 +397,10 @@
     "Unloaded": 236,
     "Pending": 36,
     "routes": "S0002 : MUMB-BRDB-AMDB",
-    "Leg": " MUMB-BRDB"
+    "Leg": " MUMB-BRDB",
+    "WeightKg": 224,
+    "VolumeCFT": 581,
+    "Customer": "Singh Motors"
   },
   {
     "Shipment": 39939400,
@@ -380,7 +410,10 @@
     "Unloaded": 237,
     "Pending": 37,
     "routes": "S0003 : MUMB-BRDB-AMDB",
-    "Leg": "BRDB-AMDB"
+    "Leg": "BRDB-AMDB",
+    "WeightKg": 173,
+    "VolumeCFT": 543,
+    "Customer": "Anz Motors"
   },
   {
     "Shipment": 39939401,
@@ -390,7 +423,10 @@
     "Unloaded": 238,
     "Pending": 38,
     "routes": "S0037: NAGM-PNQM-MUMB",
-    "Leg": " NAGM-PNQM"
+    "Leg": " NAGM-PNQM",
+    "WeightKg": 200,
+    "VolumeCFT": 239,
+    "Customer": "Pefect Foods"
   },
   {
     "Shipment": 39939402,
@@ -400,7 +436,10 @@
     "Unloaded": 239,
     "Pending": 39,
     "routes": "S0038: NAGM-PNQM-MUMB",
-    "Leg": " NAGM-MUMB"
+    "Leg": " NAGM-MUMB",
+    "WeightKg": 209,
+    "VolumeCFT": 225,
+    "Customer": "Savla Auto parts"
   },
   {
     "Shipment": 39939403,
@@ -410,7 +449,10 @@
     "Unloaded": 240,
     "Pending": 40,
     "routes": "S0008: MUMB-BNGB",
-    "Leg": "MUMB-BNGB"
+    "Leg": "MUMB-BNGB",
+    "WeightKg": 206,
+    "VolumeCFT": 699,
+    "Customer": "L&T switchgear"
   },
   {
     "Shipment": 39939404,
@@ -420,7 +462,10 @@
     "Unloaded": 241,
     "Pending": 41,
     "routes": "S0026 : MUMB-PNQB-BNGB",
-    "Leg": " MUMB-PNQB"
+    "Leg": " MUMB-PNQB",
+    "WeightKg": 107,
+    "VolumeCFT": 558,
+    "Customer": "Singh Motors"
   },
   {
     "Shipment": 39939405,
@@ -430,7 +475,10 @@
     "Unloaded": 242,
     "Pending": 42,
     "routes": "S0027 : MUMB-PNQB-BNGB",
-    "Leg": " MUMB-BNGB"
+    "Leg": " MUMB-BNGB",
+    "WeightKg": 186,
+    "VolumeCFT": 745,
+    "Customer": "Anz Motors"
   },
   {
     "Shipment": 39939406,
@@ -440,7 +488,10 @@
     "Unloaded": 243,
     "Pending": 43,
     "routes": "S0018:MUMB-CHNB",
-    "Leg": "MUMB-CHNB"
+    "Leg": "MUMB-CHNB",
+    "WeightKg": 201,
+    "VolumeCFT": 591,
+    "Customer": "Pefect Foods"
   },
   {
     "Shipment": 39939407,
@@ -450,7 +501,10 @@
     "Unloaded": 244,
     "Pending": 44,
     "routes": "S0070: MUMB-SRTB",
-    "Leg": " MUMB-SRTB"
+    "Leg": " MUMB-SRTB",
+    "WeightKg": 156,
+    "VolumeCFT": 386,
+    "Customer": "Savla Auto parts"
   },
   {
     "Shipment": 39939408,
@@ -460,7 +514,10 @@
     "Unloaded": 245,
     "Pending": 45,
     "routes": "S0097: SRT-MAL",
-    "Leg": "SRT-MAL"
+    "Leg": "SRT-MAL",
+    "WeightKg": 142,
+    "VolumeCFT": 180,
+    "Customer": "L&T switchgear"
   },
   {
     "Shipment": 39939409,
@@ -470,7 +527,10 @@
     "Unloaded": 246,
     "Pending": 46,
     "routes": "S0111: MUMB-MAAM",
-    "Leg": " MUMB-MAAM"
+    "Leg": " MUMB-MAAM",
+    "WeightKg": 208,
+    "VolumeCFT": 787,
+    "Customer": "Singh Motors"
   },
   {
     "Shipment": 39939410,
@@ -480,7 +540,10 @@
     "Unloaded": 247,
     "Pending": 47,
     "routes": "S0019: MUMB-HUBB",
-    "Leg": " MUMB-HUBB"
+    "Leg": " MUMB-HUBB",
+    "WeightKg": 124,
+    "VolumeCFT": 675,
+    "Customer": "Anz Motors"
   },
   {
     "Shipment": 39939411,
@@ -490,7 +553,10 @@
     "Unloaded": 248,
     "Pending": 48,
     "routes": "S0060:MUMB-AMDB-JAIB",
-    "Leg": "MUMB-AMDB"
+    "Leg": "MUMB-AMDB",
+    "WeightKg": 141,
+    "VolumeCFT": 355,
+    "Customer": "Pefect Foods"
   },
   {
     "Shipment": 39939412,
@@ -500,7 +566,10 @@
     "Unloaded": 249,
     "Pending": 49,
     "routes": "S0060:MUMB-AMDB-JAIB",
-    "Leg": "MUMB-JAIB"
+    "Leg": "MUMB-JAIB",
+    "WeightKg": 128,
+    "VolumeCFT": 310,
+    "Customer": "Savla Auto parts"
   },
   {
     "Shipment": 39939420,
@@ -510,7 +579,10 @@
     "Unloaded": 257,
     "Pending": 57,
     "routes": "S0123: MUMB-BNGB",
-    "Leg": " MUMB-BNGB"
+    "Leg": " MUMB-BNGB",
+    "WeightKg": 153,
+    "VolumeCFT": 251,
+    "Customer": "L&T switchgear"
   },
   {
     "Shipment": 39939421,
@@ -520,7 +592,10 @@
     "Unloaded": 258,
     "Pending": 58,
     "routes": "S0124: MUMB-SRT",
-    "Leg": " MUMB-SRTB"
+    "Leg": " MUMB-SRTB",
+    "WeightKg": 180,
+    "VolumeCFT": 275,
+    "Customer": "Singh Motors"
   },
   {
     "Shipment": 39939422,
@@ -530,7 +605,10 @@
     "Unloaded": 259,
     "Pending": 59,
     "routes": "S0125:MUMB-401107",
-    "Leg": "MUMB-401107"
+    "Leg": "MUMB-401107",
+    "WeightKg": 173,
+    "VolumeCFT": 309,
+    "Customer": "Anz Motors"
   },
   {
     "Shipment": 39939423,
@@ -540,7 +618,10 @@
     "Unloaded": 260,
     "Pending": 60,
     "routes": "S0049: MUMB-PNQB",
-    "Leg": " MUMB-PNQB"
+    "Leg": " MUMB-PNQB",
+    "WeightKg": 122,
+    "VolumeCFT": 794,
+    "Customer": "Pefect Foods"
   }
  ]
 

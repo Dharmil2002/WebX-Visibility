@@ -8,14 +8,15 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { loadingControl } from 'src/assets/FormControls/loadingSheet';
 import { LodingSheetGenerateSuccessComponent } from '../../loding-sheet-generate-success/loding-sheet-generate-success.component';
 import { AdvanceControl, BalanceControl, DepartVehicleControl, DepartureControl } from 'src/assets/FormControls/departVehicle';
-
+import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 @Component({
   selector: 'app-depart-vehicle',
   templateUrl: './depart-vehicle.component.html'
 })
 export class DepartVehicleComponent implements OnInit {
   loadingJsonUrl = '../../../assets/data/vehicleType.json'
-  loadingSheetJsonUrl = '../../../assets/data/shipmentDetails.json'
+  vendorDetailsUrl='../../../assets/data/vendorDetails.json'
+  shipingDetailsUrl='../../../assets/data/arrival-dashboard-data.json'
   jsonUrl = '../../../assets/data/departVehicleLoadDetails.json'
   data: [] | any;
   tableload = false;
@@ -25,6 +26,7 @@ export class DepartVehicleComponent implements OnInit {
   loadingSheetData: any;
   csvFileName: string; //name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
   companyCode: number;
+  shipData:any;
   dynamicControls = {
     add: false,
     edit: false,
@@ -87,30 +89,36 @@ export class DepartVehicleComponent implements OnInit {
   loadingData: any;
   vendordetails: any;
   advancebalance: any;
+  CEWBflag: boolean;
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
   constructor(private Route: Router, private dialog: MatDialog, 
     private http: HttpClient, private fb: UntypedFormBuilder, 
-    private filter: FilterUtils) 
+    private filter: FilterUtils,private CnoteService: CnoteService) 
     {
     // if (data) {
     //   this.tripData = data
     // }
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
+      
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
-    this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
-      let tableArray = this.data['shipments'];
-      this.vendordetails = this.data['vendordetails'];
-      this.advancebalance = this.data['advancebalance'];
-      this.autoBindData();
-      const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      this.csv = newArray;
-      this.tableload = false;
-    });
     this.IntializeFormControl()
+    this.getDepartDetails();
+    this.getShipingDetails();
     // this.autoBindData()
+  }
+  getDepartDetails() {
+     this.http.get(this.vendorDetailsUrl).subscribe(res => {
+      this.data = res;
+      this.vendordetails=this.data['data'].filter((x)=>x.vehicleNo==this.tripData?.VehicleNo);
+   //   let tableArray = this.data['shipments'];
+     // this.advancebalance = this.data['advancebalance'];
+      this.autoBindData();
+     // const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
+     // this.csv = newArray;
+      //this.tableload = false;
+    });
   }
   autoBindData() {
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.tripData?.VehicleNo || '')
@@ -118,24 +126,12 @@ export class DepartVehicleComponent implements OnInit {
     this.loadingSheetTableForm.controls['tripID'].setValue(this.tripData?.TripID || '')
     this.loadingSheetTableForm.controls['Expected'].setValue(this.tripData?.Expected || '')
     this.loadingSheetTableForm.controls['LoadingLocation'].setValue(localStorage.getItem('Branch') || '')
-    this.departvehicleTableForm.controls['VendorType'].setValue(this.vendordetails[0].VendorType)
+    this.departvehicleTableForm.controls['VendorType'].setValue(this.tripData?.VehicleType || '')
     this.departvehicleTableForm.controls['Vendor'].setValue(this.vendordetails[0].Vendor)
     this.departvehicleTableForm.controls['Driver'].setValue(this.vendordetails[0].Driver)
     this.departvehicleTableForm.controls['DriverMob'].setValue(this.vendordetails[0].DriverMobile)
     this.departvehicleTableForm.controls['License'].setValue(this.vendordetails[0].LicenseNo)
     this.departvehicleTableForm.controls['Expiry'].setValue(this.vendordetails[0].Expirydate)
-    this.advanceTableForm.controls['ContractAmt'].setValue(this.advancebalance[0].ContractAmount)
-    this.advanceTableForm.controls['TotalTripAmt'].setValue(this.advancebalance[0].TotalTripAmount)
-    this.advanceTableForm.controls['Loading'].setValue(this.advancebalance[0].Othercharges.Loading)
-    this.advanceTableForm.controls['Unloading'].setValue(this.advancebalance[0].Othercharges.Unloading)
-    this.advanceTableForm.controls['Enroute'].setValue(this.advancebalance[0].Othercharges.Enroute)
-    this.advanceTableForm.controls['Misc'].setValue(this.advancebalance[0].Othercharges.Misc)
-    this.balanceTableForm.controls['TotalAdv'].setValue(this.advancebalance[0].TotalAdvance)
-    this.balanceTableForm.controls['BalanceAmt'].setValue(this.advancebalance[0].BalanceAmount)
-    this.balanceTableForm.controls['PaidByCash'].setValue(this.advancebalance[0].AdvancePaid.PaidbyCash)
-    this.balanceTableForm.controls['PaidbyBank'].setValue(this.advancebalance[0].AdvancePaid.PaidbyBank)
-    this.balanceTableForm.controls['PaidbyFuel'].setValue(this.advancebalance[0].AdvancePaid.PaidbyFuel)
-    this.balanceTableForm.controls['PaidbyCard'].setValue(this.advancebalance[0].AdvancePaid.PaidbyCard)
   }
   IntializeFormControl() {
     const loadingControlFormControls = new loadingControl();
@@ -183,6 +179,22 @@ export class DepartVehicleComponent implements OnInit {
   IsActiveFuntion($event) {
     this.loadingData = $event
   }
+  getShipingDetails(){
+    this.http.get(this.shipingDetailsUrl).subscribe(res=>{
+         this.shipData = res;
+         let nestedShipdata=this.shipData.shippingData.find((x)=>x.routes==this.tripData.RouteandSchedule &&  x.Leg==this.tripData.Leg)
+          let shipingCount=[nestedShipdata];
+         let json ={
+          leg: this.tripData.Leg,
+          manifest: this.tripData.menifestNo,
+          shipments_lb: shipingCount.length+"/"+shipingCount.length,
+          packages_lb:nestedShipdata.Packages+"/"+nestedShipdata.Packages,
+          weight_kg:nestedShipdata.WeightKg,
+          volume_cft:nestedShipdata.VolumeCFT
+         }
+         this.csv= [json]
+    })
+  }
   vehicleTypeDropdown() {
     this.http.get(this.loadingJsonUrl).subscribe(res => {
       this.loadingSheetData = res;
@@ -212,15 +224,15 @@ export class DepartVehicleComponent implements OnInit {
     // this.getshipmentData()
   }
   
-  getshipmentData() {
-    let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
-    routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
-    this.http.get(this.loadingSheetJsonUrl).subscribe(res => {
-      this.shipmentData = res;
-      this.csv = this.shipmentData.shipmentData.filter((x) => x.RouteandSchedule == this.tripData.RouteandSchedule);
-      this.tableload = false;
-    })
-  }
+  // getshipmentData() {
+  //   let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
+  //   routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
+  //   this.http.get(this.loadingSheetJsonUrl).subscribe(res => {
+  //     this.shipmentData = res;
+  //     this.csv = this.shipmentData.shipmentData.filter((x) => x.RouteandSchedule == this.tripData.RouteandSchedule);
+  //     this.tableload = false;
+  //   })
+  // }
   loadingSheetDetails() {
     let loadingSheetDetails = this.loadingSheetData.data[0].find((x) => x.Type_Code == this.loadingSheetTableForm.value?.vehicleType.value || '')
     this.loadingSheetTableForm.controls['CapacityKg'].setValue(loadingSheetDetails?.CapacityKg || '')
@@ -267,8 +279,20 @@ export class DepartVehicleComponent implements OnInit {
     return groupedShipments;
   }
   Close() {
-    window.history.back();
+    let data=[this.tripData];
+    data.forEach((x)=>{
+      x.Action='DEPARTED'
+    })
+    this.CnoteService.setLsData(data);
+       this.goBack(2);
   } 
-
+  GenerateCEWB(){
+    this.CEWBflag=true;
+    const randomNumber = "CEW/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+   this.departureTableForm.controls['Cewb'].setValue(randomNumber);
+  }
+  goBack(tabIndex: number): void {
+    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
+  }
 }
 

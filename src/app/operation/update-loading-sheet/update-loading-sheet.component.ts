@@ -6,6 +6,8 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { Router } from '@angular/router';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
 import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival/mark-arrival.component';
+import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
+import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -29,6 +31,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     "Pending": "Pending",
     "Leg": "Leg",
   }
+  shipmentStatus: string = 'Unloaded';
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "Shipment": "Shipment",
@@ -58,45 +61,82 @@ export class UpdateLoadingSheetComponent implements OnInit {
   loadingData: any;
   formdata: any;
   arrivalData: any;
-  constructor(private Route: Router,public dialogRef: MatDialogRef<MarkArrivalComponent>,
+  boxData: { count: any; title: any; class: string; }[];
+
+  constructor(private Route: Router,private dialog: MatDialog,public dialogRef: MatDialogRef<MarkArrivalComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
-    private http: HttpClient, private fb: UntypedFormBuilder) {
-  
-    if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
+    private http: HttpClient, private fb: UntypedFormBuilder,private cnoteService:CnoteService) {
+    if (item.LoadingSheet) {
+      this.arrivalData = this.cnoteService.getVehicleLoadingData();
+      this.shipmentStatus = 'Loaded'
+    } else {
+      this.shipmentStatus = 'Unloaded'
+      this.arrivalData = item;
     }
-    if(item){
-      this.arrivalData=item;
-    }
-   this.getShippningData();
+    this.getShippningData();
     this.IntializeFormControl()
   }
   getShippningData() {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
-      this.csv = tableArray.filter((item)=>item.routes==this.arrivalData.Route && item.Leg==this.arrivalData.Leg);
+      if(this.shipmentStatus === 'Loaded'){
+      this.csv = tableArray.filter((item) => item.routes == this.arrivalData?.RouteandSchedule && item.Leg == this.arrivalData.Leg);
+      }
+      else{
+        this.csv = tableArray.filter((item) => item.routes == this.arrivalData?.Route && item.Leg == this.arrivalData.Leg);
+      }
+      let packages = 0;
+      let shipingUnloaded = 0;
+      this.csv.forEach((element, index) => {
+        packages = element.Packages + packages
+        shipingUnloaded = element.Unloaded + shipingUnloaded;
+      });
+
+      const createShipDataObject = (count, title, className) => ({
+        count,
+        title,
+        class: `info-box7 ${className} order-info-box7`
+      });
+
+      const shipData = [
+        createShipDataObject(this.csv.length, "Shipments", "bg-danger"),
+        createShipDataObject(packages, "Packages", "bg-warning"),
+        createShipDataObject(this.csv.length, "Shipments" + ' ' + this.shipmentStatus, "bg-info"),
+        createShipDataObject(this.csv.length, "Packages" + ' ' + this.shipmentStatus, "bg-warning"),
+      ];
+
+      this.boxData = shipData;
+
       this.tableload = false;
+
     });
   }
   autoBindData() {
     const vehicleControl = this.loadingSheetTableForm.get('vehicle');
     vehicleControl?.patchValue(this.arrivalData?.VehicleNo || '');
-    
-    this.loadingSheetTableForm.controls['vehicle'].setValue(this.arrivalData?.VehicleNo||'')
-    this.loadingSheetTableForm.controls['Route'].setValue(this.arrivalData?.Route||'')
-    this.loadingSheetTableForm.controls['tripID'].setValue(this.arrivalData?.TripID||'')
-    this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.arrivalData?.ArrivalLocation||'')
-    this.loadingSheetTableForm.controls['Unoadingsheet'].setValue(this.arrivalData?.Unoadingsheet||'')
-    this.loadingSheetTableForm.controls['Leg'].setValue(this.arrivalData?.Leg||'')
+    this.loadingSheetTableForm.controls['vehicle'].setValue(this.arrivalData?.VehicleNo || '')
+    this.loadingSheetTableForm.controls['Route'].setValue(this.arrivalData?.Route || this.arrivalData?.RouteandSchedule||'')
+    this.loadingSheetTableForm.controls['tripID'].setValue(this.arrivalData?.TripID || '')
+    this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.arrivalData?.ArrivalLocation || this.arrivalData?.location||'')
+    this.loadingSheetTableForm.controls['Unoadingsheet'].setValue(this.arrivalData?.Unoadingsheet ||this.arrivalData?.loadingSheetNo || '')
+    this.loadingSheetTableForm.controls['Leg'].setValue(this.arrivalData?.Leg || '')
   }
   ngOnInit(): void {
   }
   IntializeFormControl() {
     const ManifestGeneratedFormControl = new UpdateloadingControl();
     this.jsonControlArray = ManifestGeneratedFormControl.getupdatelsFormControls();
+    if (this.shipmentStatus === 'Loaded') {
+      this.jsonControlArray = this.jsonControlArray.filter((x) => {
+        if (x.name === "Unoadingsheet") {
+          x.label = "Loading sheet"
+        }
+        return x
+      })
+    }
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
-    this.autoBindData() ;
+    this.autoBindData();
   }
   IsActiveFuntion($event) {
     this.loadingData = $event
@@ -115,11 +155,35 @@ export class UpdateLoadingSheetComponent implements OnInit {
       console.log("failed");
     }
   }
-  CompleteScan(){
+  CompleteScan() {
+    if(this.shipmentStatus == 'Loaded'){
+      const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
+        width: '100%', // Set the desired width
+        data: {arrivalData:this.arrivalData,loadingSheetData:this.csv} // Pass the data object
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        let arravalDataDetails= [this.arrivalData];
+         arravalDataDetails.forEach(x=>{
+          x.Action="DEPART VEHICLE"
+          x.menifestNo=result[0].MFNumber
+        })
+        // this.cnoteService.setLsData(arravalDataDetails);
+         this.goBack(2);
+         this.dialogRef.close(arravalDataDetails)
+        // Handle the result after the dialog is closed
+      });
+    }
+    else{
     this.dialogRef.close(this.loadingSheetTableForm.value)
-   
+  }
+
+
   }
   Close(): void {
     this.dialogRef.close()
+  }
+  goBack(tabIndex: number): void {
+    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 }

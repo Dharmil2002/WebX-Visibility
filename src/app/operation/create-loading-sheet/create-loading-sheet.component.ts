@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { LodingSheetGenerateSuccessComponent } from '../loding-sheet-generate-success/loding-sheet-generate-success.component';
+
 @Component({
   selector: 'app-create-loading-sheet',
   templateUrl: './create-loading-sheet.component.html'
@@ -17,6 +18,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   departureJsonUrl = '../../../assets/data/departureDetails.json'
   loadingJsonUrl = '../../../assets/data/vehicleType.json'
   loadingSheetJsonUrl = '../../../assets/data/shipmentDetails.json'
+  jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
   tableload = true;
   addAndEditPath: string
   drillDownPath: string
@@ -90,6 +92,22 @@ export class CreateLoadingSheetComponent implements OnInit {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data?.columnData || this.Route.getCurrentNavigation()?.extras?.state.data;
       this.shippingData = this.Route.getCurrentNavigation()?.extras?.state.shipping;
+      if(this.tripData){
+      if(this.tripData.Action=="Vehicle Loading"){
+        this.Route.navigate(['Operation/VehicleLoading'], {
+          state: {
+            data: this.tripData,
+          },
+        });
+      } 
+      if(this.tripData.Action=="DEPART VEHICLE"){
+        this.Route.navigate(['Operation/DepartVehicle'], {
+          state: {
+            data: this.tripData,
+          },
+        });
+      }
+    }
       if (this.shippingData) {
         this.getloadingFormData = this.CnoteService.getData();
         this.isShipmentUpdate = true;
@@ -194,11 +212,11 @@ export class CreateLoadingSheetComponent implements OnInit {
       let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
       routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
     }
-    this.http.get(this.loadingSheetJsonUrl).subscribe(res => {
+    this.http.get(this.jsonUrl).subscribe(res => {
       let filterData = []
       if (!this.isShipmentUpdate) {
         this.shipmentData = res;
-        filterData = this.shipmentData.NestedSingmentData.filter((x) => x.route.trim() == this.tripData.RouteandSchedule.trim());
+        filterData = this.shipmentData.shippingData.filter((x) => x.routes.trim() == this.tripData.RouteandSchedule.trim()  && x.Leg==this.tripData.Leg);
         this.extraData = filterData;
 
       }
@@ -212,13 +230,13 @@ export class CreateLoadingSheetComponent implements OnInit {
 
       // Group shipments by route
       filterData.forEach(shipment => {
-        const { leg, Packages, Weight, Volume } = shipment;
+        const { Leg, Packages, WeightKg, VolumeCFT } = shipment;
 
-        if (!groupedData[leg]) {
+        if (!groupedData[Leg]) {
           // If the route doesn't exist in groupedData, initialize it
-          groupedData[leg] = {
+          groupedData[Leg] = {
             Shipment: 0,
-            lag: leg,
+            lag: Leg,
             Packages: 0,
             WeightKg: 0,
             VolumeCFT: 0,
@@ -226,10 +244,10 @@ export class CreateLoadingSheetComponent implements OnInit {
         }
 
         // Increment the count of shipments and update the packages and weight
-        groupedData[leg].Shipment++;
-        groupedData[leg].Packages += Packages;
-        groupedData[leg].WeightKg += Weight;
-        groupedData[leg].VolumeCFT += Volume;
+        groupedData[Leg].Shipment++;
+        groupedData[Leg].Packages += Packages;
+        groupedData[Leg].WeightKg += WeightKg;
+        groupedData[Leg].VolumeCFT += VolumeCFT;
       });
 
       // Convert the grouped data to an array
@@ -240,7 +258,6 @@ export class CreateLoadingSheetComponent implements OnInit {
     })
   }
   vehicleTypeDataAutofill() {
-    console.log("VehicleType 1"+this.loadingSheetTableForm.value);
     //let routeRlocation = getArrayAfterMatch(ruteHlocation, this.orgBranch);
     let loadingSheetDetails = this.loadingSheetData.data[0].find((x) => x.Type_Code == this.loadingSheetTableForm.value?.vehicleType.value || '')
     if (loadingSheetDetails) {
@@ -268,7 +285,13 @@ export class CreateLoadingSheetComponent implements OnInit {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed', result);
+        let lsData= [this.tripData]
+        lsData.forEach((x)=>{
+        x.loadingSheetNo=result[0].LoadingSheet,
+        x.Action="Vehicle Loading"
+       })
+       this.CnoteService.setLsData(lsData);
+       this.goBack(2);
         // Handle the result after the dialog is closed
       });
     }

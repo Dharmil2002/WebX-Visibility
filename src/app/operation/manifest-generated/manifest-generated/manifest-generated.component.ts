@@ -1,10 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { ManifestGeneratedControl } from 'src/assets/FormControls/ManifestGenerated';
-
 @Component({
   selector: 'app-manifest-generated',
   templateUrl: './manifest-generated.component.html',
@@ -18,6 +16,7 @@ export class ManifestGeneratedComponent implements OnInit {
   tabledata: any;
   manifestgeneratedTableForm:UntypedFormGroup
   manifestControlArray:any;
+  orgBranch: string = localStorage.getItem("Branch");
   columnHeader = {
     "MFNumber": "MF Number",
     "Leg": "Leg",
@@ -57,38 +56,32 @@ export class ManifestGeneratedComponent implements OnInit {
   }
   loadingData: any;
   formdata: any;
+  menifest: any;
   constructor(private Route: Router,
-    private http: HttpClient, private fb: UntypedFormBuilder) {
+    private http: HttpClient, private fb: UntypedFormBuilder,@Inject(MAT_DIALOG_DATA) public item: any,public dialogRef: MatDialogRef<ManifestGeneratedComponent>) {
 
-    if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
+   if(item){
+    this.menifest=item.loadingSheetData;
+    this.getMenifest();
+   }
+  }
+  getMenifest() {
+    const randomNumber = "MF/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+    let meniFestjson={
+      MFNumber: randomNumber,
+      Leg: this.menifest[0].Leg,
+      ShipmentsLoadedBooked:this.menifest.length+"/"+this.menifest.length,
+      PackagesLoadedBooked: this.menifest[0].Packages+"/"+this.menifest[0].Packages,
+      WeightKg: this.menifest[0].WeightKg,
+      VolumeCFT:this.menifest[0].VolumeCFT,
     }
-    this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
-      let tableArray = this.data['tabledata'];
-      this.formdata = this.data['formdata'];
-      this.autoBindData();
-      const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      this.csv = newArray;
-      this.tableload = false;
-    });
-    this.IntializeFormControl()
+    let MenifestGenerate=[meniFestjson];
+    this.csv=MenifestGenerate;
   }
-  autoBindData() {
-    this.manifestgeneratedTableForm.controls['Vehicle'].setValue(this.formdata[0].Vehicle)
-    this.manifestgeneratedTableForm.controls['Route'].setValue(this.formdata[0].Route)
-    this.manifestgeneratedTableForm.controls['TripId'].setValue(this.formdata[0].TripID)
-    this.manifestgeneratedTableForm.controls['LoadingLoc'].setValue(this.formdata[0].LoadingLocation)
-    this.manifestgeneratedTableForm.controls['LoadingSheet'].setValue(this.formdata[0].LoadingSheet)
-    this.manifestgeneratedTableForm.controls['Leg'].setValue(this.formdata[0].Leg)
-  }
+
   ngOnInit(): void {
   }
-  IntializeFormControl() {
-    const ManifestGeneratedFormControl = new ManifestGeneratedControl();
-    this.manifestControlArray = ManifestGeneratedFormControl.getManifestGeneratedFormControls();
-    this.manifestgeneratedTableForm = formGroupBuilder(this.fb, [this.manifestControlArray])
-  }
+
   IsActiveFuntion($event) {
     this.loadingData = $event
   }
@@ -107,6 +100,6 @@ export class ManifestGeneratedComponent implements OnInit {
     }
   }
   Close(): void {
-    window.history.back();
+    this.dialogRef.close(this.csv)
   }
 }

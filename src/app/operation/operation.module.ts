@@ -1,5 +1,4 @@
 import { NgModule } from "@angular/core";
-import { LoadingSheetViewComponent } from "./loading-sheet-view/loading-sheet-view.component";
 import { SnackBarUtilityService } from "../Utility/SnackBarUtility.service";
 import { CommonModule, DatePipe } from "@angular/common";
 import { OperationRoutingModule } from "./operation-routing.module";
@@ -16,7 +15,6 @@ import { ComponentsModule } from "../shared/components/components.module";
 import { SharedModule } from "../shared/shared.module";
 import { CreateLoadingSheetComponent } from './create-loading-sheet/create-loading-sheet.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { LodingSheetGenerateSuccessComponent } from './loding-sheet-generate-success/loding-sheet-generate-success.component';
 import { DepartVehicleComponent } from "./depart-vehicle/depart-vehicle/depart-vehicle.component";
 import { ManifestGeneratedComponent } from "./manifest-generated/manifest-generated/manifest-generated.component";
@@ -24,13 +22,18 @@ import { RunsheetGeneratedComponent } from "./runsheet-generated/runsheet-genera
 import { UpdateLoadingSheetComponent } from "./update-loading-sheet/update-loading-sheet.component";
 import { CreateRunSheetComponent } from './create-run-sheet/create-run-sheet.component';
 import { UpdateRunSheetComponent } from './update-run-sheet/update-run-sheet.component';
+import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.component";
 @NgModule({
   declarations: [
-    CreateLoadingSheetComponent,
-    LodingSheetGenerateSuccessComponent,
-    DepartVehicleComponent,
+    VehicleLoadingComponent,
+    UpdateRunSheetComponent,
+    CreateRunSheetComponent,
+    UpdateLoadingSheetComponent,
+    RunsheetGeneratedComponent,
     ManifestGeneratedComponent,
-    RunsheetGeneratedComponent, UpdateLoadingSheetComponent, CreateRunSheetComponent, UpdateRunSheetComponent 
+    DepartVehicleComponent,
+    LodingSheetGenerateSuccessComponent,
+    CreateLoadingSheetComponent
   ],
   imports: [
     CommonModule,
@@ -48,7 +51,7 @@ import { UpdateRunSheetComponent } from './update-run-sheet/update-run-sheet.com
     MatDialogModule,
     MatSnackBarModule
   ],
-  providers: [SnackBarUtilityService, DatePipe, FilterUtils],
+  providers: [SnackBarUtilityService, DatePipe,MatDialogModule ],
   exports: []
 })
 export class OperationModule { }

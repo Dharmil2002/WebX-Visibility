@@ -64,5 +64,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
+  close(){
+    this.dialogRef.close(this.csv);
+  }
 }

@@ -10,6 +10,8 @@ import { environment } from 'src/environments/environment';
 export class CnoteService {
   private savedData: any;
   private Departure:any;
+  private loadingSheetData:any;
+  private vehicleLoadingData:any;
   //tab:number;
   getData(): any {
     return this.savedData;
@@ -23,6 +25,18 @@ export class CnoteService {
   setDeparture(data: any): void {
     this.Departure = data;
   } 
+  setLsData(data:any){
+    this.loadingSheetData = data;
+  }
+  getLsData(){
+    return this.loadingSheetData
+  }
+  setvehicelodingData(data:any){
+    this.vehicleLoadingData=data;
+  }
+  getVehicleLoadingData(){
+    return this.vehicleLoadingData;
+  }
   constructor(private http: HttpClient) { }
   // GetCnoteFormcontrol() {
   //   return this.http.get<any>(

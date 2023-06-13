@@ -9,6 +9,7 @@ import { RunsheetGeneratedComponent } from "./runsheet-generated/runsheet-genera
 import { UpdateLoadingSheetComponent } from "./update-loading-sheet/update-loading-sheet.component";
 import { CreateRunSheetComponent } from "./create-run-sheet/create-run-sheet.component";
 import { UpdateRunSheetComponent } from "./update-run-sheet/update-run-sheet.component";
+import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.component";
 
 const routes: Routes = [
   {
@@ -46,6 +47,9 @@ const routes: Routes = [
   {
     path: "UpdateRunSheet",
     component: UpdateRunSheetComponent,
+  },{
+    path:"VehicleLoading",
+    component:VehicleLoadingComponent
   }
 ]
 

@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   templateUrl: './loading-sheet-view.component.html'
 })
 export class LoadingSheetViewComponent implements OnInit {
-  jsonUrl = '../../../assets/data/shipmentDetails.json'
+  jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
   csv: any[];
@@ -46,22 +46,22 @@ export class LoadingSheetViewComponent implements OnInit {
   columnHeader = {
     "checkBoxRequired": "",
     "Shipment": "Shipment",
-    "Customer": "Vehicle No",
-    "Origin": "Trip ID",
-    "Destination": "Scheduled",
+    "Customer": "Customer",
+    "Origin": "Origin",
+    "Destination": "Destination",
     "Packages": "Expected",
-    "Weight": "Status",
-    "Volume": "Hrs",
+    "WeightKg": "Weight",
+    "VolumeCFT": "Volume",
   }
  //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "Shipment": "Shipment",
-    "Customer": "Vehicle No",
-    "Origin": "Trip ID",
-    "Destination": "Scheduled",
+    "Customer": "Customer",
+    "Origin": "Origin",
+    "Destination": "Destination",
     "Packages": "Expected",
-    "Weight": "Status",
-    "Volume": "Hrs",
+    "WeightKg": "Weight",
+    "VolumeCFT": "Volume"
   }
 
   METADATA = {
@@ -104,7 +104,7 @@ export class LoadingSheetViewComponent implements OnInit {
   getLoadingSheetDetails() {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
-      let tableArray = this.data.NestedSingmentData.filter((x)=>x.leg==this.loadinSheet.lag);
+      let tableArray = this.data.shippingData.filter((x)=>x.Leg==this.loadinSheet.lag);
      let Shipment=[]
       this.extraData.forEach(element => {
         Shipment.push(element.Shipment)

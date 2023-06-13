@@ -1,0 +1,70 @@
+{
+    "GenerateData": [
+        {
+            "RunSheetID": "<to be generated>",
+            "Cluster": "CL002: Mahim-Dadar cluster",
+            "VehicleNo": "MH02CB5544",
+            "VehType": "Tata 407",
+            "VendorID": "V000324",
+            "VenType": "Business Associate",
+            "CapacityKg": 3200,
+            "CapacityVolumeCFT": 740,
+            "LoadedKg": 1700,
+            "LoadedVolumeCFT": 650,
+            "WeightUtilization": "55%",
+            "VolumeUtilization": "87%"
+        }
+    ],
+    "RunsheetData": [
+        {
+            "Document": "A887474",
+            "Type": "Delivery",
+            "Customer": "Anz Motors",
+            "Address": "34, Navkar building, Mahim",
+            "Pincode": "400014",
+            "Packages": 34,
+            "Weight": 3450,
+            "Volume": 450
+        },
+        {
+            "Document": "PR000393",
+            "Type": "Pickup",
+            "Customer": "Perfect Foods",
+            "Address": "3/103, Pandurang bhavan, Matunga",
+            "Pincode": "400014",
+            "Packages": 23,
+            "Weight": 2133,
+            "Volume": 650
+        },
+        {
+            "Document": "A773664",
+            "Type": "Delivery",
+            "Customer": "Savla Auto parts",
+            "Address": "J K House, Chunam Lane, Dadar",
+            "Pincode": "400016",
+            "Packages": 45,
+            "Weight": 567,
+            "Volume": 320
+        },
+        {
+            "Document": "B003848",
+            "Type": "Delivery",
+            "Customer": "L&T switchgear",
+            "Address": "Evershine Sunrise, Veer Savarkar Marg, Shivaji park",
+            "Pincode": "400018",
+            "Packages": 21,
+            "Weight": 198,
+            "Volume": 230
+        },
+        {
+            "Document": "P000654",
+            "Type": "Pickup",
+            "Customer": "Singh Motors",
+            "Address": "32, L J Road",
+            "Pincode": "400023",
+            "Packages": 35,
+            "Weight": 345,
+            "Volume": 550
+        }
+    ]
+}

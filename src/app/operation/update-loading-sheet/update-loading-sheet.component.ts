@@ -86,7 +86,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.arrivalData?.VehicleNo||'')
     this.loadingSheetTableForm.controls['Route'].setValue(this.arrivalData?.Route||'')
     this.loadingSheetTableForm.controls['tripID'].setValue(this.arrivalData?.TripID||'')
-    this.loadingSheetTableForm.controls['LoadingLocation'].setValue(this.arrivalData?.ArrivalLocation||'')
+    this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.arrivalData?.ArrivalLocation||'')
     this.loadingSheetTableForm.controls['Unoadingsheet'].setValue(this.arrivalData?.Unoadingsheet||'')
     this.loadingSheetTableForm.controls['Leg'].setValue(this.arrivalData?.Leg||'')
   }

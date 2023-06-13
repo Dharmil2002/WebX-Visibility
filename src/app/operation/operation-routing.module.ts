@@ -7,6 +7,7 @@ import { DepartVehicleComponent } from "./depart-vehicle/depart-vehicle/depart-v
 import { ManifestGeneratedComponent } from "./manifest-generated/manifest-generated/manifest-generated.component";
 import { RunsheetGeneratedComponent } from "./runsheet-generated/runsheet-generated/runsheet-generated.component";
 import { UpdateLoadingSheetComponent } from "./update-loading-sheet/update-loading-sheet.component";
+import { CreateRunSheetComponent } from "./create-run-sheet/create-run-sheet.component";
 import { UpdateRunSheetComponent } from "./update-run-sheet/update-run-sheet.component";
 
 const routes: Routes = [
@@ -37,6 +38,10 @@ const routes: Routes = [
   {
     path: "UpdateLoadingSheet",
     component: UpdateLoadingSheetComponent,
+  },
+  {
+    path: "CreateRunSheet",
+    component: CreateRunSheetComponent,
   },
   {
     path: "UpdateRunSheet",

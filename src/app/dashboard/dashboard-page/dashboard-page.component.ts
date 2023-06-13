@@ -12,7 +12,7 @@ export class DashboardPageComponent implements OnInit {
   breadscrums = [
     {
       title: "Dashboard",
-      items: ["dashboard"],
+      items: ["Dashboard"],
       active: "Dashboard"
     }
   ]

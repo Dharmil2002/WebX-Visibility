@@ -86,7 +86,7 @@ export class MarkArrivalControl {
                 label: 'Seal Status',
                 placeholder: '',
                 type: 'text',
-                value:'',
+                value: '',
                 Validations: [],
                 generatecontrol: true,
                 disable: false
@@ -96,7 +96,17 @@ export class MarkArrivalControl {
                 label: 'Seal Change Reason',
                 placeholder: '',
                 type: 'text',
-                value:'',
+                value: '',
+                Validations: [],
+                generatecontrol: true,
+                disable: false
+            },
+            {
+                name: 'LateReason',
+                label: 'Late Reason',
+                placeholder: '',
+                type: 'text',
+                value: '',
                 Validations: [],
                 generatecontrol: true,
                 disable: false

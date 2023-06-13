@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CreateRunSheetComponent } from 'src/app/operation/create-run-sheet/create-run-sheet.component';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 @Component({
   selector: 'app-pickup-del-page',
@@ -33,7 +34,7 @@ export class PickupDelPageComponent extends UnsubscribeOnDestroyAdapter implemen
    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
    want hyper link and add Path which you want to redirect*/
   linkArray = [
-    { Row: 'Action', Path: 'Operation/CreateLoadingSheet' }
+    { Row: 'Action', Path: 'Operation/CreateRunSheet' }
   ]
   menuItems = [
     { label: 'Create Run Sheet' },
@@ -109,7 +110,7 @@ export class PickupDelPageComponent extends UnsubscribeOnDestroyAdapter implemen
   }
   handleMenuItemClick(label: any, element) {
 
-    this.Route.navigate(['Operation/CreateLoadingSheet'], {
+    this.Route.navigate(['Operation/CreateRunSheet'], {
       state: {
         data: label.data,
       },

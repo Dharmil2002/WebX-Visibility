@@ -105,6 +105,6 @@ export class UpdateRunSheetComponent implements OnInit {
     this.dialogRef.close(this.updateSheetTableForm.value)
   }
   DepartDelivery(){
-    this.Route.navigateByUrl('/dashboard/ManageRunsheet');
+    this.Route.navigateByUrl('/dashboard/GlobeDashboardPage');
   }
 }

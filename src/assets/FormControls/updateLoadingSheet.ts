@@ -32,8 +32,8 @@ export class UpdateloadingControl {
                 generatecontrol: true, disable: true
             },
             {
-                name: 'LoadingLocation',
-                label: 'Loading Location',
+                name: 'ArrivalLocation',
+                label: 'Arrival Location',
                 placeholder: '',
                 type: 'text',
                 value: '',

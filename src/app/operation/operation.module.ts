@@ -22,13 +22,14 @@ import { DepartVehicleComponent } from "./depart-vehicle/depart-vehicle/depart-v
 import { ManifestGeneratedComponent } from "./manifest-generated/manifest-generated/manifest-generated.component";
 import { RunsheetGeneratedComponent } from "./runsheet-generated/runsheet-generated/runsheet-generated.component";
 import { UpdateLoadingSheetComponent } from "./update-loading-sheet/update-loading-sheet.component";
+import { UpdateRunSheetComponent } from './update-run-sheet/update-run-sheet.component';
 @NgModule({
   declarations: [
     CreateLoadingSheetComponent,
     LodingSheetGenerateSuccessComponent,
     DepartVehicleComponent,
     ManifestGeneratedComponent,
-    RunsheetGeneratedComponent, UpdateLoadingSheetComponent 
+    RunsheetGeneratedComponent, UpdateLoadingSheetComponent, UpdateRunSheetComponent 
   ],
   imports: [
     CommonModule,

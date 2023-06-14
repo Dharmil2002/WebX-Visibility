@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { RunSheetControl } from 'src/assets/FormControls/RunsheetGeneration';
@@ -81,20 +80,28 @@ export class CreateRunSheetComponent implements OnInit {
     }
   }
   autoBindData() {
-    this.RunSheetTableForm.controls['Cluster'].setValue(this.RunSheetTable?.columnData.DeliveryCluster || '')
-    this.RunSheetTableForm.controls['RunSheetID'].setValue(this.data[0]?.RunSheetID || '')
-    this.RunSheetTableForm.controls['Vehicle'].setValue(this.data[0]?.VehicleNo || '')
-    this.RunSheetTableForm.controls['VehType'].setValue(this.data[0]?.VehType || '')
-    this.RunSheetTableForm.controls['Vendor'].setValue(this.data[0]?.VendorID || '')
-    this.RunSheetTableForm.controls['VenType'].setValue(this.data[0]?.VenType || '')
-    this.RunSheetTableForm.controls['CapacityKg'].setValue(this.data[0]?.CapacityKg || '')
-    this.RunSheetTableForm.controls['CapVol'].setValue(this.data[0]?.CapacityVolumeCFT || '')
-    this.RunSheetTableForm.controls['LoadKg'].setValue(this.data[0]?.LoadedKg || '')
-    this.RunSheetTableForm.controls['LoadVol'].setValue(this.data[0]?.LoadedVolumeCFT || '')
-    this.RunSheetTableForm.controls['WeightUti'].setValue(this.data[0]?.WeightUtilization || '')
-    this.RunSheetTableForm.controls['VolUti'].setValue(this.data[0]?.VolumeUtilization || '')
+    const mappings = {
+      'Cluster': 'DeliveryCluster',
+      'RunSheetID': 'RunSheetID',
+      'Vehicle': 'VehicleNo',
+      'VehType': 'VehType',
+      'Vendor': 'VendorID',
+      'VenType': 'VenType',
+      'CapacityKg': 'CapacityKg',
+      'CapVol': 'CapacityVolumeCFT',
+      'LoadKg': 'LoadedKg',
+      'LoadVol': 'LoadedVolumeCFT',
+      'WeightUti': 'WeightUtilization',
+      'VolUti': 'VolumeUtilization'
+    };
+
+    for (let key in mappings) {
+      let value = this.data[0]?.[mappings[key]] || '';
+      if (key === 'Cluster') value = this.RunSheetTable?.columnData.DeliveryCluster || '';
+      this.RunSheetTableForm.controls[key].setValue(value);
+    }
   }
-  GenerateRunsheet(){
+  GenerateRunsheet() {
     this.Route.navigateByUrl('/dashboard/GlobeDashboardPage');
   }
 }

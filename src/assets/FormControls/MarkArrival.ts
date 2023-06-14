@@ -20,7 +20,7 @@ export class MarkArrivalControl {
                     // onChange: 'GetVehicleDetails',
                 },
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
 
             {
@@ -31,7 +31,7 @@ export class MarkArrivalControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
             {
                 name: 'Route',
@@ -56,7 +56,7 @@ export class MarkArrivalControl {
                 label: 'Arrival Time',
                 placeholder: '',
                 type: 'time',
-                value: '',
+                value: new Date().toLocaleTimeString(),
                 Validations: [],
                 generatecontrol: true, disable: false
             },
@@ -66,7 +66,10 @@ export class MarkArrivalControl {
                 placeholder: '',
                 type: 'text',
                 value: '',
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message: "Assign Dock is required"
+                }],
                 generatecontrol: true, disable: false
             },
 
@@ -76,7 +79,10 @@ export class MarkArrivalControl {
                 placeholder: '',
                 type: "text",
                 value: '',
-                Validations: [],
+                Validations: [{
+                    name: "required",
+                    message: "Seal No is required"
+                }],
                 generatecontrol: true,
                 disable: false
             },

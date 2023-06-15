@@ -69,13 +69,22 @@ export class UpdateRunSheetComponent implements OnInit {
     this.IntializeFormControl()
   }
   autoBindData() {
-    this.updateSheetTableForm.controls['Vehicle'].setValue(this.formdata[0].vehicle)
-    this.updateSheetTableForm.controls['Cluster'].setValue(this.formdata[0].cluster)
-    this.updateSheetTableForm.controls['Runsheet'].setValue(this.formdata[0].runSheetID)
-    this.updateSheetTableForm.controls['LoadingLocation'].setValue(this.formdata[0].loadingLocation)
-    this.updateSheetTableForm.controls['Startkm'].setValue(this.formdata[0].startKm)
-    this.updateSheetTableForm.controls['Departuretime'].setValue(this.formdata[0].departureTime)
-   }
+    const formControlsMap = {
+      Vehicle: 'vehicle',
+      Cluster: 'cluster',
+      Runsheet: 'runSheetID',
+      LoadingLocation: 'loadingLocation',
+      Startkm: 'startKm',
+      Departuretime: 'departureTime'
+    };
+  
+    Object.keys(formControlsMap).forEach(controlName => {
+      const formControl = this.updateSheetTableForm.controls[controlName];
+      const formdataKey = formControlsMap[controlName];
+      const value = this.formdata[0][formdataKey];
+      formControl.setValue(value);
+    });
+  }
   ngOnInit(): void {
   }
   IntializeFormControl() {

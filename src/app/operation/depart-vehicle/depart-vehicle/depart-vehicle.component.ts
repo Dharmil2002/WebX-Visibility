@@ -120,19 +120,55 @@ export class DepartVehicleComponent implements OnInit {
       //this.tableload = false;
     });
   }
+  // autoBindData() {
+  //   this.loadingSheetTableForm.controls['vehicle'].setValue(this.tripData?.VehicleNo || '')
+  //   this.loadingSheetTableForm.controls['Route'].setValue(this.tripData?.RouteandSchedule || '')
+  //   this.loadingSheetTableForm.controls['tripID'].setValue(this.tripData?.TripID || '')
+  //   this.loadingSheetTableForm.controls['Expected'].setValue(this.tripData?.Expected || '')
+  //   this.loadingSheetTableForm.controls['LoadingLocation'].setValue(localStorage.getItem('Branch') || '')
+  //   this.departvehicleTableForm.controls['VendorType'].setValue(this.tripData?.VehicleType || '')
+  //   this.departvehicleTableForm.controls['Vendor'].setValue(this.vendordetails[0].Vendor)
+  //   this.departvehicleTableForm.controls['Driver'].setValue(this.vendordetails[0].Driver)
+  //   this.departvehicleTableForm.controls['DriverMob'].setValue(this.vendordetails[0].DriverMobile)
+  //   this.departvehicleTableForm.controls['License'].setValue(this.vendordetails[0].LicenseNo)
+  //   this.departvehicleTableForm.controls['Expiry'].setValue(this.vendordetails[0].Expirydate)
+  // }
   autoBindData() {
-    this.loadingSheetTableForm.controls['vehicle'].setValue(this.tripData?.VehicleNo || '')
-    this.loadingSheetTableForm.controls['Route'].setValue(this.tripData?.RouteandSchedule || '')
-    this.loadingSheetTableForm.controls['tripID'].setValue(this.tripData?.TripID || '')
-    this.loadingSheetTableForm.controls['Expected'].setValue(this.tripData?.Expected || '')
-    this.loadingSheetTableForm.controls['LoadingLocation'].setValue(localStorage.getItem('Branch') || '')
-    this.departvehicleTableForm.controls['VendorType'].setValue(this.tripData?.VehicleType || '')
-    this.departvehicleTableForm.controls['Vendor'].setValue(this.vendordetails[0].Vendor)
-    this.departvehicleTableForm.controls['Driver'].setValue(this.vendordetails[0].Driver)
-    this.departvehicleTableForm.controls['DriverMob'].setValue(this.vendordetails[0].DriverMobile)
-    this.departvehicleTableForm.controls['License'].setValue(this.vendordetails[0].LicenseNo)
-    this.departvehicleTableForm.controls['Expiry'].setValue(this.vendordetails[0].Expirydate)
+    const loadingSheetFormControlsMap = {
+      vehicle: 'VehicleNo',
+      Route: 'RouteandSchedule',
+      tripID: 'TripID',
+      Expected: 'Expected'
+    };
+  
+    const departVehicleFormControlsMap = {
+      VendorType: 'VehicleType',
+      Vendor: 'Vendor',
+      Driver: 'Driver',
+      DriverMob: 'DriverMobile',
+      License: 'LicenseNo',
+      Expiry: 'Expirydate'
+    };
+  
+    Object.entries(loadingSheetFormControlsMap).forEach(([controlName, dataKey]) => {
+      const formControl = this.loadingSheetTableForm.controls[controlName];
+      const value = this.tripData?.[dataKey] || '';
+      formControl.setValue(value);
+    });
+  
+    Object.entries(departVehicleFormControlsMap).forEach(([controlName, dataKey]) => {
+      const formControl = this.departvehicleTableForm.controls[controlName];
+      const value = this.vendordetails[0]?.[dataKey] || '';
+      formControl.setValue(value);
+    });
+  
+    // Set value for LoadingLocation separately
+    const loadingLocationFormControl = this.loadingSheetTableForm.controls['LoadingLocation'];
+    const loadingLocationValue = localStorage.getItem('Branch') || '';
+    loadingLocationFormControl.setValue(loadingLocationValue);
   }
+  
+  
   IntializeFormControl() {
     const loadingControlFormControls = new loadingControl();
     this.jsonControlArray = loadingControlFormControls.getMarkArrivalsertFormControls();

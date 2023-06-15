@@ -12,7 +12,7 @@ export class ManifestGeneratedControl {
                 value:'',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
             {
                 name: 'Route',
@@ -41,7 +41,7 @@ export class ManifestGeneratedControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
 
             {
@@ -52,7 +52,7 @@ export class ManifestGeneratedControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
 
             {
@@ -63,7 +63,7 @@ export class ManifestGeneratedControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
         ];
     }

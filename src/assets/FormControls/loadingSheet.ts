@@ -11,7 +11,7 @@ export class loadingControl {
                 type: 'text',
                 value: '',
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: true
             },
             {
                 name: 'vehicle',
@@ -19,7 +19,13 @@ export class loadingControl {
                 placeholder: '',
                 type: 'text',
                 value: '',
-                Validations: [],
+                Validations: [
+                    {
+                        type: 'regex',
+                        value: '^[A-Z0-9]{1,10}$',
+                        message: 'Please enter a valid vehicle number.'
+                    }
+                ],
                 generatecontrol: true,
                 disable: false
             },

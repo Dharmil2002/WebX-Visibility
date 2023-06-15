@@ -55,11 +55,13 @@ export class ManageRunsheetComponent extends UnsubscribeOnDestroyAdapter impleme
 
   columnHeader = {
     "RunSheet":"Run Sheet",
+    "Vehicle":"Vehicle",
     "Cluster": "Cluster",
     "Shipments": "Shipments",
     "Packages": "Packages",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
+    "Status":"Status",
     "Action": "Action"
   }
 

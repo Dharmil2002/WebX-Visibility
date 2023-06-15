@@ -7,7 +7,9 @@
       "Packages": 2300,
       "WeightKg": 1800,
       "VolumeCFT": 789,
-      "Action": "Depart"
+      "Action": "Depart",
+      "Status":"Generated",
+      "Vehicle":""
 
     },
     {
@@ -17,8 +19,9 @@
       "Packages": 1890,
       "WeightKg": 2130,
       "VolumeCFT": 890,
-      "Action": "Update Delivery"
-
+      "Action": "Update Delivery",
+      "OutforDelivery":"Out For Delivery",
+      "Vehicle":"MH02JH6363"
     }
   ],
   "DeliveryCountData": [

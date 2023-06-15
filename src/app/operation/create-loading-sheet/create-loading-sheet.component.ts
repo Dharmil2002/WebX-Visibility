@@ -191,7 +191,6 @@ export class CreateLoadingSheetComponent implements OnInit {
           value:this.getloadingFormData?.vehicleType.value
         }
         this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleDropValue)
-        console.log("VehicleType"+JSON.stringify(this.loadingSheetTableForm.value.vehicleType));
         this.vehicleTypeDataAutofill();
       }
     });
@@ -208,6 +207,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     })
   }
   getshipmentData() {
+    debugger;
     if (!this.isShipmentUpdate) {
       let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
       routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
@@ -216,7 +216,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       let filterData = []
       if (!this.isShipmentUpdate) {
         this.shipmentData = res;
-        filterData = this.shipmentData.shippingData.filter((x) => x.routes.trim() == this.tripData.RouteandSchedule.trim()  && x.Leg==this.tripData.Leg);
+        filterData = this.shipmentData.shippingData.filter((x) => x.routes.trim() == this.tripData.RouteandSchedule.trim());
         this.extraData = filterData;
 
       }
@@ -259,6 +259,10 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   vehicleTypeDataAutofill() {
     //let routeRlocation = getArrayAfterMatch(ruteHlocation, this.orgBranch);
+    if(!this.loadingSheetTableForm.controls['tripID'].value){
+    const randomNumber = "TH/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+    this.loadingSheetTableForm.controls['tripID'].setValue(randomNumber);
+    }
     let loadingSheetDetails = this.loadingSheetData.data[0].find((x) => x.Type_Code == this.loadingSheetTableForm.value?.vehicleType.value || '')
     if (loadingSheetDetails) {
       this.loadingSheetTableForm.controls['CapacityKg'].setValue(loadingSheetDetails?.CapacityKg || '')
@@ -273,6 +277,10 @@ export class CreateLoadingSheetComponent implements OnInit {
     }
   }
   loadingSheetGenerate() {
+    if(!this.loadingSheetTableForm.value.vehicle){
+      SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
+    }
+    else{
     if (this.loadingData) {
       // Check if BcSerialType is "E"
       // If it is "E", set displaybarcode to true
@@ -287,6 +295,8 @@ export class CreateLoadingSheetComponent implements OnInit {
       dialogRef.afterClosed().subscribe(result => {
         let lsData= [this.tripData]
         lsData.forEach((x)=>{
+        x.VehicleNo=this.loadingSheetTableForm.value.vehicle,
+        x.TripID=this.loadingSheetTableForm.value.tripID,
         x.loadingSheetNo=result[0].LoadingSheet,
         x.Action="Vehicle Loading"
        })
@@ -298,6 +308,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     else {
       SwalerrorMessage("error", "Please Select Any one Record", "", true);
     }
+  }
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });

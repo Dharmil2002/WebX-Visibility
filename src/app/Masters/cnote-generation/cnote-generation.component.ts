@@ -2910,7 +2910,6 @@ export class CNoteGenerationComponent implements OnInit {
   //End
   // //start
   // Validationchecked(Formcontrol,step) {
-  //   debugger
   //    const requiredStepNames = Formcontrol
   //   .filter(step => step.Validation === 'Required' && step.type!="toggle")
   //   .map(step => step.name);

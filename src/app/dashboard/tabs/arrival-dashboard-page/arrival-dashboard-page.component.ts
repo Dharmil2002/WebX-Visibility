@@ -60,7 +60,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     "Route": "Route",
     "TripID": "Trip ID",
     "Location": "Location",
-    "STA": "STA",
+    "Scheduled": "STA",
     "ETAATA": "ETA/ ATA",
     "Status": "Status",
     "Hrs": "Hrs.",
@@ -115,7 +115,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       this.data = res;
       let tableArray = this.data;
       const newArray = tableArray.arrivalData.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      this.csv = newArray;
+      this.csv = newArray.filter((x)=>x.module=="Arrival");
       let packages=0;
       this.data.shippingData.forEach((element,index) => {
         packages=element.Packages+packages
@@ -142,7 +142,6 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
 
   }
   updateDepartureData(event){
-
  const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
  const action = result?.Action ?? '';
     if(action){

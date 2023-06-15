@@ -4,7 +4,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { RunSheetControl } from 'src/assets/FormControls/RunsheetGeneration';
-
+import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 
 @Component({
   selector: 'app-create-run-sheet',
@@ -17,6 +17,7 @@ export class CreateRunSheetComponent implements OnInit {
   RunSheetTable: any;
   runsheetData: any;
   //declaring breadscrum
+  orgBranch: string = localStorage.getItem("Branch");
   breadscrums = [
     {
       title: "Create Run Sheet",
@@ -27,7 +28,8 @@ export class CreateRunSheetComponent implements OnInit {
   data: any;
   tableload = false;
   csv: any[];
-  constructor(private http: HttpClient, private Route: Router, private fb: UntypedFormBuilder
+  runSheetData: any;
+  constructor(private http: HttpClient, private Route: Router,private CnoteService:CnoteService,private fb: UntypedFormBuilder
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.RunSheetTable = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -55,9 +57,9 @@ export class CreateRunSheetComponent implements OnInit {
   }
   ngOnInit(): void {
     this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res['GenerateData'];
+      this.data = res['GenerateData'].find((x)=>x.Cluster==this.RunSheetTable.columnData.Cluster);
       this.autoBindData();
-      this.csv = res['RunsheetData'];
+      this.csv = res['RunsheetData'].filter((x)=>x.Cluster==this.RunSheetTable.columnData.Cluster);
       this.tableload = false;
     });
   }
@@ -65,6 +67,9 @@ export class CreateRunSheetComponent implements OnInit {
     const RunSheetFormControl = new RunSheetControl();
     this.jsonControlArray = RunSheetFormControl.RunSheetFormControls();
     this.RunSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
+  }
+  IsActiveFuntion(event){ 
+     this.runSheetData=event;
   }
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
@@ -80,28 +85,30 @@ export class CreateRunSheetComponent implements OnInit {
     }
   }
   autoBindData() {
-    const mappings = {
-      'Cluster': 'DeliveryCluster',
-      'RunSheetID': 'RunSheetID',
-      'Vehicle': 'VehicleNo',
-      'VehType': 'VehType',
-      'Vendor': 'VendorID',
-      'VenType': 'VenType',
-      'CapacityKg': 'CapacityKg',
-      'CapVol': 'CapacityVolumeCFT',
-      'LoadKg': 'LoadedKg',
-      'LoadVol': 'LoadedVolumeCFT',
-      'WeightUti': 'WeightUtilization',
-      'VolUti': 'VolumeUtilization'
-    };
-
-    for (let key in mappings) {
-      let value = this.data[0]?.[mappings[key]] || '';
-      if (key === 'Cluster') value = this.RunSheetTable?.columnData.DeliveryCluster || '';
-      this.RunSheetTableForm.controls[key].setValue(value);
-    }
+    this.RunSheetTableForm.controls['Cluster'].setValue(this.RunSheetTable.columnData.Cluster || '')
+    this.RunSheetTableForm.controls['RunSheetID'].setValue(this.data?.RunSheetID || '')
+    this.RunSheetTableForm.controls['Vehicle'].setValue(this.data?.VehicleNo || '')
+    this.RunSheetTableForm.controls['VehType'].setValue(this.data?.VehType || '')
+    this.RunSheetTableForm.controls['Vendor'].setValue(this.data?.VendorID || '')
+    this.RunSheetTableForm.controls['VenType'].setValue(this.data?.VenType || '')
+    this.RunSheetTableForm.controls['CapacityKg'].setValue(this.data?.CapacityKg || '')
+    this.RunSheetTableForm.controls['CapVol'].setValue(this.data?.CapacityVolumeCFT || '')
+    this.RunSheetTableForm.controls['LoadKg'].setValue(this.data?.LoadedKg || '')
+    this.RunSheetTableForm.controls['LoadVol'].setValue(this.data?.LoadedVolumeCFT || '')
+    this.RunSheetTableForm.controls['WeightUti'].setValue(this.data?.WeightUtilization || '')
+    this.RunSheetTableForm.controls['VolUti'].setValue(this.data?.VolumeUtilization || '')
   }
-  GenerateRunsheet() {
-    this.Route.navigateByUrl('/dashboard/GlobeDashboardPage');
+  GenerateRunsheet(){
+    const randomNumber = "PDNHW/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+    this.RunSheetTableForm.controls['RunSheetID'].setValue(randomNumber)
+    let runSheetDetils={
+      shippingData:this.runSheetData,
+      runSheetDetails: this.RunSheetTableForm.value
+    }
+    this.CnoteService.setRunSheetData(runSheetDetils);
+    this.goBack(3)
+  }
+  goBack(tabIndex: number): void {
+    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 }

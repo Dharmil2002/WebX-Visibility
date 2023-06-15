@@ -67,7 +67,8 @@ export class MarkArrivalComponent implements OnInit {
              element.Action='Arrival Scan'
           }
         });
-        this.dialogRef.close(this.arrivalData.arrivalData)
+        let arrivalNestedData=this.arrivalData.arrivalData.filter((x)=>x.module=='Arrival');  
+        this.dialogRef.close(arrivalNestedData)
     });
  
      

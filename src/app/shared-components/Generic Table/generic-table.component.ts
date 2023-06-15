@@ -62,7 +62,6 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     this.maxWidth = changes.extraData?.currentValue ?? this.maxWidth;
     this.width = changes.width?.currentValue ?? this.width;
     this.height = changes.height?.currentValue ?? this.height;
-    this.maxWidth = changes.height?.currentValue ?? this.maxWidth;
     if (changes.tableData?.currentValue) {
       this.refresh();
     }

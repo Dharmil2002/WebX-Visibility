@@ -3,7 +3,6 @@ import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { Router } from '@angular/router';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
-import { debug } from 'console';
 @Component({
   selector: 'app-departure-dashboard-page',
   templateUrl: './departure-dashboard-page.component.html'
@@ -13,6 +12,7 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
   jsonUrl = '../../../assets/data/departureDetails.json'
   jsonDeparturUrl = '../../../assets/data/arrival-dashboard-data.json';
   loadingSheetJsonUrl = '../../../assets/data/shipmentDetails.json'
+  
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
   csv: any[];
@@ -68,7 +68,6 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
     "Expected": "Expected",
     "Status": "Status",
     "Hrs": "Hrs.",
-    "Leg":"",
     "Action": "Action "
   }
 
@@ -101,13 +100,7 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
   constructor(private http: HttpClient, private Route: Router, private CnoteService: CnoteService) {
     super();
     this.loadingSheetData=this.CnoteService.getLsData();
-    if(this.loadingSheetData){
-      this.csv=this.loadingSheetData;
-    }
-    else{
-      this.departure = this.CnoteService.getDeparture();
-    
-    }
+    this.departure = this.CnoteService.getDeparture();
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
     this.IscheckBoxRequired = true;
@@ -131,48 +124,37 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
 
   }
   getdepartureDetail() {
-    // this.http.get(this.jsonUrl).subscribe(res => {
-    //   this.data = res;
-    //   let tableArray = this.data['data'];
-    //   const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-    //   this.csv = newArray.filter((x) => x.location === this.orgBranch);
+    this.http.get(this.jsonDeparturUrl).subscribe(res => {
+      this.data = res;
+      let tableArray = this.data['arrivalData'].filter((x)=>x.module==='Departure');
+      const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
+      //let departure= newArray.filter((x) => x.ArrivalLocation === this.orgBranch);
+      let dataDeparture: { [key: string]: string }[] = [];// Initialize dataDeparture as an empty array
+      newArray.forEach(element => {
+        let jsonDeparture = {
+          RouteandSchedule: element?.Route || '',
+          VehicleNo: element?.VehicleNo || '',
+          TripID: element?.TripID || '',
+          Scheduled: element?.Scheduled || '',
+          Expected: element?.ETAATA || '',
+          Status: element?.Status || '',
+          Hrs: element?.Hrs || '',
+          VehicleType: element?.VehicleType || '',
+          Action: element.TripID!=''?'Update Trip':'Create Trip',
+          location: element?.ArrivalLocation || '',
+          Leg: element?.Leg || ''
+        };
+        dataDeparture.push(jsonDeparture);
+      });
+      this.csv=dataDeparture;
 
+      if (this.departure) {
+        let currentDate = new Date();
+        let formattedDate = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear();
+        let formattedTime = currentDate.getHours() + ':' + currentDate.getMinutes();
 
-    //   if (this.departure) {
-    //     let currentDate = new Date();
-    //     let formattedDate = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear();
-    //     let formattedTime = currentDate.getHours() + ':' + currentDate.getMinutes();
-
-    //     let formattedDateTime = formattedDate + ' ' + formattedTime;
-    //     let jsonDeparture = {
-    //       RouteandSchedule: this.departure?.Route || '',
-    //       VehicleNo: this.departure?.vehicle || '',
-    //       TripID: this.departure?.tripID || '',
-    //       Scheduled:formattedDateTime,
-    //       Expected: formattedDateTime,
-    //       Status: "SCHEDULED",
-    //       Hrs: "17:30",
-    //       VehicleType: "CANTER 1080",
-    //       Action: "Update Trip",
-    //       location: this.departure?.LoadingLocation || ''
-    //     }
-    //     this.csv.push(jsonDeparture)
-    //   }
-    //   this.getshipmentData();
-    //   this.tableload = false;
-
-    // });
-    
-    if (this.departure) {
-      let currentDate = new Date();
-      let formattedDate = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear();
-      let formattedTime = currentDate.getHours() + ':' + currentDate.getMinutes();
-
-      let formattedDateTime = formattedDate + ' ' + formattedTime;
-      if (!this.csv) {
-        this.csv = [];
-      }
-      let jsonDeparture = {
+        let formattedDateTime = formattedDate + ' ' + formattedTime;
+        let jsonDeparture = {
         RouteandSchedule: this.departure?.Route || '',
         VehicleNo: this.departure?.vehicle || '',
         TripID: this.departure?.tripID || '',
@@ -187,8 +169,48 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
       }
       this.csv.push(jsonDeparture)
     }
-    this.getshipmentData() ;
-    this.tableload = false;
+      if(this.loadingSheetData){
+        // Use the `map()` function along with the `filter()` function to replace the object
+        // this.csv = this.csv.map(item => {
+        //   if (item.RouteandSchedule === this.loadingSheetData[0].RouteandSchedule) {
+        //     return this.loadingSheetData[0];
+        //   }
+        //   return item;
+        // });
+        this.csv=this.csv.filter((x)=>x.RouteandSchedule!=this.loadingSheetData[0].RouteandSchedule)
+        console.log(this.loadingSheetData);
+        this.csv.push(this.loadingSheetData[0]);
+      }
+      this.getshipmentData();
+      this.tableload = false;
+
+    });
+    
+    // if (this.departure) {
+    //   let currentDate = new Date();
+    //   let formattedDate = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear();
+    //   let formattedTime = currentDate.getHours() + ':' + currentDate.getMinutes();
+
+    //   let formattedDateTime = formattedDate + ' ' + formattedTime;
+    //   if (!this.csv) {
+    //     this.csv = [];
+    //   }
+    //   let jsonDeparture = {
+    //     RouteandSchedule: this.departure?.Route || '',
+    //     VehicleNo: this.departure?.vehicle || '',
+    //     TripID: this.departure?.tripID || '',
+    //     Scheduled:formattedDateTime,
+    //     Expected: formattedDateTime,
+    //     Status: "SCHEDULED",
+    //     Hrs: "17:30",
+    //     VehicleType: "CANTER 1080",
+    //     Action: "Update Trip",
+    //     location: this.departure?.LoadingLocation || '',
+    //     Leg:this.departure?.Leg || ''
+    //   }
+    //   this.csv.push(jsonDeparture)
+    // }
+
 
   }
   handleMenuItemClick(label: any, element) {
@@ -201,12 +223,18 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
 
   }
   getshipmentData() {
+
     this.http.get(this.jsonDeparturUrl).subscribe(res => {
       this.shipmentData = res;
       let shipPackage = 0
       let shipmat = 0
-      let shipmentFilter = this.shipmentData.shippingData.filter(x => x.Origin === (this.departure ? this.departure.LoadingLocation : this.loadingSheetData[0]?.location) && x.Leg === (this.departure ? this.departure.Leg : this.loadingSheetData[0]?.Leg));
-
+      let shipmentFilter;
+      if(this.departure||this.loadingSheetData){
+       shipmentFilter = this.shipmentData.shippingData.filter(x => x.Origin === (this.departure ? this.departure.LoadingLocation : this.loadingSheetData[0]?.location) && x.Leg === (this.departure ? this.departure.Leg : this.loadingSheetData[0]?.Leg));
+      }
+      else{
+         shipmentFilter = this.shipmentData.shippingData.filter((x) => x.Origin === this.orgBranch);
+      }
       shipmentFilter.forEach((element, index) => {
         shipPackage = element.Packages + shipPackage
         shipmat = index + shipmat

@@ -4,6 +4,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { UpdateloadingControl } from 'src/assets/FormControls/UpdateRunsheet';
+import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 
 @Component({
   selector: 'app-update-run-sheet',
@@ -13,6 +14,7 @@ export class UpdateRunSheetComponent implements OnInit {
   jsonUrl = '../../../assets/data/updateRunsheet.json'
   tableload = false;
   csv: any[];
+  branch=localStorage.getItem("Branch");
   data: [] | any;
   tripData: any;
   tabledata: any;
@@ -51,39 +53,64 @@ export class UpdateRunSheetComponent implements OnInit {
   formdata: any;
   arrivalData: any;
   dialogRef: any;
+  boxData: { count: number; title: string; class: string; }[];
   constructor(private Route: Router,
-    private http: HttpClient, private fb: UntypedFormBuilder) {
+    private http: HttpClient, private fb: UntypedFormBuilder,private cnoteService:CnoteService) {
 
-    // if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-    //   this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
-    // }
-    this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
-      let tableArray = this.data['tabledata'];
-      this.formdata = this.data['formdata'];
-      this.autoBindData();
-      const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      this.csv = newArray;
-      this.tableload = false;
-    });
+    if (this.Route.getCurrentNavigation()?.extras?.state != null) {
+      this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
+    }
+    
     this.IntializeFormControl()
+    this.autoBindData();
   }
   autoBindData() {
-    const formControlsMap = {
-      Vehicle: 'vehicle',
-      Cluster: 'cluster',
-      Runsheet: 'runSheetID',
-      LoadingLocation: 'loadingLocation',
-      Startkm: 'startKm',
-      Departuretime: 'departureTime'
-    };
-  
-    Object.keys(formControlsMap).forEach(controlName => {
-      const formControl = this.updateSheetTableForm.controls[controlName];
-      const formdataKey = formControlsMap[controlName];
-      const value = this.formdata[0][formdataKey];
-      formControl.setValue(value);
+    let runSheetDetails=this.cnoteService.getRunSheetData();
+    let runSheetNestedDetails=[runSheetDetails.runSheetDetails];
+    let autoFillUpdateRunSheet=runSheetNestedDetails.find((x)=>x.Cluster===this.tripData.columnData.Cluster)
+    this.updateSheetTableForm.controls['Vehicle'].setValue(autoFillUpdateRunSheet?.Vehicle||'')
+    this.updateSheetTableForm.controls['Cluster'].setValue(autoFillUpdateRunSheet?.Cluster||'')
+    this.updateSheetTableForm.controls['Runsheet'].setValue(autoFillUpdateRunSheet?.RunSheetID||'')
+    this.updateSheetTableForm.controls['LoadingLocation'].setValue(this.branch||'')
+    this.updateSheetTableForm.controls['Startkm'].setValue(0)
+    this.updateSheetTableForm.controls['Departuretime'].setValue('')
+    this.getShipingData(runSheetDetails)
+   }
+  getShipingData(runSheetDetails){
+    let runSheetShipingDetails=runSheetDetails.shippingData.filter((x)=>x.Cluster===this.tripData.columnData.Cluster);
+    let runSheetList:any[]=[];
+    runSheetShipingDetails.forEach(element => {
+      let runSheetJson={
+        shipment: element?.Document||'',
+        packages:element?.Packages||'',
+        loaded:element?.Packages||'',
+        pending: 0,
+      }
+      runSheetList.push(runSheetJson)
     });
+    this.csv=runSheetList;
+    
+      // Create shipData objects for displaying summary information
+      const createShipDataObject = (count: number, title: string, className: string) => ({
+        count,
+        title,
+        class: `info-box7 ${className} order-info-box7`,
+      });
+  
+      const totalPackages = runSheetShipingDetails.reduce(
+        (total: number, shipment: any) => total + shipment.Packages,
+        0
+      );
+      // Prepare the shipData array with summary information
+      const shipData = [
+        createShipDataObject(this.csv.length, "Shipments", "bg-danger"),
+        createShipDataObject(totalPackages, "Packages", "bg-info"),
+        createShipDataObject(this.csv.length, "Shipments Loaded", "bg-warning"),
+        createShipDataObject(totalPackages, "Packages Loaded", "bg-primary"),
+      ];
+  
+      // Store the shipData in boxData property
+      this.boxData = shipData;
   }
   ngOnInit(): void {
   }
@@ -114,6 +141,20 @@ export class UpdateRunSheetComponent implements OnInit {
     this.dialogRef.close(this.updateSheetTableForm.value)
   }
   DepartDelivery(){
-    this.Route.navigateByUrl('/dashboard/GlobeDashboardPage');
+    let updateStatus={
+        RunSheet:this.tripData.columnData?.RunSheet||'',
+        Cluster: this.tripData.columnData?.RunSheet||'',
+        Shipments:this.tripData.columnData?.Shipments||'',
+        Packages: this.tripData.columnData?.Packages||'',
+        WeightKg: this.tripData.columnData?.WeightKg||'',
+        VolumeCFT:this.tripData.columnData?.VolumeCFT||'',
+        Status: "OUT FOR DELIVERY",
+        Action:"Update Delivery"
+    }
+    this.cnoteService.setdepartRunSheetData(updateStatus)
+    this.goBack(3);
+  }
+  goBack(tabIndex: number): void {
+    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 }

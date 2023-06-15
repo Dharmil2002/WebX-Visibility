@@ -5,7 +5,7 @@
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
     </app-form-without-auto-complete-webxpress>
 </form>
-<app-generic-card-webxpress [boxData]="this.data?.CountData"></app-generic-card-webxpress>
+<app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
 <div class="row" *ngIf="!tableload">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content">

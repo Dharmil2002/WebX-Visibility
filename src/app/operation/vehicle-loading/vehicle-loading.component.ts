@@ -86,16 +86,14 @@ export class VehicleLoadingComponent implements OnInit {
    this.vehicleLoadingTableForm.controls['Route'].setValue(this.tripData?.RouteandSchedule||'')
    this.vehicleLoadingTableForm.controls['TripID'].setValue(this.tripData?.TripID||'')
    this.vehicleLoadingTableForm.controls['LoadingLocation'].setValue(this.tripData?.location||'')
-   this.vehicleLoadingTableForm.controls['LoadingLocation'].setValue(this.tripData?.location||'')
   this.getLoadingSheetData();
   }
   getLoadingSheetData() {
-
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
       let loadingcsv = tableArray.filter((item)=>item.routes==this.tripData.RouteandSchedule && item.Leg==this.tripData.Leg);
-     let Packages=0;
+      let Packages=0;
       loadingcsv.forEach(element => {
         Packages=element.Packages+Packages
         
@@ -137,5 +135,8 @@ export class VehicleLoadingComponent implements OnInit {
       // we have to handle , if function not exists.
       console.log("failed");
     }
+  }
+  goBack(tabIndex: number): void {
+    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 }

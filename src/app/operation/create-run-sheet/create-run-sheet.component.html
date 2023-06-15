@@ -6,7 +6,7 @@
     </form>
     <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
         [csvHeaders]="headerForCsv" [toggleArray]="toggleArray" [menuItems]="menuItems" [menuItemFlag]="menuItemflag"
-        [Link]="linkArray" [dynamicControls]="dynamicControls">
+        [Link]="linkArray" [dynamicControls]="dynamicControls"(onFlagChange)="IsActiveFuntion($event)">
     </generic-table-webxpress>
     <div class="row" *ngIf="!tableload">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">

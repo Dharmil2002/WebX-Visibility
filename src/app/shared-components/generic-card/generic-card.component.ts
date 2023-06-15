@@ -5,7 +5,7 @@ import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
   templateUrl: './generic-card.component.html'
 })
 export class GenericCardComponent implements OnInit {
-  @Input() boxData: any[];
+  @Input() boxData: any;
   ngOnChanges(changes: SimpleChanges) {
     this.boxData=changes.boxData.currentValue
 

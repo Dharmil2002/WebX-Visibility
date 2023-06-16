@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { MarkArrivalComponent } from '../../ActionPages/mark-arrival/mark-arrival.component';
 import { UpdateLoadingSheetComponent } from 'src/app/operation/update-loading-sheet/update-loading-sheet.component';
-import{CnoteService}from 'src/app/core/service/Masters/CnoteService/cnote.service';
+import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -12,7 +12,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   jsonUrl = '../../../assets/data/arrival-dashboard-data.json';
   viewComponent: any;
   advancdeDetails: any;
-  arrivalChanged:any;
+  arrivalChanged: any;
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   csv: any[];
@@ -29,9 +29,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       active: "Arrival Details"
     }
   ]
-  height='100vw';
-  width='100vw';
-  maxWidth:'232vw'
+  height = '100vw';
+  width = '100vw';
+  maxWidth: '232vw'
   dynamicControls = {
     add: false,
     edit: true,
@@ -41,9 +41,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   /*Below is Link Array it will Used When We Want a DrillDown
  Table it's Jst for set A Hyper Link on same You jst add row Name Which You
  want hyper link and add Path which you want to redirect*/
- linkArray = [
-  { Row: 'Action',Path:'',componentDetails: MarkArrivalComponent }
-]
+  linkArray = [
+    { Row: 'Action', Path: '', componentDetails: MarkArrivalComponent }
+  ]
   //Warning--It`s Used is not compasary if you does't add any link you just pass blank array
   /*End*/
   toggleArray = [
@@ -61,7 +61,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     "TripID": "Trip ID",
     "Location": "Location",
     "Scheduled": "STA",
-    "ETAATA": "ETA/ ATA",
+    "Expected": "ETA",
     "Status": "Status",
     "Hrs": "Hrs.",
     "Action": "Action"
@@ -92,7 +92,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   boxData: { count: any; title: any; class: string; }[];
   departureDetails: any;
   // declararing properties
-  constructor(private http: HttpClient,private CnoteService:CnoteService) {
+  constructor(private http: HttpClient, private CnoteService: CnoteService) {
 
     super();
     this.csvFileName = "exampleUserData.csv";
@@ -111,47 +111,95 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     }
   }
   getArrivalDetails() {
+
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data;
-      const newArray = tableArray.arrivalData.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      this.csv = newArray.filter((x)=>x.module=="Arrival");
-      let packages=0;
-      this.data.shippingData.forEach((element,index) => {
-        packages=element.Packages+packages
+      // Get today's date
+      const today = new Date();
+      const todayFormatted = formatDate(today);
+
+      // Iterate over each object in the array
+      const updatedArray = tableArray.arrivalData.map((item) => {
+        // Convert item.Hrs to a valid number
+        const hrs = parseFloat(item.Hrs);
+
+        // Check if hrs is a valid number
+        const expectedDate = !isNaN(hrs)
+          ? new Date(today.getTime() + hrs * 60 * 60 * 1000)
+          : null;
+
+        const expectedFormatted = expectedDate ? formatDateTime(expectedDate) : null;
+
+        // Update the "Scheduled" and "Expected" values with today's date and calculated expected time
+        return {
+          ...item,
+          Scheduled: todayFormatted + " " + getTimeComponent(item.Scheduled),
+          Expected: expectedFormatted,
+        };
       });
-    
+
+      // Function to format date as "dd-mm-yy"
+      function formatDate(date) {
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = String(date.getFullYear()).slice(-2);
+        return `${day}-${month}-${year}`;
+      }
+
+      // Function to format date and time as "dd-mm-yy hh:mm"
+      function formatDateTime(date) {
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = String(date.getFullYear()).slice(-2);
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+      }
+
+      // Function to extract the time component from a string in the format "dd-mm-yy hh:mm"
+      function getTimeComponent(dateTimeString) {
+        const timeString = dateTimeString.split(" ")[1];
+        return timeString;
+      }
+
+      this.csv = updatedArray.filter((x) => x.module == "Arrival");
+      let packages = 0;
+      this.data.shippingData.forEach((element, index) => {
+        packages = element.Packages + packages
+      });
+
       const createShipDataObject = (count, title, className) => ({
         count,
         title,
         class: `info-box7 ${className} order-info-box7`
       });
-      
+
       const shipData = [
         createShipDataObject(this.csv.length, "Vehicles", "bg-danger"),
         createShipDataObject(this.csv.length, "Routes", "bg-info"),
         createShipDataObject(this.data.shippingData.length, "Shipments", "bg-warning"),
         createShipDataObject(packages, "Packages", "bg-warning")
       ];
-      
+
       this.boxData = shipData;
-      
+
       this.tableload = false;
 
     });
 
   }
-  updateDepartureData(event){
- const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
- const action = result?.Action ?? '';
-    if(action){
-      this.csv=event;
+  updateDepartureData(event) {
+    const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
+    const action = result?.Action ?? '';
+    if (action) {
+      this.csv = event;
     }
-   else{
-       this.CnoteService.setDeparture(event)
-    this.csv=this.csv.filter((x)=>x.TripID!=event.tripID);
+    else {
+      this.CnoteService.setDeparture(event)
+      this.csv = this.csv.filter((x) => x.TripID != event.tripID);
 
-   }
+    }
   }
   handleMenuItemClick(label: string, element) {
     let Data = { label: label, data: element }

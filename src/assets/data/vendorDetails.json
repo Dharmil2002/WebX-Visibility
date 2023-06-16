@@ -2,16 +2,16 @@
     "data":[
         {
           "vehicleNo": "MH02CB5544",
-          "VendorType": "atteched",
-          "Driver": "paresh",
+          "VendorType": "Attached",
+          "Driver": "Paresh",
           "LicenseNo": "AHK906AJ",
-          "Vendor": "ashika test:asika",
+          "Vendor": "BLR/OSP/0034:SRI SAIBHOLA TRANSPORT",
           "DriverMobile": 917950520174,
           "Expirydate": "13-07-2023"
         },
         {
           "vehicleNo": "HR0UY6646",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "suresh",
           "LicenseNo": "BVD579UH",
           "Vendor": "BLR/OSP/0037:SRI SAIRAM TRANSPORT",
@@ -20,61 +20,61 @@
         },
         {
           "vehicleNo": "KA05RE5564",
-          "VendorType": "no atteched",
-          "Driver": "suresh",
+          "VendorType": "NotAttached",
+          "Driver": "Suresh",
           "LicenseNo": "RWG439XC",
-          "Vendor": "V000002:VIREN VED - 02",
+          "Vendor": "BLR/OSP/0034:SRI RAGHUVANSHI TRANSPORT",
           "DriverMobile": 914665032561,
           "Expirydate": "15-07-2023"
         },
         {
           "vehicleNo": "HR0UY6646",
-          "VendorType": "no atteched",
-          "Driver": "shivesh",
+          "VendorType": "NotAttached",
+          "Driver": "Shivesh",
           "LicenseNo": "ISY740YK",
-          "Vendor": "V000005:JAIMIN ",
+          "Vendor": "BLR/OSP/0031:SRI MARUTI TRANSPORT",
           "DriverMobile": 911930472341,
           "Expirydate": "16-07-2023"
         },
         {
           "vehicleNo": "KA05RE5564",
-          "VendorType": "no atteched",
+          "VendorType": "NotAttached",
           "Driver": "suresh",
           "LicenseNo": "CKG460CU",
-          "Vendor": "V000006:RAKESH",
+          "Vendor": "BLR/OSP/0028:SRI MAHALAXMI TRANSPORT",
           "DriverMobile": 913381694336,
           "Expirydate": "17-07-2023"
         },
         {
           "vehicleNo": "KA05RE5565",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "suresh",
           "LicenseNo": "DDP108BQ",
-          "Vendor": "V00001:AADARSH ROADWAYS",
+          "Vendor": "BLR/OSP/0031:SRI VISHNU TRANSPORT",
           "DriverMobile": 917322235361,
           "Expirydate": "18-07-2023"
         },
         {
           "vehicleNo": "KA05RE5566",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "mahesh",
           "LicenseNo": "ZDG940LX",
-          "Vendor": "V000012:KISHORE KENE - MONDELEZ BHIWANDI",
+          "Vendor": "BLR/OSP/0021:RITCO TRANSPORT",
           "DriverMobile": 911817650490,
           "Expirydate": "19-07-2023"
         },
         {
           "vehicleNo": "KA05RE5567",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "mahesh",
           "LicenseNo": "UEO597JI",
-          "Vendor": "V000015:DUSHANT ENTERPRISES -APL",
+          "Vendor": "BLR/OSP/0031:VISHWAKARMA TRANSPORT",
           "DriverMobile": 918588667052,
           "Expirydate": "20-07-2023"
         },
         {
           "vehicleNo": "KA05RE5568",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "suresh",
           "LicenseNo": "DKD269YY",
           "Vendor": "V00002:DTDC",
@@ -83,7 +83,7 @@
         },
         {
           "vehicleNo": "MH02CB5544",
-          "VendorType": "no atteched",
+          "VendorType": "NotAttached",
           "Driver": "ramesh",
           "LicenseNo": "WNT146MI",
           "Vendor": "V000021:AHUJA TRANSPORT",
@@ -92,7 +92,7 @@
         },
         {
           "vehicleNo": "MH02CB5545",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "suresh",
           "LicenseNo": "UIG127TT",
           "Vendor": "V000022:FLYING CARGO MOVERS",
@@ -101,7 +101,7 @@
         },
         {
           "vehicleNo": "HR0UY6646",
-          "VendorType": "no atteched",
+          "VendorType": "NotAttached",
           "Driver": "ramesh",
           "LicenseNo": "YPA582YP",
           "Vendor": "V000023:AKA SUPPLAY CHAIN-MCLAY",
@@ -110,7 +110,7 @@
         },
         {
           "vehicleNo": "KA05RE5564",
-          "VendorType": "no atteched",
+          "VendorType": "NotAttached",
           "Driver": "suresh",
           "LicenseNo": "BEE469PZ",
           "Vendor": "V000025:RAKESH TRANSPORT",
@@ -119,7 +119,7 @@
         },
         {
           "vehicleNo": "KA05RE5565",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "mahesh",
           "LicenseNo": "YBK962OO",
           "Vendor": "V000026:HITESH CARGO MOVERS",
@@ -128,7 +128,7 @@
         },
         {
           "vehicleNo": "KA05RE5566",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "suresh",
           "LicenseNo": "GTZ299NI",
           "Vendor": "V000028:MAHESH TRANSPORT",
@@ -137,7 +137,7 @@
         },
         {
           "vehicleNo": "KA05RE5567",
-          "VendorType": "no atteched",
+          "VendorType": "NotAttached",
           "Driver": "suresh",
           "LicenseNo": "VAD306LG",
           "Vendor": "V000029:NAYAN CARGO MOVERS",
@@ -146,7 +146,7 @@
         },
         {
           "vehicleNo": "KA05RE5568",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "paresh",
           "LicenseNo": "YNA504XR",
           "Vendor": "V00003:FAST X",
@@ -155,7 +155,7 @@
         },
         {
           "vehicleNo": "KA05RE5569",
-          "VendorType": "no atteched",
+          "VendorType": "NotAttached",
           "Driver": "shivesh",
           "LicenseNo": "ARB398LI",
           "Vendor": "V000035:Viren VED - 01",
@@ -164,7 +164,7 @@
         },
         {
           "vehicleNo": "KA05RE5570",
-          "VendorType": "atteched",
+          "VendorType": "Attached",
           "Driver": "paresh",
           "LicenseNo": "IXI520HY",
           "Vendor": "V00004:HYDRABAD VENDOR",

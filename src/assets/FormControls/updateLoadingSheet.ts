@@ -61,6 +61,16 @@ export class UpdateloadingControl {
                 generatecontrol: true,
                 disable: false
             },
+            {
+                name: 'Scan',
+                label: 'Scan',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [],
+                generatecontrol: true,
+                disable: false
+            },
         ];
         this.ScanControlArray = [
             {

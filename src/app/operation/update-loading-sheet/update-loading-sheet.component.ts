@@ -21,8 +21,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   data: [] | any;
   tripData: any;
   tabledata: any;
-  loadingSheetTableForm: UntypedFormGroup
-  ScanTableForm: UntypedFormGroup
+  loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
   columnHeader = {
@@ -65,7 +64,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   formdata: any;
   arrivalData: any;
   boxData: { count: any; title: any; class: string; }[];
-  shipmentdet: any;
+  updateListData: any;
+  Scan: any;
 
   constructor(private Route: Router, private dialog: MatDialog, public dialogRef: MatDialogRef<MarkArrivalComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
@@ -84,37 +84,52 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
-      if (this.shipmentStatus === 'Loaded') {
-        this.csv = tableArray.filter((item) => item.routes == this.arrivalData?.RouteandSchedule && item.Leg == this.arrivalData.Leg);
+      if(this.shipmentStatus === 'Loaded'){
+      this.csv = tableArray.filter((item) => item.routes.trim() == this.arrivalData?.RouteandSchedule.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
       }
-      else {
-        this.csv = tableArray.filter((item) => item.routes == this.arrivalData?.Route && item.Leg == this.arrivalData.Leg);
+      else{
+        this.csv = tableArray.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
       }
-      let packages = 0;
-      let shipingUnloaded = 0;
-      this.csv.forEach((element, index) => {
-        packages = element.Packages + packages
-        shipingUnloaded = element.Unloaded + shipingUnloaded;
-      });
-
-      const createShipDataObject = (count, title, className) => ({
-        count,
-        title,
-        class: `info-box7 ${className} order-info-box7`
-      });
-
-      const shipData = [
-        createShipDataObject(this.csv.length, "Shipments", "bg-danger"),
-        createShipDataObject(packages, "Packages", "bg-warning"),
-        createShipDataObject(this.csv.length, "Shipments" + ' ' + this.shipmentStatus, "bg-info"),
-        createShipDataObject(this.csv.length, "Packages" + ' ' + this.shipmentStatus, "bg-warning"),
-      ];
-
-      this.boxData = shipData;
+     
+    this.kpiData("")
 
       this.tableload = false;
 
     });
+  }
+  updatePackage(){
+   let Unload=  this.data.packagesData.find((x)=>x.PackageId.trim()===this.loadingSheetTableForm.value.Scan.trim() && x.Leg.trim()== this.arrivalData.Leg.trim())
+    if(Unload){
+      this.csv.forEach(element => {
+        if(element.Shipment===Unload.Shipment){
+          element.Packages=element.Packages-1,
+          element.Unloaded = element?.Unloaded||0+1
+        }
+      });
+      this.csv=this.csv
+    }
+  }
+  kpiData(event) {
+    let packages = 0;
+    let shipingUnloaded = 0;
+    this.csv.forEach((element, index) => {
+      packages = element.Packages + packages
+      shipingUnloaded = element.Unloaded + shipingUnloaded;
+    });
+    const createShipDataObject = (count, title, className) => ({
+      count,
+      title,
+      class: `info-box7 ${className} order-info-box7`
+    });
+
+    const shipData = [
+      createShipDataObject(this.csv.length, "Shipments", "bg-danger"),
+      createShipDataObject(packages, "Packages", "bg-warning"),
+      createShipDataObject(event?.shipment||0, "Shipments" + ' ' + this.shipmentStatus, "bg-info"),
+      createShipDataObject(event?.Package||0, "Packages" + ' ' + this.shipmentStatus, "bg-warning"),
+    ];
+
+    this.boxData = shipData;
   }
   autoBindData() {
     const vehicleControl = this.loadingSheetTableForm.get('vehicle');
@@ -140,8 +155,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
       })
     }
     this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
+    this.updateListData=this.jsonControlArray.filter((x)=>x.name!="Scan");
+    this.Scan=this.jsonControlArray.filter((x)=>x.name=="Scan");
+
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
-    this.ScanTableForm = formGroupBuilder(this.fb, [this.jsonscanControlArray])
     this.autoBindData();
   }
   IsActiveFuntion($event) {
@@ -192,23 +209,23 @@ export class UpdateLoadingSheetComponent implements OnInit {
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
-  GetShipmentDet() {
-    this.http.get(this.packageUrl).subscribe(res => {
-      this.shipmentdet = res;
-      const matchingPackages = this.shipmentdet.filter((item: any) => {
-        debugger
-        return (
-          item.PackageId === this.ScanTableForm.value.Shipment &&
-          item.shipment === this.csv[0].shipment
-        );
-      });
-      debugger
-      if (matchingPackages.length > 0) {
-        console.log('Match found');
-      } else {
-        console.log('No match found');
-      }
-    });
-  }
+  // GetShipmentDet() {
+  //   this.http.get(this.packageUrl).subscribe(res => {
+  //     this.shipmentdet = res;
+  //     const matchingPackages = this.shipmentdet.filter((item: any) => {
+  //       
+  //       return (
+  //         item.PackageId === this.ScanTableForm.value.Shipment &&
+  //         item.shipment === this.csv[0].shipment
+  //       );
+  //     });
+  //     
+  //     if (matchingPackages.length > 0) {
+  //       console.log('Match found');
+  //     } else {
+  //       console.log('No match found');
+  //     }
+  //   });
+  // }
 
 }

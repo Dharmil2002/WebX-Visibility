@@ -1,8 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import Swal from 'sweetalert2';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CreateLoadingSheetComponent } from '../create-loading-sheet/create-loading-sheet.component';
 import { Router } from '@angular/router';
+import { GenericTableComponent } from '../../shared-components/Generic Table/generic-table.component';
+import { debug } from 'console';
 
 @Component({
   selector: 'app-loading-sheet-view',
@@ -15,7 +18,7 @@ export class LoadingSheetViewComponent implements OnInit {
   csv: any[];
   addAndEditPath: string
   drillDownPath: string
-  extraData:any
+  extraData: any
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
   companyCode: number;
@@ -34,34 +37,29 @@ export class LoadingSheetViewComponent implements OnInit {
       active: "Update Shipments"
     }
   ]
-  toggleArray=[]
+  toggleArray = []
   IscheckBoxRequired: boolean;
   menuItemflag: boolean = true;
 
   menuItems = [
-    { label: 'Create Trip', componentDetails: CreateLoadingSheetComponent, function: "GeneralMultipleView" },
-    { label: 'Update Trip', componentDetails: CreateLoadingSheetComponent, function: "GeneralMultipleView" },
-    // Add more menu items as needed
   ];
   columnHeader = {
     "checkBoxRequired": "",
     "Shipment": "Shipment",
-    "Customer": "Customer",
     "Origin": "Origin",
     "Destination": "Destination",
-    "Packages": "Expected",
-    "WeightKg": "Weight",
-    "VolumeCFT": "Volume",
+    "Packages": "Packages",
+    "KgWeight": "Weight",
+    "CftVolume": "Volume",
   }
- //#region declaring Csv File's Header as key and value Pair
+  //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "Shipment": "Shipment",
-    "Customer": "Customer",
     "Origin": "Origin",
     "Destination": "Destination",
-    "Packages": "Expected",
-    "WeightKg": "Weight",
-    "VolumeCFT": "Volume"
+    "Packages": "Packages",
+    "KgWeight": "Weight",
+    "CftVolume": "Volume",
   }
 
   METADATA = {
@@ -74,12 +72,12 @@ export class LoadingSheetViewComponent implements OnInit {
   //#endregion
 
 
-  constructor(private http: HttpClient,private Route: Router) {
-    if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.loadinSheet = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
-      this.extraData=this.Route.getCurrentNavigation()?.extras?.state.data.extraData;
-      
-      this.IscheckBoxRequired=true;
+  constructor(private http: HttpClient, private Route: Router, public dialogRef: MatDialogRef<GenericTableComponent>, @Inject(MAT_DIALOG_DATA) public item: any) {
+    if (item) {
+      this.loadinSheet = item;
+      //this.extraData=this.Route.getCurrentNavigation()?.extras?.state.data.extraData;
+
+      this.IscheckBoxRequired = true;
     }
     this.getLoadingSheetDetails()
   }
@@ -98,17 +96,35 @@ export class LoadingSheetViewComponent implements OnInit {
   IsActiveFuntion(data) {
     this.dataDetails = data;
   }
-  updateShipping(){
-    this.createLoadingSheetData()
+  updateShipping() {
+    let jsonShipping = {
+      shipping: this.dataDetails ? this.dataDetails : this.csv.filter((x) => x.isSelected == true)
+    }
+    this.dialogRef.close(jsonShipping)
   }
   getLoadingSheetDetails() {
+
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
-      let tableArray = this.data.shippingData.filter((x)=>x.Leg==this.loadinSheet.lag);
-     let Shipment=[]
-      this.extraData.forEach(element => {
-        Shipment.push(element.Shipment)
+      let tableArray = this.data.shippingData.filter((x) => x.Leg == this.loadinSheet.lag);
+      let packagesData = this.data.packagesData.filter((x) =>
+        tableArray.some((shipment) => shipment.Shipment === x.Shipment));
+      let mergedData: any[] = [];
+
+      // Perform inner join based on Shipment key
+      mergedData = tableArray.filter((shippingItem) =>
+        packagesData.some((packageItem) => packageItem.Shipment === shippingItem.Shipment)
+      ).map((shippingItem) => {
+        const matchingPackage = packagesData.find((packageItem) => packageItem.Shipment === shippingItem.Shipment);
+        return { ...shippingItem, ...matchingPackage };
       });
+
+      // The mergedData array now contains the merged result based on the Shipment key
+
+      let Shipment: any[] = []
+      // this.extraData.forEach(element => {
+      //   Shipment.push(element.Shipment)
+      // });
       if (Shipment) {
         tableArray.forEach((element) => {
           if (Shipment.includes(element.Shipment)) {
@@ -116,22 +132,22 @@ export class LoadingSheetViewComponent implements OnInit {
           }
         });
       }
-      
-      this.csv = tableArray;
+
+      this.csv = mergedData;
       // console.log(this.csv);
       this.tableload = false;
 
     });
   }
-createLoadingSheetData(){
-  this.Route.navigate(['Operation/CreateLoadingSheet'], {
-    state: {
-      shipping: this.dataDetails?this.dataDetails:this.csv.filter((x)=>x.isSelected==true),
-    },
-  });
-}
-    goBack(): void {
-      this.createLoadingSheetData()
-    }
+  createLoadingSheetData() {
+    this.Route.navigate(['Operation/CreateLoadingSheet'], {
+      state: {
+        shipping: this.dataDetails ? this.dataDetails : this.csv.filter((x) => x.isSelected == true),
+      },
+    });
+  }
+  goBack(): void {
+    this.dialogRef.close()
+  }
 
 }

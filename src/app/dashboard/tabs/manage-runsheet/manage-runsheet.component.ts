@@ -142,7 +142,6 @@ export class ManageRunsheetComponent extends UnsubscribeOnDestroyAdapter impleme
       let updatedData= this.cnoteService.getdepartRunSheetData()
       this.csv=[]
       if(updatedData){
-        debugger
         runSheetDetailsList.forEach(element => {
           if(element.Cluster==updatedData.Cluster){
             element.Status=updatedData.Status,

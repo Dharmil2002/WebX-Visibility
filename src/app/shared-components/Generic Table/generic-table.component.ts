@@ -221,24 +221,30 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   }
 
 
-  //#region Funtion to send data for edit
-  drillDownData(item, tableData) {
-    let drillDownLink = this.Link.find((x) => x.Row == tableData)
-    if(drillDownLink.Path){
-    this.router.navigate([drillDownLink.Path], {
-      state: {
-        data: {columnData:item,extraData:this.extraData}
-      },
-    });
-  }
-    else{
-      if(this.menuItems){
-        let navigateTopopUp=this.menuItems.find((x)=>x.label===item.Action)
-      this.GeneralMultipleView(item,navigateTopopUp.componentDetails)       
+    //#region Funtion to send data for edit
+    drillDownData(item, tableData) {
+      let drillDownLink = this.Link.find((x) => x.Row == tableData)
+      if(drillDownLink.Path){
+      this.router.navigate([drillDownLink.Path], {
+        state: {
+          data: {columnData:item,extraData:this.extraData}
+        },
+      });
+    }
+      else{
+        if(this.menuItems){
+          let navigateTopopUp=this.menuItems.find((x)=>x.label===item.Action)
+          if(navigateTopopUp){
+           this.GeneralMultipleView(item,navigateTopopUp.componentDetails)       
+          }
+          else{
+            let navigateTopopUp=this.menuItems.find((x)=>x.label===tableData)
+            this.GeneralMultipleView(item,navigateTopopUp.componentDetails)
+          }
+        }
       }
     }
-  }
-  //#endregion  
+    //#endregion
   // #region  to Convert to Csv File 
   // csvData is 2D array , where first list id of csv headers and later whole table data is pushed row wise.
   ExportToCsv() {

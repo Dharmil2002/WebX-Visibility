@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { LodingSheetGenerateSuccessComponent } from '../loding-sheet-generate-success/loding-sheet-generate-success.component';
+import { LoadingSheetViewComponent } from '../loading-sheet-view/loading-sheet-view.component';
 
 @Component({
   selector: 'app-create-loading-sheet',
@@ -31,9 +32,13 @@ export class CreateLoadingSheetComponent implements OnInit {
     edit: false,
     csv: true
   }
-  linkArray = [
-    { Row: 'Shipment', Path: 'Operation/LoadingSheetView' }
-  ]
+  height='100vw';
+  width='100vw';
+  maxWidth:'232vw'
+  menuItems = [
+    { label: 'Shipment', componentDetails: LoadingSheetViewComponent},
+    // Add more menu items as needed
+  ];
   //declaring breadscrum
   breadscrums = [
     {
@@ -42,7 +47,9 @@ export class CreateLoadingSheetComponent implements OnInit {
       active: "Loading-Sheet"
     }
   ]
-  menuItems = []
+  linkArray = [
+    { Row: 'Shipment', Path: '' }
+  ]
   toggleArray = []
   IscheckBoxRequired: boolean;
   menuItemflag: boolean = true;
@@ -207,16 +214,35 @@ export class CreateLoadingSheetComponent implements OnInit {
     })
   }
   getshipmentData() {
-    debugger;
     if (!this.isShipmentUpdate) {
       let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
       routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
     }
     this.http.get(this.jsonUrl).subscribe(res => {
-      let filterData = []
+      let filterData:any[]= []
+      let packagesData:any[]=[]
+      let combinedData:any[]=[]
       if (!this.isShipmentUpdate) {
         this.shipmentData = res;
-        filterData = this.shipmentData.shippingData.filter((x) => x.routes.trim() == this.tripData.RouteandSchedule.trim());
+        filterData = this.shipmentData.shippingData.filter(
+          (x) => x.routes.trim() === this.tripData.RouteandSchedule.trim()
+        );
+        
+        packagesData = this.shipmentData.packagesData.filter((x) =>
+          filterData.some((shipment) => shipment.Shipment === x.Shipment)
+        );
+        
+         combinedData = filterData.map((filterItem) => {
+          const packageItem = packagesData.find(
+            (packageItem) => packageItem.Shipment === filterItem.Shipment
+          );
+        
+          return {
+            ...filterItem,
+            ...packageItem
+          };
+        });
+        
         this.extraData = filterData;
 
       }
@@ -229,8 +255,8 @@ export class CreateLoadingSheetComponent implements OnInit {
       const groupedData = {};
 
       // Group shipments by route
-      filterData.forEach(shipment => {
-        const { Leg, Packages, WeightKg, VolumeCFT } = shipment;
+      combinedData.forEach(shipment => {
+        const { Leg, Packages, KgWeight, CftVolume } = shipment;
 
         if (!groupedData[Leg]) {
           // If the route doesn't exist in groupedData, initialize it
@@ -246,8 +272,8 @@ export class CreateLoadingSheetComponent implements OnInit {
         // Increment the count of shipments and update the packages and weight
         groupedData[Leg].Shipment++;
         groupedData[Leg].Packages += Packages;
-        groupedData[Leg].WeightKg += WeightKg;
-        groupedData[Leg].VolumeCFT += VolumeCFT;
+        groupedData[Leg].WeightKg += KgWeight;
+        groupedData[Leg].VolumeCFT += CftVolume;
       });
 
       // Convert the grouped data to an array

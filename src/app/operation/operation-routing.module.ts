@@ -10,6 +10,7 @@ import { UpdateLoadingSheetComponent } from "./update-loading-sheet/update-loadi
 import { CreateRunSheetComponent } from "./create-run-sheet/create-run-sheet.component";
 import { UpdateRunSheetComponent } from "./update-run-sheet/update-run-sheet.component";
 import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.component";
+import { ViewPrintComponent } from "./view-print/view-print.component";
 
 const routes: Routes = [
   {
@@ -47,9 +48,14 @@ const routes: Routes = [
   {
     path: "UpdateRunSheet",
     component: UpdateRunSheetComponent,
-  },{
+  },
+  {
     path:"VehicleLoading",
     component:VehicleLoadingComponent
+  },
+  {
+    path:"ViewPrint",
+    component:ViewPrintComponent
   }
 ]
 

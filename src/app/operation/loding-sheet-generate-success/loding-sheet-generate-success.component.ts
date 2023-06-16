@@ -38,6 +38,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     "Packages": "Packages",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
+    "Action":"Print"
   }
   headerForCsv = {
     "LoadingSheet": "Loading Sheet",
@@ -47,8 +48,22 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
   }
+  // linkArray = [
+
+  // ]
   linkArray = [
+
+    { Row: 'Action', Path: 'Operation/ViewPrint' }
+
   ]
+
+  // menuItems = [
+
+  //   { label: 'Print' },
+
+  //   // Add more menu items as needed
+
+  // ];
   METADATA = {
     checkBoxRequired: false,
     // selectAllorRenderedData : false,
@@ -58,6 +73,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     const randomNumber = "Ls/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
     this.data.forEach(obj => {
       obj.LoadingSheet = randomNumber;
+      obj.Action= "Print";
     });
     this.csv=this.data;
   }

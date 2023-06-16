@@ -23,6 +23,7 @@ import { UpdateLoadingSheetComponent } from "./update-loading-sheet/update-loadi
 import { CreateRunSheetComponent } from './create-run-sheet/create-run-sheet.component';
 import { UpdateRunSheetComponent } from './update-run-sheet/update-run-sheet.component';
 import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.component";
+import { ViewPrintComponent } from './view-print/view-print.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -33,7 +34,8 @@ import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.compo
     ManifestGeneratedComponent,
     DepartVehicleComponent,
     LodingSheetGenerateSuccessComponent,
-    CreateLoadingSheetComponent
+    CreateLoadingSheetComponent,
+    ViewPrintComponent
   ],
   imports: [
     CommonModule,

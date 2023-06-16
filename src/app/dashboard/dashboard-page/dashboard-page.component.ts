@@ -28,7 +28,7 @@ export class DashboardPageComponent implements OnInit {
    
   }
   ngAfterContentChecked(): void {
-    this.changeDetectorRef.detectChanges();
+    this.changeDetectorRef?.detectChanges();
   }
   GetSelectedIndex(Index: number) {
     if(Index==2){

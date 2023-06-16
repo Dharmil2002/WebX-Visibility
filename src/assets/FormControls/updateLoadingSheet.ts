@@ -2,6 +2,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class UpdateloadingControl {
     private updateloadingSheetControlArray: FormControls[];
+    private ScanControlArray: FormControls[];
     constructor() {
         this.updateloadingSheetControlArray = [
             {
@@ -61,9 +62,26 @@ export class UpdateloadingControl {
                 disable: false
             },
         ];
+        this.ScanControlArray = [
+            {
+                name: 'Shipment',
+                label: 'Package ID',
+                placeholder: 'Enter Package ID to scan',
+                type: 'text',
+                value: '',
+                Validations: [],
+                functions: {
+                    onChange: 'GetShipmentDet',
+                },
+                generatecontrol: true,
+                disable: false
+            }]
     }
     getupdatelsFormControls() {
         return this.updateloadingSheetControlArray;
     }
+    getScanFormControls() {
+        return this.ScanControlArray;
 
+    }
 }

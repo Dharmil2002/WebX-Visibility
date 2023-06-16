@@ -15,13 +15,16 @@ import { ManifestGeneratedComponent } from '../manifest-generated/manifest-gener
 })
 export class UpdateLoadingSheetComponent implements OnInit {
   jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
+  packageUrl = '../../../assets/data/package-data.json'
   tableload = false;
   csv: any[];
   data: [] | any;
   tripData: any;
   tabledata: any;
   loadingSheetTableForm: UntypedFormGroup
+  ScanTableForm: UntypedFormGroup
   jsonControlArray: any;
+  jsonscanControlArray: any;
   columnHeader = {
     "Shipment": "Shipment",
     "Origin": "Origin",
@@ -62,10 +65,11 @@ export class UpdateLoadingSheetComponent implements OnInit {
   formdata: any;
   arrivalData: any;
   boxData: { count: any; title: any; class: string; }[];
+  shipmentdet: any;
 
-  constructor(private Route: Router,private dialog: MatDialog,public dialogRef: MatDialogRef<MarkArrivalComponent>,
+  constructor(private Route: Router, private dialog: MatDialog, public dialogRef: MatDialogRef<MarkArrivalComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
-    private http: HttpClient, private fb: UntypedFormBuilder,private cnoteService:CnoteService) {
+    private http: HttpClient, private fb: UntypedFormBuilder, private cnoteService: CnoteService) {
     if (item.LoadingSheet) {
       this.arrivalData = this.cnoteService.getVehicleLoadingData();
       this.shipmentStatus = 'Loaded'
@@ -80,10 +84,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
-      if(this.shipmentStatus === 'Loaded'){
-      this.csv = tableArray.filter((item) => item.routes == this.arrivalData?.RouteandSchedule && item.Leg == this.arrivalData.Leg);
+      if (this.shipmentStatus === 'Loaded') {
+        this.csv = tableArray.filter((item) => item.routes == this.arrivalData?.RouteandSchedule && item.Leg == this.arrivalData.Leg);
       }
-      else{
+      else {
         this.csv = tableArray.filter((item) => item.routes == this.arrivalData?.Route && item.Leg == this.arrivalData.Leg);
       }
       let packages = 0;
@@ -116,10 +120,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const vehicleControl = this.loadingSheetTableForm.get('vehicle');
     vehicleControl?.patchValue(this.arrivalData?.VehicleNo || '');
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.arrivalData?.VehicleNo || '')
-    this.loadingSheetTableForm.controls['Route'].setValue(this.arrivalData?.Route || this.arrivalData?.RouteandSchedule||'')
+    this.loadingSheetTableForm.controls['Route'].setValue(this.arrivalData?.Route || this.arrivalData?.RouteandSchedule || '')
     this.loadingSheetTableForm.controls['tripID'].setValue(this.arrivalData?.TripID || '')
-    this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.arrivalData?.ArrivalLocation || this.arrivalData?.location||'')
-    this.loadingSheetTableForm.controls['Unoadingsheet'].setValue(this.arrivalData?.Unoadingsheet ||this.arrivalData?.loadingSheetNo || '')
+    this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.arrivalData?.ArrivalLocation || this.arrivalData?.location || '')
+    this.loadingSheetTableForm.controls['Unoadingsheet'].setValue(this.arrivalData?.Unoadingsheet || this.arrivalData?.loadingSheetNo || '')
     this.loadingSheetTableForm.controls['Leg'].setValue(this.arrivalData?.Leg || '')
   }
   ngOnInit(): void {
@@ -135,7 +139,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
         return x
       })
     }
+    this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
+    this.ScanTableForm = formGroupBuilder(this.fb, [this.jsonscanControlArray])
     this.autoBindData();
   }
   IsActiveFuntion($event) {
@@ -156,27 +162,27 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
   }
   CompleteScan() {
-    if(this.shipmentStatus == 'Loaded'){
+    if (this.shipmentStatus == 'Loaded') {
       const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
         width: '100%', // Set the desired width
-        data: {arrivalData:this.arrivalData,loadingSheetData:this.csv} // Pass the data object
+        data: { arrivalData: this.arrivalData, loadingSheetData: this.csv } // Pass the data object
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        let arravalDataDetails= [this.arrivalData];
-         arravalDataDetails.forEach(x=>{
-          x.Action="DEPART VEHICLE"
-          x.menifestNo=result[0].MFNumber
+        let arravalDataDetails = [this.arrivalData];
+        arravalDataDetails.forEach(x => {
+          x.Action = "DEPART VEHICLE"
+          x.menifestNo = result[0].MFNumber
         })
         // this.cnoteService.setLsData(arravalDataDetails);
-         this.goBack(2);
-         this.dialogRef.close(arravalDataDetails)
+        this.goBack(2);
+        this.dialogRef.close(arravalDataDetails)
         // Handle the result after the dialog is closed
       });
     }
-    else{
-    this.dialogRef.close(this.loadingSheetTableForm.value)
-  }
+    else {
+      this.dialogRef.close(this.loadingSheetTableForm.value)
+    }
 
 
   }
@@ -186,4 +192,23 @@ export class UpdateLoadingSheetComponent implements OnInit {
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
+  GetShipmentDet() {
+    this.http.get(this.packageUrl).subscribe(res => {
+      this.shipmentdet = res;
+      const matchingPackages = this.shipmentdet.filter((item: any) => {
+        debugger
+        return (
+          item.PackageId === this.ScanTableForm.value.Shipment &&
+          item.shipment === this.csv[0].shipment
+        );
+      });
+      debugger
+      if (matchingPackages.length > 0) {
+        console.log('Match found');
+      } else {
+        console.log('No match found');
+      }
+    });
+  }
+
 }

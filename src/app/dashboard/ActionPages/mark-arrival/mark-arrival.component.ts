@@ -7,7 +7,8 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { utilityService } from 'src/app/Utility/utility.service';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
 import { MarkArrivalControl } from 'src/assets/FormControls/MarkArrival';
-import{CnoteService} from 'src/app/core/service/Masters/CnoteService/cnote.service'
+import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service'
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -18,10 +19,10 @@ export class MarkArrivalComponent implements OnInit {
   jsonUrl = '../../../assets/data/arrival-dashboard-data.json';
   MarkArrivalTableForm: UntypedFormGroup;
   MarkArrivalTable: any;
-  arrivalData:any;
+  arrivalData: any;
   departature: any;
-  constructor(public dialogRef: MatDialogRef<GenericTableComponent>,public dialog: MatDialog,private service: utilityService,
-    private http: HttpClient,@Inject(MAT_DIALOG_DATA) public item: any, private fb: UntypedFormBuilder,private Route:Router,private CnoteService:CnoteService) {
+  constructor(public dialogRef: MatDialogRef<GenericTableComponent>, public dialog: MatDialog, private service: utilityService,
+    private http: HttpClient, @Inject(MAT_DIALOG_DATA) public item: any, private fb: UntypedFormBuilder, private Route: Router, private CnoteService: CnoteService) {
     this.MarkArrivalTable = item;
   }
   jsonControlArray: any;
@@ -30,7 +31,7 @@ export class MarkArrivalComponent implements OnInit {
     this.jsonControlArray = MarkArrivalFormControls.getMarkArrivalsertFormControls();
     this.MarkArrivalTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
   }
-  
+
   ngOnInit(): void {
     this.IntializeFormControl()
     this.MarkArrivalTableForm.controls.Vehicle.setValue(this.MarkArrivalTable.VehicleNo)
@@ -55,34 +56,36 @@ export class MarkArrivalComponent implements OnInit {
       console.log("failed");
     }
   }
-  getPreviousData(arrivealDetail){
+  getPreviousData(arrivealDetail) {
     this.http.get(this.jsonUrl).subscribe(data => {
       // Find the specific record you want to update
-      this.arrivalData=data;
-    
+      this.arrivalData = data;
       // Check if the record exists
-        // Update the desired fields, keeping the other fields unchanged
-        this.arrivalData.arrivalData.forEach(element => {
-          if(element.VehicleNo===arrivealDetail.Vehicle){
-             element.Action='Arrival Scan'
-          }
-        });
-        let arrivalNestedData=this.arrivalData.arrivalData.filter((x)=>x.module=='Arrival');  
-        this.dialogRef.close(arrivalNestedData)
+      // Update the desired fields, keeping the other fields unchanged
+      this.arrivalData.arrivalData.forEach(element => {
+        if (element.VehicleNo === arrivealDetail.Vehicle) {
+          element.Action = 'Arrival Scan'
+        }
+      });
+      let arrivalNestedData = this.arrivalData.arrivalData.filter((x) => x.module == 'Arrival');
+      this.dialogRef.close(arrivalNestedData)
     });
- 
-     
+    Swal.fire({
+      icon: "success",
+      title: "Successful",
+      text: `Vehicle Arrived Successfully : ${arrivealDetail.Vehicle}`,//
+      showConfirmButton: true,
+    })
   }
 
   save() {
     this.getPreviousData(this.MarkArrivalTableForm.value);
-  
   }
 
   cancel() {
     this.dialogRef.close()
   }
   goBack(tabIndex: number): void {
-    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex},state:this.departature });
+    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: this.departature });
   }
 }

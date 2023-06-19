@@ -37,6 +37,7 @@
     "apexcharts": "^3.30.0",
     "bootstrap": "^5.0.1",
     "chart.js": "^2.9.4",
+    "date-fns": "^2.30.0",
     "echarts": "^4.9.0",
     "hash-it": "^5.0.2",
     "leaflet": "^1.7.1",

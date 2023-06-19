@@ -130,15 +130,16 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
       const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
       //let departure= newArray.filter((x) => x.ArrivalLocation === this.orgBranch);
       let dataDeparture: { [key: string]: string }[] = [];// Initialize dataDeparture as an empty array
+      const { format } = require('date-fns');
       newArray.forEach(element => {
         let jsonDeparture = {
           RouteandSchedule: element?.Route || '',
           VehicleNo: element?.VehicleNo || '',
           TripID: element?.TripID || '',
-          Scheduled: element?.Scheduled || '',
-          Expected: element?.ETAATA || '',
-          Status: element?.Status || '',
-          Hrs: element?.Hrs || '',
+          Scheduled: format(new Date(), 'dd-MM-yy HH:mm'),
+          Expected: format(new Date(), 'dd-MM-yy HH:mm'),
+          Status: element?.Status || 'OnTime',
+          Hrs: element?.Hrs || '0:00',
           VehicleType: element?.VehicleType || '',
           Action: element.TripID!=''?'Update Trip':'Create Trip',
           location: element?.ArrivalLocation || '',

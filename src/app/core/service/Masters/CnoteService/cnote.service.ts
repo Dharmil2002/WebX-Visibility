@@ -64,6 +64,12 @@ export class CnoteService {
       `${environment.APIBaseURL}` + ApiURL + req
     );
   }
+  getNewCnoteBooking(ApiURL, req) {
+   
+    return this.http.get<any>(
+      `${environment.APIBaseBetaURL}` + ApiURL + req
+    );
+  }
    cnotePost(ApiURL, Request) {
     return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }

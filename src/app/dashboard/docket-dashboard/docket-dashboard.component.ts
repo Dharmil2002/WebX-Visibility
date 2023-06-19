@@ -17,7 +17,9 @@ export class DocketDashboardComponent implements OnInit {
   ewayBillDetail: any;
   
 
-  constructor(private router: Router,) { }
+  constructor(private router: Router,) {
+    this.docket=true
+   }
 
   ngOnInit(): void {
     this.ewayBillDetail=localStorage.getItem("EwayBillDetail");

@@ -222,7 +222,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   }
 
   getRules() {
-    this.ICnoteService.getCnoteBooking(
+    this.ICnoteService.getNewCnoteBooking(
       "services/companyWiseRules/",
       parseInt(localStorage.getItem("companyCode"))
     ).subscribe({
@@ -833,7 +833,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
     setTimeout(() => {
       this.getRules();
 
-    }, 1000);
+    }, 4000);
     
   }
 

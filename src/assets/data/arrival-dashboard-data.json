@@ -514,7 +514,8 @@
     "Leg": "MUMB-BLR",
     "Action": "Loading",
     "KgWeight": 568,
-    "CftVolume": 59
+    "CftVolume": 59,
+    "ScanFlag":false
   },
   {
     "Shipment": 23737388,
@@ -526,7 +527,8 @@
     "Leg": " BLR-MUMB",
     "Action": "Unloading",
     "KgWeight": 750,
-    "CftVolume": 89
+    "CftVolume": 89,
+    "ScanFlag":false
   },
   {
     "Shipment": 23737388,
@@ -538,7 +540,8 @@
     "Leg": " BLR-MUMB",
     "Action": "Unloading",
     "KgWeight": 843,
-    "CftVolume": 92
+    "CftVolume": 92,
+    "ScanFlag":false
   },
   {
     "Shipment": 23737388,
@@ -550,7 +553,8 @@
     "Leg": " BLR-MUMB",
     "Action": "Unloading",
     "KgWeight": 568,
-    "CftVolume": 53
+    "CftVolume": 53,
+    "ScanFlag":false
   },
   {
     "Shipment": 39884849,
@@ -562,7 +566,8 @@
     "Leg": "BLR-AMD",
     "Action": "Unloading",
     "KgWeight": 985,
-    "CftVolume": 100
+    "CftVolume": 100,
+    "ScanFlag":false
   },
   {
     "Shipment": 39884849,
@@ -574,7 +579,8 @@
     "Leg": "BLR-AMD",
     "Action": "Unloading",
     "KgWeight": 501,
-    "CftVolume": 72
+    "CftVolume": 72,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939393,
@@ -586,7 +592,8 @@
     "Leg": " PNQ-MUMB",
     "Action": "Unloading",
     "KgWeight": 649,
-    "CftVolume": 64
+    "CftVolume": 64,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939393,
@@ -598,7 +605,8 @@
     "Leg": " PNQ-MUMB",
     "Action": "Unloading",
     "KgWeight": 549,
-    "CftVolume": 100
+    "CftVolume": 100,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939393,
@@ -610,7 +618,8 @@
     "Leg": " PNQ-MUMB",
     "Action": "Unloading",
     "KgWeight": 719,
-    "CftVolume": 52
+    "CftVolume": 52,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939394,
@@ -622,7 +631,8 @@
     "Leg": " MUMB-VPI",
     "Action": "Loading",
     "KgWeight": 583,
-    "CftVolume": 71
+    "CftVolume": 71,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939394,
@@ -634,7 +644,8 @@
     "Leg": " MUMB-VPI",
     "Action": "Loading",
     "KgWeight": 645,
-    "CftVolume": 66
+    "CftVolume": 66,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939395,
@@ -646,7 +657,8 @@
     "Leg": " AMD-BRDB",
     "Action": "Unloading",
     "KgWeight": 613,
-    "CftVolume": 69
+    "CftVolume": 69,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939396,
@@ -658,7 +670,8 @@
     "Leg": " BRDB-MUMB",
     "Action": "Loading",
     "KgWeight": 968,
-    "CftVolume": 63
+    "CftVolume": 63,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939396,
@@ -670,7 +683,8 @@
     "Leg": " BRDB-MUMB",
     "Action": "Loading",
     "KgWeight": 659,
-    "CftVolume": 97
+    "CftVolume": 97,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939396,
@@ -682,7 +696,8 @@
     "Leg": " BRDB-MUMB",
     "Action": "Loading",
     "KgWeight": 978,
-    "CftVolume": 88
+    "CftVolume": 88,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939396,
@@ -694,7 +709,8 @@
     "Leg": " BRDB-MUMB",
     "Action": "Loading",
     "KgWeight": 609,
-    "CftVolume": 81
+    "CftVolume": 81,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939396,
@@ -706,7 +722,8 @@
     "Leg": " BRDB-MUMB",
     "Action": "Loading",
     "KgWeight": 557,
-    "CftVolume": 51
+    "CftVolume": 51,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939399,
@@ -718,7 +735,8 @@
     "Leg": " MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 774,
-    "CftVolume": 80
+    "CftVolume": 80,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939399,
@@ -730,7 +748,8 @@
     "Leg": " MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 994,
-    "CftVolume": 68
+    "CftVolume": 68,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939399,
@@ -742,7 +761,8 @@
     "Leg": " MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 738,
-    "CftVolume": 67
+    "CftVolume": 67,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939399,
@@ -754,7 +774,8 @@
     "Leg": " MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 920,
-    "CftVolume": 52
+    "CftVolume": 52,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939399,
@@ -766,7 +787,8 @@
     "Leg": " MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 850,
-    "CftVolume": 50
+    "CftVolume": 50,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939400,
@@ -778,7 +800,8 @@
     "Leg": "BRDB-AMD",
     "Action": "Loading",
     "KgWeight": 879,
-    "CftVolume": 68
+    "CftVolume": 68,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939402,
@@ -790,7 +813,8 @@
     "Leg": " NAGM-MUMB",
     "Action": "Unloading",
     "KgWeight": 656,
-    "CftVolume": 80
+    "CftVolume": 80,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939403,
@@ -802,7 +826,8 @@
     "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 529,
-    "CftVolume": 78
+    "CftVolume": 78,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939403,
@@ -814,7 +839,8 @@
     "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 984,
-    "CftVolume": 98
+    "CftVolume": 98,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939403,
@@ -826,7 +852,8 @@
     "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 819,
-    "CftVolume": 90
+    "CftVolume": 90,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939403,
@@ -838,7 +865,8 @@
     "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 649,
-    "CftVolume": 54
+    "CftVolume": 54,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939404,
@@ -850,7 +878,8 @@
     "Leg": " MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 926,
-    "CftVolume": 83
+    "CftVolume": 83,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939404,
@@ -862,7 +891,8 @@
     "Leg": " MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 925,
-    "CftVolume": 83
+    "CftVolume": 83,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939405,
@@ -874,7 +904,8 @@
     "Leg": " MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 507,
-    "CftVolume": 68
+    "CftVolume": 68,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939406,
@@ -886,7 +917,8 @@
     "Leg": "MUMB-CHNB",
     "Action": "Loading",
     "KgWeight": 939,
-    "CftVolume": 58
+    "CftVolume": 58,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939407,
@@ -898,7 +930,8 @@
     "Leg": " MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 521,
-    "CftVolume": 90
+    "CftVolume": 90,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939407,
@@ -910,7 +943,8 @@
     "Leg": " MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 959,
-    "CftVolume": 70
+    "CftVolume": 70,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939407,
@@ -922,7 +956,8 @@
     "Leg": " MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 886,
-    "CftVolume": 96
+    "CftVolume": 96,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939407,
@@ -934,7 +969,8 @@
     "Leg": " MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 793,
-    "CftVolume": 75
+    "CftVolume": 75,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939409,
@@ -946,7 +982,8 @@
     "Leg": " MUMB-MAAM",
     "Action": "Loading",
     "KgWeight": 982,
-    "CftVolume": 93
+    "CftVolume": 93,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939410,
@@ -958,7 +995,8 @@
     "Leg": " MUMB-HUBB",
     "Action": "Loading",
     "KgWeight": 927,
-    "CftVolume": 83
+    "CftVolume": 83,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939411,
@@ -970,7 +1008,8 @@
     "Leg": "MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 915,
-    "CftVolume": 57
+    "CftVolume": 57,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939411,
@@ -982,7 +1021,8 @@
     "Leg": "MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 539,
-    "CftVolume": 87
+    "CftVolume": 87,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939411,
@@ -994,7 +1034,8 @@
     "Leg": "MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 890,
-    "CftVolume": 92
+    "CftVolume": 92,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939411,
@@ -1006,7 +1047,8 @@
     "Leg": "MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 847,
-    "CftVolume": 77
+    "CftVolume": 77,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939412,
@@ -1018,7 +1060,8 @@
     "Leg": "MUMB-JAIB",
     "Action": "Loading",
     "KgWeight": 579,
-    "CftVolume": 96
+    "CftVolume": 96,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939412,
@@ -1030,7 +1073,8 @@
     "Leg": "MUMB-JAIB",
     "Action": "Loading",
     "KgWeight": 912,
-    "CftVolume": 90
+    "CftVolume": 90,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939412,
@@ -1042,7 +1086,8 @@
     "Leg": "MUMB-JAIB",
     "Action": "Loading",
     "KgWeight": 730,
-    "CftVolume": 85
+    "CftVolume": 85,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939412,
@@ -1066,7 +1111,8 @@
     "Leg": "MUMB-JAIB",
     "Action": "Loading",
     "KgWeight": 981,
-    "CftVolume": 85
+    "CftVolume": 85,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939420,
@@ -1078,7 +1124,8 @@
     "Leg": " MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 975,
-    "CftVolume": 100
+    "CftVolume": 100,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939420,
@@ -1090,7 +1137,8 @@
     "Leg": " MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 539,
-    "CftVolume": 59
+    "CftVolume": 59,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939420,
@@ -1102,7 +1150,8 @@
     "Leg": " MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 879,
-    "CftVolume": 55
+    "CftVolume": 55,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939420,
@@ -1114,7 +1163,8 @@
     "Leg": " MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 938,
-    "CftVolume": 96
+    "CftVolume": 96,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939420,
@@ -1126,7 +1176,8 @@
     "Leg": " MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 827,
-    "CftVolume": 60
+    "CftVolume": 60,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939421,
@@ -1138,7 +1189,8 @@
     "Leg": " MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 844,
-    "CftVolume": 100
+    "CftVolume": 100,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939421,
@@ -1150,7 +1202,8 @@
     "Leg": " MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 647,
-    "CftVolume": 92
+    "CftVolume": 92,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939423,
@@ -1162,7 +1215,8 @@
     "Leg": " MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 990,
-    "CftVolume": 93
+    "CftVolume": 93,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939423,
@@ -1174,7 +1228,8 @@
     "Leg": " MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 688,
-    "CftVolume": 100
+    "CftVolume": 100,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939423,
@@ -1186,7 +1241,8 @@
     "Leg": " MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 593,
-    "CftVolume": 73
+    "CftVolume": 73,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939423,
@@ -1198,7 +1254,8 @@
     "Leg": " MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 985,
-    "CftVolume": 74
+    "CftVolume": 74,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939423,
@@ -1210,7 +1267,8 @@
     "Leg": " MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 590,
-    "CftVolume": 69
+    "CftVolume": 69,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939424,
@@ -1222,7 +1280,8 @@
     "Leg": "      BLR-AMD",
     "Action": "NoAction",
     "KgWeight": 884,
-    "CftVolume": 69
+    "CftVolume": 69,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939424,
@@ -1234,7 +1293,8 @@
     "Leg": "      BLR-AMD",
     "Action": "NoAction",
     "KgWeight": 896,
-    "CftVolume": 92
+    "CftVolume": 92,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939424,
@@ -1246,7 +1306,8 @@
     "Leg": "      BLR-AMD",
     "Action": "NoAction",
     "KgWeight": 967,
-    "CftVolume": 90
+    "CftVolume": 90,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939424,
@@ -1258,7 +1319,8 @@
     "Leg": "      BLR-AMD",
     "Action": "NoAction",
     "KgWeight": 869,
-    "CftVolume": 75
+    "CftVolume": 75,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939424,
@@ -1270,7 +1332,8 @@
     "Leg": "      BLR-AMD",
     "Action": "NoAction",
     "KgWeight": 554,
-    "CftVolume": 71
+    "CftVolume": 71,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939424,
@@ -1282,7 +1345,8 @@
     "Leg": "      BLR-AMD",
     "Action": "NoAction",
     "KgWeight": 701,
-    "CftVolume": 50
+    "CftVolume": 50,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939425,
@@ -1294,7 +1358,8 @@
     "Leg": "      MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 517,
-    "CftVolume": 92
+    "CftVolume": 92,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939425,
@@ -1306,7 +1371,8 @@
     "Leg": "      MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 610,
-    "CftVolume": 88
+    "CftVolume": 88,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939425,
@@ -1318,7 +1384,8 @@
     "Leg": "      MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 669,
-    "CftVolume": 54
+    "CftVolume": 54,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939425,
@@ -1330,7 +1397,8 @@
     "Leg": "      MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 739,
-    "CftVolume": 64
+    "CftVolume": 64,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939425,
@@ -1342,7 +1410,8 @@
     "Leg": "      MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 611,
-    "CftVolume": 74
+    "CftVolume": 74,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939425,
@@ -1354,7 +1423,8 @@
     "Leg": "      MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 715,
-    "CftVolume": 91
+    "CftVolume": 91,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939425,
@@ -1366,7 +1436,8 @@
     "Leg": "      MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 648,
-    "CftVolume": 53
+    "CftVolume": 53,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939426,
@@ -1378,7 +1449,8 @@
     "Leg": "MUMB-JPR",
     "Action": "Loading",
     "KgWeight": 856,
-    "CftVolume": 80
+    "CftVolume": 80,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939426,
@@ -1390,7 +1462,8 @@
     "Leg": "MUMB-JPR",
     "Action": "Loading",
     "KgWeight": 767,
-    "CftVolume": 85
+    "CftVolume": 85,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939426,
@@ -1402,7 +1475,8 @@
     "Leg": "MUMB-JPR",
     "Action": "Loading",
     "KgWeight": 525,
-    "CftVolume": 57
+    "CftVolume": 57,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939426,
@@ -1414,7 +1488,8 @@
     "Leg": "MUMB-JPR",
     "Action": "Loading",
     "KgWeight": 549,
-    "CftVolume": 56
+    "CftVolume": 56,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939426,
@@ -1426,7 +1501,8 @@
     "Leg": "MUMB-JPR",
     "Action": "Loading",
     "KgWeight": 697,
-    "CftVolume": 66
+    "CftVolume": 66,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939426,
@@ -1438,7 +1514,8 @@
     "Leg": "MUMB-JPR",
     "Action": "Loading",
     "KgWeight": 656,
-    "CftVolume": 85
+    "CftVolume": 85,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939426,
@@ -1450,7 +1527,8 @@
     "Leg": "MUMB-JPR",
     "Action": "Loading",
     "KgWeight": 612,
-    "CftVolume": 89
+    "CftVolume": 89,
+    "ScanFlag":false
   },
   {
     "Shipment": 39939426,
@@ -1462,7 +1540,8 @@
     "Leg": "MUMB-JPR",
     "Action": "Loading",
     "KgWeight": 687,
-    "CftVolume": 75
+    "CftVolume": 75,
+    "ScanFlag":false
   }
  ]
 }

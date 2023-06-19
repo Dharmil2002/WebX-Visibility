@@ -50,7 +50,7 @@ export class MarkArrivalComponent implements OnInit {
     this.IntializeFormControl();
     this.getReasonList();
     this.MarkArrivalTableForm.controls.Vehicle.setValue(this.MarkArrivalTable.VehicleNo)
-    this.MarkArrivalTableForm.controls.ETA.setValue(this.MarkArrivalTable.ETAATA)
+    this.MarkArrivalTableForm.controls.ETA.setValue(this.MarkArrivalTable.Expected)
     this.MarkArrivalTableForm.controls.Route.setValue(this.MarkArrivalTable.Route)
     this.MarkArrivalTableForm.controls.TripID.setValue(this.MarkArrivalTable.TripID)
   }

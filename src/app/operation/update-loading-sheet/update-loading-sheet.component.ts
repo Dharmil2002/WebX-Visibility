@@ -85,11 +85,15 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
+      const shippingData = tableArray.map(shipData => {
+        return { ...shipData, Pending: shipData.Packages };
+      });
+
       if (this.shipmentStatus === 'Loaded') {
-        this.csv = tableArray.filter((item) => item.routes.trim() == this.arrivalData?.RouteandSchedule.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
+        this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.RouteandSchedule.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
       }
       else {
-        this.csv = tableArray.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
+        this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
       }
 
       this.kpiData("")
@@ -99,16 +103,44 @@ export class UpdateLoadingSheetComponent implements OnInit {
     });
   }
   updatePackage() {
-    let Unload = this.data.packagesData.find((x) => x.PackageId.trim() === this.loadingSheetTableForm.value.Scan.trim() && x.Leg.trim() == this.arrivalData.Leg.trim())
-    if (Unload) {
-      this.csv.forEach(element => {
+    let Unload = this.data.packagesData.find((x) => x.PackageId.trim() === this.loadingSheetTableForm.value.Scan.trim() && x.Leg.trim() === this.arrivalData.Leg.trim());
+
+    if (Unload && !Unload.ScanFlag) {
+      this.csv.forEach((element) => {
         if (element.Shipment === Unload.Shipment) {
-          element.Packages = element.Packages - 1,
-            element.Unloaded = element?.Unloaded || 0 + 1
+          if (!element.hasOwnProperty('Unloaded') || element.Packages > element.Unloaded) {
+            element.Pending -= 1;
+            element.Unloaded = (element.Unloaded || 0) + 1;
+            Unload.ScanFlag=true
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Operation",
+              text: "Cannot perform the operation. Packages must be greater than Unloaded.",
+              showConfirmButton: true,
+            });
+          }
         }
       });
-      this.csv = this.csv
     }
+    else if(!Unload.hasOwnProperty('Unloaded') ||Unload.ScanFlag){
+      Swal.fire({
+        icon: "info",
+        title: "Already Scanned",
+        text: "Your Package ID is Already Scanned.",
+        showConfirmButton: true,
+      });
+    }
+     else {
+      Swal.fire({
+        icon: "error",
+        title: "Not Match with Shipment",
+        text: "Your Package ID does not match with any shipment.",
+        showConfirmButton: true,
+      });
+    }
+
+
   }
   kpiData(event) {
     let packages = 0;

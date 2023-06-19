@@ -646,7 +646,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Get all fields and bind
   GetCnotecontrols() {
-    this.ICnoteService.getCnoteBooking('cnotefields/', parseInt(localStorage.getItem("companyCode"))).subscribe({
+    this.ICnoteService.getNewCnoteBooking('cnotefields/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         if (res) {
           // Push the details array into the response array and filter based on useField property, sort by Seq property
@@ -675,7 +675,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Bind all rules
   getRules() {
-    this.ICnoteService.getCnoteBooking('services/companyWiseRules/', parseInt(localStorage.getItem("companyCode"))).subscribe({
+    this.ICnoteService.getNewCnoteBooking('services/companyWiseRules/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         if (res) {
           // Set the Rules variable to the first element of the response array
@@ -799,7 +799,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   // This function fetches the date rules from the backend and sets the minimum date for the date picker based on the rule.
   getDaterules() {
-    this.ICnoteService.getCnoteBooking('services/getRuleFordate/', parseInt(localStorage.getItem("companyCode"))).subscribe({
+    this.ICnoteService.getNewCnoteBooking('services/getRuleFordate/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         let filterfordate = res.find((x) => x.Rule_Y_N == 'Y');
         this.minDate.setDate(this.minDate.getDate() - filterfordate.BackDate_Days);
@@ -920,7 +920,7 @@ export class CNoteGenerationComponent implements OnInit {
    * Fetches contract details from API and sets it in component variable.
    */
   getContractDetail() {
-    this.ICnoteService.getCnoteBooking('services/getContractDetail/', parseInt(localStorage.getItem("companyCode"))).subscribe({
+    this.ICnoteService.getNewCnoteBooking('services/getContractDetail/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         if (res) {
           this.contractDetail = res;

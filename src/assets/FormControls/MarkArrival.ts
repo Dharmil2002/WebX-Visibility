@@ -56,7 +56,7 @@ export class MarkArrivalControl {
                 label: 'Arrival Time',
                 placeholder: '',
                 type: 'time',
-                value: new Date().toLocaleTimeString(),
+                value: '',
                 Validations: [],
                 generatecontrol: true, disable: false
             },
@@ -64,7 +64,7 @@ export class MarkArrivalControl {
                 name: 'AssignDock',
                 label: 'Assign Dock',
                 placeholder: '',
-                type: 'text',
+                type: 'number',
                 value: '',
                 Validations: [{
                     name: "required",
@@ -111,9 +111,12 @@ export class MarkArrivalControl {
                 name: 'LateReason',
                 label: 'Late Reason',
                 placeholder: '',
-                type: 'text',
+                type: 'dropdown',
                 value: '',
                 Validations: [],
+                additionalData: {
+                    showNameAndValue: false
+                },
                 generatecontrol: true,
                 disable: false
             },

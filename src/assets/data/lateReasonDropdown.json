@@ -1,0 +1,32 @@
+{
+    "codeList": [
+        {
+            "CodeId": "1",
+            "CodeDesc": "Vehicle accident"
+        },
+        {
+            "CodeId": "2",
+            "CodeDesc": "Vehicle Stuck on RTO checking"
+        },
+        {
+            "CodeId": "3",
+            "CodeDesc": "Late departure by branch"
+        },
+        {
+            "CodeId": "4",
+            "CodeDesc": "Transporter Strike"
+        },
+        {
+            "CodeId": "5",
+            "CodeDesc": "Natural claimity"
+        },
+        {
+            "CodeId": "6",
+            "CodeDesc": "Petrol Pump strike"
+        },
+        {
+            "CodeId": "7",
+            "CodeDesc": "Shortage of cash with driver"
+        }
+    ]
+}

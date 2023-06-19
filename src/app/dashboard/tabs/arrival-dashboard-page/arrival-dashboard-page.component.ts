@@ -134,7 +134,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
         // Update the "Scheduled" and "Expected" values with today's date and calculated expected time
         return {
           ...item,
-          Scheduled: todayFormatted + " " + getTimeComponent(item.Scheduled),
+          Scheduled: formatDateTime(new Date()) ,
           Expected: expectedFormatted,
         };
       });

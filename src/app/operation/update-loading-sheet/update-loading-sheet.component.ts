@@ -71,13 +71,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   constructor(private Route: Router, private dialog: MatDialog, public dialogRef: MatDialogRef<MarkArrivalComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private http: HttpClient, private fb: UntypedFormBuilder, private cnoteService: CnoteService) {
-    if (item.LoadingSheet) {
-      this.arrivalData = this.cnoteService.getVehicleLoadingData();
-      this.shipmentStatus = 'Loaded'
-    } else {
-      this.shipmentStatus = 'Unloaded'
-      this.arrivalData = item;
-    }
+    this.shipmentStatus = 'Unloaded'
+    this.arrivalData = item;
     this.getShippningData();
     this.IntializeFormControl()
   }
@@ -88,16 +83,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
       const shippingData = tableArray.map(shipData => {
         return { ...shipData, Pending: shipData.Packages };
       });
-
-      if (this.shipmentStatus === 'Loaded') {
-        this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.RouteandSchedule.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
-      }
-      else {
-        this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
-      }
-
+      this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
       this.kpiData("")
-
       this.tableload = false;
 
     });
@@ -111,7 +98,12 @@ export class UpdateLoadingSheetComponent implements OnInit {
           if (!element.hasOwnProperty('Unloaded') || element.Packages > element.Unloaded) {
             element.Pending -= 1;
             element.Unloaded = (element.Unloaded || 0) + 1;
-            Unload.ScanFlag=true
+            Unload.ScanFlag = true
+            let kpiData={
+              shipment:this.csv.length,
+              Package:element.Unloaded
+            }
+            this.kpiData(kpiData) 
           } else {
             Swal.fire({
               icon: "error",
@@ -123,7 +115,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
         }
       });
     }
-    else if(!Unload.hasOwnProperty('Unloaded') ||Unload.ScanFlag){
+    else if (!Unload.hasOwnProperty('Unloaded') || Unload.ScanFlag) {
       Swal.fire({
         icon: "info",
         title: "Already Scanned",
@@ -131,7 +123,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
         showConfirmButton: true,
       });
     }
-     else {
+    else {
       Swal.fire({
         icon: "error",
         title: "Not Match with Shipment",
@@ -179,14 +171,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
   IntializeFormControl() {
     const ManifestGeneratedFormControl = new UpdateloadingControl();
     this.jsonControlArray = ManifestGeneratedFormControl.getupdatelsFormControls();
-    if (this.shipmentStatus === 'Loaded') {
-      this.jsonControlArray = this.jsonControlArray.filter((x) => {
-        if (x.name === "Unoadingsheet") {
-          x.label = "Loading sheet"
-        }
-        return x
-      })
-    }
     this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
     this.updateListData = this.jsonControlArray.filter((x) => x.name != "Scan");
     this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
@@ -212,38 +196,53 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
   }
   CompleteScan() {
-    if (this.shipmentStatus == 'Loaded') {
-      const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
-        width: '100%', // Set the desired width
-        data: { arrivalData: this.arrivalData, loadingSheetData: this.csv } // Pass the data object
-      });
+    let packageChecked = false;
+    const exists = this.csv.some(obj => obj.hasOwnProperty("Unloaded"));
+    if (exists) {
+      packageChecked = this.csv.every(obj => obj.Packages === obj.Unloaded);
+    }
+    if (packageChecked) {
+      if (this.shipmentStatus == 'Loaded') {
+        const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
+          width: '100%', // Set the desired width
+          data: { arrivalData: this.arrivalData, loadingSheetData: this.csv } // Pass the data object
+        });
 
-      dialogRef.afterClosed().subscribe(result => {
-        let arravalDataDetails = [this.arrivalData];
-        arravalDataDetails.forEach(x => {
-          x.Action = "DEPART VEHICLE"
-          x.menifestNo = result[0].MFNumber
-        })
-        // this.cnoteService.setLsData(arravalDataDetails);
+        dialogRef.afterClosed().subscribe(result => {
+          let arravalDataDetails = [this.arrivalData];
+          arravalDataDetails.forEach(x => {
+            x.Action = "DEPART VEHICLE"
+            x.menifestNo = result[0].MFNumber
+          })
+          // this.cnoteService.setLsData(arravalDataDetails);
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: `Manifest Generated Successfully`,
+            showConfirmButton: true,
+          })
+          this.goBack(2);
+          this.dialogRef.close(arravalDataDetails)
+          // Handle the result after the dialog is closed
+        });
+      }
+      else {
         Swal.fire({
           icon: "success",
           title: "Successful",
-          text: `Manifest Generated Successfully`,
+          text: `Arrival Scan done Successfully`,
           showConfirmButton: true,
         })
-        this.goBack(2);
-        this.dialogRef.close(arravalDataDetails)
-        // Handle the result after the dialog is closed
-      });
+        this.dialogRef.close(this.loadingSheetTableForm.value)
+      }
     }
     else {
       Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: `Arrival Scan done Successfully`,
+        icon: "error",
+        title: "Unload Package",
+        text: `Please Unload All  Your Package`,
         showConfirmButton: true,
       })
-      this.dialogRef.close(this.loadingSheetTableForm.value)
     }
 
   }

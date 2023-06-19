@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { vehicleLoadingControl } from '../../../assets/FormControls/vehicleloading';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { UpdateLoadingSheetComponent } from '../update-loading-sheet/update-loading-sheet.component';
+import { VehicleUpdateUploadComponent } from '../vehicle-update-upload/vehicle-update-upload.component';
 @Component({
   selector: 'app-vehicle-loading',
   templateUrl: './vehicle-loading.component.html'
@@ -56,7 +56,7 @@ export class VehicleLoadingComponent implements OnInit {
     { Row: 'Action', Path: '' }
   ]
   menuItems = [
-    { label: 'Load Vehicle', componentDetails: UpdateLoadingSheetComponent, function: "GeneralMultipleView" },
+    { label: 'Load Vehicle', componentDetails: VehicleUpdateUploadComponent, function: "GeneralMultipleView" },
     // Add more menu items as needed
   ];
   dynamicControls = {

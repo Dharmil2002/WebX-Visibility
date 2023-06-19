@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { UpdateloadingControl } from 'src/assets/FormControls/UpdateRunsheet';
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
+import { UpdateloadingRunControl } from '../../../assets/FormControls/UpdateRunsheet';
 
 @Component({
   selector: 'app-update-run-sheet',
@@ -115,7 +115,7 @@ export class UpdateRunSheetComponent implements OnInit {
   ngOnInit(): void {
   }
   IntializeFormControl() {
-    const UpdaterunsheetFormControl = new UpdateloadingControl();
+    const UpdaterunsheetFormControl = new UpdateloadingRunControl();
     this.UpdaterunControlArray = UpdaterunsheetFormControl.getupdaterunsheetFormControls();
     this.updateSheetTableForm = formGroupBuilder(this.fb, [this.UpdaterunControlArray])
   }

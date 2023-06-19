@@ -78,7 +78,7 @@ export class MarkArrivalComponent implements OnInit {
       // Check if the record exists
       // Update the desired fields, keeping the other fields unchanged
       this.arrivalData.arrivalData.forEach(element => {
-        if (element.VehicleNo === arrivealDetail.Vehicle) {
+        if (element.Route === arrivealDetail.Route) {
           element.Action = 'Arrival Scan'
         }
       });
@@ -131,10 +131,5 @@ export class MarkArrivalComponent implements OnInit {
       // if companyCode is not found , we should logout immmediately.
     }
   }
-  loadingSheetNo(jsonControlArray: any, MarkArrivalTableForm: UntypedFormGroup, lateReasonList: any[], loadingSheetNo: any, loadingSheetNoStatus: any) {
-    throw new Error('Method not implemented.');
-  }
-  loadingSheetNoStatus(jsonControlArray: any, MarkArrivalTableForm: UntypedFormGroup, lateReasonList: any[], loadingSheetNo: any, loadingSheetNoStatus: any) {
-    throw new Error('Method not implemented.');
-  }
+
 }

@@ -2,10 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, Inject } from '@angular/core';
 import Swal from 'sweetalert2';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { CreateLoadingSheetComponent } from '../create-loading-sheet/create-loading-sheet.component';
 import { Router } from '@angular/router';
 import { GenericTableComponent } from '../../shared-components/Generic Table/generic-table.component';
-import { debug } from 'console';
 
 @Component({
   selector: 'app-loading-sheet-view',

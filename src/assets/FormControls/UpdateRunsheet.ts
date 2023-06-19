@@ -1,6 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
-export class UpdateloadingControl {
+export class UpdateloadingRunControl {
     private updaterunsheetControlArray: FormControls[];
     constructor() {
         this.updaterunsheetControlArray = [

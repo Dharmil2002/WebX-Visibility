@@ -24,6 +24,7 @@ import { CreateRunSheetComponent } from './create-run-sheet/create-run-sheet.com
 import { UpdateRunSheetComponent } from './update-run-sheet/update-run-sheet.component';
 import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.component";
 import { ViewPrintComponent } from './view-print/view-print.component';
+import { VehicleUpdateUploadComponent } from "./vehicle-update-upload/vehicle-update-upload.component";
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -35,7 +36,8 @@ import { ViewPrintComponent } from './view-print/view-print.component';
     DepartVehicleComponent,
     LodingSheetGenerateSuccessComponent,
     CreateLoadingSheetComponent,
-    ViewPrintComponent
+    ViewPrintComponent,
+    VehicleUpdateUploadComponent
   ],
   imports: [
     CommonModule,

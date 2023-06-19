@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { RunSheetControl } from 'src/assets/FormControls/RunsheetGeneration';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-create-run-sheet',
@@ -29,7 +31,7 @@ export class CreateRunSheetComponent implements OnInit {
   tableload = false;
   csv: any[];
   runSheetData: any;
-  constructor(private http: HttpClient, private Route: Router, private CnoteService: CnoteService, private fb: UntypedFormBuilder
+  constructor(private http: HttpClient, private Route: Router, private CnoteService: CnoteService, private fb: UntypedFormBuilder, private ObjSnackBarUtility: SnackBarUtilityService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.RunSheetTable = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -107,6 +109,11 @@ export class CreateRunSheetComponent implements OnInit {
     }
   }
   GenerateRunsheet() {
+    if (this.runSheetData == undefined) {
+      // If no item has isSelected set to true, return or perform any desired action.
+      this.ObjSnackBarUtility.ShowCommonSwal1('error', 'Please select atleast one Cluster to generate Runsheet!', false, false, false);
+      return;
+    }
     const randomNumber = "PDNHW/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
     this.RunSheetTableForm.controls['RunSheetID'].setValue(randomNumber)
     let runSheetDetils = {
@@ -115,6 +122,12 @@ export class CreateRunSheetComponent implements OnInit {
     }
     this.CnoteService.setRunSheetData(runSheetDetils);
     this.goBack(3)
+    Swal.fire({
+      icon: "success",
+      title: "Successful",
+      text: `Loading Sheet generated Successfully`,
+      showConfirmButton: true,
+    })
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });

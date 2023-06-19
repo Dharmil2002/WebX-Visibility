@@ -9,6 +9,7 @@ import { GenericTableComponent } from 'src/app/shared-components/Generic Table/g
 import { MarkArrivalControl } from 'src/assets/FormControls/MarkArrival';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service'
 import Swal from 'sweetalert2';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -17,11 +18,16 @@ import Swal from 'sweetalert2';
 
 export class MarkArrivalComponent implements OnInit {
   jsonUrl = '../../../assets/data/arrival-dashboard-data.json';
+  lateReasonURL = '../../../assets/data/lateReasonDropdown.json';
   MarkArrivalTableForm: UntypedFormGroup;
   MarkArrivalTable: any;
   arrivalData: any;
   departature: any;
-  constructor(public dialogRef: MatDialogRef<GenericTableComponent>, public dialog: MatDialog, private service: utilityService,
+  latereason: any;
+  companyCode: any;
+  latereasonlist: any;
+  latereasonlistStatus: any;
+  constructor(private filter: FilterUtils, public dialogRef: MatDialogRef<GenericTableComponent>, public dialog: MatDialog, private service: utilityService,
     private http: HttpClient, @Inject(MAT_DIALOG_DATA) public item: any, private fb: UntypedFormBuilder, private Route: Router, private CnoteService: CnoteService) {
     this.MarkArrivalTable = item;
   }
@@ -29,11 +35,20 @@ export class MarkArrivalComponent implements OnInit {
   IntializeFormControl() {
     const MarkArrivalFormControls = new MarkArrivalControl();
     this.jsonControlArray = MarkArrivalFormControls.getMarkArrivalsertFormControls();
+    this.jsonControlArray.forEach(data => {
+      if (data.name === 'LateReason') {
+        // Set Late Reason related variables
+        this.latereasonlist = data.name;
+        this.latereasonlistStatus = data.additionalData.showNameAndValue;
+      }
+
+    });
     this.MarkArrivalTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
   }
 
   ngOnInit(): void {
-    this.IntializeFormControl()
+    this.IntializeFormControl();
+    this.getReasonList();
     this.MarkArrivalTableForm.controls.Vehicle.setValue(this.MarkArrivalTable.VehicleNo)
     this.MarkArrivalTableForm.controls.ETA.setValue(this.MarkArrivalTable.ETAATA)
     this.MarkArrivalTableForm.controls.Route.setValue(this.MarkArrivalTable.Route)
@@ -87,5 +102,39 @@ export class MarkArrivalComponent implements OnInit {
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: this.departature });
+  }
+  getReasonList() {
+    this.http.get(this.lateReasonURL).subscribe(res => {
+      this.latereason = res;
+      let tableArray = this.latereason.codeList;
+      let lateReasonList = [];
+      tableArray.forEach(element => {
+        let dropdownList = {
+          name: element.CodeDesc,
+          value: element.CodeId
+        }
+        lateReasonList.push(dropdownList)
+      });
+
+      this.filter.Filter(
+        this.jsonControlArray,
+        this.MarkArrivalTableForm,
+        lateReasonList,
+        this.latereasonlist,
+        this.latereasonlistStatus,
+      );
+
+    });
+    try {
+      this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
+    } catch (error) {
+      // if companyCode is not found , we should logout immmediately.
+    }
+  }
+  loadingSheetNo(jsonControlArray: any, MarkArrivalTableForm: UntypedFormGroup, lateReasonList: any[], loadingSheetNo: any, loadingSheetNoStatus: any) {
+    throw new Error('Method not implemented.');
+  }
+  loadingSheetNoStatus(jsonControlArray: any, MarkArrivalTableForm: UntypedFormGroup, lateReasonList: any[], loadingSheetNo: any, loadingSheetNoStatus: any) {
+    throw new Error('Method not implemented.');
   }
 }

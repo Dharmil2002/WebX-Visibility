@@ -45,8 +45,13 @@ export class ManifestGeneratedComponent implements OnInit {
   ]
   toggleArray=[]
   menuItems=[]
-  linkArray=[
-    { Row: 'Action', Path: 'Operation/' }
+  // linkArray=[
+  //   { Row: 'Action', Path: 'Operation/' }
+
+  // ]
+  linkArray = [
+
+    { Row: 'Action', Path: 'Operation/ViewPrint' }
 
   ]
   dynamicControls = {
@@ -63,6 +68,7 @@ export class ManifestGeneratedComponent implements OnInit {
    if(item){
     this.menifest=item.loadingSheetData;
     this.getMenifest();
+    
    }
   }
   getMenifest() {
@@ -74,6 +80,7 @@ export class ManifestGeneratedComponent implements OnInit {
       PackagesLoadedBooked: this.menifest[0].Packages+"/"+this.menifest[0].Packages,
       WeightKg: this.menifest[0].WeightKg,
       VolumeCFT:this.menifest[0].VolumeCFT,
+      Action: "Print"
     }
     let MenifestGenerate=[meniFestjson];
     this.csv=MenifestGenerate;

@@ -8,6 +8,7 @@ import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet
 import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival/mark-arrival.component';
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -84,29 +85,29 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
-      if(this.shipmentStatus === 'Loaded'){
-      this.csv = tableArray.filter((item) => item.routes.trim() == this.arrivalData?.RouteandSchedule.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
+      if (this.shipmentStatus === 'Loaded') {
+        this.csv = tableArray.filter((item) => item.routes.trim() == this.arrivalData?.RouteandSchedule.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
       }
-      else{
+      else {
         this.csv = tableArray.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
       }
-     
-    this.kpiData("")
+
+      this.kpiData("")
 
       this.tableload = false;
 
     });
   }
-  updatePackage(){
-   let Unload=  this.data.packagesData.find((x)=>x.PackageId.trim()===this.loadingSheetTableForm.value.Scan.trim() && x.Leg.trim()== this.arrivalData.Leg.trim())
-    if(Unload){
+  updatePackage() {
+    let Unload = this.data.packagesData.find((x) => x.PackageId.trim() === this.loadingSheetTableForm.value.Scan.trim() && x.Leg.trim() == this.arrivalData.Leg.trim())
+    if (Unload) {
       this.csv.forEach(element => {
-        if(element.Shipment===Unload.Shipment){
-          element.Packages=element.Packages-1,
-          element.Unloaded = element?.Unloaded||0+1
+        if (element.Shipment === Unload.Shipment) {
+          element.Packages = element.Packages - 1,
+            element.Unloaded = element?.Unloaded || 0 + 1
         }
       });
-      this.csv=this.csv
+      this.csv = this.csv
     }
   }
   kpiData(event) {
@@ -125,8 +126,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const shipData = [
       createShipDataObject(this.csv.length, "Shipments", "bg-danger"),
       createShipDataObject(packages, "Packages", "bg-warning"),
-      createShipDataObject(event?.shipment||0, "Shipments" + ' ' + this.shipmentStatus, "bg-info"),
-      createShipDataObject(event?.Package||0, "Packages" + ' ' + this.shipmentStatus, "bg-warning"),
+      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + this.shipmentStatus, "bg-info"),
+      createShipDataObject(event?.Package || 0, "Packages" + ' ' + this.shipmentStatus, "bg-warning"),
     ];
 
     this.boxData = shipData;
@@ -155,8 +156,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
       })
     }
     this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
-    this.updateListData=this.jsonControlArray.filter((x)=>x.name!="Scan");
-    this.Scan=this.jsonControlArray.filter((x)=>x.name=="Scan");
+    this.updateListData = this.jsonControlArray.filter((x) => x.name != "Scan");
+    this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
 
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
     this.autoBindData();
@@ -192,15 +193,26 @@ export class UpdateLoadingSheetComponent implements OnInit {
           x.menifestNo = result[0].MFNumber
         })
         // this.cnoteService.setLsData(arravalDataDetails);
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: `Manifest Generated Successfully`,
+          showConfirmButton: true,
+        })
         this.goBack(2);
         this.dialogRef.close(arravalDataDetails)
         // Handle the result after the dialog is closed
       });
     }
     else {
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: `Arrival Scan done Successfully`,
+        showConfirmButton: true,
+      })
       this.dialogRef.close(this.loadingSheetTableForm.value)
     }
-
 
   }
   Close(): void {

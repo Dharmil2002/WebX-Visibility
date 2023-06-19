@@ -38,6 +38,8 @@ import { utilityService } from "../Utility/utility.service";
 import { PickupDeliveryPlannerComponent } from './tabs/pickup-delivery-planner/pickup-delivery-planner.component';
 import { PickupDelPageComponent } from './tabs/pickup-del-page/pickup-del-page.component';
 import { ManageRunsheetComponent } from './tabs/manage-runsheet/manage-runsheet.component';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+
 @NgModule({
   declarations: [
     LoadPlanningComponent,
@@ -80,6 +82,6 @@ import { ManageRunsheetComponent } from './tabs/manage-runsheet/manage-runsheet.
     SharedComponentsModule,
     MatDialogModule
   ],
-  providers: [SnackBarUtilityService, DatePipe, utilityService]
+  providers: [SnackBarUtilityService, DatePipe, utilityService, FilterUtils]
 })
 export class DashboardModule { }

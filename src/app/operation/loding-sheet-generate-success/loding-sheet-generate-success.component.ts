@@ -1,6 +1,7 @@
 import { Component, OnInit,Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-loding-sheet-generate-success',
@@ -76,6 +77,12 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
       obj.Action= "Print";
     });
     this.csv=this.data;
+    Swal.fire({
+      icon: "success",
+      title: "Successful",
+      text: `Loading Sheet generated Successfully`,//
+      showConfirmButton: true,
+    })
   }
 
   ngOnInit(): void {

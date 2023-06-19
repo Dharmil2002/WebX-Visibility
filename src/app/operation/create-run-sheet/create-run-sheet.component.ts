@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { RunSheetControl } from 'src/assets/FormControls/RunsheetGeneration';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-create-run-sheet',
@@ -115,6 +116,12 @@ export class CreateRunSheetComponent implements OnInit {
     }
     this.CnoteService.setRunSheetData(runSheetDetils);
     this.goBack(3)
+    Swal.fire({
+      icon: "success",
+      title: "Successful",
+      text: `Loading Sheet generated Successfully`,//
+      showConfirmButton: true,
+    })
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });

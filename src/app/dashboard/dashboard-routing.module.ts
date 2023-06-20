@@ -5,6 +5,7 @@ import { DocketDashboardComponent } from './docket-dashboard/docket-dashboard.co
 import { DashboardPageComponent } from "./dashboard-page/dashboard-page.component";
 import { PickupDeliveryPlannerComponent } from "./tabs/pickup-delivery-planner/pickup-delivery-planner.component";
 import { ManageRunsheetComponent } from "./tabs/manage-runsheet/manage-runsheet.component";
+import { StocksComponent } from "./stocks/stocks.component";
 const routes: Routes = [
   {
     path: "",
@@ -30,6 +31,10 @@ const routes: Routes = [
   {
     path:"ManageRunsheet",
     component:ManageRunsheetComponent
+  },
+  {
+    path:"DocketStock",
+    component:StocksComponent
   },
 
 ];

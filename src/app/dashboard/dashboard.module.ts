@@ -39,6 +39,7 @@ import { PickupDeliveryPlannerComponent } from './tabs/pickup-delivery-planner/p
 import { PickupDelPageComponent } from './tabs/pickup-del-page/pickup-del-page.component';
 import { ManageRunsheetComponent } from './tabs/manage-runsheet/manage-runsheet.component';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { StocksComponent } from './stocks/stocks.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
     LoadingSheetViewComponent,
     PickupDeliveryPlannerComponent,
     PickupDelPageComponent,
-    ManageRunsheetComponent
+    ManageRunsheetComponent,
+    StocksComponent
   ],
   imports: [
     CommonModule,

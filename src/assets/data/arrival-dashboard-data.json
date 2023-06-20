@@ -476,22 +476,31 @@
     "Action": "loading"
   },
   {
-    "Shipment": 39939424,
-    "Origin": "BLR",
-    "Destination": "AMD",
-    "Packages": 6,
-    "routes": "S003: BLR-MUMB-AMD-JPR",
-    "Leg": "BLR-AMD",
-    "Action": ""
-  },
-  {
     "Shipment": 39939425,
     "Origin": "BLR",
     "Destination": "AMD",
     "Packages": 7,
-    "routes": "S004: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-AMD",
-    "Action": "loading"
+    "routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-AMD",
+    "Action": "NoAction"
+  },
+  {
+    "Shipment": 39939525,
+    "Origin": "BLR",
+    "Destination": "JPR",
+    "Packages": 2,
+    "routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-JPR",
+    "Action": "NoAction"
+  },
+  {
+    "Shipment": 39939526,
+    "Origin": "BLR",
+    "Destination": "MUMB",
+    "Packages": 2,
+    "routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-MUMB",
+    "Action": "Unloading"
   },
   {
     "Shipment": 39939426,

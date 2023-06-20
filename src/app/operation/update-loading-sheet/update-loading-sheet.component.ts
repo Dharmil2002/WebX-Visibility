@@ -9,7 +9,7 @@ import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
 import Swal from 'sweetalert2';
-
+import { Shipment, filterShipments } from '../shipment';
 @Component({
   selector: 'app-update-loading-sheet',
   templateUrl: './update-loading-sheet.component.html'
@@ -80,11 +80,17 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
-      const shippingData = tableArray.map(shipData => {
+      // const shippingData = tableArray.map(shipData => {
+      //   return { ...shipData, Pending: shipData.Packages };
+      // });
+      let shipments: Shipment[] = tableArray.map(shipData => {
         return { ...shipData, Pending: shipData.Packages };
-      });
-      this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
-      this.kpiData("")
+      });;
+      let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, 'MUMB');
+      // const filteredData = this.filterShipmentsByRouteAndLocation(tableArray, this.arrivalData?.Route, this.arrivalData?.ArrivalLocation);
+      // this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
+      this.csv = filteredShipments;
+      this.kpiData("");
       this.tableload = false;
 
     });
@@ -99,11 +105,11 @@ export class UpdateLoadingSheetComponent implements OnInit {
             element.Pending -= 1;
             element.Unloaded = (element.Unloaded || 0) + 1;
             Unload.ScanFlag = true
-            let kpiData={
-              shipment:this.csv.length,
-              Package:element.Unloaded
+            let kpiData = {
+              shipment: this.csv.length,
+              Package: element.Unloaded
             }
-            this.kpiData(kpiData) 
+            this.kpiData(kpiData)
           } else {
             Swal.fire({
               icon: "error",

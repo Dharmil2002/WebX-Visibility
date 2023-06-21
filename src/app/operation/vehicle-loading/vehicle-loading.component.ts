@@ -6,6 +6,7 @@ import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.se
 import { vehicleLoadingControl } from '../../../assets/FormControls/vehicleloading';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VehicleUpdateUploadComponent } from '../vehicle-update-upload/vehicle-update-upload.component';
+import { debug } from 'console';
 @Component({
   selector: 'app-vehicle-loading',
   templateUrl: './vehicle-loading.component.html'
@@ -15,7 +16,7 @@ export class VehicleLoadingComponent implements OnInit {
   jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
   tripData: any;
   jsonControlArray: any;
-  
+
   //declaring breadscrum
   breadscrums = [
     {
@@ -24,9 +25,9 @@ export class VehicleLoadingComponent implements OnInit {
       active: "vehicle-loading"
     }
   ]
-  height='100vw';
-  width='100vw';
-  maxWidth:'232vw'
+  height = '100vw';
+  width = '100vw';
+  maxWidth: '232vw'
   columnHeader = {
     "LoadingSheet": "Loading Sheet",
     "Manifest": "Manifest",
@@ -66,12 +67,12 @@ export class VehicleLoadingComponent implements OnInit {
   }
   csv: any;
   data: Object;
-  tableload: boolean=true;
-  constructor(private Route: Router, private CnoteService: CnoteService, private http: HttpClient, private fb: UntypedFormBuilder) { 
+  tableload: boolean = true;
+  constructor(private Route: Router, private CnoteService: CnoteService, private http: HttpClient, private fb: UntypedFormBuilder) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.tripData =  this.Route.getCurrentNavigation()?.extras?.state.data;
+      this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
-    this.IntializeFormControl() ;
+    this.IntializeFormControl();
   }
   IntializeFormControl() {
     const vehicleLoadingControls = new vehicleLoadingControl();
@@ -82,42 +83,40 @@ export class VehicleLoadingComponent implements OnInit {
     this.autofillvehicleData()
   }
   autofillvehicleData() {
-   this.vehicleLoadingTableForm.controls['Vehicle'].setValue(this.tripData?.VehicleNo||'');
-   this.vehicleLoadingTableForm.controls['Route'].setValue(this.tripData?.RouteandSchedule||'')
-   this.vehicleLoadingTableForm.controls['TripID'].setValue(this.tripData?.TripID||'')
-   this.vehicleLoadingTableForm.controls['LoadingLocation'].setValue(this.tripData?.location||'')
-  this.getLoadingSheetData();
+    this.vehicleLoadingTableForm.controls['Vehicle'].setValue(this.tripData?.VehicleNo || '');
+    this.vehicleLoadingTableForm.controls['Route'].setValue(this.tripData?.RouteandSchedule || '')
+    this.vehicleLoadingTableForm.controls['TripID'].setValue(this.tripData?.TripID || '')
+    this.vehicleLoadingTableForm.controls['LoadingLocation'].setValue(this.tripData?.location || '')
+    this.getLoadingSheetData();
   }
   getLoadingSheetData() {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
-      let tableArray = this.data['shippingData'];
-      let loadingcsv = tableArray.filter((item)=>item.routes==this.tripData.RouteandSchedule && item.Leg==this.tripData.Leg);
-      let Packages=0;
-      loadingcsv.forEach(element => {
-        Packages=element.Packages+Packages
-        
-      });
-    let dataLoading=[{}]
-    let json={
-      LoadingSheet: this.tripData?.loadingSheetNo||'',
-      Manifest:'',
-      Leg: this.tripData?.Leg||'',
-      Shipments:loadingcsv.length,
-      Packages:Packages,
-      ShipmentsLoaded:loadingcsv.length,
-      PackagesLoaded:Packages,
-      Pending:'',
-      Action:'Load Vehicle',
-      printPending:'print'
-    }
-    dataLoading.push(json)
-    dataLoading = dataLoading.filter(obj => Object.keys(obj).length !== 0);
+      let loadingSheetData = this.CnoteService.getVehicleLoadingSheetData(); // Call the function to get the actual data
 
-    this.tableload=false;
-    this.csv=dataLoading;
-    this.CnoteService.setvehicelodingData(this.tripData)
-  })
+      // Rest of the code...
+      let dataLoading: any[] = []
+      if (loadingSheetData) {
+        loadingSheetData.forEach((element: any) => { // Specify the type of 'element' as 'any'
+          let json = {
+            LoadingSheet: element?.LoadingSheet || '',
+            Manifest: '',
+            Leg: element?.lag || '',
+            Shipments: element?.Shipment || '',
+            Packages: element?.Packages || '',
+            ShipmentsLoaded: element?.Shipment || '',
+            PackagesLoaded: element?.Packages || '',
+            Pending: '',
+            Action: 'Load Vehicle',
+            printPending: 'print'
+          };
+          dataLoading.push(json);
+        });
+      }
+      this.tableload = false;
+      this.csv = dataLoading;
+      this.CnoteService.setvehicelodingData(this.tripData)
+    })
   }
   functionCallHandler($event) {
     // console.log("fn handler called", $event);

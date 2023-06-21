@@ -14,6 +14,7 @@ export class CnoteService {
   private vehicleLoadingData:any;
   private runSheetData:any;
   departRunSheetData: any;
+  private VehiceLodingSheetData:any;
   //tab:number;
   getData(): any {
     return this.savedData;
@@ -51,6 +52,13 @@ export class CnoteService {
   }
   getdepartRunSheetData(){
     return this.departRunSheetData;
+  }
+  setVehicleLoadingData(data:any){
+    this.VehiceLodingSheetData=data;
+  }
+  getVehicleLoadingSheetData(){
+
+    return this.VehiceLodingSheetData;
   }
   constructor(private http: HttpClient) { }
   // GetCnoteFormcontrol() {

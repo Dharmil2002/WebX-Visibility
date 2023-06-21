@@ -197,7 +197,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     }
     else {
       this.CnoteService.setDeparture(event)
+      if(event){
       this.csv = this.csv.filter((x) => x.TripID != event.tripID);
+      }
 
     }
   }

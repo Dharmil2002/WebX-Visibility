@@ -41,3 +41,54 @@ export const filterShipments = (shipments: Shipment[], routeStr: string, current
         originArray.includes(shipment.Origin) && destinationArray.includes(shipment.Destination) && shipment.routes === routeStr
     );
 }
+
+// Export the kpiData function to make it accessible in other modules
+export function kpiData(csv, shipmentStatus, event) {
+    // Initialize variables for counting packages and unloaded shipments
+    let packages = 0;
+    let shipingUnloaded = 0;
+  
+    // Iterate through the csv array to calculate total packages and unloaded shipments
+    csv.forEach((element, index) => {
+      packages = element.Packages + packages;
+      shipingUnloaded = element.Unloaded + shipingUnloaded;
+    });
+  
+    // Helper function to create a shipData object
+    const createShipDataObject = (count, title, className) => ({
+      count,
+      title,
+      class: `info-box7 ${className} order-info-box7`,
+    });
+  
+    // Create an array of shipData objects with dynamic values
+    const shipData = [
+      createShipDataObject(csv.length, "Shipments", "bg-danger"),
+      createShipDataObject(packages, "Packages", "bg-warning"),
+      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + shipmentStatus, "bg-info"),
+      createShipDataObject(event?.Package || 0, "Packages" + ' ' + shipmentStatus, "bg-warning"),
+    ];
+  
+    // Return the shipData array
+    return shipData;
+  }
+ export function autoBindData(formControls, formData) {
+    // Iterate over each control in the form controls object
+    for (const controlName in formControls) {
+      if (formControls.hasOwnProperty(controlName)) {
+        // Get the control instance
+        const control = formControls[controlName];
+        
+        // Get the corresponding data value from the formData object,
+        // or use an empty string if it doesn't exist
+        const data = formData[controlName] || '';
+  
+        // Patch the value of the control with the data value
+        control.patchValue(data);
+  
+        // Set the value of the control with the data value
+        control.setValue(data);
+      }
+    }
+  }
+  

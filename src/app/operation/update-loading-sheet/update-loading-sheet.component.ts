@@ -9,7 +9,7 @@ import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
 import Swal from 'sweetalert2';
-import { Shipment, filterShipments } from '../shipment';
+import { Shipment, autoBindData, filterShipments, kpiData } from '../shipment';
 @Component({
   selector: 'app-update-loading-sheet',
   templateUrl: './update-loading-sheet.component.html'
@@ -17,14 +17,22 @@ import { Shipment, filterShipments } from '../shipment';
 export class UpdateLoadingSheetComponent implements OnInit {
   jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
   packageUrl = '../../../assets/data/package-data.json'
-  tableload = false;
+  tableload = true;
   csv: any[];
   data: [] | any;
   tripData: any;
   tabledata: any;
+  currentBranch: string = localStorage.getItem("Branch") || '';
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
+  shipingHeader = {
+    "Leg": "Leg",
+    "Shipment": "Shipments",
+    "Packages": "Packages",
+    "WeightKg": "Weight Kg",
+    "VolumeCFT": "Volume CFT"
+  }
   columnHeader = {
     "Shipment": "Shipment",
     "Origin": "Origin",
@@ -44,6 +52,13 @@ export class UpdateLoadingSheetComponent implements OnInit {
     "Unloaded": "Unloaded",
     "Pending": "Pending",
     "Leg": "Leg"
+  }
+  shipingHeaderForCsv = {
+    "Leg": "Leg",
+    "Shipment": "Shipments",
+    "Packages": "Packages",
+    "WeightKg": "Weight Kg",
+    "VolumeCFT": "Volume CFT"
   }
   //declaring breadscrum
   breadscrums = [
@@ -67,7 +82,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   boxData: { count: any; title: any; class: string; }[];
   updateListData: any;
   Scan: any;
-
+  shipingDataTable: any;
   constructor(private Route: Router, private dialog: MatDialog, public dialogRef: MatDialogRef<MarkArrivalComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private http: HttpClient, private fb: UntypedFormBuilder, private cnoteService: CnoteService) {
@@ -77,6 +92,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.IntializeFormControl()
   }
   getShippningData() {
+    
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
@@ -86,91 +102,134 @@ export class UpdateLoadingSheetComponent implements OnInit {
       let shipments: Shipment[] = tableArray.map(shipData => {
         return { ...shipData, Pending: shipData.Packages };
       });;
-      let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, 'MUMB');
+      let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, this.currentBranch);
       // const filteredData = this.filterShipmentsByRouteAndLocation(tableArray, this.arrivalData?.Route, this.arrivalData?.ArrivalLocation);
       // this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
       this.csv = filteredShipments;
-      this.kpiData("");
+
+      this.boxData = kpiData(this.csv, this.shipmentStatus, "");
       this.tableload = false;
 
+      let shipingTableData = this.csv;
+      let shipingTableDataArray: any = []
+      shipingTableData.forEach(element => {
+        let uniqueShipments = {};
+        this.data.packagesData.forEach(x => {
+          if (x.Leg.trim() === element.Leg && x.Routes === element.routes) {
+            uniqueShipments[x.Shipment] = true;
+          }
+        });
+        let packageData = this.data.packagesData.filter(x => x.Leg.trim() === element.Leg && x.Routes === element.routes);
+        let totalWeightKg = packageData.reduce((total, current) => total + current.KgWeight, 0);
+        let totalVolumeCFT = packageData.reduce((total, current) => total + current.CftVolume, 0)
+        let shipingJson = {
+          Leg: element?.Leg || '',
+          Shipment: [uniqueShipments].length,
+          Packages: element?.Packages || 0,
+          WeightKg: totalWeightKg,
+          VolumeCFT: totalVolumeCFT
+        }
+        shipingTableDataArray.push(shipingJson)
+      });
+      this.shipingDataTable = shipingTableDataArray;
     });
+
   }
   updatePackage() {
-    let Unload = this.data.packagesData.find((x) => x.PackageId.trim() === this.loadingSheetTableForm.value.Scan.trim() && x.Leg.trim() === this.arrivalData.Leg.trim());
+    // Get the trimmed values of scan and leg
+    const scanValue = this.loadingSheetTableForm.value.Scan.trim();
+    ///const legValue = this.arrivalData.Leg.trim();
+    const legValue = this.arrivalData.Route.trim();
 
-    if (Unload && !Unload.ScanFlag) {
-      this.csv.forEach((element) => {
-        if (element.Shipment === Unload.Shipment) {
-          if (!element.hasOwnProperty('Unloaded') || element.Packages > element.Unloaded) {
-            element.Pending -= 1;
-            element.Unloaded = (element.Unloaded || 0) + 1;
-            Unload.ScanFlag = true
-            let kpiData = {
-              shipment: this.csv.length,
-              Package: element.Unloaded
-            }
-            this.kpiData(kpiData)
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Invalid Operation",
-              text: "Cannot perform the operation. Packages must be greater than Unloaded.",
-              showConfirmButton: true,
-            });
-          }
-        }
+    // Find the unload package based on scan and leg values
+    const unloadPackage = this.data.packagesData.find(x => x.PackageId.trim() === scanValue && x.Routes.trim() === legValue);
+
+    // Check if the unload package exists
+    if (!unloadPackage) {
+      // Package does not belong to the current branch
+      Swal.fire({
+        icon: "error",
+        title: "Not Allow to Unload Package",
+        text: "This package does not belong to the current branch.",
+        showConfirmButton: true,
       });
+      return;
     }
-    else if (!Unload.hasOwnProperty('Unloaded') || Unload.ScanFlag) {
+    //if Destination is Not Belongs to Currect location then to allow to unload a packaged
+    if (unloadPackage.Destination.trim() !== this.currentBranch) {
+      Swal.fire({
+        icon: "error",
+        title: "Not Allow to Unload Package",
+        text: "This package does not belong to the current branch.",
+        showConfirmButton: true,
+      });
+      return;
+    }
+    // Check if the package is already scanned
+    if (unloadPackage.ScanFlag) {
       Swal.fire({
         icon: "info",
         title: "Already Scanned",
-        text: "Your Package ID is Already Scanned.",
+        text: "Your Package ID is already scanned.",
         showConfirmButton: true,
       });
+      return;
     }
-    else {
+
+    // Find the element in csv array that matches the shipment
+    const element = this.csv.find(e => e.Shipment === unloadPackage.Shipment);
+
+    // Check if the element exists and the number of unloaded packages is less than the total packages
+    if (!element || (element.hasOwnProperty('Unloaded') && element.Packages <= element.Unloaded)) {
+      // Invalid operation, packages must be greater than Unloaded
       Swal.fire({
         icon: "error",
-        title: "Not Match with Shipment",
-        text: "Your Package ID does not match with any shipment.",
+        title: "Invalid Operation",
+        text: "Cannot perform the operation. Packages must be greater than Unloaded.",
         showConfirmButton: true,
       });
+      return;
     }
 
+    // Update Pending and Unloaded counts
+    element.Pending--;
+    element.Unloaded = (element.Unloaded || 0) + 1;
+    unloadPackage.ScanFlag = true;
+
+    // Prepare kpiData
+    const event = {
+      shipment: this.csv.length,
+      Package: element.Unloaded,
+    };
+
+    // Call kpiData function
+    this.boxData = kpiData(this.csv, this.shipmentStatus, event);
 
   }
-  kpiData(event) {
-    let packages = 0;
-    let shipingUnloaded = 0;
-    this.csv.forEach((element, index) => {
-      packages = element.Packages + packages
-      shipingUnloaded = element.Unloaded + shipingUnloaded;
-    });
-    const createShipDataObject = (count, title, className) => ({
-      count,
-      title,
-      class: `info-box7 ${className} order-info-box7`
+
+  setArrivalDataBindData() {
+    autoBindData(this.loadingSheetTableForm.controls, {
+      // Bind vehicle data to the 'vehicle' control
+      vehicle: this.arrivalData?.VehicleNo,
+
+      // Bind route data to the 'Route' control, or use RouteandSchedule as fallback
+      Route: this.arrivalData?.Route || this.arrivalData?.RouteandSchedule,
+
+      // Bind tripID data to the 'tripID' control
+      tripID: this.arrivalData?.TripID,
+
+      // Bind ArrivalLocation data to the 'ArrivalLocation' control,
+      // or use location as fallback
+      ArrivalLocation: this.currentBranch,
+
+      // Bind Unoadingsheet data to the 'Unoadingsheet' control,
+      // or use loadingSheetNo as fallback
+      Unoadingsheet: this.arrivalData?.Unoadingsheet || this.arrivalData?.loadingSheetNo,
+
+      // Bind Leg data to the 'Leg' control
+      Leg: this.arrivalData?.Leg
     });
 
-    const shipData = [
-      createShipDataObject(this.csv.length, "Shipments", "bg-danger"),
-      createShipDataObject(packages, "Packages", "bg-warning"),
-      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + this.shipmentStatus, "bg-info"),
-      createShipDataObject(event?.Package || 0, "Packages" + ' ' + this.shipmentStatus, "bg-warning"),
-    ];
-
-    this.boxData = shipData;
-  }
-  autoBindData() {
-    const vehicleControl = this.loadingSheetTableForm.get('vehicle');
-    vehicleControl?.patchValue(this.arrivalData?.VehicleNo || '');
-    this.loadingSheetTableForm.controls['vehicle'].setValue(this.arrivalData?.VehicleNo || '')
-    this.loadingSheetTableForm.controls['Route'].setValue(this.arrivalData?.Route || this.arrivalData?.RouteandSchedule || '')
-    this.loadingSheetTableForm.controls['tripID'].setValue(this.arrivalData?.TripID || '')
-    this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.arrivalData?.ArrivalLocation || this.arrivalData?.location || '')
-    this.loadingSheetTableForm.controls['Unoadingsheet'].setValue(this.arrivalData?.Unoadingsheet || this.arrivalData?.loadingSheetNo || '')
-    this.loadingSheetTableForm.controls['Leg'].setValue(this.arrivalData?.Leg || '')
   }
   ngOnInit(): void {
   }
@@ -182,7 +241,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
 
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
-    this.autoBindData();
+    this.setArrivalDataBindData();
   }
   IsActiveFuntion($event) {
     this.loadingData = $event
@@ -203,9 +262,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   CompleteScan() {
     let packageChecked = false;
-    const exists = this.csv.some(obj => obj.hasOwnProperty("Unloaded"));
+    let locationWiseData=this.csv.filter((x)=>x.Destination===this.currentBranch);
+    const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
     if (exists) {
-      packageChecked = this.csv.every(obj => obj.Packages === obj.Unloaded);
+      packageChecked =locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
     if (packageChecked) {
       if (this.shipmentStatus == 'Loaded') {

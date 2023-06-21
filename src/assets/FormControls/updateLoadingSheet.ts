@@ -53,16 +53,6 @@ export class UpdateloadingControl {
                 disable: false
             },
             {
-                name: 'Leg',
-                label: 'Leg',
-                placeholder: '',
-                type: 'text',
-                value: '',
-                Validations: [],
-                generatecontrol: true,
-                disable: false
-            },
-            {
                 name: 'Scan',
                 label: 'Scan',
                 placeholder: '',

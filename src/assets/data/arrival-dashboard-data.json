@@ -292,7 +292,7 @@
     "Destination": "MUMB",
     "Packages": 3,
     "routes": "S004: BLR-MUMB-AMD",
-    "Leg": " BLR-MUMB",
+    "Leg": "BLR-MUMB",
     "Action": "unloading"
   },
   {
@@ -302,6 +302,15 @@
     "Packages": 2,
     "routes": "S004: BLR-MUMB-AMD",
     "Leg": "BLR-AMD",
+    "Action": "unloading"
+  },
+  {
+    "Shipment": 39884949,
+    "Origin": "MUMB",
+    "Destination": "AMD",
+    "Packages": 1,
+    "routes": "S004: BLR-MUMB-AMD",
+    "Leg": "MUMB-AMD",
     "Action": "unloading"
   },
   {
@@ -533,7 +542,7 @@
     "Origin": "BLR",
     "Destination": "MUMB",
     "Routes": "S004: BLR-MUMB-AMD",
-    "Leg": " BLR-MUMB",
+    "Leg": "BLR-MUMB",
     "Action": "Unloading",
     "KgWeight": 750,
     "CftVolume": 89,
@@ -546,7 +555,7 @@
     "Origin": "BLR",
     "Destination": "MUMB",
     "Routes": "S004: BLR-MUMB-AMD",
-    "Leg": " BLR-MUMB",
+    "Leg": "BLR-MUMB",
     "Action": "Unloading",
     "KgWeight": 843,
     "CftVolume": 92,
@@ -559,7 +568,7 @@
     "Origin": "BLR",
     "Destination": "MUMB",
     "Routes": "S004: BLR-MUMB-AMD",
-    "Leg": " BLR-MUMB",
+    "Leg": "BLR-MUMB",
     "Action": "Unloading",
     "KgWeight": 568,
     "CftVolume": 53,
@@ -586,6 +595,19 @@
     "Destination": "AMD",
     "Routes": "S004: BLR-MUMB-AMD",
     "Leg": "BLR-AMD",
+    "Action": "Unloading",
+    "KgWeight": 501,
+    "CftVolume": 72,
+    "ScanFlag":false
+  },
+  {
+    "Shipment": 39884949,
+    "PackageId": "39884949-1",
+    "Packages": 1,
+    "Origin": "MUMB",
+    "Destination": "AMD",
+    "Routes": "S004: BLR-MUMB-AMD",
+    "Leg": "MUMB-AMD",
     "Action": "Unloading",
     "KgWeight": 501,
     "CftVolume": 72,

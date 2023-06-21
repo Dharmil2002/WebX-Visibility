@@ -125,6 +125,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     this.dataSource = new MatTableDataSource(this.tableData);
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+    if(this.filter){
     this.subs.sink = fromEvent(
       this.filter.nativeElement,
       "keyup"
@@ -134,6 +135,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
       }
       this.dataSource.filter = this.filter.nativeElement.value;
     });
+  }
   }
   //#endregion
 

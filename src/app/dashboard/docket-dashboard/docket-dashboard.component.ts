@@ -9,7 +9,7 @@ export class DocketDashboardComponent implements OnInit {
   docket=false;
   breadscrums = [
     {
-      title: "Docket Dashboard",
+      title: "Network Logistics Management",
       items: ["Home"],
       active: "Dashboard",
     },

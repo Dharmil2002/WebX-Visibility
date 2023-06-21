@@ -1,32 +1,30 @@
 <!-- This row holds the boxes of the dashboard -->
 <h4 class="m-b-10">{{boxData?.Title}}</h4>
 <div *ngIf="boxData?.Items" class="row clearfix dashboardcard">
-        <!-- This loop creates a box for each item in the boxData array -->
-        <div class="col-lg-3 col-sm-3" *ngFor="let box of boxData?.Items" [style]="style">
-                <!-- This box is a clickable item -->
-                <div [class]="box.class">
-                        <div class="info-box7-block">
-                                <h6 class="m-b-10">{{box.title}}</h6>
-                                <h2 class="text-end"><i [class]="box.icon"></i><span>{{box.count}}</span>
-                                </h2>
-                        </div>
-                </div>
-                <div>
-                </div>
-        </div>
+  <!-- This loop creates a box for each item in the boxData array -->
+  <div class="col-lg-3 col-sm-3" *ngFor="let box of boxData?.Items | keyvalue" [style]="style">
+    <!-- This box is a clickable item -->
+    <div [class]="box.value.class">
+      <div class="info-box7-block">
+        <h6 class="m-b-10">{{box.value.title}}</h6>
+        <h2 class="text-end"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
+      </div>
+    </div>
+    <div>
+    </div>
+  </div>
 </div>
 <div *ngIf="boxData" class="row clearfix dashboardcard">
-        <!-- This loop creates a box for each item in the boxData array -->
-        <div class="col-lg-3 col-sm-3" *ngFor="let box of boxData" [style]="style">
-                <!-- This box is a clickable item -->
-                <div [class]="box.class">
-                        <div class="info-box7-block">
-                                <h6 class="m-b-10">{{box.title}}</h6>
-                                <h2 class="text-end"><i [class]="box.icon"></i><span>{{box.count}}</span>
-                                </h2>
-                        </div>
-                </div>
-                <div>
-                </div>
-        </div>
+  <!-- This loop creates a box for each item in the boxData array -->
+  <div class="col-lg-3 col-sm-3" *ngFor="let box of boxData | keyvalue" [style]="style">
+    <!-- This box is a clickable item -->
+    <div [class]="box.value.class">
+      <div class="info-box7-block">
+        <h6 class="m-b-10">{{box.value.title}}</h6>
+        <h2 class="text-end"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
+      </div>
+    </div>
+    <div>
+    </div>
+  </div>
 </div>

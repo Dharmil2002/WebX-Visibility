@@ -16,6 +16,7 @@ import { WINDOW } from "src/app/core/service/window.service";
 import { LanguageService } from "src/app/core/service/language.service";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { BreakpointObserver, BreakpointState } from "@angular/cdk/layout";
+import * as moment from 'moment-timezone';
 const document: any = window.document;
 
 @Component({
@@ -25,12 +26,13 @@ const document: any = window.document;
 })
 export class HeaderComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit, AfterViewInit
-{
+  implements OnInit, AfterViewInit {
   public config: any = {};
   isNavbarCollapsed = true;
   isNavbarShow = true;
   flagvalue;
+  BaseTimeZone;
+  FinancialYear: string;
   countryName;
   langStoreValue: string;
   defaultFlag: string;
@@ -131,6 +133,8 @@ export class HeaderComponent
     } else {
       this.flagvalue = val.map((element) => element.flag);
     }
+    this.convertTimeFromUtc(new Date(), 'India Standard Timezone')
+    this.getCurrentFinancialYear();
   }
   ngAfterViewInit() {
     // set theme on startup
@@ -232,11 +236,39 @@ export class HeaderComponent
       this.renderer.addClass(this.document.body, "submenu-closed");
     }
   }
+
   logout() {
     this.subs.sink = this.authService.logout().subscribe((res) => {
       if (!res.success) {
         this.router.navigate(["/authentication/signin"]);
       }
     });
+  }
+  get CurrentLocation(): any {
+    return localStorage.getItem('Branch');
+  }
+  get CompanyLogo(): any {
+    return localStorage.getItem('company_Logo');
+  }
+  // VirtualLogin() {
+  //   const dialogRef = this.dialogModel.open(VitualLoginComponent, {
+  //     width: "30%",
+  //     position: {
+  //       top: "20px",
+  //     },
+  //     disableClose: true,
+  //   });
+
+  // }
+  convertTimeFromUtc(utcDate: Date, timeZone: string = ''): Date {
+    const indianTimeZone = 'Asia/Kolkata';
+    const convertedDate = moment.utc(utcDate).tz(timeZone || indianTimeZone).toDate();
+    this.BaseTimeZone = convertedDate;
+    return convertedDate;
+  }
+  getCurrentFinancialYear() {
+    const thisYear = (new Date()).getFullYear();
+    const lastYear = thisYear + 1;
+    this.FinancialYear = `${thisYear}-${lastYear}`;
   }
 }

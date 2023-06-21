@@ -10,6 +10,7 @@ import { MarkArrivalControl } from 'src/assets/FormControls/MarkArrival';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service'
 import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { getSealNumber } from 'src/app/operation/shipment';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -54,9 +55,11 @@ export class MarkArrivalComponent implements OnInit {
     this.MarkArrivalTableForm.controls.Route.setValue(this.MarkArrivalTable.Route)
     this.MarkArrivalTableForm.controls.TripID.setValue(this.MarkArrivalTable.TripID)
   }
+
+
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
-
+    debugger;
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
 
@@ -131,5 +134,11 @@ export class MarkArrivalComponent implements OnInit {
       // if companyCode is not found , we should logout immmediately.
     }
   }
+
+  checkSealNumber(){
+    console.log('TestcheckSealNumber');
+    console.log(this.MarkArrivalTable);
+  }
+
 
 }

@@ -84,7 +84,10 @@ export class MarkArrivalControl {
                     message: "Seal No is required"
                 }],
                 generatecontrol: true,
-                disable: false
+                disable: false,
+                functions: {
+                    onModel: 'checkSealNumber',
+                },
             },
 
             {

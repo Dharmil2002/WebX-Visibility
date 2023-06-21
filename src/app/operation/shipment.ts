@@ -92,3 +92,8 @@ export function kpiData(csv, shipmentStatus, event) {
     }
   }
   
+  export function getSealNumber(sealNo: number | undefined): number | string {
+    return sealNo !== undefined ? sealNo : 'No seal number provided.';
+  }
+  
+  

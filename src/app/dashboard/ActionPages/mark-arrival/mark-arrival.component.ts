@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
@@ -28,6 +28,7 @@ export class MarkArrivalComponent implements OnInit {
   companyCode: any;
   latereasonlist: any;
   latereasonlistStatus: any;
+  sealdet: any;
   constructor(private filter: FilterUtils, public dialogRef: MatDialogRef<GenericTableComponent>, public dialog: MatDialog, private service: utilityService,
     private http: HttpClient, @Inject(MAT_DIALOG_DATA) public item: any, private fb: UntypedFormBuilder, private Route: Router, private CnoteService: CnoteService) {
     this.MarkArrivalTable = item;
@@ -58,7 +59,7 @@ export class MarkArrivalComponent implements OnInit {
 
 
   functionCaller($event) {
- 
+
     // console.log("fn handler called", $event);
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -75,19 +76,19 @@ export class MarkArrivalComponent implements OnInit {
     }
   }
   getPreviousData(arrivealDetail) {
-     
-  
-      // Find the specific record you want to update
-      this.arrivalData = this.CnoteService.getVehicleArrivalData();
-      // Check if the record exists
-      // Update the desired fields, keeping the other fields unchanged
-      this.arrivalData.arrivalData.forEach(element => {
-        if (element.Route === arrivealDetail.Route) {
-          element.Action = 'Arrival Scan'
-        }
-      });
-      let arrivalNestedData = this.arrivalData.arrivalData.filter((x) => x.module == 'Arrival');
-      this.dialogRef.close(arrivalNestedData)
+
+
+    // Find the specific record you want to update
+    this.arrivalData = this.CnoteService.getVehicleArrivalData();
+    // Check if the record exists
+    // Update the desired fields, keeping the other fields unchanged
+    this.arrivalData.arrivalData.forEach(element => {
+      if (element.Route === arrivealDetail.Route) {
+        element.Action = 'Arrival Scan'
+      }
+    });
+    let arrivalNestedData = this.arrivalData.arrivalData.filter((x) => x.module == 'Arrival');
+    this.dialogRef.close(arrivalNestedData)
     Swal.fire({
       icon: "success",
       title: "Successful",
@@ -135,10 +136,29 @@ export class MarkArrivalComponent implements OnInit {
     }
   }
 
-  checkSealNumber(){
-    console.log('TestcheckSealNumber');
-    console.log(this.MarkArrivalTable);
+  checkSealNumber() {
+    const isMatchingSeal = this.MarkArrivalTableForm.value.Sealno == this.MarkArrivalTable.SealNo;
+
+    this.MarkArrivalTableForm.controls.SealStatus.setValue(isMatchingSeal ? 'Matching' : 'Not Matching');
+
+    this.jsonControlArray.forEach(data => {
+      if (data.name === 'Reason') {
+        // Set Late Reason related variables
+        data.generatecontrol = !isMatchingSeal;
+
+        if (isMatchingSeal) {
+          data.Validations = [];
+          this.MarkArrivalTableForm.controls.Reason.clearValidators();
+        } else {
+          data.Validations = [{
+            name: "required",
+            message: "Seal Change reason is required"
+          }];
+          this.MarkArrivalTableForm.controls.Reason.setValidators([Validators.required]);
+        }
+
+        this.MarkArrivalTableForm.controls.Reason.updateValueAndValidity();
+      }
+    });
   }
-
-
 }

@@ -44,6 +44,8 @@ import { DispatchVehicleComponent } from './dispatch-vehicle/dispatch-vehicle.co
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { ManifestGenerationComponent } from './manifest-generation/manifest-generation.component';
 import { SnackBarUtilityService } from '../Utility/SnackBarUtility.service';
+import { CompanygstmasterListComponent } from './Company GST Master/companygstmaster-list/companygstmaster-list.component';
+import { CompanygstmasterAddComponent } from './Company GST Master/companygstmaster-add/companygstmaster-add.component';
 @NgModule({
 
   imports: [
@@ -87,7 +89,7 @@ import { SnackBarUtilityService } from '../Utility/SnackBarUtility.service';
 
   ],
 
-  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent, GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent, DispatchVehicleComponent, ManifestGenerationComponent],
+  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent, GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent, DispatchVehicleComponent, ManifestGenerationComponent, CompanygstmasterListComponent, CompanygstmasterAddComponent],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, jsonDataServiceService,FilterUtils,SnackBarUtilityService]
 })

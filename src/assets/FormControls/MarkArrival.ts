@@ -79,14 +79,21 @@ export class MarkArrivalControl {
                 placeholder: '',
                 type: "text",
                 value: '',
-                Validations: [{
-                    name: "required",
-                    message: "Seal No is required"
-                }],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Seal No is required"
+                    },
+                    {
+                        name: "pattern",
+                        message: "Please enter a Seal No. consisting of 1 to 7 alphanumeric characters.",
+                        pattern: "^[a-zA-Z 0-9]{1,7}$",
+                    }
+                ],
                 generatecontrol: true,
                 disable: false,
                 functions: {
-                    onModel: 'checkSealNumber',
+                    onChange: 'checkSealNumber',
                 },
             },
 
@@ -98,17 +105,7 @@ export class MarkArrivalControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
-            },
-            {
-                name: 'Reason',
-                label: 'Seal Change Reason',
-                placeholder: '',
-                type: 'text',
-                value: '',
-                Validations: [],
-                generatecontrol: true,
-                disable: false
+                disable: true
             },
             {
                 name: 'LateReason',
@@ -131,6 +128,16 @@ export class MarkArrivalControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
+                disable: false
+            },
+            {
+                name: 'Reason',
+                label: 'Seal Change Reason',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [],
+                generatecontrol: false,
                 disable: false
             },
         ];

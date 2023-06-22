@@ -8,6 +8,7 @@ import { LoadingsheetComponent } from './loadingsheet/loadingsheet.component';
 import { LoadingSheetDetailsComponent } from './loading-sheet-details/loading-sheet-details.component';
 import { DispatchVehicleComponent } from './dispatch-vehicle/dispatch-vehicle.component';
 import { ManifestGenerationComponent } from './manifest-generation/manifest-generation.component';
+import { CompanygstmasterListComponent } from './Company GST Master/companygstmaster-list/companygstmaster-list.component';
 
 const routes: Routes = [
   {path:'Docket/Create',component:CNoteGenerationComponent},
@@ -17,8 +18,8 @@ const routes: Routes = [
   {path:'Docket/LoadingSheet',component:LoadingsheetComponent},
   {path:'Docket/LoadingSheetDetails',component:LoadingSheetDetailsComponent},
   {path:'Docket/DispatchVehicle',component:DispatchVehicleComponent},
-  {path:'Docket/ManifestGeneration',component:ManifestGenerationComponent}
-
+  {path:'Docket/ManifestGeneration',component:ManifestGenerationComponent},
+  {path:'CompanyGSTMaster/CompanyGSTMasterList',component:CompanygstmasterListComponent}
 ];
 
 @NgModule({

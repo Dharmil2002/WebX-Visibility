@@ -20,9 +20,9 @@ export class StocksComponent extends UnsubscribeOnDestroyAdapter implements OnIn
   menuItemflag: boolean = true;
   breadscrums = [
     {
-      title: "Docket Stocks",
+      title: "Docket Stock",
       items: ["Dashboard"],
-      active: "Docket Stocks"
+      active: "Docket Stock"
     }
   ]
   METADATA = {
@@ -39,7 +39,7 @@ export class StocksComponent extends UnsubscribeOnDestroyAdapter implements OnIn
    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
    want hyper link and add Path which you want to redirect*/
   linkArray = [
-    { Row: 'Action', Path: 'Operation/CreateRunSheet' }
+    { Row: 'Action', Path: 'Masters/Docket/Create' }
   ]
   menuItems = [
     { label: 'Create Run Sheet' },
@@ -47,25 +47,20 @@ export class StocksComponent extends UnsubscribeOnDestroyAdapter implements OnIn
   ];
   //Warning--It`s Used is not compasary if you does't add any link you just pass blank array
   /*End*/
-  toggleArray = [
-    'activeFlag',
-    'isActive',
-    'isActiveFlag',
-    'isMultiEmployeeRole'
-  ]
+  toggleArray = []
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table > 
 
   columnHeader = {
     "No": "Cnote",
-    "Date": "Date of Cnote",
-    "PaymentType": "Payment Type",
+    "Date": "Date",
+    "PaymentType": "Pay-Type",
     "ContractParty": "Contract Party",
-    "Origin-Destination": "Origin-Destination",
-    "FromCity-ToCity": "From City-To City",
-    "NoofPackages": "No of Packages",
-    "ActualWeight": "Actual Weight",
-    "ChargedWeight": "Charged Weight",
+    "Origin-Destination": "Org-Dest",
+    "FromCity-ToCity": "Leg",
+    "NoofPackages": "Packages",
+    "ActualWeight": "Act-Weight",
+    "ChargedWeight": "Chrg-Weight",
     "Status": "Status",
     "Action": "Action"
   }
@@ -90,11 +85,9 @@ export class StocksComponent extends UnsubscribeOnDestroyAdapter implements OnIn
   // viewComponent: any;
   boxData: { count: any; title: any; class: string; }[];
   // declararing properties
-
   constructor(private http: HttpClient, private Route: Router) {
     super();
   }
-
   ngOnInit(): void {
     this.getRunSheetDetails();
   }
@@ -107,7 +100,6 @@ export class StocksComponent extends UnsubscribeOnDestroyAdapter implements OnIn
       // Extract relevant data arrays from the response
       //const tableArray = this.data['tabledata'];
       this.tableload = false;
-
     }
     );
   }

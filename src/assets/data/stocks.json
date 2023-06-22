@@ -10,7 +10,7 @@
         "NoofPackages": 40,
         "ActualWeight": 80,
         "ChargedWeight": 80,
-        "Status": "Quick Docket Booked",
+        "Status": "QDB",
         "Action": "Quick Completion"
       },
       {
@@ -23,7 +23,7 @@
         "NoofPackages": 230,
         "ActualWeight": 200,
         "ChargedWeight": 200,
-        "Status": "Quick Docket Booked",
+        "Status": "QDB",
         "Action": "Quick Completion"
       },
       {
@@ -36,7 +36,7 @@
         "NoofPackages": 120,
         "ActualWeight": 70,
         "ChargedWeight": 70,
-        "Status": "Quick Docket Booked",
+        "Status": "QDB",
         "Action": "Quick Completion"
       },
       {
@@ -49,7 +49,7 @@
         "NoofPackages": 320,
         "ActualWeight": 280,
         "ChargedWeight": 280,
-        "Status": "Quick Docket Booked",
+        "Status": "QDB",
         "Action": "Quick Completion"
       },
       {
@@ -62,7 +62,7 @@
         "NoofPackages": 100,
         "ActualWeight": 70,
         "ChargedWeight": 70,
-        "Status": "Quick Docket Booked",
+        "Status": "QDB",
         "Action": "Quick Completion"
       },
       {
@@ -153,21 +153,21 @@
     "StockCountData": [
       {
         "count": 48,
-        "title": "Cnotes Booked",
+        "title": "Total",
         "class": "info-box7 bg-danger order-info-box7"
       },
       {
         "count": 33,
-        "title": "Available for Quick Completion",
+        "title": "Completion",
         "class": "info-box7 bg-info order-info-box7"
       },
       {
         "count": 14,
-        "title": "Available for Loading Sheet",
+        "title": "Loading Sheet",
         "class": "info-box7 bg-warning order-info-box7"
       },{
         "count": 10,
-        "title": "Available for Delivery",
+        "title": "Delivery",
         "class": "info-box7 bg-danger order-info-box7"
       }
     ]

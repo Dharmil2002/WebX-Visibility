@@ -19,10 +19,19 @@
                         <mat-tab>
                             <ng-template mat-tab-label>
                                 <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
+                                Docket Stock
+
+                            </ng-template>
+                            <app-stocks *ngIf="myTabGroup.selectedIndex== 1"
+                                (CurrentIndex)="GetSelectedIndex($event)" (departure)="departureDetails"></app-stocks>
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
                                 Arrivals
 
                             </ng-template>
-                            <app-arrival-dashboard-page *ngIf="myTabGroup.selectedIndex== 1"
+                            <app-arrival-dashboard-page *ngIf="myTabGroup.selectedIndex== 2"
                                 (CurrentIndex)="GetSelectedIndex($event)" (departure)="departureDetails"></app-arrival-dashboard-page>
                         </mat-tab>
                         <mat-tab>
@@ -31,7 +40,7 @@
                                 Departures
 
                             </ng-template>
-                            <app-departure-dashboard-page *ngIf="myTabGroup.selectedIndex==2"
+                            <app-departure-dashboard-page *ngIf="myTabGroup.selectedIndex==3"
                                 (CurrentIndex)="GetSelectedIndex($event)" [arrivaldeparture]="departure"></app-departure-dashboard-page>
                         </mat-tab>
                         <mat-tab>
@@ -40,7 +49,7 @@
                                 Delivery
 
                             </ng-template>
-                            <app-pickup-delivery-planner *ngIf="myTabGroup.selectedIndex==3"
+                            <app-pickup-delivery-planner *ngIf="myTabGroup.selectedIndex==4"
                                 (CurrentIndex)="GetSelectedIndex($event)"></app-pickup-delivery-planner>
                         </mat-tab>
                         <mat-tab>

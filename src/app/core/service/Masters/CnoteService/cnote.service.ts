@@ -17,6 +17,7 @@ export class CnoteService {
   private VehiceLodingSheetData:any;
   private MeniFlexPackageData:any
   vehicleArrivalData: any;
+  shipingData: any;
   //tab:number;
   getData(): any {
     return this.savedData;
@@ -76,6 +77,16 @@ setVehicleArrivalData(data){
 }
 //End//
 
+/*for Shiping Data*/
+setShipingData(data){
+  this.shipingData=data;
+}
+/*end*/
+/*getShipingData*/
+getShipingData(){
+  return this.shipingData;
+}
+/*End*/
 /*here Function call to Get VehicleArrivalData in Mark-arrival-component.ts*/
 getVehicleArrivalData(){
   return this.vehicleArrivalData;

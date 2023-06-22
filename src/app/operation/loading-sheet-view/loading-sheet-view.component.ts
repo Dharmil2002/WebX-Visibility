@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GenericTableComponent } from '../../shared-components/Generic Table/generic-table.component';
+import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 
 @Component({
   selector: 'app-loading-sheet-view',
@@ -70,7 +71,7 @@ export class LoadingSheetViewComponent implements OnInit {
   //#endregion
 
 
-  constructor(private http: HttpClient, private Route: Router, public dialogRef: MatDialogRef<GenericTableComponent>, @Inject(MAT_DIALOG_DATA) public item: any) {
+  constructor(private http: HttpClient, private Route: Router,private cnoteService: CnoteService,public dialogRef: MatDialogRef<GenericTableComponent>, @Inject(MAT_DIALOG_DATA) public item: any) {
     if (item) {
       this.loadinSheet = item;
       //this.extraData=this.Route.getCurrentNavigation()?.extras?.state.data.extraData;
@@ -95,6 +96,7 @@ export class LoadingSheetViewComponent implements OnInit {
     this.dataDetails = data;
   }
   updateShipping() {
+    debugger
     let jsonShipping = {
       shipping: this.dataDetails ? this.dataDetails : this.csv.filter((x) => x.isSelected == true)
     }
@@ -104,7 +106,8 @@ export class LoadingSheetViewComponent implements OnInit {
 
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
-      let tableArray = this.data.shippingData.filter((x) => x.Leg == this.loadinSheet.lag);
+      let ShipingDatadetails=this.cnoteService.getShipingData();
+      let tableArray = ShipingDatadetails.filter((x)=>x.Leg === this.loadinSheet.lag)
       let packagesData = this.data.packagesData.filter((x) =>
         tableArray.some((shipment) => shipment.Shipment === x.Shipment));
       let mergedData: any[] = [];

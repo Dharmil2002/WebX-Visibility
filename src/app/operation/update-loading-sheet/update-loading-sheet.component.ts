@@ -93,7 +93,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   getShippningData() {
 
-
     this.data = this.cnoteService.getVehicleArrivalData();
     let tableArray = this.data['shippingData'];
     // const shippingData = tableArray.map(shipData => {
@@ -154,6 +153,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
         text: "This package does not belong to the current branch.",
         showConfirmButton: true,
       });
+      this.tableload=false;
       return;
     }
     //if Destination is Not Belongs to Currect location then to allow to unload a packaged
@@ -164,6 +164,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
         text: "This package does not belong to the current branch.",
         showConfirmButton: true,
       });
+      this.tableload=false;
       return;
     }
     // Check if the package is already scanned
@@ -174,7 +175,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
         text: "Your Package ID is already scanned.",
         showConfirmButton: true,
       });
+      this.tableload=false;
       return;
+    
     }
 
     // Find the element in csv array that matches the shipment
@@ -189,6 +192,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
         text: "Cannot perform the operation. Packages must be greater than Unloaded.",
         showConfirmButton: true,
       });
+      this.tableload=false;
       return;
     }
 

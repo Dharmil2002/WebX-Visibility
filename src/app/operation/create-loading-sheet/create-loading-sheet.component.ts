@@ -91,6 +91,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   listDepartueDetail: any;
   getloadingFormData: any;
   legWiseData: any;
+  updateShiping: any;
   //#endregion
 
 
@@ -225,19 +226,19 @@ export class CreateLoadingSheetComponent implements OnInit {
       if (!this.isShipmentUpdate) {
         this.shipmentData = res;
         filterData = this.shipmentData.shippingData.filter(
-          (x) => x.routes.trim() === this.tripData.RouteandSchedule.trim()
-        );
-        
+          (x) => x.routes.trim() === this.tripData.RouteandSchedule.trim() && x.Destination.trim()!==this.orgBranch.trim())
+        this.CnoteService.setShipingData(filterData)
         let routeData = transform(this.tripData.RouteandSchedule, this.orgBranch)
         let CurrectLeg = routeData.split("-").splice(1);
 
         this.legWiseData = this.shipmentData.shippingData.filter((x) => {
           return x.Origin.trim() === this.orgBranch && x.routes.trim() === this.tripData.RouteandSchedule.trim() && CurrectLeg.includes(x.Destination);
         });
+        
         packagesData = this.shipmentData.packagesData.filter((x) =>
           filterData.some((shipment) => shipment.Shipment === x.Shipment)
         );
-        
+
          combinedData = filterData.map((filterItem) => {
           const packageItem = packagesData.find(
             (packageItem) => packageItem.Shipment === filterItem.Shipment
@@ -347,6 +348,10 @@ export class CreateLoadingSheetComponent implements OnInit {
       SwalerrorMessage("error", "Please Select Any one Record", "", true);
     }
   }
+  }
+  updateLoadingData(event){
+   
+
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });

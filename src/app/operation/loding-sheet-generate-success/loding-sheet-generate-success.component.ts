@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
+import { ViewPrintComponent } from '../view-print/view-print.component';
 @Component({
   selector: 'app-loding-sheet-generate-success',
   templateUrl: './loding-sheet-generate-success.component.html'
@@ -53,10 +54,12 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
 
   // ]
   linkArray = [
-
-    { Row: 'Action', Path: 'Operation/ViewPrint' }
-
+    { Row: 'Action', Path: '', componentDetails: "" }
   ]
+  menuItems = [
+    { label: 'Action',componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
+    // Add more menu items as needed
+  ];
 
   // menuItems = [
 

@@ -18,6 +18,8 @@ export class CnoteService {
   private MeniFlexPackageData:any
   vehicleArrivalData: any;
   shipingData: any;
+  NestedShipingData: any;
+  groupedShipments: any;
   //tab:number;
   getData(): any {
     return this.savedData;
@@ -82,16 +84,22 @@ setShipingData(data){
   this.shipingData=data;
 }
 /*end*/
+
 /*getShipingData*/
+
 getShipingData(){
   return this.shipingData;
 }
+
 /*End*/
+
+
 /*here Function call to Get VehicleArrivalData in Mark-arrival-component.ts*/
 getVehicleArrivalData(){
   return this.vehicleArrivalData;
 }
 /*----- End ------ */
+
 
   constructor(private http: HttpClient) { }
   // GetCnoteFormcontrol() {

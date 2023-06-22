@@ -92,6 +92,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   getloadingFormData: any;
   legWiseData: any;
   updateShiping: any;
+  routeWiseData: any;
   //#endregion
 
 
@@ -225,16 +226,23 @@ export class CreateLoadingSheetComponent implements OnInit {
       let combinedData:any[]=[]
       if (!this.isShipmentUpdate) {
         this.shipmentData = res;
-        filterData = this.shipmentData.shippingData.filter(
-          (x) => x.routes.trim() === this.tripData.RouteandSchedule.trim() && x.Destination.trim()!==this.orgBranch.trim())
-        this.CnoteService.setShipingData(filterData)
+
+        // filterData = this.shipmentData.shippingData.filter(
+        //   (x) => x.routes.trim() === this.tripData.RouteandSchedule.trim() && x.Destination.trim()!==this.orgBranch.trim())
         let routeData = transform(this.tripData.RouteandSchedule, this.orgBranch)
         let CurrectLeg = routeData.split("-").splice(1);
-
         this.legWiseData = this.shipmentData.shippingData.filter((x) => {
-          return x.Origin.trim() === this.orgBranch && x.routes.trim() === this.tripData.RouteandSchedule.trim() && CurrectLeg.includes(x.Destination);
-        });
-        
+            return x.Origin.trim() === this.orgBranch && CurrectLeg.includes(x.Destination);
+          });
+          
+          this.routeWiseData=this.shipmentData.shippingData.filter((x)=>x.routes.trim()===this.tripData.RouteandSchedule.trim() && x.Destination!==this.orgBranch)
+          let mergedData = this.legWiseData.concat(this.routeWiseData);
+           let uniqueData = Array.from(new Set(mergedData));
+           filterData=uniqueData;
+        this.CnoteService.setShipingData(filterData);
+      
+
+       
         packagesData = this.shipmentData.packagesData.filter((x) =>
           filterData.some((shipment) => shipment.Shipment === x.Shipment)
         );
@@ -350,8 +358,18 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   }
   updateLoadingData(event){
-   
-
+    let Packages = event.shipping.reduce((total, current) => total + current.Packages, 0);
+    let totalWeightKg = event.shipping.reduce((total, current) => total + current.KgWeight, 0);
+    let totalVolumeCFT = event.shipping.reduce((total, current) => total + current.CftVolume, 0)
+    this.csv.find((x)=>{
+       if(x.lag===event.shipping[0].Leg){
+          x.Shipment=event.shipping.length,
+          x.WeightKg=totalWeightKg,
+          x.VolumeCFT=totalVolumeCFT,
+          x.Packages=Packages
+  }
+});
+    // this.getshipmentData(event) 
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });

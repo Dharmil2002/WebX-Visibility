@@ -96,7 +96,7 @@ export class LoadingSheetViewComponent implements OnInit {
     this.dataDetails = data;
   }
   updateShipping() {
-    debugger
+
     let jsonShipping = {
       shipping: this.dataDetails ? this.dataDetails : this.csv.filter((x) => x.isSelected == true)
     }
@@ -141,6 +141,7 @@ export class LoadingSheetViewComponent implements OnInit {
     });
   }
   createLoadingSheetData() {
+    
     this.Route.navigate(['Operation/CreateLoadingSheet'], {
       state: {
         shipping: this.dataDetails ? this.dataDetails : this.csv.filter((x) => x.isSelected == true),

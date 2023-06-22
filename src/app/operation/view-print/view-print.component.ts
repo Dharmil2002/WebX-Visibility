@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-view-print',
@@ -6,7 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ViewPrintComponent implements OnInit {
 
-  constructor() { }
+  constructor() { 
+    Swal.fire({
+      icon: "success",
+      title: "Successful",
+      text: `View Print is in under development!`,//
+      showConfirmButton: true,
+    })
+  }
 
   ngOnInit(): void {
 

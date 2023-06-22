@@ -160,7 +160,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     if (unloadPackage.Destination.trim() !== this.currentBranch) {
       Swal.fire({
         icon: "error",
-        title: "Not Allow to Unload Package",
+        title: "Not Allowed",
         text: "This package does not belong to the current branch.",
         showConfirmButton: true,
       });

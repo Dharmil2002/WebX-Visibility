@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
@@ -85,7 +85,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   shipingDataTable: any;
   constructor(private Route: Router, private dialog: MatDialog, public dialogRef: MatDialogRef<MarkArrivalComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
-    private http: HttpClient, private fb: UntypedFormBuilder, private cnoteService: CnoteService) {
+    private http: HttpClient, private fb: UntypedFormBuilder,private cdr: ChangeDetectorRef,private cnoteService: CnoteService) {
     this.shipmentStatus = 'Unloaded'
     this.arrivalData = item;
     this.getShippningData();
@@ -136,6 +136,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   }
   updatePackage() {
+    this.tableload=true;
     // Get the trimmed values of scan and leg
     const scanValue = this.loadingSheetTableForm.value.Scan.trim();
     ///const legValue = this.arrivalData.Leg.trim();
@@ -204,7 +205,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
     // Call kpiData function
     this.boxData = kpiData(this.csv, this.shipmentStatus, event);
-
+    this.cdr.detectChanges(); // Trigger change detection
+    this.tableload=false;
   }
 
   setArrivalDataBindData() {

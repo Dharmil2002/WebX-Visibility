@@ -92,47 +92,47 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.IntializeFormControl()
   }
   getShippningData() {
-    
-    this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
-      let tableArray = this.data['shippingData'];
-      // const shippingData = tableArray.map(shipData => {
-      //   return { ...shipData, Pending: shipData.Packages };
-      // });
-      let shipments: Shipment[] = tableArray.map(shipData => {
-        return { ...shipData, Pending: shipData.Packages };
-      });;
-      let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, this.currentBranch);
-      // const filteredData = this.filterShipmentsByRouteAndLocation(tableArray, this.arrivalData?.Route, this.arrivalData?.ArrivalLocation);
-      // this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
-      this.csv = filteredShipments;
 
-      this.boxData = kpiData(this.csv, this.shipmentStatus, "");
-      this.tableload = false;
 
-      let shipingTableData = this.csv;
-      let shipingTableDataArray: any = []
-      shipingTableData.forEach(element => {
-        let uniqueShipments = {};
-        this.data.packagesData.forEach(x => {
-          if (x.Leg.trim() === element.Leg && x.Routes === element.routes) {
-            uniqueShipments[x.Shipment] = true;
-          }
-        });
-        let packageData = this.data.packagesData.filter(x => x.Leg.trim() === element.Leg && x.Routes === element.routes);
-        let totalWeightKg = packageData.reduce((total, current) => total + current.KgWeight, 0);
-        let totalVolumeCFT = packageData.reduce((total, current) => total + current.CftVolume, 0)
-        let shipingJson = {
-          Leg: element?.Leg || '',
-          Shipment: [uniqueShipments].length,
-          Packages: element?.Packages || 0,
-          WeightKg: totalWeightKg,
-          VolumeCFT: totalVolumeCFT
+    this.data = this.cnoteService.getVehicleArrivalData();
+    let tableArray = this.data['shippingData'];
+    // const shippingData = tableArray.map(shipData => {
+    //   return { ...shipData, Pending: shipData.Packages };
+    // });
+    let shipments: Shipment[] = tableArray.map(shipData => {
+      return { ...shipData, Pending: shipData.Packages };
+    });;
+    let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, this.currentBranch);
+    // const filteredData = this.filterShipmentsByRouteAndLocation(tableArray, this.arrivalData?.Route, this.arrivalData?.ArrivalLocation);
+    // this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
+    this.csv = filteredShipments;
+
+    this.boxData = kpiData(this.csv, this.shipmentStatus, "");
+    this.tableload = false;
+
+    let shipingTableData = this.csv;
+    let shipingTableDataArray: any = []
+    shipingTableData.forEach(element => {
+      let uniqueShipments = {};
+      this.data.packagesData.forEach(x => {
+        if (x.Leg.trim() === element.Leg && x.Routes === element.routes) {
+          uniqueShipments[x.Shipment] = true;
         }
-        shipingTableDataArray.push(shipingJson)
       });
-      this.shipingDataTable = shipingTableDataArray;
+      let packageData = this.data.packagesData.filter(x => x.Leg.trim() === element.Leg && x.Routes === element.routes);
+      let totalWeightKg = packageData.reduce((total, current) => total + current.KgWeight, 0);
+      let totalVolumeCFT = packageData.reduce((total, current) => total + current.CftVolume, 0)
+      let shipingJson = {
+        Leg: element?.Leg || '',
+        Shipment: [uniqueShipments].length,
+        Packages: element?.Packages || 0,
+        WeightKg: totalWeightKg,
+        VolumeCFT: totalVolumeCFT
+      }
+      shipingTableDataArray.push(shipingJson)
     });
+    this.shipingDataTable = shipingTableDataArray;
+
 
   }
   updatePackage() {
@@ -262,37 +262,13 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   CompleteScan() {
     let packageChecked = false;
-    let locationWiseData=this.csv.filter((x)=>x.Destination===this.currentBranch);
+    let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
     if (exists) {
-      packageChecked =locationWiseData.every(obj => obj.Packages === obj.Unloaded);
+      packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
     if (packageChecked) {
-      if (this.shipmentStatus == 'Loaded') {
-        const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
-          width: '100%', // Set the desired width
-          data: { arrivalData: this.arrivalData, loadingSheetData: this.csv } // Pass the data object
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-          let arravalDataDetails = [this.arrivalData];
-          arravalDataDetails.forEach(x => {
-            x.Action = "DEPART VEHICLE"
-            x.menifestNo = result[0].MFNumber
-          })
-          // this.cnoteService.setLsData(arravalDataDetails);
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: `Manifest Generated Successfully`,
-            showConfirmButton: true,
-          })
-          this.goBack(2);
-          this.dialogRef.close(arravalDataDetails)
-          // Handle the result after the dialog is closed
-        });
-      }
-      else {
+  
         Swal.fire({
           icon: "success",
           title: "Successful",
@@ -300,7 +276,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
           showConfirmButton: true,
         })
         this.dialogRef.close(this.loadingSheetTableForm.value)
-      }
     }
     else {
       Swal.fire({

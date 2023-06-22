@@ -155,7 +155,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         shipment: this.csv.length,
         Package: element.loaded,
       };
-         this.kpiData(event);
+  this.kpiData(event);
   }
   kpiData(event) {
     let packages = 0;

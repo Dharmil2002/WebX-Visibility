@@ -81,12 +81,12 @@ export class MarkArrivalComponent implements OnInit {
       this.arrivalData = this.CnoteService.getVehicleArrivalData();
       // Check if the record exists
       // Update the desired fields, keeping the other fields unchanged
-      this.arrivalData.forEach(element => {
+      this.arrivalData.arrivalData.forEach(element => {
         if (element.Route === arrivealDetail.Route) {
           element.Action = 'Arrival Scan'
         }
       });
-      let arrivalNestedData = this.arrivalData.filter((x) => x.module == 'Arrival');
+      let arrivalNestedData = this.arrivalData.arrivalData.filter((x) => x.module == 'Arrival');
       this.dialogRef.close(arrivalNestedData)
     Swal.fire({
       icon: "success",

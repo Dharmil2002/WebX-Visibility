@@ -91,6 +91,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   IscheckBoxRequired: boolean;
   boxData: { count: any; title: any; class: string; }[];
   departureDetails: any;
+  isCalled: boolean;
   // declararing properties
   constructor(private http: HttpClient, private CnoteService: CnoteService) {
 
@@ -113,7 +114,14 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   getArrivalDetails() {
 
     this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
+      if(this.CnoteService.getVehicleArrivalData())
+      {
+        this.data=this.CnoteService.getVehicleArrivalData();
+      }
+      else{
+        this.data = res
+      }
+      
       let tableArray = this.data;
       // Get today's date
       const today = new Date();
@@ -186,7 +194,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
 
       /*here set the value for Mark-Arrival*/
       
-      this.CnoteService.setVehicleArrivalData(this.csv);
+      this.CnoteService.setVehicleArrivalData(this.data);
       
       /*  End  */
 
@@ -196,6 +204,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
 
   }
   updateDepartureData(event) {
+  
     const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
     const action = result?.Action ?? '';
     if (action) {
@@ -205,6 +214,14 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       this.CnoteService.setDeparture(event)
       if(event){
       this.csv = this.csv.filter((x) => x.TripID != event.tripID);
+      /*Here Function is Declare for get Latest arrival Data*/
+      let arrivalData={
+        arrivalData:this.csv,
+        packagesData:this.data?.packagesData||"",
+        shippingData:this.data?.shippingData||""
+      }
+      this.CnoteService.setVehicleArrivalData(arrivalData);
+      /*End*/
       }
 
     }

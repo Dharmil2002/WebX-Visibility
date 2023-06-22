@@ -23,6 +23,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
+  currentBranch: string = localStorage.getItem("Branch") || '';
   columnHeader = {
     "Shipment": "Shipment",
     "Origin": "Origin",
@@ -55,12 +56,14 @@ export class VehicleUpdateUploadComponent implements OnInit {
     boxData: { count: any; title: any; class: string; }[];
     updateListData: any;
     Scan: any;
+  vehicelLoadData: any;
   constructor(private Route: Router, private dialog: MatDialog, public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private http: HttpClient, private fb: UntypedFormBuilder, private cnoteService: CnoteService) { 
       if (item.LoadingSheet) {
         this.arrivalData = this.cnoteService.getVehicleLoadingData();
         this.shipmentStatus = 'Loaded'
+        this.vehicelLoadData=item;
       }
       this.getShippningData();
       this.IntializeFormControl()
@@ -69,6 +72,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   ngOnInit(): void {
   }
   getShippningData() {
+  
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
@@ -76,7 +80,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         return { ...shipData, Pending: shipData.Packages };
       });
 
-        this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.RouteandSchedule.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
+        this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.RouteandSchedule.trim() && item.Leg.trim() === this.vehicelLoadData.Leg.trim());
 
       this.kpiData("")
 
@@ -85,49 +89,73 @@ export class VehicleUpdateUploadComponent implements OnInit {
     });
   }
   updatePackage() {
-    let Loaded = this.data.packagesData.find((x) => x.PackageId.trim() === this.loadingSheetTableForm.value.Scan.trim() && x.Leg.trim() === this.arrivalData.Leg.trim());
-
-    if (Loaded && !Loaded.ScanFlag) {
-      this.csv.forEach((element) => {
-        if (element.Shipment === Loaded.Shipment) {
-          if (!element.hasOwnProperty('Loaded') || element.Packages > element.loaded) {
-            element.Pending -= 1;
-            element.loaded = (element.loaded || 0) + 1;
-            Loaded.ScanFlag=true
-            let kpiData={
-              shipment:this.csv.length,
-              Package:element.loaded
-            }
-            this.kpiData(kpiData) 
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Invalid Operation",
-              text: "Cannot perform the operation. Packages must be greater than loaded.",
-              showConfirmButton: true,
-            });
-          }
-        }
-      });
-    }
-    else if(!Loaded.hasOwnProperty('Loaded') ||Loaded.ScanFlag){
-      Swal.fire({
-        icon: "info",
-        title: "Already Scanned",
-        text: "Your Package ID is Already Scanned.",
-        showConfirmButton: true,
-      });
-    }
-     else {
-      Swal.fire({
-        icon: "error",
-        title: "Not Match with Shipment",
-        text: "Your Package ID does not match with any shipment.",
-        showConfirmButton: true,
-      });
-    }
-
-
+      
+      // Get the trimmed values of scan and leg
+      const scanValue = this.loadingSheetTableForm.value.Scan.trim();
+      ///const legValue = this.arrivalData.Leg.trim();
+      const legValue = this.arrivalData.RouteandSchedule.trim();
+  
+      // Find the unload package based on scan and leg values
+      const loadPackage = this.data.packagesData.find(x => x.PackageId.trim() === scanValue && x.Routes.trim() === legValue);
+  
+      // Check if the unload package exists
+      if (!loadPackage) {
+        // Package does not belong to the current branch
+        Swal.fire({
+          icon: "error",
+          title: "Not Allow to load Package",
+          text: "This package does not belong to the current branch.",
+          showConfirmButton: true,
+        });
+        return;
+      }
+      //if Destination is Not Belongs to Currect location then to allow to unload a packaged
+      if (loadPackage.Destination.trim() == this.currentBranch) {
+        Swal.fire({
+          icon: "error",
+          title: "Not Allow to load Package",
+          text: "This package does not belong to the current branch.",
+          showConfirmButton: true,
+        });
+        return;
+      }
+      // Check if the package is already scanned
+      if (loadPackage.ScanFlag) {
+        Swal.fire({
+          icon: "info",
+          title: "Already Scanned",
+          text: "Your Package ID is already scanned.",
+          showConfirmButton: true,
+        });
+        return;
+      }
+  
+      // Find the element in csv array that matches the shipment
+      const element = this.csv.find(e => e.Shipment === loadPackage.Shipment);
+  
+      // Check if the element exists and the number of unloaded packages is less than the total packages
+      if (!element || (element.hasOwnProperty('loaded') && element.Packages <= element.loaded)) {
+        // Invalid operation, packages must be greater than Unloaded
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Operation",
+          text: "Cannot perform the operation. Packages must be greater than loaded.",
+          showConfirmButton: true,
+        });
+        return;
+      }
+  
+      // Update Pending and Unloaded counts
+      element.Pending--;
+      element.loaded = (element.loaded || 0) + 1;
+      loadPackage.ScanFlag = true;
+  
+      // Prepare kpiData
+      const event = {
+        shipment: this.csv.length,
+        Package: element.loaded,
+      };
+         this.kpiData(event);
   }
   kpiData(event) {
     let packages = 0;

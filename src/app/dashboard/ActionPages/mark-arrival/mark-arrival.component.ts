@@ -57,9 +57,9 @@ export class MarkArrivalComponent implements OnInit {
   }
 
 
-  functionCallHandler($event) {
+  functionCaller($event) {
+ 
     // console.log("fn handler called", $event);
-    debugger;
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
 

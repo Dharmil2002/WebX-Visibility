@@ -45,10 +45,6 @@ export class ManifestGeneratedComponent implements OnInit {
   ]
   toggleArray=[]
   menuItems=[]
-  // linkArray=[
-  //   { Row: 'Action', Path: 'Operation/' }
-
-  // ]
   linkArray = [
 
     { Row: 'Action', Path: 'Operation/ViewPrint' }
@@ -57,7 +53,6 @@ export class ManifestGeneratedComponent implements OnInit {
   dynamicControls = {
     add: false,
     edit: false,
-    //csv: true
   }
   loadingData: any;
   formdata: any;
@@ -72,18 +67,22 @@ export class ManifestGeneratedComponent implements OnInit {
    }
   }
   getMenifest() {
-    const randomNumber = "MF/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
-    let meniFestjson={
-      MFNumber: randomNumber,
-      Leg: this.menifest[0].Leg,
-      ShipmentsLoadedBooked:this.menifest.length+"/"+this.menifest.length,
-      PackagesLoadedBooked: this.menifest[0].Packages+"/"+this.menifest[0].Packages,
-      WeightKg: this.menifest[0].WeightKg,
-      VolumeCFT:this.menifest[0].VolumeCFT,
-      Action: "Print"
-    }
-    let MenifestGenerate=[meniFestjson];
-    this.csv=MenifestGenerate;
+    let MeniFestDetails:any=[]
+    this.menifest.forEach(element => {
+      const randomNumber = "MF/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+      let meniFestjson={
+        MFNumber: randomNumber,
+        Leg: element?.Leg||'',
+        ShipmentsLoadedBooked:this.menifest.length+"/"+this.menifest.length,
+        PackagesLoadedBooked:element?.Packages ||''+"/"+ element?.Packages||'',
+        WeightKg: this.menifest[0].WeightKg,
+        VolumeCFT:this.menifest[0].VolumeCFT,
+        Action: "Print"
+      }
+      MeniFestDetails.push(meniFestjson)
+    });
+ 
+    this.csv=MeniFestDetails;
   }
 
   ngOnInit(): void {

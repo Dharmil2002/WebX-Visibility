@@ -6,7 +6,6 @@ import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.se
 import { vehicleLoadingControl } from '../../../assets/FormControls/vehicleloading';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VehicleUpdateUploadComponent } from '../vehicle-update-upload/vehicle-update-upload.component';
-import { debug } from 'console';
 @Component({
   selector: 'app-vehicle-loading',
   templateUrl: './vehicle-loading.component.html'
@@ -16,7 +15,7 @@ export class VehicleLoadingComponent implements OnInit {
   jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
   tripData: any;
   jsonControlArray: any;
-
+  orgBranch: string = localStorage.getItem("Branch");
   //declaring breadscrum
   breadscrums = [
     {
@@ -71,6 +70,7 @@ export class VehicleLoadingComponent implements OnInit {
   constructor(private Route: Router, private CnoteService: CnoteService, private http: HttpClient, private fb: UntypedFormBuilder) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
+      console.log(this.tripData);
     }
     this.IntializeFormControl();
   }
@@ -86,7 +86,7 @@ export class VehicleLoadingComponent implements OnInit {
     this.vehicleLoadingTableForm.controls['Vehicle'].setValue(this.tripData?.VehicleNo || '');
     this.vehicleLoadingTableForm.controls['Route'].setValue(this.tripData?.RouteandSchedule || '')
     this.vehicleLoadingTableForm.controls['TripID'].setValue(this.tripData?.TripID || '')
-    this.vehicleLoadingTableForm.controls['LoadingLocation'].setValue(this.tripData?.location || '')
+    this.vehicleLoadingTableForm.controls['LoadingLocation'].setValue(this.orgBranch || '')
     this.getLoadingSheetData();
   }
   getLoadingSheetData() {

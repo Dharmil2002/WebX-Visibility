@@ -15,6 +15,7 @@ export class CnoteService {
   private runSheetData:any;
   departRunSheetData: any;
   private VehiceLodingSheetData:any;
+  private MeniFlexPackageData:any
   //tab:number;
   getData(): any {
     return this.savedData;
@@ -60,6 +61,13 @@ export class CnoteService {
 
     return this.VehiceLodingSheetData;
   }
+setMeniFlexPackageData(data){
+  this.MeniFlexPackageData=data
+}
+getMeniFlexPackageData(){
+  return this.MeniFlexPackageData
+}
+
   constructor(private http: HttpClient) { }
   // GetCnoteFormcontrol() {
   //   return this.http.get<any>(

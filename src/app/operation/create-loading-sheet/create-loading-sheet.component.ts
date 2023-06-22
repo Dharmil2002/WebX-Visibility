@@ -10,6 +10,7 @@ import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { LodingSheetGenerateSuccessComponent } from '../loding-sheet-generate-success/loding-sheet-generate-success.component';
 import { LoadingSheetViewComponent } from '../loading-sheet-view/loading-sheet-view.component';
+import { transform } from './loadingSheetCommon';
 
 @Component({
   selector: 'app-create-loading-sheet',
@@ -89,6 +90,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   shippingData: any;
   listDepartueDetail: any;
   getloadingFormData: any;
+  legWiseData: any;
   //#endregion
 
 
@@ -188,11 +190,9 @@ export class CreateLoadingSheetComponent implements OnInit {
       );
       let vehicleTypeDetails = vehicleType.find((x) => x.name.trim() == this.tripData?.VehicleType.trim() || '')
       if (vehicleTypeDetails) {
-        console.log('2');
         this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleTypeDetails)
         this.vehicleTypeDataAutofill()
       } else {
-        console.log('1');
         let vehicleDropValue={
           name:this.getloadingFormData?.vehicleType.name,
           value:this.getloadingFormData?.vehicleType.value
@@ -228,6 +228,12 @@ export class CreateLoadingSheetComponent implements OnInit {
           (x) => x.routes.trim() === this.tripData.RouteandSchedule.trim()
         );
         
+        let routeData = transform(this.tripData.RouteandSchedule, this.orgBranch)
+        let CurrectLeg = routeData.split("-").splice(1);
+
+        this.legWiseData = this.shipmentData.shippingData.filter((x) => {
+          return x.Origin.trim() === this.orgBranch && x.routes.trim() === this.tripData.RouteandSchedule.trim() && CurrectLeg.includes(x.Destination);
+        });
         packagesData = this.shipmentData.packagesData.filter((x) =>
           filterData.some((shipment) => shipment.Shipment === x.Shipment)
         );
@@ -308,11 +314,14 @@ export class CreateLoadingSheetComponent implements OnInit {
     }
     else{
     if (this.loadingData) {
+      let unmatchedRecords = this.loadingData.filter((record) => {
+        return this.legWiseData.some((item) => item.Leg !== record.lag);
+      });
       // Check if BcSerialType is "E"
       // If it is "E", set displaybarcode to true
       // Open a modal using the content parameter passed to the function
-
-
+     
+     if(unmatchedRecords.length<=0){
       const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> = this.dialog.open(LodingSheetGenerateSuccessComponent, {
         width: '100%', // Set the desired width
         data: this.loadingData // Pass the data object
@@ -330,6 +339,9 @@ export class CreateLoadingSheetComponent implements OnInit {
        this.goBack(2);
         // Handle the result after the dialog is closed
       });
+    }else{
+      SwalerrorMessage("error", "Please Select Only For Your Leg", "", true);
+    }
     }
     else {
       SwalerrorMessage("error", "Please Select Any one Record", "", true);

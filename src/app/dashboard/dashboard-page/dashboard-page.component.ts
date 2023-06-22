@@ -11,9 +11,9 @@ export class DashboardPageComponent implements OnInit {
 
   breadscrums = [
     {
-      title: "Dashboard",
-      items: ["Dashboard"],
-      active: "Dashboard"
+      title: "Network Logistics Management",
+      items: ["Home"],
+      active: "Network Logistics Management"
     }
   ]
   @ViewChild('myTabGroup') myTabGroup: MatTabGroup;

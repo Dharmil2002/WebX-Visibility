@@ -59,8 +59,8 @@ export class StocksComponent extends UnsubscribeOnDestroyAdapter implements OnIn
     "Origin-Destination": "Org-Dest",
     "FromCity-ToCity": "Leg",
     "NoofPackages": "Packages",
-    "ActualWeight": "Act-Weight",
-    "ChargedWeight": "Chrg-Weight",
+    "ActualWeight": "Act-Wt(Kg)",
+    "ChargedWeight": "Chrg-Wt(Kg)",
     "Status": "Status",
     "Action": "Action"
   }

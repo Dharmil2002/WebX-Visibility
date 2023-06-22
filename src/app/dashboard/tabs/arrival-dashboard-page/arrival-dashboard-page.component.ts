@@ -56,8 +56,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   // < column name : Column name you want to display on table >
 
   columnHeader = {
-    "VehicleNo": "Vehicle No",
     "Route": "Route",
+    "VehicleNo": "Vehicle No",
     "TripID": "Trip ID",
     "Location": "Location",
     "Scheduled": "STA",
@@ -184,8 +184,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       });
 
       const shipData = [
-        createShipDataObject(this.csv.length, "Vehicles", "bg-danger"),
         createShipDataObject(this.csv.length, "Routes", "bg-info"),
+        createShipDataObject(this.csv.length, "Vehicles", "bg-danger"),
         createShipDataObject(this.data.shippingData.length, "Shipments", "bg-warning"),
         createShipDataObject(packages, "Packages", "bg-warning")
       ];

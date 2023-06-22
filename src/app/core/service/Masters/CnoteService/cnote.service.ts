@@ -16,6 +16,7 @@ export class CnoteService {
   departRunSheetData: any;
   private VehiceLodingSheetData:any;
   private MeniFlexPackageData:any
+  vehicleArrivalData: any;
   //tab:number;
   getData(): any {
     return this.savedData;
@@ -61,12 +62,25 @@ export class CnoteService {
 
     return this.VehiceLodingSheetData;
   }
-setMeniFlexPackageData(data){
+  setMeniFlexPackageData(data){
   this.MeniFlexPackageData=data
 }
 getMeniFlexPackageData(){
   return this.MeniFlexPackageData
 }
+/*Here Function Call to Set VehicleArrivalData in
+ arriva-Dashboard.page.component.ts*/
+
+setVehicleArrivalData(data){
+  this.vehicleArrivalData=data
+}
+//End//
+
+/*here Function call to Get VehicleArrivalData in Mark-arrival-component.ts*/
+getVehicleArrivalData(){
+  return this.vehicleArrivalData;
+}
+/*----- End ------ */
 
   constructor(private http: HttpClient) { }
   // GetCnoteFormcontrol() {

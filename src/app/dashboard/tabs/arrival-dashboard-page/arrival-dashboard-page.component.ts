@@ -184,6 +184,12 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
 
       this.boxData = shipData;
 
+      /*here set the value for Mark-Arrival*/
+      
+      this.CnoteService.setVehicleArrivalData(this.csv);
+      
+      /*  End  */
+
       this.tableload = false;
 
     });

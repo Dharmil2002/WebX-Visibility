@@ -40,12 +40,12 @@ function computeLegs(routeStr: string, current: string): Legs {
     throw new Error(`Current location ${current} not found in route`);
   }
 
-  const carryforwardLeg = route
-    .slice(0, currentIndex)
-    .flatMap((origin, i) =>
-      route.slice(i + 1).map(destination => `${origin}-${destination}`)
-    )
-    .filter((_, i) => i < currentIndex * (route.length - currentIndex - 1));
+  const carryforwardLeg: RouteLeg[] = [];
+  for(let i = 0; i < currentIndex; i++) {
+    for(let j = currentIndex+1; j < route.length; j++) {
+      carryforwardLeg.push(`${route[i]}-${route[j]}`);
+    }
+  }
 
   const forwardLeg = route
     .slice(currentIndex + 1)

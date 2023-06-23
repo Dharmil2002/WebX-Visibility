@@ -20,6 +20,7 @@ export class CnoteService {
   shipingData: any;
   NestedShipingData: any;
   groupedShipments: any;
+  meniFlexDetails: any;
   //tab:number;
   getData(): any {
     return this.savedData;
@@ -99,8 +100,19 @@ getVehicleArrivalData(){
   return this.vehicleArrivalData;
 }
 /*----- End ------ */
+/*Set meniflex data */
 
+setMeniFestDetails(data){
+  this.meniFlexDetails=data
+}
 
+/*---End-----*/
+/*getMeniFestDetails*/
+getMeniFestDetails(){
+
+  return  this.meniFlexDetails
+}
+/*---End-----*/
   constructor(private http: HttpClient) { }
   // GetCnoteFormcontrol() {
   //   return this.http.get<any>(

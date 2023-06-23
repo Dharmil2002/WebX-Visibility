@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { transform } from '../create-loading-sheet/loadingSheetCommon';
 @Component({
   selector: 'app-vehicle-update-upload',
   templateUrl: './vehicle-update-upload.component.html'
@@ -33,6 +34,20 @@ export class VehicleUpdateUploadComponent implements OnInit {
     "Pending": "Pending",
     "Leg": "Leg",
   }
+  shipingHeader = {
+    "Leg": "Leg",
+    "Shipment": "Shipments",
+    "Packages": "Packages",
+    "WeightKg": "Weight Kg",
+    "VolumeCFT": "Volume CFT"
+  }
+  shipingHeaderForCsv = {
+    "Leg": "Leg",
+    "Shipment": "Shipments",
+    "Packages": "Packages",
+    "WeightKg": "Weight Kg",
+    "VolumeCFT": "Volume CFT"
+  }
   shipmentStatus: string = 'Loaded';
     //declaring breadscrum
     breadscrums = [
@@ -57,6 +72,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
     updateListData: any;
     Scan: any;
   vehicelLoadData: any;
+  shipingDataTable: any;
+  legWiseData: any;
   constructor(private Route: Router, private dialog: MatDialog, public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private http: HttpClient, private fb: UntypedFormBuilder, private cnoteService: CnoteService) { 
@@ -72,16 +89,50 @@ export class VehicleUpdateUploadComponent implements OnInit {
   ngOnInit(): void {
   }
   getShippningData() {
-  
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data['shippingData'];
       const shippingData = tableArray.map(shipData => {
         return { ...shipData, Pending: shipData.Packages };
       });
-
-        this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.RouteandSchedule.trim() && item.Leg.trim() === this.vehicelLoadData.Leg.trim());
-
+      let routeData = transform( this.arrivalData?.RouteandSchedule, this.currentBranch)
+      let CurrectLeg = routeData.split("-").splice(1);
+      this.legWiseData = shippingData.filter((x) => {
+          return x.Origin.trim() === this.currentBranch && CurrectLeg.includes(x.Destination);
+        });
+        let totalVolumeCFT,totalWeightKg,Packages
+        this.csv = this.legWiseData;
+        let shipingTableData = this.csv;
+        let groupedData = {};
+        shipingTableData.forEach(element => {
+          let leg = element.Leg.trim();
+        
+          // Check if the leg already exists in the groupedData object
+          if (!groupedData.hasOwnProperty(leg)) {
+            groupedData[leg] = {
+              Leg: leg,
+              Shipment: 0,
+              Packages: 0,
+              WeightKg: 0,
+              VolumeCFT: 0
+            };
+          }
+        
+          // Increment the shipment count
+          groupedData[leg].Shipment += 1;
+        
+          // Retrieve the package data for the current leg and routes
+          let packageData = this.data.packagesData.filter(x => x.Leg.trim() === leg && x.Routes === element.routes);
+        
+          // Calculate Packages, WeightKg, and VolumeCFT for the current leg
+          groupedData[leg].Packages += packageData.reduce((total, current) => total + current.Packages, 0);
+          groupedData[leg].WeightKg += packageData.reduce((total, current) => total + current.KgWeight, 0);
+          groupedData[leg].VolumeCFT += packageData.reduce((total, current) => total + current.CftVolume, 0);
+        });
+        
+        // Convert the groupedData object to an array of values
+        let shipingTableDataArray = Object.values(groupedData);
+        this.shipingDataTable = shipingTableDataArray;
       this.kpiData("")
 
       this.tableload = false;
@@ -89,14 +140,15 @@ export class VehicleUpdateUploadComponent implements OnInit {
     });
   }
   updatePackage() {
-      
+
+    this.tableload = true;
       // Get the trimmed values of scan and leg
       const scanValue = this.loadingSheetTableForm.value.Scan.trim();
       ///const legValue = this.arrivalData.Leg.trim();
       const legValue = this.arrivalData.RouteandSchedule.trim();
   
       // Find the unload package based on scan and leg values
-      const loadPackage = this.data.packagesData.find(x => x.PackageId.trim() === scanValue && x.Routes.trim() === legValue);
+      const loadPackage = this.data.packagesData.find(x => x.PackageId.trim() === scanValue && x.Leg.trim() === this.arrivalData.Leg);
   
       // Check if the unload package exists
       if (!loadPackage) {
@@ -107,6 +159,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
           text: "This package does not belong to the current branch.",
           showConfirmButton: true,
         });
+        this.tableload = false;
         return;
       }
       //if Destination is Not Belongs to Currect location then to allow to unload a packaged
@@ -117,6 +170,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
           text: "This package does not belong to the current branch.",
           showConfirmButton: true,
         });
+        this.tableload = false;
         return;
       }
       // Check if the package is already scanned
@@ -127,6 +181,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
           text: "Your Package ID is already scanned.",
           showConfirmButton: true,
         });
+        this.tableload = false;
         return;
       }
   
@@ -142,6 +197,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
           text: "Cannot perform the operation. Packages must be greater than loaded.",
           showConfirmButton: true,
         });
+        this.tableload = false;
         return;
       }
   
@@ -155,6 +211,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         shipment: this.csv.length,
         Package: element.loaded,
       };
+      this.tableload = false;
   this.kpiData(event);
   }
   kpiData(event) {
@@ -185,9 +242,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.arrivalData?.VehicleNo || '')
     this.loadingSheetTableForm.controls['Route'].setValue(this.arrivalData?.Route || this.arrivalData?.RouteandSchedule || '')
     this.loadingSheetTableForm.controls['tripID'].setValue(this.arrivalData?.TripID || '')
-    this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.arrivalData?.ArrivalLocation || this.arrivalData?.location || '')
+    this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.currentBranch || '')
     this.loadingSheetTableForm.controls['Loadingsheet'].setValue(this.arrivalData?.Unoadingsheet || this.arrivalData?.loadingSheetNo || '')
-    this.loadingSheetTableForm.controls['Leg'].setValue(this.arrivalData?.Leg || '')
   }
   IntializeFormControl() {
     const ManifestGeneratedFormControl = new UpdateloadingControl();

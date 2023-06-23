@@ -288,7 +288,9 @@
     "Packages": 1,
     "routes": "S003: MUMB-BLR",
     "Leg": "MUMB-BLR",
-    "Action": "loading"
+    "Action": "loading",
+    "KgWt": 568,
+    "CftVolume": 59
   },
   {
     "Shipment": 23737388,
@@ -297,7 +299,9 @@
     "Packages": 3,
     "routes": "S004: BLR-MUMB-AMD",
     "Leg": "BLR-MUMB",
-    "Action": "unloading"
+    "Action": "unloading",
+    "KgWt": 2161,
+    "CftVolume": 234
   },
   {
     "Shipment": 39884849,
@@ -306,7 +310,9 @@
     "Packages": 2,
     "routes": "S004: BLR-MUMB-AMD",
     "Leg": "BLR-AMD",
-    "Action": "unloading"
+    "Action": "unloading",
+    "KgWt": 1486,
+    "CftVolume": 172
   },
   {
     "Shipment": 39884949,
@@ -315,7 +321,9 @@
     "Packages": 1,
     "routes": "S004: BLR-MUMB-AMD",
     "Leg": "MUMB-AMD",
-    "Action": "unloading"
+    "Action": "unloading",
+    "KgWt": 501,
+    "CftVolume": 72
   },
   {
     "Shipment": 39939393,
@@ -323,8 +331,10 @@
     "Destination": "MUMB",
     "Packages": 3,
     "routes": "S005: PNQ-MUMB-VPI",
-    "Leg": " PNQ-MUMB",
-    "Action": "unloading"
+    "Leg": "PNQ-MUMB",
+    "Action": "unloading",
+    "KgWt": 1917,
+    "CftVolume": 216
   },
   {
     "Shipment": 39939394,
@@ -332,8 +342,10 @@
     "Destination": "VPI",
     "Packages": 2,
     "routes": "S005: PNQ-MUMB-VPI",
-    "Leg": " MUMB-VPI",
-    "Action": "loading"
+    "Leg": "PNQ-VPI",
+    "Action": "loading",
+    "KgWt": 1228,
+    "CftVolume": 137
   },
   {
     "Shipment": 39939395,
@@ -341,8 +353,10 @@
     "Destination": "BRDB",
     "Packages": 1,
     "routes": "S0010 : AMD-BRDB-MUMB",
-    "Leg": " AMD-BRDB",
-    "Action": "unloading"
+    "Leg": "AMD-BRDB",
+    "Action": "unloading",
+    "KgWt": 613,
+    "CftVolume": 69
   },
   {
     "Shipment": 39939396,
@@ -350,8 +364,10 @@
     "Destination": "MUMB",
     "Packages": 5,
     "routes": "S0010 : AMD-BRDB-MUMB",
-    "Leg": " BRDB-MUMB",
-    "Action": "loading"
+    "Leg": "AMD-MUMB",
+    "Action": "loading",
+    "KgWt": 3771,
+    "CftVolume": 380
   },
   {
     "Shipment": 39939399,
@@ -359,8 +375,10 @@
     "Destination": "BRDB",
     "Packages": 5,
     "routes": "S0002 : MUMB-BRDB-AMD",
-    "Leg": " MUMB-BRDB",
-    "Action": "loading"
+    "Leg": "MUMB-BRDB",
+    "Action": "loading",
+    "KgWt": 4276,
+    "CftVolume": 317
   },
   {
     "Shipment": 39939400,
@@ -369,7 +387,9 @@
     "Packages": 1,
     "routes": "S0003 : MUMB-BRDB-AMD",
     "Leg": "MUMB-AMD",
-    "Action": "loading"
+    "Action": "loading",
+    "KgWt": 879,
+    "CftVolume": 68
   },
   {
     "Shipment": 39939402,
@@ -377,8 +397,10 @@
     "Destination": "MUMB",
     "Packages": 1,
     "routes": "S0038: NAGM-PNQ-MUMB",
-    "Leg": " NAGM-MUMB",
-    "Action": "unloading"
+    "Leg": "NAGM-MUMB",
+    "Action": "unloading",
+    "KgWt": 656,
+    "CftVolume": 80
   },
   {
     "Shipment": 39939403,
@@ -387,7 +409,9 @@
     "Packages": 4,
     "routes": "S0008: MUMB-BNGB",
     "Leg": "MUMB-BNGB",
-    "Action": "loading"
+    "Action": "loading",
+    "KgWt": 2981,
+    "CftVolume": 320
   },
   {
     "Shipment": 39939404,
@@ -395,8 +419,10 @@
     "Destination": "PNQ",
     "Packages": 2,
     "routes": "S0026 : MUMB-PNQ-BNGB",
-    "Leg": " MUMB-PNQ",
-    "Action": "loading"
+    "Leg": "MUMB-PNQ",
+    "Action": "loading",
+    "KgWt": 1851,
+    "CftVolume": 166
   },
   {
     "Shipment": 39939405,
@@ -404,8 +430,10 @@
     "Destination": "BNGB",
     "Packages": 1,
     "routes": "S0027 : MUMB-PNQ-BNGB",
-    "Leg": " MUMB-BNGB",
-    "Action": "loading"
+    "Leg": "MUMB-BNGB",
+    "Action": "loading",
+    "KgWt": 507,
+    "CftVolume": 68
   },
   {
     "Shipment": 39939406,
@@ -414,7 +442,9 @@
     "Packages": 1,
     "routes": "S0018:MUMB-CHNB",
     "Leg": "MUMB-CHNB",
-    "Action": "loading"
+    "Action": "loading",
+    "KgWt": 939,
+    "CftVolume": 58
   },
   {
     "Shipment": 39939407,
@@ -422,8 +452,10 @@
     "Destination": "SRTB",
     "Packages": 4,
     "routes": "S0070: MUMB-SRTB",
-    "Leg": " MUMB-SRTB",
-    "Action": "loading"
+    "Leg": "MUMB-SRTB",
+    "Action": "loading",
+    "KgWt": 3159,
+    "CftVolume": 331
   },
   {
     "Shipment": 39939409,
@@ -431,8 +463,10 @@
     "Destination": "MAAM",
     "Packages": 1,
     "routes": "S0111: MUMB-MAAM",
-    "Leg": " MUMB-MAAM",
-    "Action": "loading"
+    "Leg": "MUMB-MAAM",
+    "Action": "loading",
+    "KgWt": 982,
+    "CftVolume": 93
   },
   {
     "Shipment": 39939410,
@@ -440,8 +474,10 @@
     "Destination": "HUBB",
     "Packages": 1,
     "routes": "S0019: MUMB-HUBB",
-    "Leg": " MUMB-HUBB",
-    "Action": "loading"
+    "Leg": "MUMB-HUBB",
+    "Action": "loading",
+    "KgWt": 927,
+    "CftVolume": 83
   },
   {
     "Shipment": 39939411,
@@ -450,7 +486,9 @@
     "Packages": 4,
     "routes": "S0060:MUMB-AMD-JAIB",
     "Leg": "MUMB-AMD",
-    "Action": "loading"
+    "Action": "loading",
+    "KgWt": 3191,
+    "CftVolume": 313
   },
   {
     "Shipment": 39939412,
@@ -459,7 +497,9 @@
     "Packages": 5,
     "routes": "S0060:MUMB-AMD-JAIB",
     "Leg": "MUMB-JAIB",
-    "Action": "loading"
+    "Action": "loading",
+    "KgWt": 3984,
+    "CftVolume": 450
   },
   {
     "Shipment": 39939420,
@@ -468,7 +508,9 @@
     "Packages": 5,
     "routes": "S0123: MUMB-BNGB",
     "Leg": "MUMB-BNGB",
-    "Action": "loading"
+    "Action": "loading",
+    "KgWt": 4158,
+    "CftVolume": 370
   },
   {
     "Shipment": 39939421,
@@ -476,8 +518,10 @@
     "Destination": "SRTB",
     "Packages": 2,
     "routes": "S0124: MUMB-SRTB",
-    "Leg": " MUMB-SRTB",
-    "Action": "loading"
+    "Leg": "MUMB-SRTB",
+    "Action": "loading",
+    "KgWt": 1491,
+    "CftVolume": 192
   },
   {
     "Shipment": 39939423,
@@ -485,8 +529,10 @@
     "Destination": "PNQ",
     "Packages": 5,
     "routes": "S0049: MUMB-PNQ",
-    "Leg": " MUMB-PNQ",
-    "Action": "loading"
+    "Leg": "MUMB-PNQ",
+    "Action": "loading",
+    "KgWt": 3846,
+    "CftVolume": 409
   },
   {
     "Shipment": 39939425,
@@ -495,7 +541,9 @@
     "Packages": 7,
     "routes": "S003: BLR-MUMB-AMD-JPR",
     "Leg": "BLR-AMD",
-    "Action": "NoAction"
+    "Action": "NoAction",
+    "KgWt": 4509,
+    "CftVolume": 516
   },
   {
     "Shipment": 39939525,
@@ -504,7 +552,9 @@
     "Packages": 2,
     "routes": "S003: BLR-MUMB-AMD-JPR",
     "Leg": "BLR-JPR",
-    "Action": "NoAction"
+    "Action": "NoAction",
+    "KgWt": 0,
+    "CftVolume": 0
   },
   {
     "Shipment": 39939526,
@@ -513,7 +563,9 @@
     "Packages": 2,
     "routes": "S003: BLR-MUMB-AMD-JPR",
     "Leg": "BLR-MUMB",
-    "Action": "Unloading"
+    "Action": "Unloading",
+    "KgWt": 1792,
+    "CftVolume": 184
   },
   {
     "Shipment": 39939426,
@@ -522,10 +574,13 @@
     "Packages": 8,
     "routes": "S005: BLR-MUMB-AMD-JPR",
     "Leg": "MUMB-AMD",
-    "Action": "loading"
+    "Action": "loading",
+    "KgWt": 5349,
+    "CftVolume": 593
   }
  ],
- "packagesData":[
+ "packagesData":
+ [
   {
     "Shipment": 12335835,
     "PackageId": "12335835-1",
@@ -537,7 +592,7 @@
     "Action": "Loading",
     "KgWeight": 568,
     "CftVolume": 59,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 23737388,
@@ -550,7 +605,7 @@
     "Action": "Unloading",
     "KgWeight": 750,
     "CftVolume": 89,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 23737388,
@@ -563,7 +618,7 @@
     "Action": "Unloading",
     "KgWeight": 843,
     "CftVolume": 92,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 23737388,
@@ -576,7 +631,7 @@
     "Action": "Unloading",
     "KgWeight": 568,
     "CftVolume": 53,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39884849,
@@ -589,7 +644,7 @@
     "Action": "Unloading",
     "KgWeight": 985,
     "CftVolume": 100,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39884849,
@@ -602,7 +657,7 @@
     "Action": "Unloading",
     "KgWeight": 501,
     "CftVolume": 72,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39884949,
@@ -615,7 +670,7 @@
     "Action": "Unloading",
     "KgWeight": 501,
     "CftVolume": 72,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939393,
@@ -624,11 +679,11 @@
     "Origin": "PNQ",
     "Destination": "MUMB",
     "Routes": "S005: PNQ-MUMB-VPI",
-    "Leg": " PNQ-MUMB",
+    "Leg": "PNQ-MUMB",
     "Action": "Unloading",
     "KgWeight": 649,
     "CftVolume": 64,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939393,
@@ -637,11 +692,11 @@
     "Origin": "PNQ",
     "Destination": "MUMB",
     "Routes": "S005: PNQ-MUMB-VPI",
-    "Leg": " PNQ-MUMB",
+    "Leg": "PNQ-MUMB",
     "Action": "Unloading",
     "KgWeight": 549,
     "CftVolume": 100,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939393,
@@ -650,11 +705,11 @@
     "Origin": "PNQ",
     "Destination": "MUMB",
     "Routes": "S005: PNQ-MUMB-VPI",
-    "Leg": " PNQ-MUMB",
+    "Leg": "PNQ-MUMB",
     "Action": "Unloading",
     "KgWeight": 719,
     "CftVolume": 52,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939394,
@@ -663,11 +718,11 @@
     "Origin": "PNQ",
     "Destination": "VPI",
     "Routes": "S005: PNQ-MUMB-VPI",
-    "Leg": " MUMB-VPI",
+    "Leg": "PNQ-VPI",
     "Action": "Loading",
     "KgWeight": 583,
     "CftVolume": 71,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939394,
@@ -676,11 +731,11 @@
     "Origin": "PNQ",
     "Destination": "VPI",
     "Routes": "S005: PNQ-MUMB-VPI",
-    "Leg": " MUMB-VPI",
+    "Leg": "PNQ-VPI",
     "Action": "Loading",
     "KgWeight": 645,
     "CftVolume": 66,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939395,
@@ -689,11 +744,11 @@
     "Origin": "AMD",
     "Destination": "BRDB",
     "Routes": "S0010 : AMD-BRDB-MUMB",
-    "Leg": " AMD-BRDB",
+    "Leg": "AMD-BRDB",
     "Action": "Unloading",
     "KgWeight": 613,
     "CftVolume": 69,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939396,
@@ -702,11 +757,11 @@
     "Origin": "AMD",
     "Destination": "MUMB",
     "Routes": "S0010 : AMD-BRDB-MUMB",
-    "Leg": " BRDB-MUMB",
+    "Leg": "AMD-MUMB",
     "Action": "Loading",
     "KgWeight": 968,
     "CftVolume": 63,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939396,
@@ -715,11 +770,11 @@
     "Origin": "AMD",
     "Destination": "MUMB",
     "Routes": "S0010 : AMD-BRDB-MUMB",
-    "Leg": " BRDB-MUMB",
+    "Leg": "AMD-MUMB",
     "Action": "Loading",
     "KgWeight": 659,
     "CftVolume": 97,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939396,
@@ -728,11 +783,11 @@
     "Origin": "AMD",
     "Destination": "MUMB",
     "Routes": "S0010 : AMD-BRDB-MUMB",
-    "Leg": " BRDB-MUMB",
+    "Leg": "AMD-MUMB",
     "Action": "Loading",
     "KgWeight": 978,
     "CftVolume": 88,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939396,
@@ -741,11 +796,11 @@
     "Origin": "AMD",
     "Destination": "MUMB",
     "Routes": "S0010 : AMD-BRDB-MUMB",
-    "Leg": " BRDB-MUMB",
+    "Leg": "AMD-MUMB",
     "Action": "Loading",
     "KgWeight": 609,
     "CftVolume": 81,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939396,
@@ -754,11 +809,11 @@
     "Origin": "AMD",
     "Destination": "MUMB",
     "Routes": "S0010 : AMD-BRDB-MUMB",
-    "Leg": " BRDB-MUMB",
+    "Leg": "AMD-MUMB",
     "Action": "Loading",
     "KgWeight": 557,
     "CftVolume": 51,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939399,
@@ -767,11 +822,11 @@
     "Origin": "MUMB",
     "Destination": "BRDB",
     "Routes": "S0002 : MUMB-BRDB-AMD",
-    "Leg": " MUMB-BRDB",
+    "Leg": "MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 774,
     "CftVolume": 80,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939399,
@@ -780,11 +835,11 @@
     "Origin": "MUMB",
     "Destination": "BRDB",
     "Routes": "S0002 : MUMB-BRDB-AMD",
-    "Leg": " MUMB-BRDB",
+    "Leg": "MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 994,
     "CftVolume": 68,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939399,
@@ -793,11 +848,11 @@
     "Origin": "MUMB",
     "Destination": "BRDB",
     "Routes": "S0002 : MUMB-BRDB-AMD",
-    "Leg": " MUMB-BRDB",
+    "Leg": "MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 738,
     "CftVolume": 67,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939399,
@@ -806,11 +861,11 @@
     "Origin": "MUMB",
     "Destination": "BRDB",
     "Routes": "S0002 : MUMB-BRDB-AMD",
-    "Leg": " MUMB-BRDB",
+    "Leg": "MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 920,
     "CftVolume": 52,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939399,
@@ -819,11 +874,11 @@
     "Origin": "MUMB",
     "Destination": "BRDB",
     "Routes": "S0002 : MUMB-BRDB-AMD",
-    "Leg": " MUMB-BRDB",
+    "Leg": "MUMB-BRDB",
     "Action": "Loading",
     "KgWeight": 850,
     "CftVolume": 50,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939400,
@@ -836,7 +891,7 @@
     "Action": "Loading",
     "KgWeight": 879,
     "CftVolume": 68,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939402,
@@ -845,11 +900,11 @@
     "Origin": "NAGM",
     "Destination": "MUMB",
     "Routes": "S0038: NAGM-PNQ-MUMB",
-    "Leg": " NAGM-MUMB",
+    "Leg": "NAGM-MUMB",
     "Action": "Unloading",
     "KgWeight": 656,
     "CftVolume": 80,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939403,
@@ -862,7 +917,7 @@
     "Action": "Loading",
     "KgWeight": 529,
     "CftVolume": 78,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939403,
@@ -875,7 +930,7 @@
     "Action": "Loading",
     "KgWeight": 984,
     "CftVolume": 98,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939403,
@@ -888,7 +943,7 @@
     "Action": "Loading",
     "KgWeight": 819,
     "CftVolume": 90,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939403,
@@ -901,7 +956,7 @@
     "Action": "Loading",
     "KgWeight": 649,
     "CftVolume": 54,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939404,
@@ -910,11 +965,11 @@
     "Origin": "MUMB",
     "Destination": "PNQ",
     "Routes": "S0026 : MUMB-PNQ-BNGB",
-    "Leg": " MUMB-PNQ",
+    "Leg": "MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 926,
     "CftVolume": 83,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939404,
@@ -923,11 +978,11 @@
     "Origin": "MUMB",
     "Destination": "PNQ",
     "Routes": "S0026 : MUMB-PNQ-BNGB",
-    "Leg": " MUMB-PNQ",
+    "Leg": "MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 925,
     "CftVolume": 83,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939405,
@@ -936,11 +991,11 @@
     "Origin": "MUMB",
     "Destination": "BNGB",
     "Routes": "S0027 : MUMB-PNQ-BNGB",
-    "Leg": " MUMB-BNGB",
+    "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 507,
     "CftVolume": 68,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939406,
@@ -953,7 +1008,7 @@
     "Action": "Loading",
     "KgWeight": 939,
     "CftVolume": 58,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939407,
@@ -962,11 +1017,11 @@
     "Origin": "MUMB",
     "Destination": "SRTB",
     "Routes": "S0070: MUMB-SRTB",
-    "Leg": " MUMB-SRTB",
+    "Leg": "MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 521,
     "CftVolume": 90,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939407,
@@ -975,11 +1030,11 @@
     "Origin": "MUMB",
     "Destination": "SRTB",
     "Routes": "S0070: MUMB-SRTB",
-    "Leg": " MUMB-SRTB",
+    "Leg": "MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 959,
     "CftVolume": 70,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939407,
@@ -988,11 +1043,11 @@
     "Origin": "MUMB",
     "Destination": "SRTB",
     "Routes": "S0070: MUMB-SRTB",
-    "Leg": " MUMB-SRTB",
+    "Leg": "MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 886,
     "CftVolume": 96,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939407,
@@ -1001,11 +1056,11 @@
     "Origin": "MUMB",
     "Destination": "SRTB",
     "Routes": "S0070: MUMB-SRTB",
-    "Leg": " MUMB-SRTB",
+    "Leg": "MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 793,
     "CftVolume": 75,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939409,
@@ -1014,11 +1069,11 @@
     "Origin": "MUMB",
     "Destination": "MAAM",
     "Routes": "S0111: MUMB-MAAM",
-    "Leg": " MUMB-MAAM",
+    "Leg": "MUMB-MAAM",
     "Action": "Loading",
     "KgWeight": 982,
     "CftVolume": 93,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939410,
@@ -1027,11 +1082,11 @@
     "Origin": "MUMB",
     "Destination": "HUBB",
     "Routes": "S0019: MUMB-HUBB",
-    "Leg": " MUMB-HUBB",
+    "Leg": "MUMB-HUBB",
     "Action": "Loading",
     "KgWeight": 927,
     "CftVolume": 83,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939411,
@@ -1044,7 +1099,7 @@
     "Action": "Loading",
     "KgWeight": 915,
     "CftVolume": 57,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939411,
@@ -1057,7 +1112,7 @@
     "Action": "Loading",
     "KgWeight": 539,
     "CftVolume": 87,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939411,
@@ -1070,7 +1125,7 @@
     "Action": "Loading",
     "KgWeight": 890,
     "CftVolume": 92,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939411,
@@ -1083,7 +1138,7 @@
     "Action": "Loading",
     "KgWeight": 847,
     "CftVolume": 77,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939412,
@@ -1096,7 +1151,7 @@
     "Action": "Loading",
     "KgWeight": 579,
     "CftVolume": 96,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939412,
@@ -1109,7 +1164,7 @@
     "Action": "Loading",
     "KgWeight": 912,
     "CftVolume": 90,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939412,
@@ -1122,7 +1177,7 @@
     "Action": "Loading",
     "KgWeight": 730,
     "CftVolume": 85,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939412,
@@ -1134,7 +1189,8 @@
     "Leg": "MUMB-JAIB",
     "Action": "Loading",
     "KgWeight": 782,
-    "CftVolume": 94
+    "CftVolume": 94,
+    "ScanFlag": null
   },
   {
     "Shipment": 39939412,
@@ -1147,7 +1203,7 @@
     "Action": "Loading",
     "KgWeight": 981,
     "CftVolume": 85,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939420,
@@ -1156,11 +1212,11 @@
     "Origin": "MUMB",
     "Destination": "BNGB",
     "Routes": "S0123: MUMB-BNGB",
-    "Leg": " MUMB-BNGB",
+    "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 975,
     "CftVolume": 100,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939420,
@@ -1169,11 +1225,11 @@
     "Origin": "MUMB",
     "Destination": "BNGB",
     "Routes": "S0123: MUMB-BNGB",
-    "Leg": " MUMB-BNGB",
+    "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 539,
     "CftVolume": 59,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939420,
@@ -1182,11 +1238,11 @@
     "Origin": "MUMB",
     "Destination": "BNGB",
     "Routes": "S0123: MUMB-BNGB",
-    "Leg": " MUMB-BNGB",
+    "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 879,
     "CftVolume": 55,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939420,
@@ -1195,11 +1251,11 @@
     "Origin": "MUMB",
     "Destination": "BNGB",
     "Routes": "S0123: MUMB-BNGB",
-    "Leg": " MUMB-BNGB",
+    "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 938,
     "CftVolume": 96,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939420,
@@ -1208,11 +1264,11 @@
     "Origin": "MUMB",
     "Destination": "BNGB",
     "Routes": "S0123: MUMB-BNGB",
-    "Leg": " MUMB-BNGB",
+    "Leg": "MUMB-BNGB",
     "Action": "Loading",
     "KgWeight": 827,
     "CftVolume": 60,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939421,
@@ -1221,11 +1277,11 @@
     "Origin": "MUMB",
     "Destination": "SRTB",
     "Routes": "S0124: MUMB-SRTB",
-    "Leg": " MUMB-SRTB",
+    "Leg": "MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 844,
     "CftVolume": 100,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939421,
@@ -1234,11 +1290,11 @@
     "Origin": "MUMB",
     "Destination": "SRTB",
     "Routes": "S0124: MUMB-SRTB",
-    "Leg": " MUMB-SRTB",
+    "Leg": "MUMB-SRTB",
     "Action": "Loading",
     "KgWeight": 647,
     "CftVolume": 92,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939423,
@@ -1247,11 +1303,11 @@
     "Origin": "MUMB",
     "Destination": "PNQ",
     "Routes": "S0049: MUMB-PNQ",
-    "Leg": " MUMB-PNQ",
+    "Leg": "MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 990,
     "CftVolume": 93,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939423,
@@ -1260,11 +1316,11 @@
     "Origin": "MUMB",
     "Destination": "PNQ",
     "Routes": "S0049: MUMB-PNQ",
-    "Leg": " MUMB-PNQ",
+    "Leg": "MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 688,
     "CftVolume": 100,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939423,
@@ -1273,11 +1329,11 @@
     "Origin": "MUMB",
     "Destination": "PNQ",
     "Routes": "S0049: MUMB-PNQ",
-    "Leg": " MUMB-PNQ",
+    "Leg": "MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 593,
     "CftVolume": 73,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939423,
@@ -1286,11 +1342,11 @@
     "Origin": "MUMB",
     "Destination": "PNQ",
     "Routes": "S0049: MUMB-PNQ",
-    "Leg": " MUMB-PNQ",
+    "Leg": "MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 985,
     "CftVolume": 74,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939423,
@@ -1299,11 +1355,11 @@
     "Origin": "MUMB",
     "Destination": "PNQ",
     "Routes": "S0049: MUMB-PNQ",
-    "Leg": " MUMB-PNQ",
+    "Leg": "MUMB-PNQ",
     "Action": "Loading",
     "KgWeight": 590,
     "CftVolume": 69,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939424,
@@ -1311,12 +1367,12 @@
     "Packages": 6,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S003: BLR-MUMB-AMD-JPR",
-    "Leg": "BLR-AMD",
+    "Routes": "#N/A",
+    "Leg": "#N/A",
     "Action": "NoAction",
     "KgWeight": 884,
     "CftVolume": 69,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939424,
@@ -1324,12 +1380,12 @@
     "Packages": 6,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S003: BLR-MUMB-AMD-JPR",
-    "Leg": "BLR-AMD",
+    "Routes": "#N/A",
+    "Leg": "#N/A",
     "Action": "NoAction",
     "KgWeight": 896,
     "CftVolume": 92,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939526,
@@ -1342,8 +1398,9 @@
     "Action": "NoAction",
     "KgWeight": 896,
     "CftVolume": 92,
-    "ScanFlag":false
-  },  {
+    "ScanFlag": false
+  },
+  {
     "Shipment": 39939526,
     "PackageId": "39939526-2",
     "Packages": 6,
@@ -1354,7 +1411,7 @@
     "Action": "NoAction",
     "KgWeight": 896,
     "CftVolume": 92,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939424,
@@ -1362,12 +1419,12 @@
     "Packages": 6,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S003: BLR-MUMB-AMD-JPR",
-    "Leg": "BLR-AMD",
+    "Routes": "#N/A",
+    "Leg": "#N/A",
     "Action": "NoAction",
     "KgWeight": 967,
     "CftVolume": 90,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939424,
@@ -1375,12 +1432,12 @@
     "Packages": 6,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S003: BLR-MUMB-AMD-JPR",
-    "Leg": "BLR-AMD",
+    "Routes": "#N/A",
+    "Leg": "#N/A",
     "Action": "NoAction",
     "KgWeight": 869,
     "CftVolume": 75,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939424,
@@ -1388,12 +1445,12 @@
     "Packages": 6,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S003: BLR-MUMB-AMD-JPR",
-    "Leg": "BLR-AMD",
+    "Routes": "#N/A",
+    "Leg": "#N/A",
     "Action": "NoAction",
     "KgWeight": 554,
     "CftVolume": 71,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939424,
@@ -1401,12 +1458,12 @@
     "Packages": 6,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S003: BLR-MUMB-AMD-JPR",
-    "Leg": "BLR-AMD",
+    "Routes": "#N/A",
+    "Leg": "#N/A",
     "Action": "NoAction",
     "KgWeight": 701,
     "CftVolume": 50,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939425,
@@ -1414,12 +1471,12 @@
     "Packages": 7,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S004: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-AMD",
+    "Routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-AMD",
     "Action": "Loading",
     "KgWeight": 517,
     "CftVolume": 92,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939425,
@@ -1427,12 +1484,12 @@
     "Packages": 7,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S004: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-AMD",
+    "Routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-AMD",
     "Action": "Loading",
     "KgWeight": 610,
     "CftVolume": 88,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939425,
@@ -1440,12 +1497,12 @@
     "Packages": 7,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S004: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-AMD",
+    "Routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-AMD",
     "Action": "Loading",
     "KgWeight": 669,
     "CftVolume": 54,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939425,
@@ -1453,12 +1510,12 @@
     "Packages": 7,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S004: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-AMD",
+    "Routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-AMD",
     "Action": "Loading",
     "KgWeight": 739,
     "CftVolume": 64,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939425,
@@ -1466,12 +1523,12 @@
     "Packages": 7,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S004: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-AMD",
+    "Routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-AMD",
     "Action": "Loading",
     "KgWeight": 611,
     "CftVolume": 74,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939425,
@@ -1479,12 +1536,12 @@
     "Packages": 7,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S004: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-AMD",
+    "Routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-AMD",
     "Action": "Loading",
     "KgWeight": 715,
     "CftVolume": 91,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939425,
@@ -1492,12 +1549,12 @@
     "Packages": 7,
     "Origin": "BLR",
     "Destination": "AMD",
-    "Routes": "S004: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-AMD",
+    "Routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-AMD",
     "Action": "Loading",
     "KgWeight": 648,
     "CftVolume": 53,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939426,
@@ -1510,7 +1567,7 @@
     "Action": "Loading",
     "KgWeight": 856,
     "CftVolume": 80,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939426,
@@ -1523,7 +1580,7 @@
     "Action": "Loading",
     "KgWeight": 767,
     "CftVolume": 85,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939426,
@@ -1536,7 +1593,7 @@
     "Action": "Loading",
     "KgWeight": 525,
     "CftVolume": 57,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939426,
@@ -1549,7 +1606,7 @@
     "Action": "Loading",
     "KgWeight": 549,
     "CftVolume": 56,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939426,
@@ -1558,11 +1615,11 @@
     "Origin": "MUMB",
     "Destination": "AMD",
     "Routes": "S005: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-JPR",
+    "Leg": "MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 697,
     "CftVolume": 66,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939426,
@@ -1571,11 +1628,11 @@
     "Origin": "MUMB",
     "Destination": "AMD",
     "Routes": "S005: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-JPR",
+    "Leg": "MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 656,
     "CftVolume": 85,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939426,
@@ -1584,11 +1641,11 @@
     "Origin": "MUMB",
     "Destination": "AMD",
     "Routes": "S005: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-JPR",
+    "Leg": "MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 612,
     "CftVolume": 89,
-    "ScanFlag":false
+    "ScanFlag": false
   },
   {
     "Shipment": 39939426,
@@ -1597,11 +1654,11 @@
     "Origin": "MUMB",
     "Destination": "AMD",
     "Routes": "S005: BLR-MUMB-AMD-JPR",
-    "Leg": "MUMB-JPR",
+    "Leg": "MUMB-AMD",
     "Action": "Loading",
     "KgWeight": 687,
     "CftVolume": 75,
-    "ScanFlag":false
+    "ScanFlag": false
   }
  ]
 }

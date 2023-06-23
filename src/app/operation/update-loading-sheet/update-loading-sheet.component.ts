@@ -7,7 +7,6 @@ import { Router } from '@angular/router';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
 import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival/mark-arrival.component';
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
-import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
 import Swal from 'sweetalert2';
 import { Shipment, autoBindData, filterShipments, kpiData } from '../shipment';
 @Component({
@@ -101,41 +100,61 @@ export class UpdateLoadingSheetComponent implements OnInit {
     let shipments: Shipment[] = tableArray.map(shipData => {
       return { ...shipData, Pending: shipData.Packages };
     });;
-    let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, this.currentBranch);
+    
+   let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, this.currentBranch);
+   // let filteredShipments = filterUnloadingShipments(shipments,this.arrivalData?.Route, this.currentBranch);
+
     // const filteredData = this.filterShipmentsByRouteAndLocation(tableArray, this.arrivalData?.Route, this.arrivalData?.ArrivalLocation);
     // this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
     this.csv = filteredShipments;
-
     this.boxData = kpiData(this.csv, this.shipmentStatus, "");
     this.tableload = false;
 
     let shipingTableData = this.csv;
-    let shipingTableDataArray: any = []
-    shipingTableData.forEach(element => {
-      let uniqueShipments = {};
-      this.data.packagesData.forEach(x => {
-        if (x.Leg.trim() === element.Leg && x.Routes === element.routes) {
-          uniqueShipments[x.Shipment] = true;
-        }
-      });
-      let packageData = this.data.packagesData.filter(x => x.Leg.trim() === element.Leg && x.Routes === element.routes);
-      let totalWeightKg = packageData.reduce((total, current) => total + current.KgWeight, 0);
-      let totalVolumeCFT = packageData.reduce((total, current) => total + current.CftVolume, 0)
-      let shipingJson = {
-        Leg: element?.Leg || '',
-        Shipment: [uniqueShipments].length,
-        Packages: element?.Packages || 0,
-        WeightKg: totalWeightKg,
-        VolumeCFT: totalVolumeCFT
-      }
-      shipingTableDataArray.push(shipingJson)
-    });
+    let totalVolumeCFT,totalWeightKg,Packages
+  // Initialize an object to store the grouped data
+let groupedData = {};
+
+shipingTableData.forEach(element => {
+  let leg = element.Leg.trim();
+
+  // Check if the leg already exists in the groupedData object
+  if (!groupedData.hasOwnProperty(leg)) {
+    groupedData[leg] = {
+      Leg: leg,
+      Shipment: 0,
+      Packages: 0,
+      WeightKg: 0,
+      VolumeCFT: 0
+    };
+  }
+
+  // Increment the shipment count
+  groupedData[leg].Shipment += 1;
+
+  // Retrieve the package data for the current leg and routes
+  let packageData = this.data.packagesData.filter(x => x.Leg.trim() === leg && x.Routes === element.routes);
+
+  // Calculate Packages, WeightKg, and VolumeCFT for the current leg
+  groupedData[leg].Packages += packageData.reduce((total, current) => total + current.Packages, 0);
+  groupedData[leg].WeightKg += packageData.reduce((total, current) => total + current.KgWeight, 0);
+  groupedData[leg].VolumeCFT += packageData.reduce((total, current) => total + current.CftVolume, 0);
+});
+
+// Convert the groupedData object to an array of values
+let shipingTableDataArray = Object.values(groupedData);
+
+    this.arrivalData.Leg= shipingTableData[0]?.Leg;
+    
     this.shipingDataTable = shipingTableDataArray;
 
 
   }
   updatePackage() {
     this.tableload=true;
+
+   
+
     // Get the trimmed values of scan and leg
     const scanValue = this.loadingSheetTableForm.value.Scan.trim();
     ///const legValue = this.arrivalData.Leg.trim();

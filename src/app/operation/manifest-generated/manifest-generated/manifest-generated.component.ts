@@ -3,6 +3,7 @@ import { Component, OnInit,Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CnoteService } from '../../../core/service/Masters/CnoteService/cnote.service';
 @Component({
   selector: 'app-manifest-generated',
   templateUrl: './manifest-generated.component.html',
@@ -58,7 +59,7 @@ export class ManifestGeneratedComponent implements OnInit {
   formdata: any;
   menifest: any;
   constructor(private Route: Router,
-    private http: HttpClient, private fb: UntypedFormBuilder,@Inject(MAT_DIALOG_DATA) public item: any,public dialogRef: MatDialogRef<ManifestGeneratedComponent>) {
+    private http: HttpClient, private fb: UntypedFormBuilder,@Inject(MAT_DIALOG_DATA) public item: any,public dialogRef: MatDialogRef<ManifestGeneratedComponent>,private cnoteService:CnoteService) {
 
    if(item){
     this.menifest=item.loadingSheetData;
@@ -81,7 +82,7 @@ export class ManifestGeneratedComponent implements OnInit {
       }
       MeniFestDetails.push(meniFestjson)
     });
- 
+    this.cnoteService.setMeniFestDetails(MeniFestDetails);
     this.csv=MeniFestDetails;
   }
 

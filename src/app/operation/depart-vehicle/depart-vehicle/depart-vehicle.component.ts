@@ -204,20 +204,37 @@ export class DepartVehicleComponent implements OnInit {
     this.loadingData = $event
   }
   getShipingDetails(){
-    this.http.get(this.shipingDetailsUrl).subscribe(res=>{
-         this.shipData = res;
-         let nestedShipdata=this.shipData.shippingData.find((x)=>x.routes==this.tripData.RouteandSchedule &&  x.Leg==this.tripData.Leg)
-          let shipingCount=[nestedShipdata];
-         let json ={
-          leg: this.tripData.Leg,
-          manifest: this.tripData.menifestNo,
-          shipments_lb: shipingCount.length+"/"+shipingCount.length,
-          packages_lb:nestedShipdata.Packages+"/"+nestedShipdata.Packages,
-          weight_kg:nestedShipdata.WeightKg,
-          volume_cft:nestedShipdata.VolumeCFT
-         }
-         this.csv= [json]
+    let MeniFestDetails =this.CnoteService.getMeniFestDetails();
+    let menifestList:any=[]
+    let packagesData:any=[]
+    this.http.get(this.shipingDetailsUrl).subscribe((res:any)=>{
+       packagesData=res.packagesData
     })
+    MeniFestDetails.forEach(element => {
+         let weightKg=packagesData.filter((x)=>x.Leg===element.Leg).reduce((total,packaged)=>total + packaged.KgWeight,0)
+         let CftVolume=packagesData.filter((x)=>x.Leg===element.Leg).reduce((total,packaged)=>total + packaged.CftVolume,0)
+         console.log(weightKg+""+CftVolume)
+      let json={
+          leg:element.Leg,
+          manifest: element.MFNumber,
+          shipments_lb: element.ShipmentsLoadedBooked,
+          packages_lb:element.PackagesLoadedBooked,
+          weight_kg:weightKg,
+          volume_cft:CftVolume
+      }
+      menifestList.push(json)
+      this.csv=menifestList;
+      this.tableload=false;
+    });
+        //  let json ={
+        //   leg: this.tripData.Leg,
+        //   manifest: this.tripData.menifestNo,
+        //   shipments_lb: shipingCount.length+"/"+shipingCount.length,
+        //   packages_lb:nestedShipdata.Packages+"/"+nestedShipdata.Packages,
+        //   weight_kg:nestedShipdata.WeightKg,
+        //   volume_cft:nestedShipdata.VolumeCFT
+        //  }
+        // this.csv= [json]
   }
   vehicleTypeDropdown() {
     this.http.get(this.loadingJsonUrl).subscribe(res => {

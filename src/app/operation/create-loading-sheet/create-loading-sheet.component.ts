@@ -10,7 +10,7 @@ import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { LodingSheetGenerateSuccessComponent } from '../loding-sheet-generate-success/loding-sheet-generate-success.component';
 import { LoadingSheetViewComponent } from '../loading-sheet-view/loading-sheet-view.component';
-import { transform } from './loadingSheetCommon';
+import { filterloadingShipments, transform } from './loadingSheetCommon';
 
 @Component({
   selector: 'app-create-loading-sheet',
@@ -216,6 +216,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     })
   }
   getshipmentData() {
+ 
     if (!this.isShipmentUpdate) {
       let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
       routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
@@ -226,19 +227,20 @@ export class CreateLoadingSheetComponent implements OnInit {
       let combinedData:any[]=[]
       if (!this.isShipmentUpdate) {
         this.shipmentData = res;
-
-        // filterData = this.shipmentData.shippingData.filter(
-        //   (x) => x.routes.trim() === this.tripData.RouteandSchedule.trim() && x.Destination.trim()!==this.orgBranch.trim())
-        let routeData = transform(this.tripData.RouteandSchedule, this.orgBranch)
+        filterData = this.shipmentData.shippingData.filter(
+          (x) => x.routes.trim() === this.tripData.RouteandSchedule.trim() && x.Destination.trim()!==this.orgBranch.trim())
+       let routeData = transform(this.tripData.RouteandSchedule, this.orgBranch)
         let CurrectLeg = routeData.split("-").splice(1);
+       //let filteredShipments = filterloadingShipments(this.shipmentData.shippingData,'S003: BLR-MUMB-AMD-JPR','MUMB')
+       //  console.log("filterShipingData"+filteredShipments)
         this.legWiseData = this.shipmentData.shippingData.filter((x) => {
             return x.Origin.trim() === this.orgBranch && CurrectLeg.includes(x.Destination);
           });
           
           this.routeWiseData=this.shipmentData.shippingData.filter((x)=>x.routes.trim()===this.tripData.RouteandSchedule.trim() && x.Destination!==this.orgBranch)
-          let mergedData = this.legWiseData.concat(this.routeWiseData);
+           let mergedData = this.legWiseData.concat(this.routeWiseData);
            let uniqueData = Array.from(new Set(mergedData));
-           filterData=uniqueData;
+          filterData=uniqueData;
         this.CnoteService.setShipingData(filterData);
       
 

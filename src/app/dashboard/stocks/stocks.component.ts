@@ -39,7 +39,7 @@ export class StocksComponent extends UnsubscribeOnDestroyAdapter implements OnIn
    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
    want hyper link and add Path which you want to redirect*/
   linkArray = [
-    { Row: 'Action', Path: 'Masters/Docket/Create' }
+    { Row: 'Action', Path: 'Masters/Docket/EwayBillDocketBooking' }
   ]
   menuItems = [
     { label: 'Create Run Sheet' },

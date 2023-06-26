@@ -9,6 +9,8 @@ import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import Swal from 'sweetalert2';
 import { Shipment, autoBindData, filterShipments, kpiData } from '../shipment';
+import { updatePending } from './loadingSheetshipment';
+
 @Component({
   selector: 'app-update-loading-sheet',
   templateUrl: './update-loading-sheet.component.html'
@@ -97,10 +99,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
     // const shippingData = tableArray.map(shipData => {
     //   return { ...shipData, Pending: shipData.Packages };
     // });
-    let shipments: Shipment[] = tableArray.map(shipData => {
-      return { ...shipData, Pending: shipData.Packages };
-    });;
-    
+    // let shipments: Shipment[] = tableArray.map(shipData => {
+    //   return { ...shipData, Pending: shipData.Packages };
+    // });;
+    let shipments = updatePending(tableArray, this.currentBranch,false,true);
    let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, this.currentBranch);
    // let filteredShipments = filterUnloadingShipments(shipments,this.arrivalData?.Route, this.currentBranch);
 

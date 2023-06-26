@@ -35,7 +35,7 @@ export const getOriginDestinationArrays = (routeStr: string, currentLocation: Lo
     return { originArray, destinationArray };
 }
 
-export const filterShipments = (shipments: Shipment[], routeStr: string, currentLocation: Location): Shipment[] => {
+export const filterShipments = (shipments: any[], routeStr: string, currentLocation: Location): Shipment[] => {
     const { originArray, destinationArray } = getOriginDestinationArrays(routeStr, currentLocation);
     return shipments.filter(shipment =>
         originArray.includes(shipment.Origin) && destinationArray.includes(shipment.Destination) && shipment.routes === routeStr

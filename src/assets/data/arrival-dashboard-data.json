@@ -1659,6 +1659,19 @@
     "KgWeight": 687,
     "CftVolume": 75,
     "ScanFlag": false
+  },
+  {
+    "Shipment": 39939525,
+    "PackageId": "39939525-1",
+    "Packages": 8,
+    "Origin": "BLR",
+    "Destination": "JPR",
+    "Routes": "S003: BLR-MUMB-AMD-JPR",
+    "Leg": "BLR-JPR",
+    "Action": "Loading",
+    "KgWeight": 687,
+    "CftVolume": 75,
+    "ScanFlag": false
   }
  ]
 }

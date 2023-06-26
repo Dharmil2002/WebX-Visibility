@@ -90,6 +90,7 @@ export class VehicleLoadingComponent implements OnInit {
     this.getLoadingSheetData();
   }
   getLoadingSheetData() {
+    
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let loadingSheetData = this.CnoteService.getVehicleLoadingSheetData(); // Call the function to get the actual data

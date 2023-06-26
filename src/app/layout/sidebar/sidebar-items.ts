@@ -17,7 +17,7 @@ export const ROUTES: RouteInfo[] = [
     icon: "",
     class: "",
     groupTitle: false,
-    submenu:[]
+    submenu: []
   },
   {
     path: "Masters/Docket/Ewaybill",
@@ -26,7 +26,7 @@ export const ROUTES: RouteInfo[] = [
     icon: "",
     class: "",
     groupTitle: false,
-    submenu:[]
+    submenu: []
   },
   {
     path: "Masters/Docket/Create",
@@ -35,7 +35,7 @@ export const ROUTES: RouteInfo[] = [
     icon: "",
     class: "",
     groupTitle: false,
-    submenu:[]
+    submenu: []
   },
   {
     path: "Masters/Docket/Ewaybill-Config",
@@ -44,7 +44,7 @@ export const ROUTES: RouteInfo[] = [
     icon: "",
     class: "",
     groupTitle: false,
-    submenu:[]
+    submenu: []
   },
   {
     path: "Masters/Docket/LoadingSheet",
@@ -53,14 +53,43 @@ export const ROUTES: RouteInfo[] = [
     icon: "",
     class: "",
     groupTitle: false,
-    submenu:[]
-  }, {
+    submenu: []
+  }, 
+  {
     path: "Masters/Docket/ManifestGeneration",
     title: "Manifest Generation ",
     moduleName: "Masters",
     icon: "",
     class: "",
     groupTitle: false,
-    submenu:[]
+    submenu: []
+  }
+  ,
+  {
+    path: "",
+    title: "Masters",
+    moduleName: "Masters",
+    icon: "",
+    class: "",
+    groupTitle: false,
+    submenu: [
+      {
+      path: "Masters/StateMaster/StateMasterView",
+      title: "State Masters",
+      moduleName: "State Masters",
+      icon: "",
+      class: "",
+      groupTitle: false,
+      submenu: []
+    },
+    {
+      path: "Masters/CityMaster/CityMasterView",
+      title: "City Masters",
+      moduleName: "City Masters",
+      icon: "",
+      class: "",
+      groupTitle: false,
+      submenu: []
+    }]
   }
 ];

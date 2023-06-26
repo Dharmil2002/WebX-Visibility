@@ -127,6 +127,12 @@ export class MarkArrivalControl {
                 type: 'file',
                 value: '',
                 Validations: [],
+                additionalData: {
+                    multiple: true
+                },
+                functions: {
+                    onChange: 'GetFileList',
+                },
                 generatecontrol: true,
                 disable: false
             },

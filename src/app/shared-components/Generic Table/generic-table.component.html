@@ -65,7 +65,8 @@
             </ng-template>
 
             <!-- All data except activeFlag and isActive is passed to "formatData" function, which return formatted data, depending upon its datatype/key -->
-            <td mat-cell *matCellDef="let element">
+            <td mat-cell *matCellDef="let element"
+                [ngClass]="{'center-align': isNumeric(element[tableData])&& tableData !== 'srNo' && tableData !== 'SrNo'}">
                 <mat-checkbox *ngIf="tableData=='checkBoxRequired'" color="primary" [(ngModel)]="element.isSelected"
                     (change)="getCheckData($event)" class="example-margin"></mat-checkbox>
                 {{Link && !shouldDisplayLink(tableData) && toggleArray && !toggleArray.includes(tableData) ?

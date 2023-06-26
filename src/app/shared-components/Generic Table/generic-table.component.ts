@@ -33,7 +33,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() Link;
   @Input() toggleArray;
   @Input() dynamicControls;
-  @Input() menuItems:any;
+  @Input() menuItems: any;
   @Input() menuItemFlag;
   @Output() menuItemClicked = new EventEmitter<any>();
   @Input() height;
@@ -125,17 +125,17 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     this.dataSource = new MatTableDataSource(this.tableData);
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
-    if(this.filter){
-    this.subs.sink = fromEvent(
-      this.filter.nativeElement,
-      "keyup"
-    ).subscribe(() => {
-      if (!this.dataSource) {
-        return;
-      }
-      this.dataSource.filter = this.filter.nativeElement.value;
-    });
-  }
+    if (this.filter) {
+      this.subs.sink = fromEvent(
+        this.filter.nativeElement,
+        "keyup"
+      ).subscribe(() => {
+        if (!this.dataSource) {
+          return;
+        }
+        this.dataSource.filter = this.filter.nativeElement.value;
+      });
+    }
   }
   //#endregion
 
@@ -208,7 +208,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
       this.router.navigate([this.addAndEditPath], {
         state: {
           data: item,
-          
+
         },
       });
     }
@@ -223,30 +223,30 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   }
 
 
-    //#region Funtion to send data for edit
-    drillDownData(item, tableData) {
-      let drillDownLink = this.Link.find((x) => x.Row == tableData)
-      if(drillDownLink.Path){
+  //#region Funtion to send data for edit
+  drillDownData(item, tableData) {
+    let drillDownLink = this.Link.find((x) => x.Row == tableData)
+    if (drillDownLink.Path) {
       this.router.navigate([drillDownLink.Path], {
         state: {
-          data: {columnData:item,extraData:this.extraData}
+          data: { columnData: item, extraData: this.extraData }
         },
       });
     }
-      else{
-        if(this.menuItems){
-          let navigateTopopUp=this.menuItems.find((x)=>x.label===item.Action)
-          if(navigateTopopUp){
-           this.GeneralMultipleView(item,navigateTopopUp.componentDetails)       
-          }
-          else{
-            let navigateTopopUp=this.menuItems.find((x)=>x.label===tableData)
-            this.GeneralMultipleView(item,navigateTopopUp.componentDetails)
-          }
+    else {
+      if (this.menuItems) {
+        let navigateTopopUp = this.menuItems.find((x) => x.label === item.Action)
+        if (navigateTopopUp) {
+          this.GeneralMultipleView(item, navigateTopopUp.componentDetails)
+        }
+        else {
+          let navigateTopopUp = this.menuItems.find((x) => x.label === tableData)
+          this.GeneralMultipleView(item, navigateTopopUp.componentDetails)
         }
       }
     }
-    //#endregion
+  }
+  //#endregion
   // #region  to Convert to Csv File 
   // csvData is 2D array , where first list id of csv headers and later whole table data is pushed row wise.
   ExportToCsv() {
@@ -311,30 +311,33 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   getCheckData(data) {
     //this.onFlagChange.emit(data)
     this.onFlagChange.emit(this.getSelecteditems())
-   // console.log(this.getSelecteditems());
-   //get data on single selection
+    // console.log(this.getSelecteditems());
+    //get data on single selection
   }
-  handleMenuItemClick(item,element) {
-    let functionName = item.function;  
-    let Data={label:item,data:element}
-    if(!functionName){
-     this.menuItemClicked.emit(Data);
+  handleMenuItemClick(item, element) {
+    let functionName = item.function;
+    let Data = { label: item, data: element }
+    if (!functionName) {
+      this.menuItemClicked.emit(Data);
     }
-    else{
-     this[functionName](element,item.componentDetails);
+    else {
+      this[functionName](element, item.componentDetails);
     }
-}
-GeneralMultipleView(item,viewComponent) {
-  const dialogref = this.dialog.open(
-    viewComponent,
-    {
-      width: this.width,
-      height: this.height,
-      maxWidth: this.maxWidth,
-       data: item
-    });
-  dialogref.afterClosed().subscribe(result => {
-    this.dialogClosed.emit(result);
-  })
-}
+  }
+  GeneralMultipleView(item, viewComponent) {
+    const dialogref = this.dialog.open(
+      viewComponent,
+      {
+        width: this.width,
+        height: this.height,
+        maxWidth: this.maxWidth,
+        data: item
+      });
+    dialogref.afterClosed().subscribe(result => {
+      this.dialogClosed.emit(result);
+    })
+  }
+  isNumeric(value: any): boolean {
+    return typeof value === 'number';
+  }
 }

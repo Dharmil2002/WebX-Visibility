@@ -209,14 +209,14 @@
                 <mat-form-field appearance="outline">
                     <mat-label>{{formItem.label}}</mat-label>
                     <input matInput style="cursor:pointer" [formControlName]="formItem.name" readonly="true"
-                        (click)="fileInput.click()" class="example-full-width">
+                        (click)="fileInput.click()" class="example-full-width"
+                        [multiple]="(formItem.additionalData?.multiple||false)">
                     <button mat-icon-button matSuffix (click)="fileInput.click()" class="example-full-width">
                         <mat-icon>attach_file</mat-icon>
                     </button>
                     <input hidden class="example-full-width" style="cursor:pointer" [formControlName]='formItem.name'
                         (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event.target.files })"
-                        #fileInput type="file">
-
+                        #fileInput type="file" [multiple]="(formItem.additionalData?.multiple||false)">
                 </mat-form-field>
             </ng-container>
             <ng-container *ngIf="formItem.generatecontrol && formItem.type==='link' && formItem.value">
@@ -286,3 +286,9 @@
         </div>
     </ng-container>
 </form>
+<ng-container *ngIf="uploadedFiles?.length > 0">
+    <h4>Selected Files:</h4>
+    <ul>
+        <li *ngFor="let file of uploadedFiles">{{ file.name }}</li>
+    </ul>
+</ng-container>

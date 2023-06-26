@@ -11,6 +11,7 @@ import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.se
 import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { getSealNumber } from 'src/app/operation/shipment';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -29,7 +30,8 @@ export class MarkArrivalComponent implements OnInit {
   latereasonlist: any;
   latereasonlistStatus: any;
   sealdet: any;
-  constructor(private filter: FilterUtils, public dialogRef: MatDialogRef<GenericTableComponent>, public dialog: MatDialog, private service: utilityService,
+  uploadedFiles: File[];
+  constructor(private ObjSnackBarUtility: SnackBarUtilityService, private filter: FilterUtils, public dialogRef: MatDialogRef<GenericTableComponent>, public dialog: MatDialog, private service: utilityService,
     private http: HttpClient, @Inject(MAT_DIALOG_DATA) public item: any, private fb: UntypedFormBuilder, private Route: Router, private CnoteService: CnoteService) {
     this.MarkArrivalTable = item;
   }
@@ -59,7 +61,6 @@ export class MarkArrivalComponent implements OnInit {
 
 
   functionCaller($event) {
-
     // console.log("fn handler called", $event);
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -98,6 +99,7 @@ export class MarkArrivalComponent implements OnInit {
   }
 
   save() {
+    console.log(this.uploadedFiles);
     this.getPreviousData(this.MarkArrivalTableForm.value);
   }
 
@@ -161,4 +163,38 @@ export class MarkArrivalComponent implements OnInit {
       }
     });
   }
+  GetFileList(data) {
+    const files: FileList = data.eventArgs;
+    const fileCount: number = files.length;
+    const fileList: File[] = [];
+    const allowedExtensions: string[] = ['jpeg', 'jpg', 'png'];
+    let hasUnsupportedFiles = false;
+    const fileNames: string[] = [];
+
+    for (let i = 0; i < fileCount; i++) {
+      const file: File = files[i];
+      const fileExtension: string = file.name.split('.').pop()?.toLowerCase() || '';
+
+      if (allowedExtensions.includes(fileExtension)) {
+        fileList.push(file);
+        fileNames.push(file.name); // Save file name
+      } else {
+        hasUnsupportedFiles = true;
+      }
+    }
+
+    if (hasUnsupportedFiles) {
+      // Display an error message or take appropriate action
+      this.ObjSnackBarUtility.showNotification(
+        "snackbar-danger",
+        "Unsupported file format. Please select PNG, JPEG, or JPG files only.",
+        "bottom",
+        "center"
+      );
+    } else {
+      this.uploadedFiles = fileList; // Assign the file list to a separate variable
+    }
+  }
+
+
 }

@@ -80,10 +80,10 @@ export class LoadingSheetDetailsComponent implements OnInit {
   ]
 
 classDashboard=[
-  'info-box7  bg-danger order-info-box7',
-  'info-box7 bg-info order-info-box7',
-  'info-box7 bg-warning order-info-box7',
-  'info-box7 bg-primary order-info-box7',
+  'info-box7  bg-white order-info-box7',
+  'info-box7 bg-white order-info-box7',
+  'info-box7 bg-white order-info-box7',
+  'info-box7 bg-white order-info-box7',
 ]
   constructor(private Route: Router,private ICnoteService: CnoteService, private modalService: NgbModal, private dialog: MatDialog, @Inject(PLATFORM_ID) private platformId: Object) { 
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {

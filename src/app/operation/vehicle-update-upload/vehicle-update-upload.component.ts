@@ -228,10 +228,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
     });
 
     const shipData = [
-      createShipDataObject(this.csv.length, "Shipments", "bg-danger"),
-      createShipDataObject(packages, "Packages", "bg-warning"),
-      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + this.shipmentStatus, "bg-info"),
-      createShipDataObject(event?.Package || 0, "Packages" + ' ' + this.shipmentStatus, "bg-warning"),
+      createShipDataObject(this.csv.length, "Shipments", "bg-white"),
+      createShipDataObject(packages, "Packages", "bg-white"),
+      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + this.shipmentStatus, "bg-white"),
+      createShipDataObject(event?.Package || 0, "Packages" + ' ' + this.shipmentStatus, "bg-white"),
     ];
 
     this.boxData = shipData;

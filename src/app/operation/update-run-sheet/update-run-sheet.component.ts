@@ -103,10 +103,10 @@ export class UpdateRunSheetComponent implements OnInit {
       );
       // Prepare the shipData array with summary information
       const shipData = [
-        createShipDataObject(this.csv.length, "Shipments", "bg-danger"),
-        createShipDataObject(totalPackages, "Packages", "bg-info"),
-        createShipDataObject(this.csv.length, "Shipments Loaded", "bg-warning"),
-        createShipDataObject(totalPackages, "Packages Loaded", "bg-primary"),
+        createShipDataObject(this.csv.length, "Shipments", "bg-white"),
+        createShipDataObject(totalPackages, "Packages", "bg-white"),
+        createShipDataObject(this.csv.length, "Shipments Loaded", "bg-white"),
+        createShipDataObject(totalPackages, "Packages Loaded", "bg-white"),
       ];
   
       // Store the shipData in boxData property

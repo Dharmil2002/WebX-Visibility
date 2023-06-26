@@ -16,6 +16,7 @@ export class FormComponent {
   maxDate: Date
   @Output() callFunction = new EventEmitter();
   @Input() showSaveAndCancelButton: boolean
+  @Input() showSaveButton: boolean
   @Output() functionCallEmitter = new EventEmitter();
   @Input() uploadedFiles;
   selectedValue: any;

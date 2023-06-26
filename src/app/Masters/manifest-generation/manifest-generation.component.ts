@@ -34,10 +34,10 @@ export class ManifestGenerationComponent implements OnInit {
   ]
 
   classDashboard = [
-    'info-box7  bg-danger order-info-box7',
-    'info-box7 bg-info order-info-box7',
-    'info-box7 bg-warning order-info-box7',
-    'info-box7 bg-primary order-info-box7',
+    'info-box7  bg-white order-info-box7',
+    'info-box7 bg-white order-info-box7',
+    'info-box7 bg-white order-info-box7',
+    'info-box7 bg-white order-info-box7',
   ]
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < (column name) : Column name you want to display on table > 

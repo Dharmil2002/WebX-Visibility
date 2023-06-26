@@ -1,30 +1,31 @@
-<!-- This row holds the boxes of the dashboard -->
-<h4 class="m-b-10">{{boxData?.Title}}</h4>
-<div *ngIf="boxData?.Items" class="row clearfix dashboardcard">
-  <!-- This loop creates a box for each item in the boxData array -->
-  <div class="col-lg-3 col-sm-3" *ngFor="let box of boxData?.Items | keyvalue" [style]="style">
-    <!-- This box is a clickable item -->
-    <div [class]="box.value.class">
-      <div class="info-box7-block">
-        <h6 class="m-b-10 black">{{box.value.title}}</h6>
-        <h2 class="text-end black"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
+<div class="responsive_table"><!-- This row holds the boxes of the dashboard -->
+  <h4 class="m-b-10"><u>{{boxData?.Title}}</u></h4>
+  <div *ngIf="boxData?.Items" class="row clearfix dashboardcard">
+    <!-- This loop creates a box for each item in the boxData array -->
+    <div class="col-lg-3 col-sm-3" *ngFor="let box of boxData?.Items | keyvalue" [style]="style">
+      <!-- This box is a clickable item -->
+      <div [class]="box.value.class">
+        <div class="info-box7-block">
+          <h6 class="m-b-10 black">{{box.value.title}}</h6>
+          <h2 class="text-end black"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
+        </div>
       </div>
-    </div>
-    <div>
+      <div>
+      </div>
     </div>
   </div>
-</div>
-<div *ngIf="boxData" class="row clearfix dashboardcard">
-  <!-- This loop creates a box for each item in the boxData array -->
-  <div class="col-lg-3 col-sm-3" *ngFor="let box of boxData | keyvalue" [style]="style">
-    <!-- This box is a clickable item -->
-    <div [class]="box.value.class">
-      <div class="info-box7-block">
-        <h6 class="m-b-10 black">{{box.value.title}}</h6>
-        <h2 class="text-end black"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
+  <div *ngIf="boxData" class="row clearfix dashboardcard">
+    <!-- This loop creates a box for each item in the boxData array -->
+    <div class="col-lg-3 col-sm-3" *ngFor="let box of boxData | keyvalue" [style]="style">
+      <!-- This box is a clickable item -->
+      <div [class]="box.value.class">
+        <div class="info-box7-block">
+          <h6 class="m-b-10 black">{{box.value.title}}</h6>
+          <h2 class="text-end black"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
+        </div>
       </div>
-    </div>
-    <div>
+      <div>
+      </div>
     </div>
   </div>
 </div>

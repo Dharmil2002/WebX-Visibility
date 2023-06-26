@@ -1,0 +1,37 @@
+export class StateMaster {
+    stnm: string;
+    stcd: number;
+    stateName: string;
+    countryName: string;
+    countryId: Number
+    stateAbbrv: string;
+    activeflag: any;
+    UpdateBy: string;
+    EntryBy: string;
+    stateCode: string;
+    stateType: string;
+    srNo: any;
+    isActive: boolean;
+    stateAlias:any;
+  GSTWiseStateCode: any;
+    constructor(StateMaster) {
+        {
+            this.stcd = StateMaster.stcd || 'System Genrated';
+            this.stateName = StateMaster.stateName || '';
+            this.countryName = StateMaster.countryName || '';
+            this.stateType = StateMaster.stateType || '';
+            this.stateAbbrv = StateMaster.stateAbbrv || '';
+            this.activeflag = StateMaster.activeflag || false;
+        }
+    }
+}
+
+export class StateAutoDropdown {
+    constructor(public stateId: number, public stateName: string, public FromState: string) { }
+}
+
+export class stateResponse {
+    isSuccess: boolean;
+    message: string;
+    statelist: StateMaster[];
+}

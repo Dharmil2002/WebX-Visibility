@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MastersRoutingModule } from './masters-routing.module';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSortModule } from '@angular/material/sort';
@@ -46,6 +46,11 @@ import { ManifestGenerationComponent } from './manifest-generation/manifest-gene
 import { SnackBarUtilityService } from '../Utility/SnackBarUtility.service';
 import { CompanygstmasterListComponent } from './Company GST Master/companygstmaster-list/companygstmaster-list.component';
 import { CompanygstmasterAddComponent } from './Company GST Master/companygstmaster-add/companygstmaster-add.component';
+import { utilityService } from '../Utility/utility.service';
+import { AddCityMasterComponent } from './City Master/add-city-master/add-city-master.component';
+import { CityMasterListComponent } from './City Master/city-master-list/city-master-list.component';
+import { AddStateMasterComponent } from './state-master/add-state-master/add-state-master.component';
+import { StateMasterListComponent } from './state-master/state-master-list/state-master-list.component';
 @NgModule({
 
   imports: [
@@ -89,9 +94,9 @@ import { CompanygstmasterAddComponent } from './Company GST Master/companygstmas
 
   ],
 
-  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent, GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent, DispatchVehicleComponent, ManifestGenerationComponent, CompanygstmasterListComponent, CompanygstmasterAddComponent],
+  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent, GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent, DispatchVehicleComponent, ManifestGenerationComponent, CompanygstmasterListComponent, CompanygstmasterAddComponent,StateMasterListComponent,AddStateMasterComponent,CityMasterListComponent,AddCityMasterComponent],
 
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, jsonDataServiceService,FilterUtils,SnackBarUtilityService]
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },  { provide: MAT_DIALOG_DATA, useValue: {} },jsonDataServiceService,FilterUtils,SnackBarUtilityService,utilityService]
 })
 
 export class MastersModule { }

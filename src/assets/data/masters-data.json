@@ -1,0 +1,196 @@
+{
+    "StateData": [
+        {
+            "srNo": 1,
+            "stateCode": 24,
+            "stateName": "Gujarat",
+            "stateAlias": "Gj",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "23",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 2,
+            "stateCode": 46,
+            "stateName": "Maharashtra",
+            "stateAlias": "MH",
+            "stateType": "UT",
+            "countryName": "India",
+            "GSTWiseStateCode": "85",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 3,
+            "stateCode": 19,
+            "stateName": "haryana",
+            "stateAlias": "HR",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 4,
+            "stateCode": 22,
+            "stateName": "Jharkhand",
+            "stateAlias": "JHD",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "79", 
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 5,
+            "stateCode": 15,
+            "stateName": "Assam",
+            "stateAlias": "AS",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },{
+            "srNo": 6,
+            "stateCode": 24,
+            "stateName": "Dhofar",
+            "stateAlias": "DHF",
+            "stateType": "DH",
+            "countryName": "Oman",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 7,
+            "stateCode": 8,
+            "stateName": "Andhra Pradesh",
+            "stateAlias": "AP",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "37",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 8,
+            "stateCode": 19,
+            "stateName": "Ash Sharqiyah",
+            "stateAlias": "ADD",
+            "stateType": "TS",
+            "countryName": "Oman",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 9,
+            "stateCode": 22,
+            "stateName": "Pune",
+            "stateAlias": "PN",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 10,
+            "stateCode": 15,
+            "stateName": "Assam",
+            "stateAlias": "AS",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        }
+    ],
+    "CityData": [
+        {
+            "srNo": 1,
+            "cityName": "Mulshi",
+            "stateName": "Maharashtra",
+            "zoneName": "South Zone",
+            "ODAFlag":"Y",
+            "isActive": true,
+            "actions": ""
+        },{
+            "srNo": 2,
+            "cityName": "Indore",
+            "stateName": "Madhya Pradesh",
+            "zoneName": "SOUTH2",
+            "ODAFlag":"Y",
+            "isActive": true,
+            "actions": ""
+        },{
+            "srNo": 3,
+            "cityName": "Batinah",
+            "stateName": "",
+            "zoneName": "West Zone",
+            "ODAFlag":"Y",
+            "isActive": true,
+            "actions": ""
+        },{
+            "srNo": 4,
+            "cityName": "Dhakhiliyah",
+            "stateName": "Nizwa",
+            "zoneName": "CENTRAL",
+            "ODAFlag":"N",
+            "isActive": false,
+            "actions": ""
+        },{
+            "srNo": 5,
+            "cityName": "Dhofar",
+            "stateName": "Southern Oman",
+            "zoneName": "South Zone",
+            "ODAFlag":"Y",
+            "isActive": false,
+            "actions": ""
+        },{
+            "srNo": 6,
+            "cityName": "Mumbai",
+            "stateName": "Maharashtra",
+            "zoneName": "West Zone",
+            "ODAFlag":"N",
+            "isActive": true,
+            "actions": ""
+        },{
+            "srNo": 7,
+            "cityName": "Muscat",
+            "stateName": "Gulf of Oman coast",
+            "zoneName": "SOUTH3",
+            "ODAFlag":"Y",
+            "isActive": true,
+            "actions": ""
+        },{
+            "srNo": 8,
+            "cityName": "Sohar",
+            "stateName": "Al Batinah North",
+            "zoneName": "CENTRAL",
+            "ODAFlag":"N",
+            "isActive": true,
+            "actions": ""
+        },{
+            "srNo": 9,
+            "cityName": "Sur",
+            "stateName": "",
+            "zoneName": "CENTRAL",
+            "ODAFlag":"N",
+            "isActive": true,
+            "actions": ""
+        },{
+            "srNo": 10,
+            "cityName": "Mumbai",
+            "stateName": "Maharashtra",
+            "zoneName": "SOUTH",
+            "ODAFlag":"N",
+            "isActive": true,
+            "actions": ""
+        }
+    ]
+}

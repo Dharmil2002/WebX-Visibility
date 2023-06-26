@@ -51,8 +51,9 @@ import { AddCityMasterComponent } from './City Master/add-city-master/add-city-m
 import { CityMasterListComponent } from './City Master/city-master-list/city-master-list.component';
 import { AddStateMasterComponent } from './state-master/add-state-master/add-state-master.component';
 import { StateMasterListComponent } from './state-master/state-master-list/state-master-list.component';
+import { DriverMasterComponent } from './driver-master/driver-master.component';
+import { AddDriverMasterComponent } from './driver-master/add-driver-master/add-driver-master.component';
 @NgModule({
-
   imports: [
     CommonModule,
     MastersRoutingModule,
@@ -94,9 +95,28 @@ import { StateMasterListComponent } from './state-master/state-master-list/state
 
   ],
 
-  declarations: [CNoteGenerationComponent, EwaybillConfigComponent, EwayBillDetailsComponent, EwayBillDocketBookingComponent, LoadingsheetComponent, GridListComponent, LoadingSheetDetailsComponent, LoadingsheetgenerateComponent, DispatchVehicleComponent, ManifestGenerationComponent, CompanygstmasterListComponent, CompanygstmasterAddComponent,StateMasterListComponent,AddStateMasterComponent,CityMasterListComponent,AddCityMasterComponent],
+  declarations: [
+    CNoteGenerationComponent,
+    EwaybillConfigComponent,
+    EwayBillDetailsComponent,
+    EwayBillDocketBookingComponent,
+    LoadingsheetComponent,
+    GridListComponent,
+    LoadingSheetDetailsComponent,
+    LoadingsheetgenerateComponent,
+    DispatchVehicleComponent,
+    ManifestGenerationComponent,
+    CompanygstmasterListComponent,
+    CompanygstmasterAddComponent,
+    StateMasterListComponent,
+    AddStateMasterComponent,
+    CityMasterListComponent,
+    AddCityMasterComponent,
+    DriverMasterComponent,
+    AddDriverMasterComponent
+  ],
 
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },  { provide: MAT_DIALOG_DATA, useValue: {} },jsonDataServiceService,FilterUtils,SnackBarUtilityService,utilityService]
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]
 })
 
 export class MastersModule { }

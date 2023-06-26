@@ -40,7 +40,7 @@
             "stateAlias": "JHD",
             "stateType": "ST",
             "countryName": "India",
-            "GSTWiseStateCode": "79", 
+            "GSTWiseStateCode": "79",
             "isActive": true,
             "actions": ""
         },
@@ -54,7 +54,8 @@
             "GSTWiseStateCode": "",
             "isActive": true,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 6,
             "stateCode": 24,
             "stateName": "Dhofar",
@@ -116,81 +117,436 @@
             "cityName": "Mulshi",
             "stateName": "Maharashtra",
             "zoneName": "South Zone",
-            "ODAFlag":"Y",
+            "ODAFlag": "Y",
             "isActive": true,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 2,
             "cityName": "Indore",
             "stateName": "Madhya Pradesh",
             "zoneName": "SOUTH2",
-            "ODAFlag":"Y",
+            "ODAFlag": "Y",
             "isActive": true,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 3,
             "cityName": "Batinah",
             "stateName": "",
             "zoneName": "West Zone",
-            "ODAFlag":"Y",
+            "ODAFlag": "Y",
             "isActive": true,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 4,
             "cityName": "Dhakhiliyah",
             "stateName": "Nizwa",
             "zoneName": "CENTRAL",
-            "ODAFlag":"N",
+            "ODAFlag": "N",
             "isActive": false,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 5,
             "cityName": "Dhofar",
             "stateName": "Southern Oman",
             "zoneName": "South Zone",
-            "ODAFlag":"Y",
+            "ODAFlag": "Y",
             "isActive": false,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 6,
             "cityName": "Mumbai",
             "stateName": "Maharashtra",
             "zoneName": "West Zone",
-            "ODAFlag":"N",
+            "ODAFlag": "N",
             "isActive": true,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 7,
             "cityName": "Muscat",
             "stateName": "Gulf of Oman coast",
             "zoneName": "SOUTH3",
-            "ODAFlag":"Y",
+            "ODAFlag": "Y",
             "isActive": true,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 8,
             "cityName": "Sohar",
             "stateName": "Al Batinah North",
             "zoneName": "CENTRAL",
-            "ODAFlag":"N",
+            "ODAFlag": "N",
             "isActive": true,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 9,
             "cityName": "Sur",
             "stateName": "",
             "zoneName": "CENTRAL",
-            "ODAFlag":"N",
+            "ODAFlag": "N",
             "isActive": true,
             "actions": ""
-        },{
+        },
+        {
             "srNo": 10,
             "cityName": "Mumbai",
             "stateName": "Maharashtra",
             "zoneName": "SOUTH",
-            "ODAFlag":"N",
+            "ODAFlag": "N",
             "isActive": true,
             "actions": ""
+        }
+    ],
+    "DriverData": [
+        {
+            "SrNo": 1,
+            "DriverName": "Rajesh yadav",
+            "ManualDriverCode": "M00203",
+            "ActiveFlag": true,
+            "LicenseNo": "35453435",
+            "ValidityDate": "13-10-2022"
+        },
+        {
+            "SrNo": 2,
+            "DriverName": "RAJESH YADAV",
+            "ManualDriverCode": "D0015",
+            "ActiveFlag": true,
+            "LicenseNo": "LIC00015",
+            "ValidityDate": "31-03-2032"
+        },
+        {
+            "SrNo": 3,
+            "DriverName": "RAJESH YADAV",
+            "ManualDriverCode": "D0016",
+            "ActiveFlag": true,
+            "LicenseNo": "LIC00016",
+            "ValidityDate": "31-03-2033"
+        },
+        {
+            "SrNo": 4,
+            "DriverName": "Saleh",
+            "ManualDriverCode": "Saleh",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 5,
+            "DriverName": "Hamdan",
+            "ManualDriverCode": "Hamdan",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 6,
+            "DriverName": "Humaid",
+            "ManualDriverCode": "Humaid",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 7,
+            "DriverName": "Mazin",
+            "ManualDriverCode": "Mazin",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 8,
+            "DriverName": "Younis",
+            "ManualDriverCode": "Younis",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 9,
+            "DriverName": "Maddad",
+            "ManualDriverCode": "Maddad",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 10,
+            "DriverName": "Abdullah",
+            "ManualDriverCode": "Abdullah",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 11,
+            "DriverName": "Anwar",
+            "ManualDriverCode": "Anwar",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 12,
+            "DriverName": "Muntasir",
+            "ManualDriverCode": "Muntasir",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 13,
+            "DriverName": "AliSaif",
+            "ManualDriverCode": "AliSaif",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 14,
+            "DriverName": "Nasser",
+            "ManualDriverCode": "Nasser",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 15,
+            "DriverName": "Saud",
+            "ManualDriverCode": "Saud",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 16,
+            "DriverName": "Muhammad",
+            "ManualDriverCode": "Muhammad",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 17,
+            "DriverName": "Mahmood",
+            "ManualDriverCode": "Mahmood",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 18,
+            "DriverName": "Saud",
+            "ManualDriverCode": "Saud",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 19,
+            "DriverName": "Darshan",
+            "ManualDriverCode": "Darshan",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 20,
+            "DriverName": "Ali",
+            "ManualDriverCode": "Ali",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 21,
+            "DriverName": "Juma",
+            "ManualDriverCode": "Juma",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 22,
+            "DriverName": "Said",
+            "ManualDriverCode": "Said",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 23,
+            "DriverName": "KhamisNasser",
+            "ManualDriverCode": "KhamisNasser",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 24,
+            "DriverName": "Saleh",
+            "ManualDriverCode": "Saleh",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 25,
+            "DriverName": "Khamis",
+            "ManualDriverCode": "Khamis",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 26,
+            "DriverName": "Yusuf",
+            "ManualDriverCode": "Yusuf",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 27,
+            "DriverName": "Yusuf1",
+            "ManualDriverCode": "Yusuf1",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 28,
+            "DriverName": "Jabri",
+            "ManualDriverCode": "Jabri",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 29,
+            "DriverName": "SuratDriver",
+            "ManualDriverCode": "SuratDriver",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "07-06-2023"
+        },
+        {
+            "SrNo": 30,
+            "DriverName": "MumbaiDriver",
+            "ManualDriverCode": "MumbaiDriver",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "07-06-2023"
+        },
+        {
+            "SrNo": 31,
+            "DriverName": "barka",
+            "ManualDriverCode": "barka",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "07-06-2023"
+        },
+        {
+            "SrNo": 32,
+            "DriverName": "barkaa",
+            "ManualDriverCode": "barkaa",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "07-06-2023"
+        },
+        {
+            "SrNo": 33,
+            "DriverName": "Jayesh",
+            "ManualDriverCode": "jayesh12",
+            "ActiveFlag": true,
+            "LicenseNo": "JKIH12548",
+            "ValidityDate": "08-06-2023"
+        },
+        {
+            "SrNo": 34,
+            "DriverName": "Raj",
+            "ManualDriverCode": "D00018",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2024"
+        },
+        {
+            "SrNo": 35,
+            "DriverName": "abcmumb",
+            "ManualDriverCode": "mumb",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "09-06-2023"
+        },
+        {
+            "SrNo": 36,
+            "DriverName": "mumb",
+            "ManualDriverCode": "mumb1",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "09-06-2023"
+        },
+        {
+            "SrNo": 37,
+            "DriverName": "juman",
+            "ManualDriverCode": "juman",
+            "ActiveFlag": true,
+            "LicenseNo": "123",
+            "ValidityDate": "10-06-2027"
+        },
+        {
+            "SrNo": 38,
+            "DriverName": "sam",
+            "ManualDriverCode": "sam",
+            "ActiveFlag": true,
+            "LicenseNo": "123",
+            "ValidityDate": "11-06-2026"
+        },
+        {
+            "SrNo": 39,
+            "DriverName": "Surat",
+            "ManualDriverCode": "Surat",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "20-06-2023"
+        },
+        {
+            "SrNo": 40,
+            "DriverName": "test2",
+            "ManualDriverCode": "test2",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "21-06-2023"
+        },
+        {
+            "SrNo": 41,
+            "DriverName": "test01",
+            "ManualDriverCode": "test01",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "21-06-2023"
+        },
+        {
+            "SrNo": 42,
+            "DriverName": "test3",
+            "ManualDriverCode": "test3",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "22-06-2023"
+        },
+        {
+            "SrNo": 43,
+            "DriverName": "rinkesh",
+            "ManualDriverCode": "rinkesh",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "22-06-2023"
         }
     ]
 }

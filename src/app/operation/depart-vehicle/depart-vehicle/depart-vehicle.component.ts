@@ -90,6 +90,7 @@ export class DepartVehicleComponent implements OnInit {
   vendordetails: any;
   advancebalance: any;
   CEWBflag: boolean;
+  setVehicleType: any[];
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
   constructor(private Route: Router, private dialog: MatDialog, 
@@ -100,7 +101,6 @@ export class DepartVehicleComponent implements OnInit {
     //   this.tripData = data
     // }
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
     this.IntializeFormControl()
@@ -130,7 +130,7 @@ export class DepartVehicleComponent implements OnInit {
     };
   
     const departVehicleFormControlsMap = {
-      VendorType: 'VehicleType',
+      VendorType: 'VendorType',
       Vendor: 'Vendor',
       Driver: 'Driver',
       DriverMob: 'DriverMobile',
@@ -154,6 +154,7 @@ export class DepartVehicleComponent implements OnInit {
     const loadingLocationFormControl = this.loadingSheetTableForm.controls['LoadingLocation'];
     const loadingLocationValue = localStorage.getItem('Branch') || '';
     loadingLocationFormControl.setValue(loadingLocationValue);
+    this.loadingSheetTableForm.controls['vehicleType'].setValue(this.setVehicleType);
   }
   
   
@@ -204,42 +205,29 @@ export class DepartVehicleComponent implements OnInit {
     this.loadingData = $event
   }
   getShipingDetails(){
+    
     let MeniFestDetails =this.CnoteService.getMeniFestDetails();
     let menifestList:any=[]
-    let packagesData:any=[]
-    this.http.get(this.shipingDetailsUrl).subscribe((res:any)=>{
-       packagesData=res.packagesData
-    })
     MeniFestDetails.forEach(element => {
-         let weightKg=packagesData.filter((x)=>x.Leg===element.Leg).reduce((total,packaged)=>total + packaged.KgWeight,0)
-         let CftVolume=packagesData.filter((x)=>x.Leg===element.Leg).reduce((total,packaged)=>total + packaged.CftVolume,0)
-         console.log(weightKg+""+CftVolume)
       let json={
           leg:element.Leg,
           manifest: element.MFNumber,
           shipments_lb: element.ShipmentsLoadedBooked,
           packages_lb:element.PackagesLoadedBooked,
-          weight_kg:weightKg,
-          volume_cft:CftVolume
+          weight_kg:element.WeightKg,
+          volume_cft:element.VolumeCFT
       }
-      menifestList.push(json)
+      menifestList.push(json);
       this.csv=menifestList;
       this.tableload=false;
     });
-        //  let json ={
-        //   leg: this.tripData.Leg,
-        //   manifest: this.tripData.menifestNo,
-        //   shipments_lb: shipingCount.length+"/"+shipingCount.length,
-        //   packages_lb:nestedShipdata.Packages+"/"+nestedShipdata.Packages,
-        //   weight_kg:nestedShipdata.WeightKg,
-        //   volume_cft:nestedShipdata.VolumeCFT
-        //  }
-        // this.csv= [json]
+      
   }
   vehicleTypeDropdown() {
+
     this.http.get(this.loadingJsonUrl).subscribe(res => {
       this.loadingSheetData = res;
-      let vehicleType = [];
+      let vehicleType:any[] = [];
       if (this.loadingSheetData) {
         this.loadingSheetData.data[0].forEach(element => {
           let json = {
@@ -256,13 +244,29 @@ export class DepartVehicleComponent implements OnInit {
         this.vehicleType,
         this.vehicleTypeStatus
       );
-      //let tableArray = this.data['data'];
-      //.this.csv = tableArray;
-      // console.log(this.csv);
-      //this.tableload = false;
-
+      let vehicleTypeDetails= this.loadingSheetData.data[0].filter((x)=>x.Type_Code===this.tripData.VehicleType);
+      this.setVehicleType=vehicleType.filter((x)=>x.value===this.tripData.VehicleType);
+      this.autofillVehicleData(vehicleTypeDetails)
     });
     // this.getshipmentData()
+  }
+  autofillVehicleData(vehicleTypeDetails) {
+    
+      if (vehicleTypeDetails) {
+       
+          this.loadingSheetTableForm.controls['CapacityKg'].setValue(vehicleTypeDetails[0]?.CapacityKg || '');
+          this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleTypeDetails[0]?.CapacityVolumeCFT || '');
+          this.loadingSheetTableForm.controls['LoadedKg'].setValue(vehicleTypeDetails[0]?.LoadedKg || '');
+          this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(vehicleTypeDetails[0]?.LoadedvolumeCFT || '');
+          this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(vehicleTypeDetails[0]?.LoadaddedKg || '');
+          this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(vehicleTypeDetails[0]?.VolumeaddedCFT || '');
+          this.loadingSheetTableForm.controls['WeightUtilization'].setValue(vehicleTypeDetails[0]?.WeightUtilization || '');
+          this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(vehicleTypeDetails[0]?.VolumeUtilization || '');
+      
+        this.CnoteService.setData(this.loadingSheetTableForm.value);
+      }
+      
+    
   }
   
   // getshipmentData() {
@@ -319,6 +323,7 @@ export class DepartVehicleComponent implements OnInit {
     }
     return groupedShipments;
   }
+  
   Close() {
     let data=[this.tripData];
     data.forEach((x)=>{

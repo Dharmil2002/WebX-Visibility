@@ -10,6 +10,9 @@ import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { transform } from '../create-loading-sheet/loadingSheetCommon';
 import { updatePending } from '../update-loading-sheet/loadingSheetshipment';
+import { groupShipingTableData } from './groupShipingTableData';
+import { vehicleLoadingScan } from './packageUtilsvehiceLoading';
+
 @Component({
   selector: 'app-vehicle-update-upload',
   templateUrl: './vehicle-update-upload.component.html'
@@ -103,35 +106,11 @@ export class VehicleUpdateUploadComponent implements OnInit {
       let totalVolumeCFT, totalWeightKg, Packages
       this.csv = this.legWiseData;
       let shipingTableData = this.csv;
-      let groupedData = {};
-      shipingTableData.forEach(element => {
-        let leg = element.Leg.trim();
+   // Call the function and pass the required arguments
+  let shipingTableDataArray = groupShipingTableData(shipingTableData);
 
-        // Check if the leg already exists in the groupedData object
-        if (!groupedData.hasOwnProperty(leg)) {
-          groupedData[leg] = {
-            Leg: leg,
-            Shipment: 0,
-            Packages: 0,
-            WeightKg: 0,
-            VolumeCFT: 0
-          };
-        }
-
-        // Increment the shipment count
-        groupedData[leg].Shipment += 1;
-
-        // Retrieve the package data for the current leg and routes
-        let packageData = this.data.packagesData.filter(x => x.Leg.trim() === leg && x.Routes === element.routes);
-
-        // Calculate Packages, WeightKg, and VolumeCFT for the current leg
-        groupedData[leg].Packages += packageData.reduce((total, current) => total + current.Packages, 0);
-        groupedData[leg].WeightKg += packageData.reduce((total, current) => total + current.KgWeight, 0);
-        groupedData[leg].VolumeCFT += packageData.reduce((total, current) => total + current.CftVolume, 0);
-      });
-
+// Use the shipingTableDataArray as needed
       // Convert the groupedData object to an array of values
-      let shipingTableDataArray = Object.values(groupedData);
       this.shipingDataTable = shipingTableDataArray;
       this.kpiData("")
 
@@ -147,70 +126,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
 
     // Find the unload package based on scan and leg values
     const loadPackage = this.data.packagesData.find(x => x.PackageId.trim() === scanValue && x.Leg.trim() === this.vehicelLoadData.Leg);
+    const loading=vehicleLoadingScan(loadPackage,this.currentBranch,this.csv)
 
-    // Check if the unload package exists
-    if (!loadPackage) {
-      // Package does not belong to the current branch
-      Swal.fire({
-        icon: "error",
-        title: "Not Allow to load Package",
-        text: "This package does not belong to the current branch.",
-        showConfirmButton: true,
-      });
-      this.tableload = false;
-      return;
-    }
-    //if Destination is Not Belongs to Currect location then to allow to unload a packaged
-    if (loadPackage.Destination.trim() == this.currentBranch) {
-      Swal.fire({
-        icon: "error",
-        title: "Not Allow to load Package",
-        text: "This package does not belong to the current branch.",
-        showConfirmButton: true,
-      });
-      this.tableload = false;
-      return;
-    }
-    // Check if the package is already scanned
-    if (loadPackage.ScanFlag) {
-      Swal.fire({
-        icon: "info",
-        title: "Already Scanned",
-        text: "Your Package ID is already scanned.",
-        showConfirmButton: true,
-      });
-      this.tableload = false;
-      return;
-    }
-
-    // Find the element in csv array that matches the shipment
-    const element = this.csv.find(e => e.Shipment === loadPackage.Shipment);
-
-    // Check if the element exists and the number of unloaded packages is less than the total packages
-    if (!element || (element.hasOwnProperty('loaded') && element.Packages <= element.loaded)) {
-      // Invalid operation, packages must be greater than Unloaded
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Operation",
-        text: "Cannot perform the operation. Packages must be greater than loaded.",
-        showConfirmButton: true,
-      });
-      this.tableload = false;
-      return;
-    }
-
-    // Update Pending and Unloaded counts
-    element.Pending--;
-    element.loaded = (element.loaded || 0) + 1;
-    loadPackage.ScanFlag = true;
-
-    // Prepare kpiData
-    const event = {
-      shipment: this.csv.length,
-      Package: element.loaded,
-    };
-
-    this.kpiData(event);
+    this.kpiData(loading);
     this.cdr.detectChanges(); // Trigger change detection
     this.tableload=false;
   }

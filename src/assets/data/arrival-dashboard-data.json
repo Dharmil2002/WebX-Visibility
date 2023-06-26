@@ -20,7 +20,7 @@
   },
   {
     "Route": "S005: PNQ-MUMB-VPI",
-    "VehicleNo": "KA05RE5564",
+    "VehicleNo": "MH05H7198",
     "TripID": "THMAA00837",
     "Location": "320 Km | View\n1.5 km from panvel",
     "Scheduled": "29-05-2023 12:30",
@@ -37,7 +37,7 @@
   },
   {
     "Route": "S0010 : AMDB-BRDB-MUMB",
-    "VehicleNo": "HR0UY6646",
+    "VehicleNo": "MH05H7201",
     "TripID": "THMAA00838",
     "Location": "320 Km | View\n1.6 km from baroda ",
     "Scheduled": "30-05-2023 12:30",
@@ -54,7 +54,7 @@
   },
   {
     "Route": "S0037: NAGM-PNQ-MUMB",
-    "VehicleNo": "KA05RE5566",
+    "VehicleNo": "MH05H7203",
     "TripID": "THMAA00841",
     "Location": "320 Km | View\n1.9 km from panvel",
     "Scheduled": "02-06-2023 12:30",
@@ -553,8 +553,8 @@
     "routes": "S003: BLR-MUMB-AMD-JPR",
     "Leg": "BLR-JPR",
     "Action": "NoAction",
-    "KgWt": 0,
-    "CftVolume": 0
+    "KgWt": 687,
+    "CftVolume": 75
   },
   {
     "Shipment": 39939526,

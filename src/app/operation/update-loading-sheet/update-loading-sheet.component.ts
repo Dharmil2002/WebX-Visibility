@@ -10,6 +10,8 @@ import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.serv
 import Swal from 'sweetalert2';
 import { Shipment, autoBindData, filterShipments, kpiData } from '../shipment';
 import { updatePending } from './loadingSheetshipment';
+import { groupShipmentsByLeg } from './shipmentsUtils';
+import { handlePackageUpdate } from './packageUtils';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -84,155 +86,76 @@ export class UpdateLoadingSheetComponent implements OnInit {
   updateListData: any;
   Scan: any;
   shipingDataTable: any;
-  constructor(private Route: Router, private dialog: MatDialog, public dialogRef: MatDialogRef<MarkArrivalComponent>,
-    @Inject(MAT_DIALOG_DATA) public item: any,
-    private http: HttpClient, private fb: UntypedFormBuilder,private cdr: ChangeDetectorRef,private cnoteService: CnoteService) {
-    this.shipmentStatus = 'Unloaded'
-    this.arrivalData = item;
-    this.getShippningData();
-    this.IntializeFormControl()
-  }
-  getShippningData() {
 
+  
+  constructor(
+    private Route: Router,
+    private dialog: MatDialog,
+    public dialogRef: MatDialogRef<MarkArrivalComponent>,
+    @Inject(MAT_DIALOG_DATA) public item: any,
+    private http: HttpClient,
+    private fb: UntypedFormBuilder,
+    private cdr: ChangeDetectorRef,
+    private cnoteService: CnoteService
+  ) {
+    // Set the initial shipment status to 'Unloaded'
+    this.shipmentStatus = 'Unloaded';
+  
+    // Assign the item to the arrivalData property
+    this.arrivalData = item;
+  
+    // Call the getShippningData() function to fetch shipping data
+    this.getShippningData();
+  
+    // Initialize form controls for the loading sheet table
+    this.IntializeFormControl();
+  }
+  
+
+  getShippningData() {
+    // Get vehicle arrival data
     this.data = this.cnoteService.getVehicleArrivalData();
     let tableArray = this.data['shippingData'];
-    // const shippingData = tableArray.map(shipData => {
-    //   return { ...shipData, Pending: shipData.Packages };
-    // });
-    // let shipments: Shipment[] = tableArray.map(shipData => {
-    //   return { ...shipData, Pending: shipData.Packages };
-    // });;
-    let shipments = updatePending(tableArray, this.currentBranch,false,true);
-   let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, this.currentBranch);
-   // let filteredShipments = filterUnloadingShipments(shipments,this.arrivalData?.Route, this.currentBranch);
-
-    // const filteredData = this.filterShipmentsByRouteAndLocation(tableArray, this.arrivalData?.Route, this.arrivalData?.ArrivalLocation);
-    // this.csv = shippingData.filter((item) => item.routes.trim() == this.arrivalData?.Route.trim() && item.Leg.trim() == this.arrivalData.Leg.trim());
+  
+    // Update pending shipments
+    let shipments = updatePending(tableArray, this.currentBranch, false, true);
+  
+    // Filter shipments based on route and branch
+    let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, this.currentBranch);
+  
+    // Update CSV and boxData
     this.csv = filteredShipments;
     this.boxData = kpiData(this.csv, this.shipmentStatus, "");
     this.tableload = false;
-
+  
     let shipingTableData = this.csv;
-    let totalVolumeCFT,totalWeightKg,Packages
-  // Initialize an object to store the grouped data
-let groupedData = {};
-
-shipingTableData.forEach(element => {
-  let leg = element.Leg.trim();
-
-  // Check if the leg already exists in the groupedData object
-  if (!groupedData.hasOwnProperty(leg)) {
-    groupedData[leg] = {
-      Leg: leg,
-      Shipment: 0,
-      Packages: 0,
-      WeightKg: 0,
-      VolumeCFT: 0
-    };
-  }
-
-  // Increment the shipment count
-  groupedData[leg].Shipment += 1;
-
-  // Retrieve the package data for the current leg and routes
-  let packageData = this.data.packagesData.filter(x => x.Leg.trim() === leg && x.Routes === element.routes);
-
-  // Calculate Packages, WeightKg, and VolumeCFT for the current leg
-  groupedData[leg].Packages += packageData.reduce((total, current) => total + current.Packages, 0);
-  groupedData[leg].WeightKg += packageData.reduce((total, current) => total + current.KgWeight, 0);
-  groupedData[leg].VolumeCFT += packageData.reduce((total, current) => total + current.CftVolume, 0);
-});
-
-// Convert the groupedData object to an array of values
-let shipingTableDataArray = Object.values(groupedData);
-
-    this.arrivalData.Leg= shipingTableData[0]?.Leg;
-    
+    let packagesData = this.data.packagesData;
+  
+    // Group shipments by leg using the utility function
+    let shipingTableDataArray = groupShipmentsByLeg(shipingTableData);
+  
+    // Set the leg of the arrivalData
+    this.arrivalData.Leg = shipingTableData[0]?.Leg;
+  
+    // Set the shipingDataTable to the grouped data
     this.shipingDataTable = shipingTableDataArray;
-
-
   }
+
+
   updatePackage() {
-    this.tableload=true;
+    this.tableload = true;
 
-   
+  const scanValue = this.loadingSheetTableForm.value.Scan.trim();
+  const legValue = this.arrivalData.Route.trim();
 
-    // Get the trimmed values of scan and leg
-    const scanValue = this.loadingSheetTableForm.value.Scan.trim();
-    ///const legValue = this.arrivalData.Leg.trim();
-    const legValue = this.arrivalData.Route.trim();
-
-    // Find the unload package based on scan and leg values
-    const unloadPackage = this.data.packagesData.find(x => x.PackageId.trim() === scanValue && x.Routes.trim() === legValue);
-
-    // Check if the unload package exists
-    if (!unloadPackage) {
-      // Package does not belong to the current branch
-      Swal.fire({
-        icon: "error",
-        title: "Not Allow to Unload Package",
-        text: "This package does not belong to the current branch.",
-        showConfirmButton: true,
-      });
-      this.tableload=false;
-      return;
-    }
-    //if Destination is Not Belongs to Currect location then to allow to unload a packaged
-    if (unloadPackage.Destination.trim() !== this.currentBranch) {
-      Swal.fire({
-        icon: "error",
-        title: "Not Allowed",
-        text: "This package does not belong to the current branch.",
-        showConfirmButton: true,
-      });
-      this.tableload=false;
-      return;
-    }
-    // Check if the package is already scanned
-    if (unloadPackage.ScanFlag) {
-      Swal.fire({
-        icon: "info",
-        title: "Already Scanned",
-        text: "Your Package ID is already scanned.",
-        showConfirmButton: true,
-      });
-      this.tableload=false;
-      return;
-    
-    }
-
-    // Find the element in csv array that matches the shipment
-    const element = this.csv.find(e => e.Shipment === unloadPackage.Shipment);
-
-    // Check if the element exists and the number of unloaded packages is less than the total packages
-    if (!element || (element.hasOwnProperty('Unloaded') && element.Packages <= element.Unloaded)) {
-      // Invalid operation, packages must be greater than Unloaded
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Operation",
-        text: "Cannot perform the operation. Packages must be greater than Unloaded.",
-        showConfirmButton: true,
-      });
-      this.tableload=false;
-      return;
-    }
-
-    // Update Pending and Unloaded counts
-    element.Pending--;
-    element.Unloaded = (element.Unloaded || 0) + 1;
-    unloadPackage.ScanFlag = true;
-
-    // Prepare kpiData
-    const event = {
-      shipment: this.csv.length,
-      Package: element.Unloaded,
-    };
-
+  // Call the imported function to handle the logic
+  let PackageUpdate =handlePackageUpdate(scanValue, legValue, this.currentBranch, this.data, this.csv, this.boxData, this.cdr);
     // Call kpiData function
-    this.boxData = kpiData(this.csv, this.shipmentStatus, event);
+    this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
     this.cdr.detectChanges(); // Trigger change detection
     this.tableload=false;
   }
+
 
   setArrivalDataBindData() {
     autoBindData(this.loadingSheetTableForm.controls, {
@@ -260,19 +183,37 @@ let shipingTableDataArray = Object.values(groupedData);
   }
   ngOnInit(): void {
   }
-  IntializeFormControl() {
-    const ManifestGeneratedFormControl = new UpdateloadingControl();
-    this.jsonControlArray = ManifestGeneratedFormControl.getupdatelsFormControls();
-    this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
-    this.updateListData = this.jsonControlArray.filter((x) => x.name != "Scan");
-    this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
+/**
+ * Function to initialize form controls for the loading sheet table
+ */
 
-    this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
-    this.setArrivalDataBindData();
-  }
+IntializeFormControl() {
+  // Create an instance of UpdateloadingControl
+  const ManifestGeneratedFormControl = new UpdateloadingControl();
+
+  // Get the form controls for the update list
+  this.jsonControlArray = ManifestGeneratedFormControl.getupdatelsFormControls();
+
+  // Get the form controls for the scan
+  this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
+
+  // Filter out the "Scan" control from the update list
+  this.updateListData = this.jsonControlArray.filter((x) => x.name != "Scan");
+
+  // Get only the "Scan" control
+  this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
+
+  // Build the form group using the form control array
+  this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+
+  // Set the arrival data binding
+  this.setArrivalDataBindData();
+}
+
   IsActiveFuntion($event) {
     this.loadingData = $event
   }
+
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
     let field = $event.field;                   // the actual formControl instance
@@ -287,6 +228,8 @@ let shipingTableDataArray = Object.values(groupedData);
       console.log("failed");
     }
   }
+
+
   CompleteScan() {
     let packageChecked = false;
     let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
@@ -320,23 +263,5 @@ let shipingTableDataArray = Object.values(groupedData);
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
-  // GetShipmentDet() {
-  //   this.http.get(this.packageUrl).subscribe(res => {
-  //     this.shipmentdet = res;
-  //     const matchingPackages = this.shipmentdet.filter((item: any) => {
-  //       
-  //       return (
-  //         item.PackageId === this.ScanTableForm.value.Shipment &&
-  //         item.shipment === this.csv[0].shipment
-  //       );
-  //     });
-  //     
-  //     if (matchingPackages.length > 0) {
-  //       console.log('Match found');
-  //     } else {
-  //       console.log('No match found');
-  //     }
-  //   });
-  // }
 
 }

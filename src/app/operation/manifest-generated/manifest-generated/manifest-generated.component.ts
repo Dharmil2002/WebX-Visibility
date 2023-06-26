@@ -68,16 +68,38 @@ export class ManifestGeneratedComponent implements OnInit {
    }
   }
   getMenifest() {
-    let MeniFestDetails:any=[]
-    this.menifest.forEach(element => {
+
+    let groupedDataWithoutKey;
+    const groupedData = this.menifest.reduce((acc, element) => {
+      const leg = element.Leg;
+      if (!acc[leg]) {
+        acc[leg] = {
+          Leg: leg,
+          TotalWeightKg: 0,
+          TotalVolumeCFT: 0,
+          TotalPackages: 0,
+          ShipmentCount: 0,
+          Data: []
+        };
+      }
+      acc[leg].TotalWeightKg += element.KgWt;
+      acc[leg].TotalVolumeCFT += element.CftVolume;
+      acc[leg].TotalPackages += element.Packages;
+      acc[leg].ShipmentCount++;
+      acc[leg].Data.push(element);
+      return acc;
+    }, {});
+     groupedDataWithoutKey = Object.values(groupedData);
+   let MeniFestDetails:any[]=[];
+   groupedDataWithoutKey.forEach(element => {
       const randomNumber = "MF/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
       let meniFestjson={
         MFNumber: randomNumber,
         Leg: element?.Leg||'',
-        ShipmentsLoadedBooked:this.menifest.length+"/"+this.menifest.length,
-        PackagesLoadedBooked:element?.Packages ||''+"/"+ element?.Packages||'',
-        WeightKg: this.menifest[0].WeightKg,
-        VolumeCFT:this.menifest[0].VolumeCFT,
+        ShipmentsLoadedBooked:element.ShipmentCount+"/"+element.ShipmentCount,
+        PackagesLoadedBooked:element?.TotalPackages ||''+"/"+ element?.TotalPackages||'',
+        WeightKg: element.TotalWeightKg,
+        VolumeCFT:element.TotalVolumeCFT,
         Action: "Print"
       }
       MeniFestDetails.push(meniFestjson)

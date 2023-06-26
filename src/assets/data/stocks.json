@@ -154,21 +154,21 @@
       {
         "count": 48,
         "title": "Total",
-        "class": "info-box7 bg-danger order-info-box7"
+        "class": "info-box7 bg-white order-info-box7"
       },
       {
         "count": 33,
         "title": "Completion",
-        "class": "info-box7 bg-info order-info-box7"
+        "class": "info-box7 bg-white order-info-box7"
       },
       {
         "count": 14,
         "title": "Loading Sheet",
-        "class": "info-box7 bg-warning order-info-box7"
+        "class": "info-box7 bg-white order-info-box7"
       },{
         "count": 10,
         "title": "Delivery",
-        "class": "info-box7 bg-danger order-info-box7"
+        "class": "info-box7 bg-white order-info-box7"
       }
     ]
   }

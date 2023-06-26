@@ -165,9 +165,9 @@ export class ManageRunsheetComponent extends UnsubscribeOnDestroyAdapter impleme
     }
     let pickUpDelivary=runSheetDetails.filter((x)=>x.Pickup===true);
     const shipData = [
-      createShipDataObject(this.csv.length, "Clusters", "bg-danger"),
-      createShipDataObject(runSheetShipingDetails.length, "Shipments for Delivery", "bg-info"),
-      createShipDataObject(pickUpDelivary.length, "Pickup Requests", "bg-warning"),
+      createShipDataObject(this.csv.length, "Clusters", "bg-white"),
+      createShipDataObject(runSheetShipingDetails.length, "Shipments for Delivery", "bg-white"),
+      createShipDataObject(pickUpDelivary.length, "Pickup Requests", "bg-white"),
     ]
      this.boxdata=shipData
   }

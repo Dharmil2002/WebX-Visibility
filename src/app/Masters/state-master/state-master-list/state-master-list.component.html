@@ -1,13 +1,13 @@
 <section class="content">
     <app-common-wrapper-webxpress [breadscrums]="breadscrums" [loadTable]="tableload">
 
-        <div class="verticalScrollbar">
+        <!-- <div class="verticalScrollbar"> -->
             <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
             [csvFileName]="csvFileName"  [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
             [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
             [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
         </generic-table-webxpress>
-        </div>
+        <!-- </div> -->
     </app-common-wrapper-webxpress>
     <!-- Loading Generic table as parent component and passing  required data-->
     <!--

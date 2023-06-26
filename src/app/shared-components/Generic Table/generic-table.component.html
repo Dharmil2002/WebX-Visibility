@@ -99,7 +99,7 @@
         <tr mat-header-row *matHeaderRowDef="objectKeys(columnHeader)"></tr>
         <tr mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"></tr>
     </table>
-    <mat-paginator *ngIf="tableData.length>=10" #paginator [length]="dataSource.filteredData.length" [pageIndex]="0"
+    <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0"
         [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
     </mat-paginator>
 </div>

@@ -248,10 +248,10 @@ export class DepartureDashboardPageComponent extends UnsubscribeOnDestroyAdapter
       });
 
       const shipData = [
-        createShipDataObject(this.csv.length, "Routes", "bg-info"),
-        createShipDataObject(this.csv.length, "Vehicles", "bg-danger"),
-        createShipDataObject(this.csv.length, "Shipments", "bg-warning"),
-        createShipDataObject(shipPackage, "Packages", "bg-warning")
+        createShipDataObject(this.csv.length, "Routes", "bg-white"),
+        createShipDataObject(this.csv.length, "Vehicles", "bg-white"),
+        createShipDataObject(this.csv.length, "Shipments", "bg-white"),
+        createShipDataObject(shipPackage, "Packages", "bg-white")
       ];
 
       this.boxData = shipData;

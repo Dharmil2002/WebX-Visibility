@@ -71,7 +71,7 @@ export const ROUTES: RouteInfo[] = [
     moduleName: "Masters",
     icon: "",
     class: "",
-    groupTitle: false,
+    groupTitle: true,
     submenu: [
       {
       path: "Masters/StateMaster/StateMasterView",

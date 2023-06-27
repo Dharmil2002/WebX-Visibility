@@ -66,17 +66,17 @@ export const ROUTES: RouteInfo[] = [
   }
   ,
   {
-    path: "",
+    path: "Masters/StateMaster/StateMasterView",
     title: "Masters",
     moduleName: "Masters",
     icon: "",
     class: "",
-    groupTitle: true,
+    groupTitle: false,
     submenu: [
       {
       path: "Masters/StateMaster/StateMasterView",
       title: "State Masters",
-      moduleName: "State Masters",
+      moduleName: "Masters",
       icon: "",
       class: "",
       groupTitle: false,
@@ -85,7 +85,7 @@ export const ROUTES: RouteInfo[] = [
     {
       path: "Masters/CityMaster/CityMasterView",
       title: "City Masters",
-      moduleName: "City Masters",
+      moduleName: "Masters",
       icon: "",
       class: "",
       groupTitle: false,

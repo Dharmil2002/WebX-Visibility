@@ -13,6 +13,9 @@
          -->
     <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
         [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-        [Link]="linkArray" [toggleArray]="toggleArray" (dialogClosed)="updateLoadingData($event)"[extraData]="extraData" [maxWidth]="maxWidth" [width]="width" [height]="height" [menuItems]="menuItems"  (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
+        [Link]="linkArray" [toggleArray]="toggleArray" (dialogClosed)="updateLoadingData($event)"
+        [extraData]="extraData" [maxWidth]="maxWidth" [width]="width" [height]="height"
+        [centerAligned]="centerAlignedData" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
     </generic-table-webxpress>
 </div>

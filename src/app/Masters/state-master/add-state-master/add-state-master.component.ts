@@ -40,7 +40,6 @@ export class AddStateMasterComponent implements OnInit {
 
 
     functionCallHandler($event) {
-        debugger
         // console.log("fn handler called" , $event);
 
         let field = $event.field;                   // the actual formControl instance
@@ -59,10 +58,8 @@ export class AddStateMasterComponent implements OnInit {
         private filter: FilterUtils, private service: utilityService
     ) {
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-            debugger
             this.data = Route.getCurrentNavigation().extras.state.data;
             this.countryCode = this.data.countryName;
-            console.log(this.countryCode); //log(this.countryCode);
             this.action = 'edit'
             this.IsUpdate = true;
         } else {
@@ -117,10 +114,8 @@ export class AddStateMasterComponent implements OnInit {
     }
 
     getCountryList() {
-        debugger
         //throw new Error("Method not implemented.");
         this.http.get(this.countryURL).subscribe(res => {
-            debugger
             this.Country = res;
             let tableArray = this.Country.countryList;
             let countryList = [];
@@ -135,7 +130,6 @@ export class AddStateMasterComponent implements OnInit {
                 this.UpdateCountry = countryList.find((x) => x.name == this.countryCode);
                 this.StateTableForm.controls.Country.setValue(this.UpdateCountry);
             }
-            debugger
             this.filter.Filter(
                 this.jsonControlStateArray,
                 this.StateTableForm,
@@ -156,7 +150,6 @@ export class AddStateMasterComponent implements OnInit {
         this.StateTableForm.controls["GSTWiseStateCode"].setValue(this.StateTableForm.value.GSTWiseStateCode);
         this.StateTableForm.controls["activeflag"].setValue(this.StateTableForm.value.activeflag == true ? "Y" : "N");
         this.StateTableForm.controls["stateCode"].setValue(this.StateTableForm.value.stateCode);
-        console.log(this.StateTableForm.value);
 
         this.Route.navigateByUrl('/Masters/StateMaster/StateMasterView');
         this.service.exportData(this.StateTableForm.value)

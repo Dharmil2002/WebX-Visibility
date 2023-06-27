@@ -50,7 +50,9 @@ export class LoadingSheetViewComponent implements OnInit {
     "Packages": "Packages",
     "KgWeight": "Weight",
     "CftVolume": "Volume",
-  }
+  };
+ centerAlignedData = ['Shipment', 'Packages', 'KgWeight', 'CftVolume'];
+
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "Shipment": "Shipment",

@@ -38,7 +38,9 @@ export class VehicleLoadingComponent implements OnInit {
     "Pending": "Pending",
     "Action": "Action",
     "printPending": "Pending",
-  }
+  };
+  centerAlignedData = ['Shipments', 'Packages', 'ShipmentsLoaded', 'PackagesLoaded','Pending'];
+
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "LoadingSheet": "Loading Sheet",

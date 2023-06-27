@@ -45,6 +45,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
     "Pending": "Pending",
     "Leg": "Leg",
   }
+  centerShippingData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
+  centerAlignedData = ['Shipment', 'Packages', 'Unloaded', 'Pending'];
   shipmentStatus: string = 'Unloaded';
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {

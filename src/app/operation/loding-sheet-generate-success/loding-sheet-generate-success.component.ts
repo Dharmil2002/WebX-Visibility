@@ -41,7 +41,8 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT",
     "Action":"Print"
-  }
+  };
+  centerAlignedData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
   headerForCsv = {
     "LoadingSheet": "Loading Sheet",
     "lag": "Leg",

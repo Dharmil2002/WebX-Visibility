@@ -63,7 +63,6 @@ export class CityMasterListComponent implements OnInit {
         //throw new Error("Method not implemented."); CityData
         // Fetch data from the JSON endpoint
         this.http.get(this.jsonUrl).subscribe((res: any) => {
-            debugger
             this.data = res;
             this.csv = this.data['CityData']
             // Extract relevant data arrays from the response

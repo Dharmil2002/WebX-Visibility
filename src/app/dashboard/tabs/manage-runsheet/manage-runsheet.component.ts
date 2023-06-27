@@ -70,7 +70,7 @@ export class ManageRunsheetComponent
     Status: "Status",
     Action: "Action",
   };
-
+  centerAlignedData = ['Shipments', 'Packages', 'WeightKg', 'VolumeCFT'];
   METADATA = {
     checkBoxRequired: true,
     // selectAllorRenderedData : false,

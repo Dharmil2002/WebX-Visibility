@@ -26,6 +26,7 @@ export class UpdateRunSheetComponent implements OnInit {
     "loaded": "Loaded",
     "pending": "Pending",
   }
+  centerAlignedData = ['shipment',  'packages', 'loaded','pending'];
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "shipment": "Shipment",

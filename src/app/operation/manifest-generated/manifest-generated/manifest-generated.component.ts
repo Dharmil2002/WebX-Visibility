@@ -27,6 +27,8 @@ export class ManifestGeneratedComponent implements OnInit {
     "VolumeCFT": "Volume CFT",
     "Action": "Print"
   }
+  centerAlignedData = ['PackagesLoadedBooked',  'WeightKg', 'VolumeCFT'];
+
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "MFNumber": "MF Number",

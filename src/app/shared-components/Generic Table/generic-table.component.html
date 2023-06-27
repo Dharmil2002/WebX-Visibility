@@ -49,44 +49,42 @@
         </div>
     </div>
     <!-- Generic Table -->
-    <table mat-table [dataSource]="dataSource" matSort class="col-12">
+    <mat-table [dataSource]="dataSource" matSort class="col-12">
         <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)">
-
-            <!-- 'tableData' contains the keys of columnHeader Objects , therefore columnHeader[tableData] gives us Title for particular column -->
-            <ng-container *ngIf="!metaData.noColumnSort.includes(tableData);else elseBlock">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{columnHeader[tableData]}}
-                </th>
+            <ng-container *ngIf="!metaData.noColumnSort.includes(tableData); else elseBlock">
+                <mat-header-cell *matHeaderCellDef mat-sort-header [ngClass]="centerAlignClass(tableData)">
+                    {{columnHeader[tableData]}}
+                </mat-header-cell>
             </ng-container>
             <ng-template #elseBlock>
-                <th mat-header-cell *matHeaderCellDef> {{columnHeader[tableData]}}
+                <mat-header-cell *matHeaderCellDef [ngClass]="centerAlignClass(tableData)">
+                    {{columnHeader[tableData]}}
                     <mat-checkbox *ngIf="tableData === 'checkBoxRequired'" class="example-margin" color="primary"
                         (change)="selectAll($event)"></mat-checkbox>
-                </th>
+                </mat-header-cell>
             </ng-template>
 
-            <!-- All data except activeFlag and isActive is passed to "formatData" function, which return formatted data, depending upon its datatype/key -->
-            <td mat-cell *matCellDef="let element"
-                [ngClass]="{'center-align': isNumeric(element[tableData])&& tableData !== 'srNo' && tableData !== 'SrNo'}">
+            <mat-cell *matCellDef="let element" style="min-width: 100px;"
+                [ngClass]="{'matcolumncenter': isNumeric(element[tableData]), 'matcolumnleft': !isNumeric(element[tableData])}">
                 <mat-checkbox *ngIf="tableData=='checkBoxRequired'" color="primary" [(ngModel)]="element.isSelected"
                     (change)="getCheckData($event)" class="example-margin"></mat-checkbox>
                 {{Link && !shouldDisplayLink(tableData) && toggleArray && !toggleArray.includes(tableData) ?
-                formatData(element[tableData]
-                , tableData ): '' }}
+                formatData(element[tableData], tableData ): '' }}
                 <ng-container *ngFor="let toggle of toggleArray">
                     <mat-slide-toggle *ngIf="tableData==toggle" color="primary" (change)="isActive(element)"
                         [(ngModel)]="element[tableData]">
                     </mat-slide-toggle>
                 </ng-container>
                 <a *ngIf="shouldDisplayLink(tableData)" class="pointer" (click)="drillDownData(element,tableData)"
-                    (ngInit)="triggered = false"><u>{{ formatData(element[tableData],
-                        tableData) }}</u></a>
+                    (ngInit)="triggered = false"><u>{{ formatData(element[tableData], tableData) }}</u></a>
                 <button mat-icon-button *ngIf="tableData=='actions'" (click)="editCall(element)"
                     [matMenuTriggerFor]="menuItemFlag ? menu : null" (click)="$event.stopPropagation()"
                     class="tbl-action-btn">
                     <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
                 </button>
                 <mat-menu #menu="matMenu">
-                    <button mat-menu-item *ngFor="let item of menuItems" (click)="handleMenuItemClick(item,element)">
+                    <button mat-menu-item *ngFor="let item of menuItems"
+                        (click)="handleMenuItemClick(item.label,element)">
                         {{ item.label }}
                     </button>
                 </mat-menu>
@@ -94,11 +92,12 @@
                     (click)="View(element)" class="tbl-action-btn">
                     <app-feather-icons [icon]="'eye'" [class]="'tbl-fav-edit'"></app-feather-icons>
                 </button>
-            </td>
+            </mat-cell>
         </ng-container>
-        <tr mat-header-row *matHeaderRowDef="objectKeys(columnHeader)"></tr>
-        <tr mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"></tr>
-    </table>
+
+        <mat-header-row *matHeaderRowDef="objectKeys(columnHeader)"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"></mat-row>
+    </mat-table>
     <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0"
         [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
     </mat-paginator>

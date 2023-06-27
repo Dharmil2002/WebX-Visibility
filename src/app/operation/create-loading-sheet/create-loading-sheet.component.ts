@@ -72,6 +72,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT"
   }
+  centerAlignedData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "RouteandSchedule": "Leg",

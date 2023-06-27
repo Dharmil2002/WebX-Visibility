@@ -55,7 +55,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Output() onFlagChange: EventEmitter<any> = new EventEmitter();
   @Output() dialogClosed = new EventEmitter<any>();
   selectedItems: any[] = [];
-
+  @Input() centerAligned;
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
@@ -65,6 +65,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
+    console.log(this.centerAligned);
   }
   constructor(public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router, public dialog: MatDialog) {
@@ -337,7 +338,23 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
       this.dialogClosed.emit(result);
     })
   }
+  // isNumeric(value: any): boolean {
+  //   return typeof value === 'number';
+  // }
+  // centerAlignClass(tableData: string): string {
+  //   const centerAlignColumns = this.centerAligned;
+  //   return centerAlignColumns.includes(tableData) ? 'matcolumncenter' : '';
+  // }
   isNumeric(value: any): boolean {
     return typeof value === 'number';
+  }
+  centerAlignClass(tableData: string): string {
+    // const centerAlignColumns = this.centerAligned;
+    // return centerAlignColumns.includes(tableData) ? 'matcolumncenter' : 'matcolumnleft';
+    const centerAlignColumns = this.centerAligned;
+    if (centerAlignColumns && centerAlignColumns.includes(tableData)) {
+      return 'matcolumncenter';
+    }
+    return 'matcolumnleft';
   }
 }

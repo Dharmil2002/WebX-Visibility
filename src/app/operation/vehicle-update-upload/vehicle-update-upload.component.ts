@@ -38,7 +38,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
     "loaded": "Loaded",
     "Pending": "Pending",
     "Leg": "Leg",
-  }
+  };
+  centerAlignedData = ['Shipment', 'Packages', 'loaded', 'Pending'];
+
   shipingHeader = {
     "Leg": "Leg",
     "Shipment": "Shipments",
@@ -46,6 +48,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT"
   }
+  centerShippingData= ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
   shipingHeaderForCsv = {
     "Leg": "Leg",
     "Shipment": "Shipments",

@@ -47,10 +47,8 @@ export class AddCityMasterComponent implements OnInit {
         private http: HttpClient,private service: utilityService) {
         //super();
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-            debugger
              this.data = Route.getCurrentNavigation().extras.state.data;
             this.stateId = this.data.stateName;
-            console.log(this.stateId); 
             this.zoneId = this.data.zoneName;
             this.IsUpdate = true;
             this.action = "edit";
@@ -140,7 +138,6 @@ export class AddCityMasterComponent implements OnInit {
                 zone.push(dropdownList)
             });
             if (this.IsUpdate) {
-                debugger
                 this.UpdateCountry = zone.find((x) => x.name == this.zoneId);
                 this.CityTableForm.controls.Zone.setValue(this.UpdateCountry);
             }
@@ -166,7 +163,6 @@ export class AddCityMasterComponent implements OnInit {
                 }
                 state.push(dropdownList)
             });
-            debugger
             if (this.IsUpdate) {
                 this.UpdateCountry = state.find((x) => x.name == this.stateId);
                 this.CityTableForm.controls.State.setValue(this.UpdateCountry);

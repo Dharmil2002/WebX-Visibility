@@ -71,6 +71,7 @@ export class DepartVehicleComponent implements OnInit {
     "weight_kg": "Weight Kg",
     "volume_cft": "Volume CFT"
   }
+  centerAlignedData = ['packages_lb', 'weight_kg', 'volume_cft'];
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
     "leg": "Leg",

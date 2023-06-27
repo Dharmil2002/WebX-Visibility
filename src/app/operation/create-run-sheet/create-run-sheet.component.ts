@@ -52,6 +52,8 @@ export class CreateRunSheetComponent implements OnInit {
     "Volume": "Volume",
     "checkBoxRequired": "Select"
   }
+  centerAlignedData = ['Pincode', 'Packages', 'Weight', 'Volume'];
+
   dynamicControls = {
     add: false,
     edit: false,
@@ -125,7 +127,7 @@ export class CreateRunSheetComponent implements OnInit {
     Swal.fire({
       icon: "success",
       title: "Successful",
-      text: `Loading Sheet generated Successfully`,
+      text: `Run Sheet generated Successfully`,
       showConfirmButton: true,
     })
   }

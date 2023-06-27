@@ -16,10 +16,10 @@
                 
 /*                 [1. Common ]                   			*/
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
-@import "~ng-pick-datetime/assets/style/picker.min.css";
+@import "ng-pick-datetime/assets/style/picker.min.css";
 /* Importing Bootstrap SCSS file. */
-@import '~bootstrap/scss/bootstrap';
-@import '~perfect-scrollbar/css/perfect-scrollbar.css';
+@import 'bootstrap/scss/bootstrap';
+@import 'perfect-scrollbar/css/perfect-scrollbar.css';
 @import 'common/_variables';
 @import 'common/_mixins';
 @import 'common/_customanimate.scss';
@@ -56,6 +56,8 @@
 @import 'components/_thumbnails.scss';
 @import 'components/_todo.scss';
 @import 'components/_settingSidebar.scss';
+@import 'components/_multileveltable.scss';
+
 
 /*                 [4. Apps]                   				*/
 @import 'apps/_calendar.scss';
@@ -106,7 +108,6 @@
 /*                 [8. Browser ]                   			*/
 @import 'browser/_ie10.scss';
 @import 'browser/_ie11.scss';
-
 .tablewidth {
   max-width: 80px !important;
 }
@@ -350,10 +351,6 @@ a {
 
 .pointer {
   cursor: pointer;
-}
-
-.center-align {
-  text-align: center;
 }
 
 .black {

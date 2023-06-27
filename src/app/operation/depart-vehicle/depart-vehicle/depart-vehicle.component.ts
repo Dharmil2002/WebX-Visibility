@@ -154,7 +154,6 @@ export class DepartVehicleComponent implements OnInit {
     const loadingLocationFormControl = this.loadingSheetTableForm.controls['LoadingLocation'];
     const loadingLocationValue = localStorage.getItem('Branch') || '';
     loadingLocationFormControl.setValue(loadingLocationValue);
-    this.loadingSheetTableForm.controls['vehicleType'].setValue(this.setVehicleType);
   }
   
   
@@ -224,7 +223,7 @@ export class DepartVehicleComponent implements OnInit {
       
   }
   vehicleTypeDropdown() {
-
+    
     this.http.get(this.loadingJsonUrl).subscribe(res => {
       this.loadingSheetData = res;
       let vehicleType:any[] = [];
@@ -251,9 +250,8 @@ export class DepartVehicleComponent implements OnInit {
     // this.getshipmentData()
   }
   autofillVehicleData(vehicleTypeDetails) {
-    
       if (vehicleTypeDetails) {
-       
+          this.loadingSheetTableForm.controls['vehicleType'].setValue(this.setVehicleType[0]);
           this.loadingSheetTableForm.controls['CapacityKg'].setValue(vehicleTypeDetails[0]?.CapacityKg || '');
           this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleTypeDetails[0]?.CapacityVolumeCFT || '');
           this.loadingSheetTableForm.controls['LoadedKg'].setValue(vehicleTypeDetails[0]?.LoadedKg || '');
@@ -330,7 +328,7 @@ export class DepartVehicleComponent implements OnInit {
       x.Action='DEPARTED'
     })
     this.CnoteService.setLsData(data);
-       this.goBack(2);
+       this.goBack(3);
   } 
   GenerateCEWB(){
     this.CEWBflag=true;

@@ -131,4 +131,5 @@ export class ManifestGeneratedComponent implements OnInit {
   Close(): void {
     this.dialogRef.close(this.csv)
   }
+
 }

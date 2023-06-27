@@ -1,5 +1,5 @@
 import Swal from 'sweetalert2';
-
+let uniqueShipments: Set<number> = new Set(); 
 /**
  * Function to handle package updates
  * @param scanValue - The scan value of the package
@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
  */
 
 export function handlePackageUpdate(scanValue: string, legValue: string, currentBranch: string, data: any, csv: any[], boxData: any, cdr: any) {
+
   const unloadPackage = data.packagesData.find((x: any) => x.PackageId.trim() === scanValue && x.Routes.trim() === legValue);
 
   if (!unloadPackage) {
@@ -36,14 +37,26 @@ export function handlePackageUpdate(scanValue: string, legValue: string, current
     showError("Invalid Operation", "Cannot perform the operation. Packages must be greater than Unloaded.");
     return;
   }
+  if (!uniqueShipments.has(element.Shipment)) {
+    uniqueShipments.add(element.Shipment);
+  }
+  
 
   element.Pending--;
   element.Unloaded = (element.Unloaded || 0) + 1;
   unloadPackage.ScanFlag = true;
+  
+  //below the Process for The get All count of Unloaded Packages
+  
+  const totalUnloadedPackages = csv.reduce((total: number, e: any) => {
+    return total + (e.Unloaded || 0);
+  }, 0);
+
+  //End
 
   const event = {
-    shipment: csv.length,
-    Package: element.Unloaded,
+    shipment: uniqueShipments.size,
+    Package: totalUnloadedPackages,
   };
 
   // Call kpiData function

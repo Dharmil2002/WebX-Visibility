@@ -1,4 +1,5 @@
 export function groupShipingTableData(shipingTableData) {
+  debugger
     const groupedData = {};
   
     shipingTableData.forEach(element => {
@@ -21,8 +22,8 @@ export function groupShipingTableData(shipingTableData) {
   
       // Calculate Packages, WeightKg, and VolumeCFT for the current leg
       groupedData[leg].Packages += element.Packages;
-      groupedData[leg].WeightKg += element.Packages;
-      groupedData[leg].VolumeCFT += element.Packages;
+      groupedData[leg].WeightKg += element.KgWt;
+      groupedData[leg].VolumeCFT += element.CftVolume;
     });
   
     // Convert the groupedData object to an array of values

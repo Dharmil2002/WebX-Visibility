@@ -94,4 +94,5 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   close(){
     this.dialogRef.close(this.csv);
   }
+  
 }

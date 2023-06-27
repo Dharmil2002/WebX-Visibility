@@ -28,6 +28,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
+  shipments=[]
   currentBranch: string = localStorage.getItem("Branch") || '';
   columnHeader = {
     "Shipment": "Shipment",
@@ -123,12 +124,14 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.tableload = true;
     // Get the trimmed values of scan and leg
     const scanValue = this.loadingSheetTableForm.value.Scan.trim();
-
+   
     // Find the unload package based on scan and leg values
     const loadPackage = this.data.packagesData.find(x => x.PackageId.trim() === scanValue && x.Leg.trim() === this.vehicelLoadData.Leg);
-    const loading=vehicleLoadingScan(loadPackage,this.currentBranch,this.csv)
 
+    const loading=vehicleLoadingScan(loadPackage,this.currentBranch,this.csv)
+    if(loading){
     this.kpiData(loading);
+    }
     this.cdr.detectChanges(); // Trigger change detection
     this.tableload=false;
   }
@@ -216,7 +219,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
             text: `Manifest Generated Successfully`,
             showConfirmButton: true,
           })
-          this.goBack(2);
+          this.goBack(3);
           this.dialogRef.close(arravalDataDetails)
           // Handle the result after the dialog is closed
         });

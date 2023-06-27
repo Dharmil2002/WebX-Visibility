@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-
+let uniqueShipments: Set<number> = new Set();
 /**
  * Performs the vehicle loading scan operation.
  * @param loadPackage - The package to be loaded.
@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
  * @returns The event object containing shipment and package information.
  */
 export function vehicleLoadingScan(loadPackage: any, currentBranch: string, csv: any[]): any {
+
   // Check if the unload package exists
   if (!loadPackage) {
     // Package does not belong to the current branch
@@ -45,9 +46,9 @@ export function vehicleLoadingScan(loadPackage: any, currentBranch: string, csv:
   // Find the element in the csv array that matches the shipment
   const element = csv.find(e => e.Shipment === loadPackage.Shipment);
 
-  // Check if the element exists and the number of unloaded packages is less than the total packages
+  // Check if the element exists and the number of Loaded packages is less than the total packages
   if (!element || (element.hasOwnProperty('loaded') && element.Packages <= element.loaded)) {
-    // Invalid operation, packages must be greater than unloaded
+    // Invalid operation, packages must be greater than Loaded
     Swal.fire({
       icon: "error",
       title: "Invalid Operation",
@@ -57,15 +58,25 @@ export function vehicleLoadingScan(loadPackage: any, currentBranch: string, csv:
     return;
   }
 
-  // Update Pending and Unloaded counts
+
+  // Update Pending and Loaded counts
   element.Pending--;
   element.loaded = (element.loaded || 0) + 1;
   loadPackage.ScanFlag = true;
   // Prepare kpiData
+  //below the Process for The get All count of Loaded Packages
+  const totalLoadedPackages = csv.reduce((total: number, e: any) => {
+    return total + (e.loaded || 0);
+  }, 0);
+  //End
+  if (!uniqueShipments.has(element.Shipment)) {
+    uniqueShipments.add(element.Shipment);
+  }
   const event = {
-    shipment: csv.length,
-    Package: element.loaded,
+    shipment: uniqueShipments.size,
+    Package: totalLoadedPackages,
   };
-  
+
+
   return event;
 }

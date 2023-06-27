@@ -143,6 +143,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
 
   updatePackage() {
+   
     this.tableload = true;
 
   const scanValue = this.loadingSheetTableForm.value.Scan.trim();
@@ -151,7 +152,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
   // Call the imported function to handle the logic
   let PackageUpdate =handlePackageUpdate(scanValue, legValue, this.currentBranch, this.data, this.csv, this.boxData, this.cdr);
     // Call kpiData function
+    if(PackageUpdate){
     this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
+    }
     this.cdr.detectChanges(); // Trigger change detection
     this.tableload=false;
   }

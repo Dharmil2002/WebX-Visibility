@@ -319,7 +319,7 @@ export class CreateLoadingSheetComponent implements OnInit {
                 x.Action = "Vehicle Loading"
             })
             this.CnoteService.setLsData(lsData);
-            this.goBack(2);
+            this.goBack(3);
             // Handle the result after the dialog is closed
           });
         } else {

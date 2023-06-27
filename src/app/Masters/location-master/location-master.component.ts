@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+
 @Component({
-  selector: 'app-driver-master',
-  templateUrl: './driver-master.component.html',
+  selector: 'app-location-master',
+  templateUrl: './location-master.component.html',
 })
-export class DriverMasterComponent implements OnInit {
+export class LocationMasterComponent implements OnInit {
   jsonUrl = '../../../assets/data/masters-data.json'
   data: [] | any;
   csv: any[];
@@ -14,26 +15,27 @@ export class DriverMasterComponent implements OnInit {
 
   columnHeader = {
       "SrNo": "Sr No",
-      'ManualDriverCode': 'Driver Code',
-      'DriverName': 'Driver Name',
-      'LicenseNo': 'License No',
-      'ValidityDate': 'Validity Date',
+      'LocationCode': 'Location Code',
+      'LocationName': 'Location Name',
+      'LocationAddress': 'Location Address',
+      'ReportingLocation': 'Reporting Location',
       "ActiveFlag": "Active Status",
       "actions": "Actions"
   };
   headerForCsv = {
-    'ManualDriverCode': 'Driver Code',
-      'DriverName': 'Driver Name',
-      'LicenseNo': 'License No',
-      'ValidityDate': 'Validity Date',
-      "ActiveFlag": "Active Status",
+    "SrNo": "Sr No",
+    'LocationCode': 'Location Code',
+    'LocationName': 'Location Name',
+    'LocationAddress': 'Location Address',
+    'ReportingLocation': 'Reporting Location',
+    "ActiveFlag": "Active Status"
   }
 
   breadscrums = [
       {
-        title: "Driver Master",
+        title: "Location Master",
         items: ["Home"],
-        active: "Driver Master",
+        active: "Location Master",
       },
     ];
 
@@ -45,19 +47,19 @@ export class DriverMasterComponent implements OnInit {
   cityActiveFlag: any;
   addAndEditPath: string;
   constructor(private http: HttpClient){
-      this.addAndEditPath = "/Masters/DriverMaster/AddDriverMaster";
+      this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
   }
   ngOnInit(): void {
       //throw new Error("Method not implemented.");
-      this.GetDriverDetails();
+      this.GetLocationDetails();
   }
 
-  GetDriverDetails() {
+  GetLocationDetails() {
       //throw new Error("Method not implemented."); CityData
       // Fetch data from the JSON endpoint
       this.http.get(this.jsonUrl).subscribe((res: any) => {
           this.data = res;
-          this.csv = this.data['DriverData']
+          this.csv = this.data['LocationData']
           // Extract relevant data arrays from the response
           //const tableArray = this.data['tabledata'];
           this.tableload = false;

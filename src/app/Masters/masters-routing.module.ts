@@ -15,6 +15,7 @@ import { AddStateMasterComponent } from './state-master/add-state-master/add-sta
 import { StateMasterListComponent } from './state-master/state-master-list/state-master-list.component';
 import { DriverMasterComponent } from './driver-master/driver-master.component';
 import { AddDriverMasterComponent } from './driver-master/add-driver-master/add-driver-master.component';
+import { LocationMasterComponent } from './location-master/location-master.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -31,7 +32,9 @@ const routes: Routes = [
   { path: "CityMaster/CityMasterView", component: CityMasterListComponent },
   { path: "CityMaster/AddCity", component: AddCityMasterComponent },
   { path: "DriverMaster/DriverMasterList", component: DriverMasterComponent },
-  { path: "DriverMaster/AddDriverMaster", component: AddDriverMasterComponent }
+  { path: "DriverMaster/AddDriverMaster", component: AddDriverMasterComponent },
+  { path: "LocationMaster/LocationMasterList", component: LocationMasterComponent }
+
 
 
 ];

@@ -65,9 +65,8 @@ export class UpdateRunSheetComponent implements OnInit {
     this.autoBindData();
   }
   autoBindData() {
-    let runSheetDetails=this.cnoteService.getRunSheetData();
-    let runSheetNestedDetails=[runSheetDetails.runSheetDetails];
-    let autoFillUpdateRunSheet=runSheetNestedDetails.find((x)=>x.Cluster===this.tripData.columnData.Cluster)
+    let runSheetDetails=this.cnoteService.getDepartVehicleData();
+    let autoFillUpdateRunSheet=runSheetDetails.runSheetdetails.find((x)=>x.Cluster===this.tripData.columnData.Cluster)
     this.updateSheetTableForm.controls['Vehicle'].setValue(autoFillUpdateRunSheet?.Vehicle||'')
     this.updateSheetTableForm.controls['Cluster'].setValue(autoFillUpdateRunSheet?.Cluster||'')
     this.updateSheetTableForm.controls['Runsheet'].setValue(autoFillUpdateRunSheet?.RunSheetID||'')
@@ -77,7 +76,7 @@ export class UpdateRunSheetComponent implements OnInit {
     this.getShipingData(runSheetDetails)
    }
   getShipingData(runSheetDetails){
-    let runSheetShipingDetails=runSheetDetails.shippingData.filter((x)=>x.Cluster===this.tripData.columnData.Cluster);
+    let runSheetShipingDetails=runSheetDetails.shipments.filter((x)=>x.Cluster===this.tripData.columnData.Cluster);
     let runSheetList:any[]=[];
     runSheetShipingDetails.forEach(element => {
       let runSheetJson={

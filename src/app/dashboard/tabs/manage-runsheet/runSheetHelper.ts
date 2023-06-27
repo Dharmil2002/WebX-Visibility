@@ -1,7 +1,13 @@
-export function createRunSheetData(runsheetdata,departRunSheetData) {
-    let runSheetDetails = [runsheetdata.runSheetDetails];
-    let runSheetShipingDetails = runsheetdata.shippingData;
-  
+export function createRunSheetData(runsheetdata,departRunSheetData,apiData) {
+    let runSheetDetails,runSheetShipingDetails
+    if(apiData){
+     runSheetDetails = [runsheetdata.runSheetDetails];
+     runSheetShipingDetails = runsheetdata.shippingData;
+    }
+    else{
+    runSheetDetails = runsheetdata.GenerateData;
+    runSheetShipingDetails = runsheetdata.RunsheetData;
+    }
     // Create shipData objects for displaying summary information
     const createShipDataObject = (count, title, className) => ({
       count,

@@ -1,5 +1,4 @@
 export function groupShipingTableData(shipingTableData) {
-  debugger
     const groupedData = {};
   
     shipingTableData.forEach(element => {

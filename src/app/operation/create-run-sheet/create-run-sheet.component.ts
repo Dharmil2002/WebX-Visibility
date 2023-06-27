@@ -121,7 +121,7 @@ export class CreateRunSheetComponent implements OnInit {
       runSheetDetails: this.RunSheetTableForm.value
     }
     this.CnoteService.setRunSheetData(runSheetDetils);
-    this.goBack(3)
+    this.goBack(4)
     Swal.fire({
       icon: "success",
       title: "Successful",

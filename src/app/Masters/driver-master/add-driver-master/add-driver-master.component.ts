@@ -122,7 +122,6 @@ export class AddDriverMasterComponent implements OnInit {
   initializeFormControl() {
     // Create DriverFormControls instance to get form controls for different sections
     const driverFormControls = new DriverControls(this.DriverTable, this.IsUpdate);
-    debugger
     this.jsonControlDriverArray = driverFormControls.getFormControlsD();
     this.jsonControlLicenseArray = driverFormControls.getFormControlsL();
     this.jsonControlPermanentArray = driverFormControls.getFormControlsP();

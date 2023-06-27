@@ -1,0 +1,19 @@
+<!-- <app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <form [formGroup]="LocationTableForm">
+      <app-form-webxpress
+       [form]="LocationTableForm"
+       [formData]="jsonControlArray"
+      (functionCallEmitter)="functionCallHandler($event)" 
+      [showSaveAndCancelButton]="true">
+      </app-form-webxpress>
+    </form>
+  </app-common-wrapper-webxpress> -->
+  <app-common-wrapper-webxpress [breadscrums]="breadscrums" > 
+    <form [formGroup]="LocationTableForm" >
+        <generic-accordion-webxpress 
+        [AccordionForm]="LocationTableForm"
+        [accordionGroup]="accordionData"
+        (functionCallEmitter)="functionCallHandler($event)" >
+        </generic-accordion-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

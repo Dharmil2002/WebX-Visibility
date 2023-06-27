@@ -54,6 +54,7 @@ import { StateMasterListComponent } from './state-master/state-master-list/state
 import { DriverMasterComponent } from './driver-master/driver-master.component';
 import { AddDriverMasterComponent } from './driver-master/add-driver-master/add-driver-master.component';
 import { LocationMasterComponent } from './location-master/location-master.component';
+import { AddLocationMasterComponent } from './location-master/add-location-master/add-location-master.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -115,7 +116,8 @@ import { LocationMasterComponent } from './location-master/location-master.compo
     AddCityMasterComponent,
     DriverMasterComponent,
     AddDriverMasterComponent,
-    LocationMasterComponent
+    LocationMasterComponent,
+    AddLocationMasterComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

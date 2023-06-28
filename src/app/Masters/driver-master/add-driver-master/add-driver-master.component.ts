@@ -130,7 +130,7 @@ export class AddDriverMasterComponent implements OnInit {
     this.accordionData = {
       "Driver Details": this.jsonControlDriverArray,
       "License Details": this.jsonControlLicenseArray,
-      "Permanent Address": this.jsonControlPermanentArray,
+      "Address": this.jsonControlPermanentArray,
     };
 
     // Build the form group using formGroupBuilder function and the values of accordionData
@@ -171,15 +171,32 @@ export class AddDriverMasterComponent implements OnInit {
   }
   cancel() {
     window.history.back();
-    //this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList);
+    this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList");
   }
   save() {
-    this.DriverTableForm.controls["cityId"].setValue(this.DriverTableForm.value.cityId);
-    this.DriverTableForm.controls["cityName"].setValue(this.DriverTableForm.value.cityName);
-    this.DriverTableForm.controls["State"].setValue(this.DriverTableForm.value.State.value);
-    this.DriverTableForm.controls["Zone"].setValue(this.DriverTableForm.value.Zone.value);
-    this.DriverTableForm.controls["isActive"].setValue(this.DriverTableForm.value.isActive == true ? "Y" : "N");
-    this.Route.navigateByUrl('/Masters/CityMaster/CityMasterView');
+    this.DriverTableForm.controls["Driver_Name"].setValue(this.DriverTableForm.value.Driver_Name);
+    this.DriverTableForm.controls["DFather_Name"].setValue(this.DriverTableForm.value.DFather_Name);
+    this.DriverTableForm.controls["Manual_Driver_Code"].setValue(this.DriverTableForm.value.Manual_Driver_Code);
+    this.DriverTableForm.controls["Driver_Location"].setValue(this.DriverTableForm.value.Driver_Location);
+    this.DriverTableForm.controls["VEHNO"].setValue(this.DriverTableForm.value.VEHNO);
+    this.DriverTableForm.controls["VendorDriverCode"].setValue(this.DriverTableForm.value.VendorDriverCode);
+    this.DriverTableForm.controls["Telno"].setValue(this.DriverTableForm.value.Telno);
+    this.DriverTableForm.controls["D_DOB"].setValue(this.DriverTableForm.value.D_DOB);
+    this.DriverTableForm.controls["Guarantor_Name"].setValue(this.DriverTableForm.value.Guarantor_Name);
+    this.DriverTableForm.controls["GuarantorMobileNo"].setValue(this.DriverTableForm.value.GuarantorMobileNo);
+    this.DriverTableForm.controls["D_category"].setValue(this.DriverTableForm.value.D_category);
+    this.DriverTableForm.controls["JoiningDate"].setValue(this.DriverTableForm.value.JoiningDate);
+    this.DriverTableForm.controls["Driver_Id"].setValue(this.DriverTableForm.value.Driver_Id);
+    this.DriverTableForm.controls["License_No"].setValue(this.DriverTableForm.value.License_No);
+    this.DriverTableForm.controls["Issue_By_RTO"].setValue(this.DriverTableForm.value.Issue_By_RTO);
+    this.DriverTableForm.controls["Valdity_dt"].setValue(this.DriverTableForm.value.Valdity_dt);
+    this.DriverTableForm.controls["BlackListedReason"].setValue(this.DriverTableForm.value.BlackListedReason);
+    this.DriverTableForm.controls["IsBlackListed"].setValue(this.DriverTableForm.value.IsBlackListed);
+    this.DriverTableForm.controls["P_Address"].setValue(this.DriverTableForm.value.P_Address);
+    this.DriverTableForm.controls["P_City"].setValue(this.DriverTableForm.value.P_City);
+    this.DriverTableForm.controls["P_Pincode"].setValue(this.DriverTableForm.value.P_Pincode);
+    this.DriverTableForm.controls["ActiveFlag"].setValue(this.DriverTableForm.value.ActiveFlag == true ? "Y" : "N");
+    this.Route.navigateByUrl('/Masters/DriverMaster/DriverMasterList');
     this.service.exportData(this.DriverTableForm.value)
   }
   functionCallHandler($event) {

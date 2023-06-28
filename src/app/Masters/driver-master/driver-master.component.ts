@@ -22,11 +22,12 @@ export class DriverMasterComponent implements OnInit {
       "actions": "Actions"
   };
   headerForCsv = {
+    "SrNo": "Sr No",
     'ManualDriverCode': 'Driver Code',
-      'DriverName': 'Driver Name',
-      'LicenseNo': 'License No',
-      'ValidityDate': 'Validity Date',
-      "ActiveFlag": "Active Status",
+    'DriverName': 'Driver Name',
+    'LicenseNo': 'License No',
+    'ValdityDate': 'Validity Date',
+    "ActiveFlag": "Active Status",
   }
 
   breadscrums = [

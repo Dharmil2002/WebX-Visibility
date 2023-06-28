@@ -2,67 +2,66 @@ import { RouteInfo } from "./sidebar.metadata";
 export const ROUTES: RouteInfo[] =
   [
     {
-      path: "Masters/Docket/Create",
+      path: "",
       title: "Menu",
       moduleName: "CNote",
       icon: "check-circle",
-      class: "",
+      class: "menu-toggle",
       groupTitle: false,
-      submenu: [],
-    },
-    {
-      path: "dashboard/GlobeDashboardPage",
-      title: "Globe Dashboard Page",
-      moduleName: "Dashboard",
-      icon: "",
-      class: "",
-      groupTitle: false,
-      submenu: []
-    },
-    {
-      path: "Masters/Docket/Ewaybill",
-      title: "Eway Bill",
-      moduleName: "Masters",
-      icon: "",
-      class: "",
-      groupTitle: false,
-      submenu: []
-    },
-    {
-      path: "Masters/Docket/Create",
-      title: "Manual docket",
-      moduleName: "Masters",
-      icon: "",
-      class: "",
-      groupTitle: false,
-      submenu: []
-    },
-    {
-      path: "Masters/Docket/Ewaybill-Config",
-      title: "Eway-Bill Config",
-      moduleName: "Masters",
-      icon: "",
-      class: "",
-      groupTitle: false,
-      submenu: []
-    },
-    {
-      path: "Masters/Docket/LoadingSheet",
-      title: "Loading Sheet",
-      moduleName: "Masters",
-      icon: "",
-      class: "",
-      groupTitle: false,
-      submenu: []
-    },
-    {
-      path: "Masters/Docket/ManifestGeneration",
-      title: "Manifest Generation ",
-      moduleName: "Masters",
-      icon: "",
-      class: "",
-      groupTitle: false,
-      submenu: []
+      submenu: [{
+        path: "dashboard/GlobeDashboardPage",
+        title: "Globe Dashboard Page",
+        moduleName: "Dashboard",
+        icon: "",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      },
+      {
+        path: "Masters/Docket/Ewaybill",
+        title: "Eway Bill",
+        moduleName: "Masters",
+        icon: "",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      },
+      {
+        path: "Masters/Docket/Create",
+        title: "Manual docket",
+        moduleName: "Masters",
+        icon: "",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      },
+      {
+        path: "Masters/Docket/Ewaybill-Config",
+        title: "Eway-Bill Config",
+        moduleName: "Masters",
+        icon: "",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      },
+      {
+        path: "Masters/Docket/LoadingSheet",
+        title: "Loading Sheet",
+        moduleName: "Masters",
+        icon: "",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      },
+      {
+        path: "Masters/Docket/ManifestGeneration",
+        title: "Manifest Generation ",
+        moduleName: "Masters",
+        icon: "",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      }],
     },
     {
       "path": "Masters/DriverMaster/DriverMasterList",
@@ -114,6 +113,16 @@ export const ROUTES: RouteInfo[] =
               "path": "Masters/DriverMaster/DriverMasterList",
               "title": "Driver Master",
               "moduleName": "Driver Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Masters/VendorMaster/VendorMasterList",
+              "title": "Vendor Master",
+              "moduleName": "Vendor Master",
               "icon": "",
               "class": "ml-menu",
               "groupTitle": false,

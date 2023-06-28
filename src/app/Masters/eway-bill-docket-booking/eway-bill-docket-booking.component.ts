@@ -222,7 +222,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
   }
 
   getRules() {
-    this.ICnoteService.getCnoteBooking(
+    this.ICnoteService.getNewCnoteBooking(
       "services/companyWiseRules/",
       parseInt(localStorage.getItem("companyCode"))
     ).subscribe({
@@ -310,7 +310,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
     let reqbody = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
     };
-    this.ICnoteService.cnotePost(
+    this.ICnoteService.cnoteNewPost(
       "cnotefields/GetdocketFieldUsingEwayBill",
       reqbody
     ).subscribe({
@@ -437,7 +437,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         PaymentType: "P02",
       };
 
-      this.ICnoteService.cnotePost(
+      this.ICnoteService.cnoteNewPost(
         "services/GetFromCityDetails",
         request
       ).subscribe({
@@ -470,7 +470,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         };
 
         // Call the API to get the list of destination cities
-        this.ICnoteService.cnotePost(
+        this.ICnoteService.cnoteNewPost(
           "services/GetToCityDetails",
           req
         ).subscribe({
@@ -531,7 +531,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
                 ? "Consignor"
                 : "Consignee",
         };
-        this.ICnoteService.cnotePost("services/billingParty", req).subscribe({
+        this.ICnoteService.cnoteNewPost("services/billingParty", req).subscribe({
           next: (res: any) => {
             if (res) {
               this.cnoteAutoComplete = res;
@@ -565,7 +565,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         };
 
         // Makes the API call to fetch the Consignor City
-        this.ICnoteService.cnotePost("services/ConsignorCity", req).subscribe({
+        this.ICnoteService.cnoteNewPost("services/ConsignorCity", req).subscribe({
           next: (res: any) => {
             if (res) {
               this.ConsignorCity = res;
@@ -609,7 +609,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         };
 
         // Make a POST request to fetch the details
-        this.ICnoteService.cnotePost("services/getPincode", req).subscribe({
+        this.ICnoteService.cnoteNewPost("services/getPincode", req).subscribe({
           next: (res: any) => {
             // If the response is not empty
             if (res) {
@@ -643,7 +643,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         };
 
         // Make a POST request to the 'services/consigneeCity' API endpoint with the request object.
-        this.ICnoteService.cnotePost("services/consigneeCity", req).subscribe({
+        this.ICnoteService.cnoteNewPost("services/consigneeCity", req).subscribe({
           next: (res: any) => {
             // Update the 'ConsigneeCity' array with the result returned by the API.
             this.ConsigneeCity = res.result;
@@ -833,7 +833,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
     setTimeout(() => {
       this.getRules();
 
-    }, 1000);
+    }, 4000);
     
   }
 
@@ -848,7 +848,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         loc_level: "234",
         searchText: this.step2.controls["Destination"].value,
       };
-      this.ICnoteService.cnotePost(
+      this.ICnoteService.cnoteNewPost(
         "services/GetDestination",
         reqbody
       ).subscribe({
@@ -979,7 +979,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
     };
 
     // Call API to get invoice configuration
-    this.ICnoteService.cnotePost(
+    this.ICnoteService.cnoteNewPost(
       "services/GetInvoiceConfigurationBasedOnTransMode",
       req
     ).subscribe({
@@ -1263,7 +1263,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
       companyCode: parseInt(localStorage.getItem('companyCode')),
       locName: this.EwayBillDetail[0][1].Consignor.city
     }
-    this.ICnoteService.cnotePost("services/GetLocationDetails", req).subscribe({
+    this.ICnoteService.cnoteNewPost("services/GetLocationDetails", req).subscribe({
       next: (res: any) => {
         if (res) {
           this.step2.controls["OrgLoc"].setValue(
@@ -1296,7 +1296,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
       };
 
       // Call the API to get the mapped location from city name
-      this.ICnoteService.cnotePost(
+      this.ICnoteService.cnoteNewPost(
         "services/GetMappedLocationFromCityName",
         req
       ).subscribe({
@@ -1330,7 +1330,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         ChargeType: "BKG",
         PayBase: this.step2.controls["PAYTYP"].value,
       };
-      this.ICnoteService.cnotePost(
+      this.ICnoteService.cnoteNewPost(
         "services/GetContractInvokeDependent",
         req
       ).subscribe({
@@ -1399,7 +1399,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         .defaultvalue,
       ContractKeys: this.RequestContractKeysDetail.ContractKeys,
     };
-    this.ICnoteService.cnotePost("services/CalculatEdd", reqbody).subscribe({
+    this.ICnoteService.cnoteNewPost("services/CalculatEdd", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           let date = new Date(res.result.Date);
@@ -1500,7 +1500,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
 
     try {
       // Call the docketValidation service and subscribe to the response
-      this.ICnoteService.cnotePost('services/docketValidation', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/docketValidation', req).subscribe({
         next: (res: any) => {
           // If the service returns success, set the docketallocate value
           if (res.issuccess) {
@@ -1581,7 +1581,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         SearchText: this.step2.controls['PRQ'].value
       };
       // Send POST request to retrieve PRQ vehicle request
-      this.ICnoteService.cnotePost('services/prqVehicleReq', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/prqVehicleReq', req).subscribe({
         next: (res: any) => {
           // Save retrieved PRQ vehicle request
           this.prqVehicleReq = res;
@@ -1739,8 +1739,8 @@ export class EwayBillDocketBookingComponent implements OnInit {
         VehicleType: "Toll",
         IsCheck: 0
       };
-      // Call cnotePost method from ICnoteService with endpoint 'services/GetVehicle' and request object
-      this.ICnoteService.cnotePost('services/GetVehicle', req).subscribe(
+      // Call cnoteNewPost method from ICnoteService with endpoint 'services/GetVehicle' and request object
+      this.ICnoteService.cnoteNewPost('services/GetVehicle', req).subscribe(
         // Handle the response from server
         {
           next: (res: any) => {
@@ -1761,7 +1761,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
       PrqNumber: this.step2.controls['PRQ'].value.PRQNO
     }
 
-    this.ICnoteService.cnotePost('services/GetPrqInvoiceList', req).subscribe(
+    this.ICnoteService.cnoteNewPost('services/GetPrqInvoiceList', req).subscribe(
       {
         next: (res: any) => {
           let prqinvoiceDetail = res.result;
@@ -1783,7 +1783,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
       }
 
       // Fetch dropdown values using API
-      this.ICnoteService.cnotePost('services/GetcommonActiveGeneralMasterCodeListByTenantId', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetcommonActiveGeneralMasterCodeListByTenantId', req).subscribe({
         next: (res: any) => {
           // Set ContainerSize, ContainerType, and ContainerCapacity arrays with filtered results
           this.ContainerSize = res.result.filter((x) => x.CodeType == 'CNTSIZE')
@@ -2134,7 +2134,7 @@ export class EwayBillDocketBookingComponent implements OnInit {
         this.DocketEntity.TotalChargedNoofPkgsQuickCnot = 0
         this.DocketEntity.BillingPartysCode = this.step1.controls['PRQ_BILLINGPARTY']?.value.Value || ''
         this.DocketEntity.BillingPartysName = this.step1.controls['PRQ_BILLINGPARTY']?.value.Name || ''
-        this.ICnoteService.cnotePost('services/BookDocket', this.DocketEntity).subscribe({
+        this.ICnoteService.cnoteNewPost('services/BookDocket', this.DocketEntity).subscribe({
           next: (res: any) => {
             this.gDockNo= res.result[0].DocketNumber
             Swal.fire({

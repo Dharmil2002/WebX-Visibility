@@ -49,3 +49,13 @@ export class FileUploadModel {
   canCancel: boolean;
   sub?: Subscription;
 }
+export class TreeItemNode {
+  children: TreeItemNode[];
+  item: string;
+}
+
+export class TreeItemFlatNode {
+  item: string;
+  level: number;
+  expandable: boolean;
+}

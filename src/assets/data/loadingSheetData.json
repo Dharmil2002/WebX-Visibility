@@ -1,0 +1,194 @@
+{"LoadingSheetDetails":
+[
+  {
+    "RouteandSchedule": "S003: BHW-BLR",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "29-05-2023 11:30",
+    "Expected": "29-05-2023 11:30",
+    "Status": "SCHEDULED",
+    "Hrs": "2:30",
+    "VehicleType": "TATA-2518"
+  },
+  {
+    "RouteandSchedule": "S003: BLR-BHW-AMD",
+    "VehicleNo": "MH02CB5544",
+    "TripID": "THBLR000343",
+    "Scheduled": "29-05-2023 12:45",
+    "Expected": "29-05-2023 14:00",
+    "Status": "ARRIVED LATE",
+    "Hrs": "2:30",
+    "VehicleType": "TATA-2518"
+  },
+  {
+    "RouteandSchedule": "S003: PNQ-BHW-VPI",
+    "VehicleNo": "HR0UY6646",
+    "TripID": "THPNQ000125",
+    "Scheduled": "29-05-2023 11:00",
+    "Expected": "29-05-2023 11:55",
+    "Status": "ARRIVED LATE",
+    "Hrs": "0:05",
+    "VehicleType": "OMNI CARGO"
+  },
+  {
+    "RouteandSchedule": "S0010 : AMDB-BRDB-MUMB",
+    "VehicleNo": "KA05RE5564",
+    "TripID": "THMAA00837",
+    "Scheduled": "29-05-2023 12:30",
+    "Expected": "29-05-2023 15:00",
+    "Status": "YET TO ARRIVE",
+    "Hrs": "2:30",
+    "VehicleType": "CANTER 1059"
+  },
+  {
+    "RouteandSchedule": "S0003: AMDB-JAIB-DELB",
+    "VehicleNo": "KA05RE5565",
+    "TripID": "THMAA00838",
+    "Scheduled": "30-05-2023 12:30",
+    "Expected": "30-05-2023 15:00",
+    "Status": "YET TO ARRIVE",
+    "Hrs": "3:30",
+    "VehicleType": "CANTER 1080"
+  },
+  {
+    "RouteandSchedule": "S0002 : MUMB-BRDB-AMDB",
+    "VehicleNo": "KA05RE5566",
+    "TripID": "THMAA00839",
+    "Scheduled": "31-05-2023 12:30",
+    "Expected": "31-05-2023 15:00",
+    "Status": "YET TO ARRIVE",
+    "Hrs": "4:30",
+    "VehicleType": "TATA -407"
+  },
+  {
+    "RouteandSchedule": "S0037: NAGM-PNQM-MUMB",
+    "VehicleNo": "KA05RE5567",
+    "TripID": "THMAA00840",
+    "Scheduled": "01-06-2023 12:30",
+    "Expected": "01-06-2023 15:00",
+    "Status": "YET TO ARRIVE",
+    "Hrs": "5:30",
+    "VehicleType": "CANTER 2016"
+  },
+  {
+    "RouteandSchedule": "S0008: MUMB-BNGB",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "02-06-2023 12:30",
+    "Expected": "02-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "6:30",
+    "VehicleType": "TATA-2518"
+  },
+  {
+    "RouteandSchedule": "S0026 : MUMB-PNQB-BNGB",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "03-06-2023 12:30",
+    "Expected": "03-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "7:30",
+    "VehicleType": "TATA-2518"
+  },
+  {
+    "RouteandSchedule": "S0018:MUMB-CHNB",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "04-06-2023 12:30",
+    "Expected": "04-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "8:30",
+    "VehicleType": "OMNI CARGO"
+  },
+  {
+    "RouteandSchedule": "S0070: MUMB-SRTB",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "05-06-2023 12:30",
+    "Expected": "05-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "9:30",
+    "VehicleType": "CANTER 1059"
+  },
+  {
+    "RouteandSchedule": "S0097: SRT-MAL",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "06-06-2023 12:30",
+    "Expected": "06-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "10:30",
+    "VehicleType": "CANTER 1080"
+  },
+  {
+    "RouteandSchedule": "S0111: MUMB-MAAM",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "07-06-2023 12:30",
+    "Expected": "07-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "11:30",
+    "VehicleType": "TATA -407"
+  },
+  {
+    "RouteandSchedule": "S0019: MUMB-HUBB",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "08-06-2023 12:30",
+    "Expected": "08-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "12:30",
+    "VehicleType": "CANTER 2016"
+  },
+  {
+    "RouteandSchedule": "S0060:MUMB-AMDB-JAIB",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "09-06-2023 12:30",
+    "Expected": "09-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "13:30",
+    "VehicleType": "TATA-2518"
+  },
+  {
+    "RouteandSchedule": "S0123: MUMB-BNGB",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "10-06-2023 12:30",
+    "Expected": "10-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "14:30",
+    "VehicleType": "TATA-2518"
+  },
+  {
+    "RouteandSchedule": "S0124: MUMB-SRT",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "11-06-2023 12:30",
+    "Expected": "11-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "15:30",
+    "VehicleType": "OMNI CARGO"
+  },
+  {
+    "RouteandSchedule": "S0125:MUMB-401107",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "12-06-2023 12:30",
+    "Expected": "12-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "16:30",
+    "VehicleType": "CANTER 1059"
+  },
+  {
+    "RouteandSchedule": "S0049: MUMB-PNQB",
+    "VehicleNo": "",
+    "TripID": "",
+    "Scheduled": "13-06-2023 12:30",
+    "Expected": "13-06-2023 15:00",
+    "Status": "SCHEDULED",
+    "Hrs": "17:30",
+    "VehicleType": "CANTER 1080"
+  }
+ ]
+}

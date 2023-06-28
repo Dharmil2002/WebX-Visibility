@@ -1,0 +1,763 @@
+{
+    "StateData": [
+        {
+            "srNo": 1,
+            "stateCode": 24,
+            "stateName": "Gujarat",
+            "stateAlias": "Gj",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "23",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 2,
+            "stateCode": 46,
+            "stateName": "Maharashtra",
+            "stateAlias": "MH",
+            "stateType": "UT",
+            "countryName": "India",
+            "GSTWiseStateCode": "85",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 3,
+            "stateCode": 19,
+            "stateName": "haryana",
+            "stateAlias": "HR",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 4,
+            "stateCode": 22,
+            "stateName": "Jharkhand",
+            "stateAlias": "JHD",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "79",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 5,
+            "stateCode": 15,
+            "stateName": "Assam",
+            "stateAlias": "AS",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 6,
+            "stateCode": 24,
+            "stateName": "Dhofar",
+            "stateAlias": "DHF",
+            "stateType": "DH",
+            "countryName": "Oman",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 7,
+            "stateCode": 8,
+            "stateName": "Andhra Pradesh",
+            "stateAlias": "AP",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "37",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 8,
+            "stateCode": 19,
+            "stateName": "Ash Sharqiyah",
+            "stateAlias": "ADD",
+            "stateType": "TS",
+            "countryName": "Oman",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 9,
+            "stateCode": 22,
+            "stateName": "Pune",
+            "stateAlias": "PN",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 10,
+            "stateCode": 15,
+            "stateName": "Assam",
+            "stateAlias": "AS",
+            "stateType": "ST",
+            "countryName": "India",
+            "GSTWiseStateCode": "",
+            "isActive": true,
+            "actions": ""
+        }
+    ],
+    "CityData": [
+        {
+            "srNo": 1,
+            "cityName": "Mulshi",
+            "stateName": "Maharashtra",
+            "zoneName": "South Zone",
+            "ODAFlag": "Y",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 2,
+            "cityName": "Indore",
+            "stateName": "Madhya Pradesh",
+            "zoneName": "SOUTH2",
+            "ODAFlag": "Y",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 3,
+            "cityName": "Batinah",
+            "stateName": "",
+            "zoneName": "West Zone",
+            "ODAFlag": "Y",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 4,
+            "cityName": "Dhakhiliyah",
+            "stateName": "Nizwa",
+            "zoneName": "CENTRAL",
+            "ODAFlag": "N",
+            "isActive": false,
+            "actions": ""
+        },
+        {
+            "srNo": 5,
+            "cityName": "Dhofar",
+            "stateName": "Southern Oman",
+            "zoneName": "South Zone",
+            "ODAFlag": "Y",
+            "isActive": false,
+            "actions": ""
+        },
+        {
+            "srNo": 6,
+            "cityName": "Mumbai",
+            "stateName": "Maharashtra",
+            "zoneName": "West Zone",
+            "ODAFlag": "N",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 7,
+            "cityName": "Muscat",
+            "stateName": "Gulf of Oman coast",
+            "zoneName": "SOUTH3",
+            "ODAFlag": "Y",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 8,
+            "cityName": "Sohar",
+            "stateName": "Al Batinah North",
+            "zoneName": "CENTRAL",
+            "ODAFlag": "N",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 9,
+            "cityName": "Sur",
+            "stateName": "",
+            "zoneName": "CENTRAL",
+            "ODAFlag": "N",
+            "isActive": true,
+            "actions": ""
+        },
+        {
+            "srNo": 10,
+            "cityName": "Mumbai",
+            "stateName": "Maharashtra",
+            "zoneName": "SOUTH",
+            "ODAFlag": "N",
+            "isActive": true,
+            "actions": ""
+        }
+    ],
+    "DriverData": [
+        {
+            "SrNo": 1,
+            "DriverName": "Rajesh yadav",
+            "ManualDriverCode": "M00203",
+            "ActiveFlag": true,
+            "LicenseNo": "35453435",
+            "ValidityDate": "13-10-2022"
+        },
+        {
+            "SrNo": 2,
+            "DriverName": "RAJESH YADAV",
+            "ManualDriverCode": "D0015",
+            "ActiveFlag": true,
+            "LicenseNo": "LIC00015",
+            "ValidityDate": "31-03-2032"
+        },
+        {
+            "SrNo": 3,
+            "DriverName": "RAJESH YADAV",
+            "ManualDriverCode": "D0016",
+            "ActiveFlag": true,
+            "LicenseNo": "LIC00016",
+            "ValidityDate": "31-03-2033"
+        },
+        {
+            "SrNo": 4,
+            "DriverName": "Saleh",
+            "ManualDriverCode": "Saleh",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 5,
+            "DriverName": "Hamdan",
+            "ManualDriverCode": "Hamdan",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 6,
+            "DriverName": "Humaid",
+            "ManualDriverCode": "Humaid",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 7,
+            "DriverName": "Mazin",
+            "ManualDriverCode": "Mazin",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 8,
+            "DriverName": "Younis",
+            "ManualDriverCode": "Younis",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 9,
+            "DriverName": "Maddad",
+            "ManualDriverCode": "Maddad",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 10,
+            "DriverName": "Abdullah",
+            "ManualDriverCode": "Abdullah",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 11,
+            "DriverName": "Anwar",
+            "ManualDriverCode": "Anwar",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 12,
+            "DriverName": "Muntasir",
+            "ManualDriverCode": "Muntasir",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 13,
+            "DriverName": "AliSaif",
+            "ManualDriverCode": "AliSaif",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 14,
+            "DriverName": "Nasser",
+            "ManualDriverCode": "Nasser",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 15,
+            "DriverName": "Saud",
+            "ManualDriverCode": "Saud",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 16,
+            "DriverName": "Muhammad",
+            "ManualDriverCode": "Muhammad",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 17,
+            "DriverName": "Mahmood",
+            "ManualDriverCode": "Mahmood",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 18,
+            "DriverName": "Saud",
+            "ManualDriverCode": "Saud",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 19,
+            "DriverName": "Darshan",
+            "ManualDriverCode": "Darshan",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 20,
+            "DriverName": "Ali",
+            "ManualDriverCode": "Ali",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 21,
+            "DriverName": "Juma",
+            "ManualDriverCode": "Juma",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 22,
+            "DriverName": "Said",
+            "ManualDriverCode": "Said",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 23,
+            "DriverName": "KhamisNasser",
+            "ManualDriverCode": "KhamisNasser",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 24,
+            "DriverName": "Saleh",
+            "ManualDriverCode": "Saleh",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 25,
+            "DriverName": "Khamis",
+            "ManualDriverCode": "Khamis",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 26,
+            "DriverName": "Yusuf",
+            "ManualDriverCode": "Yusuf",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 27,
+            "DriverName": "Yusuf1",
+            "ManualDriverCode": "Yusuf1",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 28,
+            "DriverName": "Jabri",
+            "ManualDriverCode": "Jabri",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2025"
+        },
+        {
+            "SrNo": 29,
+            "DriverName": "SuratDriver",
+            "ManualDriverCode": "SuratDriver",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "07-06-2023"
+        },
+        {
+            "SrNo": 30,
+            "DriverName": "MumbaiDriver",
+            "ManualDriverCode": "MumbaiDriver",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "07-06-2023"
+        },
+        {
+            "SrNo": 31,
+            "DriverName": "barka",
+            "ManualDriverCode": "barka",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "07-06-2023"
+        },
+        {
+            "SrNo": 32,
+            "DriverName": "barkaa",
+            "ManualDriverCode": "barkaa",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "07-06-2023"
+        },
+        {
+            "SrNo": 33,
+            "DriverName": "Jayesh",
+            "ManualDriverCode": "jayesh12",
+            "ActiveFlag": true,
+            "LicenseNo": "JKIH12548",
+            "ValidityDate": "08-06-2023"
+        },
+        {
+            "SrNo": 34,
+            "DriverName": "Raj",
+            "ManualDriverCode": "D00018",
+            "ActiveFlag": true,
+            "LicenseNo": "lic1542",
+            "ValidityDate": "08-05-2024"
+        },
+        {
+            "SrNo": 35,
+            "DriverName": "abcmumb",
+            "ManualDriverCode": "mumb",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "09-06-2023"
+        },
+        {
+            "SrNo": 36,
+            "DriverName": "mumb",
+            "ManualDriverCode": "mumb1",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "09-06-2023"
+        },
+        {
+            "SrNo": 37,
+            "DriverName": "juman",
+            "ManualDriverCode": "juman",
+            "ActiveFlag": true,
+            "LicenseNo": "123",
+            "ValidityDate": "10-06-2027"
+        },
+        {
+            "SrNo": 38,
+            "DriverName": "sam",
+            "ManualDriverCode": "sam",
+            "ActiveFlag": true,
+            "LicenseNo": "123",
+            "ValidityDate": "11-06-2026"
+        },
+        {
+            "SrNo": 39,
+            "DriverName": "Surat",
+            "ManualDriverCode": "Surat",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "20-06-2023"
+        },
+        {
+            "SrNo": 40,
+            "DriverName": "test2",
+            "ManualDriverCode": "test2",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "21-06-2023"
+        },
+        {
+            "SrNo": 41,
+            "DriverName": "test01",
+            "ManualDriverCode": "test01",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "21-06-2023"
+        },
+        {
+            "SrNo": 42,
+            "DriverName": "test3",
+            "ManualDriverCode": "test3",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "22-06-2023"
+        },
+        {
+            "SrNo": 43,
+            "DriverName": "rinkesh",
+            "ManualDriverCode": "rinkesh",
+            "ActiveFlag": true,
+            "LicenseNo": "",
+            "ValidityDate": "22-06-2023"
+        }
+    ],
+   "LocationData": [
+        {
+          "SrNo": "1",
+          "LocationCode": "002",
+          "LocationName": "VIRAR",
+          "LocationAddress": "NELMANGALA",
+          "ReportingLocation": "BNGB",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "2",
+          "LocationCode": "1208",
+          "LocationName": "VIRAR",
+          "LocationAddress": "A/702",
+          "ReportingLocation": "MUMB",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "3",
+          "LocationCode": "123",
+          "LocationName": "KANCHEEPURAM",
+          "LocationAddress": "PLOT NO. -1134, NEAR FORD KANCHEEPURAM",
+          "ReportingLocation": "CRO",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "4",
+          "LocationCode": "1234",
+          "LocationName": "KALAMBOLI",
+          "LocationAddress": "DGAYSUJUGK",
+          "ReportingLocation": "CRO",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "5",
+          "LocationCode": "12345",
+          "LocationName": "MUMBAI",
+          "LocationAddress": "MUMBAI TEST",
+          "ReportingLocation": "MUMC",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "6",
+          "LocationCode": "125",
+          "LocationName": "KASAUL",
+          "LocationAddress": "HIMACHAL STEEL PLANT, MAIN KASAULI ROAD",
+          "ReportingLocation": "NRO",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "7",
+          "LocationCode": "215648",
+          "LocationName": "THANE",
+          "LocationAddress": "ASMITA ANITA, NAYA NAGAR, MIRA ROAD (WEST)",
+          "ReportingLocation": "MUMB",
+          "ActiveFlag": false
+        },
+        {
+          "SrNo": "8",
+          "LocationCode": "401107",
+          "LocationName": "SIKKIM",
+          "LocationAddress": "20/65 LANE ROAD, NEAR DURGA HOSPITAL",
+          "ReportingLocation": "BOMM",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "9",
+          "LocationCode": "9010",
+          "LocationName": "ALUVA",
+          "LocationAddress": "EMMAY LOGISTICS, ASHOKAPURAM, ALUVA, KERALA 683101",
+          "ReportingLocation": "HQTR",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "10",
+          "LocationCode": "ABJ",
+          "LocationName": "AMBEJOGAI",
+          "LocationAddress": "AMBEJOGAI BEED",
+          "ReportingLocation": "MUMB",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "11",
+          "LocationCode": "ACC",
+          "LocationName": "ACC",
+          "LocationAddress": "TEST",
+          "ReportingLocation": "ARPB",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "12",
+          "LocationCode": "ADH",
+          "LocationName": "ANDHERI",
+          "LocationAddress": "ANDHERI",
+          "ReportingLocation": "HQTR",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "13",
+          "LocationCode": "ADIT",
+          "LocationName": "AHMEDABAD REGION",
+          "LocationAddress": "ND FLOOR, D BLOCK, SIGNATURE - 2,, NR. SARKHEJ SANAND CIRCLE, SARKHEJ, AHMEDABAD, GUJARAT",
+          "ReportingLocation": "AMDB",
+          "ActiveFlag": false
+        },
+        {
+          "SrNo": "14",
+          "LocationCode": "AHM",
+          "LocationName": "AHMEDABAD HUB TECR",
+          "LocationAddress": "AHMEDABAD",
+          "ReportingLocation": "NRO",
+          "ActiveFlag": false
+        },
+        {
+          "SrNo": "15",
+          "LocationCode": "AL01",
+          "LocationName": "ALIPUR",
+          "LocationAddress": "A/302, SAI SADAN CHS, NEW MHADA LAYOUT, MALAD WEST",
+          "ReportingLocation": "HQTR",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "16",
+          "LocationCode": "AMDB",
+          "LocationName": "BRANCH OFFICE AHMEDABAD",
+          "LocationAddress": "8-266/7, ISB RD, FINANCIAL DISTRICT, NANAKRAM GUDA",
+          "ReportingLocation": "HQTR",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "17",
+          "LocationCode": "AMDC",
+          "LocationName": "AHMEDABAD CENTER",
+          "LocationAddress": "Ahmedabad city",
+          "ReportingLocation": "WRO",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "18",
+          "LocationCode": "AMDM",
+          "LocationName": "AHMEDABAD",
+          "LocationAddress": "AHMEDABAD",
+          "ReportingLocation": "AMDB",
+          "ActiveFlag": false
+        },
+        {
+          "SrNo": "19",
+          "LocationCode": "AND",
+          "LocationName": "ANDHERI",
+          "LocationAddress": "ANDHERI MUMBAI",
+          "ReportingLocation": "MUMB",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "20",
+          "LocationCode": "ARPB",
+          "LocationName": "ARUNACHAL PRADESH",
+          "LocationAddress": "TAWANG",
+          "ReportingLocation": "ERO",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "21",
+          "LocationCode": "BBA",
+          "LocationName": "BARDOLI",
+          "LocationAddress": "4656678988",
+          "ReportingLocation": "HQTR",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "22",
+          "LocationCode": "BBIM",
+          "LocationName": "BHUBNESHWAR",
+          "LocationAddress": "PLOT NO. 868/42, BAUSAKHANI AREA, KAPILA PRASAD MAHATAB ROAD, OLD TOWN, BHUBNESHWAR -751002",
+          "ReportingLocation": "ERO",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "23",
+          "LocationCode": "BDQM",
+          "LocationName": "VADODARA",
+          "LocationAddress": "MITUJ",
+          "ReportingLocation": "WRO",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "24",
+          "LocationCode": "BHOM",
+          "LocationName": "BHOPAL",
+          "LocationAddress": "MITUJ",
+          "ReportingLocation": "CRO",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "25",
+          "LocationCode": "BHW",
+          "LocationName": "BHIWANDI",
+          "LocationAddress": "MITUJ MARKETING PRIVATE LIMITED",
+          "ReportingLocation": "WRO",
+          "ActiveFlag": true
+        },
+        {
+          "SrNo": "26",
+          "LocationCode": "BHWM",
+          "LocationName": "BHIWANDI",
+          "LocationAddress": "MITUJ MARKETING PRIVATE LIMITED",
+          "ReportingLocation": "MUMB",
+          "ActiveFlag": true
+        }
+      ]
+      
+}

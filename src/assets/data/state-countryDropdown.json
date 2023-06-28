@@ -1,0 +1,96 @@
+{
+    "countryList": [
+        {
+            "CodeId": "1",
+            "CodeDesc": "India"
+        },
+        {
+            "CodeId": "2",
+            "CodeDesc": "USA"
+        },
+        {
+            "CodeId": "3",
+            "CodeDesc": "Oman"
+        },
+        {
+            "CodeId": "4",
+            "CodeDesc": "Australia"
+        },
+        {
+            "CodeId": "5",
+            "CodeDesc": "New Zealand"
+        },
+        {
+            "CodeId": "6",
+            "CodeDesc": "Afghanistan"
+        },
+        {
+            "CodeId": "7",
+            "CodeDesc": "Sri Lanka"
+        }
+    ],
+    "stateList":[
+        {
+            "StateId": "1",
+            "StateDesc": "Maharashtra"
+        },
+        {
+            "StateId": "2",
+            "StateDesc": "Dhofar"
+        },
+        {
+            "StateId": "3",
+            "StateDesc": "Gulf of Oman coast"
+        },
+        {
+            "StateId": "4",
+            "StateDesc": "Pune"
+        },
+        {
+            "StateId": "5",
+            "StateDesc": "Assam"
+        },
+        {
+            "StateId": "6",
+            "StateDesc": "Southern Oman"
+        },
+        {
+            "StateId": "7",
+            "StateDesc": "Al Batinah North"
+        },
+        {
+            "StateId": "8",
+            "StateDesc": "Nizwa"
+        }
+    ],
+    "zoneList" : [
+        {
+            "ZoneId": "1",
+            "ZoneDesc": "SOUTH"
+        },
+        {
+            "ZoneId": "2",
+            "ZoneDesc": "North Zone"
+        },
+        {
+            "ZoneId": "3",
+            "ZoneDesc": "SOUTH3"
+        },
+        {
+            "ZoneId": "4",
+            "ZoneDesc": "West Zone"
+        },
+        {
+            "ZoneId": "5",
+            "ZoneDesc": "CENTRAL"
+        },
+        {
+            "ZoneId": "6",
+            "ZoneDesc": "SOUTH2"
+        },
+        {
+            "ZoneId": "6",
+            "ZoneDesc": "South Zone"
+        }
+    ]
+}

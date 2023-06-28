@@ -1,0 +1,22 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" [loadTable]="tableload">
+
+    <form [formGroup]="LoadingSheetForm">
+        <app-form-without-auto-complete-webxpress [formData]="jsonloadingSheetControls" [form]="LoadingSheetForm"
+            (functionCallEmitter)="functionCallHandler($event)">
+        </app-form-without-auto-complete-webxpress>
+    </form>
+    <app-generic-card-webxpress [boxData]="BoxData"></app-generic-card-webxpress>
+    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+        [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
+        [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA"
+         [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
+    </generic-table-webxpress>
+    <div class="row"  *ngIf="!tableload">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+            <div class="example-button-row d-flex justify-content-end">
+                <button class="msr-3" mat-raised-button color="primary" (click)="generateMenifest()">Generate
+                   Menifest</button>
+                </div>
+        </div>
+    </div>
+</app-common-wrapper-webxpress>

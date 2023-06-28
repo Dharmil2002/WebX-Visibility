@@ -1,0 +1,175 @@
+{
+    "tabledata": [
+      {
+        "No": "100004400102",
+        "Date": "19-Jun-23",
+        "PaymentType": "TBB",
+        "ContractParty": "Bright Lifecare Pvt Ltd",
+        "Origin-Destination": "MUMB-HYD",
+        "FromCity-ToCity": "Mumbai-Hyderabad",
+        "NoofPackages": 40,
+        "ActualWeight": 80,
+        "ChargedWeight": 80,
+        "Status": "QDB",
+        "Action": "Quick Completion"
+      },
+      {
+        "No": "100004400103",
+        "Date": "19-Jun-23",
+        "PaymentType": "TBB",
+        "ContractParty": "Bright Lifecare Pvt Ltd",
+        "Origin-Destination": "MUMB-HYD",
+        "FromCity-ToCity": "Mumbai-Hyderabad",
+        "NoofPackages": 230,
+        "ActualWeight": 200,
+        "ChargedWeight": 200,
+        "Status": "QDB",
+        "Action": "Quick Completion"
+      },
+      {
+        "No": "100004400104",
+        "Date": "19-Jun-23",
+        "PaymentType": "TBB",
+        "ContractParty": "Bright Lifecare Pvt Ltd",
+        "Origin-Destination": "MUMB-BLR",
+        "FromCity-ToCity": "Mumbai-Bangalore",
+        "NoofPackages": 120,
+        "ActualWeight": 70,
+        "ChargedWeight": 70,
+        "Status": "QDB",
+        "Action": "Quick Completion"
+      },
+      {
+        "No": "100004400105",
+        "Date": "19-Jun-23",
+        "PaymentType": "TBB",
+        "ContractParty": "Bright Lifecare Pvt Ltd",
+        "Origin-Destination": "MUMB-SRT",
+        "FromCity-ToCity": "Mumbai-Surat",
+        "NoofPackages": 320,
+        "ActualWeight": 280,
+        "ChargedWeight": 280,
+        "Status": "QDB",
+        "Action": "Quick Completion"
+      },
+      {
+        "No": "900004400201",
+        "Date": "19-Jun-23",
+        "PaymentType": "To Pay",
+        "ContractParty": "Walkin Customer",
+        "Origin-Destination": "MUMB-SRT",
+        "FromCity-ToCity": "Mumbai-Surat",
+        "NoofPackages": 100,
+        "ActualWeight": 70,
+        "ChargedWeight": 70,
+        "Status": "QDB",
+        "Action": "Quick Completion"
+      },
+      {
+        "No": "900004400202",
+        "Date": "18-Jun-23",
+        "PaymentType": "To Pay",
+        "ContractParty": "Walkin Customer",
+        "Origin-Destination": "MUMB-SRT",
+        "FromCity-ToCity": "Mumbai-Surat",
+        "NoofPackages": 90,
+        "ActualWeight": 90,
+        "ChargedWeight": 90,
+        "Status": "Available for LS"
+      },
+      {
+        "No": "900004400203",
+        "Date": "19-Jun-23",
+        "PaymentType": "To Pay",
+        "ContractParty": "Walkin Customer",
+        "Origin-Destination": "MUMB-AHMD",
+        "FromCity-ToCity": "Mumbai-Ahmedabad",
+        "NoofPackages": 30,
+        "ActualWeight": 20,
+        "ChargedWeight": 20,
+        "Status": "Available for LS"
+      },
+      {
+        "No": "900004400204",
+        "Date": "18-Jun-23",
+        "PaymentType": "Paid",
+        "ContractParty": "Walkin Customer",
+        "Origin-Destination": "PNQ-MUMB",
+        "FromCity-ToCity": "Pune-Mumbai",
+        "NoofPackages": 70,
+        "ActualWeight": 40,
+        "ChargedWeight": 40,
+        "Status": "Available for Delivery"
+      },
+      {
+        "No": "100004400107",
+        "Date": "18-Jun-23",
+        "PaymentType": "Paid",
+        "ContractParty": "Walkin Customer",
+        "Origin-Destination": "BLR-SRT",
+        "FromCity-ToCity": "Bangalore-Surat",
+        "NoofPackages": 80,
+        "ActualWeight": 80,
+        "ChargedWeight": 80,
+        "Status": "Available for LS"
+      },
+      {
+        "No": "100004400108",
+        "Date": "18-Jun-23",
+        "PaymentType": "TBB",
+        "ContractParty": "Airon Electricals Pvt Ltd",
+        "Origin-Destination": "BLR-SRT",
+        "FromCity-ToCity": "Bangalore-Surat",
+        "NoofPackages": 200,
+        "ActualWeight": 190,
+        "ChargedWeight": 190,
+        "Status": "Available for LS"
+      },
+      {
+        "No": "100004400109",
+        "Date": "18-Jun-23",
+        "PaymentType": "TBB",
+        "ContractParty": "Airon Electricals Pvt Ltd",
+        "Origin-Destination": "BLR-SRT",
+        "FromCity-ToCity": "Bangalore-Surat",
+        "NoofPackages": 80,
+        "ActualWeight": 80,
+        "ChargedWeight": 80,
+        "Status": "Available for Departure"
+      },
+      {
+        "No": "100004400110",
+        "Date": "18-Jun-23",
+        "PaymentType": "TBB",
+        "ContractParty": "Airon Electricals Pvt Ltd",
+        "Origin-Destination": "BLR-SRT",
+        "FromCity-ToCity": "Bangalore-Surat",
+        "NoofPackages": 200,
+        "ActualWeight": 190,
+        "ChargedWeight": 190,
+        "Status": "Available for Departure"
+      }
+    ],
+    "StockCountData": [
+      {
+        "count": 48,
+        "title": "Total",
+        "class": "info-box7 bg-white order-info-box7"
+      },
+      {
+        "count": 33,
+        "title": "Completion",
+        "class": "info-box7 bg-white order-info-box7"
+      },
+      {
+        "count": 14,
+        "title": "Loading Sheet",
+        "class": "info-box7 bg-white order-info-box7"
+      },{
+        "count": 10,
+        "title": "Delivery",
+        "class": "info-box7 bg-white order-info-box7"
+      }
+    ]
+  }
+  

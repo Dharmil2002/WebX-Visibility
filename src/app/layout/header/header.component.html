@@ -6,8 +6,7 @@
       <!-- mobile menu bars -->
       <a href="#" onClick="return false;" class="bars" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
       <a class="navbar-brand" routerLink="dashboard">
-        <img src="assets/images/banner/DMS.jpg" height="30px" width="30px"
-          alt="" />
+        <img src="assets/images/banner/DMS.jpg" height="30px" width="30px" alt="" />
         <span class="logo-name" style="color: #03a9f3;">Globe</span>
       </a>
     </div>
@@ -19,15 +18,33 @@
           </button>
         </li>
       </ul>
+      <ul class="nav navbar-nav navbar-left">
+        <li style="margin-left: 450px;position:fixed;">
+          <img src="assets/images/globe.png" height="50px" width="150px" alt="Company Logo">
+        </li>
+      </ul>
       <ul class="nav navbar-nav navbar-right">
+        <li>
+          <label style="color: white;">{{BaseTimeZone | date: 'hh:mm a'}}</label>&nbsp;&nbsp;
+          <label style="color: white;">{{BaseTimeZone | date: 'MMM dd' }}</label>&nbsp;&nbsp;
+          <label style="color: white;">FY {{FinancialYear}}</label>
+        </li>
         <!-- Full Screen Button -->
         <li class="fullscreen">
           <button mat-icon-button (click)="callFullscreen()" class=" nav-notification-icons">
             <app-feather-icons [icon]="'maximize'" [class]="'header-icon'"></app-feather-icons>
           </button>
         </li>
+      
+        <li>
+          <p style="color: white;cursor: pointer;" matTooltip="Change Branch" matTooltipPosition="above"
+            matTooltipClass="tooltip">{{CurrentLocation}}</p>
+          <!-- <button mat-icon-button (click)="VirtualLogin()" class=" nav-notification-icons">
+            <app-feather-icons [icon]="'maximize'" [class]="'header-icon'"></app-feather-icons>
+          </button> -->
+        </li>
         <!-- #END# Full Screen Button -->
-        <li class="nav-item" ngbDropdown>
+        <!-- <li class="nav-item" ngbDropdown>
           <a ngbDropdownToggle class="lang-dropdown">
             <img *ngIf="flagvalue !== undefined" src="{{flagvalue}}" height="16">
             <img *ngIf="flagvalue === undefined" src="{{defaultFlag}}" height="16">
@@ -39,13 +56,13 @@
               <img src="{{item.flag}}" class="flag-img" height="12"> <span class="align-middle">{{item.text}}</span>
             </a>
           </div>
-        </li>
+        </li> -->
         <!-- #START# Notifications-->
         <li class="nav-item" ngbDropdown>
-          <button mat-icon-button ngbDropdownToggle class="nav-notification-icons">
+          <!-- <button mat-icon-button ngbDropdownToggle class="nav-notification-icons">
             <app-feather-icons [icon]="'bell'" [class]="'header-icon'"></app-feather-icons>
             <span class="label-count bg-orange"></span>
-          </button>
+          </button> -->
           <div ngbDropdownMenu class="notification-dropdown">
             <div class="noti-list" style="position: relative; max-width: 600px; max-height: 300px;" [perfectScrollbar]>
               <ul class="menu">
@@ -82,11 +99,11 @@
               <ul class="menu">
                 <li class="body">
                   <ul class="user_dw_menu">
-                    <li>
+                    <!-- <li>
                       <a href="#" onClick="return false;">
                         <app-feather-icons [icon]="'user'" [class]="'user-menu-icons'"></app-feather-icons>Account
                       </a>
-                    </li>
+                    </li> -->
                     <!-- <li>
                       <a href="#" onClick="return false;">
                         <app-feather-icons [icon]="'mail'" [class]="'user-menu-icons'"></app-feather-icons>Inbox

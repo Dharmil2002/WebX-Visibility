@@ -19,7 +19,7 @@ export class LoadingSheetDetailsComponent implements OnInit {
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
   companyCode: number;
   orgBranch:string=localStorage.getItem("Branch");
-  
+  BoxData:any[]
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < (column name) : Column name you want to display on table > 
   columnHeader = {
@@ -31,8 +31,8 @@ export class LoadingSheetDetailsComponent implements OnInit {
     "FROMLOC": "From Location",
     "TOLOC": "To Location",
     "PKGSNO": "No of Package",
-    "ACTUWT": "Actual Weight",
-    "CHRGWT":"Charge Weight"
+    "ACTUWT": "Actual Weight(kg)",
+    "CHRGWT":"Charge Weight(kg)"
   }
 
   METADATA = {
@@ -64,14 +64,27 @@ export class LoadingSheetDetailsComponent implements OnInit {
     "FROMLOC": "From Location",
     "TOLOC": "To Location",
     "PKGSNO": "No of Package",
-    "ACTUWT": "Actual Weight",
-    "CHRGWT":"Charge Weight"
+    "ACTUWT": "Actual Weight(kg)",
+    "CHRGWT":"Charge Weight(kg)"
   }
   loadingSheetData: any;
   dataDetails: any;
   tableloadloading:boolean=true;
   LoadingData:boolean=false;
   routeDetailsFromDropdown:any;
+  iconCard=[
+    'fas fa-cart-plus float-start',
+    'fas fa-business-time float-start',
+    'fas fa-chart-line float-start',
+    'fas fas fa-truck-pickup float-start'
+  ]
+
+classDashboard=[
+  'info-box7  bg-white order-info-box7',
+  'info-box7 bg-white order-info-box7',
+  'info-box7 bg-white order-info-box7',
+  'info-box7 bg-white order-info-box7',
+]
   constructor(private Route: Router,private ICnoteService: CnoteService, private modalService: NgbModal, private dialog: MatDialog, @Inject(PLATFORM_ID) private platformId: Object) { 
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.loadingSheetData=this.Route.getCurrentNavigation()?.extras?.state.data.data;
@@ -109,6 +122,32 @@ export class LoadingSheetDetailsComponent implements OnInit {
 }
 onFlagChange(data){
 this.dataDetails=data;
+let loadingData=[];
+let PKGSNO=0;
+let ACTUWT=0;
+let CHRGWT=0;
+this.dataDetails.forEach(element => {
+  PKGSNO+=element.PKGSNO,
+  ACTUWT+=element.ACTUWT,
+  CHRGWT+=element.CHRGWT
+});
+let title=[
+  {title:'Docket',value:this.dataDetails?.length||0},
+  {title:'No of Package',value:PKGSNO},
+  {title:'Actual Weight(kg)',value:ACTUWT},
+  {title:'Charge Weight(kg)',value:CHRGWT},
+]
+title.forEach((element,index) => {
+  let loadingSheetDetail={
+    title:element.title,
+    count:element.value,
+    class:this.classDashboard[index],
+    icon:this.iconCard[index]
+  }
+  loadingData.push(loadingSheetDetail);
+});
+
+this.BoxData=loadingData
 }
 loadingSheetGenerate() {
   if(this.dataDetails && this.dataDetails.length>0){

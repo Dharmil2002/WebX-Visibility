@@ -1,0 +1,18 @@
+[
+    {
+        "Shipment": 12345678,
+        "PackageId": "ABC123"
+      },
+      {
+        "Shipment": 39939397,
+        "PackageId": "DEF456"
+      },
+      {
+        "Shipment": 39939397,
+        "PackageId": "GHI789"
+      },
+      {
+        "Shipment": 98765432,
+        "PackageId": "JKL012"
+      }
+]

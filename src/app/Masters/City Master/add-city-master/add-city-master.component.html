@@ -1,0 +1,7 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <form [formGroup]="CityTableForm">
+      <app-form-webxpress [form]="CityTableForm" [formData]="jsonControlCityArray"
+          (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+      </app-form-webxpress>
+  </form>
+  </app-common-wrapper-webxpress>

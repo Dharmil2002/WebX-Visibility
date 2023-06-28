@@ -1,0 +1,175 @@
+{
+    "data":[
+        {
+          "vehicleNo": "MH02CB5544",
+          "VendorType": "Attached",
+          "Driver": "Paresh",
+          "LicenseNo": "AHK906AJ",
+          "Vendor": "BLR/OSP/0034:SRI SAIBHOLA TRANSPORT",
+          "DriverMobile": 917950520174,
+          "Expirydate": "13-07-2023"
+        },
+        {
+          "vehicleNo": "HR0UY6646",
+          "VendorType": "Attached",
+          "Driver": "suresh",
+          "LicenseNo": "BVD579UH",
+          "Vendor": "BLR/OSP/0037:SRI SAIRAM TRANSPORT",
+          "DriverMobile": 914055164867,
+          "Expirydate": "14-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5564",
+          "VendorType": "NotAttached",
+          "Driver": "Suresh",
+          "LicenseNo": "RWG439XC",
+          "Vendor": "BLR/OSP/0034:SRI RAGHUVANSHI TRANSPORT",
+          "DriverMobile": 914665032561,
+          "Expirydate": "15-07-2023"
+        },
+        {
+          "vehicleNo": "HR0UY6646",
+          "VendorType": "NotAttached",
+          "Driver": "Shivesh",
+          "LicenseNo": "ISY740YK",
+          "Vendor": "BLR/OSP/0031:SRI MARUTI TRANSPORT",
+          "DriverMobile": 911930472341,
+          "Expirydate": "16-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5564",
+          "VendorType": "NotAttached",
+          "Driver": "suresh",
+          "LicenseNo": "CKG460CU",
+          "Vendor": "BLR/OSP/0028:SRI MAHALAXMI TRANSPORT",
+          "DriverMobile": 913381694336,
+          "Expirydate": "17-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5565",
+          "VendorType": "Attached",
+          "Driver": "suresh",
+          "LicenseNo": "DDP108BQ",
+          "Vendor": "BLR/OSP/0031:SRI VISHNU TRANSPORT",
+          "DriverMobile": 917322235361,
+          "Expirydate": "18-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5566",
+          "VendorType": "Attached",
+          "Driver": "mahesh",
+          "LicenseNo": "ZDG940LX",
+          "Vendor": "BLR/OSP/0021:RITCO TRANSPORT",
+          "DriverMobile": 911817650490,
+          "Expirydate": "19-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5567",
+          "VendorType": "Attached",
+          "Driver": "mahesh",
+          "LicenseNo": "UEO597JI",
+          "Vendor": "BLR/OSP/0031:VISHWAKARMA TRANSPORT",
+          "DriverMobile": 918588667052,
+          "Expirydate": "20-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5568",
+          "VendorType": "Attached",
+          "Driver": "suresh",
+          "LicenseNo": "DKD269YY",
+          "Vendor": "V00002:DTDC",
+          "DriverMobile": 915080199378,
+          "Expirydate": "21-07-2023"
+        },
+        {
+          "vehicleNo": "MH02CB5544",
+          "VendorType": "NotAttached",
+          "Driver": "ramesh",
+          "LicenseNo": "WNT146MI",
+          "Vendor": "V000021:AHUJA TRANSPORT",
+          "DriverMobile": 919608422507,
+          "Expirydate": "22-07-2023"
+        },
+        {
+          "vehicleNo": "MH02CB5545",
+          "VendorType": "Attached",
+          "Driver": "suresh",
+          "LicenseNo": "UIG127TT",
+          "Vendor": "V000022:FLYING CARGO MOVERS",
+          "DriverMobile": 914724336649,
+          "Expirydate": "23-07-2023"
+        },
+        {
+          "vehicleNo": "HR0UY6646",
+          "VendorType": "NotAttached",
+          "Driver": "ramesh",
+          "LicenseNo": "YPA582YP",
+          "Vendor": "V000023:AKA SUPPLAY CHAIN-MCLAY",
+          "DriverMobile": 913685477501,
+          "Expirydate": "24-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5564",
+          "VendorType": "NotAttached",
+          "Driver": "suresh",
+          "LicenseNo": "BEE469PZ",
+          "Vendor": "V000025:RAKESH TRANSPORT",
+          "DriverMobile": 918956093376,
+          "Expirydate": "25-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5565",
+          "VendorType": "Attached",
+          "Driver": "mahesh",
+          "LicenseNo": "YBK962OO",
+          "Vendor": "V000026:HITESH CARGO MOVERS",
+          "DriverMobile": 912019401950,
+          "Expirydate": "26-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5566",
+          "VendorType": "Attached",
+          "Driver": "suresh",
+          "LicenseNo": "GTZ299NI",
+          "Vendor": "V000028:MAHESH TRANSPORT",
+          "DriverMobile": 911111600967,
+          "Expirydate": "27-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5567",
+          "VendorType": "NotAttached",
+          "Driver": "suresh",
+          "LicenseNo": "VAD306LG",
+          "Vendor": "V000029:NAYAN CARGO MOVERS",
+          "DriverMobile": 912094420276,
+          "Expirydate": "28-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5568",
+          "VendorType": "Attached",
+          "Driver": "paresh",
+          "LicenseNo": "YNA504XR",
+          "Vendor": "V00003:FAST X",
+          "DriverMobile": 914615569554,
+          "Expirydate": "29-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5569",
+          "VendorType": "NotAttached",
+          "Driver": "shivesh",
+          "LicenseNo": "ARB398LI",
+          "Vendor": "V000035:Viren VED - 01",
+          "DriverMobile": 914302490493,
+          "Expirydate": "30-07-2023"
+        },
+        {
+          "vehicleNo": "KA05RE5570",
+          "VendorType": "Attached",
+          "Driver": "paresh",
+          "LicenseNo": "IXI520HY",
+          "Vendor": "V00004:HYDRABAD VENDOR",
+          "DriverMobile": 916711929470,
+          "Expirydate": "31-07-2023"
+        }
+       ]
+}

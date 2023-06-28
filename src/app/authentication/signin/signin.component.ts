@@ -4,6 +4,7 @@ import { MainMenu } from "./../../Models/Menu/MenuModel";
 import { Router } from "@angular/router";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { DomSanitizer } from "@angular/platform-browser";
 
 @Component({
   selector: "app-signin",
@@ -19,12 +20,14 @@ export class SigninComponent
   error = "";
   IsRegister = true;
   Menudetailarray: any;
+  CompanyLogo;
   hide = true;
   Menulist: any;
   constructor(
     private formBuilder: UntypedFormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private sanitizer: DomSanitizer,
   ) {
     super();
   }
@@ -41,12 +44,16 @@ export class SigninComponent
   get f() {
     return this.loginForm.controls;
   }
+  CompanyDataSet() {
+    // this.CompanyLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
+    //   "data:image/png;base64," + localStorage.getItem("company_Logo")
+    // );
+  }
 
   onSubmit() {
     localStorage.setItem("companyCode", this.loginForm.value.companyCode)
     localStorage.setItem("Username", this.loginForm.value.Username);
     localStorage.setItem("Branch", this.loginForm.value.Branch);
-    this.router.navigate(["/dashboard/DocketDashboard"]);
+    this.router.navigate(["/dashboard/GlobeDashboardPage"]);
   }
-
 }

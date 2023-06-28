@@ -1,6 +1,4 @@
 import { RouterModule, Routes } from "@angular/router";
-
-import { AuthGuard } from "./core/guard/auth.guard";
 import { AuthLayoutComponent } from "./layout/app-layout/auth-layout/auth-layout.component";
 import { DashboardLayoutComponent } from "./layout/app-layout/dashboard-layout/dashboard-layout.component";
 import { MainLayoutComponent } from "./layout/app-layout/main-layout/main-layout.component";
@@ -57,6 +55,11 @@ const routes: Routes = [
         path: "Masters",
         loadChildren: () =>
           import("./Masters/masters.module").then((m) => m.MastersModule),
+      },
+      {
+        path: "Operation",
+        loadChildren: () =>
+          import("./operation/operation.module").then((m) => m.OperationModule),
       },
     ],
   },

@@ -1,0 +1,68 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12">
+                <div class="card">
+                    <mat-tab-group (selectedIndexChange)="GetSelectedIndex($event)" #myTabGroup>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <!-- <mat-icon class="example-tab-icon msr-2">home</mat-icon> -->
+                                Dashboard
+                            </ng-template>
+                            <app-dashboard-count-page *ngIf="myTabGroup.selectedIndex== 0"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-dashboard-count-page>
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
+                                Docket Stock
+
+                            </ng-template>
+                            <app-stocks *ngIf="myTabGroup.selectedIndex== 1"
+                                (CurrentIndex)="GetSelectedIndex($event)" (departure)="departureDetails"></app-stocks>
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
+                                Arrivals
+
+                            </ng-template>
+                            <app-arrival-dashboard-page *ngIf="myTabGroup.selectedIndex== 2"
+                                (CurrentIndex)="GetSelectedIndex($event)" (departure)="departureDetails"></app-arrival-dashboard-page>
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
+                                Departures
+
+                            </ng-template>
+                            <app-departure-dashboard-page *ngIf="myTabGroup.selectedIndex==3"
+                                (CurrentIndex)="GetSelectedIndex($event)" [arrivaldeparture]="departure"></app-departure-dashboard-page>
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
+                                Delivery
+
+                            </ng-template>
+                            <app-pickup-delivery-planner *ngIf="myTabGroup.selectedIndex==4"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-pickup-delivery-planner>
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
+                                DEPS
+
+                            </ng-template>
+
+                        </mat-tab>
+                    </mat-tab-group>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

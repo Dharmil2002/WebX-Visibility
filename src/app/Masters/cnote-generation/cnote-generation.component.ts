@@ -646,7 +646,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   // Get all fields and bind
   GetCnotecontrols() {
-    this.ICnoteService.getCnoteBooking('cnotefields/', parseInt(localStorage.getItem("companyCode"))).subscribe({
+    this.ICnoteService.getNewCnoteBooking('cnotefields/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         if (res) {
           // Push the details array into the response array and filter based on useField property, sort by Seq property
@@ -675,7 +675,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   //Bind all rules
   getRules() {
-    this.ICnoteService.getCnoteBooking('services/companyWiseRules/', parseInt(localStorage.getItem("companyCode"))).subscribe({
+    this.ICnoteService.getNewCnoteBooking('services/companyWiseRules/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         if (res) {
           // Set the Rules variable to the first element of the response array
@@ -799,7 +799,7 @@ export class CNoteGenerationComponent implements OnInit {
 
   // This function fetches the date rules from the backend and sets the minimum date for the date picker based on the rule.
   getDaterules() {
-    this.ICnoteService.getCnoteBooking('services/getRuleFordate/', parseInt(localStorage.getItem("companyCode"))).subscribe({
+    this.ICnoteService.getNewCnoteBooking('services/getRuleFordate/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         let filterfordate = res.find((x) => x.Rule_Y_N == 'Y');
         this.minDate.setDate(this.minDate.getDate() - filterfordate.BackDate_Days);
@@ -920,7 +920,7 @@ export class CNoteGenerationComponent implements OnInit {
    * Fetches contract details from API and sets it in component variable.
    */
   getContractDetail() {
-    this.ICnoteService.getCnoteBooking('services/getContractDetail/', parseInt(localStorage.getItem("companyCode"))).subscribe({
+    this.ICnoteService.getNewCnoteBooking('services/getContractDetail/', parseInt(localStorage.getItem("companyCode"))).subscribe({
       next: (res: any) => {
         if (res) {
           this.contractDetail = res;
@@ -971,7 +971,7 @@ export class CNoteGenerationComponent implements OnInit {
           CustomerType: rules.defaultvalue == 'Y' ? CustomerType : "",
           ContractParty: event == 'PRQ_BILLINGPARTY' ? 'BillingParty' : event == 'Consignor' ? 'Consignor' : 'Consignee'
         }
-        this.ICnoteService.cnotePost('services/billingParty', req).subscribe({
+        this.ICnoteService.cnoteNewPost('services/billingParty', req).subscribe({
           next: (res: any) => {
             if (res) {
               this.cnoteAutoComplete = res;
@@ -1058,7 +1058,7 @@ export class CNoteGenerationComponent implements OnInit {
           PaymentType: this.step1.controls['PAYTYP'].value
         };
 
-        this.ICnoteService.cnotePost('services/GetFromCityDetails', request).subscribe({
+        this.ICnoteService.cnoteNewPost('services/GetFromCityDetails', request).subscribe({
           next: (response: any) => {
             this.Fcity = response.result;
             this.getCityFilter();
@@ -1093,7 +1093,7 @@ export class CNoteGenerationComponent implements OnInit {
         }
 
         // Call the API to get the list of destination cities
-        this.ICnoteService.cnotePost('services/GetToCityDetails', req).subscribe({
+        this.ICnoteService.cnoteNewPost('services/GetToCityDetails', req).subscribe({
           next: (res: any) => {
             // Save the response to the Tcity property and update the city filter
             this.Tcity = res.result;
@@ -1121,7 +1121,7 @@ export class CNoteGenerationComponent implements OnInit {
       }
 
       // Call the API to get the mapped location from city name
-      this.ICnoteService.cnotePost('services/GetMappedLocationFromCityName', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetMappedLocationFromCityName', req).subscribe({
         next: (res: any) => {
           // Set the Destination property to the response
           this.Destination = res;
@@ -1155,7 +1155,7 @@ export class CNoteGenerationComponent implements OnInit {
         SearchText: this.step1.controls['PRQ'].value
       };
       // Send POST request to retrieve PRQ vehicle request
-      this.ICnoteService.cnotePost('services/prqVehicleReq', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/prqVehicleReq', req).subscribe({
         next: (res: any) => {
           // Save retrieved PRQ vehicle request
           this.prqVehicleReq = res;
@@ -1206,8 +1206,8 @@ export class CNoteGenerationComponent implements OnInit {
         VehicleType: "Toll",
         IsCheck: 0
       };
-      // Call cnotePost method from ICnoteService with endpoint 'services/GetVehicle' and request object
-      this.ICnoteService.cnotePost('services/GetVehicle', req).subscribe(
+      // Call cnoteNewPost method from ICnoteService with endpoint 'services/GetVehicle' and request object
+      this.ICnoteService.cnoteNewPost('services/GetVehicle', req).subscribe(
         // Handle the response from server
         {
           next: (res: any) => {
@@ -1367,7 +1367,7 @@ export class CNoteGenerationComponent implements OnInit {
 
     try {
       // Call the docketValidation service and subscribe to the response
-      this.ICnoteService.cnotePost('services/docketValidation', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/docketValidation', req).subscribe({
         next: (res: any) => {
           // If the service returns success, set the docketallocate value
           if (res.issuccess) {
@@ -1408,7 +1408,7 @@ export class CNoteGenerationComponent implements OnInit {
       }
 
       // Send the request to the server to get the list of dockets
-      this.ICnoteService.cnotePost('services/GetMultiPickupDeliveryDocket', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetMultiPickupDeliveryDocket', req).subscribe({
         next: (res: any) => {
 
           // If the request was successful
@@ -1458,7 +1458,7 @@ export class CNoteGenerationComponent implements OnInit {
     };
 
     // Call the API
-    this.ICnoteService.cnotePost('services/GetDetailedBasedOnLocations', req).subscribe({
+    this.ICnoteService.cnoteNewPost('services/GetDetailedBasedOnLocations', req).subscribe({
       next: (res: any) => {
         // Get the details from the response
         const ResDetailsBased = res.result[0];
@@ -1502,7 +1502,7 @@ export class CNoteGenerationComponent implements OnInit {
         }
 
         // Makes the API call to fetch the Consignor City
-        this.ICnoteService.cnotePost('services/ConsignorCity', req).subscribe({
+        this.ICnoteService.cnoteNewPost('services/ConsignorCity', req).subscribe({
           next: (res: any) => {
             if (res) {
               this.ConsignorCity = res;
@@ -1538,7 +1538,7 @@ export class CNoteGenerationComponent implements OnInit {
         }
 
         // Make a POST request to the 'services/consigneeCity' API endpoint with the request object.
-        this.ICnoteService.cnotePost('services/consigneeCity', req).subscribe({
+        this.ICnoteService.cnoteNewPost('services/consigneeCity', req).subscribe({
           next: (res: any) => {
             // Update the 'ConsigneeCity' array with the result returned by the API.
             this.ConsigneeCity = res.result;
@@ -1585,7 +1585,7 @@ export class CNoteGenerationComponent implements OnInit {
         }
 
         // Make a POST request to fetch the details
-        this.ICnoteService.cnotePost('services/getPincode', req).subscribe({
+        this.ICnoteService.cnoteNewPost('services/getPincode', req).subscribe({
           next: (res: any) => {
             // If the response is not empty
             if (res) {
@@ -1662,7 +1662,7 @@ export class CNoteGenerationComponent implements OnInit {
         PAYBAS: this.step1.controls['PAYTYP'].value,
         CONTRACTID: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId || ""
       }
-      this.ICnoteService.cnotePost('services/GetDetailedBasedOnContract', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetDetailedBasedOnContract', req).subscribe({
         next: (res: any) => {
           // Define an array of code types that need dropdown data
           const codeTypes = ['FTLTYP', 'PKPDL', 'SVCTYP', 'TRN'];
@@ -1726,7 +1726,7 @@ export class CNoteGenerationComponent implements OnInit {
       }
 
       // Fetch dropdown values using API
-      this.ICnoteService.cnotePost('services/GetcommonActiveGeneralMasterCodeListByTenantId', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetcommonActiveGeneralMasterCodeListByTenantId', req).subscribe({
         next: (res: any) => {
           // Set ContainerSize, ContainerType, and ContainerCapacity arrays with filtered results
           this.ContainerSize = res.result.filter((x) => x.CodeType == 'CNTSIZE')
@@ -1984,7 +1984,7 @@ export class CNoteGenerationComponent implements OnInit {
     };
 
     // Call API to get invoice configuration
-    this.ICnoteService.cnotePost('services/GetInvoiceConfigurationBasedOnTransMode', req).subscribe({
+    this.ICnoteService.cnoteNewPost('services/GetInvoiceConfigurationBasedOnTransMode', req).subscribe({
       next: (res: any) => {
         // Update form controls with received invoice details
         let invoiceDetail = res.result;
@@ -2018,7 +2018,7 @@ export class CNoteGenerationComponent implements OnInit {
       PrqNumber: this.step1.controls['PRQ'].value.PRQNO
     }
 
-    this.ICnoteService.cnotePost('services/GetPrqInvoiceList', req).subscribe(
+    this.ICnoteService.cnoteNewPost('services/GetPrqInvoiceList', req).subscribe(
       {
         next: (res: any) => {
           let prqinvoiceDetail = res.result;
@@ -2040,7 +2040,7 @@ export class CNoteGenerationComponent implements OnInit {
       TO_SRNO: event.controls.To?.value || 0,
       Location: 'MUMB'
     }
-    this.ICnoteService.cnotePost('services/ValidateBcSeriesRow', req).subscribe({
+    this.ICnoteService.cnoteNewPost('services/ValidateBcSeriesRow', req).subscribe({
       next: (res: any) => {
         if (res.result[0].Flag == 'N') {
           SwalerrorMessage("error", res.result[0].Reason, "", true);
@@ -2062,7 +2062,7 @@ export class CNoteGenerationComponent implements OnInit {
         companyCode: parseInt(localStorage.getItem("companyCode")),
         contractid: this.step1.controls['PRQ_BILLINGPARTY'].value?.ContractId || ''
       }
-      this.ICnoteService.cnotePost('services/billingParty', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/billingParty', req).subscribe({
         next: (res: any) => {
           this.CcmServicesData = res.result
         }
@@ -2082,7 +2082,7 @@ export class CNoteGenerationComponent implements OnInit {
       DocketNo: this.step1.controls['DKTNO'].value,
       FinYear: 2023
     }
-    this.ICnoteService.cnotePost('services/ValidateInvoiceNo', req).subscribe({
+    this.ICnoteService.cnoteNewPost('services/ValidateInvoiceNo', req).subscribe({
       next: (res: any) => {
         if (res) {
           let docketNoexist = res.result[0].length > 0 ? res.result[0][0].InvoiceNo : '';
@@ -2137,7 +2137,7 @@ export class CNoteGenerationComponent implements OnInit {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       PayBase: this.step1.controls['PAYTYP'].value
     }
-    this.ICnoteService.cnotePost('services/GetConsignorConsigneeRules', req).subscribe({
+    this.ICnoteService.cnoteNewPost('services/GetConsignorConsigneeRules', req).subscribe({
       next: (res: any) => {
         if (res.result[0].ConsignorFromMaster == "N") {
           this.step2.controls['IsConsignorFromMasterOrWalkin'].enable();
@@ -2182,7 +2182,7 @@ export class CNoteGenerationComponent implements OnInit {
         ChargeType: "BKG",
         PayBase: this.step1.controls['PAYTYP'].value,
       }
-      this.ICnoteService.cnotePost("services/GetContractInvokeDependent", req).subscribe({
+      this.ICnoteService.cnoteNewPost("services/GetContractInvokeDependent", req).subscribe({
         next: (res: any) => {
           if (res) {
             this.BasedOn1 = res.result[0]?.BasedOn1 || "";
@@ -2288,7 +2288,7 @@ export class CNoteGenerationComponent implements OnInit {
       Destination: this.step1.controls['DELLOC'].value.Value,
       TransMode: this.step1.controls['TRN'].value
     }
-    this.ICnoteService.cnotePost('services/GetDistanceFromContract', req).subscribe({
+    this.ICnoteService.cnoteNewPost('services/GetDistanceFromContract', req).subscribe({
       next: (res: any) => {
         if (res.result) {
           this.Distance = res.result[0];
@@ -2307,7 +2307,7 @@ export class CNoteGenerationComponent implements OnInit {
     this.Invoiceinit()
     if (ruleContractType.defaultvalue == "C") {
       if (this.RequestContractKeysDetail.ContractKeys.ContractID != this.RequestContractKeysDetail.ContractKeys.PayBase + "8888" && this.RequestContractKeysDetail.ContractKeys.ContractID) {
-        this.ICnoteService.cnotePost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
+        this.ICnoteService.cnoteNewPost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
           next: (res: any) => {
             if (res) {
               this.contractKeysInvoke = res.result.root;
@@ -2324,7 +2324,7 @@ export class CNoteGenerationComponent implements OnInit {
         }
         else {
           this.RequestContractKeysDetail.ContractKeys.ContractID = this.RequestContractKeysDetail.ContractKeys.PayBase + "8888";
-          this.ICnoteService.cnotePost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
+          this.ICnoteService.cnoteNewPost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
             next: (res: any) => {
               if (res) {
                 this.contractKeysInvoke = res.result.root;
@@ -2345,7 +2345,7 @@ export class CNoteGenerationComponent implements OnInit {
       }
       if (FreightCharge == 0 || this.FreightRate == 0) {
         this.RequestContractKeysDetail.ContractKeys.ContractID = this.RequestContractKeysDetail.ContractKeys.PayBase + "8888";
-        this.ICnoteService.cnotePost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
+        this.ICnoteService.cnoteNewPost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
           next: (res: any) => {
             if (res) {
               this.contractKeysInvoke = res.result.root;
@@ -2359,7 +2359,7 @@ export class CNoteGenerationComponent implements OnInit {
     else if (ruleContractType.defaultvalue == "D") {
       this.RequestContractKeysDetail.ContractKeys.ContractID = this.RequestContractKeysDetail.ContractKeys.PayBase + "8888";
 
-      this.ICnoteService.cnotePost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
+      this.ICnoteService.cnoteNewPost('services/InvokeFreight', this.RequestContractKeysDetail).subscribe({
         next: (res: any) => {
           if (res) {
             this.contractKeysInvoke = res.result.root;
@@ -2418,7 +2418,7 @@ export class CNoteGenerationComponent implements OnInit {
         dockdt: this.step1.controls['DKTDT'].value,
         ContractKeys: this.RequestContractKeysDetail.ContractKeys
       }
-      this.ICnoteService.cnotePost('services/GetFuelCharge', req).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetFuelCharge', req).subscribe({
         next: (res: any) => {
           if (res) {
             //----------------------------FuelSurcharge---------------------------------//
@@ -2454,7 +2454,7 @@ export class CNoteGenerationComponent implements OnInit {
         ServiceType: this.step1.controls['SVCTYP'].value
       }
 
-      this.ICnoteService.cnotePost('services/GetFOVCharge', reqFOVChargeCriteria).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetFOVCharge', reqFOVChargeCriteria).subscribe({
         next: (res: any) => {
           if (res) {
             this.FOVFlag = res.result[0];
@@ -2476,7 +2476,7 @@ export class CNoteGenerationComponent implements OnInit {
         companyCode: parseInt(localStorage.getItem("companyCode")),
         CODCriteria: "<root><ContractID>" + this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId + "</ContractID><InvoiceAmount>" + this.step3.controls['TotalDeclaredValue'].value + "</InvoiceAmount></root>"
       }
-      this.ICnoteService.cnotePost('services/GetCodeDodCharges', reqCod).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetCodeDodCharges', reqCod).subscribe({
         next: (res: any) => {
           if (res) {
             this.codCharges = res.result[0];
@@ -2489,7 +2489,7 @@ export class CNoteGenerationComponent implements OnInit {
         DACCCharged: 0,
         DACCRateType: ""
       }
-      this.ICnoteService.cnotePost('services/GetDaccCharges', reqDacc).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetDaccCharges', reqDacc).subscribe({
         next: (res: any) => {
           if (res) {
             this.DaccChargedDetail = res.result[0];
@@ -2530,7 +2530,7 @@ export class CNoteGenerationComponent implements OnInit {
           basedon: this.Rules.find(x => x.code == 'CHRG_RULE').defaultvalue,
           basecode: this.BaseCode1
         }
-        this.ICnoteService.cnotePost('services/GetDocketchargeList', reqDocketchargeList).subscribe({
+        this.ICnoteService.cnoteNewPost('services/GetDocketchargeList', reqDocketchargeList).subscribe({
           next: (res: any) => {
             this.chargeList = res.ResultchargeList;
           }
@@ -2540,7 +2540,7 @@ export class CNoteGenerationComponent implements OnInit {
           ContractKeys: this.RequestContractKeysDetail.ContractKeys
         }
 
-        this.ICnoteService.cnotePost('services/GetDocketchargeValues', reqchargeValues).subscribe({
+        this.ICnoteService.cnoteNewPost('services/GetDocketchargeValues', reqchargeValues).subscribe({
           next: (res: any) => {
             this.chargeValues = res.result;
             this.chargeList.forEach(element => {
@@ -2611,7 +2611,7 @@ export class CNoteGenerationComponent implements OnInit {
           companyCode: parseInt(localStorage.getItem("companyCode")),
           ddArray: dropdown
         }
-        this.ICnoteService.cnotePost('services/GetcommonActiveGeneralMasterCodeListByTenantId', reqratetype).subscribe({
+        this.ICnoteService.cnoteNewPost('services/GetcommonActiveGeneralMasterCodeListByTenantId', reqratetype).subscribe({
           next: (res: any) => {
             if (res) {
               let RateType = res.result.filter((x) => x.CodeType == 'RATETYPE');
@@ -2675,7 +2675,7 @@ export class CNoteGenerationComponent implements OnInit {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       ContractId: this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId
     }
-    this.ICnoteService.cnotePost('services/CheckDPHBillingRule', reqCheckDPHBillingRule).subscribe({
+    this.ICnoteService.cnoteNewPost('services/CheckDPHBillingRule', reqCheckDPHBillingRule).subscribe({
       next(res: any) {
         if (res) {
           this.RuleDPHBilling = res.result[0].DPHBilling;
@@ -2688,7 +2688,7 @@ export class CNoteGenerationComponent implements OnInit {
       ContractId: this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId,
       TransMode: this.step1.controls['TRN'].value
     }
-    this.ICnoteService.cnotePost('services/CheckDPHBillingReadOnly', reqDPHBilling).subscribe({
+    this.ICnoteService.cnoteNewPost('services/CheckDPHBillingReadOnly', reqDPHBilling).subscribe({
       next(res: any) {
         if (res) {
           this.DPHBillingReadOnly = res.result[0].DPHType;
@@ -2701,7 +2701,7 @@ export class CNoteGenerationComponent implements OnInit {
       ContractId: this.step1.controls['PRQ_BILLINGPARTY'].value.ContractId,
       TransMode: this.step1.controls['TRN'].value
     }
-    this.ICnoteService.cnotePost('services/GetDPHCharge', reqDPHCharge).subscribe({
+    this.ICnoteService.cnoteNewPost('services/GetDPHCharge', reqDPHCharge).subscribe({
       next(res: any) {
         if (res) {
           this.DPHCharge = res.result[0];
@@ -2831,7 +2831,7 @@ export class CNoteGenerationComponent implements OnInit {
       EDD_ADD_HDAYS: this.Rules.find((x) => x.code == 'EDD_ADD_HDAYS').defaultvalue,
       ContractKeys: this.RequestContractKeysDetail.ContractKeys
     }
-    this.ICnoteService.cnotePost('services/CalculatEdd', reqbody).subscribe({
+    this.ICnoteService.cnoteNewPost('services/CalculatEdd', reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           let date = new Date(res.result.Date)
@@ -2855,7 +2855,7 @@ export class CNoteGenerationComponent implements OnInit {
         loc_level: "234",
         searchText: this.step1.controls['DELLOC'].value
       }
-      this.ICnoteService.cnotePost('services/GetDestination', reqbody).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetDestination', reqbody).subscribe({
         next: (res: any) => {
           if (res) {
             this.Destination = res.result;
@@ -2885,7 +2885,7 @@ export class CNoteGenerationComponent implements OnInit {
       Origin: localStorage.getItem("Branch"),
       DocketNumber: this.step1.controls['DKTNO']?.value || ''
     }
-    this.ICnoteService.cnotePost('services/GetDetailedBasedOnCStep1', reqbody).subscribe({
+    this.ICnoteService.cnoteNewPost('services/GetDetailedBasedOnCStep1', reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           //MArk that this is temapory res.Result[0]?.ORIGIN||"" bcz in this time Virtual login and Location is not available so i jst working using static location if the varitual login is done this condtion shold be changed
@@ -2910,7 +2910,6 @@ export class CNoteGenerationComponent implements OnInit {
   //End
   // //start
   // Validationchecked(Formcontrol,step) {
-  //   debugger
   //    const requiredStepNames = Formcontrol
   //   .filter(step => step.Validation === 'Required' && step.type!="toggle")
   //   .map(step => step.name);
@@ -3282,7 +3281,7 @@ export class CNoteGenerationComponent implements OnInit {
       this.DocketEntity.BillingPartysCode = this.step1.controls['PRQ_BILLINGPARTY']?.value.Value || ''
       this.DocketEntity.BillingPartysName = this.step1.controls['PRQ_BILLINGPARTY']?.value.Name || ''
       console.log(this.DocketEntity);
-      this.ICnoteService.cnotePost('services/BookDocket', this.DocketEntity).subscribe({
+      this.ICnoteService.cnoteNewPost('services/BookDocket', this.DocketEntity).subscribe({
         next: (res: any) => {
           SwalerrorMessage("success", "DocketNo:" + res.result[0].DocketNumber, "", true);
         }

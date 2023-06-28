@@ -1,0 +1,38 @@
+<!-- 
+    we are using mat-stepper in which we are looping through titles of form , and passing the corresponding 
+    formData to 'app-form-without-auto-complete-webxpress' component which renders the dynamic form ,
+    similar to accordion.
+    whichever component uses this component, have to define functionlister and 'save' and 'cancel' function
+    in parent.
+
+ -->
+
+<mat-stepper  #stepper>
+    <ng-container *ngFor="let formtabName of tabFormGroupList; last as isLast; first as isFirst">
+        <mat-step [stepControl]="formtabName" [label]="formtabName">
+            <form [formGroup]="tabForm">
+
+                <app-form-without-auto-complete-webxpress [formData]="tabGroup[formtabName]" [form]="tabForm"
+                    (functionCallEmitter)="functionCallHandler($event)">
+                </app-form-without-auto-complete-webxpress>
+
+                <!-- displaying action buttons ... -->
+                <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 my-2">
+                        <div class="example-button-row">
+
+                            <button *ngIf="!isFirst" mat-raised-button mat-button type="button" color="primary"
+                                matStepperPrevious>Back</button>
+                            <button *ngIf="!isLast" mat-raised-button mat-button type="button" color="primary"
+                                matStepperNext>Next</button>
+                            <button *ngIf="isLast" mat-raised-button mat-button type="button" color="primary" mat-button
+                                (click)="save($event)">Save</button>
+                            <button *ngIf="isLast" mat-raised-button mat-button type="button" color="accent" mat-button
+                                (click)="tabForm.reset()">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </mat-step>
+    </ng-container>
+</mat-stepper>

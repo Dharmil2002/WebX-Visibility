@@ -11,6 +11,7 @@
                 </mat-progress-spinner>
             </div>
         </div>
+        <app-generic-card-webxpress [boxData]="BoxData"></app-generic-card-webxpress>
         <div >
             <div>
                 <app-grid-list class="w-100" *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"

@@ -1,0 +1,21 @@
+<div class="paddingdiv">
+
+    <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
+    <!-- Loading Generic table as parent component and passing  required data-->
+    <!--
+        columnHeader: a object that contains only that pair of column id:title that are to be shown on dashBoard.
+        tableData : api Response.
+        addAndEditPath : path of the page where Add and edit is handled.
+        uploadComponent : REference of component, which is to be opened in dialog box.
+        csvHeaders : a object that contains ordered pair of column id:title that are to be shown in csv file.
+        csvFileName : Name of the csv File.
+        activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
+         -->
+    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+        [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
+        [Link]="linkArray" [toggleArray]="toggleArray" (dialogClosed)="updateLoadingData($event)"
+        [extraData]="extraData" [maxWidth]="maxWidth" [width]="width" [height]="height"
+        [centerAligned]="centerAlignedData" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
+    </generic-table-webxpress>
+</div>

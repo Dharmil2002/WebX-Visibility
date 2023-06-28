@@ -1,0 +1,47 @@
+{
+    "data": [
+      {
+        "DeliveryCluster": "CL002: Mahim-Dadar cluster",
+        "DeliveryShipments": 45,
+        "PickupRequests": 32,
+        "TotalWeight": 445,
+        "CFT": 340,
+        "Action": "Create Run Sheet"
+
+      },
+      {
+        "DeliveryCluster": "CL003: North mumbai",
+        "DeliveryShipments": 56,
+        "PickupRequests": 20,
+        "TotalWeight": 785,
+        "CFT": 600,
+        "Action": "Create Run Sheet"
+
+      },
+      {
+        "DeliveryCluster": "CL004: Wester suburbs",
+        "DeliveryShipments": 32,
+        "PickupRequests": 14,
+        "TotalWeight": 450,
+        "CFT": 270,
+        "Action": "Create Run Sheet"
+
+      }
+    ],
+    "DeliveryCountData": [
+        {
+            "count": 12,
+            "title": "Clusters",
+            "class": "info-box7 bg-danger order-info-box7"
+        }, {
+            "count": 540,
+            "title": "Shipments for Delivery",
+            "class": "info-box7 bg-info order-info-box7"
+        }, {
+            "count": 120,
+            "title": "Pickup Requests",
+            "class": "info-box7 bg-warning order-info-box7"
+        }
+    ]
+  }
+  

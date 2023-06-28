@@ -1,0 +1,594 @@
+{
+"cluster":[
+  {
+    "runSheetID": "",
+    "cluster": "CL002: Mahim-Dadar cluster",
+    "vehicleNo": "MH02CB5544",
+    "vehType": "Tata 407",
+    "vendorId": "V000324: Navyug Transport",
+    "vendorType": "Business Associate",
+    "capacityKg": 3200,
+    "capacityVol": 740,
+    "loadedKg": 1700,
+    "loadedVol": 650,
+    "weightUtilization": "75%",
+    "volumeUtilization": "55%",
+    "action": "Create Run Sheet"
+  },
+  {
+    "runSheetID": "",
+    "cluster": "CL003: North mumbai",
+    "vehicleNo": "MH02CB5545",
+    "vehType": "Tata 408",
+    "vendorId": "V000325: shreeDhara Transport",
+    "vendorType": "Business Associate",
+    "capacityKg": 3827,
+    "capacityVol": 822,
+    "loadedKg": 1915,
+    "loadedVol": 2201,
+    "weightUtilization": "75%",
+    "volumeUtilization": "55%",
+    "action": "Create Run Sheet"
+  },
+  {
+    "runSheetID": "",
+    "cluster": "CL004: Wester suburbs",
+    "vehicleNo": "MH02CB5546",
+    "vehType": "Tata 408",
+    "vendorId": "V000325: shreeDhara Transport",
+    "vendorType": "Business Associate",
+    "capacityKg": 3827,
+    "capacityVol": 822,
+    "loadedKg": 1915,
+    "loadedVol": 2201,
+    "weightUtilization": "75%",
+    "volumeUtilization": "55%",
+    "action": "Create Run Sheet"
+  },
+  {
+    "runSheetID": "PDNHW/MUMB/2223/92353",
+    "cluster": "CL005: Andheri cluster",
+    "vehicleNo": "MH02CB5547",
+    "vehType": "Tata 407",
+    "vendorId": "V000324: Navyug Transport",
+    "vendorType": "Business Associate",
+    "capacityKg": 3200,
+    "capacityVol": 740,
+    "loadedKg": 1700,
+    "loadedVol": 650,
+    "weightUtilization": "75%",
+    "volumeUtilization": "55%",
+    "action": "Depart"
+  },
+  {
+    "runSheetID": "PDNHW/MUMB/2223/92354",
+    "cluster": "CL006: Goregaon",
+    "vehicleNo": "MH02CB5548",
+    "vehType": "Tata 408",
+    "vendorId": "V000325: shreeDhara Transport",
+    "vendorType": "Business Associate",
+    "capacityKg": 3827,
+    "capacityVol": 822,
+    "loadedKg": 1915,
+    "loadedVol": 2201,
+    "weightUtilization": "75%",
+    "volumeUtilization": "55%",
+    "action": "Depart"
+  },
+  {
+    "runSheetID": "PDNHW/MUMB/2223/92355",
+    "cluster": "CL007: Vikroli",
+    "vehicleNo": "MH02CB5549",
+    "vehType": "Tata 408",
+    "vendorId": "V000325: shreeDhara Transport",
+    "vendorType": "Business Associate",
+    "capacityKg": 3827,
+    "capacityVol": 822,
+    "loadedKg": 1915,
+    "loadedVol": 2201,
+    "weightUtilization": "75%",
+    "volumeUtilization": "55%",
+    "action": "Depart"
+  }
+ ],
+
+ "shipment":[
+  {
+    "documentId": "A887474",
+    "type": "Delivery",
+    "customer": "Anz Motors",
+    "address": "34, Navkar building, Mahim",
+    "pincode": 400014,
+    "packages": 4,
+    "weight": 30,
+    "volume": 268,
+    "cluster": "CL005: Andheri cluster"
+  },
+  {
+    "documentId": "PR000393",
+    "type": "Pickup",
+    "customer": "Pefect Foods",
+    "address": "3/103, Pandurang bhavan, Matunga",
+    "pincode": 400014,
+    "packages": 3,
+    "weight": 21,
+    "volume": 261,
+    "cluster": "CL006: Goregaon"
+  },
+  {
+    "documentId": "A773664",
+    "type": "Delivery",
+    "customer": "Savla Auto parts",
+    "address": "J K House, Chunam Lane, Dadar",
+    "pincode": 400016,
+    "packages": 2,
+    "weight": 16,
+    "volume": 141,
+    "cluster": "CL002: Mahim-Dadar cluster"
+  },
+  {
+    "documentId": "B003848",
+    "type": "Delivery",
+    "customer": "L&T switchgear",
+    "address": "Evershine Sunrise, Veer Savarkar Marg, Shivaji park",
+    "pincode": 400018,
+    "packages": 3,
+    "weight": 22,
+    "volume": 206,
+    "cluster": "CL002: Mahim-Dadar cluster"
+  },
+  {
+    "documentId": "P000654",
+    "type": "Pickup",
+    "customer": "Singh Motors",
+    "address": "32, L J Road",
+    "pincode": 400023,
+    "packages": 3,
+    "weight": 23,
+    "volume": 265,
+    "cluster": "CL006: Goregaon"
+  },
+  {
+    "documentId": "PR000391",
+    "type": "Pickup",
+    "customer": "Pefect Foods",
+    "address": "3/103, Pandurang bhavan, Matunga",
+    "pincode": 400014,
+    "packages": 2,
+    "weight": 30,
+    "volume": 361,
+    "cluster": "CL003: North mumbai"
+  },
+  {
+    "documentId": "B003841",
+    "type": "Delivery",
+    "customer": "L&T switchgear",
+    "address": "Evershine Sunrise, Veer Savarkar Marg, Shivaji park",
+    "pincode": 400018,
+    "packages": 2,
+    "weight": 47,
+    "volume": 469,
+    "cluster": "CL003: North mumbai"
+  },
+  {
+    "documentId": "P000655",
+    "type": "Pickup",
+    "customer": "Singh Motors",
+    "address": "32, L J Road",
+    "pincode": 400023,
+    "packages": 3,
+    "weight": 39,
+    "volume": 429,
+    "cluster": "CL003: North mumbai"
+  },
+  {
+    "documentId": "A887471",
+    "type": "Delivery",
+    "customer": "Anz Motors",
+    "address": "34, Navkar building, Mahim",
+    "pincode": 400014,
+    "packages": 4,
+    "weight": 53,
+    "volume": 523,
+    "cluster": "CL007: Vikroli"
+  },
+  {
+    "documentId": "PR000391",
+    "type": "Pickup",
+    "customer": "Pefect Foods",
+    "address": "3/103, Pandurang bhavan, Matunga",
+    "pincode": 400014,
+    "packages": 2,
+    "weight": 30,
+    "volume": 361,
+    "cluster": "CL007: Vikroli"
+  },
+  {
+    "documentId": "A773661",
+    "type": "Delivery",
+    "customer": "Savla Auto parts",
+    "address": "J K House, Chunam Lane, Dadar",
+    "pincode": 400016,
+    "packages": 2,
+    "weight": 46,
+    "volume": 405,
+    "cluster": "CL004: Wester suburbs"
+  },
+  {
+    "documentId": "B003841",
+    "type": "Delivery",
+    "customer": "L&T switchgear",
+    "address": "Evershine Sunrise, Veer Savarkar Marg, Shivaji park",
+    "pincode": 400018,
+    "packages": 4,
+    "weight": 47,
+    "volume": 469,
+    "cluster": "CL004: Wester suburbs"
+  },
+  {
+    "documentId": "P000655",
+    "type": "Pickup",
+    "customer": "Singh Motors",
+    "address": "32, L J Road",
+    "pincode": 400023,
+    "packages": 3,
+    "weight": 39,
+    "volume": 429,
+    "cluster": "CL004: Wester suburbs"
+  }
+ ],
+ "packages":[
+  {
+    "documentId": "A887474",
+    "packages": 4,
+    "packageId": "A887474-1",
+    "cluster": "CL005: Andheri cluster",
+    "weight": 6,
+    "volume": 98
+  },
+  {
+    "documentId": "A887474",
+    "packages": 4,
+    "packageId": "A887474-2",
+    "cluster": "CL005: Andheri cluster",
+    "weight": 7,
+    "volume": 55
+  },
+  {
+    "documentId": "A887474",
+    "packages": 4,
+    "packageId": "A887474-3",
+    "cluster": "CL005: Andheri cluster",
+    "weight": 10,
+    "volume": 61
+  },
+  {
+    "documentId": "A887474",
+    "packages": 4,
+    "packageId": "A887474-4",
+    "cluster": "CL005: Andheri cluster",
+    "weight": 7,
+    "volume": 54
+  },
+  {
+    "documentId": "PR000393",
+    "packages": 3,
+    "packageId": "PR000393-1",
+    "cluster": "CL006: Goregaon",
+    "weight": 7,
+    "volume": 81
+  },
+  {
+    "documentId": "PR000393",
+    "packages": 3,
+    "packageId": "PR000393-2",
+    "cluster": "CL006: Goregaon",
+    "weight": 9,
+    "volume": 90
+  },
+  {
+    "documentId": "PR000393",
+    "packages": 3,
+    "packageId": "PR000393-3",
+    "cluster": "CL006: Goregaon",
+    "weight": 5,
+    "volume": 90
+  },
+  {
+    "documentId": "A773664",
+    "packages": 2,
+    "packageId": "A773664-1",
+    "cluster": "CL002: Mahim-Dadar cluster",
+    "weight": 6,
+    "volume": 85
+  },
+  {
+    "documentId": "A773664",
+    "packages": 2,
+    "packageId": "A773664-2",
+    "cluster": "CL002: Mahim-Dadar cluster",
+    "weight": 10,
+    "volume": 56
+  },
+  {
+    "documentId": "B003848",
+    "packages": 3,
+    "packageId": "B003848-1",
+    "cluster": "CL002: Mahim-Dadar cluster",
+    "weight": 6,
+    "volume": 75
+  },
+  {
+    "documentId": "B003848",
+    "packages": 3,
+    "packageId": "B003848-2",
+    "cluster": "CL002: Mahim-Dadar cluster",
+    "weight": 9,
+    "volume": 55
+  },
+  {
+    "documentId": "B003848",
+    "packages": 3,
+    "packageId": "B003848-3",
+    "cluster": "CL002: Mahim-Dadar cluster",
+    "weight": 7,
+    "volume": 76
+  },
+  {
+    "documentId": "P000654",
+    "packages": 3,
+    "packageId": "P000654-1",
+    "cluster": "CL006: Goregaon",
+    "weight": 7,
+    "volume": 100
+  },
+  {
+    "documentId": "P000654",
+    "packages": 3,
+    "packageId": "P000654-2",
+    "cluster": "CL006: Goregaon",
+    "weight": 8,
+    "volume": 72
+  },
+  {
+    "documentId": "P000654",
+    "packages": 3,
+    "packageId": "P000654-3",
+    "cluster": "CL006: Goregaon",
+    "weight": 8,
+    "volume": 93
+  },
+  {
+    "documentId": "A887471",
+    "packages": 3,
+    "packageId": "A887471-1",
+    "cluster": "CL007: Vikroli",
+    "weight": 7,
+    "volume": 80
+  },
+  {
+    "documentId": "A887471",
+    "packages": 3,
+    "packageId": "A887471-2",
+    "cluster": "CL007: Vikroli",
+    "weight": 9,
+    "volume": 55
+  },
+  {
+    "documentId": "A887471",
+    "packages": 3,
+    "packageId": "A887471-3",
+    "cluster": "CL007: Vikroli",
+    "weight": 8,
+    "volume": 68
+  },
+  {
+    "documentId": "PR000391",
+    "packages": 2,
+    "packageId": "PR000391-1",
+    "cluster": "CL007: Vikroli",
+    "weight": 10,
+    "volume": 97
+  },
+  {
+    "documentId": "PR000391",
+    "packages": 2,
+    "packageId": "PR000391-2",
+    "cluster": "CL007: Vikroli",
+    "weight": 6,
+    "volume": 92
+  },
+  {
+    "documentId": "A773661",
+    "packages": 4,
+    "packageId": "A773661-1",
+    "cluster": "CL003: North mumbai",
+    "weight": 9,
+    "volume": 73
+  },
+  {
+    "documentId": "A773661",
+    "packages": 4,
+    "packageId": "A773661-2",
+    "cluster": "CL003: North mumbai",
+    "weight": 6,
+    "volume": 50
+  },
+  {
+    "documentId": "A773661",
+    "packages": 4,
+    "packageId": "A773661-3",
+    "cluster": "CL003: North mumbai",
+    "weight": 8,
+    "volume": 64
+  },
+  {
+    "documentId": "A773661",
+    "packages": 4,
+    "packageId": "A773661-4",
+    "cluster": "CL003: North mumbai",
+    "weight": 9,
+    "volume": 54
+  },
+  {
+    "documentId": "B003841",
+    "packages": 2,
+    "packageId": "B003841-1",
+    "cluster": "CL003: North mumbai",
+    "weight": 5,
+    "volume": 61
+  },
+  {
+    "documentId": "B003841",
+    "packages": 2,
+    "packageId": "B003841-2",
+    "cluster": "CL003: North mumbai",
+    "weight": 8,
+    "volume": 73
+  },
+  {
+    "documentId": "P000655",
+    "packages": 3,
+    "packageId": "P000655-1",
+    "cluster": "CL003: North mumbai",
+    "weight": 9,
+    "volume": 71
+  },
+  {
+    "documentId": "P000655",
+    "packages": 3,
+    "packageId": "P000655-2",
+    "cluster": "CL003: North mumbai",
+    "weight": 5,
+    "volume": 51
+  },
+  {
+    "documentId": "P000655",
+    "packages": 3,
+    "packageId": "P000655-3",
+    "cluster": "CL003: North mumbai",
+    "weight": 5,
+    "volume": 91
+  },
+  {
+    "documentId": "A887471",
+    "packages": 4,
+    "packageId": "A887471-1",
+    "cluster": "CL003: North mumbai",
+    "weight": 10,
+    "volume": 82
+  },
+  {
+    "documentId": "A887471",
+    "packages": 4,
+    "packageId": "A887471-2",
+    "cluster": "CL003: North mumbai",
+    "weight": 6,
+    "volume": 77
+  },
+  {
+    "documentId": "A887471",
+    "packages": 4,
+    "packageId": "A887471-3",
+    "cluster": "CL003: North mumbai",
+    "weight": 7,
+    "volume": 75
+  },
+  {
+    "documentId": "A887471",
+    "packages": 4,
+    "packageId": "A887471-4",
+    "cluster": "CL003: North mumbai",
+    "weight": 6,
+    "volume": 86
+  },
+  {
+    "documentId": "PR000391",
+    "packages": 2,
+    "packageId": "PR000391-1",
+    "cluster": "CL003: North mumbai",
+    "weight": 8,
+    "volume": 85
+  },
+  {
+    "documentId": "PR000391",
+    "packages": 2,
+    "packageId": "PR000391-2",
+    "cluster": "CL003: North mumbai",
+    "weight": 6,
+    "volume": 87
+  },
+  {
+    "documentId": "A773661",
+    "packages": 2,
+    "packageId": "A773661-1",
+    "cluster": "CL003: North mumbai",
+    "weight": 8,
+    "volume": 90
+  },
+  {
+    "documentId": "A773661",
+    "packages": 2,
+    "packageId": "A773661-2",
+    "cluster": "CL004: Wester suburbs",
+    "weight": 6,
+    "volume": 74
+  },
+  {
+    "documentId": "B003841",
+    "packages": 4,
+    "packageId": "B003841-1",
+    "cluster": "CL003: North mumbai",
+    "weight": 10,
+    "volume": 89
+  },
+  {
+    "documentId": "B003841",
+    "packages": 4,
+    "packageId": "B003841-2",
+    "cluster": "CL003: North mumbai",
+    "weight": 10,
+    "volume": 89
+  },
+  {
+    "documentId": "B003841",
+    "packages": 4,
+    "packageId": "B003841-3",
+    "cluster": "CL003: North mumbai",
+    "weight": 7,
+    "volume": 57
+  },
+  {
+    "documentId": "B003841",
+    "packages": 4,
+    "packageId": "B003841-4",
+    "cluster": "CL003: North mumbai",
+    "weight": 7,
+    "volume": 100
+  },
+  {
+    "documentId": "P000655",
+    "packages": 3,
+    "packageId": "P000655-1",
+    "cluster": "CL003: North mumbai",
+    "weight": 8,
+    "volume": 55
+  },
+  {
+    "documentId": "P000655",
+    "packages": 3,
+    "packageId": "P000655-2",
+    "cluster": "CL003: North mumbai",
+    "weight": 7,
+    "volume": 84
+  },
+  {
+    "documentId": "P000655",
+    "packages": 3,
+    "packageId": "P000655-3",
+    "cluster": "CL003: North mumbai",
+    "weight": 5,
+    "volume": 77
+  }
+ ]
+}

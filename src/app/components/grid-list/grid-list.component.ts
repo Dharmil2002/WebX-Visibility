@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -58,7 +58,10 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
   @Output() onChecked: EventEmitter<any> = new EventEmitter();
   @Output() dialogClosed = new EventEmitter<any>();
   selectedItems: any[] = [];
-
+  ngOnChanges(changes: SimpleChanges) {
+    this.tableData = changes.tableData.currentValue;
+    this.refresh();
+  }
   constructor(
     private router: Router, public dialog: MatDialog) {
     super();
@@ -229,26 +232,32 @@ export class GridListComponent extends UnsubscribeOnDestroyAdapter implements Af
 
     // Check or uncheck all rows based on the header checkbox state
     if (event.checked) {
+      
       // Check if selectAllorRenderedData is true (both checkboxes enabled)
       if (this.metaData?.checkBoxRequired && this.metaData?.selectAllorRenderedData) {
         // Only select the data rendered on the current page
         for (let i = startIndex; i < endIndex; i++) {
           this.dataSource.filteredData[i]['isSelected'] = true;
         }
+
         console.log(this.dataSource.filteredData);//selected/deselected data
       } else {
+      
         // Select all rows in the data source
         this.dataSource.filteredData = this.dataSource.filteredData.map(obj => {
           obj['isSelected'] = true;
           return obj;
         });
+        this.getCheckData()
       }
     } else {
+      
       // Deselect all rows in the data source
       this.dataSource.filteredData = this.dataSource.filteredData.map(obj => {
         obj['isSelected'] = false;
         return obj;
       });
+      this.getCheckData()
     }
   }
 

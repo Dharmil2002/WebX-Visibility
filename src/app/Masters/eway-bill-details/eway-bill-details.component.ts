@@ -58,7 +58,7 @@ export class EwayBillDetailsComponent implements OnInit {
         companyCode: parseInt(localStorage.getItem("companyCode")),
         ddArray: ['SVCTYP']
       }
-      this.ICnoteService.cnotePost('services/GetcommonActiveGeneralMasterCodeListByTenantId', reqBody).subscribe({
+      this.ICnoteService.cnoteNewPost('services/GetcommonActiveGeneralMasterCodeListByTenantId', reqBody).subscribe({
         next: (res: any) => {
           if (res) {
             this.ServiceTypeDetail = res.result;
@@ -75,7 +75,7 @@ export class EwayBillDetailsComponent implements OnInit {
   onFetchData() {
     this.isLoading = true;
     if(this.EwayBill.value.EWBNo){
-    this.ICnoteService.cnotePost('courses/ewaybill', this.EwayBill.value).subscribe({
+    this.ICnoteService.cnoteNewPost('courses/ewaybill', this.EwayBill.value).subscribe({
       next: (res: any) => {
         if (res) {
           if(res[0][1].Consignor){
@@ -115,7 +115,7 @@ export class EwayBillDetailsComponent implements OnInit {
       PAYBAS: this.EwayBill.value.PayBasis,
       CONTRACTID: this.contractNo
     }
-    this.ICnoteService.cnotePost('services/GetDetailedBasedOnContract', reqBody).subscribe({
+    this.ICnoteService.cnoteNewPost('services/GetDetailedBasedOnContract', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           this.ContractDetails = res;

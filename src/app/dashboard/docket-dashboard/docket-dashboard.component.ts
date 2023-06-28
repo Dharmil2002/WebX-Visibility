@@ -6,9 +6,10 @@ import { Router } from '@angular/router';
   templateUrl: './docket-dashboard.component.html'
 })
 export class DocketDashboardComponent implements OnInit {
+  docket=false;
   breadscrums = [
     {
-      title: "Docket Dashboard",
+      title: "Network Logistics Management",
       items: ["Home"],
       active: "Dashboard",
     },
@@ -16,25 +17,26 @@ export class DocketDashboardComponent implements OnInit {
   ewayBillDetail: any;
   
 
-  constructor(private router: Router,) { }
+  constructor(private router: Router,) {
+    this.docket=true
+   }
 
   ngOnInit(): void {
     this.ewayBillDetail=localStorage.getItem("EwayBillDetail");
   }
   docketBooking(event){
-    if(event=='Docket'){
-    this.router.navigate(["/Masters/Docket/Create"]);
-    }
-    else if(event=='EwaybillNo'){
-      this.router.navigate(["/Masters/Docket/Ewaybill"]);
-    }
-    else if(event=='LoadingSheet'){
-      this.router.navigate(["/Masters/Docket/LoadingSheet"]);
-    }
-    else{
-      this.router.navigate(["/Masters/Docket/Ewaybill-Config"])}
-     
-    }
+    const routeMap = {
+      'Docket': '/Masters/Docket/Create',
+      'EwaybillNo': '/Masters/Docket/Ewaybill',
+      'LoadingSheet': '/Masters/Docket/LoadingSheet',
+      'Manifest': '/Masters/Docket/ManifestGeneration',
+      'GlobeDashboardPage': 'dashboard/GlobeDashboardPage',
+      'default': '/Masters/Docket/Ewaybill-Config'
+    };
+    
+    const route = routeMap[event] || routeMap['default'];
+    this.router.navigate([route]);
+  }    
   
 
 }

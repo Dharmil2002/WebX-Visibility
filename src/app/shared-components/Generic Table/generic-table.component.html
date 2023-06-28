@@ -1,0 +1,104 @@
+<div class="responsive_table">
+    <div *ngIf="tableData.length>=10" class="materialTableHeader">
+        <div class="row">
+            <div class="col-8">
+                <ul class="header-buttons-left ml-0">
+                    <li class="dropdown m-l-20">
+                        <label for="search-input"><i class="material-icons search-icon">search</i>
+                        </label>
+                        <input placeholder="Search" type="text" #filter class="browser-default search-field"
+                            aria-label="Search box">
+                    </li>
+                    <li>
+                        <div class="export-button m-l-10" *ngIf="dynamicControls" matTooltip="ADD">
+                            <button *ngIf="!headercode && dynamicControls.add" mat-mini-fab color="primary">
+                                <mat-icon class="col-white" (click)="addNew()">add</mat-icon>
+                            </button>
+                            <button *ngIf="headercode && dynamicControls.add" mat-mini-fab color="primary">
+                                <mat-icon class="col-white" (click)="addNewGeneral()">add</mat-icon>
+                            </button>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="export-button m-l-10" matTooltip="REFRESH">
+                            <button mat-mini-fab color="primary">
+                                <mat-icon class="col-white" (click)="refresh()">refresh
+                                </mat-icon>
+                            </button>
+                        </div>
+                    </li>
+                    <li>
+                        <div *ngIf="uploadComponent" class="export-button m-l-10" matTooltip="Bulk Upload"
+                            (click)="onUploadClick()">
+                            <button mat-mini-fab color="primary">
+                                <mat-icon class="col-white">upload</mat-icon>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-4" *ngIf="dynamicControls.csv">
+                <ul class="header-buttons">
+                    <li>
+                        <div class="export-button m-l-10" matTooltip="CSV">
+                            <img src="assets/images/icons/csv.png" alt="" (click)="ExportToCsv()" />
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Generic Table -->
+    <mat-table [dataSource]="dataSource" matSort class="col-12">
+        <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)">
+            <ng-container *ngIf="!metaData.noColumnSort.includes(tableData); else elseBlock">
+                <mat-header-cell *matHeaderCellDef mat-sort-header [ngClass]="centerAlignClass(tableData)">
+                    {{columnHeader[tableData]}}
+                </mat-header-cell>
+            </ng-container>
+            <ng-template #elseBlock>
+                <mat-header-cell *matHeaderCellDef [ngClass]="centerAlignClass(tableData)">
+                    {{columnHeader[tableData]}}
+                    <mat-checkbox *ngIf="tableData === 'checkBoxRequired'" class="example-margin" color="primary"
+                        (change)="selectAll($event)"></mat-checkbox>
+                </mat-header-cell>
+            </ng-template>
+
+            <mat-cell *matCellDef="let element" style="min-width: 100px;"
+                [ngClass]="{'matcolumncenter': isNumeric(element[tableData]), 'matcolumnleft': !isNumeric(element[tableData])}">
+                <mat-checkbox *ngIf="tableData=='checkBoxRequired'" color="primary" [(ngModel)]="element.isSelected"
+                    (change)="getCheckData($event)" class="example-margin"></mat-checkbox>
+                {{Link && !shouldDisplayLink(tableData) && toggleArray && !toggleArray.includes(tableData) ?
+                formatData(element[tableData], tableData ): '' }}
+                <ng-container *ngFor="let toggle of toggleArray">
+                    <mat-slide-toggle *ngIf="tableData==toggle" color="primary" (change)="isActive(element)"
+                        [(ngModel)]="element[tableData]">
+                    </mat-slide-toggle>
+                </ng-container>
+                <a *ngIf="shouldDisplayLink(tableData)" class="pointer" (click)="drillDownData(element,tableData)"
+                    (ngInit)="triggered = false"><u>{{ formatData(element[tableData], tableData) }}</u></a>
+                <button mat-icon-button *ngIf="tableData=='actions'" (click)="editCall(element)"
+                    [matMenuTriggerFor]="menuItemFlag ? menu : null" (click)="$event.stopPropagation()"
+                    class="tbl-action-btn">
+                    <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                </button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item *ngFor="let item of menuItems"
+                        (click)="handleMenuItemClick(item.label,element)">
+                        {{ item.label }}
+                    </button>
+                </mat-menu>
+                <button mat-icon-button *ngIf="tableData=='view'" (click)="$event.stopPropagation()"
+                    (click)="View(element)" class="tbl-action-btn">
+                    <app-feather-icons [icon]="'eye'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="objectKeys(columnHeader)"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0"
+        [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+    </mat-paginator>
+</div>

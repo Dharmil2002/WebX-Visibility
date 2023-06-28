@@ -23,9 +23,7 @@ import { DashboardLayoutComponent } from "./app-layout/dashboard-layout/dashboar
     NgMultiSelectDropDownModule.forRoot(),
   ],
   declarations: [
-    AuthLayoutComponent,
-    MainLayoutComponent,
-    DashboardLayoutComponent
+    AuthLayoutComponent
   ],
 })
 export class LayoutModule {}

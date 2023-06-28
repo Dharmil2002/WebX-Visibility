@@ -1,0 +1,24 @@
+{
+    "formdata": [
+        {
+            "Vehicle": "MH02CB5544",
+            "Route": "S003: BLR-BHW-AMD",
+            "TripID": "THBLR000343",
+            "LoadingLocation": "BHW",
+            "LoadingSheet": "LSMUM001334",
+            "Leg": "BHW-AMD"
+        }
+    ],
+
+    "tabledata":[
+        {
+            "MFNumber": "MFMUM03033",
+            "Leg": "BHW-AMD",
+            "ShipmentsLoadedBooked": "120/124",
+            "PackagesLoadedBooked": "360/370",
+            "WeightKg": 12000,
+            "VolumeCFT": 1300,
+            "Action": "Print"
+          }
+    ]
+}

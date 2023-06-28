@@ -1,0 +1,218 @@
+{
+  "GenerateData":
+  [
+      {
+          "RunSheetID": "PDNHW/MUMB/2223/92353",
+          "Cluster": "CL002: Ujjain cluster",
+          "VehicleNo": "MH02CB5544",
+          "VehType": "Tata 407",
+          "VendorID": "V000324: Navyug Transport",
+          "VenType": "Business Associate",
+          "CapacityKg": 3200,
+          "CapacityVolumeCFT": 740,
+          "LoadedKg": 1700,
+          "LoadedVolumeCFT": 650,
+          "WeightUtilization": 5,
+          "VolumeUtilization": 55,
+          "Action":"Create Run Sheet"
+      },
+      {
+          "RunSheetID":"PDNHW/MUMB/2223/92354",
+          "Cluster": "CL003: Surya Nagari",
+          "VehicleNo": "MH02CB5545",
+          "VehType": "Tata 408",
+          "VendorID": "V000325: shreeDhara Transport",
+          "VenType": "Business Associate",
+          "CapacityKg": 3827,
+          "CapacityVolumeCFT": 822,
+          "LoadedKg": 1915,
+          "LoadedVolumeCFT": 2201,
+          "WeightUtilization": 3,
+          "VolumeUtilization": 88,
+          "Action":"Create Run Sheet"
+      },    
+    {
+          "RunSheetID":"PDNHW/MUMB/2223/92355",
+          "Cluster": "CL004: West-Benglore",
+          "VehicleNo": "MH02CB5545",
+          "VehType": "Tata 408",
+          "VendorID": "V000325: shreeDhara Transport",
+          "VenType": "Business Associate",
+          "CapacityKg": 3827,
+          "CapacityVolumeCFT": 822,
+          "LoadedKg": 1915,
+          "LoadedVolumeCFT": 2201,
+          "WeightUtilization": 3,
+          "VolumeUtilization": 88,
+          "Action":"Create Run Sheet"
+      }
+    ],
+  "RunsheetData": 
+  [
+          {
+            "Document": "A887473",
+            "Type": "Delivery",
+            "Customer": "Anz Motors",
+            "Address": "34, Navkar building, Mahim",
+            "Pincode": 400014,
+            "Packages": 34,
+            "Weight": 4545,
+            "Volume": 450,
+            "Cluster": "CL004: West-Benglore"
+          },
+          {
+            "Document": "PR000398",
+            "Type": "Pickup",
+            "Customer": "Pefect Foods",
+            "Address": "3/103, Pandurang bhavan, Matunga",
+            "Pincode": 400014,
+            "Packages": 23,
+            "Weight": 4545,
+            "Volume": 650,
+            "Cluster": "CL004: West-Benglore"
+          },
+          {
+            "Document": "A7736648",
+            "Type": "Delivery",
+            "Customer": "Savla Auto parts",
+            "Address": "J K House, Chunam Lane, Dadar",
+            "Pincode": 400016,
+            "Packages": 45,
+            "Weight": 567,
+            "Volume": 320,
+            "Cluster": "CL004: West-Benglore"
+          },
+          {
+            "Document": "B0038447",
+            "Type": "Delivery",
+            "Customer": "L&T switchgear",
+            "Address": "Evershine Sunrise, Veer Savarkar Marg, Shivaji park",
+            "Pincode": 400018,
+            "Packages": 21,
+            "Weight": 198,
+            "Volume": 230,
+            "Cluster": "CL004: West-Benglore"
+          },
+          {
+            "Document": "P0006554",
+            "Type": "Pickup",
+            "Customer": "Singh Motors",
+            "Address": "32, L J Road",
+            "Pincode": 400023,
+            "Packages": 35,
+            "Weight": 345,
+            "Volume": 550,
+            "Cluster": "CL004: West-Benglore"
+          },
+          {
+            "Document": "A887475651",
+            "Type": "Delivery",
+            "Customer": "Anz Motors",
+            "Address": "34, Navkar building, Mahim",
+            "Pincode": 400014,
+            "Packages": 34,
+            "Weight": 3450,
+            "Volume": 450,
+            "Cluster": "CL002: Ujjain cluster"
+          },
+          {
+            "Document": "PR0003941",
+            "Type": "Pickup",
+            "Customer": "Pefect Foods",
+            "Address": "3/103, Pandurang bhavan, Matunga",
+            "Pincode": 400014,
+            "Packages": 23,
+            "Weight": 2133,
+            "Volume": 650,
+            "Cluster": "CL002: Ujjain cluster"
+          },
+          {
+            "Document": "A7734661",
+            "Type": "Delivery",
+            "Customer": "Savla Auto parts",
+            "Address": "J K House, Chunam Lane, Dadar",
+            "Pincode": 400016,
+            "Packages": 45,
+            "Weight": 567,
+            "Volume": 320,
+            "Cluster": "CL002: Ujjain cluster"
+          },
+          {
+            "Document": "B0053841",
+            "Type": "Delivery",
+            "Customer": "L&T switchgear",
+            "Address": "Evershine Sunrise, Veer Savarkar Marg, Shivaji park",
+            "Pincode": 400018,
+            "Packages": 21,
+            "Weight": 198,
+            "Volume": 230,
+            "Cluster": "CL002: Ujjain cluster"
+          },
+          {
+            "Document": "P0004655",
+            "Type": "Pickup",
+            "Customer": "Singh Motors",
+            "Address": "32, L J Road",
+            "Pincode": 400023,
+            "Packages": 35,
+            "Weight": 345,
+            "Volume": 550,
+            "Cluster": "CL002: Ujjain cluster"
+          },
+          {
+            "Document": "A8857471",
+            "Type": "Delivery",
+            "Customer": "Anz Motors",
+            "Address": "34, Navkar building, Mahim",
+            "Pincode": 400014,
+            "Packages": 34,
+            "Weight": 3450,
+            "Volume": 450,
+            "Cluster": "CL003: Surya Nagari"
+          },
+          {
+            "Document": "PR0040391",
+            "Type": "Pickup",
+            "Customer": "Pefect Foods",
+            "Address": "3/103, Pandurang bhavan, Matunga",
+            "Pincode": 400014,
+            "Packages": 23,
+            "Weight": 2133,
+            "Volume": 650,
+            "Cluster": "CL003: Surya Nagari"
+          },
+          {
+            "Document": "A7734661",
+            "Type": "Delivery",
+            "Customer": "Savla Auto parts",
+            "Address": "J K House, Chunam Lane, Dadar",
+            "Pincode": 400016,
+            "Packages": 45,
+            "Weight": 567,
+            "Volume": 320,
+            "Cluster": "CL003: Surya Nagari"
+          },
+          {
+            "Document": "B0034841",
+            "Type": "Delivery",
+            "Customer": "L&T switchgear",
+            "Address": "Evershine Sunrise, Veer Savarkar Marg, Shivaji park",
+            "Pincode": 400018,
+            "Packages": 21,
+            "Weight": 198,
+            "Volume": 230,
+            "Cluster": "CL003: Surya Nagari"
+          },
+          {
+            "Document": "P0050655",
+            "Type": "Pickup",
+            "Customer": "Singh Motors",
+            "Address": "32, L J Road",
+            "Pincode": 400023,
+            "Packages": 35,
+            "Weight": 345,
+            "Volume": 550,
+            "Cluster": "CL003: Surya Nagari"
+          }
+  ]
+  }

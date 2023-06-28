@@ -1,0 +1,66 @@
+{
+  "shipments": [
+    {
+      "leg": "BLR-BHW",
+      "manifest": "MFBLR00303",
+      "shipments_lb": "120/120",
+      "packages_lb": "800/800",
+      "weight_kg": 12000,
+      "volume_cft": 1100
+    },
+    {
+      "leg": "BLR-AMD",
+      "manifest": "MFBLR00304",
+      "shipments_lb": "187/187",
+      "packages_lb": "450/450",
+      "weight_kg": 18000,
+      "volume_cft": 1200
+    },
+    {
+      "leg": "BHW-AMD",
+      "manifest": "MFBHW00101",
+      "shipments_lb": "120/124",
+      "packages_lb": "360/375",
+      "weight_kg": 12000,
+      "volume_cft": 1300
+    },
+    {
+      "leg": "BHW-JPR",
+      "manifest": "MFBHW00103",
+      "shipments_lb": "56",
+      "packages_lb": "345",
+      "weight_kg": 340,
+      "volume_cft": 560
+    }
+  ],
+  "vendordetails": [
+    {
+      "VendorType": "Attached",
+      "Driver": "J H Singh",
+      "LicenseNo": "HR03TR55363",
+      "Vendor": "V001: Sun Roadways",
+      "DriverMobile": "9838833321",
+      "Expirydate": "23-May-28"
+    }
+  ],
+  "advancebalance": [
+    {
+      "ContractAmount": 50000,
+      "Othercharges": {
+        "Loading": 3000,
+        "Unloading": 1500,
+        "Enroute": 1000,
+        "Misc": 3000
+      },
+      "TotalTripAmount": 58500,
+      "AdvancePaid": {
+        "PaidbyCash": 25000,
+        "PaidbyBank": null,
+        "PaidbyFuel": 10000,
+        "PaidbyCard": null
+      },
+      "TotalAdvance": 35000,
+      "BalanceAmount": 23500
+    }
+  ]
+}

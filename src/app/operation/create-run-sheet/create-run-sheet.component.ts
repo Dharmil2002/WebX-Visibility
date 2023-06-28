@@ -42,14 +42,14 @@ export class CreateRunSheetComponent implements OnInit {
   menuItems = []
   linkArray = []
   columnHeader = {
-    "Document": "Document",
-    "Type": "Type",
-    "Customer": "Customer",
-    "Address": "Address",
-    "Pincode": "Pin code",
-    "Packages": "Packages",
-    "Weight": "Weight",
-    "Volume": "Volume",
+    "documentId": "Document",
+    "type": "Type",
+    "customer": "Customer",
+    "address": "Address",
+    "pincode": "Pin code",
+    "packages": "Packages",
+    "weight": "Weight",
+    "volume": "Volume",
     "checkBoxRequired": "Select"
   }
   centerAlignedData = ['Pincode', 'Packages', 'Weight', 'Volume'];
@@ -61,9 +61,9 @@ export class CreateRunSheetComponent implements OnInit {
   }
   ngOnInit(): void {
     this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res['GenerateData'].find((x) => x.Cluster == this.RunSheetTable.columnData.Cluster);
+      this.data = res['cluster'].find((x) => x.cluster == this.RunSheetTable.columnData.Cluster);
       this.autoBindData();
-      this.csv = res['RunsheetData'].filter((x) => x.Cluster == this.RunSheetTable.columnData.Cluster);
+      this.csv = res['shipment'].filter((x) => x.cluster == this.RunSheetTable.columnData.Cluster);
       this.tableload = false;
     });
   }
@@ -90,18 +90,18 @@ export class CreateRunSheetComponent implements OnInit {
   }
   autoBindData() {
     const mappings = {
-      'Cluster': 'Cluster',
-      'RunSheetID': 'RunSheetID',
-      'Vehicle': 'VehicleNo',
-      'VehType': 'VehType',
-      'Vendor': 'VendorID',
-      'VenType': 'VenType',
-      'CapacityKg': 'CapacityKg',
-      'CapVol': 'CapacityVolumeCFT',
-      'LoadKg': 'LoadedKg',
-      'LoadVol': 'LoadedVolumeCFT',
-      'WeightUti': 'WeightUtilization',
-      'VolUti': 'VolumeUtilization'
+      'Cluster': 'cluster',
+      'RunSheetID': 'runSheetID',
+      'Vehicle': 'vehicleNo',
+      'VehType': 'vehType',
+      'Vendor': 'vendorId',
+      'VenType': 'vendorType',
+      'CapacityKg': 'capacityKg',
+      'CapVol': 'capacityVol',
+      'LoadKg': 'loadedKg',
+      'LoadVol': 'loadedVol',
+      'WeightUti': 'weightUtilization',
+      'VolUti': 'volumeUtilization'
     };
 
     for (let key in mappings) {
@@ -111,6 +111,7 @@ export class CreateRunSheetComponent implements OnInit {
     }
   }
   GenerateRunsheet() {
+   
     if (this.runSheetData == undefined) {
       // If no item has isSelected set to true, return or perform any desired action.
       this.ObjSnackBarUtility.ShowCommonSwal1('error', 'Please select atleast one Cluster to generate Runsheet!', false, false, false);
@@ -118,9 +119,24 @@ export class CreateRunSheetComponent implements OnInit {
     }
     const randomNumber = "PDNHW/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
     this.RunSheetTableForm.controls['RunSheetID'].setValue(randomNumber)
+    let json={
+      runSheetID: this.RunSheetTableForm?.value.RunSheetID,
+      cluster: this.RunSheetTableForm?.value.Cluster,
+      vehicleNo:this.RunSheetTableForm?.value.Vehicle,
+      vehType: this.RunSheetTableForm?.value.VehType,
+      vendorId: this.RunSheetTableForm?.value.Vendor,
+      vendorType: this.RunSheetTableForm?.value.VenType,
+      capacityKg: this.RunSheetTableForm?.value.CapacityKg,
+      capacityVol: this.RunSheetTableForm?.value.CapVol,
+      loadedKg:this.RunSheetTableForm?.value.LoadKg,
+      loadedVol: this.RunSheetTableForm?.value.LoadVol,
+      weightUtilization: this.RunSheetTableForm?.value.WeightUti,
+      volumeUtilization: this.RunSheetTableForm?.value.VolUti,
+      action: "Depart"
+    }
     let runSheetDetils = {
       shippingData: this.runSheetData,
-      runSheetDetails: this.RunSheetTableForm.value
+      runSheetDetails: json
     }
     this.CnoteService.setRunSheetData(runSheetDetils);
     this.goBack(4)

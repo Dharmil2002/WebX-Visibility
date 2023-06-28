@@ -60,6 +60,16 @@ export class UpdateloadingRunControl {
                 generatecontrol: true,
                 disable: false
             },
+            {
+                name: 'Scan',
+                label: 'Scan',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [],
+                generatecontrol: true,
+                disable: false
+            },
         ];
     }
     getupdaterunsheetFormControls() {

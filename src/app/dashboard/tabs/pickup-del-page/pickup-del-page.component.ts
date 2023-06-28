@@ -100,44 +100,45 @@ export class PickupDelPageComponent extends UnsubscribeOnDestroyAdapter implemen
     this.getRunSheetDetails();
   }
   getRunSheetDetails() {
+  
     // Fetch data from the JSON endpoint
     this.http.get(this.jsonUrl).subscribe((res: any) => {
       this.data = res;
 
       // Extract relevant data arrays from the response
-      const tableArray = this.data['GenerateData'];
-      const shippingData = this.data['RunsheetData'];
+      const tableArray = this.data['cluster'].filter((x)=>x.action.trim()==="Create Run Sheet");
+      const shippingData = this.data['shipment'];
       const pickUpData: any[] = [];
 
       // Iterate over each element in tableArray
       for (const element of tableArray) {
         // Filter shippingData for delivery and pickup details of the current cluster
         const shippingDetailsForDelivery = shippingData.filter(
-          (x: any) => x.Cluster === element.Cluster && x.Type === 'Delivery'
+          (x: any) => x.cluster === element.cluster && x.type === 'Delivery'
         );
         const pickupRequests = shippingData.filter(
-          (x: any) => x.Cluster === element.Cluster && x.Type === 'Pickup'
+          (x: any) => x.cluster === element.cluster && x.type === 'Pickup'
         );
 
         // Calculate total weight and total CFT for the delivery shipments
         const totalWeight = shippingDetailsForDelivery.reduce(
-          (total: number, shipment: any) => total + shipment.Weight,
+          (total: number, shipment: any) => total + shipment.weight,
           0
         );
 
         const totalCFT = shippingDetailsForDelivery.reduce(
-          (total: number, shipment: any) => total + shipment.Volume,
+          (total: number, shipment: any) => total + shipment.volume,
           0
         );
 
         // Prepare an object with the required data for the current cluster
         const clusterData = {
-          Cluster: element.Cluster,
+          Cluster: element.cluster,
           DeliveryShipments: shippingDetailsForDelivery.length,
           PickupRequests: pickupRequests.length,
           TotalWeight: totalWeight,
           CFT: totalCFT,
-          Action: element.Action,
+          Action: element.action,
         };
 
         // Add the cluster data to pickUpData array

@@ -1,12 +1,13 @@
 export function createRunSheetData(runsheetdata,departRunSheetData,apiData) {
+
     let runSheetDetails,runSheetShipingDetails
     if(apiData){
      runSheetDetails = [runsheetdata.runSheetDetails];
      runSheetShipingDetails = runsheetdata.shippingData;
     }
     else{
-    runSheetDetails = runsheetdata.GenerateData;
-    runSheetShipingDetails = runsheetdata.RunsheetData;
+    runSheetDetails = runsheetdata.cluster.filter((x)=>x.action==="Depart");
+    runSheetShipingDetails = runsheetdata.shipment;
     }
     // Create shipData objects for displaying summary information
     const createShipDataObject = (count, title, className) => ({
@@ -17,14 +18,14 @@ export function createRunSheetData(runsheetdata,departRunSheetData,apiData) {
   
     let runSheetDetailsList:any[] = [];
     runSheetDetails.forEach((element) => {
-      let shipingDetails = runSheetShipingDetails.filter((x) => x.Cluster === element.Cluster);
-      const totalWeight = shipingDetails.reduce((total, shipment) => total + shipment.Weight, 0);
-      const totalCFT = shipingDetails.reduce((total, shipment) => total + shipment.Volume, 0);
-      const totalPackages = shipingDetails.reduce((total, shipment) => total + shipment.Packages, 0);
+      let shipingDetails = runSheetShipingDetails.filter((x) => x.cluster === element.cluster);
+      const totalWeight = shipingDetails.reduce((total, shipment) => total + shipment.weight, 0);
+      const totalCFT = shipingDetails.reduce((total, shipment) => total + shipment.volume, 0);
+      const totalPackages = shipingDetails.reduce((total, shipment) => total + shipment.packages, 0);
   
       let jsonRunSheet = {
-        RunSheet: element?.RunSheetID || '',
-        Cluster: element?.Cluster || '',
+        RunSheet: element?.runSheetID || '',
+        Cluster: element?.cluster || '',
         Shipments: shipingDetails.length,
         Packages: totalPackages,
         WeightKg: totalWeight,

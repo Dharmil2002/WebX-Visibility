@@ -13,7 +13,7 @@ export class ManageRunsheetComponent
   extends UnsubscribeOnDestroyAdapter
   implements OnInit
 {
-  jsonUrl = "../../../assets/data/manageRunsheet.json";
+  jsonUrl = "../../../assets/data/create-runsheet-data.json";
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   csv: any[];
@@ -109,10 +109,11 @@ export class ManageRunsheetComponent
     //.uploadComponent = undefined;
   }
   getManagedRunSheetDetails() {
-    this.creatRunSheetData();
+    this.runSheetDetails();
   }
 
-  creatRunSheetData() {
+  runSheetDetails() {
+
     this.shipmentData = [];
     let runSheetJson={
     runsheetdata : this.cnoteService?.getRunSheetData()||0,
@@ -121,8 +122,7 @@ export class ManageRunsheetComponent
     if(this.cnoteService?.getRunSheetData()){
     this.shipmentData.push(...this.cnoteService?.getRunSheetData().shippingData)
     }
-    // let runSheetDetails=[runsheetdata.runSheetDetails];
-    // let runSheetShipingDetails=runsheetdata.shippingData;
+   
       this.getRunSheet(runSheetJson);
      
   }
@@ -131,27 +131,47 @@ export class ManageRunsheetComponent
     
   }
   getRunSheet(dataapi){
+
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data;
       let data = createRunSheetData(this.data,"",false);
+      let departRunSheetData=this.cnoteService?.departRunSheetData||''
       if(data){
+        let csv
+        if(!dataapi && departRunSheetData){
+           csv = data.csv.map(item => {
+            if (item.RunSheet === departRunSheetData.RunSheet) {
+              item.Action="Update Delivery",
+              item.Status="OUT FOR DELIVERY"
+            }
+            return item;
+          });
+        }
+        else{
+
+        }
       this.csv = data.csv;
   
       this.tableload=false;
       this.boxdata = data.boxdata;
-      this.shipmentData.push(...this.data.RunsheetData);
-      let departVehicleData = {
-        runSheetdetails:this.csv,
-        shipments:this.shipmentData
-      }
-      this.cnoteService.setDepartvehicleData(departVehicleData);
+      this.shipmentData.push(...this.data.shipment);
       if(dataapi){
+          
       let dataApiRunsheet = createRunSheetData(dataapi.runsheetdata,dataapi.updatedData,true);
       this.csv.push(...dataApiRunsheet.csv);
+      if(departRunSheetData){
+        this.csv = data.csv.map(item => {
+          if (item.RunSheet === departRunSheetData.RunSheet) {
+            item.Action="Update Delivery",
+            item.Status="OUT FOR DELIVERY"
+          }
+          return item;
+        });
+      }
       let departVehicleData = {
         runSheetdetails:this.csv,
-        shipments:this.shipmentData
+        shipments:dataapi.runsheetdata 
       }
       this.cnoteService.setDepartvehicleData(departVehicleData);
       

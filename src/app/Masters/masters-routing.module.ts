@@ -17,6 +17,9 @@ import { DriverMasterComponent } from './driver-master/driver-master.component';
 import { AddDriverMasterComponent } from './driver-master/add-driver-master/add-driver-master.component';
 import { LocationMasterComponent } from './location-master/location-master.component';
 import { AddLocationMasterComponent } from './location-master/add-location-master/add-location-master.component';
+import { AddCompanyComponent } from './Company Setup Master/add-company/add-company.component';
+// import { AddVendorMasterComponent } from './Vendor Master/add-vendor-master/add-vendor-master.component';
+// import { VendorMasterListComponent } from './Vendor Master/vendor-master-list/vendor-master-list.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -35,8 +38,10 @@ const routes: Routes = [
   { path: "DriverMaster/DriverMasterList", component: DriverMasterComponent },
   { path: "DriverMaster/AddDriverMaster", component: AddDriverMasterComponent },
   { path: "LocationMaster/LocationMasterList", component: LocationMasterComponent },
-  { path: "LocationMaster/AddLocationMaster", component: AddLocationMasterComponent }
-
+  { path: "LocationMaster/AddLocationMaster", component: AddLocationMasterComponent },
+  { path: "CompanyMaster/AddCompany", component: AddCompanyComponent, },
+  // { path: 'VendorMaster/VendorMasterList', component: VendorMasterListComponent },
+  // { path: 'VendorMaster/AddVendorMaster', component: AddVendorMasterComponent },
 ];
 
 @NgModule({

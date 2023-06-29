@@ -57,11 +57,13 @@
             <mat-form-field appearance="outline" floatLabel="never" class="example-full-width"
                 *ngIf="formItem.type=='select' && formItem.generatecontrol===true">
                 <mat-label>{{formItem.label}}</mat-label>
-                <mat-select placeholder="{{formItem.label}}"  (selectionChange)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"formControlName={{formItem.additionalData.support}}>
+                <mat-select placeholder="{{formItem.label}}"
+                    (selectionChange)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                    formControlName={{formItem.additionalData.support}}>
                     <mat-option>
                         <ngx-mat-select-search placeholderLabel="Find bank..."
                             noEntriesFoundLabel="'no matching bank found'"
-                            formControlName={{formItem.name}}  ></ngx-mat-select-search>
+                            formControlName={{formItem.name}}></ngx-mat-select-search>
                     </mat-option>
                     <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
                         <ng-container *ngIf="formItem.additionalData.showNameAndValue; else showName">
@@ -84,8 +86,9 @@
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
                 <mat-label>{{formItem.label}}</mat-label>
-                <mat-select [formControlName]="formItem.additionalData.support"  (selectionChange)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })" placeholder={{formItem.placeholder}}
-                    [multiple]="true" #singleSelect>
+                <mat-select [formControlName]="formItem.additionalData.support"
+                    (selectionChange)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                    placeholder={{formItem.placeholder}} [multiple]="true" #singleSelect>
                     <mat-option>
                         <ngx-mat-select-search formControlName={{formItem.name}}
                             placeholderLabel={{formItem.placeholder}} noEntriesFoundLabel="'no matching found'"
@@ -144,13 +147,63 @@
             </ng-container>
             <!--Radio Button-->
             <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
+                <mat-label>{{formItem.label}}</mat-label>
                 <mat-radio-group [formControlName]="formItem.name">
                     <mat-radio-button *ngFor="let option of formItem.value" [value]="option.value">
                         {{ option.name }}
                     </mat-radio-button>
                 </mat-radio-group>
             </ng-container>
+            <!--file-->
+            <ng-container *ngIf="formItem.type === 'file' && formItem.generatecontrol">
+                <mat-form-field appearance="outline">
+                    <mat-label>{{formItem.label}}</mat-label>
+                    <input matInput style="cursor:pointer" [formControlName]="formItem.name" readonly="true"
+                        (click)="fileInput.click()" class="example-full-width"
+                        [multiple]="(formItem.additionalData?.multiple||false)">
+                    <button mat-icon-button matSuffix (click)="fileInput.click()" class="example-full-width">
+                        <mat-icon>attach_file</mat-icon>
+                    </button>
+                    <input hidden class="example-full-width" style="cursor:pointer" [formControlName]='formItem.name'
+                        (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event.target.files })"
+                        #fileInput type="file" [multiple]="(formItem.additionalData?.multiple||false)">
+                </mat-form-field>
+            </ng-container>
+            <!-- Dropdown -->
+            <mat-form-field class="example-full-width" appearance="outline"
+                *ngIf="formItem.type=='dropdown' && formItem.generatecontrol===true">
+                <mat-label>{{formItem.label}}</mat-label>
+                <input matInput placeholder={{formItem.placeholder}} [matAutocomplete]="autocomplete"
+                    formControlName={{formItem.name}} [readonly]="formItem.disable"
+                    (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">
+                <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="formItem.displaywith"
+                    (optionSelected)="functionCalled( {field :formItem , functionName:formItem.functions?.onOptionSelect, eventArgs: $event })">
+                    <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
+                        <ng-container *ngIf="formItem.additionalData.showNameAndValue; else showName">
+                            {{item.value}} : {{ item.name }}
+                        </ng-container>
+                        <ng-template #showName>
+                            {{ item.name }}
+                        </ng-template>
+                    </mat-option>
+                </mat-autocomplete>
 
+                <mat-error *ngFor="let error of formItem.Validations">
+                    <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                        {{error?.message}}
+                    </ng-container>
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Download Icon -->
+            <div style="margin-top: 28px!important;" class="example-full-width" appearance="outline"
+                *ngIf="formItem.type=='Icon' && formItem.generatecontrol===true">
+                <mat-label>{{formItem.label}}</mat-label>
+                <i [class]="fafIconData"></i>
+                <mat-icon style="position: absolute!important;" aria-hidden="false"
+                    aria-label="Default Chart Of Account" [fontIcon]="Icondata" (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick,
+                   eventArgs: $event })"></mat-icon>
+            </div>
             <!-- OR -->
             <div style="text-align: center; padding-top: 21px;" *ngIf="formItem.type=='OR'">
                 <span class="label l-bg-purple shadow-style">OR</span>
@@ -165,7 +218,7 @@
         <div class="row">
             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                 <div class="example-button-row">
-                    <button type="button" mat-raised-button color="primary" (click)="save()">
+                    <button type="button" [disabled]="!form.valid" mat-raised-button color="primary" (click)="save()">
                         Save
                     </button>
                     <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>

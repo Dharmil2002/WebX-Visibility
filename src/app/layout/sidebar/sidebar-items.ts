@@ -128,6 +128,16 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
+            },
+            {
+              "path": "Masters/CompanyMaster/AddCompany",
+              "title": "Company Setup Master",
+              "moduleName": "Company Setup Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
             }
           ]
         },

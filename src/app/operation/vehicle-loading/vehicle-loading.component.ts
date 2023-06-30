@@ -6,6 +6,7 @@ import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.se
 import { vehicleLoadingControl } from '../../../assets/FormControls/vehicleloading';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VehicleUpdateUploadComponent } from '../vehicle-update-upload/vehicle-update-upload.component';
+import { ViewPrintComponent } from '../view-print/view-print.component';
 @Component({
   selector: 'app-vehicle-loading',
   templateUrl: './vehicle-loading.component.html'
@@ -37,9 +38,9 @@ export class VehicleLoadingComponent implements OnInit {
     "PackagesLoaded": "PackagesLoaded",
     "Pending": "Pending",
     "Action": "Action",
-    "printPending": "Pending",
+    "printPending": "Print",
   };
-  centerAlignedData = ['Shipments', 'Packages', 'ShipmentsLoaded', 'PackagesLoaded','Pending'];
+  centerAlignedData = ['Shipments', 'Packages', 'ShipmentsLoaded', 'PackagesLoaded', 'Pending'];
 
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
@@ -54,11 +55,12 @@ export class VehicleLoadingComponent implements OnInit {
   }
   toggleArray = []
   linkArray = [
-    { Row: 'printPending', Path: 'Operation/LoadingSheetView' },
-    { Row: 'Action', Path: '' }
+    { Row: 'Action', Path: '' },
+    { Row: 'printPending', Path: '' },
   ]
   menuItems = [
     { label: 'Load Vehicle', componentDetails: VehicleUpdateUploadComponent, function: "GeneralMultipleView" },
+    { label: 'printPending', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
     // Add more menu items as needed
   ];
   dynamicControls = {
@@ -92,7 +94,7 @@ export class VehicleLoadingComponent implements OnInit {
     this.getLoadingSheetData();
   }
   getLoadingSheetData() {
-    
+
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let loadingSheetData = this.CnoteService.getVehicleLoadingSheetData(); // Call the function to get the actual data
@@ -107,9 +109,9 @@ export class VehicleLoadingComponent implements OnInit {
             Leg: element?.lag || '',
             Shipments: element?.Shipment || '',
             Packages: element?.Packages || '',
-            ShipmentsLoaded: element?.Shipment || '',
-            PackagesLoaded: element?.Packages || '',
-            Pending: '',
+            ShipmentsLoaded: 0,
+            PackagesLoaded: 0,
+            Pending: element?.Shipment || '',
             Action: 'Load Vehicle',
             printPending: 'print'
           };

@@ -11,8 +11,7 @@ import { createRunSheetData } from "./runSheetHelper";
 })
 export class ManageRunsheetComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit
-{
+  implements OnInit {
   jsonUrl = "../../../assets/data/create-runsheet-data.json";
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
@@ -91,8 +90,8 @@ export class ManageRunsheetComponent
   IscheckBoxRequired: boolean;
   advancdeDetails: { data: { label: string; data: any }; viewComponent: any };
   viewComponent: any;
-  boxdata:any[];
-  shipmentData:any[];
+  boxdata: any[];
+  shipmentData: any[];
   // declararing properties
 
   constructor(
@@ -113,79 +112,82 @@ export class ManageRunsheetComponent
   }
 
   runSheetDetails() {
-
     this.shipmentData = [];
-    let runSheetJson={
-    runsheetdata : this.cnoteService?.getRunSheetData()||0,
-    updatedData : this.cnoteService?.getdepartRunSheetData()||0
+    let runSheetJson = {
+      runsheetdata: this.cnoteService?.getRunSheetData() || 0,
+      updatedData: this.cnoteService?.getdepartRunSheetData() || 0
     }
-    if(this.cnoteService?.getRunSheetData()){
-    this.shipmentData.push(...this.cnoteService?.getRunSheetData().shippingData)
+    if (this.cnoteService?.getRunSheetData()) {
+      this.shipmentData.push(...this.cnoteService?.getRunSheetData().shippingData)
     }
-   
-      this.getRunSheet(runSheetJson);
-     
+
+    this.getRunSheet(runSheetJson);
+
   }
 
   ngOnInit(): void {
-    
-  }
-  getRunSheet(dataapi){
 
+  }
+  getRunSheet(dataapi) {
     this.http.get(this.jsonUrl).subscribe(res => {
       this.data = res;
       let tableArray = this.data;
-      let data = createRunSheetData(this.data,"",false);
-      let departRunSheetData=this.cnoteService?.departRunSheetData||''
-      if(data){
+      let data = createRunSheetData(this.data, "", false);
+      let departRunSheetData = this.cnoteService?.departRunSheetData || ''
+      if (data) {
         let csv
-        if(!dataapi && departRunSheetData){
-           csv = data.csv.map(item => {
+        if (!dataapi && departRunSheetData) {
+          csv = data.csv.map(item => {
             if (item.RunSheet === departRunSheetData.RunSheet) {
-              item.Action="Update Delivery",
-              item.Status="OUT FOR DELIVERY"
+              item.Action = "Update Delivery",
+                item.Status = "OUT FOR DELIVERY"
             }
             return item;
           });
         }
-        else{
+        else {
 
         }
-      this.csv = data.csv;
-  
-      this.tableload=false;
-      this.boxdata = data.boxdata;
-      this.shipmentData.push(...this.data.shipment);
-      if(dataapi){
-          
-      let dataApiRunsheet = createRunSheetData(dataapi.runsheetdata,dataapi.updatedData,true);
-      this.csv.push(...dataApiRunsheet.csv);
-      if(departRunSheetData){
-        this.csv = data.csv.map(item => {
-          if (item.RunSheet === departRunSheetData.RunSheet) {
-            item.Action="Update Delivery",
-            item.Status="OUT FOR DELIVERY"
+        this.csv = data.csv;
+
+        this.tableload = false;
+        this.boxdata = data.boxdata;
+        this.shipmentData.push(...this.data.shipment);
+        if (dataapi) {
+
+          let dataApiRunsheet = createRunSheetData(dataapi.runsheetdata, dataapi.updatedData, true);
+          this.csv.push(...dataApiRunsheet.csv);
+          if (departRunSheetData) {
+            this.csv = data.csv.map(item => {
+              if (item.RunSheet === departRunSheetData.RunSheet) {
+                item.Action = "Update Delivery",
+                  item.Status = "OUT FOR DELIVERY"
+              }
+              return item;
+            });
           }
-          return item;
-        });
+          let departVehicleData = {
+            runSheetdetails: this.csv,
+            shipments: dataapi.runsheetdata
+          }
+          this.cnoteService.setDepartvehicleData(departVehicleData);
+
+          for (let newData of dataApiRunsheet.boxdata) {
+            let existingData = this.boxdata.find((data) => data.title === newData.title);
+            if (existingData) {
+              existingData.count += newData.count;
+            }
+          }
+          this.tableload = false;
+        }
+        /*this service is for pass data to depart Vehicle for scaning*/
+
+
+
+        /*End*/
+
       }
-      let departVehicleData = {
-        runSheetdetails:this.csv,
-        shipments:dataapi.runsheetdata 
-      }
-      this.cnoteService.setDepartvehicleData(departVehicleData);
-      
-      this.boxdata.push(...dataApiRunsheet.boxdata);
-      this.tableload=false;
-      }
-            /*this service is for pass data to depart Vehicle for scaning*/
-      
-           
-      
-            /*End*/
-      
-      }
-    
+
     });
 
   }

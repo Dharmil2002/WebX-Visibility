@@ -18,6 +18,8 @@ import { AddDriverMasterComponent } from './driver-master/add-driver-master/add-
 import { LocationMasterComponent } from './location-master/location-master.component';
 import { AddLocationMasterComponent } from './location-master/add-location-master/add-location-master.component';
 import { AddCompanyComponent } from './Company Setup Master/add-company/add-company.component';
+import { CustomerMasterListComponent } from './customer-master/customer-master-list/customer-master-list.component';
+import { CustomerMasterAddComponent } from './customer-master/customer-master-add/customer-master-add.component';
 // import { AddVendorMasterComponent } from './Vendor Master/add-vendor-master/add-vendor-master.component';
 // import { VendorMasterListComponent } from './Vendor Master/vendor-master-list/vendor-master-list.component';
 
@@ -39,7 +41,10 @@ const routes: Routes = [
   { path: "DriverMaster/AddDriverMaster", component: AddDriverMasterComponent },
   { path: "LocationMaster/LocationMasterList", component: LocationMasterComponent },
   { path: "LocationMaster/AddLocationMaster", component: AddLocationMasterComponent },
-  { path: "CompanyMaster/AddCompany", component: AddCompanyComponent, },
+  { path: "CompanyMaster/AddCompany", component: AddCompanyComponent },
+  { path: "CompanyMaster/AddCompany", component: AddCompanyComponent },
+  { path: "CustomerMaster/CustomerMasterList", component: CustomerMasterListComponent },
+  { path: "CustomerMaster/AddCustomerMaster", component: CustomerMasterAddComponent },
   // { path: 'VendorMaster/VendorMasterList', component: VendorMasterListComponent },
   // { path: 'VendorMaster/AddVendorMaster', component: AddVendorMasterComponent },
 ];

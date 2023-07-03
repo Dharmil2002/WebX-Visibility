@@ -56,6 +56,8 @@ import { AddDriverMasterComponent } from './driver-master/add-driver-master/add-
 import { LocationMasterComponent } from './location-master/location-master.component';
 import { AddCompanyComponent } from './Company Setup Master/add-company/add-company.component';
 import { AddLocationMasterComponent } from './location-master/add-location-master/add-location-master.component';
+import { CustomerMasterListComponent } from './customer-master/customer-master-list/customer-master-list.component';
+import { CustomerMasterAddComponent } from './customer-master/customer-master-add/customer-master-add.component';
 // import { VendorMasterListComponent } from './Vendor Master/vendor-master-list/vendor-master-list.component';
 // import { AddVendorMasterComponent } from './Vendor Master/add-vendor-master/add-vendor-master.component';
 @NgModule({
@@ -121,10 +123,9 @@ import { AddLocationMasterComponent } from './location-master/add-location-maste
     AddDriverMasterComponent,
     LocationMasterComponent,
     AddCompanyComponent,
-    AddLocationMasterComponent
-    // ,
-    // VendorMasterListComponent,
-    // AddVendorMasterComponent
+    AddLocationMasterComponent,
+    CustomerMasterListComponent,
+    CustomerMasterAddComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

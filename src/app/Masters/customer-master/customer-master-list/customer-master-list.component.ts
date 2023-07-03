@@ -8,23 +8,25 @@ export class CustomerMasterListComponent implements OnInit {
   jsonUrl = '../../../assets/data/masters-data.json'
   data: [] | any;
   csv: any[];
-  tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  toggleArray = ["ActiveFlag"]
+  tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
+  toggleArray = ["activeFlag"]
   linkArray = []
   columnHeader = {
-    'GroupCode': 'Group Code',
-    'CustomerCode': 'Customer Code',
-    'CustomerName': 'Customer Name',
-    "ActiveFlag": "Active Status",
+    "srNo":"Sr No",
+    "groupCode": "Group Code",
+    "customerCode": "Customer Code",
+    "customerName": "Customer Name",
+    "activeFlag": "Active Status",
     "actions": "Actions"
   };
   headerForCsv = {
-    'GroupCode': 'Group Code',
-    'CustomerCode': 'Customer Code',
-    'CustomerName': 'Customer Name',
-    "ActiveFlag": "Active Status"
+    "srNo":"Sr No",
+    "groupCode": "Group Code",
+    "customerCode": "Customer Code",
+    "customerName": "Customer Name",
+    "activeFlag": "Active Status",
   }
-  breadscrums = [
+  breadScrums = [
     {
       title: "Customer Master",
       items: ["Home"],
@@ -34,7 +36,7 @@ export class CustomerMasterListComponent implements OnInit {
   dynamicControls = {
     add: true,
     edit: true,
-    csv: true
+    csv: false
   }
   addAndEditPath: string;
   constructor(private http: HttpClient) {
@@ -49,10 +51,10 @@ export class CustomerMasterListComponent implements OnInit {
     //Fetch data from the JSON endpoint
     this.http.get(this.jsonUrl).subscribe((res: any) => {
       this.data = res;
-      this.csv = this.data['CustomerData']
+      this.csv = this.data['customerData']
       //Extract relevant data arrays from the response
       //const tableArray = this.data['tabledata'];
-      this.tableload = false;
+      this.tableLoad = false;
     }
     );
   }

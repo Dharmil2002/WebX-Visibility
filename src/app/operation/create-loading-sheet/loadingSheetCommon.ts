@@ -60,12 +60,10 @@ let data: Shipment[] = [
 
 export function filterloadingShipments(data: any, routeStr: string, currentStop: string): Shipment[] {
   const { carryforwardLeg, forwardLeg } = computeLegs(routeStr, currentStop);
-  console.log({ carryforwardLeg, forwardLeg });
-  console.log("shipment:" + data)
   return data.filter(shipment => (carryforwardLeg.includes(shipment.Leg) && shipment.routes === routeStr) || forwardLeg.includes(shipment.Leg));
 }
 
-// usage: create-loading-sheet.component
+// usage: -screate-loadingheet.component
 
 /**
  * Filters shipment data based on location criteria.

@@ -65,7 +65,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
-    console.log(this.centerAligned);
+    
   }
   constructor(public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router, public dialog: MatDialog) {

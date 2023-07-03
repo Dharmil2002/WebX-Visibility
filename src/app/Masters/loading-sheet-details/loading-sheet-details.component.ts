@@ -12,7 +12,7 @@ import { LoadingsheetgenerateComponent } from '../loadingsheetgenerate/loadingsh
   templateUrl: './loading-sheet-details.component.html'
 })
 export class LoadingSheetDetailsComponent implements OnInit {
-  jsonUrl = '../../../assets/data/tableDataSmaple.json'
+
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
   uploadComponent: any;

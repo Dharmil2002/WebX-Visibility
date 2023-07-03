@@ -769,3 +769,16 @@ tr.group:hover {
 .export-button {
   cursor: pointer;
 }
+mat-cell, mat-header-cell, mat-footer-cell {
+  align-items: center;
+  overflow: hidden;
+  word-wrap: break-word;
+  min-height: inherit;
+  /* Other styles specific to your needs */
+}
+
+.mat-cell,
+.mat-header-cell,
+.mat-footer-cell {
+  display: table-cell;
+}

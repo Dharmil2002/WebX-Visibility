@@ -12,13 +12,14 @@ import { transform } from '../create-loading-sheet/loadingSheetCommon';
 import { updatePending } from '../update-loading-sheet/loadingSheetshipment';
 import { groupShipingTableData } from './groupShipingTableData';
 import { vehicleLoadingScan } from './packageUtilsvehiceLoading';
+import { OperationService } from 'src/app/core/service/operations/operation.service';
 
 @Component({
   selector: 'app-vehicle-update-upload',
   templateUrl: './vehicle-update-upload.component.html'
 })
 export class VehicleUpdateUploadComponent implements OnInit {
-  jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
+  arrivalUrl = '../../../assets/data/arrival-dashboard-data.json'
   packageUrl = '../../../assets/data/package-data.json'
   tableload = false;
   csv: any[];
@@ -82,9 +83,18 @@ export class VehicleUpdateUploadComponent implements OnInit {
   vehicelLoadData: any;
   shipingDataTable: any;
   legWiseData: any;
-  constructor(private Route: Router, private dialog: MatDialog, public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
+  constructor(
+    private Route: Router,
+    private dialog: MatDialog,
+    public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
-    private http: HttpClient, private fb: UntypedFormBuilder, private cdr: ChangeDetectorRef, private cnoteService: CnoteService) {
+    private http: HttpClient,
+    private fb: UntypedFormBuilder,
+    private cdr: ChangeDetectorRef,
+    private operationService: OperationService,
+    private cnoteService: CnoteService
+  ) 
+   {
     if (item.LoadingSheet) {
       this.arrivalData = this.cnoteService.getVehicleLoadingData();
       this.shipmentStatus = 'Loaded'
@@ -97,23 +107,24 @@ export class VehicleUpdateUploadComponent implements OnInit {
   ngOnInit(): void {
   }
   getShippningData() {
-
-    this.http.get(this.jsonUrl).subscribe(res => {
+    
+    let updatedShipingData = this.cnoteService.getUpdatedShipmentData();
+    this.operationService.getJsonFileDetails('arrivalUrl').subscribe(res => {
       this.data = res;
-      let tableArray = this.data['shippingData'];
+      let tableArray = updatedShipingData?updatedShipingData:this.data['shippingData'];
       let shipments = updatePending(tableArray, this.currentBranch,true,false);
       let routeData = transform(this.arrivalData?.RouteandSchedule, this.currentBranch)
       let CurrectLeg = routeData.split("-").splice(1);
       this.legWiseData = shipments.filter((x) => {
         return x.Origin.trim() === this.currentBranch && CurrectLeg.includes(x.Destination);
       });
-      let totalVolumeCFT, totalWeightKg, Packages
+
       this.csv = this.legWiseData;
       let shipingTableData = this.csv;
    // Call the function and pass the required arguments
   let shipingTableDataArray = groupShipingTableData(shipingTableData);
 
-// Use the shipingTableDataArray as needed
+      // Use the shipingTableDataArray as needed
       // Convert the groupedData object to an array of values
       this.shipingDataTable = shipingTableDataArray;
       this.kpiData("")

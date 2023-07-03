@@ -25,6 +25,8 @@ import { UpdateRunSheetComponent } from './update-run-sheet/update-run-sheet.com
 import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.component";
 import { ViewPrintComponent } from './view-print/view-print.component';
 import { VehicleUpdateUploadComponent } from "./vehicle-update-upload/vehicle-update-upload.component";
+import { OperationService } from "../core/service/operations/operation.service";
+import { NavigationService } from "../Utility/commonFunction/route/route";
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -55,7 +57,7 @@ import { VehicleUpdateUploadComponent } from "./vehicle-update-upload/vehicle-up
     MatDialogModule,
     MatSnackBarModule
   ],
-  providers: [SnackBarUtilityService, DatePipe,MatDialogModule ],
+  providers: [SnackBarUtilityService,OperationService,NavigationService,DatePipe,MatDialogModule ],
   exports: []
 })
 export class OperationModule { }

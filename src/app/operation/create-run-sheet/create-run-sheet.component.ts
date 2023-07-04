@@ -7,6 +7,7 @@ import { RunSheetControl } from 'src/assets/FormControls/RunsheetGeneration';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import Swal from 'sweetalert2';
+import { OperationService } from 'src/app/core/service/operations/operation.service';
 
 @Component({
   selector: 'app-create-run-sheet',
@@ -31,7 +32,7 @@ export class CreateRunSheetComponent implements OnInit {
   tableload = false;
   csv: any[];
   runSheetData: any;
-  constructor(private http: HttpClient, private Route: Router, private CnoteService: CnoteService, private fb: UntypedFormBuilder, private ObjSnackBarUtility: SnackBarUtilityService
+  constructor(private http: HttpClient, private Route: Router, private CnoteService: CnoteService, private operationService: OperationService, private fb: UntypedFormBuilder, private ObjSnackBarUtility: SnackBarUtilityService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.RunSheetTable = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -60,7 +61,7 @@ export class CreateRunSheetComponent implements OnInit {
     csv: false
   }
   ngOnInit(): void {
-    this.http.get(this.jsonUrl).subscribe(res => {
+    this.operationService.getJsonFileDetails('runSheerUrl').subscribe(res => {
       this.data = res['cluster'].find((x) => x.cluster == this.RunSheetTable.columnData.Cluster);
       this.autoBindData();
       this.csv = res['shipment'].filter((x) => x.cluster == this.RunSheetTable.columnData.Cluster);
@@ -101,7 +102,7 @@ export class CreateRunSheetComponent implements OnInit {
       'LoadKg': 'loadedKg',
       'LoadVol': 'loadedVol',
       'WeightUti': 'weightUtilization',
-      'VolUti': 'volumeUtilization'
+      'VolUti': 'volumeUtilization',
     };
 
     for (let key in mappings) {
@@ -132,6 +133,8 @@ export class CreateRunSheetComponent implements OnInit {
       loadedVol: this.RunSheetTableForm?.value.LoadVol,
       weightUtilization: this.RunSheetTableForm?.value.WeightUti,
       volumeUtilization: this.RunSheetTableForm?.value.VolUti,
+      Pickup:this.RunSheetTableForm?.value.Pickup||'',
+      Delivery:this.RunSheetTableForm?.value.Delivery||'',
       action: "Depart"
     }
     let runSheetDetils = {

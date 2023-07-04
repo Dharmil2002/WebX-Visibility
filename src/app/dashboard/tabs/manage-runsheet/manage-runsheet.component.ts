@@ -5,6 +5,7 @@ import { UpdateRunSheetComponent } from "src/app/operation/update-run-sheet/upda
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { createRunSheetData } from "./runSheetHelper";
+import { OperationService } from "src/app/core/service/operations/operation.service";
 @Component({
   selector: "app-manage-runsheet",
   templateUrl: "./manage-runsheet.component.html",
@@ -12,10 +13,9 @@ import { createRunSheetData } from "./runSheetHelper";
 export class ManageRunsheetComponent
   extends UnsubscribeOnDestroyAdapter
   implements OnInit {
-  jsonUrl = "../../../assets/data/create-runsheet-data.json";
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  csv: any[];
+  tableData: any[];
   addAndEditPath: string;
   drillDownPath: string;
   uploadComponent: any;
@@ -95,8 +95,8 @@ export class ManageRunsheetComponent
   // declararing properties
 
   constructor(
-    private http: HttpClient,
     private Route: Router,
+    private operationService: OperationService, // Injecting OperationService,
     private cnoteService: CnoteService
   ) {
     super();
@@ -129,9 +129,9 @@ export class ManageRunsheetComponent
 
   }
   getRunSheet(dataapi) {
-    this.http.get(this.jsonUrl).subscribe(res => {
+   
+    this.operationService.getJsonFileDetails('runSheerUrl').subscribe(res => {
       this.data = res;
-      let tableArray = this.data;
       let data = createRunSheetData(this.data, "", false);
       let departRunSheetData = this.cnoteService?.departRunSheetData || ''
       if (data) {
@@ -148,7 +148,7 @@ export class ManageRunsheetComponent
         else {
 
         }
-        this.csv = data.csv;
+        this.tableData = data.csv;
 
         this.tableload = false;
         this.boxdata = data.boxdata;
@@ -156,9 +156,9 @@ export class ManageRunsheetComponent
         if (dataapi) {
 
           let dataApiRunsheet = createRunSheetData(dataapi.runsheetdata, dataapi.updatedData, true);
-          this.csv.push(...dataApiRunsheet.csv);
+          this.tableData.push(...dataApiRunsheet.csv);
           if (departRunSheetData) {
-            this.csv = data.csv.map(item => {
+            this.tableData = data.csv.map(item => {
               if (item.RunSheet === departRunSheetData.RunSheet) {
                 item.Action = "Update Delivery",
                   item.Status = "OUT FOR DELIVERY"
@@ -167,7 +167,7 @@ export class ManageRunsheetComponent
             });
           }
           let departVehicleData = {
-            runSheetdetails: this.csv,
+            runSheetdetails: this.tableData,
             shipments: dataapi.runsheetdata
           }
           this.cnoteService.setDepartvehicleData(departVehicleData);

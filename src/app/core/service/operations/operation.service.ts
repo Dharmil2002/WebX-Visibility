@@ -12,6 +12,7 @@ export class OperationService {
   loadingJsonUrl = '../../../assets/data/vehicleType.json';
   loadingSheetJsonUrl = '../../../assets/data/shipmentDetails.json';
   arrivalUrl = '../../../assets/data/arrival-dashboard-data.json';
+  runSheerUrl = "../../../assets/data/create-runsheet-data.json";
 
   constructor(private http: HttpClient) {}
 

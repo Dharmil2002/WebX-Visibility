@@ -1,1 +1,7 @@
-<p>customer-master-add works!</p>
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <form [formGroup]="customerTableForm">
+      <generic-accordion-webxpress [AccordionForm]="customerTableForm" [accordionGroup]="accordionData"
+        (functionCallEmitter)="functionCallHandler($event)" >
+      </generic-accordion-webxpress>
+    </form>
+  </app-common-wrapper-webxpress>

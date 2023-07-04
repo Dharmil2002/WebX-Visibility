@@ -1,17 +1,15 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { CompanyGSTControl } from 'src/assets/FormControls/CompanyGSTMaster';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
   selector: 'app-companygstmaster-list',
   templateUrl: './companygstmaster-list.component.html'
 })
 export class CompanygstmasterListComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
-  jsonUrl = '../../../assets/data/CompanyGST-data.json'
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
   csv: any[];
@@ -89,18 +87,18 @@ export class CompanygstmasterListComponent extends UnsubscribeOnDestroyAdapter i
   // declararing properties
   CompanyGSTTableForm: UntypedFormGroup;
 
-  constructor(private http: HttpClient, private Route: Router, private fb: UntypedFormBuilder,) {
+  constructor(private masterService: MasterService, private fb: UntypedFormBuilder,) {
     super();
   }
 
   ngOnInit(): void {
-    this.getRunSheetDetails();
-    this.IntializeFormControl();
+    this.getCompanyGstDetails();
+    this.intializeFormControl();
   }
   jsonControlArray: any;
-  IntializeFormControl() {
-    const MarkArrivalFormControls = new CompanyGSTControl();
-    this.jsonControlArray = MarkArrivalFormControls.getCompanyGSTFormControls();
+  intializeFormControl() {
+    const companyGstFormControls = new CompanyGSTControl();
+    this.jsonControlArray = companyGstFormControls.getCompanyGSTFormControls();
     this.CompanyGSTTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   functionCaller($event) {
@@ -120,9 +118,9 @@ export class CompanygstmasterListComponent extends UnsubscribeOnDestroyAdapter i
       console.log("failed");
     }
   }
-  getRunSheetDetails() {
+  getCompanyGstDetails() {
     // Fetch data from the JSON endpoint
-    this.http.get(this.jsonUrl).subscribe((res: any) => {
+    this.masterService.getJsonFileDetails('companyJsonUrl').subscribe(res => {
       this.data = res;
       // Assign the companyCode to each item in lst_CompanyGSTDetailDetails
       this.data.lst_CompanyGSTDetailDetails.forEach(item => {

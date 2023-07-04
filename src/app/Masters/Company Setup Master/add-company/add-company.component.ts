@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { CompanyControl } from 'src/assets/FormControls/CompanyControl';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { HttpClient } from '@angular/common/http';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from 'src/app/Utility/utility.service';
 import Swal from 'sweetalert2';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
   selector: 'app-add-company',
@@ -30,10 +30,9 @@ export class AddCompanyComponent implements OnInit {
     {
       title: "Company Setup",
       items: ["Home"],
-      active: "Company Master",
+      active: "Company Setup",
     },
   ];
-  jsonUrl = '../../../assets/data/CompanyGST-data.json'
   data: any;
   TimeZoneDet: any;
   Theme: any;
@@ -42,11 +41,12 @@ export class AddCompanyComponent implements OnInit {
   selectedFiles: boolean;
   SelectFile: File;
   imageName: string;
-  constructor(private service: utilityService, private fb: UntypedFormBuilder, private http: HttpClient, private filter: FilterUtils,
+  constructor(private service: utilityService, private fb: UntypedFormBuilder, private masterService: MasterService,
+    private filter: FilterUtils,
   ) { }
 
   ngOnInit(): void {
-    this.http.get(this.jsonUrl).subscribe((res: any) => {
+    this.masterService.getJsonFileDetails('companyJsonUrl').subscribe(res => {
       this.data = res.CompanyDet[0];
       this.TimeZoneDet = res.TimeZone[0];
       this.Theme = res.Theme[0];
@@ -140,7 +140,7 @@ export class AddCompanyComponent implements OnInit {
       const file: File = fileList[0];
       const allowedFormats = ["jpeg", "png", "jpg"];
       const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
-  
+
       if (allowedFormats.includes(fileFormat)) {
         this.SelectFile = file;
         this.imageName = file.name;
@@ -160,7 +160,7 @@ export class AddCompanyComponent implements OnInit {
       alert("No file selected");
     }
   }
-  
+
   downloadfile() {
     let link = document.createElement("a");
     link.download = "DefaultChartOfAccount";
@@ -177,5 +177,8 @@ export class AddCompanyComponent implements OnInit {
       text: `Data Downloaded successfully!!!`,
       showConfirmButton: true,
     });
+  }
+  cancel() {
+    window.history.back();
   }
 }

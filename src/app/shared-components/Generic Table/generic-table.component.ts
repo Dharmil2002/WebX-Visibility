@@ -344,7 +344,6 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     return typeof value === 'number';
   }
   centerAlignClass(tableData: string): string {
-    debugger
     const centerAlignColumns = this.centerAligned;
     if (centerAlignColumns && centerAlignColumns.includes(tableData)) {
       return 'matcolumncenter';

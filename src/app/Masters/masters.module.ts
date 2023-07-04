@@ -58,6 +58,7 @@ import { AddCompanyComponent } from './Company Setup Master/add-company/add-comp
 import { AddLocationMasterComponent } from './location-master/add-location-master/add-location-master.component';
 import { CustomerMasterListComponent } from './customer-master/customer-master-list/customer-master-list.component';
 import { CustomerMasterAddComponent } from './customer-master/customer-master-add/customer-master-add.component';
+import { AddDcrSeriesComponent } from './dcr-series/add-dcr-series/add-dcr-series.component';
 // import { VendorMasterListComponent } from './Vendor Master/vendor-master-list/vendor-master-list.component';
 // import { AddVendorMasterComponent } from './Vendor Master/add-vendor-master/add-vendor-master.component';
 @NgModule({
@@ -124,6 +125,7 @@ import { CustomerMasterAddComponent } from './customer-master/customer-master-ad
     LocationMasterComponent,
     AddCompanyComponent,
     AddLocationMasterComponent,
+    AddDcrSeriesComponent,
     CustomerMasterListComponent,
     CustomerMasterAddComponent,
   ],

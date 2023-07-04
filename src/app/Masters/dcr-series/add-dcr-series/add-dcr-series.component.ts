@@ -1,0 +1,328 @@
+import { Component, Input, OnInit } from '@angular/core';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { utilityService } from 'src/app/Utility/utility.service';
+import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
+import Swal from 'sweetalert2';
+
+@Component({
+  selector: 'app-add-dcr-series',
+  templateUrl: './add-dcr-series.component.html'
+})
+export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
+  @Input() data: any;
+
+  // Breadcrumbs
+  breadScrums = [
+    {
+      title: "Add DCR Series",
+      items: ["Masters"],
+      active: "Add DCR Series",
+    },
+  ];
+
+  // Table data
+  tableData: any = [];
+
+  // Action buttons configuration
+  actionObject = {
+    addRow: true,
+    submit: true,
+    search: true
+  };
+
+  // Displayed columns configuration
+  displayedColumns1 = {
+    srNo: {
+      name: "Sr No",
+      key: "index",
+      style: "",
+    },
+    documentType: {
+      name: "Document Type",
+      key: "Dropdown",
+      option: [],
+      style: "",
+    },
+    bookCode: {
+      name: "Book Code",
+      key: "inputString",
+      style: "",
+    },
+    seriesFrom: {
+      name: "Series From",
+      key: "input",
+      style: "",
+      functions: {
+        'onChange': "getSeriesFrom" // Function to be called on change event
+      }
+    },
+    seriesTo: {
+      name: "Series To",
+      key: "input",
+      style: "",
+      functions: {
+        'onChange': "getSeriesFrom" // Function to be called on change event
+      }
+    },
+    totalLeaf: {
+      name: "Total Leaf",
+      key: "input",
+      style: { 'min-width': '10px' },
+      readonly: true,
+      Headerstyle: { 'min-width': '10px' },
+    },
+    allotTo: {
+      name: "Allot To",
+      key: "Dropdown",
+      option: [],
+      style: "",
+    },
+    allocateTo: {
+      name: "Allocate To",
+      key: "Dropdown",
+      option: [],
+      style: "",
+    },
+    action: {
+      name: "Action",
+      key: "Action",
+      style: "",
+    },
+  };
+
+  constructor(
+    public objSnackBarUtility: SnackBarUtilityService, private service: utilityService
+  ) {
+    super();
+  }
+
+  ngOnInit() {
+    this.loadTempData();
+    this.getAllMastersData();
+  }
+
+  // Load temporary data
+  loadTempData() {
+    this.tableData = [{
+      documentType: [],
+      srNo: 0,
+      bookCode: "",
+      seriesFrom: "",
+      seriesTo: "",
+      totalLeaf: "",
+      allotTo: [],
+      allocateTo: []
+    }];
+  }
+
+  // Add a new item to the table
+  addItem() {
+    const AddObj = {
+      documentType: [],
+      srNo: 0,
+      bookCode: "",
+      seriesFrom: "",
+      seriesTo: "",
+      totalLeaf: "",
+      allotTo: [],
+      allocateTo: []
+    };
+    this.tableData.splice(0, 0, AddObj);
+  }
+
+  // Get all dropdown data
+  getAllMastersData() {
+    // Options for documentType dropdown
+    this.displayedColumns1.documentType.option = [
+      {
+        "name": "CNote",
+        "value": "1"
+      },
+      {
+        "name": "Delivery MR",
+        "value": "2"
+      },
+      {
+        "name": "UBI Series",
+        "value": "3"
+      }
+    ];
+
+    // Options for allocateTo dropdown
+    this.displayedColumns1.allocateTo.option = [
+      {
+        "name": "ABDE",
+        "value": 1
+      },
+      {
+        "name": "ADCB",
+        "value": 2
+      },
+      {
+        "name": "AGRA",
+        "value": 3
+      },
+      {
+        "name": "AHM",
+        "value": 4
+      },
+      {
+        "name": "AHMEDABAD",
+        "value": 5
+      },
+      {
+        "name": "AIZAWL",
+        "value": 7
+      },
+    ];
+
+    // Options for allotTo dropdown
+    this.displayedColumns1.allotTo.option = [
+      {
+        "name": "ABDE",
+        "value": 1
+      },
+      {
+        "name": "ADCB",
+        "value": 2
+      },
+      {
+        "name": "AGRA",
+        "value": 3
+      },
+      {
+        "name": "AHM",
+        "value": 4
+      },
+      {
+        "name": "AHMEDABAD",
+        "value": 5
+      },
+      {
+        "name": "AIZAWL",
+        "value": 7
+      },
+    ];
+  }
+
+  // Delete a row from the table
+  async delete(event) {
+    const index = event.index;
+    const row = event.element;
+
+    const swalWithBootstrapButtons = await Swal.mixin({
+      customClass: {
+        confirmButton: "btn btn-success msr-2",
+        cancelButton: "btn btn-danger",
+      },
+      buttonsStyling: false,
+    });
+
+    swalWithBootstrapButtons
+      .fire({
+        title: `<h4><strong>Are you sure you want to delete ?</strong></h4>`,
+        showCancelButton: true,
+        cancelButtonColor: "#d33",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        showLoaderOnConfirm: true,
+        preConfirm: (Remarks) => {
+          var request = {
+            companyCode: localStorage.getItem("CompanyCode"),
+            id: row.id,
+          };
+          if (row.id == 0) {
+            return {
+              isSuccess: true,
+              message: "City has been deleted !",
+            };
+          } else {
+            console.log("Request", request);
+          }
+        },
+        allowOutsideClick: () => !Swal.isLoading(),
+      })
+      .then((result) => {
+
+        if (result.isConfirmed) {
+          this.tableData.splice(index, 1);
+          this.tableData = this.tableData;
+          swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
+          event.callback(true);
+        } else if (result.isConfirmed) {
+          swalWithBootstrapButtons.fire("Not Deleted!", "Your Message", "info");
+          event.callback(false);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithBootstrapButtons.fire(
+            "Cancelled",
+            "Your item is safe :)",
+            "error"
+          );
+          event.callback(false);
+        }
+      });
+
+    return true;
+  }
+
+  // Handle function calls
+  functionCallHandler($event) {
+    let field = $event.field;                   // the actual formControl instance
+    let functionName = $event.functionName;     // name of the function , we have to call
+
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+
+  // Save data
+  saveData() {
+    this.service.exportData(this.tableData);
+    Swal.fire({
+      icon: "success",
+      title: "Successful",
+      text: `Data Downloaded successfully!!!`,
+      showConfirmButton: true,
+    });
+    window.location.reload();
+  }
+
+  // Get series from input
+  getSeriesFrom(): void {
+    const seriesFrom = this.tableData[0].seriesFrom;
+    let seriesTo = this.tableData[0].seriesTo;
+    let totalLeaf = this.tableData[0].totalLeaf;
+
+    if (seriesFrom.length !== 12) {
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: `Series From should have a length of 12.`,
+        showConfirmButton: true,
+      });
+      return;
+    }
+
+    if (seriesTo !== '' && seriesTo <= seriesFrom) {
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: `Series To should be greater than Series From.`,
+        showConfirmButton: true,
+      });
+      return;
+    }
+
+    if (seriesTo !== '') {
+      const difference = parseInt(seriesTo, 10) - parseInt(seriesFrom, 10);
+      totalLeaf = difference;
+    } else {
+      seriesTo = '';
+      totalLeaf = '';
+    }
+    this.tableData[0].seriesTo = seriesTo;
+    this.tableData[0].totalLeaf = totalLeaf;
+  }
+}

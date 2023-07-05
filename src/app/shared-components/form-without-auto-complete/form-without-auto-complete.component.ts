@@ -7,6 +7,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 export class FormWithoutAutoCompleteComponent implements OnInit {
   @Input() formData                           // form data
   @Input() form                               // formgroup
+  @Input() fafIconData:string
+  @Input() Icondata:string  
 
   // 'showSaveAndCancelButton'. it should be kept false form when dealing with more than one forms (like in accordion)
   // refer example of accordion for example...at     example/accordion

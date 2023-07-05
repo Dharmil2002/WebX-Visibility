@@ -143,14 +143,8 @@ export class AddStateMasterComponent implements OnInit {
     }
 
     save() {
-        this.StateTableForm.controls["stateName"].setValue(this.StateTableForm.value.stateName);
-        this.StateTableForm.controls["stateType"].setValue(this.StateTableForm.value.stateType);
-        this.StateTableForm.controls["stateAlias"].setValue(this.StateTableForm.value.stateAlias);
         this.StateTableForm.controls["Country"].setValue(this.StateTableForm.value.Country.value);
-        this.StateTableForm.controls["GSTWiseStateCode"].setValue(this.StateTableForm.value.GSTWiseStateCode);
         this.StateTableForm.controls["activeflag"].setValue(this.StateTableForm.value.activeflag == true ? "Y" : "N");
-        this.StateTableForm.controls["stateCode"].setValue(this.StateTableForm.value.stateCode);
-
         this.Route.navigateByUrl('/Masters/StateMaster/StateMasterView');
         this.service.exportData(this.StateTableForm.value)
     }

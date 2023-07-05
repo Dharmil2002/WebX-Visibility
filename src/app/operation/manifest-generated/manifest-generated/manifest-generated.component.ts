@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit,Inject } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CnoteService } from '../../../core/service/Masters/CnoteService/cnote.service';
+import { ViewPrintComponent } from '../../view-print/view-print.component';
 @Component({
   selector: 'app-manifest-generated',
   templateUrl: './manifest-generated.component.html',
@@ -15,8 +16,8 @@ export class ManifestGeneratedComponent implements OnInit {
   data: [] | any;
   tripData: any;
   tabledata: any;
-  manifestgeneratedTableForm:UntypedFormGroup
-  manifestControlArray:any;
+  manifestgeneratedTableForm: UntypedFormGroup
+  manifestControlArray: any;
   orgBranch: string = localStorage.getItem("Branch");
   columnHeader = {
     "MFNumber": "MF Number",
@@ -27,7 +28,7 @@ export class ManifestGeneratedComponent implements OnInit {
     "VolumeCFT": "Volume CFT",
     "Action": "Print"
   }
-  centerAlignedData = ['PackagesLoadedBooked',  'WeightKg', 'VolumeCFT'];
+  centerAlignedData = ['PackagesLoadedBooked', 'WeightKg', 'VolumeCFT'];
 
   //  #region declaring Csv File's Header as key and value Pair
   headerForCsv = {
@@ -46,11 +47,13 @@ export class ManifestGeneratedComponent implements OnInit {
       active: "Manifest Generated"
     }
   ]
-  toggleArray=[]
-  menuItems=[]
+  toggleArray = []
+  menuItems = [
+    { label: 'Print', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
+  ]
   linkArray = [
 
-    { Row: 'Action', Path: 'Operation/ViewPrint' }
+    { Row: 'Action', Path: '' }
 
   ]
   dynamicControls = {
@@ -61,13 +64,13 @@ export class ManifestGeneratedComponent implements OnInit {
   formdata: any;
   menifest: any;
   constructor(private Route: Router,
-    private http: HttpClient, private fb: UntypedFormBuilder,@Inject(MAT_DIALOG_DATA) public item: any,public dialogRef: MatDialogRef<ManifestGeneratedComponent>,private cnoteService:CnoteService) {
+    private http: HttpClient, private fb: UntypedFormBuilder, @Inject(MAT_DIALOG_DATA) public item: any, public dialogRef: MatDialogRef<ManifestGeneratedComponent>, private cnoteService: CnoteService) {
 
-   if(item){
-    this.menifest=item.loadingSheetData;
-    this.getMenifest();
-    
-   }
+    if (item) {
+      this.menifest = item.loadingSheetData;
+      this.getMenifest();
+
+    }
   }
   getMenifest() {
 
@@ -91,23 +94,23 @@ export class ManifestGeneratedComponent implements OnInit {
       acc[leg].Data.push(element);
       return acc;
     }, {});
-     groupedDataWithoutKey = Object.values(groupedData);
-   let MeniFestDetails:any[]=[];
-   groupedDataWithoutKey.forEach(element => {
+    groupedDataWithoutKey = Object.values(groupedData);
+    let MeniFestDetails: any[] = [];
+    groupedDataWithoutKey.forEach(element => {
       const randomNumber = "MF/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
-      let meniFestjson={
+      let meniFestjson = {
         MFNumber: randomNumber,
-        Leg: element?.Leg||'',
-        ShipmentsLoadedBooked:element.ShipmentCount+"/"+element.ShipmentCount,
-        PackagesLoadedBooked:element?.TotalPackages ||''+"/"+ element?.TotalPackages||'',
+        Leg: element?.Leg || '',
+        ShipmentsLoadedBooked: element.ShipmentCount + "/" + element.ShipmentCount,
+        PackagesLoadedBooked: element?.TotalPackages || '' + "/" + element?.TotalPackages || '',
         WeightKg: element.TotalWeightKg,
-        VolumeCFT:element.TotalVolumeCFT,
+        VolumeCFT: element.TotalVolumeCFT,
         Action: "Print"
       }
       MeniFestDetails.push(meniFestjson)
     });
     this.cnoteService.setMeniFestDetails(MeniFestDetails);
-    this.csv=MeniFestDetails;
+    this.csv = MeniFestDetails;
   }
 
   ngOnInit(): void {

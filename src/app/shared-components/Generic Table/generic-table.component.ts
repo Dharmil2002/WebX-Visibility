@@ -65,7 +65,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
-    console.log(this.centerAligned);
+    
   }
   constructor(public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router, public dialog: MatDialog) {
@@ -220,7 +220,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
       return false;
     }
 
-    return this.Link && this.Link.some(item => item.Row && item.Row.includes(tableData));
+    return this.Link && this.Link.some(item => item.Row && item.Row == tableData);
   }
 
 
@@ -236,13 +236,15 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     }
     else {
       if (this.menuItems) {
-        let navigateTopopUp = this.menuItems.find((x) => x.label === item.Action)
-        if (navigateTopopUp) {
-          this.GeneralMultipleView(item, navigateTopopUp.componentDetails)
+        let navigateToComponent;
+        if (tableData === 'Action') {
+          let action = item.Action;
+          navigateToComponent = this.menuItems.find((x) => x.label === action);
+        } else {
+          navigateToComponent = this.menuItems.find((x) => x.label === tableData);
         }
-        else {
-          let navigateTopopUp = this.menuItems.find((x) => x.label === tableData)
-          this.GeneralMultipleView(item, navigateTopopUp.componentDetails)
+        if (navigateToComponent) {
+          this.GeneralMultipleView(item, navigateToComponent.componentDetails);
         }
       }
     }
@@ -338,19 +340,10 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
       this.dialogClosed.emit(result);
     })
   }
-  // isNumeric(value: any): boolean {
-  //   return typeof value === 'number';
-  // }
-  // centerAlignClass(tableData: string): string {
-  //   const centerAlignColumns = this.centerAligned;
-  //   return centerAlignColumns.includes(tableData) ? 'matcolumncenter' : '';
-  // }
   isNumeric(value: any): boolean {
     return typeof value === 'number';
   }
   centerAlignClass(tableData: string): string {
-    // const centerAlignColumns = this.centerAligned;
-    // return centerAlignColumns.includes(tableData) ? 'matcolumncenter' : 'matcolumnleft';
     const centerAlignColumns = this.centerAligned;
     if (centerAlignColumns && centerAlignColumns.includes(tableData)) {
       return 'matcolumncenter';

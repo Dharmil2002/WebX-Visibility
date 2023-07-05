@@ -1,5 +1,5 @@
 export function createRunSheetData(runsheetdata,departRunSheetData,apiData) {
-
+ 
     let runSheetDetails,runSheetShipingDetails
     if(apiData){
      runSheetDetails = [runsheetdata.runSheetDetails];
@@ -63,9 +63,10 @@ export function createRunSheetData(runsheetdata,departRunSheetData,apiData) {
     }
   
     let pickUpDelivary = runSheetDetails.filter((x) => x.Pickup === true);
+    let ShipmentsDelivery = runSheetDetails.filter((x) => x.Delivery === true);
     const shipData = [
       createShipDataObject(csv.length, "Clusters", "bg-white"),
-      createShipDataObject(runSheetShipingDetails.length, "Shipments for Delivery", "bg-white"),
+      createShipDataObject(ShipmentsDelivery.length, "Shipments for Delivery", "bg-white"),
       createShipDataObject(pickUpDelivary.length, "Pickup Requests", "bg-white"),
     ];
   

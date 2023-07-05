@@ -86,7 +86,6 @@ export class AddDriverMasterComponent implements OnInit {
 
       this.LocationId = this.DriverTable.driver_Location
       this.DCategoryID = this.DriverTable.driverCat
-      //this.vehno = this.DriverTable.vehno
       this.IsUpdate = true;
       this.action = 'edit'
 
@@ -130,7 +129,7 @@ export class AddDriverMasterComponent implements OnInit {
     this.accordionData = {
       "Driver Details": this.jsonControlDriverArray,
       "License Details": this.jsonControlLicenseArray,
-      "Permanent Address": this.jsonControlPermanentArray,
+      "Address": this.jsonControlPermanentArray,
     };
 
     // Build the form group using formGroupBuilder function and the values of accordionData
@@ -171,15 +170,11 @@ export class AddDriverMasterComponent implements OnInit {
   }
   cancel() {
     window.history.back();
-    //this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList);
+    this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList");
   }
   save() {
-    this.DriverTableForm.controls["cityId"].setValue(this.DriverTableForm.value.cityId);
-    this.DriverTableForm.controls["cityName"].setValue(this.DriverTableForm.value.cityName);
-    this.DriverTableForm.controls["State"].setValue(this.DriverTableForm.value.State.value);
-    this.DriverTableForm.controls["Zone"].setValue(this.DriverTableForm.value.Zone.value);
-    this.DriverTableForm.controls["isActive"].setValue(this.DriverTableForm.value.isActive == true ? "Y" : "N");
-    this.Route.navigateByUrl('/Masters/CityMaster/CityMasterView');
+    this.DriverTableForm.controls["ActiveFlag"].setValue(this.DriverTableForm.value.ActiveFlag == true ? "Y" : "N");
+    this.Route.navigateByUrl('/Masters/DriverMaster/DriverMasterList');
     this.service.exportData(this.DriverTableForm.value)
   }
   functionCallHandler($event) {

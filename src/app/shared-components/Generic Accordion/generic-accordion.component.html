@@ -25,7 +25,9 @@
                 [formData]="accordionGroup[accordion_title]"
                 [form]="AccordionForm"
                 [showSaveAndCancelButton]="showSaveAndCancelButton"
-                (functionCallEmitter)="functionCallHandler($event)">
+                (functionCallEmitter)="functionCallHandler($event)" 
+                [Icondata]="Icondata"
+                [fafIconData]="fafIcondata">
                 </app-form-without-auto-complete-webxpress>
 
             </div>
@@ -36,7 +38,7 @@
     <div class="row" *ngIf="!showSaveAndCancelButton">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 my-2">
             <div class="example-button-row">
-                <button type="button" mat-raised-button color="primary" (click)="save()">
+                <button type="button" [disabled]="!AccordionForm.valid" mat-raised-button color="primary" (click)="save()">
                     Save
                 </button>
                 <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>

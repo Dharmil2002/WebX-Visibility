@@ -10,6 +10,8 @@ export class GenericAccordionComponent implements OnInit {
   */
   @Input() accordionGroup: any;
   @Input() AccordionForm: any;
+  @Input() fafIconData:string
+  @Input() Icondata:string  
 
   @Output() functionCallEmitter = new EventEmitter();
 

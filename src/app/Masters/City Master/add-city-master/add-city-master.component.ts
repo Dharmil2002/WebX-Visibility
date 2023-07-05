@@ -44,10 +44,10 @@ export class AddCityMasterComponent implements OnInit {
 
     constructor(private Route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
         private fb: UntypedFormBuilder, private filter: FilterUtils,
-        private http: HttpClient,private service: utilityService) {
+        private http: HttpClient, private service: utilityService) {
         //super();
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-             this.data = Route.getCurrentNavigation().extras.state.data;
+            this.data = Route.getCurrentNavigation().extras.state.data;
             this.stateId = this.data.stateName;
             this.zoneId = this.data.zoneName;
             this.IsUpdate = true;
@@ -112,27 +112,22 @@ export class AddCityMasterComponent implements OnInit {
         //this.Route.navigateByUrl("/Masters/CityMaster/CityMasterView);
     }
 
-    save(){
-        this.CityTableForm.controls["cityId"].setValue(this.CityTableForm.value.cityId);
-        this.CityTableForm.controls["cityName"].setValue(this.CityTableForm.value.cityName);
+    save() {
         this.CityTableForm.controls["State"].setValue(this.CityTableForm.value.State.value);
         this.CityTableForm.controls["Zone"].setValue(this.CityTableForm.value.Zone.value);
-        this.CityTableForm.controls["isActive"].setValue(this.CityTableForm.value.isActive== true ? "Y" : "N");
-
-
+        this.CityTableForm.controls["isActive"].setValue(this.CityTableForm.value.isActive == true ? "Y" : "N");
         this.Route.navigateByUrl('/Masters/CityMaster/CityMasterView');
         this.service.exportData(this.CityTableForm.value)
     }
     GetZoneData() {
         //throw new Error("Method not implemented.");
-        
         this.http.get(this.countryURL).subscribe(res => {
             this.Zone = res;
             let tableArray = this.Zone.zoneList;
             let zone = [];
             tableArray.forEach(element => {
-                let dropdownList={
-                    name : element.ZoneDesc,
+                let dropdownList = {
+                    name: element.ZoneDesc,
                     value: element.ZoneId
                 }
                 zone.push(dropdownList)
@@ -171,7 +166,7 @@ export class AddCityMasterComponent implements OnInit {
             this.filter.Filter(
                 this.jsonControlCityArray,
                 this.CityTableForm,
-                state,               
+                state,
                 this.state,
                 this.StateStatus
             );

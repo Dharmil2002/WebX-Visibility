@@ -44,6 +44,7 @@ import { DecimaRangeValidatorDirective } from '../core/Directives/decimal-range-
 import { MatTabsModule } from '@angular/material/tabs';
 import { GenericTableComponent } from './Generic Table/generic-table.component';
 import { FilterUtils } from '../Utility/Form Utilities/dropdownFilter';
+import { MatRadioModule } from '@angular/material/radio';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -86,7 +87,8 @@ const MY_DATE_FORMAT = {
     MatTreeModule,
     MatDatepickerModule,
     MatMenuModule,
-    MatTabsModule
+    MatTabsModule,
+    MatRadioModule,
   ],
   providers: [
     {

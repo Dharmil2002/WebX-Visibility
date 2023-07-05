@@ -29,7 +29,7 @@
             "CodeDesc": "Sri Lanka"
         }
     ],
-    "stateList":[
+    "stateList": [
         {
             "StateId": "1",
             "StateDesc": "Maharashtra"
@@ -63,7 +63,7 @@
             "StateDesc": "Nizwa"
         }
     ],
-    "zoneList" : [
+    "zoneList": [
         {
             "ZoneId": "1",
             "ZoneDesc": "SOUTH"
@@ -91,6 +91,104 @@
         {
             "ZoneId": "6",
             "ZoneDesc": "South Zone"
+        }
+    ],
+    "serviceOptedDropdown": [
+        {
+            "name": "TMS",
+            "value": "tms"
+        },
+        {
+            "name": "WMS",
+            "value": "wms"
+        },
+        {
+            "name": "FMS",
+            "value": "fms"
+        }
+    ],
+    "groupCodeDropdown": [
+        {
+            "name": "Emami",
+            "value": "C0001"
+        },
+        {
+            "name": "Warehouse Group",
+            "value": "C0002"
+        },
+        {
+            "name": "DTDC Courier and Cargo",
+            "value": "C0003"
+        }
+    ],
+    "ownershipDropdown": [
+        {
+            "name": "Private Limited",
+            "value": "T0001"
+        },
+        {
+            "name": "Public Limited",
+            "value": "T0002"
+        },
+        {
+            "name": "Government Company",
+            "value": "T0002"
+        }
+    ],
+    "locationDropdown": [
+        {
+            "name": "Mumbai",
+            "value": "MUMB"
+        },
+        {
+            "name": "Surat",
+            "value": "SUR"
+        },
+        {
+            "name": "Pune",
+            "value": "PUN"
+        }
+    ],
+    "payBasisDropdown": [
+        {
+            "name": "PAID",
+            "value": "Paid"
+        },
+        {
+            "name": "To Pay",
+            "value": "Topay"
+        },
+        {
+            "name": "TBB",
+            "value": "Tbb"
+        }
+    ],
+    "nonOdaDropdown": [
+        {
+            "name": "Mumbai",
+            "value": "MUMB"
+        },
+        {
+            "name": "Surat",
+            "value": "SUR"
+        },
+        {
+            "name": "Pune",
+            "value": "PUN"
+        }
+    ],
+    "controllingDropdown": [
+        {
+            "name": "Mumbai",
+            "value": "MUMB"
+        },
+        {
+            "name": "Surat",
+            "value": "SUR"
+        },
+        {
+            "name": "Pune",
+            "value": "PUN"
         }
     ]
 }

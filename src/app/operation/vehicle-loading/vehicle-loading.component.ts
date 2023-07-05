@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,121 +5,163 @@ import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.se
 import { vehicleLoadingControl } from '../../../assets/FormControls/vehicleloading';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VehicleUpdateUploadComponent } from '../vehicle-update-upload/vehicle-update-upload.component';
+import { ViewPrintComponent } from '../view-print/view-print.component';
+import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
+import { setFormControlValue } from 'src/app/Utility/commonFunction/setFormValue/setFormValue';
 @Component({
   selector: 'app-vehicle-loading',
   templateUrl: './vehicle-loading.component.html'
 })
 export class VehicleLoadingComponent implements OnInit {
-  vehicleLoadingTableForm: UntypedFormGroup;
-  jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
-  tripData: any;
-  jsonControlArray: any;
-  orgBranch: string = localStorage.getItem("Branch");
-  //declaring breadscrum
+  vehicleLoadingTableForm: UntypedFormGroup; // Declaration of UntypedFormGroup for vehicle loading table
+  tripData: any; // Declaration of tripData variable
+  jsonControlArray: any; // Declaration of jsonControlArray variable
+  orgBranch: string = localStorage.getItem("Branch"); // Retrieve value from localStorage for orgBranch
+  
+  // Declaring breadscrum
   breadscrums = [
-    {
-      title: "vehicle-loading",
-      items: ["Loading-Sheet"],
-      active: "vehicle-loading"
-    }
-  ]
+      {
+          title: "vehicle-loading",
+          items: ["Loading-Sheet"],
+          active: "vehicle-loading"
+      }
+  ];
+  
   height = '100vw';
   width = '100vw';
-  maxWidth: '232vw'
+  maxWidth: '232vw';
+  
   columnHeader = {
-    "LoadingSheet": "Loading Sheet",
-    "Manifest": "Manifest",
-    "Leg": "Leg",
-    "Shipments": "Shipments",
-    "Packages": "Packages",
-    "ShipmentsLoaded": "ShipmentsLoaded",
-    "PackagesLoaded": "PackagesLoaded",
-    "Pending": "Pending",
-    "Action": "Action",
-    "printPending": "Pending",
+      "LoadingSheet": "Loading Sheet",
+      "Manifest": "Manifest",
+      "Leg": "Leg",
+      "Shipments": "Shipments",
+      "Packages": "Packages",
+      "ShipmentsLoaded": "ShipmentsLoaded",
+      "PackagesLoaded": "PackagesLoaded",
+      "Pending": "Pending",
+      "Action": "Action",
+      "printPending": "Print"
   };
-  centerAlignedData = ['Shipments', 'Packages', 'ShipmentsLoaded', 'PackagesLoaded','Pending'];
-
-  //  #region declaring Csv File's Header as key and value Pair
+  
+  centerAlignedData = ['Shipments', 'Packages', 'ShipmentsLoaded', 'PackagesLoaded', 'Pending'];
+  
+  // Declaring Csv File's Header as key and value Pair
   headerForCsv = {
-    "LoadingSheet": "Loading Sheet",
-    "Manifest": "Manifest",
-    "Leg": "Leg",
-    "Shipments": "Shipments",
-    "Packages": "Packages",
-    "ShipmentsLoaded": "ShipmentsLoaded",
-    "PackagesLoaded": "PackagesLoaded",
-    "Pending": "Pending",
-  }
-  toggleArray = []
+      "LoadingSheet": "Loading Sheet",
+      "Manifest": "Manifest",
+      "Leg": "Leg",
+      "Shipments": "Shipments",
+      "Packages": "Packages",
+      "ShipmentsLoaded": "ShipmentsLoaded",
+      "PackagesLoaded": "PackagesLoaded",
+      "Pending": "Pending"
+  };
+  
+  toggleArray = [];
   linkArray = [
-    { Row: 'printPending', Path: 'Operation/LoadingSheetView' },
-    { Row: 'Action', Path: '' }
-  ]
-  menuItems = [
-    { label: 'Load Vehicle', componentDetails: VehicleUpdateUploadComponent, function: "GeneralMultipleView" },
-    // Add more menu items as needed
+      { Row: 'Action', Path: '' },
+      { Row: 'printPending', Path: '' },
   ];
+  
+  menuItems = [
+      { label: 'Load Vehicle', componentDetails: VehicleUpdateUploadComponent, function: "GeneralMultipleView" },
+      { label: 'printPending', componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
+      // Add more menu items as needed
+  ];
+  
   dynamicControls = {
-    add: false,
-    edit: false,
-    //csv: true
-  }
+      add: false,
+      edit: false,
+      //csv: true
+  };
+  
   csv: any;
   data: Object;
   tableload: boolean = true;
-  constructor(private Route: Router, private CnoteService: CnoteService, private http: HttpClient, private fb: UntypedFormBuilder) {
+  
+  constructor(
+    private Route: Router, // Injecting Router service
+    private CnoteService: CnoteService, // Injecting CnoteService
+    private navigationService: NavigationService, // Injecting NavigationService
+    private operationService: OperationService, // Injecting OperationService
+    private fb: UntypedFormBuilder // Injecting UntypedFormBuilder
+) {
+    // Check if there is data in the state passed through navigation
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
-      console.log(this.tripData);
+        // Retrieve the data from the state
+        this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
-    this.IntializeFormControl();
-  }
-  IntializeFormControl() {
-    const vehicleLoadingControls = new vehicleLoadingControl();
-    this.jsonControlArray = vehicleLoadingControls.getvehiceLoadingFormControls();
-    this.vehicleLoadingTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
-  }
-  ngOnInit(): void {
-    this.autofillvehicleData()
-  }
-  autofillvehicleData() {
-    this.vehicleLoadingTableForm.controls['Vehicle'].setValue(this.tripData?.VehicleNo || '');
-    this.vehicleLoadingTableForm.controls['Route'].setValue(this.tripData?.RouteandSchedule || '')
-    this.vehicleLoadingTableForm.controls['TripID'].setValue(this.tripData?.TripID || '')
-    this.vehicleLoadingTableForm.controls['LoadingLocation'].setValue(this.orgBranch || '')
-    this.getLoadingSheetData();
-  }
-  getLoadingSheetData() {
     
-    this.http.get(this.jsonUrl).subscribe(res => {
+    this.IntializeFormControl(); // Call the IntializeFormControl() method
+}
+
+ IntializeFormControl() {
+    // Create an instance of vehicleLoadingControl class
+    const vehicleLoadingControls = new vehicleLoadingControl();
+
+    // Get the form controls from the vehicleLoadingControls instance
+    this.jsonControlArray = vehicleLoadingControls.getvehiceLoadingFormControls();
+
+    // Build the form group using the form controls obtained
+    this.vehicleLoadingTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+}
+
+ngOnInit(): void {
+  this.autofillvehicleData();
+}
+
+autofillvehicleData() {
+  // Set the value of 'Vehicle' form control with tripData's VehicleNo or an empty string
+  setFormControlValue(this.vehicleLoadingTableForm.controls['Vehicle'], (this.tripData?.VehicleNo || ''));
+
+  // Set the value of 'Route' form control with tripData's RouteandSchedule or an empty string
+  setFormControlValue(this.vehicleLoadingTableForm.controls['Route'], (this.tripData?.RouteandSchedule || ''));
+
+  // Set the value of 'TripID' form control with tripData's TripID or an empty string
+  setFormControlValue(this.vehicleLoadingTableForm.controls['TripID'], (this.tripData?.TripID || ''));
+
+  // Set the value of 'LoadingLocation' form control with orgBranch or an empty string
+  setFormControlValue(this.vehicleLoadingTableForm.controls['LoadingLocation'], (this.orgBranch || ''));
+
+  // Call the getLoadingSheetData() method
+  this.getLoadingSheetData();
+}
+
+getLoadingSheetData() {
+  // Call the operationService to get JSON file details from 'arrivalUrl'
+  this.operationService.getJsonFileDetails('arrivalUrl').subscribe(res => {
       this.data = res;
+
       let loadingSheetData = this.CnoteService.getVehicleLoadingSheetData(); // Call the function to get the actual data
 
       // Rest of the code...
-      let dataLoading: any[] = []
+      let dataLoading: any[] = [];
       if (loadingSheetData) {
-        loadingSheetData.forEach((element: any) => { // Specify the type of 'element' as 'any'
-          let json = {
-            LoadingSheet: element?.LoadingSheet || '',
-            Manifest: '',
-            Leg: element?.lag || '',
-            Shipments: element?.Shipment || '',
-            Packages: element?.Packages || '',
-            ShipmentsLoaded: element?.Shipment || '',
-            PackagesLoaded: element?.Packages || '',
-            Pending: '',
-            Action: 'Load Vehicle',
-            printPending: 'print'
-          };
-          dataLoading.push(json);
-        });
+          loadingSheetData.forEach((element: any) => { // Specify the type of 'element' as 'any'
+              let json = {
+                  LoadingSheet: element?.LoadingSheet || '',
+                  Manifest: '',
+                  Leg: element?.lag || '',
+                  Shipments: element?.Shipment || '',
+                  Packages: element?.Packages || '',
+                  ShipmentsLoaded: 0,
+                  PackagesLoaded: 0,
+                  Pending: element?.Shipment || '',
+                  Action: 'Load Vehicle',
+                  printPending: 'print'
+              };
+              dataLoading.push(json);
+          });
       }
+
       this.tableload = false;
       this.csv = dataLoading;
-      this.CnoteService.setvehicelodingData(this.tripData)
-    })
-  }
+      this.CnoteService.setvehicelodingData(this.tripData);
+  });
+}
+
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
 
@@ -139,6 +180,6 @@ export class VehicleLoadingComponent implements OnInit {
     }
   }
   goBack(tabIndex: number): void {
-    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
+    this.navigationService.navigateTotab(tabIndex,'/dashboard/GlobeDashboardPage');
   }
 }

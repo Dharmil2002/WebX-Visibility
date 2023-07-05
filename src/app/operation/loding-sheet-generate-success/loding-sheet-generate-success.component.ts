@@ -58,17 +58,10 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     { Row: 'Action', Path: '', componentDetails: "" }
   ]
   menuItems = [
-    { label: 'Action',componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
+    { label: 'Print',componentDetails: ViewPrintComponent, function: "GeneralMultipleView" },
     // Add more menu items as needed
   ];
 
-  // menuItems = [
-
-  //   { label: 'Print' },
-
-  //   // Add more menu items as needed
-
-  // ];
   METADATA = {
     checkBoxRequired: false,
     // selectAllorRenderedData : false,

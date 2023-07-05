@@ -1,26 +1,20 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, Inject } from '@angular/core';
-import Swal from 'sweetalert2';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { MAT_DIALOG_DATA,MatDialogRef } from '@angular/material/dialog';
 import { GenericTableComponent } from '../../shared-components/Generic Table/generic-table.component';
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
+import { OperationService } from 'src/app/core/service/operations/operation.service';
 
 @Component({
   selector: 'app-loading-sheet-view',
   templateUrl: './loading-sheet-view.component.html'
 })
 export class LoadingSheetViewComponent implements OnInit {
-  jsonUrl = '../../../assets/data/arrival-dashboard-data.json'
-  data: [] | any;
+  arrivalData: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
-  csv: any[];
+  tableData: any[];
   addAndEditPath: string
-  drillDownPath: string
-  extraData: any
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime. 
-  companyCode: number;
   dynamicControls = {
     add: false,
     edit: false,
@@ -38,7 +32,7 @@ export class LoadingSheetViewComponent implements OnInit {
   ]
   toggleArray = []
   IscheckBoxRequired: boolean;
-  menuItemflag: boolean = true;
+  menuItemflag: boolean;
 
   menuItems = [
   ];
@@ -72,84 +66,84 @@ export class LoadingSheetViewComponent implements OnInit {
   dataDetails: any;
   //#endregion
 
-
-  constructor(private http: HttpClient, private Route: Router,private cnoteService: CnoteService,public dialogRef: MatDialogRef<GenericTableComponent>, @Inject(MAT_DIALOG_DATA) public item: any) {
+  constructor(
+    private cnoteService: CnoteService,
+    private operationService: OperationService,
+    public dialogRef: MatDialogRef<GenericTableComponent>,
+    @Inject(MAT_DIALOG_DATA) public item: any
+  ) {
     if (item) {
       this.loadinSheet = item;
-      //this.extraData=this.Route.getCurrentNavigation()?.extras?.state.data.extraData;
-
       this.IscheckBoxRequired = true;
     }
-    this.getLoadingSheetDetails()
+    this.getLoadingSheetDetails();
   }
+  
 
 
   ngOnInit(): void {
 
   }
 
-  handleMenuItemClick(label: any) {
-    if (label.label.label === 'Create Trip') {
-      Swal.fire("Loading Sheet");
-    }
-    // Perform some action when a menu item is clicked in the child component
-  }
   IsActiveFuntion(data) {
     this.dataDetails = data;
   }
   updateShipping() {
-
+    // Create a JSON object with the shipping details
     let jsonShipping = {
-      shipping: this.dataDetails ? this.dataDetails : this.csv.filter((x) => x.isSelected == true)
-    }
-    this.dialogRef.close(jsonShipping)
+      shipping: this.dataDetails ? this.dataDetails : this.tableData.filter((x) => x.isSelected == true)
+    };
+  
+    // Close the dialog and pass the JSON object as the result
+    this.dialogRef.close(jsonShipping);
   }
+
   getLoadingSheetDetails() {
+  // Retrieve arrival data from the operation service
+  this.operationService.getJsonFileDetails('arrivalUrl').subscribe(res => {
+    this.arrivalData = res;
 
-    this.http.get(this.jsonUrl).subscribe(res => {
-      this.data = res;
-      let ShipingDatadetails=this.cnoteService.getShipingData();
-      let tableArray = ShipingDatadetails.filter((x)=>x.Leg === this.loadinSheet.lag)
-      let packagesData = this.data.packagesData.filter((x) =>
-        tableArray.some((shipment) => shipment.Shipment === x.Shipment));
-      let mergedData: any[] = [];
+    // Retrieve shipping data from the cnote service
+    let ShipingDatadetails = this.cnoteService.getShipingData();
 
-      // Perform inner join based on Shipment key
-      mergedData = tableArray.filter((shippingItem) =>
-        packagesData.some((packageItem) => packageItem.Shipment === shippingItem.Shipment)
-      ).map((shippingItem) => {
-        const matchingPackage = packagesData.find((packageItem) => packageItem.Shipment === shippingItem.Shipment);
-        return { ...shippingItem, ...matchingPackage };
+    // Filter tableArray based on the specified condition
+    let tableArray = ShipingDatadetails.filter((x) => x.Leg === this.loadinSheet.lag);
+
+    // Filter packagesData based on the specified condition
+    let packagesData = this.arrivalData.packagesData.filter((x) =>
+      tableArray.some((shipment) => shipment.Shipment === x.Shipment)
+    );
+
+    let mergedData: any[] = [];
+
+    // Perform inner join based on Shipment key
+    mergedData = tableArray.filter((shippingItem) =>
+      packagesData.some((packageItem) => packageItem.Shipment === shippingItem.Shipment)
+    ).map((shippingItem) => {
+      const matchingPackage = packagesData.find((packageItem) => packageItem.Shipment === shippingItem.Shipment);
+      return { ...shippingItem, ...matchingPackage };
+    });
+
+    // The mergedData array now contains the merged result based on the Shipment key
+
+    let Shipment: any[] = [];
+
+    // Check if Shipment array is not empty
+    if (Shipment) {
+      // Set isSelected to true for elements in tableArray that are present in Shipment
+      tableArray.forEach((element) => {
+        if (Shipment.includes(element.Shipment)) {
+          element.isSelected = true;
+        }
       });
+    }
 
-      // The mergedData array now contains the merged result based on the Shipment key
+    this.tableData = mergedData;
 
-      let Shipment: any[] = []
-      // this.extraData.forEach(element => {
-      //   Shipment.push(element.Shipment)
-      // });
-      if (Shipment) {
-        tableArray.forEach((element) => {
-          if (Shipment.includes(element.Shipment)) {
-            element.isSelected = true;
-          }
-        });
-      }
+    this.tableload = false;
+  });
+}
 
-      this.csv = mergedData;
-      // console.log(this.csv);
-      this.tableload = false;
-
-    });
-  }
-  createLoadingSheetData() {
-    
-    this.Route.navigate(['Operation/CreateLoadingSheet'], {
-      state: {
-        shipping: this.dataDetails ? this.dataDetails : this.csv.filter((x) => x.isSelected == true),
-      },
-    });
-  }
   goBack(): void {
     this.dialogRef.close()
   }

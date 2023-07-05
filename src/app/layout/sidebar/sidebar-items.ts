@@ -128,30 +128,39 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
+            },
+            {
+              "path": "Masters/CompanyMaster/AddCompany",
+              "title": "Company Setup Master",
+              "moduleName": "Company Setup Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Masters/CustomerMaster/CustomerMasterList",
+              "title": "Customer Master",
+              "moduleName": "Customer Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Masters/DocumentControlRegister/AddDCR",
+              "title": "Add DCR Series",
+              "moduleName": "Add DCR Series",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
             }
           ]
         },
-        // below commented code is for to add menu under the stakeholder
-        // {
-        //   "path": "Masters/DriverMaster/DriverMasterList",
-        //   "title": "Stakeholders",
-        //   "moduleName": "Stakeholders",
-        //   "icon": "",
-        //   "class": "ml-menu",
-        //   "groupTitle": false,
-        //   "submenu": [
-        //     // {
-        //     //   "path": "Masters/UserMaster/UserMasterView",
-        //     //   "title": "User Master",
-        //     //   "moduleName": "User Master",
-        //     //   "icon": "",
-        //     //   "class": "ml-menu",
-        //     //   "groupTitle": false,
-        //     //   "submenu": [
-        //     //   ]
-        //     // },
-        //   ]
-        // },
       ]
     },
   ]

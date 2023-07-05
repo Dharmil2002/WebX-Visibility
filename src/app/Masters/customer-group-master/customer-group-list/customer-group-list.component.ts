@@ -16,7 +16,6 @@ export class CustomerGroupListComponent implements OnInit {
     "srNo":"Sr No",
     "groupCode": "Group Code",
     "groupName": "Group Name",
-    "groupPassword": "Group Password",
     "activeFlag": "Active Status",
     "actions": "Actions"
   };
@@ -34,7 +33,7 @@ export class CustomerGroupListComponent implements OnInit {
   }
   addAndEditPath: string;
   constructor(private http: HttpClient,private masterService: MasterService,) {
-  this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
+  this.addAndEditPath = "/Masters/CustomerGroupMaster/AddCustomerGroupMaster";
   }
   ngOnInit(): void {
     //throw new Error("Method not implemented.");

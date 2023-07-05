@@ -1,1 +1,7 @@
-<p>customer-group-add works!</p>
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <form [formGroup]="groupTableForm">
+        <app-form-webxpress [form]="groupTableForm" [formData]="jsonControlGroupArray" [showSaveAndCancelButton]="true"
+            (functionCallEmitter)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

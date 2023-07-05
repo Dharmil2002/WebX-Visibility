@@ -190,5 +190,19 @@
             "name": "Pune",
             "value": "PUN"
         }
+    ],
+    "documentTypeDropDown": [
+        {
+            "name": "CNote",
+            "value": "1"
+        },
+        {
+            "name": "Delivery MR",
+            "value": "2"
+        },
+        {
+            "name": "UBI Series",
+            "value": "3"
+        }
     ]
 }

@@ -21,10 +21,11 @@ import { AddCompanyComponent } from './Company Setup Master/add-company/add-comp
 import { CustomerMasterListComponent } from './customer-master/customer-master-list/customer-master-list.component';
 import { CustomerMasterAddComponent } from './customer-master/customer-master-add/customer-master-add.component';
 import { AddDcrSeriesComponent } from './dcr-series/add-dcr-series/add-dcr-series.component';
+// import { TrackDcrSeriesComponent } from './dcr-series/track-dcr-series/track-dcr-series.component';
+import { AddVehicletypeMasterComponent } from './vehicle-type-master/add-vehicletype-master/add-vehicletype-master.component';
+import { VehicletypeMasterListComponent } from './vehicle-type-master/vehicletype-master-list/vehicletype-master-list.component';
 import { CustomerGroupListComponent } from './customer-group-master/customer-group-list/customer-group-list.component';
 import { CustomerGroupAddComponent } from './customer-group-master/customer-group-add/customer-group-add.component';
-// import { AddVendorMasterComponent } from './Vendor Master/add-vendor-master/add-vendor-master.component';
-// import { VendorMasterListComponent } from './Vendor Master/vendor-master-list/vendor-master-list.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -47,12 +48,12 @@ const routes: Routes = [
   { path: "CompanyMaster/AddCompany", component: AddCompanyComponent },
   { path: "CustomerMaster/CustomerMasterList", component: CustomerMasterListComponent },
   { path: "CustomerMaster/AddCustomerMaster", component: CustomerMasterAddComponent },
-  { path: "DocumentControlRegister/AddDCR", component: AddDcrSeriesComponent, },
+  { path: "DocumentControlRegister/AddDCR", component: AddDcrSeriesComponent },
   { path: "CustomerGroupMaster/CustomerGroupMasterList", component: CustomerGroupListComponent, },
   { path: "CustomerGroupMaster/AddCustomerGroupMaster", component: CustomerGroupAddComponent, },
-  // { path: 'VendorMaster/VendorMasterList', component: VendorMasterListComponent },
-  // { path: 'VendorMaster/AddVendorMaster', component: AddVendorMasterComponent },
-];
+  // { path: "DocumentControlRegister/TrackDCR", component: TrackDcrSeriesComponent },
+  { path: "VehicleTypeMaster/VehicleTypeMasterList", component: VehicletypeMasterListComponent },
+  { path: "VehicleTypeMaster/AddVehicleTypeMaster", component: AddVehicletypeMasterComponent },];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

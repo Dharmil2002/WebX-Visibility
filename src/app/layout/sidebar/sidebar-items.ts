@@ -150,6 +150,26 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
+              "path": "Masters/VehicleTypeMaster/VehicleTypeMasterList",
+              "title": "Vehicle Type Master",
+              "moduleName": "Vehicle Type Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+          ]
+        },
+        {
+          "path": "",
+          "title": "Document Control",
+          "moduleName": "Document Control",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
               "path": "Masters/CustomerGroupMaster/CustomerGroupMasterList",
               "title": "Customer Group Master",
               "moduleName": "Customer Group Master",
@@ -168,9 +188,19 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
+            },
+            {
+              "path": "Masters/DocumentControlRegister/TrackDCR",
+              "title": "Track and Manage DCR",
+              "moduleName": "Track and Manage DCR",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
             }
           ]
-        },
+        }
       ]
     },
   ]

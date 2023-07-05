@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 export class MasterService {
   companyJsonUrl = '../../../assets/data/CompanyGST-data.json';
   dropDownUrl = '../../../assets/data/state-countryDropdown.json';
+  masterUrl = '../../../assets/data/masters-data.json';
   constructor(private http: HttpClient) { }
   /**
    * Retrieves JSON file details from the specified API URL.

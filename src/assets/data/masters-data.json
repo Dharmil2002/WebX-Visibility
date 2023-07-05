@@ -1059,5 +1059,78 @@
           "billingCity": "Pune",
           "billingPincode": "412220"
         }
+      ],
+
+      "customerGroupData": [
+        {
+          "srNo": "1",
+          "groupCode": "002",
+          "groupName": "VIRAR",
+          "groupPassword": "123456",
+          "activeFlag": true
+        },
+        {
+          "srNo": "2",
+          "groupCode": "1208",
+          "groupName": "VIRAR",
+          "groupPassword": "123456",
+          "activeFlag": true
+        },
+        {
+          "srNo": "3",
+          "groupCode": "123",
+          "groupName": "KANCHEEPURAM",
+          "groupPassword": "123456",
+          "activeFlag": true
+        },
+        {
+          "srNo": "4",
+          "groupCode": "1234",
+          "groupName": "KALAMBOLI",
+          "groupPassword": "123456",
+          "activeFlag": true
+        },
+        {
+          "srNo": "5",
+          "groupCode": "12345",
+          "groupName": "MUMBAI",
+          "groupPassword": "123456",
+          "activeFlag": true
+        },
+        {
+          "srNo": "6",
+          "groupCode": "125",
+          "groupName": "KASAUL",
+          "groupPassword": "123456",
+          "activeFlag": true
+        },
+        {
+          "srNo": "7",
+          "groupCode": "215648",
+          "groupName": "THANE",
+          "groupPassword": "123456",
+          "activeFlag": false
+        },
+        {
+          "srNo": "8",
+          "groupCode": "401107",
+          "groupName": "SIKKIM",
+          "groupPassword": "123456",
+          "activeFlag": true
+        },
+        {
+          "srNo": "9",
+          "groupCode": "9010",
+          "groupName": "ALUVA",
+          "groupPassword": "123456",
+          "activeFlag": true
+        },
+        {
+          "srNo": "10",
+          "groupCode": "ABJ",
+          "groupName": "AMBEJOGAI",
+          "groupPassword": "123456",
+          "activeFlag": true
+        }
       ]
 }

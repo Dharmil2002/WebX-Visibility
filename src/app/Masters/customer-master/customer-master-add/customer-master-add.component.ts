@@ -15,7 +15,6 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
   templateUrl: './customer-master-add.component.html',
 })
 export class CustomerMasterAddComponent implements OnInit {
-  countryURL = '../../../assets/data/state-countryDropdown.json'
   customerTableForm: UntypedFormGroup;
   error: string
   isUpdate = false;
@@ -29,9 +28,7 @@ export class CustomerMasterAddComponent implements OnInit {
   locationStatus: any;
   nonOda: any;
   noOdaStatus: any;
-  nonOdaData: any;
   controlling: any;
-  controllingData: any;
   controllingStatus: any;
   pay: any;
   payStatus: any;

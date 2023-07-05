@@ -97,7 +97,7 @@ const MY_DATE_FORMAT = {
       deps: [MAT_DATE_LOCALE],
      
     },
-    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },,
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },
     FilterUtils
   ],
   

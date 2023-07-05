@@ -150,6 +150,16 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
+              "path": "Masters/CustomerGroupMaster/CustomerGroupMasterList",
+              "title": "Customer Group Master",
+              "moduleName": "Customer Group Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
               "path": "Masters/DocumentControlRegister/AddDCR",
               "title": "Add DCR Series",
               "moduleName": "Add DCR Series",

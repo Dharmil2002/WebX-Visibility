@@ -59,7 +59,7 @@
                 <mat-label>{{formItem.label}}</mat-label>
                 <mat-select placeholder="{{formItem.label}}"
                     (selectionChange)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                    formControlName={{formItem.additionalData.support}}>
+                    formControlName={{formItem.additionalData?.support}}>
                     <mat-option>
                         <ngx-mat-select-search placeholderLabel="Find bank..."
                             noEntriesFoundLabel="'no matching bank found'"

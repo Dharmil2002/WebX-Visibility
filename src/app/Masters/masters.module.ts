@@ -59,6 +59,8 @@ import { AddLocationMasterComponent } from './location-master/add-location-maste
 import { CustomerMasterListComponent } from './customer-master/customer-master-list/customer-master-list.component';
 import { CustomerMasterAddComponent } from './customer-master/customer-master-add/customer-master-add.component';
 import { AddDcrSeriesComponent } from './dcr-series/add-dcr-series/add-dcr-series.component';
+import { CustomerGroupListComponent } from './customer-group-master/customer-group-list/customer-group-list.component';
+import { CustomerGroupAddComponent } from './customer-group-master/customer-group-add/customer-group-add.component';
 // import { VendorMasterListComponent } from './Vendor Master/vendor-master-list/vendor-master-list.component';
 // import { AddVendorMasterComponent } from './Vendor Master/add-vendor-master/add-vendor-master.component';
 @NgModule({
@@ -128,6 +130,8 @@ import { AddDcrSeriesComponent } from './dcr-series/add-dcr-series/add-dcr-serie
     AddDcrSeriesComponent,
     CustomerMasterListComponent,
     CustomerMasterAddComponent,
+    CustomerGroupListComponent,
+    CustomerGroupAddComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

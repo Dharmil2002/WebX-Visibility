@@ -21,6 +21,8 @@ import { AddCompanyComponent } from './Company Setup Master/add-company/add-comp
 import { CustomerMasterListComponent } from './customer-master/customer-master-list/customer-master-list.component';
 import { CustomerMasterAddComponent } from './customer-master/customer-master-add/customer-master-add.component';
 import { AddDcrSeriesComponent } from './dcr-series/add-dcr-series/add-dcr-series.component';
+import { CustomerGroupListComponent } from './customer-group-master/customer-group-list/customer-group-list.component';
+import { CustomerGroupAddComponent } from './customer-group-master/customer-group-add/customer-group-add.component';
 // import { AddVendorMasterComponent } from './Vendor Master/add-vendor-master/add-vendor-master.component';
 // import { VendorMasterListComponent } from './Vendor Master/vendor-master-list/vendor-master-list.component';
 
@@ -46,6 +48,8 @@ const routes: Routes = [
   { path: "CustomerMaster/CustomerMasterList", component: CustomerMasterListComponent },
   { path: "CustomerMaster/AddCustomerMaster", component: CustomerMasterAddComponent },
   { path: "DocumentControlRegister/AddDCR", component: AddDcrSeriesComponent, },
+  { path: "CustomerGroupMaster/CustomerGroupMasterList", component: CustomerGroupListComponent, },
+  { path: "CustomerGroupMaster/AddCustomerGroupMaster", component: CustomerGroupAddComponent, },
   // { path: 'VendorMaster/VendorMasterList', component: VendorMasterListComponent },
   // { path: 'VendorMaster/AddVendorMaster', component: AddVendorMasterComponent },
 ];

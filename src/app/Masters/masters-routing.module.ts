@@ -30,6 +30,8 @@ import { PincodeMasterListComponent } from './pincode-master/pincode-master-list
 // import { UserMasterListComponent } from './user-master/user-master-list/user-master-list.component';
 import { CityMasterListComponent } from './city-master/city-master-list/city-master-list.component';
 import { AddCityMasterComponent } from './city-master/add-city-master/add-city-master.component';
+import { AddVehicleMasterComponent } from './vehicle-master/add-vehicle-master/add-vehicle-master.component';
+import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list/vehicle-master-list.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -60,9 +62,8 @@ const routes: Routes = [
   { path: "VehicleTypeMaster/AddVehicleTypeMaster", component: AddVehicletypeMasterComponent },
   { path: "PinCodeMaster/PinCodeMasterList", component: PincodeMasterListComponent },
   { path: "PinCodeMaster/AddPinCodeMaster", component: AddPinCodeMasterComponent },
-  // { path: "UserMaster/UserMasterView", component: UserMasterListComponent },
-  // { path: "UserMaster/AddUser", component: AddUserMasterComponent }
-];
+  { path: "VehicleMaster/VehicleMasterList", component: VehicleMasterListComponent },
+  { path: "VehicleMaster/AddVehicle", component: AddVehicleMasterComponent },];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

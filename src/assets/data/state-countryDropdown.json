@@ -450,6 +450,90 @@
     "documentTypeDropDown": [
         {
             "name": "CNote",
+            "value": "DKT"
+        },
+        {
+            "name": "Delivery MR",
+            "value": "DMR"
+        },
+        {
+            "name": "UBI Series",
+            "value": "DKTBC"
+        }
+    ],
+    "vehicleTypeDropdown": [
+        {
+            "name": "ASHOK LEYLAND",
+            "value": "1"
+        },
+        {
+            "name": "TATA-2518",
+            "value": "2"
+        },
+        {
+            "name": "TATA",
+            "value": "3"
+        }
+    ],
+    "controllBranchDropdown": [
+        {
+            "name": "Mumbai",
+            "value": "MUMB"
+        },
+        {
+            "name": "Ahmedabad",
+            "value": "AMDB"
+        },
+        {
+            "name": "Pune",
+            "value": "PUNE"
+        }
+    ],
+    "assetNameDropdown": [
+        {
+            "name": "Vehicle",
+            "value": "1"
+        },
+        {
+            "name": "Reefer",
+            "value": "2"
+        },
+        {
+            "name": "Container",
+            "value": "3"
+        },
+        {
+            "name": "Trailer",
+            "value": "3"
+        }
+    ],
+    "vendorTypeDropdown": [
+        {
+            "name": "Attached",
+            "value": "1"
+        },
+        {
+            "name": "Service Provider",
+            "value": "2"
+        },
+        {
+            "name": "Own",
+            "value": "3"
+        }
+    ],
+    "vendorNameDropdown": [
+        {
+            "name": "V00001:AADARSH ROADWAYSY",
+            "value": "V00001AADARSHROADWAYSY"
+        },
+        {
+            "name": "V000005:ABC TRANSPORT COMPANY",
+            "value": "V000005ABCTRANSPORTCOMPANY"
+        }
+    ],
+    "gpsProviderDropdown": [
+        {
+            "name": "CNote",
             "value": "1"
         },
         {
@@ -458,6 +542,34 @@
         },
         {
             "name": "UBI Series",
+            "value": "3"
+        }
+    ],
+    "ftlTypeDropdown": [
+        {
+            "name": "40 FT Container",
+            "value": "1"
+        },
+        {
+            "name": "7 Ton",
+            "value": "2"
+        },
+        {
+            "name": "6.50 -7.50 MT",
+            "value": "3"
+        }
+    ],
+    "permitStateDropdown": [
+        {
+            "name": "Maharashtra",
+            "value": "1"
+        },
+        {
+            "name": "Gujarat",
+            "value": "2"
+        },
+        {
+            "name": "Goa",
             "value": "3"
         }
     ]

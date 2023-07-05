@@ -1,0 +1,9 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" > 
+    <form [formGroup]="vehicleTableForm" >
+        <generic-accordion-webxpress 
+        [AccordionForm]="vehicleTableForm"
+        [accordionGroup]="accordionData"
+        (functionCallEmitter)="functionCallHandler($event)" >
+        </generic-accordion-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

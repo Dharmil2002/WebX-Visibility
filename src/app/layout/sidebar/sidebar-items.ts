@@ -150,13 +150,23 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
-              path: "Masters/PinCodeMaster/PinCodeMasterList",
-              title: "Pin code Masters",
-              moduleName: "Masters",
-              icon: "",
-              class: "",
-              groupTitle: false,
-              submenu: []
+              "path": "Masters/PinCodeMaster/PinCodeMasterList",
+              "title": "Pin code Masters",
+              "moduleName": "Masters",
+              "icon": "",
+              "class": "",
+              "groupTitle": false,
+              "submenu": []
+            },
+            {
+              "path": "Masters/VehicleMaster/VehicleMasterList",
+              "title": "Vehicle Master",
+              "moduleName": "Vehicle Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
             },
             {
               "path": "Masters/VehicleTypeMaster/VehicleTypeMasterList",

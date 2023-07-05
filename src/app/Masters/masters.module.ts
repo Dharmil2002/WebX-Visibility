@@ -57,7 +57,7 @@ import { AddLocationMasterComponent } from './location-master/add-location-maste
 import { CustomerMasterListComponent } from './customer-master/customer-master-list/customer-master-list.component';
 import { CustomerMasterAddComponent } from './customer-master/customer-master-add/customer-master-add.component';
 import { AddDcrSeriesComponent } from './dcr-series/add-dcr-series/add-dcr-series.component';
-// import { TrackDcrSeriesComponent } from './dcr-series/track-dcr-series/track-dcr-series.component';
+import { TrackDcrSeriesComponent } from './dcr-series/track-dcr-series/track-dcr-series.component';
 import { AddVehicletypeMasterComponent } from './vehicle-type-master/add-vehicletype-master/add-vehicletype-master.component';
 import { VehicletypeMasterListComponent } from './vehicle-type-master/vehicletype-master-list/vehicletype-master-list.component';
 import { CustomerGroupListComponent } from './customer-group-master/customer-group-list/customer-group-list.component';
@@ -137,7 +137,7 @@ import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list
     AddDcrSeriesComponent,
     CustomerMasterListComponent,
     CustomerMasterAddComponent,
-    // TrackDcrSeriesComponent,
+    TrackDcrSeriesComponent,
     AddVehicletypeMasterComponent,
     VehicletypeMasterListComponent,
     CustomerGroupListComponent,

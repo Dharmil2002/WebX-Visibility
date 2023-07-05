@@ -19,7 +19,7 @@ import { AddCompanyComponent } from './Company Setup Master/add-company/add-comp
 import { CustomerMasterListComponent } from './customer-master/customer-master-list/customer-master-list.component';
 import { CustomerMasterAddComponent } from './customer-master/customer-master-add/customer-master-add.component';
 import { AddDcrSeriesComponent } from './dcr-series/add-dcr-series/add-dcr-series.component';
-// import { TrackDcrSeriesComponent } from './dcr-series/track-dcr-series/track-dcr-series.component';
+import { TrackDcrSeriesComponent } from './dcr-series/track-dcr-series/track-dcr-series.component';
 import { AddVehicletypeMasterComponent } from './vehicle-type-master/add-vehicletype-master/add-vehicletype-master.component';
 import { VehicletypeMasterListComponent } from './vehicle-type-master/vehicletype-master-list/vehicletype-master-list.component';
 import { CustomerGroupListComponent } from './customer-group-master/customer-group-list/customer-group-list.component';
@@ -57,7 +57,7 @@ const routes: Routes = [
   { path: "DocumentControlRegister/AddDCR", component: AddDcrSeriesComponent },
   { path: "CustomerGroupMaster/CustomerGroupMasterList", component: CustomerGroupListComponent, },
   { path: "CustomerGroupMaster/AddCustomerGroupMaster", component: CustomerGroupAddComponent, },
-  // { path: "DocumentControlRegister/TrackDCR", component: TrackDcrSeriesComponent },
+  { path: "DocumentControlRegister/TrackDCR", component: TrackDcrSeriesComponent },
   { path: "VehicleTypeMaster/VehicleTypeMasterList", component: VehicletypeMasterListComponent },
   { path: "VehicleTypeMaster/AddVehicleTypeMaster", component: AddVehicletypeMasterComponent },
   { path: "PinCodeMaster/PinCodeMasterList", component: PincodeMasterListComponent },

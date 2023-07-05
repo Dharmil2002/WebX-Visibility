@@ -15,7 +15,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
   breadScrums = [
     {
       title: "Add DCR Series",
-      items: ["Masters"],
+      items: ["Document Control"],
       active: "Add DCR Series",
     },
   ];
@@ -67,9 +67,9 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
     totalLeaf: {
       name: "Total Leaf",
       key: "input",
-      style: { 'min-width': '10px' },
+      style: "",
       readonly: true,
-      Headerstyle: { 'min-width': '10px' },
+      // Headerstyle: { 'min-width': '10px' },
     },
     allotTo: {
       name: "Allot To",
@@ -279,14 +279,45 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
 
   // Save data
   saveData() {
-    this.service.exportData(this.tableData);
-    Swal.fire({
-      icon: "success",
-      title: "Successful",
-      text: `Data Downloaded successfully!!!`,
-      showConfirmButton: true,
-    });
-    window.location.reload();
+    if (
+      this.tableData[0].documentType.length === 0 ||
+      this.tableData[0].bookCode === "" ||
+      this.tableData[0].seriesFrom === "" ||
+      this.tableData[0].seriesTo === "" ||
+      this.tableData[0].totalLeaf === "" ||
+      this.tableData[0].allotTo.length === 0 ||
+      this.tableData[0].allocateTo.length === 0
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Data",
+        text: "Please fill in all the required fields.",
+        showConfirmButton: true,
+      });
+    } else if (this.isBookCodeUnique()) {
+      this.service.exportData(this.tableData);
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: "Data Downloaded successfully!",
+        showConfirmButton: true,
+      });
+      window.location.reload();
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Duplicate Book Code",
+        text: "Each book code should be unique.",
+        showConfirmButton: true,
+      });
+    }
+  }
+
+  isBookCodeUnique(): boolean {
+    const bookCode = this.tableData[0].bookCode;
+    // Check if any other item in the tableData has the same bookCode
+    const isUnique = this.tableData.filter((item) => item.bookCode === bookCode).length === 1;
+    return isUnique;
   }
 
   // Get series from input
@@ -304,7 +335,15 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
       });
       return;
     }
-
+    if (seriesTo !== '' && seriesTo.length !== 12) {
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: `Series To should have a length of 12.`,
+        showConfirmButton: true,
+      });
+      return;
+    }
     if (seriesTo !== '' && seriesTo <= seriesFrom) {
       Swal.fire({
         icon: "warning",

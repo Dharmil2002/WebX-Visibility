@@ -1,96 +1,352 @@
 {
     "countryList": [
         {
-            "CodeId": "1",
-            "CodeDesc": "India"
+            "codeId": "1",
+            "codeDesc": "India"
         },
         {
-            "CodeId": "2",
-            "CodeDesc": "USA"
+            "codeId": "2",
+            "codeDesc": "USA"
         },
         {
-            "CodeId": "3",
-            "CodeDesc": "Oman"
+            "codeId": "3",
+            "codeDesc": "Oman"
         },
         {
-            "CodeId": "4",
-            "CodeDesc": "Australia"
+            "codeId": "4",
+            "codeDesc": "Australia"
         },
         {
-            "CodeId": "5",
-            "CodeDesc": "New Zealand"
+            "codeId": "5",
+            "codeDesc": "New Zealand"
         },
         {
-            "CodeId": "6",
-            "CodeDesc": "Afghanistan"
+            "codeId": "6",
+            "codeDesc": "Afghanistan"
         },
         {
-            "CodeId": "7",
-            "CodeDesc": "Sri Lanka"
+            "codeId": "7",
+            "codeDesc": "Sri Lanka"
         }
     ],
     "stateList": [
         {
-            "StateId": "1",
-            "StateDesc": "Maharashtra"
+            "stateId": "1",
+            "stateDesc": "Maharashtra"
         },
         {
-            "StateId": "2",
-            "StateDesc": "Dhofar"
+            "stateId": "2",
+            "stateDesc": "Dhofar"
         },
         {
-            "StateId": "3",
-            "StateDesc": "Gulf of Oman coast"
+            "stateId": "3",
+            "stateDesc": "Gulf of Oman coast"
         },
         {
-            "StateId": "4",
-            "StateDesc": "Pune"
+            "stateId": "4",
+            "stateDesc": "Pune"
         },
         {
-            "StateId": "5",
-            "StateDesc": "Assam"
+            "stateId": "5",
+            "stateDesc": "Assam"
         },
         {
-            "StateId": "6",
-            "StateDesc": "Southern Oman"
+            "stateId": "6",
+            "stateDesc": "Southern Oman"
         },
         {
-            "StateId": "7",
-            "StateDesc": "Al Batinah North"
+            "stateId": "7",
+            "stateDesc": "Al Batinah North"
         },
         {
-            "StateId": "8",
-            "StateDesc": "Nizwa"
+            "stateId": "8",
+            "stateDesc": "Nizwa"
+        },
+        {
+            "stateId": "9",
+            "stateDesc": "Gujarat"
+        },
+        {
+            "stateId": "10",
+            "stateDesc": "Madhya Pradesh"
         }
     ],
     "zoneList": [
         {
-            "ZoneId": "1",
-            "ZoneDesc": "SOUTH"
+            "zoneId": "1",
+            "zoneDesc": "SOUTH"
         },
         {
-            "ZoneId": "2",
-            "ZoneDesc": "North Zone"
+            "zoneId": "2",
+            "zoneDesc": "North Zone"
         },
         {
-            "ZoneId": "3",
-            "ZoneDesc": "SOUTH3"
+            "zoneId": "3",
+            "zoneDesc": "SOUTH3"
         },
         {
-            "ZoneId": "4",
-            "ZoneDesc": "West Zone"
+            "zoneId": "4",
+            "zoneDesc": "West Zone"
         },
         {
-            "ZoneId": "5",
-            "ZoneDesc": "CENTRAL"
+            "zoneId": "5",
+            "zoneDesc": "CENTRAL"
         },
         {
-            "ZoneId": "6",
-            "ZoneDesc": "SOUTH2"
+            "zoneId": "6",
+            "zoneDesc": "SOUTH2"
         },
         {
-            "ZoneId": "6",
-            "ZoneDesc": "South Zone"
+            "zoneId": "6",
+            "zoneDesc": "South Zone"
+        }
+    ],
+    "cityList": [
+        {
+            "cityId": 1,
+            "cityDesc": "Mumbai"
+        },
+        {
+            "cityId": 2,
+            "cityDesc": "Pune"
+        },
+        {
+            "cityId": 3,
+            "cityDesc": "Navi Mumbai"
+        },
+        {
+            "cityId": 4,
+            "cityDesc": "Mira-Bhayandar"
+        },
+        {
+            "cityId": 5,
+            "cityDesc": "Surat"
+        },
+        {
+            "cityId": 6,
+            "cityDesc": "Valsad"
+        },
+        {
+            "cityId": 7,
+            "cityDesc": "Vapi"
+        },
+        {
+            "cityId": 8,
+            "cityDesc": "Thane"
+        },
+        {
+            "cityId": 9,
+            "cityDesc": "Kalyan"
+        }
+    ],
+    "pincodeList": [
+        {
+            "PincodeId": 1,
+            "PincodeDesc": "400029"
+        },
+        {
+            "PincodeId": 2,
+            "PincodeDesc": "400065"
+        },
+        {
+            "PincodeId": 3,
+            "PincodeDesc": "400011"
+        },
+        {
+            "PincodeId": 4,
+            "PincodeDesc": "400099"
+        },
+        {
+            "PincodeId": 5,
+            "PincodeDesc": "400004"
+        },
+        {
+            "PincodeId": 6,
+            "PincodeDesc": "400053"
+        }
+    ],
+    "locationList": [
+        {
+            "locId": 1,
+            "locDesc": "VIDHYANAGA"
+        },
+        {
+            "locId": 2,
+            "locDesc": "Surat"
+        },
+        {
+            "locId": 3,
+            "locDesc": "Mumbai"
+        },
+        {
+            "locId": 4,
+            "locDesc": "BARKA"
+        },
+        {
+            "locId": 5,
+            "locDesc": "Delhi"
+        },
+        {
+            "locId": 6,
+            "locDesc": "GOA"
+        },
+        {
+            "locId": 7,
+            "locDesc": "HQTR"
+        },
+        {
+            "locId": 8,
+            "locDesc": "GWTB"
+        }
+    ],
+    "userList": [
+        {
+            "userId": 1,
+            "userDesc": "Bussiness associate"
+        },
+        {
+            "userId": 2,
+            "userDesc": "Employee"
+        },
+        {
+            "userId": 3,
+            "userDesc": "Vendor"
+        },
+        {
+            "userId": 4,
+            "userDesc": "Customer"
+        }
+    ],
+    "userStatus": [
+        {
+            "userStatusId": 1,
+            "userStatusDesc": "Permanent"
+        },
+        {
+            "userStatusId": 2,
+            "userStatusDesc": "Contractual"
+        },
+        {
+            "userStatusId": 3,
+            "userStatusDesc": "Trainee"
+        }
+    ],
+    "managerId": [
+        {
+            "managerId": 1,
+            "managerDesc": "RupaliLad"
+        },
+        {
+            "managerId": 2,
+            "managerDesc": "10002"
+        },
+        {
+            "managerId": 3,
+            "managerDesc": "SHAMS"
+        },
+        {
+            "managerId": 4,
+            "managerDesc": "E10001"
+        },
+        {
+            "managerId": 5,
+            "managerDesc": "E10003r"
+        },
+        {
+            "managerId": 6,
+            "managerDesc": "1234"
+        },
+        {
+            "managerId": 7,
+            "managerDesc": "aarti1"
+        }
+    ],
+    "roleId": [
+        {
+            "roleId": 1,
+            "roleDesc": "CEO"
+        },
+        {
+            "roleId": 2,
+            "roleDesc": "Manager"
+        },
+        {
+            "roleId": 3,
+            "roleDesc": "Developer"
+        },
+        {
+            "roleId": 4,
+            "roleDesc": "Super Admin"
+        },
+        {
+            "roleId": 5,
+            "roleDesc": "aarti1"
+        },
+        {
+            "roleId": 6,
+            "roleDesc": "CTO"
+        },
+        {
+            "roleId": 7,
+            "roleDesc": "Admin"
+        },
+        {
+            "roleId": 8,
+            "roleDesc": "HR"
+        },
+        {
+            "roleId": 9,
+            "roleDesc": "Booking"
+        },
+        {
+            "roleId": 10,
+            "roleDesc": "CFO"
+        },
+        {
+            "roleId": 11,
+            "roleDesc": "COO"
+        },
+        {
+            "roleId": 12,
+            "roleDesc": "Freight"
+        },
+        {
+            "roleId": 13,
+            "roleDesc": "Accountant1"
+        }
+    ],
+    "divisionAccess": [
+        {
+            "divisionId": 1,
+            "divisionDesc": "PROCTER AND GABLE"
+        },
+        {
+            "divisionId": 2,
+            "divisionDesc": "CONSUMER PRODUCTS"
+        },
+        {
+            "divisionId": 3,
+            "divisionDesc": "Khimji Pharmacy LLC"
+        },
+        {
+            "divisionId": 4,
+            "divisionDesc": "BEL"
+        },
+        {
+            "divisionId": 5,
+            "divisionDesc": "Commodify"
+        },
+        {
+            "divisionId": 6,
+            "divisionDesc": "Catering"
+        },
+        {
+            "divisionId": 7,
+            "divisionDesc": "Plant-3"
+        },
+        {
+            "divisionId": 8,
+            "divisionDesc": "Plant-4"
         }
     ],
     "serviceOptedDropdown": [

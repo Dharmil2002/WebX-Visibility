@@ -150,6 +150,15 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
+              path: "Masters/PinCodeMaster/PinCodeMasterList",
+              title: "Pin code Masters",
+              moduleName: "Masters",
+              icon: "",
+              class: "",
+              groupTitle: false,
+              submenu: []
+            },
+            {
               "path": "Masters/VehicleTypeMaster/VehicleTypeMasterList",
               "title": "Vehicle Type Master",
               "moduleName": "Vehicle Type Master",
@@ -163,8 +172,8 @@ export const ROUTES: RouteInfo[] =
         },
         {
           "path": "",
-          "title": "Document Control",
-          "moduleName": "Document Control",
+          "title": "Stakeholders",
+          "moduleName": "Stakeholders",
           "icon": "",
           "class": "ml-menu",
           "groupTitle": false,
@@ -179,6 +188,25 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
+            {
+              "path": "Masters/UserMaster/UserMasterView",
+              "title": "User Master",
+              "moduleName": "User Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },]
+        },
+        {
+          "path": "",
+          "title": "Document Control",
+          "moduleName": "Document Control",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
             {
               "path": "Masters/DocumentControlRegister/AddDCR",
               "title": "Add DCR Series",

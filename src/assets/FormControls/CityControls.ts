@@ -37,7 +37,7 @@ export class CityControl {
       },
 
       {
-        name: 'State', label: "State", placeholder: "Select State", type: 'dropdown',
+        name: 'state', label: "State", placeholder: "Select State", type: 'dropdown',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
@@ -58,7 +58,7 @@ export class CityControl {
       },
 
       {
-        name: 'Zone', label: "Zone", placeholder: "Select Zone", type: 'dropdown',
+        name: 'zone', label: "Zone", placeholder: "Select Zone", type: 'dropdown',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
@@ -84,10 +84,10 @@ export class CityControl {
       },
 
       { name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: parseInt(localStorage.getItem("CompanyCode")), Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
-      { name: 'StateId', label: 'StateId', placeholder: 'StateId', type: 'text', value: '', Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
-      { name: 'ZoneId', label: 'ZoneId', placeholder: 'ZoneId', type: 'text', value: '', Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
+      { name: 'stateId', label: 'StateId', placeholder: 'StateId', type: 'text', value: IsUpdate ? CityTable.stateId : "", Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
+      { name: 'zoneId', label: 'ZoneId', placeholder: 'ZoneId', type: 'text', value: '', Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
       { name: 'EntryBy', label: 'EntryBy', placeholder: 'EntryBy', type: 'text', value: '', Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
-      { name: 'IsUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
+      { name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
     ]
   }
 

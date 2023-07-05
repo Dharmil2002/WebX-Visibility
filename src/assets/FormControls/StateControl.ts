@@ -3,14 +3,14 @@ import { StateMaster } from "src/app/core/models/Masters/State Master/StateMaste
 
 export class StateControl {
     StateControlArray: FormControls[];
-    constructor(StateTabledata: StateMaster, IsUpdate: boolean) {
+    constructor(StateTabledata: StateMaster, isUpdate: boolean) {
         this.StateControlArray = [
             {
                 name: 'stateCode',
                 label: 'State Code',
                 placeholder: 'State Code',
                 type: 'text',
-                value: IsUpdate ? StateTabledata.stateCode : "System Generated",
+                value: isUpdate ? StateTabledata.stateCode : "System Generated",
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',
@@ -88,11 +88,11 @@ export class StateControl {
                 }
             },
             {
-                name: 'GSTWiseStateCode',
+                name: 'gstWiseStateCode',
                 label: 'GST Wise State Code',
                 placeholder: 'State Code',
                 type: 'text',
-                value: StateTabledata.GSTWiseStateCode,
+                value: StateTabledata.gstWiseStateCode,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',

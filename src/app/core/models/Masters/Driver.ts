@@ -54,24 +54,3 @@ export class DriverMaster {
       this.ActiveFlag = DriverMaster.ActiveFlag || false;
     }
   }
-  
-  export class DriverStatus {
-    CompanyCode: number;
-    Driver_Id: string;
-    UpdatedBy: string
-    ActiveFlag: string;
-  }
-  export class FileUpload {
-    data: File;
-  }
-  export class DriverUpload {
-    isSuccess: boolean;
-    filepath: string;
-    constructor(DriverUpload) {
-      {
-        this.filepath = DriverUpload.filepath || '';
-        this.isSuccess = DriverUpload.isSuccess || false;
-      }
-    }
-  }
-  

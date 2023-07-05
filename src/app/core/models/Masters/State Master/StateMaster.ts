@@ -12,8 +12,8 @@ export class StateMaster {
     stateType: string;
     srNo: any;
     isActive: boolean;
-    stateAlias:any;
-  GSTWiseStateCode: any;
+    stateAlias: any;
+    gstWiseStateCode: any;
     constructor(StateMaster) {
         {
             this.stcd = StateMaster.stcd || 'System Genrated';
@@ -24,14 +24,4 @@ export class StateMaster {
             this.activeflag = StateMaster.activeflag || false;
         }
     }
-}
-
-export class StateAutoDropdown {
-    constructor(public stateId: number, public stateName: string, public FromState: string) { }
-}
-
-export class stateResponse {
-    isSuccess: boolean;
-    message: string;
-    statelist: StateMaster[];
 }

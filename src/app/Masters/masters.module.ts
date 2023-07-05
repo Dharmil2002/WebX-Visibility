@@ -47,8 +47,6 @@ import { SnackBarUtilityService } from '../Utility/SnackBarUtility.service';
 import { CompanygstmasterListComponent } from './Company GST Master/companygstmaster-list/companygstmaster-list.component';
 import { CompanygstmasterAddComponent } from './Company GST Master/companygstmaster-add/companygstmaster-add.component';
 import { utilityService } from '../Utility/utility.service';
-import { AddCityMasterComponent } from './City Master/add-city-master/add-city-master.component';
-import { CityMasterListComponent } from './City Master/city-master-list/city-master-list.component';
 import { AddStateMasterComponent } from './state-master/add-state-master/add-state-master.component';
 import { StateMasterListComponent } from './state-master/state-master-list/state-master-list.component';
 import { DriverMasterComponent } from './driver-master/driver-master.component';
@@ -64,6 +62,12 @@ import { AddVehicletypeMasterComponent } from './vehicle-type-master/add-vehicle
 import { VehicletypeMasterListComponent } from './vehicle-type-master/vehicletype-master-list/vehicletype-master-list.component';
 import { CustomerGroupListComponent } from './customer-group-master/customer-group-list/customer-group-list.component';
 import { CustomerGroupAddComponent } from './customer-group-master/customer-group-add/customer-group-add.component';
+import { AddPinCodeMasterComponent } from './pincode-master/add-pincode-master/add-pincode-master.component';
+import { PincodeMasterListComponent } from './pincode-master/pincode-master-list/pincode-master-list.component';
+// import { AddUserMasterComponent } from './user-master/add-user-master/add-user-master.component';
+// import { UserMasterListComponent } from './user-master/user-master-list/user-master-list.component';
+import { AddCityMasterComponent } from './city-master/add-city-master/add-city-master.component';
+import { CityMasterListComponent } from './city-master/city-master-list/city-master-list.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -136,6 +140,10 @@ import { CustomerGroupAddComponent } from './customer-group-master/customer-grou
     VehicletypeMasterListComponent,
     CustomerGroupListComponent,
     CustomerGroupAddComponent,
+    PincodeMasterListComponent,
+    AddPinCodeMasterComponent,
+    // UserMasterListComponent,
+    // AddUserMasterComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

@@ -9,8 +9,6 @@ import { LoadingSheetDetailsComponent } from './loading-sheet-details/loading-sh
 import { DispatchVehicleComponent } from './dispatch-vehicle/dispatch-vehicle.component';
 import { ManifestGenerationComponent } from './manifest-generation/manifest-generation.component';
 import { CompanygstmasterListComponent } from './Company GST Master/companygstmaster-list/companygstmaster-list.component';
-import { AddCityMasterComponent } from './City Master/add-city-master/add-city-master.component';
-import { CityMasterListComponent } from './City Master/city-master-list/city-master-list.component';
 import { AddStateMasterComponent } from './state-master/add-state-master/add-state-master.component';
 import { StateMasterListComponent } from './state-master/state-master-list/state-master-list.component';
 import { DriverMasterComponent } from './driver-master/driver-master.component';
@@ -26,6 +24,12 @@ import { AddVehicletypeMasterComponent } from './vehicle-type-master/add-vehicle
 import { VehicletypeMasterListComponent } from './vehicle-type-master/vehicletype-master-list/vehicletype-master-list.component';
 import { CustomerGroupListComponent } from './customer-group-master/customer-group-list/customer-group-list.component';
 import { CustomerGroupAddComponent } from './customer-group-master/customer-group-add/customer-group-add.component';
+import { AddPinCodeMasterComponent } from './pincode-master/add-pincode-master/add-pincode-master.component';
+import { PincodeMasterListComponent } from './pincode-master/pincode-master-list/pincode-master-list.component';
+// import { AddUserMasterComponent } from './user-master/add-user-master/add-user-master.component';
+// import { UserMasterListComponent } from './user-master/user-master-list/user-master-list.component';
+import { CityMasterListComponent } from './city-master/city-master-list/city-master-list.component';
+import { AddCityMasterComponent } from './city-master/add-city-master/add-city-master.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -53,7 +57,12 @@ const routes: Routes = [
   { path: "CustomerGroupMaster/AddCustomerGroupMaster", component: CustomerGroupAddComponent, },
   // { path: "DocumentControlRegister/TrackDCR", component: TrackDcrSeriesComponent },
   { path: "VehicleTypeMaster/VehicleTypeMasterList", component: VehicletypeMasterListComponent },
-  { path: "VehicleTypeMaster/AddVehicleTypeMaster", component: AddVehicletypeMasterComponent },];
+  { path: "VehicleTypeMaster/AddVehicleTypeMaster", component: AddVehicletypeMasterComponent },
+  { path: "PinCodeMaster/PinCodeMasterList", component: PincodeMasterListComponent },
+  { path: "PinCodeMaster/AddPinCodeMaster", component: AddPinCodeMasterComponent },
+  // { path: "UserMaster/UserMasterView", component: UserMasterListComponent },
+  // { path: "UserMaster/AddUser", component: AddUserMasterComponent }
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

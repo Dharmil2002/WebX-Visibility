@@ -1,38 +1,37 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
-import { HttpClient } from '@angular/common/http';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { StateMaster } from "src/app/core/models/Masters/State Master/StateMaster";
-import { StateControl } from "src/assets/FormControls/StateControl";
+import { StateControl } from "src/assets/FormControls/stateControl";
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from 'src/app/Utility/utility.service';
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+
 
 @Component({
     selector: 'app-add-state-master',
     templateUrl: './add-state-master.component.html'
 })
-
 export class AddStateMasterComponent implements OnInit {
-    countryURL = '../../../assets/data/state-countryDropdown.json'
-    breadscrums: { title: string; items: string[]; active: string; }[];
+    breadScrums: { title: string; items: string[]; active: string; }[];
     countryCode: any;
     action: string;
-    IsUpdate = false;
-    StateTabledata: StateMaster;
-    StateTableForm: UntypedFormGroup;
-    StateFormControls: StateControl;
+    isUpdate = false;
+    stateTabledata: StateMaster;
+    stateTableForm: UntypedFormGroup;
+    stateFormControls: StateControl;
     jsonControlStateArray: any;
     Country: any;
-    CountryStatus: any;
+    countryStatus: any;
     countrylistStatus: any;
     countrylist: any;
     companyCode: any;
     country: any;
-    StateData: any;
     savedData: StateMaster;
-    UpdateCountry: any;
+    updateCountry: any;
+
     ngOnInit() {
         // throw new Error("Method not implemented.");
         this.getCountryList();
@@ -54,21 +53,22 @@ export class AddStateMasterComponent implements OnInit {
         }
     }
     constructor(@Inject(MAT_DIALOG_DATA) public data: any,
-        private Route: Router, private fb: UntypedFormBuilder, private http: HttpClient,
-        private filter: FilterUtils, private service: utilityService
+        private route: Router, private fb: UntypedFormBuilder,
+        private filter: FilterUtils, private service: utilityService,private masterService: MasterService
+
     ) {
-        if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-            this.data = Route.getCurrentNavigation().extras.state.data;
+        if (this.route.getCurrentNavigation()?.extras?.state != null) {
+            this.data = route.getCurrentNavigation().extras.state.data;
             this.countryCode = this.data.countryName;
             this.action = 'edit'
-            this.IsUpdate = true;
+            this.isUpdate = true;
         } else {
             this.action = "Add";
         }
         if (this.action === 'edit') {
-            this.IsUpdate = true;
-            this.StateTabledata = this.data;
-            this.breadscrums = [
+            this.isUpdate = true;
+            this.stateTabledata = this.data;
+            this.breadScrums = [
                 {
                     title: "State Master",
                     items: ["Home"],
@@ -76,34 +76,32 @@ export class AddStateMasterComponent implements OnInit {
                 },
             ];
         } else {
-            this.breadscrums = [
+            this.breadScrums = [
                 {
                     title: "State Master",
                     items: ["Home"],
                     active: "Add State",
                 },
             ];
-            this.StateTabledata = new StateMaster({});
+            this.stateTabledata = new StateMaster({});
         }
         this.initializeFormControl();
-        this.IsUpdate ? this.StateTableForm.controls["stateType"].setValue(this.StateTabledata.stateType) : "";
+        this.isUpdate ? this.stateTableForm.controls["stateType"].setValue(this.stateTabledata.stateType) : "";
     }
     initializeFormControl() {
         // throw new Error("Method not implemented.");
         // Create StateFormControls instance to get form controls for different sections
-        this.StateFormControls = new StateControl(this.StateTabledata, this.IsUpdate);
+        this.stateFormControls = new StateControl(this.stateTabledata, this.isUpdate);
         // Get form controls for State Details section
-        this.jsonControlStateArray = this.StateFormControls.getFormControls();
+        this.jsonControlStateArray = this.stateFormControls.getFormControls();
         this.jsonControlStateArray.forEach(data => {
             if (data.name === 'Country') {
                 // Set country-related variables
                 this.country = data.name;
-                this.CountryStatus = data.additionalData.showNameAndValue;
+                this.countryStatus = data.additionalData.showNameAndValue;
             }
         });
-        // Build the form group using formGroupBuilder function and the values of accordionData
-        // this.StateTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
-        this.StateTableForm = formGroupBuilder(this.fb, [this.jsonControlStateArray]);
+        this.stateTableForm = formGroupBuilder(this.fb, [this.jsonControlStateArray]);
 
 
     }
@@ -115,27 +113,27 @@ export class AddStateMasterComponent implements OnInit {
 
     getCountryList() {
         //throw new Error("Method not implemented.");
-        this.http.get(this.countryURL).subscribe(res => {
+            this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res =>{
             this.Country = res;
             let tableArray = this.Country.countryList;
             let countryList = [];
             tableArray.forEach(element => {
                 let dropdownList = {
-                    name: element.CodeDesc,
-                    value: element.CodeId
+                    name: element.codeDesc,
+                    value: element.codeId
                 }
                 countryList.push(dropdownList)
             });
-            if (this.IsUpdate) {
-                this.UpdateCountry = countryList.find((x) => x.name == this.countryCode);
-                this.StateTableForm.controls.Country.setValue(this.UpdateCountry);
+            if (this.isUpdate) {
+                this.updateCountry = countryList.find((x) => x.name == this.countryCode);
+                this.stateTableForm.controls.Country.setValue(this.updateCountry);
             }
             this.filter.Filter(
                 this.jsonControlStateArray,
-                this.StateTableForm,
+                this.stateTableForm,
                 countryList,
                 this.country,
-                this.CountryStatus,
+                this.countryStatus,
             );
 
         });
@@ -143,9 +141,9 @@ export class AddStateMasterComponent implements OnInit {
     }
 
     save() {
-        this.StateTableForm.controls["Country"].setValue(this.StateTableForm.value.Country.value);
-        this.StateTableForm.controls["activeflag"].setValue(this.StateTableForm.value.activeflag == true ? "Y" : "N");
-        this.Route.navigateByUrl('/Masters/StateMaster/StateMasterView');
-        this.service.exportData(this.StateTableForm.value)
+        this.stateTableForm.controls["Country"].setValue(this.stateTableForm.value.Country.value);
+        this.stateTableForm.controls["activeflag"].setValue(this.stateTableForm.value.activeflag == true ? "Y" : "N");
+        this.route.navigateByUrl('/Masters/StateMaster/StateMasterView');
+        this.service.exportData(this.stateTableForm.value)
     }
 }

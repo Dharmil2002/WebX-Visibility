@@ -1,3 +1,86 @@
+.multileveltable {
+  table {
+    width: 100%;
+
+    .matcolumncenter {
+      border-right: 1px solid #0000001f;
+      padding-right: 14px;
+      padding-left: 14px;
+      text-align: center;
+      .mat-sort-header-container {
+        justify-content: center;
+      }
+    }
+    .matcolumnfirst {
+      border-right: 1px solid #0000001f;
+      border-left: 1px solid #0000001f;
+      padding-right: 14px;
+      padding-left: 14px;
+      text-align: center;
+      .mat-sort-header-container {
+        justify-content: center;
+      }
+    }
+    .matcolumnright {
+      border-right: 1px solid #0000001f;
+      padding-right: 14px;
+      padding-left: 14px;
+      text-align: right;
+      .mat-sort-header-container {
+        justify-content: center;
+      }
+    }
+  }
+  tr.example-detail-row {
+    height: 0;
+  }
+
+  // tr.example-element-row:not(.example-expanded-row):hover {
+  //   // background: rgba(0, 0, 0, 0.075);
+  // }
+
+  .example-element-row td {
+    border-bottom-width: 0;
+  }
+
+  .example-element-detail {
+    overflow: hidden;
+    display: flex;
+  }
+
+  // .example-element-diagram {
+  //   min-width: 80px;
+  //   border: 2px solid black;
+  //   padding: 8px;
+  //   font-weight: lighter;
+  //   margin: 8px 0;
+  //   height: 104px;
+  // }
+
+  // .example-element-symbol {
+  //   font-weight: bold;
+  //   font-size: 40px;
+  //   line-height: normal;
+  // }
+
+  // .example-element-description {
+  //   padding: 16px;
+  // }
+
+  // .example-element-description-attribution {
+  //   opacity: 0.5;
+  // }
+  //style=""
+  .inner-table {
+    width: 100%;
+  }
+
+  .inner-table mat-form-field {
+    margin-top: 15px;
+    // width: 100%;
+  }
+}
+
 .matdefaulttablecolumncenter {
   padding-right: 14px;
   padding-left: 14px;
@@ -10,11 +93,9 @@
 .responsive_table {
   mat-table {
     .matcolumncenter {
-      border-top: 1px solid #0000001f;
       border-right: 1px solid #0000001f;
       padding-right: 14px;
       padding-left: 14px;
-      text-align: center;
       justify-content: center;
       .mat-sort-header-container {
         justify-content: center;
@@ -40,7 +121,6 @@
       }
     }
     .matcolumnleft {
-      border-top: 1px solid #0000001f;
       border-right: 1px solid #0000001f;
       padding-right: 14px;
       padding-left: 14px;
@@ -50,18 +130,4 @@
       }
     }
   }
-  mat-cell, mat-header-cell, mat-footer-cell {
-  align-items: center;
-  overflow: hidden;
-  word-wrap: break-word;
-  min-height: inherit;
-  /* Other styles specific to your needs */
-}
-
-.mat-cell,
-.mat-header-cell,
-.mat-footer-cell {
-  display: table-cell;
-}
-
 }

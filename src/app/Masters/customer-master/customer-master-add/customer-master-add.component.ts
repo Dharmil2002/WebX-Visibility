@@ -59,7 +59,6 @@ export class CustomerMasterAddComponent implements OnInit {
     private http: HttpClient, private service: utilityService, private masterService: MasterService) {
     //super();
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      debugger
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
       this.action = 'edit'

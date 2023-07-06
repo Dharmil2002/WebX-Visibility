@@ -14,7 +14,6 @@ export function getShipmentData(
     orgBranch: any,
     tableData: any
   ): any {
-    debugger
     const shipmentData = shipmentDetails;
     let shipPackage = 0;
     let shipmat = 0;

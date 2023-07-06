@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
@@ -32,7 +31,7 @@ export class CustomerGroupListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
-  constructor(private http: HttpClient,private masterService: MasterService,) {
+  constructor(private masterService: MasterService) {
   this.addAndEditPath = "/Masters/CustomerGroupMaster/AddCustomerGroupMaster";
   }
   ngOnInit(): void {

@@ -150,11 +150,6 @@ export class CustomerMasterAddComponent implements OnInit {
         this.serviceOptStatus = data.additionalData.showNameAndValue;
       }
     });
-
-    if (this.isUpdate) {
-      // this.groupCode = this.groupCodeDropdown.find((x) => x.name == this.customerTable.groupCode);
-      this.customerTableForm.controls.groupCode.setValue(this.groupCode);
-    }
   }
   cancel() {
     window.history.back();

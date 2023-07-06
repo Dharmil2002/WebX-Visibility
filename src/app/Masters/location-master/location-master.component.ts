@@ -1,37 +1,36 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
   selector: 'app-location-master',
   templateUrl: './location-master.component.html',
 })
 export class LocationMasterComponent implements OnInit {
-  jsonUrl = '../../../assets/data/masters-data.json'
   data: [] | any;
   csv: any[];
-  tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  toggleArray = ["ActiveFlag"]
+  tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
+  toggleArray = ["activeFlag"]
   linkArray = []
 
   columnHeader = {
-      "SrNo": "Sr No",
-      'LocationCode': 'Location Code',
-      'LocationName': 'Location Name',
-      'LocationAddress': 'Location Address',
-      'ReportingLocation': 'Reporting Location',
-      "ActiveFlag": "Active Status",
+      "srNo": "Sr No",
+      'locCode': 'Location Code',
+      'locName': 'Location Name',
+      'locAddress': 'Location Address',
+      'reportLoc': 'Reporting Location',
+      "activeFlag": "Active Status",
       "actions": "Actions"
   };
   headerForCsv = {
-    "SrNo": "Sr No",
-    'LocationCode': 'Location Code',
-    'LocationName': 'Location Name',
-    'LocationAddress': 'Location Address',
-    'ReportingLocation': 'Reporting Location',
-    "ActiveFlag": "Active Status"
+    "srNo": "Sr No",
+      'locCode': 'Location Code',
+      'locName': 'Location Name',
+      'locAddress': 'Location Address',
+      'reportLoc': 'Reporting Location',
+      "activeFlag": "Active Status",
   }
 
-  breadscrums = [
+  breadScrums = [
       {
         title: "Location Master",
         items: ["Home"],
@@ -46,24 +45,25 @@ export class LocationMasterComponent implements OnInit {
   }
   cityActiveFlag: any;
   addAndEditPath: string;
-  constructor(private http: HttpClient){
-      this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
+  constructor(private masterService: MasterService){
+  this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
   }
   ngOnInit(): void {
       //throw new Error("Method not implemented.");
-      this.GetLocationDetails();
+      this.getLocationDetails();
   }
-
-  GetLocationDetails() {
-      //throw new Error("Method not implemented."); CityData
-      // Fetch data from the JSON endpoint
-      this.http.get(this.jsonUrl).subscribe((res: any) => {
-          this.data = res;
-          this.csv = this.data['LocationData']
-          // Extract relevant data arrays from the response
-          //const tableArray = this.data['tabledata'];
-          this.tableload = false;
-      }
-      );
+  
+  getLocationDetails() {
+    //throw new Error("Method not implemented."); 
+    //Fetch data from the JSON endpoint
+    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {  
+    this.data = res;
+    this.csv = this.data['LocationData']
+    //Extract relevant data arrays from the response
+    //const tableArray = this.data['tabledata'];
+    this.tableLoad = false;
+    }
+    );
   }
+  
 }

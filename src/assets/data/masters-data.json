@@ -1062,212 +1062,212 @@
   ],
   "LocationData": [
     {
-      "SrNo": "1",
-      "LocationCode": "002",
-      "LocationName": "VIRAR",
-      "LocationAddress": "NELMANGALA",
-      "ReportingLocation": "BNGB",
-      "ActiveFlag": true
+      "srNo": "1",
+      "locCode": "002",
+      "locName": "VIRAR",
+      "locAddr": "NELMANGALA",
+      "reportLoc": "BNGB",
+      "activeFlag": true
     },
     {
-      "SrNo": "2",
-      "LocationCode": "1208",
-      "LocationName": "VIRAR",
-      "LocationAddress": "A/702",
-      "ReportingLocation": "MUMB",
-      "ActiveFlag": true
+      "srNo": "2",
+      "locCode": "1208",
+      "locName": "VIRAR",
+      "locAddr": "A/702",
+      "reportLoc": "MUMB",
+      "activeFlag": true
     },
     {
-      "SrNo": "3",
-      "LocationCode": "123",
-      "LocationName": "KANCHEEPURAM",
-      "LocationAddress": "PLOT NO. -1134, NEAR FORD KANCHEEPURAM",
-      "ReportingLocation": "CRO",
-      "ActiveFlag": true
+      "srNo": "3",
+      "locCode": "123",
+      "locName": "KANCHEEPURAM",
+      "locAddr": "PLOT NO. -1134, NEAR FORD KANCHEEPURAM",
+      "reportLoc": "CRO",
+      "activeFlag": true
     },
     {
-      "SrNo": "4",
-      "LocationCode": "1234",
-      "LocationName": "KALAMBOLI",
-      "LocationAddress": "DGAYSUJUGK",
-      "ReportingLocation": "CRO",
-      "ActiveFlag": true
+      "srNo": "4",
+      "locCode": "1234",
+      "locName": "KALAMBOLI",
+      "locAddr": "DGAYSUJUGK",
+      "reportLoc": "CRO",
+      "activeFlag": true
     },
     {
-      "SrNo": "5",
-      "LocationCode": "12345",
-      "LocationName": "MUMBAI",
-      "LocationAddress": "MUMBAI TEST",
-      "ReportingLocation": "MUMC",
-      "ActiveFlag": true
+      "srNo": "5",
+      "locCode": "12345",
+      "locName": "MUMBAI",
+      "locAddr": "MUMBAI TEST",
+      "reportLoc": "MUMC",
+      "activeFlag": true
     },
     {
-      "SrNo": "6",
-      "LocationCode": "125",
-      "LocationName": "KASAUL",
-      "LocationAddress": "HIMACHAL STEEL PLANT, MAIN KASAULI ROAD",
-      "ReportingLocation": "NRO",
-      "ActiveFlag": true
+      "srNo": "6",
+      "locCode": "125",
+      "locName": "KASAUL",
+      "locAddr": "HIMACHAL STEEL PLANT, MAIN KASAULI ROAD",
+      "reportLoc": "NRO",
+      "activeFlag": true
     },
     {
-      "SrNo": "7",
-      "LocationCode": "215648",
-      "LocationName": "THANE",
-      "LocationAddress": "ASMITA ANITA, NAYA NAGAR, MIRA ROAD (WEST)",
-      "ReportingLocation": "MUMB",
-      "ActiveFlag": false
+      "srNo": "7",
+      "locCode": "215648",
+      "locName": "THANE",
+      "locAddr": "ASMITA ANITA, NAYA NAGAR, MIRA ROAD (WEST)",
+      "reportLoc": "MUMB",
+      "activeFlag": false
     },
     {
-      "SrNo": "8",
-      "LocationCode": "401107",
-      "LocationName": "SIKKIM",
-      "LocationAddress": "20/65 LANE ROAD, NEAR DURGA HOSPITAL",
-      "ReportingLocation": "BOMM",
-      "ActiveFlag": true
+      "srNo": "8",
+      "locCode": "401107",
+      "locName": "SIKKIM",
+      "locAddr": "20/65 LANE ROAD, NEAR DURGA HOSPITAL",
+      "reportLoc": "BOMM",
+      "activeFlag": true
     },
     {
-      "SrNo": "9",
-      "LocationCode": "9010",
-      "LocationName": "ALUVA",
-      "LocationAddress": "EMMAY LOGISTICS, ASHOKAPURAM, ALUVA, KERALA 683101",
-      "ReportingLocation": "HQTR",
-      "ActiveFlag": true
+      "srNo": "9",
+      "locCode": "9010",
+      "locName": "ALUVA",
+      "locAddr": "EMMAY LOGISTICS, ASHOKAPURAM, ALUVA, KERALA 683101",
+      "reportLoc": "HQTR",
+      "activeFlag": true
     },
     {
-      "SrNo": "10",
-      "LocationCode": "ABJ",
-      "LocationName": "AMBEJOGAI",
-      "LocationAddress": "AMBEJOGAI BEED",
-      "ReportingLocation": "MUMB",
-      "ActiveFlag": true
+      "srNo": "10",
+      "locCode": "ABJ",
+      "locName": "AMBEJOGAI",
+      "locAddr": "AMBEJOGAI BEED",
+      "reportLoc": "MUMB",
+      "activeFlag": true
     },
     {
-      "SrNo": "11",
-      "LocationCode": "ACC",
-      "LocationName": "ACC",
-      "LocationAddress": "TEST",
-      "ReportingLocation": "ARPB",
-      "ActiveFlag": true
+      "srNo": "11",
+      "locCode": "ACC",
+      "locName": "ACC",
+      "locAddr": "TEST",
+      "reportLoc": "ARPB",
+      "activeFlag": true
     },
     {
-      "SrNo": "12",
-      "LocationCode": "ADH",
-      "LocationName": "ANDHERI",
-      "LocationAddress": "ANDHERI",
-      "ReportingLocation": "HQTR",
-      "ActiveFlag": true
+      "srNo": "12",
+      "locCode": "ADH",
+      "locName": "ANDHERI",
+      "locAddr": "ANDHERI",
+      "reportLoc": "HQTR",
+      "activeFlag": true
     },
     {
-      "SrNo": "13",
-      "LocationCode": "ADIT",
-      "LocationName": "AHMEDABAD REGION",
-      "LocationAddress": "ND FLOOR, D BLOCK, SIGNATURE - 2,, NR. SARKHEJ SANAND CIRCLE, SARKHEJ, AHMEDABAD, GUJARAT",
-      "ReportingLocation": "AMDB",
-      "ActiveFlag": false
+      "srNo": "13",
+      "locCode": "ADIT",
+      "locName": "AHMEDABAD REGION",
+      "locAddr": "ND FLOOR, D BLOCK, SIGNATURE - 2,, NR. SARKHEJ SANAND CIRCLE, SARKHEJ, AHMEDABAD, GUJARAT",
+      "reportLoc": "AMDB",
+      "activeFlag": false
     },
     {
-      "SrNo": "14",
-      "LocationCode": "AHM",
-      "LocationName": "AHMEDABAD HUB TECR",
-      "LocationAddress": "AHMEDABAD",
-      "ReportingLocation": "NRO",
-      "ActiveFlag": false
+      "srNo": "14",
+      "locCode": "AHM",
+      "locName": "AHMEDABAD HUB TECR",
+      "locAddr": "AHMEDABAD",
+      "reportLoc": "NRO",
+      "activeFlag": false
     },
     {
-      "SrNo": "15",
-      "LocationCode": "AL01",
-      "LocationName": "ALIPUR",
-      "LocationAddress": "A/302, SAI SADAN CHS, NEW MHADA LAYOUT, MALAD WEST",
-      "ReportingLocation": "HQTR",
-      "ActiveFlag": true
+      "srNo": "15",
+      "locCode": "AL01",
+      "locName": "ALIPUR",
+      "locAddr": "A/302, SAI SADAN CHS, NEW MHADA LAYOUT, MALAD WEST",
+      "reportLoc": "HQTR",
+      "activeFlag": true
     },
     {
-      "SrNo": "16",
-      "LocationCode": "AMDB",
-      "LocationName": "BRANCH OFFICE AHMEDABAD",
-      "LocationAddress": "8-266/7, ISB RD, FINANCIAL DISTRICT, NANAKRAM GUDA",
-      "ReportingLocation": "HQTR",
-      "ActiveFlag": true
+      "srNo": "16",
+      "locCode": "AMDB",
+      "locName": "BRANCH OFFICE AHMEDABAD",
+      "locAddr": "8-266/7, ISB RD, FINANCIAL DISTRICT, NANAKRAM GUDA",
+      "reportLoc": "HQTR",
+      "activeFlag": true
     },
     {
-      "SrNo": "17",
-      "LocationCode": "AMDC",
-      "LocationName": "AHMEDABAD CENTER",
-      "LocationAddress": "Ahmedabad city",
-      "ReportingLocation": "WRO",
-      "ActiveFlag": true
+      "srNo": "17",
+      "locCode": "AMDC",
+      "locName": "AHMEDABAD CENTER",
+      "locAddr": "Ahmedabad city",
+      "reportLoc": "WRO",
+      "activeFlag": true
     },
     {
-      "SrNo": "18",
-      "LocationCode": "AMDM",
-      "LocationName": "AHMEDABAD",
-      "LocationAddress": "AHMEDABAD",
-      "ReportingLocation": "AMDB",
-      "ActiveFlag": false
+      "srNo": "18",
+      "locCode": "AMDM",
+      "locName": "AHMEDABAD",
+      "locAddr": "AHMEDABAD",
+      "reportLoc": "AMDB",
+      "activeFlag": false
     },
     {
-      "SrNo": "19",
-      "LocationCode": "AND",
-      "LocationName": "ANDHERI",
-      "LocationAddress": "ANDHERI MUMBAI",
-      "ReportingLocation": "MUMB",
-      "ActiveFlag": true
+      "srNo": "19",
+      "locCode": "AND",
+      "locName": "ANDHERI",
+      "locAddr": "ANDHERI MUMBAI",
+      "reportLoc": "MUMB",
+      "activeFlag": true
     },
     {
-      "SrNo": "20",
-      "LocationCode": "ARPB",
-      "LocationName": "ARUNACHAL PRADESH",
-      "LocationAddress": "TAWANG",
-      "ReportingLocation": "ERO",
-      "ActiveFlag": true
+      "srNo": "20",
+      "locCode": "ARPB",
+      "locName": "ARUNACHAL PRADESH",
+      "locAddr": "TAWANG",
+      "reportLoc": "ERO",
+      "activeFlag": true
     },
     {
-      "SrNo": "21",
-      "LocationCode": "BBA",
-      "LocationName": "BARDOLI",
-      "LocationAddress": "4656678988",
-      "ReportingLocation": "HQTR",
-      "ActiveFlag": true
+      "srNo": "21",
+      "locCode": "BBA",
+      "locName": "BARDOLI",
+      "locAddr": "4656678988",
+      "reportLoc": "HQTR",
+      "activeFlag": true
     },
     {
-      "SrNo": "22",
-      "LocationCode": "BBIM",
-      "LocationName": "BHUBNESHWAR",
-      "LocationAddress": "PLOT NO. 868/42, BAUSAKHANI AREA, KAPILA PRASAD MAHATAB ROAD, OLD TOWN, BHUBNESHWAR -751002",
-      "ReportingLocation": "ERO",
-      "ActiveFlag": true
+      "srNo": "22",
+      "locCode": "BBIM",
+      "locName": "BHUBNESHWAR",
+      "locAddr": "PLOT NO. 868/42, BAUSAKHANI AREA, KAPILA PRASAD MAHATAB ROAD, OLD TOWN, BHUBNESHWAR -751002",
+      "reportLoc": "ERO",
+      "activeFlag": true
     },
     {
-      "SrNo": "23",
-      "LocationCode": "BDQM",
-      "LocationName": "VADODARA",
-      "LocationAddress": "MITUJ",
-      "ReportingLocation": "WRO",
-      "ActiveFlag": true
+      "srNo": "23",
+      "locCode": "BDQM",
+      "locName": "VADODARA",
+      "locAddr": "MITUJ",
+      "reportLoc": "WRO",
+      "activeFlag": true
     },
     {
-      "SrNo": "24",
-      "LocationCode": "BHOM",
-      "LocationName": "BHOPAL",
-      "LocationAddress": "MITUJ",
-      "ReportingLocation": "CRO",
-      "ActiveFlag": true
+      "srNo": "24",
+      "locCode": "BHOM",
+      "locName": "BHOPAL",
+      "locAddr": "MITUJ",
+      "reportLoc": "CRO",
+      "activeFlag": true
     },
     {
-      "SrNo": "25",
-      "LocationCode": "BHW",
-      "LocationName": "BHIWANDI",
-      "LocationAddress": "MITUJ MARKETING PRIVATE LIMITED",
-      "ReportingLocation": "WRO",
-      "ActiveFlag": true
+      "srNo": "25",
+      "locCode": "BHW",
+      "locName": "BHIWANDI",
+      "locAddr": "MITUJ MARKETING PRIVATE LIMITED",
+      "reportLoc": "WRO",
+      "activeFlag": true
     },
     {
-      "SrNo": "26",
-      "LocationCode": "BHWM",
-      "LocationName": "BHIWANDI",
-      "LocationAddress": "MITUJ MARKETING PRIVATE LIMITED",
-      "ReportingLocation": "MUMB",
-      "ActiveFlag": true
+      "srNo": "26",
+      "locCode": "BHWM",
+      "locName": "BHIWANDI",
+      "locAddr": "MITUJ MARKETING PRIVATE LIMITED",
+      "reportLoc": "MUMB",
+      "activeFlag": true
     }
   ],
   "customerData": [

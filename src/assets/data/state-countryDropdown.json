@@ -572,5 +572,153 @@
             "name": "Goa",
             "value": "3"
         }
+    ],
+    "locationHierarchyDropDown": [
+        {
+            "name": "Regional Office",
+            "value": "1"
+        },
+        {
+            "name": "Branch/Hub Office",
+            "value": "2"
+        },
+        {
+            "name": "Head Office",
+            "value": "3"
+        },
+        {
+            "name": "Divisional Office",
+            "value": "3"
+        },
+        {
+            "name": "Centre",
+            "value": "3"
+        }
+    ],
+    "pincodeLocationDropDown": [
+        {
+            "name": "400007",
+            "value": "1"
+        },
+        {
+            "name": "401105",
+            "value": "2"
+        },
+        {
+            "name": "406621",
+            "value": "3"
+        },
+        {
+            "name": "400072",
+            "value": "3"
+        },
+        {
+            "name": "401101",
+            "value": "3"
+        }
+    ],
+    "reportingLocationDropDown": [
+        {
+            "name": "Raipur",
+            "value": "RAI"
+        },
+        {
+            "name": "Calcutta",
+            "value": "CCU"
+        },
+        {
+            "name": "Chennai",
+            "value": "CHE"
+        },
+        {
+            "name": "Delhi",
+            "value": "DEL"
+        }
+    ],
+    "cityLocDropDown": [
+        {
+            "name": "Faridabad",
+            "value": "1"
+        },
+        {
+            "name": "Bilaspur",
+            "value": "2"
+        },
+        {
+            "name": "Belapur",
+            "value": "3"
+        },
+        {
+            "name": "Mumbai",
+            "value": "4"
+        }
+    ],
+    "stateLocDropDown": [
+        {
+            "name": "Faridabad",
+            "value": "1"
+        },
+        {
+            "name": "Bilaspur",
+            "value": "2"
+        },
+        {
+            "name": "Belapur",
+            "value": "3"
+        },
+        {
+            "name": "Mumbai",
+            "value": "4"
+        }
+    ],
+    "zoneDropDown": [
+        {
+            "name": "East",
+            "value": "1"
+        },
+        {
+            "name": "West",
+            "value": "2"
+        },
+        {
+            "name": "North",
+            "value": "3"
+        },
+        {
+            "name": "South",
+            "value": "4"
+        }
+    ],
+    "locationOwnershipDropDown": [
+        {
+            "name": "BA",
+            "value": "1"
+        },
+        {
+            "name": "Customer",
+            "value": "2"
+        },
+        {
+            "name": "Company",
+            "value": "3"
+        }      
+    ],
+    "locdataDropDown": [
+        {
+            "name": "Sakinaka",
+            "value": "SKN"
+        },
+        {
+            "name": "Gurgaon",
+            "value": "GGN"
+        },
+        {
+            "name": "Pune",
+            "value": "PUN"
+        },
+        {
+            "name": "Kanpur",
+            "value": "KNP"
+        }
     ]
 }

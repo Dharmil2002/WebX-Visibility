@@ -70,6 +70,8 @@ import { AddCityMasterComponent } from './city-master/add-city-master/add-city-m
 import { CityMasterListComponent } from './city-master/city-master-list/city-master-list.component';
 import { AddVehicleMasterComponent } from './vehicle-master/add-vehicle-master/add-vehicle-master.component';
 import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list/vehicle-master-list.component';
+import { DcrDetailPageComponent } from './dcr-series/dcr-detail-page/dcr-detail-page.component';
+import { ReAllocateDcrComponent } from './dcr-series/re-allocate-dcr/re-allocate-dcr.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -145,7 +147,9 @@ import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list
     PincodeMasterListComponent,
     AddPinCodeMasterComponent,
     AddVehicleMasterComponent,
-    VehicleMasterListComponent
+    VehicleMasterListComponent,
+    DcrDetailPageComponent,
+    ReAllocateDcrComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

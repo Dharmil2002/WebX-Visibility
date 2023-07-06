@@ -2752,7 +2752,7 @@
   "dcrTrackData": [
     {
       "companyCode": "10065",
-      "docKey": "32212",
+      "docKey": 32212,
       "docType": "DKT",
       "bookCode": "M001121",
       "bookNumber": "M001121",
@@ -2783,7 +2783,7 @@
     },
     {
       "companyCode": "10065",
-      "docKey": "72361",
+      "docKey": 72361,
       "docType": "DKT",
       "bookCode": "AG8484",
       "bookNumber": "AG8484",
@@ -2814,7 +2814,7 @@
     },
     {
       "companyCode": "10065",
-      "docKey": "26520",
+      "docKey": 26520,
       "docType": "DKT",
       "bookCode": "test02",
       "bookNumber": "test02",
@@ -2845,7 +2845,7 @@
     },
     {
       "companyCode": "10065",
-      "docKey": "39710",
+      "docKey": 39710,
       "docType": "DKT",
       "bookCode": "DEL",
       "bookNumber": "DEL",
@@ -2876,7 +2876,7 @@
     },
     {
       "companyCode": "10065",
-      "docKey": "39892",
+      "docKey": 39892,
       "docType": "DKT",
       "bookCode": "KOLK",
       "bookNumber": "KOLK",
@@ -2905,5 +2905,84 @@
       "entryByPrintOutTaken": "E00010 : demouser",
       "rePrintOutTaken": "0"
     }
+  ],
+  "dcrTrackHistoryData": [
+    [
+      {
+        "srNo": 290195,
+        "docKey": 32212,
+        "docType": "DKT",
+        "action": 2,
+        "actionDesc": "Allocated",
+        "actionDate": "29-Jun-20",
+        "bookCode": "M001121",
+        "suffix": "",
+        "docSrFrom": "M001121",
+        "docSrTo": "M001130",
+        "fromTo": "M001121-M001130",
+        "entryBy": "ANJU",
+        "entryByName": "Anju Abraham",
+        "entryDate": "55:22.9",
+        "splitToKey": null,
+        "bookNumber": "M001121",
+        "allotedLoc": "BOR",
+        "allotedLocName": "BORIVALI",
+        "allotedTo": null,
+        "allotedToName": null,
+        "allotedType": null,
+        "allotedTypeDesc": null,
+        "companyCode": 10065
+      },
+      {
+        "srNo": 229612,
+        "docKey": 32212,
+        "docType": "DKT",
+        "action": 1,
+        "actionDesc": "Added",
+        "actionDate": "16-Apr-20",
+        "bookCode": "M001121",
+        "suffix": "",
+        "docSrFrom": "M001121",
+        "docSrTo": "M001130",
+        "fromTo": "M001121-M001130",
+        "entryBy": "ANJU",
+        "entryByName": "Anju Abraham",
+        "entryDate": "03:50.7",
+        "splitToKey": null,
+        "bookNumber": "M001121",
+        "allotedLoc": "HQTR",
+        "allotedLocName": "HQTR",
+        "allotedTo": null,
+        "allotedToName": null,
+        "allotedType": null,
+        "allotedTypeDesc": null,
+        "companyCode": 10065
+      },
+      {
+        "srNo": 229613,
+        "docKey": 32212,
+        "docType": "DKT",
+        "action": 2,
+        "actionDesc": "Allocated",
+        "actionDate": "16-Apr-20",
+        "bookCode": "M001121",
+        "suffix": "",
+        "docSrFrom": "M001121",
+        "docSrTo": "M001130",
+        "fromTo": "M001121-M001130",
+        "entryBy": "ANJU",
+        "entryByName": "Anju Abraham",
+        "entryDate": "03:50.7",
+        "splitToKey": null,
+        "bookNumber": "M001121",
+        "allotedLoc": "MUMB",
+        "allotedLocName": "MUMBAI BRANCH OFFICE",
+        "allotedTo": null,
+        "allotedToName": null,
+        "allotedType": null,
+        "allotedTypeDesc": null,
+        "companyCode": 10065
+      }
+    ]
   ]
 }

@@ -1,0 +1,24 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="dcrDetailForm">
+        <app-form-webxpress [form]="dcrDetailForm" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+    <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="historyDet"
+        [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
+        [toggleArray]="toggleArray" [menuItems]="menuItems" [menuItemFlag]="menuItemflag"
+        [dynamicControls]="dynamicControls">
+    </generic-table-webxpress>
+    <ng-container>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                <div class="example-button-row">
+                    <button type="button" mat-raised-button color="primary" (click)="close()">Close</button>
+                    <button type="button" mat-raised-button color="primary" *ngIf="type === 'Manage'"
+                        (click)="manage()">Manage</button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+</app-common-wrapper-webxpress>

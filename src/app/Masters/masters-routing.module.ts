@@ -32,6 +32,7 @@ import { CityMasterListComponent } from './city-master/city-master-list/city-mas
 import { AddCityMasterComponent } from './city-master/add-city-master/add-city-master.component';
 import { AddVehicleMasterComponent } from './vehicle-master/add-vehicle-master/add-vehicle-master.component';
 import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list/vehicle-master-list.component';
+import { DcrDetailPageComponent } from './dcr-series/dcr-detail-page/dcr-detail-page.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -58,6 +59,7 @@ const routes: Routes = [
   { path: "CustomerGroupMaster/CustomerGroupMasterList", component: CustomerGroupListComponent, },
   { path: "CustomerGroupMaster/AddCustomerGroupMaster", component: CustomerGroupAddComponent, },
   { path: "DocumentControlRegister/TrackDCR", component: TrackDcrSeriesComponent },
+  { path: "DocumentControlRegister/DCRDetail", component: DcrDetailPageComponent },
   { path: "VehicleTypeMaster/VehicleTypeMasterList", component: VehicletypeMasterListComponent },
   { path: "VehicleTypeMaster/AddVehicleTypeMaster", component: AddVehicletypeMasterComponent },
   { path: "PinCodeMaster/PinCodeMasterList", component: PincodeMasterListComponent },

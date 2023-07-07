@@ -9,24 +9,24 @@ export class RouteMasterLocationWiseComponent implements OnInit {
   data: [] | any;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  toggleArray = ["isActive"]
+  toggleArray = ["active"]
   linkArray = []
   columnHeader = {
     "srNo": "Sr No",
-    'cityName': 'City Name',
-    'stateName': 'State',
-    'zoneName': 'Zone',
-    'odaFlag': 'ODA Flag',
-    "isActive": "Active Flag",
+    'routeMode': 'Route Mode',
+    'routeId': 'Route Code',
+    'routeName': 'Route Name',
+    'routeCategory': 'Route Category',
+    "active": "Active Flag",
     "actions": "Actions"
   };
   headerForCsv = {
-    'cityId': "City Code",
-    'companyCode': "CompanyCode",
-    'cityName': "City Name",
-    'stateName': "State Name",
-    'zoneName': "Zone Name",
-    'isActive': "IsActive",
+    "srNo": "Sr No",
+    'routeMode': 'Route Mode',
+    'routeId': 'Route Code',
+    'routeName': 'Route Name',
+    'routeCategory': 'Route Category',
+    "active": "Active Flag"
   }
   breadScrums = [
     {

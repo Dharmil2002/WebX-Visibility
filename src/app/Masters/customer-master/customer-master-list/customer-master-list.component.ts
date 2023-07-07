@@ -50,7 +50,7 @@ export class CustomerMasterListComponent implements OnInit {
     //Fetch data from the JSON endpoint
     this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
       this.data = res;
-      this.csv = this.data['customerGroupData']
+      this.csv = this.data['customerData']
       //Extract relevant data arrays from the response
       //const tableArray = this.data['tabledata'];
       this.tableLoad = false;

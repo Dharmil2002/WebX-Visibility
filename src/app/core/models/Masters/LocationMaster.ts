@@ -31,10 +31,14 @@ export class LocationMaster {
   locEmail:string;
   contLoc:string;
 
+ 
+
+
   constructor(LocationMaster) {
     {
       this.locLevel = LocationMaster.locLevel || '';
       this.reportTo = LocationMaster.reportTo || '';
+      this.reportLoc = LocationMaster.reportLoc || '';
       this.locCode = LocationMaster.locCode || '';
       this.locName = LocationMaster.locName || '';
       this.locPincode = LocationMaster.locPincode || '';
@@ -43,6 +47,7 @@ export class LocationMaster {
       this.locCity = LocationMaster.locCity || '';
       this.locMobile = LocationMaster.locMobile || '';
       this.locTel = LocationMaster.locTel || '';
+      this.ownership = LocationMaster.ownership || '';
       this.locEmail = LocationMaster.locEmail || '';
       this.locStrtDate = LocationMaster.locStrtDate || '';
       this.locEndDate = LocationMaster.locEndDate || '';
@@ -50,6 +55,10 @@ export class LocationMaster {
       this.activeFlag = LocationMaster.activeFlag || false;
       this.locEndmile = LocationMaster.locEndmile || '';
       this.contLoc = LocationMaster.contLoc || '';
+      this.acctLoc = LocationMaster.acctLoc || '';
+      this.dataLoc = LocationMaster.dataLoc || '';
+      this.defaultLoc = LocationMaster.defaultLoc || '';
+      this.nearLoc = LocationMaster.nearLoc || '';
 
 
     }

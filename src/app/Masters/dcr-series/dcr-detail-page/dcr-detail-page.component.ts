@@ -3,7 +3,6 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { DCRControl } from 'src/assets/FormControls/dcrControl';
 import Swal from 'sweetalert2';
@@ -132,8 +131,17 @@ export class DcrDetailPageComponent implements OnInit {
       this.dialog.open(
         ReAllocateDcrComponent,
         {
-         data: ''
+          width: '800px',
+          height: '280px',
+          data: ''
         });
+    }
+    else {
+      this.route.navigate(['Masters/DocumentControlRegister/SplitDCR'], {
+        state: {
+          data: '',
+        }
+      });
     }
     // Rest of the code for the manage() function
   }

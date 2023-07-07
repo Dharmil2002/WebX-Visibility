@@ -238,7 +238,27 @@ export const ROUTES: RouteInfo[] =
               ]
             }
           ]
-        }
+        },
+        {
+          "path": "",
+          "title": "Transport Related",
+          "moduleName": "Transport Related",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Masters/RouteLocationWise/RouteList",
+              "title": "Route Master - Location wise",
+              "moduleName": "Route Master - Location wise",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            }
+          ]
+        },
       ]
     },
   ]

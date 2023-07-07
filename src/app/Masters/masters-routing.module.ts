@@ -33,6 +33,8 @@ import { AddCityMasterComponent } from './city-master/add-city-master/add-city-m
 import { AddVehicleMasterComponent } from './vehicle-master/add-vehicle-master/add-vehicle-master.component';
 import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list/vehicle-master-list.component';
 import { DcrDetailPageComponent } from './dcr-series/dcr-detail-page/dcr-detail-page.component';
+import { SplitDcrComponent } from './dcr-series/split-dcr/split-dcr.component';
+import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -60,12 +62,15 @@ const routes: Routes = [
   { path: "CustomerGroupMaster/AddCustomerGroupMaster", component: CustomerGroupAddComponent, },
   { path: "DocumentControlRegister/TrackDCR", component: TrackDcrSeriesComponent },
   { path: "DocumentControlRegister/DCRDetail", component: DcrDetailPageComponent },
+  { path: "DocumentControlRegister/SplitDCR", component: SplitDcrComponent },
   { path: "VehicleTypeMaster/VehicleTypeMasterList", component: VehicletypeMasterListComponent },
   { path: "VehicleTypeMaster/AddVehicleTypeMaster", component: AddVehicletypeMasterComponent },
   { path: "PinCodeMaster/PinCodeMasterList", component: PincodeMasterListComponent },
   { path: "PinCodeMaster/AddPinCodeMaster", component: AddPinCodeMasterComponent },
   { path: "VehicleMaster/VehicleMasterList", component: VehicleMasterListComponent },
-  { path: "VehicleMaster/AddVehicle", component: AddVehicleMasterComponent },];
+  { path: "VehicleMaster/AddVehicle", component: AddVehicleMasterComponent },
+  { path: "RouteLocationWise/RouteList", component: RouteMasterLocationWiseComponent },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

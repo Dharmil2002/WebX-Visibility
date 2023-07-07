@@ -3,6 +3,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class DCRControl {
     dcrControlArray: FormControls[];
     dcrDetailControlArray: FormControls[];
+    dcrReallocateControlArray: FormControls[];
     constructor() {
         this.dcrControlArray = [
             {
@@ -169,6 +170,60 @@ export class DCRControl {
                     disable: true
                 },
 
+            ],
+            this.dcrReallocateControlArray = [
+                {
+                    name: 'newLocation',
+                    label: 'New Allocation Location',
+                    placeholder: 'New Allocation Location',
+                    type: 'dropdown',
+                    value: "",
+                    Validations: [
+                        {
+                            name: "invalidAutocomplete",
+                            message: "Choose proper value",
+                        }
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }, generatecontrol: true,
+                    disable: true
+                },
+                {
+                    name: 'newCategory',
+                    label: 'New Allocation Category',
+                    placeholder: 'New Allocation Category',
+                    type: 'dropdown',
+                    value: "",
+                    Validations: [
+                        {
+                            name: "invalidAutocomplete",
+                            message: "Choose proper value",
+                        }
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }, generatecontrol: true,
+                    disable: true
+                },
+                {
+                    name: 'newPerson',
+                    label: 'Person to be Assigned Series',
+                    placeholder: 'Person to be Assigned Series',
+                    type: 'dropdown',
+                    value: "",
+                    Validations: [
+                        {
+                            name: "invalidAutocomplete",
+                            message: "Choose proper value",
+                        }
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }, generatecontrol: true,
+                    disable: true
+                },
+
             ]
     }
 
@@ -177,5 +232,8 @@ export class DCRControl {
     }
     getDcrDetailsFormControls() {
         return this.dcrDetailControlArray;
+    }
+    getReallocateDcrFormControls() {
+        return this.dcrReallocateControlArray;
     }
 }

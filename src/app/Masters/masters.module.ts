@@ -72,6 +72,8 @@ import { AddVehicleMasterComponent } from './vehicle-master/add-vehicle-master/a
 import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list/vehicle-master-list.component';
 import { DcrDetailPageComponent } from './dcr-series/dcr-detail-page/dcr-detail-page.component';
 import { ReAllocateDcrComponent } from './dcr-series/re-allocate-dcr/re-allocate-dcr.component';
+import { SplitDcrComponent } from './dcr-series/split-dcr/split-dcr.component';
+import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -149,7 +151,9 @@ import { ReAllocateDcrComponent } from './dcr-series/re-allocate-dcr/re-allocate
     AddVehicleMasterComponent,
     VehicleMasterListComponent,
     DcrDetailPageComponent,
-    ReAllocateDcrComponent
+    ReAllocateDcrComponent,
+    SplitDcrComponent,
+    RouteMasterLocationWiseComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

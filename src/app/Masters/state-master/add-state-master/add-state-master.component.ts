@@ -8,6 +8,8 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from 'src/app/Utility/utility.service';
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from "sweetalert2";
+import { generateRandomNumber, getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
 
 
 @Component({
@@ -27,11 +29,10 @@ export class AddStateMasterComponent implements OnInit {
     countryStatus: any;
     countrylistStatus: any;
     countrylist: any;
-    companyCode: any;
+    companyCode: any = parseInt(localStorage.getItem("companyCode"));
     country: any;
     savedData: StateMaster;
     updateCountry: any;
-
     ngOnInit() {
         // throw new Error("Method not implemented.");
         this.getCountryList();
@@ -54,12 +55,13 @@ export class AddStateMasterComponent implements OnInit {
     }
     constructor(@Inject(MAT_DIALOG_DATA) public data: any,
         private route: Router, private fb: UntypedFormBuilder,
-        private filter: FilterUtils, private service: utilityService,private masterService: MasterService
+        private filter: FilterUtils, private service: utilityService,
+        private masterService: MasterService
 
     ) {
         if (this.route.getCurrentNavigation()?.extras?.state != null) {
             this.data = route.getCurrentNavigation().extras.state.data;
-            this.countryCode = this.data.countryName;
+            this.countryCode = this.data.country;
             this.action = 'edit'
             this.isUpdate = true;
         } else {
@@ -95,7 +97,7 @@ export class AddStateMasterComponent implements OnInit {
         // Get form controls for State Details section
         this.jsonControlStateArray = this.stateFormControls.getFormControls();
         this.jsonControlStateArray.forEach(data => {
-            if (data.name === 'Country') {
+            if (data.name === 'country') {
                 // Set country-related variables
                 this.country = data.name;
                 this.countryStatus = data.additionalData.showNameAndValue;
@@ -113,7 +115,7 @@ export class AddStateMasterComponent implements OnInit {
 
     getCountryList() {
         //throw new Error("Method not implemented.");
-            this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res =>{
+        this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
             this.Country = res;
             let tableArray = this.Country.countryList;
             let countryList = [];
@@ -126,7 +128,7 @@ export class AddStateMasterComponent implements OnInit {
             });
             if (this.isUpdate) {
                 this.updateCountry = countryList.find((x) => x.name == this.countryCode);
-                this.stateTableForm.controls.Country.setValue(this.updateCountry);
+                this.stateTableForm.controls['country'].setValue(this.updateCountry);
             }
             this.filter.Filter(
                 this.jsonControlStateArray,
@@ -141,9 +143,68 @@ export class AddStateMasterComponent implements OnInit {
     }
 
     save() {
-        this.stateTableForm.controls["Country"].setValue(this.stateTableForm.value.Country.value);
+        // Set the value of "country" control to its name property
+        this.stateTableForm.controls["country"].setValue(this.stateTableForm.value.country.name);
+    
+        // Convert boolean value of "activeflag" to "Y" or "N"
         this.stateTableForm.controls["activeflag"].setValue(this.stateTableForm.value.activeflag == true ? "Y" : "N");
-        this.route.navigateByUrl('/Masters/StateMaster/StateMasterView');
-        this.service.exportData(this.stateTableForm.value)
+    
+        if (this.isUpdate) {
+            let id = this.stateTableForm.value.id;
+    
+            // Remove the "id" field from the form controls
+            this.stateTableForm.removeControl("id");
+    
+            let req = {
+                companyCode: this.companyCode,
+                type: "masters",
+                collection: "state",
+                id: id,
+                data: this.stateTableForm.value
+            };
+    
+            this.masterService.masterPut('common/update', req).subscribe({
+                next: (res: any) => {
+                    if (res) {
+                        // Display success message
+                        Swal.fire({
+                            icon: "success",
+                            title: "Successful",
+                            text: res.message,
+                            showConfirmButton: true,
+                        });
+                        this.route.navigateByUrl('/Masters/StateMaster/StateMasterView');
+                    }
+                }
+            });
+        } else {
+            const randomNumber = getShortName(this.stateTableForm.value.stateName);
+            this.stateTableForm.controls["stateCode"].setValue(randomNumber);
+            this.stateTableForm.controls["id"].setValue(randomNumber);
+    
+            let req = {
+                companyCode: this.companyCode,
+                type: "masters",
+                collection: "state",
+                data: this.stateTableForm.value
+            };
+    
+            this.masterService.masterPost('common/create', req).subscribe({
+                next: (res: any) => {
+                    if (res) {
+                        // Display success message
+                        Swal.fire({
+                            icon: "success",
+                            title: "Successful",
+                            text: res.message,
+                            showConfirmButton: true,
+                        });
+                        this.route.navigateByUrl('/Masters/StateMaster/StateMasterView');
+                    }
+                }
+            });
+        }
     }
+    
+    
 }

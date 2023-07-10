@@ -1,7 +1,7 @@
     <app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
 
         <!-- <div class="verticalScrollbar"> -->
-            <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
+            <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="tableData"
             [csvFileName]="csvFileName"  [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
             [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
             [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">

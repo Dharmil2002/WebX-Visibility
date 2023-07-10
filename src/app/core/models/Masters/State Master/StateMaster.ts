@@ -1,4 +1,5 @@
 export class StateMaster {
+    id:string;
     stnm: string;
     stcd: number;
     stateName: string;
@@ -16,6 +17,7 @@ export class StateMaster {
     gstWiseStateCode: any;
     constructor(StateMaster) {
         {
+            this.id=StateMaster.id||''
             this.stcd = StateMaster.stcd || 'System Genrated';
             this.stateName = StateMaster.stateName || '';
             this.countryName = StateMaster.countryName || '';

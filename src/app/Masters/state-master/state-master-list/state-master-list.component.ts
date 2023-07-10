@@ -8,7 +8,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 export class StateMasterListComponent implements OnInit {
     jsonUrl = '../../../assets/data/masters-data.json'
     data: [] | any;
-    csv: any[];
+    tableData: any[];
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     // Define column headers for the table
     columnHeader =
@@ -18,7 +18,7 @@ export class StateMasterListComponent implements OnInit {
             "stateName": "State Name",
             "stateAlias": "State Alias",
             "stateType": "State Type",
-            "countryName": "Country Name",
+            "country": "Country Name",
             "gstWiseStateCode": "GST Wise State Code",
             "isActive": "Active Flag",
             "actions": "Actions",
@@ -63,16 +63,29 @@ export class StateMasterListComponent implements OnInit {
     }
 
     getStateDetails() {
-        //throw new Error("Method not implemented.");
-        // Fetch data from the JSON endpoint
-        this.masterService.getJsonFileDetails('masterUrl').subscribe(res => { 
-            this.data = res;
-            this.csv = this.data['stateData']
-            // Extract relevant data arrays from the response
-            //const tableArray = this.data['tabledata'];
-            this.tableLoad = false;
+        let req = {
+            "companyCode": 10065,
+            "type": "masters",
+            "collection": "state"
 
         }
-        );
+        this.masterService.masterPost('common/getall', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+
+                    // Generate srno for each object in the array
+                    const dataWithSrno = res.data.map((obj, index) => {
+                        return {
+                            ...obj,
+                            srNo: index + 1
+                        };
+                    });
+
+
+                    this.tableData = dataWithSrno;
+                    this.tableLoad = false;
+                }
+            }
+        })
     }
 }

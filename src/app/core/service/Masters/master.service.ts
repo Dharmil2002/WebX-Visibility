@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -17,4 +18,11 @@ export class MasterService {
   getJsonFileDetails(ApiURL) {
     return this.http.get<any>(this[ApiURL]);
   }
+  masterPost(ApiURL, Request) {
+    return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  }
+  masterPut(ApiURL, Request) {
+    return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  }
+  
 }

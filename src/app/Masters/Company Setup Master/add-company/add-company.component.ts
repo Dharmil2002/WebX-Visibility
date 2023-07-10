@@ -71,12 +71,12 @@ export class AddCompanyComponent implements OnInit {
     // Get form controls for TimeZone, ColorTheme
     this.jsonControlBankArray = this.CompanyFormControls.getFormControlB();
     this.jsonControlBankArray.forEach(data => {
-      if (data.name === 'TimezoneId') {
+      if (data.name === 'timeZone') {
         // Set TimeZone-related variables
         this.TimezoneId = data.name;
         this.TimeZone = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'Color_Theme') {
+      if (data.name === 'color_Theme') {
         // Set ColorTheme-related variables
         this.Color_Theme = data.name;
         this.ColorTheme = data.additionalData.showNameAndValue;
@@ -94,7 +94,7 @@ export class AddCompanyComponent implements OnInit {
 
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.AddCompanyFormsValue = formGroupBuilder(this.fb, Object.values(this.accordionData));
-    this.AddCompanyFormsValue.controls["Brand"].setValue('V');
+    this.AddCompanyFormsValue.controls["brand"].setValue('V');
 
   }
   functionCallHandler($event) {
@@ -116,9 +116,9 @@ export class AddCompanyComponent implements OnInit {
   }
   autoBindDropdown() {
     this.Timezonedata = this.TimeZoneDet.find((x) => x.value == this.data.identifier);
-    this.AddCompanyFormsValue.controls.TimezoneId.setValue(this.Timezonedata);
+    this.AddCompanyFormsValue.controls.timeZone.setValue(this.Timezonedata);
     this.Themedata = this.Theme.find((x) => x.name == this.data.CompanyTheme);
-    this.AddCompanyFormsValue.controls.Color_Theme.setValue(this.Themedata);
+    this.AddCompanyFormsValue.controls.color_Theme.setValue(this.Themedata);
     this.filter.Filter(
       this.jsonControlBankArray,
       this.AddCompanyFormsValue,
@@ -145,7 +145,7 @@ export class AddCompanyComponent implements OnInit {
         this.SelectFile = file;
         this.imageName = file.name;
         this.selectedFiles = true;
-        this.AddCompanyFormsValue.controls["Company_Image"].setValue(this.SelectFile.name);
+        this.AddCompanyFormsValue.controls["company_Image"].setValue(this.SelectFile.name);
       } else {
         this.selectedFiles = false;
         Swal.fire({
@@ -168,8 +168,8 @@ export class AddCompanyComponent implements OnInit {
     link.click();
   }
   save() {
-    this.AddCompanyFormsValue.controls["Color_Theme"].setValue(this.AddCompanyFormsValue.value.Color_Theme.value);
-    this.AddCompanyFormsValue.controls["TimezoneId"].setValue(this.AddCompanyFormsValue.value.TimezoneId.value);
+    this.AddCompanyFormsValue.controls["color_Theme"].setValue(this.AddCompanyFormsValue.value.Color_Theme.value);
+    this.AddCompanyFormsValue.controls["timeZone"].setValue(this.AddCompanyFormsValue.value.TimezoneId.value);
     this.service.exportData(this.AddCompanyFormsValue.value);
     Swal.fire({
       icon: "success",

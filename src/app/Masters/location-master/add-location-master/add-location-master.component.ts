@@ -134,44 +134,44 @@ export class AddLocationMasterComponent implements OnInit {
   }
   bindDropdown() {
     this.jsonControlLocationArray.forEach(data => {
-      if (data.name === 'Loc_Level') {
+      if (data.name === 'locLevel') {
         // Set location-related variables
         this.locHierachy = data.name;
         this.locHierachyStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'Report_Level') {
+      if (data.name === 'reportLevel') {
         // Set category-related variables
         this.reportLoc = data.name;
         this.reportLocStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'LocPincode') {
+      if (data.name === 'locPincode') {
         // Set category-related variables
         this.pincode = data.name;
         this.pincodeStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'LocCity') {
+      if (data.name === 'locCity') {
         // Set category-related variables
         this.locationCity = data.name;
         this.locationCitygStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'Report_Loc') {
+      if (data.name === 'reportLoc') {
         // Set category-related variables
         this.report = data.name;
         this.reportStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'LocState') {
+      if (data.name === 'locState') {
         // Set category-related variables
         this.stateLoc = data.name;
         this.stateLocStatus = data.additionalData.showNameAndValue;
       }
     });
     this.jsonControlOtherArray.forEach(data => {
-      if (data.name === 'LocRegion') {
+      if (data.name === 'locRegion') {
         // Set location-related variables
         this.zoneLoc = data.name;
         this.zoneLocStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'Ownership') {
+      if (data.name === 'ownership') {
         // Set category-related variables
         this.locOwnership = data.name;
         this.locOwnershipStatus = data.additionalData.showNameAndValue;
@@ -186,17 +186,17 @@ export class AddLocationMasterComponent implements OnInit {
         this.locData = data.name;
         this.locDataStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'NextLoc') {
+      if (data.name === 'nextLoc') {
         // Set category-related variables
         this.nextLocation = data.name;
         this.nextLocationStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'PrevLoc') {
+      if (data.name === 'prevLoc') {
         // Set category-related variables
         this.locPrev = data.name;
         this.locPrevStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'ContLoc') {
+      if (data.name === 'contLoc') {
         // Set category-related variables
         this.locCont = data.name;
         this.locContStatus = data.additionalData.showNameAndValue;
@@ -228,28 +228,28 @@ export class AddLocationMasterComponent implements OnInit {
       this.accounting = locdataDropDown;
       if (this.isUpdate) {
         this.hierarchydet = this.findDropdownItemByName(this.locationHierarchy, this.LocationTable.locLevel);
-        this.locationTableForm.controls.Loc_Level.setValue(this.hierarchydet);
+        this.locationTableForm.controls.locLevel.setValue(this.hierarchydet);
 
         this.reportLocation = this.findDropdownItemByName(this.locationHierarchy, this.LocationTable.reportTo);
-        this.locationTableForm.controls.Report_Level.setValue(this.reportLocation);
+        this.locationTableForm.controls.reportLevel.setValue(this.reportLocation);
 
         this.pincodeDet = this.findDropdownItemByName(this.pincodeLoc, this.LocationTable.locPincode);
-        this.locationTableForm.controls.LocPincode.setValue(this.pincodeDet);
+        this.locationTableForm.controls.locPincode.setValue(this.pincodeDet);
 
         this.cityLocDet = this.findDropdownItemByName(this.cityLoc, this.LocationTable.locCity);
-        this.locationTableForm.controls.LocCity.setValue(this.cityLocDet);
+        this.locationTableForm.controls.locCity.setValue(this.cityLocDet);
 
         this.reportingLoDet = this.findDropdownItemByName(this.reportingLoc, this.LocationTable.reportLoc);
-        this.locationTableForm.controls.Report_Loc.setValue(this.reportingLoDet);
+        this.locationTableForm.controls.reportLoc.setValue(this.reportingLoDet);
 
         this.stateDet = this.findDropdownItemByName(this.stateData, this.LocationTable.locState);
-        this.locationTableForm.controls.LocState.setValue(this.stateDet);
+        this.locationTableForm.controls.locState.setValue(this.stateDet);
 
         this.zoneDet = this.findDropdownItemByName(this.zoneData, this.LocationTable.locZone);
-        this.locationTableForm.controls.LocRegion.setValue(this.zoneDet);
+        this.locationTableForm.controls.locRegion.setValue(this.zoneDet);
 
         this.ownerShipDet = this.findDropdownItemByName(this.ownershipData, this.LocationTable.ownership);
-        this.locationTableForm.controls.Ownership.setValue(this.ownerShipDet);
+        this.locationTableForm.controls.ownership.setValue(this.ownerShipDet);
 
         this.accountingDet = this.findDropdownItemByName(this.accounting, this.LocationTable.acctLoc);
         this.locationTableForm.controls.acctLoc.setValue(this.accountingDet);
@@ -258,13 +258,13 @@ export class AddLocationMasterComponent implements OnInit {
         this.locationTableForm.controls.dataLoc.setValue(this.dataLocDet);
 
         this.defaultDet = this.findDropdownItemByName(this.accounting, this.LocationTable.defaultLoc);
-        this.locationTableForm.controls.NextLoc.setValue(this.defaultDet);
+        this.locationTableForm.controls.nextLoc.setValue(this.defaultDet);
 
         this.prevLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.nearLoc);
-        this.locationTableForm.controls.PrevLoc.setValue(this.prevLocDet);
+        this.locationTableForm.controls.prevLoc.setValue(this.prevLocDet);
 
         this.contLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.contLoc);
-        this.locationTableForm.controls.ContLoc.setValue(this.contLocDet);
+        this.locationTableForm.controls.contLoc.setValue(this.contLocDet);
       }
       const filterParams = [
         [this.jsonControlLocationArray, this.locationHierarchy, this.locHierachy, this.locHierachyStatus],

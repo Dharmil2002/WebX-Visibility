@@ -10,7 +10,7 @@ export class LocationControl {
         this.LocationDetailControl = 
         [
             {
-                name: 'Loc_Level', label: "Location Hierarchy", placeholder: "Select location Hierarchy", type: 'dropdown',
+                name: 'locLevel', label: "Location Hierarchy", placeholder: "Select location Hierarchy", type: 'dropdown',
                 value: LocationTable.locLevel, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     // {
@@ -24,7 +24,7 @@ export class LocationControl {
                
             },
             {
-                name: 'Report_Level', label: "Reporting To", placeholder: "Select Reporting To", type: 'dropdown',
+                name: 'reportLevel', label: "Reporting To", placeholder: "Select Reporting To", type: 'dropdown',
                 value: LocationTable.reportTo, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     // {
@@ -37,7 +37,7 @@ export class LocationControl {
                 },
             },
             {
-                name: 'Report_Loc', label: "Reporting Location", placeholder: "Select Reporting Location", type: 'dropdown',
+                name: 'reportLoc', label: "Reporting Location", placeholder: "Select Reporting Location", type: 'dropdown',
                 value: LocationTable.reportLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     // {
@@ -50,7 +50,7 @@ export class LocationControl {
                 }
             },
             {
-                name: 'LocCode', label: 'Location Code', placeholder: 'Enter Location Code', type: 'text', value: LocationTable.locCode, generatecontrol: true, disable: IsUpdate ? true : false,
+                name: 'locCode', label: 'Location Code', placeholder: 'Enter Location Code', type: 'text', value: LocationTable.locCode, generatecontrol: true, disable: IsUpdate ? true : false,
                 Validations: [
                     {
                         name: "required",
@@ -64,7 +64,7 @@ export class LocationControl {
                 ],
             },
             {
-                name: 'LocName', label: 'Location Name', placeholder: 'Enter Location Name', type: 'text', value:LocationTable.locName, generatecontrol: true, disable: false,
+                name: 'locName', label: 'Location Name', placeholder: 'Enter Location Name', type: 'text', value:LocationTable.locName, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
@@ -81,7 +81,7 @@ export class LocationControl {
                 // }
             },
             {
-                name: 'LocPincode', label: 'Pincode', placeholder: 'Enter Pincode', type: 'dropdown', value: LocationTable.locPincode, generatecontrol: true, disable: false,
+                name: 'locPincode', label: 'Pincode', placeholder: 'Enter Pincode', type: 'dropdown', value: LocationTable.locPincode, generatecontrol: true, disable: false,
                 Validations: [
                     // {
                     //     name: "required",
@@ -93,7 +93,7 @@ export class LocationControl {
                 }
             },
             {
-                name: 'LocState', label: "State", placeholder: "Select State", type: 'dropdown',
+                name: 'locState', label: "State", placeholder: "Select State", type: 'dropdown',
                 value: LocationTable.locState, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     // {
@@ -106,7 +106,7 @@ export class LocationControl {
                 },
             },
             {
-                name: 'LocCity', label: "City", placeholder: "Select City", type: 'dropdown',
+                name: 'locCity', label: "City", placeholder: "Select City", type: 'dropdown',
                 value: LocationTable.locCity, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                         // {
@@ -120,7 +120,7 @@ export class LocationControl {
                 }
             },
             {
-                name: 'LocAddr', label: 'Address', placeholder: 'Enter Location Address', type: 'text', value: LocationTable.locAddr, generatecontrol: true, disable: IsUpdate ? true : false,
+                name: 'locAddr', label: 'Address', placeholder: 'Enter Location Address', type: 'text', value: LocationTable.locAddr, generatecontrol: true, disable: IsUpdate ? true : false,
                 Validations: [
                     {
                         name: "required",
@@ -130,7 +130,7 @@ export class LocationControl {
 
             },
             {
-                name: 'LocTelno', label: "Telephone Number", placeholder: "Enter Telephone Number", type: 'number', value: LocationTable.locTel, generatecontrol: true, disable: false,
+                name: 'locTelno', label: "Telephone Number", placeholder: "Enter Telephone Number", type: 'number', value: LocationTable.locTel, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "pattern",
@@ -144,7 +144,7 @@ export class LocationControl {
                 ]
             },
             {
-                name: 'Locmobile', label: "Mobile No", placeholder: "Enter Mobile Number", type: 'number', value: LocationTable.locMobile, generatecontrol: true, disable: false,
+                name: 'locMobile', label: "Mobile No", placeholder: "Enter Mobile Number", type: 'number', value: LocationTable.locMobile, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "pattern",
@@ -155,7 +155,7 @@ export class LocationControl {
             },
            
             {
-                name: 'LocEmail', label: "Email Id", placeholder: "Enter Email Id", type: 'text', value: LocationTable.locEmail, generatecontrol: true, disable: false,
+                name: 'locEmail', label: "Email Id", placeholder: "Enter Email Id", type: 'text', value: LocationTable.locEmail, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
@@ -173,10 +173,10 @@ export class LocationControl {
                 Validations: []
             },
             {
-                name: 'UPDTBY', label: 'Update By', placeholder: 'Update By', type: 'text', value: localStorage.getItem("UserName"), filterOptions: '', autocomplete: '', displaywith: '', Validations: [], generatecontrol: false, disable: false
+                name: 'updtBy', label: 'Update By', placeholder: 'Update By', type: 'text', value: localStorage.getItem("UserName"), filterOptions: '', autocomplete: '', displaywith: '', Validations: [], generatecontrol: false, disable: false
             },
             {
-                name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: localStorage.getItem("CompanyCode"), filterOptions: '', Validations: [], autocomplete: '', displaywith: '', generatecontrol: false, disable: false
+                name: 'companyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: localStorage.getItem("CompanyCode"), filterOptions: '', Validations: [], autocomplete: '', displaywith: '', generatecontrol: false, disable: false
             },
 	    
         ],
@@ -184,7 +184,7 @@ export class LocationControl {
 	  this.OtherDetailsControls =
             [
                 {
-                    name: 'LocRegion', label: "Zone", placeholder: "Select zone", type: 'dropdown',
+                    name: 'locRegion', label: "Zone", placeholder: "Select zone", type: 'dropdown',
                     value: LocationTable.locZone, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                         // {
@@ -221,7 +221,7 @@ export class LocationControl {
                     }
                 },
                 {
-                    name: 'loc_startdt', label: 'Location Start Date', placeholder: 'Enter Location Start Date', type: 'date', value:LocationTable.locStrtDate, generatecontrol: true, disable: false,
+                    name: 'locStartDt', label: 'Location Start Date', placeholder: 'Enter Location Start Date', type: 'date', value:LocationTable.locStrtDate, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "required",
@@ -236,7 +236,7 @@ export class LocationControl {
                     // }
                 },
                 {
-                    name: 'loc_enddt', label: 'Location End Date', placeholder: 'Enter Location End Date', type: 'date', value: LocationTable.locEndDate, generatecontrol: true, disable: false,
+                    name: 'locEndDt', label: 'Location End Date', placeholder: 'Enter Location End Date', type: 'date', value: LocationTable.locEndDate, generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
                         minDate: ''
@@ -248,11 +248,11 @@ export class LocationControl {
                     ]
                 },
                 {
-                    name: 'Computerised', label: 'Computerised', placeholder: '', type: 'toggle', value:LocationTable.computerised, generatecontrol: true, disable: false,
+                    name: 'computerised', label: 'Computerised', placeholder: '', type: 'toggle', value:LocationTable.computerised, generatecontrol: true, disable: false,
                     Validations: []
                 },
                 {
-                    name: 'Cutoff', label: 'Cutoff Time Flag', placeholder: '', type: 'toggle', value: LocationTable.cutOff, generatecontrol: true, disable: false,
+                    name: 'cutoff', label: 'Cutoff Time Flag', placeholder: '', type: 'toggle', value: LocationTable.cutOff, generatecontrol: true, disable: false,
                     Validations: []
                 },
                 {
@@ -260,11 +260,11 @@ export class LocationControl {
                     Validations: []
                 },
                 {
-                    name: 'ActiveFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value:LocationTable.activeFlag, generatecontrol: true, disable: false,
+                    name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value:LocationTable.activeFlag, generatecontrol: true, disable: false,
                     Validations: []
                 },
                 {
-                    name: 'NextLoc', label: "Default Next Location", placeholder: "Select Default Next Location", type: 'dropdown',
+                    name: 'nextLoc', label: "Default Next Location", placeholder: "Select Default Next Location", type: 'dropdown',
                     value: LocationTable.defaultLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                         // {
@@ -280,7 +280,7 @@ export class LocationControl {
                     }
                 },
                 {
-                    name: 'PrevLoc', label: "Nearest Previous Location", placeholder: "Select Nearest Previous Location", type: 'dropdown',
+                    name: 'prevLoc', label: "Nearest Previous Location", placeholder: "Select Nearest Previous Location", type: 'dropdown',
                     value: LocationTable.nearLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                         // {
@@ -296,7 +296,7 @@ export class LocationControl {
                     }
                 },
                 {
-                    name: 'Ownership', label: "Location Ownership", placeholder: "Select Location Ownership", type: 'dropdown',
+                    name: 'ownership', label: "Location Ownership", placeholder: "Select Location Ownership", type: 'dropdown',
                     value: LocationTable.ownership, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                       
@@ -310,7 +310,7 @@ export class LocationControl {
                     }
                 },
                 {
-                    name: 'ContLoc', label: "Delivery Control Location", placeholder: "Select Delivery Control Location", type: 'dropdown',
+                    name: 'contLoc', label: "Delivery Control Location", placeholder: "Select Delivery Control Location", type: 'dropdown',
                     value: LocationTable.contLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                         // {

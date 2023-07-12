@@ -21,7 +21,6 @@ export class EwayBillControls {
                     functions: {
                         change: 'DocketValidation',
                     }
-
                 }
                 , {
                     name: "cnoteDate",
@@ -206,7 +205,46 @@ export class EwayBillControls {
                     name: 'appoint', label: '', placeholder: '', type: 'radiobutton',
                     value: [{ value: 'Y', name: 'Yes', "checked": true }, { value: 'N', name: 'No' }],
                     Validations: [],
+                    functions: {
+                        onChange: "displayAppointment"
+                    },
                     generatecontrol: true, disable: false
+                },
+                {
+                    name: 'AppointmentDate', label: 'Appointment Date', placeholder: 'Appointment Date', type: 'date', value: '',
+                    filterOptions: '', autocomplete: '',
+                    displaywith: '', generatecontrol: false, disable: false,
+                    Validations: [],
+                },
+                {
+                    name: 'NameOfPerson', label: 'Name Of Person', placeholder: 'Name Of Person', type: 'text', value: '',
+                    filterOptions: '', autocomplete: '',
+                    displaywith: '', generatecontrol: false, disable: false,
+                    Validations: [],
+                },
+                {
+                    name: 'AppointmentContactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'text', value: '',
+                    filterOptions: '', autocomplete: '',
+                    displaywith: '', generatecontrol: false, disable: false,
+                    Validations: [],
+                },
+                {
+                    name: 'AppointmentRemarks', label: 'Remarks', placeholder: 'Remarks', type: 'text', value: '',
+                    filterOptions: '', autocomplete: '',
+                    displaywith: '', generatecontrol: false, disable: false,
+                    Validations: [],
+                },
+                {
+                    name: 'AppointmentFromTime', label: 'Appointment From Time', placeholder: 'Appointment From Time', type: 'time', value: '',
+                    filterOptions: '', autocomplete: '',
+                    displaywith: '', generatecontrol: false, disable: false,
+                    Validations: [],
+                },
+                {
+                    name: 'AppointmentToTime', label: 'Appointment To Time', placeholder: 'Appointment To Time', type: 'time', value: '',
+                    filterOptions: '', autocomplete: '',
+                    displaywith: '', generatecontrol: false, disable: false,
+                    Validations: [],
                 }
             ];
         this.containerControlArray =
@@ -420,7 +458,7 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], 
+                    Validations: [],
                     additionalData: {
                         showNameAndValue: true
                     }

@@ -147,7 +147,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
 
   functionCallHandler($event) {
-    debugger
     // console.log("fn handler called" , $event);
 
     let field = $event.field;                   // the actual formControl instance
@@ -235,6 +234,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     });
     this.tabForm = formGroupBuilder(this.fb, Object.values(this.tabData));
     this.contractForm = formGroupBuilder(this.fb, Object.values(this.contractData));
+    this.tabForm.controls["appoint"].setValue('N');
     this.getEwayBillData();
   }
   save() {
@@ -284,5 +284,13 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       HSN_CODE: ""
     };
     this.tableData.splice(0, 0, AddObj);
+  }
+  displayAppointment($event) {
+    const generateControl = $event.eventArgs.value === "Y";
+    this.appointmentControlArray.forEach(data => {
+      if (data.name !== 'appoint') {
+        data.generatecontrol = generateControl;
+      }
+    });
   }
 }

@@ -82,6 +82,22 @@
                 </mat-error>
             </mat-form-field>
             <!--  -->
+            <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
+            <mat-form-field class="example-full-width" appearance="outline"
+                *ngIf="(formItem.type=='time') && formItem.generatecontrol">
+                <mat-label>{{formItem.label}}</mat-label>
+                <input matInput [owlDateTimeTrigger]="timepicker" [formControlName]="formItem.name"
+                    [owlDateTime]="timepicker">
+                <mat-icon matSuffix [owlDateTimeTrigger]="timepicker" class="date-icon">schedule</mat-icon>
+                <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>
+                <!-- error  -->
+                <mat-error *ngFor="let error of formItem.Validations">
+                    <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                        {{error.message}}
+                    </ng-container>
+                </mat-error>
+            </mat-form-field>
+            <!--  -->
             <!-- multiselect Dropdown ---------------------------------------------------------->
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
@@ -158,7 +174,8 @@
             <!--Radio Button-->
             <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
                 <mat-label>{{formItem.label}}</mat-label>
-                <mat-radio-group [formControlName]="formItem.name">
+                <mat-radio-group [formControlName]="formItem.name"
+                    (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
                     <mat-radio-button *ngFor="let option of formItem.value" [value]="option.value">
                         {{ option.name }}
                     </mat-radio-button>

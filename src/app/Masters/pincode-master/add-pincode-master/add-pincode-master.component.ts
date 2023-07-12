@@ -160,14 +160,10 @@ export class AddPinCodeMasterComponent implements OnInit {
         window.history.back();
     }
     save() {
-        this.pincodeTableForm.controls["State"].setValue(this.pincodeTableForm.value.State);
-        this.pincodeTableForm.controls["City"].setValue(this.pincodeTableForm.value.City);
-        this.pincodeTableForm.controls["Pincode"].setValue(this.pincodeTableForm.value.Pincode);
-        this.pincodeTableForm.controls["Area"].setValue(this.pincodeTableForm.value.Area);
-        this.pincodeTableForm.controls["PincodeCat"].setValue(this.pincodeTableForm.value.PincodeCat.value);
+        this.pincodeTableForm.controls["State"].setValue(this.pincodeTableForm.value.State.value);
+        this.pincodeTableForm.controls["City"].setValue(this.pincodeTableForm.value.City.value);
         this.pincodeTableForm.controls["isActive"].setValue(this.pincodeTableForm.value.isActive == true ? "Y" : "N");
         this.pincodeTableForm.controls["serviceable"].setValue(this.pincodeTableForm.value.serviceable == true ? "Y" : "N");
-
         this.route.navigateByUrl('/Masters/PinCodeMaster/PinCodeMasterList');
         this.service.exportData(this.pincodeTableForm.value)
     }

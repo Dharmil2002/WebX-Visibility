@@ -199,154 +199,218 @@
             "locDesc": "GWTB"
         }
     ],
+    "locationData": [
+        {
+            "value": 1,
+            "name": "VIDHYANAGA"
+        },
+        {
+            "value": 2,
+            "name": "Surat"
+        },
+        {
+            "value": 3,
+            "name": "Mumbai"
+        },
+        {
+            "value": 4,
+            "name": "BARKA"
+        },
+        {
+            "value": 5,
+            "name": "Delhi"
+        },
+        {
+            "value": 6,
+            "name": "GOA"
+        },
+        {
+            "value": 7,
+            "name": "HQTR"
+        },
+        {
+            "value": 8,
+            "name": "GWTB"
+        }
+    ],
+    "countryData": [
+        {
+            "value": "1",
+            "name": "India"
+        },
+        {
+            "value": "2",
+            "name": "USA"
+        },
+        {
+            "value": "3",
+            "name": "Oman"
+        },
+        {
+            "value": "4",
+            "name": "Australia"
+        },
+        {
+            "value": "5",
+            "name": "New Zealand"
+        },
+        {
+            "value": "6",
+            "name": "Afghanistan"
+        },
+        {
+            "value": "7",
+            "name": "Sri Lanka"
+        }
+    ],
     "userList": [
         {
-            "userId": 1,
-            "userDesc": "Bussiness associate"
+            "value": 1,
+            "name": "Bussiness associate"
         },
         {
-            "userId": 2,
-            "userDesc": "Employee"
+            "value": 2,
+            "name": "Employee"
         },
         {
-            "userId": 3,
-            "userDesc": "Vendor"
+            "value": 3,
+            "name": "Vendor"
         },
         {
-            "userId": 4,
-            "userDesc": "Customer"
+            "value": 4,
+            "name": "Customer"
         }
     ],
     "userStatus": [
         {
-            "userStatusId": 1,
-            "userStatusDesc": "Permanent"
+            "value": 1,
+            "name": "Permanent"
         },
         {
-            "userStatusId": 2,
-            "userStatusDesc": "Contractual"
+            "value": 2,
+            "name": "Contractual"
         },
         {
-            "userStatusId": 3,
-            "userStatusDesc": "Trainee"
+            "value": 3,
+            "name": "Trainee"
         }
     ],
     "managerId": [
         {
-            "managerId": 1,
-            "managerDesc": "RupaliLad"
+            "value": 1,
+            "name": "RupaliLad"
         },
         {
-            "managerId": 2,
-            "managerDesc": "10002"
+            "value": 2,
+            "name": "10002"
         },
         {
-            "managerId": 3,
-            "managerDesc": "SHAMS"
+            "value": 3,
+            "name": "SHAMS"
         },
         {
-            "managerId": 4,
-            "managerDesc": "E10001"
+            "value": 4,
+            "name": "E10001"
         },
         {
-            "managerId": 5,
-            "managerDesc": "E10003r"
+            "value": 5,
+            "name": "E10003r"
         },
         {
-            "managerId": 6,
-            "managerDesc": "1234"
+            "value": 6,
+            "name": "1234"
         },
         {
-            "managerId": 7,
-            "managerDesc": "aarti1"
+            "value": 7,
+            "name": "aarti1"
         }
     ],
     "roleId": [
         {
-            "roleId": 1,
-            "roleDesc": "CEO"
+            "value": 1,
+            "name": "CEO"
         },
         {
-            "roleId": 2,
-            "roleDesc": "Manager"
+            "value": 2,
+            "name": "Manager"
         },
         {
-            "roleId": 3,
-            "roleDesc": "Developer"
+            "value": 3,
+            "name": "Developer"
         },
         {
-            "roleId": 4,
-            "roleDesc": "Super Admin"
+            "value": 4,
+            "name": "Super Admin"
         },
         {
-            "roleId": 5,
-            "roleDesc": "aarti1"
+            "value": 5,
+            "name": "aarti1"
         },
         {
-            "roleId": 6,
-            "roleDesc": "CTO"
+            "value": 6,
+            "name": "CTO"
         },
         {
-            "roleId": 7,
-            "roleDesc": "Admin"
+            "value": 7,
+            "name": "Admin"
         },
         {
-            "roleId": 8,
-            "roleDesc": "HR"
+            "value": 8,
+            "name": "HR"
         },
         {
-            "roleId": 9,
-            "roleDesc": "Booking"
+            "value": 9,
+            "name": "Booking"
         },
         {
-            "roleId": 10,
-            "roleDesc": "CFO"
+            "value": 10,
+            "name": "CFO"
         },
         {
-            "roleId": 11,
-            "roleDesc": "COO"
+            "value": 11,
+            "name": "COO"
         },
         {
-            "roleId": 12,
-            "roleDesc": "Freight"
+            "value": 12,
+            "name": "Freight"
         },
         {
-            "roleId": 13,
-            "roleDesc": "Accountant1"
+            "value": 13,
+            "name": "Accountant1"
         }
     ],
     "divisionAccess": [
         {
-            "divisionId": 1,
-            "divisionDesc": "PROCTER AND GABLE"
+            "value": 1,
+            "name": "PROCTER AND GABLE"
         },
         {
-            "divisionId": 2,
-            "divisionDesc": "CONSUMER PRODUCTS"
+            "value": 2,
+            "name": "CONSUMER PRODUCTS"
         },
         {
-            "divisionId": 3,
-            "divisionDesc": "Khimji Pharmacy LLC"
+            "value": 3,
+            "name": "Khimji Pharmacy LLC"
         },
         {
-            "divisionId": 4,
-            "divisionDesc": "BEL"
+            "value": 4,
+            "name": "BEL"
         },
         {
-            "divisionId": 5,
-            "divisionDesc": "Commodify"
+            "value": 5,
+            "name": "Commodify"
         },
         {
-            "divisionId": 6,
-            "divisionDesc": "Catering"
+            "value": 6,
+            "name": "Catering"
         },
         {
-            "divisionId": 7,
-            "divisionDesc": "Plant-3"
+            "value": 7,
+            "name": "Plant-3"
         },
         {
-            "divisionId": 8,
-            "divisionDesc": "Plant-4"
+            "value": 8,
+            "name": "Plant-4"
         }
     ],
     "serviceOptedDropdown": [

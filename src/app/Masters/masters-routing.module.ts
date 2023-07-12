@@ -26,8 +26,8 @@ import { CustomerGroupListComponent } from './customer-group-master/customer-gro
 import { CustomerGroupAddComponent } from './customer-group-master/customer-group-add/customer-group-add.component';
 import { AddPinCodeMasterComponent } from './pincode-master/add-pincode-master/add-pincode-master.component';
 import { PincodeMasterListComponent } from './pincode-master/pincode-master-list/pincode-master-list.component';
-// import { AddUserMasterComponent } from './user-master/add-user-master/add-user-master.component';
-// import { UserMasterListComponent } from './user-master/user-master-list/user-master-list.component';
+import { AddUserMasterComponent } from './user-master/add-user-master/add-user-master.component';
+import { UserMasterListComponent } from './user-master/user-master-list/user-master-list.component';
 import { CityMasterListComponent } from './city-master/city-master-list/city-master-list.component';
 import { AddCityMasterComponent } from './city-master/add-city-master/add-city-master.component';
 import { AddVehicleMasterComponent } from './vehicle-master/add-vehicle-master/add-vehicle-master.component';
@@ -72,8 +72,8 @@ const routes: Routes = [
   { path: "VehicleMaster/VehicleMasterList", component: VehicleMasterListComponent },
   { path: "VehicleMaster/AddVehicle", component: AddVehicleMasterComponent },
   { path: "RouteLocationWise/RouteList", component: RouteMasterLocationWiseComponent },
-  // { path: "UserMaster/UserMasterView", component: UserMasterListComponent },
-  // { path: "UserMaster/AddUser", component: AddUserMasterComponent },
+  { path: "UserMaster/UserMasterView", component: UserMasterListComponent },
+  { path: "UserMaster/AddUser", component: AddUserMasterComponent },
 ];
 
 @NgModule({

@@ -1,0 +1,191 @@
+{
+    "Ewddata": [
+      [
+        {
+          "status": 1,
+          "error_cd": "",
+          "message": "Success",
+          "data": {
+            "transactionType": 1,
+            "ewbNo": "541471694755",
+            "ewayBillDate": "01/03/2023 02:37:00 PM",
+            "genMode": "API",
+            "userGstin": "33AAACS5123K1ZK",
+            "supplyType": "O",
+            "subSupplyType": "1  ",
+            "docType": "INV",
+            "docNo": "33LCS0112191",
+            "docDate": "01/03/2023",
+            "fromGstin": "33AAACS5123K1ZK",
+            "fromTrdName": "SAMSUNG INDIA ELECTRONICS PVT LTD",
+            "fromAddr1": "PLOT NO P-1, M-5 & M-18,SIPCOT INDUSTRIAL PARK,PHASE II",
+            "fromAddr2": "SUNGUVARCHATRAM POST,SRIPERUMBUDUR TALUK",
+            "fromPlace": "KANCHEEPURAM DISTRICT",
+            "fromPincode": "602106",
+            "fromStateCode": "33",
+            "toGstin": "29AAACS5123K1Z9",
+            "toTrdName": "SAMSUNG INDIA ELECTRONICS PRIVATE LIMITED",
+            "toAddr1": "C/O PROCONNECT SUPPLY CHAIN SOLUTIONS LIMITED VALLIAPPATECH PARK SNO79 80 81 AND 82,HEJJALA RAMANAGR",
+            "toAddr2": "AM BANGALOREVA,BANGALORE,562109...",
+            "toPlace": "BANGALORE",
+            "toPincode": "562109",
+            "toStateCode": "29",
+            "totalValue": 331581.59,
+            "totInvValue": 391266.28,
+            "cgstValue": 0,
+            "sgstValue": 0,
+            "igstValue": 59684.69,
+            "cessValue": 0,
+            "cessNonAdvolValue": 0,
+            "otherValue": 0,
+            "transporterId": "33AACCG5453E1ZY",
+            "transporterName": "GLOVIS INDIA PRIVATE LIMITED",
+            "status": "ACT",
+            "actualDist": 335,
+            "noValidDays": 2,
+            "validUpto": "03/03/2023 11:59:00 PM",
+            "extendedTimes": "0",
+            "rejectStatus": "N",
+            "actFromStateCode": 33,
+            "actToStateCode": 29,
+            "vehicleType": "R",
+            "itemList": [
+              {
+                "itemNo": "1",
+                "productId": "0",
+                "productName": "",
+                "productDesc": "WASHING MACHINE",
+                "hsnCode": "84501100",
+                "quantity": 6,
+                "qtyUnit": "PCS",
+                "cgstRate": 0,
+                "sgstRate": 0,
+                "igstRate": 18,
+                "cessRate": 0,
+                "cessNonAdvol": 0,
+                "taxableAmount": 79386.64
+              },
+              {
+                "itemNo": "2",
+                "productId": "0",
+                "productName": "",
+                "productDesc": "WASHING MACHINE",
+                "hsnCode": "84501100",
+                "quantity": 22,
+                "qtyUnit": "PCS",
+                "cgstRate": 0,
+                "sgstRate": 0,
+                "igstRate": 18,
+                "cessRate": 0,
+                "cessNonAdvol": 0,
+                "taxableAmount": 252194.95
+              }
+            ],
+            "VehiclListDetails": [
+              {
+                "updMode": "API",
+                "vehicleNo": "TN20DD6658",
+                "fromPlace": "KANCHEEPURAM DISTRICT",
+                "fromState": "33",
+                "tripshtNo": "0",
+                "userGSTINTransin": "33AAACS5123K1ZK",
+                "transMode": "1",
+                "transDocNo": "EAOB/2223/01025",
+                "transDocDate": "01/03/2023",
+                "groupNo": "0",
+                "enteredDate": "01/03/2023 02:37:00 PM"
+              }
+            ]
+          }
+        },
+        {
+          "Consignor": {
+            "CompanyCode": 10065,
+            "CUSTCD": "C004515",
+            "CUSTNM": "Samsung India Electronics Pvt Ltd",
+            "CUSTCAT": "P01,P02,P03",
+            "city": "KANCHEEPURAM",
+            "CustAddress": "A-40 Rang Complex , Tushidham road",
+            "pincode": "602106",
+            "MOBILENO": "7874384847",
+            "telno": "7811711471",
+            "EMAILIDS": "Dhaval@webxpress.in",
+            "ContractId": "CN0000000340",
+            "Contract_Type": "P02"
+          }
+        }
+      ],
+      {
+        "Consginee": {
+          "CompanyCode": 10065,
+          "CUSTCD": "CDIT",
+          "CUSTNM": "SAMSUNG INDIA ELECTRONICS PVT. LTD.",
+          "CUSTCAT": "P02",
+          "city": "SUNGUVARCHATRAM",
+          "CustAddress": "PLOT NO; P1, SIPCOT INDUTRIAL PARK, PHASE-2",
+          "pincode": "602106",
+          "MOBILENO": "9841799950",
+          "telno": "234561231",
+          "EMAILIDS": "1233456@GMAIL.COM",
+          "ContractId": "CN0000000285",
+          "Contract_Type": "P02"
+        }
+      }
+    ],
+    "contractDetail": {
+      "CONTRACT": {
+        "CONTRACTID": "CN0000000340",
+        "SEARCH": "",
+        "BEHAVE": "",
+        "FLAG_LOT": "",
+        "FLAG_MULTI_PICKUPDEL": ",P02,P03,3,2,1",
+        "FLAGDEFERMENT": "N",
+        "FLAGCONTRACTSERVICETAX": "",
+        "DEFAULTPRODUCTSET": "2",
+        "DEFAULTMODESET": "9",
+        "REPLICATESERVICETYPERULE": "",
+        "REPLICATESERVICELIST": "1~1",
+        "PickUpDel": "4",
+        "FlagVolumetric": "Y",
+        "FlagCODDODEnable": "N",
+        "FlagDACCEnable": "N",
+        "RiskType": "",
+        "CODDODCharged": 0,
+        "DACCCharged": 0,
+        "BillingLoc": "HQTR",
+        "DiscountRate": 0,
+        "FlagVolumetricRowWise": "N",
+        "FlagAllowChrgGtActWtAtRowLvl": "N",
+        "DefaultCodDOD": "N",
+        "CustomerRefrenceNo": "",
+        "PolicyValidUpto": "2023-07-11T12:17:42.667Z"
+      },
+      "MASTER": [
+        {
+          "CodeType": "FTLTYP",
+          "CodeId": "12",
+          "CodeDesc": "14.00- 16.00 MT",
+          "FtlTypeRequired": false
+        },
+        {
+          "CodeType": "PKPDL",
+          "CodeId": "4",
+          "CodeDesc": "Door Pickup - Door Delivery",
+          "FtlTypeRequired": false
+        },
+        {
+          "CodeType": "SVCTYP",
+          "CodeId": "1",
+          "CodeDesc": "LTL",
+          "FtlTypeRequired": false
+        },
+        {
+          "CodeType": "TRN",
+          "CodeId": "2",
+          "CodeDesc": "ROAD",
+          "FtlTypeRequired": false
+        }
+      ]
+    },
+    "ServiceType": "1"
+  }

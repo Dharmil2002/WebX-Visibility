@@ -35,12 +35,14 @@ import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list
 import { DcrDetailPageComponent } from './dcr-series/dcr-detail-page/dcr-detail-page.component';
 import { SplitDcrComponent } from './dcr-series/split-dcr/split-dcr.component';
 import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise.component';
+import { EwayBillDocketBookingV2Component } from './eway-bill-docket-booking-v2/eway-bill-docket-booking-v2t';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
   { path: 'Docket/Ewaybill-Config', component: EwaybillConfigComponent },
   { path: 'Docket/Ewaybill', component: EwayBillDetailsComponent },
   { path: 'Docket/EwayBillDocketBooking', component: EwayBillDocketBookingComponent },
+  { path: 'Docket/EwayBillDocketBookingV2', component: EwayBillDocketBookingV2Component },
   { path: 'Docket/LoadingSheet', component: LoadingsheetComponent },
   { path: 'Docket/LoadingSheetDetails', component: LoadingSheetDetailsComponent },
   { path: 'Docket/DispatchVehicle', component: DispatchVehicleComponent },
@@ -70,6 +72,8 @@ const routes: Routes = [
   { path: "VehicleMaster/VehicleMasterList", component: VehicleMasterListComponent },
   { path: "VehicleMaster/AddVehicle", component: AddVehicleMasterComponent },
   { path: "RouteLocationWise/RouteList", component: RouteMasterLocationWiseComponent },
+  // { path: "UserMaster/UserMasterView", component: UserMasterListComponent },
+  // { path: "UserMaster/AddUser", component: AddUserMasterComponent },
 ];
 
 @NgModule({

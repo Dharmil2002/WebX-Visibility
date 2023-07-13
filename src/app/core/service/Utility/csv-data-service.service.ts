@@ -7,8 +7,8 @@ export class CsvDataServiceService {
     const separator = ',';
     const keys = Object.keys(rows[0]);
     const csvData =
-      keys.join(separator) +
-      '\n' +
+      // keys.join(separator) +
+      // '\n' +
       rows.map(row => {
         return keys.map(k => {
           let cell = row[k] === null || row[k] === undefined ? '' : row[k];

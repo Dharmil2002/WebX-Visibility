@@ -5,8 +5,8 @@ export class DriverControls {
     private DriverDetailsControl: FormControls[];
     private LicenseDetailsControls: FormControls[];
     private PermanentAddressControls: FormControls[];
-    //private CurrentAddressControls: FormControls[];
-
+    private UploadsControls: FormControls[];
+    private BankDetailsControls: FormControls[];
     // formControlsArray
     constructor(DriverTable: DriverMaster, IsUpdate: boolean,
     ) {
@@ -116,26 +116,26 @@ export class DriverControls {
                         minDate: new Date("01 Jan 1900")
                     }
                 },
-                {
-                    name: 'Guarantor_Name', label: "Guarantor Name", placeholder: "Enter Guarantor Name", type: 'text', value: DriverTable.GuarantorName, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only text of length 3 to 10 characters",
-                            pattern: '^[a-zA-Z ]{3,10}$',
-                        }
-                    ]
-                },
-                {
-                    name: 'GuarantorMobileNo', label: 'Guarantor Mobile No', placeholder: 'Enter Guarantor Mobile No', type: 'number', value: DriverTable.GuarantorMobileNo, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter 6 to 10 digit mobile number",
-                            pattern: "^[0-9]{6,10}$",
-                        }
-                    ]
-                },
+                // {
+                //     name: 'Guarantor_Name', label: "Guarantor Name", placeholder: "Enter Guarantor Name", type: 'text', value: DriverTable.GuarantorName, generatecontrol: true, disable: false,
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please Enter only text of length 3 to 10 characters",
+                //             pattern: '^[a-zA-Z ]{3,10}$',
+                //         }
+                //     ]
+                // },
+                // {
+                //     name: 'GuarantorMobileNo', label: 'Guarantor Mobile No', placeholder: 'Enter Guarantor Mobile No', type: 'number', value: DriverTable.GuarantorMobileNo, generatecontrol: true, disable: false,
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please enter 6 to 10 digit mobile number",
+                //             pattern: "^[0-9]{6,10}$",
+                //         }
+                //     ]
+                // },
                 {
                     name: 'D_category', label: "Driver Category", placeholder: "", type: 'select', value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
@@ -197,35 +197,35 @@ export class DriverControls {
                         }
                     ]
                 },
+                // {
+                //     name: 'Issue_By_RTO', label: 'Issue By RTO', placeholder: 'Enter Issue By RTO', type: 'text', value: DriverTable.IssueByRTO, generatecontrol: true, disable: false,
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please Enter Issue by RTO of length 3 to 10 characters",
+                //             pattern: "^[a-zA-Z]{3,10}$",
+                //         }
+                //     ]
+                // },
                 {
-                    name: 'Issue_By_RTO', label: 'Issue By RTO', placeholder: 'Enter Issue By RTO', type: 'text', value: DriverTable.IssueByRTO, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Issue by RTO of length 3 to 10 characters",
-                            pattern: "^[a-zA-Z]{3,10}$",
-                        }
-                    ]
-                },
-                {
-                    name: 'Valdity_dt', label: "Valdity Date", placeholder: "select Valdity Date", type: 'date', value: DriverTable.ValidityDate, generatecontrol: true, disable: false,
+                    name: 'Valdity_dt', label: "License Valdity Date", placeholder: "select Valdity Date", type: 'date', value: DriverTable.ValidityDate, generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
                         minDate: new Date("01 Jan 1900")
                     }
                 },
-                {
-                    name: 'BlackListedReason', label: 'BlackListed Reason', placeholder: 'Enter BlackListed Reason', type: 'text', value: DriverTable.blackListedReason, generatecontrol: true, disable: false,
-                    Validations: [{
-                        name: "pattern",
-                        message: "Please enter BlackListed Reason of length 2 to 50 characters",
-                        pattern: "^[a-zA-Z ]{2,50}$",
-                    }]
-                },
-                {
-                    name: 'IsBlackListed', label: 'IsBlackListed', placeholder: '', type: 'toggle', value: DriverTable.IsBlackListed, generatecontrol: true, disable: false,
-                    Validations: []
-                }
+                // {
+                //     name: 'BlackListedReason', label: 'BlackListed Reason', placeholder: 'Enter BlackListed Reason', type: 'text', value: DriverTable.blackListedReason, generatecontrol: true, disable: false,
+                //     Validations: [{
+                //         name: "pattern",
+                //         message: "Please enter BlackListed Reason of length 2 to 50 characters",
+                //         pattern: "^[a-zA-Z ]{2,50}$",
+                //     }]
+                // },
+                // {
+                //     name: 'IsBlackListed', label: 'IsBlackListed', placeholder: '', type: 'toggle', value: DriverTable.IsBlackListed, generatecontrol: true, disable: false,
+                //     Validations: []
+                // }
             ],
             this.PermanentAddressControls = [
                 {
@@ -270,6 +270,143 @@ export class DriverControls {
                         }
                     ]
                 },
+            ],
+            this.UploadsControls = [
+                //  {
+                //     name: 'Photo',
+                //     label: 'Photo',
+                //     placeholder: '',
+                //     type: 'file',
+                //     value: '',
+                //     Validations: [],
+                //     additionalData: {
+                //         multiple: true
+                //     },
+                //     functions: {
+                //         onChange: 'selectedFile',
+                //     },
+                //     generatecontrol: true,
+                //     disable: false
+                // },
+                // {
+                //     name: 'Thumb',
+                //     label: 'Thumb Impression',
+                //     placeholder: '',
+                //     type: 'file',
+                //     value: '',
+                //     Validations: [],
+                //     additionalData: {
+                //         multiple: true
+                //     },
+                //     functions: {
+                //         onChange: 'selectedFile',
+                //     },
+                //     generatecontrol: true,
+                //     disable: false
+                // },
+                // {
+                //     name: 'Passport',
+                //     label: 'Passport',
+                //     placeholder: '',
+                //     type: 'file',
+                //     value: '',
+                //     Validations: [],
+                //     additionalData: {
+                //         multiple: true
+                //     },
+                //     functions: {
+                //         onChange: 'selectedFile',
+                //     },
+                //     generatecontrol: true,
+                //     disable: false
+                // },
+                {
+                    name: 'D_License',
+                    label: 'Driving License',
+                    placeholder: '',
+                    type: 'file',
+                    value: '',
+                    Validations: [],
+                    additionalData: {
+                        multiple: true
+                    },
+                    functions: {
+                        onChange: 'selectedFile',
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+                // {
+                //     name: 'V_ID',
+                //     label: 'Voters ID',
+                //     placeholder: '',
+                //     type: 'file',
+                //     value: '',
+                //     Validations: [],
+                //     additionalData: {
+                //         multiple: true
+                //     },
+                //     functions: {
+                //         onChange: 'selectedFile',
+                //     },
+                //     generatecontrol: true,
+                //     disable: false
+                // },
+                {
+                    name: 'PanCard',
+                    label: 'PAN Card',
+                    placeholder: '',
+                    type: 'file',
+                    value: '',
+                    Validations: [],
+                    additionalData: {
+                        multiple: true
+                    },
+                    functions: {
+                        onChange: 'selectedFile',
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: 'Aadhar',
+                    label: 'Aadhar Card',
+                    placeholder: '',
+                    type: 'file',
+                    value: '',
+                    Validations: [],
+                    additionalData: {
+                        multiple: true
+                    },
+                    functions: {
+                        onChange: 'selectedFile',
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+
+            ],
+            this.BankDetailsControls = [
+                {
+                    name: 'B_Name', label: 'Bank Name', placeholder: 'Enter Bank Name', type: 'text', value: DriverTable.PermanentAddress, generatecontrol: true, disable: false,
+                    Validations: []
+                },
+                {
+                    name: 'B_Acct', label: 'Bank Account No', placeholder: 'Enter Bank Account No', type: 'text', value: DriverTable.PermanentCity, generatecontrol: true, disable: false,
+                    Validations: []
+                },
+                {
+                    name: 'Branch', label: 'Branch Name', placeholder: 'Enter Branch Name', type: 'text', value: DriverTable.PermanentPincode, generatecontrol: true, disable: false,
+                    Validations: []
+                },
+                {
+                    name: 'Acct_Name', label: 'Account Name', placeholder: 'Enter Account Name', type: 'text', value: DriverTable.PermanentPincode, generatecontrol: true, disable: false,
+                    Validations: []
+                },
+                {
+                    name: 'IFSC', label: 'IFSC Code', placeholder: 'Enter IFSC Code', type: 'text', value: DriverTable.PermanentPincode, generatecontrol: true, disable: false,
+                    Validations: []
+                }
             ]
     }
     getFormControlsD() {
@@ -280,5 +417,11 @@ export class DriverControls {
     }
     getFormControlsP() {
         return this.PermanentAddressControls;
+    }
+    getFormControlsU() {
+        return this.UploadsControls;
+    }
+    getFormControlsB() {
+        return this.BankDetailsControls;
     }
 }

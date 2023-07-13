@@ -1,33 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { LocationMaster } from 'src/app/core/models/Masters/LocationMaster';
 import { LocationControl } from 'src/assets/FormControls/LocationMaster';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
-import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { utilityService } from 'src/app/Utility/utility.service';
 
 @Component({
   selector: 'app-add-location-master',
   templateUrl: './add-location-master.component.html',
 })
 export class AddLocationMasterComponent implements OnInit {
-  LocationTableForm: UntypedFormGroup;
+  locationTableForm: UntypedFormGroup;
   data: any;
-  IsUpdate = false;
-  CityUpdate: any;
+  isUpdate = false;
   action: any;
-  LocationHierarchy: AutoComplateCommon[];
-  nestedHierarchy: AutoComplateCommon[];
-  CityAutoComplate: AutoComplateCommon[];
-  StateAutoComplete: AutoComplateCommon[];
-  AutoRegion: AutoComplateCommon[];
-  Timezone: AutoComplateCommon[]
-  LocationAutocomplate: AutoComplateCommon[];
+  locationHierarchy: any;
   LocationTable: LocationMaster;
+  locationFormControls: LocationControl
+  error: string;
+  jsonControlLocationArray: any;
+  jsonControlOtherArray: any;
+  accordionData: any
+  hierarchydet: any;
   breadscrums = [
     {
       title: "Add Location Master",
@@ -35,77 +33,62 @@ export class AddLocationMasterComponent implements OnInit {
       active: "Location Master",
     },
   ];
-  
-  regionId: any;
-  zoneId: any;
-  stateId: any;
-  locCity: string;
-  reportlevelId: any;
-  loclevalId: any;
-  Report_Loc: string;
-  Zone: any;
-  StateUpdate: any;
-  timezone: any;
-  ReportLeval: any;
-  ReportLocation: any;
-  LocLeval: any;
-  LocationList: any;
-  Loccode: any;
-  loc_startdt: any;
-  loc_enddt: any;
-  jsonControlArray: any[];
-  Loc_Level: any;
-  Loc_LevelStatus: any;
-  Report_Level: any;
-  Report_LevelStatus: any;
-  Report_LocStatus: any;
-  locationFormControls: LocationControl
-  LocState: any;
-  LocStateStatus: any;
-  LocCity: any;
-  LocCityStatus: any;
-  TimezoneId: any;
-  TimezoneStatus: any;
-  LocRegion: any;
-  LocRegionStatus: any;
-  TimezoneIds: any;
-  Report_Locnm: any;
-  LocCitynm: any;
-  error: string;
-  ISLocCode: boolean;
-  jsonControlLocationArray: any;
-  jsonControlOtherArray: any;
-  accordionData: any
+  locHierachy: any;
+  locHierachyStatus: any;
+  reportLoc: any;
+  reportLocStatus: any;
+  reportLocation: any;
+  pincodeLoc: any;
+  pincodeDet: any;
+  pincode: any;
+  pincodeStatus: any;
+  cityLoc: any;
+  cityLocDet: any;
+  locationCity: any;
+  locationCitygStatus: any;
+  reportingLoDet: any;
+  reportingLoc: any;
+  report: any;
+  reportStatus: any;
+  stateData: any;
+  stateDet: any;
+  stateLoc: any;
+  stateLocStatus: any;
+  zoneData: any;
+  zoneDet: any;
+  zoneLoc: any;
+  zoneLocStatus: any;
+  ownershipData: any;
+  ownerShipDet: any;
+  locOwnership: any;
+  locOwnershipStatus: any;
+  accountLoc: any;
+  accountLocStatus: any;
+  accounting: any;
+  accountingDet: any;
+  dataLocDet: any;
+  locData: any;
+  locDataStatus: any;
+  defaultDet: any;
+  nextLocation: any;
+  nextLocationStatus: any;
+  contLocDet: any;
+  prevLocDet: any;
+  locPrev: any;
+  locPrevStatus: any;
+  locCont: any;
+  locContStatus: any;
   constructor(
-    private fb: UntypedFormBuilder,
-    public dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    public ObjSnackBarUtility: SnackBarUtilityService,
-   // private ILocationMasterServiceService: LocationMasterServiceService,
-    private router: Router,
-    private filter: FilterUtils
-
+    private fb: UntypedFormBuilder, public dialog: MatDialog, private router: Router, private filter: FilterUtils,
+    private masterService: MasterService, private service: utilityService, private route: Router,
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.LocationTable = router.getCurrentNavigation().extras.state.data;
-      console.log(JSON.stringify(this.LocationTable));
-      this.regionId = this.LocationTable.regionId
-      this.zoneId = this.LocationTable.zoneId
-      this.stateId = this.LocationTable.stateId
-      this.locCity = this.LocationTable.locCity
-      this.timezone = this.LocationTable.timezoneID
-      this.reportlevelId = this.LocationTable.reportlevelId
-      this.loclevalId = this.LocationTable.loclevalId
-      this.Report_Loc = this.LocationTable.report_Loc
-      this.loc_startdt = this.LocationTable.loc_startdt <= "1900-01-01T00:00:00" ? "" : this.LocationTable.loc_startdt;
-      this.loc_enddt = this.LocationTable.loc_enddt <= "1900-01-01T00:00:00" ? "" : this.LocationTable.loc_enddt;
-      this.IsUpdate = true;
+      this.isUpdate = true;
       this.action = 'edit'
 
     } else {
       this.action = 'Add'
-      this.loc_startdt = "";
-      this.loc_enddt = "";
     }
     if (this.action === 'edit') {
       this.breadscrums = [
@@ -129,44 +112,200 @@ export class AddLocationMasterComponent implements OnInit {
     }
     this.initializeFormControl();
   }
-
-   //#region This method creates the form controls from the json array along with the validations.
-   initializeFormControl() {
+  //#region This method creates the form controls from the json array along with the validations.
+  initializeFormControl() {
     // Create DriverFormControls instance to get form controls for different sections
-    const driverFormControls = new LocationControl(this.LocationTable, this.IsUpdate);
-    this.jsonControlLocationArray = driverFormControls.getFormControlsLocation();
-    this.jsonControlOtherArray = driverFormControls.getFormControlsOther();
+    const locationFormControls = new LocationControl(this.LocationTable, this.isUpdate);
+    this.jsonControlLocationArray = locationFormControls.getFormControlsLocation();
+    this.jsonControlOtherArray = locationFormControls.getFormControlsOther();
 
     // Build the accordion data with section names as keys and corresponding form controls as values
     this.accordionData = {
       "Location Details": this.jsonControlLocationArray,
       "Other Details": this.jsonControlOtherArray,
     };
-
     // Build the form group using formGroupBuilder function and the values of accordionData
-    this.LocationTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
+    this.locationTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
   }
   //#endregion
-
-  
-
   ngOnInit(): void {
-    // this.GetAllLocationHierarchy();
-    // this.GetCityDetails();
-    // this.GetStateDetails();
-    // this.GetAllTimezone("");
-    // this.GetZoneDetails();
+    this.bindDropdown();
+    this.getDropDownData();
+  }
+  bindDropdown() {
+    this.jsonControlLocationArray.forEach(data => {
+      if (data.name === 'locLevel') {
+        // Set location-related variables
+        this.locHierachy = data.name;
+        this.locHierachyStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'reportLevel') {
+        // Set category-related variables
+        this.reportLoc = data.name;
+        this.reportLocStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'locPincode') {
+        // Set category-related variables
+        this.pincode = data.name;
+        this.pincodeStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'locCity') {
+        // Set category-related variables
+        this.locationCity = data.name;
+        this.locationCitygStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'reportLoc') {
+        // Set category-related variables
+        this.report = data.name;
+        this.reportStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'locState') {
+        // Set category-related variables
+        this.stateLoc = data.name;
+        this.stateLocStatus = data.additionalData.showNameAndValue;
+      }
+    });
+    this.jsonControlOtherArray.forEach(data => {
+      if (data.name === 'locRegion') {
+        // Set location-related variables
+        this.zoneLoc = data.name;
+        this.zoneLocStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'ownership') {
+        // Set category-related variables
+        this.locOwnership = data.name;
+        this.locOwnershipStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'acctLoc') {
+        // Set category-related variables
+        this.accountLoc = data.name;
+        this.accountLocStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'dataLoc') {
+        // Set category-related variables
+        this.locData = data.name;
+        this.locDataStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'nextLoc') {
+        // Set category-related variables
+        this.nextLocation = data.name;
+        this.nextLocationStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'prevLoc') {
+        // Set category-related variables
+        this.locPrev = data.name;
+        this.locPrevStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'contLoc') {
+        // Set category-related variables
+        this.locCont = data.name;
+        this.locContStatus = data.additionalData.showNameAndValue;
+      }
+    });
   }
 
+
+  //DROPDOWN FILTER IN OPTIMIZED WAY
+  getDropDownData() {
+    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
+      const {
+        locationHierarchyDropDown,
+        pincodeLocationDropDown,
+        cityLocDropDown,
+        ownershipDropdown,
+        stateLocDropDown,
+        zoneDropDown,
+        locationOwnershipDropDown,
+        locdataDropDown
+      } = res;
+      this.locationHierarchy = locationHierarchyDropDown;
+      this.pincodeLoc = pincodeLocationDropDown;
+      this.cityLoc = cityLocDropDown;
+      this.reportingLoc = ownershipDropdown;
+      this.stateData = stateLocDropDown;
+      this.zoneData = zoneDropDown;
+      this.ownershipData = locationOwnershipDropDown;
+      this.accounting = locdataDropDown;
+      if (this.isUpdate) {
+        this.hierarchydet = this.findDropdownItemByName(this.locationHierarchy, this.LocationTable.locLevel);
+        this.locationTableForm.controls.locLevel.setValue(this.hierarchydet);
+
+        this.reportLocation = this.findDropdownItemByName(this.locationHierarchy, this.LocationTable.reportTo);
+        this.locationTableForm.controls.reportLevel.setValue(this.reportLocation);
+
+        this.pincodeDet = this.findDropdownItemByName(this.pincodeLoc, this.LocationTable.locPincode);
+        this.locationTableForm.controls.locPincode.setValue(this.pincodeDet);
+
+        this.cityLocDet = this.findDropdownItemByName(this.cityLoc, this.LocationTable.locCity);
+        this.locationTableForm.controls.locCity.setValue(this.cityLocDet);
+
+        this.reportingLoDet = this.findDropdownItemByName(this.reportingLoc, this.LocationTable.reportLoc);
+        this.locationTableForm.controls.reportLoc.setValue(this.reportingLoDet);
+
+        this.stateDet = this.findDropdownItemByName(this.stateData, this.LocationTable.locState);
+        this.locationTableForm.controls.locState.setValue(this.stateDet);
+
+        this.zoneDet = this.findDropdownItemByName(this.zoneData, this.LocationTable.locZone);
+        this.locationTableForm.controls.locRegion.setValue(this.zoneDet);
+
+        this.ownerShipDet = this.findDropdownItemByName(this.ownershipData, this.LocationTable.ownership);
+        this.locationTableForm.controls.ownership.setValue(this.ownerShipDet);
+
+        this.accountingDet = this.findDropdownItemByName(this.accounting, this.LocationTable.acctLoc);
+        this.locationTableForm.controls.acctLoc.setValue(this.accountingDet);
+
+        this.dataLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.dataLoc);
+        this.locationTableForm.controls.dataLoc.setValue(this.dataLocDet);
+
+        this.defaultDet = this.findDropdownItemByName(this.accounting, this.LocationTable.defaultLoc);
+        this.locationTableForm.controls.nextLoc.setValue(this.defaultDet);
+
+        this.prevLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.nearLoc);
+        this.locationTableForm.controls.prevLoc.setValue(this.prevLocDet);
+
+        this.contLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.contLoc);
+        this.locationTableForm.controls.contLoc.setValue(this.contLocDet);
+      }
+      const filterParams = [
+        [this.jsonControlLocationArray, this.locationHierarchy, this.locHierachy, this.locHierachyStatus],
+        [this.jsonControlLocationArray, this.locationHierarchy, this.reportLoc, this.reportLocStatus],
+        [this.jsonControlLocationArray, this.pincodeLoc, this.pincode, this.pincodeStatus],
+        [this.jsonControlLocationArray, this.cityLoc, this.locationCity, this.locationCitygStatus],
+        [this.jsonControlLocationArray, this.reportingLoc, this.report, this.reportStatus],
+        [this.jsonControlLocationArray, this.stateData, this.stateLoc, this.stateLocStatus],
+        [this.jsonControlOtherArray, this.zoneData, this.zoneLoc, this.zoneLocStatus],
+        [this.jsonControlOtherArray, this.ownershipData, this.locOwnership, this.locOwnershipStatus],
+        [this.jsonControlOtherArray, this.accounting, this.accountLoc, this.accountLocStatus],
+        [this.jsonControlOtherArray, this.accounting, this.locData, this.locDataStatus],
+        [this.jsonControlOtherArray, this.accounting, this.nextLocation, this.nextLocationStatus],
+        [this.jsonControlOtherArray, this.accounting, this.locPrev, this.locPrevStatus],
+        [this.jsonControlOtherArray, this.accounting, this.locCont, this.locContStatus]
+      ];
+      filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
+        this.filter.Filter(jsonControlArray, this.locationTableForm, dropdownData, formControl, statusControl);
+      });
+    });
+  }
+
+  //OPTIMIZED WAY TO SAVE DATA WITH DROPDOWN VALUE
+  save() {
+    const formValue = this.locationTableForm.value;
+    Object.keys(formValue).forEach(key => {
+      this.locationTableForm.controls[key].setValue(formValue[key]);
+    });
+    this.locationTableForm.controls.ActiveFlag.setValue(formValue.ActiveFlag ? "Y" : "N");
+    this.route.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
+    this.service.exportData(formValue);
+  }
+  findDropdownItemByName(dropdownData, name) {
+    return dropdownData.find(item => item.name === name);
+  }
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
-
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
-
     // we can add more arguments here, if needed. like as shown
     // $event['fieldName'] = field.name;
-
     // function of this name may not exists, hence try..catch 
     try {
       this[functionName]($event);
@@ -177,14 +316,5 @@ export class AddLocationMasterComponent implements OnInit {
   }
   cancel() {
     window.history.back();
-  }
-  showNotification(colorName, text, placementFrom, placementAlign) {
-    this.snackBar.open(text, '', {
-      duration: 5000,
-      verticalPosition: placementFrom,
-      horizontalPosition: placementAlign,
-      panelClass: colorName
-    });
-    this.router.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
   }
 }

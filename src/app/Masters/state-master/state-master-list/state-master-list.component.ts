@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from '@angular/common/http';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
     selector: 'app-state-master-list',
@@ -8,8 +8,8 @@ import { HttpClient } from '@angular/common/http';
 export class StateMasterListComponent implements OnInit {
     jsonUrl = '../../../assets/data/masters-data.json'
     data: [] | any;
-    csv: any[];
-    tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
+    tableData: any[];
+    tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     // Define column headers for the table
     columnHeader =
         {
@@ -18,8 +18,8 @@ export class StateMasterListComponent implements OnInit {
             "stateName": "State Name",
             "stateAlias": "State Alias",
             "stateType": "State Type",
-            "countryName": "Country Name",
-            "GSTWiseStateCode": "GST Wise State Code",
+            "country": "Country Name",
+            "gstWiseStateCode": "GST Wise State Code",
             "isActive": "Active Flag",
             "actions": "Actions",
         }
@@ -31,11 +31,11 @@ export class StateMasterListComponent implements OnInit {
         "stateAlias": "State Alias",
         "stateType": "State Type",
         "countryName": "Country Name",
-        "GSTWiseStateCode": "GST Wise State Code",
+        "gstWiseStateCode": "GST Wise State Code",
         "isActive": "Active Flag",
         "actions": "Actions",
     }
-    breadscrums = [
+    breadScrums = [
         {
             title: "State Master",
             items: ["Master"],
@@ -53,26 +53,39 @@ export class StateMasterListComponent implements OnInit {
     linkArray = []
     addAndEditPath: string;
 
-    constructor(private http: HttpClient) {
+    constructor(private masterService: MasterService) {
         this.addAndEditPath = "/Masters/StateMaster/AddState";
     }
 
     ngOnInit(): void {
         //throw new Error("Method not implemented.");
-        this.GetStateDetails();
+        this.getStateDetails();
     }
 
-    GetStateDetails() {
-        //throw new Error("Method not implemented.");
-        // Fetch data from the JSON endpoint
-        this.http.get(this.jsonUrl).subscribe((res: any) => {
-            this.data = res;
-            this.csv = this.data['StateData']
-            // Extract relevant data arrays from the response
-            //const tableArray = this.data['tabledata'];
-            this.tableload = false;
+    getStateDetails() {
+        let req = {
+            "companyCode": 10065,
+            "type": "masters",
+            "collection": "state"
 
         }
-        );
+        this.masterService.masterPost('common/getall', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+
+                    // Generate srno for each object in the array
+                    const dataWithSrno = res.data.map((obj, index) => {
+                        return {
+                            ...obj,
+                            srNo: index + 1
+                        };
+                    });
+
+
+                    this.tableData = dataWithSrno;
+                    this.tableLoad = false;
+                }
+            }
+        })
     }
 }

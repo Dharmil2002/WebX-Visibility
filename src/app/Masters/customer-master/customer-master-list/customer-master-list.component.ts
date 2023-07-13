@@ -1,18 +1,17 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 @Component({
   selector: 'app-customer-master-list',
   templateUrl: './customer-master-list.component.html',
 })
 export class CustomerMasterListComponent implements OnInit {
-  jsonUrl = '../../../assets/data/masters-data.json'
   data: [] | any;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   linkArray = []
   columnHeader = {
-    "srNo":"Sr No",
+    "srNo": "Sr No",
     "groupCode": "Group Code",
     "customerCode": "Customer Code",
     "customerName": "Customer Name",
@@ -20,7 +19,7 @@ export class CustomerMasterListComponent implements OnInit {
     "actions": "Actions"
   };
   headerForCsv = {
-    "srNo":"Sr No",
+    "srNo": "Sr No",
     "groupCode": "Group Code",
     "customerCode": "Customer Code",
     "customerName": "Customer Name",
@@ -39,7 +38,7 @@ export class CustomerMasterListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
-  constructor(private http: HttpClient) {
+  constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
   }
   ngOnInit(): void {
@@ -49,7 +48,7 @@ export class CustomerMasterListComponent implements OnInit {
   getCustomerDetails() {
     //throw new Error("Method not implemented."); 
     //Fetch data from the JSON endpoint
-    this.http.get(this.jsonUrl).subscribe((res: any) => {
+    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
       this.data = res;
       this.csv = this.data['customerData']
       //Extract relevant data arrays from the response

@@ -1,0 +1,26 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
+    <form [formGroup]="pincodeTableForm">
+        <app-form-webxpress 
+                [form]="pincodeTableForm" 
+                [formData]="jsonControlArray"
+                (functionCallEmitter)="functionCallHandler($event)" 
+                [showSaveButton]="true">
+        </app-form-webxpress>
+    </form>
+    <!-- Loading Generic table as parent component and passing  required data-->
+    <generic-table-webxpress 
+        *ngIf="!tableLoad" 
+        [columnHeader]="columnHeader" 
+        [tableData]="csv"
+        [uploadComponent]="uploadComponent" 
+        [csvHeaders]="headerForCsv"
+        [csvFileName]="csvFileName" 
+        [toggleArray]="toggleArray"
+        [Link]="linkArray"
+        [menuItems]="menuItems" 
+        [metaData]="METADATA" 
+        [addAndEditPath]="addAndEditPath"
+        [dynamicControls]="dynamicControls"
+        (onFlagChange)="IsActive($event)">
+    </generic-table-webxpress>
+</app-common-wrapper-webxpress>

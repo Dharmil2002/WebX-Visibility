@@ -197,6 +197,7 @@ IntializeFormControl() {
 
 // Function to retrieve vehicle types from JSON file and populate the dropdown
 vehicleTypeDropdown() {
+  
   this.operationService.getJsonFileDetails('loadingJsonUrl').subscribe(res => {
       this.loadingSheetData = res;
       let vehicleType: any[] = [];

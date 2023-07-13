@@ -11,6 +11,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from 'src/app/Utility/utility.service';
 import { DriverMaster } from 'src/app/core/models/Masters/Driver';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-add-driver-master',
   templateUrl: './add-driver-master.component.html',
@@ -44,6 +45,8 @@ export class AddDriverMasterComponent implements OnInit {
   jsonControlLicenseArray: any;
   jsonControlPermanentArray: any;
   jsonControlCurrentArray: any;
+  jsonControlUploadArray: any;
+  jsonControlBankDetailArray: any;
   accordionData: any
   location: any;
   locationStatus: any;
@@ -54,6 +57,9 @@ export class AddDriverMasterComponent implements OnInit {
   breadscrums: { title: string; items: string[]; active: string; }[];
   Routes: any;
   RouteStatus: any;
+  selectedFiles: boolean;
+  SelectFile: File;
+  imageName: string;
   sampleDropdownData2 = [
     { name: "HQTR", value: "HQTR" },
     { name: "MUMB", value: "MUMB" },
@@ -124,12 +130,16 @@ export class AddDriverMasterComponent implements OnInit {
     this.jsonControlDriverArray = driverFormControls.getFormControlsD();
     this.jsonControlLicenseArray = driverFormControls.getFormControlsL();
     this.jsonControlPermanentArray = driverFormControls.getFormControlsP();
+    this.jsonControlUploadArray = driverFormControls.getFormControlsU();
+    this.jsonControlBankDetailArray= driverFormControls.getFormControlsB();
 
     // Build the accordion data with section names as keys and corresponding form controls as values
     this.accordionData = {
       "Driver Details": this.jsonControlDriverArray,
       "License Details": this.jsonControlLicenseArray,
       "Address": this.jsonControlPermanentArray,
+      "ID Proof Document Type":this.jsonControlUploadArray,
+      "Bank Account Details": this.jsonControlBankDetailArray
     };
 
     // Build the form group using formGroupBuilder function and the values of accordionData
@@ -171,6 +181,32 @@ export class AddDriverMasterComponent implements OnInit {
   cancel() {
     window.history.back();
     this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList");
+  }
+  selectedFile(data) {
+    let fileList: FileList = data.eventArgs;
+    if (fileList.length > 0) {
+      const file: File = fileList[0];
+      const allowedFormats = ["jpeg", "png", "jpg"];
+      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
+  
+      if (allowedFormats.includes(fileFormat)) {
+        this.SelectFile = file;
+        this.imageName = file.name;
+        this.selectedFiles = true;
+        this.DriverTableForm.controls["Company_Image"].setValue(this.SelectFile.name);
+      } else {
+        this.selectedFiles = false;
+        Swal.fire({
+          icon: "warning",
+          title: "Alert",
+          text: `Please select a JPEG, PNG, or JPG file.`,
+          showConfirmButton: true,
+        });
+      }
+    } else {
+      this.selectedFiles = false;
+      alert("No file selected");
+    }
   }
   save() {
     this.DriverTableForm.controls["ActiveFlag"].setValue(this.DriverTableForm.value.ActiveFlag == true ? "Y" : "N");

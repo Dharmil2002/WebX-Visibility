@@ -150,9 +150,107 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
+              "path": "Masters/PinCodeMaster/PinCodeMasterList",
+              "title": "Pin code Masters",
+              "moduleName": "Masters",
+              "icon": "",
+              "class": "",
+              "groupTitle": false,
+              "submenu": []
+            },
+            {
+              "path": "Masters/VehicleMaster/VehicleMasterList",
+              "title": "Vehicle Master",
+              "moduleName": "Vehicle Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Masters/VehicleTypeMaster/VehicleTypeMasterList",
+              "title": "Vehicle Type Master",
+              "moduleName": "Vehicle Type Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+          ]
+        },
+        {
+          "path": "",
+          "title": "Stakeholders",
+          "moduleName": "Stakeholders",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Masters/CustomerGroupMaster/CustomerGroupMasterList",
+              "title": "Customer Group Master",
+              "moduleName": "Customer Group Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Masters/UserMaster/UserMasterView",
+              "title": "User Master",
+              "moduleName": "User Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },]
+        },
+        {
+          "path": "",
+          "title": "Document Control",
+          "moduleName": "Document Control",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
               "path": "Masters/DocumentControlRegister/AddDCR",
               "title": "Add DCR Series",
               "moduleName": "Add DCR Series",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Masters/DocumentControlRegister/TrackDCR",
+              "title": "Track and Manage DCR",
+              "moduleName": "Track and Manage DCR",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            }
+          ]
+        },
+        {
+          "path": "",
+          "title": "Transport Related",
+          "moduleName": "Transport Related",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Masters/RouteLocationWise/RouteList",
+              "title": "Route Master - Location wise",
+              "moduleName": "Route Master - Location wise",
               "icon": "",
               "class": "ml-menu",
               "groupTitle": false,

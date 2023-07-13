@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -7,6 +8,8 @@ import { HttpClient } from '@angular/common/http';
 export class MasterService {
   companyJsonUrl = '../../../assets/data/CompanyGST-data.json';
   dropDownUrl = '../../../assets/data/state-countryDropdown.json';
+  masterUrl = '../../../assets/data/masters-data.json';
+  ewayUrl = '../../../assets/data/ewayData.json';
   constructor(private http: HttpClient) { }
   /**
    * Retrieves JSON file details from the specified API URL.
@@ -16,4 +19,11 @@ export class MasterService {
   getJsonFileDetails(ApiURL) {
     return this.http.get<any>(this[ApiURL]);
   }
+  masterPost(ApiURL, Request) {
+    return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  }
+  masterPut(ApiURL, Request) {
+    return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  }
+  
 }

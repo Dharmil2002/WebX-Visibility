@@ -6,13 +6,13 @@ export class CompanyControl {
     constructor(CompanyDetailsResponse) {
         this.CompanyControlArray = [
             {
-                name: 'Brand', label: 'Brand', placeholder: 'Brand', type: 'radiobutton',
-                value: [{ value: 'V', name: 'Velocity', "checked": true }, { value: 'K', name: 'Kale' }], 
+                name: 'brand', label: 'Brand', placeholder: 'Brand', type: 'radiobutton',
+                value: [{ value: 'V', name: 'Velocity', "checked": true }, { value: 'K', name: 'Kale' }],
                 Validations: [],
                 generatecontrol: true, disable: false
             },
             {
-                name: 'Company_Code', label: 'Company Code', placeholder: 'Company Code', type: 'text', 
+                name: 'company_Code', label: 'Company Code', placeholder: 'Company Code', type: 'text',
                 value: CompanyDetailsResponse?.COMPANY_CODE, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -23,7 +23,7 @@ export class CompanyControl {
                         name: "pattern",
                         message: "Please Enter only text with 1-20 alphabets",
                         pattern: '^[a-zA-Z ]{1,20}$'
-                    }                    
+                    }
                 ],
                 functions: {
                     onChange: 'OnCompanyCodeChange',
@@ -31,7 +31,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Company_Name', label: 'Company Name', placeholder: 'Company Name', type: 'text', 
+                name: 'company_Name', label: 'Company Name', placeholder: 'Company Name', type: 'text',
                 value: CompanyDetailsResponse?.COMPANY_NAME, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -42,12 +42,12 @@ export class CompanyControl {
                         name: "pattern",
                         message: "Please Enter only text with 1-100 alphabets",
                         pattern: '^[a-zA-Z ]{1,100}$'
-                      }
+                    }
                 ]
             },
 
             {
-                name: 'Contact_Person_Name', label: 'Contact Person Name', placeholder: 'Contact Person Name', type: 'text', 
+                name: 'contact_Person_Name', label: 'Contact Person Name', placeholder: 'Contact Person Name', type: 'text',
                 value: CompanyDetailsResponse?.CONTACT_PERSON, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -63,7 +63,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Contact_No', label: "Contact Number", placeholder: "Contact Number", type: 'text', 
+                name: 'contact_No', label: "Contact Number", placeholder: "Contact Number", type: 'text',
                 value: CompanyDetailsResponse?.CONTACTNO, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -78,7 +78,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Branch_Code', label: 'Branch Code', placeholder: 'Branch Code', type: 'text', 
+                name: 'branch_Code', label: 'Branch Code', placeholder: 'Branch Code', type: 'text',
                 value: CompanyDetailsResponse?.BRCD, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -94,7 +94,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Telephone_No', label: "Telephone No", placeholder: "Telephone No", type: 'number', 
+                name: 'telephone_No', label: "Telephone No", placeholder: "Telephone No", type: 'number',
                 value: CompanyDetailsResponse?.TelephoneNo, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -106,7 +106,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Company_Address', label: 'Company Address', placeholder: 'Company Address', type: 'text', 
+                name: 'company_Address', label: 'Company Address', placeholder: 'Company Address', type: 'text',
                 value: CompanyDetailsResponse?.ADDRESS, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -117,7 +117,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Servise_Tax_No', label: 'Servise Tax No', placeholder: 'Servise Tax No', type: 'text', 
+                name: 'service_Tax_No', label: 'Service Tax No', placeholder: 'Service Tax No', type: 'text',
                 value: CompanyDetailsResponse?.ServicetaxNo, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -127,7 +127,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'PAN_No', label: 'PAN No', placeholder: 'PAN No', type: 'text', value: CompanyDetailsResponse?.PANNo, 
+                name: 'pan_N0', label: 'PAN No', placeholder: 'PAN No', type: 'text', value: CompanyDetailsResponse?.PANNo,
                 generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -137,7 +137,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'TAN_No', label: 'TAN No', placeholder: 'TAN No', type: 'text', value: CompanyDetailsResponse?.TANNo, 
+                name: 'tan_No', label: 'TAN No', placeholder: 'TAN No', type: 'text', value: CompanyDetailsResponse?.TANNo,
                 generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -147,7 +147,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Fax_No', label: 'FAX No', placeholder: 'FAX No', type: 'text', value: CompanyDetailsResponse?.FAXNo, 
+                name: 'fax_No', label: 'FAX No', placeholder: 'FAX No', type: 'text', value: CompanyDetailsResponse?.FAXNo,
                 generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -157,7 +157,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Help_Line_No', label: 'Help Line No', placeholder: 'Help Line No', type: 'text', 
+                name: 'help_Line_No', label: 'Help Line No', placeholder: 'Help Line No', type: 'text',
                 value: CompanyDetailsResponse?.HelpLineNo, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -167,7 +167,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Registration_No', label: 'Registration No', placeholder: 'Registration No', type: 'text', 
+                name: 'registration_No', label: 'Registration No', placeholder: 'Registration No', type: 'text',
                 value: CompanyDetailsResponse?.RegistrationNo, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -177,7 +177,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Punch_Line', label: 'Punch Line', placeholder: 'Punch Line', type: 'text', 
+                name: 'punch_Line', label: 'Punch Line', placeholder: 'Punch Line', type: 'text',
                 value: CompanyDetailsResponse?.PunchLine, generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -187,7 +187,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'Company_Image', label: "Company Image", placeholder: "", type: 'file', value: "", 
+                name: 'company_Image', label: "Company Image", placeholder: "", type: 'file', value: "",
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
@@ -196,13 +196,13 @@ export class CompanyControl {
             },
 
             {
-                name: 'ActiveFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: CompanyDetailsResponse?.ACTIVEFLAG, generatecontrol: true, disable: false,
+                name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: CompanyDetailsResponse?.ACTIVEFLAG, generatecontrol: true, disable: false,
                 Validations: []
             },
         ],
             this.BankControlArray = [
                 {
-                    name: 'Beneficiary_Name', label: 'Beneficiary Name', placeholder: 'Beneficiary Name ', type: 'text', 
+                    name: 'beneficiary_Name', label: 'Beneficiary Name', placeholder: 'Beneficiary Name ', type: 'text',
                     value: CompanyDetailsResponse?.BeneficiaryName, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -212,7 +212,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'Barcode_Header_Name', label: 'Barcode Header Name', placeholder: 'Barcode Header Name', type: 'text', 
+                    name: 'barcode_Header_Name', label: 'Barcode Header Name', placeholder: 'Barcode Header Name', type: 'text',
                     value: CompanyDetailsResponse?.BarcodeName, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -222,7 +222,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'Bank_Account_No', label: 'Bank Account No', placeholder: 'Bank Account No', type: 'text', 
+                    name: 'bank_Account_No', label: 'Bank Account No', placeholder: 'Bank Account No', type: 'text',
                     value: CompanyDetailsResponse?.BankAccountNo, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -232,7 +232,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'Bank_Name', label: ' Bank Account No', placeholder: ' Bank Account No', type: 'text', 
+                    name: 'bank_Name', label: ' Bank Account No', placeholder: ' Bank Account No', type: 'text',
                     value: CompanyDetailsResponse?.BankName, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -242,7 +242,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'RTGS_Code', label: 'RTGS Code', placeholder: 'RTGS Code', type: 'text', 
+                    name: 'rtgs_Code', label: 'RTGS Code', placeholder: 'RTGS Code', type: 'text',
                     value: CompanyDetailsResponse?.RTGS_NEFTcode, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -252,7 +252,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'MICR_Code', label: 'MICR Code', placeholder: 'MICR Code', type: 'text', 
+                    name: 'micr_Code', label: 'MICR Code', placeholder: 'MICR Code', type: 'text',
                     value: CompanyDetailsResponse?.MICRCode, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -262,7 +262,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'IFSC_Code', label: 'IFSC Code', placeholder: 'IFSC Code', type: 'text', 
+                    name: 'ifsc_Code', label: 'IFSC Code', placeholder: 'IFSC Code', type: 'text',
                     value: CompanyDetailsResponse?.IFSCCode, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -272,7 +272,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'SWIFT_Code', label: 'SWIFT Code', placeholder: 'SWIFT Code', type: 'text', 
+                    name: 'swift_Code', label: 'SWIFT Code', placeholder: 'SWIFT Code', type: 'text',
                     value: CompanyDetailsResponse?.SWIFTcode, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -282,7 +282,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'account_Type', label: 'Account Type', placeholder: 'Account Type', type: 'text', 
+                    name: 'account_Type', label: 'Account Type', placeholder: 'Account Type', type: 'text',
                     value: CompanyDetailsResponse?.AccountType, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -292,7 +292,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'Branch_Name', label: 'Branch Name', placeholder: 'Branch Name', type: 'text',
+                    name: 'branch_Name', label: 'Branch Name', placeholder: 'Branch Name', type: 'text',
                     value: CompanyDetailsResponse?.BankBranch, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -302,7 +302,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'Terms_and_Conditions', label: ' Terms and Conditions', placeholder: ' Terms and Conditions', 
+                    name: 'terms_And_Conditions', label: ' Terms and Conditions', placeholder: ' Terms and Conditions',
                     type: 'text', value: CompanyDetailsResponse?.TermsCondition, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -312,7 +312,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'TimezoneId', label: "Time Zone", placeholder: "Time Zone", type: 'dropdown',
+                    name: 'timeZone', label: "Time Zone", placeholder: "Time Zone", type: 'dropdown',
                     value: '',
                     generatecontrol: true,
                     disable: false,
@@ -323,7 +323,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'LR_Terms_and_Conditions', label: 'LR Terms and Conditions', placeholder: 'LR Terms and Conditions', 
+                    name: 'lr_Terms_And_Conditions', label: 'LR Terms and Conditions', placeholder: 'LR Terms and Conditions',
                     type: 'text', value: CompanyDetailsResponse?.LRTermsCondition, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -333,7 +333,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'PO_Terms_and_Conditions', label: 'PO Terms and Conditions', placeholder: 'PO Terms and Conditions', 
+                    name: 'po_Terms_and_Conditions', label: 'PO Terms and Conditions', placeholder: 'PO Terms and Conditions',
                     type: 'text', value: CompanyDetailsResponse?.POTermsCondition, generatecontrol: true, disable: false,
                     Validations: [
                         {
@@ -343,7 +343,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'Download_Icon', label: 'Default Chart Of Account',
+                    name: 'download_Icon', label: 'Default Chart Of Account',
                     placeholder: 'Default Chart Of Account', type: 'Icon',
                     value: '', generatecontrol: true, disable: false,
                     Validations: [],
@@ -353,17 +353,17 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'Color_Theme', label: "Select Theme", placeholder: "Select Theme", type: 'dropdown', value: CompanyDetailsResponse?.CompanyTheme,
+                    name: 'color_Theme', label: "Select Theme", placeholder: "Select Theme", type: 'dropdown', value: CompanyDetailsResponse?.CompanyTheme,
                     generatecontrol: true,
                     disable: false,
-                    Validations: [ ],
+                    Validations: [],
                     additionalData: {
                         showNameAndValue: true
                     }
                 },
 
                 {
-                    name: 'Multi_Currency_Flag', label: 'Multi Currency', placeholder: 'Multi Currency Flag', type: 'toggle', 
+                    name: 'multi_Currency_Flag', label: 'Multi Currency', placeholder: 'Multi Currency Flag', type: 'toggle',
                     value: CompanyDetailsResponse?.EnableMultiCurrency, generatecontrol: true, disable: false,
                     Validations: []
                 },

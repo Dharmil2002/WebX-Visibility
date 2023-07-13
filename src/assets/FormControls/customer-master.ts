@@ -249,7 +249,7 @@ export class customerControl {
                 },
 
                 {
-                    name: 'branch', label: 'Branch', placeholder: 'Branch', type: 'text', 
+                    name: 'branch', label: 'Bank Branch', placeholder: 'Branch', type: 'text', 
                     value: customerTable?.branch, generatecontrol: true, disable: false,
                     Validations: [],
                     
@@ -262,7 +262,7 @@ export class customerControl {
                 },
 
                 {
-                    name: 'payBasis', label: "Pay basis", placeholder: "Pay basis", type: 'dropdown', value: customerTable?.payBasis,
+                    name: 'payBasis', label: "Pay basis", placeholder: "Pay basis", type: 'multiselect', value: customerTable?.payBasis,
                     generatecontrol: true,
                     disable: false,
                     Validations: [],
@@ -271,7 +271,7 @@ export class customerControl {
                     }
                 },
                 {
-                    name: 'serviceOpted', label: "Service Opted For", placeholder: "Service Opted For", type: 'dropdown', value: customerTable?.serviceOpted,
+                    name: 'serviceOpted', label: "Service Opted For", placeholder: "Service Opted For", type: 'multiselect', value: customerTable?.serviceOpted,
                     generatecontrol: true,
                     disable: false,
                     Validations: [ ],

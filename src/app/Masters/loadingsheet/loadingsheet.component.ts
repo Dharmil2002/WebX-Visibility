@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { FormGroup, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';

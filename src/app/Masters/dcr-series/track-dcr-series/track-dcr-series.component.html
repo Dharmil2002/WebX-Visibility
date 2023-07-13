@@ -1,0 +1,17 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="trackDcrForm">
+        <app-form-webxpress [form]="trackDcrForm" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+    <ng-container>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                <div class="example-button-row">
+                    <button type="button" mat-raised-button color="primary" (click)="track('Track')">Track</button>
+                    <button type="button" mat-raised-button mat-button (click)="track('Manage')">Manage</button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</app-common-wrapper-webxpress>

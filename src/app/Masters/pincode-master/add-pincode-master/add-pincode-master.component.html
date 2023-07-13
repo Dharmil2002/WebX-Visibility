@@ -1,0 +1,7 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="pincodeTableForm">
+        <app-form-webxpress [form]="pincodeTableForm" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

@@ -59,7 +59,7 @@
                 <mat-label>{{formItem.label}}</mat-label>
                 <mat-select placeholder="{{formItem.label}}"
                     (selectionChange)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                    formControlName={{formItem.additionalData.support}}>
+                    formControlName={{formItem.additionalData?.support}}>
                     <mat-option>
                         <ngx-mat-select-search placeholderLabel="Find bank..."
                             noEntriesFoundLabel="'no matching bank found'"
@@ -78,6 +78,22 @@
                 <mat-error *ngFor="let error of formItem.Validations">
                     <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
                         {{error?.message}}
+                    </ng-container>
+                </mat-error>
+            </mat-form-field>
+            <!--  -->
+            <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
+            <mat-form-field class="example-full-width" appearance="outline"
+                *ngIf="(formItem.type=='time') && formItem.generatecontrol">
+                <mat-label>{{formItem.label}}</mat-label>
+                <input matInput [owlDateTimeTrigger]="timepicker" [formControlName]="formItem.name"
+                    [owlDateTime]="timepicker">
+                <mat-icon matSuffix [owlDateTimeTrigger]="timepicker" class="date-icon">schedule</mat-icon>
+                <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>
+                <!-- error  -->
+                <mat-error *ngFor="let error of formItem.Validations">
+                    <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                        {{error.message}}
                     </ng-container>
                 </mat-error>
             </mat-form-field>
@@ -115,7 +131,17 @@
                 </mat-error>
 
             </mat-form-field>
-
+            <!-- Static Dropdown Down Field -->
+            <mat-form-field class="example-full-width" appearance="outline"
+                *ngIf="(formItem.type=='Staticdropdown') && formItem.generatecontrol===true">
+                <mat-label>{{formItem.label}}</mat-label>
+                <mat-select formControlName={{formItem.name}} [multiple]="(formItem.additionalData?.multiple||false)"
+                    (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelection ,
+    eventArgs: $event })">
+                    <mat-option *ngFor="let optValue of formItem.value" [value]="optValue.value">
+                        {{optValue.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
 
             <!--Datepicker---------------------------------------------------------->
             <mat-form-field class="example-full-width" appearance="outline"
@@ -148,7 +174,8 @@
             <!--Radio Button-->
             <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
                 <mat-label>{{formItem.label}}</mat-label>
-                <mat-radio-group [formControlName]="formItem.name">
+                <mat-radio-group [formControlName]="formItem.name"
+                    (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
                     <mat-radio-button *ngFor="let option of formItem.value" [value]="option.value">
                         {{ option.name }}
                     </mat-radio-button>

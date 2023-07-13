@@ -1,0 +1,116 @@
+<div class="container-fluid">
+    <mat-icon color="primary" (click)="close()">close</mat-icon>
+    <mat-icon color="primary" (click)="printPage()">print</mat-icon>
+
+    <div id="printableArea">
+        <table style="margin-top: 0; border:0; margin-bottom:0;" class="table" cellpadding="0" cellspacing="0"
+            width="100%">
+            <tr>
+                <td
+                    style="text-align:center; border:0 !important; width:20%; vertical-align:bottom !important; padding:0;">
+                    <h3><b>Vendor Master</b></h3>
+                </td>
+            </tr>
+        </table>
+        <table class="table table-bordered">
+            <tr *ngFor="let data of this.vendordet">
+                <td>
+                    <div>
+                        <b>Vendor Code</b>
+                        <br />
+                        <span>{{data.vendorcode}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <b>Vendor Name</b>
+                        <br />
+                        <span>{{data.vendorname}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <b>Vendor Type</b>
+                        <br />
+                        <span>{{data.vendorTypeName}}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr *ngFor="let data of this.vendordet">
+                <td>
+                    <div> <b>Address</b>
+                        <br />
+                        <span>{{data.vendoraddress}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Vendor City</b>
+                        <br />
+                        <span>{{data.vendorcity}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Pincode</b>
+                        <br />
+                        <span>{{data.vendorpin}}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr *ngFor="let data of this.vendordet">
+                <td>
+                    <div> <b>Vendor Phone No.</b>
+                        <br />
+                        <span>{{data.vendorphone}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>E - Mail</b>
+                        <br />
+                        <span>{{data.vendoremail}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Customer Locations</b>
+                        <br />
+                        <div style="word-wrap: break-word;width:200px; ">
+                            {{data.vendorbrcd}}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr *ngFor="let data of this.vendordet">
+                <td>
+                    <div> <b>Active Flag </b>
+                        <br />
+                        <span>{{data.active}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Is GST Charged</b>
+                        <br />
+                        <span *ngIf="data.isGSTCharged==true">Yes</span>
+                        <span *ngIf="data.isGSTCharged==false">No</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Last Update By</b>
+                        <br />
+                        <span>{{data.updtby}}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr *ngFor="let data of this.vendordet">
+                <td>
+                    <div> <b>Last Update Date</b>
+                        <br />
+                        <span>{{data.updton | date: 'dd MMM yyyy' }}</span><br />
+                        <span>{{data.UpdateTime}}</span>
+                    </div>
+                </td>
+                <td>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -1,96 +1,416 @@
 {
     "countryList": [
         {
-            "CodeId": "1",
-            "CodeDesc": "India"
+            "codeId": "1",
+            "codeDesc": "India"
         },
         {
-            "CodeId": "2",
-            "CodeDesc": "USA"
+            "codeId": "2",
+            "codeDesc": "USA"
         },
         {
-            "CodeId": "3",
-            "CodeDesc": "Oman"
+            "codeId": "3",
+            "codeDesc": "Oman"
         },
         {
-            "CodeId": "4",
-            "CodeDesc": "Australia"
+            "codeId": "4",
+            "codeDesc": "Australia"
         },
         {
-            "CodeId": "5",
-            "CodeDesc": "New Zealand"
+            "codeId": "5",
+            "codeDesc": "New Zealand"
         },
         {
-            "CodeId": "6",
-            "CodeDesc": "Afghanistan"
+            "codeId": "6",
+            "codeDesc": "Afghanistan"
         },
         {
-            "CodeId": "7",
-            "CodeDesc": "Sri Lanka"
+            "codeId": "7",
+            "codeDesc": "Sri Lanka"
         }
     ],
     "stateList": [
         {
-            "StateId": "1",
-            "StateDesc": "Maharashtra"
+            "stateId": "1",
+            "stateDesc": "Maharashtra"
         },
         {
-            "StateId": "2",
-            "StateDesc": "Dhofar"
+            "stateId": "2",
+            "stateDesc": "Dhofar"
         },
         {
-            "StateId": "3",
-            "StateDesc": "Gulf of Oman coast"
+            "stateId": "3",
+            "stateDesc": "Gulf of Oman coast"
         },
         {
-            "StateId": "4",
-            "StateDesc": "Pune"
+            "stateId": "4",
+            "stateDesc": "Pune"
         },
         {
-            "StateId": "5",
-            "StateDesc": "Assam"
+            "stateId": "5",
+            "stateDesc": "Assam"
         },
         {
-            "StateId": "6",
-            "StateDesc": "Southern Oman"
+            "stateId": "6",
+            "stateDesc": "Southern Oman"
         },
         {
-            "StateId": "7",
-            "StateDesc": "Al Batinah North"
+            "stateId": "7",
+            "stateDesc": "Al Batinah North"
         },
         {
-            "StateId": "8",
-            "StateDesc": "Nizwa"
+            "stateId": "8",
+            "stateDesc": "Nizwa"
+        },
+        {
+            "stateId": "9",
+            "stateDesc": "Gujarat"
+        },
+        {
+            "stateId": "10",
+            "stateDesc": "Madhya Pradesh"
         }
     ],
     "zoneList": [
         {
-            "ZoneId": "1",
-            "ZoneDesc": "SOUTH"
+            "zoneId": "1",
+            "zoneDesc": "SOUTH"
         },
         {
-            "ZoneId": "2",
-            "ZoneDesc": "North Zone"
+            "zoneId": "2",
+            "zoneDesc": "North Zone"
         },
         {
-            "ZoneId": "3",
-            "ZoneDesc": "SOUTH3"
+            "zoneId": "3",
+            "zoneDesc": "SOUTH3"
         },
         {
-            "ZoneId": "4",
-            "ZoneDesc": "West Zone"
+            "zoneId": "4",
+            "zoneDesc": "West Zone"
         },
         {
-            "ZoneId": "5",
-            "ZoneDesc": "CENTRAL"
+            "zoneId": "5",
+            "zoneDesc": "CENTRAL"
         },
         {
-            "ZoneId": "6",
-            "ZoneDesc": "SOUTH2"
+            "zoneId": "6",
+            "zoneDesc": "SOUTH2"
         },
         {
-            "ZoneId": "6",
-            "ZoneDesc": "South Zone"
+            "zoneId": "6",
+            "zoneDesc": "South Zone"
+        }
+    ],
+    "cityList": [
+        {
+            "cityId": 1,
+            "cityDesc": "Mumbai"
+        },
+        {
+            "cityId": 2,
+            "cityDesc": "Pune"
+        },
+        {
+            "cityId": 3,
+            "cityDesc": "Navi Mumbai"
+        },
+        {
+            "cityId": 4,
+            "cityDesc": "Mira-Bhayandar"
+        },
+        {
+            "cityId": 5,
+            "cityDesc": "Surat"
+        },
+        {
+            "cityId": 6,
+            "cityDesc": "Valsad"
+        },
+        {
+            "cityId": 7,
+            "cityDesc": "Vapi"
+        },
+        {
+            "cityId": 8,
+            "cityDesc": "Thane"
+        },
+        {
+            "cityId": 9,
+            "cityDesc": "Kalyan"
+        }
+    ],
+    "pincodeList": [
+        {
+            "PincodeId": 1,
+            "PincodeDesc": "400029"
+        },
+        {
+            "PincodeId": 2,
+            "PincodeDesc": "400065"
+        },
+        {
+            "PincodeId": 3,
+            "PincodeDesc": "400011"
+        },
+        {
+            "PincodeId": 4,
+            "PincodeDesc": "400099"
+        },
+        {
+            "PincodeId": 5,
+            "PincodeDesc": "400004"
+        },
+        {
+            "PincodeId": 6,
+            "PincodeDesc": "400053"
+        }
+    ],
+    "locationList": [
+        {
+            "locId": 1,
+            "locDesc": "VIDHYANAGA"
+        },
+        {
+            "locId": 2,
+            "locDesc": "Surat"
+        },
+        {
+            "locId": 3,
+            "locDesc": "Mumbai"
+        },
+        {
+            "locId": 4,
+            "locDesc": "BARKA"
+        },
+        {
+            "locId": 5,
+            "locDesc": "Delhi"
+        },
+        {
+            "locId": 6,
+            "locDesc": "GOA"
+        },
+        {
+            "locId": 7,
+            "locDesc": "HQTR"
+        },
+        {
+            "locId": 8,
+            "locDesc": "GWTB"
+        }
+    ],
+    "locationData": [
+        {
+            "value": 1,
+            "name": "VIDHYANAGA"
+        },
+        {
+            "value": 2,
+            "name": "Surat"
+        },
+        {
+            "value": 3,
+            "name": "Mumbai"
+        },
+        {
+            "value": 4,
+            "name": "BARKA"
+        },
+        {
+            "value": 5,
+            "name": "Delhi"
+        },
+        {
+            "value": 6,
+            "name": "GOA"
+        },
+        {
+            "value": 7,
+            "name": "HQTR"
+        },
+        {
+            "value": 8,
+            "name": "GWTB"
+        }
+    ],
+    "countryData": [
+        {
+            "value": "1",
+            "name": "India"
+        },
+        {
+            "value": "2",
+            "name": "USA"
+        },
+        {
+            "value": "3",
+            "name": "Oman"
+        },
+        {
+            "value": "4",
+            "name": "Australia"
+        },
+        {
+            "value": "5",
+            "name": "New Zealand"
+        },
+        {
+            "value": "6",
+            "name": "Afghanistan"
+        },
+        {
+            "value": "7",
+            "name": "Sri Lanka"
+        }
+    ],
+    "userList": [
+        {
+            "value": 1,
+            "name": "Bussiness associate"
+        },
+        {
+            "value": 2,
+            "name": "Employee"
+        },
+        {
+            "value": 3,
+            "name": "Vendor"
+        },
+        {
+            "value": 4,
+            "name": "Customer"
+        }
+    ],
+    "userStatus": [
+        {
+            "value": 1,
+            "name": "Permanent"
+        },
+        {
+            "value": 2,
+            "name": "Contractual"
+        },
+        {
+            "value": 3,
+            "name": "Trainee"
+        }
+    ],
+    "managerId": [
+        {
+            "value": 1,
+            "name": "RupaliLad"
+        },
+        {
+            "value": 2,
+            "name": "10002"
+        },
+        {
+            "value": 3,
+            "name": "SHAMS"
+        },
+        {
+            "value": 4,
+            "name": "E10001"
+        },
+        {
+            "value": 5,
+            "name": "E10003r"
+        },
+        {
+            "value": 6,
+            "name": "1234"
+        },
+        {
+            "value": 7,
+            "name": "aarti1"
+        }
+    ],
+    "roleId": [
+        {
+            "value": 1,
+            "name": "CEO"
+        },
+        {
+            "value": 2,
+            "name": "Manager"
+        },
+        {
+            "value": 3,
+            "name": "Developer"
+        },
+        {
+            "value": 4,
+            "name": "Super Admin"
+        },
+        {
+            "value": 5,
+            "name": "aarti1"
+        },
+        {
+            "value": 6,
+            "name": "CTO"
+        },
+        {
+            "value": 7,
+            "name": "Admin"
+        },
+        {
+            "value": 8,
+            "name": "HR"
+        },
+        {
+            "value": 9,
+            "name": "Booking"
+        },
+        {
+            "value": 10,
+            "name": "CFO"
+        },
+        {
+            "value": 11,
+            "name": "COO"
+        },
+        {
+            "value": 12,
+            "name": "Freight"
+        },
+        {
+            "value": 13,
+            "name": "Accountant1"
+        }
+    ],
+    "divisionAccess": [
+        {
+            "value": 1,
+            "name": "PROCTER AND GABLE"
+        },
+        {
+            "value": 2,
+            "name": "CONSUMER PRODUCTS"
+        },
+        {
+            "value": 3,
+            "name": "Khimji Pharmacy LLC"
+        },
+        {
+            "value": 4,
+            "name": "BEL"
+        },
+        {
+            "value": 5,
+            "name": "Commodify"
+        },
+        {
+            "value": 6,
+            "name": "Catering"
+        },
+        {
+            "value": 7,
+            "name": "Plant-3"
+        },
+        {
+            "value": 8,
+            "name": "Plant-4"
         }
     ],
     "serviceOptedDropdown": [
@@ -190,5 +510,363 @@
             "name": "Pune",
             "value": "PUN"
         }
+    ],
+    "documentTypeDropDown": [
+        {
+            "name": "CNote",
+            "value": "DKT"
+        },
+        {
+            "name": "Delivery MR",
+            "value": "DMR"
+        },
+        {
+            "name": "UBI Series",
+            "value": "DKTBC"
+        }
+    ],
+    "vehicleTypeDropdown": [
+        {
+            "name": "ASHOK LEYLAND",
+            "value": "1"
+        },
+        {
+            "name": "TATA-2518",
+            "value": "2"
+        },
+        {
+            "name": "TATA",
+            "value": "3"
+        }
+    ],
+    "controllBranchDropdown": [
+        {
+            "name": "Mumbai",
+            "value": "MUMB"
+        },
+        {
+            "name": "Ahmedabad",
+            "value": "AMDB"
+        },
+        {
+            "name": "Pune",
+            "value": "PUNE"
+        }
+    ],
+    "assetNameDropdown": [
+        {
+            "name": "Vehicle",
+            "value": "1"
+        },
+        {
+            "name": "Reefer",
+            "value": "2"
+        },
+        {
+            "name": "Container",
+            "value": "3"
+        },
+        {
+            "name": "Trailer",
+            "value": "3"
+        }
+    ],
+    "vendorTypeDropdown": [
+        {
+            "name": "Attached",
+            "value": "1"
+        },
+        {
+            "name": "Service Provider",
+            "value": "2"
+        },
+        {
+            "name": "Own",
+            "value": "3"
+        },
+        {
+            "name": "MARKET",
+            "value": "4"
+        }
+    ],
+    "vendorNameDropdown": [
+        {
+            "name": "V00001:AADARSH ROADWAYSY",
+            "value": "V00001AADARSHROADWAYSY"
+        },
+        {
+            "name": "V000005:ABC TRANSPORT COMPANY",
+            "value": "V000005ABCTRANSPORTCOMPANY"
+        }
+    ],
+    "gpsProviderDropdown": [
+        {
+            "name": "CNote",
+            "value": "1"
+        },
+        {
+            "name": "Delivery MR",
+            "value": "2"
+        },
+        {
+            "name": "UBI Series",
+            "value": "3"
+        }
+    ],
+    "ftlTypeDropdown": [
+        {
+            "name": "40 FT Container",
+            "value": "1"
+        },
+        {
+            "name": "7 Ton",
+            "value": "2"
+        },
+        {
+            "name": "6.50 -7.50 MT",
+            "value": "3"
+        }
+    ],
+    "permitStateDropdown": [
+        {
+            "name": "Maharashtra",
+            "value": "1"
+        },
+        {
+            "name": "Gujarat",
+            "value": "2"
+        },
+        {
+            "name": "Goa",
+            "value": "3"
+        }
+    ],
+    "locationHierarchyDropDown": [
+        {
+            "name": "Regional Office",
+            "value": "1"
+        },
+        {
+            "name": "Branch/Hub Office",
+            "value": "2"
+        },
+        {
+            "name": "Head Office",
+            "value": "3"
+        },
+        {
+            "name": "Divisional Office",
+            "value": "3"
+        },
+        {
+            "name": "Centre",
+            "value": "3"
+        }
+    ],
+    "pincodeLocationDropDown": [
+        {
+            "name": "400007",
+            "value": "1"
+        },
+        {
+            "name": "401105",
+            "value": "2"
+        },
+        {
+            "name": "406621",
+            "value": "3"
+        },
+        {
+            "name": "400072",
+            "value": "3"
+        },
+        {
+            "name": "401101",
+            "value": "3"
+        }
+    ],
+    "reportingLocationDropDown": [
+        {
+            "name": "Raipur",
+            "value": "RAI"
+        },
+        {
+            "name": "Calcutta",
+            "value": "CCU"
+        },
+        {
+            "name": "Chennai",
+            "value": "CHE"
+        },
+        {
+            "name": "Delhi",
+            "value": "DEL"
+        }
+    ],
+    "cityLocDropDown": [
+        {
+            "name": "Faridabad",
+            "value": "1"
+        },
+        {
+            "name": "Bilaspur",
+            "value": "2"
+        },
+        {
+            "name": "Belapur",
+            "value": "3"
+        },
+        {
+            "name": "Mumbai",
+            "value": "4"
+        },
+        {
+            "name": "CHENNAI",
+            "value": "5"
+        }
+
+    ],
+    "stateLocDropDown": [
+        {
+            "name": "Faridabad",
+            "value": "1"
+        },
+        {
+            "name": "Bilaspur",
+            "value": "2"
+        },
+        {
+            "name": "Belapur",
+            "value": "3"
+        },
+        {
+            "name": "Mumbai",
+            "value": "4"
+        }
+    ],
+    "zoneDropDown": [
+        {
+            "name": "East",
+            "value": "1"
+        },
+        {
+            "name": "West",
+            "value": "2"
+        },
+        {
+            "name": "North",
+            "value": "3"
+        },
+        {
+            "name": "South",
+            "value": "4"
+        }
+    ],
+    "locationOwnershipDropDown": [
+        {
+            "name": "BA",
+            "value": "1"
+        },
+        {
+            "name": "Customer",
+            "value": "2"
+        },
+        {
+            "name": "Company",
+            "value": "3"
+        }      
+    ],
+    "locdataDropDown": [
+        {
+            "name": "Sakinaka",
+            "value": "SKN"
+        },
+        {
+            "name": "Gurgaon",
+            "value": "GGN"
+        },
+        {
+            "name": "Pune",
+            "value": "PUN"
+        },
+        {
+            "name": "Kanpur",
+            "value": "KNP"
+        }
+    ],
+    "allocationCategory":[
+        {
+            "name": "Employee",
+            "value": "E"
+        },
+        {
+            "name": "BA",
+            "value": "B"
+        },
+        {
+            "name": "Customer",
+            "value": "C"
+        },
+        {
+            "name": "Location",
+            "value": "L"
+        } 
+    ],
+    "tdsSectionDropdown":[
+        {
+            "name": "TDS Account",
+            "value": "1"
+        },
+        {
+            "name": "TDS Receivable",
+            "value": "2"
+        },
+        {
+            "name": "TDS Payable",
+            "value": "3"
+        },  
+        {
+            "name": "TDS App",
+            "value": "4"
+        },
+        {
+            "name": "TDS Payable on Contract",
+            "value": "5"
+        }  
+    ],
+    "tdsTypeDropdown": [
+        {
+            "name": "Corporate",
+            "value": "1"
+        },
+        {
+            "name": "Non-Corporate",
+            "value": "2"
+        },
+        {
+            "name": "Pan Card NA",
+            "value": "3"
+        } 
+    ],
+    "lspNameDropdown":[
+        {
+            "name": "DLVBB",
+            "value": "1"
+        },
+        {
+            "name": "MXpress",
+            "value": "2"
+        }  
+    ],
+    "selectDropdown":[
+        {
+            "name": "CP",
+            "value": "1"
+        },
+        {
+            "name": "MXpress",
+            "value": "2"
+        }  
     ]
+
 }

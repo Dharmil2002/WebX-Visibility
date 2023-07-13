@@ -2,65 +2,57 @@ import { Component, Inject, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { CityMaster } from "src/app/core/models/Masters/City Master/City Master";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { CityControl } from "src/assets/FormControls/CityControls";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { HttpClient } from '@angular/common/http';
 import { utilityService } from 'src/app/Utility/utility.service';
-
-
-
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { CityControl } from "src/assets/FormControls/cityControls";
 @Component({
     selector: 'app-add-city-master',
     templateUrl: './add-city-master.component.html'
 })
-
 export class AddCityMasterComponent implements OnInit {
-    countryURL = '../../../assets/data/state-countryDropdown.json'
+    //countryURL = '../../../assets/data/state-countryDropdown.json'
     stateDetails: any;
-    StateStatus: any;
-    ZoneStatus: any;
-    State: any;
-    Zone: any;
-    CityTableForm: UntypedFormGroup;
+    stateStatus: any;
+    zoneStatus: any;
+    state: any;
+    zone: any;
+    cityTableForm: UntypedFormGroup;
     jsonControlCityArray: any;
-    CityTabledata: CityMaster;
-    IsUpdate = false;
+    cityTableData: CityMaster;
+    isUpdate = false;
     action: string;
-    breadscrums: { title: string; items: string[]; active: string }[];
+    breadScrums: { title: string; items: string[]; active: string }[];
     stateId: any;
     zoneId: any;
     retrievedData: string;
-    CityFormControls: CityControl;
-    Country: any;
-    StateBind: any;
-    StateList: any;
+    cityFormControls: CityControl;
+    country: any;
     countryCode: any;
-    UpdateCountry: any;
-    state: any;
+    updateCountry: any;
     stateList: any[];
-    zone: any;
-
-    constructor(private Route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
+    stateData: any;
+    zoneData: any;
+    constructor(private route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
         private fb: UntypedFormBuilder, private filter: FilterUtils,
-        private http: HttpClient, private service: utilityService) {
-        //super();
-        if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-            this.data = Route.getCurrentNavigation().extras.state.data;
+         private service: utilityService,private masterService: MasterService) {
+        if (this.route.getCurrentNavigation()?.extras?.state != null) {
+            this.data = route.getCurrentNavigation().extras.state.data;
             this.stateId = this.data.stateName;
             this.zoneId = this.data.zoneName;
-            this.IsUpdate = true;
+            this.isUpdate = true;
             this.action = "edit";
         } else {
             this.action = "Add";
         }
         if (this.action === "edit") {
-            this.IsUpdate = true;
-            this.CityTabledata = this.data;
-            // this.stateId = this.CityTabledata.stateName;
-            // this.zoneId = this.CityTabledata.zoneName;
-            this.breadscrums = [
+            this.isUpdate = true;
+            this.cityTableData = this.data;
+            this.stateId = this.cityTableData.stateName;
+            this.zoneId = this.cityTableData.zoneName;
+            this.breadScrums = [
                 {
                     title: "City Master",
                     items: ["Home"],
@@ -68,43 +60,42 @@ export class AddCityMasterComponent implements OnInit {
                 },
             ];
         } else {
-            this.breadscrums = [
+            this.breadScrums = [
                 {
                     title: "City Master",
                     items: ["Home"],
                     active: "Add City",
                 },
             ];
-            this.CityTabledata = new CityMaster({});
+            this.cityTableData = new CityMaster({});
         }
         this.retrievedData = localStorage.getItem("currentUser");
         this.stateDetails = JSON.parse(this.retrievedData);
-        this.IntializeFormControls();
+        this.intializeFormControls();
     }
-
-    IntializeFormControls() {
+    intializeFormControls() {
+        
         //throw new Error("Method not implemented.");
-        this.CityFormControls = new CityControl(this.CityTabledata, this.IsUpdate);
-        this.jsonControlCityArray = this.CityFormControls.getFormControls();
+        this.cityFormControls = new CityControl(this.cityTableData, this.isUpdate);
+        this.jsonControlCityArray = this.cityFormControls.getFormControls();
         this.jsonControlCityArray.forEach(data => {
-            if (data.name === 'State') {
+            if (data.name === 'state') {
                 // Set State-related variables
                 this.state = data.name;
-                this.StateStatus = data.additionalData.showNameAndValue;
+                this.stateStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === 'Zone') {
+            if (data.name === 'zone') {
                 // Set Zone-related variables
                 this.zone = data.name;
-                this.ZoneStatus = data.additionalData.showNameAndValue;
+                this.zoneStatus = data.additionalData.showNameAndValue;
             }
         });
-        this.CityTableForm = formGroupBuilder(this.fb, [this.jsonControlCityArray]);
+        this.cityTableForm = formGroupBuilder(this.fb, [this.jsonControlCityArray]);
     }
-
     ngOnInit(): void {
         //throw new Error("Method not implemented.");
-        this.GetStateData();
-        this.GetZoneData();
+        this.getStateData();
+        this.getZoneData();
     }
 
     cancel() {
@@ -113,62 +104,65 @@ export class AddCityMasterComponent implements OnInit {
     }
 
     save() {
-        this.CityTableForm.controls["State"].setValue(this.CityTableForm.value.State.value);
-        this.CityTableForm.controls["Zone"].setValue(this.CityTableForm.value.Zone.value);
-        this.CityTableForm.controls["isActive"].setValue(this.CityTableForm.value.isActive == true ? "Y" : "N");
-        this.Route.navigateByUrl('/Masters/CityMaster/CityMasterView');
-        this.service.exportData(this.CityTableForm.value)
+        this.cityTableForm.controls["state"].setValue(this.cityTableForm.value.state.value);
+        this.cityTableForm.controls["zone"].setValue(this.cityTableForm.value.zone.value);
+        this.cityTableForm.controls["isActive"].setValue(this.cityTableForm.value.isActive == true ? "Y" : "N");
+        this.route.navigateByUrl('/Masters/CityMaster/CityMasterView');
+        this.service.exportData(this.cityTableForm.value)
     }
-    GetZoneData() {
+    getZoneData() {
         //throw new Error("Method not implemented.");
-        this.http.get(this.countryURL).subscribe(res => {
-            this.Zone = res;
-            let tableArray = this.Zone.zoneList;
+            this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res =>{
+            //this.http.get(this.countryURL).subscribe(res => {
+            this.zoneData = res;
+            let tableArray = this.zoneData.zoneList;
             let zone = [];
             tableArray.forEach(element => {
                 let dropdownList = {
-                    name: element.ZoneDesc,
-                    value: element.ZoneId
+                    name: element.zoneDesc,
+                    value: element.zoneId
                 }
                 zone.push(dropdownList)
             });
-            if (this.IsUpdate) {
-                this.UpdateCountry = zone.find((x) => x.name == this.zoneId);
-                this.CityTableForm.controls.Zone.setValue(this.UpdateCountry);
+            if (this.isUpdate) {
+                
+                this.updateCountry = zone.find((x) => x.name == this.zoneId);
+                this.cityTableForm.controls.zone.setValue(this.updateCountry);
             }
+            
             this.filter.Filter(
                 this.jsonControlCityArray,
-                this.CityTableForm,
+                this.cityTableForm,
                 zone,
                 this.zone,
-                this.ZoneStatus,
+                this.zoneStatus,
             );
         });
     }
 
-    GetStateData() {
-        this.http.get(this.countryURL).subscribe(res => {
-            this.State = res;
-            let tableArray = this.State.stateList;
+    getStateData() {
+        //this.http.get(this.countryURL).subscribe(res => {
+            this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res =>{
+            this.stateData = res;
+            let tableArray = this.stateData.stateList;
             let state = [];
             tableArray.forEach(element => {
                 let dropdownList = {
-                    name: element.StateDesc,
-                    value: element.StateId
+                    name: element.stateDesc,
+                    value: element.stateId
                 }
                 state.push(dropdownList)
             });
-            if (this.IsUpdate) {
-                this.UpdateCountry = state.find((x) => x.name == this.stateId);
-                this.CityTableForm.controls.State.setValue(this.UpdateCountry);
+            if (this.isUpdate) {
+                this.updateCountry = state.find((x) => x.name == this.stateId);
+                this.cityTableForm.controls.state.setValue(this.updateCountry);
             }
-
             this.filter.Filter(
                 this.jsonControlCityArray,
-                this.CityTableForm,
+                this.cityTableForm,
                 state,
                 this.state,
-                this.StateStatus
+                this.stateStatus
             );
         });
     }

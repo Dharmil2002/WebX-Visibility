@@ -1,6 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from '@angular/common/http';
-
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
     selector: 'app-city-master-list',
@@ -8,23 +7,20 @@ import { HttpClient } from '@angular/common/http';
 })
 
 export class CityMasterListComponent implements OnInit {
-    jsonUrl = '../../../assets/data/masters-data.json'
     data: [] | any;
     csv: any[];
-    tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-    toggleArray = ["isActive"]
+    tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
+    toggleArray = ["isActive", "odaFlag"]
     linkArray = []
-
     columnHeader = {
         "srNo": "Sr No",
         'cityName': 'City Name',
         'stateName': 'State',
         'zoneName': 'Zone',
-        'ODAFlag': 'ODA Flag',
+        'odaFlag': 'ODA Flag',
         "isActive": "Active Flag",
         "actions": "Actions"
     };
-
     headerForCsv = {
         'cityId': "City Code",
         'companyCode': "CompanyCode",
@@ -33,41 +29,35 @@ export class CityMasterListComponent implements OnInit {
         'zoneName': "Zone Name",
         'isActive': "IsActive",
     }
-
-    breadscrums = [
+    breadScrums = [
         {
-          title: "City Master",
-          items: ["Home"],
-          active: "City Master",
+            title: "City Master",
+            items: ["Home"],
+            active: "City Master",
         },
-      ];
-
+    ];
     dynamicControls = {
         add: true,
         edit: true,
         csv: false
     }
-    cityActiveFlag: any;
     addAndEditPath: string;
-    constructor(private http: HttpClient){
+    constructor(private masterService: MasterService) {
         this.addAndEditPath = "/Masters/CityMaster/AddCity";
     }
-
-
     ngOnInit(): void {
         //throw new Error("Method not implemented.");
-        this.GetCityDetails();
+        this.getCityDetails();
     }
-
-    GetCityDetails() {
+    getCityDetails() {
         //throw new Error("Method not implemented."); CityData
         // Fetch data from the JSON endpoint
-        this.http.get(this.jsonUrl).subscribe((res: any) => {
+            this.masterService.getJsonFileDetails('masterUrl').subscribe(res => { 
             this.data = res;
-            this.csv = this.data['CityData']
+            this.csv = this.data['cityData']
             // Extract relevant data arrays from the response
             //const tableArray = this.data['tabledata'];
-            this.tableload = false;
+            this.tableLoad = false;
         }
         );
     }

@@ -47,8 +47,6 @@ import { SnackBarUtilityService } from '../Utility/SnackBarUtility.service';
 import { CompanygstmasterListComponent } from './Company GST Master/companygstmaster-list/companygstmaster-list.component';
 import { CompanygstmasterAddComponent } from './Company GST Master/companygstmaster-add/companygstmaster-add.component';
 import { utilityService } from '../Utility/utility.service';
-import { AddCityMasterComponent } from './City Master/add-city-master/add-city-master.component';
-import { CityMasterListComponent } from './City Master/city-master-list/city-master-list.component';
 import { AddStateMasterComponent } from './state-master/add-state-master/add-state-master.component';
 import { StateMasterListComponent } from './state-master/state-master-list/state-master-list.component';
 import { DriverMasterComponent } from './driver-master/driver-master.component';
@@ -59,8 +57,27 @@ import { AddLocationMasterComponent } from './location-master/add-location-maste
 import { CustomerMasterListComponent } from './customer-master/customer-master-list/customer-master-list.component';
 import { CustomerMasterAddComponent } from './customer-master/customer-master-add/customer-master-add.component';
 import { AddDcrSeriesComponent } from './dcr-series/add-dcr-series/add-dcr-series.component';
-// import { VendorMasterListComponent } from './Vendor Master/vendor-master-list/vendor-master-list.component';
-// import { AddVendorMasterComponent } from './Vendor Master/add-vendor-master/add-vendor-master.component';
+import { TrackDcrSeriesComponent } from './dcr-series/track-dcr-series/track-dcr-series.component';
+import { AddVehicletypeMasterComponent } from './vehicle-type-master/add-vehicletype-master/add-vehicletype-master.component';
+import { VehicletypeMasterListComponent } from './vehicle-type-master/vehicletype-master-list/vehicletype-master-list.component';
+import { CustomerGroupListComponent } from './customer-group-master/customer-group-list/customer-group-list.component';
+import { CustomerGroupAddComponent } from './customer-group-master/customer-group-add/customer-group-add.component';
+import { AddPinCodeMasterComponent } from './pincode-master/add-pincode-master/add-pincode-master.component';
+import { PincodeMasterListComponent } from './pincode-master/pincode-master-list/pincode-master-list.component';
+import { AddUserMasterComponent } from './user-master/add-user-master/add-user-master.component';
+import { UserMasterListComponent } from './user-master/user-master-list/user-master-list.component';
+import { AddCityMasterComponent } from './city-master/add-city-master/add-city-master.component';
+import { CityMasterListComponent } from './city-master/city-master-list/city-master-list.component';
+import { AddVehicleMasterComponent } from './vehicle-master/add-vehicle-master/add-vehicle-master.component';
+import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list/vehicle-master-list.component';
+import { DcrDetailPageComponent } from './dcr-series/dcr-detail-page/dcr-detail-page.component';
+import { ReAllocateDcrComponent } from './dcr-series/re-allocate-dcr/re-allocate-dcr.component';
+import { SplitDcrComponent } from './dcr-series/split-dcr/split-dcr.component';
+import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise.component';
+import { EwayBillDocketBookingV2Component } from './eway-bill-docket-booking-v2/eway-bill-docket-booking-v2t';
+import { AddVendorMasterComponent } from './vendor-master/add-vendor-master/add-vendor-master.component';
+import { VendorMasterListComponent } from './vendor-master/vendor-master-list/vendor-master-list.component';
+import { VendorMasterViewComponent } from './vendor-master/vendor-master-view/vendor-master-view.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -128,6 +145,25 @@ import { AddDcrSeriesComponent } from './dcr-series/add-dcr-series/add-dcr-serie
     AddDcrSeriesComponent,
     CustomerMasterListComponent,
     CustomerMasterAddComponent,
+    TrackDcrSeriesComponent,
+    AddVehicletypeMasterComponent,
+    VehicletypeMasterListComponent,
+    CustomerGroupListComponent,
+    CustomerGroupAddComponent,
+    PincodeMasterListComponent,
+    AddPinCodeMasterComponent,
+    AddVehicleMasterComponent,
+    VehicleMasterListComponent,
+    DcrDetailPageComponent,
+    ReAllocateDcrComponent,
+    SplitDcrComponent,
+    RouteMasterLocationWiseComponent,
+    UserMasterListComponent,
+    AddUserMasterComponent,
+    EwayBillDocketBookingV2Component,
+    VendorMasterListComponent,
+    AddVendorMasterComponent,
+    VendorMasterViewComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

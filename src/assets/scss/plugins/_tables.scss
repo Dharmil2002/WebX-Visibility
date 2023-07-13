@@ -1,17 +1,15 @@
-﻿/*
+﻿﻿/*
  *  Document   : _tables.scss
  *  Author     : RedStar Template
  *  Description: This scss file for tables style classes
  */
 
 // ngx-datatables material theme import
-@import "@swimlane/ngx-datatable/index.css";
-@import "@swimlane/ngx-datatable/themes/material.scss";
-@import "@swimlane/ngx-datatable/assets/icons.css";
 
 .table {
   tbody {
     border-top: none !important;
+
     tr {
       td,
       th {
@@ -188,6 +186,7 @@
     background-color: #62b5f8;
   }
 }
+
 .btn-tbl-reject {
   background-color: #f96333;
   height: 30px !important;
@@ -214,13 +213,15 @@
 .tbl-fav-edit {
   height: 20px !important;
   width: 20px !important;
-  color: #4caf50;
+  color: #03a9f3;
 }
+
 .tbl-fav-delete {
   height: 20px !important;
   width: 20px !important;
   color: #ff5200;
 }
+
 .avatar {
   position: relative;
   width: 30px;
@@ -487,7 +488,8 @@ tr.group:hover {
 .mat-table {
   .mat-header-cell {
     font-size: 14px;
-    font-weight: 600;
+    color: #535353;
+    font-weight: bold;
   }
 }
 
@@ -544,13 +546,18 @@ tr.group:hover {
     line-height: 2.4 !important;
   }
 }
-
+mat-header-row {
+  background: #ebebee !important;
+}
+.mat-table {
+  font-family: helvetica !important;
+}
 .materialTableHeader {
   padding: 10px 20px;
   -webkit-box-align: center;
   align-items: center;
   border-color: #e6e9ed;
-  background-color: #ebebee;
+  background-color: rgba(230, 233, 237, 0.3);
   height: 70px;
   min-width: 800px;
 
@@ -591,7 +598,7 @@ tr.group:hover {
       font-weight: 500;
       color: rgba(0, 0, 0, 0.54);
       border-radius: 5px;
-      border: 0;
+      border: 1px solid darkgrey;
       height: 45px;
       padding: 8px 8px 8px 50px;
       width: 250px;
@@ -624,6 +631,7 @@ tr.group:hover {
 .tbl-checkbox label {
   margin-bottom: 0px;
 }
+
 .column-nowrap {
   white-space: nowrap;
   overflow: hidden;
@@ -634,6 +642,7 @@ tr.group:hover {
   background-color: #e2e2e2 !important;
   color: #868788 !important;
   border-radius: 30px;
+
   &.active {
     background-color: #7274e2 !important;
     box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.2), 0 4px 13px -11px #7197b5;
@@ -641,6 +650,7 @@ tr.group:hover {
     border-radius: 30px;
   }
 }
+
 .app-list {
   display: flex;
   flex-direction: row;
@@ -651,10 +661,12 @@ tr.group:hover {
   margin-bottom: 10px;
   border: 1px solid #d8d7d7;
   box-shadow: 0.25rem 0.25rem 0.6rem rgba(0, 0, 0, 0.05), 0 0.5rem 1.125rem rgba(75, 0, 0, 0.05);
+
   .set-flex {
     flex: 1;
   }
 }
+
 .report-list {
   display: flex;
   align-items: center;
@@ -662,14 +674,17 @@ tr.group:hover {
   padding: 12px 12px;
   border: 1px dashed #bfc9d4;
   border-radius: 6px;
+
   .ms-auto {
     margin-right: 10px;
     cursor: pointer;
+
     i {
       padding-right: 10px;
     }
   }
 }
+
 .lecture-list {
   display: flex;
   flex-direction: row;
@@ -680,11 +695,13 @@ tr.group:hover {
   margin-bottom: 10px;
   background: #f6f4ff;
 }
+
 .patient-group-list {
   display: flex;
   align-items: center;
   padding: 12px 12px;
   border-radius: 6px;
+
   .lbl-bedge {
     padding: 10px;
     border-radius: 50%;
@@ -695,6 +712,7 @@ tr.group:hover {
     font-size: 14px;
     font-weight: 600;
     letter-spacing: 1px;
+
     .lbl-bedge-title {
       color: #ffffff;
       display: flex;
@@ -711,12 +729,14 @@ tr.group:hover {
     font-weight: 500;
   }
 }
+
 .assignment-file-type {
   .d-flex {
     margin-bottom: 15px;
     padding-bottom: 15px;
     border-bottom: 1px solid #d5dadb;
   }
+
   .img-icon {
     width: 46px;
     height: 46px;
@@ -726,28 +746,35 @@ tr.group:hover {
     text-align: center;
     margin: 0px 15px;
   }
+
   .set-flex {
     display: block;
     color: #000;
     height: 30px;
   }
+
   .ms-auto {
     margin-right: 10px;
     cursor: pointer;
   }
 }
+
 .primary-rgba {
   background-color: rgba(110, 129, 220, 0.1);
 }
+
 .success-rgba {
   background-color: rgba(95, 194, 126, 0.1);
 }
+
 .danger-rgba {
   background-color: rgba(244, 68, 85, 0.1);
 }
+
 .info-rgba {
   background-color: rgba(114, 208, 251, 0.1);
 }
+
 .timetable-block {
   border-radius: 4px;
   border: 1px solid #f4f4f4;
@@ -757,15 +784,18 @@ tr.group:hover {
     0 0.25rem 0.53125rem rgba(90, 97, 105, 0.12), 0 0.125rem 0.1875rem rgba(90, 97, 105, 0.1);
   background: #ffffff;
 }
+
 .tbl-spinner {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
 }
+
 .medicine-list td {
   padding: 0.4rem;
 }
+
 .export-button {
   cursor: pointer;
 }

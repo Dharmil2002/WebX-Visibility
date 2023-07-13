@@ -50,19 +50,3 @@ export class customerModel {
     }
   }
 }
-export class Customer {
-  CompanyCode: number;
-  CUSTCD: string;
-  UPDTBY: string;
-  CUST_ACTIVE: any;
-}
-export class GetCustomerDetails {
-  IsSuccess: string;
-  Message: string;
-  CustomerMaster: customerModel[];
-}
-export class customerResponse {
-  isSuccess: boolean;
-  message: string;
-  Customerlist: customerModel[];
-}

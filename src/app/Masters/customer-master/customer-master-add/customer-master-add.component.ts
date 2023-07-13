@@ -15,7 +15,6 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
   templateUrl: './customer-master-add.component.html',
 })
 export class CustomerMasterAddComponent implements OnInit {
-  countryURL = '../../../assets/data/state-countryDropdown.json'
   customerTableForm: UntypedFormGroup;
   error: string
   isUpdate = false;
@@ -29,9 +28,7 @@ export class CustomerMasterAddComponent implements OnInit {
   locationStatus: any;
   nonOda: any;
   noOdaStatus: any;
-  nonOdaData: any;
   controlling: any;
-  controllingData: any;
   controllingStatus: any;
   pay: any;
   payStatus: any;
@@ -62,7 +59,6 @@ export class CustomerMasterAddComponent implements OnInit {
     private http: HttpClient, private service: utilityService, private masterService: MasterService) {
     //super();
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      debugger
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
       this.action = 'edit'
@@ -154,11 +150,6 @@ export class CustomerMasterAddComponent implements OnInit {
         this.serviceOptStatus = data.additionalData.showNameAndValue;
       }
     });
-
-    if (this.isUpdate) {
-      // this.groupCode = this.groupCodeDropdown.find((x) => x.name == this.customerTable.groupCode);
-      this.customerTableForm.controls.groupCode.setValue(this.groupCode);
-    }
   }
   cancel() {
     window.history.back();

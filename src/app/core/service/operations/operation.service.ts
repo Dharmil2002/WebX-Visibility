@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 /**
  * The OperationService class provides methods to retrieve JSON file details from various URLs.
@@ -21,7 +22,12 @@ export class OperationService {
    * @param ApiURL The URL of the JSON file to retrieve.
    * @returns An observable that emits the JSON file details.
    */
+
   getJsonFileDetails(ApiURL) {
     return this.http.get<any>(this[ApiURL]);
+  }
+
+  operationPost(ApiURL,Request){
+      return this.http.post<any>(`${environment.APIBaseNewURL}` + ApiURL, Request);
   }
 }

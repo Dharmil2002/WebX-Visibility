@@ -75,6 +75,9 @@ import { ReAllocateDcrComponent } from './dcr-series/re-allocate-dcr/re-allocate
 import { SplitDcrComponent } from './dcr-series/split-dcr/split-dcr.component';
 import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise.component';
 import { EwayBillDocketBookingV2Component } from './eway-bill-docket-booking-v2/eway-bill-docket-booking-v2t';
+import { AddVendorMasterComponent } from './vendor-master/add-vendor-master/add-vendor-master.component';
+import { VendorMasterListComponent } from './vendor-master/vendor-master-list/vendor-master-list.component';
+import { VendorMasterViewComponent } from './vendor-master/vendor-master-view/vendor-master-view.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -158,6 +161,9 @@ import { EwayBillDocketBookingV2Component } from './eway-bill-docket-booking-v2/
     UserMasterListComponent,
     AddUserMasterComponent,
     EwayBillDocketBookingV2Component,
+    VendorMasterListComponent,
+    AddVendorMasterComponent,
+    VendorMasterViewComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

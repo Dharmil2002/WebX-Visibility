@@ -36,6 +36,8 @@ import { DcrDetailPageComponent } from './dcr-series/dcr-detail-page/dcr-detail-
 import { SplitDcrComponent } from './dcr-series/split-dcr/split-dcr.component';
 import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise.component';
 import { EwayBillDocketBookingV2Component } from './eway-bill-docket-booking-v2/eway-bill-docket-booking-v2t';
+import { AddVendorMasterComponent } from './vendor-master/add-vendor-master/add-vendor-master.component';
+import { VendorMasterListComponent } from './vendor-master/vendor-master-list/vendor-master-list.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -74,6 +76,8 @@ const routes: Routes = [
   { path: "RouteLocationWise/RouteList", component: RouteMasterLocationWiseComponent },
   { path: "UserMaster/UserMasterView", component: UserMasterListComponent },
   { path: "UserMaster/AddUser", component: AddUserMasterComponent },
+  { path: "VendorMaster/VendorMasterList", component: VendorMasterListComponent },
+  { path: "VendorMaster/AddVendorMaster", component: AddVendorMasterComponent },
 ];
 
 @NgModule({

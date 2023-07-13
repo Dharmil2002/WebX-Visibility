@@ -583,6 +583,10 @@
         {
             "name": "Own",
             "value": "3"
+        },
+        {
+            "name": "MARKET",
+            "value": "4"
         }
     ],
     "vendorNameDropdown": [
@@ -715,7 +719,12 @@
         {
             "name": "Mumbai",
             "value": "4"
+        },
+        {
+            "name": "CHENNAI",
+            "value": "5"
         }
+
     ],
     "stateLocDropDown": [
         {
@@ -802,5 +811,62 @@
             "name": "Location",
             "value": "L"
         } 
+    ],
+    "tdsSectionDropdown":[
+        {
+            "name": "TDS Account",
+            "value": "1"
+        },
+        {
+            "name": "TDS Receivable",
+            "value": "2"
+        },
+        {
+            "name": "TDS Payable",
+            "value": "3"
+        },  
+        {
+            "name": "TDS App",
+            "value": "4"
+        },
+        {
+            "name": "TDS Payable on Contract",
+            "value": "5"
+        }  
+    ],
+    "tdsTypeDropdown": [
+        {
+            "name": "Corporate",
+            "value": "1"
+        },
+        {
+            "name": "Non-Corporate",
+            "value": "2"
+        },
+        {
+            "name": "Pan Card NA",
+            "value": "3"
+        } 
+    ],
+    "lspNameDropdown":[
+        {
+            "name": "DLVBB",
+            "value": "1"
+        },
+        {
+            "name": "MXpress",
+            "value": "2"
+        }  
+    ],
+    "selectDropdown":[
+        {
+            "name": "CP",
+            "value": "1"
+        },
+        {
+            "name": "MXpress",
+            "value": "2"
+        }  
     ]
+
 }

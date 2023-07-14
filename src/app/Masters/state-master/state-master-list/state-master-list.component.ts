@@ -11,6 +11,7 @@ export class StateMasterListComponent implements OnInit {
     tableData: any[];
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     // Define column headers for the table
+    companyCode: any = parseInt(localStorage.getItem("companyCode"));
     columnHeader =
         {
             "srNo": "Sr No",
@@ -64,7 +65,7 @@ export class StateMasterListComponent implements OnInit {
 
     getStateDetails() {
         let req = {
-            "companyCode": 10065,
+            "companyCode": this.companyCode,
             "type": "masters",
             "collection": "state"
 

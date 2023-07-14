@@ -145,7 +145,7 @@ public async DeleteEvent(element) {
   const getdata = await this.DeleteAction.emit({ element, index, callback });
 };
 SubmitData() {
-  this.Submit.emit();
+  this.Submit.emit(this.dataSource);
 }
 AddRowData() {
   this.AddRow.emit();

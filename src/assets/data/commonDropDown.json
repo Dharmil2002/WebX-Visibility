@@ -1,0 +1,11 @@
+{
+    "riskType": [
+        {
+            "name": "C",
+            "value": "Carrier's Risk"
+        }, {
+            "name": "O",
+            "value": "Owner's Risk"
+        }
+    ]
+}

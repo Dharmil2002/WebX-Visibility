@@ -6,8 +6,8 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { EwayBillControls } from "src/assets/FormControls/ewayBillControl";
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from "src/app/Utility/utility.service";
-import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { OperationService } from "src/app/core/service/operations/operation.service";
 
 @Component({
   selector: 'app-eway-example',
@@ -44,7 +44,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   // Action buttons configuration
   actionObject = {
     addRow: false,
-    submit: false,
+    submit: true,
     search: true
   };
   sampleDropdownData2 = [
@@ -69,6 +69,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   ]
   DocketField: any;
   isLinear = true;
+  showSaveAndCancelButton = false;
   error: any;
   data: any;
   fromCity: string;
@@ -137,8 +138,36 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       style: "",
     },
   };
-  constructor(private ICnoteService: CnoteService, private masterService: MasterService,
-    private fb: UntypedFormBuilder, private filter: FilterUtils, private service: utilityService) {
+  toCity: string;
+  toCityStatus: any;
+  customer: string;
+  customerStatus: any;
+  consignorName: string;
+  consignorStatus: any;
+  consignorCity: string;
+  consignorCityStatus: any;
+  consigneeCity: string;
+  consigneeCityStatus: any;
+  consigneeName: string;
+  consigneeNameStatus: any;
+  genralMaster: any;
+  containerSize1: any;
+  containerSize2: any;
+  containerType: any;
+  containerSize1Size: boolean;
+  destination: any;
+  destinationStatus: boolean;
+  companyCode = parseInt(localStorage.getItem("companyCode"));
+  constructor(
+    private masterService: MasterService,
+    private fb: UntypedFormBuilder,
+    private filter: FilterUtils,
+    private service: utilityService,
+    private operationService: OperationService
+  ) {
+    this.getCity();
+    this.customerDetails();
+    this.destionationDropDown();
   }
 
   ngOnInit(): void {
@@ -163,49 +192,12 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       console.log("failed");
     }
   }
-  getFromCity() {
-    if (this.tabForm.controls["FromCity"].value.length > 2) {
-      var request = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        ruleValue: 'Y',
-        searchText: this.tabForm.controls.FromCity.value,
-        docketMode: "Yes",
-        ContractParty: "",
-        PaymentType: "P02",
-      };
-      this.error = "";
-      this.ICnoteService.cnoteNewPost(
-        "services/GetFromCityDetails",
-        request
-      ).subscribe({
-        next: (res) => {
-          if (res) {
-            this.data = res.result.map((item) => {
-              item["name"] = item.Name;
-              item["value"] = item.Value;
-              return item;
-            });
-            // this.tabForm.controls["FromCity"].setValue(this.data.find(x => x.name == this.ewayData?.Ewddata[0][1].Consignor.city))
-            this.filter.Filter(
-              this.docketControlArray,
-              this.tabForm,
-              this.data,
-              this.fromCity,
-              this.fromCityStatus,
-            );
-          } else {
-            this.error = "Error While Getting Cluster List";
-          }
-        },
-        error: (error) => {
-          this.error = error;
-        },
-        complete() { },
-      });
-    }
-  }
+
+  // Initialize form control
   initializeFormControl() {
     this.ewayBillTab = new EwayBillControls();
+
+    // Get control arrays for different sections
     this.docketControlArray = this.ewayBillTab.getDocketFieldControls();
     this.consignorControlArray = this.ewayBillTab.getConsignorFieldControls();
     this.consigneeControlArray = this.ewayBillTab.getConsigneeFieldControls();
@@ -214,6 +206,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     this.contractControlArray = this.ewayBillTab.getContractFieldControls();
     this.totalSummaryControlArray = this.ewayBillTab.getTotalSummaryFieldControls();
     this.ewayBillControlArray = this.ewayBillTab.getEwayBillFieldControls();
+
+    // Set up data for tabs and contracts
     this.tabData = {
       "Details From Eway-Bill": this.docketControlArray,
       "Consignor Details": this.consignorControlArray,
@@ -221,76 +215,283 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       "Appointment Based Delivery": this.appointmentControlArray,
       "Container Details": this.containerControlArray,
     };
+
     this.contractData = {
       "Contract Details": this.contractControlArray,
       "Total Summary": this.totalSummaryControlArray,
       "E-Way Bill Details": this.ewayBillControlArray,
     };
-    this.docketControlArray.forEach(data => {
-      if (data.name === 'FromCity') {
-        this.fromCity = data.name;
-        this.fromCityStatus = data.additionalData.showNameAndValue;
-      }
-    });
+
+    // Perform common drop-down mapping
+    this.commonDropDownMapping();
+
+    // Build form groups
     this.tabForm = formGroupBuilder(this.fb, Object.values(this.tabData));
     this.contractForm = formGroupBuilder(this.fb, Object.values(this.contractData));
+
+    // Set initial values for the form controls
     this.tabForm.controls["appoint"].setValue('N');
+
+    // Retrieve EwayBill data
     this.getEwayBillData();
   }
-  save() {
-    this.service.exportData(this.tabForm.value)
-  }
-  getEwayBillData() {
-    this.masterService.getJsonFileDetails('ewayUrl').subscribe(res => {
-      this.ewayData = res;
-      this.tabForm.controls.FromCity.setValue(res.Ewddata[0][1].Consignor.city)
-      this.tableData = this.ewayData.Ewddata[0][0].data.itemList
+
+
+  // Get city details
+  getCity() {
+    this.masterService.getJsonFileDetails('city').subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.filter.Filter(
+            this.docketControlArray,
+            this.tabForm,
+            res,
+            this.fromCity,
+            this.fromCityStatus,
+          );  // Filter the docket control array based on fromCity details
+
+          this.filter.Filter(
+            this.docketControlArray,
+            this.tabForm,
+            res,
+            this.toCity,
+            this.toCityStatus,
+          );  // Filter the docket control array based on toCity details
+
+          this.filter.Filter(
+            this.consignorControlArray,
+            this.tabForm,
+            res,
+            this.consignorCity,
+            this.consignorCityStatus,
+          );  // Filter the consignor control array based on consignorCity details
+
+          this.filter.Filter(
+            this.consigneeControlArray,
+            this.tabForm,
+            res,
+            this.consigneeCity,
+            this.consigneeNameStatus,
+          );  // Filter the consignee control array based on consigneeCity details
+        }
+      }
     });
   }
+
+  // Customer details
+  customerDetails() {
+    this.masterService.getJsonFileDetails('customer').subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.filter.Filter(
+            this.docketControlArray,
+            this.tabForm,
+            res,
+            this.customer,
+            this.customerStatus
+          );  // Filter the docket control array based on customer details
+
+          this.filter.Filter(
+            this.consignorControlArray,
+            this.tabForm,
+            res,
+            this.consignorName,
+            this.consignorStatus
+          );  // Filter the consignor control array based on customer details
+
+          this.filter.Filter(
+            this.consigneeControlArray,
+            this.tabForm,
+            res,
+            this.consigneeName,
+            this.consigneeNameStatus
+          );  // Filter the consignee control array based on customer details
+        }
+      }
+    });
+  }
+
+  // Get EwayBill data
+  getEwayBillData() {
+    // this.masterService.getJsonFileDetails('ewayUrl').subscribe(res => {
+    //   this.ewayData = res;  // Assign the received data to the ewayData property
+
+    //   // Set the value of fromCity in the tabForm control using the data
+    //   this.tabForm.controls.fCity.setValue(res.Ewddata[0][1].Consignor.city);
+
+    //   // Assign the itemList data to the tableData property
+    //   this.tableData = this.ewayData.Ewddata[0][0].data.itemList;
+    // });
+  }
+
   // Load temporary data
   loadTempData() {
     this.tableData = [{
-      documentType: [],
-      srNo: 0,
-      INVNO: "",
-      INVDT: "",
-      LENGTH: "",
-      BREADTH: "",
-      HEIGHT: "",
-      DECLVAL: "",
-      NO_PKGS: "",
-      CUB_WT: "",
-      ACT_WT: "",
-      Invoice_Product: "",
-      HSN_CODE: ""
+      documentType: [],   // Array to store document types
+      srNo: 0,            // Serial number
+      INVNO: "",          // Invoice number
+      INVDT: "",          // Invoice date
+      LENGTH: "",         // Length
+      BREADTH: "",        // Breadth
+      HEIGHT: "",         // Height
+      DECLVAL: "",        // Declaration value
+      NO_PKGS: "",        // Number of packages
+      CUB_WT: "",         // Cubic weight
+      ACT_WT: "",         // Actual weight
+      Invoice_Product: "",// Invoice product
+      HSN_CODE: ""        // HSN code
     }];
   }
-
   // Add a new item to the table
   addItem() {
     const AddObj = {
-      documentType: [],
-      srNo: 0,
-      INVNO: "",
-      INVDT: "",
-      LENGTH: "",
-      BREADTH: "",
-      HEIGHT: "",
-      DECLVAL: "",
-      NO_PKGS: "",
-      CUB_WT: "",
-      ACT_WT: "",
-      Invoice_Product: "",
-      HSN_CODE: ""
+      documentType: [],     // Array to store document types
+      srNo: 0,              // Serial number
+      INVNO: "",            // Invoice number
+      INVDT: "",            // Invoice date
+      LENGTH: "",           // Length
+      BREADTH: "",          // Breadth
+      HEIGHT: "",           // Height
+      DECLVAL: "",          // Declaration value
+      NO_PKGS: "",          // Number of packages
+      CUB_WT: "",           // Cubic weight
+      ACT_WT: "",           // Actual weight
+      Invoice_Product: "",  // Invoice product
+      HSN_CODE: ""          // HSN code
     };
-    this.tableData.splice(0, 0, AddObj);
+    this.tableData.splice(0, 0, AddObj);  // Insert the new object at the beginning of the tableData array
   }
+
+  // Display appointment
   displayAppointment($event) {
-    const generateControl = $event.eventArgs.value === "Y";
+    const generateControl = $event.eventArgs.value === "Y";  // Check if value is "Y" to generate control
     this.appointmentControlArray.forEach(data => {
       if (data.name !== 'appoint') {
-        data.generatecontrol = generateControl;
+        data.generatecontrol = generateControl;  // Set generatecontrol property based on the generateControl value
       }
     });
   }
+
+  // Common drop-down mapping
+  commonDropDownMapping() {
+    const mapControlArray = (controlArray, mappings) => {
+      controlArray.forEach(data => {
+        const mapping = mappings.find(mapping => mapping.name === data.name);
+        if (mapping) {
+          this[mapping.target] = data.name;  // Set the target property with the value of the name property
+          this[`${mapping.target}Status`] = data.additionalData.showNameAndValue;  // Set the targetStatus property with the value of additionalData.showNameAndValue
+        }
+      });
+    };
+
+    const docketMappings = [
+      { name: 'fromCity', target: 'fromCity' },
+      { name: 'toCity', target: 'toCity' },
+      { name: 'billingParty', target: 'customer' }
+    ];
+
+    const consignorMappings = [
+      { name: 'consignorName', target: 'consignorName' },
+      { name: 'consignorCity', target: 'consignorCity' }
+    ];
+
+    const consigneeMappings = [
+      { name: 'consigneeCity', target: 'consigneeCity' },
+      { name: 'consigneeName', target: 'consigneeName' }
+    ];
+    const destinationMapping = [
+      { name: 'destination', target: 'destination' }
+    ]
+    mapControlArray(this.docketControlArray, docketMappings);  // Map docket control array
+    mapControlArray(this.consignorControlArray, consignorMappings);  // Map consignor control array
+    mapControlArray(this.consigneeControlArray, consigneeMappings);  // Map consignee control array
+    mapControlArray(this.contractControlArray, destinationMapping)
+  }
+
+  //End
+  //destionation
+  destionationDropDown() {
+
+    this.masterService.getJsonFileDetails('destination').subscribe({
+      next: (res: any) => {
+        if (res) {
+
+          this.filter.Filter(
+            this.contractControlArray,
+            this.contractForm,
+            res,
+            this.destination,
+            this.destinationStatus,
+          );
+        }
+      }
+    })
+  }
+  //end 
+  saveData(event) {
+
+    let invoiceDetails = {
+      invoiceDetails: event.data
+    }
+    const dynamicValue = localStorage.getItem('Branch'); // Replace with your dynamic value
+    const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
+    const paddedNumber = dynamicNumber.toString().padStart(4, '0');
+    const result = `CN${dynamicValue}${paddedNumber}`;
+    this.tabForm.controls['docketNumber'].setValue(result);
+    this.tabForm.controls['fromCity'].setValue(this.tabForm.value.fromCity?.name || '');
+    this.tabForm.controls['toCity'].setValue(this.tabForm.value.toCity?.name || '');
+    this.tabForm.controls['billingParty'].setValue(this.tabForm.value?.billingParty.name || '');
+    this.tabForm.controls['consignorName'].setValue(this.tabForm.value?.consignorName.name || '');
+    this.tabForm.controls['consignorCity'].setValue(this.tabForm.value?.consignorCity.name || '');
+    this.tabForm.controls['consigneeCity'].setValue(this.tabForm.value?.consigneeCity.name || '');
+    this.tabForm.controls['consigneeName'].setValue(this.tabForm.value?.consigneeName.name || '');
+    this.contractForm.controls['destination'].setValue(this.contractForm.value?.destination.name || '');
+    let id={id:result}
+    let docketDetails = { ...this.tabForm.value, ...this.contractForm.value, ...invoiceDetails,...id};
+    let reqBody = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "docket",
+      data: docketDetails
+    }
+    this.operationService.operationPost('common/create', reqBody).subscribe({
+      next: (res: any) => {
+        this.Addseries()
+      }
+    })
+  }
+  Addseries() {
+    const resultArray = this.generateArray(this.companyCode,this.tabForm.controls['docketNumber'].value,this.contractForm.controls['totalChargedNoOfpkg'].value);
+  let nestedData ={id:this.tabForm.controls['docketNumber'].value,docketScanData:resultArray}
+    let reqBody = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "docketScan",
+      data: nestedData
+    }
+    this.operationService.operationPost('common/create', reqBody).subscribe({
+      next: (res: any) => {
+        
+      }
+    })
+  }
+   generateArray(companyCode, dockno,pkg) {
+    const array = Array.from({ length: pkg }, (_, index) => {
+      const serialNo = (index + 1).toString().padStart(3, '0');
+      const bcSerialNo = `${dockno}-${serialNo}`;
+      const entryDateTime = new Date().toISOString();
+      const bcDockSf = '.';
+      return {
+        companyCode: companyCode,
+        dockNo: dockno,
+        bcSerialNo: bcSerialNo,
+        entryDateTime: entryDateTime,
+        bcDockSf: bcDockSf,
+      };
+    });
+  
+    return array;
+  }
+  
+   
 }

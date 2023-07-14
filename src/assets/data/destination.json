@@ -1,0 +1,218 @@
+[
+    {
+      "value": "1234",
+      "name": "SARTHAK : 1234"
+    },
+    {
+      "value": "12345",
+      "name": "NAVI MUMBA : 12345"
+    },
+    {
+      "value": "215648",
+      "name": "THANE : 215648"
+    },
+    {
+      "value": "AMDB",
+      "name": "AHMEDABAD : AMDB"
+    },
+    {
+      "value": "AMDC",
+      "name": "PUNE : AMDC"
+    },
+    {
+      "value": "BNGB",
+      "name": " BANGALORE : BNGB"
+    },
+    {
+      "value": "BNGB",
+      "name": "BANGALORE  : BNGB"
+    },
+    {
+      "value": "BNGB",
+      "name": "BANGLORE : BNGB"
+    },
+    {
+      "value": "BOM",
+      "name": "KALAMBOLI : BOM"
+    },
+    {
+      "value": "BOM",
+      "name": "NAVI MUMBA : BOM"
+    },
+    {
+      "value": "BOMM",
+      "name": "Jammu : BOMM"
+    },
+    {
+      "value": "BRDB",
+      "name": "Baroda : BRDB"
+    },
+    {
+      "value": "BRDC",
+      "name": "Baroda : BRDC"
+    },
+    {
+      "value": "CHNB",
+      "name": "CHENNAI : CHNB"
+    },
+    {
+      "value": "CJBM",
+      "name": "COIMBATORE : CJBM"
+    },
+    {
+      "value": "DEL",
+      "name": "DELHI,NEW  : DEL"
+    },
+    {
+      "value": "DELB",
+      "name": "DELHI : DELB"
+    },
+    {
+      "value": "GOA",
+      "name": "GOA : GOA"
+    },
+    {
+      "value": "GWTB",
+      "name": "GUWAHATI : GWTB"
+    },
+    {
+      "value": "GZ01",
+      "name": "CHENNAI,DE : GZ01"
+    },
+    {
+      "value": "GZ01",
+      "name": "Ghaziabad : GZ01"
+    },
+    {
+      "value": "HQTR",
+      "name": "DELHI : HQTR"
+    },
+    {
+      "value": "HQTR",
+      "name": "KOLKATA : HQTR"
+    },
+    {
+      "value": "HYDB",
+      "name": "Hyderabad : HYDB"
+    },
+    {
+      "value": "JAIB",
+      "name": "Jaipur : JAIB"
+    },
+    {
+      "value": "KLMB",
+      "name": "KALAMBOLI : KLMB"
+    },
+    {
+      "value": "KNP",
+      "name": "KANPUR : KNP"
+    },
+    {
+      "value": "LCKB",
+      "name": "LUCKNOW : LCKB"
+    },
+    {
+      "value": "MUMB",
+      "name": "ANDHERI : MUMB"
+    },
+    {
+      "value": "MUMB",
+      "name": "BHIWANDI : MUMB"
+    },
+    {
+      "value": "MUMB",
+      "name": "Hyderabad : MUMB"
+    },
+    {
+      "value": "MUMB",
+      "name": "KURLA : MUMB"
+    },
+    {
+      "value": "MUMB",
+      "name": "MUMBAI : MUMB"
+    },
+    {
+      "value": "MUMB",
+      "name": "VIJAYAWADA : MUMB"
+    },
+    {
+      "value": "MUMC",
+      "name": "AIZAWL : MUMC"
+    },
+    {
+      "value": "MUMC",
+      "name": "BHIWANDI : MUMC"
+    },
+    {
+      "value": "MUMC",
+      "name": "MULUND : MUMC"
+    },
+    {
+      "value": "MUMC",
+      "name": "MUMBAI : MUMC"
+    },
+    {
+      "value": "NGPB",
+      "name": "NAGPUR : NGPB"
+    },
+    {
+      "value": "NNDP",
+      "name": "VADODRA : NNDP"
+    },
+    {
+      "value": "PNQB",
+      "name": "CHAKAN : PNQB"
+    },
+    {
+      "value": "PNQB",
+      "name": "PUNE : PNQB"
+    },
+    {
+      "value": "PNQM",
+      "name": "CHANDAUSI : PNQM"
+    },
+    {
+      "value": "SRT",
+      "name": "DELHI : SRT"
+    },
+    {
+      "value": "SRT",
+      "name": "MUMBAI : SRT"
+    },
+    {
+      "value": "SRT",
+      "name": "SUPE : SRT"
+    },
+    {
+      "value": "SRTB",
+      "name": "SULUR : SRTB"
+    },
+    {
+      "value": "THNE",
+      "name": "THANE : THNE"
+    },
+    {
+      "value": "TRNB",
+      "name": "COIMBATORE : TRNB"
+    },
+    {
+      "value": "UPB",
+      "name": "UP BORDER : UPB"
+    },
+    {
+      "value": "VAPI",
+      "name": "ANAND : VAPI"
+    },
+    {
+      "value": "VAPI",
+      "name": "Vapi : VAPI"
+    },
+    {
+      "value": "VGAM",
+      "name": "VIJAYAWADA : VGAM"
+    },
+    {
+      "value": "VNS",
+      "name": "Varanasi : VNS"
+    }
+   ]

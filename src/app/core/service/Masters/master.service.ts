@@ -10,6 +10,11 @@ export class MasterService {
   dropDownUrl = '../../../assets/data/state-countryDropdown.json';
   masterUrl = '../../../assets/data/masters-data.json';
   ewayUrl = '../../../assets/data/ewayData.json';
+  customer='../../../assets/data/customer.json';  
+  city='../../../assets/data/city.json';  
+  generalMaster='../../../assets/data/generalMaster.json';
+  destination='../../../assets/data/destination.json';
+
   constructor(private http: HttpClient) { }
   /**
    * Retrieves JSON file details from the specified API URL.

@@ -45,6 +45,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { GenericTableComponent } from './Generic Table/generic-table.component';
 import { FilterUtils } from '../Utility/Form Utilities/dropdownFilter';
 import { MatRadioModule } from '@angular/material/radio';
+import { ExpandableTableComponent } from './expandable-table/expandable-table/expandable-table.component';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -60,7 +61,7 @@ const MY_DATE_FORMAT = {
 @NgModule({
   declarations: [GenericAccordionComponent, GenericTableComponent,
     FormComponent, FormWithoutAutoCompleteComponent, GenericDashBoardComponent,
-    GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent,CustomeDatePickerComponent,CustomRangePanelComponent, TreeViewComponent,GenericChartDashboardComponent, GenericCardComponent,DecimaRangeValidatorDirective],
+    GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent,CustomeDatePickerComponent,CustomRangePanelComponent, TreeViewComponent,GenericChartDashboardComponent, GenericCardComponent,DecimaRangeValidatorDirective, ExpandableTableComponent],
   imports: [
     CommonModule,
     MatCardModule,
@@ -126,3 +127,4 @@ const MY_DATE_FORMAT = {
 
 })
 export class SharedComponentsModule { }
+

@@ -34,7 +34,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   width = '100vw';
   maxWidth: '232vw';
   menuItems = [
-      { label: 'Shipment', componentDetails: LoadingSheetViewComponent },
+      { label: 'count', componentDetails: LoadingSheetViewComponent },
       // Add more menu items as needed
   ];
   // Declaring breadcrumbs
@@ -46,7 +46,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       }
   ];
   linkArray = [
-      { Row: 'Shipment', Path: '' }
+      { Row: 'count', Path: '' }
   ];
   toggleArray = [];
   menuItemflag: boolean = true;
@@ -62,8 +62,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   tableData: any[];
   columnHeader = {
       "checkBoxRequired": "",
-      "lag": "Leg",
-      "Shipment": "Shipments",
+      "leg": "Leg",
+      "count": "Shipments",
       "Packages": "Packages",
       "WeightKg": "Weight Kg",
       "VolumeCFT": "Volume CFT"
@@ -89,7 +89,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   getloadingFormData: any;
   legWiseData: any;
   updatedShipment: any[] = [];
-  
+  companyCode=parseInt(localStorage.getItem("companyCode"));
+  packagesScan: any;
   constructor(
     private Route: Router,
     private CnoteService: CnoteService,
@@ -226,7 +227,8 @@ vehicleTypeDropdown() {
       }
   });
   // Retrieve shipment data
-  this.getshipmentData();
+  this.getshipmentData()
+  
 }
 
 // Function to retrieve departure details based on the route
@@ -241,50 +243,29 @@ getDepartueDetail(route) {
       }
   });
 }
-
-
 // Function to retrieve shipment data
 getshipmentData() {
+  debugger
   if (!this.isShipmentUpdate) {
       let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
       routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
       // Update route details if shipment is not being updated
   }
-
-  this.operationService.getJsonFileDetails('arrivalUrl').subscribe(res => {
-      let filterData: any[] = [];
-      let packagesData: any[] = [];
-      let combinedData: any[] = [];
-
-      if (!this.isShipmentUpdate) {
-          this.shipmentData = res;
+  const req = {
+    companyCode: this.companyCode,
+    type: "operation",
+    collection: "docket",
+  };
+  this.operationService.operationPost("common/getall", req).subscribe(res => {
+          this.shipmentData = res.data;
           // Filter shipment data based on location and trip details
           const filterData = filterDataByLocation(this.shipmentData, this.tripData, this.orgBranch);
-          this.CnoteService.setShipingData(filterData.filterData);
-          packagesData = this.shipmentData.packagesData.filter((x) =>
-              filterData.filterData.some((shipment) => shipment.Shipment === x.Shipment)
-          );
-          this.legWiseData = filterData.legWiseData;
-          combinedData = filterData.filterData.map((filterItem) => {
-              const packageItem = packagesData.find(
-                  (packageItem) => packageItem.Shipment === filterItem.Shipment
-              );
-
-              return {
-                  ...filterItem,
-                  ...packageItem
-              };
-          });
-
-          this.extraData = filterData.filterData;
-      } else {
-          filterData = this.shippingData;
-          this.getDepartueDetail(this.shippingData[0].route);
-          this.extraData = filterData;
-      }
+        const shipingfilterData = filterData.legWiseData;
+          
 
       // Call the function to group shipments based on criteria
-      const groupedShipments = groupShipments(combinedData);
+      const groupedShipments = groupShipments(shipingfilterData);
+      console.log(groupedShipments);
       this.tableData = groupedShipments;
       this.tableload = false;
   });
@@ -376,7 +357,7 @@ vehicleTypeDataAutofill() {
     let totalWeightKg = event.shipping.reduce((total, current) => total + current.KgWeight, 0);
     let totalVolumeCFT = event.shipping.reduce((total, current) => total + current.CftVolume, 0)
     this.tableData.find((x) => {
-      if (x.lag === event.shipping[0].Leg) {
+      if (x.leg === event.shipping[0].Leg) {
         x.Shipment = event.shipping.length,
           x.WeightKg = totalWeightKg,
           x.VolumeCFT = totalVolumeCFT,

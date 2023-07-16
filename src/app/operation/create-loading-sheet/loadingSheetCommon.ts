@@ -6,7 +6,7 @@ interface Legs {
 }
 
 export function transform(value: any, param: string): string {
-  const parts = value.split(': ')[1].split('-');
+  const parts = value.split(':')[1].split('-');
   const index = parts.indexOf(param);
 
   if (index !== -1) {
@@ -74,66 +74,62 @@ export function filterloadingShipments(data: any, routeStr: string, currentStop:
  */
 export function filterDataByLocation(shipmentData: any, tripData: any, orgBranch: string): any {
   let filterData: any[] = [];
-  let packagesData: any[] = [];
-  let combinedData: any[] = [];
 
-    filterData = shipmentData.shippingData.filter(
-      (x) => x.routes.trim() === tripData.RouteandSchedule.trim() && x.Destination.trim() !== orgBranch.trim()
-    );
+  filterData = shipmentData.filter(
+    (x) => x.orgLoc.trim() === orgBranch.trim() && (!x.destination || x.destination.trim() === '' || x.destination.split(':')[1].trim() !== orgBranch.trim())
+  );
 
-    let routeData = transform(tripData.RouteandSchedule, orgBranch);
-    let currentLeg = routeData.split("-").splice(1);
+  let routeData = transform(tripData.RouteandSchedule, orgBranch);
+  let currentLeg = routeData.split("-").splice(1);
 
-    // Filter shipment data based on origin and current leg destinations
-    let legWiseData = shipmentData.shippingData.filter((x) => {
-      return x.Origin.trim() === orgBranch && currentLeg.includes(x.Destination);
-    });
-
-    // Filter shipment data based on route and destination branch
-    let routeWiseData = shipmentData.shippingData.filter((x) => {
-      return x.routes.trim() === tripData.RouteandSchedule.trim() && x.Destination !== orgBranch;
-    });
-
-    // Merge the leg-wise and route-wise data
-    let mergedData = legWiseData.concat(routeWiseData);
-    let uniqueData = Array.from(new Set(mergedData));
-    filterData = uniqueData;
-  
-    let data={
-    filterData:filterData,
-    legWiseData:legWiseData
-  }
-  return data;
-}
-export function groupShipments(combinedData) {
-  const groupedData = {};
-
-  // Group shipments by route
-  combinedData.forEach(shipment => {
-    const { Leg, Packages, KgWeight, CftVolume } = shipment;
-
-    if (!groupedData[Leg]) {
-      // If the route doesn't exist in groupedData, initialize it
-      groupedData[Leg] = {
-        Shipment: 0,        // Initialize shipment count to 0
-        lag: Leg,           // Assign the leg route
-        Packages: 0,        // Initialize packages count to 0
-        WeightKg: 0,        // Initialize total weight in kg to 0
-        VolumeCFT: 0,       // Initialize total volume in cubic feet to 0
-      };
-    }
-
-    // Increment the count of shipments and update the packages, weight, and volume
-    groupedData[Leg].Shipment++;
-    groupedData[Leg].Packages += Packages;
-    groupedData[Leg].WeightKg += KgWeight;
-    groupedData[Leg].VolumeCFT += CftVolume;
+  // Filter shipment data based on origin and current leg destinations
+  let legWiseData = shipmentData.filter((x) => {
+    return x.orgLoc.trim() === orgBranch.trim() && currentLeg.includes(x.destination?.split(':')[1]?.trim());
   });
 
-  // Convert the grouped data to an array
-  let groupedShipments = Object.values(groupedData);
+  // Filter shipment data based on route and destination branch
+  let routeWiseData = shipmentData.filter((x) => {
+    return x.orgLoc.trim() === orgBranch.trim() && (!x.destination || x.destination.trim() === '' || x.destination.split(':')[1].trim() !== orgBranch);
+  });
 
-  return groupedShipments;
+  // Merge the leg-wise and route-wise data
+  let mergedData = legWiseData.concat(routeWiseData);
+  let uniqueData = Array.from(new Set(mergedData));
+  filterData = uniqueData;
+
+  let data = {
+    filterData: filterData,
+    legWiseData: legWiseData
+  };
+  return data;
+}
+
+
+export function groupShipments(combinedData) {
+  const groupedData = combinedData.reduce((result, item) => {
+    const leg = item.orgLoc + "-" + item.destination.split(':')[1];
+  
+    const legData = {
+      leg,
+      count: 0,
+      Packages: 0,
+      VolumeCFT: 0,
+      WeightKg: 0
+    };
+  
+    if (!result[leg]) {
+      result[leg] = legData;
+    }
+  
+    result[leg].count++;
+    result[leg].Packages += parseInt(item.totalChargedNoOfpkg);
+    result[leg].WeightKg += parseInt(item.chrgwt);
+    result[leg].VolumeCFT += parseFloat(item.cft_tot);
+  
+    return result;
+  }, {});
+  
+  return Object.values(groupedData);
 }
 
 

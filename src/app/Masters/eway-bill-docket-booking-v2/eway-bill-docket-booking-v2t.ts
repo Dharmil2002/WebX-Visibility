@@ -8,6 +8,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from "src/app/Utility/utility.service";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
+import Swal from "sweetalert2";
 
 @Component({
   selector: 'app-eway-example',
@@ -158,6 +159,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   destination: any;
   destinationStatus: boolean;
   companyCode = parseInt(localStorage.getItem("companyCode"));
+  dockNo: string;
   constructor(
     private masterService: MasterService,
     private fb: UntypedFormBuilder,
@@ -436,8 +438,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     const dynamicValue = localStorage.getItem('Branch'); // Replace with your dynamic value
     const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
     const paddedNumber = dynamicNumber.toString().padStart(4, '0');
-    const result = `CN${dynamicValue}${paddedNumber}`;
-    this.tabForm.controls['docketNumber'].setValue(result);
+    this.dockNo = `CN${dynamicValue}${paddedNumber}`;
+    this.tabForm.controls['docketNumber'].setValue(this.dockNo);
     this.tabForm.controls['fromCity'].setValue(this.tabForm.value.fromCity?.name || '');
     this.tabForm.controls['toCity'].setValue(this.tabForm.value.toCity?.name || '');
     this.tabForm.controls['billingParty'].setValue(this.tabForm.value?.billingParty.name || '');
@@ -446,7 +448,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     this.tabForm.controls['consigneeCity'].setValue(this.tabForm.value?.consigneeCity.name || '');
     this.tabForm.controls['consigneeName'].setValue(this.tabForm.value?.consigneeName.name || '');
     this.contractForm.controls['destination'].setValue(this.contractForm.value?.destination.name || '');
-    let id={id:result}
+    let id={id:this.dockNo}
     let docketDetails = { ...this.tabForm.value, ...this.contractForm.value, ...invoiceDetails,...id};
     let reqBody = {
       companyCode: this.companyCode,
@@ -462,16 +464,20 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   Addseries() {
     const resultArray = this.generateArray(this.companyCode,this.tabForm.controls['docketNumber'].value,this.contractForm.controls['totalChargedNoOfpkg'].value);
-  let nestedData ={id:this.tabForm.controls['docketNumber'].value,docketScanData:resultArray}
     let reqBody = {
       companyCode: this.companyCode,
       type: "operation",
       collection: "docketScan",
-      data: nestedData
+      data: resultArray
     }
     this.operationService.operationPost('common/create', reqBody).subscribe({
       next: (res: any) => {
-        
+        Swal.fire({
+          icon: "success",
+          title: "Booked SuccesFully",
+          text: "DocketNo: "+this.dockNo,
+          showConfirmButton: true,
+        });
       }
     })
   }
@@ -482,6 +488,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       const entryDateTime = new Date().toISOString();
       const bcDockSf = '.';
       return {
+        id:bcSerialNo,
         companyCode: companyCode,
         dockNo: dockno,
         bcSerialNo: bcSerialNo,

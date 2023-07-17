@@ -70,7 +70,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   ]
   DocketField: any;
   isLinear = true;
-  showSaveAndCancelButton = false;
+  showSaveAndCancelButton = true;
   error: any;
   data: any;
   fromCity: string;

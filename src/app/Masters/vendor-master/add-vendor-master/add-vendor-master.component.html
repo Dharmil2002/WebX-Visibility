@@ -1,9 +1,10 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" > 
-    <form [formGroup]="vendorTableForm" >
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="vendorTableForm">
         <generic-accordion-webxpress 
-        [AccordionForm]="vendorTableForm"
+        [AccordionForm]="vendorTableForm" 
         [accordionGroup]="accordionData"
-        (functionCallEmitter)="functionCallHandler($event)" >
+        [showSaveAndCancelButton]="true" 
+        (functionCallEmitter)="functionCallHandler($event)">
         </generic-accordion-webxpress>
     </form>
 </app-common-wrapper-webxpress>

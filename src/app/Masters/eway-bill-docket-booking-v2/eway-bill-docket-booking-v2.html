@@ -33,7 +33,7 @@
                                     <form [formGroup]="tabForm">
                                         <generic-accordion-webxpress [AccordionForm]="tabForm"
                                             [accordionGroup]="tabData"
-                                            [showSaveAndCancelButton]="showSaveAndCancelButton"
+                                            [showSaveAndCancelButtonV]="showSaveAndCancelButton"
                                             (functionCallEmitter)="functionCallHandler($event)">
                                         </generic-accordion-webxpress>
                                     </form>
@@ -48,7 +48,7 @@
                                     <form [formGroup]="contractForm">
                                         <generic-accordion-webxpress [AccordionForm]="contractForm"
                                             [accordionGroup]="contractData"
-                                            [showSaveAndCancelButton]="showSaveAndCancelButton"
+                                            [showSaveAndCancelButtonV]="showSaveAndCancelButton"
                                             (functionCallEmitter)="functionCallHandler($event)">
                                         </generic-accordion-webxpress>
                                     </form>

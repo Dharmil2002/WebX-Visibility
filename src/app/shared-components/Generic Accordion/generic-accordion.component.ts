@@ -13,6 +13,7 @@ export class GenericAccordionComponent implements OnInit {
   @Input() fafIconData:string
   @Input() Icondata:string  
   @Input() showSaveAndCancelButton: false;
+  @Input() showSaveAndCancelButtonV: false;
   @Output() functionCallEmitter = new EventEmitter();
 
   expandedIndex = 0;

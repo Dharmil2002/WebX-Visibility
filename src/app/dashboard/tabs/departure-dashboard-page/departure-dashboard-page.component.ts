@@ -131,6 +131,7 @@ export class DepartureDashboardPageComponent
    * Fetches shipment data from the API and updates the boxData and tableload properties.
    */
   fetchShipmentData() {
+    debugger
     // Prepare request payload
     let req = {
       companyCode: this.companyCode,
@@ -140,12 +141,12 @@ export class DepartureDashboardPageComponent
 
     // Send request and handle response
     this.operationService.operationPost("common/getall", req).subscribe({
-      next: (res: any) => {
+      next: async (res: any) => {
         // Update shipmentData property with the received data
         this.shipmentData = res.data;
 
         // Fetch shipment result based on company code, orgBranch, and tableData
-        const shipmentResult = fetchShipmentData(
+        const shipmentResult = await fetchShipmentData(
           this.companyCode,
           this.orgBranch,
           this.tableData,

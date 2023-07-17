@@ -150,6 +150,7 @@ export function fetchShipmentData(
   operationService: any
 ): any {
   return new Promise((resolve, reject) => {
+    debugger
     // Prepare request payload
     let req = {
       companyCode: companyCode,

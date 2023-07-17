@@ -1,9 +1,8 @@
 import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
-import { Router } from "@angular/router";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
-import { generateTableData, getShipmentData } from "./departureUtils";
+import { fetchDepartureDetails, fetchShipmentData } from "./departureUtils";
 @Component({
   selector: "app-departure-dashboard-page",
   templateUrl: "./departure-dashboard-page.component.html",
@@ -18,11 +17,11 @@ export class DepartureDashboardPageComponent
   drillDownPath: string;
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
-  companyCode: number;
   menuItemflag: boolean = true;
   departure: any;
   @Input() arrivaldeparture: any;
   orgBranch: string = localStorage.getItem("Branch");
+  companyCode: number = parseInt(localStorage.getItem("companyCode"));
   breadscrums = [
     {
       title: "Departure Details",
@@ -95,7 +94,6 @@ export class DepartureDashboardPageComponent
 
   constructor(
     private operationService: OperationService,
-    private Route: Router,
     private CnoteService: CnoteService
   ) {
     super();
@@ -105,54 +103,59 @@ export class DepartureDashboardPageComponent
     this.getdepartureDetail();
   }
 
-  ngOnInit(): void {
-    try {
-      this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
-    } catch (error) {
-      // if companyCode is not found , we should logout immmediately.
-    }
-  }
+  ngOnInit(): void {}
   dailogData(event) {}
-  getdepartureDetail() {
-    let req = {
-      companyCode: 10065,
-      type: "operation",
-      collection: "trip_detail",
-    };
-    this.operationService.operationPost("common/getall", req).subscribe({
-      next: (res: any) => {
-        this.departuredata = res.data.filter(
-          (x) => x.controlLoc.toLowerCase() === this.orgBranch.toLowerCase()
-        );
-        const tableData = generateTableData(this.departuredata);
-        // Use the generated tableData as needed
-        this.tableData = tableData;
-        this.tableload = false;
-         this.getshipmentData();
-      },
-    });
-  }
 
-  getshipmentData() {
-    
+  /**
+   * Retrieves departure details from the API and updates the tableData property.
+   * Also triggers fetching shipment data.
+   */
+  async getdepartureDetail() {
+    // Fetch departure details from the API
+    const departureTableData = await fetchDepartureDetails(
+      this.companyCode,
+      this.orgBranch,
+      this.operationService
+    );
+
+    // Update the tableData property with the retrieved data
+    this.tableData = departureTableData;
+
+    // Set tableload to false to indicate that the table loading is complete
+    this.tableload = false;
+
+    // Fetch shipment data
+    this.fetchShipmentData();
+  }
+  /**
+   * Fetches shipment data from the API and updates the boxData and tableload properties.
+   */
+  fetchShipmentData() {
+    // Prepare request payload
     let req = {
-      companyCode: 10065,
+      companyCode: this.companyCode,
       type: "operation",
       collection: "docket",
     };
+
+    // Send request and handle response
     this.operationService.operationPost("common/getall", req).subscribe({
       next: (res: any) => {
-        this.shipmentData = res.data
-        const shipmentResult = getShipmentData(
-          this.shipmentData,
+        // Update shipmentData property with the received data
+        this.shipmentData = res.data;
+
+        // Fetch shipment result based on company code, orgBranch, and tableData
+        const shipmentResult = fetchShipmentData(
+          this.companyCode,
           this.orgBranch,
-          this.tableData
+          this.tableData,
+          this.operationService
         );
+
+        // Update boxData and tableload properties with the shipment result
         this.boxData = shipmentResult.boxData;
-        this.tableload = shipmentResult.tableload;
+        this.tableload = false;
       },
     });
-
-  
   }
 }

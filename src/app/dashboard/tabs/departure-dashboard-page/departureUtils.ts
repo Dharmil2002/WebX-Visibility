@@ -1,13 +1,54 @@
 import { addHours } from "date-fns";
 
 /**
+ * Fetches departure details from the API based on the provided parameters.
+ * @param companyCode - The company code.
+ * @param orgBranch - The organization branch.
+ * @param operationService - The operation service for making API requests.
+ * @returns A promise that resolves to the table data of departure details.
+ */
+export async function fetchDepartureDetails(
+  companyCode: number,
+  orgBranch: string,
+  operationService: any
+): Promise<any[]> {
+  // Prepare request payload
+  let req = {
+    companyCode: companyCode,
+    type: "operation",
+    collection: "trip_detail",
+  };
+
+  try {
+    // Send request and await response
+    const res: any = await operationService
+      .operationPost("common/getall", req)
+      .toPromise();
+
+    // Filter departure data based on organization branch
+    const departuredata = res.data.filter(
+      (x: any) => x.controlLoc.toLowerCase() === orgBranch.toLowerCase()
+    );
+
+    // Generate table data from filtered departure data
+    const tableData = generateTableData(departuredata);
+
+    // Return the generated table data
+    return tableData;
+  } catch (error) {
+    // Handle error
+    throw error;
+  }
+}
+
+/**
  * Calculates shipment data based on the provided parameters.
  * @param shipmentDetails - The shipment details object.
  * @param orgBranch - The organization branch.
  * @param tableData - The table data.
  * @returns Shipment data object.
  */
-export function getShipmentData(
+function getShipmentData(
   shipmentDetails: any,
   orgBranch: any,
   tableData: any
@@ -56,7 +97,7 @@ export function getShipmentData(
  * @param departureData - The departure data object.
  * @returns Table data array.
  */
-export function generateTableData(departureData: any[]): any[] {
+function generateTableData(departureData: any[]): any[] {
   let dataDeparture: any[] = [];
   const { format } = require("date-fns");
 
@@ -93,4 +134,43 @@ export function generateTableData(departureData: any[]): any[] {
 
   let tableData = dataDeparture;
   return tableData;
+}
+/**
+ * Fetches shipment data from the API based on the provided parameters.
+ * @param companyCode - The company code.
+ * @param orgBranch - The organization branch.
+ * @param tableData - The table data.
+ * @param operationService - The operation service for making API requests.
+ * @returns A promise that resolves to the shipment result object.
+ */
+export function fetchShipmentData(
+  companyCode: number,
+  orgBranch: string,
+  tableData: any,
+  operationService: any
+): any {
+  return new Promise((resolve, reject) => {
+    // Prepare request payload
+    let req = {
+      companyCode: companyCode,
+      type: "operation",
+      collection: "docket",
+    };
+
+    // Send request and handle response
+    operationService.operationPost("common/getall", req).subscribe({
+      next: (res: any) => {
+        const shipmentData = res.data;
+        const shipmentResult = getShipmentData(
+          shipmentData,
+          orgBranch,
+          tableData
+        );
+        resolve(shipmentResult);
+      },
+      error: (error: any) => {
+        reject(error);
+      },
+    });
+  });
 }

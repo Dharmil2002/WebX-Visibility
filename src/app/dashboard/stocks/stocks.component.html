@@ -10,9 +10,9 @@
         csvFileName : Name of the csv File.
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
-    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="tableData"
         [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [toggleArray]="toggleArray"  [addAndEditPath]="addAndEditPath" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
         [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
     </generic-table-webxpress>
 </div>

@@ -37,9 +37,7 @@ export class SplitDcrComponent implements OnInit {
   newCategoryStatus: any;
   constructor(private service: utilityService, private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      debugger
       this.data = this.route.getCurrentNavigation()?.extras.state.data;
-      console.log(this.data);
     }
   }
 
@@ -129,12 +127,6 @@ export class SplitDcrComponent implements OnInit {
       // Calculate the difference and set the totalLeaf value
       const difference = toNumericPart - fromNumericPart;
       this.dcrSplitForm.get('totalLeaf').setValue(difference);
-
-      console.log(seriesFromValue);
-      console.log(seriesToValue);
-      console.log(difference);
-
-      // ... Additional logic here ...
     }
   }
   cancel() {

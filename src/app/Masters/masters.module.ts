@@ -78,6 +78,8 @@ import { EwayBillDocketBookingV2Component } from './eway-bill-docket-booking-v2/
 import { AddVendorMasterComponent } from './vendor-master/add-vendor-master/add-vendor-master.component';
 import { VendorMasterListComponent } from './vendor-master/vendor-master-list/vendor-master-list.component';
 import { VendorMasterViewComponent } from './vendor-master/vendor-master-view/vendor-master-view.component';
+import { AirportMasterListComponent } from './airport-master/airport-master-list/airport-master-list.component';
+import { AirportMasterAddComponent } from './airport-master/airport-master-add/airport-master-add.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -164,6 +166,8 @@ import { VendorMasterViewComponent } from './vendor-master/vendor-master-view/ve
     VendorMasterListComponent,
     AddVendorMasterComponent,
     VendorMasterViewComponent,
+    AirportMasterListComponent,
+    AirportMasterAddComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

@@ -11,59 +11,67 @@ export class LocationMasterComponent implements OnInit {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   linkArray = []
-
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   columnHeader = {
-      "srNo": "Sr No",
-      'locCode': 'Location Code',
-      'locName': 'Location Name',
-      'locAddress': 'Location Address',
-      'reportLoc': 'Reporting Location',
-      "activeFlag": "Active Status",
-      "actions": "Actions"
+    "srNo": "Sr No",
+    'locCode': 'Location Code',
+    'locName': 'Location Name',
+    'locAddr': 'Location Address',
+    'reportLoc': 'Reporting Location',
+    "activeFlag": "Active Status",
+    "actions": "Actions"
   };
   headerForCsv = {
     "srNo": "Sr No",
-      'locCode': 'Location Code',
-      'locName': 'Location Name',
-      'locAddress': 'Location Address',
-      'reportLoc': 'Reporting Location',
-      "activeFlag": "Active Status",
+    'locCode': 'Location Code',
+    'locName': 'Location Name',
+    'locAddress': 'Location Address',
+    'reportLoc': 'Reporting Location',
+    "activeFlag": "Active Status",
   }
-
   breadScrums = [
-      {
-        title: "Location Master",
-        items: ["Home"],
-        active: "Location Master",
-      },
-    ];
-
+    {
+      title: "Location Master",
+      items: ["Home"],
+      active: "Location Master",
+    },
+  ];
   dynamicControls = {
-      add: true,
-      edit: true,
-      csv: false
+    add: true,
+    edit: true,
+    csv: false
   }
   cityActiveFlag: any;
   addAndEditPath: string;
-  constructor(private masterService: MasterService){
-  this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
+  tableData: any;
+  constructor(private masterService: MasterService) {
+    this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
   }
   ngOnInit(): void {
-      //throw new Error("Method not implemented.");
-      this.getLocationDetails();
+    //throw new Error("Method not implemented.");
+    this.getLocationDetails();
   }
-  
   getLocationDetails() {
-    //throw new Error("Method not implemented."); 
-    //Fetch data from the JSON endpoint
-    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {  
-    this.data = res;
-    this.csv = this.data['LocationData']
-    //Extract relevant data arrays from the response
-    //const tableArray = this.data['tabledata'];
-    this.tableLoad = false;
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "location"
     }
-    );
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          const dataWithSrno = res.data.map((obj, index) => {
+            return {
+              ...obj,
+              srNo: index + 1
+            };
+          });
+          this.csv = dataWithSrno
+          this.tableData = dataWithSrno;
+          this.tableLoad = false;
+        }
+      }
+    })
   }
-  
 }

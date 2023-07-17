@@ -30,6 +30,7 @@ export class LocationMaster {
   profit:string;
   locEmail:string;
   contLoc:string;
+  id:string;
 
  
 

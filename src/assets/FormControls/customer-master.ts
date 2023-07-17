@@ -322,6 +322,19 @@ export class customerControl {
                     Validations: [],
                     
                 },
+                {
+                    name: 'id',
+                    label: '',
+                    placeholder: '',
+                    type: 'text',
+                    value: customerTable.id,
+                    filterOptions: '',
+                    autocomplete: '',
+                    displaywith: '',
+                    Validations: [],
+                    generatecontrol: false,
+                    disable: false
+                  },
             ]
 
     }

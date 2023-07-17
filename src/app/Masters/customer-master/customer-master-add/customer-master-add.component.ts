@@ -1,14 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { HttpClient } from '@angular/common/http';
 import { customerControl } from 'src/assets/FormControls/customer-master';
-import { utilityService } from 'src/app/Utility/utility.service';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { Router } from '@angular/router';
 import { customerModel } from 'src/app/core/models/Masters/customerMaster';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from 'sweetalert2';
+import { getShortName } from 'src/app/Utility/commonFunction/random/generateRandomNumber';
 
 @Component({
   selector: 'app-customer-master-add',
@@ -16,6 +16,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 })
 export class CustomerMasterAddComponent implements OnInit {
   customerTableForm: UntypedFormGroup;
+  companyCode: any = parseInt(localStorage.getItem("companyCode")); 
   error: string
   isUpdate = false;
   action: any;
@@ -44,7 +45,7 @@ export class CustomerMasterAddComponent implements OnInit {
   jsonControlCustomerArray: any;
   jsonControlBillKycArray: any;
   accordionData: any
-  breadscrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string; }[];
   groupCode: any;
   groupCodedet: any;
   payBasisData: any;
@@ -56,7 +57,7 @@ export class CustomerMasterAddComponent implements OnInit {
   ownershipData: any;
   constructor(private Route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder, private filter: FilterUtils,
-    private http: HttpClient, private service: utilityService, private masterService: MasterService) {
+     private masterService: MasterService) {
     //super();
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
@@ -67,7 +68,7 @@ export class CustomerMasterAddComponent implements OnInit {
     }
     if (this.action === 'edit') {
       this.isUpdate = true;
-      this.breadscrums = [
+      this.breadScrums = [
         {
           title: "Customer Master",
           items: ["Masters"],
@@ -76,7 +77,7 @@ export class CustomerMasterAddComponent implements OnInit {
       ];
 
     } else {
-      this.breadscrums = [
+      this.breadScrums = [
         {
           title: "Customer Master",
           items: ["Masters"],
@@ -90,7 +91,6 @@ export class CustomerMasterAddComponent implements OnInit {
   }
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
-    // Create DriverFormControls instance to get form controls for different sections
     const customerFormControls = new customerControl(this.customerTable, this.isUpdate);
     this.jsonControlCustomerArray = customerFormControls.getFormControlsC();
     this.jsonControlBillKycArray = customerFormControls.getFormControlB();
@@ -105,7 +105,6 @@ export class CustomerMasterAddComponent implements OnInit {
   //#endregion
 
   ngOnInit(): void {
-    //throw new Error("Method not implemented.");
     this.bindDropdown();
     this.getDropDownData();
   }
@@ -136,7 +135,6 @@ export class CustomerMasterAddComponent implements OnInit {
         this.nonOda = data.name;
         this.noOdaStatus = data.additionalData.showNameAndValue;
       }
-
     });
     this.jsonControlBillKycArray.forEach(data => {
       if (data.name === 'payBasis') {
@@ -193,7 +191,6 @@ export class CustomerMasterAddComponent implements OnInit {
         this.ownerShipDet = this.findDropdownItemByName(this.ownershipData, this.customerTable.ownership);
         this.customerTableForm.controls.ownership.setValue(this.ownerShipDet);
       }
-      
       const filterParams = [
         [this.jsonControlCustomerArray, this.groupCodeData, this.gCode, this.codeStatus],
         [this.jsonControlBillKycArray, this.serviceOptedFor, this.serviceOpt, this.serviceOptStatus],
@@ -203,36 +200,82 @@ export class CustomerMasterAddComponent implements OnInit {
         [this.jsonControlCustomerArray, this.locationData, this.nonOda, this.noOdaStatus],
         [this.jsonControlCustomerArray, this.ownershipData, this.ownership, this.ownershipStatus]
       ];
-      
       filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
         this.filter.Filter(jsonControlArray, this.customerTableForm, dropdownData, formControl, statusControl);
       });
     });
   }
-  
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }
   save() {
     const formValue = this.customerTableForm.value;
-    const controlNames = [
-      "groupCode",
-      "customerLocation",
-      "ownership",
-      "customerControllingLocation",
-      "nonOda",
-      "serviceOpted",
-      "payBasis",
-      "activeFlag"
-    ];
-    controlNames.forEach(controlName => {
-      const controlValue = formValue[controlName]?.value;
-      this.customerTableForm.controls[controlName].setValue(controlValue);
-    });
-    this.customerTableForm.controls.activeFlag.setValue(formValue.activeFlag ? "Y" : "N");
-    this.Route.navigateByUrl('/Masters/CustomerMaster/CustomerMasterList');
-    this.service.exportData(formValue);
-  }
+      const controlNames = [
+        "groupCode",
+        "customerLocation",
+        "ownership",
+        "customerControllingLocation",
+        "nonOda",
+        "serviceOpted",
+        "payBasis",
+        "activeFlag"
+      ];
+      controlNames.forEach(controlName => {
+        const controlValue = formValue[controlName]?.value;
+        this.customerTableForm.controls[controlName].setValue(controlValue);
+      });
+    this.customerTableForm.controls["activeFlag"].setValue(this.customerTableForm.value.activeFlag == true ? "Y" : "N");
+    if (this.isUpdate) {
+        let id = this.customerTableForm.value.id;
+        // Remove the "id" field from the form controls
+        this.customerTableForm.removeControl("id");
+        let req = {
+            companyCode: this.companyCode,
+            type: "masters",
+            collection: "customer",
+            id: id,
+            data: this.customerTableForm.value
+        };
+        this.masterService.masterPut('common/update', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                    this.Route.navigateByUrl('/Masters/CustomerMaster/CustomerMasterList');
+                }
+            }
+        });
+    } else {
+        const randomNumber = getShortName(this.customerTableForm.value.groupCode);
+        this.customerTableForm.controls["customerCode"].setValue(randomNumber);
+        this.customerTableForm.controls["id"].setValue(randomNumber);
+        let req = {
+            companyCode: this.companyCode,
+            type: "masters",
+            collection: "customer",
+            data: this.customerTableForm.value
+        };
+        this.masterService.masterPost('common/create', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                    this.Route.navigateByUrl('/Masters/CustomerMaster/CustomerMasterList');
+                }
+            }
+        });
+    }
+}
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
     let field = $event.field;                   // the actual formControl instance

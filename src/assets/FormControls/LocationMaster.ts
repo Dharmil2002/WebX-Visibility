@@ -38,7 +38,7 @@ export class LocationControl {
             },
             {
                 name: 'reportLoc', label: "Reporting Location", placeholder: "Select Reporting Location", type: 'dropdown',
-                value: LocationTable.reportLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     // {
                     //     name: "required",
@@ -194,10 +194,7 @@ export class LocationControl {
                         // {
                         //     name: "autocomplete",
                         // },
-                        // {
-                        //     name: "invalidAutocomplete",
-                        //     message: "Choose proper value",
-                        // }
+                        
                     ],
                     additionalData: {
                         showNameAndValue: false
@@ -340,41 +337,19 @@ export class LocationControl {
                     Validations: [
                     ]
                 },
-                // {
-                //     name: 'ContLoc', label: "Related Delivery Location", placeholder: "Select Related Delivery Location", type: 'select',
-                //     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                //     Validations: [
-                //         {
-                //             name: "autocomplete",
-                //         },
-                //         {
-                //             name: "invalidAutocomplete",
-                //             message: "Choose proper value",
-                //         }
-                //     ],
-                //     additionalData: {
-                //         showNameAndValue: false,
-                //     }
-                // },
-                
-
-                // {
-                //     name: 'Latitude', label: 'Latitude & Longitude', placeholder: 'Enter Latitude & Longitude', type: 'text', value: LocationTable.latitude.toString() + "," + LocationTable.longitude.toString(), generatecontrol: true, disable: false,
-                //     Validations: [],
-                //     functions: {
-                //         onClick: 'showMap',
-                //     }
-                // },
-                // {
-                //     name: 'Radius', label: 'Radius', placeholder: 'Enter Radius', type: 'text', value: LocationTable.radius, generatecontrol: true, disable: false,
-                //     Validations: [],
-                // },
-                // {
-                //     name: 'Longitude', label: 'Latitude & Longitude', placeholder: 'Latitude & Longitude', type: 'text', value: '', filterOptions: '', autocomplete: '', displaywith: '', Validations: [], generatecontrol: false, disable: false,
-                //     functions: {
-                //         onChange: 'RenderMap',
-                //     }
-                // },
+                {
+                    name: 'id',
+                    label: '',
+                    placeholder: '',
+                    type: 'text',
+                    value: LocationTable.id,
+                    filterOptions: '',
+                    autocomplete: '',
+                    displaywith: '',
+                    Validations: [],
+                    generatecontrol: false,
+                    disable: false
+                  },
             ]
     }
     getFormControlsLocation() {

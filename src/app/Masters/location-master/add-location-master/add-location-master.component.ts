@@ -8,6 +8,8 @@ import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { utilityService } from 'src/app/Utility/utility.service';
+import Swal from 'sweetalert2';
+import { getShortName } from 'src/app/Utility/commonFunction/random/generateRandomNumber';
 
 @Component({
   selector: 'app-add-location-master',
@@ -15,6 +17,7 @@ import { utilityService } from 'src/app/Utility/utility.service';
 })
 export class AddLocationMasterComponent implements OnInit {
   locationTableForm: UntypedFormGroup;
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   data: any;
   isUpdate = false;
   action: any;
@@ -26,7 +29,7 @@ export class AddLocationMasterComponent implements OnInit {
   jsonControlOtherArray: any;
   accordionData: any
   hierarchydet: any;
-  breadscrums = [
+  breadScrums = [
     {
       title: "Add Location Master",
       items: ["Masters"],
@@ -78,9 +81,10 @@ export class AddLocationMasterComponent implements OnInit {
   locPrevStatus: any;
   locCont: any;
   locContStatus: any;
+  showSaveAndCancelButton = false;
   constructor(
     private fb: UntypedFormBuilder, public dialog: MatDialog, private router: Router, private filter: FilterUtils,
-    private masterService: MasterService, private service: utilityService, private route: Router,
+    private masterService: MasterService, private route: Router,
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.LocationTable = router.getCurrentNavigation().extras.state.data;
@@ -91,7 +95,7 @@ export class AddLocationMasterComponent implements OnInit {
       this.action = 'Add'
     }
     if (this.action === 'edit') {
-      this.breadscrums = [
+      this.breadScrums = [
         {
           title: "Location Master",
           items: ["Masters"],
@@ -100,7 +104,7 @@ export class AddLocationMasterComponent implements OnInit {
       ];
 
     } else {
-      this.breadscrums = [
+      this.breadScrums = [
         {
           title: "Location Master",
           items: ["Masters"],
@@ -114,11 +118,9 @@ export class AddLocationMasterComponent implements OnInit {
   }
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
-    // Create DriverFormControls instance to get form controls for different sections
     const locationFormControls = new LocationControl(this.LocationTable, this.isUpdate);
     this.jsonControlLocationArray = locationFormControls.getFormControlsLocation();
     this.jsonControlOtherArray = locationFormControls.getFormControlsOther();
-
     // Build the accordion data with section names as keys and corresponding form controls as values
     this.accordionData = {
       "Location Details": this.jsonControlLocationArray,
@@ -287,16 +289,64 @@ export class AddLocationMasterComponent implements OnInit {
     });
   }
 
-  //OPTIMIZED WAY TO SAVE DATA WITH DROPDOWN VALUE
+  
+
   save() {
     const formValue = this.locationTableForm.value;
     Object.keys(formValue).forEach(key => {
       this.locationTableForm.controls[key].setValue(formValue[key]);
     });
-    this.locationTableForm.controls.ActiveFlag.setValue(formValue.ActiveFlag ? "Y" : "N");
-    this.route.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
-    this.service.exportData(formValue);
-  }
+    this.locationTableForm.controls["activeFlag"].setValue(this.locationTableForm.value.activeFlag == true ? "Y" : "N");
+    if (this.isUpdate) {
+        let id = this.locationTableForm.value.id;
+        // Remove the "id" field from the form controls
+        this.locationTableForm.removeControl("id");
+        let req = {
+            companyCode: this.companyCode,
+            type: "masters",
+            collection: "location",
+            id: id,
+            data: this.locationTableForm.value
+        };
+        this.masterService.masterPut('common/update', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                    this.route.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
+                }
+            }
+        });
+    } else {
+        const randomNumber = getShortName(this.locationTableForm.value.locName);
+        this.locationTableForm.controls["id"].setValue(randomNumber);
+        let req = {
+            companyCode: this.companyCode,
+            type: "masters",
+            collection: "location",
+            data: this.locationTableForm.value
+        };
+        this.masterService.masterPost('common/create', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                    this.route.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
+                }
+            }
+        });
+    }
+}
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }

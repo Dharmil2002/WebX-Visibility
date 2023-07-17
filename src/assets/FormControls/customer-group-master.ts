@@ -46,6 +46,19 @@ export class CustomerGroupControl {
             {
               name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: customerGroupTable.activeFlag, generatecontrol: true, disable: false,
               Validations: []
+            },
+            {
+              name: 'id',
+              label: '',
+              placeholder: '',
+              type: 'text',
+              value: customerGroupTable.id,
+              filterOptions: '',
+              autocomplete: '',
+              displaywith: '',
+              Validations: [],
+              generatecontrol: false,
+              disable: false
             }
         ]
     }

@@ -37,6 +37,7 @@ export class customerModel {
   city: string;
   state: string;
   pincode: string;
+  id:string;
   serviceOptedFor: any;
 
   constructor(CustomerMaster) {

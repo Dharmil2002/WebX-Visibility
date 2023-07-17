@@ -7,6 +7,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { DCRControl } from 'src/assets/FormControls/dcrControl';
 import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { utilityService } from 'src/app/Utility/utility.service';
 
 
 @Component({
@@ -32,7 +33,7 @@ export class ReAllocateDcrComponent implements OnInit {
   allocationCat: any;
   newCategoryStatus: any;
   newCategory: any;
-  constructor(public dialog: MatDialog, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) { }
+  constructor(private service: utilityService, public dialog: MatDialog, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) { }
 
   ngOnInit(): void {
     this.intializeFormControls();
@@ -94,7 +95,14 @@ export class ReAllocateDcrComponent implements OnInit {
     });
   }
   reAlloc() {
-
+    this.service.exportData(this.dcrReallocateForm.value);
+    Swal.fire({
+      icon: "success",
+      title: "Successful",
+      text: "Re-Allocated Data Successfully",
+      showConfirmButton: true,
+    });
+    this.dialog.closeAll();
   }
   closeDialog(): void {
     this.dialog.closeAll();

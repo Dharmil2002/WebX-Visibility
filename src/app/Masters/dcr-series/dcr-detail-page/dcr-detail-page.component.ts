@@ -139,12 +139,9 @@ export class DcrDetailPageComponent implements OnInit {
     else {
       this.route.navigate(['Masters/DocumentControlRegister/SplitDCR'], {
         state: {
-          data: '',
+          data: this.data,
         }
       });
     }
-    // Rest of the code for the manage() function
   }
-
-
 }

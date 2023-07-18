@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -54,20 +53,21 @@ export class SplitDcrComponent implements OnInit {
         this.docTypeStatus = data.additionalData.showNameAndValue;
       }
       if (data.name === 'newLocation') {
-        // Set State-related variables
         this.newLocation = data.name;
         this.newLocationStatus = data.additionalData.showNameAndValue;
       }
       if (data.name === 'newCategory') {
-        // Set State-related variables
         this.newCategory = data.name;
         this.newCategoryStatus = data.additionalData.showNameAndValue;
       }
     });
     this.dcrSplitForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.dcrSplitForm.get('bookCode').setValue(this.data?.bookCode);
-    this.dcrSplitForm.get('seriesFrom').setValue(this.data?.docSrFrom);
-    this.dcrSplitForm.get('totalLeaf').setValue(this.data?.totLeaf);
+    this.dcrSplitForm.patchValue({
+      bookCode: this.data?.bookCode,
+      seriesFrom: this.data?.docSrFrom,
+      totalLeaf: this.data?.totLeaf,
+    });
+
   }
   functionCallHandler($event) {
     let field = $event.field;                   // the actual formControl instance

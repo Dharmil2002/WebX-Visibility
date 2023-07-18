@@ -73,11 +73,12 @@ import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list
 import { DcrDetailPageComponent } from './dcr-series/dcr-detail-page/dcr-detail-page.component';
 import { ReAllocateDcrComponent } from './dcr-series/re-allocate-dcr/re-allocate-dcr.component';
 import { SplitDcrComponent } from './dcr-series/split-dcr/split-dcr.component';
-import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise.component';
 import { EwayBillDocketBookingV2Component } from './eway-bill-docket-booking-v2/eway-bill-docket-booking-v2t';
 import { AddVendorMasterComponent } from './vendor-master/add-vendor-master/add-vendor-master.component';
 import { VendorMasterListComponent } from './vendor-master/vendor-master-list/vendor-master-list.component';
 import { VendorMasterViewComponent } from './vendor-master/vendor-master-view/vendor-master-view.component';
+import { RouteMasterLocationAddComponent } from './route-master-location-wise/route-master-location-add/route-master-location-add.component';
+import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise-list/route-master-location-wise.component';
 import { AirportMasterListComponent } from './airport-master/airport-master-list/airport-master-list.component';
 import { AirportMasterAddComponent } from './airport-master/airport-master-add/airport-master-add.component';
 @NgModule({
@@ -168,6 +169,7 @@ import { AirportMasterAddComponent } from './airport-master/airport-master-add/a
     VendorMasterViewComponent,
     AirportMasterListComponent,
     AirportMasterAddComponent,
+    RouteMasterLocationAddComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

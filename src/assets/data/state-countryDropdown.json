@@ -467,6 +467,10 @@
         {
             "name": "Pune",
             "value": "PUN"
+        },
+        {
+            "name": "Delhi",
+            "value": "DELC"
         }
     ],
     "payBasisDropdown": [
@@ -724,7 +728,6 @@
             "name": "CHENNAI",
             "value": "5"
         }
-
     ],
     "stateLocDropDown": [
         {
@@ -774,7 +777,7 @@
         {
             "name": "Company",
             "value": "3"
-        }      
+        }
     ],
     "locdataDropDown": [
         {
@@ -794,7 +797,7 @@
             "value": "KNP"
         }
     ],
-    "allocationCategory":[
+    "allocationCategory": [
         {
             "name": "Employee",
             "value": "E"
@@ -810,9 +813,9 @@
         {
             "name": "Location",
             "value": "L"
-        } 
+        }
     ],
-    "tdsSectionDropdown":[
+    "tdsSectionDropdown": [
         {
             "name": "TDS Account",
             "value": "1"
@@ -824,7 +827,7 @@
         {
             "name": "TDS Payable",
             "value": "3"
-        },  
+        },
         {
             "name": "TDS App",
             "value": "4"
@@ -832,7 +835,7 @@
         {
             "name": "TDS Payable on Contract",
             "value": "5"
-        }  
+        }
     ],
     "tdsTypeDropdown": [
         {
@@ -846,9 +849,9 @@
         {
             "name": "Pan Card NA",
             "value": "3"
-        } 
+        }
     ],
-    "lspNameDropdown":[
+    "lspNameDropdown": [
         {
             "name": "DLVBB",
             "value": "1"
@@ -856,9 +859,9 @@
         {
             "name": "MXpress",
             "value": "2"
-        }  
+        }
     ],
-    "selectDropdown":[
+    "selectDropdown": [
         {
             "name": "CP",
             "value": "1"
@@ -866,7 +869,6 @@
         {
             "name": "MXpress",
             "value": "2"
-        }  
+        }
     ]
-
 }

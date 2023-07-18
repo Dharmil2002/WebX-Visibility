@@ -38,11 +38,13 @@ export class RouteMasterLocationWiseComponent implements OnInit {
   dynamicControls = {
     add: true,
     edit: true,
-    csv: false
+    csv: true
   }
   addAndEditPath: string;
+  csvFileName: string;
   constructor(private masterService: MasterService) {
-    this.addAndEditPath = "/Masters/CityMaster/AddCity";
+    this.addAndEditPath = "/Masters/RouteLocationWise/RouteAdd";
+    this.csvFileName = "Route Master Location Details"  //setting csv file Name so file will be saved as per this name
   }
   ngOnInit(): void {
     this.getRouteDetails();

@@ -27,6 +27,7 @@ import { ViewPrintComponent } from './view-print/view-print.component';
 import { VehicleUpdateUploadComponent } from "./vehicle-update-upload/vehicle-update-upload.component";
 import { OperationService } from "../core/service/operations/operation.service";
 import { NavigationService } from "../Utility/commonFunction/route/route";
+import { QuickBookingComponent } from './quick-booking/quick-booking.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -39,7 +40,8 @@ import { NavigationService } from "../Utility/commonFunction/route/route";
     LodingSheetGenerateSuccessComponent,
     CreateLoadingSheetComponent,
     ViewPrintComponent,
-    VehicleUpdateUploadComponent
+    VehicleUpdateUploadComponent,
+    QuickBookingComponent
   ],
   imports: [
     CommonModule,

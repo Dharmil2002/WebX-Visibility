@@ -101,7 +101,7 @@ function generateTableData(departureData: any[]): any[] {
   let dataDeparture: any[] = [];
   const { format } = require("date-fns");
 
-  departureData.forEach((element) => {
+  departureData.forEach((element,index) => {
     let scheduleTime = new Date(); // Replace this with the actual schedule time
 
     // Convert transHrs to number for time calculations
@@ -118,6 +118,7 @@ function generateTableData(departureData: any[]): any[] {
         : "Create Trip";
 
     let jsonDeparture = {
+      id:element.id,
       RouteandSchedule: element.rutCd + ":" + element.rutNm,
       VehicleNo: element?.vehicleNo || "",
       TripID: element?.tripId || "",

@@ -9,6 +9,7 @@ import { utilityService } from "src/app/Utility/utility.service";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-eway-example',
@@ -44,35 +45,15 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   tableData: any = [];
   // Action buttons configuration
   actionObject = {
-    addRow: false,
+    addRow: true,
     submit: true,
     search: true
   };
-  sampleDropdownData2 = [
-    { name: "HQTR", value: "HQTR" },
-    { name: "MUMB", value: "MUMB" },
-    { name: "AMDB", value: "AMDB" }
-  ]
-  routedropdown = [
-    {
-      value: "S0010 ",
-      name: "AMDB-BRDB-MUMB",
-    },
-    {
-      value: "S0003 ",
-      name: "AMDB-JAIB-DELB",
-    },
-    {
-      value: "S0002 ",
-      name: "MUMB-BRDB-AMDB",
-    }
-
-  ]
   DocketField: any;
   isLinear = true;
   showSaveAndCancelButton = true;
   error: any;
-  data: any;
+  quickdocketDetaildata: any;
   fromCity: string;
   fromCityStatus: any;
   ewayData: any;
@@ -95,37 +76,58 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     },
     LENGTH: {
       name: "Length (CM)",
-      key: "input",
+      key: "inputnumber",
       style: "",
+      functions:{
+        onChange:"calculateInvoiceTotal"
+      }
     },
     BREADTH: {
       name: "Breadth (CM)",
-      key: "input",
+      key: "inputnumber",
       style: "",
+      functions:{
+        onChange:"calculateInvoiceTotal"
+      }
     },
     HEIGHT: {
       name: "Height (CM)",
-      key: "input",
+      key: "inputnumber",
+      functions:{
+        onChange:"calculateInvoiceTotal"
+      },
       style: "",
     },
     DECLVAL: {
       name: "Declared Value",
-      key: "input",
+      key: "inputnumber",
+      functions:{
+        onChange:"calculateInvoiceTotal"
+      },
       style: "",
     },
     NO_PKGS: {
       name: "No. of Pkgs.",
-      key: "input",
+      key: "inputnumber",
+      functions:{
+        onChange:"calculateInvoiceTotal"
+      },
       style: "",
     },
     CUB_WT: {
       name: "Cubic Weight",
-      key: "input",
+      key: "inputnumber",
+      functions:{
+        onChange:"calculateInvoiceTotal"
+      },
       style: "",
     },
     ACT_WT: {
       name: "Actual Weight (KG)",
-      key: "input",
+      key: "inputnumber",
+      functions:{
+        onChange:"calculateInvoiceTotal"
+      },
       style: "",
     },
     Invoice_Product: {
@@ -136,6 +138,11 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     HSN_CODE: {
       name: "HSN Code",
       key: "inputString",
+      style: "",
+    },
+    action: {
+      name: "Action",
+      key: "Action",
       style: "",
     },
   };
@@ -158,15 +165,24 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   containerSize1Size: boolean;
   destination: any;
   destinationStatus: boolean;
+  quickDocket: boolean;
   companyCode = parseInt(localStorage.getItem("companyCode"));
   dockNo: string;
+  DocketDetails: any;
+  vehicleNo: string;
+  docketId: string;
   constructor(
     private masterService: MasterService,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private service: utilityService,
-    private operationService: OperationService
+    private operationService: OperationService,
+    private route: Router
   ) {
+    if (this.route.getCurrentNavigation()?.extras?.state != null) {
+      this.quickdocketDetaildata = route.getCurrentNavigation().extras.state.data.columnData;
+      this.quickDocket=true;
+    }
+    this.bindQuickdocketData();
     this.getCity();
     this.customerDetails();
     this.destionationDropDown();
@@ -234,8 +250,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     // Set initial values for the form controls
     this.tabForm.controls["appoint"].setValue('N');
 
-    // Retrieve EwayBill data
-    this.getEwayBillData();
+    // bind Quick docket Data
+    this.bindQuickdocketData();
   }
 
 
@@ -275,9 +291,14 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             this.consigneeCity,
             this.consigneeNameStatus,
           );  // Filter the consignee control array based on consigneeCity details
+          if (this.quickDocket) {
+            this.tabForm.controls['fromCity'].setValue(res.find((x) => x.name === this.DocketDetails[0]?.fromCity || ""))
+            this.tabForm.controls['toCity'].setValue(res.find((x) => x.name === this.DocketDetails[0]?.toCity || ""))
+          }
         }
       }
     });
+  
   }
 
   // Customer details
@@ -308,22 +329,43 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             this.consigneeName,
             this.consigneeNameStatus
           );  // Filter the consignee control array based on customer details
+          if (this.quickDocket) {
+            this.tabForm.controls['billingParty'].setValue(res.find((x) => x.name === this.DocketDetails[0]?.billingParty || ""))
+          }
         }
       }
     });
   }
 
   // Get EwayBill data
-  getEwayBillData() {
-    // this.masterService.getJsonFileDetails('ewayUrl').subscribe(res => {
-    //   this.ewayData = res;  // Assign the received data to the ewayData property
 
-    //   // Set the value of fromCity in the tabForm control using the data
-    //   this.tabForm.controls.fCity.setValue(res.Ewddata[0][1].Consignor.city);
-
-    //   // Assign the itemList data to the tableData property
-    //   this.tableData = this.ewayData.Ewddata[0][0].data.itemList;
-    // });
+  bindQuickdocketData() {
+    
+    if(this.quickDocket){
+      let reqBody = {
+        companyCode: this.companyCode,
+        type: "operation",
+        collection: "docket",
+         query: {
+          id:this.quickdocketDetaildata.no
+        }
+      }
+      this.operationService.operationPost('common/getOne', reqBody).subscribe({
+        next: (res: any) => {
+           if(res){
+            this.DocketDetails=res.data.db.data.docket;
+            this.contractForm.controls['payType'].setValue(this.DocketDetails[0]?.payType||"");
+            this.vehicleNo= this.DocketDetails[0]?.vehNo;
+            this.contractForm.controls['totalChargedNoOfpkg'].setValue(this.DocketDetails[0]?.totalChargedNoOfpkg||"")
+            this.contractForm.controls['actualwt'].setValue(this.DocketDetails[0]?.actualwt||"");
+            this.contractForm.controls['chrgwt'].setValue(this.DocketDetails[0]?.chrgwt||"");
+            this.docketId=this.DocketDetails[0]?.id||"";
+            this.tabForm.controls['docketNumber'].setValue(this.DocketDetails[0]?.docketNumber||"")
+            this.tabForm.controls['docketDate'].setValue(this.DocketDetails[0]?.docketDate||"")
+           }
+        }
+      })
+    }
   }
 
   // Load temporary data
@@ -375,6 +417,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
 
   // Common drop-down mapping
+
   commonDropDownMapping() {
     const mapControlArray = (controlArray, mappings) => {
       controlArray.forEach(data => {
@@ -409,11 +452,10 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     mapControlArray(this.consigneeControlArray, consigneeMappings);  // Map consignee control array
     mapControlArray(this.contractControlArray, destinationMapping)
   }
-
   //End
   //destionation
   destionationDropDown() {
-
+ 
     this.masterService.getJsonFileDetails('destination').subscribe({
       next: (res: any) => {
         if (res) {
@@ -425,6 +467,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             this.destination,
             this.destinationStatus,
           );
+          if (this.quickDocket) {
+            this.contractForm.controls['destination'].setValue(res.find((x) => x.name === this.DocketDetails[0]?.destination || ""))
+          }
         }
       }
     })
@@ -436,10 +481,18 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       invoiceDetails: event.data
     }
     const dynamicValue = localStorage.getItem('Branch'); // Replace with your dynamic value
-    const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-    const paddedNumber = dynamicNumber.toString().padStart(4, '0');
-    this.dockNo = `CN${dynamicValue}${paddedNumber}`;
-    this.tabForm.controls['docketNumber'].setValue(this.dockNo);
+    const controlNames = ['svcType', 'payType', 'rskty', 'pkgs', 'trn'];
+    controlNames.forEach(controlName => {
+      if (Array.isArray(this.contractForm.value[controlName])) {
+        this.contractForm.controls[controlName].setValue('');
+      }
+    })
+    const controltabNames = ['containerCapacity','containerSize1','containerSize2','containerType'];
+    controltabNames.forEach(controlName => {
+      if (Array.isArray(this.contractForm.value[controlName])) {
+        this.tabForm.controls[controlName].setValue('');
+      }
+    })
     this.tabForm.controls['fromCity'].setValue(this.tabForm.value.fromCity?.name || '');
     this.tabForm.controls['toCity'].setValue(this.tabForm.value.toCity?.name || '');
     this.tabForm.controls['billingParty'].setValue(this.tabForm.value?.billingParty.name || '');
@@ -448,22 +501,47 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     this.tabForm.controls['consigneeCity'].setValue(this.tabForm.value?.consigneeCity.name || '');
     this.tabForm.controls['consigneeName'].setValue(this.tabForm.value?.consigneeName.name || '');
     this.contractForm.controls['destination'].setValue(this.contractForm.value?.destination.name || '');
-    let id={id:this.dockNo}
-    let docketDetails = { ...this.tabForm.value, ...this.contractForm.value, ...invoiceDetails,...id};
-    let reqBody = {
-      companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
-      data: docketDetails
-    }
-    this.operationService.operationPost('common/create', reqBody).subscribe({
-      next: (res: any) => {
-        this.Addseries()
+    if (this.quickDocket) {
+      let id = { isComplete: 1 }
+      let docketDetails = { ...this.tabForm.value, ...this.contractForm.value, ...invoiceDetails, ...id };
+      let reqBody = {
+        companyCode: this.companyCode,
+        type: "operation",
+        collection: "docket",
+        id: this.docketId,
+        updates: {
+          ...docketDetails
+        }
       }
-    })
+      this.operationService.operationPut('common/update', reqBody).subscribe({
+        next: (res: any) => {
+          this.Addseries()
+        }
+      })
+    }
+    else {
+      const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
+      const paddedNumber = dynamicNumber.toString().padStart(4, '0');
+      this.dockNo = `CN${dynamicValue}${paddedNumber}`;
+      this.tabForm.controls['docketNumber'].setValue(this.dockNo);
+
+      let id = { id: this.dockNo, isComplete: 1 }
+      let docketDetails = { ...this.tabForm.value, ...this.contractForm.value, ...invoiceDetails, ...id };
+      let reqBody = {
+        companyCode: this.companyCode,
+        type: "operation",
+        collection: "docket",
+        data: docketDetails
+      }
+      this.operationService.operationPost('common/create', reqBody).subscribe({
+        next: (res: any) => {
+          this.Addseries()
+        }
+      })
+    }
   }
   Addseries() {
-    const resultArray = this.generateArray(this.companyCode,this.tabForm.controls['docketNumber'].value,this.contractForm.controls['totalChargedNoOfpkg'].value);
+    const resultArray = this.generateArray(this.companyCode, this.tabForm.controls['docketNumber'].value, this.contractForm.controls['totalChargedNoOfpkg'].value);
     let reqBody = {
       companyCode: this.companyCode,
       type: "operation",
@@ -475,20 +553,20 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         Swal.fire({
           icon: "success",
           title: "Booked SuccesFully",
-          text: "DocketNo: "+this.dockNo,
+          text: "DocketNo: " + this.tabForm.controls['docketNumber'].value,
           showConfirmButton: true,
         });
       }
     })
   }
-   generateArray(companyCode, dockno,pkg) {
+  generateArray(companyCode, dockno, pkg) {
     const array = Array.from({ length: pkg }, (_, index) => {
       const serialNo = (index + 1).toString().padStart(3, '0');
       const bcSerialNo = `${dockno}-${serialNo}`;
       const entryDateTime = new Date().toISOString();
-      const bcDockSf = '.';
+      const bcDockSf = '0';
       return {
-        id:bcSerialNo,
+        id: bcSerialNo,
         companyCode: companyCode,
         dockNo: dockno,
         bcSerialNo: bcSerialNo,
@@ -496,9 +574,99 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         bcDockSf: bcDockSf,
       };
     });
-  
+
     return array;
   }
+
+  async delete(event) {
   
+    const index = event.index;
+    const row = event.element;
    
+    const swalWithBootstrapButtons = await Swal.mixin({
+      customClass: {
+        confirmButton: "btn btn-success msr-2",
+        cancelButton: "btn btn-danger",
+      },
+      buttonsStyling: false,
+    });
+
+    swalWithBootstrapButtons
+      .fire({
+        title: `<h4><strong>Are you sure you want to delete ?</strong></h4>`,
+        // color: "#03a9f3",
+        showCancelButton: true,
+        cancelButtonColor: "#d33",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        showLoaderOnConfirm: true,
+        preConfirm: (Remarks) => {
+          var Request = {
+            CompanyCode: localStorage.getItem("CompanyCode"),
+            ID: row.id,
+          };
+          if (row.id == 0) {
+            return {
+              isSuccess: true,
+              message: "City has been deleted !",
+            };
+          } else {
+            console.log("Request", Request);
+            //return this.VendorContractService.updateMileStoneRequest(Request);
+          }
+        },
+        allowOutsideClick: () => !Swal.isLoading(),
+      })
+      .then((result) => {
+
+        if (result.isConfirmed) {
+          this.tableData.splice(index, 1);
+          this.tableData=this.tableData;
+          swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
+          event.callback(true);
+        } else if (result.isConfirmed) {
+          swalWithBootstrapButtons.fire("Not Deleted!", "Your Message", "info");
+          event.callback(false);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithBootstrapButtons.fire(
+            "Cancelled",
+            "Your item is safe :)",
+            "error"
+          );
+          event.callback(false);
+        }
+      });
+
+    return true
+  } 
+
+ calculateInvoiceTotal() {
+debugger
+    let totalChargedNoofPackages = 0;
+    let totalChargedWeight = 0;
+    let totalDeclaredValue = 0;
+    let totalActualValue=0;
+    let cftTotal = 0;
+    let totalPartQuantity = 0;
+
+    // let temp = event.controls.ChargedWeight?.value;
+    //Invoices.CalculateRowLevelChargeWeight(temp, false, isFromChargwt);
+   this.tableData.forEach((x) => {
+      totalChargedNoofPackages = totalChargedNoofPackages + parseFloat(x.NO_PKGS || 0);
+      totalChargedWeight = totalChargedWeight + parseFloat(x.ChargedWeight || 0);
+      totalDeclaredValue = totalDeclaredValue + parseFloat(x.DECLVAL || 0);
+      totalActualValue = totalActualValue + parseFloat(x.ACT_WT || 0);
+      if (x.PARTQUANTITY) {
+        totalPartQuantity = totalPartQuantity + x.PARTQUANTITY;
+      }
+    })
+
+    this.contractForm.controls['totalChargedNoOfpkg'].setValue(totalChargedNoofPackages.toFixed(2));
+    this.contractForm.controls['chrgwt'].setValue(totalChargedWeight.toFixed(2));
+    this.contractForm.controls['totalDeclaredValue'].setValue(totalDeclaredValue.toFixed(2));
+    this.contractForm.controls['cft_tot'].setValue(cftTotal);
+    this.contractForm.controls['totalPartQuantity'].setValue(0);
+    this.contractForm.controls['actualwt'].setValue(totalActualValue);
+    //TotalPartQuantity calucation parts are pending 
+  }
 }

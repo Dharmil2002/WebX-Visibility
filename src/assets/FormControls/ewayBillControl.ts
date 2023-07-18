@@ -33,7 +33,12 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'C Note Date is required'
+                        }
+                    ]
 
                 },
                 {
@@ -47,7 +52,12 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Billing Party is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
@@ -62,7 +72,12 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'From City is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
@@ -78,7 +93,12 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'To City is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
@@ -90,7 +110,12 @@ export class EwayBillControls {
                     name: 'consignorName', label: 'Consignor Name', placeholder: 'Consignor Name', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'ConsignorName is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
@@ -106,7 +131,12 @@ export class EwayBillControls {
                     name: 'consignorCity', label: 'Consignor City', placeholder: 'Consignor City', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'ConsignorCity is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
@@ -115,7 +145,12 @@ export class EwayBillControls {
                     name: 'consignorPinCode', label: 'Consignor Pincode', placeholder: 'Consignor Pincode', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor Pincode is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
@@ -124,21 +159,36 @@ export class EwayBillControls {
                     name: 'consignorTelephoneNo', label: 'Consignor TelephoneNo', placeholder: 'Consignor TelephoneNo', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor TelephoneNo is required'
+                        }
+                    ],
                 }
                 ,
                 {
                     name: 'consignorMobileNo', label: 'Consignor MobileNo', placeholder: 'Consignor MobileNo', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor MobileNo is required'
+                        }
+                    ],
                 }
                 ,
                 {
                     name: 'consignorAddress', label: 'Consignor Address', placeholder: 'Consignor Address', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor Address is required'
+                        }
+                    ],
                 }
             ];
         this.consigneeFields =
@@ -147,7 +197,12 @@ export class EwayBillControls {
                     name: 'consigneeName', label: 'Consignee Name', placeholder: 'Consignee Name', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor Name is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
@@ -163,7 +218,12 @@ export class EwayBillControls {
                     name: 'consigneeCity', label: 'Consignee City', placeholder: 'Consignee City', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee City is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
@@ -172,7 +232,12 @@ export class EwayBillControls {
                     name: 'consigneePincode', label: 'Consignee Pincode', placeholder: 'Consignee Pincode', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee Pincode is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
@@ -181,21 +246,36 @@ export class EwayBillControls {
                     name: 'consigneeTelNo', label: 'Consignee TelephoneNo', placeholder: 'Consignee TelephoneNo', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee TelephoneNo is required'
+                        }
+                    ],
                 }
                 ,
                 {
                     name: 'consigneeMobNo', label: 'Consignee MobileNo', placeholder: 'Consignee MobileNo', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee Mobile No is required'
+                        }
+                    ],
                 }
                 ,
                 {
                     name: 'consigneeAddress', label: 'Consignee Address', placeholder: 'Consignee Address', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee Address is required'
+                        }
+                    ],
                 }
             ];
         this.appointmentControlArray =
@@ -488,9 +568,9 @@ export class EwayBillControls {
         this.contractControlArray =
             [
                 {
-                    name: 'orgLoc', label: 'Booking Branch', placeholder: 'Booking Branch', type: 'text', value: '',
+                    name: 'orgLoc', label: 'Booking Branch', placeholder: 'Booking Branch', type: 'text', value: localStorage.getItem("Branch"),
                     filterOptions: '', autocomplete: '',
-                    displaywith: '', generatecontrol: true, disable: false,
+                    displaywith: '', generatecontrol: true, disable: true,
                     Validations: [],
                 },
                 {
@@ -501,7 +581,12 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Destination is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
@@ -530,7 +615,12 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Payment Type is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
@@ -555,7 +645,12 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Service Type is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
@@ -690,29 +785,55 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Product is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
             ];
         this.totalSummaryControlArray = [
             {
-                name: 'cft_ratio', label: 'CFT Ratio', placeholder: 'CFT Ratio', type: 'text', value: '',
+                name: 'cft_ratio', label: 'CFT Ratio', placeholder: 'CFT Ratio', type: 'text', value: 0,
                 filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
+                displaywith: '', generatecontrol: true, disable: true,
                 Validations: [],
             },
             {
-                name: 'cft_tot', label: 'CFT Total', placeholder: 'CFT Total', type: 'text', value: '',
+                name: 'cft_tot', label: 'CFT Total', placeholder: 'CFT Total', type: 'text', value: 0,
                 filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
+                displaywith: '', generatecontrol: true, disable: true,
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'CFT Total is required'
+                    }
+                ],
             },
             {
-                name: 'chrgwt', label: 'Charged Weight', placeholder: 'Charged Weight', type: 'text', value: '',
+                name: 'actualwt', label: 'Actual Weight', placeholder: 'Actual Weight', type: 'text', value: 0,
+                filterOptions: '', autocomplete: '',
+                displaywith: '', generatecontrol: true, disable: true,
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'Actual Weight is required'
+                    }
+                ],
+            },
+            {
+                name: 'chrgwt', label: 'Charged Weight', placeholder: 'Charged Weight', type: 'text', value: 0,
                 filterOptions: '', autocomplete: '',
                 displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'Charged Weight is required'
+                    }
+                ],
             },
             {
                 name: 'edd', label: 'EDD', placeholder: 'EDD', type: 'date', value: '',
@@ -728,25 +849,45 @@ export class EwayBillControls {
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'Volumetric is required'
+                    }
+                ],
             },
             {
-                name: 'totalDeclaredValue', label: 'Total Declared Value', placeholder: 'Total Declared Value', type: 'text', value: '',
+                name: 'totalDeclaredValue', label: 'Total Declared Value', placeholder: 'Total Declared Value', type: 'text', value: 0,
                 filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
+                displaywith: '', generatecontrol: true, disable: true,
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'Total Declared Value is required'
+                    }
+                ]
             },
             {
-                name: 'totalChargedNoOfpkg', label: 'Charged No of Pkg.', placeholder: 'Charged No of Pkg.', type: 'text', value: '',
+                name: 'totalChargedNoOfpkg', label: 'Charged No of Pkg.', placeholder: 'Charged No of Pkg.', type: 'text', value:0,
                 filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
+                displaywith: '', generatecontrol: true, disable: true,
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'Charged No of Pkg Value is required'
+                    }
+                ],
             },
             {
-                name: 'totalPartQuantity', label: 'Total Part Quantity', placeholder: 'Total Part Quantity', type: 'text', value: '',
+                name: 'totalPartQuantity', label: 'Total Part Quantity', placeholder: 'Total Part Quantity', type: 'text', value:0,
                 filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
+                displaywith: '', generatecontrol: true, disable: true,
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'Total Part Quantity Value is required'
+                    }
+                ],
             },
         ];
         this.ewayBillControlArray = [

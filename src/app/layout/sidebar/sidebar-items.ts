@@ -63,6 +63,7 @@ export const ROUTES: RouteInfo[] =
         submenu: []
       }],
     },
+    
     {
       "path": "Masters/DriverMaster/DriverMasterList",
       "title": "Master & Utilities",
@@ -260,5 +261,23 @@ export const ROUTES: RouteInfo[] =
           ]
         },
       ]
+    },
+    {
+      path: "",
+      title: "Operations",
+      moduleName: "Operations",
+      icon: "settings",
+      class: "menu-toggle",
+      groupTitle: false,
+      submenu: [{
+        path: "Operation/QuickCreateDocket",
+        title: "Quick Create Docket",
+        moduleName: "Quick Create Docket",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      }
+     ],
     },
   ]

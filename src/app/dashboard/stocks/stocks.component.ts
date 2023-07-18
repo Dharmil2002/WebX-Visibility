@@ -41,7 +41,7 @@ export class StocksComponent
   /*Below is Link Array it will Used When We Want a DrillDown
    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
    want hyper link and add Path which you want to redirect*/
-  linkArray = [{ Row: "Action", Path: "Operation/CreateLoadingSheet" }];
+  linkArray = [{ Row: "Action", Path: "Masters/Docket/EwayBillDocketBookingV2" }];
   menuItems = [
     { label: "Create Run Sheet" },
     // Add more menu items as needed

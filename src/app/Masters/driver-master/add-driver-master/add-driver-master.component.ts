@@ -1,5 +1,4 @@
 import { DatePipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -8,16 +7,17 @@ import { DriverControls } from 'src/assets/FormControls/DriverMaster';
 import { Inject } from "@angular/core";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { utilityService } from 'src/app/Utility/utility.service';
 import { DriverMaster } from 'src/app/core/models/Masters/Driver';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import Swal from 'sweetalert2';
+import { getShortName } from 'src/app/Utility/commonFunction/random/generateRandomNumber';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 @Component({
   selector: 'app-add-driver-master',
   templateUrl: './add-driver-master.component.html',
 })
 export class AddDriverMasterComponent implements OnInit {
- //countryURL = '../../../assets/data/state-countryDropdown.json'
+ companyCode: any = parseInt(localStorage.getItem("companyCode")); 
   DriverTableForm: UntypedFormGroup;
   error: string
   IsUpdate = false;
@@ -37,7 +37,7 @@ export class AddDriverMasterComponent implements OnInit {
   maxDate: Date;
   minDate: Date;
   ISManualDriverCode: boolean;
-  Driver_Location: any;
+  DriverLocation: any;
   locationList: any;
   DatePipe: DatePipe;
   DriverFormControls: DriverControls;
@@ -80,18 +80,20 @@ export class AddDriverMasterComponent implements OnInit {
     }
 
   ]
+  isUpdate: any;
 
   constructor(private Route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder, private filter: FilterUtils,
-    private http: HttpClient, private service: utilityService) {
+    private masterService: MasterService
+   ) {
     //super();
     this.maxDate = new Date(new Date());
     this.minDate = new Date("01 Jan 1900");
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.DriverTable = Route.getCurrentNavigation().extras.state.data;
 
-      this.LocationId = this.DriverTable.driver_Location
-      this.DCategoryID = this.DriverTable.driverCat
+      this.LocationId = this.DriverTable.driverLocation
+      this.DCategoryID = this.DriverTable.dCategory
       this.IsUpdate = true;
       this.action = 'edit'
 
@@ -153,12 +155,12 @@ export class AddDriverMasterComponent implements OnInit {
   }
   bindDropdown() {
     this.jsonControlDriverArray.forEach(data => {
-      if (data.name === 'Driver_Location') {
+      if (data.name === 'driverLocation') {
         // Set location-related variables
         this.location = data.name;
         this.locationStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'D_category') {
+      if (data.name === 'dCategory') {
         // Set category-related variables
         this.category = data.name;
         this.categoryStatus = data.additionalData.showNameAndValue;
@@ -193,7 +195,10 @@ export class AddDriverMasterComponent implements OnInit {
         this.SelectFile = file;
         this.imageName = file.name;
         this.selectedFiles = true;
-        this.DriverTableForm.controls["Company_Image"].setValue(this.SelectFile.name);
+        this.DriverTableForm.controls["aadhar"].setValue(this.SelectFile.name);
+        this.DriverTableForm.controls["panCard"].setValue(this.SelectFile.name);
+        this.DriverTableForm.controls["license"].setValue(this.SelectFile.name);
+
       } else {
         this.selectedFiles = false;
         Swal.fire({
@@ -208,11 +213,79 @@ export class AddDriverMasterComponent implements OnInit {
       alert("No file selected");
     }
   }
+  // save() {
+  //   this.DriverTableForm.controls["ActiveFlag"].setValue(this.DriverTableForm.value.ActiveFlag == true ? "Y" : "N");
+  //   this.Route.navigateByUrl('/Masters/DriverMaster/DriverMasterList');
+  //   this.service.exportData(this.DriverTableForm.value)
+  // }
+
   save() {
-    this.DriverTableForm.controls["ActiveFlag"].setValue(this.DriverTableForm.value.ActiveFlag == true ? "Y" : "N");
-    this.Route.navigateByUrl('/Masters/DriverMaster/DriverMasterList');
-    this.service.exportData(this.DriverTableForm.value)
-  }
+
+
+
+    const formValue = this.DriverTableForm.value;
+    const controlNames = [
+      "dCategory",
+      "driverLocation",
+    ];
+    controlNames.forEach(controlName => {
+      const controlValue = formValue[controlName]?.name;
+      this.DriverTableForm.controls[controlName].setValue(controlValue);
+    });
+
+    // this.DriverTableForm.controls["dCategory"].setValue(this.DriverTableForm.value.dCategory);
+    // this.DriverTableForm.controls["driverLocation"].setValue(this.DriverTableForm.value.driverLocation);
+    this.DriverTableForm.controls["activeFlag"].setValue(this.DriverTableForm.value.activeFlag == true ? "Y" : "N");
+    if (this.isUpdate) {
+        let id = this.DriverTableForm.value.id;
+        // Remove the "id" field from the form controls
+        this.DriverTableForm.removeControl("id");
+        let req = {
+            companyCode: this.companyCode,
+            type: "masters",
+            collection: "driver",
+            id: id,
+            data: this.DriverTableForm.value
+        };
+        this.masterService.masterPut('common/update', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                    this.Route.navigateByUrl('/Masters/DriverMaster/DriverMasterList');
+                }
+            }
+        });
+    } else {
+        const randomNumber = getShortName(this.DriverTableForm.value.manualDriverCode);
+        this.DriverTableForm.controls["id"].setValue(randomNumber);
+        let req = {
+            companyCode: this.companyCode,
+            type: "masters",
+            collection: "driver",
+            data: this.DriverTableForm.value
+        };
+        this.masterService.masterPost('common/create', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                    this.Route.navigateByUrl('/Masters/DriverMaster/DriverMasterList');
+                }
+            }
+        });
+    }
+}
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
     let field = $event.field;                   // the actual formControl instance

@@ -1,56 +1,69 @@
 export class DriverMaster {
-    driverCat: string;
-    driver_Location: string
-    entryBy: string
-    updatedBy: string
-    isUpdate: boolean
-    date=new Date()
-    ManualDriverCode: any;
-    DriverFatherName:any;
-    DriverName:string;
-    VehicleNumber:string;
-    DriverLocation:string;
-    VendorDriverCode:string;
-    LicenseNo:string;
-    ValidityDate:string;
-    IssueByRTO:string;
-    ActiveFlag:boolean;
-    DriverStatus:string;
-    IsBlackListed:boolean;
-    ContactNo:string;
-    DateOfBirth:string;
-    GuarantorName:string;
-    GuarantorMobileNo:string;
-    DriverCategory:string;
-    Ethnicity:string;
-    DriverTestCode:string;
-    PermanentAddress:string;
-    PermanentPincode:string;
-    PermanentCity:string;
-    JoiningDate:string;
-    DriverId:string;
-    blackListedReason:string;
+  driverCat: string;
+  dCategory: string;
+  driverLocation: string
+  entryBy: string
+  updatedBy: string
+  isUpdate: boolean
+  date = new Date()
+  manualDriverCode: any;
+  dFatherName: any;
+  driverName: string;
+  vehicleNo: string;
+  //DriverLocation:string;
+  vendorDriverCode: string;
+  licenseNo: string;
+  valdityDt: string;
+  //IssueByRTO:string;
+  activeFlag: boolean;
+  //DriverStatus:string;
+  IsBlackListed: boolean;
+  telno: string;
+  dDob: string;
+  // DriverCategory:string;
+  Ethnicity: string;
+  DriverTestCode: string;
+  address: string;
+  pincode: string;
+  city: string;
+  joiningDate: string;
+  driverId: string;
+  blackListedReason: string;
+  id: string;
 
-    constructor(DriverMaster) {
-      this.DriverId = DriverMaster.DriverId ;
-      this.DriverName = DriverMaster.DriverName || '';
-      this.DriverFatherName = DriverMaster.DriverFatherName || '';
-      this.ManualDriverCode = DriverMaster.ManualDriverCode || '';
-      this.VehicleNumber = DriverMaster.VehicleNumber || '';
-      this.VendorDriverCode = DriverMaster.VendorDriverCode || '';
-      this.DateOfBirth = DriverMaster.DateOfBirth || new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate());
-      this.GuarantorName = DriverMaster.GuarantorName || '';
-      this.GuarantorMobileNo = DriverMaster.GuarantorMobileNo ;
-      this.driverCat = DriverMaster.driverCat || '';
-      this.JoiningDate = DriverMaster.JoiningDate || this.date;
-      this.LicenseNo = DriverMaster.LicenseNo || '';
-      this.IssueByRTO = DriverMaster.IssueByRTO || '';
-      this.ValidityDate = DriverMaster.ValidityDate ||'';
-      this.blackListedReason = DriverMaster.blackListedReason || '';
-      this.PermanentAddress = DriverMaster.PermanentAddress || '';
-      this.PermanentCity = DriverMaster.PermanentCity || '';
-      this.PermanentPincode = DriverMaster.PermanentPincode;
-      this.IsBlackListed = DriverMaster.IsBlackListed || false;
-      this.ActiveFlag = DriverMaster.ActiveFlag || false;
-    }
+  bName: string;
+  bAcct: string;
+  branch: string;
+  acctName: string;
+  ifsc: string;
+  constructor(DriverMaster) {
+    this.driverId = DriverMaster.driverId;
+    this.driverName = DriverMaster.driverName || '';
+    this.dFatherName = DriverMaster.dFatherName || '';
+    this.manualDriverCode = DriverMaster.manualDriverCode || '';
+    this.vehicleNo = DriverMaster.vehicleNo || '';
+    this.vendorDriverCode = DriverMaster.vendorDriverCode || '';
+    // this.GuarantorName = DriverMaster.GuarantorName || '';
+    this.dDob = DriverMaster.dDob || '';
+    // this.GuarantorMobileNo = DriverMaster.GuarantorMobileNo ;
+    this.driverCat = DriverMaster.driverCat || '';
+    this.joiningDate = DriverMaster.joiningDate || '';
+    this.licenseNo = DriverMaster.licenseNo || '';
+    // this.IssueByRTO = DriverMaster.IssueByRTO || '';
+    this.valdityDt = DriverMaster.valdityDt || '';
+    this.blackListedReason = DriverMaster.blackListedReason || '';
+    this.address = DriverMaster.PermanentAddress || '';
+    this.city = DriverMaster.city || '';
+    this.pincode = DriverMaster.pincode;
+    this.IsBlackListed = DriverMaster.IsBlackListed || false;
+    this.activeFlag = DriverMaster.activeFlag || false;
+    this.telno = DriverMaster.telno || '';
+    this.bName = DriverMaster.bName || '';
+    this.bAcct = DriverMaster.bAcct || '';
+    this.branch = DriverMaster.branch || '';
+    this.acctName = DriverMaster.acctName || '';
+    this.ifsc = DriverMaster.ifsc || '';
+
+
   }
+}

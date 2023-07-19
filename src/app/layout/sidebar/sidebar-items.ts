@@ -151,6 +151,15 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
+              "path": "Masters/AirportMaster/AirportMasterList",
+              "title": "Airport Masters",
+              "moduleName": "Masters",
+              "icon": "",
+              "class": "",
+              "groupTitle": false,
+              "submenu": []
+            },
+            {
               "path": "Masters/PinCodeMaster/PinCodeMasterList",
               "title": "Pin code Masters",
               "moduleName": "Masters",

@@ -39,6 +39,8 @@ import { EwayBillDocketBookingV2Component } from './eway-bill-docket-booking-v2/
 import { AddVendorMasterComponent } from './vendor-master/add-vendor-master/add-vendor-master.component';
 import { VendorMasterListComponent } from './vendor-master/vendor-master-list/vendor-master-list.component';
 import { RouteMasterLocationAddComponent } from './route-master-location-wise/route-master-location-add/route-master-location-add.component';
+import { AirportMasterListComponent } from './airport-master/airport-master-list/airport-master-list.component';
+import { AirportMasterAddComponent } from './airport-master/airport-master-add/airport-master-add.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -80,6 +82,8 @@ const routes: Routes = [
   { path: "UserMaster/AddUser", component: AddUserMasterComponent },
   { path: "VendorMaster/VendorMasterList", component: VendorMasterListComponent },
   { path: "VendorMaster/AddVendorMaster", component: AddVendorMasterComponent },
+  { path: "AirportMaster/AirportMasterList", component: AirportMasterListComponent },
+  { path: "AirportMaster/AddAirportMaster", component: AirportMasterAddComponent },
 ];
 
 @NgModule({

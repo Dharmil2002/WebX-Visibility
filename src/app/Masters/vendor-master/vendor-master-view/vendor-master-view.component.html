@@ -13,104 +13,105 @@
             </tr>
         </table>
         <table class="table table-bordered">
-            <tr *ngFor="let data of this.vendordet">
+            <tr>
                 <td>
                     <div>
                         <b>Vendor Code</b>
                         <br />
-                        <span>{{data.vendorcode}}</span>
+                        <span>{{vendordet.vendorCode}}</span>
                     </div>
                 </td>
                 <td>
                     <div>
                         <b>Vendor Name</b>
                         <br />
-                        <span>{{data.vendorname}}</span>
+                        <span>{{vendordet.vendorName}}</span>
                     </div>
                 </td>
                 <td>
                     <div>
                         <b>Vendor Type</b>
                         <br />
-                        <span>{{data.vendorTypeName}}</span>
+                        <span>{{vendordet.vendorType}}</span>
                     </div>
                 </td>
             </tr>
-            <tr *ngFor="let data of this.vendordet">
+            <tr>
                 <td>
                     <div> <b>Address</b>
                         <br />
-                        <span>{{data.vendoraddress}}</span>
+                        <span>{{vendordet.vendorAddress}}</span>
                     </div>
                 </td>
                 <td>
                     <div> <b>Vendor City</b>
                         <br />
-                        <span>{{data.vendorcity}}</span>
+                        <span>{{vendordet.vendorCity}}</span>
                     </div>
                 </td>
                 <td>
                     <div> <b>Pincode</b>
                         <br />
-                        <span>{{data.vendorpin}}</span>
+                        <span>{{vendordet.vendorPinCode}}</span>
                     </div>
                 </td>
             </tr>
-            <tr *ngFor="let data of this.vendordet">
+            <tr>
                 <td>
                     <div> <b>Vendor Phone No.</b>
                         <br />
-                        <span>{{data.vendorphone}}</span>
+                        <span>{{vendordet.vendorPhoneNo}}</span>
                     </div>
                 </td>
                 <td>
                     <div> <b>E - Mail</b>
                         <br />
-                        <span>{{data.vendoremail}}</span>
+                        <span>{{vendordet.emailId}}</span>
                     </div>
                 </td>
                 <td>
                     <div> <b>Customer Locations</b>
                         <br />
                         <div style="word-wrap: break-word;width:200px; ">
-                            {{data.vendorbrcd}}
+                            {{vendordet.vendorLocation}}
                         </div>
                     </div>
                 </td>
             </tr>
-            <tr *ngFor="let data of this.vendordet">
+            <tr>
                 <td>
                     <div> <b>Active Flag </b>
                         <br />
-                        <span>{{data.active}}</span>
+                        <span *ngIf="vendordet.isActive==true">Yes</span>
+                        <span *ngIf="vendordet.isActive==false">No</span>
                     </div>
                 </td>
                 <td>
                     <div> <b>Is GST Charged</b>
                         <br />
-                        <span *ngIf="data.isGSTCharged==true">Yes</span>
-                        <span *ngIf="data.isGSTCharged==false">No</span>
+                        <span *ngIf="vendordet.isGstCharged==true">Yes</span>
+                        <span *ngIf="vendordet.isGstCharged==false">No</span>
                     </div>
                 </td>
                 <td>
                     <div> <b>Last Update By</b>
                         <br />
-                        <span>{{data.updtby}}</span>
+                        <span>{{vendordet.editedBy}}</span>
                     </div>
                 </td>
             </tr>
-            <tr *ngFor="let data of this.vendordet">
+            <tr>
                 <td>
                     <div> <b>Last Update Date</b>
                         <br />
-                        <span>{{data.updton | date: 'dd MMM yyyy' }}</span><br />
-                        <span>{{data.UpdateTime}}</span>
+                        <span>{{vendordet.editedDate | date: 'dd MMM yyyy' }}</span><br />
+                        <span>{{ vendordet.editedDate | date: 'hh:mm:ss a' }}</span>
                     </div>
                 </td>
                 <td>
                 </td>
                 <td></td>
-            </tr>
+            </tr> 
         </table>
     </div>
 </div>

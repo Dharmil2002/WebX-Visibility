@@ -69,6 +69,10 @@
         {
             "stateId": "10",
             "stateDesc": "Madhya Pradesh"
+        },
+        {
+            "stateId": "11",
+            "stateDesc": "Mumbai"
         }
     ],
     "zoneList": [
@@ -94,11 +98,11 @@
         },
         {
             "zoneId": "6",
-            "zoneDesc": "SOUTH2"
+            "zoneDesc": "South Zone"
         },
         {
-            "zoneId": "6",
-            "zoneDesc": "South Zone"
+            "zoneId": "7",
+            "zoneDesc": "West"
         }
     ],
     "cityList": [
@@ -163,6 +167,26 @@
         {
             "PincodeId": 6,
             "PincodeDesc": "400053"
+        },
+        {
+            "PincodeId": 7,
+            "PincodeDesc": "395001"
+        },
+        {
+            "PincodeId": 8,
+            "PincodeDesc": "400014"
+        },
+        {
+            "PincodeId": 9,
+            "PincodeDesc": "226001"
+        },
+        {
+            "PincodeId": 10,
+            "PincodeDesc": "110033"
+        },
+        {
+            "PincodeId": 11,
+            "PincodeDesc": "394110"
         }
     ],
     "locationList": [
@@ -587,20 +611,29 @@
         {
             "name": "Own",
             "value": "3"
-        },
-        {
-            "name": "MARKET",
-            "value": "4"
         }
     ],
     "vendorNameDropdown": [
         {
             "name": "V00001:AADARSH ROADWAYSY",
-            "value": "V00001AADARSHROADWAYSY"
+            "value": "1"
         },
         {
             "name": "V000005:ABC TRANSPORT COMPANY",
-            "value": "V000005ABCTRANSPORTCOMPANY"
+            "value": "2"
+        },
+        {
+            "name": "V00006:GLOBE CHARTERS PVT LTD",
+            "value": "3"
+        },
+
+        {
+            "name": "V00059:Vishnu Transport",
+            "value": "4"
+        },
+        {
+            "name": "V00078:ABC fleets PVT Ltd",
+            "value": "5"
         }
     ],
     "gpsProviderDropdown": [
@@ -619,7 +652,7 @@
     ],
     "ftlTypeDropdown": [
         {
-            "name": "40 FT Container",
+            "name": "3 Ton",
             "value": "1"
         },
         {
@@ -627,8 +660,28 @@
             "value": "2"
         },
         {
-            "name": "6.50 -7.50 MT",
+            "name": "1.50 - 2.50 MT",
             "value": "3"
+        },
+        {
+            "name": "6.50 -7.50 MT",
+            "value": "4"
+        },
+        {
+            "name": "10 MT",
+            "value": "5"
+        },
+        {
+            "name": "14.00- 16.00 MT",
+            "value": "6"
+        },
+        {
+            "name": "28.00 - 30.00 MT",
+            "value": "7"
+        },
+        {
+            "name": "40 FT Container",
+            "value": "8"
         }
     ],
     "permitStateDropdown": [
@@ -869,6 +922,81 @@
         {
             "name": "MXpress",
             "value": "2"
+        }
+    ],
+    "vehicleDropdown": [
+        {
+            "name": "MH01AA1111",
+            "value": "1"
+        },
+        {
+            "name": "MH87GF8208",
+            "value": "2"
+        },
+        {
+            "name": "GJ05AK7484",
+            "value": "3"
+        },
+        {
+            "name": "MH6614154",
+            "value": "4"
+        },
+        {
+            "name": "AS12HI3457",
+            "value": "53"
+        }
+    ],
+    "weekDayDropdown": [
+        {
+            "name": "Monday",
+            "value": "1"
+        },
+        {
+            "name": "Tuesday",
+            "value": "2"
+        },
+        {
+            "name": "Wednesday",
+            "value": "3"
+        },
+        {
+            "name": "Thursday",
+            "value": "4"
+        },
+        {
+            "name": "Friday",
+            "value": "5"
+        },
+        {
+            "name": "Saturday",
+            "value": "6"
+        },
+        {
+            "name": "Sunday",
+            "value": "7"
+        }
+    ],
+    "routeLocationDropdown":
+    [
+        {
+            "name": "S0123-MUMB-BNGB",
+            "value": "1"
+        },
+        {
+            "name": "S0060-MUMB-AMDB-JAIB",
+            "value": "2"
+        },
+        {
+            "name": "S0111-MUMB-MAAM",
+            "value": "3"
+        },
+        {
+            "name": "S0026-MUMB-PNQB-BNGB",
+            "value": "4"
+        },
+        {
+            "name": "S0008-MUMB-BNGB",
+            "value": "5"
         }
     ]
 }

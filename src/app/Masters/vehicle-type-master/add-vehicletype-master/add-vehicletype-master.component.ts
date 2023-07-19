@@ -9,13 +9,14 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { VehicleTypeMaster } from "src/app/core/models/Masters/vehicle-type-master/vehicle-type-master";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-
 @Component({
   selector: 'app-add-vehicletype-master',
   templateUrl: './add-vehicletype-master.component.html',
 })
 export class AddVehicletypeMasterComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; }[];
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  lastUsedVehicleTypeCode: number = 0;
   action: string;
   isUpdate = false;
   vehicleTypeTableData: VehicleTypeMaster;
@@ -155,24 +156,74 @@ export class AddVehicletypeMasterComponent implements OnInit {
   cancel() {
     window.history.back();
   }
+  generateNextVehicleTypeCode(): string {
+    // Increment the last used vehicleTypeCode by 1 to generate the next one
+    this.lastUsedVehicleTypeCode++;
+
+    // Convert the number to a 4-digit string, padded with leading zeros
+    const paddedNumber = this.lastUsedVehicleTypeCode.toString().padStart(4, '0');
+
+    // Combine the prefix "VH" with the padded number to form the complete vehicleTypeCode
+    return `VH${paddedNumber}`;
+  }
   save() {
-    this.vehicleTypeTableForm.controls["vehicleTypeCategory"].setValue(this.vehicleTypeTableForm.value.vehicleTypeCategory.value);
-    this.vehicleTypeTableForm.controls["isActive"].setValue(this.vehicleTypeTableForm.value.isActive == true ? "Y" : "N");
-    this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
-    this.service.exportData(this.vehicleTypeTableForm.value);
-    if (this.action === 'edit') {
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: `Data Updated successfully!!!`,
-        showConfirmButton: true,
+    this.vehicleTypeTableForm.controls["vehicleTypeCategory"].setValue(this.vehicleTypeTableForm.value.vehicleTypeCategory.name);
+    this.vehicleTypeTableForm.controls["isActive"].setValue(this.vehicleTypeTableForm.value.isActive == true);
+    // Remove field from the form controls
+    this.vehicleTypeTableForm.removeControl("companyCode");
+    this.vehicleTypeTableForm.removeControl("updateBy");
+    this.vehicleTypeTableForm.removeControl("isUpdate");
+    this.vehicleTypeTableForm.removeControl("id");
+    if (this.isUpdate) {
+      let id = this.vehicleTypeTableForm.value.id;
+      // Remove the "id" field from the form controls
+      this.vehicleTypeTableForm.removeControl("id");
+
+      let req = {
+        companyCode: this.companyCode,
+        type: "masters",
+        collection: "vehicleType",
+        id: id,
+        data: this.vehicleTypeTableForm.value
+      };
+      this.masterService.masterPut('common/update', req).subscribe({
+        next: (res: any) => {
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
+          }
+        }
       });
     } else {
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: `Data Downloaded successfully!!!`,
-        showConfirmButton: true,
+      const nextVehicleTypeCode = this.generateNextVehicleTypeCode();
+      this.vehicleTypeTableForm.controls["vehicleTypeCode"].setValue(nextVehicleTypeCode);
+      this.vehicleTypeTableForm.controls["id"].setValue(nextVehicleTypeCode);
+
+      let req = {
+        companyCode: this.companyCode,
+        type: "masters",
+        collection: "vehicleType",
+        data: this.vehicleTypeTableForm.value
+      };
+      this.masterService.masterPost('common/create', req).subscribe({
+        next: (res: any) => {
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
+          }
+        }
       });
     }
   }

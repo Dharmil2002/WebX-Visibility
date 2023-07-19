@@ -85,17 +85,17 @@ export class VendorControl {
             {
                 name: 'vendorLocation',
                 label: 'Vendor Location',
-                placeholder: 'Vendor location',
-                type: 'dropdown',
-                value: '',
-                Validations: [],
-                functions: {
-                    onToggleAll: 'toggleSelectAll'
-                },
+                placeholder: 'Select Vendor location',
+                type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
+                Validations: [
+                ],
                 additionalData: {
-                    
-                    showNameAndValue: true,
-                    
+                    isIndeterminate: false,
+                    isChecked: false,
+                    support: "vendorLocationDropdown",
+                    showNameAndValue: false,
+                    Validations: [{
+                    }]
                 },
                 generatecontrol: true, disable: false
             },
@@ -188,9 +188,19 @@ export class VendorControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'IsUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
+                name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
                 generatecontrol: false, disable: false
-            }
+            },
+            {
+                name: 'vendorLocationDropdown',
+                label: 'Vendor Location',
+                placeholder: 'Select Vendor Location',
+                type: '',
+                value: '',
+                Validations: [
+                ],
+                generatecontrol: false, disable: false
+            },
         ];
         this.vendorOtherInfoArray = [
             {
@@ -208,13 +218,17 @@ export class VendorControl {
             {
                 name: 'tdsSection',
                 label: 'TDS Section',
-                placeholder: 'TDS Section',
-                type: 'dropdown',
-                value: '',
+                placeholder: 'Select TDS Section',
+                type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                 Validations: [
                 ],
                 additionalData: {
-                    showNameAndValue: false
+                    isIndeterminate: false,
+                    isChecked: false,
+                    support: "tdsSectionDropdown",
+                    showNameAndValue: false,
+                    Validations: [{
+                    }]
                 },
                 generatecontrol: true, disable: false
             },
@@ -249,7 +263,7 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'tdsDocument', label: "TDS Document", placeholder: "", type: 'file', value: vendorMasterTable.tdsDocument, 
+                name: 'tdsDocument', label: "TDS Document", placeholder: "", type: 'file', value: vendorMasterTable.tdsDocument,
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
@@ -257,7 +271,7 @@ export class VendorControl {
                 }
             },
             {
-                name: 'cancelCheque', label: "Cancel Cheque", placeholder: "", type: 'file', value: vendorMasterTable.cancelCheque, 
+                name: 'cancelCheque', label: "Cancel Cheque", placeholder: "", type: 'file', value: vendorMasterTable.cancelCheque,
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
@@ -334,7 +348,7 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'pDFFileUpload', label: "PDF File Upload", placeholder: "", type: 'file', value: "", 
+                name: 'pdfFileUpload', label: "PDF File Upload", placeholder: "", type: 'file', value: "",
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
@@ -392,9 +406,9 @@ export class VendorControl {
                 value: [
                     { value: 'CP', name: 'CP' },
                     { value: 'NCP', name: 'Non-CP' }
-                  ],
+                ],
                 Validations: [
-                    
+
                 ],
                 additionalData: {
                     showNameAndValue: true
@@ -402,10 +416,10 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'cPCode',
+                name: 'cpCode',
                 label: 'CP Code',
                 placeholder: 'CP Code',
-                type: 'text', value: vendorMasterTable.cPCode,
+                type: 'text', value: vendorMasterTable.cpCode,
                 Validations: [
                 ],
                 generatecontrol: true, disable: false
@@ -419,7 +433,7 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'reliableDocument', label: "Reliable Document", placeholder: "", type: 'file', value: vendorMasterTable.reliableDocument, 
+                name: 'reliableDocument', label: "Reliable Document", placeholder: "", type: 'file', value: vendorMasterTable.reliableDocument,
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
@@ -427,25 +441,44 @@ export class VendorControl {
                 }
             },
             {
-                name: 'EntryBy', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
+
+                name: 'id',
+
+                label: '',
+
+                placeholder: '',
+
+                type: 'text',
+
+                value: '',
+
+                filterOptions: '',
+
+                autocomplete: '',
+
+                displaywith: '',
+
+                Validations: [],
+
+                generatecontrol: false,
+
+                disable: false
+
+            },
+            {
+                name: 'entryBy', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("Username"), Validations: [],
                 generatecontrol: false, disable: false
             },
             {
-                name: 'Vendor_Location', label: '', placeholder: '', type: '', value: '', Validations: [],
+                name: 'tdsSectionDropdown',
+                label: 'TDS Section',
+                placeholder: 'Select TDS Section',
+                type: '',
+                value: '',
+                Validations: [
+                ],
                 generatecontrol: false, disable: false
             },
-            {
-                name: 'UPDTBY', label: 'Update By', placeholder: 'Update By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
-                generatecontrol: false, disable: false
-            },
-            {
-                name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: localStorage.getItem("CompanyCode"), Validations: [],
-                generatecontrol: false, disable: false
-            },
-            {
-                name: 'IsUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
-                generatecontrol: false, disable: false
-            }
         ];
     }
     getVendorFormControls() {

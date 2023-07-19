@@ -157,7 +157,7 @@ export class VehicleTypeControl {
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: 'text',
-                value: localStorage.getItem("UserName"),
+                value: localStorage.getItem("Username"),
                 Validations: [],
                 generatecontrol: false, disable: false
             },
@@ -179,30 +179,23 @@ export class VehicleTypeControl {
                 Validations: [],
                 generatecontrol: false, disable: false
              },
-            // {
-            //     name: 'isUpdate',
-            //     label: 'IsUpdate',
-            //     placeholder: 'IsUpdate',
-            //     type: 'text',
-            //     value: false,
-            //     Validations: [],
-            //     generatecontrol: false, disable: false
-            // },
-            {
-                name: 'divisioncontrolHandler',
-                label: 'DivisioncontrolHandler',
-                placeholder: 'Find DivisioncontrolHandler...',
-                type: '',
-                value: '',
-                Validations: [{
-                    name: "",
-                    message: ""
-                }],
-                generatecontrol: false, disable: false
-            },
             {
                 name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
                 generatecontrol: false, disable: false
+            },
+            {
+                name: 'id',
+                label: '',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+
             }
         ],
             this.capacityInfoArray = [

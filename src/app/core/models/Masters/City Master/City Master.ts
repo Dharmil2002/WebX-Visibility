@@ -1,22 +1,17 @@
 export class CityMaster {
   cityName: string;
   cityId: number;
-  StateId: Number;
   stateId: number;
-  StateName: string;
   stateName: string;
-  ZoneId: number;
   zoneId: number;
-  ZoneName: string;
   zoneName: string;
-  IsActive: boolean;
   isActive: boolean;
-  UpdateBy: string;
-  EntryBy: string;
   companyId: any;
-  CityId: any;
-  id: string;
+  id: any;
   srNo: any;
+  state: any;
+  zone: any;
+  entryBy: any;
 
   constructor(CityMaster) {
     {

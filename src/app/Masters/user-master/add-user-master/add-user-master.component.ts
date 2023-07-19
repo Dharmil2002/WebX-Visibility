@@ -1,14 +1,14 @@
+
 import { Component, Inject, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { utilityService } from 'src/app/Utility/utility.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { UserMaster } from "src/app/core/models/Masters/User Master/user-master";
 import { UserControl } from "src/assets/FormControls/userMaster";
-
+import Swal from "sweetalert2";
+import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
 
 @Component({
     selector: 'app-add-user-master',
@@ -16,16 +16,14 @@ import { UserControl } from "src/assets/FormControls/userMaster";
 })
 
 export class AddUserMasterComponent implements OnInit {
+    companyCode: any = parseInt(localStorage.getItem("companyCode"));
     jsonControlUserArray: any;
     userTableForm: UntypedFormGroup;
     isUpdate = false;
     action: string;
     userTable: UserMaster;
     branchCode: any;
-    retrievedData: string;
-    emptype: any;
     userType: any;
-    deptId: string;
     userLocations: string[];
     userDetails: any;
     breadScrums = [{}];
@@ -33,27 +31,24 @@ export class AddUserMasterComponent implements OnInit {
     divisionStatus: any;
     locationName: any;
     userLocationStatus: any;
-    deptidStatus: any;
     userRoleStatus: any;
     userRole: any;
-    manageridStatus: any;
-    managerID: any;
+    managerIdStatus: any;
+    managerId: any;
     userStatus: any;
-    userstatus: any;
+    userName: any;
     countryCodeStatus: any;
     countryCode: any;
     userTypeStatus: any;
     locationStatus: any;
     UserFormControls: UserControl;
     locationData: any;
-    departId: any;
     countryData: any;
     updateCountry: any;
     divisionAccess: any;
-    multiLocation: any;
+    multiLoc: any;
     locationList: any;
     userList: any;
-    managerId: any;
     roleId: any;
     countryList: any;
     updateLocation: any;
@@ -68,39 +63,23 @@ export class AddUserMasterComponent implements OnInit {
     divisionList: any;
     division: any;
     data: any;
+    manager: any;
     ngOnInit(): void {
         this.bindDropdown();
         this.getDropDownData();
     }
 
-    constructor(private service: utilityService, private filter: FilterUtils, private route: Router, private fb: UntypedFormBuilder, private masterService: MasterService
+    constructor(private filter: FilterUtils, private route: Router, private fb: UntypedFormBuilder, private masterService: MasterService
     ) {
         if (this.route.getCurrentNavigation()?.extras?.state != null) {
             this.data = route.getCurrentNavigation().extras.state.data;
             this.isUpdate = true;
             this.action = "edit";
-
         } else {
             this.action = "Add";
-
         }
         if (this.action === "edit") {
             this.userTable = this.data;
-            this.userType = this.userTable.userStatus;
-            this.emptype = this.userTable.userType;
-            this.managerID = this.userTable.managerID;
-            this.roleIdData = this.userTable.role;
-            this.countryCode = this.userTable.country;
-            this.divisionAccess = this.userTable.division;
-            this.deptId = this.userTable.department;
-            this.userLocations =
-                this.userTable.userLocations == null
-                    ? [""]
-                    : this.userTable.userLocations.split(",");
-
-            this.division =
-                this.userTable.divId == null ? [""] : this.userTable.divId.split(",");
-
             this.isUpdate = true;
             this.breadScrums = [
                 {
@@ -109,7 +88,6 @@ export class AddUserMasterComponent implements OnInit {
                     active: "Edit User",
                 },
             ];
-
         } else {
             this.breadScrums = [
                 {
@@ -119,69 +97,55 @@ export class AddUserMasterComponent implements OnInit {
                 },
             ];
             this.userTable = new UserMaster({});
-
         }
-        this.InitializeFormControl();
-        if (this.isUpdate == true) {
-            this.userTableForm.removeControl("EntryBy");
-            this.userTableForm.removeControl("userPwd");
-            this.userTableForm.removeControl("ConfirmPassword");
-        } else {
-            this.userTableForm.removeControl("UpdateBy");
-        }
-        this.retrievedData = localStorage.getItem("currentUser");
-        this.userDetails = JSON.parse(this.retrievedData);
-        this.isUpdate
-            ? this.userTableForm.controls.gender.setValue(this.userTable.gender)
-            : "";
+        this.initializeFormControl();
     }
-
     bindDropdown() {
         this.jsonControlUserArray.forEach((data) => {
-            if (data.name === "BranchCode") {
+            if (data.name === "branchCode") {
                 // Set BranchCode-related variables
                 this.location = data.name;
                 this.locationStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === "emptype") {
+            if (data.name === "userType") {
                 // Set emptype-related variables
                 this.userType = data.name;
                 this.userTypeStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === "CountryCode") {
+            if (data.name === "country") {
                 // Set CountryCode-related variables
                 this.countryCode = data.name;
                 this.countryCodeStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === "User_Type") {
+            if (data.name === "userStatus") {
                 // Set User_Type-related variables
-                this.userstatus = data.name;
+                this.userName = data.name;
                 this.userStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === "ManagerId") {
+            if (data.name === "managerId") {
                 // Set ManagerId-related variables
                 this.managerId = data.name;
-                this.manageridStatus = data.additionalData.showNameAndValue;
+                this.managerIdStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === "ROLEID") {
+            if (data.name === "role") {
                 // Set ROLEID-related variables
                 this.userRole = data.name;
                 this.userRoleStatus = data.additionalData.showNameAndValue;
             }
 
-            if (data.name === "UserLocations") {
+            if (data.name === "multiLocation") {
                 // Set UserLocations-related variables
                 this.locationName = data.name;
                 this.userLocationStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === "DivisioncontrolHandler") {
+            if (data.name === "multiDivisionAccess") {
                 // Set DivisioncontrolHandler-related variables
                 this.division = data.name;
                 this.divisionStatus = data.additionalData.showNameAndValue;
             }
         });
     }
-    InitializeFormControl() {
+    initializeFormControl() {
         //throw new Error("Method not implemented.");
         this.UserFormControls = new UserControl(this.userTable, this.isUpdate);
         // Get form controls for Driver Details section
@@ -208,42 +172,46 @@ export class AddUserMasterComponent implements OnInit {
             this.managerIdData = managerId;
             this.roleIdData = roleId;
             this.divisionList = divisionAccess;
-            this.multiLocation = locationData;
+            this.multiLoc = locationData;
             this.countryList = countryData;
 
             if (this.isUpdate) {
-                this.updateLocation = this.findDropdownItemByName(this.locationList, this.userTable.location);
-                this.userTableForm.controls.BranchCode.setValue(this.updateLocation);
+                this.updateLocation = this.findDropdownItemByName(this.locationList, this.userTable.branchCode);
+                this.userTableForm.controls.branchCode.setValue(this.updateLocation);
 
                 this.updateUser = this.findDropdownItemByName(this.userStatusData, this.userTable.userStatus);
-                this.userTableForm.controls.emptype.setValue(this.updateUser);
+                this.userTableForm.controls.userType.setValue(this.updateUser);
 
                 this.updateUserStatus = this.findDropdownItemByName(this.userData, this.userTable.userType);
-                this.userTableForm.controls.User_Type.setValue(this.updateUserStatus);
+                this.userTableForm.controls.userStatus.setValue(this.updateUserStatus);
 
-                this.updateManagerId = this.findDropdownItemByName(this.managerIdData, this.userTable.managerID);
-                this.userTableForm.controls.ManagerId.setValue(this.updateManagerId);
+                this.updateManagerId = this.findDropdownItemByName(this.managerIdData, this.userTable.managerId);
+                this.userTableForm.controls.managerId.setValue(this.updateManagerId);
 
                 this.updateRoleId = this.findDropdownItemByName(this.roleIdData, this.userTable.role);
-                this.userTableForm.controls.ROLEID.setValue(this.updateRoleId);
+                this.userTableForm.controls.role.setValue(this.updateRoleId);
 
                 this.updateCountry = this.findDropdownItemByName(this.countryList, this.userTable.country);
-                this.userTableForm.controls.CountryCode.setValue(this.updateCountry);
-
+                this.userTableForm.controls.country.setValue(this.updateCountry);
                 // Patches the Div control value of UserTableForm with filter
-                this.userTableForm.controls["Division"].patchValue(this.divisionList.filter((element) =>
-                    this.userTable.division.split(',').includes(element.name)
+                this.userTableForm.controls["division"].patchValue(this.divisionList.filter((element) =>
+                    this.userTable.multiDivisionAccess.includes(element.name)
                 ));
+
+                this.userTableForm.controls["userLocationscontrolHandler"].patchValue(this.locationList.filter((element) =>
+                    this.userTable.multiLocation.includes(element.name)
+                ));
+
             }
             const filterParams = [
-                [this.jsonControlUserArray, this.managerIdData, this.managerId, this.manageridStatus],
+                [this.jsonControlUserArray, this.managerIdData, this.managerId, this.managerIdStatus],
                 [this.jsonControlUserArray, this.userData, this.userType, this.userTypeStatus],
-                [this.jsonControlUserArray, this.userStatusData, this.userstatus, this.userStatus],
+                [this.jsonControlUserArray, this.userStatusData, this.userName, this.userStatus],
                 [this.jsonControlUserArray, this.roleIdData, this.userRole, this.userRoleStatus],
                 [this.jsonControlUserArray, this.countryList, this.countryCode, this.countryCodeStatus],
                 [this.jsonControlUserArray, this.locationList, this.location, this.locationStatus],
                 [this.jsonControlUserArray, this.divisionList, this.division, this.divisionStatus],
-                [this.jsonControlUserArray, this.multiLocation, this.locationName, this.userLocationStatus],
+                [this.jsonControlUserArray, this.locationList, this.locationName, this.userLocationStatus],
             ];
             filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
                 this.filter.Filter(jsonControlArray, this.userTableForm, dropdownData, formControl, statusControl);
@@ -255,20 +223,84 @@ export class AddUserMasterComponent implements OnInit {
         return dropdownData.find(item => item.name === name);
     }
     save() {
-        const { BranchCode, emptype, UserLocations, User_Type, ManagerId, ROLEID, DivisioncontrolHandler, CountryCode } = this.userTableForm.value;
-        const controls = this.userTableForm.controls;
+        this.userTableForm.controls["gender"].setValue(this.userTableForm.value.gender);
+        this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.name);
+        this.userTableForm.controls["managerId"].setValue(this.userTableForm.value.managerId.name);
+        this.userTableForm.controls["userStatus"].setValue(this.userTableForm.value.userStatus.name);
+        this.userTableForm.controls["userType"].setValue(this.userTableForm.value.userType.name);
+        this.userTableForm.controls["country"].setValue(this.userTableForm.value.country.name);
+        this.userTableForm.controls["role"].setValue(this.userTableForm.value.role.name);
+        //the map function is used to create a new array with only the "name" values (multiDiv & multiLoc)
+        const division = this.userTableForm.value.division.map((item: any) => item.name);
+        this.userTableForm.controls["multiDivisionAccess"].setValue(division);
+        const multiLoc = this.userTableForm.value.userLocationscontrolHandler.map((item: any) => item.name);
+        this.userTableForm.controls["multiLocation"].setValue(multiLoc);
 
-        controls["BranchCode"].setValue(BranchCode);
-        controls["emptype"].setValue(emptype);
-        controls["UserLocations"].setValue(UserLocations);
-        controls["User_Type"].setValue(User_Type);
-        controls["ManagerId"].setValue(ManagerId);
-        controls["ROLEID"].setValue(ROLEID);
-        controls["DivisioncontrolHandler"].setValue(DivisioncontrolHandler);
-        controls["CountryCode"].setValue(CountryCode);
+        this.userTableForm.controls["isActive"].setValue(this.userTableForm.value.isActive == true ? "Y" : "N");
+        if (this.isUpdate) {
+            let id = this.userTableForm.value.id;
+            // Remove the "id" field from the form controls
+            this.userTableForm.removeControl("id");
 
-        this.route.navigateByUrl('/Masters/UserMaster/UserMasterView');
-        this.service.exportData(this.userTableForm.value);
+            let req = {
+                companyCode: this.companyCode,
+                type: "masters",
+                collection: "user",
+                id: id,
+                data: this.userTableForm.value
+            };
+            this.masterService.masterPut('common/update', req).subscribe({
+                next: (res: any) => {
+                    if (res) {
+                        // Display success message
+                        Swal.fire({
+                            icon: "success",
+                            title: "Successful",
+                            text: res.message,
+                            showConfirmButton: true,
+                        });
+                        this.route.navigateByUrl('/Masters/UserMaster/UserMasterView');
+                    }
+                }
+            });
+        } else {
+            const randomNumber = getShortName(this.userTableForm.value.userId);
+            this.userTableForm.controls["userId"].setValue(randomNumber);
+            this.userTableForm.controls["id"].setValue(randomNumber);
+            const controlsToRemove = [
+                "confirmpassword",
+                "division",
+                "CompanyCode",
+                "isUpdate",
+                "controlHandler",
+                "userLocationscontrolHandler"
+              ];
+              
+              controlsToRemove.forEach(controlName => {
+                this.userTableForm.removeControl(controlName);
+              });
+
+            let req = {
+                companyCode: this.companyCode,
+                type: "masters",
+                collection: "user",
+                data: this.userTableForm.value
+            };
+            this.masterService.masterPost('common/create', req).subscribe({
+                next: (res: any) => {
+                    if (res) {
+                        // Display success message
+                        Swal.fire({
+                            icon: "success",
+                            title: "Successful",
+                            text: res.message,
+                            showConfirmButton: true,
+                        });
+                        this.route.navigateByUrl('/Masters/UserMaster/UserMasterView');
+                    }
+                }
+            });
+        }
 
     }
     cancel() {

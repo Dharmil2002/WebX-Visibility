@@ -8,6 +8,9 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from 'src/app/Utility/utility.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { PincodeControl } from "src/assets/FormControls/pincodeMaster";
+import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
+import Swal from "sweetalert2";
+
 
 @Component({
     selector: 'app-add-pincode-master',
@@ -27,21 +30,24 @@ export class AddPinCodeMasterComponent implements OnInit {
     pincatStatus: boolean;
     jsonControlArray: any;
     pincodeFormControls: PincodeControl;
-    State: any;
-    City: any;
     updateState: any;
     statename: any;
     cityname: any;
     pincatList: any;
     updateCity: any;
+    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    state: any;
+    city: any;
+    cityRes: any;
+    stateRes: any;
 
     ngOnInit(): void {
         this.getStateData();
         this.getCityList();
     }
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: any,  private route: Router, private fb: UntypedFormBuilder,
-        private filter: FilterUtils, private service: utilityService,private masterService: MasterService) {
+    constructor(@Inject(MAT_DIALOG_DATA) public data: any, private route: Router, private fb: UntypedFormBuilder,
+        private filter: FilterUtils, private service: utilityService, private masterService: MasterService) {
         if (this.route.getCurrentNavigation()?.extras?.state != null) {
             this.data = route.getCurrentNavigation().extras.state.data;
             this.statename = this.data.stateName;
@@ -49,9 +55,11 @@ export class AddPinCodeMasterComponent implements OnInit {
             this.action = 'edit'
             this.isUpdate = true;
         } else {
+            
             this.action = "Add";
         }
         if (this.action === 'edit') {
+            
             this.isUpdate = true;
             this.pincodeTable = this.data;
             this.breadScrums = [
@@ -81,12 +89,12 @@ export class AddPinCodeMasterComponent implements OnInit {
         // Get form controls for Cluster Details section
         this.jsonControlArray = this.pincodeFormControls.getPincodeFormControls();
         this.jsonControlArray.forEach(data => {
-            if (data.name === 'State') {
+            if (data.name === 'state') {
                 // Set State-related variables
                 this.stateList = data.name;
                 this.stateStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === 'City') {
+            if (data.name === 'city') {
                 // Set City-related variables
                 this.cityList = data.name;
                 this.cityStatus = data.additionalData.showNameAndValue;
@@ -103,9 +111,9 @@ export class AddPinCodeMasterComponent implements OnInit {
     }
 
     getStateData() {
-            this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res =>{
-            this.State = res;
-            let tableArray = this.State.stateList;
+        this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
+            this.stateRes = res;
+            let tableArray = this.stateRes.stateList;
             let state = [];
             tableArray.forEach(element => {
                 let dropdownList = {
@@ -114,10 +122,11 @@ export class AddPinCodeMasterComponent implements OnInit {
                 }
                 state.push(dropdownList)
             });
-            
+
             if (this.isUpdate) {
-                this.updateState = state.find((x) => x.name == this.statename);
-                this.pincodeTableForm.controls.State.setValue(this.updateState);
+                
+                this.updateState = state.find((x) => x.name == this.data.state);
+                this.pincodeTableForm.controls.state.setValue(this.updateState);
             }
 
             this.filter.Filter(
@@ -130,9 +139,9 @@ export class AddPinCodeMasterComponent implements OnInit {
         });
     }
     getCityList() {
-            this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res =>{
-            this.City = res;
-            let tableArray = this.State.cityList;
+        this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
+            this.cityRes = res;
+            let tableArray = this.cityRes.cityList;
             let city = [];
             tableArray.forEach(element => {
                 let dropdownList = {
@@ -142,8 +151,9 @@ export class AddPinCodeMasterComponent implements OnInit {
                 city.push(dropdownList)
             });
             if (this.isUpdate) {
-                this.updateCity = city.find((x) => x.name == this.cityname);
-                this.pincodeTableForm.controls.City.setValue(this.updateCity);
+                
+                this.updateCity = city.find((x) => x.name == this.data.city);
+                this.pincodeTableForm.controls.city.setValue(this.updateCity);
             }
 
             this.filter.Filter(
@@ -160,12 +170,65 @@ export class AddPinCodeMasterComponent implements OnInit {
         window.history.back();
     }
     save() {
-        this.pincodeTableForm.controls["State"].setValue(this.pincodeTableForm.value.State.value);
-        this.pincodeTableForm.controls["City"].setValue(this.pincodeTableForm.value.City.value);
+        
+        this.pincodeTableForm.controls["state"].setValue(this.pincodeTableForm.value.state.name);
+        this.pincodeTableForm.controls["city"].setValue(this.pincodeTableForm.value.city.name);
+       this.pincodeTableForm.controls["pincodeCategory"].setValue(this.pincodeTableForm.value.pincodeCategory);
         this.pincodeTableForm.controls["isActive"].setValue(this.pincodeTableForm.value.isActive == true ? "Y" : "N");
         this.pincodeTableForm.controls["serviceable"].setValue(this.pincodeTableForm.value.serviceable == true ? "Y" : "N");
-        this.route.navigateByUrl('/Masters/PinCodeMaster/PinCodeMasterList');
-        this.service.exportData(this.pincodeTableForm.value)
+
+        if (this.isUpdate) {
+            
+            let id = this.pincodeTableForm.value.id;
+            // Remove the "id" field from the form controls
+            this.pincodeTableForm.removeControl("id");
+
+            let req = {
+                companyCode: this.companyCode,
+                type: "masters",
+                collection: "pincode",
+                id: id,
+                data: this.pincodeTableForm.value
+            };
+            this.masterService.masterPut('common/update', req).subscribe({
+                next: (res: any) => {
+                    if (res) {
+                        // Display success message
+                        Swal.fire({
+                            icon: "success",
+                            title: "Successful",
+                            text: res.message,
+                            showConfirmButton: true,
+                        });
+                        this.route.navigateByUrl('/Masters/PinCodeMaster/PinCodeMasterList');
+                    }
+                }
+            });
+        } else {
+            const randomNumber = getShortName(this.pincodeTableForm.value.area);
+            //this.pincodeTableForm.controls["state"].setValue(randomNumber);
+            this.pincodeTableForm.controls["id"].setValue(randomNumber);
+            let req = {
+                companyCode: this.companyCode,
+                type: "masters",
+                collection: "pincode",
+                data: this.pincodeTableForm.value
+            };
+            this.masterService.masterPost('common/create', req).subscribe({
+                next: (res: any) => {
+                    if (res) {
+                        // Display success message
+                        Swal.fire({
+                            icon: "success",
+                            title: "Successful",
+                            text: res.message,
+                            showConfirmButton: true,
+                        });
+                        this.route.navigateByUrl('/Masters/PinCodeMaster/PinCodeMasterList');
+                    }
+                }
+            });
+        }
     }
 
     functionCallHandler($event) {

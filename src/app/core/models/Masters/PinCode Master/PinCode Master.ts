@@ -6,10 +6,9 @@ export class PincodeMaster {
   cityname: string
   stateName: any;
   activeFlag: string;
-  City: any;
-  State: any;
   statename: any;
   isActive: any;
+    id: any
 
   constructor(PincodeMaster) {
     {

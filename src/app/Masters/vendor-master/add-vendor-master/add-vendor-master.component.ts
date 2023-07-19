@@ -8,6 +8,7 @@ import { VendorMaster } from "src/app/core/models/Masters/vendor-master";
 import { VendorControl } from "src/assets/FormControls/vendor-control";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
+import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
 
 @Component({
   selector: 'app-add-vendor-master',
@@ -15,7 +16,7 @@ import Swal from "sweetalert2";
 })
 export class AddVendorMasterComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; }[];
-  countryCode: any;
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   action: string;
   isUpdate = false;
   vendorTabledata: VendorMaster;
@@ -69,7 +70,6 @@ export class AddVendorMasterComponent implements OnInit {
   select: any;
   selectStatus: any;
   vendorCityName: any;
-
   ngOnInit(): void {
     this.getDropDownData();
   }
@@ -187,9 +187,6 @@ export class AddVendorMasterComponent implements OnInit {
         this.vendorCityDetail = this.findDropdownItemByName(this.vendorCityData, this.vendorTabledata.vendorCity);
         this.vendorTableForm.controls.vendorCity.setValue(this.vendorCityDetail);
 
-        this.vLocationDetail = this.findDropdownItemByName(this.vLocationData, this.vendorTabledata.vendorLocation);
-        this.vendorTableForm.controls.vendorLocation.setValue(this.vLocationDetail);
-
         this.tdsSectionDetail = this.findDropdownItemByName(this.tdsSectionData, this.vendorTabledata.tdsSection);
         this.vendorTableForm.controls.tdsSection.setValue(this.tdsSectionDetail);
 
@@ -198,6 +195,12 @@ export class AddVendorMasterComponent implements OnInit {
 
         this.lspNameDetail = this.findDropdownItemByName(this.lspNameData, this.vendorTabledata.lspName);
         this.vendorTableForm.controls.lspName.setValue(this.lspNameDetail);
+
+        this.vendorTableForm.controls["vendorLocationDropdown"].patchValue(this.vLocationData.filter((element) =>
+        this.vendorTabledata.vendorLocation.includes(element.name)))
+
+        this.vendorTableForm.controls["tdsSectionDropdown"].patchValue(this.tdsSectionData.filter((element) =>
+        this.vendorTabledata.tdsSection.includes(element.name)))
       }
 
       const filterParams = [
@@ -222,31 +225,73 @@ export class AddVendorMasterComponent implements OnInit {
     const controlNames = [
       "vendorType",
       "vendorCity",
-      "vendorLocation",
-      "tdsSection",
       "tdsType",
       "lspName",
     ];
     controlNames.forEach(controlName => {
-      const controlValue = formValue[controlName]?.value;
+      const controlValue = formValue[controlName]?.name;
       this.vendorTableForm.controls[controlName].setValue(controlValue);
     });
-    this.vendorTableForm.controls.isActive.setValue(formValue.isActive ? "Y" : "N");
-    this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
-    this.service.exportData(formValue);
-    if (this.action === 'edit') {
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: `Data Updated successfully!!!`,
-        showConfirmButton: true,
+    const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.name);
+    this.vendorTableForm.controls["vendorLocation"].setValue(vendorLocationDropdown1);
+
+    const tdsSectionDropdown1 = this.vendorTableForm.value.tdsSectionDropdown.map((item: any) => item.name);
+    this.vendorTableForm.controls["tdsSection"].setValue(tdsSectionDropdown1);
+
+    this.vendorTableForm.controls["isActive"].setValue(this.vendorTableForm.value.isActive == true);
+    Object.values(this.vendorTableForm.controls).forEach(control => control.setErrors(null));
+        // Remove  field from the form controls
+        this.vendorTableForm.removeControl("CompanyCode");
+        this.vendorTableForm.removeControl("vendorLocationDropdown");
+        this.vendorTableForm.removeControl("tdsSectionDropdown");
+        this.vendorTableForm.removeControl("isUpdate");
+    if (this.isUpdate) {
+      let id = this.vendorTableForm.value.id;
+      let req = {
+        companyCode: this.companyCode,
+        type: "masters",
+        collection: "vendor",
+        id: id,
+        data: this.vendorTableForm.value
+      };
+      this.masterService.masterPut('common/update', req).subscribe({
+          next: (res: any) => {
+              if (res) {
+                  // Display success message
+                  Swal.fire({
+                      icon: "success",
+                      title: "Successful",
+                      text: res.message,
+                      showConfirmButton: true,
+                  });
+                  this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
+              }
+          }
       });
-    } else {
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: `Data Downloaded successfully!!!`,
-        showConfirmButton: true,
+    }
+    else {
+      const randomNumber = getShortName(this.vendorTableForm.value.vendorName);
+      this.vendorTableForm.controls["vendorCode"].setValue(randomNumber);
+      this.vendorTableForm.controls["id"].setValue(randomNumber);
+      let req = {
+        companyCode: this.companyCode,
+        type: "masters",
+        collection: "vendor",
+        data: this.vendorTableForm.value
+      };
+      this.masterService.masterPost('common/create', req).subscribe({
+          next: (res: any) => {
+              if (res) {
+                  // Display success message
+                  Swal.fire({
+                      icon: "success",
+                      title: "Successful",
+                      text: res.message,
+                      showConfirmButton: true,
+                  });
+                  this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
+              }
+          }
       });
     }
   }

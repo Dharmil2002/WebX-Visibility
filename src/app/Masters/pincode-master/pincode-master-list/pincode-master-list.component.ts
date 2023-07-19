@@ -26,11 +26,20 @@ export class PincodeMasterListComponent implements OnInit {
     pincatList: string;
     data: [] | any;
     pincatStatus: boolean;
+    csvFileName: string;
+    stateRes: any;
+    csv: any[];
+    toggleArray = ["isActive", "serviceable"]
+    linkArray = []
+    cityList: string;
+    city: any;
+    filteredCsv: any[];
+    companyCode: any = parseInt(localStorage.getItem("companyCode"));
     columnHeader =
         {
             "srNo": "Sr No",
-            "stateName": "State",
-            "cityname": "City",
+            "state": "State",
+            "city": "City",
             "pincode": "Pincode",
             "pincodeCategory": "Pincode Category",
             "area": "Area",
@@ -41,19 +50,17 @@ export class PincodeMasterListComponent implements OnInit {
 
     headerForCsv = {
         "srNo": "SrNo",
-        "stateName": "State Name",
-        "cityname": "City",
+        "state": "State Name",
+        "city": "City",
         "area": "Area",
         "pincode": "Pincode",
-        "activeFlag": "Active Flag",
-        "oda": "ODA",
-        "pincodeCategory": "Category"
+        "pincodeCategory": "Category",
     }
     //#endregion
     dynamicControls = {
         add: true,
         edit: true,
-        csv: false
+        csv: true
     }
     breadScrums = [
         {
@@ -62,16 +69,11 @@ export class PincodeMasterListComponent implements OnInit {
             active: "Pincode Master",
         },
     ];
-    State: any;
-    csv: any[];
-    toggleArray = ["isActive", "serviceable"]
-    linkArray = []
-    cityList: string;
-    city: any;
-    filteredCsv: any[];
+    
 
     ngOnInit(): void {
         this.addAndEditPath = "/Masters/PinCodeMaster/AddPinCodeMaster";
+        this.csvFileName = "Pincode Details" 
         this.getStateData();
         this.getCityList();
     }
@@ -79,8 +81,8 @@ export class PincodeMasterListComponent implements OnInit {
     getStateData() {
         // this.http.get(this.stateURL).subscribe(res => {
         this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-            this.State = res;
-            let tableArray = this.State.stateList;
+            this.stateRes = res;
+            let tableArray = this.stateRes.stateList;
             let state = [];
             tableArray.forEach(element => {
                 let dropdownList = {
@@ -132,17 +134,17 @@ export class PincodeMasterListComponent implements OnInit {
         // Get form controls for Cluster Details section
         this.jsonControlArray = this.pincodeListFormControls.getPincodeListFormControls();
         this.jsonControlArray.forEach(data => {
-            if (data.name === 'State') {
+            if (data.name === 'state') {
                 // Set State-related variables
                 this.stateList = data.name;
                 this.stateStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === 'City') {
+            if (data.name === 'city') {
                 // Set City-related variables
                 this.cityList = data.name;
                 this.cityStatus = data.additionalData.showNameAndValue;
             }
-            if (data.name === 'Pincode') {
+            if (data.name === 'pincode') {
                 // Set Pincode category-related variables
                 this.pincatList = data.name;
                 this.pincatStatus = data.additionalData.showNameAndValue;
@@ -170,14 +172,26 @@ export class PincodeMasterListComponent implements OnInit {
     }
 
     save() {
-        this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-            this.data = res;
-            const filteredData = this.data['stateWiseData'].filter((item: any) => item['stateName'] === this.pincodeTableForm.value.State.name && item['cityname'] === this.pincodeTableForm.value.City.name);
-            this.csv = filteredData;
-            this.tableLoad = false;
+        let req = {
+            "companyCode": this.companyCode,
+            "type": "masters",
+            "collection": "pincode"
         }
-        );
-
+        this.masterService.masterPost('common/getall', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Generate srno for each object in the array
+                    const dataWithSrno = res.data.map((obj, index) => {
+                        return {
+                            ...obj,
+                            srNo: index + 1
+                        };
+                    });
+                    this.csv = dataWithSrno;
+                    this.tableLoad = false;
+                }
+            }
+        })
     }
 
 }

@@ -62,6 +62,8 @@ export class LocationMasterComponent implements OnInit {
         if (res) {
           // Generate srno for each object in the array
           const dataWithSrno = res.data.map((obj, index) => {
+            obj["reportLoc"] = obj.reportLoc?.name;
+            obj["locCode"] = obj.locCode?.name;
             return {
               ...obj,
               srNo: index + 1

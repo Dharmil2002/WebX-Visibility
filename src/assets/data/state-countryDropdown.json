@@ -542,15 +542,15 @@
     "documentTypeDropDown": [
         {
             "name": "CNote",
-            "value": "DKT"
+            "value": "1"
         },
         {
             "name": "Delivery MR",
-            "value": "DMR"
+            "value": "2"
         },
         {
             "name": "UBI Series",
-            "value": "DKTBC"
+            "value": "3"
         }
     ],
     "vehicleTypeDropdown": [
@@ -626,7 +626,6 @@
             "name": "V00006:GLOBE CHARTERS PVT LTD",
             "value": "3"
         },
-
         {
             "name": "V00059:Vishnu Transport",
             "value": "4"
@@ -976,8 +975,7 @@
             "value": "7"
         }
     ],
-    "routeLocationDropdown":
-    [
+    "routeLocationDropdown": [
         {
             "name": "S0123-MUMB-BNGB",
             "value": "1"

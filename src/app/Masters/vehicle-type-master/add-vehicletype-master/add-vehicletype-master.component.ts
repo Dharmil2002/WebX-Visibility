@@ -157,14 +157,22 @@ export class AddVehicletypeMasterComponent implements OnInit {
     window.history.back();
   }
   generateNextVehicleTypeCode(): string {
-    // Increment the last used vehicleTypeCode by 1 to generate the next one
-    this.lastUsedVehicleTypeCode++;
+    // Get the last used vehicle code from localStorage
+    const lastVehicleCode = parseInt(localStorage.getItem('lastVehicleCode') || '0', 10);
+
+    // Increment the last vehicle user code by 1 to generate the next one
+    const nextVehicleCode = lastVehicleCode + 1;
 
     // Convert the number to a 4-digit string, padded with leading zeros
-    const paddedNumber = this.lastUsedVehicleTypeCode.toString().padStart(4, '0');
+    const paddedNumber = nextVehicleCode.toString().padStart(4, '0');
 
-    // Combine the prefix "VH" with the padded number to form the complete vehicleTypeCode
-    return `VH${paddedNumber}`;
+    // Combine the prefix "VH" with the padded number to form the complete vendor code
+    const vehicleCode = `VH${paddedNumber}`;
+
+    // Update the last used vehicle code in localStorage
+    localStorage.setItem('lastVehicleCode', nextVehicleCode.toString());
+
+    return vehicleCode;
   }
   save() {
     this.vehicleTypeTableForm.controls["vehicleTypeCategory"].setValue(this.vehicleTypeTableForm.value.vehicleTypeCategory.name);
@@ -173,18 +181,18 @@ export class AddVehicletypeMasterComponent implements OnInit {
     this.vehicleTypeTableForm.removeControl("companyCode");
     this.vehicleTypeTableForm.removeControl("updateBy");
     this.vehicleTypeTableForm.removeControl("isUpdate");
-    this.vehicleTypeTableForm.removeControl("id");
+
     if (this.isUpdate) {
       let id = this.vehicleTypeTableForm.value.id;
       // Remove the "id" field from the form controls
       this.vehicleTypeTableForm.removeControl("id");
-
       let req = {
+
         companyCode: this.companyCode,
         type: "masters",
-        collection: "vehicleType",
+        collection: "vehicleType_detail",
         id: id,
-        data: this.vehicleTypeTableForm.value
+        updates: this.vehicleTypeTableForm.value
       };
       this.masterService.masterPut('common/update', req).subscribe({
         next: (res: any) => {
@@ -204,11 +212,10 @@ export class AddVehicletypeMasterComponent implements OnInit {
       const nextVehicleTypeCode = this.generateNextVehicleTypeCode();
       this.vehicleTypeTableForm.controls["vehicleTypeCode"].setValue(nextVehicleTypeCode);
       this.vehicleTypeTableForm.controls["id"].setValue(nextVehicleTypeCode);
-
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "vehicleType",
+        collection: "vehicleType_detail",
         data: this.vehicleTypeTableForm.value
       };
       this.masterService.masterPost('common/create', req).subscribe({

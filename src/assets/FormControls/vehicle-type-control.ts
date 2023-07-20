@@ -29,7 +29,7 @@ export class VehicleTypeControl {
                     }
                 ],
                 functions: {
-                   // onChange: 'GetVehNameExist'
+                    // onChange: 'GetVehNameExist'
                 },
                 generatecontrol: true, disable: false
             },
@@ -71,13 +71,6 @@ export class VehicleTypeControl {
                 placeholder: 'Search And Select Vehicle Type Category',
                 type: 'dropdown', value: '', filterOptions: "", autocomplete: "", displaywith: "",//IsUpdate ? VehicleTypeTable.VehicleTypeCategory : "",
                 Validations: [
-                    {
-                        name: "autocomplete",
-                    },
-                    {
-                        name: "invalidAutocomplete",
-                        message: "Choose proper value"
-                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -119,7 +112,7 @@ export class VehicleTypeControl {
                 placeholder: 'Search And Select Vehicle Size',
                 type: "Staticdropdown",
                 value: [
-                    { value: 'HeavyVehicle', name: 'Heavy Vehicle' }, 
+                    { value: 'HeavyVehicle', name: 'Heavy Vehicle' },
                     { value: 'LightVehicle', name: 'Light Vehicle' }
                 ],
                 Validations: [],
@@ -178,7 +171,7 @@ export class VehicleTypeControl {
                 value: localStorage.getItem("companyCode"),
                 Validations: [],
                 generatecontrol: false, disable: false
-             },
+            },
             {
                 name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
                 generatecontrol: false, disable: false
@@ -188,7 +181,7 @@ export class VehicleTypeControl {
                 label: '',
                 placeholder: '',
                 type: 'text',
-                value: '',
+                value: vehicleTypeTable.id,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',

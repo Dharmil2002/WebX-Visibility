@@ -5,11 +5,11 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { EwayBillControls } from "src/assets/FormControls/ewayBillControl";
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { utilityService } from "src/app/Utility/utility.service";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
 import { Router } from "@angular/router";
+import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 
 @Component({
   selector: 'app-eway-example',
@@ -46,7 +46,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   // Action buttons configuration
   actionObject = {
     addRow: true,
-    submit: true,
+    submit: false,
     search: true
   };
   DocketField: any;
@@ -176,7 +176,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private operationService: OperationService,
-    private route: Router
+    private route: Router,
+    private _NavigationService:NavigationService
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.quickdocketDetaildata = route.getCurrentNavigation().extras.state.data.columnData;
@@ -362,6 +363,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             this.docketId=this.DocketDetails[0]?.id||"";
             this.tabForm.controls['docketNumber'].setValue(this.DocketDetails[0]?.docketNumber||"")
             this.tabForm.controls['docketDate'].setValue(this.DocketDetails[0]?.docketDate||"")
+            this.tableData[0].NO_PKGS=this.DocketDetails[0]?.totalChargedNoOfpkg||"";
+            this.tableData[0].ACT_WT=this.DocketDetails[0]?.actualwt||""
            }
         }
       })
@@ -475,11 +478,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     })
   }
   //end 
-  saveData(event) {
+  saveData() {
+    debugger
 
-    let invoiceDetails = {
-      invoiceDetails: event.data
-    }
     const dynamicValue = localStorage.getItem('Branch'); // Replace with your dynamic value
     const controlNames = ['svcType', 'payType', 'rskty', 'pkgs', 'trn'];
     controlNames.forEach(controlName => {
@@ -487,6 +488,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         this.contractForm.controls[controlName].setValue('');
       }
     })
+    let invoiceDetails = {
+      invoiceDetails:this.tableData
+    }
     const controltabNames = ['containerCapacity','containerSize1','containerSize2','containerType'];
     controltabNames.forEach(controlName => {
       if (Array.isArray(this.contractForm.value[controlName])) {
@@ -526,7 +530,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       this.tabForm.controls['docketNumber'].setValue(this.dockNo);
 
       let id = { id: this.dockNo, isComplete: 1 }
-      let docketDetails = { ...this.tabForm.value, ...this.contractForm.value, ...invoiceDetails, ...id };
+      let docketDetails = { ...this.tabForm.value, ...this.contractForm.value,...invoiceDetails, ...id };
       let reqBody = {
         companyCode: this.companyCode,
         type: "operation",
@@ -552,9 +556,14 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       next: (res: any) => {
         Swal.fire({
           icon: "success",
-          title: "Booked SuccesFully",
+          title: "Booked Successfully",
           text: "DocketNo: " + this.tabForm.controls['docketNumber'].value,
           showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Redirect to the desired page after the success message is confirmed.
+            this._NavigationService.navigateTotab(1,'dashboard/GlobeDashboardPage');
+          }
         });
       }
     })
@@ -641,8 +650,8 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   } 
 
  calculateInvoiceTotal() {
-debugger
-    let totalChargedNoofPackages = 0;
+
+  let totalChargedNoofPackages = 0;
     let totalChargedWeight = 0;
     let totalDeclaredValue = 0;
     let totalActualValue=0;
@@ -670,3 +679,4 @@ debugger
     //TotalPartQuantity calucation parts are pending 
   }
 }
+

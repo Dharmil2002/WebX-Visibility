@@ -806,23 +806,13 @@ export class EwayBillControls {
                 name: 'cft_tot', label: 'CFT Total', placeholder: 'CFT Total', type: 'text', value: 0,
                 filterOptions: '', autocomplete: '',
                 displaywith: '', generatecontrol: true, disable: true,
-                Validations: [
-                    {
-                        name: 'required',
-                        message: 'CFT Total is required'
-                    }
-                ],
+                Validations: [],
             },
             {
                 name: 'actualwt', label: 'Actual Weight', placeholder: 'Actual Weight', type: 'text', value: 0,
                 filterOptions: '', autocomplete: '',
                 displaywith: '', generatecontrol: true, disable: true,
-                Validations: [
-                    {
-                        name: 'required',
-                        message: 'Actual Weight is required'
-                    }
-                ],
+                Validations: [],
             },
             {
                 name: 'chrgwt', label: 'Charged Weight', placeholder: 'Charged Weight', type: 'text', value: 0,
@@ -860,34 +850,19 @@ export class EwayBillControls {
                 name: 'totalDeclaredValue', label: 'Total Declared Value', placeholder: 'Total Declared Value', type: 'text', value: 0,
                 filterOptions: '', autocomplete: '',
                 displaywith: '', generatecontrol: true, disable: true,
-                Validations: [
-                    {
-                        name: 'required',
-                        message: 'Total Declared Value is required'
-                    }
-                ]
+                Validations: []
             },
             {
                 name: 'totalChargedNoOfpkg', label: 'Charged No of Pkg.', placeholder: 'Charged No of Pkg.', type: 'text', value:0,
                 filterOptions: '', autocomplete: '',
                 displaywith: '', generatecontrol: true, disable: true,
-                Validations: [
-                    {
-                        name: 'required',
-                        message: 'Charged No of Pkg Value is required'
-                    }
-                ],
+                Validations: [],
             },
             {
                 name: 'totalPartQuantity', label: 'Total Part Quantity', placeholder: 'Total Part Quantity', type: 'text', value:0,
                 filterOptions: '', autocomplete: '',
                 displaywith: '', generatecontrol: true, disable: true,
-                Validations: [
-                    {
-                        name: 'required',
-                        message: 'Total Part Quantity Value is required'
-                    }
-                ],
+                Validations: [],
             },
         ];
         this.ewayBillControlArray = [

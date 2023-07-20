@@ -4,7 +4,6 @@ export class CompanyControl {
     CompanyControlArray: FormControls[];
     BankControlArray: FormControls[];
     constructor(CompanyDetailsResponse) {
-        debugger
         this.CompanyControlArray = [
             {
                 name: 'brand', label: 'Brand', placeholder: 'Brand', type: 'radiobutton',

@@ -56,7 +56,6 @@ export class DepartureDashboardPageComponent
   // < column name : Column name you want to display on table >
 
   columnHeader = {
-    id:"ID",
     RouteandSchedule: "Route and Schedule",
     VehicleNo: "Vehicle No",
     TripID: "Trip ID",

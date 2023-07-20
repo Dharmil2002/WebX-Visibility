@@ -29,13 +29,21 @@
                             <!-- Step 1 Details -->
                             <div>
                                 <mat-step>
-                                    <ng-template matStepLabel>Details From Eway-Bill</ng-template>
+                                    <ng-template matStepLabel>Basic Details</ng-template>
                                     <form [formGroup]="tabForm">
                                         <generic-accordion-webxpress [AccordionForm]="tabForm"
                                             [accordionGroup]="tabData"
                                             [showSaveAndCancelButtonV]="showSaveAndCancelButton"
                                             (functionCallEmitter)="functionCallHandler($event)">
                                         </generic-accordion-webxpress>
+                                        <div class="row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                                <div class="example-button-row d-flex justify-content-end">
+                                                    <button class="msr-3" mat-raised-button color="primary"
+                                                        matStepperNext [disabled]="!tabForm.valid">Next</button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </form>
                                 </mat-step>
                             </div>
@@ -44,7 +52,7 @@
                             <!-- Step 2 Details -->
                             <div>
                                 <mat-step>
-                                    <ng-template matStepLabel>Details From Contract</ng-template>
+                                    <ng-template matStepLabel>Contract Details</ng-template>
                                     <form [formGroup]="contractForm">
                                         <generic-accordion-webxpress [AccordionForm]="contractForm"
                                             [accordionGroup]="contractData"
@@ -57,6 +65,16 @@
                                         (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
                                         (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)"
                                         [showsubmit]="true" [ActionObject]="actionObject"></app-table-boilerplate>
+                                    <div class="row">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                                            <div class="example-button-row  d-flex justify-content-end">
+
+                                                <button mat-button matStepperPrevious>Back</button>
+                                                <button class="msr-3" mat-raised-button color="primary"
+                                                    (click)="saveData()">Book Docket</button>
+                                            </div>
+                                        </div>  
+                                    </div>
                                 </mat-step>
                             </div>
                         </mat-stepper>

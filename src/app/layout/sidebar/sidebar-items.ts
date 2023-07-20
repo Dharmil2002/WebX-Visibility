@@ -286,6 +286,15 @@ export const ROUTES: RouteInfo[] =
         class: "",
         groupTitle: false,
         submenu: []
+      },
+      {
+        path: "Masters/Docket/EwayBillDocketBookingV2",
+        title: "Eway Bill Docket Booking",
+        moduleName: "Eway Bill Docket Booking",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
       }
      ],
     },

@@ -12,26 +12,36 @@ export async function fetchDepartureDetails(
   orgBranch: string,
   operationService: any
 ): Promise<any[]> {
+
   // Prepare request payload
   let req = {
     companyCode: companyCode,
     type: "operation",
     collection: "trip_detail",
   };
+  let routeReq = {
+    companyCode: companyCode,
+    type: "masters",
+    collection: "route",
+  };
 
   try {
-    // Send request and await response
+    // Send request and await response for  trip Detai;s
     const res: any = await operationService
       .operationPost("common/getall", req)
       .toPromise();
-
+    //Send Request and await response for route Details
+    const routeRes: any = await operationService
+      .operationPost("common/getall", routeReq)
+      .toPromise();
+    //End//
     // Filter departure data based on organization branch
     const departuredata = res.data.filter(
-      (x: any) => x.controlLoc.toLowerCase() === orgBranch.toLowerCase()
+      (x: any) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase()
     );
-
+    const routeData = routeRes.data.filter((x) => x.location.toLowerCase() === orgBranch.toLowerCase())
     // Generate table data from filtered departure data
-    const tableData = generateTableData(departuredata);
+    const tableData = generateTableData(departuredata, routeData);
 
     // Return the generated table data
     return tableData;
@@ -97,37 +107,39 @@ function getShipmentData(
  * @param departureData - The departure data object.
  * @returns Table data array.
  */
-function generateTableData(departureData: any[]): any[] {
+function generateTableData(departureData: any[], routeData: any[]): any[] {
+  debugger
   let dataDeparture: any[] = [];
   const { format } = require("date-fns");
 
-  departureData.forEach((element,index) => {
-    let scheduleTime = new Date(); // Replace this with the actual schedule time
+  departureData.forEach((element, index) => {
+    //let scheduleTime = new Date(); // Replace this with the actual schedule time
 
     // Convert transHrs to number for time calculations
-    let transHrs = parseInt(element?.transHrs, 10) || 0;
+    //let transHrs = parseInt(element?.transHrs, 10) || 0;
 
     // Calculate the expected time by adding the transHrs to the schedule time
-    let expectedTime = addHours(scheduleTime, transHrs);
+    //let expectedTime = addHours(scheduleTime, transHrs);
 
     let action =
       element.tripId === "" && element.lsNo === "" && element.unloading !== ""
         ? "Update Trip"
         : element.tripId !== "" && element.lsNo !== ""
-        ? "Vehicle Loading"
-        : "Create Trip";
-
+          ? "Vehicle Loading"
+          : "Create Trip";
+    let routeDetails = routeData.find((x) => x.routeCode == element.routeCode);
+    const routeCode = routeDetails?.routeCode ?? 'Unknown';
+    const routeName = routeDetails?.routeName ?? 'Unnamed';
     let jsonDeparture = {
-      id:element.id,
-      RouteandSchedule: element.rutCd + ":" + element.rutNm,
+      RouteandSchedule: routeCode + ":" + routeName,
       VehicleNo: element?.vehicleNo || "",
       TripID: element?.tripId || "",
-      Scheduled: format(scheduleTime, "dd-MM-yy HH:mm"),
-      Expected: format(expectedTime, "dd-MM-yy HH:mm"),
-      Hrs: element?.transHrs || 0,
-      VehicleType: element?.VehicleType || "",
+      Scheduled: routeDetails.routeStartDate,
+      Expected: routeDetails.routeEndDate,
+      Hrs: 0,
+      Status: "On Time",
       Action: action,
-      location: element?.controlLoc || "",
+      location: element?.location || "",
     };
 
     dataDeparture.push(jsonDeparture);

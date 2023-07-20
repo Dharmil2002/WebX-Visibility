@@ -112,9 +112,9 @@ export function groupShipments(combinedData) {
     const legData = {
       leg,
       count: 0,
-      Packages: 0,
-      VolumeCFT: 0,
-      WeightKg: 0
+      packages: 0,
+      volumeCFT: 0,
+      weightKg: 0
     };
   
     if (!result[leg]) {
@@ -122,9 +122,9 @@ export function groupShipments(combinedData) {
     }
   
     result[leg].count++;
-    result[leg].Packages += parseInt(item.totalChargedNoOfpkg);
-    result[leg].WeightKg += parseInt(item.chrgwt);
-    result[leg].VolumeCFT += parseFloat(item.cft_tot);
+    result[leg].packages += parseInt(item.totalChargedNoOfpkg);
+    result[leg].weightKg += parseInt(item.chrgwt);
+    result[leg].volumeCFT += parseFloat(item.cft_tot);
   
     return result;
   }, {});

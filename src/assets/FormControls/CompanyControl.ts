@@ -4,6 +4,7 @@ export class CompanyControl {
     CompanyControlArray: FormControls[];
     BankControlArray: FormControls[];
     constructor(CompanyDetailsResponse) {
+        debugger
         this.CompanyControlArray = [
             {
                 name: 'brand', label: 'Brand', placeholder: 'Brand', type: 'radiobutton',
@@ -13,7 +14,7 @@ export class CompanyControl {
             },
             {
                 name: 'company_Code', label: 'Company Code', placeholder: 'Company Code', type: 'text',
-                value: CompanyDetailsResponse?.COMPANY_CODE, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.company_Code, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
@@ -32,7 +33,7 @@ export class CompanyControl {
 
             {
                 name: 'company_Name', label: 'Company Name', placeholder: 'Company Name', type: 'text',
-                value: CompanyDetailsResponse?.COMPANY_NAME, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.company_Name, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
@@ -48,7 +49,7 @@ export class CompanyControl {
 
             {
                 name: 'contact_Person_Name', label: 'Contact Person Name', placeholder: 'Contact Person Name', type: 'text',
-                value: CompanyDetailsResponse?.CONTACT_PERSON, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.contact_Person_Name, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
@@ -64,7 +65,7 @@ export class CompanyControl {
 
             {
                 name: 'contact_No', label: "Contact Number", placeholder: "Contact Number", type: 'text',
-                value: CompanyDetailsResponse?.CONTACTNO, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.contact_No, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "pattern",
@@ -79,7 +80,7 @@ export class CompanyControl {
 
             {
                 name: 'branch_Code', label: 'Branch Code', placeholder: 'Branch Code', type: 'text',
-                value: CompanyDetailsResponse?.BRCD, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.branch_Code, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
@@ -95,7 +96,7 @@ export class CompanyControl {
 
             {
                 name: 'telephone_No', label: "Telephone No", placeholder: "Telephone No", type: 'number',
-                value: CompanyDetailsResponse?.TelephoneNo, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.telephone_No, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "pattern",
@@ -107,7 +108,7 @@ export class CompanyControl {
 
             {
                 name: 'company_Address', label: 'Company Address', placeholder: 'Company Address', type: 'text',
-                value: CompanyDetailsResponse?.ADDRESS, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.company_Address, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
@@ -118,7 +119,7 @@ export class CompanyControl {
 
             {
                 name: 'service_Tax_No', label: 'Service Tax No', placeholder: 'Service Tax No', type: 'text',
-                value: CompanyDetailsResponse?.ServicetaxNo, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.service_Tax_No, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$"
@@ -127,7 +128,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'pan_N0', label: 'PAN No', placeholder: 'PAN No', type: 'text', value: CompanyDetailsResponse?.PANNo,
+                name: 'pan_N0', label: 'PAN No', placeholder: 'PAN No', type: 'text', value: CompanyDetailsResponse?.pan_N0,
                 generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -137,7 +138,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'tan_No', label: 'TAN No', placeholder: 'TAN No', type: 'text', value: CompanyDetailsResponse?.TANNo,
+                name: 'tan_No', label: 'TAN No', placeholder: 'TAN No', type: 'text', value: CompanyDetailsResponse?.tan_No,
                 generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -147,7 +148,7 @@ export class CompanyControl {
             },
 
             {
-                name: 'fax_No', label: 'FAX No', placeholder: 'FAX No', type: 'text', value: CompanyDetailsResponse?.FAXNo,
+                name: 'fax_No', label: 'FAX No', placeholder: 'FAX No', type: 'text', value: CompanyDetailsResponse?.fax_No,
                 generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -158,7 +159,7 @@ export class CompanyControl {
 
             {
                 name: 'help_Line_No', label: 'Help Line No', placeholder: 'Help Line No', type: 'text',
-                value: CompanyDetailsResponse?.HelpLineNo, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.help_Line_No, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         pattern: "^[0-9-()+s]+$"
@@ -168,7 +169,7 @@ export class CompanyControl {
 
             {
                 name: 'registration_No', label: 'Registration No', placeholder: 'Registration No', type: 'text',
-                value: CompanyDetailsResponse?.RegistrationNo, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.registration_No, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         pattern: "^[a-zA-Z0-9-.]+$"
@@ -178,7 +179,7 @@ export class CompanyControl {
 
             {
                 name: 'punch_Line', label: 'Punch Line', placeholder: 'Punch Line', type: 'text',
-                value: CompanyDetailsResponse?.PunchLine, generatecontrol: true, disable: false,
+                value: CompanyDetailsResponse?.punch_Line, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         pattern: "^[a-zA-Z0-9,.!?'s]+$"
@@ -196,14 +197,14 @@ export class CompanyControl {
             },
 
             {
-                name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: CompanyDetailsResponse?.ACTIVEFLAG, generatecontrol: true, disable: false,
+                name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: CompanyDetailsResponse?.activeFlag, generatecontrol: true, disable: false,
                 Validations: []
             },
         ],
             this.BankControlArray = [
                 {
                     name: 'beneficiary_Name', label: 'Beneficiary Name', placeholder: 'Beneficiary Name ', type: 'text',
-                    value: CompanyDetailsResponse?.BeneficiaryName, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.beneficiary_Name, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[a-zA-Z.']+([s][a-zA-Z.']+)*$"
@@ -213,7 +214,7 @@ export class CompanyControl {
 
                 {
                     name: 'barcode_Header_Name', label: 'Barcode Header Name', placeholder: 'Barcode Header Name', type: 'text',
-                    value: CompanyDetailsResponse?.BarcodeName, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.barcode_Header_Name, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[a-zA-Z.']+([s][a-zA-Z.']+)*$"
@@ -223,7 +224,7 @@ export class CompanyControl {
 
                 {
                     name: 'bank_Account_No', label: 'Bank Account No', placeholder: 'Bank Account No', type: 'text',
-                    value: CompanyDetailsResponse?.BankAccountNo, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.bank_Account_No, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^d{9,18}$"
@@ -233,7 +234,7 @@ export class CompanyControl {
 
                 {
                     name: 'bank_Name', label: ' Bank Account No', placeholder: ' Bank Account No', type: 'text',
-                    value: CompanyDetailsResponse?.BankName, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.bank_Name, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[a-zA-Z.'&]+([s][a-zA-Z.'&]+)*$"
@@ -243,7 +244,7 @@ export class CompanyControl {
 
                 {
                     name: 'rtgs_Code', label: 'RTGS Code', placeholder: 'RTGS Code', type: 'text',
-                    value: CompanyDetailsResponse?.RTGS_NEFTcode, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.rtgs_Code, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[A-Za-z]{4}d{7}$"
@@ -253,7 +254,7 @@ export class CompanyControl {
 
                 {
                     name: 'micr_Code', label: 'MICR Code', placeholder: 'MICR Code', type: 'text',
-                    value: CompanyDetailsResponse?.MICRCode, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.micr_Code, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[0-9]{1,9}$"
@@ -263,7 +264,7 @@ export class CompanyControl {
 
                 {
                     name: 'ifsc_Code', label: 'IFSC Code', placeholder: 'IFSC Code', type: 'text',
-                    value: CompanyDetailsResponse?.IFSCCode, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.ifsc_Code, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[A-Za-z]{4}d{7}$"
@@ -273,7 +274,7 @@ export class CompanyControl {
 
                 {
                     name: 'swift_Code', label: 'SWIFT Code', placeholder: 'SWIFT Code', type: 'text',
-                    value: CompanyDetailsResponse?.SWIFTcode, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.swift_Code, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[A-Z]{4}[-]{0,1}[A-Z]{2}[-]{0,1}[A-Z0-9]{2}[-]{0,1}[0-9]{3}$"
@@ -283,7 +284,7 @@ export class CompanyControl {
 
                 {
                     name: 'account_Type', label: 'Account Type', placeholder: 'Account Type', type: 'text',
-                    value: CompanyDetailsResponse?.AccountType, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.account_Type, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[a-zA-Z]+$"
@@ -293,7 +294,7 @@ export class CompanyControl {
 
                 {
                     name: 'branch_Name', label: 'Branch Name', placeholder: 'Branch Name', type: 'text',
-                    value: CompanyDetailsResponse?.BankBranch, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.branch_Name, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[a-zA-Z]+$"
@@ -303,7 +304,7 @@ export class CompanyControl {
 
                 {
                     name: 'terms_And_Conditions', label: ' Terms and Conditions', placeholder: ' Terms and Conditions',
-                    type: 'text', value: CompanyDetailsResponse?.TermsCondition, generatecontrol: true, disable: false,
+                    type: 'text', value: CompanyDetailsResponse?.terms_And_Conditions, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[a-zA-Z]+$"
@@ -324,7 +325,7 @@ export class CompanyControl {
 
                 {
                     name: 'lr_Terms_And_Conditions', label: 'LR Terms and Conditions', placeholder: 'LR Terms and Conditions',
-                    type: 'text', value: CompanyDetailsResponse?.LRTermsCondition, generatecontrol: true, disable: false,
+                    type: 'text', value: CompanyDetailsResponse?.lr_Terms_And_Conditions, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[a-zA-Z0-9 ]*$"
@@ -334,7 +335,7 @@ export class CompanyControl {
 
                 {
                     name: 'po_Terms_and_Conditions', label: 'PO Terms and Conditions', placeholder: 'PO Terms and Conditions',
-                    type: 'text', value: CompanyDetailsResponse?.POTermsCondition, generatecontrol: true, disable: false,
+                    type: 'text', value: CompanyDetailsResponse?.po_Terms_and_Conditions, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             pattern: "^[a-zA-Z0-9 ]*$"
@@ -353,7 +354,7 @@ export class CompanyControl {
                 },
 
                 {
-                    name: 'color_Theme', label: "Select Theme", placeholder: "Select Theme", type: 'dropdown', value: CompanyDetailsResponse?.CompanyTheme,
+                    name: 'color_Theme', label: "Select Theme", placeholder: "Select Theme", type: 'dropdown', value: CompanyDetailsResponse?.color_Theme,
                     generatecontrol: true,
                     disable: false,
                     Validations: [],
@@ -364,9 +365,23 @@ export class CompanyControl {
 
                 {
                     name: 'multi_Currency_Flag', label: 'Multi Currency', placeholder: 'Multi Currency Flag', type: 'toggle',
-                    value: CompanyDetailsResponse?.EnableMultiCurrency, generatecontrol: true, disable: false,
+                    value: CompanyDetailsResponse?.multi_Currency_Flag, generatecontrol: true, disable: false,
                     Validations: []
                 },
+                {
+                    name: 'id',
+                    label: '',
+                    placeholder: '',
+                    type: 'text',
+                    value: CompanyDetailsResponse?.id,
+                    filterOptions: '',
+                    autocomplete: '',
+                    displaywith: '',
+                    Validations: [],
+                    generatecontrol: false,
+                    disable: false
+    
+                }
             ]
 
     }

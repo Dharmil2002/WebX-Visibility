@@ -104,14 +104,19 @@ export class AddCompanyComponent implements OnInit {
       console.log("failed");
     }
   }
+  // Function to automatically bind dropdown values from JSON file
   autoBindDropdown() {
     this.masterService.getJsonFileDetails('companyJsonUrl').subscribe(res => {
+      // Set TimeZoneDet and Theme variables from the JSON response
       this.TimeZoneDet = res.TimeZone[0];
       this.Theme = res.Theme[0];
+      // Find the matching timeZone value in TimeZoneDet and set it in the form control
       this.Timezonedata = this.TimeZoneDet.find((x) => x.value == this.data.timeZone);
       this.AddCompanyFormsValue.controls.timeZone.setValue(this.Timezonedata);
+      // Find the matching color_Theme value in Theme and set it in the form control
       this.Themedata = this.Theme.find((x) => x.value == this.data.color_Theme);
       this.AddCompanyFormsValue.controls.color_Theme.setValue(this.Themedata);
+      // Call the Filter function with specific parameters to filter the data
       this.filter.Filter(
         this.jsonControlBankArray,
         this.AddCompanyFormsValue,
@@ -130,6 +135,7 @@ export class AddCompanyComponent implements OnInit {
     );
 
   }
+  // Function to handle file selection in the form
   selectedFile(data) {
     let fileList: FileList = data.eventArgs;
     if (fileList.length > 0) {
@@ -138,11 +144,13 @@ export class AddCompanyComponent implements OnInit {
       const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
 
       if (allowedFormats.includes(fileFormat)) {
+        // If the file format is allowed, update the form control with the selected file name
         this.SelectFile = file;
         this.imageName = file.name;
         this.selectedFiles = true;
         this.AddCompanyFormsValue.controls["company_Image"].setValue(this.SelectFile.name);
       } else {
+        // If the file format is not allowed, display a warning message
         this.selectedFiles = false;
         Swal.fire({
           icon: "warning",
@@ -152,31 +160,40 @@ export class AddCompanyComponent implements OnInit {
         });
       }
     } else {
+      // If no file is selected, display an alert
       this.selectedFiles = false;
       alert("No file selected");
     }
   }
 
+  // Function to download a file
   downloadfile() {
     let link = document.createElement("a");
     link.download = "DefaultChartOfAccount";
     link.href = "assets/Download/Default_ChartOfAccount.xlsx";
     link.click();
   }
+
+  // Function to save the form data
   save() {
+    // Set the color_Theme and timeZone form control values using the selected values
     this.AddCompanyFormsValue.controls["color_Theme"].setValue(this.AddCompanyFormsValue.value.color_Theme.value);
     this.AddCompanyFormsValue.controls["timeZone"].setValue(this.AddCompanyFormsValue.value.timeZone.value);
+
     let id = this.AddCompanyFormsValue.value.id;
     // Remove the "id" field from the form controls
     this.AddCompanyFormsValue.removeControl("id");
-    let req = {
 
+    // Prepare the request to update company details
+    let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       type: "masters",
       collection: "company_detail",
       id: id,
       updates: this.AddCompanyFormsValue.value
     };
+
+    // Call the API to update company details
     this.masterService.masterPut('common/update', req).subscribe({
       next: (res: any) => {
         if (res) {
@@ -191,23 +208,31 @@ export class AddCompanyComponent implements OnInit {
       }
     });
   }
+
+  // Function to cancel and go back to the previous page
   cancel() {
     window.history.back();
   }
+
+  // Function to get company details from the API
   getCompanyDet() {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       "type": "masters",
       "collection": "company_detail"
-    }
+    };
+
+    // Call the API to get company details
     this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {
         if (res) {
-          this.data = res.data[0]
+          // Set the retrieved data in the 'data' variable and initialize the form controls and bind dropdowns
+          this.data = res.data[0];
           this.initializeFormControl();
           this.autoBindDropdown();
         }
       }
-    })
+    });
   }
+
 }

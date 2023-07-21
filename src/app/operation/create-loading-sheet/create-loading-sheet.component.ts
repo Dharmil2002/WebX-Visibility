@@ -262,7 +262,6 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   // Function to retrieve shipment data
   getshipmentData() {
-    debugger
     if (!this.isShipmentUpdate) {
       let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
       routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
@@ -317,7 +316,6 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   loadingSheetGenerate() {
-   debugger;
     if (!this.loadingSheetTableForm.value.vehicle) {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
     }
@@ -329,7 +327,6 @@ export class CreateLoadingSheetComponent implements OnInit {
         });
 
         dialogRef.afterClosed().subscribe(result => {
-          debugger
           this.loadingSheetNo = result[0].LoadingSheet;
           this.addTripData()
           // Handle the result after the dialog is closed

@@ -479,7 +479,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   //end 
   saveData() {
-    debugger
 
     const dynamicValue = localStorage.getItem('Branch'); // Replace with your dynamic value
     const controlNames = ['svcType', 'payType', 'rskty', 'pkgs', 'trn'];

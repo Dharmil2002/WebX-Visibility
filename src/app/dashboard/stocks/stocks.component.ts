@@ -85,7 +85,7 @@ export class StocksComponent
   // declararing properties
   constructor(private operationService: OperationService) {
     super();
-    this.addAndEditPath = "/Masters/Docket/EwayBillDocketBookingV2";
+    this.addAndEditPath = "Operation/QuickCreateDocket";
   }
   ngOnInit(): void {
     this.getDocketDetails();

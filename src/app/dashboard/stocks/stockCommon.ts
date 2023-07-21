@@ -6,7 +6,6 @@ import { format, isValid, parseISO } from "date-fns";
  * @returns The KPI data array.
  */
 export function kpiData(StockCountData: any[]): any[] {
-  debugger
   // Helper function to create a shipData object
   const createShipDataObject = (
     count: number,

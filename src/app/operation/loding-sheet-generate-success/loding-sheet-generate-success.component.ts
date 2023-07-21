@@ -35,7 +35,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     ]
   columnHeader = {
     "LoadingSheet": "Loading Sheet",
-    "lag": "Leg",
+    "leg": "Leg",
     "Shipment": "Shipments",
     "Packages": "Packages",
     "WeightKg": "Weight Kg",
@@ -45,7 +45,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   centerAlignedData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
   headerForCsv = {
     "LoadingSheet": "Loading Sheet",
-    "lag": "Leg",
+    "leg": "Leg",
     "Shipment": "Shipments",
     "Packages": "Packages",
     "WeightKg": "Weight Kg",

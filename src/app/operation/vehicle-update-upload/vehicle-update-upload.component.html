@@ -20,7 +20,7 @@
             <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableload" (click)="updatePackage()">Scan</button>
 </form>
 
-<generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+<generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="loadingTableData"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
     [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
     [toggleArray]="toggleArray" [extraData]="extraData" [menuItems]="menuItems"

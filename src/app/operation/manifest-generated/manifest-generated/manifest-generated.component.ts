@@ -63,9 +63,11 @@ export class ManifestGeneratedComponent implements OnInit {
   loadingData: any;
   formdata: any;
   menifest: any;
-  constructor(private Route: Router,
-    private http: HttpClient, private fb: UntypedFormBuilder, @Inject(MAT_DIALOG_DATA) public item: any, public dialogRef: MatDialogRef<ManifestGeneratedComponent>, private cnoteService: CnoteService) {
-
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public item: any,
+    public dialogRef: MatDialogRef<ManifestGeneratedComponent>,
+    private cnoteService: CnoteService
+    ) {
     if (item) {
       this.menifest = item.loadingSheetData;
       this.getMenifest();
@@ -87,8 +89,8 @@ export class ManifestGeneratedComponent implements OnInit {
           Data: []
         };
       }
-      acc[leg].TotalWeightKg += element.KgWt;
-      acc[leg].TotalVolumeCFT += element.CftVolume;
+      acc[leg].TotalWeightKg += element.WeightKg;
+      acc[leg].TotalVolumeCFT += element.VolumeCFT;
       acc[leg].TotalPackages += element.Packages;
       acc[leg].ShipmentCount++;
       acc[leg].Data.push(element);

@@ -108,7 +108,6 @@ function getShipmentData(
  * @returns Table data array.
  */
 function generateTableData(departureData: any[], routeData: any[]): any[] {
-  debugger
   let dataDeparture: any[] = [];
   const { format } = require("date-fns");
 

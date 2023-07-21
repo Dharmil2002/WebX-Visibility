@@ -86,7 +86,6 @@ export class AddLocationMasterComponent implements OnInit {
     private fb: UntypedFormBuilder, public dialog: MatDialog, private router: Router, private filter: FilterUtils,
     private masterService: MasterService, private route: Router,
   ) {
-    debugger
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.LocationTable = router.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
@@ -210,7 +209,6 @@ export class AddLocationMasterComponent implements OnInit {
 
   //DROPDOWN FILTER IN OPTIMIZED WAY
   getDropDownData() {
-    debugger
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       const {
         locationHierarchyDropDown,

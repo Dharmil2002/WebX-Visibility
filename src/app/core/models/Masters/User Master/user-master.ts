@@ -51,11 +51,16 @@ export class UserMaster {
   locationList: any;
 roleId: any;
   divId: any;
+  userCode: any;
+  userPwd: any;
+  userTypeValue: any;
+  userStatusData: any;
 
   constructor(UserMaster) {
     {
       this.id = UserMaster.id || this.getRandomID();
       this.userId = UserMaster.userId || "";
+      this.userStatus = UserMaster.userStatus || "";
       this.name = UserMaster.name || "";
       this.email = UserMaster.email || "";
       this.password = UserMaster.password || "";

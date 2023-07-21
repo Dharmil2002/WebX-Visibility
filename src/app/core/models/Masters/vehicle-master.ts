@@ -81,6 +81,7 @@ export class vehicleModel {
     outerWidth: number;
     regNo: any;
     permitState: any;
+    tyreAttached: any;
     constructor(vehicleModel){
         this.vehregno = vehicleModel.vehregno || '';
         this.vehicleType = vehicleModel.vehicleType || '';

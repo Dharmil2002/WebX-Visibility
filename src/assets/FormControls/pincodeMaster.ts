@@ -80,7 +80,7 @@ export class PincodeControl {
                     onChange: 'GetPincodeExist',
                 },
                 generatecontrol: true,
-                disable: isUpdate ? true : false
+                disable: false
             },
             {
                 name: 'area',
@@ -121,9 +121,9 @@ export class PincodeControl {
                 label: 'Serviceable/Non-ODA',
                 placeholder: 'Serviceable',
                 type: 'toggle',
-                value: '',
+                value: PincodeTable.serviceable,
                 Validations: [],
-                generatecontrol: true, disable:  isUpdate ? true : false
+                generatecontrol: true, disable: false
             },
             {
                 name: 'entryBy',

@@ -1,5 +1,5 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
-        <app-table-boilerplate *ngIf="tableData" [tableData]="tableData" [columnHeader]="displayedColumns1"
+        <app-table-boilerplate *ngIf="tableLoad" [tableData]="tableData" [columnHeader]="displayedColumns1"
             title="Add DCR Series" (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
             (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
             [ActionObject]="actionObject"></app-table-boilerplate>

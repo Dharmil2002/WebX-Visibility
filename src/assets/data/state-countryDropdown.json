@@ -145,48 +145,48 @@
     ],
     "pincodeList": [
         {
-            "PincodeId": 1,
-            "PincodeDesc": "400029"
+            "pincodeId": 1,
+            "pincodeDesc": "400029"
         },
         {
-            "PincodeId": 2,
-            "PincodeDesc": "400065"
+            "pincodeId": 2,
+            "pincodeDesc": "400065"
         },
         {
-            "PincodeId": 3,
-            "PincodeDesc": "400011"
+            "pincodeId": 3,
+            "pincodeDesc": "400011"
         },
         {
-            "PincodeId": 4,
-            "PincodeDesc": "400099"
+            "pincodeId": 4,
+            "pincodeDesc": "400099"
         },
         {
-            "PincodeId": 5,
-            "PincodeDesc": "400004"
+            "pincodeId": 5,
+            "pincodeDesc": "400004"
         },
         {
-            "PincodeId": 6,
-            "PincodeDesc": "400053"
+            "pincodeId": 6,
+            "pincodeDesc": "400053"
         },
         {
-            "PincodeId": 7,
-            "PincodeDesc": "395001"
+            "pincodeId": 7,
+            "pincodeDesc": "395001"
         },
         {
-            "PincodeId": 8,
-            "PincodeDesc": "400014"
+            "pincodeId": 8,
+            "pincodeDesc": "400014"
         },
         {
-            "PincodeId": 9,
-            "PincodeDesc": "226001"
+            "pincodeId": 9,
+            "pincodeDesc": "226001"
         },
         {
-            "PincodeId": 10,
-            "PincodeDesc": "110033"
+            "pincodeId": 10,
+            "pincodeDesc": "110033"
         },
         {
-            "PincodeId": 11,
-            "PincodeDesc": "394110"
+            "pincodeId": 11,
+            "pincodeDesc": "394110"
         }
     ],
     "locationList": [

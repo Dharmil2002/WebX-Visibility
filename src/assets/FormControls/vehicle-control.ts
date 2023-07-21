@@ -15,7 +15,7 @@ export class VehicleControls {
         this.vehicleDetailsControl =
             [
                 {
-                    name: 'vehicleNo', label: "Vehicle Number", placeholder: "Enter Vehicle Number", type: 'text', value: vehicleTable.vehicleNo, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    name: 'vehicleNo', label: "Vehicle Number", placeholder: "Enter Vehicle Number", type: 'text', value: vehicleTable.vehicleNo, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: isUpdate ? true : false,
                     Validations: [
                         {
                             name: "required",
@@ -158,24 +158,10 @@ export class VehicleControls {
                 {
                     name: 'gpsDeviceEnabled', label: 'GPS Device Enabled', placeholder: '', type: 'toggle', value: vehicleTable.gpsDeviceEnabled, generatecontrol: true, disable: false,
                     Validations: [],
-                    // functions: {
-                    //     onChange: 'OnGpsDevice',
-                    // },
                 },
                 {
                     name: 'gpsProvider', label: 'GPS Provider', placeholder: 'Search and select GPS Provider', type: 'dropdown', value: '', generatecontrol: true, disable: false,
                     Validations: [
-                        // {
-                        //     name: "required",
-                        //     message: "GPS Provider is required.."
-                        // },
-                        // {
-                        //     name: "autocomplete",
-                        // },
-                        // {
-                        //     name: "invalidAutocomplete",
-                        //     message: "Choose proper value",
-                        // }
                     ],
                     additionalData: {
                         showNameAndValue: false
@@ -231,7 +217,7 @@ export class VehicleControls {
                     ]
                 },
                 {
-                    name: 'tyreAttached', label: 'No of Tyre Attached with Vehicle', placeholder: 'Enter No of Tyre Attached with Vehicle', type: 'number', value: 0, generatecontrol: true, disable: false,
+                    name: 'tyreAttached', label: 'No of Tyre Attached with Vehicle', placeholder: 'Enter No of Tyre Attached with Vehicle', type: 'number', value: vehicleTable.tyreAttached, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "pattern",
@@ -324,12 +310,15 @@ export class VehicleControls {
                         },
                     ],
                     functions: {
-                        //onChange: 'GetVehicleDetails',
                     }
                 },
                 {
                     name: 'regNo', label: 'Registration No', placeholder: 'Enter Registration Number', type: 'text', value: vehicleTable.regNo, generatecontrol: true, disable: false,
                     Validations: [
+                        {
+                            name: "required",
+                            message: "RC Book Number is required.."
+                        },
                         {
                             name: "pattern",
                             message: "Please Enter Max. 30 Character",
@@ -386,7 +375,6 @@ export class VehicleControls {
                         },
                     ],
                     functions: {
-                        //onChange: 'GetVehicleDetails',
                     }
                 },
                 {
@@ -398,7 +386,6 @@ export class VehicleControls {
                         },
                     ],
                     functions: {
-                        //onChange: 'GetVehicleDetails',
                     }
                 },
                 {
@@ -410,7 +397,6 @@ export class VehicleControls {
                         },
                     ],
                     functions: {
-                        //onChange: 'GetVehicleDetails',
                     }
                 },
                 {
@@ -422,7 +408,6 @@ export class VehicleControls {
                         },
                     ],
                     functions: {
-                        //onChange: 'GetVehicleDetails',
                     }
                 },
                 {
@@ -434,18 +419,12 @@ export class VehicleControls {
                         },
                     ],
                     functions: {
-                        //onChange: 'GetVehicleDetails',
                     }
                 },
                 {
                     name: 'isActive', label: 'Active Flag', placeholder: '', type: 'toggle', value: vehicleTable.isActive, generatecontrol: true, disable: false,
                     Validations: []
                 }
-                // ,
-                // {
-                //     name: 'blackListed', label: 'IsBlackListed', placeholder: '', type: 'toggle', value: VehicleTable.blackListed, generatecontrol: true, disable: false,
-                //     Validations: []
-                // }
             ],
 
             this.otherDetailsControls = [

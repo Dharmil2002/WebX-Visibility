@@ -55,7 +55,7 @@ export class CityMasterListComponent implements OnInit {
         let req = {
             "companyCode": 10065,
             "type": "masters",
-            "collection": "city"
+            "collection": "city_detail"
         }
         this.masterService.masterPost('common/getall', req).subscribe({
             next: (res: any) => {

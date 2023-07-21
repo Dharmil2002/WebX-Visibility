@@ -31,7 +31,7 @@ export class UserMasterListComponent implements OnInit {
         },
     ];
     columnHeader = {
-        "internalId": "Sr No",
+        "srNo": "Sr No",
         "userId": "User Code",
         "name": "User Name",
         "branchCode": "User Branch",
@@ -76,7 +76,7 @@ export class UserMasterListComponent implements OnInit {
         let req = {
             "companyCode": this.companyCode,
             "type": "masters",
-            "collection": "user"
+            "collection": "user_detail"
         }
         this.masterService.masterPost('common/getall', req).subscribe({
             next: (res: any) => {

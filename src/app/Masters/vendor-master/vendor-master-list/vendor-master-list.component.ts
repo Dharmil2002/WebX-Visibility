@@ -86,7 +86,7 @@ export class VendorMasterListComponent implements OnInit {
     let req = {
       companyCode: this.companyCode,
       "type": "masters",
-      "collection": "vendor"
+      "collection": "vendor_detail"
   }
   this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {

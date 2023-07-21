@@ -38,6 +38,8 @@ export class VendorMaster {
     franchise: any
     integrateWithFinSystem: any
     reliableDocument: any
+    id: any
+    tdsRate: any
     constructor(VendorMaster) {
       {
         this.vendorCode = VendorMaster.vendorCode || 'System Genrated';

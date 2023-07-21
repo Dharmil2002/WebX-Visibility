@@ -78,22 +78,30 @@ export class CityControl {
         }
       },
       {
+        name: 'odaFlag',
+        label: 'ODA Flag',
+        placeholder: 'ODA Flag',
+        type: 'toggle',
+        value: CityTable.odaFlag,
+        Validations: [],
+        generatecontrol: true, disable: false
+    },
+      {
         name: 'isActive', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: CityTable.isActive, generatecontrol: true, disable: false,
         Validations: []
-      },
-      {
-        name: 'id',
-        label: '',
-        placeholder: '',
-        type: 'text',
-        value: CityTable.id,
-        filterOptions: '',
-        autocomplete: '',
-        displaywith: '',
-        Validations: [],
-        generatecontrol: false,
-        disable: false
-      },
+      }, {
+              name: 'id',
+              label: '',
+              placeholder: '',
+              type: 'text',
+              value: CityTable.id,
+              filterOptions: '',
+              autocomplete: '',
+              displaywith: '',
+              Validations: [],
+              generatecontrol: false,
+              disable: false
+            },
       { name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: parseInt(localStorage.getItem("companyCode")), Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
       { name: 'entryBy', label: 'EntryBy', placeholder: 'EntryBy', type: 'text', value: CityTable.entryBy, Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
     ]

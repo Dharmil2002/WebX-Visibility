@@ -49,6 +49,57 @@ export class UserControl {
         ],
       },
       {
+        name: "userpassword",
+        label: "Password",
+        placeholder: "Enter Password",
+        type: "password",
+        value: UserTable.userPwd,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Password required!",
+          },
+          {
+            name: "pattern",
+            message:
+              "Please enter password with 6-15 chars, 1 upper/lower case, 1 digit & 1 special char (!@#$%^&*_=+-)",
+            pattern:
+              "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{6,15}$",
+          },
+        ],
+        additionalData: {
+          // showPassword: false,
+          inputType: "password",
+        },
+        functions: {
+          onChange: "getUpdateChangedPassword",
+        },
+      },
+      {
+        name: "confirmpassword",
+        label: "Confirm Password",
+        placeholder: "Enter Confirm Password",
+        type: "password",
+        value: UserTable.userPwd,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Confirm Password required!",
+          },
+        ],
+        additionalData: {
+          // showPassword: false,
+          inputType: "password",
+        },
+        functions: {
+          onChange: "changedPassword",
+        },
+      },
+      {
         name: "internalId",
         label: "Intenal ID",
         placeholder: "Enter Intenal ID",
@@ -152,7 +203,6 @@ export class UserControl {
           showNameAndValue: false
         }
       },
-
       {
         name: 'multiLocation',
         label: 'Multi Locations Access',
@@ -175,7 +225,7 @@ export class UserControl {
       },
       {
         name: 'userStatus', label: "User Status", placeholder: "Select User Status", type: 'dropdown',
-        value: UserTable.userStatus, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -195,7 +245,7 @@ export class UserControl {
       },
       {
         name: 'userType', label: "User Type", placeholder: "Select User Type", type: 'dropdown',
-        value: UserTable.name, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        value: UserTable.userType, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -215,7 +265,7 @@ export class UserControl {
       },
       {
         name: 'managerId', label: "Manager Id", placeholder: "Select Manager Id", type: 'dropdown',
-        value: UserTable.manager, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -369,8 +419,6 @@ export class UserControl {
         disable: false,
         Validations: [],
       },
-
-
       {
         name: 'division',
         label: 'Multi Division Access',
@@ -477,76 +525,66 @@ export class UserControl {
         Validations: [],
         generatecontrol: false,
         disable: false
-      },
-      {
-        name: 'id',
-        label: '',
-        placeholder: '',
-        type: 'text',
-        value: UserTable.id,
-        filterOptions: '',
-        autocomplete: '',
-        displaywith: '',
-        Validations: [],
-        generatecontrol: false,
-        disable: false
-      },
+      }
+      
     ];
-    if (!isUpdate) {
-      let Password = {
-        name: "password",
-        label: "Password",
-        placeholder: "Enter Password",
-        type: "password",
-        value: "",
-        generatecontrol: isUpdate ? false : true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Password required!",
-          },
-          {
-            name: "pattern",
-            message:
-              "Please enter password with 8-12 chars, 1 upper/lower case, 1 digit & 1 special char (!@#$%^&*_=+-)",
-            pattern:
-              "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,12}$",
+    // if (!isUpdate) {
+    //   let Password = {
+    //     name: "password",
+    //     label: "Password",
+    //     placeholder: "Enter Password",
+    //     type: "password",
+    //     value: UserTable.userPwd,
+    //     generatecontrol: isUpdate ? false : true,
+    //     disable: false,
+    //     Validations: [
+    //       {
+    //         name: "required",
+    //         message: "Password required!",
+    //       },
+    //       {
+    //         name: "pattern",
+    //         message:
+    //           "Please enter password with 8-12 chars, 1 upper/lower case, 1 digit & 1 special char (!@#$%^&*_=+-)",
+    //         pattern:
+    //           "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,12}$",
 
-          },
-        ],
-        additionalData: {
-          // showPassword: false,
-          inputType: "password"
-        },
+    //       },
+    //     ],
+    //     additionalData: {
+    //       // showPassword: false,
+    //       inputType: "password"
+    //     }, functions: {
+    //       onChange: "getupdateChangedPassword",
+    //     }
 
-      }
-      let ConfirmPassword = {
-        name: "confirmpassword",
-        label: "Confirm Password",
-        placeholder: "Enter Confirm Password",
-        type: "password",
-        value: "",
-        generatecontrol: isUpdate ? false : true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Confirm Password required!",
-          },
-        ],
-        additionalData: {
-          // showPassword: false,
-          inputType: "password"
-        },
-        functions: {
-          onChange: 'ChangedPassword',
-        }
-      }
-      //this code use for sequence in field and that code in sent to index value pass
-      this.UserControlArray.splice(2, 0, Password);
-      this.UserControlArray.splice(3, 0, ConfirmPassword);
-    }
+    //   }
+    //   let ConfirmPassword = {
+    //     name: "confirmpassword",
+    //     label: "Confirm Password",
+    //     placeholder: "Enter Confirm Password",
+    //     type: "password",
+    //     value: UserTable.userPwd,
+    //     generatecontrol: isUpdate ? false : true,
+    //     disable: false,
+    //     Validations: [
+    //       {
+    //         name: "required",
+    //         message: "Confirm Password required!",
+    //       },
+    //     ],
+    //     additionalData: {
+    //       // showPassword: false,
+    //       inputType: "password"
+    //     },
+    //     functions: {
+    //       onChange: 'changedPassword',
+    //     }
+    //   }
+    //   //this code use for sequence in field and that code in sent to index value pass
+    //   this.UserControlArray.splice(2, 0, Password);
+    //   this.UserControlArray.splice(3, 0, ConfirmPassword);
+    // }
   }
   getFormControlsUser() {
     return this.UserControlArray;

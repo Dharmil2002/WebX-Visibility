@@ -12,6 +12,7 @@ export class CityMaster {
   state: any;
   zone: any;
   entryBy: any;
+  odaFlag: any;
 
   constructor(CityMaster) {
     {

@@ -40,9 +40,12 @@ export class DCRControl {
                     name: 'documentType',
                     label: 'Document Type',
                     placeholder: 'Document Type',
-                    type: 'text',
+                    type: 'dropdown',
                     value: "",
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: false
+                    },
                     generatecontrol: true,
                     disable: true
                 },

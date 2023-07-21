@@ -41,6 +41,7 @@ import { VendorMasterListComponent } from './vendor-master/vendor-master-list/ve
 import { RouteMasterLocationAddComponent } from './route-master-location-wise/route-master-location-add/route-master-location-add.component';
 import { AirportMasterListComponent } from './airport-master/airport-master-list/airport-master-list.component';
 import { AirportMasterAddComponent } from './airport-master/airport-master-add/airport-master-add.component';
+import { PincodeLocationMappingComponent } from './pincode-to-location-mapping-master/pincode-location-list/pincode-to-location-mapping.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -84,6 +85,7 @@ const routes: Routes = [
   { path: "VendorMaster/AddVendorMaster", component: AddVendorMasterComponent },
   { path: "AirportMaster/AirportMasterList", component: AirportMasterListComponent },
   { path: "AirportMaster/AddAirportMaster", component: AirportMasterAddComponent },
+  { path: "PincodeLocation/PincodeLocationMapping", component:PincodeLocationMappingComponent}
 ];
 
 @NgModule({

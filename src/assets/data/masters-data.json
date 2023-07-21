@@ -3961,67 +3961,128 @@
     }
   ],
   "pincodeToLoc":[
-      {
-        "destinationLocationCode": "mumb",
-        "area": "test2",
-        "pincode": "121344",
-        "activeFlag": "Y"
-      },
-      {
-        "destinationLocationCode": "MUMB",
-        "area": "Mumbai",
-        "pincode": "395001",
-        "activeFlag": "Y"
-      },
-      {
-        "destinationLocationCode": "MUMB",
-        "area": "Andheri",
-        "pincode": "400001",
-        "activeFlag": "Y"
-      },
-      {
-        "destinationLocationCode": "MUMB",
-        "area": "Mumbai",
-        "pincode": "400001",
-        "activeFlag": "Y"
-      },
-      {
-        "destinationLocationCode": "MUMB",
-        "area": "Mumbai",
-        "pincode": "400002",
-        "activeFlag": "Y"
-      },
-      {
-        "destinationLocationCode": "MUMB",
-        "area": "Mumbai",
-        "pincode": "400003",
-        "activeFlag": "Y"
-      },
-      {
-        "destinationLocationCode": "MUMB",
-        "area": "Mumbai",
-        "pincode": "400004",
-        "activeFlag": "Y"
-      },
-      {
-        "destinationLocationCode": "MUMB",
-        "area": "Mumbai",
-        "pincode": "400005",
-        "activeFlag": "Y"
-      },
-      {
-        "destinationLocationCode": "MUMB",
-        "area": "Mumbai",
-        "pincode": "400006",
-        "activeFlag": "Y"
-      },
-      {
-        "destinationLocationCode": "MUMB",
-        "area": "Mumbai",
-        "pincode": "400007",
-        "activeFlag": "Y"
-      }
-  ],
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "Mumbai",
+
+      "pincode": "121344",
+
+      "activeFlag": "Y"
+
+    },
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "Mumbai",
+
+      "pincode": "395001",
+
+      "activeFlag": "Y"
+
+    },
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "Andheri",
+
+      "pincode": "400001",
+
+      "activeFlag": "Y"
+
+    },
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "Dadar",
+
+      "pincode": "400001",
+
+      "activeFlag": "Y"
+
+    },
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "churchgate",
+
+      "pincode": "400002",
+
+      "activeFlag": "Y"
+
+    },
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "lalbaugh",
+
+      "pincode": "400003",
+
+      "activeFlag": "Y"
+
+    },
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "Parel",
+
+      "pincode": "400004",
+
+      "activeFlag": "Y"
+
+    },
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "Marine Lines",
+
+      "pincode": "400005",
+
+      "activeFlag": "Y"
+
+    },
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "Prabhadevi",
+
+      "pincode": "400006",
+
+      "activeFlag": "Y"
+
+    },
+
+    {
+
+      "destinationLocationCode": "MUMB",
+
+      "area": "Worli",
+
+      "pincode": "400007",
+
+      "activeFlag": "Y"
+
+    }
+
+],
   "holidayData":[
     {
       "srNo": 1,

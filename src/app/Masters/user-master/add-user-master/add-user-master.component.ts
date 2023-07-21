@@ -17,6 +17,7 @@ import { getShortName } from "src/app/Utility/commonFunction/random/generateRand
 
 export class AddUserMasterComponent implements OnInit {
     companyCode: any = parseInt(localStorage.getItem("companyCode"));
+    password: any;
     jsonControlUserArray: any;
     userTableForm: UntypedFormGroup;
     isUpdate = false;
@@ -63,7 +64,8 @@ export class AddUserMasterComponent implements OnInit {
     divisionList: any;
     division: any;
     data: any;
-    manager: any;
+    confirmpassword: any;
+    lastUsedUserCode: number = 0;
     ngOnInit(): void {
         this.bindDropdown();
         this.getDropDownData();
@@ -193,6 +195,8 @@ export class AddUserMasterComponent implements OnInit {
 
                 this.updateCountry = this.findDropdownItemByName(this.countryList, this.userTable.country);
                 this.userTableForm.controls.country.setValue(this.updateCountry);
+
+                this.userTableForm.controls['gender'].setValue(this.data.gender);
                 // Patches the Div control value of UserTableForm with filter
                 this.userTableForm.controls["division"].patchValue(this.divisionList.filter((element) =>
                     this.userTable.multiDivisionAccess.includes(element.name)
@@ -223,7 +227,6 @@ export class AddUserMasterComponent implements OnInit {
         return dropdownData.find(item => item.name === name);
     }
     save() {
-        this.userTableForm.controls["gender"].setValue(this.userTableForm.value.gender);
         this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.name);
         this.userTableForm.controls["managerId"].setValue(this.userTableForm.value.managerId.name);
         this.userTableForm.controls["userStatus"].setValue(this.userTableForm.value.userStatus.name);
@@ -235,19 +238,32 @@ export class AddUserMasterComponent implements OnInit {
         this.userTableForm.controls["multiDivisionAccess"].setValue(division);
         const multiLoc = this.userTableForm.value.userLocationscontrolHandler.map((item: any) => item.name);
         this.userTableForm.controls["multiLocation"].setValue(multiLoc);
+        this.userTableForm.controls["isActive"].setValue(this.userTableForm.value.isActive === true ? true : false);
 
-        this.userTableForm.controls["isActive"].setValue(this.userTableForm.value.isActive == true ? "Y" : "N");
+        //remove unwanted controlName
+        const controlsToRemove = [
+            "confirmpassword",
+            "division",
+            "CompanyCode",
+            "isUpdate",
+            "controlHandler",
+            "userLocationscontrolHandler"
+        ];
+        controlsToRemove.forEach(controlName => {
+            this.userTableForm.removeControl(controlName);
+        });
+        //generate unique userId
+        const userCode = this.generateUserCode();
+        this.userTableForm.controls["userId"].setValue(userCode);
+
         if (this.isUpdate) {
-            let id = this.userTableForm.value.id;
             // Remove the "id" field from the form controls
-            this.userTableForm.removeControl("id");
-
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "user",
-                id: id,
-                data: this.userTableForm.value
+                collection: "user_detail",
+                id: this.data.id,
+                updates: this.userTableForm.value
             };
             this.masterService.masterPut('common/update', req).subscribe({
                 next: (res: any) => {
@@ -264,27 +280,14 @@ export class AddUserMasterComponent implements OnInit {
                 }
             });
         } else {
-            const randomNumber = getShortName(this.userTableForm.value.userId);
-            this.userTableForm.controls["userId"].setValue(randomNumber);
-            this.userTableForm.controls["id"].setValue(randomNumber);
-            const controlsToRemove = [
-                "confirmpassword",
-                "division",
-                "CompanyCode",
-                "isUpdate",
-                "controlHandler",
-                "userLocationscontrolHandler"
-              ];
-              
-              controlsToRemove.forEach(controlName => {
-                this.userTableForm.removeControl(controlName);
-              });
-
+            const data = this.userTableForm.value; 
+            const id = { id: this.userTableForm.controls["userId"].value }; 
+            const mergedObject = { ...data,...id }; 
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "user",
-                data: this.userTableForm.value
+                collection: "user_detail",
+                data: mergedObject//this.userTableForm.value
             };
             this.masterService.masterPost('common/create', req).subscribe({
                 next: (res: any) => {
@@ -301,7 +304,6 @@ export class AddUserMasterComponent implements OnInit {
                 }
             });
         }
-
     }
     cancel() {
         window.history.back();
@@ -319,6 +321,44 @@ export class AddUserMasterComponent implements OnInit {
         } catch (error) {
             // we have to handle , if function not exists.
             console.log("failed");
+        }
+    }
+
+    //method to generate unique userCode
+    generateUserCode(): string {
+        // Get the last used user code from localStorage
+        const lastUsedCode = parseInt(localStorage.getItem('lastUsedUserCode') || '0', 10);
+        // Increment the last used user code by 1 to generate the next one
+        const nextUserCode = lastUsedCode + 1;
+        // Convert the number to a 4-digit string, padded with leading zeros
+        const paddedNumber = nextUserCode.toString().padStart(4, '0');
+        // Combine the prefix "USR" with the padded number to form the complete user code
+        const userCode = `USR${paddedNumber}`;
+        // Update the last used user code in localStorage
+        localStorage.setItem('lastUsedUserCode', nextUserCode.toString());
+        return userCode;
+    }
+
+    getUpdateChangedPassword() {
+        if (this.isUpdate) {
+            this.changedPassword();
+        }
+    }
+    //password function for top-up box and check the password in confimpassword filed if correct or not
+    changedPassword() {
+        this.password = this.userTableForm.get("userpassword").value;
+        this.confirmpassword = this.userTableForm.get("confirmpassword").value;
+        if (this.password != this.confirmpassword) {
+            Swal.fire({
+                title: "Password and confirm password did not match",
+                toast: true,
+                icon: "error",
+                showCloseButton: false,
+                showCancelButton: false,
+                showConfirmButton: true,
+                confirmButtonText: "OK",
+            });
+            this.userTableForm.controls["confirmpassword"].reset();
         }
     }
 }

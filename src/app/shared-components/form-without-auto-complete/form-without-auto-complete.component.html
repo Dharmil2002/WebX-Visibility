@@ -52,7 +52,8 @@
 
             <!--toggles---------------------------------------------------------->
             <mat-slide-toggle *ngIf="formItem.type=='toggle' && formItem.generatecontrol===true" color="primary"
-                formControlName={{formItem.name}}>{{formItem.label}}</mat-slide-toggle>
+                formControlName={{formItem.name}}
+                (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">{{formItem.label}}</mat-slide-toggle>
             <!-- single select -->
             <mat-form-field appearance="outline" floatLabel="never" class="example-full-width"
                 *ngIf="formItem.type=='select' && formItem.generatecontrol===true">

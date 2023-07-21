@@ -55,11 +55,9 @@ export class AddPinCodeMasterComponent implements OnInit {
             this.action = 'edit'
             this.isUpdate = true;
         } else {
-            
             this.action = "Add";
         }
         if (this.action === 'edit') {
-            
             this.isUpdate = true;
             this.pincodeTable = this.data;
             this.breadScrums = [
@@ -103,7 +101,6 @@ export class AddPinCodeMasterComponent implements OnInit {
         });
         // Build the form group using formGroupBuilder function and the values of jsonControlArray
         this.pincodeTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-
         //for set static dropdown
         this.pincodeTableForm.controls["pincodeCategory"].setValue(
             this.pincodeTable.pincodeCategory
@@ -122,13 +119,10 @@ export class AddPinCodeMasterComponent implements OnInit {
                 }
                 state.push(dropdownList)
             });
-
             if (this.isUpdate) {
-                
                 this.updateState = state.find((x) => x.name == this.data.state);
                 this.pincodeTableForm.controls.state.setValue(this.updateState);
             }
-
             this.filter.Filter(
                 this.jsonControlArray,
                 this.pincodeTableForm,
@@ -151,11 +145,9 @@ export class AddPinCodeMasterComponent implements OnInit {
                 city.push(dropdownList)
             });
             if (this.isUpdate) {
-                
                 this.updateCity = city.find((x) => x.name == this.data.city);
                 this.pincodeTableForm.controls.city.setValue(this.updateCity);
             }
-
             this.filter.Filter(
                 this.jsonControlArray,
                 this.pincodeTableForm,
@@ -170,15 +162,15 @@ export class AddPinCodeMasterComponent implements OnInit {
         window.history.back();
     }
     save() {
-        
         this.pincodeTableForm.controls["state"].setValue(this.pincodeTableForm.value.state.name);
         this.pincodeTableForm.controls["city"].setValue(this.pincodeTableForm.value.city.name);
-       this.pincodeTableForm.controls["pincodeCategory"].setValue(this.pincodeTableForm.value.pincodeCategory);
-        this.pincodeTableForm.controls["isActive"].setValue(this.pincodeTableForm.value.isActive == true ? "Y" : "N");
-        this.pincodeTableForm.controls["serviceable"].setValue(this.pincodeTableForm.value.serviceable == true ? "Y" : "N");
+        this.pincodeTableForm.controls["pincodeCategory"].setValue(this.pincodeTableForm.value.pincodeCategory);
+        this.pincodeTableForm.controls["isActive"].setValue(this.pincodeTableForm.value.isActive === true ? true : false);
+        this.pincodeTableForm.controls["serviceable"].setValue(this.pincodeTableForm.value.serviceable === true ? true : false);
+        this.pincodeTableForm.removeControl("isUpdate");
+        this.pincodeTableForm.removeControl("companyCode");
 
         if (this.isUpdate) {
-            
             let id = this.pincodeTableForm.value.id;
             // Remove the "id" field from the form controls
             this.pincodeTableForm.removeControl("id");
@@ -186,9 +178,9 @@ export class AddPinCodeMasterComponent implements OnInit {
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "pincode",
-                id: id,
-                data: this.pincodeTableForm.value
+                collection: "pincode_detail",
+                id: this.data.id,
+                updates: this.pincodeTableForm.value
             };
             this.masterService.masterPut('common/update', req).subscribe({
                 next: (res: any) => {
@@ -206,12 +198,11 @@ export class AddPinCodeMasterComponent implements OnInit {
             });
         } else {
             const randomNumber = getShortName(this.pincodeTableForm.value.area);
-            //this.pincodeTableForm.controls["state"].setValue(randomNumber);
             this.pincodeTableForm.controls["id"].setValue(randomNumber);
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "pincode",
+                collection: "pincode_detail",
                 data: this.pincodeTableForm.value
             };
             this.masterService.masterPost('common/create', req).subscribe({
@@ -233,10 +224,8 @@ export class AddPinCodeMasterComponent implements OnInit {
 
     functionCallHandler($event) {
         // console.log("fn handler called" , $event);
-
         let field = $event.field;                   // the actual formControl instance
         let functionName = $event.functionName;     // name of the function , we have to call
-
         // function of this name may not exists, hence try..catch 
         try {
             this[functionName]($event);

@@ -66,6 +66,7 @@ export class AddVehicleMasterComponent implements OnInit {
   routeLoc: any;
   routeStatus: any;
   routeLocData: any;
+  lastUsedVehicleCode = 0;
   ngOnInit(): void {
     this.bindDropdown();
     this.getDropDownData();
@@ -292,6 +293,34 @@ export class AddVehicleMasterComponent implements OnInit {
   cancel() {
     window.history.back();
   }
+  // generateNextVehicleCode() {
+  //   // Increment the last used vehicle code by 1 to generate the next one
+  //   this.lastUsedVehicleCode++;
+
+  //   // Convert the number to a 4-digit string, padded with leading zeros
+  //   const paddedNumber = this.lastUsedVehicleCode.toString().padStart(4, '0');
+
+  //   // Combine the prefix "VH" with the padded number to form the complete vehicle code
+  //   return `VH${paddedNumber}`;
+  // }
+  generateNextVehicleCode(): string {
+    // Get the last used vehicle code from localStorage
+    const lastVehicleCode = parseInt(localStorage.getItem('lastVehicleCode') || '0', 10);
+
+    // Increment the last vehicle code by 1 to generate the next one
+    const nextVendorCode = lastVehicleCode + 1;
+
+    // Convert the number to a 4-digit string, padded with leading zeros
+    const paddedNumber = nextVendorCode.toString().padStart(4, '0');
+
+    // Combine the prefix "VH" with the padded number to form the complete vehicle code
+    const vehicleCode = `VH${paddedNumber}`;
+
+    // Update the last used vehicle code in localStorage
+    localStorage.setItem('lastVehicleCode', nextVendorCode.toString());
+
+    return vehicleCode;
+}
   save() {
     const formValue = this.vehicleTableForm.value;
     const controlNames = [
@@ -320,14 +349,17 @@ export class AddVehicleMasterComponent implements OnInit {
     this.vehicleTableForm.removeControl("permitStateDropdown");
     this.vehicleTableForm.removeControl("routeLocation");
     this.vehicleTableForm.removeControl("isUpdate");
+    
     if (this.isUpdate) {
       let id = this.vehicleTableForm.value.id;
+      // Remove the "id" field from the form controls
+      this.vehicleTableForm.removeControl("id");
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "vehicle_master",
+        collection: "vehicle_detail",
         id: id,
-        data: this.vehicleTableForm.value
+        updates: this.vehicleTableForm.value
       };
       this.masterService.masterPut('common/update', req).subscribe({
         next: (res: any) => {
@@ -345,12 +377,12 @@ export class AddVehicleMasterComponent implements OnInit {
       });
     }
     else {
-      const randomNumber = getShortName(this.vehicleTableForm.value.vehicleNo);
-      this.vehicleTableForm.controls["id"].setValue(randomNumber);
+    const nextVehicleCode = this.generateNextVehicleCode();
+    this.vehicleTableForm.controls["id"].setValue(nextVehicleCode);
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "vehicle_master",
+        collection: "vehicle_detail",
         data: this.vehicleTableForm.value
       };
       this.masterService.masterPost('common/create', req).subscribe({
@@ -369,5 +401,6 @@ export class AddVehicleMasterComponent implements OnInit {
       });
     }
   }
+
 }
 

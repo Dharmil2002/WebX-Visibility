@@ -7,10 +7,8 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from 'src/app/Utility/utility.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { CityControl } from "src/assets/FormControls/CityControls";
+import { CityControl } from "src/assets/FormControls/cityControls";
 import Swal from "sweetalert2";
-import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
-
 
 @Component({
     selector: 'app-add-city-master',
@@ -38,6 +36,8 @@ export class AddCityMasterComponent implements OnInit {
     stateList: any[];
     stateData: any;
     zoneData: any;
+    prevUsedCityCode: number = 0;
+
     constructor(private route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
         private fb: UntypedFormBuilder, private filter: FilterUtils,
         private service: utilityService, private masterService: MasterService) {
@@ -105,19 +105,22 @@ export class AddCityMasterComponent implements OnInit {
     save() {
         this.cityTableForm.controls["state"].setValue(this.cityTableForm.value.state.name);
         this.cityTableForm.controls["zone"].setValue(this.cityTableForm.value.zone.name);
-        this.cityTableForm.controls["isActive"].setValue(this.cityTableForm.value.isActive == true ? "Y" : "N");
+        this.cityTableForm.controls["odaFlag"].setValue(this.cityTableForm.value.odaFlag === true ? true : false);
+        this.cityTableForm.controls["isActive"].setValue(this.cityTableForm.value.isActive === true ? true : false);
+         //generate unique userId
+         const cityId = this.generateCityCode();
+         this.cityTableForm.controls["id"].setValue(cityId);
+         this.cityTableForm.removeControl("CompanyCode");
+
         if (this.isUpdate) {
             let id = this.cityTableForm.value.id;
-            // Remove the "id" field from the form controls
             this.cityTableForm.removeControl("id");
-            this.cityTableForm.removeControl("CompanyCode");
-
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "city",
-                id: id,
-                data: this.cityTableForm.value
+                collection: "city_detail",
+                id: this.data.id,
+                updates: this.cityTableForm.value
             };
             this.masterService.masterPut('common/update', req).subscribe({
                 next: (res: any) => {
@@ -125,7 +128,7 @@ export class AddCityMasterComponent implements OnInit {
                         // Display success message
                         Swal.fire({
                             icon: "success",
-                            title: "Successful",
+                            title: "edited successfully",
                             text: res.message,
                             showConfirmButton: true,
                         });
@@ -134,14 +137,10 @@ export class AddCityMasterComponent implements OnInit {
                 }
             });
         } else {
-            const randomNumber = getShortName(this.cityTableForm.value.cityName);
-            this.cityTableForm.controls["cityId"].setValue(randomNumber);
-            this.cityTableForm.controls["id"].setValue(randomNumber);
-            this.cityTableForm.removeControl("CompanyCode");
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "city",
+                collection: "city_detail",
                 data: this.cityTableForm.value
             };
             this.masterService.masterPost('common/create', req).subscribe({
@@ -150,7 +149,7 @@ export class AddCityMasterComponent implements OnInit {
                         // Display success message
                         Swal.fire({
                             icon: "success",
-                            title: "Successful",
+                            title: "data added successfully",
                             text: res.message,
                             showConfirmButton: true,
                         });
@@ -174,7 +173,6 @@ export class AddCityMasterComponent implements OnInit {
                 zone.push(dropdownList)
             });
             if (this.isUpdate) {
-
                 this.updateCountry = zone.find((x) => x.name == this.zoneId);
                 this.cityTableForm.controls.zone.setValue(this.updateCountry);
             }
@@ -213,7 +211,20 @@ export class AddCityMasterComponent implements OnInit {
             );
         });
     }
-
+    //method to generate unique userCode
+    generateCityCode(): string {
+        // Get the last used user code from localStorage
+        const prevCityId = parseInt(localStorage.getItem('prevUsedCityCode') || '0', 10);
+        // Increment the last used user code by 1 to generate the next one
+        const nextCityId = prevCityId + 1;
+        // Convert the number to a 4-digit string, padded with leading zeros
+        const paddedNumber = nextCityId.toString().padStart(4, '0');
+        // Combine the prefix "USR" with the padded number to form the complete user code
+        const cityId = `city${paddedNumber}`;
+        // Update the last used user code in localStorage
+        localStorage.setItem('prevUsedCityCode', nextCityId.toString());
+        return cityId;
+    }
     functionCallHandler($event) {
         // console.log("fn handler called" , $event);
         let field = $event.field;                   // the actual formControl instance
@@ -227,5 +238,4 @@ export class AddCityMasterComponent implements OnInit {
             console.log("failed");
         }
     }
-
 }

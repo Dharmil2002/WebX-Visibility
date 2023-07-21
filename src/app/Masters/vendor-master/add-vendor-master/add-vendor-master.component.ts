@@ -8,7 +8,6 @@ import { VendorMaster } from "src/app/core/models/Masters/vendor-master";
 import { VendorControl } from "src/assets/FormControls/vendor-control";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
 
 @Component({
   selector: 'app-add-vendor-master',
@@ -19,6 +18,7 @@ export class AddVendorMasterComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   action: string;
   isUpdate = false;
+  lastUsedVendorCode = 0;
   vendorTabledata: VendorMaster;
   vendorTableForm: UntypedFormGroup;
   vendorFormControls: VendorControl;
@@ -70,6 +70,9 @@ export class AddVendorMasterComponent implements OnInit {
   select: any;
   selectStatus: any;
   vendorCityName: any;
+  SelectFile: File;
+  imageName: string;
+  selectedFiles: boolean;
   ngOnInit(): void {
     this.getDropDownData();
   }
@@ -127,7 +130,7 @@ export class AddVendorMasterComponent implements OnInit {
         this.vendorType = data.name;
         this.vendorTypeStatus = data.additionalData.showNameAndValue;
       }
-     
+
       if (data.name === 'vendorLocation') {
         // Set vendorLocation category-related variables
         this.vLocation = data.name;
@@ -197,10 +200,10 @@ export class AddVendorMasterComponent implements OnInit {
         this.vendorTableForm.controls.lspName.setValue(this.lspNameDetail);
 
         this.vendorTableForm.controls["vendorLocationDropdown"].patchValue(this.vLocationData.filter((element) =>
-        this.vendorTabledata.vendorLocation.includes(element.name)))
+          this.vendorTabledata.vendorLocation.includes(element.name)))
 
         this.vendorTableForm.controls["tdsSectionDropdown"].patchValue(this.tdsSectionData.filter((element) =>
-        this.vendorTabledata.tdsSection.includes(element.name)))
+          this.vendorTabledata.tdsSection.includes(element.name)))
       }
 
       const filterParams = [
@@ -220,6 +223,135 @@ export class AddVendorMasterComponent implements OnInit {
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }
+  generateNextVendorCode(): string {
+    // Get the last used vendor code from localStorage
+    const lastVendorCode = parseInt(localStorage.getItem('lastVendorCode') || '0', 10);
+
+    // Increment the last Vendor user code by 1 to generate the next one
+    const nextVendorCode = lastVendorCode + 1;
+
+    // Convert the number to a 4-digit string, padded with leading zeros
+    const paddedNumber = nextVendorCode.toString().padStart(4, '0');
+
+    // Combine the prefix "VDR" with the padded number to form the complete vendor code
+    const vendorCode = `VDR${paddedNumber}`;
+
+    // Update the last used Vendor code in localStorage
+    localStorage.setItem('lastVendorCode', nextVendorCode.toString());
+
+    return vendorCode;
+  }
+  selectedFileForTdsDocument(data) {
+    let fileList: FileList = data.eventArgs;
+    if (fileList.length > 0) {
+      const file: File = fileList[0];
+      this.SelectFile = file;
+      this.imageName = file.name;
+      this.selectedFiles = true;
+      this.vendorTableForm.controls["tdsDocument"].setValue(this.SelectFile.name);
+    } else {
+      this.selectedFiles = false;
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: "Please select a file.",
+        showConfirmButton: true,
+      });
+    }
+  }
+  selectedFileForCancelCheque(data) {
+    let fileList: FileList = data.eventArgs;
+    if (fileList.length > 0) {
+      const file: File = fileList[0];
+      const allowedFormats = ["jpeg", "png", "jpg"];
+      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
+
+      if (allowedFormats.includes(fileFormat)) {
+        this.SelectFile = file;
+        this.imageName = file.name;
+        this.selectedFiles = true;
+        this.vendorTableForm.controls["cancelCheque"].setValue(this.SelectFile.name);
+      } else {
+        this.selectedFiles = false;
+        Swal.fire({
+          icon: "warning",
+          title: "Alert",
+          text: `Please select a CSV, JPEG, PNG, or JPG file.`,
+          showConfirmButton: true,
+        });
+      }
+    } else {
+      this.selectedFiles = false;
+      alert("No file selected");
+    }
+  }
+  selectedFileForPdfFile(data) {
+    let fileList: FileList = data.eventArgs;
+    if (fileList.length > 0) {
+      const file: File = fileList[0];
+      const allowedFormats = ["pdf"];
+      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
+
+      if (allowedFormats.includes(fileFormat)) {
+        this.SelectFile = file;
+        this.imageName = file.name;
+        this.selectedFiles = true;
+        this.vendorTableForm.controls["pdfFileUpload"].setValue(this.SelectFile.name);
+      } else {
+        this.selectedFiles = false;
+        Swal.fire({
+          icon: "warning",
+          title: "Alert",
+          text: `Please select a PDF`,
+          showConfirmButton: true,
+        });
+      }
+    } else {
+      this.selectedFiles = false;
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: "Please select a file.",
+        showConfirmButton: true,
+      });
+    }
+  }
+  selectedFileForReliableDocument(data) {
+    let fileList: FileList = data.eventArgs;
+    if (fileList.length > 0) {
+      const file: File = fileList[0];
+      this.SelectFile = file;
+      this.imageName = file.name;
+      this.selectedFiles = true;
+      this.vendorTableForm.controls["reliableDocument"].setValue(this.SelectFile.name);
+    } else {
+      this.selectedFiles = false;
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: "Please select a file.",
+        showConfirmButton: true,
+      });
+    }
+  }
+onChange(event: any) {
+  // Get the value of the vendorSubType toggle
+  const vendorSubTypeEnabled = event.target.checked;
+  // Show/hide additional dropdown based on the toggle state
+  if (vendorSubTypeEnabled) {
+    this.vendorTableForm.controls['additionalDropdown'].enable();
+  } else {
+    this.vendorTableForm.controls['additionalDropdown'].disable();
+  }
+}
+displayTds() {
+  const generateControl = this.vendorTableForm.value.tdsApplicable == true;  // Check if value is "Y" to generate control
+  this.jsonControlVendorOtherInfoArray.forEach(data => {
+    if (data.name === 'tdsSection' || data.name === 'tdsRate' || data.name === 'tdsType') {
+      data.generatecontrol = generateControl;  // Set generatecontrol property based on the generateControl value
+    }
+  });
+}
   save() {
     const formValue = this.vendorTableForm.value;
     const controlNames = [
@@ -240,19 +372,21 @@ export class AddVendorMasterComponent implements OnInit {
 
     this.vendorTableForm.controls["isActive"].setValue(this.vendorTableForm.value.isActive == true);
     Object.values(this.vendorTableForm.controls).forEach(control => control.setErrors(null));
-        // Remove  field from the form controls
-        this.vendorTableForm.removeControl("CompanyCode");
-        this.vendorTableForm.removeControl("vendorLocationDropdown");
-        this.vendorTableForm.removeControl("tdsSectionDropdown");
-        this.vendorTableForm.removeControl("isUpdate");
+    // Remove  field from the form controls
+    this.vendorTableForm.removeControl("CompanyCode");
+    this.vendorTableForm.removeControl("vendorLocationDropdown");
+    this.vendorTableForm.removeControl("tdsSectionDropdown");
+    this.vendorTableForm.removeControl("isUpdate");
     if (this.isUpdate) {
       let id = this.vendorTableForm.value.id;
+      // Remove the "id" field from the form controls
+      this.vendorTableForm.removeControl("id");
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "vendor",
+        collection: "vendor_detail",
         id: id,
-        data: this.vendorTableForm.value
+        updates: this.vendorTableForm.value
       };
       this.masterService.masterPut('common/update', req).subscribe({
           next: (res: any) => {
@@ -270,13 +404,13 @@ export class AddVendorMasterComponent implements OnInit {
       });
     }
     else {
-      const randomNumber = getShortName(this.vendorTableForm.value.vendorName);
-      this.vendorTableForm.controls["vendorCode"].setValue(randomNumber);
-      this.vendorTableForm.controls["id"].setValue(randomNumber);
+      const nextVendorCode = this.generateNextVendorCode();
+      this.vendorTableForm.controls["vendorCode"].setValue(nextVendorCode);
+      this.vendorTableForm.controls["id"].setValue(nextVendorCode);
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "vendor",
+        collection: "vendor_detail",
         data: this.vendorTableForm.value
       };
       this.masterService.masterPost('common/create', req).subscribe({

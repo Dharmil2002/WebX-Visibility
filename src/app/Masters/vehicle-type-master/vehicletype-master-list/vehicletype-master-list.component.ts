@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 @Component({
-    selector: 'app-vehicletype-master-list',
-    templateUrl: './vehicletype-master-list.component.html',
+  selector: 'app-vehicletype-master-list',
+  templateUrl: './vehicletype-master-list.component.html',
 })
 export class VehicletypeMasterListComponent implements OnInit {
     data: [] | any;
@@ -13,35 +13,35 @@ export class VehicletypeMasterListComponent implements OnInit {
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     // Define column headers for the table
     columnHeader =
-        {
-            "srNo": "Sr No.",
-            "vehicleTypeCode": "Vehicle Type Code",
-            "vehicleTypeName": "Vehicle Type Name",
-            "isActive": "Active",
-            "actions": "Actions"
-        }
+    {
+      "srNo": "Sr No.",
+      "vehicleTypeCode": "Vehicle Type Code",
+      "vehicleTypeName": "Vehicle Type Name",
+      "isActive": "Active",
+      "actions": "Actions"
+    }
     headerForCsv = {
-        "vehicleTypeCode": "Vehicle Type Code",
-        "vehicleTypeName": "Vehicle Type Name",
-        "vehicleManufacturerName": "Vehicle Manufacturer Name",
-        "modelNo": "Model No.",
-        "vehicleTypeCategory": "Vehicle Type Category",
-        "tyreRotationatKM": "Tyre Rotation at KM",
-        "typeDescription": "Type Description",
-        "vehicleSize": "Vehicle Size",
-        "tankCapacity": "Tank Capacity",
-        "activeFlag": "Active Flag",
-        "grossVehicleWeight": "Gross Vehicle Weight",
-        "unladenWeight": "Unladen Weight",
-        "capacity": "Capacity",
-        "ratePerKM": "Rate Per KM",
-        "fuelType": "Fuel Type",
-        "length": "Length",
-        "width": "Width",
-        "height": "Height",
-        "capacityDiscount": "Capacity Discount",
-        "tyreRotationAlertKMs": "Tyre Rotation Alert KMs",
-        "noOfPackages": "No. Of Packages",
+      "vehicleTypeCode": "Vehicle Type Code",
+      "vehicleTypeName": "Vehicle Type Name",
+      "vehicleManufacturerName": "Vehicle Manufacturer Name",
+      "modelNo": "Model No.",
+      "vehicleTypeCategory": "Vehicle Type Category",
+      "tyreRotationatKM": "Tyre Rotation at KM",
+      "typeDescription": "Type Description",
+      "vehicleSize": "Vehicle Size",
+      "tankCapacity": "Tank Capacity",
+      "activeFlag": "Active Flag",
+      "grossVehicleWeight": "Gross Vehicle Weight",
+      "unladenWeight": "Unladen Weight",
+      "capacity": "Capacity",
+      "ratePerKM": "Rate Per KM",
+      "fuelType": "Fuel Type",
+      "length": "Length",
+      "width": "Width",
+      "height": "Height",
+      "capacityDiscount": "Capacity Discount",
+      "tyreRotationAlertKMs": "Tyre Rotation Alert KMs",
+      "noOfPackages": "No. Of Packages",
     }
     breadScrums = [
         {
@@ -58,7 +58,7 @@ export class VehicletypeMasterListComponent implements OnInit {
     toggleArray = ["isActive"]
     linkArray = []
     constructor(private masterService: MasterService) {
-        this.addAndEditPath = "/Masters/VehicleTypeMaster/AddVehicleTypeMaster";
+      this.addAndEditPath = "/Masters/VehicleTypeMaster/AddVehicleTypeMaster"; 
     }
     ngOnInit(): void {
         this.getVehicleTypeDetails();
@@ -66,24 +66,24 @@ export class VehicletypeMasterListComponent implements OnInit {
     }
     getVehicleTypeDetails() {
         let req = {
-            companyCode: this.companyCode,
-            "type": "masters",
-            "collection": "vehicleType_detail"
-        }
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
-                if (res) {
-                    // Generate srno for each object in the array
-                    const dataWithSrno = res.data.map((obj, index) => {
-                        return {
-                            ...obj,
-                            srNo: index + 1
-                        };
-                    });
-                    this.csv = dataWithSrno;
-                    this.tableLoad = false;
-                }
-            }
-        })
+          companyCode: this.companyCode,
+          "type": "masters",
+          "collection": "vehicleType_detail"
+      }
+      this.masterService.masterPost('common/getall', req).subscribe({
+          next: (res: any) => {
+              if (res) {
+                  // Generate srno for each object in the array
+                  const dataWithSrno = res.data.map((obj, index) => {
+                      return {
+                          ...obj,
+                          srNo: index + 1
+                      };
+                  });
+                  this.csv = dataWithSrno;
+                  this.tableLoad = false;
+              }
+          }
+      })
     }
 }

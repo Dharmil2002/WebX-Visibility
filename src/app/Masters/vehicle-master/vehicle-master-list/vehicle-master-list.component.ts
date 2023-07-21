@@ -57,7 +57,7 @@ export class VehicleMasterListComponent implements OnInit {
         let req = {
             "companyCode": this.companyCode,
             "type": "masters",
-            "collection": "vehicle_master"
+            "collection": "vehicle_detail"
         }
         this.masterService.masterPost('common/getall', req).subscribe({
             next: (res: any) => {

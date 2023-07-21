@@ -156,19 +156,19 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     let userReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
       "type": "masters",
-      "collection": "user"
+      "collection": "user_detail"
     };
 
     let vendorReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
       "type": "masters",
-      "collection": "vendor"
+      "collection": "vendor_detail"
     };
 
     let customerReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
       "type": "masters",
-      "collection": "customer"
+      "collection": "customer_detail"
     };
 
     // Use forkJoin to make parallel requests and get all data at once

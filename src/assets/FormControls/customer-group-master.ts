@@ -14,7 +14,7 @@ export class CustomerGroupControl {
                 Validations: [
                   {
                     name: "required",
-                    message: "State Name is required"
+                    message: "Group Code is required"
                   },
                 ]
             },
@@ -29,7 +29,7 @@ export class CustomerGroupControl {
                 Validations: [
                   {
                     name: "required",
-                    message: "State Name is required"
+                    message: "Group Name is required"
                   },
                   
                 ]

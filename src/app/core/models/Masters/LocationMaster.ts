@@ -31,6 +31,7 @@ export class LocationMaster {
   locEmail:string;
   contLoc:string;
   id:string;
+  reportLevel: any;
 
  
 

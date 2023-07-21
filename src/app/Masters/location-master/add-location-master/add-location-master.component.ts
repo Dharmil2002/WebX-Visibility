@@ -86,6 +86,7 @@ export class AddLocationMasterComponent implements OnInit {
     private fb: UntypedFormBuilder, public dialog: MatDialog, private router: Router, private filter: FilterUtils,
     private masterService: MasterService, private route: Router,
   ) {
+    debugger
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.LocationTable = router.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
@@ -209,6 +210,7 @@ export class AddLocationMasterComponent implements OnInit {
 
   //DROPDOWN FILTER IN OPTIMIZED WAY
   getDropDownData() {
+    debugger
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       const {
         locationHierarchyDropDown,
@@ -232,7 +234,7 @@ export class AddLocationMasterComponent implements OnInit {
         this.hierarchydet = this.findDropdownItemByName(this.locationHierarchy, this.LocationTable.locLevel);
         this.locationTableForm.controls.locLevel.setValue(this.hierarchydet);
 
-        this.reportLocation = this.findDropdownItemByName(this.locationHierarchy, this.LocationTable.reportTo);
+        this.reportLocation = this.findDropdownItemByName(this.locationHierarchy, this.LocationTable.reportLevel);
         this.locationTableForm.controls.reportLevel.setValue(this.reportLocation);
 
         this.pincodeDet = this.findDropdownItemByName(this.pincodeLoc, this.LocationTable.locPincode);
@@ -288,25 +290,35 @@ export class AddLocationMasterComponent implements OnInit {
       });
     });
   }
-
-  
-
   save() {
-    const formValue = this.locationTableForm.value;
-    Object.keys(formValue).forEach(key => {
-      this.locationTableForm.controls[key].setValue(formValue[key]);
-    });
+    // const formValue = this.locationTableForm.value;
+    // Object.keys(formValue).forEach(key => {
+    //   this.locationTableForm.controls[key].setValue(formValue[key]);
+    // });
+    this.locationTableForm.controls["locLevel"].setValue(this.locationTableForm.value.locLevel.name);
+    this.locationTableForm.controls["reportLevel"].setValue(this.locationTableForm.value.reportLevel.name);
+    this.locationTableForm.controls["reportLoc"].setValue(this.locationTableForm.value.reportLoc.name);
+    this.locationTableForm.controls["locPincode"].setValue(this.locationTableForm.value.locPincode.name);
+    this.locationTableForm.controls["locState"].setValue(this.locationTableForm.value.locState.name);
+    this.locationTableForm.controls["locCity"].setValue(this.locationTableForm.value.locCity.name);
+    this.locationTableForm.controls["locRegion"].setValue(this.locationTableForm.value.locRegion.name);
+    this.locationTableForm.controls["acctLoc"].setValue(this.locationTableForm.value.acctLoc.name);
+    this.locationTableForm.controls["dataLoc"].setValue(this.locationTableForm.value.dataLoc.name);
+    this.locationTableForm.controls["nextLoc"].setValue(this.locationTableForm.value.nextLoc.name);
+    this.locationTableForm.controls["prevLoc"].setValue(this.locationTableForm.value.prevLoc.name);
+    this.locationTableForm.controls["ownership"].setValue(this.locationTableForm.value.ownership.name);
+    this.locationTableForm.controls["contLoc"].setValue(this.locationTableForm.value.contLoc.name);
     this.locationTableForm.controls["activeFlag"].setValue(this.locationTableForm.value.activeFlag == true ? "Y" : "N");
     if (this.isUpdate) {
-        let id = this.locationTableForm.value.id;
+      let id = this.locationTableForm.value.id;
         // Remove the "id" field from the form controls
         this.locationTableForm.removeControl("id");
         let req = {
             companyCode: this.companyCode,
             type: "masters",
-            collection: "location",
+            collection: "location_detail",
             id: id,
-            data: this.locationTableForm.value
+            updates: this.locationTableForm.value
         };
         this.masterService.masterPut('common/update', req).subscribe({
             next: (res: any) => {
@@ -323,13 +335,12 @@ export class AddLocationMasterComponent implements OnInit {
             }
         });
     } else {
-        const randomNumber = getShortName(this.locationTableForm.value.locName);
-        this.locationTableForm.controls["id"].setValue(randomNumber);
+      this.locationTableForm.controls['id'].setValue( this.locationTableForm.controls['locCode'].value);
         let req = {
             companyCode: this.companyCode,
             type: "masters",
-            collection: "location",
-            data: this.locationTableForm.value
+            collection: "location_detail",
+            data:  this.locationTableForm.value//this.locationTableForm.value
         };
         this.masterService.masterPost('common/create', req).subscribe({
             next: (res: any) => {

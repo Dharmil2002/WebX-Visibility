@@ -55,7 +55,7 @@ export class LocationMasterComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "type": "masters",
-      "collection": "location"
+      "collection": "location_detail"
     }
     this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {
@@ -63,7 +63,7 @@ export class LocationMasterComponent implements OnInit {
           // Generate srno for each object in the array
           const dataWithSrno = res.data.map((obj, index) => {
             obj["reportLoc"] = obj.reportLoc?.name;
-            obj["locCode"] = obj.locCode?.name;
+            //obj["locCode"] = obj.locCode?.name;
             return {
               ...obj,
               srNo: index + 1

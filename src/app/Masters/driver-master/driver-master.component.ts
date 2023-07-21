@@ -56,7 +56,7 @@ export class DriverMasterComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "type": "masters",
-      "collection": "driver"
+      "collection": "driver_detail"
     }
     this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {

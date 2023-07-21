@@ -11,7 +11,7 @@ export class LocationControl {
         [
             {
                 name: 'locLevel', label: "Location Hierarchy", placeholder: "Select location Hierarchy", type: 'dropdown',
-                value: LocationTable.locLevel, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     // {
                     //     name: "required",
@@ -25,7 +25,7 @@ export class LocationControl {
             },
             {
                 name: 'reportLevel', label: "Reporting To", placeholder: "Select Reporting To", type: 'dropdown',
-                value: LocationTable.reportTo, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     // {
                     //     name: "required",
@@ -135,7 +135,7 @@ export class LocationControl {
                     {
                         name: "pattern",
                         message: "Please enter 10 to 12 digit mobile number",
-                        pattern: "^[0-9]{10,12}$",
+                        pattern: "^[0-9]{8,12}$",
                     },
                     {
                         name: "required",
@@ -149,7 +149,7 @@ export class LocationControl {
                     {
                         name: "pattern",
                         message: "Please enter 6 to 15 digit mobile number",
-                        pattern: "^[0-9]{6,15}$",
+                        pattern: "^[0-9]{10,12}$",
                     }
                 ]
             },
@@ -172,13 +172,10 @@ export class LocationControl {
                 name: 'endMile', label: 'End Mile Serviceability', placeholder: '', type: 'toggle', value:LocationTable.locEndmile, generatecontrol: true, disable: false,
                 Validations: []
             },
-            {
-                name: 'updtBy', label: 'Update By', placeholder: 'Update By', type: 'text', value: localStorage.getItem("UserName"), filterOptions: '', autocomplete: '', displaywith: '', Validations: [], generatecontrol: false, disable: false
-            },
-            {
-                name: 'companyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: localStorage.getItem("CompanyCode"), filterOptions: '', Validations: [], autocomplete: '', displaywith: '', generatecontrol: false, disable: false
-            },
-	    
+            // {
+            //     name: 'updtBy', label: 'Update By', placeholder: 'Update By', type: 'text', value: localStorage.getItem("UserName"), filterOptions: '', autocomplete: '', displaywith: '', Validations: [], generatecontrol: false, disable: false
+            // },
+          
         ],
 	
 	  this.OtherDetailsControls =
@@ -252,10 +249,7 @@ export class LocationControl {
                     name: 'cutoff', label: 'Cutoff Time Flag', placeholder: '', type: 'toggle', value: LocationTable.cutOff, generatecontrol: true, disable: false,
                     Validations: []
                 },
-                {
-                    name: 'time', label: 'Select Time', placeholder: '', type: 'toggle', value:LocationTable.time, generatecontrol: true, disable: false,
-                    Validations: []
-                },
+              
                 {
                     name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value:LocationTable.activeFlag, generatecontrol: true, disable: false,
                     Validations: []

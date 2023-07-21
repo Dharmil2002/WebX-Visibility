@@ -93,7 +93,7 @@ export class CustomerGroupAddComponent implements OnInit {
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "customerGroup",
+        collection: "customerGroup_detail",
         id: id,
         data: this.groupTableForm.value
       };
@@ -117,7 +117,7 @@ export class CustomerGroupAddComponent implements OnInit {
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "customerGroup",
+        collection: "customerGroup_detail",
         data: this.groupTableForm.value
       };
       this.masterService.masterPost('common/create', req).subscribe({

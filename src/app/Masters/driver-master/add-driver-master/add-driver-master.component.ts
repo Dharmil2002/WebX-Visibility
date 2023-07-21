@@ -243,7 +243,7 @@ export class AddDriverMasterComponent implements OnInit {
         let req = {
             companyCode: this.companyCode,
             type: "masters",
-            collection: "driver",
+            collection: "driver_detail",
             id: id,
             data: this.DriverTableForm.value
         };
@@ -267,7 +267,7 @@ export class AddDriverMasterComponent implements OnInit {
         let req = {
             companyCode: this.companyCode,
             type: "masters",
-            collection: "driver",
+            collection: "driver_detail",
             data: this.DriverTableForm.value
         };
         this.masterService.masterPost('common/create', req).subscribe({

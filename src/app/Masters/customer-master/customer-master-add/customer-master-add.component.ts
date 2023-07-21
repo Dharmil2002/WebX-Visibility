@@ -232,7 +232,7 @@ export class CustomerMasterAddComponent implements OnInit {
         let req = {
             companyCode: this.companyCode,
             type: "masters",
-            collection: "customer",
+            collection: "customer_detail",
             id: id,
             data: this.customerTableForm.value
         };
@@ -257,7 +257,7 @@ export class CustomerMasterAddComponent implements OnInit {
         let req = {
             companyCode: this.companyCode,
             type: "masters",
-            collection: "customer",
+            collection: "customer_detail",
             data: this.customerTableForm.value
         };
         this.masterService.masterPost('common/create', req).subscribe({

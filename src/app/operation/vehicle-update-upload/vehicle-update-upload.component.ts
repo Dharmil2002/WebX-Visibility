@@ -347,6 +347,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         "totDkt": result.length,
         "totPkg": menifestDetails?.PackagesLoadedBooked || "",
         "tot_cft": menifestDetails?.VolumeCFT || "",
+        "WeightKg":menifestDetails?.WeightKg || "",
         "entryDate":new Date()
       }
       menifestData.push(jsonDetails);

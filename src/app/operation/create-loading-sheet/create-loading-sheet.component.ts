@@ -114,7 +114,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
       // Check if tripData meets the condition for navigation
       const routeMap = {
-        "DEPART VEHICLE": 'Operation/DepartVehicle',
+        "Depart Vehicle": 'Operation/DepartVehicle',
         "Vehicle Loading": 'Operation/VehicleLoading',
       };
 
@@ -390,7 +390,8 @@ export class CreateLoadingSheetComponent implements OnInit {
     let tripDetails = {
       startTime: new Date(),
       vehicleNo: this.loadingSheetTableForm.value.vehicle.value,
-      tripId: this.loadingSheetTableForm.value.tripID
+      tripId: this.loadingSheetTableForm.value.tripID,
+      status:"Vehicle Loading"
     }
     const reqBody = {
       "companyCode": this.companyCode,
@@ -449,7 +450,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     this._operationService.operationPut("common/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-         
+         this.updateVehicleStatus();
         }
       }
     })
@@ -479,6 +480,28 @@ export class CreateLoadingSheetComponent implements OnInit {
         this.goBack(3);
       }
     }})
+  }
+  updateVehicleStatus(){
+    const vehicleDetails={
+       "status":"On trip",
+       "tripId":this.loadingSheetTableForm.value?.tripID      
+    }
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "vehicle_status",
+      id: this.loadingSheetTableForm.value.vehicle.value,
+      updates: {
+        ...vehicleDetails,
+      }
+    }
+    this._operationService.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+         
+        }
+      }
+    })
   }
   goBack(tabIndex: number): void {
     this.navigationService.navigateTotab(tabIndex, '/dashboard/GlobeDashboardPage')

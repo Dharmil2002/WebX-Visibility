@@ -5,7 +5,7 @@
     </app-form-without-auto-complete-webxpress>
 </form>
 Load Details
-<generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="csv"
+<generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="menifestTableData"
         [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
         [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
         [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" [centerAligned]="centerAlignedData">

@@ -137,7 +137,7 @@ function generateTableData(departureData: any[], routeData: any[]): any[] {
       Expected: routeDetails.routeEndDate,
       Hrs: 0,
       Status: "On Time",
-      Action: action,
+      Action: element?.status||"",
       location: element?.location || "",
     };
 

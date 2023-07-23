@@ -31,7 +31,7 @@ export class DepartVehicleComponent implements OnInit {
   uploadComponent: any;
   loadingSheetData: any;
   csvFileName: string; //name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
-  companyCode: number=parseInt(localStorage.getItem("companyCode"));
+  companyCode: number = parseInt(localStorage.getItem("companyCode"));
   shipData: any;
   dynamicControls = {
     add: false,
@@ -96,6 +96,8 @@ export class DepartVehicleComponent implements OnInit {
   advancebalance: any;
   CEWBflag: boolean;
   setVehicleType: any[];
+  lsDetails: any;
+  vehicleDetail: any;
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
   constructor(
@@ -156,11 +158,11 @@ export class DepartVehicleComponent implements OnInit {
         formControl.setValue(value);
       }
     );
-    const vehicleNo={
-      "name":this.tripData.VehicleNo,
-      "value":this.tripData.VehicleNo
-    }
-    this.loadingSheetTableForm.controls['vehicle'].setValue(vehicleNo);
+    const vehicleNo = {
+      name: this.tripData.VehicleNo,
+      value: this.tripData.VehicleNo,
+    };
+    this.loadingSheetTableForm.controls["vehicle"].setValue(vehicleNo);
 
     Object.entries(departVehicleFormControlsMap).forEach(
       ([controlName, dataKey]) => {
@@ -175,6 +177,57 @@ export class DepartVehicleComponent implements OnInit {
       this.loadingSheetTableForm.controls["LoadingLocation"];
     const loadingLocationValue = localStorage.getItem("Branch") || "";
     loadingLocationFormControl.setValue(loadingLocationValue);
+  }
+  vehicleDetails() {
+    const reqbody = {
+      companyCode: this.companyCode,
+      type: "masters",
+      collection: "vehicle_detail",
+    };
+    this._operationService.operationPost("common/getall", reqbody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.vehicleDetail = res.data.find(
+            (x) => x.vehicleNo === this.tripData.VehicleNo
+          );
+          this.departvehicleTableForm.controls["VendorType"].setValue(
+            this.vehicleDetail?.vendorType || ""
+          );
+          this.departvehicleTableForm.controls["Vendor"].setValue(
+            this.vehicleDetail?.vendorName || ""
+          );
+          this.getDriverDetails();
+        }
+      },
+    });
+  }
+  getDriverDetails() {
+    const reqbody = {
+      companyCode: this.companyCode,
+      type: "masters",
+      collection: "driver_detail",
+    };
+    this._operationService.operationPost("common/getall", reqbody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          const driverDetails = res.data.find(
+            (x) => x.vehicleNo === this.tripData.VehicleNo
+          );
+          this.departvehicleTableForm.controls["Driver"].setValue(
+            driverDetails?.driverName || ""
+          );
+          this.departvehicleTableForm.controls["DriverMob"].setValue(
+            driverDetails?.telno || ""
+          );
+          this.departvehicleTableForm.controls["License"].setValue(
+            driverDetails?.licenseNo || ""
+          );
+          this.departvehicleTableForm.controls["Expiry"].setValue(
+            driverDetails?.valdityDt || ""
+          );
+        }
+      },
+    });
   }
 
   IntializeFormControl() {
@@ -212,9 +265,7 @@ export class DepartVehicleComponent implements OnInit {
       this.departureControlArray,
     ]);
   }
-  ngOnInit(): void {
-    this.vehicleTypeDropdown();
-  }
+  ngOnInit(): void {}
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
 
@@ -253,13 +304,15 @@ export class DepartVehicleComponent implements OnInit {
               leg: element.leg,
               manifest: element.mfNo,
               shipments_lb: element.totDkt,
-              packages_lb: element.totDkt,
+              packages_lb: element.totPkg,
               weight_kg: element.weight_kg,
               volume_cft: element.tot_cft,
             };
             menifestList.push(json);
             this.menifestTableData = menifestList;
             this.tableload = false;
+            this.docketDetails();
+            this.vehicleDetails();
           });
         }
       },
@@ -280,18 +333,33 @@ export class DepartVehicleComponent implements OnInit {
     //   this.tableload=false;
     // });
   }
+  docketDetails() {
+    const reqbody = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "loadingSheet_detail",
+    };
+    this._operationService.operationPost("common/getall", reqbody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.lsDetails = res.data.find(
+            (lsDetails) => lsDetails.tripId === this.tripData.TripID
+          );
+          this.vehicleTypeDropdown();
+        }
+      },
+    });
+  }
   vehicleTypeDropdown() {
     this.http.get(this.loadingJsonUrl).subscribe((res) => {
       this.loadingSheetData = res;
       let vehicleType: any[] = [];
-      if (this.loadingSheetData) {
-        this.loadingSheetData.data[0].forEach((element) => {
-          let json = {
-            name: element.Type_Name,
-            value: element.Type_Code,
-          };
-          vehicleType.push(json);
-        });
+      if (this.lsDetails) {
+        let json = {
+          name: this.lsDetails.vehType,
+          value: this.lsDetails.vehType,
+        };
+        vehicleType.push(json);
       }
       this.filter.Filter(
         this.jsonControlArray,
@@ -301,16 +369,17 @@ export class DepartVehicleComponent implements OnInit {
         this.vehicleTypeStatus
       );
       let vehicleTypeDetails = this.loadingSheetData.data[0].filter(
-        (x) => x.Type_Code === this.tripData.VehicleType
+        (x) => x.Type_Name === this.lsDetails.vehType
       );
       this.setVehicleType = vehicleType.filter(
-        (x) => x.value === this.tripData.VehicleType
+        (x) => x.value === this.lsDetails.vehType
       );
       this.autofillVehicleData(vehicleTypeDetails);
     });
     // this.getshipmentData()
   }
   autofillVehicleData(vehicleTypeDetails) {
+
     if (vehicleTypeDetails) {
       this.loadingSheetTableForm.controls["vehicleType"].setValue(
         this.setVehicleType[0]
@@ -420,11 +489,21 @@ export class DepartVehicleComponent implements OnInit {
   }
 
   Close() {
-    let data = [this.tripData];
-    data.forEach((x) => {
-      x.Action = "DEPARTED";
-    });
-    this.CnoteService.setLsData(data);
+    debugger
+    const loadingArray = [this.loadingSheetTableForm.value];
+    const departArray = [this.departvehicleTableForm.value];
+    const advancearray = [this.advanceTableForm.value];
+    const balanceArray = [this.balanceTableForm.value];
+    const departureArray = [this.departureTableForm.value];
+
+    const mergedArray = [
+      ...loadingArray,
+      ...departArray,
+      ...advancearray,
+      ...balanceArray,
+      ...departureArray,
+    ];
+    const mergedData = this.mergeArrays(mergedArray);
     this.goBack(3);
   }
   GenerateCEWB() {
@@ -442,5 +521,14 @@ export class DepartVehicleComponent implements OnInit {
     this.Route.navigate(["/dashboard/GlobeDashboardPage"], {
       queryParams: { tab: tabIndex },
     });
+  }
+  mergeArrays(data: any[]): any {
+    const mergedData = {};
+
+    for (const item of data) {
+      Object.assign(mergedData, item);
+    }
+
+    return mergedData;
   }
 }

@@ -226,7 +226,7 @@ export class DriverControls {
                         multiple: true
                     },
                     functions: {
-                        onChange: 'selectedFile',
+                        onChange: 'selectedPngFile',
                     },
                     generatecontrol: true,
                     disable: false
@@ -242,7 +242,7 @@ export class DriverControls {
                         multiple: true
                     },
                     functions: {
-                        onChange: 'selectedFile',
+                        onChange: 'selectedJpgFile',
                     },
                     generatecontrol: true,
                     disable: false

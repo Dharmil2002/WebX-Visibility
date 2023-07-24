@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from "sweetalert2";
 
 @Component({
     selector: 'app-city-master-list',
@@ -29,7 +30,7 @@ export class CityMasterListComponent implements OnInit {
         'cityName': "City Name",
         'state': "State Name",
         'zone': "Zone Name"
-        
+
     }
     breadScrums = [
         {
@@ -48,12 +49,12 @@ export class CityMasterListComponent implements OnInit {
         this.addAndEditPath = "/Masters/CityMaster/AddCity";
     }
     ngOnInit(): void {
-        this.csvFileName = "City Details" 
+        this.csvFileName = "City Details"
         this.getCityDetails();
     }
     getCityDetails() {
         let req = {
-            "companyCode": 10065,
+            "companyCode": parseInt(localStorage.getItem("companyCode")),
             "type": "masters",
             "collection": "city_detail"
         }
@@ -72,5 +73,31 @@ export class CityMasterListComponent implements OnInit {
                 }
             }
         })
+    }
+    IsActiveFuntion(det) {
+        let id = det.id;
+        // Remove the "id" field from the form controls
+        delete det.id;
+        delete det.srNo;
+        let req = {
+            companyCode: parseInt(localStorage.getItem("companyCode")),
+            type: "masters",
+            collection: "city_detail",
+            id: id,
+            updates: det
+        };
+        this.masterService.masterPut('common/update', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                }
+            }
+        });
     }
 }

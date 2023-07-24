@@ -10,7 +10,7 @@ export class CityControl {
         label: 'City Code',
         placeholder: 'City Code',
         type: 'text',
-        value: IsUpdate? CityTable.cityId: "System Generated",
+        value: IsUpdate? CityTable.id: "System Generated",
         filterOptions: '',
         autocomplete: '',
         displaywith: '',

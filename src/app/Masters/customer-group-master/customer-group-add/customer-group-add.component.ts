@@ -95,7 +95,7 @@ export class CustomerGroupAddComponent implements OnInit {
         type: "masters",
         collection: "customerGroup_detail",
         id: id,
-        data: this.groupTableForm.value
+        updates: this.groupTableForm.value
       };
       this.masterService.masterPut('common/update', req).subscribe({
         next: (res: any) => {

@@ -148,8 +148,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.operationService.operationPost('common/getall', reqBody).subscribe(res => {
       if (res.data) {
         let dataLoading = []
-
-        res.data.forEach((element: any) => { // Specify the type of 'element' as 'any'
+       const loadingSheetDetail= res.data.filter((x)=>x.tripId===this.vehicelLoadData.tripId)
+       loadingSheetDetail.forEach((element: any) => { // Specify the type of 'element' as 'any'
           let shipmentData = this.dktDetailFromApi.filter((x) => x.lsNo === element.lsno);
           let json = {
             "Leg": element?.leg.replace(" ", "") || '',

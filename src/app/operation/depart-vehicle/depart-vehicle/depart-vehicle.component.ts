@@ -15,6 +15,9 @@ import {
 } from "src/assets/FormControls/departVehicle";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
+import Swal from "sweetalert2";
+import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+
 @Component({
   selector: "app-depart-vehicle",
   templateUrl: "./depart-vehicle.component.html",
@@ -113,6 +116,7 @@ export class DepartVehicleComponent implements OnInit {
     //   this.tripData = data
     // }
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
+  
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
     this.IntializeFormControl();
@@ -489,7 +493,9 @@ export class DepartVehicleComponent implements OnInit {
   }
 
   Close() {
-    debugger
+   
+    this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType'].value.value);
+    this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle'].value.value);
     const loadingArray = [this.loadingSheetTableForm.value];
     const departArray = [this.departvehicleTableForm.value];
     const advancearray = [this.advanceTableForm.value];
@@ -504,7 +510,56 @@ export class DepartVehicleComponent implements OnInit {
       ...departureArray,
     ];
     const mergedData = this.mergeArrays(mergedArray);
-    this.goBack(3);
+    delete mergedData.vehicleTypecontrolHandler;
+    mergedData['tripId']=this.tripData.TripID;
+    mergedData['id']=this.tripData.TripID;
+    mergedData['lsno']= this.lsDetails.lsno;
+    mergedData['mfNo']= this.lsDetails.mfNo;
+    this.addDepartData(mergedData);
+  }
+
+  addDepartData(departData) {
+    const reqbody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_transaction_history",
+      "data": departData
+    }  
+    this._operationService.operationPost('common/create',reqbody).subscribe({next:(res:any)=>{
+      if(res){
+        this.updateTrip();
+      }
+      
+    }})
+  }
+  updateTrip() {
+    const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"),this.orgBranch);
+    let tripDetails = {
+      status:"depart",
+      nextUpComingLoc:next
+    }
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_detail",
+      "id": 'trip_' + this.tripData.RouteandSchedule.split(":")[0] || "",
+      "updates": {
+        ...tripDetails,
+      }
+    }
+    this._operationService.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: `Vehicle depart Successfully`,//
+            showConfirmButton: true,
+          })
+          this.goBack(3);
+        }
+      }
+    })
   }
   GenerateCEWB() {
     this.CEWBflag = true;

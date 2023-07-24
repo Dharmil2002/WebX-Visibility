@@ -528,7 +528,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       this.dockNo = `CN${dynamicValue}${paddedNumber}`;
       this.tabForm.controls['docketNumber'].setValue(this.dockNo);
 
-      let id = { id: this.dockNo, isComplete: 1 }
+      let id = { id: this.dockNo, isComplete: 1,unloading:0,lsNo:"",mfNo:""}
       let docketDetails = { ...this.tabForm.value, ...this.contractForm.value,...invoiceDetails, ...id };
       let reqBody = {
         companyCode: this.companyCode,

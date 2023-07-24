@@ -273,7 +273,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       collection: "docket",
     };
     this._operationService.operationPost("common/getall", req).subscribe(res => {
-      this.shipmentData = res.data;
+      this.shipmentData = res.data.filter((x)=>x.lsNo!=="");
       // Filter shipment data based on location and trip details
       const filterData = filterDataByLocation(this.shipmentData, this.tripData, this.orgBranch);
       //Here i user cnoteDetails varible to used in updateDocketDetails() method

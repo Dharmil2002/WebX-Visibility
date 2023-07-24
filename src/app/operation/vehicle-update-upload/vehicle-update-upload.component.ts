@@ -362,6 +362,33 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.operationService.operationPost('common/create', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
+         this.updateTripStatus();
+        }
+      }
+    })
+  }
+  updateTripStatus(){
+    let tripDetails = {
+      status:"Depart Vehicle"
+    }
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_detail",
+      "id": 'trip_' + this.vehicelLoadData?.route.split(":")[0] || "",
+      "updates": {
+        ...tripDetails,
+      }
+    }
+    this.operationService.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: `Vehicle depart Successfully`,//
+            showConfirmButton: true,
+          })
           this.goBack(3);
           this.dialogRef.close("")
         }

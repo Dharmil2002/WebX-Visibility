@@ -37,7 +37,7 @@ export async function fetchDepartureDetails(
     //End//
     // Filter departure data based on organization branch
     const departuredata = res.data.filter(
-      (x: any) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase()
+      (x: any) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase() && x.status!=="close"
     );
     const routeData = routeRes.data.filter((x) => x.location.toLowerCase() === orgBranch.toLowerCase())
     // Generate table data from filtered departure data

@@ -12,6 +12,8 @@ import { Shipment, autoBindData, filterShipments, kpiData } from '../shipment';
 import { updatePending } from './loadingSheetshipment';
 import { groupShipmentsByLeg } from './shipmentsUtils';
 import { handlePackageUpdate } from './packageUtils';
+import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -26,6 +28,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   tripData: any;
   tabledata: any;
   currentBranch: string = localStorage.getItem("Branch") || '';
+  companyCode: number = parseInt(localStorage.getItem('companyCode'));
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
@@ -88,17 +91,16 @@ export class UpdateLoadingSheetComponent implements OnInit {
   updateListData: any;
   Scan: any;
   shipingDataTable: any;
+  packageData: any;
 
   
   constructor(
     private Route: Router,
-    private dialog: MatDialog,
     public dialogRef: MatDialogRef<MarkArrivalComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
-    private http: HttpClient,
     private fb: UntypedFormBuilder,
-    private cdr: ChangeDetectorRef,
-    private cnoteService: CnoteService
+    private _operation: OperationService,
+    private cdr: ChangeDetectorRef
   ) {
     // Set the initial shipment status to 'Unloaded'
     this.shipmentStatus = 'Unloaded';
@@ -115,34 +117,65 @@ export class UpdateLoadingSheetComponent implements OnInit {
   
 
   getShippningData() {
-    // Get vehicle arrival data
-    this.data = this.cnoteService.getVehicleArrivalData();
-    let tableArray = this.data['shippingData'];
-  
+
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "docket"
+
+    }
+    this._operation.operationPost('common/getall', reqBody).subscribe(res => {
+      if (res) {
+        const arrivalData  = res.data.filter((x)=>x.destination.split(":")[1].trim()===this.currentBranch);
+        // Filter shipments based on route and branch
+        let filteredShipments = filterShipments(arrivalData, this.arrivalData?.Route, this.currentBranch);
+      
+        // Update CSV and boxData
+        this.csv =  filteredShipments.map((shipment) => ({
+          Shipment: shipment.docketNumber || "",
+          Origin: shipment.orgLoc || "",
+          Destination: shipment.destination ? shipment.destination.split(":")[1].trim() : "",
+          Packages: parseInt(shipment.totalChargedNoOfpkg),
+          Unloaded: 0,
+          Pending: parseInt(shipment.totalChargedNoOfpkg),
+          Leg: (shipment.orgLoc || "") + ":" + (shipment.destination ? shipment.destination.split(":")[1].trim() : ""),
+          KgWt:shipment?.actualwt||"",
+          CftVolume:shipment?.cft_tot||""
+        }));
+        this.boxData = kpiData(this.csv, this.shipmentStatus, "");
+        this.tableload = false;
+      
+        let shipingTableData = this.csv;
+      
+        // Group shipments by leg using the utility function
+        let shipingTableDataArray = groupShipmentsByLeg(shipingTableData);
+      
+        // Set the leg of the arrivalData
+        this.arrivalData.Leg = shipingTableData[0]?.Leg;
+      
+        // Set the shipingDataTable to the grouped data
+        this.shipingDataTable = shipingTableDataArray;
+        this.getPackagesData();
+      }
+    });
     // Update pending shipments
-    let shipments = updatePending(tableArray, this.currentBranch, false, true);
-  
-    // Filter shipments based on route and branch
-    let filteredShipments = filterShipments(shipments, this.arrivalData?.Route, this.currentBranch);
-  
-    // Update CSV and boxData
-    this.csv = filteredShipments;
-    this.boxData = kpiData(this.csv, this.shipmentStatus, "");
-    this.tableload = false;
-  
-    let shipingTableData = this.csv;
-    let packagesData = this.data.packagesData;
-  
-    // Group shipments by leg using the utility function
-    let shipingTableDataArray = groupShipmentsByLeg(shipingTableData);
-  
-    // Set the leg of the arrivalData
-    this.arrivalData.Leg = shipingTableData[0]?.Leg;
-  
-    // Set the shipingDataTable to the grouped data
-    this.shipingDataTable = shipingTableDataArray;
+   
   }
 
+  getPackagesData() {
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "docketScan"
+    }
+    this._operation.operationPost('common/getall', reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.packageData = res.data;
+        }
+      }
+    })
+  }
 
   updatePackage() {
    
@@ -152,7 +185,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   const legValue = this.arrivalData.Route.trim();
 
   // Call the imported function to handle the logic
-  let PackageUpdate =handlePackageUpdate(scanValue, legValue, this.currentBranch, this.data, this.csv, this.boxData, this.cdr);
+  let PackageUpdate =handlePackageUpdate(scanValue, legValue, this.currentBranch,this.packageData, this.csv, this.boxData, this.cdr);
     // Call kpiData function
     if(PackageUpdate){
     this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
@@ -236,6 +269,7 @@ IntializeFormControl() {
 
 
   CompleteScan() {
+  
     let packageChecked = false;
     let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
@@ -243,14 +277,8 @@ IntializeFormControl() {
       packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
     if (packageChecked) {
-  
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: `Arrival Scan done Successfully`,
-          showConfirmButton: true,
-        })
-        this.dialogRef.close(this.loadingSheetTableForm.value)
+      this.updateTripStatus()
+      
     }
     else {
       Swal.fire({
@@ -267,6 +295,77 @@ IntializeFormControl() {
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
+  }
+  updateTripStatus(){
+    const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"),this.currentBranch);
+    let tripDetails
+    if(next){
+      tripDetails = {
+       nextUpComingLoc:next
+      }
+    }
+    else{
+      tripDetails = {
+        status:"close",
+        nextUpComingLoc: "",
+        closeTime:new Date()
+       }
+    }
+ 
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_detail",
+      "id": 'trip_' +  this.arrivalData?.Route.split(":")[0] || "",
+      "updates": {
+        ...tripDetails,
+      }
+    }
+    this._operation.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (!next) {
+          this.tripHistoryUpdate() 
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: `trip Close  Successfully`,//
+            showConfirmButton: true,
+          })
+        }
+        else{
+          this.tripHistoryUpdate() 
+        }
+      }
+    })
+  }
+  
+  tripHistoryUpdate() {
+
+      let tripDetails = {
+        arrivalBranch:this.currentBranch,
+      }
+      const reqBody = {
+        "companyCode": this.companyCode,
+        "type": "operation",
+        "collection": "trip_transaction_history",
+        "id": this.arrivalData?.TripID||"",
+        "updates": {
+          ...tripDetails,
+        }
+      }
+      this._operation.operationPut("common/update", reqBody).subscribe({
+        next: (res: any) => {
+          if (res) {
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: `Arrival Scan done Successfully`,
+              showConfirmButton: true,
+            })
+            this.dialogRef.close(this.loadingSheetTableForm.value)
+          }
+        }
+      })
   }
 
 }

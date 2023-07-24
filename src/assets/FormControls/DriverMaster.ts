@@ -21,8 +21,8 @@ export class DriverControls {
                         }
                         , {
                             name: "pattern",
-                            message: "Please Enter alphanumeric Driver Name of length 3 to 10",
-                            pattern: '^[a-zA-Z0-9]{3,10}$',
+                            message: "Please Enter only text of length 3 to 25 characters",
+                            pattern: '^[a-zA-Z ]{3,25}$',
                         }
                     ]
                 },
@@ -31,8 +31,8 @@ export class DriverControls {
                     Validations: [
                         {
                             name: "pattern",
-                            message: "Please Enter only text of length 3 to 10 characters",
-                            pattern: '^[a-zA-Z ]{3,10}$',
+                            message: "Please Enter only text of length 3 to 25 characters",
+                            pattern: '^[a-zA-Z ]{3,25}$',
                         }
                     ]
                 },
@@ -126,21 +126,21 @@ export class DriverControls {
                     Validations: []
                 },
                 
-                // {
-                //     name: 'driverId', label: 'Driver_Id', placeholder: '', type: 'text', value: DriverTable.driverId, generatecontrol: false, disable: false,
-                //     Validations: []
-                // },
-               
             ],
             this.LicenseDetailsControls =
             [
                 {
                     name: 'licenseNo', label: 'License No', placeholder: 'Enter License No', type: 'text', value: DriverTable.licenseNo, generatecontrol: true, disable: false,
                     Validations: [
+                        // {
+                        //     name: "pattern",
+                        //     message: "Please Enter a valid License No ",
+                        //     pattern: "^[A-Za-z]{2}\d{2}\s\d{4}(?:\s\d{5})?$/",
+                        // }
                         {
                             name: "pattern",
-                            message: "Please Enter alphanumeric License No of length 4 to 15",
-                            pattern: "^[a-zA-Z0-9]{4,15}$",
+                            message: "Please Enter alphanumeric License No of length 10 to 15",
+                            pattern: "^[a-zA-Z0-9 ]{10,15}$",
                         }
                     ]
                 },
@@ -155,39 +155,39 @@ export class DriverControls {
             ],
             this.PermanentAddressControls = [
                 {
-                    name: 'address', label: 'Permanent Address', placeholder: 'Enter Permanent Address', type: 'text', value: DriverTable.address, generatecontrol: true, disable: false,
+                    name: 'address', label: 'Address', placeholder: 'Enter Permanent Address', type: 'text', value: DriverTable.address, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "required",
-                            message: "Permanent address is required"
+                            message: "Address is required"
                         },
                         {
                             name: "pattern",
-                            message: "Please enter Permanennt Address of length 5 to 150 characters",
-                            pattern: "^[a-zA-Z0-9]{5,150}$",
+                            message: "Please enter Address of length 5 to 150 characters",
+                            pattern: "^[a-zA-Z0-9 ]{5,150}$",
                         }
                     ]
                 },
                 {
-                    name: 'city', label: 'Permanent City', placeholder: 'Enter Permanent City', type: 'text', value: DriverTable.city, generatecontrol: true, disable: false,
+                    name: 'city', label: 'City', placeholder: 'Enter Permanent City', type: 'text', value: DriverTable.city, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "required",
-                            message: "Permanent City is required"
+                            message: "City is required"
                         }
                         , {
                             name: "pattern",
-                            message: "Please enter a Permanent City of length 3 to 10 characters",
+                            message: "Please enter a City of length 3 to 10 characters",
                             pattern: '^[a-zA-Z ]{3,10}$',
                         }
                     ]
                 },
                 {
-                    name: 'pincode', label: 'Permanent Pincode', placeholder: 'Enter Permanent Pincode', type: 'text', value: DriverTable.pincode, generatecontrol: true, disable: false,
+                    name: 'pincode', label: 'Pincode', placeholder: 'Enter Permanent Pincode', type: 'number', value: DriverTable.pincode, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "required",
-                            message: "Permanent Pincode is required"
+                            message: "Pincode is required"
                         }
                         , {
                             name: "pattern",
@@ -261,12 +261,12 @@ export class DriverControls {
                     ]
                 },
                 {
-                    name: 'bAcct', label: 'Bank Account No', placeholder: 'Enter Bank Account No', type: 'text', value: DriverTable.bAcct, generatecontrol: true, disable: false,
+                    name: 'bAcct', label: 'Bank Account No', placeholder: 'Enter Bank Account No', type: 'number', value: DriverTable.bAcct, generatecontrol: true, disable: false,
                     Validations: [ 
                         {
                             name: "pattern",
-                            message: "Please enter Bank Account No of length 10 to 15 characters",
-                            pattern: "^[a-zA-Z0-9]{10,15}$",
+                            message: "Please enter Bank Account No of length 14 digits",
+                            pattern: "^[0-9]{14}$",
                         }
                 ]
                 },
@@ -275,7 +275,7 @@ export class DriverControls {
                     Validations: [
                         {
                             name: "pattern",
-                            message: "Please enter a Branch  of length 3 to 15 characters",
+                            message: "Please enter a Branch Name of length 3 to 15 characters",
                             pattern: '^[a-zA-Z ]{3,15}$',
                         }
                     ]
@@ -285,14 +285,20 @@ export class DriverControls {
                     Validations: [ 
                         {
                         name: "pattern",
-                        message: "Please enter a Permanent City of length 3 to 10 characters",
-                        pattern: '^[a-zA-Z ]{3,10}$',
+                        message: "Please enter a Account Name of length 3 to 25 characters",
+                        pattern: '^[a-zA-Z ]{3,25}$',
                     }
                 ]
                 },
                 {
                     name: 'ifsc', label: 'IFSC Code', placeholder: 'Enter IFSC Code', type: 'text', value: DriverTable.ifsc, generatecontrol: true, disable: false,
-                    Validations: []
+                    Validations: [{
+
+                        name: "pattern",
+                        pattern: "^[A-Za-z]{4}[0-9]{7}$",
+                        message: "Please enter a valid IFSC Code (4 letters followed by 7 digits)"
+
+                    }]
                 },
                 {
                     name: 'id',

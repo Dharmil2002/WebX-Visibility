@@ -16,6 +16,11 @@ export class CustomerGroupControl {
                     name: "required",
                     message: "Group Code is required"
                   },
+                  {
+                    name: "pattern",
+                    message: "Please Enter alphanumeric Group Code of length 4 to 10",
+                    pattern: '^[a-zA-Z0-9]{4,10}$',
+                }
                 ]
             },
 
@@ -31,6 +36,12 @@ export class CustomerGroupControl {
                     name: "required",
                     message: "Group Name is required"
                   },
+                  {
+                    name: "pattern",
+                    message: "Please Enter only text of length 3 to 10 characters",
+                    pattern: '^[a-zA-Z ]{3,10}$',
+                }
+                  
                   
                 ]
             },

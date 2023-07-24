@@ -29,6 +29,11 @@ export class customerControl {
                         name: "required",
                         message: "Customer Code is required"
                     },
+                    {
+                        name: "pattern",
+                        message: "Please Enter alphanumeric Customer Code of length 4 to 10",
+                        pattern: '^[a-zA-Z0-9]{4,10}$',
+                    }
                 ],
 
             },
@@ -41,6 +46,11 @@ export class customerControl {
                         name: "required",
                         message: "Customer Name is required"
                     },
+                    {
+                        name: "pattern",
+                        message: "Please Enter only text of length 3 to 25 characters",
+                        pattern: '^[a-zA-Z ]{3,25}$',
+                    }
                 ],
 
             },
@@ -75,10 +85,11 @@ export class customerControl {
                 name: 'industry', label: 'Industry', placeholder: 'Industry', type: 'text',
                 value: customerTable?.industry, generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Industry is required"
-                    // },
+                    {
+                        name: "pattern",
+                        message: "Please Enter only text of length 3 to 25 characters",
+                        pattern: '^[a-zA-Z ]{3,25}$',
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -186,18 +197,18 @@ export class customerControl {
             },
 
             {
-                name: 'telephone', label: "Telephone Number", placeholder: "Contact Number", type: 'text',
+                name: 'telephone', label: "Telephone Number", placeholder: "Contact Number", type: 'number',
                 value: customerTable?.telephone, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "pattern",
-                        message: "Please enter 8 to 10 digit mobile number",
+                        message: "Please enter 8 to 10 digit Telephone number",
                         pattern: "^[0-9]{8,10}$",
                     },
-                    // {
-                    //     name: "required",
-                    //     message: "Telephone Number is required"
-                    // }
+                    {
+                        name: "required",
+                        message: "Telephone Number is required"
+                    }
                 ],
 
             },
@@ -231,10 +242,11 @@ export class customerControl {
                 name: 'partyType', label: 'Party Type', placeholder: 'Party Type', type: 'text',
                 value: customerTable?.partyType, generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Party Type is required"
-                    // }
+                    {
+                        name: "pattern",
+                        message: "Please Enter only text of length 3 to 25 characters",
+                        pattern: '^[a-zA-Z ]{3,25}$',
+                    }
                 ],
 
             },
@@ -274,28 +286,52 @@ export class customerControl {
                 {
                     name: 'gstNumber', label: 'GST Number', placeholder: 'GST Number ', type: 'text',
                     value: customerTable?.gstNumber, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter alphanumeric GST Number of length 15",
+                            pattern: "^[a-zA-Z0-9]{15}$",
+                        }
+                    ],
 
                 },
 
                 {
                     name: 'custBillName', label: 'Customer Billing Name', placeholder: 'Customer Billing Name', type: 'text',
                     value: customerTable?.custBillName, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter only text of length 3 to 25 characters",
+                            pattern: '^[a-zA-Z ]{3,25}$',
+                        }
+                    ],
 
                 },
 
                 {
                     name: 'billAddress', label: 'Billing Address', placeholder: 'Billing Address', type: 'text',
                     value: customerTable?.billAddress, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter alphanumeric Billing Addressof length 15",
+                            pattern: "^[a-zA-Z0-9]{3,15}$",
+                        }
+                    ],
 
                 },
 
                 {
                     name: 'billCity', label: 'Billing City', placeholder: 'Billing City', type: 'text',
                     value: customerTable?.billCity, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter only text of length 3 to 25 characters",
+                            pattern: '^[a-zA-Z ]{3,25}$',
+                        }
+                    ],
 
                 },
 
@@ -308,26 +344,46 @@ export class customerControl {
 
                 {
                     name: 'sameAddres', label: 'Billing address same as customer address', placeholder: '', type: 'toggle', value: customerTable?.sameAddres, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        
+                    ],
 
                 },
                 {
                     name: 'bankName', label: 'Bank Name', placeholder: 'Bank Name', type: 'text',
                     value: customerTable?.bankName, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please enter a Bank Name of length 3 to 15 characters",
+                            pattern: '^[a-zA-Z ]{3,15}$',
+                        }
+                    ],
                 },
 
                 {
                     name: 'branch', label: 'Bank Branch', placeholder: 'Branch', type: 'text',
                     value: customerTable?.branch, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please enter a Branch Name of length 3 to 15 characters",
+                            pattern: '^[a-zA-Z ]{3,15}$',
+                        }
+                    ],
 
                 },
 
                 {
                     name: 'bankAcct', label: 'Bank Account Number', placeholder: 'Bank Account Number', type: 'text',
                     value: customerTable?.bankAcct, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please enter Bank Account Number of length 14 digits",
+                            pattern: "^[0-9]{14}$",
+                        }
+                    ],
                 },
                 {
                     name: 'payBasis',
@@ -381,34 +437,66 @@ export class customerControl {
                 {
                     name: 'pan', label: 'PAN Number', placeholder: 'PAN Number', type: 'text',
                     value: customerTable?.pan, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter alphanumeric PAN Number of length 10",
+                            pattern: '^[a-zA-Z0-9]{10}$',
+                        }
+                    ],
 
                 },
 
                 {
                     name: 'address', label: 'Addresss', placeholder: 'Address', type: 'text',
                     value: customerTable?.address, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter alphanumeric Addresss of length 4 to 100",
+                            pattern: '^[a-zA-Z0-9]{4,100}$',
+                        }
+                    ],
 
                 },
 
                 {
                     name: 'city', label: 'City', placeholder: 'City', type: 'text',
                     value: customerTable?.city, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please enter a City of length 3 to 15 characters",
+                            pattern: '^[a-zA-Z ]{3,15}$',
+                        }
+                    ],
 
                 },
                 {
                     name: 'state', label: 'State', placeholder: 'State', type: 'text',
                     value: customerTable?.state, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please enter a State of length 3 to 15 characters",
+                            pattern: '^[a-zA-Z ]{3,15}$',
+                        }
+                    ],
 
                 },
 
                 {
-                    name: 'pincode', label: 'Pincode', placeholder: 'Pincode', type: 'text',
+                    name: 'pincode', label: 'Pincode', placeholder: 'Pincode', type: 'number',
                     value: customerTable?.pincode, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+
+                            name: "pattern",
+                            message: "Please enter Bank Account No of length 6 digits",
+                            pattern: "^[0-9]{6}$",
+
+                        }
+                    ],
 
                 },
                 {

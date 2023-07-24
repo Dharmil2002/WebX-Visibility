@@ -5,6 +5,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import Swal from 'sweetalert2';
 import { map } from 'rxjs/operators';
+import { utilityService } from 'src/app/Utility/utility.service';
 
 @Component({
   selector: 'app-add-dcr-series',
@@ -98,7 +99,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   tableLoad: boolean;
 
   constructor(
-    public objSnackBarUtility: SnackBarUtilityService, private masterService: MasterService
+    private service: utilityService, public objSnackBarUtility: SnackBarUtilityService, private masterService: MasterService
   ) {
     super();
   }
@@ -156,7 +157,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     let userReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
       "type": "masters",
-      "collection": "user_detail"
+      "collection": "user_master"
     };
 
     let vendorReq = {
@@ -325,6 +326,11 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
         const optionItem = this.displayedColumns1.allocateTo.option.find(optItem => optItem.value === tableItem.allocateTo);
         if (optionItem) {
           tableItem.type = optionItem.type;
+          tableItem.status = 'Unused';
+          tableItem.action = 'Allocated';
+          tableItem.usedLeaves = 0;
+          tableItem.entryBy = localStorage.getItem('Username');
+          tableItem.entryDate = new Date().toISOString();
         }
       });
       // Now, add the 'id' property to each object in the 'tableData' array
@@ -414,89 +420,5 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     this.tableData[0].seriesTo = seriesTo;
     this.tableData[0].totalLeaf = totalLeaf;
   }
-
-
-  // getAllocateToDropdown() {
-  //   // Prepare the requests for different collections
-  //   let locationReq = {
-  //     "companyCode": parseInt(localStorage.getItem("companyCode")),
-  //     "type": "masters",
-  //     "collection": "location_detail"
-  //   };
-
-  //   let userReq = {
-  //     "companyCode": parseInt(localStorage.getItem("companyCode")),
-  //     "type": "masters",
-  //     "collection": "user"
-  //   };
-
-  //   let vendorReq = {
-  //     "companyCode": parseInt(localStorage.getItem("companyCode")),
-  //     "type": "masters",
-  //     "collection": "vendor"
-  //   };
-
-  //   let customerReq = {
-  //     "companyCode": parseInt(localStorage.getItem("companyCode")),
-  //     "type": "masters",
-  //     "collection": "customer"
-  //   };
-
-  //   // Use forkJoin to make parallel requests and get all data at once
-  //   forkJoin([
-  //     this.masterService.masterPost('common/getall', locationReq),
-  //     this.masterService.masterPost('common/getall', userReq),
-  //     this.masterService.masterPost('common/getall', vendorReq),
-  //     this.masterService.masterPost('common/getall', customerReq)
-  //   ]).pipe(
-  //     map(([locationRes, userRes, vendorRes, customerRes]) => {
-  //       // Combine all the data into a single object
-  //       return {
-  //         locationData: locationRes?.data,
-  //         userData: userRes?.data,
-  //         vendorData: vendorRes?.data,
-  //         customerData: customerRes?.data
-  //       };
-  //     })
-  //   ).subscribe((mergedData) => {
-  //     // Access the merged data here
-  //     const locdet = mergedData.locationData.map(element => ({
-  //       name: element.locName,
-  //       value: element.locCode,
-  //       type: 'L'
-  //     }));
-
-  //     const userdet = mergedData.userData.map(element => ({
-  //       name: element.name,
-  //       value: element.userId,
-  //       type: 'E'
-  //     }));
-
-  //     const vendordet = mergedData.vendorData.map(element => ({
-  //       name: element.vendorName,
-  //       value: element.vendorCode,
-  //       type: 'B'
-  //     }));
-
-  //     const custdet = mergedData.customerData.map(element => ({
-  //       name: element.customerName,
-  //       value: element.customerCode,
-  //       type: 'C'
-  //     }));
-
-  //     // Combine all arrays into one flat array with extra data indicating the sections
-  //     const allData = [
-  //       { name: '---Location---', value: '', type: 'L' },
-  //       ...locdet,
-  //       { name: '---Employee---', value: '', type: 'E' },
-  //       ...userdet,
-  //       { name: '---BA---', value: '', type: 'B' },
-  //       ...vendordet,
-  //       { name: '---Customer---', value: '', type: 'C' },
-  //       ...custdet,
-  //     ];
-  //     console.log(allData);
-  //   });
-  // }
 
 }

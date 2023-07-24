@@ -8,7 +8,7 @@
 </div>
 <form [formGroup]="dcrReallocateForm">
     <app-form-webxpress [form]="dcrReallocateForm" [formData]="jsonControlArray"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
     </app-form-webxpress>
 </form>
 <h5 class="b-b"></h5>

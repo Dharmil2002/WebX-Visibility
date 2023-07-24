@@ -195,7 +195,7 @@ export class DCRControl {
                     additionalData: {
                         showNameAndValue: false
                     }, generatecontrol: true,
-                    disable: true
+                    disable: false
                 },
                 {
                     name: 'newCategory',
@@ -215,8 +215,12 @@ export class DCRControl {
                     ],
                     additionalData: {
                         showNameAndValue: false
-                    }, generatecontrol: true,
-                    disable: true
+                    },
+                    functions: {
+                        onOptionSelect: 'getAllMastersData'
+                    },
+                    generatecontrol: true,
+                    disable: false
                 },
                 {
                     name: 'newPerson',
@@ -237,7 +241,7 @@ export class DCRControl {
                     additionalData: {
                         showNameAndValue: false
                     }, generatecontrol: true,
-                    disable: true
+                    disable: false
                 },
 
             ],
@@ -357,7 +361,11 @@ export class DCRControl {
                     ],
                     additionalData: {
                         showNameAndValue: false
-                    }, generatecontrol: true,
+                    },
+                    functions: {
+                        onOptionSelect: 'getAllMastersData'
+                    },
+                    generatecontrol: true,
                     disable: false
                 },
                 {
@@ -380,6 +388,42 @@ export class DCRControl {
                         showNameAndValue: false
                     }, generatecontrol: true,
                     disable: false
+                },
+                {
+                    name: 'entryBy',
+                    label: 'Entry By',
+                    placeholder: 'Entry By',
+                    type: 'text',
+                    value: localStorage.getItem("Username"),
+                    Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'entrydate',
+                    label: 'Entry Date',
+                    placeholder: 'Entry Date',
+                    type: 'text',
+                    value: new Date().toISOString(),
+                    Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'id',
+                    label: 'Id',
+                    placeholder: 'Id',
+                    type: 'text',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'action',
+                    label: 'Action',
+                    placeholder: 'Action',
+                    type: 'text',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
                 },
             ]
     }

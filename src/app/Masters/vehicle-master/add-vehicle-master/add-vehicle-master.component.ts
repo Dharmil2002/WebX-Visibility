@@ -293,16 +293,6 @@ export class AddVehicleMasterComponent implements OnInit {
   cancel() {
     window.history.back();
   }
-  // generateNextVehicleCode() {
-  //   // Increment the last used vehicle code by 1 to generate the next one
-  //   this.lastUsedVehicleCode++;
-
-  //   // Convert the number to a 4-digit string, padded with leading zeros
-  //   const paddedNumber = this.lastUsedVehicleCode.toString().padStart(4, '0');
-
-  //   // Combine the prefix "VH" with the padded number to form the complete vehicle code
-  //   return `VH${paddedNumber}`;
-  // }
   generateNextVehicleCode(): string {
     // Get the last used vehicle code from localStorage
     const lastVehicleCode = parseInt(localStorage.getItem('lastVehicleCode') || '0', 10);
@@ -320,7 +310,7 @@ export class AddVehicleMasterComponent implements OnInit {
     localStorage.setItem('lastVehicleCode', nextVendorCode.toString());
 
     return vehicleCode;
-}
+  }
   save() {
     const formValue = this.vehicleTableForm.value;
     const controlNames = [
@@ -349,7 +339,7 @@ export class AddVehicleMasterComponent implements OnInit {
     this.vehicleTableForm.removeControl("permitStateDropdown");
     this.vehicleTableForm.removeControl("routeLocation");
     this.vehicleTableForm.removeControl("isUpdate");
-    
+
     if (this.isUpdate) {
       let id = this.vehicleTableForm.value.id;
       // Remove the "id" field from the form controls
@@ -377,8 +367,8 @@ export class AddVehicleMasterComponent implements OnInit {
       });
     }
     else {
-    const nextVehicleCode = this.generateNextVehicleCode();
-    this.vehicleTableForm.controls["id"].setValue(nextVehicleCode);
+      const nextVehicleCode = this.generateNextVehicleCode();
+      this.vehicleTableForm.controls["id"].setValue(nextVehicleCode);
       let req = {
         companyCode: this.companyCode,
         type: "masters",
@@ -401,6 +391,5 @@ export class AddVehicleMasterComponent implements OnInit {
       });
     }
   }
-
 }
 

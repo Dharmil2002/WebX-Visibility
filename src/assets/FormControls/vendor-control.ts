@@ -216,12 +216,12 @@ export class VendorControl {
                     {
                         name: "required",
                         message: "Account Number is required"
-                      },
-                      {
+                    },
+                    {
                         name: "pattern",
                         value: "^[0-9]+$",
                         message: "Please enter a valid account number (only digits allowed)"
-                      }
+                    }
                 ],
                 generatecontrol: true, disable: false
             },
@@ -234,12 +234,12 @@ export class VendorControl {
                     {
                         name: "required",
                         message: "IFSC Number is required"
-                      },
-                      {
+                    },
+                    {
                         name: "pattern",
                         value: "^[A-Za-z]{4}[0-9]{7}$",
                         message: "Please enter a valid IFSC number (4 letters followed by 7 digits)"
-                      }
+                    }
                 ],
                 generatecontrol: true, disable: false
             },
@@ -252,7 +252,7 @@ export class VendorControl {
                     {
                         name: "required",
                         message: "Bank Name is required"
-                      }
+                    }
                 ],
                 generatecontrol: true, disable: false
             },
@@ -265,7 +265,7 @@ export class VendorControl {
                 ],
                 generatecontrol: true, disable: false
             },
-            
+
             {
                 name: 'remark',
                 label: 'Remark',
@@ -301,7 +301,7 @@ export class VendorControl {
                 ],
                 generatecontrol: true, disable: false
             },
-            
+
             {
                 name: 'gstNo',
                 label: 'GST No',
@@ -385,9 +385,9 @@ export class VendorControl {
                 name: 'deliveryPartner', label: 'Delivery Partner', placeholder: 'Delivery Partner', type: 'toggle', value: vendorMasterTable.deliveryPartner, Validations: [],
                 generatecontrol: true, disable: false
             },
-            
-            
-            
+
+
+
             {
                 name: 'audited', label: 'Audit', placeholder: 'Audit', type: 'toggle', value: vendorMasterTable.audited, Validations: [],
                 generatecontrol: true, disable: false
@@ -404,7 +404,7 @@ export class VendorControl {
                 },
                 generatecontrol: true, disable: false
             },
-            
+
             {
                 name: 'franchise', label: 'Franchise', placeholder: 'Franchise', type: 'toggle', value: vendorMasterTable.franchise, Validations: [],
                 generatecontrol: true, disable: false
@@ -413,7 +413,7 @@ export class VendorControl {
                 name: 'integrateWithFinSystem', label: 'Integrate With Fin System', placeholder: 'Integrate With Fin System', type: 'toggle', value: vendorMasterTable.integrateWithFinSystem, Validations: [],
                 generatecontrol: true, disable: false
             },
-            
+
             {
                 name: 'tdsApplicable',
                 label: 'TDS Applicable',

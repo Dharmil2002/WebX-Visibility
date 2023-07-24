@@ -16,7 +16,7 @@ export class VehicleMasterListComponent implements OnInit {
             "srNo": "Sr No",
             "vehicleNo": "Vehicle No.",
             "vehicleType": "Vehicle Type",
-            "vendorName": "Vendor Code",
+            "vendorName": "Vendor Name",
             "vendorType": "Vendor Type",
             "isActive": "Active Flag",
             "actions": "Actions",

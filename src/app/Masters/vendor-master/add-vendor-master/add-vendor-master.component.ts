@@ -334,24 +334,24 @@ export class AddVendorMasterComponent implements OnInit {
       });
     }
   }
-onChange(event: any) {
-  // Get the value of the vendorSubType toggle
-  const vendorSubTypeEnabled = event.target.checked;
-  // Show/hide additional dropdown based on the toggle state
-  if (vendorSubTypeEnabled) {
-    this.vendorTableForm.controls['additionalDropdown'].enable();
-  } else {
-    this.vendorTableForm.controls['additionalDropdown'].disable();
-  }
-}
-displayTds() {
-  const generateControl = this.vendorTableForm.value.tdsApplicable == true;  // Check if value is "Y" to generate control
-  this.jsonControlVendorOtherInfoArray.forEach(data => {
-    if (data.name === 'tdsSection' || data.name === 'tdsRate' || data.name === 'tdsType') {
-      data.generatecontrol = generateControl;  // Set generatecontrol property based on the generateControl value
+  onChange(event: any) {
+    // Get the value of the vendorSubType toggle
+    const vendorSubTypeEnabled = event.target.checked;
+    // Show/hide additional dropdown based on the toggle state
+    if (vendorSubTypeEnabled) {
+      this.vendorTableForm.controls['additionalDropdown'].enable();
+    } else {
+      this.vendorTableForm.controls['additionalDropdown'].disable();
     }
-  });
-}
+  }
+  displayTds() {
+    const generateControl = this.vendorTableForm.value.tdsApplicable == true;  // Check if value is "Y" to generate control
+    this.jsonControlVendorOtherInfoArray.forEach(data => {
+      if (data.name === 'tdsSection' || data.name === 'tdsRate' || data.name === 'tdsType') {
+        data.generatecontrol = generateControl;  // Set generatecontrol property based on the generateControl value
+      }
+    });
+  }
   save() {
     const formValue = this.vendorTableForm.value;
     const controlNames = [
@@ -389,18 +389,18 @@ displayTds() {
         updates: this.vendorTableForm.value
       };
       this.masterService.masterPut('common/update', req).subscribe({
-          next: (res: any) => {
-              if (res) {
-                  // Display success message
-                  Swal.fire({
-                      icon: "success",
-                      title: "Successful",
-                      text: res.message,
-                      showConfirmButton: true,
-                  });
-                  this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
-              }
+        next: (res: any) => {
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
           }
+        }
       });
     }
     else {
@@ -414,18 +414,18 @@ displayTds() {
         data: this.vendorTableForm.value
       };
       this.masterService.masterPost('common/create', req).subscribe({
-          next: (res: any) => {
-              if (res) {
-                  // Display success message
-                  Swal.fire({
-                      icon: "success",
-                      title: "Successful",
-                      text: res.message,
-                      showConfirmButton: true,
-                  });
-                  this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
-              }
+        next: (res: any) => {
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
           }
+        }
       });
     }
   }

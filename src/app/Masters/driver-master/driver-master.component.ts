@@ -16,7 +16,7 @@ export class DriverMasterComponent implements OnInit {
       'manualDriverCode': 'Driver Code',
       'driverName': 'Driver Name',
       'licenseNo': 'License No',
-      'validityDate': 'Validity Date',
+     // 'validityDate': 'Validity Date',
       "activeFlag": "Active Status",
       "actions": "Actions"
   };

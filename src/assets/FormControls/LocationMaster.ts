@@ -38,7 +38,7 @@ export class LocationControl {
             },
             {
                 name: 'reportLoc', label: "Reporting Location", placeholder: "Select Reporting Location", type: 'dropdown',
-                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                value:'', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     // {
                     //     name: "required",
@@ -56,11 +56,11 @@ export class LocationControl {
                         name: "required",
                         message: "Location Code is required"
                     }
-                    // , {
-                    //     name: "pattern",
-                    //     message: "Please Enter A-Z Char Or 0-9 with no Space and Location Code should be limited to 5 characters",
-                    //     pattern: "^[.a-zA-Z0-9,-]{0,5}$",
-                    // }
+                    , {
+                        name: "pattern",
+                        message: "Please Enter A-Z Char Or 0-9 with no Space and Location Code should be limited to 5 characters",
+                        pattern: "^[.a-zA-Z0-9,-]{0,5}$",
+                    }
                 ],
             },
             {
@@ -72,21 +72,16 @@ export class LocationControl {
                     }
                     , {
                         name: "pattern",
-                        message: "Please Enter only text",
-                        pattern: '^[a-zA-Z ]*$',
+                        message: "Please Enter only text of length 3 to 25 characters",
+                        pattern: '^[a-zA-Z ]{3,25}$',
                     }
                 ],
-                // functions:{
-                //     onChange:'GetLocationName'
-                // }
+               
             },
             {
-                name: 'locPincode', label: 'Pincode', placeholder: 'Enter Pincode', type: 'dropdown', value: LocationTable.locPincode, generatecontrol: true, disable: false,
+                name: 'locPincode', label: 'Pincode', placeholder: 'Enter Pincode', type: 'dropdown', value: '', generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Pincode is required"
-                    // }
+                    
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -94,7 +89,7 @@ export class LocationControl {
             },
             {
                 name: 'locState', label: "State", placeholder: "Select State", type: 'dropdown',
-                value: LocationTable.locState, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     // {
                     //     name: "required",
@@ -107,7 +102,7 @@ export class LocationControl {
             },
             {
                 name: 'locCity', label: "City", placeholder: "Select City", type: 'dropdown',
-                value: LocationTable.locCity, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                         // {
                         //     name: "required",
@@ -125,12 +120,17 @@ export class LocationControl {
                     {
                         name: "required",
                         message: "Location Address is required"
+                    }, {
+                        name: "pattern",
+                        message: "Please Enter alphanumeric Address of length 4 to 100",
+                        pattern: '^[a-zA-Z0-9]{4,100}$',
                     }
+
                 ],
 
             },
             {
-                name: 'locTelno', label: "Telephone Number", placeholder: "Enter Telephone Number", type: 'number', value: LocationTable.locTel, generatecontrol: true, disable: false,
+                name: 'locTelno', label: "Telephone Number", placeholder: "Enter Telephone Number", type: 'number', value: LocationTable.locTelno, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "pattern",
@@ -172,17 +172,13 @@ export class LocationControl {
                 name: 'endMile', label: 'End Mile Serviceability', placeholder: '', type: 'toggle', value:LocationTable.locEndmile, generatecontrol: true, disable: false,
                 Validations: []
             },
-            // {
-            //     name: 'updtBy', label: 'Update By', placeholder: 'Update By', type: 'text', value: localStorage.getItem("UserName"), filterOptions: '', autocomplete: '', displaywith: '', Validations: [], generatecontrol: false, disable: false
-            // },
-          
         ],
 	
 	  this.OtherDetailsControls =
             [
                 {
                     name: 'locRegion', label: "Zone", placeholder: "Select zone", type: 'dropdown',
-                    value: LocationTable.locZone, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                         // {
                         //     name: "required",
@@ -199,7 +195,7 @@ export class LocationControl {
                 },
                 {
                     name: 'acctLoc', label: "Accounting Location", placeholder: "Select Accounting Location", type: 'dropdown',
-                    value: LocationTable.acctLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                     ],
                     additionalData: {
@@ -208,14 +204,14 @@ export class LocationControl {
                 },
                 {
                     name: 'dataLoc', label: "Data Entry Location", placeholder: "Select Data Entry Location", type: 'dropdown',
-                    value: LocationTable.dataLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
                         showNameAndValue: false,
                     }
                 },
                 {
-                    name: 'locStartDt', label: 'Location Start Date', placeholder: 'Enter Location Start Date', type: 'date', value:LocationTable.locStrtDate, generatecontrol: true, disable: false,
+                    name: 'locStartDt', label: 'Location Start Date', placeholder: 'Enter Location Start Date', type: 'date', value:LocationTable.locStartDt, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "required",
@@ -225,12 +221,10 @@ export class LocationControl {
                     additionalData: {
                         minDate: new Date("01 Jan 1900")
                     }
-                    // ,functions: {
-                    //     onDate: 'setLocationEndDate',
-                    // }
+                    
                 },
                 {
-                    name: 'locEndDt', label: 'Location End Date', placeholder: 'Enter Location End Date', type: 'date', value: LocationTable.locEndDate, generatecontrol: true, disable: false,
+                    name: 'locEndDt', label: 'Location End Date', placeholder: 'Enter Location End Date', type: 'date', value: LocationTable.locEndDt, generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
                         minDate: ''
@@ -256,7 +250,7 @@ export class LocationControl {
                 },
                 {
                     name: 'nextLoc', label: "Default Next Location", placeholder: "Select Default Next Location", type: 'dropdown',
-                    value: LocationTable.defaultLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                         // {
                         //     name: "autocomplete",
@@ -272,7 +266,7 @@ export class LocationControl {
                 },
                 {
                     name: 'prevLoc', label: "Nearest Previous Location", placeholder: "Select Nearest Previous Location", type: 'dropdown',
-                    value: LocationTable.nearLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                         // {
                         //     name: "autocomplete",
@@ -288,7 +282,7 @@ export class LocationControl {
                 },
                 {
                     name: 'ownership', label: "Location Ownership", placeholder: "Select Location Ownership", type: 'dropdown',
-                    value: LocationTable.ownership, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                       
                         // {
@@ -302,7 +296,7 @@ export class LocationControl {
                 },
                 {
                     name: 'contLoc', label: "Delivery Control Location", placeholder: "Select Delivery Control Location", type: 'dropdown',
-                    value: LocationTable.contLoc, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                         // {
                         //     name: "autocomplete",
@@ -319,16 +313,31 @@ export class LocationControl {
                 {
                     name: 'paid', label: 'Paid SAP Code', placeholder: 'Paid SAP Code', type: 'text', value: LocationTable.paid, generatecontrol: true, disable: false,
                     Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter alphanumeric Paid SAP Code of length 4 to 10",
+                            pattern: '^[a-zA-Z0-9]{4,10}$',
+                        }
                     ]
                 },
                 {
                     name: 'pay', label: 'To Pay SAP Code', placeholder: 'To Pay SAP Code', type: 'text', value: LocationTable.pay, generatecontrol: true, disable: false,
                     Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter alphanumeric To Pay SAP Code of length 4 to 10",
+                            pattern: '^[a-zA-Z0-9]{4,10}$',
+                        }
                     ]
                 },
                 {
                     name: 'profit', label: 'Profit Centre Code', placeholder: 'Profit Centre Code', type: 'text', value:LocationTable.profit, generatecontrol: true, disable: false,
                     Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter alphanumeric Profit Centre Code of length 4 to 10",
+                            pattern: '^[a-zA-Z0-9]{4,10}$',
+                        }
                     ]
                 },
                 {

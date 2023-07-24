@@ -6,7 +6,9 @@ export class LocationMaster {
   locName: string;
   locPincode: string;
   locState: string;
+  locRegion:string;
   locAddr: string;
+  locTelno:string;
   locCity: string;
   locTel: string;
   locMobile: string;
@@ -14,9 +16,11 @@ export class LocationMaster {
   locZone: string;
   ownership: string;
   dataLoc: string;
+  nextLoc: string;
+  prevLoc:string;
   acctLoc: string;
-  locStrtDate:string;
-  locEndDate:string;
+  locStartDt:string;
+  locEndDt:string;
   ctbs:string;
   computerised:any;
   cutOff:any;
@@ -51,8 +55,8 @@ export class LocationMaster {
       this.locTel = LocationMaster.locTel || '';
       this.ownership = LocationMaster.ownership || '';
       this.locEmail = LocationMaster.locEmail || '';
-      this.locStrtDate = LocationMaster.locStrtDate || '';
-      this.locEndDate = LocationMaster.locEndDate || '';
+      this.locStartDt = LocationMaster.locStrtDate || '';
+      this.locEndDt = LocationMaster.locEndDate || '';
       this.locZone = LocationMaster.locZone || '';
       this.activeFlag = LocationMaster.activeFlag || false;
       this.locEndmile = LocationMaster.locEndmile || '';

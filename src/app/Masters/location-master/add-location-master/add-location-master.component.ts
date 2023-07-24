@@ -7,9 +7,7 @@ import { LocationControl } from 'src/assets/FormControls/LocationMaster';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { utilityService } from 'src/app/Utility/utility.service';
 import Swal from 'sweetalert2';
-import { getShortName } from 'src/app/Utility/commonFunction/random/generateRandomNumber';
 
 @Component({
   selector: 'app-add-location-master',
@@ -235,19 +233,22 @@ export class AddLocationMasterComponent implements OnInit {
         this.reportLocation = this.findDropdownItemByName(this.locationHierarchy, this.LocationTable.reportLevel);
         this.locationTableForm.controls.reportLevel.setValue(this.reportLocation);
 
+        this.reportingLoDet = this.findDropdownItemByName(this.reportingLoc, this.LocationTable.reportLoc);
+        this.locationTableForm.controls.reportLoc.setValue(this.reportingLoDet);
+
         this.pincodeDet = this.findDropdownItemByName(this.pincodeLoc, this.LocationTable.locPincode);
         this.locationTableForm.controls.locPincode.setValue(this.pincodeDet);
 
         this.cityLocDet = this.findDropdownItemByName(this.cityLoc, this.LocationTable.locCity);
         this.locationTableForm.controls.locCity.setValue(this.cityLocDet);
 
-        this.reportingLoDet = this.findDropdownItemByName(this.reportingLoc, this.LocationTable.reportLoc);
-        this.locationTableForm.controls.reportLoc.setValue(this.reportingLoDet);
+        // this.reportingLoDet = this.findDropdownItemByName(this.reportingLoc, this.LocationTable.reportLoc);
+        // this.locationTableForm.controls.reportLoc.setValue(this.reportingLoDet);
 
         this.stateDet = this.findDropdownItemByName(this.stateData, this.LocationTable.locState);
         this.locationTableForm.controls.locState.setValue(this.stateDet);
 
-        this.zoneDet = this.findDropdownItemByName(this.zoneData, this.LocationTable.locZone);
+        this.zoneDet = this.findDropdownItemByName(this.zoneData, this.LocationTable.locRegion);
         this.locationTableForm.controls.locRegion.setValue(this.zoneDet);
 
         this.ownerShipDet = this.findDropdownItemByName(this.ownershipData, this.LocationTable.ownership);
@@ -259,10 +260,10 @@ export class AddLocationMasterComponent implements OnInit {
         this.dataLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.dataLoc);
         this.locationTableForm.controls.dataLoc.setValue(this.dataLocDet);
 
-        this.defaultDet = this.findDropdownItemByName(this.accounting, this.LocationTable.defaultLoc);
+        this.defaultDet = this.findDropdownItemByName(this.accounting, this.LocationTable.nextLoc);
         this.locationTableForm.controls.nextLoc.setValue(this.defaultDet);
 
-        this.prevLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.nearLoc);
+        this.prevLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.prevLoc);
         this.locationTableForm.controls.prevLoc.setValue(this.prevLocDet);
 
         this.contLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.contLoc);
@@ -288,24 +289,28 @@ export class AddLocationMasterComponent implements OnInit {
       });
     });
   }
+
   save() {
-    // const formValue = this.locationTableForm.value;
-    // Object.keys(formValue).forEach(key => {
-    //   this.locationTableForm.controls[key].setValue(formValue[key]);
-    // });
-    this.locationTableForm.controls["locLevel"].setValue(this.locationTableForm.value.locLevel.name);
-    this.locationTableForm.controls["reportLevel"].setValue(this.locationTableForm.value.reportLevel.name);
-    this.locationTableForm.controls["reportLoc"].setValue(this.locationTableForm.value.reportLoc.name);
-    this.locationTableForm.controls["locPincode"].setValue(this.locationTableForm.value.locPincode.name);
-    this.locationTableForm.controls["locState"].setValue(this.locationTableForm.value.locState.name);
-    this.locationTableForm.controls["locCity"].setValue(this.locationTableForm.value.locCity.name);
-    this.locationTableForm.controls["locRegion"].setValue(this.locationTableForm.value.locRegion.name);
-    this.locationTableForm.controls["acctLoc"].setValue(this.locationTableForm.value.acctLoc.name);
-    this.locationTableForm.controls["dataLoc"].setValue(this.locationTableForm.value.dataLoc.name);
-    this.locationTableForm.controls["nextLoc"].setValue(this.locationTableForm.value.nextLoc.name);
-    this.locationTableForm.controls["prevLoc"].setValue(this.locationTableForm.value.prevLoc.name);
-    this.locationTableForm.controls["ownership"].setValue(this.locationTableForm.value.ownership.name);
-    this.locationTableForm.controls["contLoc"].setValue(this.locationTableForm.value.contLoc.name);
+    const formValue = this.locationTableForm.value;
+    const controlNames = [
+      "locLevel",
+      "reportLevel",
+      "reportLoc",
+      "locPincode",
+      "locState",
+      "locCity",
+      "locRegion",
+      "acctLoc",
+      "dataLoc",
+      "nextLoc",
+      "prevLoc",
+      "ownership",
+      "contLoc",
+    ];
+    controlNames.forEach(controlName => {
+      const controlValue = formValue[controlName]?.name;
+      this.locationTableForm.controls[controlName].setValue(controlValue);
+    });
     this.locationTableForm.controls["activeFlag"].setValue(this.locationTableForm.value.activeFlag == true ? "Y" : "N");
     if (this.isUpdate) {
       let id = this.locationTableForm.value.id;

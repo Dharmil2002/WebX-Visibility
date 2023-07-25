@@ -6,6 +6,7 @@ import { format, isValid, parseISO } from "date-fns";
  * @returns The KPI data array.
  */
 export function kpiData(StockCountData: any[]): any[] {
+  const lsCount= StockCountData.filter((x)=>x.lsNo!=="")
   // Helper function to create a shipData object
   const createShipDataObject = (
     count: number,
@@ -21,7 +22,7 @@ export function kpiData(StockCountData: any[]): any[] {
   const shipData = [
     createShipDataObject(StockCountData.length, "Total", "bg-white"),
     createShipDataObject(StockCountData.filter((x) => x.isComplete === 1).length, "Completion", "bg-white"),
-    createShipDataObject(0, "Loading Sheet", "bg-white"),
+    createShipDataObject(lsCount.length, "Loading Sheet", "bg-white"),
     createShipDataObject(0, "Delivery", "bg-white"),
   ];
 

@@ -7,8 +7,9 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from 'src/app/Utility/utility.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { CityControl } from "src/assets/FormControls/cityControls";
+
 import Swal from "sweetalert2";
+import { CityControl } from "src/assets/FormControls/CityControls";
 
 @Component({
     selector: 'app-add-city-master',

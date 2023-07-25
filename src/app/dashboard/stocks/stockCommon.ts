@@ -20,7 +20,7 @@ export function kpiData(StockCountData: any[]): any[] {
   // Create an array of shipData objects with dynamic values
   const shipData = [
     createShipDataObject(StockCountData.length, "Total", "bg-white"),
-    createShipDataObject(StockCountData.filter((x)=>x.isComplete===1).length, "Completion", "bg-white"),
+    createShipDataObject(StockCountData.filter((x) => x.isComplete === 1).length, "Completion", "bg-white"),
     createShipDataObject(0, "Loading Sheet", "bg-white"),
     createShipDataObject(0, "Delivery", "bg-white"),
   ];
@@ -61,7 +61,7 @@ export async function getDocketDetailsFromApi(
 
     // Modify the data
     const modifiedData = docketDetails.map((item: any) => {
-      let actualWeight ;
+      let actualWeight;
 
       if (item.invoiceDetails) {
         actualWeight = item.invoiceDetails.reduce(
@@ -88,9 +88,16 @@ export async function getDocketDetailsFromApi(
         noofPackages: parseInt(item?.totalChargedNoOfpkg ?? 0),
         chargedWeight: parseInt(item?.chrgwt ?? 0),
         actualWeight: parseInt(actualWeight ?? 0),
-        status:item?.isComplete === 1 ? "Available for LS" : "Quick Completion",
-        Action: item?.isComplete === 1 ? "" : "Quick Completion",
-        isComplete: item?.isComplete||false
+        status: item?.isComplete === 1
+          ? item?.lsNo === "" ? "Available for LS" : "Available for manifest"
+          : item?.unloading === 1 && item?.lsNo && item?.mfNo
+            ? "Waiting for unloading"
+            : "Quick Completion",
+        // Determine the Action based on the conditions
+        Action: item?.isComplete === 1
+          ? item?.lsNo === 0 ? "" : ""
+          : "Quick Completion",
+        isComplete: item?.isComplete || false
       };
     });
 

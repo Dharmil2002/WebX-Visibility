@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -45,7 +46,8 @@ export class QuickBookingComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
-    private operationService: OperationService
+    private operationService: OperationService,
+    private _NavigationService:NavigationService
   ) {
     this.initializeFormControl();
     this.getCity();
@@ -220,6 +222,11 @@ export class QuickBookingComponent implements OnInit {
           title: "Booked SuccesFully",
           text: "DocketNo: "+docketNo,
           showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Redirect to the desired page after the success message is confirmed.
+            this._NavigationService.navigateTotab(1,'dashboard/GlobeDashboardPage');
+          }
         });
       }
     })

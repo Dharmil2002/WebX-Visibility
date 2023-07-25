@@ -9,7 +9,6 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
   templateUrl: './arrival-dashboard-page.component.html',
 })
 export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
-  jsonUrl = '../../../assets/data/arrival-dashboard-data.json';
   viewComponent: any;
   advancdeDetails: any;
   arrivalChanged: any;
@@ -139,6 +138,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     this._operation.operationPost('common/getall', reqbody).subscribe({
       next: (res: any) => {
         if (res) {
+        
           const arrivalDetails = res.data.filter((x) => x.nextUpComingLoc.toLowerCase() === this.branch.toLowerCase());
          let tableData=[];
           arrivalDetails.forEach(element => {
@@ -158,7 +158,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
             }
             tableData.push(arrivalData);
           });
-
+          this.fetchShipmentData();
           this.arrivalTableData=tableData;
           this.tableload=false;
     
@@ -171,6 +171,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
    * Fetches shipment data from the API and updates the boxData and tableload properties.
    */
  fetchShipmentData() {
+ 
   // Prepare request payload
   let req = {
     companyCode: this.companyCode,
@@ -182,9 +183,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   this._operation.operationPost("common/getall", req).subscribe({
     next: async (res: any) => {
       // Update shipmentData property with the received data
-      const boxData = res.data.filter((x)=>x.destination.split(":")[1]===this.branch && x.unloading===0);
-      const sumTotalChargedNoOfpkg = res.data.reduce((total, count) => {
-        return total + count.totalChargedNoOfpkg;
+      const boxData = res.data.filter((x)=>x.destination.split(":")[1].trim()===this.branch.trim() && x.unloading===0 && x.mfNo!=='');
+      const sumTotalChargedNoOfpkg =boxData.reduce((total, count) => {
+        return total + parseInt(count.totalChargedNoOfpkg);
       }, 0);
       
 

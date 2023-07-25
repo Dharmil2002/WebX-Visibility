@@ -505,7 +505,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     this.tabForm.controls['consigneeName'].setValue(this.tabForm.value?.consigneeName.name || '');
     this.contractForm.controls['destination'].setValue(this.contractForm.value?.destination.name || '');
     if (this.quickDocket) {
-      let id = { isComplete: 1 }
+      let id = { isComplete: 1,unloading:0,lsNo:"",mfNo:"" }
       let docketDetails = { ...this.tabForm.value, ...this.contractForm.value, ...invoiceDetails, ...id };
       let reqBody = {
         companyCode: this.companyCode,

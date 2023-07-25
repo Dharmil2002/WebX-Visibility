@@ -323,7 +323,7 @@ export class DCRControl {
                     Validations: []
                 },
                 {
-                    name: 'newLocation',
+                    name: 'allotTo',
                     label: 'New Allocation Location',
                     placeholder: 'New Allocation Location',
                     type: 'dropdown',
@@ -344,7 +344,7 @@ export class DCRControl {
                     disable: false
                 },
                 {
-                    name: 'newCategory',
+                    name: 'type',
                     label: 'New Allocation Category',
                     placeholder: 'New Allocation Category',
                     type: 'dropdown',
@@ -369,7 +369,7 @@ export class DCRControl {
                     disable: false
                 },
                 {
-                    name: 'newPerson',
+                    name: 'allocateTo',
                     label: 'Person to be Assigned Series',
                     placeholder: 'Person to be Assigned Series',
                     type: 'dropdown',
@@ -399,7 +399,7 @@ export class DCRControl {
                     generatecontrol: false, disable: false
                 },
                 {
-                    name: 'entrydate',
+                    name: 'entryDate',
                     label: 'Entry Date',
                     placeholder: 'Entry Date',
                     type: 'text',

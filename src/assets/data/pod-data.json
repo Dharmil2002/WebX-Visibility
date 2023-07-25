@@ -1,0 +1,157 @@
+{
+  "podData": [
+    {
+      "pfmCnNo": "100010002004",
+      "cnDate": "14-Jun-23",
+      "deliveryDate": "17-Jun-23",
+      "podScanDate": "17-Jun-23",
+      "customerName": "C00025164:AIRON ELECTRICALS",
+      "documentType": "TBB",
+      "originDestination": "GGN - HYD",
+      "fromCityToCity": "Gurgaon - Hyderabad",
+      "status": "POD Uploaded",
+      "action": "AUDIT POD"
+    },
+    {
+      "pfmCnNo": "100010002003",
+      "cnDate": "14-Jun-23",
+      "deliveryDate": "18-Jun-23",
+      "podScanDate": "18-Jun-23",
+      "customerName": "C00025164:AIRON ELECTRICALS",
+      "documentType": "PAID",
+      "originDestination": "GGN - HYD",
+      "fromCityToCity": "Gurgaon - Hyderabad",
+      "status": "POD Uploaded",
+      "action": "AUDIT POD"
+    },
+    {
+      "pfmCnNo": "100010002002",
+      "cnDate": "13-Jun-23",
+      "deliveryDate": "19-Jun-23",
+      "podScanDate": "19-Jun-23",
+      "customerName": "8888:Walk-In Customer",
+      "documentType": "PAID",
+      "originDestination": "IDR - HYD",
+      "fromCityToCity": "Indore - Hyderabad",
+      "status": "Good POD",
+      "action": "FORWARD POD"
+    },
+    {
+      "pfmCnNo": "100010002001",
+      "cnDate": "13-Jun-23",
+      "deliveryDate": "15-Jun-23",
+      "podScanDate": "15-Jun-23",
+      "customerName": "8888:Walk-In Customer",
+      "documentType": "TO PAY",
+      "originDestination": "MUM - HYD",
+      "fromCityToCity": "Mumbai - Hyderabad",
+      "status": "POD Rejected",
+      "action": "Upload POD"
+    },
+    {
+      "pfmCnNo": "100010001893",
+      "cnDate": "13-Jun-23",
+      "deliveryDate": "16-Jun-23",
+      "podScanDate": "16-Jun-23",
+      "customerName": "C00025164:AIRON ELECTRICALS",
+      "documentType": "PAID",
+      "originDestination": "SRT - HYD",
+      "fromCityToCity": "Surat - Hyderabad",
+      "status": "Good POD",
+      "action": "FORWARD POD"
+    },
+    {
+      "pfmCnNo": "100010001892",
+      "cnDate": "13-Jun-23",
+      "deliveryDate": "17-Jun-23",
+      "podScanDate": "17-Jun-23",
+      "customerName": "C00025164:AIRON ELECTRICALS",
+      "documentType": "PAID",
+      "originDestination": "SRT - HYD",
+      "fromCityToCity": "Surat - Hyderabad",
+      "status": "BAD POD",
+      "action": "Upload POD"
+    },
+    {
+      "pfmCnNo": "PFM/HYD/2324/00023",
+      "cnDate": "13-Jun-23",
+      "deliveryDate": "15-Jun-23",
+      "podScanDate": "15-Jun-23",
+      "customerName": "8888:Walk-In Customer",
+      "documentType": "TO PAY",
+      "originDestination": "MUM - HYD",
+      "fromCityToCity": "Hyderabad - Mumbai",
+      "status": "POD Received",
+      "action": "Acknowledge POD"
+    },
+    {
+      "pfmCnNo": "PFM/HYD/2324/00012",
+      "cnDate": "13-Jun-23",
+      "deliveryDate": "16-Jun-23",
+      "podScanDate": "16-Jun-23",
+      "customerName": "C00025164:AIRON ELECTRICALS",
+      "documentType": "PAID",
+      "originDestination": "SRT - HYD",
+      "fromCityToCity": "Hyderabad - Surat",
+      "status": "POD Received",
+      "action": "Acknowledge POD"
+    },
+    {
+      "pfmCnNo": "100010002392",
+      "cnDate": "13-Jun-23",
+      "deliveryDate": "17-Jun-23",
+      "podScanDate": "17-Jun-23",
+      "customerName": "C00025164:AIRON ELECTRICALS",
+      "documentType": "PAID",
+      "originDestination": "SRT - HYD",
+      "fromCityToCity": "Surat - Hyderabad",
+      "status": "POD Forwarded",
+      "action": "Acknowledge POD"
+    }
+  ],
+  "codKpiData": {
+    "Title": "CODS",
+    "Items": [
+      {
+        "count": 147,
+        "title": "Pending for Upload Document",
+        "class": "info-box7  bg-white order-info-box7"
+      },
+      {
+        "count": 23,
+        "title": "Pending for Forwarding",
+        "class": "info-box7 bg-white order-info-box7"
+      },
+      {
+        "count": 0,
+        "title": "Pending for Acknowledge",
+        "class": "info-box7 bg-white order-info-box7"
+      }
+    ]
+  },
+  "podKpiData": {
+    "Title": "PODS",
+    "Items": [
+      {
+        "count": 147,
+        "title": "Pending for Audit",
+        "class": "info-box7  bg-white order-info-box7"
+      },
+      {
+        "count": 23,
+        "title": "Rejected PODs",
+        "class": "info-box7 bg-white order-info-box7"
+      },
+      {
+        "count": 90,
+        "title": "Pending for Forwarding",
+        "class": "info-box7 bg-white order-info-box7"
+      },
+      {
+        "count": 0,
+        "title": "Pending for Acknowledge",
+        "class": "info-box7 bg-white order-info-box7"
+      }
+    ]
+  }
+}

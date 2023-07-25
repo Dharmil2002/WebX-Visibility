@@ -10,7 +10,6 @@
                     <mat-tab-group (selectedIndexChange)="GetSelectedIndex($event)" #myTabGroup>
                         <mat-tab>
                             <ng-template mat-tab-label>
-                                <!-- <mat-icon class="example-tab-icon msr-2">home</mat-icon> -->
                                 Dashboard
                             </ng-template>
                             <app-dashboard-count-page *ngIf="myTabGroup.selectedIndex== 0"
@@ -18,47 +17,45 @@
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>
-                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
                                 Docket Stock
-
                             </ng-template>
-                            <app-stocks *ngIf="myTabGroup.selectedIndex== 1"
-                                (CurrentIndex)="GetSelectedIndex($event)" (departure)="departureDetails"></app-stocks>
+                            <app-stocks *ngIf="myTabGroup.selectedIndex== 1" (CurrentIndex)="GetSelectedIndex($event)"
+                                (departure)="departureDetails"></app-stocks>
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>
-                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
                                 Arrivals
-
                             </ng-template>
                             <app-arrival-dashboard-page *ngIf="myTabGroup.selectedIndex== 2"
-                                (CurrentIndex)="GetSelectedIndex($event)" (departure)="departureDetails"></app-arrival-dashboard-page>
+                                (CurrentIndex)="GetSelectedIndex($event)"
+                                (departure)="departureDetails"></app-arrival-dashboard-page>
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>
-                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
                                 Departures
-
                             </ng-template>
                             <app-departure-dashboard-page *ngIf="myTabGroup.selectedIndex==3"
-                                (CurrentIndex)="GetSelectedIndex($event)" [arrivaldeparture]="departure"></app-departure-dashboard-page>
+                                (CurrentIndex)="GetSelectedIndex($event)"
+                                [arrivaldeparture]="departure"></app-departure-dashboard-page>
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>
-                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
                                 Delivery
-
                             </ng-template>
                             <app-pickup-delivery-planner *ngIf="myTabGroup.selectedIndex==4"
                                 (CurrentIndex)="GetSelectedIndex($event)"></app-pickup-delivery-planner>
                         </mat-tab>
+                        <!-- <mat-tab>
+                            <ng-template mat-tab-label>
+                                DEPS
+                            </ng-template>
+                        </mat-tab> -->
                         <mat-tab>
                             <ng-template mat-tab-label>
-                                <!-- <mat-icon class="example-tab-icon msr-2">create</mat-icon> -->
-                                DEPS
-
+                                POD/COD
                             </ng-template>
-
+                            <app-pod-cod-dashboard-page *ngIf="myTabGroup.selectedIndex== 5"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-pod-cod-dashboard-page>
                         </mat-tab>
                     </mat-tab-group>
                 </div>

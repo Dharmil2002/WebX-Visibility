@@ -14,7 +14,7 @@ export class OperationService {
   loadingSheetJsonUrl = '../../../assets/data/shipmentDetails.json';
   arrivalUrl = '../../../assets/data/arrival-dashboard-data.json';
   runSheerUrl = "../../../assets/data/create-runsheet-data.json";
-
+  podcodDetails='../../../assets/data/pod-data.json';
   constructor(private http: HttpClient) {}
   /**
    * Retrieves JSON file details from the specified API URL.

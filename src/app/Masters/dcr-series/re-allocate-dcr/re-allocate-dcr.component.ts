@@ -7,7 +7,9 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { DCRControl } from 'src/assets/FormControls/dcrControl';
 import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-
+import { utilityService } from 'src/app/Utility/utility.service';
+import { map } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-re-allocate-dcr',
@@ -32,11 +34,14 @@ export class ReAllocateDcrComponent implements OnInit {
   allocationCat: any;
   newCategoryStatus: any;
   newCategory: any;
-  constructor(public dialog: MatDialog, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) { }
+  newPerson: any;
+  newPersonStatus: any;
+  constructor(private service: utilityService, public dialog: MatDialog, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) { }
 
   ngOnInit(): void {
     this.intializeFormControls();
     this.getDropDownData();
+    this.getAllMastersData();
   }
   intializeFormControls() {
     this.dcrReallocateFormControls = new DCRControl();
@@ -51,6 +56,10 @@ export class ReAllocateDcrComponent implements OnInit {
         // Set State-related variables
         this.newCategory = data.name;
         this.newCategoryStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'newPerson') {
+        this.newPerson = data.name;
+        this.newPersonStatus = data.additionalData.showNameAndValue;
       }
     });
     this.dcrReallocateForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -68,20 +77,7 @@ export class ReAllocateDcrComponent implements OnInit {
   }
   getDropDownData() {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-      this.locationData = res.locationList.map((item) => {
-        item['name'] = item.locDesc;
-        item['value'] = item.locId;
-        return item;
-      });
       this.allocationCat = res.allocationCategory;
-      //New Location
-      this.filter.Filter(
-        this.jsonControlArray,
-        this.dcrReallocateForm,
-        this.locationData,
-        this.newLocation,
-        this.newLocationStatus,
-      );
       //New Allocation Category
       this.filter.Filter(
         this.jsonControlArray,
@@ -94,9 +90,100 @@ export class ReAllocateDcrComponent implements OnInit {
     });
   }
   reAlloc() {
-
+    this.service.exportData(this.dcrReallocateForm.value);
+    Swal.fire({
+      icon: "success",
+      title: "Successful",
+      text: "Re-Allocated Data Successfully",
+      showConfirmButton: true,
+    });
+    this.dialog.closeAll();
   }
   closeDialog(): void {
     this.dialog.closeAll();
+  }
+  getAllMastersData() {
+    // Prepare the requests for different collections
+    let locationReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "location_detail"
+    };
+
+    let userReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "user_master"
+    };
+
+    let vendorReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "vendor_detail"
+    };
+
+    let customerReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "customer_detail"
+    };
+
+    // Use forkJoin to make parallel requests and get all data at once
+    forkJoin([
+      this.masterService.masterPost('common/getall', locationReq),
+      this.masterService.masterPost('common/getall', userReq),
+      this.masterService.masterPost('common/getall', vendorReq),
+      this.masterService.masterPost('common/getall', customerReq)
+    ]).pipe(
+      map(([locationRes, userRes, vendorRes, customerRes]) => {
+        // Combine all the data into a single object
+        return {
+          locationData: locationRes?.data,
+          userData: userRes?.data,
+          vendorData: vendorRes?.data,
+          customerData: customerRes?.data
+        };
+      })
+    ).subscribe((mergedData) => {
+      // Access the merged data here
+      const locdet = mergedData.locationData.map(element => ({
+        name: element.locName,
+        value: element.locCode,
+        type: 'L'
+      }));
+
+      const userdet = mergedData.userData.map(element => ({
+        name: element.name,
+        value: element.userId,
+        type: 'E'
+      }));
+
+      const vendordet = mergedData.vendorData.map(element => ({
+        name: element.vendorName,
+        value: element.vendorCode,
+        type: 'B'
+      }));
+
+      const custdet = mergedData.customerData.map(element => ({
+        name: element.customerName,
+        value: element.customerCode,
+        type: 'C'
+      }));
+
+      // Combine all arrays into one flat array with extra data indicating the sections
+      const allData = [
+        ...locdet,
+        ...userdet,
+        ...vendordet,
+        ...custdet,
+      ];
+      const catData = allData.filter(item => item.type === this.dcrReallocateForm.value.newCategory.value);
+      this.filterDropdown(catData, this.newPerson, this.newPersonStatus);
+      this.filterDropdown(locdet, this.newLocation, this.newLocationStatus);
+    });
+
+  }
+  filterDropdown(data, control, status) {
+    this.filter.Filter(this.jsonControlArray, this.dcrReallocateForm, data, control, status);
   }
 }

@@ -1,0 +1,272 @@
+[
+    {
+      "CodeType": "BUT",
+      "CodeId": 1,
+      "CodeDesc": "Express-Cargo"
+    },
+    {
+      "CodeType": "BUT",
+      "CodeId": 11,
+      "CodeDesc": "AIR CARGO"
+    },
+    {
+      "CodeType": "BUT",
+      "CodeId": 7,
+      "CodeDesc": "Container cargo"
+    },
+    {
+      "CodeType": "BUT",
+      "CodeId": 9,
+      "CodeDesc": "FTL"
+    },
+    {
+      "CodeType": "CNTSIZE",
+      "CodeId": 1,
+      "CodeDesc": "20 FT"
+    },
+    {
+      "CodeType": "CNTSIZE",
+      "CodeId": 2,
+      "CodeDesc": "40 FT"
+    },
+    {
+      "CodeType": "CNTSIZE",
+      "CodeId": 3,
+      "CodeDesc": "45 FT "
+    },
+    {
+      "CodeType": "CNTSIZE",
+      "CodeId": 4,
+      "CodeDesc": "C17FT"
+    },
+    {
+      "CodeType": "CNTSIZE",
+      "CodeId": 5,
+      "CodeDesc": "C13FT"
+    },
+    {
+      "CodeType": "CNTSIZE",
+      "CodeId": 6,
+      "CodeDesc": "C24FT"
+    },
+    {
+      "CodeType": "CNTSIZE",
+      "CodeId": 7,
+      "CodeDesc": "C30FT"
+    },
+    {
+      "CodeType": "CONTCAP",
+      "CodeId": 1,
+      "CodeDesc": "25000 Kg "
+    },
+    {
+      "CodeType": "CONTCAP",
+      "CodeId": 2,
+      "CodeDesc": "27600 Kg"
+    },
+    {
+      "CodeType": "CONTTYP",
+      "CodeId": 1,
+      "CodeDesc": "General Purpose Container"
+    },
+    {
+      "CodeType": "CONTTYP",
+      "CodeId": 2,
+      "CodeDesc": "Flat Rack Container"
+    },  
+    {
+      "CodeType": "CONTTYP",
+      "CodeId": 3,
+      "CodeDesc": "Open Top Container"
+    },
+    {
+      "CodeType": "CONTTYP",
+      "CodeId": 4,
+      "CodeDesc": "Double Door Container"
+    },
+    {
+      "CodeType": "CONTTYP",
+      "CodeId": 5,
+      "CodeDesc": "High Cube Container"
+    },
+    {
+      "CodeType": "CONTTYP",
+      "CodeId": 6,
+      "CodeDesc": "Open Side Container"
+    },
+    {
+      "CodeType": "CONTTYP",
+      "CodeId": 7,
+      "CodeDesc": "ISO reefer Container "
+    },
+    {
+      "CodeType": "CONTTYP",
+      "CodeId": 8,
+      "CodeDesc": "Half Hight Container "
+    },
+    {
+      "CodeType": "CONTTYP",
+      "CodeId": 9,
+      "CodeDesc": "Tank Container"
+    },
+    {
+      "CodeType": "DIV",
+      "CodeId": 1,
+      "CodeDesc": "Business division-3"
+    },
+    {
+      "CodeType": "DIV",
+      "CodeId": 2,
+      "CodeDesc": "Business division-2"
+    },
+    {
+      "CodeType": "DIV",
+      "CodeId": 3,
+      "CodeDesc": "Business division -4"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 1,
+      "CodeDesc": "0.50 - 1.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 10,
+      "CodeDesc": "8.00 - 10.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 11,
+      "CodeDesc": "10.00 - 14.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 12,
+      "CodeDesc": "14.00- 16.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 13,
+      "CodeDesc": "16.00  MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 14,
+      "CodeDesc": "18.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 15,
+      "CodeDesc": "20.00 21.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 16,
+      "CodeDesc": "21.00 - 25.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 17,
+      "CodeDesc": "25.00 -28.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 18,
+      "CodeDesc": "28.00 - 30.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 19,
+      "CodeDesc": "30.00- 32.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 2,
+      "CodeDesc": "1.00 - 1.50 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 20,
+      "CodeDesc": "20 FT Container"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 21,
+      "CodeDesc": "30-FT Container SXL"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 22,
+      "CodeDesc": "32 FT Container MXL"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 23,
+      "CodeDesc": "20 FT ODC"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 24,
+      "CodeDesc": "28 FT ODC"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 25,
+      "CodeDesc": "32 FT ODC"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 26,
+      "CodeDesc": "40 FT ODC"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 27,
+      "CodeDesc": "32 FT Container MXL HQ"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 28,
+      "CodeDesc": "42 FT ODC"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 29,
+      "CodeDesc": "10 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 3,
+      "CodeDesc": "1.50 - 2.50 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 30,
+      "CodeDesc": "05 MT-14 FT Container"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 31,
+      "CodeDesc": "08 MT- 16 FT Container"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 32,
+      "CodeDesc": "TATA 407"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 33,
+      "CodeDesc": "EICHER 16:20"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 4,
+      "CodeDesc": "2.50 - 4.00 MT"
+    },
+    {
+      "CodeType": "FTLTYP",
+      "CodeId": 5,
+      "CodeDesc": "4.00 - 5.50 MT"
+    }
+   ]

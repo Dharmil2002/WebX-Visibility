@@ -41,15 +41,19 @@ columnKey:any[]
 constructor(private HTTP: HttpClient) {
 
 
-}
-ngOnChanges(changes: SimpleChanges) {
-  if (changes.columnHeader && changes.columnHeader.currentValue) {
-    const newColumnHeader = changes.columnHeader.currentValue;
-    const dropdownFields = Object.keys(newColumnHeader).filter(
-      (keyname) =>
-        newColumnHeader[keyname].key === 'Dropdown' ||
-        newColumnHeader[keyname].key === 'multipleDropdown'
-    );
+  }
+  ngOnChanges(changes: SimpleChanges) {
+    this.tableData = changes.tableData?.currentValue ?? this.tableData;
+    if (changes.tableData?.currentValue) {
+      this.ngOnInit();
+    }
+    if (changes.columnHeader && changes.columnHeader.currentValue) {
+      const newColumnHeader = changes.columnHeader.currentValue;
+      const dropdownFields = Object.keys(newColumnHeader).filter(
+        (keyname) =>
+          newColumnHeader[keyname].key === 'Dropdown' ||
+          newColumnHeader[keyname].key === 'multipleDropdown'
+      );
 
     dropdownFields.forEach((keyname) => {
       if (!this.FormControlsList[keyname]) {
@@ -145,7 +149,7 @@ public async DeleteEvent(element) {
   const getdata = await this.DeleteAction.emit({ element, index, callback });
 };
 SubmitData() {
-  this.Submit.emit();
+  this.Submit.emit(this.dataSource);
 }
 AddRowData() {
   this.AddRow.emit();

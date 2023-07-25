@@ -2,15 +2,10 @@ import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import Swal from 'sweetalert2';
 import { ManifestGeneratedComponent } from '../manifest-generated/manifest-generated/manifest-generated.component';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { transform } from '../create-loading-sheet/loadingSheetCommon';
-import { updatePending } from '../update-loading-sheet/loadingSheetshipment';
-import { groupShipingTableData } from './groupShipingTableData';
 import { vehicleLoadingScan } from './packageUtilsvehiceLoading';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 
@@ -23,14 +18,16 @@ export class VehicleUpdateUploadComponent implements OnInit {
   packageUrl = '../../../assets/data/package-data.json'
   tableload = false;
   csv: any[];
+  loadingTableData: any[];
   data: [] | any;
   tripData: any;
   tabledata: any;
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
-  shipments=[]
+  shipments = []
   currentBranch: string = localStorage.getItem("Branch") || '';
+  companyCode: number = parseInt(localStorage.getItem('companyCode'));
   columnHeader = {
     "Shipment": "Shipment",
     "Origin": "Origin",
@@ -49,7 +46,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT"
   }
-  centerShippingData= ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
+  centerShippingData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
   shipingHeaderForCsv = {
     "Leg": "Leg",
     "Shipment": "Shipments",
@@ -83,76 +80,145 @@ export class VehicleUpdateUploadComponent implements OnInit {
   vehicelLoadData: any;
   shipingDataTable: any;
   legWiseData: any;
+  tripDetails: any;
+  dktDetailFromApi: any;
+  packageData: any;
   constructor(
     private Route: Router,
     private dialog: MatDialog,
     public dialogRef: MatDialogRef<VehicleUpdateUploadComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any,
-    private http: HttpClient,
     private fb: UntypedFormBuilder,
     private cdr: ChangeDetectorRef,
     private operationService: OperationService,
-    private cnoteService: CnoteService
-  ) 
-   {
+  ) {
     if (item.LoadingSheet) {
-      this.arrivalData = this.cnoteService.getVehicleLoadingData();
       this.shipmentStatus = 'Loaded'
       this.vehicelLoadData = item;
     }
-    this.getShippningData();
+
+    this.getTripDetailData();
     this.IntializeFormControl()
   }
 
   ngOnInit(): void {
   }
-  getShippningData() {
-    
-    let updatedShipingData = this.cnoteService.getUpdatedShipmentData();
-    this.operationService.getJsonFileDetails('arrivalUrl').subscribe(res => {
-      this.data = res;
-      let tableArray = updatedShipingData?updatedShipingData:this.data['shippingData'];
-      let shipments = updatePending(tableArray, this.currentBranch,true,false);
-      let routeData = transform(this.arrivalData?.RouteandSchedule, this.currentBranch)
-      let CurrectLeg = routeData.split("-").splice(1);
-      this.legWiseData = shipments.filter((x) => {
-        return x.Origin.trim() === this.currentBranch && CurrectLeg.includes(x.Destination);
-      });
 
-      this.csv = this.legWiseData;
-      let shipingTableData = this.csv;
-   // Call the function and pass the required arguments
-  let shipingTableDataArray = groupShipingTableData(shipingTableData);
+  getTripDetailData() {
 
-      // Use the shipingTableDataArray as needed
-      // Convert the groupedData object to an array of values
-      this.shipingDataTable = shipingTableDataArray;
-      this.kpiData("")
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_detail"
 
-      this.tableload = false;
+    }
+    this.operationService.operationPost('common/getall', reqBody).subscribe(res => {
+      if (res) {
 
+        this.tripDetails = res.data.find((x) => x.tripId === this.vehicelLoadData.tripId);
+        this.getShipmentData();
+        this.autoBindData();
+
+      }
     });
+  }
+
+  getShipmentData() {
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "docket"
+
+    }
+    this.operationService.operationPost('common/getall', reqBody).subscribe(res => {
+      if (res) {
+        this.dktDetailFromApi = res.data
+        this.getLoadingSheet();
+      }
+    });
+  }
+  getLoadingSheet() {
+
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "loadingSheet_detail"
+
+    }
+    this.operationService.operationPost('common/getall', reqBody).subscribe(res => {
+      if (res.data) {
+        let dataLoading = []
+       const loadingSheetDetail= res.data.filter((x)=>x.tripId===this.vehicelLoadData.tripId)
+       loadingSheetDetail.forEach((element: any) => { // Specify the type of 'element' as 'any'
+          let shipmentData = this.dktDetailFromApi.filter((x) => x.lsNo === element.lsno);
+          let json = {
+            "Leg": element?.leg.replace(" ", "") || '',
+            "Shipment": shipmentData?.length || 0,
+            "Packages": element?.pacakges || 0,
+            "WeightKg": element?.weightKg || 0,
+            "VolumeCFT": element?.volumeCFT || 0
+          };
+          dataLoading.push(json);
+        });
+        this.shipingDataTable = dataLoading;
+
+        let docketData = []
+        let dktDetail = this.dktDetailFromApi.filter((x) => x.lsNo === this.vehicelLoadData.LoadingSheet)
+        dktDetail.forEach((element: any) => { // Specify the type of 'element' as 'any'
+          let lsDetails = res.data.find((x) => x.lsno === element.lsNo);
+          let json = {
+            "Shipment": element?.docketNumber || '',
+            "Origin": element?.orgLoc || '',
+            "Destination": element?.destination.split(":")[1] || '',
+            "Packages": lsDetails?.pacakges || '',
+            "loaded": 0,
+            "Pending": lsDetails?.pacakges || '',
+            "Leg": lsDetails?.leg.replace(" ", "") || '',
+          };
+          docketData.push(json);
+        });
+        this.loadingTableData = docketData;
+        this.kpiData("")
+      }
+    });
+    this.getPackagesData();
+  }
+
+  getPackagesData() {
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "docketScan"
+    }
+    this.operationService.operationPost('common/getall', reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.packageData = res.data;
+        }
+      }
+    })
   }
   updatePackage() {
 
     this.tableload = true;
     // Get the trimmed values of scan and leg
     const scanValue = this.loadingSheetTableForm.value.Scan.trim();
-   
-    // Find the unload package based on scan and leg values
-    const loadPackage = this.data.packagesData.find(x => x.PackageId.trim() === scanValue && x.Leg.trim() === this.vehicelLoadData.Leg);
 
-    const loading=vehicleLoadingScan(loadPackage,this.currentBranch,this.csv)
-    if(loading){
-    this.kpiData(loading);
+    // Find the unload package based on scan and leg values
+    const loadPackage = this.packageData.find(x => x.bcSerialNo.trim() === this.loadingSheetTableForm.value.Scan.trim());
+
+    const loading = vehicleLoadingScan(loadPackage, this.currentBranch, this.loadingTableData)
+    if (loading) {
+      this.kpiData(loading);
     }
     this.cdr.detectChanges(); // Trigger change detection
-    this.tableload=false;
+    this.tableload = false;
   }
   kpiData(event) {
+
     let packages = 0;
     let shipingloaded = 0;
-    this.csv.forEach((element, index) => {
+    this.loadingTableData.forEach((element, index) => {
       packages = element.Packages + packages
       shipingloaded = element.loaded + shipingloaded;
     });
@@ -163,7 +229,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     });
 
     const shipData = [
-      createShipDataObject(this.csv.length, "Shipments", "bg-white"),
+      createShipDataObject(this.loadingTableData.length, "Shipments", "bg-white"),
       createShipDataObject(packages, "Packages", "bg-white"),
       createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + this.shipmentStatus, "bg-white"),
       createShipDataObject(event?.Package || 0, "Packages" + ' ' + this.shipmentStatus, "bg-white"),
@@ -174,11 +240,11 @@ export class VehicleUpdateUploadComponent implements OnInit {
   autoBindData() {
     const vehicleControl = this.loadingSheetTableForm.get('vehicle');
     vehicleControl?.patchValue(this.arrivalData?.VehicleNo || '');
-    this.loadingSheetTableForm.controls['vehicle'].setValue(this.arrivalData?.VehicleNo || '')
-    this.loadingSheetTableForm.controls['Route'].setValue(this.arrivalData?.Route || this.arrivalData?.RouteandSchedule || '')
-    this.loadingSheetTableForm.controls['tripID'].setValue(this.arrivalData?.TripID || '')
+    this.loadingSheetTableForm.controls['vehicle'].setValue(this.tripDetails?.vehicleNo || '')
+    this.loadingSheetTableForm.controls['Route'].setValue(this.vehicelLoadData?.route || '')
+    this.loadingSheetTableForm.controls['tripID'].setValue(this.tripDetails?.tripId || '')
     this.loadingSheetTableForm.controls['ArrivalLocation'].setValue(this.currentBranch || '')
-    this.loadingSheetTableForm.controls['Loadingsheet'].setValue(this.arrivalData?.Unoadingsheet || this.arrivalData?.loadingSheetNo || '')
+    this.loadingSheetTableForm.controls['Loadingsheet'].setValue(this.vehicelLoadData?.LoadingSheet || '')
   }
   IntializeFormControl() {
     const ManifestGeneratedFormControl = new UpdateloadingControl();
@@ -188,7 +254,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
 
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray])
-    this.autoBindData();
+
   }
   IsActiveFuntion($event) {
     this.loadingData = $event
@@ -208,24 +274,29 @@ export class VehicleUpdateUploadComponent implements OnInit {
     }
   }
   CompleteScan() {
+   
     let packageChecked = false;
-    const exists = this.csv.some(obj => obj.hasOwnProperty("loaded"));
+    const exists = this.loadingTableData.some(obj => obj.hasOwnProperty("loaded"));
     if (exists) {
-      packageChecked = this.csv.every(obj => obj.Packages === obj.loaded);
+
+      packageChecked = this.loadingTableData.every(obj => obj.Packages === obj.loaded);
+
     }
     if (packageChecked) {
       if (this.shipmentStatus == 'Loaded') {
         const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
           width: '100%', // Set the desired width
-          data: { arrivalData: this.arrivalData, loadingSheetData: this.csv } // Pass the data object
+          data: { arrivalData: this.arrivalData, loadingSheetData: this.shipingDataTable } // Pass the data object
         });
 
         dialogRef.afterClosed().subscribe(result => {
-          let arravalDataDetails = [this.arrivalData];
-          arravalDataDetails.forEach(x => {
-            x.Action = "DEPART VEHICLE"
-            x.menifestNo = result[0].MFNumber
-          })
+
+          this.generateMeniFest(result);
+          // let arravalDataDetails = [this.arrivalData];
+          // arravalDataDetails.forEach(x => {
+          //   x.Action = "DEPART VEHICLE"
+          //   x.menifestNo = result[0].MFNumber
+          // })
           // this.cnoteService.setLsData(arravalDataDetails);
           Swal.fire({
             icon: "success",
@@ -233,8 +304,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
             text: `Manifest Generated Successfully`,
             showConfirmButton: true,
           })
-          this.goBack(3);
-          this.dialogRef.close(arravalDataDetails)
+         
           // Handle the result after the dialog is closed
         });
       }
@@ -260,6 +330,91 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
   Close(): void {
     this.dialogRef.close()
+  }
+  generateMeniFest(result) {
+
+    let menifestData = [];
+    this.loadingTableData.forEach(element => {
+      let menifestDetails = result.find((x) => x.Leg === element.Leg)
+      this.updatedocketDetail(element.Shipment, menifestDetails.MFNumber)
+      const jsonDetails =
+      {
+        "id": menifestDetails?.MFNumber || "",
+        "mfNo": menifestDetails?.MFNumber || "",
+        "leg": menifestDetails?.Leg || "",
+        "lsNo": this.vehicelLoadData?.LoadingSheet || "",
+        "tripId": this.vehicelLoadData?.tripId || "",
+        "totDkt": result.length,
+        "totPkg": menifestDetails?.PackagesLoadedBooked || "",
+        "tot_cft": menifestDetails?.VolumeCFT || "",
+        "WeightKg":menifestDetails?.WeightKg || "",
+        "entryDate":new Date()
+      }
+      menifestData.push(jsonDetails);
+    });
+
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "menifest_detail",
+      "data":menifestData[0]
+    }
+    this.operationService.operationPost('common/create', reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+         this.updateTripStatus();
+        }
+      }
+    })
+  }
+  updateTripStatus(){
+    let tripDetails = {
+      status:"Depart Vehicle"
+    }
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_detail",
+      "id": 'trip_' + this.vehicelLoadData?.route.split(":")[0] || "",
+      "updates": {
+        ...tripDetails,
+      }
+    }
+    this.operationService.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: `Vehicle depart Successfully`,//
+            showConfirmButton: true,
+          })
+          this.goBack(3);
+          this.dialogRef.close("")
+        }
+      }
+    })
+  }
+  updatedocketDetail(dktNo, mfNumber) {
+    let mfDetails = {
+      mfNo: mfNumber
+    }
+    const reqBody = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "docket",
+      id: dktNo,
+      updates: {
+        ...mfDetails,
+      }
+    }
+    this.operationService.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+
+        }
+      }
+    })
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });

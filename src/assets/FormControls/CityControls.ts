@@ -10,7 +10,7 @@ export class CityControl {
         label: 'City Code',
         placeholder: 'City Code',
         type: 'text',
-        value: IsUpdate ? CityTable.srNo : "System Generated",
+        value: IsUpdate? CityTable.id: "System Generated",
         filterOptions: '',
         autocomplete: '',
         displaywith: '',
@@ -77,17 +77,33 @@ export class CityControl {
           showNameAndValue: false
         }
       },
-
+      {
+        name: 'odaFlag',
+        label: 'ODA Flag',
+        placeholder: 'ODA Flag',
+        type: 'toggle',
+        value: CityTable.odaFlag,
+        Validations: [],
+        generatecontrol: true, disable: false
+    },
       {
         name: 'isActive', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: CityTable.isActive, generatecontrol: true, disable: false,
         Validations: []
-      },
-
-      { name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: parseInt(localStorage.getItem("CompanyCode")), Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
-      { name: 'stateId', label: 'StateId', placeholder: 'StateId', type: 'text', value: IsUpdate ? CityTable.stateId : "", Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
-      { name: 'zoneId', label: 'ZoneId', placeholder: 'ZoneId', type: 'text', value: '', Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
-      { name: 'EntryBy', label: 'EntryBy', placeholder: 'EntryBy', type: 'text', value: '', Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
-      { name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
+      }, {
+              name: 'id',
+              label: '',
+              placeholder: '',
+              type: 'text',
+              value: CityTable.id,
+              filterOptions: '',
+              autocomplete: '',
+              displaywith: '',
+              Validations: [],
+              generatecontrol: false,
+              disable: false
+            },
+      { name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: parseInt(localStorage.getItem("companyCode")), Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
+      { name: 'entryBy', label: 'EntryBy', placeholder: 'EntryBy', type: 'text', value: CityTable.entryBy, Validations: [], filterOptions: '', autocomplete: '', displaywith: '', generatecontrol: false, disable: true },
     ]
   }
 

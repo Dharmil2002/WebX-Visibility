@@ -8,7 +8,6 @@ let uniqueShipments: Set<number> = new Set();
  * @returns The event object containing shipment and package information.
  */
 export function vehicleLoadingScan(loadPackage: any, currentBranch: string, csv: any[]): any {
-
   // Check if the unload package exists
   if (!loadPackage) {
     // Package does not belong to the current branch
@@ -21,16 +20,16 @@ export function vehicleLoadingScan(loadPackage: any, currentBranch: string, csv:
     return;
   }
 
-  // If destination does not belong to the current location, disallow unloading the package
-  if (loadPackage.Destination.trim() == currentBranch) {
-    Swal.fire({
-      icon: "error",
-      title: "Not Allowed to Load Package",
-      text: "This package does not belong to the current branch.",
-      showConfirmButton: true,
-    });
-    return;
-  }
+  // // If destination does not belong to the current location, disallow unloading the package
+  // if (loadPackage.Destination.trim() == currentBranch) {
+  //   Swal.fire({
+  //     icon: "error",
+  //     title: "Not Allowed to Load Package",
+  //     text: "This package does not belong to the current branch.",
+  //     showConfirmButton: true,
+  //   });
+  //   return;
+  // }
 
   // Check if the package is already scanned
   if (loadPackage.ScanFlag) {
@@ -44,7 +43,7 @@ export function vehicleLoadingScan(loadPackage: any, currentBranch: string, csv:
   }
 
   // Find the element in the csv array that matches the shipment
-  const element = csv.find(e => e.Shipment === loadPackage.Shipment);
+  const element = csv.find(e => e.Shipment === loadPackage.dockNo);
 
   // Check if the element exists and the number of Loaded packages is less than the total packages
   if (!element || (element.hasOwnProperty('loaded') && element.Packages <= element.loaded)) {

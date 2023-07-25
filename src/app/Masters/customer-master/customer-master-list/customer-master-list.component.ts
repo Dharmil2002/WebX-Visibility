@@ -9,6 +9,7 @@ export class CustomerMasterListComponent implements OnInit {
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = []
   columnHeader = {
     "srNo": "Sr No",
@@ -38,6 +39,7 @@ export class CustomerMasterListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
+  tableData: any;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
   }
@@ -46,15 +48,26 @@ export class CustomerMasterListComponent implements OnInit {
     this.getCustomerDetails();
   }
   getCustomerDetails() {
-    //throw new Error("Method not implemented."); 
-    //Fetch data from the JSON endpoint
-    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-      this.data = res;
-      this.csv = this.data['customerData']
-      //Extract relevant data arrays from the response
-      //const tableArray = this.data['tabledata'];
-      this.tableLoad = false;
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "customer_detail"
     }
-    );
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          const dataWithSrno = res.data.map((obj, index) => {
+            return {
+              ...obj,
+              srNo: index + 1
+            };
+          });
+          this.csv = dataWithSrno
+          this.tableData = dataWithSrno;
+          this.tableLoad = false;
+        }
+      }
+    })
   }
 }

@@ -4,6 +4,7 @@ export class DCRControl {
     dcrControlArray: FormControls[];
     dcrDetailControlArray: FormControls[];
     dcrReallocateControlArray: FormControls[];
+    dcrSplitControlArray: FormControls[];
     constructor() {
         this.dcrControlArray = [
             {
@@ -39,9 +40,12 @@ export class DCRControl {
                     name: 'documentType',
                     label: 'Document Type',
                     placeholder: 'Document Type',
-                    type: 'text',
+                    type: 'dropdown',
                     value: "",
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: false
+                    },
                     generatecontrol: true,
                     disable: true
                 },
@@ -182,12 +186,16 @@ export class DCRControl {
                         {
                             name: "invalidAutocomplete",
                             message: "Choose proper value",
-                        }
+                        },
+                        {
+                            name: "required",
+                            message: "Location is required"
+                        },
                     ],
                     additionalData: {
                         showNameAndValue: false
                     }, generatecontrol: true,
-                    disable: true
+                    disable: false
                 },
                 {
                     name: 'newCategory',
@@ -199,12 +207,20 @@ export class DCRControl {
                         {
                             name: "invalidAutocomplete",
                             message: "Choose proper value",
-                        }
+                        },
+                        {
+                            name: "required",
+                            message: "Category is required"
+                        },
                     ],
                     additionalData: {
                         showNameAndValue: false
-                    }, generatecontrol: true,
-                    disable: true
+                    },
+                    functions: {
+                        onOptionSelect: 'getAllMastersData'
+                    },
+                    generatecontrol: true,
+                    disable: false
                 },
                 {
                     name: 'newPerson',
@@ -216,14 +232,199 @@ export class DCRControl {
                         {
                             name: "invalidAutocomplete",
                             message: "Choose proper value",
-                        }
+                        },
+                        {
+                            name: "required",
+                            message: "Person to be Assigned is required"
+                        },
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }, generatecontrol: true,
+                    disable: false
+                },
+
+            ],
+            this.dcrSplitControlArray = [
+                {
+                    name: 'documentType',
+                    label: 'Document Type',
+                    placeholder: 'Document Type',
+                    type: 'dropdown',
+                    value: "",
+                    filterOptions: '',
+                    autocomplete: '',
+                    displaywith: '',
+                    Validations: [
+                        {
+                            name: "invalidAutocomplete",
+                            message: "Choose proper value",
+                        },
+                        {
+                            name: "required",
+                            message: "Document Type is required"
+                        },
                     ],
                     additionalData: {
                         showNameAndValue: false
                     }, generatecontrol: true,
                     disable: true
                 },
-
+                {
+                    name: 'bookCode',
+                    label: 'Book Code',
+                    placeholder: 'Book Code',
+                    type: 'text',
+                    value: "",
+                    generatecontrol: true,
+                    disable: true,
+                    Validations: [{
+                        name: "required",
+                        message: "Book Code is required"
+                    },]
+                },
+                {
+                    name: 'seriesFrom',
+                    label: 'Series From',
+                    placeholder: 'Series From',
+                    type: 'text',
+                    value: "",
+                    generatecontrol: true,
+                    disable: true,
+                    Validations: [{
+                        name: "required",
+                        message: "Series From is required"
+                    },]
+                },
+                {
+                    name: 'seriesTo',
+                    label: 'Series To',
+                    placeholder: 'Series To',
+                    type: 'text',
+                    value: "",
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [{
+                        name: "required",
+                        message: "Series To is required"
+                    },],
+                    functions: {
+                        onChange: 'getSeriesValidation',
+                    }
+                },
+                {
+                    name: 'totalLeaf',
+                    label: 'Total BC Leaf',
+                    placeholder: 'Total BC Leaf',
+                    type: 'text',
+                    value: "",
+                    generatecontrol: true,
+                    disable: true,
+                    Validations: []
+                },
+                {
+                    name: 'newLocation',
+                    label: 'New Allocation Location',
+                    placeholder: 'New Allocation Location',
+                    type: 'dropdown',
+                    value: "",
+                    Validations: [
+                        {
+                            name: "invalidAutocomplete",
+                            message: "Choose proper value",
+                        },
+                        {
+                            name: "required",
+                            message: "Location is required"
+                        },
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }, generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: 'newCategory',
+                    label: 'New Allocation Category',
+                    placeholder: 'New Allocation Category',
+                    type: 'dropdown',
+                    value: "",
+                    Validations: [
+                        {
+                            name: "invalidAutocomplete",
+                            message: "Choose proper value",
+                        },
+                        {
+                            name: "required",
+                            message: "Category is required"
+                        },
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
+                    },
+                    functions: {
+                        onOptionSelect: 'getAllMastersData'
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: 'newPerson',
+                    label: 'Person to be Assigned Series',
+                    placeholder: 'Person to be Assigned Series',
+                    type: 'dropdown',
+                    value: "",
+                    Validations: [
+                        {
+                            name: "invalidAutocomplete",
+                            message: "Choose proper value",
+                        },
+                        {
+                            name: "required",
+                            message: "Person to be Assigned is required"
+                        },
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }, generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: 'entryBy',
+                    label: 'Entry By',
+                    placeholder: 'Entry By',
+                    type: 'text',
+                    value: localStorage.getItem("Username"),
+                    Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'entrydate',
+                    label: 'Entry Date',
+                    placeholder: 'Entry Date',
+                    type: 'text',
+                    value: new Date().toISOString(),
+                    Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'id',
+                    label: 'Id',
+                    placeholder: 'Id',
+                    type: 'text',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+                },
+                {
+                    name: 'action',
+                    label: 'Action',
+                    placeholder: 'Action',
+                    type: 'text',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+                },
             ]
     }
 
@@ -235,5 +436,8 @@ export class DCRControl {
     }
     getReallocateDcrFormControls() {
         return this.dcrReallocateControlArray;
+    }
+    getSplitDcrFormControls() {
+        return this.dcrSplitControlArray;
     }
 }

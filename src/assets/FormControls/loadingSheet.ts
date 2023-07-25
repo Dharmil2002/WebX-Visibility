@@ -12,21 +12,19 @@ export class loadingControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true, disable: true
+                
             },
             {
                 name: 'vehicle',
                 label: 'Vehicle',
                 placeholder: '',
-                type: 'text',
+                type: 'dropdown',
                 value: '',
-                Validations: [
-                    {
-                        type: 'regex',
-                        value: '^[A-Z0-9]{1,10}$',
-                        message: 'Please enter a valid vehicle number.'
-                    }
-                ],
+                Validations: [],
                 generatecontrol: true,
+                additionalData: {
+                    showNameAndValue: false
+                },
                 disable: false
             },
             {

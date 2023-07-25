@@ -33,7 +33,7 @@ export class LoadingSheetViewComponent implements OnInit {
   toggleArray = []
   IscheckBoxRequired: boolean;
   menuItemflag: boolean;
-
+  companyCode=parseInt(localStorage.getItem("companyCode"));
   menuItems = [
   ];
   columnHeader = {
@@ -99,46 +99,32 @@ export class LoadingSheetViewComponent implements OnInit {
   }
 
   getLoadingSheetDetails() {
+    const req = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "docket",
+    };
   // Retrieve arrival data from the operation service
-  this.operationService.getJsonFileDetails('arrivalUrl').subscribe(res => {
-    this.arrivalData = res;
-
-    // Retrieve shipping data from the cnote service
-    let ShipingDatadetails = this.cnoteService.getShipingData();
-
-    // Filter tableArray based on the specified condition
-    let tableArray = ShipingDatadetails.filter((x) => x.Leg === this.loadinSheet.lag);
-
-    // Filter packagesData based on the specified condition
-    let packagesData = this.arrivalData.packagesData.filter((x) =>
-      tableArray.some((shipment) => shipment.Shipment === x.Shipment)
-    );
-
-    let mergedData: any[] = [];
-
-    // Perform inner join based on Shipment key
-    mergedData = tableArray.filter((shippingItem) =>
-      packagesData.some((packageItem) => packageItem.Shipment === shippingItem.Shipment)
-    ).map((shippingItem) => {
-      const matchingPackage = packagesData.find((packageItem) => packageItem.Shipment === shippingItem.Shipment);
-      return { ...shippingItem, ...matchingPackage };
+  this.operationService.operationPost('common/getall',req).subscribe(res => {
+    const shipingDetails = res.data;
+    let tableArray =shipingDetails.filter((x) => {
+      const orgLoc = x.orgLoc ? x.orgLoc.toLowerCase().trim() : '';
+      const legParts = this.loadinSheet.leg.split('-');
+      const legPart1 = legParts[0] ? legParts[0].toLowerCase().trim() : '';
+      const legPart2 = legParts[1] ? legParts[1].toLowerCase().trim() : '';
+    
+      return orgLoc === legPart1 && x.destination.split(':')[1]?.toLowerCase().trim() === legPart2;
     });
-
-    // The mergedData array now contains the merged result based on the Shipment key
-
-    let Shipment: any[] = [];
-
-    // Check if Shipment array is not empty
-    if (Shipment) {
-      // Set isSelected to true for elements in tableArray that are present in Shipment
-      tableArray.forEach((element) => {
-        if (Shipment.includes(element.Shipment)) {
-          element.isSelected = true;
-        }
-      });
-    }
-
-    this.tableData = mergedData;
+    
+    const shipmentDetails = tableArray.map((item) => ({
+      Shipment: item.docketNumber,
+      Origin: item.orgLoc,
+      Destination: item.destination.split(':')[1].trim(),
+      Packages: item.totalChargedNoOfpkg,
+      KgWeight: item.chrgwt,
+      CftVolume: item.cft_tot,
+    }));
+    this.tableData = shipmentDetails;
 
     this.tableload = false;
   });

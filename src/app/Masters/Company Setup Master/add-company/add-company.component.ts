@@ -3,7 +3,6 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { CompanyControl } from 'src/assets/FormControls/CompanyControl';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { utilityService } from 'src/app/Utility/utility.service';
 import Swal from 'sweetalert2';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
@@ -41,19 +40,11 @@ export class AddCompanyComponent implements OnInit {
   selectedFiles: boolean;
   SelectFile: File;
   imageName: string;
-  constructor(private service: utilityService, private fb: UntypedFormBuilder, private masterService: MasterService,
-    private filter: FilterUtils,
+  constructor(private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils
   ) { }
 
   ngOnInit(): void {
-    this.masterService.getJsonFileDetails('companyJsonUrl').subscribe(res => {
-      this.data = res.CompanyDet[0];
-      this.TimeZoneDet = res.TimeZone[0];
-      this.Theme = res.Theme[0];
-      this.initializeFormControl();
-      this.autoBindDropdown();
-    }
-    );
+    this.getCompanyDet();
     this.initializeFormControl();
   }
   initializeFormControl() {
@@ -94,8 +85,7 @@ export class AddCompanyComponent implements OnInit {
 
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.AddCompanyFormsValue = formGroupBuilder(this.fb, Object.values(this.accordionData));
-    this.AddCompanyFormsValue.controls["brand"].setValue('V');
-
+    this.AddCompanyFormsValue.controls["brand"].setValue(this.data.brand);
   }
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
@@ -114,26 +104,38 @@ export class AddCompanyComponent implements OnInit {
       console.log("failed");
     }
   }
+  // Function to automatically bind dropdown values from JSON file
   autoBindDropdown() {
-    this.Timezonedata = this.TimeZoneDet.find((x) => x.value == this.data.identifier);
-    this.AddCompanyFormsValue.controls.timeZone.setValue(this.Timezonedata);
-    this.Themedata = this.Theme.find((x) => x.name == this.data.CompanyTheme);
-    this.AddCompanyFormsValue.controls.color_Theme.setValue(this.Themedata);
-    this.filter.Filter(
-      this.jsonControlBankArray,
-      this.AddCompanyFormsValue,
-      this.TimeZoneDet,
-      this.TimezoneId,
-      this.TimeZone,
+    this.masterService.getJsonFileDetails('companyJsonUrl').subscribe(res => {
+      // Set TimeZoneDet and Theme variables from the JSON response
+      this.TimeZoneDet = res.TimeZone[0];
+      this.Theme = res.Theme[0];
+      // Find the matching timeZone value in TimeZoneDet and set it in the form control
+      this.Timezonedata = this.TimeZoneDet.find((x) => x.value == this.data.timeZone);
+      this.AddCompanyFormsValue.controls.timeZone.setValue(this.Timezonedata);
+      // Find the matching color_Theme value in Theme and set it in the form control
+      this.Themedata = this.Theme.find((x) => x.value == this.data.color_Theme);
+      this.AddCompanyFormsValue.controls.color_Theme.setValue(this.Themedata);
+      // Call the Filter function with specific parameters to filter the data
+      this.filter.Filter(
+        this.jsonControlBankArray,
+        this.AddCompanyFormsValue,
+        this.TimeZoneDet,
+        this.TimezoneId,
+        this.TimeZone,
+      );
+      this.filter.Filter(
+        this.jsonControlBankArray,
+        this.AddCompanyFormsValue,
+        this.Theme,
+        this.Color_Theme,
+        this.ColorTheme,
+      );
+    }
     );
-    this.filter.Filter(
-      this.jsonControlBankArray,
-      this.AddCompanyFormsValue,
-      this.Theme,
-      this.Color_Theme,
-      this.ColorTheme,
-    );
+
   }
+  // Function to handle file selection in the form
   selectedFile(data) {
     let fileList: FileList = data.eventArgs;
     if (fileList.length > 0) {
@@ -142,11 +144,13 @@ export class AddCompanyComponent implements OnInit {
       const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
 
       if (allowedFormats.includes(fileFormat)) {
+        // If the file format is allowed, update the form control with the selected file name
         this.SelectFile = file;
         this.imageName = file.name;
         this.selectedFiles = true;
         this.AddCompanyFormsValue.controls["company_Image"].setValue(this.SelectFile.name);
       } else {
+        // If the file format is not allowed, display a warning message
         this.selectedFiles = false;
         Swal.fire({
           icon: "warning",
@@ -156,29 +160,79 @@ export class AddCompanyComponent implements OnInit {
         });
       }
     } else {
+      // If no file is selected, display an alert
       this.selectedFiles = false;
       alert("No file selected");
     }
   }
 
+  // Function to download a file
   downloadfile() {
     let link = document.createElement("a");
     link.download = "DefaultChartOfAccount";
     link.href = "assets/Download/Default_ChartOfAccount.xlsx";
     link.click();
   }
+
+  // Function to save the form data
   save() {
-    this.AddCompanyFormsValue.controls["color_Theme"].setValue(this.AddCompanyFormsValue.value.Color_Theme.value);
-    this.AddCompanyFormsValue.controls["timeZone"].setValue(this.AddCompanyFormsValue.value.TimezoneId.value);
-    this.service.exportData(this.AddCompanyFormsValue.value);
-    Swal.fire({
-      icon: "success",
-      title: "Successful",
-      text: `Data Downloaded successfully!!!`,
-      showConfirmButton: true,
+    // Set the color_Theme and timeZone form control values using the selected values
+    this.AddCompanyFormsValue.controls["color_Theme"].setValue(this.AddCompanyFormsValue.value.color_Theme.value);
+    this.AddCompanyFormsValue.controls["timeZone"].setValue(this.AddCompanyFormsValue.value.timeZone.value);
+
+    let id = this.AddCompanyFormsValue.value.id;
+    // Remove the "id" field from the form controls
+    this.AddCompanyFormsValue.removeControl("id");
+
+    // Prepare the request to update company details
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      type: "masters",
+      collection: "company_detail",
+      id: id,
+      updates: this.AddCompanyFormsValue.value
+    };
+
+    // Call the API to update company details
+    this.masterService.masterPut('common/update', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+        }
+      }
     });
   }
+
+  // Function to cancel and go back to the previous page
   cancel() {
     window.history.back();
   }
+
+  // Function to get company details from the API
+  getCompanyDet() {
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "company_detail"
+    };
+
+    // Call the API to get company details
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Set the retrieved data in the 'data' variable and initialize the form controls and bind dropdowns
+          this.data = res.data[0];
+          this.initializeFormControl();
+          this.autoBindDropdown();
+        }
+      }
+    });
+  }
+
 }

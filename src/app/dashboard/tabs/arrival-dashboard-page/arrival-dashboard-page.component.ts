@@ -1,26 +1,25 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { MarkArrivalComponent } from '../../ActionPages/mark-arrival/mark-arrival.component';
 import { UpdateLoadingSheetComponent } from 'src/app/operation/update-loading-sheet/update-loading-sheet.component';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
+import { OperationService } from 'src/app/core/service/operations/operation.service';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
 })
 export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
-  jsonUrl = '../../../assets/data/arrival-dashboard-data.json';
   viewComponent: any;
   advancdeDetails: any;
   arrivalChanged: any;
   data: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  csv: any[];
+  arrivalTableData: any[];
   addAndEditPath: string
   drillDownPath: string
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
-  companyCode: number;
+  companyCode: number = parseInt(localStorage.getItem("companyCode"));
   menuItemflag: boolean = true;
   breadscrums = [
     {
@@ -92,90 +91,103 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   boxData: { count: any; title: any; class: string; }[];
   departureDetails: any;
   isCalled: boolean;
+  branch: string = localStorage.getItem("Branch");
+  routeDetails: any;
   // declararing properties
-  constructor(private http: HttpClient, private CnoteService: CnoteService) {
+  constructor(
+    private CnoteService: CnoteService,
+    private _operation: OperationService
+  ) {
 
     super();
     this.csvFileName = "exampleUserData.csv";
     this.addAndEditPath = 'example/form';
     this.IscheckBoxRequired = true;
     this.drillDownPath = 'example/drillDown'
-    this.getArrivalDetails();
+    this.getRouteDetail();
   }
   ngOnInit(): void {
     this.viewComponent = MarkArrivalComponent //setting Path to add data
 
     try {
-      this.companyCode = parseInt(localStorage.getItem("CompanyCode"));
     } catch (error) {
       // if companyCode is not found , we should logout immmediately.
     }
   }
+  getRouteDetail() {
+    let reqbody = {
+      companyCode: this.companyCode,
+      type: "masters",
+      collection: "route",
+    };
+    this._operation.operationPost('common/getall', reqbody).subscribe({
+      next: (res: any) => {
+        this.routeDetails = res.data;
+        this.getArrivalDetails();
+      }
+    })
+  }
+
   getArrivalDetails() {
+    const reqbody =
+    {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_detail"
+    }
+    this._operation.operationPost('common/getall', reqbody).subscribe({
+      next: (res: any) => {
+        if (res) {
+        
+          const arrivalDetails = res.data.filter((x) => x.nextUpComingLoc.toLowerCase() === this.branch.toLowerCase());
+         let tableData=[];
+          arrivalDetails.forEach(element => {
+            let routeDetails = this.routeDetails.find((x) => x.routeCode == element.routeCode);
+            const routeCode = routeDetails?.routeCode ?? 'Unknown';
+            const routeName = routeDetails?.routeName ?? 'Unnamed';
+            let arrivalData = {
+              "Route": routeCode + ":" + routeName,
+              "VehicleNo": element?.vehicleNo || '',
+              "TripID": element?.tripId || '',
+              "Location": this.branch,
+              "Scheduled": routeDetails.routeStartDate,
+              "Expected": routeDetails.routeEndDate,
+              "Status":  "On Time",
+              "Hrs": 0,
+              "Action": element?.status==="depart"?"Vehicle Arrival":"Arrival Scan"
+            }
+            tableData.push(arrivalData);
+          });
+          this.fetchShipmentData();
+          this.arrivalTableData=tableData;
+          this.tableload=false;
+    
+       
+        }
+      }
+    })
+  }
+ /**
+   * Fetches shipment data from the API and updates the boxData and tableload properties.
+   */
+ fetchShipmentData() {
+ 
+  // Prepare request payload
+  let req = {
+    companyCode: this.companyCode,
+    type: "operation",
+    collection: "docket",
+  };
 
-    this.http.get(this.jsonUrl).subscribe(res => {
-      if(this.CnoteService.getVehicleArrivalData())
-      {
-        this.data=this.CnoteService.getVehicleArrivalData();
-      }
-      else{
-        this.data = res
-      }
+  // Send request and handle response
+  this._operation.operationPost("common/getall", req).subscribe({
+    next: async (res: any) => {
+      // Update shipmentData property with the received data
+      const boxData = res.data.filter((x)=>x.destination.split(":")[1].trim()===this.branch.trim() && x.unloading===0 && x.mfNo!=='');
+      const sumTotalChargedNoOfpkg =boxData.reduce((total, count) => {
+        return total + parseInt(count.totalChargedNoOfpkg);
+      }, 0);
       
-      let tableArray = this.data;
-      // Get today's date
-      const today = new Date();
-      const todayFormatted = formatDate(today);
-
-      // Iterate over each object in the array
-      const updatedArray = tableArray.arrivalData.map((item) => {
-        // Convert item.Hrs to a valid number
-        const hrs = parseFloat(item.Hrs);
-
-        // Check if hrs is a valid number
-        const expectedDate = !isNaN(hrs)
-          ? new Date(today.getTime() + hrs * 60 * 60 * 1000)
-          : null;
-
-        const expectedFormatted = expectedDate ? formatDateTime(expectedDate) : null;
-
-        // Update the "Scheduled" and "Expected" values with today's date and calculated expected time
-        return {
-          ...item,
-          Scheduled: formatDateTime(new Date()) ,
-          Expected: expectedFormatted,
-        };
-      });
-
-      // Function to format date as "dd-mm-yy"
-      function formatDate(date) {
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = String(date.getFullYear()).slice(-2);
-        return `${day}-${month}-${year}`;
-      }
-
-      // Function to format date and time as "dd-mm-yy hh:mm"
-      function formatDateTime(date) {
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = String(date.getFullYear()).slice(-2);
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-        return `${day}-${month}-${year} ${hours}:${minutes}`;
-      }
-
-      // Function to extract the time component from a string in the format "dd-mm-yy hh:mm"
-      function getTimeComponent(dateTimeString) {
-        const timeString = dateTimeString.split(" ")[1];
-        return timeString;
-      }
-
-      this.csv = updatedArray.filter((x) => x.module == "Arrival");
-      let packages = 0;
-      this.data.shippingData.forEach((element, index) => {
-        packages = element.Packages + packages
-      });
 
       const createShipDataObject = (count, title, className) => ({
         count,
@@ -184,44 +196,35 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       });
 
       const shipData = [
-        createShipDataObject(this.csv.length, "Routes", "bg-white"),
-        createShipDataObject(this.csv.length, "Vehicles", "bg-white"),
-        createShipDataObject(this.data.shippingData.length, "Shipments", "bg-white"),
-        createShipDataObject(packages, "Packages", "bg-white")
+        createShipDataObject(this.arrivalTableData.length, "Routes", "bg-white"),
+        createShipDataObject(this.arrivalTableData.length, "Vehicles", "bg-white"),
+        createShipDataObject(boxData.length, "Shipments", "bg-white"),
+        createShipDataObject(sumTotalChargedNoOfpkg, "Packages", "bg-white")
       ];
 
       this.boxData = shipData;
-
-      /*here set the value for Mark-Arrival*/
-      
-      this.CnoteService.setVehicleArrivalData(this.data);
-      
-      /*  End  */
-
-      this.tableload = false;
-
-    });
-
-  }
+    },
+  });
+}
   updateDepartureData(event) {
-  
+
     const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
     const action = result?.Action ?? '';
     if (action) {
-      this.csv = event;
+      this.arrivalTableData = event;
     }
     else {
       this.CnoteService.setDeparture(event)
-      if(event){
-      this.csv = this.csv.filter((x) => x.TripID != event.tripID);
-      /*Here Function is Declare for get Latest arrival Data*/
-      let arrivalData={
-        arrivalData:this.csv,
-        packagesData:this.data?.packagesData||"",
-        shippingData:this.data?.shippingData||""
-      }
-      this.CnoteService.setVehicleArrivalData(arrivalData);
-      /*End*/
+      if (event) {
+        this.arrivalTableData = this.arrivalTableData.filter((x) => x.TripID != event.tripID);
+        /*Here Function is Declare for get Latest arrival Data*/
+        let arrivalData = {
+          arrivalData: this.arrivalTableData,
+          packagesData: this.data?.packagesData || "",
+          shippingData: this.data?.shippingData || ""
+        }
+        this.CnoteService.setVehicleArrivalData(arrivalData);
+        /*End*/
       }
 
     }

@@ -6,11 +6,11 @@ export class PincodeControl {
     constructor(PincodeTable: PincodeMaster, isUpdate: boolean) {
         this.PincodeControlArray = [
             {
-                name: 'State',
+                name: 'state',
                 label: 'State',
                 placeholder: 'Search State',
                 type: 'dropdown',
-                value: isUpdate ? PincodeTable.stateName : "",
+                value: '',
                 Validations: [
                     {
                         name: "autocomplete",
@@ -33,11 +33,11 @@ export class PincodeControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'City',
+                name: 'city',
                 label: 'City',
                 placeholder: 'Search City',
                 type: 'dropdown',
-                value: isUpdate ? PincodeTable.cityname : "",
+                value: '',
                 Validations: [
                     {
                         name: "autocomplete",
@@ -56,11 +56,11 @@ export class PincodeControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'Pincode',
+                name: 'pincode',
                 label: 'Pin Code',
                 placeholder: 'Search Pin Code',
                 type: 'text',
-                value: isUpdate ? PincodeTable.pincode : '',
+                value: PincodeTable.pincode,
                 Validations: [
                     {
                         name: "minlength",
@@ -80,10 +80,10 @@ export class PincodeControl {
                     onChange: 'GetPincodeExist',
                 },
                 generatecontrol: true,
-                disable: isUpdate ? true : false
+                disable: false
             },
             {
-                name: 'Area',
+                name: 'area',
                 label: 'Area/Region',
                 placeholder: 'Area',
                 type: 'text',
@@ -95,19 +95,16 @@ export class PincodeControl {
                 name: 'pincodeCategory',
                 label: 'Pincode Category',
                 placeholder: 'Search Pincode Category',
-                type: 'Staticdropdown',//'dropdown',
+                type: 'Staticdropdown',
                 value:  [
-                    { value: 'WODA', name: 'Serviceable - With ODA' },
-                    { value: 'WoODA', name: 'Serviceable - Non ODA' }
-                  ],//IsUpdate ? PincodeTable.pincodeCategory : "",
+                    { value: "Serviceable - With ODA", name: 'Serviceable - With ODA' },
+                    { value: "Serviceable - Non ODA", name: 'Serviceable - Non ODA' }
+                  ],
                   Validations: [
                     {
                       name: "required"
                     }
                    ],
-                // additionalData: {
-                //     showNameAndValue: false
-                // },
                 generatecontrol: true, disable: false
             },
             {
@@ -115,7 +112,7 @@ export class PincodeControl {
                 label: 'Active Flag',
                 placeholder: 'Active Flag',
                 type: 'toggle',
-                value:PincodeTable.isActive,//PincodeTable.activeFlag == "Y" ? true : false,
+                value:PincodeTable.isActive,
                 Validations: [],
                 generatecontrol: true, disable: false
             },
@@ -126,10 +123,10 @@ export class PincodeControl {
                 type: 'toggle',
                 value: PincodeTable.serviceable,
                 Validations: [],
-                generatecontrol: true, disable:  isUpdate ? true : false
+                generatecontrol: true, disable: false
             },
             {
-                name: 'EntryBy',
+                name: 'entryBy',
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: '',
@@ -138,7 +135,7 @@ export class PincodeControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'IsUpdate',
+                name: 'isUpdate',
                 label: 'Update By',
                 placeholder: 'Update By',
                 type: '',
@@ -147,13 +144,26 @@ export class PincodeControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'CompanyCode',
+                name: 'companyCode',
                 label: 'Company Code',
                 placeholder: 'Company Code',
                 type: '',
                 value: localStorage.getItem("CompanyCode"),
                 Validations: [],
                 generatecontrol: false, disable: false
+            },
+            {
+              name: 'id',
+              label: '',
+              placeholder: '',
+              type: 'text',
+              value: PincodeTable.id,
+              filterOptions: '',
+              autocomplete: '',
+              displaywith: '',
+              Validations: [],
+              generatecontrol: false,
+              disable: false
             },
         ]
     }
@@ -167,11 +177,11 @@ export class PincodeListControl {
     constructor(PincodeTable: PincodeMaster) {
         this.PincodeControlListArray = [
             {
-                name: 'State',
+                name: 'state',
                 label: 'State',
                 placeholder: 'Search State',
                 type: 'dropdown',
-                value: "",
+                value: '',
                 Validations: [
                     {
                         name: "autocomplete",
@@ -190,11 +200,11 @@ export class PincodeListControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'City',
+                name: 'city',
                 label: 'City',
                 placeholder: 'Search City',
                 type: 'dropdown',
-                value: "",
+                value: '',
                 Validations: [
                     {
                         name: "autocomplete",
@@ -215,11 +225,11 @@ export class PincodeListControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'Pincode',
+                name: 'pincode',
                 label: 'Pin Code',
                 placeholder: 'Search Pin Code',
                 type: 'dropdown',
-                value: "",
+                value: '',
                 Validations: [
                     {
                         name: "autocomplete",
@@ -230,9 +240,6 @@ export class PincodeListControl {
                     }
                 ], additionalData: {
                     showNameAndValue: false
-                },
-                functions: {
-                    onModel: 'PassPinValue',
                 },
                 generatecontrol: true, disable: false
             },

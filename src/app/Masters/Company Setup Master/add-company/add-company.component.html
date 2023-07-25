@@ -1,7 +1,13 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
   <form [formGroup]="AddCompanyFormsValue">
-    <generic-accordion-webxpress [AccordionForm]="AddCompanyFormsValue" [accordionGroup]="accordionData"
-      (functionCallEmitter)="functionCallHandler($event)" [Icondata]="Icondata" [fafIconData]="fafIcondata">
+    <generic-accordion-webxpress 
+    [AccordionForm]="AddCompanyFormsValue" 
+    [accordionGroup]="accordionData"
+    (functionCallEmitter)="functionCallHandler($event)" 
+    [Icondata]="Icondata" 
+    [fafIconData]="fafIcondata"
+    [showSaveAndCancelButton]="true" 
+    >
     </generic-accordion-webxpress>
   </form>
 </app-common-wrapper-webxpress>

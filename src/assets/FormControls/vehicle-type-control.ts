@@ -29,7 +29,7 @@ export class VehicleTypeControl {
                     }
                 ],
                 functions: {
-                   // onChange: 'GetVehNameExist'
+                    // onChange: 'GetVehNameExist'
                 },
                 generatecontrol: true, disable: false
             },
@@ -71,13 +71,6 @@ export class VehicleTypeControl {
                 placeholder: 'Search And Select Vehicle Type Category',
                 type: 'dropdown', value: '', filterOptions: "", autocomplete: "", displaywith: "",//IsUpdate ? VehicleTypeTable.VehicleTypeCategory : "",
                 Validations: [
-                    {
-                        name: "autocomplete",
-                    },
-                    {
-                        name: "invalidAutocomplete",
-                        message: "Choose proper value"
-                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -119,7 +112,7 @@ export class VehicleTypeControl {
                 placeholder: 'Search And Select Vehicle Size',
                 type: "Staticdropdown",
                 value: [
-                    { value: 'HeavyVehicle', name: 'Heavy Vehicle' }, 
+                    { value: 'HeavyVehicle', name: 'Heavy Vehicle' },
                     { value: 'LightVehicle', name: 'Light Vehicle' }
                 ],
                 Validations: [],
@@ -157,7 +150,7 @@ export class VehicleTypeControl {
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: 'text',
-                value: localStorage.getItem("UserName"),
+                value: localStorage.getItem("Username"),
                 Validations: [],
                 generatecontrol: false, disable: false
             },
@@ -178,31 +171,24 @@ export class VehicleTypeControl {
                 value: localStorage.getItem("companyCode"),
                 Validations: [],
                 generatecontrol: false, disable: false
-             },
-            // {
-            //     name: 'isUpdate',
-            //     label: 'IsUpdate',
-            //     placeholder: 'IsUpdate',
-            //     type: 'text',
-            //     value: false,
-            //     Validations: [],
-            //     generatecontrol: false, disable: false
-            // },
-            {
-                name: 'divisioncontrolHandler',
-                label: 'DivisioncontrolHandler',
-                placeholder: 'Find DivisioncontrolHandler...',
-                type: '',
-                value: '',
-                Validations: [{
-                    name: "",
-                    message: ""
-                }],
-                generatecontrol: false, disable: false
             },
             {
                 name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
                 generatecontrol: false, disable: false
+            },
+            {
+                name: 'id',
+                label: '',
+                placeholder: '',
+                type: 'text',
+                value: vehicleTypeTable.id,
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+
             }
         ],
             this.capacityInfoArray = [

@@ -1,14 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { utilityService } from 'src/app/Utility/utility.service';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import Swal from 'sweetalert2';
+import { map } from 'rxjs/operators';
+import { utilityService } from 'src/app/Utility/utility.service';
 
 @Component({
   selector: 'app-add-dcr-series',
   templateUrl: './add-dcr-series.component.html'
 })
-export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
+export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   @Input() data: any;
 
   // Breadcrumbs
@@ -69,7 +72,6 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
       key: "input",
       style: "",
       readonly: true,
-      // Headerstyle: { 'min-width': '10px' },
     },
     allotTo: {
       name: "Allot To",
@@ -88,10 +90,16 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
       key: "Action",
       style: "",
     },
+    allotType: {
+      name: "",
+      key: "",
+      style: "",
+    },
   };
+  tableLoad: boolean;
 
   constructor(
-    public objSnackBarUtility: SnackBarUtilityService, private service: utilityService
+    private service: utilityService, public objSnackBarUtility: SnackBarUtilityService, private masterService: MasterService
   ) {
     super();
   }
@@ -129,82 +137,102 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
     };
     this.tableData.splice(0, 0, AddObj);
   }
-
+  documentTypeOptions = [
+    { "name": "CNote", "value": "1" },
+    { "name": "Delivery MR", "value": "2" },
+    { "name": "UBI Series", "value": "3" }
+  ];
   // Get all dropdown data
   getAllMastersData() {
     // Options for documentType dropdown
-    this.displayedColumns1.documentType.option = [
-      {
-        "name": "CNote",
-        "value": "1"
-      },
-      {
-        "name": "Delivery MR",
-        "value": "2"
-      },
-      {
-        "name": "UBI Series",
-        "value": "3"
-      }
-    ];
+    this.displayedColumns1.documentType.option = this.documentTypeOptions;
 
-    // Options for allocateTo dropdown
-    this.displayedColumns1.allocateTo.option = [
-      {
-        "name": "ABDE",
-        "value": 1
-      },
-      {
-        "name": "ADCB",
-        "value": 2
-      },
-      {
-        "name": "AGRA",
-        "value": 3
-      },
-      {
-        "name": "AHM",
-        "value": 4
-      },
-      {
-        "name": "AHMEDABAD",
-        "value": 5
-      },
-      {
-        "name": "AIZAWL",
-        "value": 7
-      },
-    ];
+    // Prepare the requests for different collections
+    let locationReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "location_detail"
+    };
 
-    // Options for allotTo dropdown
-    this.displayedColumns1.allotTo.option = [
-      {
-        "name": "ABDE",
-        "value": 1
-      },
-      {
-        "name": "ADCB",
-        "value": 2
-      },
-      {
-        "name": "AGRA",
-        "value": 3
-      },
-      {
-        "name": "AHM",
-        "value": 4
-      },
-      {
-        "name": "AHMEDABAD",
-        "value": 5
-      },
-      {
-        "name": "AIZAWL",
-        "value": 7
-      },
-    ];
+    let userReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "user_master"
+    };
+
+    let vendorReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "vendor_detail"
+    };
+
+    let customerReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "customer_detail"
+    };
+
+    // Use forkJoin to make parallel requests and get all data at once
+    forkJoin([
+      this.masterService.masterPost('common/getall', locationReq),
+      this.masterService.masterPost('common/getall', userReq),
+      this.masterService.masterPost('common/getall', vendorReq),
+      this.masterService.masterPost('common/getall', customerReq)
+    ]).pipe(
+      map(([locationRes, userRes, vendorRes, customerRes]) => {
+        // Combine all the data into a single object
+        return {
+          locationData: locationRes?.data,
+          userData: userRes?.data,
+          vendorData: vendorRes?.data,
+          customerData: customerRes?.data
+        };
+      })
+    ).subscribe((mergedData) => {
+      // Access the merged data here
+      const locdet = mergedData.locationData.map(element => ({
+        name: element.locName,
+        value: element.locCode,
+        type: 'L'
+      }));
+
+      const userdet = mergedData.userData.map(element => ({
+        name: element.name,
+        value: element.userId,
+        type: 'E'
+      }));
+
+      const vendordet = mergedData.vendorData.map(element => ({
+        name: element.vendorName,
+        value: element.vendorCode,
+        type: 'B'
+      }));
+
+      const custdet = mergedData.customerData.map(element => ({
+        name: element.customerName,
+        value: element.customerCode,
+        type: 'C'
+      }));
+      // Options for allotTo dropdown
+      this.displayedColumns1.allotTo.option = locdet;
+      this.tableLoad = true;
+
+      // Combine all arrays into one flat array with extra data indicating the sections
+      const allData = [
+        { name: '---Location---', value: '', type: 'L' },
+        ...locdet,
+        { name: '---Employee---', value: '', type: 'E' },
+        ...userdet,
+        { name: '---BA---', value: '', type: 'B' },
+        ...vendordet,
+        { name: '---Customer---', value: '', type: 'C' },
+        ...custdet,
+      ];
+      // Options for allocateTo dropdown
+      this.displayedColumns1.allocateTo.option = allData
+    });
+
   }
-
   // Delete a row from the table
   async delete(event) {
     const index = event.index;
@@ -267,7 +295,6 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
 
   // Handle function calls
   functionCallHandler($event) {
-    let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
 
     try {
@@ -295,14 +322,43 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
         showConfirmButton: true,
       });
     } else if (this.isBookCodeUnique()) {
-      this.service.exportData(this.tableData);
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: "Data Downloaded successfully!",
-        showConfirmButton: true,
+      this.tableData.forEach(tableItem => {
+        const optionItem = this.displayedColumns1.allocateTo.option.find(optItem => optItem.value === tableItem.allocateTo);
+        if (optionItem) {
+          tableItem.type = optionItem.type;
+          tableItem.status = 'Unused';
+          tableItem.action = 'Allocated';
+          tableItem.usedLeaves = 0;
+          tableItem.entryBy = localStorage.getItem('Username');
+          tableItem.entryDate = new Date().toISOString();
+        }
       });
-      window.location.reload();
+      // Now, add the 'id' property to each object in the 'tableData' array
+      this.tableData = this.tableData.map(item => {
+        return { ...item, id: item.bookCode };
+      });
+
+      // Continue with the rest of the code (e.g., exporting data)
+      let req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        type: "masters",
+        collection: "dcr",
+        data: this.tableData
+      };
+      this.masterService.masterPost('common/create', req).subscribe({
+        next: (res: any) => {
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            window.location.reload();
+          }
+        }
+      });
     } else {
       Swal.fire({
         icon: "warning",
@@ -364,4 +420,5 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter {
     this.tableData[0].seriesTo = seriesTo;
     this.tableData[0].totalLeaf = totalLeaf;
   }
+
 }

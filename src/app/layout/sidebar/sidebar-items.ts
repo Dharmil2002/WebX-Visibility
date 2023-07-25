@@ -63,6 +63,7 @@ export const ROUTES: RouteInfo[] =
         submenu: []
       }],
     },
+    
     {
       "path": "Masters/DriverMaster/DriverMasterList",
       "title": "Master & Utilities",
@@ -148,6 +149,15 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
+            },
+            {
+              "path": "Masters/AirportMaster/AirportMasterList",
+              "title": "Airport Masters",
+              "moduleName": "Masters",
+              "icon": "",
+              "class": "",
+              "groupTitle": false,
+              "submenu": []
             },
             {
               "path": "Masters/PinCodeMaster/PinCodeMasterList",
@@ -260,5 +270,32 @@ export const ROUTES: RouteInfo[] =
           ]
         },
       ]
+    },
+    {
+      path: "",
+      title: "Operations",
+      moduleName: "Operations",
+      icon: "settings",
+      class: "menu-toggle",
+      groupTitle: false,
+      submenu: [{
+        path: "Operation/QuickCreateDocket",
+        title: "Quick Create Docket",
+        moduleName: "Quick Create Docket",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      },
+      {
+        path: "Masters/Docket/EwayBillDocketBookingV2",
+        title: "Eway Bill Docket Booking",
+        moduleName: "Eway Bill Docket Booking",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      }
+     ],
     },
   ]

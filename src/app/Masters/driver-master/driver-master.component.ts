@@ -5,19 +5,19 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
   templateUrl: './driver-master.component.html',
 })
 export class DriverMasterComponent implements OnInit {
+  companyCode: any = parseInt(localStorage.getItem("companyCode")); 
   data: [] | any;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  toggleArray = ["ActiveFlag"]
+  toggleArray = ["activeFlag"]
   linkArray = []
-
   columnHeader = {
-      "SrNo": "Sr No",
-      'ManualDriverCode': 'Driver Code',
-      'DriverName': 'Driver Name',
-      'LicenseNo': 'License No',
-      'ValidityDate': 'Validity Date',
-      "ActiveFlag": "Active Status",
+      "srNo": "Sr No",
+      'manualDriverCode': 'Driver Code',
+      'driverName': 'Driver Name',
+      'licenseNo': 'License No',
+     // 'validityDate': 'Validity Date',
+      "activeFlag": "Active Status",
       "actions": "Actions"
   };
   headerForCsv = {
@@ -44,6 +44,7 @@ export class DriverMasterComponent implements OnInit {
   }
   cityActiveFlag: any;
   addAndEditPath: string;
+  tableData: any;
   constructor(private masterService: MasterService){
       this.addAndEditPath = "/Masters/DriverMaster/AddDriverMaster";
   }
@@ -51,18 +52,27 @@ export class DriverMasterComponent implements OnInit {
       //throw new Error("Method not implemented.");
       this.getDriverDetails();
   }
-
-  
   getDriverDetails() {
-    //throw new Error("Method not implemented."); 
-    //Fetch data from the JSON endpoint
-    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {  
-    this.data = res;
-    this.csv = this.data['DriverData']
-    //Extract relevant data arrays from the response
-    //const tableArray = this.data['tabledata'];
-    this.tableLoad = false;
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "driver_detail"
     }
-    );
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          const dataWithSrno = res.data.map((obj, index) => {
+            return {
+              ...obj,
+              srNo: index + 1
+            };
+          });
+          this.csv = dataWithSrno
+          this.tableData = dataWithSrno;
+          this.tableLoad = false;
+        }
+      }
+    })
   }
 }

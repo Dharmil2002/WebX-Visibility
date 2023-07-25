@@ -8,6 +8,7 @@ import { VendorMasterViewComponent } from "../vendor-master-view/vendor-master-v
 export class VendorMasterListComponent implements OnInit {
   data: [] | any;
   csv: any[];
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   csvFileName: string;
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   // Define column headers for the table
@@ -36,7 +37,6 @@ export class VendorMasterListComponent implements OnInit {
           "blackListed": "Black Listed",
           "panNo": "PAN NO",
           "serviceTaxNo": "Service Tax No",
-          "sys21Code": "Sys 21 Code",
           "remarks": "Remarks",
           "paymentEmail": "Payment Email",
           "tdsApplicable": "TDS Applicable",
@@ -49,17 +49,12 @@ export class VendorMasterListComponent implements OnInit {
           "audited": "Audited",
           "auditedBy": "Audited By",
           "auditedDate": "Audited Date",
-          "entryBy": "Entry By",
-          "entryDate": "Entry Date",
           "tdsDocument": "TDS Document",
           "cancelCheque": "Cancel Cheque",
           "msme": "MSME",
           "isMsmeApplicable": "IsMSMEApplicable",
-          "editedBy": "Edited By",
-          "editedDate": "Edited Date",
           "isGstCharged": "IsGSTCharged",
           "franchise": "Franchise",
-          "sapCode": "SAPCode",
           "integrateWithFinSystem": "Integrate With Fin System"
   }
   //#endregion 
@@ -88,12 +83,25 @@ export class VendorMasterListComponent implements OnInit {
     this.csvFileName = "Vendor Details"  //setting csv file Name so file will be saved as per this name
   }
   getVendorDetails() {
-    // Fetch data from the JSON endpoint
-    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-      this.data = res;
-      this.csv = this.data['vendorMasterData']
-      this.tableLoad = false;
-    }
-    );
+    let req = {
+      companyCode: this.companyCode,
+      "type": "masters",
+      "collection": "vendor_detail"
   }
+  this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+          if (res) {
+              // Generate srno for each object in the array
+              const dataWithSrno = res.data.map((obj, index) => {
+                  return {
+                      ...obj,
+                      srNo: index + 1
+                  };
+              });
+              this.csv = dataWithSrno;
+              this.tableLoad = false;
+          }
+      }
+  })
+}
 } 

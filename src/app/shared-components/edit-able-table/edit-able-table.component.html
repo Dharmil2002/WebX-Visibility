@@ -156,7 +156,16 @@
                                             <mat-datepicker #picker></mat-datepicker>
                                         </mat-form-field>
                                     </ng-container>
-
+                                    <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
+                                    <ng-container *ngIf="columnHeader[item].key==='time'">
+                                        <mat-form-field appearance="outline" floatLabel="never">
+                                            <input matInput [owlDateTimeTrigger]="timepicker"
+                                                [formControlName]="columnHeader[item].name" [owlDateTime]="timepicker">
+                                            <mat-icon matSuffix [owlDateTimeTrigger]="timepicker"
+                                                class="date-icon">schedule</mat-icon>
+                                            <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>
+                                        </mat-form-field>
+                                    </ng-container>
                                     <!-- Check if the column key is 'input' -->
                                     <ng-container *ngIf="columnHeader[item].key === 'input'">
                                         <mat-form-field appearance="outline" floatLabel="never">

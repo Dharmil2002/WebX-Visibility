@@ -145,24 +145,23 @@ export class AddStateMasterComponent implements OnInit {
     save() {
         // Set the value of "country" control to its name property
         this.stateTableForm.controls["country"].setValue(this.stateTableForm.value.country.name);
-    
+
         // Convert boolean value of "activeflag" to "Y" or "N"
         this.stateTableForm.controls["activeflag"].setValue(this.stateTableForm.value.activeflag == true ? "Y" : "N");
-    
+
         if (this.isUpdate) {
             let id = this.stateTableForm.value.id;
-    
+
             // Remove the "id" field from the form controls
             this.stateTableForm.removeControl("id");
-    
+
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "state",
+                collection: "state_detail",
                 id: id,
-                data: this.stateTableForm.value
+                updates: this.stateTableForm.value
             };
-    
             this.masterService.masterPut('common/update', req).subscribe({
                 next: (res: any) => {
                     if (res) {
@@ -181,14 +180,14 @@ export class AddStateMasterComponent implements OnInit {
             const randomNumber = getShortName(this.stateTableForm.value.stateName);
             this.stateTableForm.controls["stateCode"].setValue(randomNumber);
             this.stateTableForm.controls["id"].setValue(randomNumber);
-    
+
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "state",
+                collection: "state_detail",
                 data: this.stateTableForm.value
             };
-    
+
             this.masterService.masterPost('common/create', req).subscribe({
                 next: (res: any) => {
                     if (res) {
@@ -205,6 +204,6 @@ export class AddStateMasterComponent implements OnInit {
             });
         }
     }
-    
-    
+
+
 }

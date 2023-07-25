@@ -69,6 +69,10 @@
         {
             "stateId": "10",
             "stateDesc": "Madhya Pradesh"
+        },
+        {
+            "stateId": "11",
+            "stateDesc": "Mumbai"
         }
     ],
     "zoneList": [
@@ -94,11 +98,11 @@
         },
         {
             "zoneId": "6",
-            "zoneDesc": "SOUTH2"
+            "zoneDesc": "South Zone"
         },
         {
-            "zoneId": "6",
-            "zoneDesc": "South Zone"
+            "zoneId": "7",
+            "zoneDesc": "West"
         }
     ],
     "cityList": [
@@ -141,28 +145,48 @@
     ],
     "pincodeList": [
         {
-            "PincodeId": 1,
-            "PincodeDesc": "400029"
+            "pincodeId": 1,
+            "pincodeDesc": "400029"
         },
         {
-            "PincodeId": 2,
-            "PincodeDesc": "400065"
+            "pincodeId": 2,
+            "pincodeDesc": "400065"
         },
         {
-            "PincodeId": 3,
-            "PincodeDesc": "400011"
+            "pincodeId": 3,
+            "pincodeDesc": "400011"
         },
         {
-            "PincodeId": 4,
-            "PincodeDesc": "400099"
+            "pincodeId": 4,
+            "pincodeDesc": "400099"
         },
         {
-            "PincodeId": 5,
-            "PincodeDesc": "400004"
+            "pincodeId": 5,
+            "pincodeDesc": "400004"
         },
         {
-            "PincodeId": 6,
-            "PincodeDesc": "400053"
+            "pincodeId": 6,
+            "pincodeDesc": "400053"
+        },
+        {
+            "pincodeId": 7,
+            "pincodeDesc": "395001"
+        },
+        {
+            "pincodeId": 8,
+            "pincodeDesc": "400014"
+        },
+        {
+            "pincodeId": 9,
+            "pincodeDesc": "226001"
+        },
+        {
+            "pincodeId": 10,
+            "pincodeDesc": "110033"
+        },
+        {
+            "pincodeId": 11,
+            "pincodeDesc": "394110"
         }
     ],
     "locationList": [
@@ -467,6 +491,10 @@
         {
             "name": "Pune",
             "value": "PUN"
+        },
+        {
+            "name": "Delhi",
+            "value": "DELC"
         }
     ],
     "payBasisDropdown": [
@@ -514,15 +542,15 @@
     "documentTypeDropDown": [
         {
             "name": "CNote",
-            "value": "DKT"
+            "value": "1"
         },
         {
             "name": "Delivery MR",
-            "value": "DMR"
+            "value": "2"
         },
         {
             "name": "UBI Series",
-            "value": "DKTBC"
+            "value": "3"
         }
     ],
     "vehicleTypeDropdown": [
@@ -583,20 +611,28 @@
         {
             "name": "Own",
             "value": "3"
-        },
-        {
-            "name": "MARKET",
-            "value": "4"
         }
     ],
     "vendorNameDropdown": [
         {
             "name": "V00001:AADARSH ROADWAYSY",
-            "value": "V00001AADARSHROADWAYSY"
+            "value": "1"
         },
         {
             "name": "V000005:ABC TRANSPORT COMPANY",
-            "value": "V000005ABCTRANSPORTCOMPANY"
+            "value": "2"
+        },
+        {
+            "name": "V00006:GLOBE CHARTERS PVT LTD",
+            "value": "3"
+        },
+        {
+            "name": "V00059:Vishnu Transport",
+            "value": "4"
+        },
+        {
+            "name": "V00078:ABC fleets PVT Ltd",
+            "value": "5"
         }
     ],
     "gpsProviderDropdown": [
@@ -615,7 +651,7 @@
     ],
     "ftlTypeDropdown": [
         {
-            "name": "40 FT Container",
+            "name": "3 Ton",
             "value": "1"
         },
         {
@@ -623,8 +659,28 @@
             "value": "2"
         },
         {
-            "name": "6.50 -7.50 MT",
+            "name": "1.50 - 2.50 MT",
             "value": "3"
+        },
+        {
+            "name": "6.50 -7.50 MT",
+            "value": "4"
+        },
+        {
+            "name": "10 MT",
+            "value": "5"
+        },
+        {
+            "name": "14.00- 16.00 MT",
+            "value": "6"
+        },
+        {
+            "name": "28.00 - 30.00 MT",
+            "value": "7"
+        },
+        {
+            "name": "40 FT Container",
+            "value": "8"
         }
     ],
     "permitStateDropdown": [
@@ -724,7 +780,6 @@
             "name": "CHENNAI",
             "value": "5"
         }
-
     ],
     "stateLocDropDown": [
         {
@@ -774,7 +829,7 @@
         {
             "name": "Company",
             "value": "3"
-        }      
+        }
     ],
     "locdataDropDown": [
         {
@@ -794,7 +849,7 @@
             "value": "KNP"
         }
     ],
-    "allocationCategory":[
+    "allocationCategory": [
         {
             "name": "Employee",
             "value": "E"
@@ -810,9 +865,9 @@
         {
             "name": "Location",
             "value": "L"
-        } 
+        }
     ],
-    "tdsSectionDropdown":[
+    "tdsSectionDropdown": [
         {
             "name": "TDS Account",
             "value": "1"
@@ -824,7 +879,7 @@
         {
             "name": "TDS Payable",
             "value": "3"
-        },  
+        },
         {
             "name": "TDS App",
             "value": "4"
@@ -832,7 +887,7 @@
         {
             "name": "TDS Payable on Contract",
             "value": "5"
-        }  
+        }
     ],
     "tdsTypeDropdown": [
         {
@@ -846,9 +901,9 @@
         {
             "name": "Pan Card NA",
             "value": "3"
-        } 
+        }
     ],
-    "lspNameDropdown":[
+    "lspNameDropdown": [
         {
             "name": "DLVBB",
             "value": "1"
@@ -856,9 +911,9 @@
         {
             "name": "MXpress",
             "value": "2"
-        }  
+        }
     ],
-    "selectDropdown":[
+    "selectDropdown": [
         {
             "name": "CP",
             "value": "1"
@@ -866,7 +921,80 @@
         {
             "name": "MXpress",
             "value": "2"
-        }  
+        }
+    ],
+    "vehicleDropdown": [
+        {
+            "name": "MH01AA1111",
+            "value": "1"
+        },
+        {
+            "name": "MH87GF8208",
+            "value": "2"
+        },
+        {
+            "name": "GJ05AK7484",
+            "value": "3"
+        },
+        {
+            "name": "MH6614154",
+            "value": "4"
+        },
+        {
+            "name": "AS12HI3457",
+            "value": "53"
+        }
+    ],
+    "weekDayDropdown": [
+        {
+            "name": "Monday",
+            "value": "1"
+        },
+        {
+            "name": "Tuesday",
+            "value": "2"
+        },
+        {
+            "name": "Wednesday",
+            "value": "3"
+        },
+        {
+            "name": "Thursday",
+            "value": "4"
+        },
+        {
+            "name": "Friday",
+            "value": "5"
+        },
+        {
+            "name": "Saturday",
+            "value": "6"
+        },
+        {
+            "name": "Sunday",
+            "value": "7"
+        }
+    ],
+    "routeLocationDropdown": [
+        {
+            "name": "S0123-MUMB-BNGB",
+            "value": "1"
+        },
+        {
+            "name": "S0060-MUMB-AMDB-JAIB",
+            "value": "2"
+        },
+        {
+            "name": "S0111-MUMB-MAAM",
+            "value": "3"
+        },
+        {
+            "name": "S0026-MUMB-PNQB-BNGB",
+            "value": "4"
+        },
+        {
+            "name": "S0008-MUMB-BNGB",
+            "value": "5"
+        }
     ]
-
 }

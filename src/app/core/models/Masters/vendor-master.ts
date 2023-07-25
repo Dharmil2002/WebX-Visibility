@@ -28,16 +28,18 @@ export class VendorMaster {
     accountNumber: any
     ifscNumber: any
     bankName: any
-    pDFFileUpload: any
+    pdfFileUpload: any
     audited: any
     msme: any
     dueDays: any
     ownerName: any
     gstNo: any
-    cPCode: any
+    cpCode: any
     franchise: any
     integrateWithFinSystem: any
     reliableDocument: any
+    id: any
+    tdsRate: any
     constructor(VendorMaster) {
       {
         this.vendorCode = VendorMaster.vendorCode || 'System Genrated';

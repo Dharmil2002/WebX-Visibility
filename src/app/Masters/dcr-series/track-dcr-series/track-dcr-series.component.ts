@@ -81,32 +81,45 @@ export class TrackDcrSeriesComponent implements OnInit {
       });
       return; // Stop execution if documentNumber is null or empty
     }
-    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-      this.data = res.dcrTrackData;
-      const matchingData = this.data.find(item => {
-        return (
-          item.docType === this.trackDcrForm.value.documentType.value &&
-          this.isInRange(this.trackDcrForm.value.documentNumber, item.docSrFrom, item.docSrTo) &&
-          this.hasSameLength(this.trackDcrForm.value.documentNumber, item.docSrFrom)
-        );
-      });
-      if (matchingData) {
-        this.router.navigate(['Masters/DocumentControlRegister/DCRDetail'], {
-          state: {
-            data: matchingData, additionalData: additionalData,
-          }
-        });
-      }
-      else {
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `No matching data found.`,
-          showConfirmButton: true,
-        });
-      }
+    let req = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "dcr"
     }
-    );
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          const dataWithSrno = res.data.map((obj, index) => {
+            return {
+              ...obj,
+              srNo: index + 1
+            };
+          });
+          const matchingData = dataWithSrno.find(item => {
+            return (
+              item.documentType === this.trackDcrForm.value.documentType.value &&
+              item.bookCode === this.trackDcrForm.value.documentNumber
+            );
+          });
+          if (matchingData) {
+            this.router.navigate(['Masters/DocumentControlRegister/DCRDetail'], {
+              state: {
+                data: matchingData, additionalData: additionalData,
+              }
+            });
+          }
+          else {
+            Swal.fire({
+              icon: "warning",
+              title: "Alert",
+              text: `No matching data found.`,
+              showConfirmButton: true,
+            });
+          }
+        }
+      }
+    })
   }
   isInRange(value, start, end) {
     return value >= start && value <= end;

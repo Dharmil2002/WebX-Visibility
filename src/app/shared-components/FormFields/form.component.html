@@ -100,7 +100,7 @@
                 *ngIf="formItem.type=='dropdown' && formItem.generatecontrol===true">
                 <mat-label>{{formItem.label}}</mat-label>
                 <input matInput placeholder={{formItem.placeholder}} [matAutocomplete]="autocomplete"
-                    formControlName={{formItem.name}}
+                    formControlName={{formItem.name}} [readonly]="formItem.disable"
                     (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">
                 <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="formItem.displaywith"
                     (optionSelected)="functionCalled( {field :formItem , functionName:formItem.functions?.onOptionSelect, eventArgs: $event })">
@@ -196,7 +196,7 @@
             </ng-container>
             <!--Radio Button-->
             <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
-                <mat-label>{{formItem.label}}</mat-label>
+                <mat-label>{{formItem.label}}</mat-label>&nbsp;
                 <mat-radio-group [formControlName]="formItem.name"
                     (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
                     <mat-radio-button *ngFor="let option of formItem.value" [value]="option.value">

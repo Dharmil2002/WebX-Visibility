@@ -11,7 +11,7 @@ import { CreateRunSheetComponent } from "./create-run-sheet/create-run-sheet.com
 import { UpdateRunSheetComponent } from "./update-run-sheet/update-run-sheet.component";
 import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.component";
 import { ViewPrintComponent } from "./view-print/view-print.component";
-
+import { QuickBookingComponent } from './quick-booking/quick-booking.component';
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -56,6 +56,10 @@ const routes: Routes = [
   {
     path:"ViewPrint",
     component:ViewPrintComponent
+  },
+  {
+    path:"QuickCreateDocket",
+    component:QuickBookingComponent
   }
 ]
 

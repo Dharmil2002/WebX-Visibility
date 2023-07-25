@@ -4,7 +4,7 @@
             <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="tableData"
             [csvFileName]="csvFileName"  [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
             [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
-            [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls">
+            [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)">
         </generic-table-webxpress>
         <!-- </div> -->
     </app-common-wrapper-webxpress>

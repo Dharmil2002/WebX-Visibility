@@ -1,0 +1,12 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="routeMasterLocationForm">
+        <app-form-webxpress [form]="routeMasterLocationForm" [formData]="jsonControlArray"
+            (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true">
+        </app-form-webxpress>
+    </form>
+    <app-table-boilerplate *ngIf="tableView" [tableData]="tableData" [columnHeader]="displayedColumns1"
+        title="Route Location Wise Master" (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
+        (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
+        [ActionObject]="actionObject"></app-table-boilerplate>
+</app-common-wrapper-webxpress>

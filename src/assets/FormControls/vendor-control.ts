@@ -85,17 +85,17 @@ export class VendorControl {
             {
                 name: 'vendorLocation',
                 label: 'Vendor Location',
-                placeholder: 'Vendor location',
-                type: 'dropdown',
-                value: '',
-                Validations: [],
-                functions: {
-                    onToggleAll: 'toggleSelectAll'
-                },
+                placeholder: 'Select Vendor location',
+                type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
+                Validations: [
+                ],
                 additionalData: {
-                    
-                    showNameAndValue: true,
-                    
+                    isIndeterminate: false,
+                    isChecked: false,
+                    support: "vendorLocationDropdown",
+                    showNameAndValue: false,
+                    Validations: [{
+                    }]
                 },
                 generatecontrol: true, disable: false
             },
@@ -128,9 +128,9 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        message: "Please enter a Pincode consisting of 1 to 20 alphanumeric characters.",
-                        pattern: "^[a-zA-Z 0-9]{1,20}$",
-                    },
+                        value: "^[1-9][0-9]{5}$",
+                        message: "Please enter a valid 6-digit pin code"
+                    }
                 ],
                 generatecontrol: true, disable: false
             },
@@ -141,10 +141,14 @@ export class VendorControl {
                 type: 'text', value: vendorMasterTable.vendorPhoneNo,
                 Validations: [
                     {
-                        name: "pattern",
-                        message: "Please enter 4 to 20 digit mobile number",
-                        pattern: '^[0-9]{4,20}$',
+                        name: "required",
+                        message: "Vendor Phone No is required"
                     },
+                    {
+                        name: "pattern",
+                        value: "^[0-9]{10}$",
+                        message: "Please enter a valid 10-digit phone number"
+                    }
                 ],
                 generatecontrol: true, disable: false
             },
@@ -188,82 +192,80 @@ export class VendorControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'IsUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
+                name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
                 generatecontrol: false, disable: false
-            }
+            },
+            {
+                name: 'vendorLocationDropdown',
+                label: 'Vendor Location',
+                placeholder: 'Select Vendor Location',
+                type: '',
+                value: '',
+                Validations: [
+                ],
+                generatecontrol: false, disable: false
+            },
         ];
         this.vendorOtherInfoArray = [
             {
-                name: 'tdsApplicable',
-                label: 'TDS Applicable',
-                placeholder: 'Vendor Sub Type',
-                type: 'toggle',
-                value: '',
-                Validations: [],
-                functions: {
-                    onChange: 'onChange',
-                },
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'tdsSection',
-                label: 'TDS Section',
-                placeholder: 'TDS Section',
-                type: 'dropdown',
-                value: '',
-                Validations: [
-                ],
-                additionalData: {
-                    showNameAndValue: false
-                },
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'tdsType',
-                label: 'TDS Type',
-                placeholder: 'Search TDS Type',
-                type: 'dropdown',
-                value: '',
+                name: 'accountNumber',
+                label: 'Account Number',
+                placeholder: 'Account Number',
+                type: 'text', value: vendorMasterTable.accountNumber,
                 Validations: [
                     {
                         name: "required",
-                        message: "TDS Type is required"
-                    }
-                ],
-                additionalData: {
-                    showNameAndValue: false
-                },
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'tdsRate',
-                label: 'TDS Rate',
-                placeholder: 'TDS Rate',
-                type: 'number', value: '',
-                Validations: [
+                        message: "Account Number is required"
+                    },
                     {
-                        name: "required",
-                        message: "TDS Rate is required"
+                        name: "pattern",
+                        value: "^[0-9]+$",
+                        message: "Please enter a valid account number (only digits allowed)"
                     }
                 ],
                 generatecontrol: true, disable: false
             },
             {
-                name: 'tdsDocument', label: "TDS Document", placeholder: "", type: 'file', value: vendorMasterTable.tdsDocument, 
-                generatecontrol: true, disable: false,
-                Validations: [],
-                functions: {
-                    onChange: 'selectedFile',
-                }
+                name: 'ifscNumber',
+                label: 'IFSC Number',
+                placeholder: 'IFSC Number',
+                type: 'text', value: vendorMasterTable.ifscNumber,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "IFSC Number is required"
+                    },
+                    {
+                        name: "pattern",
+                        value: "^[A-Za-z]{4}[0-9]{7}$",
+                        message: "Please enter a valid IFSC number (4 letters followed by 7 digits)"
+                    }
+                ],
+                generatecontrol: true, disable: false
             },
             {
-                name: 'cancelCheque', label: "Cancel Cheque", placeholder: "", type: 'file', value: vendorMasterTable.cancelCheque, 
-                generatecontrol: true, disable: false,
-                Validations: [],
-                functions: {
-                    onChange: 'selectedFile',
-                }
+                name: 'bankName',
+                label: 'Bank Name',
+                placeholder: 'Bank Name',
+                type: 'text', value: vendorMasterTable.bankName,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Bank Name is required"
+                    }
+                ],
+                generatecontrol: true, disable: false
             },
+            {
+                name: 'ownerName',
+                label: 'Owner Name',
+                placeholder: 'Owner Name',
+                type: 'text', value: vendorMasterTable.ownerName,
+                Validations: [
+                ],
+                generatecontrol: true, disable: false
+            },
+
             {
                 name: 'remark',
                 label: 'Remark',
@@ -271,22 +273,6 @@ export class VendorControl {
                 type: 'text', value: vendorMasterTable.remark,
                 Validations: [
                 ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'paymentEmail',
-                label: 'Payment Email',
-                placeholder: 'Payment Email',
-                type: 'toggle',
-                value: vendorMasterTable.paymentEmail,
-                Validations: [],
-                functions: {
-                    onChange: 'onChange',
-                },
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'deliveryPartner', label: 'Delivery Partner', placeholder: 'Delivery Partner', type: 'toggle', value: vendorMasterTable.deliveryPartner, Validations: [],
                 generatecontrol: true, disable: false
             },
             {
@@ -307,57 +293,6 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'accountNumber',
-                label: 'Account Number',
-                placeholder: 'Account Number',
-                type: 'text', value: vendorMasterTable.accountNumber,
-                Validations: [
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'ifscNumber',
-                label: 'IFSC Number',
-                placeholder: 'IFSC Number',
-                type: 'text', value: vendorMasterTable.ifscNumber,
-                Validations: [
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'bankName',
-                label: 'Bank Name',
-                placeholder: 'Bank Name',
-                type: 'text', value: vendorMasterTable.bankName,
-                Validations: [
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'pDFFileUpload', label: "PDF File Upload", placeholder: "", type: 'file', value: "", 
-                generatecontrol: true, disable: false,
-                Validations: [],
-                functions: {
-                    onChange: 'selectedFile',
-                }
-            },
-            {
-                name: 'audited', label: 'Audit', placeholder: 'Audit', type: 'toggle', value: vendorMasterTable.audited, Validations: [],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'msme',
-                label: 'MSME',
-                placeholder: 'MSME',
-                type: 'toggle',
-                value: vendorMasterTable.msme,
-                Validations: [],
-                functions: {
-                    onChange: 'onChange',
-                },
-                generatecontrol: true, disable: false
-            },
-            {
                 name: 'dueDays',
                 label: 'Due Days',
                 placeholder: 'Due Days',
@@ -366,15 +301,7 @@ export class VendorControl {
                 ],
                 generatecontrol: true, disable: false
             },
-            {
-                name: 'ownerName',
-                label: 'Owner Name',
-                placeholder: 'Owner Name',
-                type: 'text', value: vendorMasterTable.ownerName,
-                Validations: [
-                ],
-                generatecontrol: true, disable: false
-            },
+
             {
                 name: 'gstNo',
                 label: 'GST No',
@@ -392,9 +319,9 @@ export class VendorControl {
                 value: [
                     { value: 'CP', name: 'CP' },
                     { value: 'NCP', name: 'Non-CP' }
-                  ],
+                ],
                 Validations: [
-                    
+
                 ],
                 additionalData: {
                     showNameAndValue: true
@@ -402,14 +329,82 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'cPCode',
+                name: 'cpCode',
                 label: 'CP Code',
                 placeholder: 'CP Code',
-                type: 'text', value: vendorMasterTable.cPCode,
+                type: 'text', value: vendorMasterTable.cpCode,
                 Validations: [
                 ],
                 generatecontrol: true, disable: false
             },
+            {
+                name: 'tdsDocument', label: "TDS Document", placeholder: "", type: 'file', value: vendorMasterTable.tdsDocument,
+                generatecontrol: true, disable: false,
+                Validations: [],
+                functions: {
+                    onChange: 'selectedFileForTdsDocument',
+                }
+            },
+            {
+                name: 'cancelCheque', label: "Cancel Cheque", placeholder: "", type: 'file', value: vendorMasterTable.cancelCheque,
+                generatecontrol: true, disable: false,
+                Validations: [],
+                functions: {
+                    onChange: 'selectedFileForCancelCheque',
+                }
+            },
+            {
+                name: 'pdfFileUpload', label: "PDF File Upload", placeholder: "", type: 'file', value: vendorMasterTable.pdfFileUpload,
+                generatecontrol: true, disable: false,
+                Validations: [],
+                functions: {
+                    onChange: 'selectedFileForPdfFile',
+                }
+            },
+            {
+                name: 'reliableDocument', label: "Reliable Document", placeholder: "", type: 'file', value: vendorMasterTable.reliableDocument,
+                generatecontrol: true, disable: false,
+                Validations: [],
+                functions: {
+                    onChange: 'selectedFileForReliableDocument',
+                }
+            },
+            {
+                name: 'paymentEmail',
+                label: 'Payment Email',
+                placeholder: 'Payment Email',
+                type: 'toggle',
+                value: vendorMasterTable.paymentEmail,
+                Validations: [],
+                functions: {
+                    onChange: 'onChange',
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'deliveryPartner', label: 'Delivery Partner', placeholder: 'Delivery Partner', type: 'toggle', value: vendorMasterTable.deliveryPartner, Validations: [],
+                generatecontrol: true, disable: false
+            },
+
+
+
+            {
+                name: 'audited', label: 'Audit', placeholder: 'Audit', type: 'toggle', value: vendorMasterTable.audited, Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'msme',
+                label: 'MSME',
+                placeholder: 'MSME',
+                type: 'toggle',
+                value: vendorMasterTable.msme,
+                Validations: [],
+                functions: {
+                    onChange: 'onChange',
+                },
+                generatecontrol: true, disable: false
+            },
+
             {
                 name: 'franchise', label: 'Franchise', placeholder: 'Franchise', type: 'toggle', value: vendorMasterTable.franchise, Validations: [],
                 generatecontrol: true, disable: false
@@ -418,34 +413,93 @@ export class VendorControl {
                 name: 'integrateWithFinSystem', label: 'Integrate With Fin System', placeholder: 'Integrate With Fin System', type: 'toggle', value: vendorMasterTable.integrateWithFinSystem, Validations: [],
                 generatecontrol: true, disable: false
             },
+
             {
-                name: 'reliableDocument', label: "Reliable Document", placeholder: "", type: 'file', value: vendorMasterTable.reliableDocument, 
-                generatecontrol: true, disable: false,
+                name: 'tdsApplicable',
+                label: 'TDS Applicable',
+                placeholder: 'Vendor Sub Type',
+                type: 'toggle',
+                value: '',
                 Validations: [],
                 functions: {
-                    onChange: 'selectedFile',
-                }
+                    onChange: 'displayTds',
+                },
+                generatecontrol: true, disable: false
             },
             {
-                name: 'EntryBy', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
+                name: 'tdsSection',
+                label: 'TDS Section',
+                placeholder: 'Select TDS Section',
+                type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
+                Validations: [
+                ],
+                additionalData: {
+                    isIndeterminate: false,
+                    isChecked: false,
+                    support: "tdsSectionDropdown",
+                    showNameAndValue: false,
+                    Validations: [{
+                    }]
+                },
                 generatecontrol: false, disable: false
             },
             {
-                name: 'Vendor_Location', label: '', placeholder: '', type: '', value: '', Validations: [],
+                name: 'tdsType',
+                label: 'TDS Type',
+                placeholder: 'Search TDS Type',
+                type: 'dropdown',
+                value: '',
+                Validations: [
+                    {
+                        name: "required",
+                        message: "TDS Type is required"
+                    }
+                ],
+                additionalData: {
+                    showNameAndValue: false
+                },
                 generatecontrol: false, disable: false
             },
             {
-                name: 'UPDTBY', label: 'Update By', placeholder: 'Update By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
+                name: 'tdsRate',
+                label: 'TDS Rate',
+                placeholder: 'TDS Rate',
+                type: 'number', value: vendorMasterTable.tdsRate,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "TDS Rate is required"
+                    }
+                ],
                 generatecontrol: false, disable: false
             },
             {
-                name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: localStorage.getItem("CompanyCode"), Validations: [],
+                name: 'id',
+                label: '',
+                placeholder: '',
+                type: 'text',
+                value: vendorMasterTable.id,
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
+            {
+                name: 'entryBy', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("Username"), Validations: [],
                 generatecontrol: false, disable: false
             },
             {
-                name: 'IsUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
+                name: 'tdsSectionDropdown',
+                label: 'TDS Section',
+                placeholder: 'Select TDS Section',
+                type: '',
+                value: '',
+                Validations: [
+                ],
                 generatecontrol: false, disable: false
-            }
+            },
         ];
     }
     getVendorFormControls() {

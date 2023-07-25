@@ -35,7 +35,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     ]
   columnHeader = {
     "LoadingSheet": "Loading Sheet",
-    "lag": "Leg",
+    "leg": "Leg",
     "Shipment": "Shipments",
     "Packages": "Packages",
     "WeightKg": "Weight Kg",
@@ -45,7 +45,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   centerAlignedData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];
   headerForCsv = {
     "LoadingSheet": "Loading Sheet",
-    "lag": "Leg",
+    "leg": "Leg",
     "Shipment": "Shipments",
     "Packages": "Packages",
     "WeightKg": "Weight Kg",
@@ -68,13 +68,13 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     noColumnSort: ['checkBoxRequired']
   }
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,private CnoteService: CnoteService,public dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent>,public Route:Router) {
+
     this.data.forEach(obj => {
     const randomNumber = "Ls/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
       obj.LoadingSheet = randomNumber;
       obj.Action= "Print";
     });
     this.csv=this.data;
-    this.CnoteService.setVehicleLoadingData(this.data);
     Swal.fire({
       icon: "success",
       title: "Successful",

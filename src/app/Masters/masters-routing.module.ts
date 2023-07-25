@@ -34,10 +34,14 @@ import { AddVehicleMasterComponent } from './vehicle-master/add-vehicle-master/a
 import { VehicleMasterListComponent } from './vehicle-master/vehicle-master-list/vehicle-master-list.component';
 import { DcrDetailPageComponent } from './dcr-series/dcr-detail-page/dcr-detail-page.component';
 import { SplitDcrComponent } from './dcr-series/split-dcr/split-dcr.component';
-import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise.component';
+import { RouteMasterLocationWiseComponent } from './route-master-location-wise/route-master-location-wise-list/route-master-location-wise.component';
 import { EwayBillDocketBookingV2Component } from './eway-bill-docket-booking-v2/eway-bill-docket-booking-v2t';
 import { AddVendorMasterComponent } from './vendor-master/add-vendor-master/add-vendor-master.component';
 import { VendorMasterListComponent } from './vendor-master/vendor-master-list/vendor-master-list.component';
+import { RouteMasterLocationAddComponent } from './route-master-location-wise/route-master-location-add/route-master-location-add.component';
+import { AirportMasterListComponent } from './airport-master/airport-master-list/airport-master-list.component';
+import { AirportMasterAddComponent } from './airport-master/airport-master-add/airport-master-add.component';
+import { PincodeLocationMappingComponent } from './pincode-to-location-mapping-master/pincode-location-list/pincode-to-location-mapping.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -74,10 +78,14 @@ const routes: Routes = [
   { path: "VehicleMaster/VehicleMasterList", component: VehicleMasterListComponent },
   { path: "VehicleMaster/AddVehicle", component: AddVehicleMasterComponent },
   { path: "RouteLocationWise/RouteList", component: RouteMasterLocationWiseComponent },
+  { path: "RouteLocationWise/RouteAdd", component: RouteMasterLocationAddComponent },
   { path: "UserMaster/UserMasterView", component: UserMasterListComponent },
   { path: "UserMaster/AddUser", component: AddUserMasterComponent },
   { path: "VendorMaster/VendorMasterList", component: VendorMasterListComponent },
   { path: "VendorMaster/AddVendorMaster", component: AddVendorMasterComponent },
+  { path: "AirportMaster/AirportMasterList", component: AirportMasterListComponent },
+  { path: "AirportMaster/AddAirportMaster", component: AirportMasterAddComponent },
+  { path: "PincodeLocation/PincodeLocationMapping", component:PincodeLocationMappingComponent}
 ];
 
 @NgModule({

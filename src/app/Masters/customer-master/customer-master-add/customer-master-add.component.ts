@@ -1,14 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { HttpClient } from '@angular/common/http';
 import { customerControl } from 'src/assets/FormControls/customer-master';
-import { utilityService } from 'src/app/Utility/utility.service';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { Router } from '@angular/router';
 import { customerModel } from 'src/app/core/models/Masters/customerMaster';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from 'sweetalert2';
+import { getShortName } from 'src/app/Utility/commonFunction/random/generateRandomNumber';
 
 @Component({
   selector: 'app-customer-master-add',
@@ -16,6 +16,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 })
 export class CustomerMasterAddComponent implements OnInit {
   customerTableForm: UntypedFormGroup;
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   error: string
   isUpdate = false;
   action: any;
@@ -44,7 +45,7 @@ export class CustomerMasterAddComponent implements OnInit {
   jsonControlCustomerArray: any;
   jsonControlBillKycArray: any;
   accordionData: any
-  breadscrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string; }[];
   groupCode: any;
   groupCodedet: any;
   payBasisData: any;
@@ -56,8 +57,7 @@ export class CustomerMasterAddComponent implements OnInit {
   ownershipData: any;
   constructor(private Route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder, private filter: FilterUtils,
-    private http: HttpClient, private service: utilityService, private masterService: MasterService) {
-    //super();
+    private masterService: MasterService) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
@@ -67,7 +67,7 @@ export class CustomerMasterAddComponent implements OnInit {
     }
     if (this.action === 'edit') {
       this.isUpdate = true;
-      this.breadscrums = [
+      this.breadScrums = [
         {
           title: "Customer Master",
           items: ["Masters"],
@@ -76,7 +76,7 @@ export class CustomerMasterAddComponent implements OnInit {
       ];
 
     } else {
-      this.breadscrums = [
+      this.breadScrums = [
         {
           title: "Customer Master",
           items: ["Masters"],
@@ -90,7 +90,6 @@ export class CustomerMasterAddComponent implements OnInit {
   }
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
-    // Create DriverFormControls instance to get form controls for different sections
     const customerFormControls = new customerControl(this.customerTable, this.isUpdate);
     this.jsonControlCustomerArray = customerFormControls.getFormControlsC();
     this.jsonControlBillKycArray = customerFormControls.getFormControlB();
@@ -105,7 +104,6 @@ export class CustomerMasterAddComponent implements OnInit {
   //#endregion
 
   ngOnInit(): void {
-    //throw new Error("Method not implemented.");
     this.bindDropdown();
     this.getDropDownData();
   }
@@ -136,7 +134,6 @@ export class CustomerMasterAddComponent implements OnInit {
         this.nonOda = data.name;
         this.noOdaStatus = data.additionalData.showNameAndValue;
       }
-
     });
     this.jsonControlBillKycArray.forEach(data => {
       if (data.name === 'payBasis') {
@@ -164,36 +161,35 @@ export class CustomerMasterAddComponent implements OnInit {
         ownershipDropdown,
         locationDropdown
       } = res;
-      
+
       this.groupCodeData = groupCodeDropdown;
       this.serviceOptedFor = serviceOptedDropdown;
       this.payBasisData = payBasisDropdown;
       this.ownershipData = ownershipDropdown;
       this.locationData = locationDropdown;
-      
+
       if (this.isUpdate) {
         this.groupCodedet = this.findDropdownItemByName(this.groupCodeData, this.customerTable.groupCode);
         this.customerTableForm.controls.groupCode.setValue(this.groupCodedet);
-        
-        this.serviceOpted = this.findDropdownItemByName(this.serviceOptedFor, this.customerTable.serviceOptedFor);
-        this.customerTableForm.controls.serviceOpted.setValue(this.serviceOpted);
-        
-        this.payBasisDet = this.findDropdownItemByName(this.payBasisData, this.customerTable.payBasis);
-        this.customerTableForm.controls.payBasis.setValue(this.payBasisDet);
-        
-        this.nonOdaDet = this.findDropdownItemByName(this.locationData, this.customerTable.nonOda);
-        this.customerTableForm.controls.nonOda.setValue(this.nonOdaDet);
-        
-        this.controllingDet = this.findDropdownItemByName(this.locationData, this.customerTable.customerControllingLocation);
-        this.customerTableForm.controls.customerControllingLocation.setValue(this.controllingDet);
-        
-        this.locationDet = this.findDropdownItemByName(this.locationData, this.customerTable.customerLocation);
-        this.customerTableForm.controls.customerLocation.setValue(this.locationDet);
-        
+
+        this.customerTableForm.controls["serviceOptedDropdown"].patchValue(this.serviceOptedFor.filter((element) =>
+          this.customerTable.serviceOpted.includes(element.name)))
+
+        this.customerTableForm.controls["payBasisDropdown"].patchValue(this.payBasisData.filter((element) =>
+          this.customerTable.payBasis.includes(element.name)))
+
+        this.customerTableForm.controls["nonOdaDropdown"].patchValue(this.locationData.filter((element) =>
+          this.customerTable.nonOda.includes(element.name)))
+
+        this.customerTableForm.controls["controllingDropdown"].patchValue(this.locationData.filter((element) =>
+          this.customerTable.customerControllingLocation.includes(element.name)))
+
+        this.customerTableForm.controls["locationDropdown"].patchValue(this.locationData.filter((element) =>
+          this.customerTable.customerLocation.includes(element.name)))
+
         this.ownerShipDet = this.findDropdownItemByName(this.ownershipData, this.customerTable.ownership);
         this.customerTableForm.controls.ownership.setValue(this.ownerShipDet);
       }
-      
       const filterParams = [
         [this.jsonControlCustomerArray, this.groupCodeData, this.gCode, this.codeStatus],
         [this.jsonControlBillKycArray, this.serviceOptedFor, this.serviceOpt, this.serviceOptStatus],
@@ -203,13 +199,11 @@ export class CustomerMasterAddComponent implements OnInit {
         [this.jsonControlCustomerArray, this.locationData, this.nonOda, this.noOdaStatus],
         [this.jsonControlCustomerArray, this.ownershipData, this.ownership, this.ownershipStatus]
       ];
-      
       filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
         this.filter.Filter(jsonControlArray, this.customerTableForm, dropdownData, formControl, statusControl);
       });
     });
   }
-  
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }
@@ -217,21 +211,80 @@ export class CustomerMasterAddComponent implements OnInit {
     const formValue = this.customerTableForm.value;
     const controlNames = [
       "groupCode",
-      "customerLocation",
       "ownership",
-      "customerControllingLocation",
-      "nonOda",
-      "serviceOpted",
-      "payBasis",
-      "activeFlag"
     ];
     controlNames.forEach(controlName => {
-      const controlValue = formValue[controlName]?.value;
+      const controlValue = formValue[controlName]?.name;
       this.customerTableForm.controls[controlName].setValue(controlValue);
     });
-    this.customerTableForm.controls.activeFlag.setValue(formValue.activeFlag ? "Y" : "N");
-    this.Route.navigateByUrl('/Masters/CustomerMaster/CustomerMasterList');
-    this.service.exportData(formValue);
+
+
+    const controllingDropdown = this.customerTableForm.value.controllingDropdown.map((item: any) => item.name);
+    this.customerTableForm.controls["customerControllingLocation"].setValue(controllingDropdown);
+
+    const locationDropdown = this.customerTableForm.value.locationDropdown.map((item: any) => item.name);
+    this.customerTableForm.controls["customerLocation"].setValue(locationDropdown);
+
+    const nonOdaDropdown = this.customerTableForm.value.nonOdaDropdown.map((item: any) => item.name);
+    this.customerTableForm.controls["nonOda"].setValue(nonOdaDropdown);
+
+    const payBasisDropdown = this.customerTableForm.value.payBasisDropdown.map((item: any) => item.name);
+    this.customerTableForm.controls["payBasis"].setValue(payBasisDropdown);
+
+    const serviceOptedDropdown = this.customerTableForm.value.serviceOptedDropdown.map((item: any) => item.name);
+    this.customerTableForm.controls["serviceOpted"].setValue(serviceOptedDropdown);
+    this.customerTableForm.controls["activeFlag"].setValue(this.customerTableForm.value.activeFlag == true ? "Y" : "N");
+    if (this.isUpdate) {
+      let id = this.customerTableForm.value.id;
+      // Remove the "id" field from the form controls
+      this.customerTableForm.removeControl("id");
+      let req = {
+        companyCode: this.companyCode,
+        type: "masters",
+        collection: "customer_detail",
+        id: id,
+        updates: this.customerTableForm.value
+      };
+
+      this.masterService.masterPut('common/update', req).subscribe({
+        next: (res: any) => {
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            this.Route.navigateByUrl('/Masters/CustomerMaster/CustomerMasterList');
+          }
+        }
+      });
+    } else {
+      const randomNumber = getShortName(this.customerTableForm.value.groupCode);
+      this.customerTableForm.controls["customerCode"].setValue(randomNumber);
+      this.customerTableForm.controls["id"].setValue(randomNumber);
+      let req = {
+        companyCode: this.companyCode,
+        type: "masters",
+        collection: "customer_detail",
+        data: this.customerTableForm.value
+      };
+      this.masterService.masterPost('common/create', req).subscribe({
+        next: (res: any) => {
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            this.Route.navigateByUrl('/Masters/CustomerMaster/CustomerMasterList');
+          }
+        }
+      });
+    }
   }
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);

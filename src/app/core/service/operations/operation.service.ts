@@ -16,7 +16,6 @@ export class OperationService {
   runSheerUrl = "../../../assets/data/create-runsheet-data.json";
 
   constructor(private http: HttpClient) {}
-
   /**
    * Retrieves JSON file details from the specified API URL.
    * @param ApiURL The URL of the JSON file to retrieve.
@@ -26,8 +25,11 @@ export class OperationService {
   getJsonFileDetails(ApiURL) {
     return this.http.get<any>(this[ApiURL]);
   }
-
+ //here is create for post request//
   operationPost(ApiURL,Request){
-      return this.http.post<any>(`${environment.APIBaseNewURL}` + ApiURL, Request);
+      return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
+  operationPut(ApiURL,Request){
+    return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+}
 }

@@ -14,24 +14,18 @@ let uniqueShipments: Set<number> = new Set();
 
 export function handlePackageUpdate(scanValue: string, legValue: string, currentBranch: string, data: any, csv: any[], boxData: any, cdr: any) {
 
-  const unloadPackage = data.packagesData.find((x: any) => x.PackageId.trim() === scanValue && x.Routes.trim() === legValue);
+  const unloadPackage = data.find((x: any) => x.bcSerialNo.trim() === scanValue);
 
   if (!unloadPackage) {
     showError("Not Allow to Unload Package", "This package does not belong to the current branch.");
     return;
   }
-
-  if (unloadPackage.Destination.trim() !== currentBranch) {
-    showError("Not Allowed", "This package does not belong to the current branch.");
-    return;
-  }
-
   if (unloadPackage.ScanFlag) {
     showError("Already Scanned", "Your Package ID is already scanned.");
     return;
   }
 
-  const element = csv.find((e: any) => e.Shipment === unloadPackage.Shipment);
+  const element = csv.find((e: any) => e.Shipment === unloadPackage.dockNo);
 
   if (!element || (element.hasOwnProperty('Unloaded') && element.Packages <= element.Unloaded)) {
     showError("Invalid Operation", "Cannot perform the operation. Packages must be greater than Unloaded.");

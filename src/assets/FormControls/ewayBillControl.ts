@@ -13,7 +13,7 @@ export class EwayBillControls {
         this.docketFields =
             [
                 {
-                    name: 'DKTNO', label: 'CNote No', placeholder: 'CNote No', type: 'text', value: '',
+                    name: 'docketNumber', label: 'CNote No', placeholder: 'CNote No', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [
@@ -23,7 +23,7 @@ export class EwayBillControls {
                     }
                 }
                 , {
-                    name: "cnoteDate",
+                    name: "docketDate",
                     label: "C Note Date",
                     placeholder: "C Note Date",
                     type: "date",
@@ -33,7 +33,12 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'C Note Date is required'
+                        }
+                    ]
 
                 },
                 {
@@ -47,12 +52,17 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Billing Party is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
                 {
-                    name: "FromCity",
+                    name: "fromCity",
                     label: "From City",
                     placeholder: "From City",
                     type: "dropdown",
@@ -62,14 +72,18 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'From City is required'
+                        }
+                    ],
+                    additionalData: {
                         showNameAndValue: true
-                    }, functions: {
-                        onModel: 'getFromCity',
                     }
                 },
                 {
-                    name: "ToCity",
+                    name: "toCity",
                     label: "To City",
                     placeholder: "To City",
                     type: "dropdown",
@@ -79,7 +93,12 @@ export class EwayBillControls {
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'To City is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
@@ -88,115 +107,175 @@ export class EwayBillControls {
         this.consignorFields =
             [
                 {
-                    name: 'ConsignorName', label: 'Consignor Name', placeholder: 'Consignor Name', type: 'dropdown', value: '',
+                    name: 'consignorName', label: 'Consignor Name', placeholder: 'Consignor Name', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'ConsignorName is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
                 }
                 ,
                 {
-                    name: 'ConsignorGSTINNO', label: 'GSTIN NO', placeholder: 'GSTIN NO', type: 'text', value: '',
+                    name: 'consignorGSTINNO', label: 'GSTIN NO', placeholder: 'GSTIN NO', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
                 },
                 {
-                    name: 'ConsignorCity', label: 'Consignor City', placeholder: 'Consignor City', type: 'dropdown', value: '',
+                    name: 'consignorCity', label: 'Consignor City', placeholder: 'Consignor City', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'ConsignorCity is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
                 },
                 {
-                    name: 'ConsignorPincode', label: 'Consignor Pincode', placeholder: 'Consignor Pincode', type: 'dropdown', value: '',
+                    name: 'consignorPinCode', label: 'Consignor Pincode', placeholder: 'Consignor Pincode', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor Pincode is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
                 },
                 {
-                    name: 'ConsignorTelNo', label: 'Consignor TelephoneNo', placeholder: 'Consignor TelephoneNo', type: 'text', value: '',
+                    name: 'consignorTelephoneNo', label: 'Consignor TelephoneNo', placeholder: 'Consignor TelephoneNo', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor TelephoneNo is required'
+                        }
+                    ],
                 }
                 ,
                 {
-                    name: 'ConsignorMobNo', label: 'Consignor MobileNo', placeholder: 'Consignor MobileNo', type: 'text', value: '',
+                    name: 'consignorMobileNo', label: 'Consignor MobileNo', placeholder: 'Consignor MobileNo', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor MobileNo is required'
+                        }
+                    ],
                 }
                 ,
                 {
-                    name: 'ConsignorAddress', label: 'Consignor Address', placeholder: 'Consignor Address', type: 'text', value: '',
+                    name: 'consignorAddress', label: 'Consignor Address', placeholder: 'Consignor Address', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor Address is required'
+                        }
+                    ],
                 }
             ];
         this.consigneeFields =
             [
                 {
-                    name: 'ConsigneeName', label: 'Consignee Name', placeholder: 'Consignee Name', type: 'dropdown', value: '',
+                    name: 'consigneeName', label: 'Consignee Name', placeholder: 'Consignee Name', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignor Name is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
                 }
                 ,
                 {
-                    name: 'ConsigneeGSTINNO', label: 'GSTIN NO', placeholder: 'GSTIN NO', type: 'text', value: '',
+                    name: 'consigneeGSTINNO', label: 'GSTIN NO', placeholder: 'GSTIN NO', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
                 },
                 {
-                    name: 'ConsigneeCity', label: 'Consignee City', placeholder: 'Consignee City', type: 'dropdown', value: '',
+                    name: 'consigneeCity', label: 'Consignee City', placeholder: 'Consignee City', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee City is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
                 },
                 {
-                    name: 'ConsigneePincode', label: 'Consignee Pincode', placeholder: 'Consignee Pincode', type: 'dropdown', value: '',
+                    name: 'consigneePincode', label: 'Consignee Pincode', placeholder: 'Consignee Pincode', type: 'dropdown', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee Pincode is required'
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: true
                     }
                 },
                 {
-                    name: 'ConsigneeTelNo', label: 'Consignee TelephoneNo', placeholder: 'Consignee TelephoneNo', type: 'text', value: '',
+                    name: 'consigneeTelNo', label: 'Consignee TelephoneNo', placeholder: 'Consignee TelephoneNo', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee TelephoneNo is required'
+                        }
+                    ],
                 }
                 ,
                 {
-                    name: 'ConsigneeMobNo', label: 'Consignee MobileNo', placeholder: 'Consignee MobileNo', type: 'text', value: '',
+                    name: 'consigneeMobNo', label: 'Consignee MobileNo', placeholder: 'Consignee MobileNo', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee Mobile No is required'
+                        }
+                    ],
                 }
                 ,
                 {
-                    name: 'ConsigneeAddress', label: 'Consignee Address', placeholder: 'Consignee Address', type: 'text', value: '',
+                    name: 'consigneeAddress', label: 'Consignee Address', placeholder: 'Consignee Address', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Consignee Address is required'
+                        }
+                    ],
                 }
             ];
         this.appointmentControlArray =
@@ -250,18 +329,47 @@ export class EwayBillControls {
         this.containerControlArray =
             [
                 {
-                    name: 'ContainerNo1', label: 'Container No. 1', placeholder: 'Container No. 1', type: 'text', value: '',
+                    name: 'containerNo1', label: 'Container No. 1', placeholder: 'Container No. 1', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
 
                 },
                 {
-                    name: "ContainerSize1",
+                    name: "containerSize1",
                     label: "Size",
                     placeholder: "Size",
-                    type: "dropdown",
-                    value: "",
+                    type: "Staticdropdown",
+                    value: [
+                        {
+                            "value":"20 FT",
+                            "name":"20 FT"
+                        },
+                        {
+                            "value": "40 FT",
+                            "name": "40 FT"
+                        },
+                        {
+                            "value": "45 FT",
+                            "name": "45 FT"
+                        },
+                        {
+                            "value":"C17FT",
+                            "name": "C17FT"
+                        },
+                        {
+                            "value":"C13FT",
+                            "name": "C13FT"
+                        },
+                        {
+                            "value":"C24FT",
+                            "name": "C24FT"
+                        },
+                        {
+                            "value":"C30FT",
+                            "name": "C30FT"
+                        }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -272,18 +380,47 @@ export class EwayBillControls {
                     }
                 },
                 {
-                    name: 'ContainerNo2', label: 'Container No. 2', placeholder: 'Container No. 2', type: 'text', value: '',
+                    name: 'containerNo2', label: 'Container No. 2', placeholder: 'Container No. 2', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
 
                 },
                 {
-                    name: "ContainerSize2",
+                    name: "containerSize2",
                     label: "Size",
                     placeholder: "Size",
-                    type: "dropdown",
-                    value: "",
+                    type: "Staticdropdown",
+                    value: [
+                        {
+                            "value": "20 FT",
+                            "name": "20 FT"
+                        },
+                        {
+                            "value": "40 FT",
+                            "name": "40 FT"
+                        },
+                        {
+                            "value": "45 FT",
+                            "name": "45 FT"
+                        },
+                        {
+                            "value": "C17FT",
+                            "name": "C17FT"
+                        },
+                        {
+                            "value": "C13FT",
+                            "name": "C13FT"
+                        },
+                        {
+                            "value": "C24FT",
+                            "name": "C24FT"
+                        },
+                        {
+                            "value": "C30FT",
+                            "name": "C30FT"
+                        }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -294,11 +431,48 @@ export class EwayBillControls {
                     }
                 },
                 {
-                    name: "ContainerType",
+                    name: "containerType",
                     label: "Container Type",
                     placeholder: "Container Type",
-                    type: "dropdown",
-                    value: "",
+                    type: "Staticdropdown",
+                    value: [
+                        {
+                            "value": "General Purpose Container",
+                            "name": "General Purpose Container"
+                        },
+                        {
+                            "value": "Flat Rack Container",
+                            "name": "Flat Rack Container"
+                        },
+                        {
+                            "value": "Open Top Container",
+                            "name": "Open Top Container"
+                        },
+                        {
+                            "value": "Double Door Container",
+                            "name": "Double Door Container"
+                        },
+                        {
+                            "value": "High Cube Container",
+                            "name": "High Cube Container"
+                        },
+                        {
+                            "value": "Open Side Container",
+                            "name": "Open Side Container"
+                        },
+                        {
+                            "value": "ISO reefer Container",
+                            "name": "ISO reefer Container"
+                        },
+                        {
+                            "value": "Half Hight Container",
+                            "name": "Half Hight Container"
+                        },
+                        {
+                            "value": "Tank Container",
+                            "name": "Tank Container"
+                        }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -309,11 +483,28 @@ export class EwayBillControls {
                     }
                 },
                 {
-                    name: "ContainerCapacity",
+                    name: "containerCapacity",
                     label: "Container Capacity",
                     placeholder: "Container Capacity",
-                    type: "dropdown",
-                    value: "",
+                    type: "Staticdropdown",
+                    value: [
+                        {
+                            "value": "25000 Kg",
+                            "name": "25000 Kg"
+                        },
+                        {
+                            "value": "27600 Kg",
+                            "name": "27600 Kg"
+                        },
+                        {
+                            "value": "25000 Kg",
+                            "name": "25000 Kg"
+                        },
+                        {
+                            "value": "27600 Kg",
+                            "name": "27600 Kg"
+                        }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -324,49 +515,49 @@ export class EwayBillControls {
                     }
                 },
                 {
-                    name: 'FIELD1', label: 'Booking No', placeholder: 'Booking No', type: 'text', value: '',
+                    name: 'bookingNo', label: 'Booking No', placeholder: 'Booking No', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
 
                 },
                 {
-                    name: 'FIELD2', label: 'Seal No', placeholder: 'Seal No', type: 'text', value: '',
+                    name: 'sealNo', label: 'Seal No', placeholder: 'Seal No', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
 
                 },
                 {
-                    name: 'FIELD3', label: 'Shipping Line', placeholder: 'Shipping Line', type: 'text', value: '',
+                    name: 'shippingLine', label: 'Shipping Line', placeholder: 'Shipping Line', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
 
                 },
                 {
-                    name: 'FIELD4', label: 'Job Order No', placeholder: 'Job Order No', type: 'text', value: '',
+                    name: 'jobOrderNo', label: 'Job Order No', placeholder: 'Job Order No', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
 
                 },
                 {
-                    name: 'FIELD5', label: 'Port', placeholder: 'Port', type: 'text', value: '',
+                    name: 'port', label: 'Port', placeholder: 'Port', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
 
                 },
                 {
-                    name: 'FIELD6', label: 'Job Order No 2', placeholder: 'Job Order No 2', type: 'text', value: '',
+                    name: 'jobOrderNoTwo', label: 'Job Order No 2', placeholder: 'Job Order No 2', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
 
                 },
                 {
-                    name: 'FIELD7', label: 'DEO No.', placeholder: 'DEO No.', type: 'text', value: '',
+                    name: 'deoNo', label: 'DEO No.', placeholder: 'DEO No.', type: 'text', value: '',
                     filterOptions: '', autocomplete: '',
                     displaywith: '', generatecontrol: true, disable: false,
                     Validations: [],
@@ -377,49 +568,94 @@ export class EwayBillControls {
         this.contractControlArray =
             [
                 {
-                    name: 'OrgLoc', label: 'Booking Branch', placeholder: 'Booking Branch', type: 'text', value: '',
+                    name: 'orgLoc', label: 'Booking Branch', placeholder: 'Booking Branch', type: 'text', value: localStorage.getItem("Branch"),
                     filterOptions: '', autocomplete: '',
-                    displaywith: '', generatecontrol: true, disable: false,
+                    displaywith: '', generatecontrol: true, disable: true,
                     Validations: [],
                 },
                 {
-                    name: 'Destination', label: 'Destination', placeholder: 'Destination', type: "dropdown",
+                    name: 'destination', label: 'Destination', placeholder: 'Destination', type: "dropdown",
                     value: "",
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Destination is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
                 {
-                    name: 'PAYTYP', label: 'Payment Type', placeholder: 'Payment Type', type: "dropdown",
-                    value: "",
+                    name: 'payType', label: 'Payment Type', placeholder: 'Payment Type', type: "Staticdropdown",
+                    value: [
+                        {
+                            "value": "PAID",
+                            "name": "PAID"
+                        },
+                        {
+                            "value": "TBB",
+                            "name": "TBB"
+                        },
+                        {
+                            "value": "TO PAY",
+                            "name": "TO PAY"
+                        },
+                        {
+                            "value": "FOC",
+                            "name": "FOC"
+                        }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Payment Type is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
                 {
-                    name: 'SVCTYP', label: 'Service Type', placeholder: 'Service Type', type: "dropdown",
-                    value: "",
+                    name: 'svcType', label: 'Service Type', placeholder: 'Service Type', type: "Staticdropdown",
+                    value: [
+                        {
+                            "value": "LTL",
+                            "name": "LTL"
+                        },
+                        {
+                            "value": "FTL",
+                            "name": "FTL"
+                        },
+                        {
+                            "value": "FCL",
+                            "name": "FCL"
+                        }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Service Type is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
                 {
-                    name: 'Local', label: 'Local', placeholder: 'Local', type: "toggle",
+                    name: 'local', label: 'Local', placeholder: 'Local', type: "toggle",
                     value: "",
                     filterOptions: "",
                     autocomplete: "",
@@ -429,7 +665,7 @@ export class EwayBillControls {
                     Validations: [],
                 },
                 {
-                    name: 'ODA', label: 'ODA', placeholder: 'ODA', type: "toggle",
+                    name: 'oda', label: 'ODA', placeholder: 'ODA', type: "toggle",
                     value: "",
                     filterOptions: "",
                     autocomplete: "",
@@ -439,8 +675,16 @@ export class EwayBillControls {
                     Validations: [],
                 },
                 {
-                    name: 'RSKTY', label: 'Risk Type', placeholder: 'Risk Type', type: "dropdown",
-                    value: "",
+                    name: 'rskty', label: 'Risk Type', placeholder: 'Risk Type', type: "Staticdropdown",
+                    value: [
+                        {
+                            "value": "Carrier's Risk",
+                            "name": "Carrier's Risk"
+                        }, {
+                            "value": "Owner's Risk",
+                            "name": "Owner's Risk"
+                        }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -451,8 +695,53 @@ export class EwayBillControls {
                     }
                 },
                 {
-                    name: 'PKGS', label: 'Packaging Type', placeholder: 'Packaging Type', type: "dropdown",
-                    value: "",
+                    name: 'pkgs', label: 'Packaging Type', placeholder: 'Packaging Type', type: "Staticdropdown",
+                    value: [
+                        {
+                            "value": "Wooden Box",
+                            "name": "Wooden Box"
+                        },
+                        {
+                            "value": "BAG",
+                            "name": "BAG"
+                        },
+                        {
+                            "value": "Drum",
+                            "name": "Drum"
+                        },
+                        {
+                            "value": "Cars",
+                            "name": "Cars"
+                        },
+                        {
+                            "value": "Plastic drum",
+                            "name": "Plastic drum"
+                        },
+                        {
+                            "value": "Metal drum",
+                            "name": "Metal drum"
+                        },
+                        {
+                            "value": "Lose Cargo",
+                            "name": "Lose Cargo"
+                        },
+                        {
+                            "value": "Gunny Bundel",
+                            "name": "Gunny Bundel"
+                        },
+                        {
+                            "value": "Plastic crate",
+                            "name": "Plastic crate"
+                        },
+                        {
+                            "value": "Metal Box",
+                            "name": "Metal Box"
+                        },
+                        {
+                            "value": "Carton Box ",
+                            "name": "Carton Box "
+                        }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -464,81 +753,127 @@ export class EwayBillControls {
                     }
                 },
                 {
-                    name: 'TRN', label: 'Product', placeholder: 'Product', type: "dropdown",
-                    value: "",
+                    name: 'trn', label: 'Product', placeholder: 'Product', type: "Staticdropdown",
+                    value: [
+                        {
+                            "value": "AIR",
+                            "name": "AIR"
+                        },
+                        {
+                            "value": "ROAD",
+                            "name": "ROAD"
+                        },
+                        {
+                            "value": "RAIL",
+                            "name": "RAIL"
+                        },
+                        {
+                            "value": "EXPRESS",
+                            "name": "EXPRESS"
+                        },
+                        {
+                            "value": "Road 2W",
+                            "name": "Road 2W"
+                        },
+                        {
+                            "value": "Road 4W",
+                            "name": "Road 4W"
+                        }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
-                    Validations: [], additionalData: {
+                    Validations: [
+                        {
+                            name: 'required',
+                            message: 'Product is required'
+                        }
+                    ], additionalData: {
                         showNameAndValue: true
                     }
                 },
             ];
         this.totalSummaryControlArray = [
             {
-                name: 'CFT_RATIO', label: 'CFT Ratio', placeholder: 'CFT Ratio', type: 'text', value: '',
+                name: 'cft_ratio', label: 'CFT Ratio', placeholder: 'CFT Ratio', type: 'text', value: 0,
+                filterOptions: '', autocomplete: '',
+                displaywith: '', generatecontrol: true, disable: true,
+                Validations: [],
+            },
+            {
+                name: 'cft_tot', label: 'CFT Total', placeholder: 'CFT Total', type: 'text', value: 0,
+                filterOptions: '', autocomplete: '',
+                displaywith: '', generatecontrol: true, disable: true,
+                Validations: [],
+            },
+            {
+                name: 'actualwt', label: 'Actual Weight', placeholder: 'Actual Weight', type: 'text', value: 0,
+                filterOptions: '', autocomplete: '',
+                displaywith: '', generatecontrol: true, disable: true,
+                Validations: [],
+            },
+            {
+                name: 'chrgwt', label: 'Charged Weight', placeholder: 'Charged Weight', type: 'text', value: 0,
+                filterOptions: '', autocomplete: '',
+                displaywith: '', generatecontrol: true, disable: false,
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'Charged Weight is required'
+                    }
+                ],
+            },
+            {
+                name: 'edd', label: 'EDD', placeholder: 'EDD', type: 'date', value: '',
                 filterOptions: '', autocomplete: '',
                 displaywith: '', generatecontrol: true, disable: false,
                 Validations: [],
             },
             {
-                name: 'CFT_TOT', label: 'CFT Total', placeholder: 'CFT Total', type: 'text', value: '',
-                filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
-            },
-            {
-                name: 'CHRGWT', label: 'Charged Weight', placeholder: 'Charged Weight', type: 'text', value: '',
-                filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
-            },
-            {
-                name: 'EDD', label: 'EDD', placeholder: 'EDD', type: 'date', value: '',
-                filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
-            },
-            {
-                name: 'F_VOL', label: 'Volumetric', placeholder: 'Volumetric', type: "toggle",
+                name: 'f_vol', label: 'Volumetric', placeholder: 'Volumetric', type: "toggle",
                 value: "",
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
+                Validations: [
+                    {
+                        name: 'required',
+                        message: 'Volumetric is required'
+                    }
+                ],
+            },
+            {
+                name: 'totalDeclaredValue', label: 'Total Declared Value', placeholder: 'Total Declared Value', type: 'text', value: 0,
+                filterOptions: '', autocomplete: '',
+                displaywith: '', generatecontrol: true, disable: true,
+                Validations: []
+            },
+            {
+                name: 'totalChargedNoOfpkg', label: 'Charged No of Pkg.', placeholder: 'Charged No of Pkg.', type: 'text', value:0,
+                filterOptions: '', autocomplete: '',
+                displaywith: '', generatecontrol: true, disable: true,
                 Validations: [],
             },
             {
-                name: 'TotalDeclaredValue', label: 'Total Declared Value', placeholder: 'Total Declared Value', type: 'text', value: '',
+                name: 'totalPartQuantity', label: 'Total Part Quantity', placeholder: 'Total Part Quantity', type: 'text', value:0,
                 filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
-            },
-            {
-                name: 'TotalChargedNoofPackages', label: 'Charged No of Pkg.', placeholder: 'Charged No of Pkg.', type: 'text', value: '',
-                filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
-                Validations: [],
-            },
-            {
-                name: 'TotalPartQuantity', label: 'Total Part Quantity', placeholder: 'Total Part Quantity', type: 'text', value: '',
-                filterOptions: '', autocomplete: '',
-                displaywith: '', generatecontrol: true, disable: false,
+                displaywith: '', generatecontrol: true, disable: true,
                 Validations: [],
             },
         ];
         this.ewayBillControlArray = [
             {
-                name: 'EWBNO', label: 'EWB Number', placeholder: 'EWB Number', type: 'text', value: '',
+                name: 'ewbNo', label: 'EWB Number', placeholder: 'EWB Number', type: 'text', value: '',
                 filterOptions: '', autocomplete: '',
                 displaywith: '', generatecontrol: true, disable: false,
                 Validations: [],
             },
             {
-                name: "EWBDATE",
+                name: "ewbDate",
                 label: "EWB Date",
                 placeholder: "EWB Date",
                 type: "date",
@@ -551,7 +886,7 @@ export class EwayBillControls {
                 Validations: [],
             },
             {
-                name: 'IsMultipleEWB', label: 'Multiple EWB', placeholder: 'Multiple EWB', type: "toggle",
+                name: 'isMultipleEWB', label: 'Multiple EWB', placeholder: 'Multiple EWB', type: "toggle",
                 value: "",
                 filterOptions: "",
                 autocomplete: "",
@@ -561,7 +896,7 @@ export class EwayBillControls {
                 Validations: [],
             },
             {
-                name: "EWBEXPIRED",
+                name: "ewbExprired",
                 label: "EWB Expired Date",
                 placeholder: "EWB Expired Date",
                 type: "date",

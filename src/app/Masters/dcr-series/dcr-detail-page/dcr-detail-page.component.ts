@@ -7,6 +7,8 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { DCRControl } from 'src/assets/FormControls/dcrControl';
 import Swal from 'sweetalert2';
 import { ReAllocateDcrComponent } from '../re-allocate-dcr/re-allocate-dcr.component';
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dcr-detail-page',
@@ -47,6 +49,7 @@ export class DcrDetailPageComponent implements OnInit {
   type: any;
   action: any;
   actionStatus: any;
+  docData: any;
   constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, public dialog: MatDialog) {
     if (this.route.getCurrentNavigation()?.extras != null) {
       this.type = this.route.getCurrentNavigation().extras?.state?.additionalData;
@@ -59,7 +62,7 @@ export class DcrDetailPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.intializeFormControls();
-    this.bindData();
+    this.bindDropdown();
   }
   // Handle function calls
   functionCallHandler($event) {
@@ -83,25 +86,106 @@ export class DcrDetailPageComponent implements OnInit {
     this.dcrDetailForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   bindData() {
-    const locdet = this.data?.allotedBy && this.data?.allotedByName ? `${this.data.allotedBy}-${this.data.allotedByName}` : '';
-    const mappings = {
-      'documentType': 'docType',
-      'queryNumber': 'docSrTo',
-      'bookNumber': 'bookCode',
-      'seriesStartEnd': 'fromTo',
-      'totalLeaves': 'totLeaf',
-      'location': 'location',
-      'usedLeaves': 'used',
-      'person': 'allotedByUser',
-      'personCat': 'allotedType',
-      'locationHierarchy': 'locationHierarchy',
-      'status': 'status'
-    };
-    for (let key in mappings) {
-      let value = this.data?.[mappings[key]] || '';
-      if (key === 'location') { value = locdet; }
-      this.dcrDetailForm.controls[key].setValue(value);
+    const companyCode = parseInt(localStorage.getItem("companyCode"));
+    // Helper function to generate request object
+    function generateRequest(collection) {
+      return {
+        companyCode,
+        type: "masters",
+        collection,
+      };
     }
+
+    // Prepare the requests for different collections
+    const locationReq = generateRequest("location_detail");
+    const userReq = generateRequest("user_master");
+    const vendorReq = generateRequest("vendor_detail");
+    const customerReq = generateRequest("customer_detail");
+
+    // Create separate observables for each HTTP request
+    const locationObs = this.masterService.masterPost('common/getall', locationReq);
+    const userObs = this.masterService.masterPost('common/getall', userReq);
+    const vendorObs = this.masterService.masterPost('common/getall', vendorReq);
+    const customerObs = this.masterService.masterPost('common/getall', customerReq);
+
+    // Use forkJoin to make parallel requests and get all data at once
+    forkJoin([locationObs, userObs, vendorObs, customerObs]).pipe(
+      map(([locationRes, userRes, vendorRes, customerRes]) => {
+        // Combine all the data into a single object
+        return {
+          locationData: locationRes?.data,
+          userData: userRes?.data,
+          vendorData: vendorRes?.data,
+          customerData: customerRes?.data,
+        };
+      })
+    ).subscribe((mergedData) => {
+      // Access the merged data here
+      const locdet = mergedData.locationData.map(element => ({
+        name: element.locName,
+        value: element.locCode,
+        type: 'L',
+      }));
+
+      const userdet = mergedData.userData.map(element => ({
+        name: element.name,
+        value: element.userId,
+        type: 'E',
+      }));
+
+      const vendordet = mergedData.vendorData.map(element => ({
+        name: element.vendorName,
+        value: element.vendorCode,
+        type: 'B',
+      }));
+
+      const custdet = mergedData.customerData.map(element => ({
+        name: element.customerName,
+        value: element.customerCode,
+        type: 'C',
+      }));
+
+      // Combine all arrays into one flat array with extra data indicating the sections
+      const allData = [
+        { name: '---Location---', value: '', type: 'L' },
+        ...locdet,
+        { name: '---Employee---', value: '', type: 'E' },
+        ...userdet,
+        { name: '---BA---', value: '', type: 'B' },
+        ...vendordet,
+        { name: '---Customer---', value: '', type: 'C' },
+        ...custdet,
+      ];
+
+      // Options for allocateTo dropdown
+      const hierarchyLoc = mergedData.locationData.find(optItem => optItem.locCode === this.data.allotTo)
+      const allocateTo = allData.find(optItem => optItem.value === this.data.allocateTo);
+      const allotTo = locdet.find(optItem => optItem.value === this.data.allotTo);
+      const series = this.data?.seriesFrom && this.data?.seriesTo ? `${this.data.seriesFrom} - ${this.data.seriesTo}` : '';
+      const mappings = {
+        'queryNumber': 'seriesFrom',
+        'bookNumber': 'bookCode',
+        'seriesStartEnd': 'fromTo',
+        'totalLeaves': 'totalLeaf',
+        'location': 'allotTo',
+        'usedLeaves': 'usedLeaves',
+        'person': 'allocateTo',
+        'personCat': 'type',
+        'locationHierarchy': 'locationHierarchy',
+        'status': 'status',
+      };
+      for (let key in mappings) {
+        let value = this.data?.[mappings[key]] || '';
+        if (key === 'seriesStartEnd') { value = series; }
+        if (key === 'person') { value = allocateTo ? `${allocateTo.value} - ${allocateTo.name}` : ''; }
+        if (key === 'location') { value = allotTo ? `${allotTo.value} - ${allotTo.name}` : ''; }
+        if (key === 'locationHierarchy') { value = hierarchyLoc ? `${hierarchyLoc.reportLevel}` : ''; }
+        if (key === 'usedLeaves') { value = this.data.usedLeaves; }
+        this.dcrDetailForm.controls[key].setValue(value);
+      }
+      // Set 'personCat' form control based on 'type'
+      this.dcrDetailForm.controls['personCat'].setValue(this.data?.type === 'E' ? 'Employee' : this.data?.type === 'C' ? 'Customer' : this.data?.type === 'L' ? 'Location' : 'BA');
+    });
   }
   close() {
     window.history.back();
@@ -109,7 +193,7 @@ export class DcrDetailPageComponent implements OnInit {
   getDcrHistoryData() {
     this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
       this.historyData = res.dcrTrackHistoryData[0];
-      this.historyDet = this.historyData.filter(item => parseInt(item.docKey) === parseInt(this.data.docKey)).map((item) => {
+      this.historyDet = this.historyData.filter(item => parseInt(item.docKey) === parseInt(this.data.bookCode)).map((item) => {
         item['location'] = item.allotedLoc + ' : ' + item.allotedLocName;
         return item;
       });
@@ -139,12 +223,17 @@ export class DcrDetailPageComponent implements OnInit {
     else {
       this.route.navigate(['Masters/DocumentControlRegister/SplitDCR'], {
         state: {
-          data: '',
+          data: this.data,
         }
       });
     }
-    // Rest of the code for the manage() function
   }
-
-
+  bindDropdown() {
+    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
+      this.docData = res.documentTypeDropDown;
+      const Select = this.docData.find(x => x.value == this.data.documentType)
+      this.dcrDetailForm.get('documentType').setValue(Select);
+      this.bindData();
+    });
+  }
 }

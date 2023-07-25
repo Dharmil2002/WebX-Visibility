@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from "sweetalert2";
 
 @Component({
     selector: 'app-city-master-list',
@@ -11,12 +12,14 @@ export class CityMasterListComponent implements OnInit {
     csv: any[];
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     toggleArray = ["isActive", "odaFlag"]
-    linkArray = []
+    tableData: any[];
+    linkArray = [];
+    csvFileName: string;
     columnHeader = {
         "srNo": "Sr No",
         'cityName': 'City Name',
-        'stateName': 'State',
-        'zoneName': 'Zone',
+        'state': 'State',
+        'zone': 'Zone',
         'odaFlag': 'ODA Flag',
         "isActive": "Active Flag",
         "actions": "Actions"
@@ -25,9 +28,9 @@ export class CityMasterListComponent implements OnInit {
         'cityId': "City Code",
         'companyCode': "CompanyCode",
         'cityName': "City Name",
-        'stateName': "State Name",
-        'zoneName': "Zone Name",
-        'isActive': "IsActive",
+        'state': "State Name",
+        'zone': "Zone Name"
+
     }
     breadScrums = [
         {
@@ -39,26 +42,62 @@ export class CityMasterListComponent implements OnInit {
     dynamicControls = {
         add: true,
         edit: true,
-        csv: false
+        csv: true
     }
     addAndEditPath: string;
     constructor(private masterService: MasterService) {
         this.addAndEditPath = "/Masters/CityMaster/AddCity";
     }
     ngOnInit(): void {
-        //throw new Error("Method not implemented.");
+        this.csvFileName = "City Details"
         this.getCityDetails();
     }
     getCityDetails() {
-        //throw new Error("Method not implemented."); CityData
-        // Fetch data from the JSON endpoint
-            this.masterService.getJsonFileDetails('masterUrl').subscribe(res => { 
-            this.data = res;
-            this.csv = this.data['cityData']
-            // Extract relevant data arrays from the response
-            //const tableArray = this.data['tabledata'];
-            this.tableLoad = false;
+        let req = {
+            "companyCode": parseInt(localStorage.getItem("companyCode")),
+            "type": "masters",
+            "collection": "city_detail"
         }
-        );
+        this.masterService.masterPost('common/getall', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Generate srno for each object in the array
+                    const dataWithSrno = res.data.map((obj, index) => {
+                        return {
+                            ...obj,
+                            srNo: index + 1
+                        };
+                    });
+                    this.csv = dataWithSrno;
+                    this.tableLoad = false;
+                }
+            }
+        })
+    }
+    IsActiveFuntion(det) {
+        let id = det.id;
+        // Remove the "id" field from the form controls
+        delete det.id;
+        delete det.srNo;
+        let req = {
+            companyCode: parseInt(localStorage.getItem("companyCode")),
+            type: "masters",
+            collection: "city_detail",
+            id: id,
+            updates: det
+        };
+        this.masterService.masterPut('common/update', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                }
+            }
+        });
     }
 }

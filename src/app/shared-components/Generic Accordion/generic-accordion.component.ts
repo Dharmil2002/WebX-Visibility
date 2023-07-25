@@ -12,7 +12,8 @@ export class GenericAccordionComponent implements OnInit {
   @Input() AccordionForm: any;
   @Input() fafIconData:string
   @Input() Icondata:string  
-
+  @Input() showSaveAndCancelButton: false;
+  @Input() showSaveAndCancelButtonV: false;
   @Output() functionCallEmitter = new EventEmitter();
 
   expandedIndex = 0;
@@ -20,14 +21,12 @@ export class GenericAccordionComponent implements OnInit {
   accordionTitles: string[];
 
   // here showSaveAndCancelButton is false as we show that button from this component directly. see its html for better understanding.
-  showSaveAndCancelButton: false;
+
 
   //Called after the constructor, initializing input properties, 
   ngOnInit(): void {
     //extracting accordion titles from AccordionGroup.
     this.accordionTitles = Object.keys(this.accordionGroup);
-    console.log(this.AccordionForm);
-    console.log(this.accordionGroup);
     
   }
   functionCallHandler($event){
@@ -39,7 +38,6 @@ export class GenericAccordionComponent implements OnInit {
   save(){
     let context = {};
     context['functionName']='save';
-    console.log("called Save",this.AccordionForm);
     // calling 'save' named function of parent component. 
     this.functionCallEmitter.emit(context);
     

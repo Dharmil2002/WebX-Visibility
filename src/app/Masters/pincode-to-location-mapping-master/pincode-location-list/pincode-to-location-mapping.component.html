@@ -1,0 +1,11 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="pinLocTableForm">
+        <app-form-webxpress [form]="pinLocTableForm" [formData]="jsonControlArray"
+            (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+    <app-table-boilerplate *ngIf="tableData" [tableData]="tableData" [columnHeader]="displayedColumns1"
+        title="Pincode to Location Mapping Master" (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
+        (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
+        [ActionObject]="actionObject"></app-table-boilerplate>
+</app-common-wrapper-webxpress>

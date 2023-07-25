@@ -15,8 +15,8 @@
         [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)">
     </generic-table-webxpress> -->
     <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
-    [csvFileName]="csvFileName"  [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
-    [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
-    [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)">
-</generic-table-webxpress>
+        [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
+        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)">
+    </generic-table-webxpress>
 </app-common-wrapper-webxpress>

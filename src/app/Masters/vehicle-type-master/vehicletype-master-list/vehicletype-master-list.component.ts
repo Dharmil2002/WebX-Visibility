@@ -9,6 +9,7 @@ export class VehicletypeMasterListComponent implements OnInit {
     addAndEditPath: string
     csvFileName: string;
     csv: any[];
+    companyCode: any = parseInt(localStorage.getItem("companyCode"));
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     // Define column headers for the table
     columnHeader =
@@ -41,16 +42,6 @@ export class VehicletypeMasterListComponent implements OnInit {
       "capacityDiscount": "Capacity Discount",
       "tyreRotationAlertKMs": "Tyre Rotation Alert KMs",
       "noOfPackages": "No. Of Packages",
-      "vehicleFillRate": "Vehicle Fill Rate",
-      "averageSpeed": "Average Speed",
-      "variableCost": "Variable Cost",
-      "availableFrom": "Available From",
-      "availableTill": "Available Till",
-      "loadingTime": "Loading Time",
-      "unloadingTime": "Unloading Time",
-      "weight": "Weight",
-      "maxVisitingLocations": "Max Visiting Locations",
-  
     }
     breadScrums = [
         {
@@ -70,19 +61,29 @@ export class VehicletypeMasterListComponent implements OnInit {
       this.addAndEditPath = "/Masters/VehicleTypeMaster/AddVehicleTypeMaster"; 
     }
     ngOnInit(): void {
-        //throw new Error("Method not implemented.");
         this.getVehicleTypeDetails();
         this.csvFileName = "Vehicle Type Details"  //setting csv file Name so file will be saved as per this name
     }
     getVehicleTypeDetails() {
-        //throw new Error("Method not implemented.");
-        // Fetch data from the JSON endpoint
-          this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-            this.data = res;
-            this.csv = this.data['vehicleTypeMaster']
-            // Extract relevant data arrays from the response
-            this.tableLoad = false;
-        }
-        );
+        let req = {
+          companyCode: this.companyCode,
+          "type": "masters",
+          "collection": "vehicleType_detail"
+      }
+      this.masterService.masterPost('common/getall', req).subscribe({
+          next: (res: any) => {
+              if (res) {
+                  // Generate srno for each object in the array
+                  const dataWithSrno = res.data.map((obj, index) => {
+                      return {
+                          ...obj,
+                          srNo: index + 1
+                      };
+                  });
+                  this.csv = dataWithSrno;
+                  this.tableLoad = false;
+              }
+          }
+      })
     }
 }

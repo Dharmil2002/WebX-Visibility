@@ -6,13 +6,13 @@ export class UserControl {
   constructor(UserTable: UserMaster, isUpdate: boolean) {
     this.UserControlArray = [
       {
-        name: "UserId",
+        name: "userId",
         label: "User ID",
         placeholder: "Enter User ID",
         type: "text",
-        value: UserTable.userId,
+        value: isUpdate ? UserTable.userId : "System Generated",//UserTable.userId,//UserTable.userId,
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -49,11 +49,62 @@ export class UserControl {
         ],
       },
       {
-        name: "EmpId",
+        name: "userpassword",
+        label: "Password",
+        placeholder: "Enter Password",
+        type: "password",
+        value: UserTable.userPwd,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Password required!",
+          },
+          {
+            name: "pattern",
+            message:
+              "Please enter password with 6-15 chars, 1 upper/lower case, 1 digit & 1 special char (!@#$%^&*_=+-)",
+            pattern:
+              "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{6,15}$",
+          },
+        ],
+        additionalData: {
+          // showPassword: false,
+          inputType: "password",
+        },
+        functions: {
+          onChange: "getUpdateChangedPassword",
+        },
+      },
+      {
+        name: "confirmpassword",
+        label: "Confirm Password",
+        placeholder: "Enter Confirm Password",
+        type: "password",
+        value: UserTable.userPwd,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Confirm Password required!",
+          },
+        ],
+        additionalData: {
+          // showPassword: false,
+          inputType: "password",
+        },
+        functions: {
+          onChange: "changedPassword",
+        },
+      },
+      {
+        name: "internalId",
         label: "Intenal ID",
         placeholder: "Enter Intenal ID",
         type: "text",
-        value: UserTable.internalID,
+        value: UserTable.internalId,
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -69,7 +120,7 @@ export class UserControl {
         ],
       },
       {
-        name: "PasswordQues",
+        name: "secretQuestion",
         label: "Secret Question",
         placeholder: "Enter Secret Question",
         type: "text",
@@ -84,7 +135,7 @@ export class UserControl {
         ],
       },
       {
-        name: "PasswordAns",
+        name: "secretAnswer",
         label: "Secret Answer",
         placeholder: "Enter Secret Answer",
         type: "text",
@@ -117,30 +168,24 @@ export class UserControl {
         disable: false
       },
       {
-        name: 'DOB', label: 'Birth date', placeholder: 'Birth date', type: 'date', value: UserTable.dateOfBirth, filterOptions: '', autocomplete: '', displaywith: '',
+        name: 'dateOfBirth', label: 'Birth date', placeholder: 'Birth date', type: 'date', value: UserTable.dateOfBirth, filterOptions: '', autocomplete: '', displaywith: '',
         generatecontrol: true, disable: false, Validations: [],
         additionalData: {
-          maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
-          minDate: new Date("01 Jan 1900")
         }
       },
       {
-        name: "DOJ_ORG",
+        name: "dateOfJoining",
         label: "Date Of Joining",
         placeholder: "select Date Of Joining",
         type: "date",
         value: UserTable.dateOfJoining,
         generatecontrol: true,
         disable: false,
-        Validations: [],
-        additionalData: {
-          maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
-          minDate: new Date("01 Jan 1900")
-        }
+        Validations: []
       },
       {
-        name: 'BranchCode', label: "Location", placeholder: "Select Location", type: 'dropdown',
-        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: 'branchCode', label: "Location", placeholder: "Select Location", type: 'dropdown',
+        value: UserTable.branchCode, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -158,19 +203,19 @@ export class UserControl {
           showNameAndValue: false
         }
       },
-
       {
-        name: 'UserLocations',
+        name: 'multiLocation',
         label: 'Multi Locations Access',
         placeholder: 'Multi Locations Access',
         type: 'multiselect',
         value: '',
         Validations: [],
         additionalData: {
+         
           isIndeterminate: false,
           isChecked: false,
-          support: "UserLocationscontrolHandler",
-          showNameAndValue: true,
+          support: "userLocationscontrolHandler",
+          showNameAndValue: false,
           Validations: [{
             name: "",
             message: ""
@@ -178,12 +223,9 @@ export class UserControl {
         },
         generatecontrol: true, disable: false
       },
-
-
-
       {
-        name: 'User_Type', label: "User Status", placeholder: "Select User Status", type: 'dropdown',
-        value: UserTable.User_Type, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: 'userStatus', label: "User Status", placeholder: "Select User Status", type: 'dropdown',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -198,12 +240,12 @@ export class UserControl {
           }
         ],
         additionalData: {
-          showNameAndValue: true
+          showNameAndValue: false
         }
       },
       {
-        name: 'emptype', label: "User Type", placeholder: "Select User Type", type: 'dropdown',
-        value: UserTable.name, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: 'userType', label: "User Type", placeholder: "Select User Type", type: 'dropdown',
+        value: UserTable.userType, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -218,12 +260,12 @@ export class UserControl {
           }
         ],
         additionalData: {
-          showNameAndValue: true
+          showNameAndValue: false
         }
       },
       {
-        name: 'ManagerId', label: "Manager Id", placeholder: "Select Manager Id", type: 'dropdown',
-        value: UserTable.managerId, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: 'managerId', label: "Manager Id", placeholder: "Select Manager Id", type: 'dropdown',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -238,12 +280,12 @@ export class UserControl {
           }
         ],
         additionalData: {
-          showNameAndValue: true
+          showNameAndValue: false
         }
       },
       {
-        name: 'CountryCode', label: "Country Code", placeholder: "Country Code", type: 'dropdown',
-        value: UserTable.CountryCode, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: 'country', label: "Country Code", placeholder: "Country Code", type: 'dropdown',
+        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -258,11 +300,11 @@ export class UserControl {
           }
         ],
         additionalData: {
-          showNameAndValue: true
+          showNameAndValue: false
         }
       },
       {
-        name: "mobileno",
+        name: "mobileNo",
         label: "Mobile",
         placeholder: "Enter mobileno",
         type: "number",
@@ -283,7 +325,7 @@ export class UserControl {
         ],
       },
       {
-        name: "EmailId",
+        name: "emailId",
         label: "Email ID",
         placeholder: "Enter Email ID",
         type: "text",
@@ -305,8 +347,8 @@ export class UserControl {
         }
       },
       {
-        name: 'ROLEID', label: "User Role", placeholder: "Select User Role", type: 'dropdown',
-        value: UserTable.Role, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: 'role', label: "User Role", placeholder: "Select User Role", type: 'dropdown',
+        value: UserTable.roleId, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
             name: "required",
@@ -321,31 +363,11 @@ export class UserControl {
           }
         ],
         additionalData: {
-          showNameAndValue: true
+          showNameAndValue: false
         }
       },
-      // {
-      //   name: 'DeptId', label: "Department", placeholder: "Select Department", type: 'text',
-      //   value:UserTable.deptId, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-      //   Validations: [
-      //       // {
-      //       //     name: "required",
-      //       //     message: "Department is required.."
-      //       // },
-      //       {
-      //           name: "autocomplete",
-      //       },
-      //       {
-      //           name: "invalidAutocomplete",
-      //           message: "Choose proper value",
-      //       }
-      //   ],
-      //   additionalData: {
-      //       showNameAndValue: true
-      //   }
-      // },
       {
-        name: "resi_addr",
+        name: "residentialAddress",
         label: "Residential Address",
         placeholder: "Enter Residential Address",
         type: "text",
@@ -360,7 +382,7 @@ export class UserControl {
         ],
       },
       {
-        name: "DivisioncontrolHandler",
+        name: "multiDivisionAccess",
         label: "Multi Division Access",
         placeholder: "Multi Division Access",
         type: "multiselect",
@@ -379,8 +401,8 @@ export class UserControl {
         additionalData: {
           isIndeterminate: false,
           isChecked: false,
-          support: "Division",
-          showNameAndValue: true,
+          support: "division",
+          showNameAndValue: false,
           Validations: [{
             name: "",
             message: ""
@@ -388,7 +410,7 @@ export class UserControl {
         }
       },
       {
-        name: "Status",
+        name: "isActive",
         label: "Active Flag",
         placeholder: "",
         type: "toggle",
@@ -397,10 +419,8 @@ export class UserControl {
         disable: false,
         Validations: [],
       },
-
-
       {
-        name: 'Division',
+        name: 'division',
         label: 'Multi Division Access',
         placeholder: 'Multi Division Access',
         type: '',
@@ -419,40 +439,7 @@ export class UserControl {
           }
         ],
         generatecontrol: false, disable: false
-      },
-      {
-        name: 'DivId',
-        label: '',
-        placeholder: '',
-        type: '',
-        value: '',
-        Validations: [{
-          name: "",
-          message: ""
-        }],
-        generatecontrol: false, disable: false
-      },
-      {
-        name: 'DivDesc',
-        label: '',
-        placeholder: '',
-        type: '',
-        value: '',
-        Validations: [{
-          name: "",
-          message: ""
-        }],
-        generatecontrol: false, disable: false
-      },
-      {
-        name: 'LastUpdatedBy',
-        label: 'LastUpdatedBy',
-        placeholder: 'LastUpdatedBy',
-        type: 'text',
-        value: localStorage.getItem("UserName"),
-        Validations: [],
-        generatecontrol: false, disable: false
-      },
+       },
       {
         name: 'CompanyCode',
         label: 'Company Code',
@@ -463,11 +450,11 @@ export class UserControl {
         generatecontrol: false, disable: false
       },
       {
-        name: 'EntryBy',
+        name: 'entryBy',
         label: 'Entry By',
         placeholder: 'Entry By',
         type: 'text',
-        value: localStorage.getItem("UserName"),
+        value: '',
         Validations: [],
         generatecontrol: false, disable: false
       },
@@ -497,9 +484,9 @@ export class UserControl {
             name: "",
           },
         ],
-      },
+       },
       {
-        name: "UserLocationscontrolHandler",
+        name: "userLocationscontrolHandler",
         label: "Multi Locations Access",
         placeholder: "Multi Locations Access",
         type: "",
@@ -507,7 +494,7 @@ export class UserControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         Validations: [
           {
@@ -527,82 +514,76 @@ export class UserControl {
         },
       },
       {
-        name: "controlHandler1",
-        label: "",
-        placeholder: "Multi Locations Access",
-        type: "",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
+        name: 'entryDate',
+        label: 'Entry Date',
+        placeholder: 'Select Entry Date',
+        type: 'date',
+        value: new Date(), // Set the value to the current date
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
         generatecontrol: false,
-        disable: true,
-        Validations: [
-          {
-            name: "",
-          },
-          {
-            name: "",
-          },
-        ],
-      },
+        disable: false
+      }
+      
     ];
-    if (!isUpdate) {
-      let Password = {
-        name: "UserPwd",
-        label: "Password",
-        placeholder: "Enter Password",
-        type: "password",
-        value: "",
-        generatecontrol: isUpdate ? false : true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Password required!",
-          },
-          {
-            name: "pattern",
-            message:
-              "Please enter password with 8-12 chars, 1 upper/lower case, 1 digit & 1 special char (!@#$%^&*_=+-)",
-            pattern:
-              "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,12}$",
+    // if (!isUpdate) {
+    //   let Password = {
+    //     name: "password",
+    //     label: "Password",
+    //     placeholder: "Enter Password",
+    //     type: "password",
+    //     value: UserTable.userPwd,
+    //     generatecontrol: isUpdate ? false : true,
+    //     disable: false,
+    //     Validations: [
+    //       {
+    //         name: "required",
+    //         message: "Password required!",
+    //       },
+    //       {
+    //         name: "pattern",
+    //         message:
+    //           "Please enter password with 8-12 chars, 1 upper/lower case, 1 digit & 1 special char (!@#$%^&*_=+-)",
+    //         pattern:
+    //           "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,12}$",
 
-          },
-        ],
-        additionalData: {
-          // showPassword: false,
-          inputType: "password"
-        },
+    //       },
+    //     ],
+    //     additionalData: {
+    //       // showPassword: false,
+    //       inputType: "password"
+    //     }, functions: {
+    //       onChange: "getupdateChangedPassword",
+    //     }
 
-      }
-      let ConfirmPassword = {
-        name: "confirmpassword",
-        label: "Confirm Password",
-        placeholder: "Enter Confirm Password",
-        type: "password",
-        value: "",
-        generatecontrol: isUpdate ? false : true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Confirm Password required!",
-          },
-        ],
-        additionalData: {
-          // showPassword: false,
-          inputType: "password"
-        },
-        functions: {
-          onChange: 'ChangedPassword',
-        }
-      }
-      //this code use for sequence in field and that code in sent to index value pass
-      this.UserControlArray.splice(2, 0, Password);
-      this.UserControlArray.splice(3, 0, ConfirmPassword);
-    }
-    // getFormControlsUser() {
-    //   return this.UserControlArray;
+    //   }
+    //   let ConfirmPassword = {
+    //     name: "confirmpassword",
+    //     label: "Confirm Password",
+    //     placeholder: "Enter Confirm Password",
+    //     type: "password",
+    //     value: UserTable.userPwd,
+    //     generatecontrol: isUpdate ? false : true,
+    //     disable: false,
+    //     Validations: [
+    //       {
+    //         name: "required",
+    //         message: "Confirm Password required!",
+    //       },
+    //     ],
+    //     additionalData: {
+    //       // showPassword: false,
+    //       inputType: "password"
+    //     },
+    //     functions: {
+    //       onChange: 'changedPassword',
+    //     }
+    //   }
+    //   //this code use for sequence in field and that code in sent to index value pass
+    //   this.UserControlArray.splice(2, 0, Password);
+    //   this.UserControlArray.splice(3, 0, ConfirmPassword);
     // }
   }
   getFormControlsUser() {

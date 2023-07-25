@@ -99,6 +99,7 @@ export class LoadingSheetViewComponent implements OnInit {
   }
 
   getLoadingSheetDetails() {
+  
     const req = {
       companyCode: this.companyCode,
       type: "operation",
@@ -113,16 +114,16 @@ export class LoadingSheetViewComponent implements OnInit {
       const legPart1 = legParts[0] ? legParts[0].toLowerCase().trim() : '';
       const legPart2 = legParts[1] ? legParts[1].toLowerCase().trim() : '';
     
-      return orgLoc === legPart1 && x.destination.split(':')[1]?.toLowerCase().trim() === legPart2;
+      return orgLoc === legPart1 && x.destination.split(':')[1]?.toLowerCase().trim() === legPart2 && x.lsNo=="";
     });
     
     const shipmentDetails = tableArray.map((item) => ({
       Shipment: item.docketNumber,
       Origin: item.orgLoc,
       Destination: item.destination.split(':')[1].trim(),
-      Packages: item.totalChargedNoOfpkg,
-      KgWeight: item.chrgwt,
-      CftVolume: item.cft_tot,
+      Packages: parseInt(item.totalChargedNoOfpkg),
+      KgWeight: parseInt(item.chrgwt),
+      CftVolume: parseInt(item.cft_tot),
     }));
     this.tableData = shipmentDetails;
 

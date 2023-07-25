@@ -36,10 +36,10 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   columnHeader = {
     "LoadingSheet": "Loading Sheet",
     "leg": "Leg",
-    "Shipment": "Shipments",
-    "Packages": "Packages",
-    "WeightKg": "Weight Kg",
-    "VolumeCFT": "Volume CFT",
+    "count": "Shipments",
+    "packages": "Packages",
+    "weightKg": "Weight Kg",
+    "volumeCFT": "Volume CFT",
     "Action":"Print"
   };
   centerAlignedData = ['Shipment', 'Packages', 'WeightKg', 'VolumeCFT'];

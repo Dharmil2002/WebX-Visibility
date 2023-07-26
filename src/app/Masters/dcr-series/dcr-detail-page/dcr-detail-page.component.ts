@@ -159,10 +159,10 @@ export class DcrDetailPageComponent implements OnInit {
       ];
 
       // Options for allocateTo dropdown
-      const hierarchyLoc = mergedData.locationData.find(optItem => optItem.locCode === this.data.allotTo)
-      const allocateTo = this.allData.find(optItem => optItem.value === this.data.allocateTo);
-      const allotTo = this.locdet.find(optItem => optItem.value === this.data.allotTo);
-      const series = this.data?.seriesFrom && this.data?.seriesTo ? `${this.data.seriesFrom} - ${this.data.seriesTo}` : '';
+      const hierarchyLoc = mergedData.locationData.find(optItem => optItem.locCode === this.data?.allotTo)
+      const allocateTo = this.allData.find(optItem => optItem.value === this.data?.allocateTo);
+      const allotTo = this.locdet.find(optItem => optItem.value === this.data?.allotTo);
+      const series = this.data?.seriesFrom && this.data?.seriesTo ? `${this.data?.seriesFrom} - ${this.data?.seriesTo}` : '';
       const mappings = {
         'queryNumber': 'seriesFrom',
         'bookNumber': 'bookCode',
@@ -181,7 +181,7 @@ export class DcrDetailPageComponent implements OnInit {
         if (key === 'person') { value = allocateTo ? `${allocateTo.value} - ${allocateTo.name}` : ''; }
         if (key === 'location') { value = allotTo ? `${allotTo.value} - ${allotTo.name}` : ''; }
         if (key === 'locationHierarchy') { value = hierarchyLoc ? `${hierarchyLoc.reportLevel}` : ''; }
-        if (key === 'usedLeaves') { value = this.data.usedLeaves; }
+        if (key === 'usedLeaves') { value = this.data?.usedLeaves; }
         this.dcrDetailForm.controls[key].setValue(value);
       }
       // Set 'personCat' form control based on 'type'
@@ -210,7 +210,7 @@ export class DcrDetailPageComponent implements OnInit {
               srNo: index + 1
             };
           });
-          this.historyDet = dataWithSrno.filter(item => item.bookCode === this.data.bookCode).map((item) => {
+          this.historyDet = dataWithSrno.filter(item => item.bookCode === this.data?.bookCode).map((item) => {
             const loc = this.locdet.find(optItem => optItem.value === item.allotTo);
             const allocateTo = this.allData.find(optItem => optItem.value === item.allocateTo);
             item['location'] = loc ? `${loc.value} - ${loc.name}` : '';
@@ -243,7 +243,7 @@ export class DcrDetailPageComponent implements OnInit {
         {
           width: '800px',
           height: '280px',
-          data: ''
+          data: this.data
         });
     }
     else {
@@ -257,7 +257,7 @@ export class DcrDetailPageComponent implements OnInit {
   bindDropdown() {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       this.docData = res.documentTypeDropDown;
-      const Select = this.docData.find(x => x.value == this.data.documentType)
+      const Select = this.docData.find(x => x.value == this.data?.documentType)
       this.dcrDetailForm.get('documentType').setValue(Select);
       this.bindData();
     });

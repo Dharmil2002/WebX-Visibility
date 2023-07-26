@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { DCRControl } from 'src/assets/FormControls/dcrControl';
 import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { utilityService } from 'src/app/Utility/utility.service';
 import { map } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
@@ -36,7 +35,9 @@ export class ReAllocateDcrComponent implements OnInit {
   newCategory: any;
   newPerson: any;
   newPersonStatus: any;
-  constructor(private service: utilityService, public dialog: MatDialog, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) { }
+  id: string;
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private route: Router, public dialog: MatDialog, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) {
+  }
 
   ngOnInit(): void {
     this.intializeFormControls();
@@ -90,14 +91,71 @@ export class ReAllocateDcrComponent implements OnInit {
     });
   }
   reAlloc() {
-    this.service.exportData(this.dcrReallocateForm.value);
-    Swal.fire({
-      icon: "success",
-      title: "Successful",
-      text: "Re-Allocated Data Successfully",
-      showConfirmButton: true,
-    });
-    this.dialog.closeAll();
+    let getReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "dcr"
+    }
+    this.masterService.masterPost('common/getall', getReq).subscribe({
+      next: (res: any) => {
+        if (res && res.data) {
+          const currentBookCode = this.data.bookCode;
+          const existingData = res.data.filter((item: any) => item.id.includes(currentBookCode + '-'));
+          if (existingData.length > 0) {
+            // If bookCode with suffix exists, find the maximum suffix and increment it by 1
+            const maxSuffix = existingData.reduce((max: number, item: any) => {
+              const suffix = parseInt(item.id.split('-')[1]);
+              return isNaN(suffix) ? max : Math.max(max, suffix);
+            }, 0);
+
+            const newSuffix = maxSuffix + 1;
+            this.id = `${currentBookCode}-${newSuffix}`;
+          } else {
+            // If no suffix exists, check if currentBookCode already has '-'
+            if (currentBookCode.includes('-')) {
+              // If currentBookCode already has '-', then just set the id as it is
+              this.id = currentBookCode;
+            } else {
+              // If currentBookCode does not have '-', append '-1' to the id
+              this.id = `${currentBookCode}-1`;
+            }
+          }
+          let req = {
+            companyCode: parseInt(localStorage.getItem("companyCode")),
+            type: "masters",
+            collection: "dcr",
+            data: {
+              "documentType": this.data.documentType,
+              "bookCode": this.data.bookCode,
+              "seriesFrom": this.data.seriesFrom,
+              "seriesTo": this.data.seriesTo,
+              "totalLeaf": this.data.totalLeaf,
+              "allotTo": this.dcrReallocateForm.value.newLocation.value,
+              "type": this.dcrReallocateForm.value.newCategory.value,
+              "allocateTo": this.dcrReallocateForm.value.newPerson.value,
+              "entryBy": localStorage.getItem('Username'),
+              "entryDate": new Date().toISOString(),
+              "id": this.id,
+              "action": "Re-Allocate"
+            }
+          };
+          this.masterService.masterPost('common/create', req).subscribe({
+            next: (res: any) => {
+              if (res) {
+                // Display success message
+                Swal.fire({
+                  icon: "success",
+                  title: "Successful",
+                  text: res.message,
+                  showConfirmButton: true,
+                });
+              }
+            }
+          });
+          this.route.navigateByUrl("/Masters/DocumentControlRegister/TrackDCR");
+        }
+      }
+    })
   }
   closeDialog(): void {
     this.dialog.closeAll();

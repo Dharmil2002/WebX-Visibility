@@ -7,7 +7,6 @@ import { DCRControl } from 'src/assets/FormControls/dcrControl';
 import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { map } from 'rxjs/operators';
-import { utilityService } from 'src/app/Utility/utility.service';
 import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-split-dcr',
@@ -37,7 +36,7 @@ export class SplitDcrComponent implements OnInit {
   newCategoryStatus: any;
   newPerson: any;
   newPersonStatus: any;
-  constructor(private service: utilityService, private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
+  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = this.route.getCurrentNavigation()?.extras.state.data;
     }
@@ -186,7 +185,6 @@ export class SplitDcrComponent implements OnInit {
                   text: res.message,
                   showConfirmButton: true,
                 });
-                window.location.reload();
               }
             }
           });

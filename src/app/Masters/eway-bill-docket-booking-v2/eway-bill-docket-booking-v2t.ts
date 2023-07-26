@@ -544,7 +544,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     }
   }
   Addseries() {
-    debugger
     const resultArray = this.generateArray(this.companyCode, this.tabForm.controls['docketNumber'].value, this.contractForm.controls['totalChargedNoOfpkg'].value);
     let reqBody = {
       companyCode: this.companyCode,

@@ -82,6 +82,8 @@ import { RouteMasterLocationWiseComponent } from './route-master-location-wise/r
 import { AirportMasterListComponent } from './airport-master/airport-master-list/airport-master-list.component';
 import { AirportMasterAddComponent } from './airport-master/airport-master-add/airport-master-add.component';
 import { PincodeLocationMappingComponent } from './pincode-to-location-mapping-master/pincode-location-list/pincode-to-location-mapping.component';
+import { AddressMasterListComponent } from './address-master/address-master-list/address-master-list.component';
+import { AddressMasterAddComponent } from './address-master/address-master-add/address-master-add.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -171,7 +173,9 @@ import { PincodeLocationMappingComponent } from './pincode-to-location-mapping-m
     AirportMasterListComponent,
     AirportMasterAddComponent,
     RouteMasterLocationAddComponent,
-    PincodeLocationMappingComponent
+    PincodeLocationMappingComponent,
+    AddressMasterListComponent,
+    AddressMasterAddComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

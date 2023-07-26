@@ -3,6 +3,7 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { fetchDepartureDetails, fetchShipmentData } from "./departureUtils";
+import { DatePipe } from '@angular/common';
 @Component({
   selector: "app-departure-dashboard-page",
   templateUrl: "./departure-dashboard-page.component.html",
@@ -94,7 +95,8 @@ export class DepartureDashboardPageComponent
 
   constructor(
     private operationService: OperationService,
-    private CnoteService: CnoteService
+    private CnoteService: CnoteService,
+    private datePipe: DatePipe
   ) {
     super();
     this.loadingSheetData = this.CnoteService.getLsData();
@@ -115,7 +117,8 @@ export class DepartureDashboardPageComponent
     const departureTableData = await fetchDepartureDetails(
       this.companyCode,
       this.orgBranch,
-      this.operationService
+      this.operationService,
+      this.datePipe
     );
 
     // Update the tableData property with the retrieved data

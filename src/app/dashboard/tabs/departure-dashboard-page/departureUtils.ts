@@ -1,4 +1,4 @@
-import { addHours } from "date-fns";
+import { _Schedule } from "@angular/cdk/table";
 
 /**
  * Fetches departure details from the API based on the provided parameters.
@@ -10,7 +10,8 @@ import { addHours } from "date-fns";
 export async function fetchDepartureDetails(
   companyCode: number,
   orgBranch: string,
-  operationService: any
+  operationService: any,
+  datePipe
 ): Promise<any[]> {
 
   // Prepare request payload
@@ -37,11 +38,11 @@ export async function fetchDepartureDetails(
     //End//
     // Filter departure data based on organization branch
     const departuredata = res.data.filter(
-      (x: any) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase() && x.status!=="close" || x.nextUpComingLoc==orgBranch.toLowerCase()
+      (x: any) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase() && x.status !== "close"
     );
     const routeData = routeRes.data.filter((x) => x.location.toLowerCase() === orgBranch.toLowerCase())
     // Generate table data from filtered departure data
-    const tableData = generateTableData(departuredata, routeData);
+    const tableData = generateTableData(departuredata, routeData, datePipe);
 
     // Return the generated table data
     return tableData;
@@ -107,41 +108,48 @@ function getShipmentData(
  * @param departureData - The departure data object.
  * @returns Table data array.
  */
-function generateTableData(departureData: any[], routeData: any[]): any[] {
+function generateTableData(departureData: any[], routeData: any[], datePipe): any[] {
   let dataDeparture: any[] = [];
   const { format } = require("date-fns");
 
   departureData.forEach((element, index) => {
     //let scheduleTime = new Date(); // Replace this with the actual schedule time
 
-    // Convert transHrs to number for time calculations
-    //let transHrs = parseInt(element?.transHrs, 10) || 0;
+    // Step 1: Create a new Date object for the current date and time
+    const currentDate = new Date();
 
-    // Calculate the expected time by adding the transHrs to the schedule time
-    //let expectedTime = addHours(scheduleTime, transHrs);
+    // Step 2: Add 10 minutes to the Date object for the expected time
+    const expectedTime = new Date(currentDate.getTime() + 10 * 60000); // 10 minutes in milliseconds
 
-    let action =
-      element.tripId === "" && element.lsNo === "" && element.unloading !== ""
-        ? "Update Trip"
-        : element.tripId !== "" && element.lsNo !== ""
-          ? "Vehicle Loading"
-          : "Create Trip";
+    // Step 3: Add the transHrs (if required) to the expected time
+    // let expectedTimeWithTransHrs = addHours(expectedTime, transHrs);
+
+    // Step 4: Get the schedule time (replace this with your scheduleTime variable)
+    const scheduleTime = new Date(); // Replace this line with your actual scheduleTime variable
+
+    // Step 5: Format the dates to strings
+    const updatedISOString = expectedTime.toISOString();
+    const scheduleTimeISOString = scheduleTime.toISOString();
+
+
     let routeDetails = routeData.find((x) => x.routeCode == element.routeCode);
     const routeCode = routeDetails?.routeCode ?? 'Unknown';
     const routeName = routeDetails?.routeName ?? 'Unnamed';
+    if(routeDetails){
     let jsonDeparture = {
       RouteandSchedule: routeCode + ":" + routeName,
       VehicleNo: element?.vehicleNo || "",
       TripID: element?.tripId || "",
-      Scheduled: routeDetails.routeStartDate,
-      Expected: routeDetails.routeEndDate,
+      Scheduled: datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
+      Expected: datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
       Hrs: 0,
       Status: "On Time",
-      Action: element?.status||"",
+      Action: element?.status || "",
       location: element?.location || "",
     };
 
     dataDeparture.push(jsonDeparture);
+  }
   });
 
   let tableData = dataDeparture;

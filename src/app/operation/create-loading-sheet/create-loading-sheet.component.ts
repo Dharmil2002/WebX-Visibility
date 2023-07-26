@@ -9,7 +9,7 @@ import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { LodingSheetGenerateSuccessComponent } from "../loding-sheet-generate-success/loding-sheet-generate-success.component";
 import { LoadingSheetViewComponent } from "../loading-sheet-view/loading-sheet-view.component";
-import { filterDataByLocation, groupShipments } from "./loadingSheetCommon";
+import { filterCnoteDetails, filterDataByLocation, groupShipments } from "./loadingSheetCommon";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { setFormControlValue } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
@@ -97,9 +97,10 @@ export class CreateLoadingSheetComponent implements OnInit {
   loadingSheetNo: any;
   docketApiRes: any;
   cnoteDetails: any;
+  loadingGenerated: any;
   constructor(
     private Route: Router,
-    private CnoteService: CnoteService,
+    private _cnoteService: CnoteService,
     private _operationService: OperationService,
     private navigationService: NavigationService,
     private dialog: MatDialog,
@@ -126,12 +127,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         this.navigationService.navigateTo(route, this.tripData);
       }
 
-      // Check if shippingData exists
-      if (this.shippingData) {
-        // Get loading form data and set isShipmentUpdate flag
-        this.getloadingFormData = this.CnoteService.getData();
-        this.isShipmentUpdate = true;
-      }
+    
     }
 
     // Initialize form controls
@@ -314,6 +310,7 @@ export class CreateLoadingSheetComponent implements OnInit {
           this.orgBranch
         );
         //Here i user cnoteDetails varible to used in updateDocketDetails() method
+        this._cnoteService.setShipingData(filterData.legWiseData);
         this.cnoteDetails = filterData.legWiseData;
         const shipingfilterData = filterData.legWiseData;
         // Call the function to group shipments based on criteria
@@ -352,25 +349,29 @@ export class CreateLoadingSheetComponent implements OnInit {
         );
       });
 
-      this.CnoteService.setData(this.loadingSheetTableForm.value);
-      // Set form data and save to service
     }
   }
 
   loadingSheetGenerate() {
+    
     if (!this.loadingSheetTableForm.value.vehicle) {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
     } else {
       if (this.loadingData) {
-        const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
+        this.loadingData.forEach(obj => {
+          const randomNumber = "Ls/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+            obj.LoadingSheet = randomNumber;
+            obj.Action= "Print";
+          });
+          this.addTripData();
+          const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
           this.dialog.open(LodingSheetGenerateSuccessComponent, {
             width: "100%", // Set the desired width
             data: this.loadingData, // Pass the data object
           });
 
         dialogRef.afterClosed().subscribe((result) => {
-          this.loadingSheetNo = result[0].LoadingSheet;
-          this.addTripData();
+          this.goBack(3);
           // Handle the result after the dialog is closed
         });
       } else {
@@ -379,7 +380,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     }
   }
 
-  updateLoadingData(event) {
+  updateLoadingData(event) { 
 
     let packages = event.shipping.reduce(
       (total, current) => total + current.Packages,
@@ -405,6 +406,8 @@ export class CreateLoadingSheetComponent implements OnInit {
       }
     });
     // this.getshipmentData(event)
+   this.cnoteDetails=filterCnoteDetails(this.cnoteDetails,event.shipping)
+   this._cnoteService.setShipingData(this.cnoteDetails);
   }
 
   // get vehicleNo
@@ -439,7 +442,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   //Add tripData
   addTripData() {
-    if (!this.loadingSheetTableForm.controls["tripID"].value) {
+    if (this.loadingSheetTableForm.controls["tripID"].value==='System Generated'||!this.loadingSheetTableForm.controls["tripID"].value) {
       const randomNumber =
         "TH/" +
         this.orgBranch +
@@ -475,28 +478,30 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   // Method to retrieve details for each leg in the leg_details array
   getDetailsByLeg() {
-    for (const leg of this.loadingData) {
+    for (const leg of this.loadingGenerated) {
       const org_loc = leg.leg.split("-")[0].trim();
       const destination = leg.leg.split("-")[1].trim();
-
-      const matchingShipment = this.cnoteDetails.find(
+  
+      const matchingShipments = this.cnoteDetails.filter(
         (shipment) =>
           shipment.orgLoc === org_loc &&
           shipment.destination.split(":")[1].trim() === destination
       );
-
-      if (matchingShipment) {
-        this.updateDocketDetails(matchingShipment.docketNumber);
-        this.addLsDetails(leg);
+      this.addLsDetails(leg);
+      if (matchingShipments.length > 0) {
+        for (const matchingShipment of matchingShipments) {
+          this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet);
+        }
       } else {
         // console.log(`No matching details found for the leg: ${leg.leg}`);
       }
     }
   }
-
-  updateDocketDetails(docket) {
+  
+  updateDocketDetails(docket,lsNo) {
+  
     let loadingSheetData = {
-      lsNo: this.loadingSheetNo,
+      lsNo: lsNo,
     };
     const reqBody = {
       companyCode: this.companyCode,
@@ -504,7 +509,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       collection: "docket",
       id: docket,
       updates: {
-        ...loadingSheetData,
+        ...loadingSheetData
       },
     };
     this._operationService.operationPut("common/update", reqBody).subscribe({
@@ -517,9 +522,10 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   addLsDetails(leg) {
+
     const lsDetails = {
-      id: this.loadingSheetNo,
-      lsno: this.loadingSheetNo,
+      id: leg.LoadingSheet,
+      lsno: leg.LoadingSheet,
       leg: leg.leg,
       vehno: this.loadingSheetTableForm.value.vehicle.value,
       vehType: this.loadingSheetTableForm.value.vehicleType.name,
@@ -538,12 +544,13 @@ export class CreateLoadingSheetComponent implements OnInit {
     this._operationService.operationPost("common/create", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          this.goBack(3);
+        
         }
       },
     });
   }
   updateVehicleStatus() {
+
     const vehicleDetails = {
       status: "On trip",
       tripId: this.loadingSheetTableForm.value?.tripID,
@@ -560,6 +567,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     this._operationService.operationPut("common/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
+        
         }
       },
     });

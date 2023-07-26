@@ -6,7 +6,7 @@ import { format, isValid, parseISO } from "date-fns";
  * @returns The KPI data array.
  */
 export function kpiData(StockCountData: any[]): any[] {
-  const lsCount= StockCountData.filter((x)=>x.lsNo!=="")
+  const lsCount = StockCountData.filter((x) => x.lsNo !== "")
   // Helper function to create a shipData object
   const createShipDataObject = (
     count: number,

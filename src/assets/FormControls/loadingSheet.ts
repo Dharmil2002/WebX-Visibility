@@ -55,7 +55,7 @@ export class loadingControl {
                 label: "Trip ID",
                 placeholder: '',
                 type: "text",
-                value: '',
+                value: 'System Generated',
                 Validations: [],
                 generatecontrol: true, disable: true
             },

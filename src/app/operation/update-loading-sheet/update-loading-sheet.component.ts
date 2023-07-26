@@ -6,7 +6,6 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { Router } from '@angular/router';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
 import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival/mark-arrival.component';
-import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import Swal from 'sweetalert2';
 import { Shipment, autoBindData, filterShipments, kpiData } from '../shipment';
 import { updatePending } from './loadingSheetshipment';
@@ -93,7 +92,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   shipingDataTable: any;
   packageData: any;
 
-  
+
   constructor(
     private Route: Router,
     public dialogRef: MatDialogRef<MarkArrivalComponent>,
@@ -102,21 +101,37 @@ export class UpdateLoadingSheetComponent implements OnInit {
     private _operation: OperationService,
     private cdr: ChangeDetectorRef
   ) {
+ 
     // Set the initial shipment status to 'Unloaded'
     this.shipmentStatus = 'Unloaded';
-  
+
     // Assign the item to the arrivalData property
     this.arrivalData = item;
-  
+
     // Call the getShippningData() function to fetch shipping data
-    this.getShippningData();
-  
+    this.getLoadingSheetDetail();
     // Initialize form controls for the loading sheet table
     this.IntializeFormControl();
   }
-  
 
-  getShippningData() {
+  getLoadingSheetDetail() {
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "menifest_detail"
+    }
+    this._operation.operationPost('common/getall',reqBody).subscribe({
+      next: (res: any) => {
+       if(res){
+         const mfDetail=res.data.find((x)=>x.tripId===this.arrivalData?.TripID);
+         this.getShippningData(mfDetail.mfNo)
+       }
+      }
+    })
+  }
+
+
+  getShippningData(menifestNo) {
 
     const reqBody = {
       "companyCode": this.companyCode,
@@ -126,12 +141,12 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     this._operation.operationPost('common/getall', reqBody).subscribe(res => {
       if (res) {
-        const arrivalData  = res.data.filter((x)=>x.destination.split(":")[1].trim()===this.currentBranch);
+        const arrivalData = res.data.filter((x) => x.destination.split(":")[1].trim() === this.currentBranch && x.mfNo === menifestNo || "");
         // Filter shipments based on route and branch
         let filteredShipments = filterShipments(arrivalData, this.arrivalData?.Route, this.currentBranch);
-      
+
         // Update CSV and boxData
-        this.csv =  filteredShipments.map((shipment) => ({
+        this.csv = filteredShipments.map((shipment) => ({
           Shipment: shipment.docketNumber || "",
           Origin: shipment.orgLoc || "",
           Destination: shipment.destination ? shipment.destination.split(":")[1].trim() : "",
@@ -139,27 +154,27 @@ export class UpdateLoadingSheetComponent implements OnInit {
           Unloaded: 0,
           Pending: parseInt(shipment.totalChargedNoOfpkg),
           Leg: (shipment.orgLoc || "") + ":" + (shipment.destination ? shipment.destination.split(":")[1].trim() : ""),
-          KgWt:shipment?.actualwt||"",
-          CftVolume:shipment?.cft_tot||""
+          KgWt: shipment?.actualwt || "",
+          CftVolume: shipment?.cft_tot || ""
         }));
         this.boxData = kpiData(this.csv, this.shipmentStatus, "");
         this.tableload = false;
-      
+
         let shipingTableData = this.csv;
-      
+
         // Group shipments by leg using the utility function
         let shipingTableDataArray = groupShipmentsByLeg(shipingTableData);
-      
+
         // Set the leg of the arrivalData
         this.arrivalData.Leg = shipingTableData[0]?.Leg;
-      
+
         // Set the shipingDataTable to the grouped data
         this.shipingDataTable = shipingTableDataArray;
         this.getPackagesData();
       }
     });
     // Update pending shipments
-   
+
   }
 
   getPackagesData() {
@@ -178,20 +193,20 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   updatePackage() {
-   
+
     this.tableload = true;
 
-  const scanValue = this.loadingSheetTableForm.value.Scan.trim();
-  const legValue = this.arrivalData.Route.trim();
+    const scanValue = this.loadingSheetTableForm.value.Scan.trim();
+    const legValue = this.arrivalData.Route.trim();
 
-  // Call the imported function to handle the logic
-  let PackageUpdate =handlePackageUpdate(scanValue, legValue, this.currentBranch,this.packageData, this.csv, this.boxData, this.cdr);
+    // Call the imported function to handle the logic
+    let PackageUpdate = handlePackageUpdate(scanValue, legValue, this.currentBranch, this.packageData, this.csv, this.boxData, this.cdr);
     // Call kpiData function
-    if(PackageUpdate){
-    this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
+    if (PackageUpdate) {
+      this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
     }
     this.cdr.detectChanges(); // Trigger change detection
-    this.tableload=false;
+    this.tableload = false;
   }
 
 
@@ -221,32 +236,32 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   ngOnInit(): void {
   }
-/**
- * Function to initialize form controls for the loading sheet table
- */
+  /**
+   * Function to initialize form controls for the loading sheet table
+   */
 
-IntializeFormControl() {
-  // Create an instance of UpdateloadingControl
-  const ManifestGeneratedFormControl = new UpdateloadingControl();
+  IntializeFormControl() {
+    // Create an instance of UpdateloadingControl
+    const ManifestGeneratedFormControl = new UpdateloadingControl();
 
-  // Get the form controls for the update list
-  this.jsonControlArray = ManifestGeneratedFormControl.getupdatelsFormControls();
+    // Get the form controls for the update list
+    this.jsonControlArray = ManifestGeneratedFormControl.getupdatelsFormControls();
 
-  // Get the form controls for the scan
-  this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
+    // Get the form controls for the scan
+    this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
 
-  // Filter out the "Scan" control from the update list
-  this.updateListData = this.jsonControlArray.filter((x) => x.name != "Scan");
+    // Filter out the "Scan" control from the update list
+    this.updateListData = this.jsonControlArray.filter((x) => x.name != "Scan");
 
-  // Get only the "Scan" control
-  this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
+    // Get only the "Scan" control
+    this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
 
-  // Build the form group using the form control array
-  this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    // Build the form group using the form control array
+    this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
 
-  // Set the arrival data binding
-  this.setArrivalDataBindData();
-}
+    // Set the arrival data binding
+    this.setArrivalDataBindData();
+  }
 
   IsActiveFuntion($event) {
     this.loadingData = $event
@@ -269,16 +284,19 @@ IntializeFormControl() {
 
 
   CompleteScan() {
-  
+
     let packageChecked = false;
     let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
     if (exists) {
       packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
+    locationWiseData.forEach(element => {
+    this.UpdateDocketDetail(element.Shipment);
+    });
     if (packageChecked) {
       this.updateTripStatus()
-      
+
     }
     else {
       Swal.fire({
@@ -290,33 +308,51 @@ IntializeFormControl() {
     }
 
   }
+  UpdateDocketDetail(dkt) {
+   const reqbody= {
+      "companyCode": 10065,
+      "type": "operation",
+      "collection": "docket",
+      "id": dkt,
+      "updates": {
+         "unloading": 1
+  
+      }
+    }
+      this._operation.operationPut("common/update",reqbody).subscribe({next:(res:any)=>{
+      }})
+  
+    
+  }
   Close(): void {
     this.dialogRef.close()
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
-  updateTripStatus(){
-    const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"),this.currentBranch);
+  updateTripStatus() {
+
+    const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"), this.currentBranch);
     let tripDetails
-    if(next){
+    if (next) {
       tripDetails = {
-       nextUpComingLoc:next
+        nextUpComingLoc: next
+      }
+
+    }
+    else {
+      tripDetails = {
+        status: "close",
+        nextUpComingLoc: "",
+        closeTime: new Date()
       }
     }
-    else{
-      tripDetails = {
-        status:"close",
-        nextUpComingLoc: "",
-        closeTime:new Date()
-       }
-    }
- 
+
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "trip_detail",
-      "id": 'trip_' +  this.arrivalData?.Route.split(":")[0] || "",
+      "id": 'trip_' + this.arrivalData?.Route.split(":")[0] || "",
       "updates": {
         ...tripDetails,
       }
@@ -324,7 +360,7 @@ IntializeFormControl() {
     this._operation.operationPut("common/update", reqBody).subscribe({
       next: (res: any) => {
         if (!next) {
-          this.tripHistoryUpdate() 
+          this.tripHistoryUpdate()
           Swal.fire({
             icon: "success",
             title: "Successful",
@@ -332,40 +368,40 @@ IntializeFormControl() {
             showConfirmButton: true,
           })
         }
-        else{
-          this.tripHistoryUpdate() 
+        else {
+          this.tripHistoryUpdate()
         }
       }
     })
   }
-  
+
   tripHistoryUpdate() {
 
-      let tripDetails = {
-        arrivalBranch:this.currentBranch,
+    let tripDetails = {
+      arrivalBranch: this.currentBranch,
+    }
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_transaction_history",
+      "id": this.arrivalData?.TripID || "",
+      "updates": {
+        ...tripDetails,
       }
-      const reqBody = {
-        "companyCode": this.companyCode,
-        "type": "operation",
-        "collection": "trip_transaction_history",
-        "id": this.arrivalData?.TripID||"",
-        "updates": {
-          ...tripDetails,
+    }
+    this._operation.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: `Arrival Scan done Successfully`,
+            showConfirmButton: true,
+          })
+          this.dialogRef.close(this.loadingSheetTableForm.value)
         }
       }
-      this._operation.operationPut("common/update", reqBody).subscribe({
-        next: (res: any) => {
-          if (res) {
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: `Arrival Scan done Successfully`,
-              showConfirmButton: true,
-            })
-            this.dialogRef.close(this.loadingSheetTableForm.value)
-          }
-        }
-      })
+    })
   }
 
 }

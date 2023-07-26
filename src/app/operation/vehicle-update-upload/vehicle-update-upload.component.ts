@@ -170,9 +170,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "Shipment": element?.docketNumber || '',
             "Origin": element?.orgLoc || '',
             "Destination": element?.destination.split(":")[1] || '',
-            "Packages": lsDetails?.pacakges || '',
+            "Packages": element?.totalChargedNoOfpkg || '',
             "loaded": 0,
-            "Pending": lsDetails?.pacakges || '',
+            "Pending": element?.totalChargedNoOfpkg || '',
             "Leg": lsDetails?.leg.replace(" ", "") || '',
           };
           docketData.push(json);

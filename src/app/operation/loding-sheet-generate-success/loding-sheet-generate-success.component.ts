@@ -69,11 +69,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
   }
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,private CnoteService: CnoteService,public dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent>,public Route:Router) {
 
-    this.data.forEach(obj => {
-    const randomNumber = "Ls/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
-      obj.LoadingSheet = randomNumber;
-      obj.Action= "Print";
-    });
+
     this.csv=this.data;
     Swal.fire({
       icon: "success",

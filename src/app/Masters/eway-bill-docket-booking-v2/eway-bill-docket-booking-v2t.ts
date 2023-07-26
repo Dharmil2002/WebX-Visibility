@@ -492,7 +492,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     }
     const controltabNames = ['containerCapacity','containerSize1','containerSize2','containerType'];
     controltabNames.forEach(controlName => {
-      if (Array.isArray(this.contractForm.value[controlName])) {
+      if (Array.isArray(this.tabForm.value[controlName])) {
         this.tabForm.controls[controlName].setValue('');
       }
     })
@@ -544,6 +544,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     }
   }
   Addseries() {
+    debugger
     const resultArray = this.generateArray(this.companyCode, this.tabForm.controls['docketNumber'].value, this.contractForm.controls['totalChargedNoOfpkg'].value);
     let reqBody = {
       companyCode: this.companyCode,
@@ -660,7 +661,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     // let temp = event.controls.ChargedWeight?.value;
     //Invoices.CalculateRowLevelChargeWeight(temp, false, isFromChargwt);
    this.tableData.forEach((x) => {
-      totalChargedNoofPackages = totalChargedNoofPackages + parseFloat(x.NO_PKGS || 0);
+      totalChargedNoofPackages = totalChargedNoofPackages + parseInt(x.NO_PKGS || 0);
       totalChargedWeight = totalChargedWeight + parseFloat(x.ChargedWeight || 0);
       totalDeclaredValue = totalDeclaredValue + parseFloat(x.DECLVAL || 0);
       totalActualValue = totalActualValue + parseFloat(x.ACT_WT || 0);
@@ -669,7 +670,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       }
     })
 
-    this.contractForm.controls['totalChargedNoOfpkg'].setValue(totalChargedNoofPackages.toFixed(2));
+    this.contractForm.controls['totalChargedNoOfpkg'].setValue(totalChargedNoofPackages);
     this.contractForm.controls['chrgwt'].setValue(totalChargedWeight.toFixed(2));
     this.contractForm.controls['totalDeclaredValue'].setValue(totalDeclaredValue.toFixed(2));
     this.contractForm.controls['cft_tot'].setValue(cftTotal);

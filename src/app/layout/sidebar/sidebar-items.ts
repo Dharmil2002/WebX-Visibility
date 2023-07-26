@@ -101,6 +101,24 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
+              "path": "Masters/ClusterMaster/ClusterMasterList",
+              "title": "Cluster Master",
+              "moduleName": "Masters",
+              "icon": "",
+              "class": "",
+              "groupTitle": false,
+              "submenu": []
+            },
+            {
+              "path": "Masters/AddressMaster/AddressMasterList",
+              "title": "Address Master",
+              "moduleName": "Masters",
+              "icon": "",
+              "class": "",
+              "groupTitle": false,
+              "submenu": []
+            },
+            {
               "path": "Masters/LocationMaster/LocationMasterList",
               "title": "Location Master",
               "moduleName": "Location Master",
@@ -152,7 +170,7 @@ export const ROUTES: RouteInfo[] =
             },
             {
               "path": "Masters/AirportMaster/AirportMasterList",
-              "title": "Airport Masters",
+              "title": "Airport Master",
               "moduleName": "Masters",
               "icon": "",
               "class": "",
@@ -161,7 +179,7 @@ export const ROUTES: RouteInfo[] =
             },
             {
               "path": "Masters/PinCodeMaster/PinCodeMasterList",
-              "title": "Pin code Masters",
+              "title": "Pin code Master",
               "moduleName": "Masters",
               "icon": "",
               "class": "",

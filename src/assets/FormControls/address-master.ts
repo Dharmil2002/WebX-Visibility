@@ -93,7 +93,7 @@ export class AddressControl {
                 name: 'pincode', label: "Pincode",
                 placeholder: "Enter Address",
                 type: 'text',
-                value: addressGroupTable.address,
+                value: addressGroupTable.pincode,
                 generatecontrol: true, disable: false,
                 Validations: [
                     {

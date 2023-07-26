@@ -84,6 +84,8 @@ import { AirportMasterAddComponent } from './airport-master/airport-master-add/a
 import { PincodeLocationMappingComponent } from './pincode-to-location-mapping-master/pincode-location-list/pincode-to-location-mapping.component';
 import { AddressMasterListComponent } from './address-master/address-master-list/address-master-list.component';
 import { AddressMasterAddComponent } from './address-master/address-master-add/address-master-add.component';
+import { ClusterMasterAddComponent } from './cluster-master/cluster-master-add/cluster-master-add.component';
+import { ClusterMasterListComponent } from './cluster-master/cluster-master-list/cluster-master-list.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -175,7 +177,9 @@ import { AddressMasterAddComponent } from './address-master/address-master-add/a
     RouteMasterLocationAddComponent,
     PincodeLocationMappingComponent,
     AddressMasterListComponent,
-    AddressMasterAddComponent
+    AddressMasterAddComponent,
+    ClusterMasterAddComponent,
+    ClusterMasterListComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

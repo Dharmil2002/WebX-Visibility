@@ -1,29 +1,28 @@
-import { Component, Inject, OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { Component, Inject, OnInit } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { getShortName } from 'src/app/Utility/commonFunction/random/generateRandomNumber';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Router } from "@angular/router";
-import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
-import Swal from "sweetalert2";
-import { MasterService } from "src/app/core/service/Masters/master.service";
-import { AddressMaster } from "src/app/core/models/Masters/address-master";
-import { AddressControl } from "src/assets/FormControls/address-master";
+import { ClusterMaster } from 'src/app/core/models/Masters/cluster-master';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { ClusterControl } from 'src/assets/FormControls/cluster-master';
+import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-address-master-add',
-  templateUrl: './address-master-add.component.html',
+  selector: 'app-cluster-master-add',
+  templateUrl: './cluster-master-add.component.html',
 })
-export class AddressMasterAddComponent implements OnInit {
+export class ClusterMasterAddComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   countryCode: any;
   action: string;
   isUpdate = false;
-  addressTabledata: AddressMaster;
-  addressTableForm: UntypedFormGroup;
-  addressFormControls: AddressControl;
+  clusterTabledata: ClusterMaster;
+  clusterTableForm: UntypedFormGroup;
+  clusterFormControls: ClusterControl;
   jsonControlGroupArray: any;
-  // savedData: CustomerGroupMaster;
   ngOnInit() {
   }
   functionCallHandler($event) {
@@ -54,45 +53,45 @@ export class AddressMasterAddComponent implements OnInit {
     }
     if (this.action === 'edit') {
       this.isUpdate = true;
-      this.addressTabledata = this.data;
+      this.clusterTabledata = this.data;
       this.breadScrums = [
         {
-          title: "Address Master",
+          title: "Cluster Master",
           items: ["Home"],
-          active: "Edit Address Master",
+          active: "Edit Cluster Master",
         },
       ];
     } else {
       this.breadScrums = [
         {
-          title: "Address Master",
+          title: "Cluster Master",
           items: ["Home"],
-          active: "Add Address Master",
+          active: "Add Cluster Master",
         },
       ];
-      this.addressTabledata = new AddressMaster({});
+      this.clusterTabledata = new ClusterMaster({});
     }
     this.initializeFormControl();
   }
   initializeFormControl() {
-    this.addressFormControls = new AddressControl(this.addressTabledata, this.isUpdate);
-    this.jsonControlGroupArray = this.addressFormControls.getFormControls();
-    this.addressTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
+    this.clusterFormControls = new ClusterControl(this.clusterTabledata, this.isUpdate);
+    this.jsonControlGroupArray = this.clusterFormControls.getClusterFormControls();
+    this.clusterTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
   }
   cancel() {
     window.history.back();
   }
   save() {
-    this.addressTableForm.controls["activeFlag"].setValue(this.addressTableForm.value.activeFlag == true ? "Y" : "N");
+    this.clusterTableForm.controls["activeFlag"].setValue(this.clusterTableForm.value.activeFlag == true ? "Y" : "N");
     if (this.isUpdate) {
-      let id = this.addressTableForm.value.id;
-      this.addressTableForm.removeControl("id");
+      let id = this.clusterTableForm.value.id;
+      this.clusterTableForm.removeControl("id");
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "address",
+        collection: "cluster",
         id: id,
-        updates: this.addressTableForm.value
+        updates: this.clusterTableForm.value
       };
       this.masterService.masterPut('common/update', req).subscribe({
         next: (res: any) => {
@@ -104,18 +103,18 @@ export class AddressMasterAddComponent implements OnInit {
               text: res.message,
               showConfirmButton: true,
             });
-            this.Route.navigateByUrl('/Masters/AddressMaster/AddressMasterList');
+            this.Route.navigateByUrl('/Masters/ClusterMaster/ClusterMasterList');
           }
         }
       });
     } else {
-      const randomNumber = getShortName(this.addressTableForm.value.manualCode);
-      this.addressTableForm.controls["id"].setValue(randomNumber);
+      const randomNumber = getShortName(this.clusterTableForm.value.clusterCode);
+      this.clusterTableForm.controls["id"].setValue(randomNumber);
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "address",
-        data: this.addressTableForm.value
+        collection: "cluster",
+        data: this.clusterTableForm.value
       };
       this.masterService.masterPost('common/create', req).subscribe({
         next: (res: any) => {
@@ -127,7 +126,7 @@ export class AddressMasterAddComponent implements OnInit {
               text: res.message,
               showConfirmButton: true,
             });
-            this.Route.navigateByUrl('/Masters/AddressMaster/AddressMasterList');
+            this.Route.navigateByUrl('/Masters/ClusterMaster/ClusterMasterList');
           }
         }
       });

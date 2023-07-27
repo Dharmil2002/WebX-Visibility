@@ -177,9 +177,12 @@ export class VehicleLoadingComponent implements OnInit {
          
           let dataLoading=[];
           if (this.tripDetails) {
-            this.tripDetails.forEach((element: any) => { // Specify the type of 'element' as 'any'
+            this.tripDetails.forEach((element: any) => {
+               // Specify the type of 'element' as 'any'
+               let shipmentCount=0;
               let shipmentData =  res.data.filter((x) => x.lsNo === element.lsno && x.mfNo === element.mfNo);
                 let json = {
+                    count:shipmentCount+1,
                     id: this.tripData.id,
                     route:this.vehicleLoadingTableForm.controls['Route']?.value||"",
                     tripId:this.tripData?.TripID||'',

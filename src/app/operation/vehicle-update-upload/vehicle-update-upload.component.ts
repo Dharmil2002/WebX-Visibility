@@ -148,14 +148,14 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.operationService.operationPost('common/getall', reqBody).subscribe(res => {
       if (res.data) {
         let dataLoading = []
-       const loadingSheetDetail= res.data.filter((x)=>x.tripId===this.vehicelLoadData.tripId)
-       loadingSheetDetail.forEach((element: any) => { // Specify the type of 'element' as 'any'
-          let shipmentData = this.dktDetailFromApi.filter((x) => x.lsNo === element.lsno);
+        const loadingSheetDetail = res.data.filter((x) => x.lsno === this.vehicelLoadData.LoadingSheet)
+        loadingSheetDetail.forEach((element: any) => { // Specify the type of 'element' as 'any'
+          let shipmentData = this.dktDetailFromApi.filter((x) => x.lsNo === this.vehicelLoadData.LoadingSheet);
           let json = {
             "Leg": element?.leg.replace(" ", "") || '',
             "Shipment": shipmentData?.length || 0,
-            "Packages":  parseInt(element?.pacakges) || 0,
-            "WeightKg":  parseInt(element?.weightKg) || 0,
+            "Packages": parseInt(element?.pacakges) || 0,
+            "WeightKg": parseInt(element?.weightKg) || 0,
             "VolumeCFT": parseInt(element?.volumeCFT) || 0
           };
           dataLoading.push(json);
@@ -170,9 +170,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "Shipment": element?.docketNumber || '',
             "Origin": element?.orgLoc || '',
             "Destination": element?.destination.split(":")[1] || '',
-            "Packages":  parseInt(element?.totalChargedNoOfpkg) ||0,
+            "Packages": parseInt(element?.totalChargedNoOfpkg) || 0,
             "loaded": 0,
-            "Pending":  parseInt(element?.totalChargedNoOfpkg) ||0,
+            "Pending": parseInt(element?.totalChargedNoOfpkg) || 0,
             "Leg": lsDetails?.leg.replace(" ", "") || '',
           };
           docketData.push(json);
@@ -220,7 +220,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     let shipingloaded = 0;
     this.loadingTableData.forEach((element, index) => {
       packages = parseInt(element.Packages) + packages
-      shipingloaded =  parseInt(element.loaded) + shipingloaded;
+      shipingloaded = parseInt(element.loaded) + shipingloaded;
     });
     const createShipDataObject = (count, title, className) => ({
       count,
@@ -274,7 +274,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     }
   }
   CompleteScan() {
-   
+
     let packageChecked = false;
     const exists = this.loadingTableData.some(obj => obj.hasOwnProperty("loaded"));
     if (exists) {
@@ -304,7 +304,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
             text: `Manifest Generated Successfully`,
             showConfirmButton: true,
           })
-         
+
           // Handle the result after the dialog is closed
         });
       }
@@ -347,8 +347,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
         "totDkt": result.length,
         "totPkg": menifestDetails?.PackagesLoadedBooked || "",
         "tot_cft": menifestDetails?.VolumeCFT || "",
-        "WeightKg":menifestDetails?.WeightKg || "",
-        "entryDate":new Date()
+        "WeightKg": menifestDetails?.WeightKg || "",
+        "entryDate": new Date()
       }
       menifestData.push(jsonDetails);
     });
@@ -357,25 +357,39 @@ export class VehicleUpdateUploadComponent implements OnInit {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "menifest_detail",
-      "data":menifestData[0]
+      "data": menifestData[0]
     }
     this.operationService.operationPost('common/create', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-         this.updateTripStatus();
+          if (this.vehicelLoadData.count == "1") {
+            this.updateTripStatus();
+          }
+          else {
+            if (res) {
+              Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: `Vehicle Loaded Successfully`,//
+                showConfirmButton: true,
+              })
+              this.goBack(3);
+              this.dialogRef.close("")
+            }
+          }
+          }
         }
-      }
-    })
+      })
   }
-  updateTripStatus(){
+  updateTripStatus() {
     let tripDetails = {
-      status:"Depart Vehicle"
+      status: "Depart Vehicle"
     }
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "trip_detail",
-      "id": this.vehicelLoadData?.id||"",
+      "id": this.vehicelLoadData?.id || "",
       "updates": {
         ...tripDetails,
       }
@@ -386,7 +400,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
           Swal.fire({
             icon: "success",
             title: "Successful",
-            text: `Vehicle depart Successfully`,//
+            text: `Vehicle Load Successfully`,//
             showConfirmButton: true,
           })
           this.goBack(3);

@@ -113,6 +113,7 @@ function generateTableData(departureData: any[], routeData: any[], datePipe): an
   const { format } = require("date-fns");
 
   departureData.forEach((element, index) => {
+  
     //let scheduleTime = new Date(); // Replace this with the actual schedule time
 
     // Step 1: Create a new Date object for the current date and time
@@ -130,26 +131,34 @@ function generateTableData(departureData: any[], routeData: any[], datePipe): an
     // Step 5: Format the dates to strings
     const updatedISOString = expectedTime.toISOString();
     const scheduleTimeISOString = scheduleTime.toISOString();
+    // Step 1: Get the schedule time (replace this with your actual scheduleTime variable)
+    const diffScheduleTime = new Date(updatedISOString); // Replace 'element.scheduleTime' with the actual property containing the schedule time
 
+    // Step 2: Get the expected time (replace this with your actual expectedTime variable)
+    const diffSexpectedTime = new Date(scheduleTimeISOString); // Replace 'element.expectedTime' with the actual property containing the expected time
+
+    const timeDifferenceInMilliseconds = diffScheduleTime.getTime() - diffSexpectedTime.getTime();
+    const timeDifferenceInHours = timeDifferenceInMilliseconds / (1000 * 60 * 60);
 
     let routeDetails = routeData.find((x) => x.routeCode == element.routeCode);
     const routeCode = routeDetails?.routeCode ?? 'Unknown';
     const routeName = routeDetails?.routeName ?? 'Unnamed';
-    if(routeDetails){
-    let jsonDeparture = {
-      RouteandSchedule: routeCode + ":" + routeName,
-      VehicleNo: element?.vehicleNo || "",
-      TripID: element?.tripId || "",
-      Scheduled: datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
-      Expected: datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
-      Hrs: 0,
-      Status: "On Time",
-      Action: element?.status || "",
-      location: element?.location || "",
-    };
 
-    dataDeparture.push(jsonDeparture);
-  }
+    if (routeDetails) {
+      let jsonDeparture = {
+        RouteandSchedule: routeCode + ":" + routeName,
+        VehicleNo: element?.vehicleNo || "",
+        TripID: element?.tripId || "",
+        Scheduled: datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
+        Expected: datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
+        Hrs: timeDifferenceInHours.toFixed(2),
+        Status:timeDifferenceInHours > 0 ? "Delay" : "On Time",
+        Action: element?.status === "depart" ? "" : element?.status === "arrival" ? "" : element?.status,
+        location: element?.location || "",
+      };
+
+      dataDeparture.push(jsonDeparture);
+    }
   });
 
   let tableData = dataDeparture;

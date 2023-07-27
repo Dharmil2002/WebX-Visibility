@@ -157,7 +157,14 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
             // Step 5: Format the dates to strings
             const updatedISOString = expectedTime.toISOString();
             const scheduleTimeISOString = scheduleTime.toISOString();
+            // Step 1: Get the schedule time (replace this with your actual scheduleTime variable)
+            const diffScheduleTime = new Date(scheduleTimeISOString); // Replace 'element.scheduleTime' with the actual property containing the schedule time
 
+            // Step 2: Get the expected time (replace this with your actual expectedTime variable)
+            const diffSexpectedTime = new Date(updatedISOString); // Replace 'element.expectedTime' with the actual property containing the expected time
+
+            const timeDifferenceInMilliseconds = diffScheduleTime.getTime() - diffSexpectedTime.getTime();
+            const timeDifferenceInHours = timeDifferenceInMilliseconds / (1000 * 60 * 60);
             let routeDetails = this.routeDetails.find((x) => x.routeCode == element.routeCode);
             const routeCode = routeDetails?.routeCode ?? 'Unknown';
             const routeName = routeDetails?.routeName ?? 'Unnamed';
@@ -166,10 +173,10 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
               "VehicleNo": element?.vehicleNo || '',
               "TripID": element?.tripId || '',
               "Location": this.branch,
-              "Scheduled":this.datePipe.transform(scheduleTimeISOString,'dd/MM/yyyy HH:mm'),
-              "Expected": this.datePipe.transform(updatedISOString,'dd/MM/yyyy HH:mm'),
-              "Status": "On Time",
-              "Hrs": 0,
+              "Scheduled": this.datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
+              "Expected": this.datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
+              "Status":timeDifferenceInHours > 0 ? "Delay" : "On Time",
+              "Hrs": timeDifferenceInHours.toFixed(),
               "Action": element?.status === "depart" ? "Vehicle Arrival" : "Arrival Scan"
             }
             tableData.push(arrivalData);
@@ -198,8 +205,10 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     // Send request and handle response
     this._operation.operationPost("common/getall", req).subscribe({
       next: async (res: any) => {
-        // Update shipmentData property with the received data
-        const boxData = res.data.filter((x) => x.destination.split(":")[1].trim() === this.branch.trim() && x.unloading === 0 && x.mfNo !== '');
+        const boxData = res.data.filter((x) => {
+          const destination = x.destination ? x.destination.split(":")[1].trim() : "";
+          return destination === this.branch.trim() && x.unloading === 0 && x.mfNo !== '';
+        });
         const sumTotalChargedNoOfpkg = boxData.reduce((total, count) => {
           return total + parseInt(count.totalChargedNoOfpkg);
         }, 0);

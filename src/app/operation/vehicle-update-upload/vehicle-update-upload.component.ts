@@ -154,9 +154,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
           let json = {
             "Leg": element?.leg.replace(" ", "") || '',
             "Shipment": shipmentData?.length || 0,
-            "Packages": element?.pacakges || 0,
-            "WeightKg": element?.weightKg || 0,
-            "VolumeCFT": element?.volumeCFT || 0
+            "Packages":  parseInt(element?.pacakges) || 0,
+            "WeightKg":  parseInt(element?.weightKg) || 0,
+            "VolumeCFT": parseInt(element?.volumeCFT) || 0
           };
           dataLoading.push(json);
         });
@@ -170,9 +170,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "Shipment": element?.docketNumber || '',
             "Origin": element?.orgLoc || '',
             "Destination": element?.destination.split(":")[1] || '',
-            "Packages": element?.totalChargedNoOfpkg || '',
+            "Packages":  parseInt(element?.totalChargedNoOfpkg) ||0,
             "loaded": 0,
-            "Pending": element?.totalChargedNoOfpkg || '',
+            "Pending":  parseInt(element?.totalChargedNoOfpkg) ||0,
             "Leg": lsDetails?.leg.replace(" ", "") || '',
           };
           docketData.push(json);
@@ -219,8 +219,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
     let packages = 0;
     let shipingloaded = 0;
     this.loadingTableData.forEach((element, index) => {
-      packages = element.Packages + packages
-      shipingloaded = element.loaded + shipingloaded;
+      packages = parseInt(element.Packages) + packages
+      shipingloaded =  parseInt(element.loaded) + shipingloaded;
     });
     const createShipDataObject = (count, title, className) => ({
       count,

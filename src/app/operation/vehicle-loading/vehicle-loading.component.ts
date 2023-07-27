@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { vehicleLoadingControl } from '../../../assets/FormControls/vehicleloading';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VehicleUpdateUploadComponent } from '../vehicle-update-upload/vehicle-update-upload.component';

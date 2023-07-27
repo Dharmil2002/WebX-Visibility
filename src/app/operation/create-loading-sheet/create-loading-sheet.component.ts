@@ -97,7 +97,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   loadingSheetNo: any;
   docketApiRes: any;
   cnoteDetails: any;
-  loadingGenerated: any;
+
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,
@@ -353,6 +353,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   loadingSheetGenerate() {
+    debugger
     
     if (!this.loadingSheetTableForm.value.vehicle) {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
@@ -478,7 +479,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   // Method to retrieve details for each leg in the leg_details array
   getDetailsByLeg() {
-    for (const leg of this.loadingGenerated) {
+    for (const leg of  this.loadingData) {
       const org_loc = leg.leg.split("-")[0].trim();
       const destination = leg.leg.split("-")[1].trim();
   

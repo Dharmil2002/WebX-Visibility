@@ -68,10 +68,13 @@ export class AddressControl {
                 ]
             },
             {
-                name: 'city', label: "City",
-                placeholder: "Enter City",
-                type: 'text',
-                value: addressGroupTable.city,
+                name: 'cityName', label: "City",
+                placeholder: "Select City",
+                type: 'dropdown',
+                value: '',
+                additionalData: {
+                    showNameAndValue: false
+                },
                 generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -91,16 +94,20 @@ export class AddressControl {
             },
             {
                 name: 'pincode', label: "Pincode",
-                placeholder: "Enter Address",
-                type: 'text',
-                value: addressGroupTable.pincode,
+                placeholder: "Select Pincode",
+                type: 'dropdown',
+                value: '',
+                additionalData: {
+                    showNameAndValue: false
+                },
                 generatecontrol: true, disable: false,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "Pincode is required"
-                    },
+                    // {
+                    //     name: "required",
+                    //     message: "Pincode is required"
+                    // },
                 ]
+              
             },
             {
                 name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: addressGroupTable.activeFlag, generatecontrol: true, disable: false,

@@ -61,7 +61,7 @@ export class ClusterMasterListComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "type": "masters",
-      "collection": "cluster"
+      "collection": "cluster_detail"
     }
     this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {

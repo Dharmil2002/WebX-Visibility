@@ -60,24 +60,19 @@ export class ClusterControl {
                 name: 'pincode',
                 label: 'Pincode',
                 placeholder: 'Pincode',
-                type: 'text',
-                value: clusterMasterTable.pincode,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Cluster name is required"
-                    },
-                    {
-                        name: "minlength",
-                        message: "Cluster name must be between 1 and 20 characters long",
-                        minLength: '1',
-                    },
-                    {
-                        name: "maxlength",
-                        message: "Cluster name must be between 1 and 20 characters long",
-                        maxLength: '20',
-                    },
-                ],
+                type: 'multiselect',
+                value:'' ,
+                Validations: [],
+                additionalData: {
+                    isIndeterminate: false,
+                    isChecked: false,
+                    support: "pincodeDropdown",
+                    showNameAndValue: false,
+                    Validations: [{
+                        name: "",
+                        message: ""
+                    }]
+                },
                 generatecontrol: true, disable: false
             },
             // {
@@ -160,6 +155,16 @@ export class ClusterControl {
                 value: clusterMasterTable.activeFlag,
                 Validations: [],
                 generatecontrol: true, disable: false
+            },
+            {
+                name: 'pincodeDropdown',
+                label: 'Pay Basis',
+                placeholder: 'Pay Basis',
+                type: '',
+                value: '',
+                Validations: [
+                ],
+                generatecontrol: false, disable: false
             },
             {
                 name: 'id',

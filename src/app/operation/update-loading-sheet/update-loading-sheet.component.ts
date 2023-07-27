@@ -101,7 +101,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     private _operation: OperationService,
     private cdr: ChangeDetectorRef
   ) {
- 
+
     // Set the initial shipment status to 'Unloaded'
     this.shipmentStatus = 'Unloaded';
 
@@ -115,17 +115,18 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   getLoadingSheetDetail() {
+
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "menifest_detail"
     }
-    this._operation.operationPost('common/getall',reqBody).subscribe({
+    this._operation.operationPost('common/getall', reqBody).subscribe({
       next: (res: any) => {
-       if(res){
-         const mfDetail=res.data.find((x)=>x.tripId===this.arrivalData?.TripID);
-         this.getShippningData(mfDetail.mfNo)
-       }
+        if (res) {
+          const mfDetail = res.data.find((x) => x.tripId === this.arrivalData?.TripID);
+          this.getShippningData(mfDetail.mfNo)
+        }
       }
     })
   }
@@ -141,7 +142,11 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     this._operation.operationPost('common/getall', reqBody).subscribe(res => {
       if (res) {
-        const arrivalData = res.data.filter((x) => x.destination.split(":")[1].trim() === this.currentBranch && x.mfNo === menifestNo || "");
+        const arrivalData = res.data.filter((x) => {
+          const destinationParts = x.destination ? x.destination.split(":")[1].trim() : "";
+          return destinationParts === this.currentBranch && x.mfNo === menifestNo;
+        });
+
         // Filter shipments based on route and branch
         let filteredShipments = filterShipments(arrivalData, this.arrivalData?.Route, this.currentBranch);
 
@@ -154,7 +159,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
           Unloaded: 0,
           Pending: parseInt(shipment.totalChargedNoOfpkg),
           Leg: (shipment.orgLoc || "") + ":" + (shipment.destination ? shipment.destination.split(":")[1].trim() : ""),
-          KgWt: shipment?.actualwt || "",
+          KgWt: parseInt(shipment?.actualwt) ||0,
           CftVolume: shipment?.cft_tot || ""
         }));
         this.boxData = kpiData(this.csv, this.shipmentStatus, "");
@@ -292,7 +297,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
     locationWiseData.forEach(element => {
-    this.UpdateDocketDetail(element.Shipment);
+      this.UpdateDocketDetail(element.Shipment);
     });
     if (packageChecked) {
       this.updateTripStatus()
@@ -309,20 +314,22 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   }
   UpdateDocketDetail(dkt) {
-   const reqbody= {
+    const reqbody = {
       "companyCode": 10065,
       "type": "operation",
       "collection": "docket",
       "id": dkt,
       "updates": {
-         "unloading": 1
-  
+        "unloading": 1
+
       }
     }
-      this._operation.operationPut("common/update",reqbody).subscribe({next:(res:any)=>{
-      }})
-  
-    
+    this._operation.operationPut("common/update", reqbody).subscribe({
+      next: (res: any) => {
+      }
+    })
+
+
   }
   Close(): void {
     this.dialogRef.close()

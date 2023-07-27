@@ -4,6 +4,7 @@ import { MarkArrivalComponent } from '../../ActionPages/mark-arrival/mark-arriva
 import { UpdateLoadingSheetComponent } from 'src/app/operation/update-loading-sheet/update-loading-sheet.component';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -96,7 +97,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   // declararing properties
   constructor(
     private CnoteService: CnoteService,
-    private _operation: OperationService
+    private _operation: OperationService,
+    private datePipe: DatePipe
   ) {
 
     super();
@@ -138,10 +140,24 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     this._operation.operationPost('common/getall', reqbody).subscribe({
       next: (res: any) => {
         if (res) {
-        
+
           const arrivalDetails = res.data.filter((x) => x.nextUpComingLoc.toLowerCase() === this.branch.toLowerCase());
-         let tableData=[];
+          let tableData = [];
           arrivalDetails.forEach(element => {
+            //let scheduleTime = new Date(); // Replace this with the actual schedule time
+            // Step 1: Create a new Date object for the current date and time
+            const currentDate = new Date();
+            // Step 2: Add 10 minutes to the Date object for the expected time
+            const expectedTime = new Date(currentDate.getTime() + 10 * 60000); // 10 minutes in milliseconds
+            // Step 3: Add the transHrs (if required) to the expected time
+            // let expectedTimeWithTransHrs = addHours(expectedTime, transHrs);
+            // Step 4: Get the schedule time (replace this with your scheduleTime variable)
+            const scheduleTime = new Date(); // Replace this line with your actual scheduleTime variable
+
+            // Step 5: Format the dates to strings
+            const updatedISOString = expectedTime.toISOString();
+            const scheduleTimeISOString = scheduleTime.toISOString();
+
             let routeDetails = this.routeDetails.find((x) => x.routeCode == element.routeCode);
             const routeCode = routeDetails?.routeCode ?? 'Unknown';
             const routeName = routeDetails?.routeName ?? 'Unnamed';
@@ -150,62 +166,62 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
               "VehicleNo": element?.vehicleNo || '',
               "TripID": element?.tripId || '',
               "Location": this.branch,
-              "Scheduled": routeDetails.routeStartDate,
-              "Expected": routeDetails.routeEndDate,
-              "Status":  "On Time",
+              "Scheduled":this.datePipe.transform(scheduleTimeISOString,'dd/MM/yyyy HH:mm'),
+              "Expected": this.datePipe.transform(updatedISOString,'dd/MM/yyyy HH:mm'),
+              "Status": "On Time",
               "Hrs": 0,
-              "Action": element?.status==="depart"?"Vehicle Arrival":"Arrival Scan"
+              "Action": element?.status === "depart" ? "Vehicle Arrival" : "Arrival Scan"
             }
             tableData.push(arrivalData);
           });
           this.fetchShipmentData();
-          this.arrivalTableData=tableData;
-          this.tableload=false;
-    
-       
+          this.arrivalTableData = tableData;
+          this.tableload = false;
+
+
         }
       }
     })
   }
- /**
-   * Fetches shipment data from the API and updates the boxData and tableload properties.
-   */
- fetchShipmentData() {
- 
-  // Prepare request payload
-  let req = {
-    companyCode: this.companyCode,
-    type: "operation",
-    collection: "docket",
-  };
+  /**
+    * Fetches shipment data from the API and updates the boxData and tableload properties.
+    */
+  fetchShipmentData() {
 
-  // Send request and handle response
-  this._operation.operationPost("common/getall", req).subscribe({
-    next: async (res: any) => {
-      // Update shipmentData property with the received data
-      const boxData = res.data.filter((x)=>x.destination.split(":")[1].trim()===this.branch.trim() && x.unloading===0 && x.mfNo!=='');
-      const sumTotalChargedNoOfpkg =boxData.reduce((total, count) => {
-        return total + parseInt(count.totalChargedNoOfpkg);
-      }, 0);
-      
+    // Prepare request payload
+    let req = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "docket",
+    };
 
-      const createShipDataObject = (count, title, className) => ({
-        count,
-        title,
-        class: `info-box7 ${className} order-info-box7`
-      });
+    // Send request and handle response
+    this._operation.operationPost("common/getall", req).subscribe({
+      next: async (res: any) => {
+        // Update shipmentData property with the received data
+        const boxData = res.data.filter((x) => x.destination.split(":")[1].trim() === this.branch.trim() && x.unloading === 0 && x.mfNo !== '');
+        const sumTotalChargedNoOfpkg = boxData.reduce((total, count) => {
+          return total + parseInt(count.totalChargedNoOfpkg);
+        }, 0);
 
-      const shipData = [
-        createShipDataObject(this.arrivalTableData.length, "Routes", "bg-white"),
-        createShipDataObject(this.arrivalTableData.length, "Vehicles", "bg-white"),
-        createShipDataObject(boxData.length, "Shipments", "bg-white"),
-        createShipDataObject(sumTotalChargedNoOfpkg, "Packages", "bg-white")
-      ];
 
-      this.boxData = shipData;
-    },
-  });
-}
+        const createShipDataObject = (count, title, className) => ({
+          count,
+          title,
+          class: `info-box7 ${className} order-info-box7`
+        });
+
+        const shipData = [
+          createShipDataObject(this.arrivalTableData.length, "Routes", "bg-white"),
+          createShipDataObject(this.arrivalTableData.length, "Vehicles", "bg-white"),
+          createShipDataObject(boxData.length, "Shipments", "bg-white"),
+          createShipDataObject(sumTotalChargedNoOfpkg, "Packages", "bg-white")
+        ];
+
+        this.boxData = shipData;
+      },
+    });
+  }
   updateDepartureData(event) {
 
     const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;

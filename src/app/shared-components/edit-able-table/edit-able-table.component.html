@@ -63,8 +63,8 @@
 
                                     <!-- Check if the column key is 'toggle' -->
                                     <ng-container *ngIf="columnHeader[item].key === 'toggle'">
-                                        <mat-slide-toggle color="primary" class="example-margin"
-                                            [(ngModel)]="row[item]">
+                                        <mat-slide-toggle color="primary" class="example-margin" [(ngModel)]="row[item]"
+                                            (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange })">
                                         </mat-slide-toggle>
                                     </ng-container>
 

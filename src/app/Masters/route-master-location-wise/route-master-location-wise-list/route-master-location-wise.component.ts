@@ -9,15 +9,15 @@ export class RouteMasterLocationWiseComponent implements OnInit {
   data: [] | any;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  toggleArray = ["active"]
+  toggleArray = ["isActive"]
   linkArray = []
   columnHeader = {
     "srNo": "Sr No",
     'routeMode': 'Route Mode',
     'routeId': 'Route Code',
     'routeName': 'Route Name',
-    'routeCategory': 'Route Category',
-    "active": "Active Flag",
+    'routeCat': 'Route Category',
+    "isActive": "Active Flag",
     "actions": "Actions"
   };
   headerForCsv = {
@@ -25,7 +25,7 @@ export class RouteMasterLocationWiseComponent implements OnInit {
     'routeMode': 'Route Mode',
     'routeId': 'Route Code',
     'routeName': 'Route Name',
-    'routeCategory': 'Route Category',
+    'routeCat': 'Route Category',
     "active": "Active Flag"
   }
   breadScrums = [
@@ -50,12 +50,24 @@ export class RouteMasterLocationWiseComponent implements OnInit {
     this.getRouteDetails();
   }
   getRouteDetails() {
-    // Fetch data from the JSON endpoint
-    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-      this.data = res;
-      this.csv = this.data['routeLocationData']
-      this.tableLoad = false;
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "routeMasterLocWise"
     }
-    );
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          this.csv = res.data.map((obj, index) => {
+            obj['srNo'] = index + 1
+            const route = obj.loccd.join('-'); // Join the elements with a hyphen
+            obj['routeName'] = route;
+            return obj;
+          })
+          this.tableLoad = false;
+        }
+      }
+    })
   }
 }

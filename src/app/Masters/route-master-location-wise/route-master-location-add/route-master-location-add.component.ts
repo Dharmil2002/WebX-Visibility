@@ -3,12 +3,10 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { DCRControl } from 'src/assets/FormControls/dcrControl';
 import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { map } from 'rxjs/operators';
-import { utilityService } from 'src/app/Utility/utility.service';
 import { RouteLocationControl } from 'src/assets/FormControls/routeLocationControl';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-route-master-location-add',
@@ -48,7 +46,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
     },
     distKm: {
       name: "Distance (In Km)",
-      key: "inputString",
+      key: "input",
       style: "",
     },
     trtimeHr: {
@@ -56,18 +54,8 @@ export class RouteMasterLocationAddComponent implements OnInit {
       key: "input",
       style: "",
     },
-    trtimeMin: {
-      name: "Time (Minutes)",
-      key: "input",
-      style: "",
-    },
     sttimeHr: {
       name: "Stoppage (Hours)",
-      key: "input",
-      style: "",
-    },
-    sttimeMin: {
-      name: "Time (Hours)",
       key: "input",
       style: "",
     },
@@ -112,7 +100,9 @@ export class RouteMasterLocationAddComponent implements OnInit {
   };
   tableView: boolean;
   filteredData: any;
-  constructor(private service: utilityService, private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
+  newRouteCode: string;
+  datePipe: DatePipe = new DatePipe("en-US");
+  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
@@ -120,10 +110,10 @@ export class RouteMasterLocationAddComponent implements OnInit {
       this.getRouteDet();
     } else {
       this.action = "Add";
+      this.loadTempData('');
     }
     if (this.action === 'edit') {
       this.isUpdate = true;
-      // this.pincodeTable = this.data;
       this.breadScrums = [
         {
           title: "Route Location Wise Master",
@@ -139,13 +129,11 @@ export class RouteMasterLocationAddComponent implements OnInit {
           active: "Add Route Location Wise Master",
         },
       ];
-      // this.pincodeTable = new PincodeMaster({});
     }
-    this.loadTempData('');
   }
   ngOnInit(): void {
     this.intializeFormControls();
-    this.getDropDownData();
+    this.getAllMastersData();
   }
   intializeFormControls() {
     this.routeMasterLocationFormControls = new RouteLocationControl(this.data);
@@ -158,7 +146,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
     });
     this.routeMasterLocationForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.routeMasterLocationForm.controls["routeType"].setValue(this.data?.routeType);
-    this.routeMasterLocationForm.controls["routeCat"].setValue(this.data?.routeCategory);
+    this.routeMasterLocationForm.controls["routeCat"].setValue(this.data?.routeCat);
     this.routeMasterLocationForm.controls["routeMode"].setValue(this.data?.routeMode);
   }
   functionCallHandler($event) {
@@ -169,33 +157,138 @@ export class RouteMasterLocationAddComponent implements OnInit {
       console.log("failed");
     }
   }
-  getDropDownData() {
-    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-      this.locationData = res.locationDropdown
-      this.displayedColumns1.loccd.option = this.locationData;
-      this.tableView = true;
-      if (this.isUpdate) {
-        this.updateState = this.locationData.find((x) => x.value == this.data.controlLocation);
-        this.routeMasterLocationForm.controls.controlLoc.setValue(this.updateState);
+  getAllMastersData() {
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "location_detail"
+    }
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          const locData = res.data.map(element => ({
+            name: element.locName,
+            value: element.locCode,
+          }));
+          this.locationData = locData
+          this.displayedColumns1.loccd.option = this.locationData;
+          this.tableView = true;
+          if (this.isUpdate) {
+            this.updateState = this.locationData.find((x) => x.name == this.data.controlLoc);
+            this.routeMasterLocationForm.controls.controlLoc.setValue(this.updateState);
+          }
+          this.filter.Filter(
+            this.jsonControlArray,
+            this.routeMasterLocationForm,
+            this.locationData,
+            this.controlLoc,
+            this.controlLocStatus,
+          );
+        }
       }
-      this.filter.Filter(
-        this.jsonControlArray,
-        this.routeMasterLocationForm,
-        this.locationData,
-        this.controlLoc,
-        this.controlLocStatus,
-      );
-    });
+    })
   }
   cancel() {
     window.history.back();
   }
   save() {
-    const jData = {
-      routeDet: this.routeMasterLocationForm.value,
-      objRouteDet: this.tableData
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "routeMasterLocWise"
     }
-    this.service.exportData(jData);
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          const lastRoute = res.data[res.data.length - 1];
+          const lastRouteCode = parseInt(lastRoute.routeId.substring(1));
+          // Function to generate a new route code
+          function generateRouteCode() {
+            const nextRouteCode = lastRouteCode + 1;
+            const routeNumber = nextRouteCode.toString().padStart(4, '0');
+            const routeCode = `R${routeNumber}`;
+            return routeCode;
+          }
+          if (this.isUpdate) {
+            this.newRouteCode = this.data.id
+          } else {
+            this.newRouteCode = generateRouteCode();
+          }
+          const transformedData = {
+            routeId: this.newRouteCode,
+            routeMode: this.routeMasterLocationForm.value.routeMode,
+            routeCat: this.routeMasterLocationForm.value.routeCat,
+            routeKm: this.routeMasterLocationForm.value.routeKm,
+            departureClockTime: parseFloat(this.datePipe.transform(this.routeMasterLocationForm.value.departureTime, "HH:mm")),
+            controlLoc: this.routeMasterLocationForm.value.controlLoc.name,
+            routeType: this.routeMasterLocationForm.value.routeType,
+            isActive: this.routeMasterLocationForm.value.isActive,
+            id: this.newRouteCode,
+            loccd: this.tableData.map((item) => item.loccd),
+            distKm: this.tableData.map((item) => parseInt(item.distKm)),
+            trtimeHr: this.tableData.map((item) => parseInt(item.trtimeHr)),
+            sttimeHr: this.tableData.map((item) => parseInt(item.sttimeHr)),
+            speedLightVeh: this.tableData.map((item) => parseInt(item.speedLightVeh)),
+            speedHeavyVeh: this.tableData.map((item) => parseInt(item.speedHeavyVeh)),
+            nightDrivingRestricted: this.tableData.map((item) => item.nightDrivingRestricted),
+            restrictedHoursFrom: this.tableData.map((item) => parseInt(item.restrictedHoursFrom)),
+            restrictedHoursTo: this.tableData.map((item) => parseInt(item.restrictedHoursTo)),
+            entryBy: localStorage.getItem('Username'),
+            entryDate: new Date().toISOString()
+          };
+
+          if (this.isUpdate) {
+            let id = transformedData.id;
+            // Remove the "id" field from the form controls
+            delete transformedData.id;
+            let req = {
+              companyCode: parseInt(localStorage.getItem("companyCode")),
+              type: "masters",
+              collection: "routeMasterLocWise",
+              id: id,
+              updates: transformedData
+            };
+            this.masterService.masterPut('common/update', req).subscribe({
+              next: (res: any) => {
+                if (res) {
+                  // Display success message
+                  Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                  });
+                  this.route.navigateByUrl('/Masters/RouteLocationWise/RouteList');
+                }
+              }
+            });
+          } else {
+            let req = {
+              companyCode: parseInt(localStorage.getItem("companyCode")),
+              type: "masters",
+              collection: "routeMasterLocWise",
+              data: transformedData
+            };
+            this.masterService.masterPost('common/create', req).subscribe({
+              next: (res: any) => {
+                if (res) {
+                  // Display success message
+                  Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                  });
+                  this.route.navigateByUrl('/Masters/RouteLocationWise/RouteList');
+                }
+              }
+            });
+          }
+        }
+      }
+    })
   }
   // Load temporary data
   loadTempData(det) {
@@ -283,11 +376,38 @@ export class RouteMasterLocationAddComponent implements OnInit {
     return true;
   }
   getRouteDet() {
-    // Fetch data from the JSON endpoint
-    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-      this.filteredData = res['objRouteDetails'].filter(item => item.rutcd === this.data.routeId);
-      this.loadTempData(this.filteredData)
+    // Function to transform array properties
+    function transformArrayProperties(data) {
+      const transformedData = [];
+      const len = Math.max(
+        data.loccd.length,
+        data.distKm.length,
+        data.trtimeHr.length,
+        data.sttimeHr.length,
+        data.speedLightVeh.length,
+        data.speedHeavyVeh.length,
+        data.nightDrivingRestricted.length,
+        data.restrictedHoursFrom.length,
+        data.restrictedHoursTo.length
+      );
+
+      for (let i = 0; i < len; i++) {
+        transformedData.push({
+          loccd: data.loccd[i],
+          distKm: data.distKm[i] || 0,
+          trtimeHr: data.trtimeHr[i] || 0,
+          sttimeHr: data.sttimeHr[i] || 0,
+          speedLightVeh: data.speedLightVeh[i] || 0,
+          speedHeavyVeh: data.speedHeavyVeh[i] || 0,
+          nightDrivingRestricted: data.nightDrivingRestricted[i] || false,
+          restrictedHoursFrom: data.restrictedHoursFrom[i] || null,
+          restrictedHoursTo: data.restrictedHoursTo[i] || null,
+        });
+      }
+      return transformedData;
     }
-    );
+    const transformedData = transformArrayProperties(this.data);
+    this.loadTempData(transformedData);
   }
+
 }

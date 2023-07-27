@@ -76,7 +76,7 @@ export class RouteLocationControl {
                 name: 'departureTime',
                 label: 'Departure time from starting Location',
                 placeholder: '',
-                type: 'date',
+                type: 'time',
                 value: new Date(2023, 6, 18, 13, 14),
                 Validations: [],
                 generatecontrol: true, disable: false
@@ -124,10 +124,24 @@ export class RouteLocationControl {
                 label: 'Active Flag',
                 placeholder: 'Active Flag',
                 type: 'toggle',
-                value: '',
+                value: routeLocationData?.isActive,
                 Validations: [],
                 generatecontrol: true, disable: false
             },
+            {
+                name: 'id',
+                label: '',
+                placeholder: '',
+                type: 'text',
+                value: routeLocationData?.id,
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+
+            }
         ]
     }
     getFormControls() {

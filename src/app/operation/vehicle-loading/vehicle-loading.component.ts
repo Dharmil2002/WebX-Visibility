@@ -130,6 +130,7 @@ export class VehicleLoadingComponent implements OnInit {
   }
 
   getLoadingSheetData() {
+
     const reqBody = {
       "companyCode": 10065,
       "type": "operation",
@@ -164,6 +165,7 @@ export class VehicleLoadingComponent implements OnInit {
     }
   }
   getDocketDetails() {
+
     const reqBody = {
       "companyCode": 10065,
       "type": "operation",
@@ -176,8 +178,9 @@ export class VehicleLoadingComponent implements OnInit {
           let dataLoading=[];
           if (this.tripDetails) {
             this.tripDetails.forEach((element: any) => { // Specify the type of 'element' as 'any'
-              let shipmentData =  res.data.filter((x) => x.lsNo === element.lsno);
+              let shipmentData =  res.data.filter((x) => x.lsNo === element.lsno && x.mfNo === element.mfNo);
                 let json = {
+                    id: this.tripData.id,
                     route:this.vehicleLoadingTableForm.controls['Route']?.value||"",
                     tripId:this.tripData?.TripID||'',
                     LoadingSheet: element?.lsno || '',

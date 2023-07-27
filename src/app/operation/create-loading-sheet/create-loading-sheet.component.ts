@@ -424,7 +424,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       .subscribe((res) => {
         if (res) {
           let vehicleDetails = res.data
-            .filter((x) => x.status === "")
+            .filter((x) => x.status === ""&&x.currentLocation===this.orgBranch)
             .map((x) => {
               return { name: x.vehNo, value: x.vehNo };
             });
@@ -463,7 +463,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       companyCode: this.companyCode,
       type: "operation",
       collection: "trip_detail",
-      id: "trip_" + this.loadingSheetTableForm.value.Route.split(":")[0] || "",
+      id: this.tripData.id,
       updates: {
         ...tripDetails,
       },
@@ -522,7 +522,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   addLsDetails(leg) {
-
+  debugger
     const lsDetails = {
       id: leg.LoadingSheet,
       lsno: leg.LoadingSheet,

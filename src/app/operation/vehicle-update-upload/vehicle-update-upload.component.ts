@@ -375,7 +375,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "trip_detail",
-      "id": 'trip_' + this.vehicelLoadData?.route.split(":")[0] || "",
+      "id": this.vehicelLoadData?.id||"",
       "updates": {
         ...tripDetails,
       }

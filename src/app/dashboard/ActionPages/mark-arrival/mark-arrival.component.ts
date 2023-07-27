@@ -141,7 +141,7 @@ export class MarkArrivalComponent implements OnInit {
         "companyCode": this.companyCode,
         "type": "operation",
         "collection": "trip_detail",
-        "id": 'trip_' +this.MarkArrivalTable.Route.split(":")[0] || "",
+        "id":this.MarkArrivalTable.id,
         "updates": {
           ...tripDetails
         }

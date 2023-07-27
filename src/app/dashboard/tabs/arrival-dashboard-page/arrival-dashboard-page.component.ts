@@ -144,31 +144,26 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
           const arrivalDetails = res.data.filter((x) => x.nextUpComingLoc.toLowerCase() === this.branch.toLowerCase());
           let tableData = [];
           arrivalDetails.forEach(element => {
-            //let scheduleTime = new Date(); // Replace this with the actual schedule time
-            // Step 1: Create a new Date object for the current date and time
             const currentDate = new Date();
-            // Step 2: Add 10 minutes to the Date object for the expected time
+            /*here  the of schedule is not avaible so i can trying to ad delay manually*/
             const expectedTime = new Date(currentDate.getTime() + 10 * 60000); // 10 minutes in milliseconds
-            // Step 3: Add the transHrs (if required) to the expected time
-            // let expectedTimeWithTransHrs = addHours(expectedTime, transHrs);
-            // Step 4: Get the schedule time (replace this with your scheduleTime variable)
             const scheduleTime = new Date(); // Replace this line with your actual scheduleTime variable
-
-            // Step 5: Format the dates to strings
             const updatedISOString = expectedTime.toISOString();
             const scheduleTimeISOString = scheduleTime.toISOString();
-            // Step 1: Get the schedule time (replace this with your actual scheduleTime variable)
-            const diffScheduleTime = new Date(scheduleTimeISOString); // Replace 'element.scheduleTime' with the actual property containing the schedule time
-
+            const diffScheduleTime = new Date(updatedISOString); // Replace 'element.scheduleTime' with the actual property containing the schedule time
+        
             // Step 2: Get the expected time (replace this with your actual expectedTime variable)
-            const diffSexpectedTime = new Date(updatedISOString); // Replace 'element.expectedTime' with the actual property containing the expected time
-
+            const diffSexpectedTime = new Date(scheduleTimeISOString); // Replace 'element.expectedTime' with the actual property containing the expected time
+        
             const timeDifferenceInMilliseconds = diffScheduleTime.getTime() - diffSexpectedTime.getTime();
             const timeDifferenceInHours = timeDifferenceInMilliseconds / (1000 * 60 * 60);
+        
+          
             let routeDetails = this.routeDetails.find((x) => x.routeCode == element.routeCode);
             const routeCode = routeDetails?.routeCode ?? 'Unknown';
             const routeName = routeDetails?.routeName ?? 'Unnamed';
             let arrivalData = {
+              "id":element?.id||"",
               "Route": routeCode + ":" + routeName,
               "VehicleNo": element?.vehicleNo || '',
               "TripID": element?.tripId || '',
@@ -176,7 +171,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
               "Scheduled": this.datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
               "Expected": this.datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
               "Status":timeDifferenceInHours > 0 ? "Delay" : "On Time",
-              "Hrs": timeDifferenceInHours.toFixed(),
+              "Hrs": timeDifferenceInHours.toFixed(2),
               "Action": element?.status === "depart" ? "Vehicle Arrival" : "Arrival Scan"
             }
             tableData.push(arrivalData);

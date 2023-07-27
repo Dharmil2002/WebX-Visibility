@@ -542,7 +542,7 @@ export class DepartVehicleComponent implements OnInit {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "trip_detail",
-      "id": 'trip_' + this.tripData.RouteandSchedule.split(":")[0] || "",
+      "id":this.tripData.id,
       "updates": {
         ...tripDetails,
       }

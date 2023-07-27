@@ -38,7 +38,7 @@ export async function fetchDepartureDetails(
     //End//
     // Filter departure data based on organization branch
     const departuredata = res.data.filter(
-      (x: any) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase() && x.status !== "close"
+      (x: any) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase() && x.status !== "close" && x.status !== "depart" && x.status !== "arrival"
     );
     const routeData = routeRes.data.filter((x) => x.location.toLowerCase() === orgBranch.toLowerCase())
     // Generate table data from filtered departure data
@@ -113,7 +113,7 @@ function generateTableData(departureData: any[], routeData: any[], datePipe): an
   const { format } = require("date-fns");
 
   departureData.forEach((element, index) => {
-  
+
     //let scheduleTime = new Date(); // Replace this with the actual schedule time
 
     // Step 1: Create a new Date object for the current date and time
@@ -146,13 +146,14 @@ function generateTableData(departureData: any[], routeData: any[], datePipe): an
 
     if (routeDetails) {
       let jsonDeparture = {
+        id:element?.id||"",
         RouteandSchedule: routeCode + ":" + routeName,
         VehicleNo: element?.vehicleNo || "",
         TripID: element?.tripId || "",
         Scheduled: datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
         Expected: datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
         Hrs: timeDifferenceInHours.toFixed(2),
-        Status:timeDifferenceInHours > 0 ? "Delay" : "On Time",
+        Status: timeDifferenceInHours > 0 ? "Delay" : "On Time",
         Action: element?.status === "depart" ? "" : element?.status === "arrival" ? "" : element?.status,
         location: element?.location || "",
       };

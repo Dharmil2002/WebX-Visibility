@@ -133,7 +133,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
 
   getShippningData(menifestNo) {
-
+       
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -359,7 +359,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "trip_detail",
-      "id": 'trip_' + this.arrivalData?.Route.split(":")[0] || "",
+      "id":this.arrivalData.id,
       "updates": {
         ...tripDetails,
       }

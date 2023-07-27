@@ -58,7 +58,6 @@ export class StocksComponent
     paymentType: "Pay-Type",
     contractParty: "Contract Party",
     orgdest: "Org-Dest",
-    fromCityToCity: "Leg",
     noofPackages: "Packages",
     actualWeight: "Act-Wt(Kg)",
     chargedWeight: "Chrg-Wt(Kg)",

@@ -1,8 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
+import {UntypedFormGroup } from '@angular/forms';
 import { CnoteService } from '../../../core/service/Masters/CnoteService/cnote.service';
 import { ViewPrintComponent } from '../../view-print/view-print.component';
 @Component({
@@ -99,6 +97,7 @@ export class ManifestGeneratedComponent implements OnInit {
     groupedDataWithoutKey = Object.values(groupedData);
     let MeniFestDetails: any[] = [];
     groupedDataWithoutKey.forEach(element => {
+
       const randomNumber = "MF/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
       let meniFestjson = {
         MFNumber: randomNumber,

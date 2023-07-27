@@ -353,7 +353,6 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   loadingSheetGenerate() {
-    debugger
     
     if (!this.loadingSheetTableForm.value.vehicle) {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);

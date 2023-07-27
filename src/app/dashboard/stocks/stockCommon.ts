@@ -78,7 +78,18 @@ export async function getDocketDetailsFromApi(
           formattedDate = format(parsedDate, "dd-MM-yy HH:mm");
         }
       }
-
+      const status =
+        item.isComplete === 0 && item?.unloading === 0 && item?.lsNo === "" && item?.mfNo === ""
+          ? "Quick Completion"
+          : item.isComplete === 1 && item?.lsNo === "" && !item?.unloading && item?.mfNo === ""
+            ? "Available for LS"
+            : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo === ""
+              ? "Available for manifest"
+              : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo
+                ? "Depart for " + item.destination.split(":")[1]
+                : item.isComplete === 1 && item?.unloading && item?.lsNo && item?.mfNo
+                  ? "Unloading at " + item.destination.split(":")[1]
+                  :"Quick Completion";
       return {
         no: item?.docketNumber ?? "",
         date: formattedDate,
@@ -89,11 +100,7 @@ export async function getDocketDetailsFromApi(
         noofPackages: parseInt(item?.totalChargedNoOfpkg ?? 0),
         chargedWeight: parseInt(item?.chrgwt ?? 0),
         actualWeight: parseInt(actualWeight ?? 0),
-        status: item?.isComplete === 1
-          ? item?.lsNo === "" ? "Available for LS" : "Available for manifest"
-          : item?.unloading === 1 && item?.lsNo && item?.mfNo
-            ? "Waiting for unloading"
-            : "Quick Completion",
+        status: status,
         // Determine the Action based on the conditions
         Action: item?.isComplete === 1
           ? item?.lsNo === 0 ? "" : ""

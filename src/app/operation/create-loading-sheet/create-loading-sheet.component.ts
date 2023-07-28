@@ -522,7 +522,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   addLsDetails(leg) {
-  debugger
+
     const lsDetails = {
       id: leg.LoadingSheet,
       lsno: leg.LoadingSheet,

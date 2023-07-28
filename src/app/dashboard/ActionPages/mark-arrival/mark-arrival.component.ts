@@ -88,7 +88,7 @@ export class MarkArrivalComponent implements OnInit {
     }
   }
   getPreviousData() {
-
+    this.goBack(1)
     this.dialogRef.close("")
     Swal.fire({
       icon: "success",
@@ -155,6 +155,7 @@ export class MarkArrivalComponent implements OnInit {
       })
   }
   cancel() {
+    this.goBack(1)
     this.dialogRef.close()
   }
   goBack(tabIndex: number): void {

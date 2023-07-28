@@ -290,14 +290,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
         });
 
         dialogRef.afterClosed().subscribe(result => {
-
+      
           this.generateMeniFest(result);
-          // let arravalDataDetails = [this.arrivalData];
-          // arravalDataDetails.forEach(x => {
-          //   x.Action = "DEPART VEHICLE"
-          //   x.menifestNo = result[0].MFNumber
-          // })
-          // this.cnoteService.setLsData(arravalDataDetails);
           Swal.fire({
             icon: "success",
             title: "Successful",
@@ -362,7 +356,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.operationService.operationPost('common/create', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          if (this.vehicelLoadData.count == "1") {
+          if (this.vehicelLoadData.count===1) {
             this.updateTripStatus();
           }
           else {

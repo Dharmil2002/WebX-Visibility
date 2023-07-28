@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -115,7 +114,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   getLoadingSheetDetail() {
-
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -124,8 +122,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this._operation.operationPost('common/getall', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          const mfDetail = res.data.find((x) => x.tripId === this.arrivalData?.TripID);
-          this.getShippningData(mfDetail.mfNo)
+          const mfDetail = res.data.filter((x) => x.tripId === this.arrivalData?.TripID);
+          mfDetail.forEach(element => {
+          this.getShippningData(element.mfNo)
+          });
         }
       }
     })
@@ -133,7 +133,6 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
 
   getShippningData(menifestNo) {
-       
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -315,7 +314,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   UpdateDocketDetail(dkt) {
     const reqbody = {
-      "companyCode": 10065,
+      "companyCode": this.companyCode,
       "type": "operation",
       "collection": "docket",
       "id": dkt,
@@ -332,6 +331,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   }
   Close(): void {
+    this.goBack(1)
     this.dialogRef.close()
   }
   goBack(tabIndex: number): void {
@@ -406,6 +406,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
             showConfirmButton: true,
           })
           this.dialogRef.close(this.loadingSheetTableForm.value)
+          this.goBack(1)
         }
       }
     })

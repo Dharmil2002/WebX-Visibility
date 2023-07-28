@@ -17,7 +17,7 @@ export class VehicleLoadingComponent implements OnInit {
   tripData: any; // Declaration of tripData variable
   jsonControlArray: any; // Declaration of jsonControlArray variable
   orgBranch: string = localStorage.getItem("Branch"); // Retrieve value from localStorage for orgBranch
-
+  companyCode: number = parseInt(localStorage.getItem("companyCode"));
   // Declaring breadscrum
   breadscrums = [
     {
@@ -132,7 +132,7 @@ export class VehicleLoadingComponent implements OnInit {
   getLoadingSheetData() {
 
     const reqBody = {
-      "companyCode": 10065,
+      "companyCode": this.companyCode,
       "type": "operation",
       "collection": "loadingSheet_detail"
     }
@@ -167,42 +167,46 @@ export class VehicleLoadingComponent implements OnInit {
   getDocketDetails() {
 
     const reqBody = {
-      "companyCode": 10065,
+      "companyCode": this.companyCode,
       "type": "operation",
       "collection": "docket"
     }
     this.operationService.operationPost('common/getall', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-         
-          let dataLoading=[];
+
+          let dataLoading = [];
           if (this.tripDetails) {
+          
+            let count = 0
             this.tripDetails.forEach((element: any) => {
-               // Specify the type of 'element' as 'any'
-               let shipmentCount=0;
-              let shipmentData =  res.data.filter((x) => x.lsNo === element.lsno && x.mfNo === element.mfNo);
+              // Specify the type of 'element' as 'any'
+              let shipmentData = res.data.filter((x) => x.lsNo === element.lsno && x.mfNo == "");
+              if (shipmentData.length > 0) {
                 let json = {
-                    count:shipmentCount+1,
-                    id: this.tripData.id,
-                    route:this.vehicleLoadingTableForm.controls['Route']?.value||"",
-                    tripId:this.tripData?.TripID||'',
-                    LoadingSheet: element?.lsno || '',
-                    Manifest: '',
-                    Leg: element?.leg || '',
-                    Shipments: shipmentData?.length||0,
-                    Packages: element?.pacakges || '',
-                    ShipmentsLoaded: 0,
-                    PackagesLoaded: 0,
-                    Pending: shipmentData?.length||0,
-                    Action: 'Load Vehicle',
-                    printPending: 'print'
+                  id: this.tripData.id,
+                  route: this.vehicleLoadingTableForm.controls['Route']?.value || "",
+                  tripId: this.tripData?.TripID || '',
+                  LoadingSheet: element?.lsno || '',
+                  Manifest: '',
+                  Leg: element?.leg || '',
+                  Shipments: shipmentData?.length || 0,
+                  Packages: element?.pacakges || '',
+                  ShipmentsLoaded: 0,
+                  PackagesLoaded: 0,
+                  Pending: shipmentData?.length || 0,
+                  Action: 'Load Vehicle',
+                  printPending: 'print'
                 };
+                count++
                 dataLoading.push(json);
+              }
             });
-        }
-           this.tableData = dataLoading
-           this.tableload=false;
           }
+          // Add the "count" key to each object in the 'dataLoading' array using 'map'
+          this.tableData = dataLoading.map((obj, index) => ({ ...obj, count: dataLoading.length }));;
+          this.tableload = false;
+        }
       }
     })
   }

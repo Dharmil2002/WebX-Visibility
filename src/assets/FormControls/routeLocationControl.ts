@@ -120,6 +120,28 @@ export class RouteLocationControl {
                 disable: true
             },
             {
+                name: 'scheduleType',
+                label: 'Schedule Type',
+                placeholder: 'Search Schedule Type',
+                type: 'Staticdropdown',
+                value: [
+                    { value: 'Daily', name: 'Daily' },
+                    { value: '2 Days', name: '2 Days' },
+                    { value: '3 Days', name: '3 Days' },
+                    { value: '4 Days', name: '4 Days' },
+                    { value: '5 Days', name: '5 Days' },
+                    { value: '6 Days', name: '6 Days' },
+                    { value: 'Alternate', name: 'Alternate' }
+                ],
+                Validations: [
+                ],
+                generatecontrol: true,
+                disable: false,
+                additionalData: {
+                    showNameAndValue: false
+                },
+            },
+            {
                 name: 'isActive',
                 label: 'Active Flag',
                 placeholder: 'Active Flag',

@@ -50,12 +50,12 @@ export class RouteMasterLocationAddComponent implements OnInit {
       style: "",
     },
     trtimeHr: {
-      name: "Transit (Hours)",
+      name: "Transit (Minutes)",
       key: "input",
       style: "",
     },
     sttimeHr: {
-      name: "Stoppage (Hours)",
+      name: "Stoppage (Minutes)",
       key: "input",
       style: "",
     },
@@ -148,6 +148,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
     this.routeMasterLocationForm.controls["routeType"].setValue(this.data?.routeType);
     this.routeMasterLocationForm.controls["routeCat"].setValue(this.data?.routeCat);
     this.routeMasterLocationForm.controls["routeMode"].setValue(this.data?.routeMode);
+    this.routeMasterLocationForm.controls["scheduleType"].setValue(this.data?.scheduleType);
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -224,6 +225,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
             departureClockTime: parseFloat(this.datePipe.transform(this.routeMasterLocationForm.value.departureTime, "HH:mm")),
             controlLoc: this.routeMasterLocationForm.value.controlLoc.name,
             routeType: this.routeMasterLocationForm.value.routeType,
+            scheduleType: this.routeMasterLocationForm.value.scheduleType,
             isActive: this.routeMasterLocationForm.value.isActive,
             id: this.newRouteCode,
             loccd: this.tableData.map((item) => item.loccd),
@@ -232,7 +234,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
             sttimeHr: this.tableData.map((item) => parseInt(item.sttimeHr)),
             speedLightVeh: this.tableData.map((item) => parseInt(item.speedLightVeh)),
             speedHeavyVeh: this.tableData.map((item) => parseInt(item.speedHeavyVeh)),
-            nightDrivingRestricted: this.tableData.map((item) => item.nightDrivingRestricted),
+            nightDrivingRestricted: this.tableData.map((item) => item.nightDrivingRestricted != "" ? true : false),
             restrictedHoursFrom: this.tableData.map((item) => parseInt(item.restrictedHoursFrom)),
             restrictedHoursTo: this.tableData.map((item) => parseInt(item.restrictedHoursTo)),
             entryBy: localStorage.getItem('Username'),

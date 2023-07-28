@@ -46,6 +46,8 @@ import { AddressMasterAddComponent } from './address-master/address-master-add/a
 import { AddressMasterListComponent } from './address-master/address-master-list/address-master-list.component';
 import { ClusterMasterAddComponent } from './cluster-master/cluster-master-add/cluster-master-add.component';
 import { ClusterMasterListComponent } from './cluster-master/cluster-master-list/cluster-master-list.component';
+import { AddRouteScheduleMasterComponent } from './route-schedule-master/add-route-schedule-master/add-route-schedule-master.component';
+import { RouteScheduleMasterListComponent } from './route-schedule-master/route-schedule-master-list/route-schedule-master-list.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -93,7 +95,9 @@ const routes: Routes = [
   { path: "AddressMaster/AddAddressMaster", component: AddressMasterAddComponent },
   { path: "AddressMaster/AddressMasterList", component: AddressMasterListComponent },
   { path: "ClusterMaster/AddClusterMaster", component: ClusterMasterAddComponent },
-  { path: "ClusterMaster/ClusterMasterList", component: ClusterMasterListComponent }
+  { path: "ClusterMaster/ClusterMasterList", component: ClusterMasterListComponent },
+  { path: "RouteScheduleMaster/RouteScheduleMasterList", component: RouteScheduleMasterListComponent },
+  { path: "RouteScheduleMaster/AddRouteScheduleMaster", component: AddRouteScheduleMasterComponent }
 ];
 
 @NgModule({

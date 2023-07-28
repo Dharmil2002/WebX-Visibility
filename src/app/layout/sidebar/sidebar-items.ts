@@ -63,7 +63,6 @@ export const ROUTES: RouteInfo[] =
         submenu: []
       }],
     },
-    
     {
       "path": "Masters/DriverMaster/DriverMasterList",
       "title": "Master & Utilities",
@@ -167,15 +166,6 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
-            },
-            {
-              "path": "Masters/AirportMaster/AirportMasterList",
-              "title": "Airport Master",
-              "moduleName": "Masters",
-              "icon": "",
-              "class": "",
-              "groupTitle": false,
-              "submenu": []
             },
             {
               "path": "Masters/PinCodeMaster/PinCodeMasterList",
@@ -284,6 +274,16 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
+            },
+            {
+              "path": "Masters/RouteScheduleMaster/RouteScheduleMasterList",
+              "title": "Route Schedule Master",
+              "moduleName": "Route Schedule Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
             }
           ]
         },
@@ -314,6 +314,6 @@ export const ROUTES: RouteInfo[] =
         groupTitle: false,
         submenu: []
       }
-     ],
+      ],
     },
   ]

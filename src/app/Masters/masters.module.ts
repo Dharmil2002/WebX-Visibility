@@ -86,6 +86,8 @@ import { AddressMasterListComponent } from './address-master/address-master-list
 import { AddressMasterAddComponent } from './address-master/address-master-add/address-master-add.component';
 import { ClusterMasterAddComponent } from './cluster-master/cluster-master-add/cluster-master-add.component';
 import { ClusterMasterListComponent } from './cluster-master/cluster-master-list/cluster-master-list.component';
+import { AddRouteScheduleMasterComponent } from './route-schedule-master/add-route-schedule-master/add-route-schedule-master.component';
+import { RouteScheduleMasterListComponent } from './route-schedule-master/route-schedule-master-list/route-schedule-master-list.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -179,7 +181,9 @@ import { ClusterMasterListComponent } from './cluster-master/cluster-master-list
     AddressMasterListComponent,
     AddressMasterAddComponent,
     ClusterMasterAddComponent,
-    ClusterMasterListComponent
+    ClusterMasterListComponent,
+    RouteScheduleMasterListComponent,
+    AddRouteScheduleMasterComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

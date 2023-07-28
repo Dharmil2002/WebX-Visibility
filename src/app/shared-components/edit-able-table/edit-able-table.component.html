@@ -116,6 +116,7 @@
                                     <ng-container *ngIf="columnHeader[item].key === 'Dropdown'">
                                         <mat-form-field appearance="outline" floatLabel="never">
                                             <mat-select [(value)]="row[item]" placeholder={{columnHeader[item].name}}
+                                                (selectionChange)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onOptionSelect, eventArgs: $event})"
                                                 #singleSelect [disabled]="columnHeader[item]?.readonly">
                                                 <mat-option>
                                                     <ngx-mat-select-search

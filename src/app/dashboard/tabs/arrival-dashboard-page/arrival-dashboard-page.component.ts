@@ -141,7 +141,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       next: (res: any) => {
         if (res) {
 
-          const arrivalDetails = res.data.filter((x) => x.nextUpComingLoc.toLowerCase() === this.branch.toLowerCase());
+          const arrivalDetails = res.data.filter((x) => x.nextUpComingLoc.toLowerCase() === this.branch.toLowerCase() && x.status!="close");
           let tableData = [];
           arrivalDetails.forEach(element => {
             const currentDate = new Date();

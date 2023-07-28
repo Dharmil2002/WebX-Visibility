@@ -115,7 +115,7 @@ export class QuickBookingControls {
                         }
                     ],
                     additionalData: {
-                        showNameAndValue: true
+                        showNameAndValue: false
                     }
                 },
                 {
@@ -136,7 +136,7 @@ export class QuickBookingControls {
                         }
                     ],
                     additionalData: {
-                        showNameAndValue: true
+                        showNameAndValue: false
                     }
                 },
                 {
@@ -157,7 +157,7 @@ export class QuickBookingControls {
                         }
                     ],
                     additionalData: {
-                        showNameAndValue: true
+                        showNameAndValue: false
                     }
                 },
                 {

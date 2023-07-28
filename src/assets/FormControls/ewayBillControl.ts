@@ -79,7 +79,7 @@ export class EwayBillControls {
                         }
                     ],
                     additionalData: {
-                        showNameAndValue: true
+                        showNameAndValue: false
                     }
                 },
                 {
@@ -99,7 +99,7 @@ export class EwayBillControls {
                             message: 'To City is required'
                         }
                     ], additionalData: {
-                        showNameAndValue: true
+                        showNameAndValue: false
                     }
                 },
 
@@ -138,7 +138,7 @@ export class EwayBillControls {
                         }
                     ],
                     additionalData: {
-                        showNameAndValue: true
+                        showNameAndValue: false
                     }
                 },
                 {
@@ -225,7 +225,7 @@ export class EwayBillControls {
                         }
                     ],
                     additionalData: {
-                        showNameAndValue: true
+                        showNameAndValue: false
                     }
                 },
                 {

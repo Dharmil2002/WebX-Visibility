@@ -30,6 +30,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
+  scanPackage:string;
   shipingHeader = {
     "Leg": "Leg",
     "Shipment": "Shipments",
@@ -200,7 +201,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
     this.tableload = true;
 
-    const scanValue = this.loadingSheetTableForm.value.Scan.trim();
+    const scanValue = this.scanPackage.trim();
     const legValue = this.arrivalData.Route.trim();
 
     // Call the imported function to handle the logic

@@ -90,7 +90,7 @@ export class CustomerMasterAddComponent implements OnInit {
     }
     this.initializeFormControl()
   }
-  
+
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
     const customerFormControls = new customerControl(this.customerTable, this.isUpdate);
@@ -212,13 +212,13 @@ export class CustomerMasterAddComponent implements OnInit {
           value: element.locCode
         }));
         if (this.isUpdate) {
-          this.locData = LocationList.find((x) => x.name == this.data.locName);
+          this.locData = LocationList.find((x) => x.name == this.customerTable.customerControllingLocation);
           this.customerTableForm.controls.customerControllingLocation.setValue(this.locData);
 
-          this.locData = LocationList.find((x) => x.name == this.data.locName);
+          this.locData = LocationList.find((x) => x.name == this.customerTable.nonOda);
           this.customerTableForm.controls.nonOda.setValue(this.locData);
 
-          this.locData = LocationList.find((x) => x.name == this.data.locName);
+          this.locData = LocationList.find((x) => x.name == this.customerTable.customerLocation);
           this.customerTableForm.controls.customerLocation.setValue(this.locData);
         }
         this.filter.Filter(

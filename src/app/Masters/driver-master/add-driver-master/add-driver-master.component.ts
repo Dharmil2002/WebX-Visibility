@@ -151,7 +151,7 @@ export class AddDriverMasterComponent implements OnInit {
           value: element.locCode
         }));
         if (this.isUpdate) {
-          this.locData = LocationList.find((x) => x.name == this.data.locName);
+          this.locData = LocationList.find((x) => x.name == this.DriverTable.driverLocation);
           this.DriverTableForm.controls.driverLocation.setValue(this.locData);
         }
         this.filter.Filter(

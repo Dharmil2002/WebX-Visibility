@@ -80,7 +80,7 @@
                 <mat-label>{{formItem.label}}</mat-label>
                 <mat-select formControlName={{formItem.name}} [multiple]="(formItem.additionalData?.multiple||false)"
                     (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelection ,
-                    eventArgs: $event })">
+                    eventArgs: $event })" [disabled]="formItem.disable">
                     <mat-option *ngFor="let optValue of formItem.value" [value]="optValue.value">
                         {{optValue.name}}</mat-option>
                 </mat-select>

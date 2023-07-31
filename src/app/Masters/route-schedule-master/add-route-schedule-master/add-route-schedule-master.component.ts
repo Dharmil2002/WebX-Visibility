@@ -165,6 +165,55 @@ export class AddRouteScheduleMasterComponent implements OnInit {
   }
 
   save() {
+    const scheduleType = this.routeScheduleTableForm.value.scheduleType;
+    const tableDataLength = this.tableData.length;
+
+    // Check for schedule type and table data length
+    if (scheduleType === "2 Days" && tableDataLength !== 2) {
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: "Please Enter 2 Row items for 2 Days",
+        showConfirmButton: true,
+      });
+      return; // Exit the function to prevent saving invalid data.
+    }
+    if (scheduleType === "3 Days" && tableDataLength !== 3) {
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: "Please Enter 3 Row items for 3 Days",
+        showConfirmButton: true,
+      });
+      return; // Exit the function to prevent saving invalid data.
+    }
+    if (scheduleType === "4 Days" && tableDataLength !== 4) {
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: "Please Enter 4 Row items for 4 Days",
+        showConfirmButton: true,
+      });
+      return; // Exit the function to prevent saving invalid data.
+    }
+    if (scheduleType === "5 Days" && tableDataLength !== 5) {
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: "Please Enter 5 Row items for 5 Days",
+        showConfirmButton: true,
+      });
+      return; // Exit the function to prevent saving invalid data.
+    }
+    if (scheduleType === "6 Days" && tableDataLength !== 6) {
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: "Please Enter 6 Row items for 6 Days",
+        showConfirmButton: true,
+      });
+      return; // Exit the function to prevent saving invalid data.
+    }
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       "type": "masters",
@@ -193,7 +242,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
             routeMode: this.routeScheduleTableForm.value.routeMode,
             routeName: this.routeScheduleTableForm.value.routeName.value,
             routeId: this.routeScheduleTableForm.value.routeName.name,
-            applyDate: this.datePipe.transform(this.routeScheduleTableForm.value.applyFrom, "dd-MM-yyyy HH:mm:ss"),
+            applyDate: this.datePipe.transform(this.routeScheduleTableForm.value.applyFrom, "dd-MM-yyyy"),
             scheduleType: this.routeScheduleTableForm.value.scheduleType,
             isActive: this.routeScheduleTableForm.value.isActive,
             id: this.newRouteCode,

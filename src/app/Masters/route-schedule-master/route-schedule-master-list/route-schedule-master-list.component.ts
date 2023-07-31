@@ -1,7 +1,7 @@
 import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import Swal from "sweetalert2";
+import { RouteScheduleDetComponent } from "../route-schedule-det/route-schedule-det.component";
 @Component({
   selector: 'app-route-schedule-master-list',
   templateUrl: './route-schedule-master-list.component.html'
@@ -46,8 +46,14 @@ export class RouteScheduleMasterListComponent implements OnInit {
     edit: true,
     csv: true
   }
-  toggleArray = ["isActive"]
-  linkArray = []
+  toggleArray = ["isActive"];
+  /*Below is Link Array it will Used When We Want a DrillDown
+    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
+    want hyper link and add Path which you want to redirect*/
+  linkArray = [
+    { Row: 'routeName' }
+  ];
+  menuItems = [{ label: 'routeName', componentDetails: RouteScheduleDetComponent }];
   addAndEditPath: string;
   viewComponent: any;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
@@ -72,40 +78,11 @@ export class RouteScheduleMasterListComponent implements OnInit {
           this.csv = res.data.map((obj, index) => {
             obj['srNo'] = index + 1
             obj['routeName'] = obj.routeName + ' - ' + obj.routeId;
-            obj['applyDate'] = this.datePipe.transform(obj.applyDate, "dd/MM/yyyy");
             return obj;
           })
           this.tableLoad = false;
         }
       }
     })
-  }
-  IsActiveFuntion(det) {
-    let id = det.id;
-    // Remove the "id" field from the form controls
-    delete det.id;
-    //delete det.srNo;
-    delete det.activeflag;
-    let req = {
-      companyCode: this.companyCode,
-      type: "masters",
-      collection: "routeSchedule",
-      id: id,
-      updates: det
-    };
-
-    // this.masterService.masterPut('common/update', req).subscribe({
-    //     next: (res: any) => {
-    //         if (res) {
-    //             // Display success message
-    //             Swal.fire({
-    //                 icon: "success",
-    //                 title: "Successful",
-    //                 text: res.message,
-    //                 showConfirmButton: true,
-    //             });
-    //         }
-    //     }
-    // });
   }
 } 

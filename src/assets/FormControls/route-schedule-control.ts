@@ -15,7 +15,7 @@ export class RouteScheduleControl {
                     { value: 'ROAD', name: 'ROAD' },
                     { value: 'SEA/RIVER', name: 'SEA/RIVER' }
                 ],
-                generatecontrol: true, disable: false,
+                generatecontrol: true, disable: isUpdate ? true : false,
                 Validations: [
                     {
                         name: "required",

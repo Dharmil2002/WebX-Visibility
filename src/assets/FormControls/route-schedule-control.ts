@@ -39,6 +39,10 @@ export class RouteScheduleControl {
                     {
                         name: "required",
                         message: "Route is required"
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
                     }
                 ],
                 additionalData: {

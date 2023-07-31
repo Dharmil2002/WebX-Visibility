@@ -18,7 +18,7 @@ export class DCRControl {
                 displaywith: '',
                 Validations: [
                     {
-                        name: "invalidAutocomplete",
+                        name: "invalidAutocompleteObject",
                         message: "Choose proper value",
                     }
                 ],
@@ -163,7 +163,7 @@ export class DCRControl {
                     displaywith: '',
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         }
                     ],
@@ -184,7 +184,7 @@ export class DCRControl {
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -205,7 +205,7 @@ export class DCRControl {
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -230,7 +230,7 @@ export class DCRControl {
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -257,7 +257,7 @@ export class DCRControl {
                     displaywith: '',
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObjectObject",
                             message: "Choose proper value",
                         },
                         {
@@ -330,7 +330,7 @@ export class DCRControl {
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -351,7 +351,7 @@ export class DCRControl {
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -376,7 +376,7 @@ export class DCRControl {
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {

@@ -93,7 +93,7 @@ export class RouteLocationControl {
                         name: "autocomplete",
                     },
                     {
-                        name: "invalidAutocomplete",
+                        name: "invalidAutocompleteObject",
                         message: "Choose proper value",
                     }
                 ],

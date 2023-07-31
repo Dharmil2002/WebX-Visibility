@@ -127,7 +127,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         this.navigationService.navigateTo(route, this.tripData);
       }
 
-    
+
     }
 
     // Initialize form controls
@@ -202,7 +202,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     ]);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
@@ -353,18 +353,18 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   loadingSheetGenerate() {
-    
+
     if (!this.loadingSheetTableForm.value.vehicle) {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
     } else {
       if (this.loadingData) {
         this.loadingData.forEach(obj => {
           const randomNumber = "Ls/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
-            obj.LoadingSheet = randomNumber;
-            obj.Action= "Print";
-          });
-          this.addTripData();
-          const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
+          obj.LoadingSheet = randomNumber;
+          obj.Action = "Print";
+        });
+        this.addTripData();
+        const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
           this.dialog.open(LodingSheetGenerateSuccessComponent, {
             width: "100%", // Set the desired width
             data: this.loadingData, // Pass the data object
@@ -380,7 +380,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     }
   }
 
-  updateLoadingData(event) { 
+  updateLoadingData(event) {
 
     let packages = event.shipping.reduce(
       (total, current) => total + current.Packages,
@@ -406,8 +406,8 @@ export class CreateLoadingSheetComponent implements OnInit {
       }
     });
     // this.getshipmentData(event)
-   this.cnoteDetails=filterCnoteDetails(this.cnoteDetails,event.shipping)
-   this._cnoteService.setShipingData(this.cnoteDetails);
+    this.cnoteDetails = filterCnoteDetails(this.cnoteDetails, event.shipping)
+    this._cnoteService.setShipingData(this.cnoteDetails);
   }
 
   // get vehicleNo
@@ -424,7 +424,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       .subscribe((res) => {
         if (res) {
           let vehicleDetails = res.data
-            .filter((x) => x.status === ""&&x.currentLocation===this.orgBranch)
+            .filter((x) => x.status === "" && x.currentLocation === this.orgBranch)
             .map((x) => {
               return { name: x.vehNo, value: x.vehNo };
             });
@@ -441,8 +441,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   //Add tripData
-  addTripData() {
-    if (this.loadingSheetTableForm.controls["tripID"].value==='System Generated'||!this.loadingSheetTableForm.controls["tripID"].value) {
+  async addTripData() {
+    if (this.loadingSheetTableForm.controls["tripID"].value === 'System Generated' || !this.loadingSheetTableForm.controls["tripID"].value) {
       const randomNumber =
         "TH/" +
         this.orgBranch +
@@ -468,38 +468,44 @@ export class CreateLoadingSheetComponent implements OnInit {
         ...tripDetails,
       },
     };
-    this._operationService.operationPut("common/update", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.getDetailsByLeg();
-        }
-      },
-    });
+    try {
+      // Await the API call's response before proceeding
+      const res = await this._operationService.operationPut("common/update", reqBody).toPromise();
+      if (res) {
+        // If response is successful, call the next function
+        await this.getDetailsByLeg();
+      }
+    } catch (error) {
+      // Handle any errors that might occur during the API call
+      console.error('Error occurred during the API call:', error);
+    }
   }
-  // Method to retrieve details for each leg in the leg_details array
-  getDetailsByLeg() {
-    for (const leg of  this.loadingData) {
+  async getDetailsByLeg() {
+    for (const leg of this.loadingData) {
       const org_loc = leg.leg.split("-")[0].trim();
       const destination = leg.leg.split("-")[1].trim();
-  
+
       const matchingShipments = this.cnoteDetails.filter(
         (shipment) =>
           shipment.orgLoc === org_loc &&
           shipment.destination.split(":")[1].trim() === destination
       );
-      this.addLsDetails(leg);
+
+      // Call the addLsDetails function and await its completion before proceeding
+      await this.addLsDetails(leg);
+
       if (matchingShipments.length > 0) {
         for (const matchingShipment of matchingShipments) {
-          this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet);
+          await this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet);
         }
       } else {
         // console.log(`No matching details found for the leg: ${leg.leg}`);
       }
     }
   }
-  
-  updateDocketDetails(docket,lsNo) {
-  
+
+  async updateDocketDetails(docket, lsNo) {
+
     let loadingSheetData = {
       lsNo: lsNo,
     };
@@ -512,17 +518,18 @@ export class CreateLoadingSheetComponent implements OnInit {
         ...loadingSheetData
       },
     };
-    this._operationService.operationPut("common/update", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.updateVehicleStatus();
-        }
-      },
-    });
+
+    try {
+      const res = await this._operationService.operationPut("common/update", reqBody).toPromise();
+      if (res) {
+        await this.updateVehicleStatus();
+      }
+    } catch (error) {
+      console.error('Error occurred during the API call:', error);
+    }
   }
 
-  addLsDetails(leg) {
-
+  async addLsDetails(leg) {
     const lsDetails = {
       id: leg.LoadingSheet,
       lsno: leg.LoadingSheet,
@@ -541,13 +548,14 @@ export class CreateLoadingSheetComponent implements OnInit {
       collection: "loadingSheet_detail",
       data: lsDetails,
     };
-    this._operationService.operationPost("common/create", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-        
-        }
-      },
-    });
+    try {
+      const res = await this._operationService.operationPost("common/create", reqBody).toPromise();
+      if (res) {
+        // Perform any necessary actions after the API call
+      }
+    } catch (error) {
+      console.error('Error occurred during the API call:', error);
+    }
   }
   updateVehicleStatus() {
 
@@ -567,7 +575,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     this._operationService.operationPut("common/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-        
+
         }
       },
     });

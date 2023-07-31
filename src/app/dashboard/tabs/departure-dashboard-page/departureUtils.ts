@@ -40,7 +40,7 @@ export async function fetchDepartureDetails(
     const departuredata = res.data.filter(
       (x: any) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase() && x.status !== "close" && x.status !== "depart" && x.status !== "arrival"
     );
-    const routeData = routeRes.data.filter((x) => x.location.toLowerCase() === orgBranch.toLowerCase())
+    const routeData = routeRes.data;
     // Generate table data from filtered departure data
     const tableData = generateTableData(departuredata, routeData, datePipe);
 

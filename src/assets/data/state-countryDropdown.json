@@ -73,6 +73,14 @@
         {
             "stateId": "11",
             "stateDesc": "Mumbai"
+        },
+        {
+            "stateId": "12",
+            "stateDesc": " Telangana"
+        },
+        {
+            "stateId": "13",
+            "stateDesc": "Tamilnadu"
         }
     ],
     "zoneList": [

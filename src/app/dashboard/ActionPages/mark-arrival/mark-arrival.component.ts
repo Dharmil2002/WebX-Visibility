@@ -41,8 +41,7 @@ export class MarkArrivalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public item: any, 
     private fb: UntypedFormBuilder, 
     private Route: Router,
-    private _operationService: OperationService,
-    private CnoteService: CnoteService) {
+    private _operationService: OperationService) {
     
       this.MarkArrivalTable = item;
   }
@@ -155,7 +154,7 @@ export class MarkArrivalComponent implements OnInit {
       })
   }
   cancel() {
-    this.goBack(1)
+    this.goBack(2)
     this.dialogRef.close()
   }
   goBack(tabIndex: number): void {

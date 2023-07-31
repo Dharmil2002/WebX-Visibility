@@ -124,9 +124,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       next: (res: any) => {
         if (res) {
           const mfDetail = res.data.filter((x) => x.tripId === this.arrivalData?.TripID);
-          mfDetail.forEach(element => {
-          this.getShippningData(element.mfNo)
-          });
+          this.getShippningData(mfDetail)
         }
       }
     })
@@ -134,6 +132,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
 
   getShippningData(menifestNo) {
+    ///element.mfNo
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -142,11 +141,11 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     this._operation.operationPost('common/getall', reqBody).subscribe(res => {
       if (res) {
+        
         const arrivalData = res.data.filter((x) => {
           const destinationParts = x.destination ? x.destination.split(":")[1].trim() : "";
-          return destinationParts === this.currentBranch && x.mfNo === menifestNo;
+          return destinationParts === this.currentBranch && menifestNo.some((manifestItem) => manifestItem.mfNo === x.mfNo);
         });
-
         // Filter shipments based on route and branch
         let filteredShipments = filterShipments(arrivalData, this.arrivalData?.Route, this.currentBranch);
 
@@ -332,8 +331,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   }
   Close(): void {
-    this.goBack(1)
     this.dialogRef.close()
+    this.goBack(2)
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
@@ -344,7 +343,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     let tripDetails
     if (next) {
       tripDetails = {
-        nextUpComingLoc: next
+        orgLoc:this.currentBranch,
+        nextUpComingLoc: next,
+        status: "Depart Vehicle"
       }
 
     }

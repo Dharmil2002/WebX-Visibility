@@ -177,6 +177,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   destinationStatus: boolean;
   quickDocket: boolean;
   companyCode = parseInt(localStorage.getItem("companyCode"));
+  branch = parseInt(localStorage.getItem("Branch"));
   dockNo: string;
   DocketDetails: any;
   vehicleNo: string;
@@ -665,6 +666,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         bcSerialNo: bcSerialNo,
         entryDateTime: entryDateTime,
         bcDockSf: bcDockSf,
+        loc:this.branch
       };
     });
 

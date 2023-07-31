@@ -116,12 +116,12 @@ export class DepartVehicleComponent implements OnInit {
     //   this.tripData = data
     // }
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-  
+
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
     this.IntializeFormControl();
     this.getDepartDetails();
-    this.getShipingDetails();
+    this.fetchShipmentData();
     // this.autoBindData()
   }
   getDepartDetails() {
@@ -269,7 +269,7 @@ export class DepartVehicleComponent implements OnInit {
       this.departureControlArray,
     ]);
   }
-  ngOnInit(): void {}
+  ngOnInit(): void { }
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
 
@@ -290,6 +290,26 @@ export class DepartVehicleComponent implements OnInit {
   IsActiveFuntion($event) {
     this.loadingData = $event;
   }
+  /**
+ * Fetches shipment data from the API and updates the boxData and tableload properties.
+ */
+  fetchShipmentData() {
+    // Prepare request payload
+    let req = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "docket",
+    };
+
+    // Send request and handle response
+    this._operationService.operationPost("common/getall", req).subscribe({
+      next: async (res: any) => {
+        // Update shipmentData property with the received data
+        this.shipmentData = res.data;
+        this.getShipingDetails()
+      },
+    });
+  }
   getShipingDetails() {
     const reqbody = {
       companyCode: this.companyCode,
@@ -299,11 +319,17 @@ export class DepartVehicleComponent implements OnInit {
     this._operationService.operationPost("common/getall", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
-          const menifestDetails = res.data.filter(
-            (mfDetail) => mfDetail.tripId === this.tripData.TripID
-          );
+          // Filter menifestDetails based on mfNo and unloading=0
+          const filteredMenifestDetails = res.data.filter((manifest) => {
+            const matchedShipment = this.shipmentData.find((item) => item.mfNo === manifest.mfNo);
+
+            // Check if there's a matching shipment and unloading is 0
+            return matchedShipment && matchedShipment.unloading === 0;
+          });
+
+
           let menifestList: any = [];
-          menifestDetails.forEach((element) => {
+          filteredMenifestDetails.forEach((element) => {
             let json = {
               leg: element.leg,
               manifest: element.mfNo,
@@ -493,7 +519,7 @@ export class DepartVehicleComponent implements OnInit {
   }
 
   Close() {
-   
+
     this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType'].value.value);
     this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle'].value.value);
     const loadingArray = [this.loadingSheetTableForm.value];
@@ -511,10 +537,10 @@ export class DepartVehicleComponent implements OnInit {
     ];
     const mergedData = this.mergeArrays(mergedArray);
     delete mergedData.vehicleTypecontrolHandler;
-    mergedData['tripId']=this.tripData.TripID;
-    mergedData['id']=this.tripData.TripID;
-    mergedData['lsno']= this.lsDetails.lsno;
-    mergedData['mfNo']= this.lsDetails.mfNo;
+    mergedData['tripId'] = this.tripData.TripID;
+    mergedData['id'] = this.tripData.TripID;
+    mergedData['lsno'] = this.lsDetails.lsno;
+    mergedData['mfNo'] = this.lsDetails.mfNo;
     this.addDepartData(mergedData);
   }
 
@@ -524,25 +550,27 @@ export class DepartVehicleComponent implements OnInit {
       "type": "operation",
       "collection": "trip_transaction_history",
       "data": departData
-    }  
-    this._operationService.operationPost('common/create',reqbody).subscribe({next:(res:any)=>{
-      if(res){
-        this.updateTrip();
+    }
+    this._operationService.operationPost('common/create', reqbody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.updateTrip();
+        }
+
       }
-      
-    }})
+    })
   }
   updateTrip() {
-    const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"),this.orgBranch);
+    const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"), this.orgBranch);
     let tripDetails = {
-      status:"depart",
-      nextUpComingLoc:next
+      status: "depart",
+      nextUpComingLoc: next
     }
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "trip_detail",
-      "id":this.tripData.id,
+      "id": this.tripData.id,
       "updates": {
         ...tripDetails,
       }

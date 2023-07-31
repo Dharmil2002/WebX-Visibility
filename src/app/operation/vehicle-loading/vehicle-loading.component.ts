@@ -130,7 +130,6 @@ export class VehicleLoadingComponent implements OnInit {
   }
 
   getLoadingSheetData() {
-
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -165,7 +164,6 @@ export class VehicleLoadingComponent implements OnInit {
     }
   }
   getDocketDetails() {
-
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",

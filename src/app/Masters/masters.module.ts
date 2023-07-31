@@ -89,6 +89,7 @@ import { ClusterMasterListComponent } from './cluster-master/cluster-master-list
 import { AddRouteScheduleMasterComponent } from './route-schedule-master/add-route-schedule-master/add-route-schedule-master.component';
 import { RouteScheduleMasterListComponent } from './route-schedule-master/route-schedule-master-list/route-schedule-master-list.component';
 import { RouteScheduleDetComponent } from './route-schedule-master/route-schedule-det/route-schedule-det.component';
+import { VehicleStatusUpdateComponent } from './vehicle-status-update/vehicle-status-update.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -186,6 +187,7 @@ import { RouteScheduleDetComponent } from './route-schedule-master/route-schedul
     RouteScheduleMasterListComponent,
     AddRouteScheduleMasterComponent,
     RouteScheduleDetComponent,
+    VehicleStatusUpdateComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

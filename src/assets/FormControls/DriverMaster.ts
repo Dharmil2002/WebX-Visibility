@@ -58,6 +58,10 @@ export class DriverControls {
                     name: 'driverLocation', label: "Driver Location", placeholder: "Select location", type: 'dropdown',
                     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
                         
                     ],
                     additionalData: {
@@ -109,6 +113,10 @@ export class DriverControls {
                 {
                     name: 'dCategory', label: "Driver Category", placeholder: "", type: 'dropdown', value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
                     ],
                     additionalData: {
                         showNameAndValue: false

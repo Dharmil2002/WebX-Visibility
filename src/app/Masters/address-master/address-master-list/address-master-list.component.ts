@@ -16,18 +16,18 @@ export class AddressMasterListComponent implements OnInit {
     "srNo": "Sr No",
     "addressCode": "Address Code",
     "manualCode": "Manual Code",
-    "city": "City Name",
+    "cityName": "City Name",
     "address": "Address",
     "activeFlag": "Active Status",
     "actions": "Actions"
   };
   headerForCsv = {
     "srNo": "Sr No",
-    "groupCode": "Address Code",
-    "customerCode": "Manual Code",
-    "customerName": "City Name",
+    "addressCode": "Address Code",
+    "manualCode": "Manual Code",
+    "cityName": "City Name",
     "address": "Address",
-    "activeFlag": "Active Status"
+    "activeFlag": "Active Status",
   }
   breadScrums = [
     {
@@ -53,7 +53,7 @@ export class AddressMasterListComponent implements OnInit {
     let req = {
       "companyCode": this.companyCode,
       "type": "masters",
-      "collection": "address"
+      "collection": "address_detail"
     }
     this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {

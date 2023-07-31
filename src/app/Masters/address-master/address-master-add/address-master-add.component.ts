@@ -16,22 +16,30 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 export class AddressMasterAddComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  countryCode: any;
-  action: string;
-  isUpdate = false;
   addressTabledata: AddressMaster;
   addressTableForm: UntypedFormGroup;
   addressFormControls: AddressControl;
+  //#region Variable Declaration
   jsonControlGroupArray: any;
   pincodeList: any;
+  countryCode: any;
   pincodeStatus: any;
-  cityList: string;
-  cityStatus: boolean;
+  cityList: any;
+  cityStatus: any;
+  stateList: any;
+  stateStatus: any;
+  LocLeval: any;
+  cityData: any;
+  stateData: any;
+  pincodeData: any;
+  isUpdate = false;
+  action: string;
+  //#endregion
 
-  // savedData: CustomerGroupMaster;
   ngOnInit() {
     this.getPincodeData();
     this.getCityData();
+    this.getStateData();
   }
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
@@ -49,7 +57,7 @@ export class AddressMasterAddComponent implements OnInit {
   }
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private Route: Router, private fb: UntypedFormBuilder,
-    private masterService: MasterService,private filter: FilterUtils,
+    private masterService: MasterService, private filter: FilterUtils,
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
@@ -59,26 +67,20 @@ export class AddressMasterAddComponent implements OnInit {
     } else {
       this.action = "Add";
     }
+
     if (this.action === 'edit') {
       this.isUpdate = true;
       this.addressTabledata = this.data;
-      this.breadScrums = [
-        {
-          title: "Address Master",
-          items: ["Home"],
-          active: "Edit Address Master",
-        },
-      ];
     } else {
-      this.breadScrums = [
-        {
-          title: "Address Master",
-          items: ["Home"],
-          active: "Add Address Master",
-        },
-      ];
       this.addressTabledata = new AddressMaster({});
     }
+    this.breadScrums = [
+      {
+        title: "Address Master",
+        items: ["Home"],
+        active: this.action === 'edit' ? "Edit Address Master" : "Add Address Master",
+      },
+    ];
     this.initializeFormControl();
   }
   initializeFormControl() {
@@ -86,21 +88,27 @@ export class AddressMasterAddComponent implements OnInit {
     this.jsonControlGroupArray = this.addressFormControls.getFormControls();
     this.jsonControlGroupArray.forEach(data => {
       if (data.name === 'pincode') {
-          // Set Pincode category-related variables
-          this.pincodeList = data.name;
-          this.pincodeStatus = data.additionalData.showNameAndValue;
+        // Set Pincode category-related variables
+        this.pincodeList = data.name;
+        this.pincodeStatus = data.additionalData.showNameAndValue;
       }
       if (data.name === 'cityName') {
         // Set Pincode category-related variables
         this.cityList = data.name;
         this.cityStatus = data.additionalData.showNameAndValue;
-    }
-  });
+      }
+      if (data.name === 'stateName') {
+        // Set Pincode category-related variables
+        this.stateList = data.name;
+        this.stateStatus = data.additionalData.showNameAndValue;
+      }
+    });
     this.addressTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
   }
   cancel() {
     window.history.back();
   }
+  //#region Pincode Dropdown
   getPincodeData() {
     let req = {
       "companyCode": this.companyCode,
@@ -110,27 +118,27 @@ export class AddressMasterAddComponent implements OnInit {
     this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {
         // Assuming the API response contains an array named 'pincodeList'
-        const pincodeList = res.data;
-        let pincode = pincodeList
-          .filter(element => element.pincode != null && element.pincode !== '') // Filter out items with null and empty 'name' values
-          .map(element => {
-            let pincodeValue = element.pincode;
-            if (typeof pincodeValue === 'object') {
-              // If 'pincodeValue' is an object, extract the specific property representing the 'pincode' value
-              pincodeValue = pincodeValue.name; // Replace 'name' with the correct property name representing the 'pincode' value
-            }
-            return { name: String(pincodeValue), value: String(pincodeValue) }; // Convert the 'pincode' value to a string
-          });
-          this.filter.Filter(
+        const pincodeList = res.data.map(element => ({
+          name: element.pincode,
+          value: element.pincode
+        }));
+        if (this.isUpdate) {
+          this.pincodeData = pincodeList.find((x) => x.name == this.data.pincode);
+          this.addressTableForm.controls.pincode.setValue(this.pincodeData);
+        }
+        this.filter.Filter(
           this.jsonControlGroupArray,
           this.addressTableForm,
-          pincode,
+          pincodeList,
           this.pincodeList,
           this.pincodeStatus
         );
       }
     });
   }
+  //#endregion
+
+  //#region City Dropdown
   getCityData() {
     let req = {
       "companyCode": this.companyCode,
@@ -139,37 +147,60 @@ export class AddressMasterAddComponent implements OnInit {
     };
     this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {
-        // Assuming the API response contains an array named 'pincodeList'
-        const cityList = res.data;
-        let city = cityList
-          .filter(element => element.cityName != null && element.cityName !== '') // Filter out items with null and empty 'name' values
-          .map(element => {
-            let cityValue = element.cityName;
-            if (typeof cityValue === 'object') {
-              // If 'cityValue' is an object, extract the specific property representing the 'pincode' value
-              cityValue = cityValue.name; // Replace 'name' with the correct property name representing the 'pincode' value
-            }
-            return { name: String(cityValue), value: String(cityValue) }; // Convert the 'pincode' value to a string
-          });
-          // if (this.isUpdate) {
-          //   var filter = [];
-          //   this.data.cityName.forEach(item => {
-          //     filter.push(city.find(element => element.value == item));
-          //   });
-          // }
-          this.filter.Filter(
+        const cityList = res.data.map(element => ({
+          name: element.cityName,
+          value: element.id
+        }));
+        if (this.isUpdate) {
+          this.cityData = cityList.find((x) => x.name == this.data.cityName);
+          this.addressTableForm.controls.cityName.setValue(this.cityData);
+        }
+        this.filter.Filter(
           this.jsonControlGroupArray,
           this.addressTableForm,
-          city,
+          cityList,
           this.cityList,
           this.cityStatus
         );
       }
     });
   }
+  //#endregion
+
+  //#region State Dropdown
+  getStateData() {
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "state_detail"
+    };
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        const stateList = res.data.map(element => ({
+          name: element.stateName,
+          value: element.stateCode
+        }));
+        if (this.isUpdate) {
+          this.stateData = stateList.find((x) => x.name == this.data.stateName);
+          this.addressTableForm.controls.stateName.setValue(this.stateData);
+        }
+        this.filter.Filter(
+          this.jsonControlGroupArray,
+          this.addressTableForm,
+          stateList,
+          this.stateList,
+          this.stateStatus
+        );
+      }
+    });
+  }
+  //#endregion
+
+  //#region Save Data
   save() {
-    this.addressTableForm.controls["pincode"].setValue(this.addressTableForm.value.pincode);
+    this.addressTableForm.controls["pincode"].setValue(this.addressTableForm.value.pincode.name);
     this.addressTableForm.controls["cityName"].setValue(this.addressTableForm.value.cityName.name);
+    this.addressTableForm.controls["stateName"].setValue(this.addressTableForm.value.stateName.name);
     this.addressTableForm.controls["activeFlag"].setValue(this.addressTableForm.value.activeFlag == true ? "Y" : "N");
     if (this.isUpdate) {
       let id = this.addressTableForm.value.id;
@@ -177,7 +208,7 @@ export class AddressMasterAddComponent implements OnInit {
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "address",
+        collection: "address_detail",
         id: id,
         updates: this.addressTableForm.value
       };
@@ -201,7 +232,7 @@ export class AddressMasterAddComponent implements OnInit {
       let req = {
         companyCode: this.companyCode,
         type: "masters",
-        collection: "address",
+        collection: "address_detail",
         data: this.addressTableForm.value
       };
       this.masterService.masterPost('common/create', req).subscribe({
@@ -220,4 +251,5 @@ export class AddressMasterAddComponent implements OnInit {
       });
     }
   }
+  //#endregion
 }

@@ -16,6 +16,7 @@ import Swal from 'sweetalert2';
 export class AddLocationMasterComponent implements OnInit {
   locationTableForm: UntypedFormGroup;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
+ //#region Variable declaration
   data: any;
   isUpdate = false;
   action: any;
@@ -46,7 +47,7 @@ export class AddLocationMasterComponent implements OnInit {
   cityLoc: any;
   cityLocDet: any;
   locationCity: any;
-  locationCitygStatus: any;
+  locationCityStatus: any;
   reportingLoDet: any;
   reportingLoc: any;
   report: any;
@@ -80,6 +81,8 @@ export class AddLocationMasterComponent implements OnInit {
   locCont: any;
   locContStatus: any;
   showSaveAndCancelButton = false;
+  //#endregion
+  
   constructor(
     private fb: UntypedFormBuilder, public dialog: MatDialog, private router: Router, private filter: FilterUtils,
     private masterService: MasterService, private route: Router,
@@ -100,7 +103,6 @@ export class AddLocationMasterComponent implements OnInit {
           active: "Edit Location",
         },
       ];
-
     } else {
       this.breadScrums = [
         {
@@ -110,10 +112,10 @@ export class AddLocationMasterComponent implements OnInit {
         },
       ];
       this.LocationTable = new LocationMaster({});
-
     }
     this.initializeFormControl();
   }
+
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
     const locationFormControls = new LocationControl(this.LocationTable, this.isUpdate);
@@ -131,6 +133,10 @@ export class AddLocationMasterComponent implements OnInit {
   ngOnInit(): void {
     this.bindDropdown();
     this.getDropDownData();
+    this.getLocation();
+    this.getPincodeData();
+    this.getCityData();
+    this.getStateData();
   }
   bindDropdown() {
     this.jsonControlLocationArray.forEach(data => {
@@ -152,7 +158,7 @@ export class AddLocationMasterComponent implements OnInit {
       if (data.name === 'locCity') {
         // Set category-related variables
         this.locationCity = data.name;
-        this.locationCitygStatus = data.additionalData.showNameAndValue;
+        this.locationCityStatus = data.additionalData.showNameAndValue;
       }
       if (data.name === 'reportLoc') {
         // Set category-related variables
@@ -204,28 +210,19 @@ export class AddLocationMasterComponent implements OnInit {
     });
   }
 
-
-  //DROPDOWN FILTER IN OPTIMIZED WAY
+  //#region DROPDOWN FILTER IN OPTIMIZED WAY
   getDropDownData() {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       const {
         locationHierarchyDropDown,
-        pincodeLocationDropDown,
-        cityLocDropDown,
         ownershipDropdown,
-        stateLocDropDown,
         zoneDropDown,
         locationOwnershipDropDown,
-        locdataDropDown
       } = res;
       this.locationHierarchy = locationHierarchyDropDown;
-      this.pincodeLoc = pincodeLocationDropDown;
-      this.cityLoc = cityLocDropDown;
       this.reportingLoc = ownershipDropdown;
-      this.stateData = stateLocDropDown;
       this.zoneData = zoneDropDown;
       this.ownershipData = locationOwnershipDropDown;
-      this.accounting = locdataDropDown;
       if (this.isUpdate) {
         this.hierarchydet = this.findDropdownItemByName(this.locationHierarchy, this.LocationTable.locLevel);
         this.locationTableForm.controls.locLevel.setValue(this.hierarchydet);
@@ -236,52 +233,21 @@ export class AddLocationMasterComponent implements OnInit {
         this.reportingLoDet = this.findDropdownItemByName(this.reportingLoc, this.LocationTable.reportLoc);
         this.locationTableForm.controls.reportLoc.setValue(this.reportingLoDet);
 
-        this.pincodeDet = this.findDropdownItemByName(this.pincodeLoc, this.LocationTable.locPincode);
-        this.locationTableForm.controls.locPincode.setValue(this.pincodeDet);
-
-        this.cityLocDet = this.findDropdownItemByName(this.cityLoc, this.LocationTable.locCity);
-        this.locationTableForm.controls.locCity.setValue(this.cityLocDet);
-
-        // this.reportingLoDet = this.findDropdownItemByName(this.reportingLoc, this.LocationTable.reportLoc);
-        // this.locationTableForm.controls.reportLoc.setValue(this.reportingLoDet);
-
-        this.stateDet = this.findDropdownItemByName(this.stateData, this.LocationTable.locState);
-        this.locationTableForm.controls.locState.setValue(this.stateDet);
+        this.reportingLoDet = this.findDropdownItemByName(this.reportingLoc, this.LocationTable.reportLoc);
+        this.locationTableForm.controls.reportLoc.setValue(this.reportingLoDet);
 
         this.zoneDet = this.findDropdownItemByName(this.zoneData, this.LocationTable.locRegion);
         this.locationTableForm.controls.locRegion.setValue(this.zoneDet);
 
         this.ownerShipDet = this.findDropdownItemByName(this.ownershipData, this.LocationTable.ownership);
         this.locationTableForm.controls.ownership.setValue(this.ownerShipDet);
-
-        this.accountingDet = this.findDropdownItemByName(this.accounting, this.LocationTable.acctLoc);
-        this.locationTableForm.controls.acctLoc.setValue(this.accountingDet);
-
-        this.dataLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.dataLoc);
-        this.locationTableForm.controls.dataLoc.setValue(this.dataLocDet);
-
-        this.defaultDet = this.findDropdownItemByName(this.accounting, this.LocationTable.nextLoc);
-        this.locationTableForm.controls.nextLoc.setValue(this.defaultDet);
-
-        this.prevLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.prevLoc);
-        this.locationTableForm.controls.prevLoc.setValue(this.prevLocDet);
-
-        this.contLocDet = this.findDropdownItemByName(this.accounting, this.LocationTable.contLoc);
-        this.locationTableForm.controls.contLoc.setValue(this.contLocDet);
       }
       const filterParams = [
         [this.jsonControlLocationArray, this.locationHierarchy, this.locHierachy, this.locHierachyStatus],
         [this.jsonControlLocationArray, this.locationHierarchy, this.reportLoc, this.reportLocStatus],
-        [this.jsonControlLocationArray, this.pincodeLoc, this.pincode, this.pincodeStatus],
-        [this.jsonControlLocationArray, this.cityLoc, this.locationCity, this.locationCitygStatus],
         [this.jsonControlLocationArray, this.reportingLoc, this.report, this.reportStatus],
-        [this.jsonControlLocationArray, this.stateData, this.stateLoc, this.stateLocStatus],
         [this.jsonControlOtherArray, this.zoneData, this.zoneLoc, this.zoneLocStatus],
         [this.jsonControlOtherArray, this.ownershipData, this.locOwnership, this.locOwnershipStatus],
-        [this.jsonControlOtherArray, this.accounting, this.accountLoc, this.accountLocStatus],
-        [this.jsonControlOtherArray, this.accounting, this.locData, this.locDataStatus],
-        [this.jsonControlOtherArray, this.accounting, this.nextLocation, this.nextLocationStatus],
-        [this.jsonControlOtherArray, this.accounting, this.locPrev, this.locPrevStatus],
         [this.jsonControlOtherArray, this.accounting, this.locCont, this.locContStatus]
       ];
       filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
@@ -289,7 +255,176 @@ export class AddLocationMasterComponent implements OnInit {
       });
     });
   }
+  //#endregion
 
+  //#region Dropdown for Location List
+  getLocation() {
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "location_detail"
+    };
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        const LocationList = res.data.map(element => ({
+          name: element.locName,
+          value: element.locCode
+        }));
+        if (this.isUpdate) {
+          this.locData = LocationList.find((x) => x.name == this.LocationTable.prevLoc);
+          this.locationTableForm.controls.prevLoc.setValue(this.locData);
+
+          this.locData = LocationList.find((x) => x.name == this.LocationTable.acctLoc);
+          this.locationTableForm.controls.acctLoc.setValue(this.locData);
+
+          this.locData = LocationList.find((x) => x.name == this.LocationTable.dataLoc);
+          this.locationTableForm.controls.dataLoc.setValue(this.locData);
+
+          this.locData = LocationList.find((x) => x.name == this.LocationTable.nextLoc);
+          this.locationTableForm.controls.nextLoc.setValue(this.locData);
+
+          this.locData = LocationList.find((x) => x.name == this.LocationTable.contLoc);
+          this.locationTableForm.controls.contLoc.setValue(this.locData);
+
+        }
+        this.filter.Filter(
+          this.jsonControlOtherArray,
+          this.locationTableForm,
+          LocationList,
+          this.locPrev,
+          this.locPrevStatus
+        );
+        this.filter.Filter(
+          this.jsonControlOtherArray,
+          this.locationTableForm,
+          LocationList,
+          this.accountLoc,
+          this.accountLocStatus
+        );
+        this.filter.Filter(
+          this.jsonControlOtherArray,
+          this.locationTableForm,
+          LocationList,
+          this.accountLoc,
+          this.accountLocStatus
+        );
+        this.filter.Filter(
+          this.jsonControlOtherArray,
+          this.locationTableForm,
+          LocationList,
+          this.locData,
+          this.locDataStatus
+        );
+        this.filter.Filter(
+          this.jsonControlOtherArray,
+          this.locationTableForm,
+          LocationList,
+          this.nextLocation,
+          this.nextLocationStatus
+        );
+        this.filter.Filter(
+          this.jsonControlOtherArray,
+          this.locationTableForm,
+          LocationList,
+          this.locCont,
+          this.locContStatus
+        );
+
+      }
+    });
+  }
+  //#endregion
+
+  //#region Dropdown for Pincode 
+  getPincodeData() {
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "pincode_detail"
+    };
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        // Assuming the API response contains an array named 'pincodeList'
+        const pincodeList = res.data.map(element => ({
+          name: element.pincode,
+          value: element.pincode
+        }));
+        if (this.isUpdate) {
+          this.pincodeDet = pincodeList.find((x) => x.name == this.LocationTable.locPincode);
+          this.locationTableForm.controls.locPincode.setValue(this.pincodeDet);
+        }
+        this.filter.Filter(
+          this.jsonControlLocationArray,
+          this.locationTableForm,
+          pincodeList,
+          this.pincode,
+          this.pincodeStatus
+        );
+      }
+    });
+  }
+  //#endregion
+
+  //#region Dropdown for City
+  getCityData() {
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "city_detail"
+    };
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        const cityList = res.data.map(element => ({
+          name: element.cityName,
+          value: element.id
+        }));
+        if (this.isUpdate) {
+          this.cityLocDet = cityList.find((x) => x.name == this.LocationTable.locCity);
+          this.locationTableForm.controls.locCity.setValue(this.cityLocDet);
+        }
+        this.filter.Filter(
+          this.jsonControlLocationArray,
+          this.locationTableForm,
+          cityList,
+          this.locationCity,
+          this.locationCityStatus
+        );
+      }
+    });
+  }
+  //#endregion
+
+  //#region Dropdown for State
+  getStateData() {
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "state_detail"
+    };
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        const stateList = res.data.map(element => ({
+          name: element.stateName,
+          value: element.stateCode
+        }));
+        if (this.isUpdate) {
+          this.stateData = stateList.find((x) => x.name == this.LocationTable.locState);
+          this.locationTableForm.controls.locState.setValue(this.stateData);
+        }
+        this.filter.Filter(
+          this.jsonControlLocationArray,
+          this.locationTableForm,
+          stateList,
+          this.stateLoc,
+          this.stateLocStatus
+        );
+      }
+    });
+  }
+  //#endregion
+
+  //#region Save function
+  
   save() {
     const formValue = this.locationTableForm.value;
     const controlNames = [
@@ -314,53 +449,55 @@ export class AddLocationMasterComponent implements OnInit {
     this.locationTableForm.controls["activeFlag"].setValue(this.locationTableForm.value.activeFlag == true ? "Y" : "N");
     if (this.isUpdate) {
       let id = this.locationTableForm.value.id;
-        // Remove the "id" field from the form controls
-        this.locationTableForm.removeControl("id");
-        let req = {
-            companyCode: this.companyCode,
-            type: "masters",
-            collection: "location_detail",
-            id: id,
-            updates: this.locationTableForm.value
-        };
-        this.masterService.masterPut('common/update', req).subscribe({
-            next: (res: any) => {
-                if (res) {
-                    // Display success message
-                    Swal.fire({
-                        icon: "success",
-                        title: "Successful",
-                        text: res.message,
-                        showConfirmButton: true,
-                    });
-                    this.route.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
-                }
-            }
-        });
+      // Remove the "id" field from the form controls
+      this.locationTableForm.removeControl("id");
+      let req = {
+        companyCode: this.companyCode,
+        type: "masters",
+        collection: "location_detail",
+        id: id,
+        updates: this.locationTableForm.value
+      };
+      this.masterService.masterPut('common/update', req).subscribe({
+        next: (res: any) => {
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            this.route.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
+          }
+        }
+      });
     } else {
-      this.locationTableForm.controls['id'].setValue( this.locationTableForm.controls['locCode'].value);
-        let req = {
-            companyCode: this.companyCode,
-            type: "masters",
-            collection: "location_detail",
-            data:  this.locationTableForm.value//this.locationTableForm.value
-        };
-        this.masterService.masterPost('common/create', req).subscribe({
-            next: (res: any) => {
-                if (res) {
-                    // Display success message
-                    Swal.fire({
-                        icon: "success",
-                        title: "Successful",
-                        text: res.message,
-                        showConfirmButton: true,
-                    });
-                    this.route.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
-                }
-            }
-        });
+      this.locationTableForm.controls['id'].setValue(this.locationTableForm.controls['locCode'].value);
+      let req = {
+        companyCode: this.companyCode,
+        type: "masters",
+        collection: "location_detail",
+        data: this.locationTableForm.value
+      };
+      this.masterService.masterPost('common/create', req).subscribe({
+        next: (res: any) => {
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            this.route.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
+          }
+        }
+      });
     }
-}
+  }
+  //#endregion
+
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }

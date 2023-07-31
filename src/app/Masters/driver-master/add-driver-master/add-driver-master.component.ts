@@ -19,12 +19,13 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 export class AddDriverMasterComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   DriverTableForm: UntypedFormGroup;
-  error: string
-  isUpdate = false;
   DriverTable: DriverMaster;
   LocationListAuto: AutoComplateCommon[];
   DCategoryDropdown: AutoComplateCommon[];
   VehicleDropdown: AutoComplateCommon[];
+  //#region Variable declaration
+  error: string
+  isUpdate = false;
   UpdateLocation: any;
   action: any;
   retrievedData: any;
@@ -60,36 +61,17 @@ export class AddDriverMasterComponent implements OnInit {
   selectedFiles: boolean;
   SelectFile: File;
   imageName: string;
-  sampleDropdownData2 = [
-    { name: "HQTR", value: "HQTR" },
-    { name: "MUMB", value: "MUMB" },
-    { name: "AMDB", value: "AMDB" }
-  ]
-  routedropdown = [
-    {
-      value: "S0010 ",
-      name: "AMDB-BRDB-MUMB",
-    },
-    {
-      value: "S0003 ",
-      name: "AMDB-JAIB-DELB",
-    },
-    {
-      value: "S0002 ",
-      name: "MUMB-BRDB-AMDB",
-    }
-
-  ]
   locationData: any;
   routeLocation: any;
   routeDet: any;
   categoryDet: any;
+  locData: any;
+  //#endregion
 
   constructor(private Route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder, private filter: FilterUtils,
     private masterService: MasterService
   ) {
-    //super();
     this.maxDate = new Date(new Date());
     this.minDate = new Date("01 Jan 1900");
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -136,7 +118,6 @@ export class AddDriverMasterComponent implements OnInit {
     this.jsonControlPermanentArray = driverFormControls.getFormControlsP();
     this.jsonControlUploadArray = driverFormControls.getFormControlsU();
     this.jsonControlBankDetailArray = driverFormControls.getFormControlsB();
-
     // Build the accordion data with section names as keys and corresponding form controls as values
     this.accordionData = {
       "Driver Details": this.jsonControlDriverArray,
@@ -145,53 +126,64 @@ export class AddDriverMasterComponent implements OnInit {
       "ID Proof Document Type": this.jsonControlUploadArray,
       "Bank Account Details": this.jsonControlBankDetailArray
     };
-
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.DriverTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
   }
   //#endregion
 
   ngOnInit(): void {
-    //throw new Error("Method not implemented.");
     this.bindDropdown();
     this.getDropDownData();
+    this.getLocation();
   }
+
+  //#region Dropdown for Location List
+  getLocation() {
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "location_detail"
+    };
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        const LocationList = res.data.map(element => ({
+          name: element.locName,
+          value: element.locCode
+        }));
+        if (this.isUpdate) {
+          this.locData = LocationList.find((x) => x.name == this.data.locName);
+          this.DriverTableForm.controls.driverLocation.setValue(this.locData);
+        }
+        this.filter.Filter(
+          this.jsonControlDriverArray,
+          this.DriverTableForm,
+          LocationList,
+          this.location,
+          this.locationStatus
+        );
+      }
+    });
+  }
+  //#endregion
 
   getDropDownData() {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       const {
-        locationDropdown,
         routeLocationDropdown,
       } = res;
-      this.locationData = locationDropdown;
       this.routeLocation = routeLocationDropdown;
       if (this.isUpdate) {
-
-        this.routeDet = this.findDropdownItemByName(this.routeLocation, this.DriverTable.dCategory);
-        this.DriverTableForm.controls.dCategory.setValue(this.routeDet);
-
-        this.categoryDet = this.findDropdownItemByName(this.locationData, this.DriverTable.driverLocation);
-        this.DriverTableForm.controls.driverLocation.setValue(this.categoryDet);
+        this.categoryDet = this.findDropdownItemByName(this.routeLocation, this.DriverTable.dCategory);
+        this.DriverTableForm.controls.dCategory.setValue(this.categoryDet);
       }
-
       const filterParams = [
-
-        [
-          this.jsonControlDriverArray,
-          this.locationData,
-          this.location,
-          this.locationStatus
-        ],
-
         [
           this.jsonControlDriverArray,
           this.routeLocation,
           this.category,
           this.categoryStatus
         ],
-
       ];
-
       filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
         this.filter.Filter(jsonControlArray, this.DriverTableForm, dropdownData, formControl, statusControl);
       });
@@ -213,19 +205,6 @@ export class AddDriverMasterComponent implements OnInit {
         this.categoryStatus = data.additionalData.showNameAndValue;
       }
     });
-    this.filter.Filter(
-      this.jsonControlDriverArray,
-      this.DriverTableForm,
-      this.sampleDropdownData2,
-      this.location,
-      this.locationStatus,
-    ); this.filter.Filter(
-      this.jsonControlDriverArray,
-      this.DriverTableForm,
-      this.routedropdown,
-      this.category,
-      this.categoryStatus,
-    );
   }
   selectedJpgFile(data) {
     let fileList: FileList = data.eventArgs;
@@ -284,6 +263,8 @@ export class AddDriverMasterComponent implements OnInit {
       alert("No file selected");
     }
   }
+
+  //#region Save function
   save() {
     const formValue = this.DriverTableForm.value;
     const controlNames = [
@@ -345,6 +326,7 @@ export class AddDriverMasterComponent implements OnInit {
       });
     }
   }
+  //#endregion
   selectedPngFile(data) {
     let fileList: FileList = data.eventArgs;
     if (fileList.length > 0) {

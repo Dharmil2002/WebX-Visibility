@@ -17,6 +17,7 @@ import { getShortName } from 'src/app/Utility/commonFunction/random/generateRand
 export class CustomerMasterAddComponent implements OnInit {
   customerTableForm: UntypedFormGroup;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  //#region Variable declaration
   error: string
   isUpdate = false;
   action: any;
@@ -55,6 +56,9 @@ export class CustomerMasterAddComponent implements OnInit {
   locationDet: any;
   ownerShipDet: any;
   ownershipData: any;
+  locData: any;
+  //#endregion
+  
   constructor(private Route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder, private filter: FilterUtils,
     private masterService: MasterService) {
@@ -74,7 +78,6 @@ export class CustomerMasterAddComponent implements OnInit {
           active: "Edit Customer",
         },
       ];
-
     } else {
       this.breadScrums = [
         {
@@ -86,8 +89,8 @@ export class CustomerMasterAddComponent implements OnInit {
       this.customerTable = new customerModel({})
     }
     this.initializeFormControl()
-
   }
+  
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
     const customerFormControls = new customerControl(this.customerTable, this.isUpdate);
@@ -106,6 +109,7 @@ export class CustomerMasterAddComponent implements OnInit {
   ngOnInit(): void {
     this.bindDropdown();
     this.getDropDownData();
+    this.getLocation();
   }
   bindDropdown() {
     this.jsonControlCustomerArray.forEach(data => {
@@ -152,40 +156,31 @@ export class CustomerMasterAddComponent implements OnInit {
     window.history.back();
     this.Route.navigateByUrl("/Masters/CustomerMaster/CustomerMasterList");
   }
+
+  //#region Dropdown through Json
   getDropDownData() {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       const {
         groupCodeDropdown,
         serviceOptedDropdown,
         payBasisDropdown,
-        ownershipDropdown,
-        locationDropdown
+        ownershipDropdown
       } = res;
 
       this.groupCodeData = groupCodeDropdown;
       this.serviceOptedFor = serviceOptedDropdown;
       this.payBasisData = payBasisDropdown;
       this.ownershipData = ownershipDropdown;
-      this.locationData = locationDropdown;
 
       if (this.isUpdate) {
         this.groupCodedet = this.findDropdownItemByName(this.groupCodeData, this.customerTable.groupCode);
         this.customerTableForm.controls.groupCode.setValue(this.groupCodedet);
 
         this.customerTableForm.controls["serviceOptedDropdown"].patchValue(this.serviceOptedFor.filter((element) =>
-          this.customerTable.serviceOpted.includes(element.name)))
+        this.customerTable.serviceOpted.includes(element.name)))
 
         this.customerTableForm.controls["payBasisDropdown"].patchValue(this.payBasisData.filter((element) =>
-          this.customerTable.payBasis.includes(element.name)))
-
-        this.customerTableForm.controls["nonOdaDropdown"].patchValue(this.locationData.filter((element) =>
-          this.customerTable.nonOda.includes(element.name)))
-
-        this.customerTableForm.controls["controllingDropdown"].patchValue(this.locationData.filter((element) =>
-          this.customerTable.customerControllingLocation.includes(element.name)))
-
-        this.customerTableForm.controls["locationDropdown"].patchValue(this.locationData.filter((element) =>
-          this.customerTable.customerLocation.includes(element.name)))
+        this.customerTable.payBasis.includes(element.name)))
 
         this.ownerShipDet = this.findDropdownItemByName(this.ownershipData, this.customerTable.ownership);
         this.customerTableForm.controls.ownership.setValue(this.ownerShipDet);
@@ -194,9 +189,6 @@ export class CustomerMasterAddComponent implements OnInit {
         [this.jsonControlCustomerArray, this.groupCodeData, this.gCode, this.codeStatus],
         [this.jsonControlBillKycArray, this.serviceOptedFor, this.serviceOpt, this.serviceOptStatus],
         [this.jsonControlBillKycArray, this.payBasisData, this.pay, this.payStatus],
-        [this.jsonControlCustomerArray, this.locationData, this.location, this.locationStatus],
-        [this.jsonControlCustomerArray, this.locationData, this.controlling, this.controllingStatus],
-        [this.jsonControlCustomerArray, this.locationData, this.nonOda, this.noOdaStatus],
         [this.jsonControlCustomerArray, this.ownershipData, this.ownership, this.ownershipStatus]
       ];
       filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
@@ -204,9 +196,63 @@ export class CustomerMasterAddComponent implements OnInit {
       });
     });
   }
+  //#endregion
+  
+  //#region Location Dropdown
+  getLocation() {
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "location_detail"
+    };
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        const LocationList = res.data.map(element => ({
+          name: element.locName,
+          value: element.locCode
+        }));
+        if (this.isUpdate) {
+          this.locData = LocationList.find((x) => x.name == this.data.locName);
+          this.customerTableForm.controls.customerControllingLocation.setValue(this.locData);
+
+          this.locData = LocationList.find((x) => x.name == this.data.locName);
+          this.customerTableForm.controls.nonOda.setValue(this.locData);
+
+          this.locData = LocationList.find((x) => x.name == this.data.locName);
+          this.customerTableForm.controls.customerLocation.setValue(this.locData);
+        }
+        this.filter.Filter(
+          this.jsonControlCustomerArray,
+          this.customerTableForm,
+          LocationList,
+          this.controlling,
+          this.controllingStatus
+        );
+        this.filter.Filter(
+          this.jsonControlCustomerArray,
+          this.customerTableForm,
+          LocationList,
+          this.nonOda,
+          this.noOdaStatus
+        );
+        this.filter.Filter(
+          this.jsonControlCustomerArray,
+          this.customerTableForm,
+          LocationList,
+          this.location,
+          this.locationStatus
+        );
+
+      }
+    });
+  }
+  //#endregion
+  
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }
+
+  //#region Save Data function
   save() {
     const formValue = this.customerTableForm.value;
     const controlNames = [
@@ -217,8 +263,6 @@ export class CustomerMasterAddComponent implements OnInit {
       const controlValue = formValue[controlName]?.name;
       this.customerTableForm.controls[controlName].setValue(controlValue);
     });
-
-
     const controllingDropdown = this.customerTableForm.value.controllingDropdown.map((item: any) => item.name);
     this.customerTableForm.controls["customerControllingLocation"].setValue(controllingDropdown);
 
@@ -245,7 +289,7 @@ export class CustomerMasterAddComponent implements OnInit {
         id: id,
         updates: this.customerTableForm.value
       };
-
+      //API FOR UPDATE
       this.masterService.masterPut('common/update', req).subscribe({
         next: (res: any) => {
           if (res) {
@@ -286,6 +330,9 @@ export class CustomerMasterAddComponent implements OnInit {
       });
     }
   }
+  //#endregion
+
+  //#region Function Call Handler
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
     let field = $event.field;                   // the actual formControl instance
@@ -298,4 +345,5 @@ export class CustomerMasterAddComponent implements OnInit {
       console.log("failed");
     }
   }
+  //#endregion
 }

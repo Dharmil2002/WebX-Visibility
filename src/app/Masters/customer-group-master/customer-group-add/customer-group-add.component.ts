@@ -26,20 +26,7 @@ export class CustomerGroupAddComponent implements OnInit {
   savedData: CustomerGroupMaster;
   ngOnInit() {
   }
-  functionCallHandler($event) {
-    // console.log("fn handler called" , $event);
-
-    let field = $event.field;                   // the actual formControl instance
-    let functionName = $event.functionName;     // name of the function , we have to call
-
-    // function of this name may not exists, hence try..catch 
-    try {
-      this[functionName]($event);
-    } catch (error) {
-      // we have to handle , if function not exists.
-      console.log("failed");
-    }
-  }
+ 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private Route: Router, private fb: UntypedFormBuilder,
     private masterService: MasterService
@@ -84,6 +71,7 @@ export class CustomerGroupAddComponent implements OnInit {
   cancel() {
     window.history.back();
   }
+  //#region Save Function
   save() {
     this.groupTableForm.controls["activeFlag"].setValue(this.groupTableForm.value.activeFlag == true ? "Y" : "N");
     if (this.isUpdate) {
@@ -136,4 +124,20 @@ export class CustomerGroupAddComponent implements OnInit {
       });
     }
   }
+  //#endregion
+
+  //#region Function Call Handler
+  functionCallHandler($event) {
+    // console.log("fn handler called" , $event);
+    let field = $event.field;                   // the actual formControl instance
+    let functionName = $event.functionName;     // name of the function , we have to call
+    // function of this name may not exists, hence try..catch 
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      // we have to handle , if function not exists.
+      console.log("failed");
+    }
+  }
+  //#endregion
 }

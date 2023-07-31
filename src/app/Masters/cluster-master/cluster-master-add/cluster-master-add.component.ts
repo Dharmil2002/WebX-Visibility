@@ -17,33 +17,23 @@ import Swal from 'sweetalert2';
 export class ClusterMasterAddComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  countryCode: any;
-  action: string;
-  isUpdate = false;
   clusterTabledata: ClusterMaster;
   clusterTableForm: UntypedFormGroup;
   clusterFormControls: ClusterControl;
+  //#region Variable Declaration
   jsonControlArray: any;
   pincodeStatus: any;
   pincodeList: any;
   routeDet: any;
+  countryCode: any;
+  action: string;
+  isUpdate = false;
+  //#endregion
+
   ngOnInit() {
     this.getPincodeData()
   }
-  functionCallHandler($event) {
-    // console.log("fn handler called" , $event);
-
-    let field = $event.field;                   // the actual formControl instance
-    let functionName = $event.functionName;     // name of the function , we have to call
-
-    // function of this name may not exists, hence try..catch 
-    try {
-      this[functionName]($event);
-    } catch (error) {
-      // we have to handle , if function not exists.
-      console.log("failed");
-    }
-  }
+ 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private Route: Router, private fb: UntypedFormBuilder,
     private masterService: MasterService, private filter: FilterUtils,
@@ -93,6 +83,7 @@ export class ClusterMasterAddComponent implements OnInit {
   cancel() {
     window.history.back();
   }
+  //#region Pincode Dropdown
   getPincodeData() {
     let req = {
       "companyCode": this.companyCode,
@@ -130,6 +121,9 @@ export class ClusterMasterAddComponent implements OnInit {
       }
     });
   }
+  //#endregion
+  
+  //#region Save Function
   save() {
     const pincodeDropdown = this.clusterTableForm.value.pincodeDropdown.map((item: any) => item.name);
     this.clusterTableForm.controls["pincode"].setValue(pincodeDropdown);
@@ -181,6 +175,20 @@ export class ClusterMasterAddComponent implements OnInit {
           }
         }
       });
+    }
+  }
+  //#endregion
+
+  functionCallHandler($event) {
+    // console.log("fn handler called" , $event);
+    let field = $event.field;                   // the actual formControl instance
+    let functionName = $event.functionName;     // name of the function , we have to call
+    // function of this name may not exists, hence try..catch 
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      // we have to handle , if function not exists.
+      console.log("failed");
     }
   }
 }

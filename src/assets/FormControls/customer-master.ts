@@ -15,6 +15,10 @@ export class customerControl {
                         name: "required",
                         message: "Group Code is required"
                     },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: true
@@ -79,7 +83,7 @@ export class customerControl {
                         pattern: "^[.a-zA-Z0-9,-]{1,5}$",
                     }
                 ],
-              
+
             },
             {
                 name: 'industry', label: 'Industry', placeholder: 'Industry', type: 'text',
@@ -127,16 +131,16 @@ export class customerControl {
                 name: 'ownership', label: 'Type of Ownership', placeholder: 'Group Code', type: 'dropdown',
                 value: '', generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Type of Ownership is required"
-                    // },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
                 }
             },
-           
+
             {
                 name: 'customerControllingLocation',
                 label: 'Customer Controlling Locations',
@@ -156,7 +160,7 @@ export class customerControl {
                 },
                 generatecontrol: true, disable: false
             },
-           
+
             {
                 name: 'customerLocation',
                 label: 'Customer location',
@@ -345,7 +349,7 @@ export class customerControl {
                 {
                     name: 'sameAddres', label: 'Billing address same as customer address', placeholder: '', type: 'toggle', value: customerTable?.sameAddres, generatecontrol: true, disable: false,
                     Validations: [
-                        
+
                     ],
 
                 },
@@ -532,7 +536,7 @@ export class customerControl {
                     ],
                     generatecontrol: false, disable: false
                 },
-                
+
             ]
 
     }

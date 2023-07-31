@@ -78,18 +78,25 @@ export class AddressControl {
                 generatecontrol: true, disable: false,
                 Validations: [
                     {
-                        name: "required",
-                        message: "City is required"
-                    },
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ]
             },
             {
-                name: 'state', label: "State",
-                placeholder: "Enter State",
-                type: 'text',
+                name: 'stateName', label: "State",
+                placeholder: "Select State",
+                type: 'dropdown',
                 value: addressGroupTable.state,
+                additionalData: {
+                    showNameAndValue: false
+                },
                 generatecontrol: true, disable: false,
                 Validations: [
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ]
             },
             {
@@ -102,10 +109,10 @@ export class AddressControl {
                 },
                 generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Pincode is required"
-                    // },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ]
               
             },

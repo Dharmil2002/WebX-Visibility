@@ -128,6 +128,25 @@ export class ClusterControl {
             //     generatecontrol: true, disable: false
             // },
             {
+                name: 'activeFlag',
+                label: 'Active Flag',
+                placeholder: 'Active Flag',
+                type: 'toggle',
+                value: clusterMasterTable.activeFlag,
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'pincodeDropdown',
+                label: 'Pay Basis',
+                placeholder: 'Pay Basis',
+                type: '',
+                value: '',
+                Validations: [
+                ],
+                generatecontrol: false, disable: false
+            },
+            {
                 name: 'tableNo',
                 label: 'Table No',
                 placeholder: 'Enter Table No',
@@ -144,25 +163,6 @@ export class ClusterControl {
                         message: "Table No must be between 1 and 20 characters long",
                         maxLength: '100',
                     },
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'activeFlag',
-                label: 'Active Flag',
-                placeholder: 'Active Flag',
-                type: 'toggle',
-                value: clusterMasterTable.activeFlag,
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'pincodeDropdown',
-                label: 'Pay Basis',
-                placeholder: 'Pay Basis',
-                type: '',
-                value: '',
-                Validations: [
                 ],
                 generatecontrol: false, disable: false
             },

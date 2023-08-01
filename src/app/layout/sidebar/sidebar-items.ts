@@ -196,6 +196,16 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
+            {
+              "path": "Masters/GeneralMaster/GeneralMasterList",
+              "title": "General Master",
+              "moduleName": "General Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
           ]
         },
         {

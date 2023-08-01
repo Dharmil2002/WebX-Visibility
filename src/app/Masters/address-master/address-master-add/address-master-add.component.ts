@@ -227,7 +227,7 @@ export class AddressMasterAddComponent implements OnInit {
         }
       });
     } else {
-      const randomNumber = getShortName(this.addressTableForm.value.manualCode);
+      const randomNumber = getShortName(this.addressTableForm.value.address);
       this.addressTableForm.controls["id"].setValue(randomNumber);
       let req = {
         companyCode: this.companyCode,

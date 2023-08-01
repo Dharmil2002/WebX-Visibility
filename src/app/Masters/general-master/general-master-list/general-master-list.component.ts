@@ -1,39 +1,38 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { GeneralMasterCodeListComponent } from '../general-master-code-list/general-master-code-list.component';
 
 @Component({
-  selector: 'app-address-master-list',
-  templateUrl: './address-master-list.component.html',
+  selector: 'app-general-master-list',
+  templateUrl: './general-master-list.component.html',
 })
-export class AddressMasterListComponent implements OnInit {
+export class GeneralMasterListComponent implements OnInit {
+  viewComponent: any;
   data: [] | any;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  linkArray = []
+  linkArray = [];
+
   columnHeader = {
     "srNo": "Sr No",
-    "addressCode": "Address Code",
-    "manualCode": "Manual Code",
-    "cityName": "City Name",
-    "address": "Address",
-    "activeFlag": "Active Status",
+    "headerDesc": "General Master",
+    "description": "Description",
+    "whereused": "Masters/Forms where used",
     "actions": "Actions"
   };
   headerForCsv = {
     "srNo": "Sr No",
-    "addressCode": "Address Code",
-    "manualCode": "Manual Code",
-    "cityName": "City Name",
-    "address": "Address",
-    "activeFlag": "Active Status",
+    "general": "General Master",
+    "description": "Description",
+    "formsUsed": "Masters/Forms where used",
   }
   breadScrums = [
     {
-      title: "Address Master",
+      title: "General Master",
       items: ["Home"],
-      active: "Address Master",
+      active: "General Master",
     },
   ];
   dynamicControls = {
@@ -42,36 +41,32 @@ export class AddressMasterListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
-  tableData: any;
+  tableData:any[];
   constructor(private masterService: MasterService) {
-    this.addAndEditPath = "/Masters/AddressMaster/AddAddressMaster";
+    this.addAndEditPath = "/Masters/GeneralMaster/GeneralMasterCodeList";
   }
   ngOnInit(): void {
-    this.getAddressDetails();
+    //throw new Error("Method not implemented.");
+    this.getGeneralDetails();
+    //this.viewComponent = GeneralMasterCodeListComponent
+
   }
-  getAddressDetails() {
+  getGeneralDetails() {
     let req = {
       "companyCode": this.companyCode,
       "type": "masters",
-      "collection": "address_detail"
+      "collection": "CodeTypes"
     }
     this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {
         if (res) {
-          console.log(res)
-          
           // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) =>
-           {
+          const dataWithSrno = res.data.map((obj, index) => {
             return {
-              
               ...obj,
               srNo: index + 1
             };
-
           });
-          console.log(res.data)
-
           this.csv = dataWithSrno
           this.tableData = dataWithSrno;
           this.tableLoad = false;
@@ -80,3 +75,4 @@ export class AddressMasterListComponent implements OnInit {
     })
   }
 }
+

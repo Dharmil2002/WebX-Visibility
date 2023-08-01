@@ -90,6 +90,9 @@ import { AddRouteScheduleMasterComponent } from './route-schedule-master/add-rou
 import { RouteScheduleMasterListComponent } from './route-schedule-master/route-schedule-master-list/route-schedule-master-list.component';
 import { RouteScheduleDetComponent } from './route-schedule-master/route-schedule-det/route-schedule-det.component';
 import { VehicleStatusUpdateComponent } from './vehicle-status-update/vehicle-status-update.component';
+import { GeneralMasterListComponent } from './general-master/general-master-list/general-master-list.component';
+import { GeneralMasterAddComponent } from './general-master/general-master-add/general-master-add.component';
+import { GeneralMasterCodeListComponent } from './general-master/general-master-code-list/general-master-code-list.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -188,6 +191,9 @@ import { VehicleStatusUpdateComponent } from './vehicle-status-update/vehicle-st
     AddRouteScheduleMasterComponent,
     RouteScheduleDetComponent,
     VehicleStatusUpdateComponent,
+    GeneralMasterListComponent,
+    GeneralMasterAddComponent,
+    GeneralMasterCodeListComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

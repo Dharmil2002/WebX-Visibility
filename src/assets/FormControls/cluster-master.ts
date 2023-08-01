@@ -8,7 +8,7 @@ export class ClusterControl {
             {
                 name: 'clusterCode',
                 label: 'Cluster Code',
-                placeholder: 'Cluster Code',
+                placeholder: 'For example CC0001',
                 type: 'text',
                 value: clusterMasterTable.clusterCode,
                 Validations: [

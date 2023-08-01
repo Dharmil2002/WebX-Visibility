@@ -37,7 +37,7 @@ export class DriverControls {
                     ]
                 },
                 {
-                    name: 'manualDriverCode', label: "Manual Driver Code", placeholder: "Enter Manual Driver Code", type: 'text', value: DriverTable.manualDriverCode, generatecontrol: true, disable: IsUpdate ? true : false,
+                    name: 'manualDriverCode', label: "Manual Driver Code", placeholder: "For example DC0001", type: 'text', value: DriverTable.manualDriverCode, generatecontrol: true, disable: IsUpdate ? true : false,
                     Validations: [
                         {
                             name: "required",

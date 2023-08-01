@@ -7,7 +7,7 @@ export class AddressControl {
         this.addressControlArray = [
             {
                 name: 'addressCode', label: "Address Code",
-                placeholder: "",
+                placeholder: "For example 000001",
                 type: 'text',
                 value: addressGroupTable.addressCode,
                 generatecontrol: true, disable: false,
@@ -16,7 +16,7 @@ export class AddressControl {
             },
             {
                 name: 'manualCode', label: "Manual Code",
-                placeholder: "Enter Manual Code",
+                placeholder: "For example AD0001",
                 type: 'text',
                 value: addressGroupTable.manualCode,
                 generatecontrol: true, disable: false,

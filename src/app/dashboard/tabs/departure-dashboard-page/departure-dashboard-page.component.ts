@@ -113,7 +113,6 @@ export class DepartureDashboardPageComponent
    * Also triggers fetching shipment data.
    */
   async getdepartureDetail() {
-    debugger
     // Fetch departure details from the API
     const departureTableData = await fetchDepartureDetails(
       this.companyCode,

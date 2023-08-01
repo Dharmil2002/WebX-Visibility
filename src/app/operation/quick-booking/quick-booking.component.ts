@@ -192,7 +192,6 @@ export class QuickBookingComponent implements OnInit {
   }
 
   save() {
-    debugger
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
     const paddedNumber = dynamicNumber.toString().padStart(4, "0");

@@ -201,14 +201,7 @@ export class QuickBookingControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [{
-          name: "autocomplete"
-        },
-        {
-          name: "invalidAutocompleteObject",
-          message: "Choose proper value",
-        }
-      ],
+        Validations: [],
         additionalData: {
           showNameAndValue: false,
         },

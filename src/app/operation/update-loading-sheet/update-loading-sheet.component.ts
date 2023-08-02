@@ -7,7 +7,7 @@ import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet
 import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival/mark-arrival.component';
 import Swal from 'sweetalert2';
 import { Shipment, autoBindData, filterShipments, kpiData } from '../shipment';
-import { updatePending } from './loadingSheetshipment';
+import { updatePending, vehicleStatusUpdate } from './loadingSheetshipment';
 import { groupShipmentsByLeg } from './shipmentsUtils';
 import { handlePackageUpdate } from './packageUtils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
@@ -30,7 +30,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
-  scanPackage:string;
+  scanPackage: string;
   shipingHeader = {
     "Leg": "Leg",
     "Shipment": "Shipments",
@@ -91,6 +91,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   Scan: any;
   shipingDataTable: any;
   packageData: any;
+  updateTrip: any;
 
 
   constructor(
@@ -141,7 +142,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     this._operation.operationPost('common/getall', reqBody).subscribe(res => {
       if (res) {
-        
+        this.updateTrip = res.data;
         const arrivalData = res.data.filter((x) => {
           const destinationParts = x.destination ? x.destination.split(":")[1].trim() : "";
           return destinationParts === this.currentBranch && menifestNo.some((manifestItem) => manifestItem.mfNo === x.mfNo);
@@ -158,7 +159,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
           Unloaded: 0,
           Pending: parseInt(shipment.totalChargedNoOfpkg),
           Leg: (shipment.orgLoc || "") + ":" + (shipment.destination ? shipment.destination.split(":")[1].trim() : ""),
-          KgWt: parseInt(shipment?.actualwt) ||0,
+          KgWt: parseInt(shipment?.actualwt) || 0,
           CftVolume: shipment?.cft_tot || ""
         }));
         this.boxData = kpiData(this.csv, this.shipmentStatus, "");
@@ -337,15 +338,15 @@ export class UpdateLoadingSheetComponent implements OnInit {
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
-  updateTripStatus() {
-
+  async updateTripStatus() {
     const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"), this.currentBranch);
     let tripDetails
     if (next) {
+      const updateTripStatus = this.updateTrip.find((x) => x.orgLoc === this.currentBranch);
       tripDetails = {
-        orgLoc:this.currentBranch,
+        orgLoc: this.currentBranch,
         nextUpComingLoc: next,
-        status: "Depart Vehicle"
+        status: updateTripStatus ? "Update Trip" : "Depart Vehicle"
       }
 
     }
@@ -355,13 +356,20 @@ export class UpdateLoadingSheetComponent implements OnInit {
         nextUpComingLoc: "",
         closeTime: new Date()
       }
+      try {
+        // Call the vehicleStatusUpdate function here
+        const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation);
+        // Handle the result if needed
+      } catch (error) {
+        // Handle any errors that might occur
+      }
     }
 
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "trip_detail",
-      "id":this.arrivalData.id,
+      "id": this.arrivalData.id,
       "updates": {
         ...tripDetails,
       }
@@ -413,5 +421,21 @@ export class UpdateLoadingSheetComponent implements OnInit {
       }
     })
   }
+  // vehicleStatusUpdate() {
+  //   let vehicleDetails = {
+  //     currentLocation: this.currentBranch,
+  //     status: "available"
+  //   }
+  //   const reqBody = {
+  //     "companyCode": this.companyCode,
+  //     "type": "operation",
+  //     "collection": "vehicle_status",
+  //     "id": this.arrivalData.VehicleNo,
+  //     "updates": {
+  //       ...vehicleDetails,
+  //     }
+  //   }
+  //   const vehicleUpdate = this._operation.operationPut("common/update", reqBody).toPromise();
 
+  // }
 }

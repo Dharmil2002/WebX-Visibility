@@ -97,7 +97,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   loadingSheetNo: any;
   docketApiRes: any;
   cnoteDetails: any;
-
+  userName=localStorage.getItem("Username");
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,
@@ -108,6 +108,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     private filter: FilterUtils
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
+      
       // Retrieve tripData and shippingData from the navigation state
       this.tripData =
         this.Route.getCurrentNavigation()?.extras?.state.data?.columnData ||
@@ -156,7 +157,17 @@ export class CreateLoadingSheetComponent implements OnInit {
       this.getloadingFormData?.TripID,
       ""
     );
-
+    setFormControlValue(
+      this.loadingSheetTableForm.controls["vehicle"],
+      { name:this.tripData?.VehicleNo,value:this.tripData?.VehicleNo},
+      ""
+    );
+    setFormControlValue(
+      this.loadingSheetTableForm.controls["tripID"],
+      this.tripData?.TripID,
+      this.getloadingFormData?.TripID,
+      ""
+    );
     // Set the value of 'Expected' form control with tripData's Expected or getloadingFormData's Expected or an empty string
     setFormControlValue(
       this.loadingSheetTableForm.controls["Expected"],
@@ -423,8 +434,9 @@ export class CreateLoadingSheetComponent implements OnInit {
       .operationPost("common/getall", vehRequest)
       .subscribe((res) => {
         if (res) {
+
           let vehicleDetails = res.data
-            .filter((x) => x.status === "" && x.currentLocation === this.orgBranch)
+            .filter((x) => x.status === "available" && x.currentLocation === this.orgBranch)
             .map((x) => {
               return { name: x.vehNo, value: x.vehNo };
             });
@@ -458,6 +470,8 @@ export class CreateLoadingSheetComponent implements OnInit {
       vehicleNo: this.loadingSheetTableForm.value.vehicle.value,
       tripId: this.loadingSheetTableForm.value.tripID,
       status: "Vehicle Loading",
+      updateBy:this.userName,
+      updateDate:new Date().toISOString()
     };
     const reqBody = {
       companyCode: this.companyCode,
@@ -541,6 +555,8 @@ export class CreateLoadingSheetComponent implements OnInit {
       pacakges: leg.packages,
       weightKg: leg.weightKg,
       volumeCFT: leg.volumeCFT,
+      entryBy:this.userName,
+      entryData:new Date().toISOString()
     };
     const reqBody = {
       companyCode: this.companyCode,
@@ -562,6 +578,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     const vehicleDetails = {
       status: "On trip",
       tripId: this.loadingSheetTableForm.value?.tripID,
+      route:this.tripData?.RouteandSchedule
     };
     const reqBody = {
       companyCode: this.companyCode,

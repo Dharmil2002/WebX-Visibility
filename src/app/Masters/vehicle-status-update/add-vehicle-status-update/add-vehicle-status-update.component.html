@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="vehicleStatusTableForm">
+      <app-form-webxpress [form]="vehicleStatusTableForm" [formData]="jsonControlVehicleArray"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+        (callFunction)="functionCallHandler($event)">
+      </app-form-webxpress>
+    </form>
+  </app-common-wrapper-webxpress>

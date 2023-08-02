@@ -35,6 +35,7 @@ export class QuickBookingComponent implements OnInit {
   vehNo: string;
   vehicleStatus: boolean;
   /*it's breadScrums to used in html you must delcare here */
+  userName=localStorage.getItem("Username");
   breadScrums = [
     {
       title: "CNote Quick Booking",
@@ -64,7 +65,6 @@ export class QuickBookingComponent implements OnInit {
   initializeFormControl() {
     // Create an instance of QuickBookingControls to get form controls for different sections
     this.docketControls = new QuickBookingControls();
-
     // Get form controls for Quick Booking section
     this.jsonControlDocketArray = this.docketControls.getDocketFieldControls();
     this.commonDropDownMapping();
@@ -192,6 +192,8 @@ export class QuickBookingComponent implements OnInit {
   }
 
   save() {
+     // Remove all form errors
+     this.quickDocketTableForm.setErrors(null);
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
     const paddedNumber = dynamicNumber.toString().padStart(4, "0");
@@ -213,7 +215,7 @@ export class QuickBookingComponent implements OnInit {
       this.quickDocketTableForm.value?.vehNo.name || ""
     );
 
-    let id = { id: docketNo, isComplete: false };
+    let id = { id: docketNo, isComplete: false,unloadloc:"",entryBy:this.userName,entryData:new Date().toISOString()};
 
     let docketDetails = { ...this.quickDocketTableForm.value, ...id };
 

@@ -51,6 +51,8 @@ import { RouteScheduleMasterListComponent } from './route-schedule-master/route-
 import { GeneralMasterListComponent } from './general-master/general-master-list/general-master-list.component';
 import { GeneralMasterCodeListComponent } from './general-master/general-master-code-list/general-master-code-list.component';
 import { GeneralMasterAddComponent } from './general-master/general-master-add/general-master-add.component';
+import { VehicleStatusUpdateComponent } from './vehicle-status-update/vehicle-status-update-list/vehicle-status-update.component';
+import { AddVehicleStatusUpdateComponent } from './vehicle-status-update/add-vehicle-status-update/add-vehicle-status-update.component';
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -103,8 +105,9 @@ const routes: Routes = [
   { path: "RouteScheduleMaster/AddRouteScheduleMaster", component: AddRouteScheduleMasterComponent },
   { path: "GeneralMaster/GeneralMasterList", component: GeneralMasterListComponent },
   { path: "GeneralMaster/GeneralMasterCodeList", component: GeneralMasterCodeListComponent },
-  { path: "GeneralMaster/AddGeneralMaster", component: GeneralMasterAddComponent }
-
+  { path: "GeneralMaster/AddGeneralMaster", component: GeneralMasterAddComponent },
+  {path:"Vehicle/Status", component: VehicleStatusUpdateComponent},
+  {path:"Vehicle/Status/Add", component: AddVehicleStatusUpdateComponent}
 ];
 
 @NgModule({

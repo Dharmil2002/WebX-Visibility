@@ -323,6 +323,15 @@ export const ROUTES: RouteInfo[] =
         class: "",
         groupTitle: false,
         submenu: []
+      },
+      {
+        path: "Masters/Vehicle/Status",
+        title: "Vehicle Status",
+        moduleName: "Vehicle Status",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
       }
       ],
     },

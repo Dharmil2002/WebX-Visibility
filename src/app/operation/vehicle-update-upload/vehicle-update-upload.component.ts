@@ -28,6 +28,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   shipments = []
   currentBranch: string = localStorage.getItem("Branch") || '';
   companyCode: number = parseInt(localStorage.getItem('companyCode'));
+  userName: string = localStorage.getItem('Username');
   columnHeader = {
     "Shipment": "Shipment",
     "Origin": "Origin",
@@ -342,7 +343,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
         "totPkg": menifestDetails?.PackagesLoadedBooked || "",
         "tot_cft": menifestDetails?.VolumeCFT || "",
         "WeightKg": menifestDetails?.WeightKg || "",
-        "entryDate": new Date()
+        "entryDate": new Date(),
+        "entryBy":this.userName
       }
       menifestData.push(jsonDetails);
     });

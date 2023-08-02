@@ -57,7 +57,7 @@ export async function getDocketDetailsFromApi(
 
     // Filter docket details based on branch
     const docketDetails = res.data.filter(
-      (x: any) => x.orgLoc.toLowerCase() === branch.toLowerCase()
+      (x: any) => x.orgLoc.toLowerCase() === branch.toLowerCase() || x.unloadloc.toLowerCase() === branch.toLowerCase()
     );
 
     // Modify the data
@@ -88,7 +88,7 @@ export async function getDocketDetailsFromApi(
               : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo
                 ? "Depart for " + item.destination.split(":")[1]
                 : item.isComplete === 1 && item?.unloading && item?.lsNo && item?.mfNo
-                  ? "Unloading at " + item.destination.split(":")[1]
+                  ? "Going to Last Mile Delivery" + item.destination.split(":")[1]
                   :"Quick Completion";
       return {
         no: item?.docketNumber ?? "",

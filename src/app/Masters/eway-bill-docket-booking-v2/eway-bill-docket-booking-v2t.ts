@@ -59,6 +59,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   fromCity: string;
   fromCityStatus: any;
   ewayData: any;
+  userName=localStorage.getItem("Username");
   // Displayed columns configuration
   displayedColumns1 = {
     srNo: {
@@ -523,6 +524,10 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   //end
   saveData() {
+
+    this.tabForm.setErrors(null);
+    this.contractForm.setErrors(null);
+
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const controlNames = ["svcType", "payType", "rskty", "pkgs", "trn"];
     controlNames.forEach((controlName) => {
@@ -569,7 +574,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       this.contractForm.value?.destination.name || ""
     );
     if (this.quickDocket) {
-      let id = { isComplete: 1, unloading: 0, lsNo: "", mfNo: "" };
+      let id = { isComplete: 1, unloading: 0, lsNo: "", mfNo: "",unloadloc:""};
       let docketDetails = {
         ...this.tabForm.value,
         ...this.contractForm.value,
@@ -602,6 +607,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         unloading: 0,
         lsNo: "",
         mfNo: "",
+        entryBy:this.userName,
+        entryData:new Date().toISOString(),
+        unloadloc:""
       };
       let docketDetails = {
         ...this.tabForm.value,
@@ -666,7 +674,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         bcSerialNo: bcSerialNo,
         entryDateTime: entryDateTime,
         bcDockSf: bcDockSf,
-        loc:this.branch
+        loc:this.branch,
+        entryBy:this.userName,
+        entryData:new Date().toISOString()
       };
     });
 

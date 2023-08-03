@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-driver-master',
   templateUrl: './driver-master.component.html',
@@ -28,7 +29,6 @@ export class DriverMasterComponent implements OnInit {
     'ValdityDate': 'Validity Date',
     "ActiveFlag": "Active Status",
   }
-
   breadScrums = [
       {
         title: "Driver Master",
@@ -75,4 +75,31 @@ export class DriverMasterComponent implements OnInit {
       }
     })
   }
+
+  IsActiveFuntion(det) {
+    let id = det.id;
+    // Remove the "id" field from the form controls
+    delete det.id;
+  //  delete det.srNo;
+    let req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        type: "masters",
+        collection: "driver_detail",
+        id: id,
+        updates: det
+    };
+    this.masterService.masterPut('common/update', req).subscribe({
+        next: (res: any) => {
+            if (res) {
+                // Display success message
+                Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                });
+            }
+        }
+    });
+}
 }

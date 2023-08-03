@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-customer-master-list',
   templateUrl: './customer-master-list.component.html',
@@ -70,4 +71,30 @@ export class CustomerMasterListComponent implements OnInit {
       }
     })
   }
+  IsActiveFuntion(det) {
+    let id = det.id;
+    // Remove the "id" field from the form controls
+    delete det.id;
+  //  delete det.srNo;
+    let req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        type: "masters",
+        collection: "customer_detail",
+        id: id,
+        updates: det
+    };
+    this.masterService.masterPut('common/update', req).subscribe({
+        next: (res: any) => {
+            if (res) {
+                // Display success message
+                Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                });
+            }
+        }
+    });
+}
 }

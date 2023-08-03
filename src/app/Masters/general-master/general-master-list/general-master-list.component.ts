@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { GeneralMasterCodeListComponent } from '../general-master-code-list/general-master-code-list.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-general-master-list',
@@ -41,15 +41,13 @@ export class GeneralMasterListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
-  tableData:any[];
-  constructor(private masterService: MasterService) {
+  tableData: any[];
+  constructor(private masterService: MasterService, private route: Router) {
     this.addAndEditPath = "/Masters/GeneralMaster/GeneralMasterCodeList";
   }
   ngOnInit(): void {
     //throw new Error("Method not implemented.");
     this.getGeneralDetails();
-    //this.viewComponent = GeneralMasterCodeListComponent
-
   }
   getGeneralDetails() {
     let req = {

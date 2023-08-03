@@ -14,6 +14,7 @@ export class MasterService {
   city='../../../assets/data/city.json';  
   generalMaster='../../../assets/data/generalMaster.json';
   destination='../../../assets/data/destination.json';
+  headerCode: string;
 
   constructor(private http: HttpClient) { }
   /**
@@ -30,5 +31,10 @@ export class MasterService {
   masterPut(ApiURL, Request) {
     return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
-  
+  setValueheaderCode(data:string){
+   this.headerCode=data
+  }
+  getHeaderCode(){
+    return this.headerCode
+  }
 }

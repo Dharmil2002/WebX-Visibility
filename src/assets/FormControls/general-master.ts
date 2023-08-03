@@ -16,11 +16,6 @@ export class GeneralMasterControl {
                     name: "required",
                     message: "Group Code is required"
                   },
-                  {
-                    name: "pattern",
-                    message: "Please Enter alphanumeric Group Code of length 4 to 10",
-                    pattern: '^[a-zA-Z0-9]{4,10}$',
-                }
                 ]
             },
             {
@@ -32,7 +27,7 @@ export class GeneralMasterControl {
                 Validations: [
                   {
                     name: "required",
-                    message: "Group Name is required"
+                    message: "Code Description is required"
                   },
                   {
                     name: "pattern",
@@ -51,7 +46,20 @@ export class GeneralMasterControl {
               label: '',
               placeholder: '',
               type: 'text',
-              value: generalTable.id,
+              value: "",
+              filterOptions: '',
+              autocomplete: '',
+              displaywith: '',
+              Validations: [],
+              generatecontrol: false,
+              disable: false
+            },
+            {
+              name: 'codeType',
+              label: '',
+              placeholder: '',
+              type: 'text',
+              value: "",
               filterOptions: '',
               autocomplete: '',
               displaywith: '',

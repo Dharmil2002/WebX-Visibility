@@ -215,7 +215,7 @@ export class QuickBookingComponent implements OnInit {
       this.quickDocketTableForm.value?.vehNo.name || ""
     );
 
-    let id = { id: docketNo, isComplete: false,unloadloc:"",entryBy:this.userName,entryData:new Date().toISOString()};
+    let id = { id: docketNo, isComplete: false,unloadloc:"",entryBy:this.userName,entryDate:new Date().toISOString()};
 
     let docketDetails = { ...this.quickDocketTableForm.value, ...id };
 

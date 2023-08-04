@@ -139,7 +139,7 @@ export function filterCnoteDetails(cnoteDetails, shipping) {
   shipping.forEach(element => {
     // Filter cnoteDetails to get data that doesn't match the current shipping element
     let existShippingData = cnoteDetails.filter((x) => x.destination.split(":")[1].trim() !== element.Destination.trim() && x.orgLoc.trim() !== element.Origin.trim());
-    
+
     // Only add non-empty arrays to cnoteData
     if (existShippingData.length > 0) {
       cnoteData.push(...existShippingData); // Spread the objects into the array
@@ -155,10 +155,10 @@ export function filterCnoteDetails(cnoteDetails, shipping) {
 
     // Filter cnoteDetails to get data that matches the current shipping element's destination, origin, but has a different docket number
     let removedData = cnoteDetails.filter((x) => x.destination.split(":")[1].trim() === element.Destination.trim() && x.orgLoc.trim() === element.Origin.trim() && x.docketNumber.trim() !== element.Shipment.trim());
-    
+
     // Filter existShippingData to remove items that also exist in removedData
     let filterData = existShippingData.filter((x) => !removedData.some((y) => x.destination === y.destination && x.orgLoc === y.orgLoc && x.docketNumber === y.docketNumber));
-    
+
     // Only add non-empty arrays to cnoteData
     if (filterData.length > 0) {
       cnoteData.push(...filterData); // Spread the objects into the array
@@ -167,6 +167,25 @@ export function filterCnoteDetails(cnoteDetails, shipping) {
 
   return cnoteData;
 }
+//export function for vehicle details
+export async function getVehicleDetailFromApi(companyCode: number, operationService,vehicleNo) {
+  const reqBody = {
+    companyCode: companyCode,
+    type: "masters",
+    collection: "vehicle_detail",
+    query: {
+      vehicleNo: vehicleNo
+  }
+  };
+  try {
+    const res = await operationService.operationPost("common/getOne", reqBody).toPromise();
+    return res.data.db.data.vehicle_detail[0]
+  } catch (error) {
+    console.error('Error occurred during the API call:', error);
+  }
+
+}
+//end
 
 
 

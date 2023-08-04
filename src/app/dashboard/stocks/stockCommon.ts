@@ -62,14 +62,7 @@ export async function getDocketDetailsFromApi(
 
     // Modify the data
     const modifiedData = docketDetails.map((item: any) => {
-      let actualWeight;
-
-      if (item.invoiceDetails) {
-        actualWeight = item.invoiceDetails.reduce(
-          (acc: number, total: any) => acc + (total.ACT_WT ?? 0),
-          0
-        );
-      }
+    
       let formattedDate = "";
 
       if (item.docketDate) {
@@ -99,7 +92,7 @@ export async function getDocketDetailsFromApi(
         fromCityToCity: `${item?.fromCity ?? ""} : ${item?.toCity ?? ""}`,
         noofPackages: parseInt(item?.totalChargedNoOfpkg ?? 0),
         chargedWeight: parseInt(item?.chrgwt ?? 0),
-        actualWeight: parseInt(actualWeight ?? 0),
+        actualWeight: parseInt(item?.actualwt ?? 0),
         status: status,
         // Determine the Action based on the conditions
         Action: item?.isComplete === 1

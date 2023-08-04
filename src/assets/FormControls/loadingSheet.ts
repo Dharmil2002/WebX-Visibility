@@ -3,7 +3,8 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class loadingControl {
     private loadingSheetControlArray: FormControls[];
     constructor() {
-        this.loadingSheetControlArray = [
+        this.loadingSheetControlArray =
+         [
             {
                 name: 'Route',
                 label: 'Route',
@@ -25,30 +26,26 @@ export class loadingControl {
                 additionalData: {
                     showNameAndValue: false
                 },
+                functions: {
+                    onOptionSelect: 'loadVehicleDetails'
+                },
                 disable: false
             },
             {
-                name: "vehicleTypecontrolHandler",
+                name: "vehicleType",
                 label: "Vehicle Type",
                 placeholder: "VehicleType",
-                type: "select",
+                type: "text",
                 value: "",
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: [
                 ],
-                functions: {
-                    onChange: 'vehicleTypeDataAutofill'
-                },
-                additionalData: {
-                    isIndeterminate: false,
-                    isChecked: false,
-                    support: "vehicleType",
-                    showNameAndValue: false
-                }
+                functions: { },
+                additionalData: {}
             },
             {
                 name: "tripID",
@@ -139,7 +136,7 @@ export class loadingControl {
             },
             {
                 name: 'WeightUtilization',
-                label: 'Weight Utilization',
+                label: 'Weight Utilization (%)',
                 placeholder: '',
                 type: 'text',
                 value:'',
@@ -149,24 +146,14 @@ export class loadingControl {
             },
             {
                 name: 'VolumeUtilization',
-                label: 'Volume Utilization',
+                label: 'Volume Utilization (%)',
                 placeholder: '',
                 type: 'text',
                 value:'',
                 Validations: [],
                 generatecontrol: true,
                 disable: true
-            },
-            {
-                name: "vehicleType", label: "", placeholder: "Vehicle Type", type: "", value: "", filterOptions: "", autocomplete: "", generatecontrol: false, disable: true,
-                Validations: [
-                    {
-                        name: "required",
-                    }
-
-                ]
-                
-            },
+            }
         ];
     }
     getMarkArrivalsertFormControls() {

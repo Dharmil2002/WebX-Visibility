@@ -28,21 +28,9 @@ export class VehicleStatusControls {
                 }
             },
             {
-                name: 'currentLocation', label: "Location", placeholder: "Search and select Location", type: 'dropdown',
-                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Location is required.."
-                    },
-                    {
-                        name: "autocomplete",
-                    },
-                    {
-                        name: "invalidAutocomplete",
-                        message: "Choose proper value",
-                    }
-                ],
+                name: 'currentLocation', label: "Location", placeholder: "Location", type: 'text',
+                value: localStorage.getItem("Branch"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
+                Validations: [],
                 additionalData: {
                     showNameAndValue: false
                 }

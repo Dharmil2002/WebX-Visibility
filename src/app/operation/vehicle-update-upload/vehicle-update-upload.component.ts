@@ -326,14 +326,14 @@ export class VehicleUpdateUploadComponent implements OnInit {
   Close(): void {
     this.dialogRef.close()
   }
-  generateMeniFest(result) {
-
+  async generateMeniFest(result) {
     let menifestData = [];
-    this.loadingTableData.forEach(element => {
-      let menifestDetails = result.find((x) => x.Leg === element.Leg)
-      this.updatedocketDetail(element.Shipment, menifestDetails.MFNumber)
-      const jsonDetails =
-      {
+  
+    for (const element of this.loadingTableData) {
+      let menifestDetails = result.find((x) => x.Leg === element.Leg);
+      await this.updatedocketDetail(element.Shipment, menifestDetails.MFNumber);
+  
+      const jsonDetails = {
         "id": menifestDetails?.MFNumber || "",
         "mfNo": menifestDetails?.MFNumber || "",
         "leg": menifestDetails?.Leg || "",
@@ -344,39 +344,69 @@ export class VehicleUpdateUploadComponent implements OnInit {
         "tot_cft": menifestDetails?.VolumeCFT || "",
         "WeightKg": menifestDetails?.WeightKg || "",
         "entryDate": new Date(),
-        "entryBy":this.userName
-      }
+        "entryBy": this.userName
+      };
+  
       menifestData.push(jsonDetails);
-    });
-
+    }
+  
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "menifest_detail",
       "data": menifestData[0]
-    }
+    };
+  
     this.operationService.operationPost('common/create', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          if (this.vehicelLoadData.count===1) {
+          if (this.vehicelLoadData.count === 1) {
             this.updateTripStatus();
-          }
-          else {
+          } else {
             if (res) {
               Swal.fire({
                 icon: "success",
                 title: "Successful",
-                text: `Vehicle Loaded Successfully`,//
+                text: `Vehicle Loaded Successfully`,
                 showConfirmButton: true,
-              })
+              });
               this.goBack(3);
-              this.dialogRef.close("")
+              this.dialogRef.close("");
             }
           }
-          }
         }
-      })
+      }
+    });
   }
+  
+  async updatedocketDetail(dktNo, mfNumber) {
+    let mfDetails = {
+      mfNo: mfNumber
+    };
+    const reqBody = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "docket",
+      id: dktNo,
+      updates: {
+        ...mfDetails
+      }
+    };
+  
+    return new Promise((resolve, reject) => {
+      this.operationService.operationPut("common/update", reqBody).subscribe({
+        next: (res: any) => {
+          if (res) {
+            resolve(res);
+          }
+        },
+        error: (err) => {
+          reject(err);
+        }
+      });
+    });
+  }
+  
   updateTripStatus() {
     let tripDetails = {
       status: "Depart Vehicle"
@@ -405,27 +435,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
       }
     })
   }
-  updatedocketDetail(dktNo, mfNumber) {
-    let mfDetails = {
-      mfNo: mfNumber
-    }
-    const reqBody = {
-      companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
-      id: dktNo,
-      updates: {
-        ...mfDetails,
-      }
-    }
-    this.operationService.operationPut("common/update", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-
-        }
-      }
-    })
-  }
+ 
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }

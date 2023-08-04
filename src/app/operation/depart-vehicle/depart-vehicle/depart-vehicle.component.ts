@@ -17,6 +17,9 @@ import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.se
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
 import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { getVehicleDetailFromApi } from "../../create-loading-sheet/loadingSheetCommon";
+import { calculateBalanceAmount, calculateTotal, calculateTotalAdvances, getDriverDetail, getLoadingSheetDetail } from "./depart-common";
+import { formatDate } from "src/app/Utility/date/date-utils";
 
 @Component({
   selector: "app-depart-vehicle",
@@ -108,7 +111,6 @@ export class DepartVehicleComponent implements OnInit {
     private dialog: MatDialog,
     private http: HttpClient,
     private fb: UntypedFormBuilder,
-    private filter: FilterUtils,
     private CnoteService: CnoteService,
     private _operationService: OperationService
   ) {
@@ -201,6 +203,7 @@ export class DepartVehicleComponent implements OnInit {
             this.vehicleDetail?.vendorName || ""
           );
           this.getDriverDetails();
+          this.fetchLoadingSheetDetailFromApi();
         }
       },
     });
@@ -270,7 +273,9 @@ export class DepartVehicleComponent implements OnInit {
     ]);
   }
   ngOnInit(): void { }
+
   functionCallHandler($event) {
+    debugger
     // console.log("fn handler called", $event);
 
     let field = $event.field; // the actual formControl instance
@@ -319,12 +324,13 @@ export class DepartVehicleComponent implements OnInit {
     this._operationService.operationPost("common/getall", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
+          debugger
           // Filter menifestDetails based on mfNo and unloading=0
           const filteredMenifestDetails = res.data.filter((manifest) => {
             const matchedShipment = this.shipmentData.find((item) => item.mfNo === manifest.mfNo);
 
             // Check if there's a matching shipment and unloading is 0
-            return matchedShipment && matchedShipment.unloading === 0;
+            return matchedShipment && matchedShipment.unloading === 0 && manifest.tripId === this.tripData.TripID
           });
 
 
@@ -335,8 +341,8 @@ export class DepartVehicleComponent implements OnInit {
               manifest: element.mfNo,
               shipments_lb: element.totDkt,
               packages_lb: element.totPkg,
-              weight_kg: element.weight_kg,
-              volume_cft: element.tot_cft,
+              weight_kg: parseFloat(element?.WeightKg || 0),
+              volume_cft: parseFloat(element?.tot_cft || 0),
             };
             menifestList.push(json);
             this.menifestTableData = menifestList;
@@ -347,21 +353,7 @@ export class DepartVehicleComponent implements OnInit {
         }
       },
     });
-    // let MeniFestDetails =this.CnoteService.getMeniFestDetails();
-    // let menifestList:any=[]
-    // MeniFestDetails.forEach(element => {
-    //   let json={
-    //       leg:element.Leg,
-    //       manifest: element.MFNumber,
-    //       shipments_lb: element.ShipmentsLoadedBooked,
-    //       packages_lb:element.PackagesLoadedBooked,
-    //       weight_kg:element.WeightKg,
-    //       volume_cft:element.VolumeCFT
-    //   }
-    //   menifestList.push(json);
-    //   this.csv=menifestList;
-    //   this.tableload=false;
-    // });
+
   }
   docketDetails() {
     const reqbody = {
@@ -375,113 +367,24 @@ export class DepartVehicleComponent implements OnInit {
           this.lsDetails = res.data.find(
             (lsDetails) => lsDetails.tripId === this.tripData.TripID
           );
-          this.vehicleTypeDropdown();
+          // this.vehicleTypeDropdown();
+          this.loadVehicleDetails()
         }
       },
     });
   }
-  vehicleTypeDropdown() {
-    this.http.get(this.loadingJsonUrl).subscribe((res) => {
-      this.loadingSheetData = res;
-      let vehicleType: any[] = [];
-      if (this.lsDetails) {
-        let json = {
-          name: this.lsDetails.vehType,
-          value: this.lsDetails.vehType,
-        };
-        vehicleType.push(json);
-      }
-      this.filter.Filter(
-        this.jsonControlArray,
-        this.loadingSheetTableForm,
-        vehicleType,
-        this.vehicleType,
-        this.vehicleTypeStatus
-      );
-      let vehicleTypeDetails = this.loadingSheetData.data[0].filter(
-        (x) => x.Type_Name === this.lsDetails.vehType
-      );
-      this.setVehicleType = vehicleType.filter(
-        (x) => x.value === this.lsDetails.vehType
-      );
-      this.autofillVehicleData(vehicleTypeDetails);
-    });
-    // this.getshipmentData()
-  }
-  autofillVehicleData(vehicleTypeDetails) {
-
-    if (vehicleTypeDetails) {
-      this.loadingSheetTableForm.controls["vehicleType"].setValue(
-        this.setVehicleType[0]
-      );
-      this.loadingSheetTableForm.controls["CapacityKg"].setValue(
-        vehicleTypeDetails[0]?.CapacityKg || ""
-      );
-      this.loadingSheetTableForm.controls["CapacityVolumeCFT"].setValue(
-        vehicleTypeDetails[0]?.CapacityVolumeCFT || ""
-      );
-      this.loadingSheetTableForm.controls["LoadedKg"].setValue(
-        vehicleTypeDetails[0]?.LoadedKg || ""
-      );
-      this.loadingSheetTableForm.controls["LoadedvolumeCFT"].setValue(
-        vehicleTypeDetails[0]?.LoadedvolumeCFT || ""
-      );
-      this.loadingSheetTableForm.controls["LoadaddedKg"].setValue(
-        vehicleTypeDetails[0]?.LoadaddedKg || ""
-      );
-      this.loadingSheetTableForm.controls["VolumeaddedCFT"].setValue(
-        vehicleTypeDetails[0]?.VolumeaddedCFT || ""
-      );
-      this.loadingSheetTableForm.controls["WeightUtilization"].setValue(
-        vehicleTypeDetails[0]?.WeightUtilization || ""
-      );
-      this.loadingSheetTableForm.controls["VolumeUtilization"].setValue(
-        vehicleTypeDetails[0]?.VolumeUtilization || ""
-      );
-
-      this.CnoteService.setData(this.loadingSheetTableForm.value);
+  async loadVehicleDetails() {
+    try {
+      const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
+      this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
+      this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
+      this.loadingSheetTableForm.controls['CapacityKg'].setValue(vehicleData.capacity);
+    } catch (error) {
     }
   }
 
-  // getshipmentData() {
-  //   let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
-  //   routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
-  //   this.http.get(this.loadingSheetJsonUrl).subscribe(res => {
-  //     this.shipmentData = res;
-  //     this.csv = this.shipmentData.shipmentData.filter((x) => x.RouteandSchedule == this.tripData.RouteandSchedule);
-  //     this.tableload = false;
-  //   })
-  // }
-  loadingSheetDetails() {
-    let loadingSheetDetails = this.loadingSheetData.data[0].find(
-      (x) =>
-        x.Type_Code == this.loadingSheetTableForm.value?.vehicleType.value || ""
-    );
-    this.loadingSheetTableForm.controls["CapacityKg"].setValue(
-      loadingSheetDetails?.CapacityKg || ""
-    );
-    this.loadingSheetTableForm.controls["CapacityVolumeCFT"].setValue(
-      loadingSheetDetails?.CapacityVolumeCFT || ""
-    );
-    this.loadingSheetTableForm.controls["LoadaddedKg"].setValue(
-      loadingSheetDetails?.LoadaddedKg || ""
-    );
-    this.loadingSheetTableForm.controls["LoadedKg"].setValue(
-      loadingSheetDetails?.LoadedKg || ""
-    );
-    this.loadingSheetTableForm.controls["LoadedvolumeCFT"].setValue(
-      loadingSheetDetails?.LoadedvolumeCFT || ""
-    );
-    this.loadingSheetTableForm.controls["VolumeaddedCFT"].setValue(
-      loadingSheetDetails?.VolumeaddedCFT || ""
-    );
-    this.loadingSheetTableForm.controls["VolumeUtilization"].setValue(
-      loadingSheetDetails?.VolumeUtilization || ""
-    );
-    this.loadingSheetTableForm.controls["WeightUtilization"].setValue(
-      loadingSheetDetails?.WeightUtilization || ""
-    );
-  }
+
+
   loadingSheetGenerate() {
     //Check if BcSerialType is "E"
     // If it is "E", set displaybarcode to true
@@ -614,4 +517,74 @@ export class DepartVehicleComponent implements OnInit {
 
     return mergedData;
   }
+  /**
+   * Fetches loading sheet details from the API and updates the form fields.
+   */
+  async fetchLoadingSheetDetailFromApi() {
+    // Fetch loading sheet details
+    const loadingSheetDetail = await getLoadingSheetDetail(
+      this.companyCode,
+      this.tripData.TripID,
+      this.tripData.VehicleNo,
+      this._operationService
+    );
+    // Fetch driver details
+    const driverDetail = await getDriverDetail(
+      this.companyCode,
+      this.tripData.VehicleNo,
+      this._operationService
+    );
+    const lsDetail = loadingSheetDetail[loadingSheetDetail.length - 1];
+    // Update departure vehicle form controls with driver details
+    this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
+    this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
+    this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");
+    let convertedDate = driverDetail[0].valdityDt || '';
+    convertedDate = convertedDate ? formatDate(convertedDate, 'dd/MM/yyyy') : '';
+    this.departvehicleTableForm.controls['Expiry'].setValue(convertedDate);
+
+
+    // Update loading sheet table form controls with loading sheet details
+    this.loadingSheetTableForm.controls["CapacityKg"].setValue(
+      lsDetail?.capacityKg || 0
+    );
+    this.loadingSheetTableForm.controls["CapacityVolumeCFT"].setValue(
+      lsDetail?.capacityVolumeCFT || 0
+    );
+    this.loadingSheetTableForm.controls["LoadaddedKg"].setValue(
+      lsDetail?.loadAddedKg || 0
+    );
+    this.loadingSheetTableForm.controls["LoadedKg"].setValue(
+      lsDetail?.loadedKg || 0
+    );
+    this.loadingSheetTableForm.controls["LoadedvolumeCFT"].setValue(
+      lsDetail?.loadedVolumeCft || 0
+    );
+    this.loadingSheetTableForm.controls["VolumeaddedCFT"].setValue(
+      lsDetail?.volumeAddedCFT || 0
+    );
+    this.loadingSheetTableForm.controls["VolumeUtilization"].setValue(
+      lsDetail?.volumeUtilization || 0
+    );
+    this.loadingSheetTableForm.controls["WeightUtilization"].setValue(
+      lsDetail?.WeightUtilization || 0
+    );
+
+    // Rest of your code that depends on loadingSheetDetail
+  }
+
+  onCalculateTotal(): void {
+    // Step 1: Calculate the individual charges and set TotalTripAmt in the advanceTableForm
+    calculateTotal(this.advanceTableForm);
+
+    // Step 2: Calculate the total advances and set TotalAdv in the balanceTableForm
+    calculateTotalAdvances(this.balanceTableForm);
+
+    // Step 3: Calculate the balance amount as the difference between TotalAdv and TotalTripAmt,
+    // and set it in the BalanceAmount control of the balanceTableForm
+    const totalTripAmt = parseFloat(this.advanceTableForm.controls['TotalTripAmt'].value) || 0;
+    calculateBalanceAmount(this.balanceTableForm, totalTripAmt);
+  }
+
+
 }

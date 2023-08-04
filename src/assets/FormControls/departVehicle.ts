@@ -79,74 +79,92 @@ export class AdvanceControl {
         this.AdvanceControlArray = [
             {
                 name: 'ContractAmt',
-                label: 'ContractAmount',
+                label: 'ContractAmount(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value: 0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
             {
                 name: 'OtherChrge',
-                label: 'Other Charges',
+                label: 'Other Charges(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value:0,
                 Validations: [],
-                generatecontrol: true, disable: true
+                generatecontrol: true, disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
             {
                 name: "Loading",
-                label: "Loading",
+                label: "Loading(₹)",
                 placeholder: '',
-                type: "text",
-                value: '',
+                type: "number",
+                value: 0,
                 Validations: [],
-                generatecontrol: true, disable: true
+                generatecontrol: true, disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
 
             {
                 name: 'Unloading',
-                label: 'Unloading',
+                label: 'Unloading(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value: 0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
 
             {
                 name: "Enroute",
-                label: "Enroute",
+                label: "Enroute(₹)",
                 placeholder: '',
-                type: "text",
-                value: '',
+                type: "number",
+                value:0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
 
             {
                 name: 'Misc',
-                label: 'Misc',
+                label: 'Misc(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value: 0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
             {
                 name: 'TotalTripAmt',
-                label: 'Total Trip Amount',
+                label: 'Total Trip Amount(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value: 0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
         ];
     }
@@ -162,74 +180,89 @@ export class BalanceControl {
         this.BalanceControlArray = [
             {
                 name: 'Advance',
-                label: 'Advance',
+                label: 'Advance(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value: 0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
             {
                 name: 'PaidByCash',
-                label: 'Paid by Cash',
+                label: 'Paid by Cash(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value: 0,
                 Validations: [],
-                generatecontrol: true, disable: true
+                generatecontrol: true, disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
             {
                 name: "PaidbyBank",
-                label: "Paid by Bank/Cheque",
+                label: "Paid by Bank/Cheque(₹)",
                 placeholder: '',
-                type: "text",
-                value: '',
+                type: "number",
+                value: 0,
                 Validations: [],
-                generatecontrol: true, disable: true
+                generatecontrol: true, disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
 
             {
                 name: 'PaidbyFuel',
-                label: 'Paid by Fuel',
+                label: 'Paid by Fuel(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value: 0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
 
             {
                 name: "PaidbyCard",
-                label: "Paid by Card",
+                label: "Paid by Card(₹)",
                 placeholder: '',
-                type: "text",
-                value: '',
+                type: "number",
+                value: 0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: false,
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                }
             },
 
             {
                 name: 'TotalAdv',
-                label: 'Total Advance',
+                label: 'Total Advance(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value: 0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
             {
                 name: 'BalanceAmt',
-                label: 'Balance Amount',
+                label: 'Balance Amount(₹)',
                 placeholder: '',
-                type: 'text',
-                value: '',
+                type: 'number',
+                value: 0,
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
         ];
     }
@@ -258,7 +291,8 @@ export class DepartureControl {
                 type: 'text',
                 value: '',
                 Validations: [],
-                generatecontrol: true, disable: true
+                generatecontrol: true,
+                disable: false
             },
             {
                 name: "Cewb",

@@ -608,7 +608,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         lsNo: "",
         mfNo: "",
         entryBy:this.userName,
-        entryData:new Date().toISOString(),
+        entryDate:new Date().toISOString(),
         unloadloc:""
       };
       let docketDetails = {
@@ -676,7 +676,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         bcDockSf: bcDockSf,
         loc:this.branch,
         entryBy:this.userName,
-        entryData:new Date().toISOString()
+        entryDate:new Date().toISOString()
       };
     });
 

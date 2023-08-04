@@ -39,6 +39,9 @@ export class customerControl {
                         pattern: '^[a-zA-Z0-9]{4,10}$',
                     }
                 ],
+                functions: {
+                    onChange: 'dataExist',
+                  },
 
             },
 
@@ -327,22 +330,28 @@ export class customerControl {
                 },
 
                 {
-                    name: 'billCity', label: 'Billing City', placeholder: 'Billing City', type: 'text',
-                    value: customerTable?.billCity, generatecontrol: true, disable: false,
+                    name: 'billCity', label: 'Billing City', placeholder: 'Billing City', type: 'dropdown',
+                    value: '', generatecontrol: true, disable: false,
                     Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only text of length 3 to 25 characters",
-                            pattern: '^[a-zA-Z ]{3,25}$',
-                        }
+                        // {
+                        //     name: "pattern",
+                        //     message: "Please Enter only text of length 3 to 25 characters",
+                        //     pattern: '^[a-zA-Z ]{3,25}$',
+                        // }
                     ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }
 
                 },
 
                 {
-                    name: 'billPincode', label: 'Billing Pincode', placeholder: 'Billing Pincode', type: 'text',
-                    value: customerTable?.billPincode, generatecontrol: true, disable: false,
+                    name: 'billPincode', label: 'Billing Pincode', placeholder: 'Billing Pincode', type: 'dropdown',
+                    value: '', generatecontrol: true, disable: false,
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: false
+                    }
 
                 },
 
@@ -465,42 +474,51 @@ export class customerControl {
                 },
 
                 {
-                    name: 'city', label: 'City', placeholder: 'City', type: 'text',
-                    value: customerTable?.city, generatecontrol: true, disable: false,
+                    name: 'city', label: 'City', placeholder: 'City', type: 'dropdown',
+                    value: '', generatecontrol: true, disable: false,
                     Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter a City of length 3 to 15 characters",
-                            pattern: '^[a-zA-Z ]{3,15}$',
-                        }
+                        // {
+                        //     name: "pattern",
+                        //     message: "Please enter a City of length 3 to 15 characters",
+                        //     pattern: '^[a-zA-Z ]{3,15}$',
+                        // }
                     ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }
 
                 },
                 {
-                    name: 'state', label: 'State', placeholder: 'State', type: 'text',
-                    value: customerTable?.state, generatecontrol: true, disable: false,
+                    name: 'state', label: 'State', placeholder: 'State', type: 'dropdown',
+                    value: '', generatecontrol: true, disable: false,
                     Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter a State of length 3 to 15 characters",
-                            pattern: '^[a-zA-Z ]{3,15}$',
-                        }
+                        // {
+                        //     name: "pattern",
+                        //     message: "Please enter a State of length 3 to 15 characters",
+                        //     pattern: '^[a-zA-Z ]{3,15}$',
+                        // }
                     ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }
 
                 },
 
                 {
-                    name: 'pincode', label: 'Pincode', placeholder: 'Pincode', type: 'number',
+                    name: 'pincode', label: 'Pincode', placeholder: 'Pincode', type: 'dropdown',
                     value: customerTable?.pincode, generatecontrol: true, disable: false,
                     Validations: [
-                        {
+                        // {
 
-                            name: "pattern",
-                            message: "Please enter Bank Account No of length 6 digits",
-                            pattern: "^[0-9]{6}$",
+                        //     name: "pattern",
+                        //     message: "Please enter Bank Account No of length 6 digits",
+                        //     pattern: "^[0-9]{6}$",
 
-                        }
+                        // }
                     ],
+                    additionalData: {
+                        showNameAndValue: false
+                    }
 
                 },
                 {

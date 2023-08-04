@@ -113,7 +113,6 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
   async save() {
 
     this.vehicleStatusTableForm.controls['id'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
-    this.vehicleStatusTableForm.controls['currentLocation'].setValue(this.vehicleStatusTableForm.value.currentLocation.value);
     this.vehicleStatusTableForm.controls['vehNo'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
     try {
 

@@ -237,6 +237,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
           } else {
             this.newRouteCode = generateRouteCode();
           }
+          const options = { hour: 'numeric', minute: 'numeric', hour12: false };
           const transformedData = {
             scheduleCode: this.newRouteCode,
             routeMode: this.routeScheduleTableForm.value.routeMode,
@@ -248,7 +249,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
             id: this.newRouteCode,
             routeCode: this.tableData.map((item) => item.routeCode),
             weekDay: this.tableData.map((item) => parseInt(item.weekDay)),
-            time: this.tableData.map((item) => parseInt(item.time)),
+            time: this.tableData.map((item) => new Date(item.time).toLocaleTimeString(undefined, options as Intl.DateTimeFormatOptions)),
             vendor: this.tableData.map((item) => item.vendor),
             ftlType: this.tableData.map((item) => item.ftlType),
             vehicleNo: this.tableData.map((item) => item.vehicleNo),
@@ -392,6 +393,31 @@ export class AddRouteScheduleMasterComponent implements OnInit {
     return true;
   }
   getRouteDet() {
+    function convertTimeFormat(inputTime: string): string {
+      if (!inputTime) {
+        return "N/A"; // Handle empty input time here, you can return a default value
+      }
+
+      const [hours, minutes] = inputTime.split(':').map(Number);
+
+      // Create a new date with the provided time
+      const currentDateTime = new Date();
+      currentDateTime.setHours(hours, minutes, 0, 0);
+
+      // Format the date to the desired format
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZoneName: 'short',
+      };
+
+      return currentDateTime.toLocaleDateString('en-US', options);
+    }
     // Function to transform array properties
     function transformArrayProperties(data) {
       const transformedData = [];
@@ -409,7 +435,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
         transformedData.push({
           routeCode: data.routeCode[i],
           weekDay: data.weekDay[i],
-          time: data.time[i],
+          time: convertTimeFormat(data.time[i]),//data.time[i],
           vendor: data.vendor[i],
           ftlType: data.ftlType[i],
           vehicleNo: data.vehicleNo[i],

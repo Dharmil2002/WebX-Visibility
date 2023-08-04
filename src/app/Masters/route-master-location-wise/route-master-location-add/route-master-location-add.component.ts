@@ -48,6 +48,9 @@ export class RouteMasterLocationAddComponent implements OnInit {
       name: "Distance (In Km)",
       key: "input",
       style: "",
+      functions: {
+        'onChange': "calRouteKm" // Function to be called on change event
+      },
     },
     trtimeHr: {
       name: "Transit (Minutes)",
@@ -362,6 +365,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
           this.tableData = this.tableData;
           swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
           event.callback(true);
+          this.calRouteKm();
         } else if (result.isConfirmed) {
           swalWithBootstrapButtons.fire("Not Deleted!", "Your Message", "info");
           event.callback(false);
@@ -411,5 +415,14 @@ export class RouteMasterLocationAddComponent implements OnInit {
     const transformedData = transformArrayProperties(this.data);
     this.loadTempData(transformedData);
   }
-
+  calRouteKm() {
+    let totalDistKm = 0;
+    for (let i = 0; i < this.tableData.length; i++) {
+      const distKm = parseInt(this.tableData[i].distKm);
+      if (!isNaN(distKm)) {
+        totalDistKm += distKm;
+      }
+      this.routeMasterLocationForm.controls["routeKm"].setValue(totalDistKm);
+    }
+  }
 }

@@ -160,8 +160,8 @@
                                     <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
                                     <ng-container *ngIf="columnHeader[item].key==='time'">
                                         <mat-form-field appearance="outline" floatLabel="never">
-                                            <input matInput [owlDateTimeTrigger]="timepicker"
-                                                [formControlName]="columnHeader[item].name" [owlDateTime]="timepicker">
+                                            <input matInput [owlDateTimeTrigger]="timepicker" [owlDateTime]="timepicker"
+                                                [value]="row[item]" [(ngModel)]="row[item]">
                                             <mat-icon matSuffix [owlDateTimeTrigger]="timepicker"
                                                 class="date-icon">schedule</mat-icon>
                                             <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>

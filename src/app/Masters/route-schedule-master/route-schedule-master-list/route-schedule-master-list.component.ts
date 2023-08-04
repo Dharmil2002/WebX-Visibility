@@ -46,7 +46,7 @@ export class RouteScheduleMasterListComponent implements OnInit {
     edit: true,
     csv: true
   }
-  toggleArray = ["isActive"];
+  toggleArray = [""];
   /*Below is Link Array it will Used When We Want a DrillDown
     Table it's Jst for set A Hyper Link on same You jst add row Name Which You
     want hyper link and add Path which you want to redirect*/

@@ -64,7 +64,7 @@ export class RouteLocationControl {
                 label: 'Route KM',
                 placeholder: 'Route KM',
                 type: 'text',
-                value: routeLocationData?.routeKm ? routeLocationData.routeKm : "",
+                value: routeLocationData?.routeKm,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',
@@ -117,7 +117,7 @@ export class RouteLocationControl {
                 Validations: [
                 ],
                 generatecontrol: true,
-                disable: true
+                disable: false
             },
             {
                 name: 'scheduleType',

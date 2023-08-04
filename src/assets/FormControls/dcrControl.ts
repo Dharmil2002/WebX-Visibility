@@ -25,7 +25,7 @@ export class DCRControl {
                 additionalData: {
                     showNameAndValue: false
                 }, generatecontrol: true,
-                disable: true
+                disable: false
             },
 
             {

@@ -207,10 +207,10 @@ export class RouteMasterLocationAddComponent implements OnInit {
         if (res) {
           // Generate srno for each object in the array
           const lastRoute = res.data[res.data.length - 1];
-          const lastRouteCode = parseInt(lastRoute.routeId.substring(1));
+          const lastRouteCode = lastRoute ? parseInt(lastRoute.routeId.substring(1)) : 0;
           // Function to generate a new route code
-          function generateRouteCode() {
-            const nextRouteCode = lastRouteCode + 1;
+          function generateRouteCode(initialCode: number = 0) {
+            const nextRouteCode = initialCode + 1;
             const routeNumber = nextRouteCode.toString().padStart(4, '0');
             const routeCode = `R${routeNumber}`;
             return routeCode;
@@ -218,7 +218,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
           if (this.isUpdate) {
             this.newRouteCode = this.data.id
           } else {
-            this.newRouteCode = generateRouteCode();
+            this.newRouteCode = generateRouteCode(lastRouteCode);
           }
           const transformedData = {
             routeId: this.newRouteCode,

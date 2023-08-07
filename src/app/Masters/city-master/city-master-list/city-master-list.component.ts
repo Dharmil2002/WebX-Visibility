@@ -22,7 +22,6 @@ export class CityMasterListComponent implements OnInit {
         'zone': 'Zone',
         'odaFlag': 'ODA Flag',
         "isActive": "Active Flag",
-        "actions": "Actions"
     };
     headerForCsv = {
         'cityId': "City Code",
@@ -40,7 +39,7 @@ export class CityMasterListComponent implements OnInit {
         },
     ];
     dynamicControls = {
-        add: true,
+        add: false,
         edit: true,
         csv: true
     }

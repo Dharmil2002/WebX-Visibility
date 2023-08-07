@@ -36,7 +36,7 @@ export class GeneralMasterListComponent implements OnInit {
     },
   ];
   dynamicControls = {
-    add: true,
+    add: false,
     edit: true,
     csv: false
   }
@@ -66,7 +66,6 @@ export class GeneralMasterListComponent implements OnInit {
             };
           });
           this.csv = dataWithSrno
-          this.tableData = dataWithSrno;
           this.tableLoad = false;
         }
       }

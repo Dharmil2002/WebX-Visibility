@@ -68,38 +68,6 @@ export class AddressControl {
                 ]
             },
             {
-                name: 'cityName', label: "City",
-                placeholder: "Select City",
-                type: 'dropdown',
-                value: '',
-                additionalData: {
-                    showNameAndValue: false
-                },
-                generatecontrol: true, disable: false,
-                Validations: [
-                    {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    }
-                ]
-            },
-            {
-                name: 'stateName', label: "State",
-                placeholder: "Select State",
-                type: 'dropdown',
-                value: addressGroupTable.state,
-                additionalData: {
-                    showNameAndValue: false
-                },
-                generatecontrol: true, disable: false,
-                Validations: [
-                    {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    }
-                ]
-            },
-            {
                 name: 'pincode', label: "Pincode",
                 placeholder: "Select Pincode",
                 type: 'dropdown',
@@ -116,6 +84,39 @@ export class AddressControl {
                 ]
               
             },
+            {
+                name: 'cityName', label: "City",
+                placeholder: "Select City",
+                type: 'dropdown',
+                value: '',
+                additionalData: {
+                    showNameAndValue: false
+                },
+                generatecontrol: true, disable: true,
+                Validations: [
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
+                ]
+            },
+            {
+                name: 'stateName', label: "State",
+                placeholder: "Select State",
+                type: 'dropdown',
+                value: addressGroupTable.state,
+                additionalData: {
+                    showNameAndValue: false
+                },
+                generatecontrol: true, disable: true,
+                Validations: [
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
+                ]
+            },
+           
             {
                 name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: addressGroupTable.activeFlag, generatecontrol: true, disable: false,
                 Validations: []

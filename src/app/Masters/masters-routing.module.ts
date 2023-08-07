@@ -48,6 +48,8 @@ import { ClusterMasterAddComponent } from './cluster-master/cluster-master-add/c
 import { ClusterMasterListComponent } from './cluster-master/cluster-master-list/cluster-master-list.component';
 import { AddRouteScheduleMasterComponent } from './route-schedule-master/add-route-schedule-master/add-route-schedule-master.component';
 import { RouteScheduleMasterListComponent } from './route-schedule-master/route-schedule-master-list/route-schedule-master-list.component';
+import { TripRouteMasterListComponent } from './trip-route-master/trip-route-master-list/trip-route-master-list.component';
+import { TripRouteMasterAddComponent } from './trip-route-master/trip-route-master-add/trip-route-master-add.component';
 import { GeneralMasterListComponent } from './general-master/general-master-list/general-master-list.component';
 import { GeneralMasterCodeListComponent } from './general-master/general-master-code-list/general-master-code-list.component';
 import { GeneralMasterAddComponent } from './general-master/general-master-add/general-master-add.component';
@@ -96,18 +98,20 @@ const routes: Routes = [
   { path: "VendorMaster/AddVendorMaster", component: AddVendorMasterComponent },
   { path: "AirportMaster/AirportMasterList", component: AirportMasterListComponent },
   { path: "AirportMaster/AddAirportMaster", component: AirportMasterAddComponent },
-  { path: "PincodeLocation/PincodeLocationMapping", component:PincodeLocationMappingComponent},
+  { path: "PincodeLocation/PincodeLocationMapping", component: PincodeLocationMappingComponent },
   { path: "AddressMaster/AddAddressMaster", component: AddressMasterAddComponent },
   { path: "AddressMaster/AddressMasterList", component: AddressMasterListComponent },
   { path: "ClusterMaster/AddClusterMaster", component: ClusterMasterAddComponent },
   { path: "ClusterMaster/ClusterMasterList", component: ClusterMasterListComponent },
   { path: "RouteScheduleMaster/RouteScheduleMasterList", component: RouteScheduleMasterListComponent },
   { path: "RouteScheduleMaster/AddRouteScheduleMaster", component: AddRouteScheduleMasterComponent },
+  { path: "TripRouteMaster/TripRouteMasterList", component: TripRouteMasterListComponent },
+  { path: "TripRouteMaster/TripRouteMasterAdd", component: TripRouteMasterAddComponent },
   { path: "GeneralMaster/GeneralMasterList", component: GeneralMasterListComponent },
   { path: "GeneralMaster/GeneralMasterCodeList", component: GeneralMasterCodeListComponent },
   { path: "GeneralMaster/AddGeneralMaster", component: GeneralMasterAddComponent },
-  {path:"Vehicle/Status", component: VehicleStatusUpdateComponent},
-  {path:"Vehicle/Status/Add", component: AddVehicleStatusUpdateComponent}
+  { path: "Vehicle/Status", component: VehicleStatusUpdateComponent },
+  { path: "Vehicle/Status/Add", component: AddVehicleStatusUpdateComponent }
 ];
 
 @NgModule({

@@ -89,6 +89,8 @@ import { ClusterMasterListComponent } from './cluster-master/cluster-master-list
 import { AddRouteScheduleMasterComponent } from './route-schedule-master/add-route-schedule-master/add-route-schedule-master.component';
 import { RouteScheduleMasterListComponent } from './route-schedule-master/route-schedule-master-list/route-schedule-master-list.component';
 import { RouteScheduleDetComponent } from './route-schedule-master/route-schedule-det/route-schedule-det.component';
+import { TripRouteMasterListComponent } from './trip-route-master/trip-route-master-list/trip-route-master-list.component';
+import { TripRouteMasterAddComponent } from './trip-route-master/trip-route-master-add/trip-route-master-add.component';
 import { GeneralMasterListComponent } from './general-master/general-master-list/general-master-list.component';
 import { GeneralMasterAddComponent } from './general-master/general-master-add/general-master-add.component';
 import { GeneralMasterCodeListComponent } from './general-master/general-master-code-list/general-master-code-list.component';
@@ -191,6 +193,8 @@ import { VehicleStatusUpdateComponent } from './vehicle-status-update/vehicle-st
     RouteScheduleMasterListComponent,
     AddRouteScheduleMasterComponent,
     RouteScheduleDetComponent,
+    TripRouteMasterListComponent,
+    TripRouteMasterAddComponent,
     VehicleStatusUpdateComponent,
     GeneralMasterListComponent,
     GeneralMasterAddComponent,

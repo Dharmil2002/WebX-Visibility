@@ -294,6 +294,16 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
+            },
+            {
+              "path": "Masters/TripRouteMaster/TripRouteMasterList",
+              "title": "Trip Route Master",
+              "moduleName": "Trip Route Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
             }
           ]
         },

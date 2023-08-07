@@ -23,7 +23,6 @@ export class StateMasterListComponent implements OnInit {
             "country": "Country Name",
             "gstWiseStateCode": "GST Wise State Code",
             "isActive": "Active Flag",
-            "actions": "Actions",
         }
 
     headerForCsv = {
@@ -46,7 +45,7 @@ export class StateMasterListComponent implements OnInit {
     ];
 
     dynamicControls = {
-        add: true,
+        add: false,
         edit: true,
         csv: false
     }

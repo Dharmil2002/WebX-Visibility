@@ -15,16 +15,13 @@
         {
             "codeId": "4",
             "codeDesc": "Australia"
-        },
-        {
+        }, {
             "codeId": "5",
             "codeDesc": "New Zealand"
-        },
-        {
+        }, {
             "codeId": "6",
             "codeDesc": "Afghanistan"
-        },
-        {
+        }, {
             "codeId": "7",
             "codeDesc": "Sri Lanka"
         }
@@ -45,42 +42,39 @@
         {
             "stateId": "4",
             "stateDesc": "Pune"
-        },
-        {
+        }, {
             "stateId": "5",
             "stateDesc": "Assam"
-        },
-        {
+        }, {
             "stateId": "6",
             "stateDesc": "Southern Oman"
-        },
-        {
+        }, {
             "stateId": "7",
             "stateDesc": "Al Batinah North"
-        },
-        {
+        }, {
             "stateId": "8",
             "stateDesc": "Nizwa"
-        },
-        {
+        }, {
             "stateId": "9",
             "stateDesc": "Gujarat"
-        },
-        {
+        }, {
             "stateId": "10",
             "stateDesc": "Madhya Pradesh"
-        },
-        {
+        }, {
             "stateId": "11",
             "stateDesc": "Mumbai"
-        },
-        {
+        }, {
             "stateId": "12",
             "stateDesc": " Telangana"
-        },
-        {
+        }, {
             "stateId": "13",
             "stateDesc": "Tamilnadu"
+        }, {
+            "stateId": "14",
+            "stateDesc": "Rajasthan"
+        },{
+            "stateId": "15",
+            "stateDesc": "Karnataka"
         }
     ],
     "zoneList": [
@@ -99,16 +93,13 @@
         {
             "zoneId": "4",
             "zoneDesc": "West Zone"
-        },
-        {
+        }, {
             "zoneId": "5",
             "zoneDesc": "CENTRAL"
-        },
-        {
+        }, {
             "zoneId": "6",
             "zoneDesc": "South Zone"
-        },
-        {
+        }, {
             "zoneId": "7",
             "zoneDesc": "West"
         }
@@ -129,24 +120,19 @@
         {
             "cityId": 4,
             "cityDesc": "Mira-Bhayandar"
-        },
-        {
+        }, {
             "cityId": 5,
             "cityDesc": "Surat"
-        },
-        {
+        }, {
             "cityId": 6,
             "cityDesc": "Valsad"
-        },
-        {
+        }, {
             "cityId": 7,
             "cityDesc": "Vapi"
-        },
-        {
+        }, {
             "cityId": 8,
             "cityDesc": "Thane"
-        },
-        {
+        }, {
             "cityId": 9,
             "cityDesc": "Kalyan"
         }
@@ -167,32 +153,25 @@
         {
             "pincodeId": 4,
             "pincodeDesc": "400099"
-        },
-        {
+        }, {
             "pincodeId": 5,
             "pincodeDesc": "400004"
-        },
-        {
+        }, {
             "pincodeId": 6,
             "pincodeDesc": "400053"
-        },
-        {
+        }, {
             "pincodeId": 7,
             "pincodeDesc": "395001"
-        },
-        {
+        }, {
             "pincodeId": 8,
             "pincodeDesc": "400014"
-        },
-        {
+        }, {
             "pincodeId": 9,
             "pincodeDesc": "226001"
-        },
-        {
+        }, {
             "pincodeId": 10,
             "pincodeDesc": "110033"
-        },
-        {
+        }, {
             "pincodeId": 11,
             "pincodeDesc": "394110"
         }
@@ -213,22 +192,22 @@
         {
             "locId": 4,
             "locDesc": "BARKA"
-        },
-        {
+        }, {
             "locId": 5,
             "locDesc": "Delhi"
-        },
-        {
+        }, {
             "locId": 6,
             "locDesc": "GOA"
-        },
-        {
+        }, {
             "locId": 7,
             "locDesc": "HQTR"
-        },
-        {
+        }, {
             "locId": 8,
             "locDesc": "GWTB"
+        },
+        {
+            "locId": 9,
+            "locDesc": "HUBB"
         }
     ],
     "locationData": [
@@ -247,20 +226,16 @@
         {
             "value": 4,
             "name": "BARKA"
-        },
-        {
+        }, {
             "value": 5,
             "name": "Delhi"
-        },
-        {
+        }, {
             "value": 6,
             "name": "GOA"
-        },
-        {
+        }, {
             "value": 7,
             "name": "HQTR"
-        },
-        {
+        }, {
             "value": 8,
             "name": "GWTB"
         }
@@ -281,16 +256,13 @@
         {
             "value": "4",
             "name": "Australia"
-        },
-        {
+        }, {
             "value": "5",
             "name": "New Zealand"
-        },
-        {
+        }, {
             "value": "6",
             "name": "Afghanistan"
-        },
-        {
+        }, {
             "value": "7",
             "name": "Sri Lanka"
         }
@@ -299,16 +271,13 @@
         {
             "value": 1,
             "name": "Bussiness associate"
-        },
-        {
+        }, {
             "value": 2,
             "name": "Employee"
-        },
-        {
+        }, {
             "value": 3,
             "name": "Vendor"
-        },
-        {
+        }, {
             "value": 4,
             "name": "Customer"
         }
@@ -317,12 +286,10 @@
         {
             "value": 1,
             "name": "Permanent"
-        },
-        {
+        }, {
             "value": 2,
             "name": "Contractual"
-        },
-        {
+        }, {
             "value": 3,
             "name": "Trainee"
         }
@@ -343,16 +310,13 @@
         {
             "value": 4,
             "name": "E10001"
-        },
-        {
+        }, {
             "value": 5,
             "name": "E10003r"
-        },
-        {
+        }, {
             "value": 6,
             "name": "1234"
-        },
-        {
+        }, {
             "value": 7,
             "name": "aarti1"
         }
@@ -373,40 +337,31 @@
         {
             "value": 4,
             "name": "Super Admin"
-        },
-        {
+        }, {
             "value": 5,
             "name": "aarti1"
-        },
-        {
+        }, {
             "value": 6,
             "name": "CTO"
-        },
-        {
+        }, {
             "value": 7,
             "name": "Admin"
-        },
-        {
+        }, {
             "value": 8,
             "name": "HR"
-        },
-        {
+        }, {
             "value": 9,
             "name": "Booking"
-        },
-        {
+        }, {
             "value": 10,
             "name": "CFO"
-        },
-        {
+        }, {
             "value": 11,
             "name": "COO"
-        },
-        {
+        }, {
             "value": 12,
             "name": "Freight"
-        },
-        {
+        }, {
             "value": 13,
             "name": "Accountant1"
         }
@@ -427,20 +382,16 @@
         {
             "value": 4,
             "name": "BEL"
-        },
-        {
+        }, {
             "value": 5,
             "name": "Commodify"
-        },
-        {
+        }, {
             "value": 6,
             "name": "Catering"
-        },
-        {
+        }, {
             "value": 7,
             "name": "Plant-3"
-        },
-        {
+        }, {
             "value": 8,
             "name": "Plant-4"
         }
@@ -449,12 +400,10 @@
         {
             "name": "TMS",
             "value": "tms"
-        },
-        {
+        }, {
             "name": "WMS",
             "value": "wms"
-        },
-        {
+        }, {
             "name": "FMS",
             "value": "fms"
         }
@@ -463,12 +412,10 @@
         {
             "name": "Emami",
             "value": "C0001"
-        },
-        {
+        }, {
             "name": "Warehouse Group",
             "value": "C0002"
-        },
-        {
+        }, {
             "name": "DTDC Courier and Cargo",
             "value": "C0003"
         }
@@ -477,12 +424,10 @@
         {
             "name": "Private Limited",
             "value": "T0001"
-        },
-        {
+        }, {
             "name": "Public Limited",
             "value": "T0002"
-        },
-        {
+        }, {
             "name": "Government Company",
             "value": "T0002"
         }
@@ -491,16 +436,13 @@
         {
             "name": "Mumbai",
             "value": "MUMB"
-        },
-        {
+        }, {
             "name": "Surat",
             "value": "SUR"
-        },
-        {
+        }, {
             "name": "Pune",
             "value": "PUN"
-        },
-        {
+        }, {
             "name": "Delhi",
             "value": "DELC"
         }
@@ -509,12 +451,10 @@
         {
             "name": "PAID",
             "value": "Paid"
-        },
-        {
+        }, {
             "name": "To Pay",
             "value": "Topay"
-        },
-        {
+        }, {
             "name": "TBB",
             "value": "Tbb"
         }
@@ -523,12 +463,10 @@
         {
             "name": "Mumbai",
             "value": "MUMB"
-        },
-        {
+        }, {
             "name": "Surat",
             "value": "SUR"
-        },
-        {
+        }, {
             "name": "Pune",
             "value": "PUN"
         }
@@ -537,12 +475,10 @@
         {
             "name": "Mumbai",
             "value": "MUMB"
-        },
-        {
+        }, {
             "name": "Surat",
             "value": "SUR"
-        },
-        {
+        }, {
             "name": "Pune",
             "value": "PUN"
         }
@@ -551,12 +487,10 @@
         {
             "name": "CNote",
             "value": "1"
-        },
-        {
+        }, {
             "name": "Delivery MR",
             "value": "2"
-        },
-        {
+        }, {
             "name": "UBI Series",
             "value": "3"
         }
@@ -565,12 +499,10 @@
         {
             "name": "ASHOK LEYLAND",
             "value": "1"
-        },
-        {
+        }, {
             "name": "TATA-2518",
             "value": "2"
-        },
-        {
+        }, {
             "name": "TATA",
             "value": "3"
         }
@@ -579,12 +511,10 @@
         {
             "name": "Mumbai",
             "value": "MUMB"
-        },
-        {
+        }, {
             "name": "Ahmedabad",
             "value": "AMDB"
-        },
-        {
+        }, {
             "name": "Pune",
             "value": "PUNE"
         }
@@ -593,16 +523,13 @@
         {
             "name": "Vehicle",
             "value": "1"
-        },
-        {
+        }, {
             "name": "Reefer",
             "value": "2"
-        },
-        {
+        }, {
             "name": "Container",
             "value": "3"
-        },
-        {
+        }, {
             "name": "Trailer",
             "value": "3"
         }
@@ -611,12 +538,10 @@
         {
             "name": "Attached",
             "value": "1"
-        },
-        {
+        }, {
             "name": "Service Provider",
             "value": "2"
-        },
-        {
+        }, {
             "name": "Own",
             "value": "3"
         }
@@ -637,8 +562,7 @@
         {
             "name": "V00059:Vishnu Transport",
             "value": "4"
-        },
-        {
+        }, {
             "name": "V00078:ABC fleets PVT Ltd",
             "value": "5"
         }
@@ -647,12 +571,10 @@
         {
             "name": "CNote",
             "value": "1"
-        },
-        {
+        }, {
             "name": "Delivery MR",
             "value": "2"
-        },
-        {
+        }, {
             "name": "UBI Series",
             "value": "3"
         }
@@ -673,20 +595,16 @@
         {
             "name": "6.50 -7.50 MT",
             "value": "4"
-        },
-        {
+        }, {
             "name": "10 MT",
             "value": "5"
-        },
-        {
+        }, {
             "name": "14.00- 16.00 MT",
             "value": "6"
-        },
-        {
+        }, {
             "name": "28.00 - 30.00 MT",
             "value": "7"
-        },
-        {
+        }, {
             "name": "40 FT Container",
             "value": "8"
         }
@@ -695,12 +613,10 @@
         {
             "name": "Maharashtra",
             "value": "1"
-        },
-        {
+        }, {
             "name": "Gujarat",
             "value": "2"
-        },
-        {
+        }, {
             "name": "Goa",
             "value": "3"
         }
@@ -721,8 +637,7 @@
         {
             "name": "Divisional Office",
             "value": "3"
-        },
-        {
+        }, {
             "name": "Centre",
             "value": "3"
         }
@@ -743,8 +658,7 @@
         {
             "name": "400072",
             "value": "3"
-        },
-        {
+        }, {
             "name": "401101",
             "value": "3"
         }
@@ -753,16 +667,13 @@
         {
             "name": "Raipur",
             "value": "RAI"
-        },
-        {
+        }, {
             "name": "Calcutta",
             "value": "CCU"
-        },
-        {
+        }, {
             "name": "Chennai",
             "value": "CHE"
-        },
-        {
+        }, {
             "name": "Delhi",
             "value": "DEL"
         }
@@ -783,8 +694,7 @@
         {
             "name": "Mumbai",
             "value": "4"
-        },
-        {
+        }, {
             "name": "CHENNAI",
             "value": "5"
         }
@@ -793,16 +703,13 @@
         {
             "name": "Faridabad",
             "value": "1"
-        },
-        {
+        }, {
             "name": "Bilaspur",
             "value": "2"
-        },
-        {
+        }, {
             "name": "Belapur",
             "value": "3"
-        },
-        {
+        }, {
             "name": "Mumbai",
             "value": "4"
         }
@@ -811,16 +718,13 @@
         {
             "name": "East",
             "value": "1"
-        },
-        {
+        }, {
             "name": "West",
             "value": "2"
-        },
-        {
+        }, {
             "name": "North",
             "value": "3"
-        },
-        {
+        }, {
             "name": "South",
             "value": "4"
         }
@@ -829,12 +733,10 @@
         {
             "name": "BA",
             "value": "1"
-        },
-        {
+        }, {
             "name": "Customer",
             "value": "2"
-        },
-        {
+        }, {
             "name": "Company",
             "value": "3"
         }
@@ -843,16 +745,13 @@
         {
             "name": "Sakinaka",
             "value": "SKN"
-        },
-        {
+        }, {
             "name": "Gurgaon",
             "value": "GGN"
-        },
-        {
+        }, {
             "name": "Pune",
             "value": "PUN"
-        },
-        {
+        }, {
             "name": "Kanpur",
             "value": "KNP"
         }
@@ -861,16 +760,13 @@
         {
             "name": "Employee",
             "value": "E"
-        },
-        {
+        }, {
             "name": "BA",
             "value": "B"
-        },
-        {
+        }, {
             "name": "Customer",
             "value": "C"
-        },
-        {
+        }, {
             "name": "Location",
             "value": "L"
         }
@@ -891,8 +787,7 @@
         {
             "name": "TDS App",
             "value": "4"
-        },
-        {
+        }, {
             "name": "TDS Payable on Contract",
             "value": "5"
         }
@@ -901,12 +796,10 @@
         {
             "name": "Corporate",
             "value": "1"
-        },
-        {
+        }, {
             "name": "Non-Corporate",
             "value": "2"
-        },
-        {
+        }, {
             "name": "Pan Card NA",
             "value": "3"
         }
@@ -915,8 +808,7 @@
         {
             "name": "DLVBB",
             "value": "1"
-        },
-        {
+        }, {
             "name": "MXpress",
             "value": "2"
         }
@@ -925,8 +817,7 @@
         {
             "name": "CP",
             "value": "1"
-        },
-        {
+        }, {
             "name": "MXpress",
             "value": "2"
         }
@@ -947,8 +838,7 @@
         {
             "name": "MH6614154",
             "value": "4"
-        },
-        {
+        }, {
             "name": "AS12HI3457",
             "value": "53"
         }
@@ -969,16 +859,13 @@
         {
             "name": "Thursday",
             "value": 4
-        },
-        {
+        }, {
             "name": "Friday",
             "value": 5
-        },
-        {
+        }, {
             "name": "Saturday",
             "value": 6
-        },
-        {
+        }, {
             "name": "Sunday",
             "value": 7
         }
@@ -999,8 +886,7 @@
         {
             "name": "S0026-MUMB-PNQB-BNGB",
             "value": "4"
-        },
-        {
+        }, {
             "name": "S0008-MUMB-BNGB",
             "value": "5"
         }

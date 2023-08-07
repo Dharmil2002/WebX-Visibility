@@ -5,6 +5,7 @@ import { UpdateLoadingSheetComponent } from 'src/app/operation/update-loading-sh
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { DatePipe } from '@angular/common';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -157,24 +158,30 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
         
             const timeDifferenceInMilliseconds = diffScheduleTime.getTime() - diffSexpectedTime.getTime();
             const timeDifferenceInHours = timeDifferenceInMilliseconds / (1000 * 60 * 60);
-        
+            const statusToActionMap = {
+              "depart": "Vehicle Arrival",
+              "arrival": "Arrival Scan"
+            };
           
             let routeDetails = this.routeDetails.find((x) => x.routeCode == element.routeCode);
             const routeCode = routeDetails?.routeCode ?? 'Unknown';
             const routeName = routeDetails?.routeName ?? 'Unnamed';
-            let arrivalData = {
-              "id":element?.id||"",
-              "Route": routeCode + ":" + routeName,
-              "VehicleNo": element?.vehicleNo || '',
-              "TripID": element?.tripId || '',
-              "Location": this.branch,
-              "Scheduled": this.datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
-              "Expected": this.datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
-              "Status":timeDifferenceInHours > 0 ? "Delay" : "On Time",
-              "Hrs": timeDifferenceInHours.toFixed(2),
-              "Action": element?.status === "depart" ? "Vehicle Arrival" : "Arrival Scan"
+            if (element.status === "depart" || element.status === "arrival") {
+              let arrivalData = {
+                "id": element?.id || "",
+                "Route": routeCode + ":" + routeName,
+                "VehicleNo": element?.vehicleNo || '',
+                "TripID": element?.tripId || '',
+                "Location": this.branch,
+                "Scheduled": this.datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
+                "Expected": this.datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
+                "Status": timeDifferenceInHours > 0 ? "Delay" : "On Time",
+                "Hrs": timeDifferenceInHours.toFixed(2),
+                "Action": statusToActionMap[element?.status]
+              };
+              tableData.push(arrivalData);
+              // Display or use arrivalData as needed
             }
-            tableData.push(arrivalData);
           });
           this.fetchShipmentData();
           this.arrivalTableData = tableData;
@@ -223,6 +230,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
         ];
 
         this.boxData = shipData;
+        const shipmentStatus = boxData.length <= 0 ? 'noDkt' : 'dktAvail';
+        this._operation.setShipmentStatus(shipmentStatus);
+        
       },
     });
   }

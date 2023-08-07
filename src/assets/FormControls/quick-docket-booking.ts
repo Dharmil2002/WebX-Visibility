@@ -88,10 +88,8 @@ export class QuickBookingControls {
         ],
         additionalData: {
           showNameAndValue: true,
-        },
-        functions:{
-          onModel:"testing"
         }
+     
       },
       {
         name: "orgLoc",

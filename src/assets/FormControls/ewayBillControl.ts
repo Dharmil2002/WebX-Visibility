@@ -1063,7 +1063,7 @@ export class EwayBillControls {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {

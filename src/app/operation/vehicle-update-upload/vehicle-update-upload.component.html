@@ -12,13 +12,10 @@
 </generic-table-webxpress>
 
 <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
-
-<form [formGroup]="loadingSheetTableForm">
-    <app-form-without-auto-complete-webxpress [form]="loadingSheetTableForm" [formData]="Scan"
-        (functionCallEmitter)="functionCallHandler($event)" >
-    </app-form-without-auto-complete-webxpress>
-            <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableload" (click)="updatePackage()">Scan</button>
-</form>
+<div class="search-bar-container">
+    <input type="text" placeholder="Scan..." [(ngModel)]="scanPackage"  class="search-bar-input">
+    <button class="search-bar-button"(click)="updatePackage()">Scan</button>
+</div>
 
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="loadingTableData"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"

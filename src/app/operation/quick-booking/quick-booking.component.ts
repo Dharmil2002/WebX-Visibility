@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { FormControl, UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
@@ -9,6 +9,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { QuickBookingControls } from "src/assets/FormControls/quick-docket-booking";
 import Swal from "sweetalert2";
 import { getCity } from "./quick-utility";
+import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 
 @Component({
   selector: "app-quick-booking",
@@ -35,7 +36,7 @@ export class QuickBookingComponent implements OnInit {
   vehNo: string;
   vehicleStatus: boolean;
   /*it's breadScrums to used in html you must delcare here */
-  userName=localStorage.getItem("Username");
+  userName = localStorage.getItem("Username");
   breadScrums = [
     {
       title: "CNote Quick Booking",
@@ -192,8 +193,10 @@ export class QuickBookingComponent implements OnInit {
   }
 
   save() {
-     // Remove all form errors
-     this.quickDocketTableForm.setErrors(null);
+    // Remove all form errors
+    const controls = this.quickDocketTableForm;
+    clearValidatorsAndValidate(controls);
+    /*End*/
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
     const paddedNumber = dynamicNumber.toString().padStart(4, "0");

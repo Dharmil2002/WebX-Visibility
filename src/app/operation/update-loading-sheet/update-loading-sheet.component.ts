@@ -320,7 +320,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
       "collection": "docket",
       "id": dkt,
       "updates": {
-        "unloading": 1
+        "unloading": 1,
+        "unloadloc":this.currentBranch
 
       }
     }
@@ -342,12 +343,12 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"), this.currentBranch);
     let tripDetails
     if (next) {
-      const updateTripStatus = this.updateTrip.find((x) => x.orgLoc === this.currentBranch);
       tripDetails = {
         orgLoc: this.currentBranch,
         nextUpComingLoc: next,
-        status: updateTripStatus ? "Update Trip" : "Depart Vehicle"
+        status:"Update Trip" 
       }
+    
 
     }
     else {
@@ -359,6 +360,12 @@ export class UpdateLoadingSheetComponent implements OnInit {
       try {
         // Call the vehicleStatusUpdate function here
         const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation);
+        Swal.fire({
+          icon: "info",
+          title: "Trip is close",
+          text: "Trip is close at"+ this.currentBranch,
+          showConfirmButton: true,
+        });
         // Handle the result if needed
       } catch (error) {
         // Handle any errors that might occur

@@ -13,13 +13,13 @@ import {
   DepartVehicleControl,
   DepartureControl,
 } from "src/assets/FormControls/departVehicle";
-import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
 import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { getVehicleDetailFromApi } from "../../create-loading-sheet/loadingSheetCommon";
 import { calculateBalanceAmount, calculateTotal, calculateTotalAdvances, getDriverDetail, getLoadingSheetDetail } from "./depart-common";
 import { formatDate } from "src/app/Utility/date/date-utils";
+import { constants } from "http2";
 
 @Component({
   selector: "app-depart-vehicle",
@@ -111,7 +111,6 @@ export class DepartVehicleComponent implements OnInit {
     private dialog: MatDialog,
     private http: HttpClient,
     private fb: UntypedFormBuilder,
-    private CnoteService: CnoteService,
     private _operationService: OperationService
   ) {
     // if (data) {
@@ -122,68 +121,42 @@ export class DepartVehicleComponent implements OnInit {
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
     this.IntializeFormControl();
-    this.getDepartDetails();
+    this.autoBindData();
     this.fetchShipmentData();
+    this.vehicleDetails();
+    this.getTripDetail();
     // this.autoBindData()
-  }
-  getDepartDetails() {
-    this.http.get(this.vendorDetailsUrl).subscribe((res) => {
-      this.data = res;
-      this.vendordetails = this.data["data"].filter(
-        (x) => x.vehicleNo == this.tripData?.VehicleNo
-      );
-      //   let tableArray = this.data['shipments'];
-      // this.advancebalance = this.data['advancebalance'];
-      this.autoBindData();
-      // const newArray = tableArray.map(({ hasAccess, ...rest }) => ({ isSelected: hasAccess, ...rest }));
-      // this.csv = newArray;
-      //this.tableload = false;
-    });
   }
 
   autoBindData() {
+
+    // Map of control names to their corresponding data keys
     const loadingSheetFormControlsMap = {
       Route: "RouteandSchedule",
       tripID: "TripID",
       Expected: "Expected",
     };
 
-    const departVehicleFormControlsMap = {
-      VendorType: "VendorType",
-      Vendor: "Vendor",
-      Driver: "Driver",
-      DriverMob: "DriverMobile",
-      License: "LicenseNo",
-      Expiry: "Expirydate",
-    };
+    // Loop through the control mappings and update form values
+    Object.entries(loadingSheetFormControlsMap).forEach(([controlName, dataKey]) => {
+      const formControl = this.loadingSheetTableForm.controls[controlName];
+      const value = this.tripData?.[dataKey] || "";
+      formControl.setValue(value);
+    });
 
-    Object.entries(loadingSheetFormControlsMap).forEach(
-      ([controlName, dataKey]) => {
-        const formControl = this.loadingSheetTableForm.controls[controlName];
-        const value = this.tripData?.[dataKey] || "";
-        formControl.setValue(value);
-      }
-    );
+    // Set value for the "vehicle" control
     const vehicleNo = {
       name: this.tripData.VehicleNo,
       value: this.tripData.VehicleNo,
     };
     this.loadingSheetTableForm.controls["vehicle"].setValue(vehicleNo);
 
-    Object.entries(departVehicleFormControlsMap).forEach(
-      ([controlName, dataKey]) => {
-        const formControl = this.departvehicleTableForm.controls[controlName];
-        const value = this.vendordetails[0]?.[dataKey] || "";
-        formControl.setValue(value);
-      }
-    );
-
-    // Set value for LoadingLocation separately
-    const loadingLocationFormControl =
-      this.loadingSheetTableForm.controls["LoadingLocation"];
+    // Set value for the "LoadingLocation" control
+    const loadingLocationFormControl = this.loadingSheetTableForm.controls["LoadingLocation"];
     const loadingLocationValue = localStorage.getItem("Branch") || "";
     loadingLocationFormControl.setValue(loadingLocationValue);
   }
+
   vehicleDetails() {
     const reqbody = {
       companyCode: this.companyCode,
@@ -204,6 +177,7 @@ export class DepartVehicleComponent implements OnInit {
           );
           this.getDriverDetails();
           this.fetchLoadingSheetDetailFromApi();
+          this.loadVehicleDetails();
         }
       },
     });
@@ -250,12 +224,6 @@ export class DepartVehicleComponent implements OnInit {
     this.balanceControlArray = BalanceControls.getBalanceFormControls();
     const DepartureControls = new DepartureControl();
     this.departureControlArray = DepartureControls.getDepartureFormControls();
-    this.jsonControlArray.forEach((data) => {
-      if (data.name === "vehicleTypecontrolHandler") {
-        this.vehicleType = data.name;
-        this.vehicleTypeStatus = data.additionalData.showNameAndValue;
-      }
-    });
     this.loadingSheetTableForm = formGroupBuilder(this.fb, [
       this.jsonControlArray,
     ]);
@@ -275,7 +243,6 @@ export class DepartVehicleComponent implements OnInit {
   ngOnInit(): void { }
 
   functionCallHandler($event) {
-    debugger
     // console.log("fn handler called", $event);
 
     let field = $event.field; // the actual formControl instance
@@ -324,7 +291,6 @@ export class DepartVehicleComponent implements OnInit {
     this._operationService.operationPost("common/getall", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
-          debugger
           // Filter menifestDetails based on mfNo and unloading=0
           const filteredMenifestDetails = res.data.filter((manifest) => {
             const matchedShipment = this.shipmentData.find((item) => item.mfNo === manifest.mfNo);
@@ -348,7 +314,7 @@ export class DepartVehicleComponent implements OnInit {
             this.menifestTableData = menifestList;
             this.tableload = false;
             this.docketDetails();
-            this.vehicleDetails();
+
           });
         }
       },
@@ -368,7 +334,7 @@ export class DepartVehicleComponent implements OnInit {
             (lsDetails) => lsDetails.tripId === this.tripData.TripID
           );
           // this.vehicleTypeDropdown();
-          this.loadVehicleDetails()
+
         }
       },
     });
@@ -442,12 +408,13 @@ export class DepartVehicleComponent implements OnInit {
     delete mergedData.vehicleTypecontrolHandler;
     mergedData['tripId'] = this.tripData.TripID;
     mergedData['id'] = this.tripData.TripID;
-    mergedData['lsno'] = this.lsDetails.lsno;
-    mergedData['mfNo'] = this.lsDetails.mfNo;
+    mergedData['lsno'] = this.lsDetails?.lsno||'';
+    mergedData['mfNo'] = this.lsDetails?.mfNo||'';
     this.addDepartData(mergedData);
   }
 
   addDepartData(departData) {
+
     const reqbody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -465,6 +432,13 @@ export class DepartVehicleComponent implements OnInit {
   }
   updateTrip() {
     const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"), this.orgBranch);
+    Swal.fire({
+      icon: "info",
+      title: "Trip Departure",
+      text: "Your trip from " + next + " is about to depart.",
+      confirmButtonText: "OK",
+    });
+
     let tripDetails = {
       status: "depart",
       nextUpComingLoc: next
@@ -521,6 +495,7 @@ export class DepartVehicleComponent implements OnInit {
    * Fetches loading sheet details from the API and updates the form fields.
    */
   async fetchLoadingSheetDetailFromApi() {
+    debugger
     // Fetch loading sheet details
     const loadingSheetDetail = await getLoadingSheetDetail(
       this.companyCode,
@@ -534,7 +509,9 @@ export class DepartVehicleComponent implements OnInit {
       this.tripData.VehicleNo,
       this._operationService
     );
-    const lsDetail = loadingSheetDetail[loadingSheetDetail.length - 1];
+    const lsDetail = loadingSheetDetail.length > 1
+    ? loadingSheetDetail[loadingSheetDetail.length - 1]
+    : (loadingSheetDetail[0] || null);
     // Update departure vehicle form controls with driver details
     this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
     this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
@@ -545,8 +522,8 @@ export class DepartVehicleComponent implements OnInit {
 
 
     // Update loading sheet table form controls with loading sheet details
-    this.loadingSheetTableForm.controls["CapacityKg"].setValue(
-      lsDetail?.capacityKg || 0
+    this.loadingSheetTableForm.controls["Capacity"].setValue(
+      lsDetail?.capacity || 0
     );
     this.loadingSheetTableForm.controls["CapacityVolumeCFT"].setValue(
       lsDetail?.capacityVolumeCFT || 0
@@ -585,6 +562,48 @@ export class DepartVehicleComponent implements OnInit {
     const totalTripAmt = parseFloat(this.advanceTableForm.controls['TotalTripAmt'].value) || 0;
     calculateBalanceAmount(this.balanceTableForm, totalTripAmt);
   }
+  async getTripDetail() {
+    const reqBody = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "trip_transaction_history",
+      query: {
+        id: this.tripData.TripID,
+      }
+    }
+    const resTrip = await this._operationService.operationPost("common/getOne", reqBody).toPromise();
+    if (resTrip) {
+      const tripDetail = resTrip.data.db.data.trip_transaction_history[0];
+      const advanceControls = this.advanceTableForm.controls;
+      const balanceControls = this.balanceTableForm.controls;
+      const departureControls = this.departureTableForm.controls;
+
+      if (tripDetail) {
+        const fieldsToUpdate = [
+          'ContractAmt', 'OtherChrge', 'Loading', 'Unloading', 'Enroute',
+          'Misc', 'TotalTripAmt', 'PaidByCash', 'PaidbyBank', 'PaidbyFuel',
+          'PaidbyCard', 'TotalAdv', 'BalanceAmt'
+        ];
+
+        fieldsToUpdate.forEach(field => {
+          if (tripDetail.hasOwnProperty(field)) {
+            const fieldValue = tripDetail[field] !== null ? tripDetail[field] : '';
+            if (advanceControls[field]) {
+              advanceControls[field].setValue(fieldValue !== '' ? fieldValue : 0);
+            }
+            if (balanceControls[field]) {
+              balanceControls[field].setValue(fieldValue !== '' ? fieldValue : 0);
+            }
+            if (departureControls[field]) {
+              departureControls[field].setValue(fieldValue !== '' ? fieldValue : '');
+            }
+          }
+        });
+
+      
+      }
+    }
 
 
+  }
 }

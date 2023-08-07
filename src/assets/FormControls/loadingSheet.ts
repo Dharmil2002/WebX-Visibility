@@ -75,8 +75,8 @@ export class loadingControl {
                 generatecontrol: true, disable: true
             },
             {
-                name: 'CapacityKg',
-                label: 'Capacity Kg',
+                name: 'Capacity',
+                label: 'Capacity(In Tons)',
                 placeholder: '',
                 type: 'text',
                 value:'',

@@ -25,7 +25,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
-  shipments = []
+  shipments = [];
+  scanPackage: string;
   currentBranch: string = localStorage.getItem("Branch") || '';
   companyCode: number = parseInt(localStorage.getItem('companyCode'));
   userName: string = localStorage.getItem('Username');
@@ -203,12 +204,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
 
     this.tableload = true;
     // Get the trimmed values of scan and leg
-    const scanValue = this.loadingSheetTableForm.value.Scan.trim();
-
+    const scanValue = this.scanPackage;
     // Find the unload package based on scan and leg values
-    const loadPackage = this.packageData.find(x => x.bcSerialNo.trim() === this.loadingSheetTableForm.value.Scan.trim());
-
-    const loading = vehicleLoadingScan(loadPackage, this.currentBranch, this.loadingTableData)
+    const loadPackage = this.packageData.find(x => x.bcSerialNo.trim() === scanValue.trim());
+    const loading = vehicleLoadingScan(loadPackage, this.loadingTableData)
     if (loading) {
       this.kpiData(loading);
     }
@@ -291,7 +290,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         });
 
         dialogRef.afterClosed().subscribe(result => {
-      
+
           this.generateMeniFest(result);
           Swal.fire({
             icon: "success",
@@ -328,11 +327,11 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
   async generateMeniFest(result) {
     let menifestData = [];
-  
+
     for (const element of this.loadingTableData) {
       let menifestDetails = result.find((x) => x.Leg === element.Leg);
       await this.updatedocketDetail(element.Shipment, menifestDetails.MFNumber);
-  
+
       const jsonDetails = {
         "id": menifestDetails?.MFNumber || "",
         "mfNo": menifestDetails?.MFNumber || "",
@@ -346,17 +345,17 @@ export class VehicleUpdateUploadComponent implements OnInit {
         "entryDate": new Date(),
         "entryBy": this.userName
       };
-  
+
       menifestData.push(jsonDetails);
     }
-  
+
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "menifest_detail",
       "data": menifestData[0]
     };
-  
+
     this.operationService.operationPost('common/create', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
@@ -378,7 +377,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
       }
     });
   }
-  
+
   async updatedocketDetail(dktNo, mfNumber) {
     let mfDetails = {
       mfNo: mfNumber
@@ -392,7 +391,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         ...mfDetails
       }
     };
-  
+
     return new Promise((resolve, reject) => {
       this.operationService.operationPut("common/update", reqBody).subscribe({
         next: (res: any) => {
@@ -406,7 +405,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
       });
     });
   }
-  
+
   updateTripStatus() {
     let tripDetails = {
       status: "Depart Vehicle"
@@ -435,7 +434,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
       }
     })
   }
- 
+
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }

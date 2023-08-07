@@ -14,6 +14,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { setFormControlValue } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
 import { getLoadingSheetDetail } from "../depart-vehicle/depart-vehicle/depart-common";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -100,6 +101,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   cnoteDetails: any;
   userName = localStorage.getItem("Username");
   lsDetails: any;
+  NoDocket: boolean;
+  departFlag: boolean = false;
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,
@@ -197,6 +200,7 @@ export class CreateLoadingSheetComponent implements OnInit {
           this._operationService
         );
       this.lsDetails = lsDetail[lsDetail.length - 1];
+      this.departFlag = true;
       this.getCapacity();
     } else {
 
@@ -298,9 +302,13 @@ export class CreateLoadingSheetComponent implements OnInit {
         const shipingfilterData = filterData.legWiseData;
         // Call the function to group shipments based on criteria
         const groupedShipments = groupShipments(shipingfilterData);
-        console.log(groupedShipments);
+        if (groupedShipments.length > 0) {
+          this.tableload = false;
+        } else {
+          this.departFlag = true;
+        }
         this.tableData = groupedShipments;
-        this.tableload = false;
+
       });
   }
   // Function to autofill vehicle type data
@@ -316,7 +324,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     if (loadingSheetDetails) {
       // Set control values based on loading sheet details
       const controlNames = [
-        "CapacityKg",
+        "Capacity",
         "CapacityVolumeCFT",
         "LoadaddedKg",
         "LoadedKg",
@@ -533,7 +541,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       loadAddedKg: parseInt(this.loadingSheetTableForm.value.LoadaddedKg),
       WeightUtilization: parseInt(this.loadingSheetTableForm.value.WeightUtilization),
       volumeUtilization: parseInt(this.loadingSheetTableForm.value.VolumeUtilization),
-      capacityKg: this.loadingSheetTableForm.value?.CapacityKg || 0,
+      capacity: this.loadingSheetTableForm.value?.Capacity || 0,
       capacityVolumeCFT: this.loadingSheetTableForm.value?.CapacityVolumeCFT || 0,
       volumeAddedCFT: this.loadingSheetTableForm.value?.VolumeaddedCFT || 0,
       entryDate: new Date().toISOString()
@@ -582,7 +590,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
       this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
       this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
-      this.loadingSheetTableForm.controls['CapacityKg'].setValue(vehicleData.capacity);
+      this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData.capacity);
     } catch (error) {
     }
   }
@@ -603,8 +611,8 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.loadingSheetTableForm.controls['WeightUtilization'].setValue(0);
     this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(0);
     if (this.lsDetails) {
-      this.loadingSheetTableForm.controls['LoadedKg'].setValue(this.lsDetails[0]?.loadedKg || 0);
-      this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(this.lsDetails[0]?.LoadedvolumeCFT || 0);
+      this.loadingSheetTableForm.controls['LoadedKg'].setValue(this.lsDetails?.loadedKg || 0);
+      this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(this.lsDetails?.loadedVolumeCft || 0);
     }
     // Calculate the previously loaded values from the form
     let loadedKgInput = parseInt(this.loadingSheetTableForm.value?.LoadedKg || 0);
@@ -632,17 +640,67 @@ export class CreateLoadingSheetComponent implements OnInit {
     // Calculate the total loaded values, including previously loaded values
     loadedKgInput += loadAddedKg;
     loadedCftInput += volAddedCft;
-
+     let capacityTons = parseFloat(this.loadingSheetTableForm.controls['Capacity'].value); // Get the capacity value in tons
+    let loadedTons = loadedKgInput / 1000;
+    let percentage = (loadedTons * 100) / capacityTons;
     // Update the form controls with the calculated values
     this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(loadAddedKg);
     this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(volAddedCft);
     this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(loadedCftInput);
     this.loadingSheetTableForm.controls['LoadedKg'].setValue(loadedKgInput);
-    const weightUtilization = loadedKgInput * 100 / parseFloat(this.loadingSheetTableForm.controls['CapacityKg'].value);
-    this.loadingSheetTableForm.controls['WeightUtilization'].setValue(weightUtilization.toFixed(2));
+    this.loadingSheetTableForm.controls['WeightUtilization'].setValue(percentage.toFixed(2));
     const volumeUtilization = loadedCftInput * 100 / parseFloat(this.loadingSheetTableForm.controls['CapacityVolumeCFT'].value);
     this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(volumeUtilization.toFixed(2));
 
+  }
+  async departVehicle() {
+    if (this.loadingSheetTableForm.controls["tripID"].value === 'System Generated' || !this.loadingSheetTableForm.controls["tripID"].value) {
+      const randomNumber =
+        "TH/" +
+        this.orgBranch +
+        "/" +
+        2223 +
+        "/" +
+        Math.floor(Math.random() * 100000);
+      this.loadingSheetTableForm.controls["tripID"].setValue(randomNumber);
+      // Generate and set a random tripID if not already set
+    }
+    const vehicleValue = this.loadingSheetTableForm.controls["vehicle"].value.value;
+
+    if (vehicleValue) {
+      const tripDetails = {
+        tripId: this.loadingSheetTableForm.controls["tripID"].value,
+        vehicleNo: vehicleValue,
+        status: "Depart Vehicle",
+        updateBy: this.userName,
+        updateDate: new Date().toISOString(),
+      };
+
+      const reqBody = {
+        companyCode: this.companyCode,
+        type: "operation",
+        collection: "trip_detail",
+        id: this.tripData.id,
+        updates: { ...tripDetails },
+      };
+
+      try {
+        await this._operationService.operationPut("common/update", reqBody).toPromise();
+
+        Swal.fire({
+          icon: "info",
+          title: "No Docket Added",
+          text: "Vehicle can depart as no docket is added for loading.",
+          showConfirmButton: true,
+        });
+
+        this.goBack(3);
+      } catch (error) {
+        console.error('Error occurred during the API call:', error);
+      }
+    } else {
+      SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
+    }
   }
 
 }

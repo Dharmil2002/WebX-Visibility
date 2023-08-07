@@ -12,6 +12,7 @@ import { Router } from "@angular/router";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { calculateInvoiceTotalCommon, getPincode } from "./docket.utility";
 import { getCity } from "src/app/operation/quick-booking/quick-utility";
+import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 
 @Component({
   selector: "app-eway-example",
@@ -197,10 +198,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       this.quickDocket = true;
     }
     this.bindQuickdocketData();
-    this.getCity();
-    this.customerDetails();
-    this.destionationDropDown();
-    this.getPincodeDetails();
+   ;
   }
 
   ngOnInit(): void {
@@ -409,6 +407,10 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         },
       });
     }
+    this.getCity();
+    this.customerDetails();
+    this.destionationDropDown();
+    this.getPincodeDetails()
   }
 
   // Load temporary data
@@ -524,10 +526,12 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   //end
   saveData() {
-
-    this.tabForm.setErrors(null);
-    this.contractForm.setErrors(null);
-
+   // Remove all form errors
+   const tabcontrols = this.tabForm;
+   clearValidatorsAndValidate(tabcontrols);
+   const contractcontrols = this.contractForm;
+   clearValidatorsAndValidate(contractcontrols);
+   /*End*/
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const controlNames = ["svcType", "payType", "rskty", "pkgs", "trn"];
     controlNames.forEach((controlName) => {

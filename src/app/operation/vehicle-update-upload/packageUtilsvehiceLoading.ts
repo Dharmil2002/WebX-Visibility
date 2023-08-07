@@ -7,7 +7,7 @@ let uniqueShipments: Set<number> = new Set();
  * @param csv - The CSV data array.
  * @returns The event object containing shipment and package information.
  */
-export function vehicleLoadingScan(loadPackage: any, currentBranch: string, csv: any[]): any {
+export function vehicleLoadingScan(loadPackage: any,csv: any[]): any {
   // Check if the unload package exists
   if (!loadPackage) {
     // Package does not belong to the current branch

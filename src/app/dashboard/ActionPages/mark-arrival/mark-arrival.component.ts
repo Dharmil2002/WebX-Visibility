@@ -6,12 +6,13 @@ import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
 import { MarkArrivalControl } from 'src/assets/FormControls/MarkArrival';
-import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service'
 import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { getSealNumber } from 'src/app/operation/shipment';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { vehicleStatusUpdate } from 'src/app/operation/update-loading-sheet/loadingSheetshipment';
+import { tripTransactionDetail } from './mark-arrival-utlity';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -26,27 +27,28 @@ export class MarkArrivalComponent implements OnInit {
   arrivalData: any;
   departature: any;
   latereason: any;
-  companyCode: number=parseInt(localStorage.getItem("companyCode"));
+  companyCode: number = parseInt(localStorage.getItem("companyCode"));
+  currentBranch: string = localStorage.getItem("Branch");
   latereasonlist: any;
   latereasonlistStatus: any;
   sealdet: any;
   uploadedFiles: File[];
-  
+
   constructor(
     private ObjSnackBarUtility: SnackBarUtilityService,
     private filter: FilterUtils,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog,
     private http: HttpClient,
-    @Inject(MAT_DIALOG_DATA) public item: any, 
-    private fb: UntypedFormBuilder, 
+    @Inject(MAT_DIALOG_DATA) public item: any,
+    private fb: UntypedFormBuilder,
     private Route: Router,
     private _operationService: OperationService) {
-    
-      this.MarkArrivalTable = item;
+    this.MarkArrivalTable = item;
   }
   jsonControlArray: any;
   IntializeFormControl() {
+    
     const MarkArrivalFormControls = new MarkArrivalControl();
     this.jsonControlArray = MarkArrivalFormControls.getMarkArrivalsertFormControls();
     this.jsonControlArray.forEach(data => {
@@ -100,58 +102,83 @@ export class MarkArrivalComponent implements OnInit {
   save() {
 
     this.MarkArrivalTableForm.controls['LateReason']
-    .setValue(
-      this.MarkArrivalTableForm.controls['LateReason']?.
-      value.name||""
-    )
+      .setValue(
+        this.MarkArrivalTableForm.controls['LateReason']?.
+          value.name || ""
+      )
 
-     let tripDetailForm=this.MarkArrivalTableForm.value
-     const tripId=this.MarkArrivalTableForm.value?.TripID||"";
-     delete tripDetailForm.Vehicle
-     delete tripDetailForm.TripID
-     delete tripDetailForm.Route
-     delete tripDetailForm.ETA
-      let tripDetails = {
-        tripDetailForm
+    let tripDetailForm = this.MarkArrivalTableForm.value
+    const tripId = this.MarkArrivalTableForm.value?.TripID || "";
+    delete tripDetailForm.Vehicle
+    delete tripDetailForm.TripID
+    delete tripDetailForm.Route
+    delete tripDetailForm.ETA
+    let tripDetails = {
+      tripDetailForm
+    }
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_transaction_history",
+      "id": tripId,
+      "updates": {
+        ...tripDetails.tripDetailForm,
       }
-      const reqBody = {
-        "companyCode": this.companyCode,
-        "type": "operation",
-        "collection": "trip_transaction_history",
-        "id":tripId,
-        "updates": {
-          ...tripDetails.tripDetailForm,
+    }
+    this._operationService.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.updateTripData()
         }
       }
-      this._operationService.operationPut("common/update", reqBody).subscribe({
-        next: (res: any) => {
-          if (res) {
-            this.updateTripData()
-          }
-        }
-      })
+    })
   }
 
-  updateTripData(){
-    let tripDetails = {
-      status:"arrival",
+  updateTripData() {
+
+    const dktStatus = this._operationService.getShipmentStatus();
+    const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
+    let tripStatus, tripDetails;
+
+    if (dktStatus === "dktAvail") {
+      tripStatus = "arrival";
+      tripDetails = {
+        status: "arrival"
+      };
+    } else if (dktStatus === "noDkt") {
+      tripStatus = next ? "Update Trip" : "close";
+      tripDetails = {
+        status: tripStatus,
+        nextUpComingLoc: "",
+        ...(next ? {} : { closeTime: new Date() })
+      };
     }
-   const reqBody = {
-        "companyCode": this.companyCode,
-        "type": "operation",
-        "collection": "trip_detail",
-        "id":this.MarkArrivalTable.id,
-        "updates": {
-          ...tripDetails
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_detail",
+      "id": this.MarkArrivalTable.id,
+      "updates": {
+        ...tripDetails
+      }
+    }
+    this._operationService.operationPut("common/update", reqBody).subscribe({
+      next: async (res: any) => {
+        if (res) {
+          if (tripDetails.status==="close") {
+            // Call the vehicleStatusUpdate function here
+            const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode,this.MarkArrivalTable, this._operationService);
+            Swal.fire({
+              icon: "info",
+              title: "Trip is close",
+              text: "Trip is close at" + this.currentBranch,
+              showConfirmButton: true,
+            });
+          }
+          this.getPreviousData();
         }
       }
-      this._operationService.operationPut("common/update", reqBody).subscribe({
-        next: (res: any) => {
-          if (res) {
-            this.getPreviousData();
-          }
-        }
-      })
+    })
   }
   cancel() {
     this.goBack(2)
@@ -183,14 +210,15 @@ export class MarkArrivalComponent implements OnInit {
 
     });
     try {
-   
+
     } catch (error) {
       // if companyCode is not found , we should logout immmediately.
     }
   }
 
-  checkSealNumber() {
-    const isMatchingSeal = this.MarkArrivalTableForm.value.Sealno == this.MarkArrivalTable.SealNo;
+  async checkSealNumber() {
+    const tripDetail= await tripTransactionDetail(this.companyCode,this.MarkArrivalTable.TripID,this._operationService)
+    const isMatchingSeal = this.MarkArrivalTableForm.value.Sealno == tripDetail[0].DepartureSeal;
 
     this.MarkArrivalTableForm.controls.SealStatus.setValue(isMatchingSeal ? 'Matching' : 'Not Matching');
 

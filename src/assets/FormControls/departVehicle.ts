@@ -290,7 +290,17 @@ export class DepartureControl {
                 placeholder: '',
                 type: 'text',
                 value: '',
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Seal No is required"
+                    },
+                    {
+                        name: "pattern",
+                        message: "Please enter a Seal No. consisting of 1 to 7 alphanumeric characters.",
+                        pattern: "^[a-zA-Z 0-9]{1,7}$",
+                    }
+                ],
                 generatecontrol: true,
                 disable: false
             },

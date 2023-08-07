@@ -15,8 +15,8 @@ export class RouteScheduleMasterListComponent implements OnInit {
   columnHeader =
     {
       "srNo": "Sr No.",
-      "routeName": "Route",
       "scheduleCode": "Schedule No",
+      "routeName": "Route",
       "applyDate": "Apply From",
       "entryBy": "Entry By",
       "scheduleType": "Schedule Type",
@@ -51,9 +51,9 @@ export class RouteScheduleMasterListComponent implements OnInit {
     Table it's Jst for set A Hyper Link on same You jst add row Name Which You
     want hyper link and add Path which you want to redirect*/
   linkArray = [
-    { Row: 'routeName' }
+    { Row: 'scheduleCode' }
   ];
-  menuItems = [{ label: 'routeName', componentDetails: RouteScheduleDetComponent }];
+  menuItems = [{ label: 'scheduleCode', componentDetails: RouteScheduleDetComponent }];
   addAndEditPath: string;
   viewComponent: any;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));

@@ -224,10 +224,10 @@ export class AddRouteScheduleMasterComponent implements OnInit {
         if (res) {
           // Generate srno for each object in the array
           const lastRoute = res.data[res.data.length - 1];
-          const lastRouteCode = parseInt(lastRoute.scheduleCode.substring(3));
+          const lastRouteCode = lastRoute ? parseInt(lastRoute.scheduleCode.substring(3)) : 0;
           // Function to generate a new route code
-          function generateRouteCode() {
-            const nextRouteCode = lastRouteCode + 1;
+          function generateRouteCode(initialCode: number = 0) {
+            const nextRouteCode = initialCode + 1;
             const routeNumber = nextRouteCode.toString().padStart(4, '0');
             const routeCode = `SCH${routeNumber}`;
             return routeCode;
@@ -235,7 +235,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
           if (this.isUpdate) {
             this.newRouteCode = this.data.id
           } else {
-            this.newRouteCode = generateRouteCode();
+            this.newRouteCode = generateRouteCode(lastRouteCode);
           }
           const options = { hour: 'numeric', minute: 'numeric', hour12: false };
           const transformedData = {

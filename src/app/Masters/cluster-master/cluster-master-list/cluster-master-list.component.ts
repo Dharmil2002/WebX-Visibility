@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cluster-master-list',
@@ -12,24 +13,15 @@ export class ClusterMasterListComponent implements OnInit {
   toggleArray = ["activeFlag"]
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = []
-  columnHeader = 
-  // {
-  //   "srNo": "Sr No",
-  //   "addressCode": "Address Code",
-  //   "manualCode": "Manual Code",
-  //   "city": "City Name",
-  //   "address": "Address",
-  //   "activeFlag": "Active Status",
-  //   "actions": "Actions"
-  // };
-  {
-    "srNo": "Sr No.",
-    "clusterCode": "Cluster Code",
-    "clusterName": "Cluster Name",
-    "pincode": "Pincode",
-    "activeFlag": "Active Status",
-    "actions": "Actions"
-  }
+  columnHeader =
+    {
+      "srNo": "Sr No.",
+      "clusterCode": "Cluster Code",
+      "clusterName": "Cluster Name",
+      "pincode": "Pincode",
+      "activeFlag": "Active Status",
+      "actions": "Actions"
+    }
   headerForCsv = {
     "srNo": "Sr No.",
     "clusterCode": "Cluster Code",
@@ -55,9 +47,9 @@ export class ClusterMasterListComponent implements OnInit {
     this.addAndEditPath = "/Masters/ClusterMaster/AddClusterMaster";
   }
   ngOnInit(): void {
-    this.getAddressDetails();
+    this.getClusterDetails();
   }
-  getAddressDetails() {
+  getClusterDetails() {
     let req = {
       "companyCode": this.companyCode,
       "type": "masters",
@@ -74,10 +66,36 @@ export class ClusterMasterListComponent implements OnInit {
             };
           });
           this.csv = dataWithSrno
-          this.tableData = dataWithSrno;
           this.tableLoad = false;
         }
       }
     })
+  }
+  IsActiveFuntion(det) {
+    let id = det.id;
+    // Remove the "id" field from the form controls
+    delete det.id;
+    delete det.srNo;
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      type: "masters",
+      collection: "cluster_detail",
+      id: id,
+      updates: det
+    };
+    this.masterService.masterPut('common/update', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.getClusterDetails();
+        }
+      }
+    });
   }
 }

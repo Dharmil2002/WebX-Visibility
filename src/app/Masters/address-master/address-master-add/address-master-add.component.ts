@@ -1,9 +1,7 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Router } from "@angular/router";
-import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { AddressMaster } from "src/app/core/models/Masters/address-master";
@@ -22,29 +20,20 @@ export class AddressMasterAddComponent implements OnInit {
   //#region Variable Declaration
   jsonControlGroupArray: any;
   pincodeList: any;
-  countryCode: any;
   pincodeStatus: any;
-  cityList: any;
-  cityStatus: any;
-  stateList: any;
-  stateStatus: any;
-  LocLeval: any;
-  cityData: any;
-  stateData: any;
   pincodeData: any;
   isUpdate = false;
   action: string;
+  pincodeDet: any;
+  addressData: any;
+  newAddressCode: string;
+  data: any;
   //#endregion
 
   ngOnInit() {
     this.getPincodeData();
-    this.getCityData();
-    this.getStateData();
   }
   functionCallHandler($event) {
-    // console.log("fn handler called" , $event);
-
-    let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
 
     // function of this name may not exists, hence try..catch 
@@ -55,13 +44,11 @@ export class AddressMasterAddComponent implements OnInit {
       console.log("failed");
     }
   }
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,
-    private Route: Router, private fb: UntypedFormBuilder,
+  constructor(private Route: Router, private fb: UntypedFormBuilder,
     private masterService: MasterService, private filter: FilterUtils,
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
-      this.countryCode = this.data.countryName;
       this.action = 'edit'
       this.isUpdate = true;
     } else {
@@ -88,19 +75,9 @@ export class AddressMasterAddComponent implements OnInit {
     this.jsonControlGroupArray = this.addressFormControls.getFormControls();
     this.jsonControlGroupArray.forEach(data => {
       if (data.name === 'pincode') {
-        // Set Pincode category-related variables
+        // Set Pincode related variables
         this.pincodeList = data.name;
         this.pincodeStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === 'cityName') {
-        // Set Pincode category-related variables
-        this.cityList = data.name;
-        this.cityStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === 'stateName') {
-        // Set Pincode category-related variables
-        this.stateList = data.name;
-        this.stateStatus = data.additionalData.showNameAndValue;
       }
     });
     this.addressTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
@@ -110,98 +87,53 @@ export class AddressMasterAddComponent implements OnInit {
   }
   //#region Pincode Dropdown
   getPincodeData() {
+    const pincodeValue = this.addressTableForm.controls['pincode'].value;
     let req = {
       "companyCode": this.companyCode,
       "type": "masters",
       "collection": "pincode_detail"
     };
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        // Assuming the API response contains an array named 'pincodeList'
-        const pincodeList = res.data.map(element => ({
-          name: element.pincode,
-          value: element.pincode
-        }));
-        if (this.isUpdate) {
-          this.pincodeData = pincodeList.find((x) => x.name == this.data.pincode);
-          this.addressTableForm.controls.pincode.setValue(this.pincodeData);
-        }
-        this.filter.Filter(
-          this.jsonControlGroupArray,
-          this.addressTableForm,
-          pincodeList,
-          this.pincodeList,
-          this.pincodeStatus
-        );
-      }
-    });
-  }
-  //#endregion
+    if (pincodeValue.length > 2) {
+      this.masterService.masterPost('common/getall', req).subscribe({
+        next: (res: any) => {
+          // Assuming the API response contains an array named 'pincodeList'
+          this.pincodeDet = res.data;
+          const pincodeList = res.data.map(element => ({
+            name: element.pincode,
+            value: element.pincode
+          })).filter(item => item.name.includes(pincodeValue));
 
-  //#region City Dropdown
-  getCityData() {
-    let req = {
-      "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "city_detail"
-    };
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        const cityList = res.data.map(element => ({
-          name: element.cityName,
-          value: element.id
-        }));
-        if (this.isUpdate) {
-          this.cityData = cityList.find((x) => x.name == this.data.cityName);
-          this.addressTableForm.controls.cityName.setValue(this.cityData);
-        }
-        this.filter.Filter(
-          this.jsonControlGroupArray,
-          this.addressTableForm,
-          cityList,
-          this.cityList,
-          this.cityStatus
-        );
-      }
-    });
-  }
-  //#endregion
+          if (pincodeList.length === 0) {
+            // Show a popup indicating no data found for the given pincode
+            Swal.fire({
+              icon: "info",
+              title: "No Data Found",
+              text: `No data found for pincode ${pincodeValue}`,
+              showConfirmButton: true,
+            });
+            return; // Exit the function
+          }
 
-  //#region State Dropdown
-  getStateData() {
-    let req = {
-      "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "state_detail"
-    };
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        const stateList = res.data.map(element => ({
-          name: element.stateName,
-          value: element.stateCode
-        }));
-        if (this.isUpdate) {
-          this.stateData = stateList.find((x) => x.name == this.data.stateName);
-          this.addressTableForm.controls.stateName.setValue(this.stateData);
+          if (this.isUpdate) {
+            this.pincodeData = pincodeList.find((x) => x.name == this.data.pincode);
+            this.addressTableForm.controls.pincode.setValue(this.pincodeData);
+          }
+          this.filter.Filter(
+            this.jsonControlGroupArray,
+            this.addressTableForm,
+            pincodeList,
+            this.pincodeList,
+            this.pincodeStatus
+          );
         }
-        this.filter.Filter(
-          this.jsonControlGroupArray,
-          this.addressTableForm,
-          stateList,
-          this.stateList,
-          this.stateStatus
-        );
-      }
-    });
+      });
+    }
   }
   //#endregion
 
   //#region Save Data
   save() {
     this.addressTableForm.controls["pincode"].setValue(this.addressTableForm.value.pincode.name);
-    this.addressTableForm.controls["cityName"].setValue(this.addressTableForm.value.cityName.name);
-    this.addressTableForm.controls["stateName"].setValue(this.addressTableForm.value.stateName.name);
-    this.addressTableForm.controls["activeFlag"].setValue(this.addressTableForm.value.activeFlag == true ? "Y" : "N");
     if (this.isUpdate) {
       let id = this.addressTableForm.value.id;
       this.addressTableForm.removeControl("id");
@@ -227,8 +159,18 @@ export class AddressMasterAddComponent implements OnInit {
         }
       });
     } else {
-      const randomNumber = getShortName(this.addressTableForm.value.address);
-      this.addressTableForm.controls["id"].setValue(randomNumber);
+      const lastCode = this.addressData[this.addressData.length - 1];
+      const lastAddressCode = lastCode ? parseInt(lastCode.addressCode.substring(1)) : 0;
+      // Function to generate a new address code
+      function generateAddressCode(initialCode: number = 0) {
+        const nextAddressCode = initialCode + 1;
+        const addressNumber = nextAddressCode.toString().padStart(4, '0');
+        const addressCode = `A${addressNumber}`;
+        return addressCode;
+      }
+      this.newAddressCode = generateAddressCode(lastAddressCode);
+      this.addressTableForm.controls["id"].setValue(this.newAddressCode);
+      this.addressTableForm.controls["addressCode"].setValue(this.newAddressCode);
       let req = {
         companyCode: this.companyCode,
         type: "masters",
@@ -252,4 +194,38 @@ export class AddressMasterAddComponent implements OnInit {
     }
   }
   //#endregion
+
+  setStateCityData() {
+    const fetchData = this.pincodeDet.find(item => item.pincode == this.addressTableForm.controls.pincode.value.value)
+    this.addressTableForm.controls.stateName.setValue(fetchData.state)
+    this.addressTableForm.controls.cityName.setValue(fetchData.city)
+  }
+  checkCodeExists() {
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "address_detail"
+    }
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          this.addressData = res.data;
+          const count = res.data.filter(item => item.manualCode == this.addressTableForm.controls.manualCode.value)
+          if (count.length > 0) {
+            Swal.fire({
+              title: 'Manual Code already exists! Please try with another',
+              toast: true,
+              icon: "error",
+              showCloseButton: false,
+              showCancelButton: false,
+              showConfirmButton: true,
+              confirmButtonText: "OK"
+            });
+            this.addressTableForm.controls['manualCode'].reset();
+          }
+        }
+      }
+    })
+  }
 }

@@ -1,7 +1,7 @@
 export class ClusterMaster {
     clusterCode: string
     clusterName: string;
-    pincode: string
+    pincode: any
     tableNo: any;
     city: string;
     activeFlag: any;

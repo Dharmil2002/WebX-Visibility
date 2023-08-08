@@ -11,6 +11,8 @@ export class AddressMaster {
     updateBy: string;
     entryBy: string;
     id:string;
+    cityName: any;
+    stateName: any;
     constructor(AddressMaster) {
         {
             this.addressCode = AddressMaster.addressCode || '';

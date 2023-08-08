@@ -3,65 +3,50 @@ import { ClusterMaster } from "src/app/core/models/Masters/cluster-master";
 
 export class ClusterControl {
     ClusterControlArray: FormControls[];
-    constructor(clusterMasterTable: ClusterMaster, IsUpdate: boolean) {
+    constructor(clusterMasterTable: ClusterMaster, isUpdate: boolean) {
         this.ClusterControlArray = [
             {
                 name: 'clusterCode',
                 label: 'Cluster Code',
                 placeholder: 'For example CC0001',
                 type: 'text',
-                value: clusterMasterTable.clusterCode,
+                value: clusterMasterTable?.clusterCode ? clusterMasterTable.clusterCode : "System Generated",
                 Validations: [
                     {
                         name: "required",
                         message: "Cluster Code is required"
                     },
-                    {
-                        name: "minlength",
-                        message: "Cluster Code must be between 1 and 10 characters long",
-                        minLength: '1',
-                    },
-                    {
-                        name: "maxlength",
-                        message: "Cluster Code must be between 1 and 10 characters long",
-                        maxLength: '10',
-                    },
                 ],
-                // functions: {
-                //     onChange: 'GetClusterExist',
-                // },
-                generatecontrol: true, disable: IsUpdate ? true : false
+                generatecontrol: true, disable: true
             },
             {
                 name: 'clusterName',
                 label: 'Cluster Name',
                 placeholder: 'Cluster Name',
                 type: 'text',
-                value:  clusterMasterTable.clusterName,
+                value: clusterMasterTable.clusterName,
                 Validations: [
                     {
                         name: "required",
                         message: "Cluster name is required"
                     },
                     {
-                        name: "minlength",
-                        message: "Cluster name must be between 1 and 20 characters long",
-                        minLength: '1',
-                    },
-                    {
-                        name: "maxlength",
-                        message: "Cluster name must be between 1 and 20 characters long",
-                        maxLength: '20',
-                    },
+                        name: "pattern",
+                        message: "Please Enter only text with 1-20 alphabets",
+                        pattern: '^[a-zA-Z ]{1,20}$'
+                    }
                 ],
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: isUpdate ? true : false,
+                functions: {
+                    onChange: "checkClusterExists",
+                },
             },
             {
                 name: 'pincode',
                 label: 'Pincode',
                 placeholder: 'Pincode',
                 type: 'multiselect',
-                value:'' ,
+                value: clusterMasterTable.pincode,
                 Validations: [],
                 additionalData: {
                     isIndeterminate: false,
@@ -73,60 +58,12 @@ export class ClusterControl {
                         message: ""
                     }]
                 },
+                functions: {
+                    onToggleAll: 'toggleSelectAll',
+                    onModel: 'getPincodeData'
+                },
                 generatecontrol: true, disable: false
             },
-            // {
-            //     name: 'pincode',
-            //     label: 'Pincode',
-            //     placeholder: 'Search Pincode',
-            //     type: 'text',
-            //     value: '',
-            //     Validations: [],
-
-            //         {
-            //             name: "invalidAutocompleteObject",
-            //             message: "Choose proper value",
-            //         }
-            //         , {
-            //             name: "autocomplete",
-            //         }
-
-              
-            //     functions: {
-            //         onToggleAll: 'toggleClusterModelSelectAll'
-            //     },
-            //     additionalData: {
-            //         isIndeterminate: false,
-            //         isChecked: false,
-            //         support: "Loc",
-            //         Validations: [{
-            //             name: "",
-            //             message: ""
-            //         }]
-            //     },
-                
-            //     generatecontrol: false, disable: false
-            // },
-            // {
-            //     name: 'city',
-            //     label: 'City',
-            //     placeholder: 'Search City',
-            //     type: 'text',
-            //     value: IsUpdate ? clusterMasterTable.city : "",
-            //     Validations: [
-            //         // {
-            //         //     name: "autocomplete",
-            //         // },
-            //         // {
-            //         //     name: "invalidAutocomplete",
-            //         //     message: "Please Select Proper Option",
-            //         // }
-            //     ],
-            //     // additionalData: {
-            //     //     showNameAndValue: false
-            //     // },
-            //     generatecontrol: true, disable: false
-            // },
             {
                 name: 'activeFlag',
                 label: 'Active Flag',
@@ -142,27 +79,10 @@ export class ClusterControl {
                 placeholder: 'Pay Basis',
                 type: '',
                 value: '',
-                Validations: [
-                ],
-                generatecontrol: false, disable: false
-            },
-            {
-                name: 'tableNo',
-                label: 'Table No',
-                placeholder: 'Enter Table No',
-                type: 'text',
-                value: clusterMasterTable.tableNo,
-                Validations: [
-                    {
-                        name: "minlength",
-                        message: "Table No must be between 1 and 20 characters long",
-                        minLength: '1',
-                    },
-                    {
-                        name: "maxlength",
-                        message: "Table No must be between 1 and 20 characters long",
-                        maxLength: '100',
-                    },
+                Validations: [{
+                    name: "required",
+                    message: "Pincode is Required...!",
+                }
                 ],
                 generatecontrol: false, disable: false
             },

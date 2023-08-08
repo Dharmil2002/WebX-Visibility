@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-address-master-list',
@@ -58,25 +59,46 @@ export class AddressMasterListComponent implements OnInit {
     this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {
         if (res) {
-          console.log(res)
-          
           // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) =>
-           {
+          const dataWithSrno = res.data.map((obj, index) => {
             return {
-              
               ...obj,
               srNo: index + 1
             };
 
           });
-          console.log(res.data)
-
           this.csv = dataWithSrno
-          this.tableData = dataWithSrno;
           this.tableLoad = false;
         }
       }
     })
+  }
+
+  IsActiveFuntion(det) {
+    let id = det.id;
+    // Remove the "id" field from the form controls
+    delete det.id;
+    delete det.srNo;
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      type: "masters",
+      collection: "address_detail",
+      id: id,
+      updates: det
+    };
+    this.masterService.masterPut('common/update', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.getAddressDetails();
+        }
+      }
+    });
   }
 }

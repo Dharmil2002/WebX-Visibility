@@ -3,14 +3,14 @@ import { AddressMaster } from "src/app/core/models/Masters/address-master";
 
 export class AddressControl {
     addressControlArray: FormControls[];
-    constructor(addressGroupTable: AddressMaster, IsUpdate: boolean) {
+    constructor(addressGroupTable: AddressMaster, isUpdate: boolean) {
         this.addressControlArray = [
             {
                 name: 'addressCode', label: "Address Code",
                 placeholder: "For example 000001",
                 type: 'text',
-                value: addressGroupTable.addressCode,
-                generatecontrol: true, disable: false,
+                value: addressGroupTable.addressCode ? addressGroupTable.addressCode : "System Generated",
+                generatecontrol: true, disable: true,
                 Validations: [
                 ]
             },
@@ -19,18 +19,21 @@ export class AddressControl {
                 placeholder: "For example AD0001",
                 type: 'text',
                 value: addressGroupTable.manualCode,
-                generatecontrol: true, disable: false,
+                generatecontrol: true, disable: isUpdate ? true : false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Group Name is required"
+                        message: "Manual Code is required"
                     },
                     {
                         name: "pattern",
                         message: "Please Enter alphanumeric Manual Code of length 4 to 10",
                         pattern: '^[a-zA-Z0-9]{4,10}$',
                     }
-                ]
+                ],
+                functions: {
+                    onChange: "checkCodeExists",
+                },
             },
             {
                 name: 'phone', label: "Phone Number", placeholder: "Phone Number", type: 'number',
@@ -38,7 +41,7 @@ export class AddressControl {
                 Validations: [
                     {
                         name: "pattern",
-                        message: "Please enter 10  digit Telephone number",
+                        message: "Please enter 10  digit Phone number",
                         pattern: "^[0-9]{10}$",
                     },
                 ],
@@ -71,52 +74,42 @@ export class AddressControl {
                 name: 'pincode', label: "Pincode",
                 placeholder: "Select Pincode",
                 type: 'dropdown',
-                value: '',
+                value: addressGroupTable.pincode,
                 additionalData: {
                     showNameAndValue: false
                 },
                 generatecontrol: true, disable: false,
                 Validations: [
                     {
+                        name: "autocomplete",
+                    },
+                    {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
                     }
-                ]
-              
+                ],
+                functions: {
+                    onModel: "getPincodeData",
+                    onOptionSelect: "setStateCityData"
+                }
+
             },
             {
                 name: 'cityName', label: "City",
                 placeholder: "Select City",
-                type: 'dropdown',
-                value: '',
-                additionalData: {
-                    showNameAndValue: false
-                },
+                type: 'text',
+                value: addressGroupTable.cityName,
                 generatecontrol: true, disable: true,
-                Validations: [
-                    {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    }
-                ]
+                Validations: []
             },
             {
                 name: 'stateName', label: "State",
                 placeholder: "Select State",
-                type: 'dropdown',
-                value: addressGroupTable.state,
-                additionalData: {
-                    showNameAndValue: false
-                },
+                type: 'text',
+                value: addressGroupTable.stateName,
                 generatecontrol: true, disable: true,
-                Validations: [
-                    {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    }
-                ]
+                Validations: []
             },
-           
             {
                 name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: addressGroupTable.activeFlag, generatecontrol: true, disable: false,
                 Validations: []

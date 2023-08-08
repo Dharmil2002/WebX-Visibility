@@ -137,7 +137,8 @@
                             [showToggleAllCheckbox]="true" toggleAllCheckboxTooltipMessage="Select / Unselect All"
                             [toggleAllCheckboxIndeterminate]="formItem.additionalData.isIndeterminate"
                             [toggleAllCheckboxChecked]="formItem.additionalData.isChecked"
-                            (toggleAll)="functionCalled({field :formItem , functionName:formItem.functions?.onToggleAll  , eventArgs: $event})">
+                            (toggleAll)="functionCalled({field :formItem , functionName:formItem.functions?.onToggleAll  , eventArgs: $event})"
+                            (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">
                             <mat-icon ngxMatSelectSearchClear>delete</mat-icon>
                         </ngx-mat-select-search>
                     </mat-option>

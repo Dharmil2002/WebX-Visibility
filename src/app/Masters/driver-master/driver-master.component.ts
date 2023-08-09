@@ -17,7 +17,6 @@ export class DriverMasterComponent implements OnInit {
     'manualDriverCode': 'Driver Code',
     'driverName': 'Driver Name',
     'licenseNo': 'License No',
-    // 'validityDate': 'Validity Date',
     "activeFlag": "Active Status",
     "actions": "Actions"
   };
@@ -26,7 +25,6 @@ export class DriverMasterComponent implements OnInit {
     'ManualDriverCode': 'Driver Code',
     'DriverName': 'Driver Name',
     'LicenseNo': 'License No',
-    'ValdityDate': 'Validity Date',
     "ActiveFlag": "Active Status",
   }
   breadScrums = [

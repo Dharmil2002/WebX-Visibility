@@ -31,17 +31,11 @@ export class AddDriverMasterComponent implements OnInit {
   locationStatus: any;
   category: any;
   categoryStatus: any;
-  Vehicle: any;
-  vehicleStatus: any;
   breadscrums: { title: string; items: string[]; active: string; }[];
-  Routes: any;
-  RouteStatus: any;
   selectedFiles: boolean;
   SelectFile: File;
   imageName: string;
-  locationData: any;
   routeLocation: any;
-  routeDet: any;
   categoryDet: any;
   locData: any;
   pincode: any;

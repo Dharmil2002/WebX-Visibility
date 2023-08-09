@@ -36,7 +36,8 @@ export class VehicleStatusUpdateComponent implements OnInit {
     "status": "Status",
     "tripId": "Trip Id",
     "currentLocation": "Location",
-    "route": "Route"
+    "route": "Route",
+    "rptLoc":"Reporting Location"
   };
   headerForCsv = {
     "srNo": "Sr No",
@@ -44,7 +45,8 @@ export class VehicleStatusUpdateComponent implements OnInit {
     "status": "Status",
     "tripId": "Trip Id",
     "currentLocation": "Location",
-    "route": "Route"
+    "route": "Route",
+    "rptLoc":"Reporting Location"
   };
   boxData: any;
   constructor(
@@ -62,7 +64,7 @@ export class VehicleStatusUpdateComponent implements OnInit {
       const vehicleStatusData = await getVehicleStatusFromApi(this.companyCode, this._operationService);
       // Assuming vehicleDetail.data is an array of objects with 'id' property
       // Generate srno for each object in the array
-      this.tableData = vehicleStatusData.filter((x)=>x.currentLocation.trim()===this.branchCode.trim()).map((obj, index) => {
+      this.tableData = vehicleStatusData.filter((x)=>x.currentLocation.trim()===this.branchCode.trim()||x.rptLoc.trim()===this.branchCode.trim()).map((obj, index) => {
         return {
           ...obj,
           srNo: index + 1

@@ -9,7 +9,7 @@ import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
 import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
 import { LodingSheetGenerateSuccessComponent } from "../loding-sheet-generate-success/loding-sheet-generate-success.component";
 import { LoadingSheetViewComponent } from "../loading-sheet-view/loading-sheet-view.component";
-import { filterCnoteDetails, filterDataByLocation, getVehicleDetailFromApi, groupShipments } from "./loadingSheetCommon";
+import { filterCnoteDetails, filterDataByLocation, getVehicleDetailFromApi, groupShipments, updateTracking } from "./loadingSheetCommon";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { setFormControlValue } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
@@ -103,6 +103,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   lsDetails: any;
   NoDocket: boolean;
   departFlag: boolean = false;
+  alldocket: any;
   constructor(
     private Route: Router,
     private _cnoteService: CnoteService,
@@ -298,6 +299,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         );
         //Here i user cnoteDetails varible to used in updateDocketDetails() method
         this._cnoteService.setShipingData(filterData.legWiseData);
+        this.alldocket=filterData.legWiseData
         this.cnoteDetails = filterData.legWiseData;
         const shipingfilterData = filterData.legWiseData;
         // Call the function to group shipments based on criteria
@@ -397,7 +399,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       }
     });
     //this.getshipmentData(event)
-    this.cnoteDetails = filterCnoteDetails(this.cnoteDetails, event.shipping)
+    this.cnoteDetails = filterCnoteDetails(this.alldocket,event.shipping)
     this._cnoteService.setShipingData(this.cnoteDetails);
   }
 
@@ -500,10 +502,17 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
 
   async updateDocketDetails(docket, lsNo) {
-
     let loadingSheetData = {
-      lsNo: lsNo,
+      lsNo: lsNo
     };
+    const trackingDocket = {
+      lsNo: lsNo,
+      tripId:this.loadingSheetTableForm.value.tripID,
+      vehNo:this.loadingSheetTableForm.controls["vehicle"].value?.value||"",
+      route: this.tripData?.RouteandSchedule||"",
+      dktNo:docket
+    };
+    await updateTracking(this.companyCode,this._operationService,trackingDocket)
     const reqBody = {
       companyCode: this.companyCode,
       type: "operation",
@@ -511,7 +520,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       id: docket,
       updates: {
         ...loadingSheetData
-      },
+      }
     };
 
     try {
@@ -564,7 +573,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   updateVehicleStatus() {
 
     const vehicleDetails = {
-      status: "On trip",
+      status: "On Transit",
       tripId: this.loadingSheetTableForm.value?.tripID,
       route: this.tripData?.RouteandSchedule
     };
@@ -651,6 +660,31 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.loadingSheetTableForm.controls['WeightUtilization'].setValue(percentage.toFixed(2));
     const volumeUtilization = loadedCftInput * 100 / parseFloat(this.loadingSheetTableForm.controls['CapacityVolumeCFT'].value);
     this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(volumeUtilization.toFixed(2));
+    if (percentage > 100 || volumeUtilization > 100) {
+      let errorMessage = "Capacity has been exceeded.";
+    
+      if (volumeUtilization > 100) {
+        errorMessage = "Cubic feet volume is greater than vehicle volume.";
+      }
+    
+      Swal.fire({
+        icon: "error",
+        title: "Capacity Exceeded",
+        text: errorMessage,
+        showConfirmButton: true,
+      });
+      this.loadingData.forEach((loadingItem) => {
+        this.tableData = this.tableData.map((tableItem) => {
+          if (loadingItem.leg === tableItem.leg) {
+            return { ...tableItem, isSelected: false };
+          }
+          return tableItem;
+        });
+      });
+      
+      
+    }
+    
 
   }
   async departVehicle() {
@@ -685,6 +719,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       };
 
       try {
+        
         await this._operationService.operationPut("common/update", reqBody).toPromise();
 
         Swal.fire({

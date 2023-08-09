@@ -27,4 +27,33 @@ export function groupShipmentsByLeg(shipingTableData) {
   
     return Object.values(groupedData);
   }
+
+  export async function updateTracking(companyCode, operationService,dktNo) {
+
+    const dockData = {
+      status:"Going to Last Mile Delivery"+" "+localStorage.getItem("Branch"),
+      upBy:localStorage.getItem("Username"),
+      evnCd:"",
+      upDt:new Date().toISOString(),
+      loc:localStorage.getItem("Branch")
+    }
+  
+    const req = {
+      companyCode: companyCode,
+      type: "operation",
+      collection: "docket_tracking",
+      id: dktNo,
+      updates: {
+        ...dockData
+      }
+    };
+  
+    try {
+      const res: any = await operationService.operationPut("common/update", req).toPromise();
+       return res;
+    } catch (error) {
+      console.error("Error update a docket Status:", error);
+      return null;
+    }
+  }
   

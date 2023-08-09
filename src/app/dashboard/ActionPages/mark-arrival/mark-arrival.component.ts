@@ -167,12 +167,12 @@ export class MarkArrivalComponent implements OnInit {
         if (res) {
           if (tripDetails.status==="close") {
             // Call the vehicleStatusUpdate function here
-            const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode,this.MarkArrivalTable, this._operationService);
+            const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode,this.MarkArrivalTable, this._operationService,true);
             Swal.fire({
               icon: "info",
               title: "Trip is close",
               text: "Trip is close at" + this.currentBranch,
-              showConfirmButton: true,
+              showConfirmButton: true
             });
           }
           this.getPreviousData();

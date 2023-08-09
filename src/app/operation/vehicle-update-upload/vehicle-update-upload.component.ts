@@ -8,6 +8,7 @@ import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { vehicleLoadingScan } from './packageUtilsvehiceLoading';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { updateTracking } from './vehicleLoadingUtility';
 
 @Component({
   selector: 'app-vehicle-update-upload',
@@ -282,6 +283,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
       packageChecked = this.loadingTableData.every(obj => obj.Packages === obj.loaded);
 
     }
+    
     if (packageChecked) {
       if (this.shipmentStatus == 'Loaded') {
         const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
@@ -382,6 +384,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     let mfDetails = {
       mfNo: mfNumber
     };
+     await updateTracking(this.companyCode,this.operationService,mfDetails,dktNo)
     const reqBody = {
       companyCode: this.companyCode,
       type: "operation",

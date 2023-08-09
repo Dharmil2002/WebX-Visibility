@@ -1,0 +1,22 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+  <div class="search-bar-container"  *ngIf="!load">
+    <input type="text" placeholder="Scan..." [(ngModel)]="docketNo" class="search-bar-input">
+    <button class="msr-3" mat-raised-button color="primary" *ngIf="tableload" (click)="Fetch()" [disabled]="!docketNo || load">
+      <mat-icon>search</mat-icon> Fetch</button>
+    <button class="msr-3" mat-raised-button color="info" *ngIf="!tableload" (click)="reset()">reset</button>
+  </div>
+  <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="tableData"
+    [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
+    [csvFileName]="csvFileName" [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)"
+    [metaData]="METADATA" [toggleArray]="toggleArray" [Link]="linkArray">
+  </generic-table-webxpress>
+  <!-- <div class="customerloader" *ngIf="load">
+  <div class="loader"></div>
+</div> -->
+<div class="customerloader" *ngIf="load">
+<div class="loader-container">
+  <img src="../../assets/images/loaders/delivery-truck.gif" alt="Loading..." class="loader">
+</div>
+</div>
+</app-common-wrapper-webxpress>
+

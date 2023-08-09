@@ -18,22 +18,25 @@ export function updatePending(shipments: Shipment[], location: string, loading: 
     });
 }
 // Assuming this function is inside a class called VehicleManager
-export async function vehicleStatusUpdate(currentBranch, companyCode, arrivalData, operation) {
+export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, operation,isClose) {
 
     try {
-        if (!currentBranch || !companyCode || !arrivalData || !arrivalData.VehicleNo) {
+        if (!rptLoc || !companyCode || !arrivalData || !arrivalData.VehicleNo) {
             throw new Error("Missing required data for vehicle status update. Ensure all parameters are provided.");
         }
-
-        const vehicleDetails = {
-            currentLocation: currentBranch,
-            status: "available",
-            tripId:"",
-            route: "",
-            entryBy:localStorage.getItem("Username"),
-            entryDate:new Date().toISOString()
+        let vehicleDetails = {
+            rptLoc,
+            status: isClose ? "available" : "In Transit",
+            ...(isClose
+                ? {
+                    tripId: "",
+                    route: "",
+                    updateBy: localStorage.getItem("Username"),
+                    updateDate: new Date().toISOString()
+                  }
+                : {})
         };
-
+        
         const reqBody = {
             companyCode,
             type: "operation",

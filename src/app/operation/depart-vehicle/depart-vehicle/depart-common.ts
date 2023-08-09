@@ -100,3 +100,31 @@ export function calculateBalanceAmount(form: FormGroup, totalTripAmt): void {
     // Set the calculated balance amount with 2 decimal places
     form.controls['BalanceAmt'].setValue(balanceAmount.toFixed(2));
 }
+
+export async function updateTracking(companyCode, operationService,dktNo,next) {
+    const dockData = {
+      status:"On Transit",
+      upBy:localStorage.getItem("Username"),
+      upDt:new Date().toISOString(),
+      evnCd:""
+    }
+  
+    const req = {
+      companyCode: companyCode,
+      type: "operation",
+      collection: "docket_tracking",
+      id: dktNo,
+      updates: {
+        ...dockData
+      }
+    };
+  
+    try {
+      const res: any = await operationService.operationPut("common/update", req).toPromise();
+       return res;
+    } catch (error) {
+      console.error("Error update a docket Status:", error);
+      return null;
+    }
+  }
+  

@@ -138,7 +138,7 @@ export function filterCnoteDetails(cnoteDetails, shipping) {
   // Loop through each shipping element
   shipping.forEach(element => {
     // Filter cnoteDetails to get data that doesn't match the current shipping element
-    let existShippingData = cnoteDetails.filter((x) => x.destination.split(":")[1].trim() !== element.Destination.trim() && x.orgLoc.trim() !== element.Origin.trim());
+    let existShippingData = cnoteDetails.filter((x) => x.destination.split(":")[1].trim() !== element.Destination.trim() && x.orgLoc.trim() === element.Origin.trim());
 
     // Only add non-empty arrays to cnoteData
     if (existShippingData.length > 0) {
@@ -185,6 +185,39 @@ export async function getVehicleDetailFromApi(companyCode: number, operationServ
   }
 
 }
+export async function updateTracking(companyCode, operationService, data) {
+  const dockData = {
+    vehNo:data?.vehNo||"",
+    route:data?.route||"",
+    status:"Available for manifest",
+    lsno:data?.lsNo||"",
+    tripId:data?.tripId||"",
+    evnCd:"",
+    loc:localStorage.getItem("Branch"),
+    upBy:localStorage.getItem("Username"),
+    upDt:new Date().toISOString()
+
+  }
+
+  const req = {
+    companyCode: companyCode,
+    type: "operation",
+    collection: "docket_tracking",
+    id: data?.dktNo||'',
+    updates: {
+      ...dockData
+    }
+  };
+
+  try {
+    const res: any = await operationService.operationPut("common/update", req).toPromise();
+     return res;
+  } catch (error) {
+    console.error("Error update a docket Status:", error);
+    return null;
+  }
+}
+
 //end
 
 

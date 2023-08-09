@@ -1,14 +1,14 @@
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { Router } from '@angular/router';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
 import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival/mark-arrival.component';
 import Swal from 'sweetalert2';
-import { Shipment, autoBindData, filterShipments, kpiData } from '../shipment';
-import { updatePending, vehicleStatusUpdate } from './loadingSheetshipment';
-import { groupShipmentsByLeg } from './shipmentsUtils';
+import { autoBindData, filterShipments, kpiData } from '../shipment';
+import { vehicleStatusUpdate } from './loadingSheetshipment';
+import { groupShipmentsByLeg, updateTracking } from './shipmentsUtils';
 import { handlePackageUpdate } from './packageUtils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
@@ -313,7 +313,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
 
   }
-  UpdateDocketDetail(dkt) {
+  async UpdateDocketDetail(dkt) {
+    await updateTracking(this.companyCode,this._operation,dkt)
     const reqbody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -349,7 +350,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
         status:"Update Trip" 
       }
     
-
+      const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation,false);
     }
     else {
       tripDetails = {
@@ -359,7 +360,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       }
       try {
         // Call the vehicleStatusUpdate function here
-        const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation);
+        const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation,true);
         Swal.fire({
           icon: "info",
           title: "Trip is close",
@@ -428,21 +429,5 @@ export class UpdateLoadingSheetComponent implements OnInit {
       }
     })
   }
-  // vehicleStatusUpdate() {
-  //   let vehicleDetails = {
-  //     currentLocation: this.currentBranch,
-  //     status: "available"
-  //   }
-  //   const reqBody = {
-  //     "companyCode": this.companyCode,
-  //     "type": "operation",
-  //     "collection": "vehicle_status",
-  //     "id": this.arrivalData.VehicleNo,
-  //     "updates": {
-  //       ...vehicleDetails,
-  //     }
-  //   }
-  //   const vehicleUpdate = this._operation.operationPut("common/update", reqBody).toPromise();
 
-  // }
 }

@@ -10,7 +10,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import Swal from "sweetalert2";
 import { Router } from "@angular/router";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
-import { calculateInvoiceTotalCommon, getPincode } from "./docket.utility";
+import { addTracking, calculateInvoiceTotalCommon, getPincode } from "./docket.utility";
 import { getCity } from "src/app/operation/quick-booking/quick-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 
@@ -525,7 +525,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     });
   }
   //end
-  saveData() {
+  async saveData() {
    // Remove all form errors
    const tabcontrols = this.tabForm;
    clearValidatorsAndValidate(tabcontrols);
@@ -577,6 +577,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     this.contractForm.controls["destination"].setValue(
       this.contractForm.value?.destination.name || ""
     );
+    //here the function is calling for add docket Data in docket Tracking.
     if (this.quickDocket) {
       let id = { isComplete: 1, unloading: 0, lsNo: "", mfNo: "",unloadloc:""};
       let docketDetails = {
@@ -585,6 +586,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         ...invoiceDetails,
         ...id,
       };
+
+     await addTracking(this.companyCode,this.operationService,docketDetails)
+
       let reqBody = {
         companyCode: this.companyCode,
         type: "operation",
@@ -621,6 +625,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         ...invoiceDetails,
         ...id,
       };
+      await addTracking(this.companyCode,this.operationService,docketDetails)
       let reqBody = {
         companyCode: this.companyCode,
         type: "operation",

@@ -31,7 +31,7 @@ export function calculateInvoiceTotalCommon(tableData, contractForm) {
   let totalDeclaredValue = 0;
   let totalActualValue = 0;
   let totalPartQuantity = 0;
-  let cftVolume=0;
+  let cftVolume = 0;
 
   // Loop through the tableData array
   tableData.forEach((x) => {
@@ -41,7 +41,7 @@ export function calculateInvoiceTotalCommon(tableData, contractForm) {
     const height = x.HEIGHT || 0;
     const cftRatio = WebxConvert.objectToDecimal(contractForm.controls['cft_ratio']?.value, 0);
     const noPkgs = WebxConvert.objectToDecimal(parseInt(x.NO_PKGS || 0), 0);
-     cftVolume = length * breadth * height * cftRatio * noPkgs;
+    cftVolume = length * breadth * height * cftRatio * noPkgs;
 
     // Update total charged values
     totalChargedNoofPackages += parseInt(x.NO_PKGS || 0);
@@ -62,3 +62,40 @@ export function calculateInvoiceTotalCommon(tableData, contractForm) {
   contractForm.controls["actualwt"].setValue(totalActualValue);
   //TotalPartQuantity calculation parts are pending
 }
+//Add Docket tracking docket Details
+
+export async function addTracking(companyCode, operationService, data) {
+  const dockData = {
+    id:data?.docketNumber||'',
+    dktNo:data?.docketNumber||'',
+    vehNo:"",
+    route:"",
+    status:"Available for LS",
+    orgn:data?.orgLoc||'',
+    loc:localStorage.getItem("Branch"),
+    dest:data.destination.split(":")[1].trim(),
+    lsno:"",
+    mfno:"",
+    dlSt:"",
+	  dlTm:"",
+    evnCd:"",
+    upBy:localStorage.getItem("Username"),
+    upDt:new Date().toISOString()
+  }
+
+  const req = {
+    companyCode: companyCode,
+    type: "operation",
+    collection: "docket_tracking",
+    data:dockData
+  };
+
+  try {
+    const res: any = await operationService.operationPost("common/create", req).toPromise();
+     return res;
+  } catch (error) {
+    console.error("Error update a docket Status:", error);
+    return null;
+  }
+}
+

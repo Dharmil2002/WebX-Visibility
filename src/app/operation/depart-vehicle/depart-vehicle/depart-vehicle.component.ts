@@ -17,7 +17,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import Swal from "sweetalert2";
 import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { getVehicleDetailFromApi } from "../../create-loading-sheet/loadingSheetCommon";
-import { calculateBalanceAmount, calculateTotal, calculateTotalAdvances, getDriverDetail, getLoadingSheetDetail } from "./depart-common";
+import { calculateBalanceAmount, calculateTotal, calculateTotalAdvances, getDriverDetail, getLoadingSheetDetail, updateTracking } from "./depart-common";
 import { formatDate } from "src/app/Utility/date/date-utils";
 import { constants } from "http2";
 
@@ -104,6 +104,8 @@ export class DepartVehicleComponent implements OnInit {
   setVehicleType: any[];
   lsDetails: any;
   vehicleDetail: any;
+  listDocket=[];
+  next: string;
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
   constructor(
@@ -291,15 +293,14 @@ export class DepartVehicleComponent implements OnInit {
     this._operationService.operationPost("common/getall", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
+             
           // Filter menifestDetails based on mfNo and unloading=0
           const filteredMenifestDetails = res.data.filter((manifest) => {
             const matchedShipment = this.shipmentData.find((item) => item.mfNo === manifest.mfNo);
-
+               this.listDocket.push(matchedShipment.docketNumber);
             // Check if there's a matching shipment and unloading is 0
             return matchedShipment && matchedShipment.unloading === 0 && manifest.tripId === this.tripData.TripID
           });
-
-
           let menifestList: any = [];
           filteredMenifestDetails.forEach((element) => {
             let json = {
@@ -411,7 +412,9 @@ export class DepartVehicleComponent implements OnInit {
     mergedData['lsno'] = this.lsDetails?.lsno||'';
     mergedData['mfNo'] = this.lsDetails?.mfNo||'';
     this.addDepartData(mergedData);
+     this.docketStatus();
   }
+
 
   addDepartData(departData) {
 
@@ -432,6 +435,7 @@ export class DepartVehicleComponent implements OnInit {
   }
   updateTrip() {
     const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"), this.orgBranch);
+    this.next=next;
     Swal.fire({
       icon: "info",
       title: "Trip Departure",
@@ -495,7 +499,7 @@ export class DepartVehicleComponent implements OnInit {
    * Fetches loading sheet details from the API and updates the form fields.
    */
   async fetchLoadingSheetDetailFromApi() {
-    debugger
+
     // Fetch loading sheet details
     const loadingSheetDetail = await getLoadingSheetDetail(
       this.companyCode,
@@ -513,6 +517,7 @@ export class DepartVehicleComponent implements OnInit {
     ? loadingSheetDetail[loadingSheetDetail.length - 1]
     : (loadingSheetDetail[0] || null);
     // Update departure vehicle form controls with driver details
+    if(driverDetail[0]){
     this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
     this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
     this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");
@@ -520,8 +525,9 @@ export class DepartVehicleComponent implements OnInit {
     convertedDate = convertedDate ? formatDate(convertedDate, 'dd/MM/yyyy') : '';
     this.departvehicleTableForm.controls['Expiry'].setValue(convertedDate);
 
-
+  }
     // Update loading sheet table form controls with loading sheet details
+    if(lsDetail){
     this.loadingSheetTableForm.controls["Capacity"].setValue(
       lsDetail?.capacity || 0
     );
@@ -546,7 +552,7 @@ export class DepartVehicleComponent implements OnInit {
     this.loadingSheetTableForm.controls["WeightUtilization"].setValue(
       lsDetail?.WeightUtilization || 0
     );
-
+    }
     // Rest of your code that depends on loadingSheetDetail
   }
 
@@ -605,5 +611,10 @@ export class DepartVehicleComponent implements OnInit {
     }
 
 
+  }
+  docketStatus() {
+   this.listDocket.forEach(async element => {
+    await updateTracking(this.companyCode,this._operationService,element,this.next)
+   });
   }
 }

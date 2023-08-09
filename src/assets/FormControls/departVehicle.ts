@@ -280,9 +280,14 @@ export class DepartureControl {
                 placeholder: '',
                 type: 'date',
                 value: '',
-                Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "DeptartureTime is required"
+                    }
+                ]
             },
             {
                 name: 'DepartureSeal',
@@ -310,7 +315,12 @@ export class DepartureControl {
                 placeholder: '',
                 type: "text",
                 value: '',
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "DeptartureTime is required"
+                    }
+                ],
                 generatecontrol: true, disable: true
             },
         ];

@@ -134,6 +134,9 @@ export class AddressMasterAddComponent implements OnInit {
   //#region Save Data
   save() {
     this.addressTableForm.controls["pincode"].setValue(this.addressTableForm.value.pincode.name);
+    // Clear any errors in the form controls
+    Object.values(this.addressTableForm.controls).forEach(control => control.setErrors(null));
+
     if (this.isUpdate) {
       let id = this.addressTableForm.value.id;
       this.addressTableForm.removeControl("id");

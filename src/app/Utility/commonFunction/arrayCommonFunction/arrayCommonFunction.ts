@@ -38,3 +38,14 @@ export const formatDateTimeString = (date) => {
     minute: '2-digit',
   }).format(date);
 };
+// Function to convert numerical strings to integers
+export function convertNumericalStringsToInteger(dataObj) {
+  for (const prop in dataObj) {
+    const value = dataObj[prop];
+    // Check if the value is a string, not empty, and a valid number
+    if (typeof value === 'string' && value.trim() !== '' && !isNaN(Date.parse(value))) {
+      dataObj[prop] = parseInt(value, 10);
+    }
+  }
+  return dataObj;
+  }

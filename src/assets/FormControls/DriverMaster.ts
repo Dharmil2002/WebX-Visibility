@@ -7,9 +7,7 @@ export class DriverControls {
     private PermanentAddressControls: FormControls[];
     private UploadsControls: FormControls[];
     private BankDetailsControls: FormControls[];
-    // formControlsArray
-    constructor(DriverTable: DriverMaster, IsUpdate: boolean,
-    ) {
+    constructor(DriverTable: DriverMaster, IsUpdate: boolean) {
         this.DriverDetailsControl =
             [
                 {
@@ -51,42 +49,52 @@ export class DriverControls {
 
                     ],
                     functions: {
-                        onChange: 'GetManualDriverCode',
+                        onChange: 'getManualDriverCodeExists',
                     }
                 },
                 {
-                    name: 'driverLocation', label: "Driver Location", placeholder: "Select location", type: 'dropdown',
-                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    name: 'driverLocation',
+                    label: "Driver Location",
+                    placeholder: "Select location",
+                    type: 'dropdown',
+                    value: DriverTable?.driverLocation,
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: false,
                     Validations: [
                         {
                             name: "invalidAutocompleteObject",
                             message: "Choose proper value",
-                        }
-                        
+                        },
+                        {
+                            name: "autocomplete",
+                        },
                     ],
                     additionalData: {
                         showNameAndValue: false
                     }
                 },
                 {
-                    name: 'vehicleNo', label: "Vehicle Number", placeholder: "Enter Vehicle Number", type: 'text', value: DriverTable.vehicleNo, generatecontrol: true, disable: false,
+                    name: 'vehicleNo',
+                    label: "Vehicle Number",
+                    placeholder: "Enter Vehicle Number",
+                    type: 'dropdown',
+                    value: DriverTable?.vehicleNo,
+                    generatecontrol: true,
+                    disable: false,
                     Validations: [
                         {
-                            name: "pattern",
-                            message: "Please Enter alphanumeric Vehicle Number of length 10",
-                            pattern: '^[a-zA-Z0-9]{10,10}$',
+                            name: "autocomplete",
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
                         }
                     ],
-                },
-                {
-                    name: 'vendorDriverCode', label: "Vendor Driver Code", placeholder: "Enter Vendor Driver Code", type: 'text', value: DriverTable.vendorDriverCode, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter alphanumeric VendriverCode of length 4 to 10",
-                            pattern: "^[a-zA-Z0-9]{4,10}$",
-                        }
-                    ]
+                    additionalData: {
+                        showNameAndValue: false
+                    },
                 },
                 {
                     name: 'telno', label: "Contact Number", placeholder: "Enter Contact Number", type: 'number', value: DriverTable.telno, generatecontrol: true, disable: false,
@@ -123,7 +131,7 @@ export class DriverControls {
                     }
                 },
                 {
-                    name: 'joiningDate', label: 'Joining Date', placeholder: 'Enter Joining Date', type: 'date', value: DriverTable.joiningDate, generatecontrol: true, disable: false,
+                    name: 'joiningDate', label: 'Joining Date', placeholder: 'Enter Joining Date', type: 'date', value: DriverTable.joiningDate ? DriverTable.joiningDate : new Date(), generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
                         minDate: new Date("01 Jan 1900")
@@ -133,18 +141,13 @@ export class DriverControls {
                     name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: DriverTable.activeFlag, generatecontrol: true, disable: false,
                     Validations: []
                 },
-                
+
             ],
             this.LicenseDetailsControls =
             [
                 {
                     name: 'licenseNo', label: 'License No', placeholder: 'Enter License No', type: 'text', value: DriverTable.licenseNo, generatecontrol: true, disable: false,
                     Validations: [
-                        // {
-                        //     name: "pattern",
-                        //     message: "Please Enter a valid License No ",
-                        //     pattern: "^[A-Za-z]{2}\d{2}\s\d{4}(?:\s\d{5})?$/",
-                        // }
                         {
                             name: "pattern",
                             message: "Please Enter alphanumeric License No of length 10 to 15",
@@ -159,7 +162,7 @@ export class DriverControls {
                         minDate: new Date("01 Jan 1900")
                     }
                 },
-               
+
             ],
             this.PermanentAddressControls = [
                 {
@@ -177,7 +180,36 @@ export class DriverControls {
                     ]
                 },
                 {
-                    name: 'city', label: 'City', placeholder: 'Enter Permanent City', type: 'text', value: DriverTable.city, generatecontrol: true, disable: false,
+                    name: 'pincode',
+                    label: 'Pincode',
+                    placeholder: 'Enter Permanent Pincode',
+                    type: 'dropdown',
+                    value: "",
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Pincode is required"
+                        },
+                        {
+                            name: "autocomplete",
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
+                    },
+                    functions: {
+                        onModel: "getAllMastersData",
+                        onOptionSelect: "setStateCityData"
+                    }
+                },
+                {
+                    name: 'city', label: 'City', placeholder: 'Enter Permanent City', type: 'text', value: DriverTable.city, generatecontrol: true, disable: true,
                     Validations: [
                         {
                             name: "required",
@@ -190,20 +222,7 @@ export class DriverControls {
                         }
                     ]
                 },
-                {
-                    name: 'pincode', label: 'Pincode', placeholder: 'Enter Permanent Pincode', type: 'number', value: DriverTable.pincode, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "Pincode is required"
-                        }
-                        , {
-                            name: "pattern",
-                            message: "Please enter 6 digit Pincode",
-                            pattern: '^[1-9][0-9]{5}$',
-                        }
-                    ]
-                },
+
             ],
             this.UploadsControls = [
                 {
@@ -222,7 +241,7 @@ export class DriverControls {
                     generatecontrol: true,
                     disable: false
                 },
-              
+
                 {
                     name: 'panCard',
                     label: 'PAN Card',
@@ -270,13 +289,13 @@ export class DriverControls {
                 },
                 {
                     name: 'bAcct', label: 'Bank Account No', placeholder: 'Enter Bank Account No', type: 'number', value: DriverTable.bAcct, generatecontrol: true, disable: false,
-                    Validations: [ 
+                    Validations: [
                         {
                             name: "pattern",
                             message: "Please enter Bank Account No of length 14 digits",
                             pattern: "^[0-9]{14}$",
                         }
-                ]
+                    ]
                 },
                 {
                     name: 'branch', label: 'Branch Name', placeholder: 'Enter Branch Name', type: 'text', value: DriverTable.branch, generatecontrol: true, disable: false,
@@ -290,20 +309,20 @@ export class DriverControls {
                 },
                 {
                     name: 'acctName', label: 'Account Name', placeholder: 'Enter Account Name', type: 'text', value: DriverTable.acctName, generatecontrol: true, disable: false,
-                    Validations: [ 
+                    Validations: [
                         {
-                        name: "pattern",
-                        message: "Please enter a Account Name of length 3 to 25 characters",
-                        pattern: '^[a-zA-Z ]{3,25}$',
-                    }
-                ]
+                            name: "pattern",
+                            message: "Please enter a Account Name of length 3 to 25 characters",
+                            pattern: '^[a-zA-Z ]{3,25}$',
+                        }
+                    ]
                 },
                 {
                     name: 'ifsc', label: 'IFSC Code', placeholder: 'Enter IFSC Code', type: 'text', value: DriverTable.ifsc, generatecontrol: true, disable: false,
                     Validations: [{
 
                         name: "pattern",
-                        pattern: "^[A-Za-z]{4}[0-9]{7}$",
+                        pattern: "^[A-Z]{4}[0-9]{7}$",
                         message: "Please enter a valid IFSC Code (4 letters followed by 7 digits)"
 
                     }]
@@ -320,7 +339,37 @@ export class DriverControls {
                     Validations: [],
                     generatecontrol: false,
                     disable: false
-                  },
+                },
+                {
+                    name: "driverId",
+                    label: "Driver Id",
+                    placeholder: "",
+                    type: "text",
+                    value: DriverTable.driverId,
+                    generatecontrol: false,
+                    disable: false,
+                    Validations: [],
+                },
+                {
+                    name: "entryBy",
+                    label: "Entry By",
+                    placeholder: "",
+                    type: "text",
+                    value: localStorage.getItem('Username'),
+                    generatecontrol: false,
+                    disable: false,
+                    Validations: [],
+                },
+                {
+                    name: "entryDate",
+                    label: "Entry Date",
+                    placeholder: "",
+                    type: "text",
+                    value: new Date(),
+                    generatecontrol: false,
+                    disable: false,
+                    Validations: [],
+                }
             ]
     }
     getFormControlsD() {

@@ -132,6 +132,10 @@ export class ClusterMasterAddComponent implements OnInit {
   save() {
     const pincodeDropdown = this.clusterTableForm.value.pincodeDropdown == "" ? [] : this.clusterTableForm.value.pincodeDropdown.map((item: any) => item.name);
     this.clusterTableForm.controls["pincode"].setValue(pincodeDropdown);
+
+    // Clear any errors in the form controls
+    Object.values(this.clusterTableForm.controls).forEach(control => control.setErrors(null));
+
     if (this.isUpdate) {
       let id = this.clusterTableForm.value.id;
       this.clusterTableForm.removeControl("id");

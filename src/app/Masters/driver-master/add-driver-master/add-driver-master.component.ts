@@ -447,8 +447,10 @@ export class AddDriverMasterComponent implements OnInit {
       if (this.isUpdate) {
         this.locData = LocationList.find((x) => x.name == this.DriverTable.driverLocation);
         this.DriverTableForm.controls.driverLocation.setValue(this.locData);
+
         this.pincodeData = this.pincodeDet.find((x) => x.name == this.DriverTable.pincode);
         this.DriverTableForm.controls.pincode.setValue(this.pincodeData);
+        
         this.vehicleData = vehicleDet.find((x) => x.name == this.DriverTable.vehicleNo);
         this.DriverTableForm.controls.vehicleNo.setValue(this.vehicleData);
       }

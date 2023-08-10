@@ -206,6 +206,16 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
+            {
+              "path": "Masters/PincodeLocation/PincodeLocationMapping",
+              "title": "Pincode to Location Mapping",
+              "moduleName": "Pincode to Location Mapping",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
           ]
         },
         {

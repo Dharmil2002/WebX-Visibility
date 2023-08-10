@@ -8,7 +8,6 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { utilityService } from 'src/app/Utility/utility.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { PincodeControl } from "src/assets/FormControls/pincodeMaster";
-import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
 import Swal from "sweetalert2";
 
 
@@ -40,6 +39,8 @@ export class AddPinCodeMasterComponent implements OnInit {
     city: any;
     cityRes: any;
     stateRes: any;
+    cityData: any;
+    stateData: any;
 
     ngOnInit(): void {
         this.getStateData();
@@ -48,16 +49,9 @@ export class AddPinCodeMasterComponent implements OnInit {
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: any, private route: Router, private fb: UntypedFormBuilder,
         private filter: FilterUtils, private service: utilityService, private masterService: MasterService) {
-        if (this.route.getCurrentNavigation()?.extras?.state != null) {
-            this.data = route.getCurrentNavigation().extras.state.data;
-            this.statename = this.data.stateName;
-            this.cityname = this.data.cityname
-            this.action = 'edit'
-            this.isUpdate = true;
-        } else {
-            this.action = "Add";
-        }
-        if (this.action === 'edit') {
+        if (this.route.getCurrentNavigation()?.extras?.state?.data != null) {
+            this.data = this.route.getCurrentNavigation().extras.state.data;
+            this.action = 'edit';
             this.isUpdate = true;
             this.pincodeTable = this.data;
             this.breadScrums = [
@@ -68,6 +62,9 @@ export class AddPinCodeMasterComponent implements OnInit {
                 },
             ];
         } else {
+            this.action = "Add";
+            this.isUpdate = false;
+            this.pincodeTable = new PincodeMaster({});
             this.breadScrums = [
                 {
                     title: "Pincode Master",
@@ -75,13 +72,13 @@ export class AddPinCodeMasterComponent implements OnInit {
                     active: "Add Pincode",
                 },
             ];
-            this.pincodeTable = new PincodeMaster({});
         }
+
         this.initializeFormControl();
+
     }
 
     initializeFormControl() {
-        //throw new Error("Method not implemented.");
         // Create PincodeFormControls instance to get form controls for different sections
         this.pincodeFormControls = new PincodeControl(this.pincodeTable, this.isUpdate);
         // Get form controls for Cluster Details section
@@ -97,7 +94,6 @@ export class AddPinCodeMasterComponent implements OnInit {
                 this.cityList = data.name;
                 this.cityStatus = data.additionalData.showNameAndValue;
             }
-
         });
         // Build the form group using formGroupBuilder function and the values of jsonControlArray
         this.pincodeTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -107,60 +103,96 @@ export class AddPinCodeMasterComponent implements OnInit {
         )
     }
 
-    getStateData() {
-        this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-            this.stateRes = res;
-            let tableArray = this.stateRes.stateList;
-            let state = [];
-            tableArray.forEach(element => {
-                let dropdownList = {
-                    name: element.stateDesc,
-                    value: element.stateId
+    dataExist() {
+        let req = {
+            companyCode: this.companyCode,
+            type: "masters",
+            collection: "pincode_detail"
+        };
+        this.masterService.masterPost('common/getall', req).subscribe({
+            next: (res: any) => {
+                // Check if the Pincode already exists in this.data
+                const pincodeExists = res.data.some((pincode) => pincode.pincode === this.pincodeTableForm.value.pincode
+                   );
+                if (pincodeExists) {
+                    // Show the popup indicating that the pincode already exists
+                    Swal.fire({
+                        title: 'Data exists! Please try with another',
+                        toast: true,
+                        icon: "error",
+                        showCloseButton: false,
+                        showCancelButton: false,
+                        showConfirmButton: true,
+                        confirmButtonText: "OK"
+                    });
+                    this.pincodeTableForm.controls["pincode"].reset();
+                    
                 }
-                state.push(dropdownList)
-            });
-            if (this.isUpdate) {
-                this.updateState = state.find((x) => x.name == this.data.state);
-                this.pincodeTableForm.controls.state.setValue(this.updateState);
+            },
+            error: (err: any) => {
+                // Handle error if required
+                console.error(err);
             }
-            this.filter.Filter(
-                this.jsonControlArray,
-                this.pincodeTableForm,
-                state,
-                this.stateList,
-                this.stateStatus
-            );
         });
     }
-    getCityList() {
-        this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-            this.cityRes = res;
-            let tableArray = this.cityRes.cityList;
-            let city = [];
-            tableArray.forEach(element => {
-                let dropdownList = {
-                    name: element.cityDesc,
-                    value: element.cityId
+
+    getStateData() {
+        let req = {
+            "companyCode": this.companyCode,
+            "type": "masters",
+            "collection": "state_detail"
+        };
+        this.masterService.masterPost('common/getall', req).subscribe({
+            next: (res: any) => {
+                const stateList = res.data.map(element => ({
+                    name: element.stateName,
+                    value: element.id
+                }));
+                if (this.isUpdate) {
+                    this.stateData = stateList.find((x) => x.name == this.data.state);
+                    this.pincodeTableForm.controls.state.setValue(this.stateData);
                 }
-                city.push(dropdownList)
-            });
-            if (this.isUpdate) {
-                this.updateCity = city.find((x) => x.name == this.data.city);
-                this.pincodeTableForm.controls.city.setValue(this.updateCity);
+                this.filter.Filter(
+                    this.jsonControlArray,
+                    this.pincodeTableForm,
+                    stateList,
+                    this.stateList,
+                    this.stateStatus
+                );
             }
-            this.filter.Filter(
-                this.jsonControlArray,
-                this.pincodeTableForm,
-                city,
-                this.cityList,
-                this.cityStatus
-            );
+        });
+    }
+
+    getCityList() {
+        let req = {
+            "companyCode": this.companyCode,
+            "type": "masters",
+            "collection": "city_detail"
+        };
+        this.masterService.masterPost('common/getall', req).subscribe({
+            next: (res: any) => {
+                const cityList = res.data.map(element => ({
+                    name: element.cityName,
+                    value: element.id
+                }));
+                if (this.isUpdate) {
+                    this.cityData = cityList.find((x) => x.name == this.data.city);
+                    this.pincodeTableForm.controls.city.setValue(this.cityData);
+                }
+                this.filter.Filter(
+                    this.jsonControlArray,
+                    this.pincodeTableForm,
+                    cityList,
+                    this.cityList,
+                    this.cityStatus
+                );
+            }
         });
     }
 
     cancel() {
         window.history.back();
-    }
+      }
     save() {
         this.pincodeTableForm.controls["state"].setValue(this.pincodeTableForm.value.state.name);
         this.pincodeTableForm.controls["city"].setValue(this.pincodeTableForm.value.city.name);
@@ -174,7 +206,6 @@ export class AddPinCodeMasterComponent implements OnInit {
             let id = this.pincodeTableForm.value.id;
             // Remove the "id" field from the form controls
             this.pincodeTableForm.removeControl("id");
-
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
@@ -197,8 +228,8 @@ export class AddPinCodeMasterComponent implements OnInit {
                 }
             });
         } else {
-            const randomNumber = getShortName(this.pincodeTableForm.value.area);
-            this.pincodeTableForm.controls["id"].setValue(randomNumber);
+           // const randomNumber = getShortName(this.pincodeTableForm.value.city);
+            this.pincodeTableForm.controls["id"].setValue(this.pincodeTableForm.value.pincode);
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
@@ -226,6 +257,7 @@ export class AddPinCodeMasterComponent implements OnInit {
         // console.log("fn handler called" , $event);
         let field = $event.field;                   // the actual formControl instance
         let functionName = $event.functionName;     // name of the function , we have to call
+
         // function of this name may not exists, hence try..catch 
         try {
             this[functionName]($event);

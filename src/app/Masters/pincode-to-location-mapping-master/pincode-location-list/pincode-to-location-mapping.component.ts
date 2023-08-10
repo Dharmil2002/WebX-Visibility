@@ -1,11 +1,13 @@
-import { Component, OnInit, EventEmitter, Input, Output } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import Swal from 'sweetalert2';
-import { utilityService } from 'src/app/Utility/utility.service';
-import { UntypedFormBuilder, Validators, FormGroup } from "@angular/forms";
+import { Router } from "@angular/router";
+import { forkJoin, map } from 'rxjs';
+import { UntypedFormBuilder } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { PincodeLocationControl } from "src/assets/FormControls/pincodeLocationMapping";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 
 @Component({
     selector: 'app-pincode-location-list',
@@ -14,22 +16,18 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 
 export class PincodeLocationMappingComponent implements OnInit {
     tableData: any = [];
-    tableLoad = true;
-    stateList: any;
-    stateStatus: any;
+    tableLoad = false;
+    areaList: any;
+    areaStatus: any;
     pincodeList: any;
     pincodeStatus: any;
     pinLocTableForm: any;
     jsonControlArray: any;
-    myForm: FormGroup;
     pinLocListFormControls: any;
     isUpdate: boolean;
-    updateState: any;
-    stateData: any;
-    stateId: any;
-    pincodeRes: any;
     data: [] | any;
-    csv: any[];
+    companyCode: any = parseInt(localStorage.getItem("companyCode"));
+
     // Action buttons configuration
     actionObject = {
         addRow: true,
@@ -44,13 +42,44 @@ export class PincodeLocationMappingComponent implements OnInit {
             active: "Pinocode to Location Mapping",
         },
     ];
-    tableDet: boolean;
-    filteredData: any;
+    pincodeDataList: any;
 
-    constructor(private filter: FilterUtils,
-        private masterService: MasterService, private fb: UntypedFormBuilder, private service: utilityService) {
+    constructor(public ObjSnackBarUtility: SnackBarUtilityService, private filter: FilterUtils, private route: Router,
+        private masterService: MasterService, private fb: UntypedFormBuilder) {
         this.loadTempData('');
     }
+
+    ngOnInit(): void {
+        this.intializeFormControl();
+        this.getData();
+    }
+
+    intializeFormControl() {
+        // Create PincodeFormControls instance to get form controls for different sections
+        this.pinLocListFormControls = new PincodeLocationControl(this.isUpdate);
+        // Get form controls for Cluster Details section
+        this.jsonControlArray = this.pinLocListFormControls.getPinLocFormControls();
+
+        this.jsonControlArray.forEach(data => {
+            switch (data.name) {
+                case 'area':
+                    // Set State-related variables
+                    this.areaList = data.name;
+                    this.areaStatus = data.additionalData.showNameAndValue;
+                    break;
+                case 'pincode':
+                    // Set Pincode category-related variables
+                    this.pincodeList = data.name;
+                    this.pincodeStatus = data.additionalData.showNameAndValue;
+                    break;
+                default:
+                    break;
+            }
+        });
+        // Build the form group using formGroupBuilder function and the values of jsonControlArray
+        this.pinLocTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    }
+
     // Displayed columns configuration
     displayedColumns1 = {
         srNo: {
@@ -63,11 +92,14 @@ export class PincodeLocationMappingComponent implements OnInit {
             key: "Dropdown",
             option: [],
             style: "",
+            functions: {
+                'onOptionSelect': "getAreaData" // Function to be called on change event
+            }
         },
-        area: {
+        city: {
             name: "Area",
-            key: "Dropdown",
-            option: [],
+            key: "inputString",
+            readonly: false,
             style: "",
         },
         action: {
@@ -90,66 +122,198 @@ export class PincodeLocationMappingComponent implements OnInit {
         const AddObj = {
             srNo: 0,
             pincode: [],
-            area: []
+            city: ""
         };
         this.tableData.splice(0, 0, AddObj);
     }
 
-    // Get all dropdown data
-    getAllMastersData() {
-        // Options for documentType dropdown
-        this.displayedColumns1.pincode.option = [
-            {
-                "name": "395001",
-                "value": "395001"
-            },
-            {
-                "name": "121344",
-                "value": "121344"
-            },
-            {
-                "name": "226001",
-                "value": "3"
-            },
-            {
-                "name": "110033",
-                "value": "4"
-            },
-            {
-                "name": "394110",
-                "value": "5"
-            }
-        ];
-        // Options for area dropdown
-        this.displayedColumns1.area.option = [
-            {
-                "name": "Mumbai",
-                "value": "Mumbai"
-            },
-            {
-                "name": "Dadar",
-                "value": 2
-            },
-            {
-                "name": "Lucknow",
-                "value": 3
-            },
-            {
-                "name": "Delhi",
-                "value": 4
-            },
-            {
-                "name": "MANGROL",
-                "value": 5
-            }
-        ];
+    getData() {
+        const mappingReq = {
+            "companyCode": this.companyCode,
+            "type": "masters",
+            "collection": "pincodeLocation_details"
+        };
+        const locationReq = {
+            "companyCode": this.companyCode,
+            "type": "masters",
+            "collection": "location_detail"
+        };
+        const pincodeReq = {
+            "companyCode": this.companyCode,
+            "type": "masters",
+            "collection": "pincode_detail"
+        };
+        // Use forkJoin to make parallel requests and get all data at once
+        forkJoin([
+            this.masterService.masterPost('common/getall', mappingReq),
+            this.masterService.masterPost('common/getall', locationReq),
+            this.masterService.masterPost('common/getall', pincodeReq),
+        ]).pipe(
+            map(([mappingRes, locationRes, pincodeRes]) => {
+                // Combine all the data into a single object
+                return {
+                    mappingData: mappingRes?.data,
+                    locationData: locationRes?.data,
+                    pincodeData: pincodeRes?.data,
+                };
+            })
+        ).subscribe((mergedData) => {
+            this.data = mergedData.mappingData.filter(item => item.location == this.pinLocTableForm.value.area.name);
+            const transformedData = this.transformArrayProperties(this.data);
+            this.loadTempData(transformedData);
+
+            const locationList = mergedData.locationData;
+            const locations = this.filterData(locationList, 'locName', 'locCode');
+            this.filter.Filter(
+                this.jsonControlArray,
+                this.pinLocTableForm,
+                locations,
+                this.areaList,
+                this.areaStatus
+            );
+
+            this.pincodeDataList = mergedData.pincodeData;
+            let pincode = this.pincodeDataList
+                .filter(element => element.pincode != null && element.pincode !== '')
+                .map((element: any) => ({
+                    name: parseInt(element.pincode),
+                    value: parseInt(element.pincode)
+                }));
+            this.displayedColumns1.pincode.option = pincode;
+            this.filter.Filter(
+                this.jsonControlArray,
+                this.pinLocTableForm,
+                pincode,
+                this.pincodeList,
+                this.pincodeStatus
+            );
+            this.tableLoad = true;
+        });
     }
 
+    getAreaData($event) {
+        var selectedPincode = $event.row.pincode;
+        const mappedData = this.pincodeDataList.map((item: any) => ({
+            area: item.area,
+            pincode: item.pincode
+        }));
+        // Find the index of the item with the selected pincode in the tableData array
+        const indexToUpdate = this.tableData.findIndex((item) => item.pincode == selectedPincode);
+
+        if (indexToUpdate !== -1) {
+            // Find matching areas based on the selected pincode
+            const matchingAreas = mappedData.filter((item) => item.pincode == selectedPincode);
+            // Extract only the "area" property from each object in the array
+            const areas = matchingAreas.map((item) => item.area);
+            // Update the "area" property of the specific index in the tableData array
+            this.tableData[indexToUpdate].city = areas;
+
+            this.tableLoad = true;
+        }
+    }
+
+    transformArrayProperties(data) {
+        const transformedData = [];
+        if (data[0] && data[0].pincodeList && data[0].city) {
+            const len = Math.max(
+                data[0].pincodeList.length,
+                data[0].city.length
+            );
+            for (let i = 0; i < len; i++) {
+                transformedData.push({
+                    pincode: data[0].pincodeList[i],
+                    city: data[0].city[i],
+                });
+            }
+        }
+        return transformedData;
+    }
+
+    filterData(data, nameKey, valueKey) {
+        return data
+            .filter(element => element[nameKey] != null && element[nameKey] !== '')
+            .map(element => ({
+                name: String(element[nameKey]),
+                value: String(element[valueKey])
+            }));
+    }
+
+    mapData(data, property1, property2) {
+        return data.map((item: any) => ({
+            [property1]: item[property1],
+            [property2]: item[property2]?.name || item[property2]
+        }));
+    }
+
+
+    saveData() {
+        const pincodeSet = new Set();
+        let hasDuplicate = false; // Flag to track duplicates
+
+        for (const item of this.tableData) {
+            const parsedPincode = parseInt(item.pincode);
+            if (pincodeSet.has(parsedPincode)) {
+                this.SwalMessage('Duplicate entry found');
+                hasDuplicate = true;
+                break; // Exit the loop as we found a duplicate
+            }
+            pincodeSet.add(parsedPincode);
+        }
+
+        if (!hasDuplicate) {
+            const areaName = this.pinLocTableForm.value.area?.name || '';
+            if (!areaName) {
+                this.SwalMessage('Select location'); // Display Swal message for empty location
+            } else {
+                const transformedData = {
+                    location: areaName,
+                    id: areaName,
+                    pincode: this.pinLocTableForm.value.pincode?.value || '',
+                    pincodeList: Array.from(pincodeSet),
+                    city: this.tableData.flatMap((item) => item.city), // Use flatMap to flatten the nested arrays           
+                    entryBy: localStorage.getItem('Username'),
+                    entryDate: new Date().toISOString()
+                };
+
+                let req = {
+                    companyCode: parseInt(localStorage.getItem("companyCode")),
+                    type: "masters",
+                    collection: "pincodeLocation_details",
+                    data: transformedData
+                };
+                this.masterService.masterPost('common/create', req).subscribe({
+                    next: (res: any) => {
+                        if (res) {
+                            // Display success message
+                            Swal.fire({
+                                icon: "success",
+                                title: "Successful",
+                                text: res.message,
+                                showConfirmButton: true,
+                            });
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    SwalMessage(message) {
+        Swal.fire({
+            title: message,
+            toast: true,
+            icon: "error",
+            showCloseButton: true,
+            showCancelButton: false,
+            showConfirmButton: false,
+            confirmButtonText: "Yes"
+        });
+    }
     // Delete a row from the table
     async delete(event) {
         const index = event.index;
         const row = event.element;
-
         const swalWithBootstrapButtons = await Swal.mixin({
             customClass: {
                 confirmButton: "btn btn-success msr-2",
@@ -182,7 +346,6 @@ export class PincodeLocationMappingComponent implements OnInit {
                 allowOutsideClick: () => !Swal.isLoading(),
             })
             .then((result) => {
-
                 if (result.isConfirmed) {
                     this.tableData.splice(index, 1);
                     this.tableData = this.tableData;
@@ -200,106 +363,8 @@ export class PincodeLocationMappingComponent implements OnInit {
                     event.callback(false);
                 }
             });
-
         return true;
     }
-    ngOnInit(): void {
-        this.intializeFormControl()
-        this.getAllMastersData();
-        this.getStateData();
-        this.getPincodeData();
-    }
-
-    intializeFormControl() {
-        // Create PincodeFormControls instance to get form controls for different sections
-        this.pinLocListFormControls = new PincodeLocationControl(this.isUpdate);
-        // Get form controls for Cluster Details section
-        this.jsonControlArray = this.pinLocListFormControls.getPinLocFormControls();
-        this.jsonControlArray.forEach(data => {
-            if (data.name === 'state') {
-                // Set State-related variables
-                this.stateList = data.name;
-                this.stateStatus = data.additionalData.showNameAndValue;
-            }
-            if (data.name === 'pincode') {
-                // Set Pincode category-related variables
-                this.pincodeList = data.name;
-                this.pincodeStatus = data.additionalData.showNameAndValue;
-            }
-        });
-        // Build the form group using formGroupBuilder function and the values of jsonControlArray
-        this.pinLocTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    }
-    getStateData() {
-        this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-            this.stateData = res;
-            let tableArray = this.stateData.stateList;
-            let state = [];
-            tableArray.forEach(element => {
-                let dropdownList = {
-                    name: element.stateDesc,
-                    value: element.stateId
-                }
-                state.push(dropdownList)
-            });
-            this.filter.Filter(
-                this.jsonControlArray,
-                this.pinLocTableForm,
-                state,
-                this.stateList,
-                this.stateStatus
-            );
-        });
-    }
-    getPincodeData() {
-        this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-            this.pincodeRes = res;
-            let tableArray = this.pincodeRes.pincodeList;
-            let pincode = [];
-            tableArray.forEach(element => {
-                let dropdownList = {
-                    name: element.pincodeDesc,
-                    value: element.pincodeId
-                }
-                pincode.push(dropdownList)
-            });
-            this.filter.Filter(
-                this.jsonControlArray,
-                this.pinLocTableForm,
-                pincode,
-                this.pincodeList,
-                this.pincodeStatus
-            );
-        });
-    }
-
-    getList() {
-        const formValue = this.pinLocTableForm.value;
-        // Fetch data for Pincode
-        this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-            this.data = res;
-            const areaFilter = this.pinLocTableForm.value.state.name;
-            const pincodeFilter = this.pinLocTableForm.value.pincode.name;
-            this.filteredData = this.data['pincodeToLoc'].filter((item: any) => {
-                const areaMatch = item['area'] === areaFilter;
-                const pincodeMatch = item['pincode'] === pincodeFilter;
-                //the filtered data includes the items matching both area and pincode when they are both selected
-                if (areaFilter && pincodeFilter) {
-                    return areaMatch && pincodeMatch;
-                   // but also includes the items matching only area or only pincode when only one of them is selected
-                } else if (areaFilter) {
-                    return areaMatch;
-                } else if (pincodeFilter) {
-                    return pincodeMatch;
-                }
-                return false;
-            });
-            this.tableDet = true;
-            this.loadTempData(this.filteredData)
-        }
-        );
-    }
-
     // Handle function calls
     functionCallHandler($event) {
         let field = $event.field;                   // the actual formControl instance
@@ -309,30 +374,6 @@ export class PincodeLocationMappingComponent implements OnInit {
             this[functionName]($event);
         } catch (error) {
             console.log("failed");
-        }
-    }
-
-    saveData() {
-        const pincodeData = this.tableData[0].pincode;
-        const areaData = this.tableData[0].area;
-        if (pincodeData.length === 0 || areaData.length === 0) {
-            Swal.fire({
-                icon: "warning",
-                title: "Incomplete Data",
-                text: "Please fill in all the required fields.",
-                showConfirmButton: true,
-            });
-        } else {
-            this.service.exportData(this.tableData);
-            Swal.fire({
-                icon: "success",
-                title: "Successful",
-                text: "Data Downloaded successfully!",
-                showConfirmButton: true,
-            });
-            if (this.addItem) {
-                window.location.reload();
-            }
         }
     }
 }

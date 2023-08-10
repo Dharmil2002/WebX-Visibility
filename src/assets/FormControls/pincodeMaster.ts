@@ -71,16 +71,14 @@ export class PincodeControl {
                         name: "maxlength",
                         message: "Pin code should be of 6 digit number",
                         maxLength: '6',
-                    },
-                    {
-                        name: "required",
-                        message: "PinCode is required"
                     }],
-                functions: {
-                    onChange: 'GetPincodeExist',
+                additionalData: {
+                    showNameAndValue: false
+                }, functions: {
+                    onChange: 'dataExist',
                 },
                 generatecontrol: true,
-                disable: false
+                disable: isUpdate ? true : false
             },
             {
                 name: 'area',
@@ -96,15 +94,15 @@ export class PincodeControl {
                 label: 'Pincode Category',
                 placeholder: 'Search Pincode Category',
                 type: 'Staticdropdown',
-                value:  [
+                value: [
                     { value: "Serviceable - With ODA", name: 'Serviceable - With ODA' },
                     { value: "Serviceable - Non ODA", name: 'Serviceable - Non ODA' }
-                  ],
-                  Validations: [
+                ],
+                Validations: [
                     {
-                      name: "required"
+                        name: "required"
                     }
-                   ],
+                ],
                 generatecontrol: true, disable: false
             },
             {
@@ -112,7 +110,7 @@ export class PincodeControl {
                 label: 'Active Flag',
                 placeholder: 'Active Flag',
                 type: 'toggle',
-                value:PincodeTable.isActive,
+                value: PincodeTable.isActive,
                 Validations: [],
                 generatecontrol: true, disable: false
             },
@@ -123,7 +121,7 @@ export class PincodeControl {
                 type: 'toggle',
                 value: PincodeTable.serviceable,
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: true
             },
             {
                 name: 'entryBy',
@@ -144,6 +142,19 @@ export class PincodeControl {
                 generatecontrol: false, disable: false
             },
             {
+                name: 'entryDate',
+                label: 'Entry Date',
+                placeholder: 'Select Entry Date',
+                type: 'date',
+                value: new Date(), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: true
+            },
+            {
                 name: 'companyCode',
                 label: 'Company Code',
                 placeholder: 'Company Code',
@@ -153,17 +164,17 @@ export class PincodeControl {
                 generatecontrol: false, disable: false
             },
             {
-              name: 'id',
-              label: '',
-              placeholder: '',
-              type: 'text',
-              value: PincodeTable.id,
-              filterOptions: '',
-              autocomplete: '',
-              displaywith: '',
-              Validations: [],
-              generatecontrol: false,
-              disable: false
+                name: 'id',
+                label: '',
+                placeholder: '',
+                type: 'text',
+                value: PincodeTable.id,
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
             },
         ]
     }

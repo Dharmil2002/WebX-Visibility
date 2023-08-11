@@ -3,7 +3,6 @@ import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { HttpClient } from "@angular/common/http";
-import { FilterUtils } from "src/app/Utility/Form Utilities/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { loadingControl } from "src/assets/FormControls/loadingSheet";
 import { LodingSheetGenerateSuccessComponent } from "../../loding-sheet-generate-success/loding-sheet-generate-success.component";
@@ -19,7 +18,7 @@ import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunct
 import { getVehicleDetailFromApi } from "../../create-loading-sheet/loadingSheetCommon";
 import { calculateBalanceAmount, calculateTotal, calculateTotalAdvances, getDriverDetail, getLoadingSheetDetail, updateTracking } from "./depart-common";
 import { formatDate } from "src/app/Utility/date/date-utils";
-import { constants } from "http2";
+
 
 @Component({
   selector: "app-depart-vehicle",
@@ -104,7 +103,7 @@ export class DepartVehicleComponent implements OnInit {
   setVehicleType: any[];
   lsDetails: any;
   vehicleDetail: any;
-  listDocket=[];
+  listDocket = [];
   next: string;
   // DepartVehicleControls: DepartVehicleControl;
   //#endregion
@@ -285,6 +284,7 @@ export class DepartVehicleComponent implements OnInit {
     });
   }
   getShipingDetails() {
+
     const reqbody = {
       companyCode: this.companyCode,
       type: "operation",
@@ -293,12 +293,10 @@ export class DepartVehicleComponent implements OnInit {
     this._operationService.operationPost("common/getall", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
-             
           // Filter menifestDetails based on mfNo and unloading=0
           const filteredMenifestDetails = res.data.filter((manifest) => {
             const matchedShipment = this.shipmentData.find((item) => item.mfNo === manifest.mfNo);
-               this.listDocket.push(matchedShipment.docketNumber);
-            // Check if there's a matching shipment and unloading is 0
+            matchedShipment && this.listDocket.push(matchedShipment.docketNumber);
             return matchedShipment && matchedShipment.unloading === 0 && manifest.tripId === this.tripData.TripID
           });
           let menifestList: any = [];
@@ -409,10 +407,10 @@ export class DepartVehicleComponent implements OnInit {
     delete mergedData.vehicleTypecontrolHandler;
     mergedData['tripId'] = this.tripData.TripID;
     mergedData['id'] = this.tripData.TripID;
-    mergedData['lsno'] = this.lsDetails?.lsno||'';
-    mergedData['mfNo'] = this.lsDetails?.mfNo||'';
+    mergedData['lsno'] = this.lsDetails?.lsno || '';
+    mergedData['mfNo'] = this.lsDetails?.mfNo || '';
     this.addDepartData(mergedData);
-     this.docketStatus();
+    
   }
 
 
@@ -435,7 +433,7 @@ export class DepartVehicleComponent implements OnInit {
   }
   updateTrip() {
     const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"), this.orgBranch);
-    this.next=next;
+    this.next = next;
     Swal.fire({
       icon: "info",
       title: "Trip Departure",
@@ -459,13 +457,8 @@ export class DepartVehicleComponent implements OnInit {
     this._operationService.operationPut("common/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: `Vehicle depart Successfully`,//
-            showConfirmButton: true,
-          })
-          this.goBack(3);
+       
+          this.docketStatus();
         }
       }
     })
@@ -514,44 +507,44 @@ export class DepartVehicleComponent implements OnInit {
       this._operationService
     );
     const lsDetail = loadingSheetDetail.length > 1
-    ? loadingSheetDetail[loadingSheetDetail.length - 1]
-    : (loadingSheetDetail[0] || null);
+      ? loadingSheetDetail[loadingSheetDetail.length - 1]
+      : (loadingSheetDetail[0] || null);
     // Update departure vehicle form controls with driver details
-    if(driverDetail[0]){
-    this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
-    this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
-    this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");
-    let convertedDate = driverDetail[0].valdityDt || '';
-    convertedDate = convertedDate ? formatDate(convertedDate, 'dd/MM/yyyy') : '';
-    this.departvehicleTableForm.controls['Expiry'].setValue(convertedDate);
+    if (driverDetail[0]) {
+      this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
+      this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
+      this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");
+      let convertedDate = driverDetail[0].valdityDt || '';
+      convertedDate = convertedDate ? formatDate(convertedDate, 'dd/MM/yyyy') : '';
+      this.departvehicleTableForm.controls['Expiry'].setValue(convertedDate);
 
-  }
+    }
     // Update loading sheet table form controls with loading sheet details
-    if(lsDetail){
-    this.loadingSheetTableForm.controls["Capacity"].setValue(
-      lsDetail?.capacity || 0
-    );
-    this.loadingSheetTableForm.controls["CapacityVolumeCFT"].setValue(
-      lsDetail?.capacityVolumeCFT || 0
-    );
-    this.loadingSheetTableForm.controls["LoadaddedKg"].setValue(
-      lsDetail?.loadAddedKg || 0
-    );
-    this.loadingSheetTableForm.controls["LoadedKg"].setValue(
-      lsDetail?.loadedKg || 0
-    );
-    this.loadingSheetTableForm.controls["LoadedvolumeCFT"].setValue(
-      lsDetail?.loadedVolumeCft || 0
-    );
-    this.loadingSheetTableForm.controls["VolumeaddedCFT"].setValue(
-      lsDetail?.volumeAddedCFT || 0
-    );
-    this.loadingSheetTableForm.controls["VolumeUtilization"].setValue(
-      lsDetail?.volumeUtilization || 0
-    );
-    this.loadingSheetTableForm.controls["WeightUtilization"].setValue(
-      lsDetail?.WeightUtilization || 0
-    );
+    if (lsDetail) {
+      this.loadingSheetTableForm.controls["Capacity"].setValue(
+        lsDetail?.capacity || 0
+      );
+      this.loadingSheetTableForm.controls["CapacityVolumeCFT"].setValue(
+        lsDetail?.capacityVolumeCFT || 0
+      );
+      this.loadingSheetTableForm.controls["LoadaddedKg"].setValue(
+        lsDetail?.loadAddedKg || 0
+      );
+      this.loadingSheetTableForm.controls["LoadedKg"].setValue(
+        lsDetail?.loadedKg || 0
+      );
+      this.loadingSheetTableForm.controls["LoadedvolumeCFT"].setValue(
+        lsDetail?.loadedVolumeCft || 0
+      );
+      this.loadingSheetTableForm.controls["VolumeaddedCFT"].setValue(
+        lsDetail?.volumeAddedCFT || 0
+      );
+      this.loadingSheetTableForm.controls["VolumeUtilization"].setValue(
+        lsDetail?.volumeUtilization || 0
+      );
+      this.loadingSheetTableForm.controls["WeightUtilization"].setValue(
+        lsDetail?.WeightUtilization || 0
+      );
     }
     // Rest of your code that depends on loadingSheetDetail
   }
@@ -606,15 +599,40 @@ export class DepartVehicleComponent implements OnInit {
           }
         });
 
-      
+
       }
     }
 
 
   }
-  docketStatus() {
-   this.listDocket.forEach(async element => {
-    await updateTracking(this.companyCode,this._operationService,element,this.next)
-   });
-  }
+  async docketStatus() {
+
+    for (const element of this.listDocket) {
+        try {
+            await updateTracking(this.companyCode, this._operationService, element, this.next);
+           
+        } catch (error) {
+            console.error('Error updating docket status:', error);
+        }
+    }
+    Swal.fire({
+      icon: "success",
+      title: "Successful",
+      text: `Vehicle depart Successfully`,//
+      showConfirmButton: true,
+    })
+      this.goBack(3);
+}
+
+  // async docketStatus() {
+ 
+  //    // Create an array of promises for updateTracking calls
+  //    const updatePromises =  this.listDocket.map(async element => {
+  //     await updateTracking(this.companyCode, this._operationService, element,this.next);
+  // });
+
+  // // Wait for all updateTracking promises to resolve
+  // await Promise.all(updatePromises);
+
+  // }
 }

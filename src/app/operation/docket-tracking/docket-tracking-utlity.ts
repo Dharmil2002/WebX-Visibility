@@ -11,14 +11,14 @@ export async function getDocketFromApiDetail(
     const reqBody = {
         companyCode: companyCode,
         type: "operation",
-        collection: "docket_tracking",
+        collection: "cnote_trackingv3",
         query: {
             dktNo:docketNo
         }
     };
     try {
         const res = await operationService.operationPost("common/getOne", reqBody).toPromise();
-        return res.data.db.data.docket_tracking;
+        return res.data.db.data.cnote_trackingv3;
     } catch (error) {
         console.error('Error occurred during the API call:', error);
     }

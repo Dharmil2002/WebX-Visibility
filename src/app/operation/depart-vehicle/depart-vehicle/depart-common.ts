@@ -101,30 +101,105 @@ export function calculateBalanceAmount(form: FormGroup, totalTripAmt): void {
     form.controls['BalanceAmt'].setValue(balanceAmount.toFixed(2));
 }
 
-export async function updateTracking(companyCode, operationService,dktNo,next) {
-    const dockData = {
-      status:"On Transit",
-      upBy:localStorage.getItem("Username"),
-      upDt:new Date().toISOString(),
-      evnCd:""
-    }
-  
-    const req = {
-      companyCode: companyCode,
-      type: "operation",
-      collection: "docket_tracking",
-      id: dktNo,
-      updates: {
-        ...dockData
-      }
-    };
-  
+// export async function updateTracking(companyCode, operationService,dktNo,next) {
+//     const dockData = {
+//       status:"On Transit",
+//       upBy:localStorage.getItem("Username"),
+//       upDt:new Date().toUTCString(),
+//       evnCd:""
+//     }
+
+//     const req = {
+//       companyCode: companyCode,
+//       type: "operation",
+//       collection: "cnote_trackingv3",
+//       id: dktNo,
+//       updates: {
+//         ...dockData
+//       }
+//     };
+
+//     try {
+//       const res: any = await operationService.operationPut("common/update", req).toPromise();
+//        return res;
+//     } catch (error) {
+//       console.error("Error update a docket Status:", error);
+//       return null;
+//     }
+//   }
+
+/**
+* Updates tracking information for a docket.
+* @param {string} companyCode - The company code.
+* @param {any} operationService - The operation service object for API calls.
+* @param {Object} data - The data containing docket information.
+* @returns {Promise<any>} - A Promise resolving to the API response.
+*/
+export async function updateTracking(companyCode, operationService, dktNo, next) {
+    debugger
     try {
-      const res: any = await operationService.operationPut("common/update", req).toPromise();
-       return res;
+        const randomNumber = "TR/" + localStorage.getItem('Branch') + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+        const docketDetails = await getDocketFromApiDetail(companyCode, operationService, dktNo);
+        const lastArray = docketDetails.length - 1;
+        const dockData = {
+            tripId: docketDetails[lastArray]?.tripId || '',
+            id: randomNumber,
+            dktNo: docketDetails[lastArray]?.dktNo || '',
+            vehNo: docketDetails[lastArray]?.vehNo || '',
+            route: docketDetails[lastArray]?.route || '',
+            event: "Departed From"+" "+localStorage.getItem('Branch'),
+            orgn: docketDetails[lastArray][lastArray]?.orgn || '',
+            loc: localStorage.getItem('Branch') || '',
+            dest: docketDetails[lastArray][lastArray]?.dest || '',
+            lsno: docketDetails[lastArray]?.lsno || '',
+            mfno: docketDetails[lastArray]?.mfno || '',
+            dlSt: '',
+            dlTm: '',
+            evnCd: '',
+            upBy: localStorage.getItem('Username') || '',
+            upDt: new Date().toUTCString(),
+        };
+
+        const req = {
+            companyCode: companyCode,
+            type: 'operation',
+            collection: 'cnote_trackingv3',
+            data: dockData
+        };
+
+        const res = await operationService.operationPost('common/create', req).toPromise();
+        return res;
     } catch (error) {
-      console.error("Error update a docket Status:", error);
-      return null;
+        console.error('Error updating docket status:', error);
+        return null;
     }
-  }
-  
+}
+
+/**
+ * Retrieves loading sheet details for a specific docket.
+ * @param {string} companyCode - The company code.
+ * @param {any} operationService - The operation service object for API calls.
+ * @param {string} docketNo - The docket number.
+ * @returns {Promise<any>} - A Promise resolving to the docket details.
+ */
+export async function getDocketFromApiDetail(companyCode, operationService, docketNo) {
+    const reqBody = {
+        companyCode: companyCode,
+        type: 'operation',
+        collection: 'cnote_trackingv3',
+        query: {
+            dktNo: docketNo,
+        },
+    };
+
+    try {
+        const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
+        return res.data.db.data.cnote_trackingv3;
+    } catch (error) {
+        console.error('Error retrieving docket details:', error);
+        throw error; // Rethrow the error for higher-level error handling if needed.
+    }
+}
+
+
+

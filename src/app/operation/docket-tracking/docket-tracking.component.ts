@@ -6,6 +6,7 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { DocketTrackingControl } from 'src/assets/FormControls/docket-tracking';
 import { getDocketFromApiDetail } from './docket-tracking-utlity';
 import Swal from 'sweetalert2';
+import { formatDate } from 'src/app/Utility/date/date-utils';
 
 @Component({
   selector: 'app-docket-tracking',
@@ -35,22 +36,16 @@ export class DocketTrackingComponent implements OnInit {
   companyCode = parseInt(localStorage.getItem("companyCode"));
   userName = localStorage.getItem("Username");
   columnHeader = {
-    dktNo: "DocketNo",
-    vehNo:"VehicleNo",
-    status: "Status",
-    tripId: "TripID",
-    lsno: "LsNo",
-    mfno: "MfNo",
-    loc:"Location"
+    upDt:"Date",
+    id: "Transaction Number",
+    loc: "Location",
+    event: "Event",
   };
   headerForCsv = {
-    dktNo: "DocketNo",
-    vehNo:"VehicleNo",
-    status: "Status",
-    tripId: "TripID",
-    lsno: "LsNo",
-    mfno: "MfNo",
-    repLoc:"Reporting Location"
+    upDt:"Date",
+    id: "Transaction Number",
+    loc: "Location",
+    event: "Event",
   };
   IscheckBoxRequired: boolean;
   menuItemflag: boolean = true;
@@ -108,9 +103,12 @@ export class DocketTrackingComponent implements OnInit {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const docketList = await getDocketFromApiDetail(this.companyCode, this.docketNo, this.operationService);
-
+    const tableDetail=docketList.map((x)=>{if(x.upDt){x.upDt= formatDate(x.upDt,'dd/MM/yyyy HH:mm') }return x})
+    const sortedTableDetail = tableDetail.sort((a, b) => {
+      return b.upDt.localeCompare(a.upDt); // Sorting by ID in descending lexicographical order
+    });
     if (docketList.length > 0) {
-        this.tableData = docketList;
+        this.tableData = sortedTableDetail;
         this.tableload = false;
         this.load = false;
     } else {

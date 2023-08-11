@@ -66,11 +66,11 @@ export function calculateInvoiceTotalCommon(tableData, contractForm) {
 
 export async function addTracking(companyCode, operationService, data) {
   const dockData = {
-    id:data?.docketNumber||'',
+    id:data?.docketNumber,
     dktNo:data?.docketNumber||'',
     vehNo:"",
     route:"",
-    status:"Available for LS",
+    event:"Booked At"+" "+localStorage.getItem("Branch"),
     orgn:data?.orgLoc||'',
     loc:localStorage.getItem("Branch"),
     dest:data.destination.split(":")[1].trim(),
@@ -80,13 +80,13 @@ export async function addTracking(companyCode, operationService, data) {
 	  dlTm:"",
     evnCd:"",
     upBy:localStorage.getItem("Username"),
-    upDt:new Date().toISOString()
+    upDt:new Date().toUTCString()
   }
 
   const req = {
     companyCode: companyCode,
     type: "operation",
-    collection: "docket_tracking",
+    collection: "cnote_trackingv3",
     data:dockData
   };
 

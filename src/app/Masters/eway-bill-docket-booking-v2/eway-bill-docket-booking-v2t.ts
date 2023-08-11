@@ -76,6 +76,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     INVDT: {
       name: "Invoice Date",
       key: "date",
+      additionalData: {
+        minDate: new Date(),
+      },
       style: "",
     },
     LENGTH: {
@@ -275,7 +278,14 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   async getCity() {
     try {
       const cityDetail = await getCity(this.companyCode, this.masterService);
-
+      if (this.quickDocket) {
+        this.tabForm.controls["fromCity"].setValue(
+          cityDetail.find((x) => x.name === this.DocketDetails[0]?.fromCity || "")
+        );
+        this.tabForm.controls["toCity"].setValue(
+          cityDetail.find((x) => x.name === this.DocketDetails[0]?.toCity || "")
+        );
+      }
       if (cityDetail) {
         if (cityDetail) {
           this.filter.Filter(
@@ -309,14 +319,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             this.consigneeCity,
             this.consigneeNameStatus
           ); // Filter the consignee control array based on consigneeCity details
-          if (this.quickDocket) {
-            this.tabForm.controls["fromCity"].setValue(
-              cityDetail.find((x) => x.name === this.DocketDetails[0]?.fromCity || "")
-            );
-            this.tabForm.controls["toCity"].setValue(
-              cityDetail.find((x) => x.name === this.DocketDetails[0]?.toCity || "")
-            );
-          }
+         
         }
       }
     } catch (error) {

@@ -73,7 +73,7 @@ export class LodingSheetGenerateSuccessComponent implements OnInit {
     this.csv=this.data;
     Swal.fire({
       icon: "success",
-      title: "Successful",
+      title: "Successfull",
       text: `Loading Sheet generated Successfully`,//
       showConfirmButton: true,
     })

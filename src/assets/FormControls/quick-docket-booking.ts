@@ -35,6 +35,9 @@ export class QuickBookingControls {
             message: "C Note Date is required",
           },
         ],
+        additionalData: {
+          minDate: new Date(),
+        },
       },
       {
         name: "payType",

@@ -8,7 +8,7 @@ import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival
 import Swal from 'sweetalert2';
 import { autoBindData, filterShipments, kpiData } from '../shipment';
 import { vehicleStatusUpdate } from './loadingSheetshipment';
-import { groupShipmentsByLeg, updateTracking } from './shipmentsUtils';
+import { groupShipmentsByLeg } from './shipmentsUtils';
 import { handlePackageUpdate } from './packageUtils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
@@ -288,33 +288,43 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
 
-  CompleteScan() {
-
+  async CompleteScan() {
     let packageChecked = false;
     let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
+
     if (exists) {
       packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
-    locationWiseData.forEach(element => {
-      this.UpdateDocketDetail(element.Shipment);
-    });
-    if (packageChecked) {
-      this.updateTripStatus()
 
-    }
-    else {
+    // Create an array of promises for UpdateDocketDetail calls
+    const updatePromises = locationWiseData.map(element => {
+      return this.UpdateDocketDetail(element.Shipment);
+    });
+
+    // Wait for all UpdateDocketDetail promises to resolve
+    await Promise.all(updatePromises);
+
+    if (packageChecked) {
+      this.updateTripStatus();
+    } else {
       Swal.fire({
         icon: "error",
         title: "Unload Package",
-        text: `Please Unload All  Your Package`,
+        text: `Please Unload All Your Package`,
         showConfirmButton: true,
-      })
+      });
     }
-
   }
+
   async UpdateDocketDetail(dkt) {
-    await updateTracking(this.companyCode,this._operation,dkt)
+    // if(dkt){
+    // await updateTracking(this.companyCode, this._operation, dkt);
+    // }
+    // const lsDetail = await loadingSheetDetails(this.companyCode, this._operation, this.arrivalData?.TripID);
+    // lsDetail.forEach(async element => {
+    //   await updateLoadingSheet(this.companyCode, this._operation, element.lsno, element.loadAddedKg, element.loadedVolumeCft)
+    // });
     const reqbody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -322,17 +332,22 @@ export class UpdateLoadingSheetComponent implements OnInit {
       "id": dkt,
       "updates": {
         "unloading": 1,
-        "unloadloc":this.currentBranch
-
+        "unloadloc": this.currentBranch
       }
-    }
-    this._operation.operationPut("common/update", reqbody).subscribe({
-      next: (res: any) => {
-      }
-    })
+    };
 
-
+    return new Promise((resolve, reject) => {
+      this._operation.operationPut("common/update", reqbody).subscribe({
+        next: (res: any) => {
+          resolve(res);
+        },
+        error: (err: any) => {
+          reject(err);
+        }
+      });
+    });
   }
+
   Close(): void {
     this.dialogRef.close()
     this.goBack(2)
@@ -347,10 +362,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
       tripDetails = {
         orgLoc: this.currentBranch,
         nextUpComingLoc: next,
-        status:"Update Trip" 
+        status: "Update Trip"
       }
-    
-      const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation,false);
+
+      const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation, false);
     }
     else {
       tripDetails = {
@@ -360,11 +375,11 @@ export class UpdateLoadingSheetComponent implements OnInit {
       }
       try {
         // Call the vehicleStatusUpdate function here
-        const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation,true);
+        const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation, true);
         Swal.fire({
           icon: "info",
           title: "Trip is close",
-          text: "Trip is close at"+ this.currentBranch,
+          text: "Trip is close at" + this.currentBranch,
           showConfirmButton: true,
         });
         // Handle the result if needed
@@ -424,7 +439,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
             showConfirmButton: true,
           })
           this.dialogRef.close(this.loadingSheetTableForm.value)
-          this.goBack(1)
+          this.goBack(2)
         }
       }
     })

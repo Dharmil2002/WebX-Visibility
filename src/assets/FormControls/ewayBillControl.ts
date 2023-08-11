@@ -44,6 +44,9 @@ export class EwayBillControls {
             message: "C Note Date is required",
           },
         ],
+        additionalData: {
+          minDate: new Date(),
+        }
       },
       {
         name: "billingParty",

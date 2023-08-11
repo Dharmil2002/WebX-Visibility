@@ -313,37 +313,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
       });
   }
-  // Function to autofill vehicle type data
-  vehicleTypeDataAutofill() {
-    // Check if tripID is not already set
 
-    let loadingSheetDetails = this.loadingSheetData.data[0].find(
-      (x) =>
-        x.Type_Code == this.loadingSheetTableForm.value?.vehicleType.value || ""
-    );
-    // Find the matching vehicle type details
-
-    if (loadingSheetDetails) {
-      // Set control values based on loading sheet details
-      const controlNames = [
-        "Capacity",
-        "CapacityVolumeCFT",
-        "LoadaddedKg",
-        "LoadedKg",
-        "LoadedvolumeCFT",
-        "VolumeaddedCFT",
-        "VolumeUtilization",
-        "WeightUtilization",
-      ];
-
-      controlNames.forEach((controlName) => {
-        this.loadingSheetTableForm.controls[controlName].setValue(
-          loadingSheetDetails[controlName] || ""
-        );
-      });
-
-    }
-  }
 
   loadingSheetGenerate() {
 
@@ -352,7 +322,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     } else {
       if (this.loadingData) {
         this.loadingData.forEach(obj => {
-          const randomNumber = "Ls/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+          const randomNumber = "LS/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
           obj.LoadingSheet = randomNumber;
           obj.Action = "Print";
         });
@@ -401,6 +371,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     //this.getshipmentData(event)
     this.cnoteDetails = filterCnoteDetails(this.alldocket,event.shipping)
     this._cnoteService.setShipingData(this.cnoteDetails);
+    this.getCapacity();
   }
 
   // get vehicleNo
@@ -476,63 +447,48 @@ export class CreateLoadingSheetComponent implements OnInit {
       console.error('Error occurred during the API call:', error);
     }
   }
-
   async getDetailsByLeg() {
     for (const leg of this.loadingData) {
-      const org_loc = leg.leg.split("-")[0].trim();
-      const destination = leg.leg.split("-")[1].trim();
-
+      const [org_loc, destination] = leg.leg.split("-").map(part => part.trim());
+  
       const matchingShipments = this.cnoteDetails.filter(
-        (shipment) =>
+        shipment =>
           shipment.orgLoc === org_loc &&
           shipment.destination.split(":")[1].trim() === destination
       );
-
-      // Call the addLsDetails function and await its completion before proceeding
+  
       await this.addLsDetails(leg);
-
+  
       if (matchingShipments.length > 0) {
-        for (const matchingShipment of matchingShipments) {
-          await this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet);
-        }
-      } else {
-        // console.log(`No matching details found for the leg: ${leg.leg}`);
+        const updatePromises = matchingShipments.map(matchingShipment =>
+          this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet)
+        );
+        await Promise.all(updatePromises);
       }
     }
   }
-
+  
   async updateDocketDetails(docket, lsNo) {
     let loadingSheetData = {
       lsNo: lsNo
     };
     const trackingDocket = {
       lsNo: lsNo,
-      tripId:this.loadingSheetTableForm.value.tripID,
-      vehNo:this.loadingSheetTableForm.controls["vehicle"].value?.value||"",
-      route: this.tripData?.RouteandSchedule||"",
-      dktNo:docket
+      tripId: this.loadingSheetTableForm.value.tripID,
+      vehNo: this.loadingSheetTableForm.controls["vehicle"].value?.value || "",
+      route: this.tripData?.RouteandSchedule || "",
+      dktNo: docket
     };
-    await updateTracking(this.companyCode,this._operationService,trackingDocket)
-    const reqBody = {
-      companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
-      id: docket,
-      updates: {
-        ...loadingSheetData
-      }
-    };
-
+  
     try {
-      const res = await this._operationService.operationPut("common/update", reqBody).toPromise();
-      if (res) {
-        await this.updateVehicleStatus();
-      }
+      await Promise.all([
+        updateTracking(this.companyCode, this._operationService, trackingDocket),
+        this.updateOperationService(docket, loadingSheetData)
+      ]);
     } catch (error) {
       console.error('Error occurred during the API call:', error);
     }
   }
-
   async addLsDetails(leg) {
     const lsDetails = {
       id: leg.LoadingSheet,
@@ -545,11 +501,11 @@ export class CreateLoadingSheetComponent implements OnInit {
       weightKg: leg.weightKg,
       volumeCFT: leg.volumeCFT,
       entryBy: this.userName,
-      loadedKg: parseInt(this.loadingSheetTableForm.value.LoadedKg),
-      loadedVolumeCft: parseInt(this.loadingSheetTableForm.value.LoadedvolumeCFT),
-      loadAddedKg: parseInt(this.loadingSheetTableForm.value.LoadaddedKg),
-      WeightUtilization: parseInt(this.loadingSheetTableForm.value.WeightUtilization),
-      volumeUtilization: parseInt(this.loadingSheetTableForm.value.VolumeUtilization),
+      loadedKg: parseFloat(this.loadingSheetTableForm.value.LoadedKg),
+      loadedVolumeCft: parseFloat(this.loadingSheetTableForm.value.LoadedvolumeCFT),
+      loadAddedKg: parseFloat(this.loadingSheetTableForm.value.LoadaddedKg),
+      WeightUtilization: parseFloat(this.loadingSheetTableForm.value.WeightUtilization),
+      volumeUtilization: parseFloat(this.loadingSheetTableForm.value.VolumeUtilization),
       capacity: this.loadingSheetTableForm.value?.Capacity || 0,
       capacityVolumeCFT: this.loadingSheetTableForm.value?.CapacityVolumeCFT || 0,
       volumeAddedCFT: this.loadingSheetTableForm.value?.VolumeaddedCFT || 0,
@@ -737,5 +693,24 @@ export class CreateLoadingSheetComponent implements OnInit {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
     }
   }
-
+  async updateOperationService(docket, loadingSheetData) {
+    const reqBody = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "docket",
+      id: docket,
+      updates: {
+        ...loadingSheetData
+      }
+    };
+  
+    try {
+      const res = await this._operationService.operationPut("common/update", reqBody).toPromise();
+      if (res) {
+        await this.updateVehicleStatus();
+      }
+    } catch (error) {
+      console.error('Error occurred during the API call:', error);
+    }
+  }
 }

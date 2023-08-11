@@ -79,7 +79,7 @@ export async function getDocketDetailsFromApi(
             : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo === ""
               ? "Available for manifest"
               : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo
-                ? "Depart for " + item.destination.split(":")[1]
+                ? "Ready to Depart From " + localStorage.getItem("Branch")
                 : item.isComplete === 1 && item?.unloading && item?.lsNo && item?.mfNo
                   ? "Going to Last Mile Delivery" + item.destination.split(":")[1]
                   :"Quick Completion";

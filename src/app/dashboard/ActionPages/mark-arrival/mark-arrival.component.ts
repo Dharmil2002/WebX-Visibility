@@ -12,7 +12,7 @@ import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service'
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { vehicleStatusUpdate } from 'src/app/operation/update-loading-sheet/loadingSheetshipment';
-import { tripTransactionDetail } from './mark-arrival-utlity';
+import { getDocketFromApiDetail, tripTransactionDetail, updateTracking } from './mark-arrival-utlity';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -128,13 +128,13 @@ export class MarkArrivalComponent implements OnInit {
     this._operationService.operationPut("common/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          this.updateTripData()
+          this.updateTripData(tripId)
         }
       }
     })
   }
 
-  updateTripData() {
+  updateTripData(tripId) {
 
     const dktStatus = this._operationService.getShipmentStatus();
     const next = getNextLocation(this.MarkArrivalTable.Route.split(":")[1].split("-"), this.currentBranch);
@@ -174,12 +174,34 @@ export class MarkArrivalComponent implements OnInit {
               text: "Trip is close at" + this.currentBranch,
               showConfirmButton: true
             });
+            this.getPreviousData();
+          }else{
+            this.getPreviousData();
+            // this.getDocketTripWise(tripId);
           }
-          this.getPreviousData();
+         
+
         }
       }
     })
   }
+  /*here i write a code becuase of update docket states*/
+  async getDocketTripWise(tripId) {
+
+    const detail = await getDocketFromApiDetail(this.companyCode, this._operationService,tripId.trim());
+    
+    // Create an array of promises for updateTracking calls
+    const updatePromises = detail.map(async element => {
+        await updateTracking(this.companyCode, this._operationService, element);
+    });
+
+    // Wait for all updateTracking promises to resolve
+    await Promise.all(updatePromises);
+
+    // Once all promises are resolved, call getPreviousData
+    this.getPreviousData();
+}
+
   cancel() {
     this.goBack(2)
     this.dialogRef.close()

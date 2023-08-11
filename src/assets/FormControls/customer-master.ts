@@ -41,7 +41,7 @@ export class customerControl {
                 ],
                 functions: {
                     onChange: 'dataExist',
-                  },
+                },
 
             },
 
@@ -323,38 +323,43 @@ export class customerControl {
                         {
                             name: "pattern",
                             message: "Please Enter alphanumeric Billing Addressof length 15",
-                            pattern: "^[a-zA-Z0-9]{3,15}$",
+                            pattern: "^[a-zA-Z0-9 ]{3,15}$",
                         }
                     ],
 
                 },
-
                 {
-                    name: 'billCity', label: 'Billing City', placeholder: 'Billing City', type: 'dropdown',
-                    value: '', generatecontrol: true, disable: false,
+                    name: 'billPincode', label: "Billing Pincode",
+                    placeholder: "Select Billing Pincode",
+                    type: 'dropdown',
+                    value: customerTable.billPincode,
+                    additionalData: {
+                        showNameAndValue: false
+                    },
+                    generatecontrol: true, disable: false,
                     Validations: [
-                        // {
-                        //     name: "pattern",
-                        //     message: "Please Enter only text of length 3 to 25 characters",
-                        //     pattern: '^[a-zA-Z ]{3,25}$',
-                        // }
+                        {
+                            name: "autocomplete",
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
                     ],
-                    additionalData: {
-                        showNameAndValue: false
+                    functions: {
+                        onModel: "getBillingPincodeData",
+                        onOptionSelect: "setCityData"
                     }
 
                 },
 
                 {
-                    name: 'billPincode', label: 'Billing Pincode', placeholder: 'Billing Pincode', type: 'dropdown',
-                    value: '', generatecontrol: true, disable: false,
-                    Validations: [],
-                    additionalData: {
-                        showNameAndValue: false
-                    }
+                    name: 'billCity', label: 'Billing City', placeholder: 'Billing City', type: 'text',
+                    value: '', generatecontrol: true, disable: true,
+                    Validations: [
+                    ],
 
                 },
-
                 {
                     name: 'sameAddres', label: 'Billing address same as customer address', placeholder: '', type: 'toggle', value: customerTable?.sameAddres, generatecontrol: true, disable: false,
                     Validations: [
@@ -472,53 +477,43 @@ export class customerControl {
                     ],
 
                 },
-
                 {
-                    name: 'city', label: 'City', placeholder: 'City', type: 'dropdown',
-                    value: '', generatecontrol: true, disable: false,
-                    Validations: [
-                        // {
-                        //     name: "pattern",
-                        //     message: "Please enter a City of length 3 to 15 characters",
-                        //     pattern: '^[a-zA-Z ]{3,15}$',
-                        // }
-                    ],
+                    name: 'pincode', label: "Pincode",
+                    placeholder: "Select Pincode",
+                    type: 'dropdown',
+                    value: customerTable.pincode,
                     additionalData: {
                         showNameAndValue: false
+                    },
+                    generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "autocomplete",
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
+                    ],
+                    functions: {
+                        onModel: "getPincodeData",
+                        onOptionSelect: "setStateCityData"
                     }
 
                 },
                 {
-                    name: 'state', label: 'State', placeholder: 'State', type: 'dropdown',
-                    value: '', generatecontrol: true, disable: false,
+                    name: 'city', label: 'City', placeholder: 'City', type: 'text',
+                    value: customerTable?.city, generatecontrol: true, disable: true,
                     Validations: [
-                        // {
-                        //     name: "pattern",
-                        //     message: "Please enter a State of length 3 to 15 characters",
-                        //     pattern: '^[a-zA-Z ]{3,15}$',
-                        // }
                     ],
-                    additionalData: {
-                        showNameAndValue: false
-                    }
 
                 },
-
                 {
-                    name: 'pincode', label: 'Pincode', placeholder: 'Pincode', type: 'dropdown',
-                    value: customerTable?.pincode, generatecontrol: true, disable: false,
+                    name: 'state', label: 'State', placeholder: 'State', type: 'text',
+                    value: customerTable?.state, generatecontrol: true, disable: true, 
                     Validations: [
-                        // {
-
-                        //     name: "pattern",
-                        //     message: "Please enter Bank Account No of length 6 digits",
-                        //     pattern: "^[0-9]{6}$",
-
-                        // }
                     ],
-                    additionalData: {
-                        showNameAndValue: false
-                    }
+                    
 
                 },
                 {

@@ -71,7 +71,7 @@ export class CustomerMasterAddComponent implements OnInit {
   stateLoc: any;
   stateLocStatus: any;
   //#endregion
-  
+
   constructor(private Route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder, private filter: FilterUtils,
     private masterService: MasterService) {
@@ -123,119 +123,10 @@ export class CustomerMasterAddComponent implements OnInit {
     this.bindDropdown();
     this.getDropDownData();
     this.getLocation();
-    this.getCityData();
-    this.getPincodeData();
-   this.getStateData();
-
+    this.getAllMastersData();
   }
 
-   //#region Dropdown for City
-   getCityData() {
-    let req = {
-      "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "city_detail"
-    };
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        const cityList = res.data.map(element => ({
-          name: element.cityName,
-          value: element.id
-        }));
-        if (this.isUpdate) {
-          this.cityLocDet = cityList.find((x) => x.name == this.customerTable.billCity);
-          this.customerTableForm.controls.billCity.setValue(this.cityLocDet);
-        }
-        if (this.isUpdate) {
-          this.cityLocDet = cityList.find((x) => x.name == this.customerTable.city);
-          this.customerTableForm.controls.city.setValue(this.cityLocDet);
-        }
-        this.filter.Filter(
-          this.jsonControlBillKycArray,
-          this.customerTableForm,
-          cityList,
-          this.cityBill,
-          this.cityBillStatus
-        );
-        this.filter.Filter(
-          this.jsonControlBillKycArray,
-          this.customerTableForm,
-          cityList,
-          this.cityData,
-          this.cityDataStatus
-        );
-      }
-    });
-  }
-  //#endregion
-//#region Dropdown for State
-getStateData() {
-  let req = {
-    "companyCode": this.companyCode,
-    "type": "masters",
-    "collection": "state_detail"
-  };
-  this.masterService.masterPost('common/getall', req).subscribe({
-    next: (res: any) => {
-      const stateList = res.data.map(element => ({
-        name: element.stateName,
-        value: element.stateCode
-      }));
-      if (this.isUpdate) {
-        this.stateData = stateList.find((x) => x.name == this.customerTable.state);
-        this.customerTableForm.controls.state.setValue(this.stateData);
-      }
-      this.filter.Filter(
-        this.jsonControlBillKycArray,
-        this.customerTableForm,
-        stateList,
-        this.stateLoc,
-        this.stateLocStatus
-      );
-    }
-  });
-}
-//#endregion
-   //#region Dropdown for Pincode 
-   getPincodeData() {
-    let req = {
-      "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "pincode_detail"
-    };
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        // Assuming the API response contains an array named 'pincodeList'
-        const pincodeList = res.data.map(element => ({
-          name: element.pincode,
-          value: element.pincode
-        }));
-        if (this.isUpdate) {
-          this.pincodeDet = pincodeList.find((x) => x.name == this.customerTable.billPincode);
-          this.customerTableForm.controls.billPincode.setValue(this.pincodeDet);
-        }
-        if (this.isUpdate) {
-          this.pincodeDet = pincodeList.find((x) => x.name == this.customerTable.pincode);
-          this.customerTableForm.controls.pincode.setValue(this.pincodeDet);
-        }
-        this.filter.Filter(
-          this.jsonControlBillKycArray,
-          this.customerTableForm,
-          pincodeList,
-          this.pincodeBill,
-          this.pincodeBillStatus
-        );
-        this.filter.Filter(
-          this.jsonControlBillKycArray,
-          this.customerTableForm,
-          pincodeList,
-          this.pincodeData,
-          this.pincodeDataStatus
-        );
-      }
-    });
-  }
-  //#endregion
+
   bindDropdown() {
     this.jsonControlCustomerArray.forEach(data => {
       if (data.name === 'groupCode') {
@@ -275,11 +166,6 @@ getStateData() {
         this.serviceOpt = data.name;
         this.serviceOptStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'billCity') {
-        // Set category-related variables
-        this.cityBill = data.name;
-        this.cityBillStatus = data.additionalData.showNameAndValue;
-      }
       if (data.name === 'billPincode') {
         // Set category-related variables
         this.pincodeBill = data.name;
@@ -290,16 +176,7 @@ getStateData() {
         this.pincodeData = data.name;
         this.pincodeDataStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'city') {
-        // Set category-related variables
-        this.cityData = data.name;
-        this.cityDataStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === 'state') {
-        // Set category-related variables
-        this.stateLoc = data.name;
-        this.stateLocStatus = data.additionalData.showNameAndValue;
-      }
+
     });
   }
   cancel() {
@@ -327,10 +204,10 @@ getStateData() {
         this.customerTableForm.controls.groupCode.setValue(this.groupCodedet);
 
         this.customerTableForm.controls["serviceOptedDropdown"].patchValue(this.serviceOptedFor.filter((element) =>
-        this.customerTable.serviceOpted.includes(element.name)))
+          this.customerTable.serviceOpted.includes(element.name)))
 
         this.customerTableForm.controls["payBasisDropdown"].patchValue(this.payBasisData.filter((element) =>
-        this.customerTable.payBasis.includes(element.name)))
+          this.customerTable.payBasis.includes(element.name)))
 
         this.ownerShipDet = this.findDropdownItemByName(this.ownershipData, this.customerTable.ownership);
         this.customerTableForm.controls.ownership.setValue(this.ownerShipDet);
@@ -347,7 +224,7 @@ getStateData() {
     });
   }
   //#endregion
-  
+
   //#region Location Dropdown
   getLocation() {
     let req = {
@@ -397,7 +274,7 @@ getStateData() {
     });
   }
   //#endregion
-  
+
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }
@@ -408,10 +285,10 @@ getStateData() {
     const controlNames = [
       "groupCode",
       "ownership",
-      "billCity",
+      // "billCity",
       "billPincode",
-      "city",
-      "state",
+      //"city",
+      // "state",
       "pincode"
     ];
     controlNames.forEach(controlName => {
@@ -488,38 +365,37 @@ getStateData() {
 
   dataExist() {
     let req = {
-        companyCode: this.companyCode,
-        type: "masters",
-        collection: "customer_detail"
+      companyCode: this.companyCode,
+      type: "masters",
+      collection: "customer_detail"
     };
     this.masterService.masterPost('common/getall', req).subscribe({
-        next: (res: any) => {
-            // Convert user-input stateAlias to lowercase
-            const customerCodeExists = res.data.some((state) => state.customerCode === this.customerTableForm.value.customerCode
-                );
-            if (customerCodeExists) {
-                // Show the popup indicating that the state already exists
-                Swal.fire({
-                    title: 'Data exists! Please try with another',
-                    toast: true,
-                    icon: "error",
-                    showCloseButton: false,
-                    showCancelButton: false,
-                    showConfirmButton: true,
-                    confirmButtonText: "OK"
-                });
-                this.customerTableForm.controls["customerCode"].reset();
-               
-            }
-        },
-        error: (err: any) => {
-            // Handle error if required
-            console.error(err);
+      next: (res: any) => {
+        // Convert user-input stateAlias to lowercase
+        const customerCodeExists = res.data.some((state) => state.customerCode === this.customerTableForm.value.customerCode
+        );
+        if (customerCodeExists) {
+          // Show the popup indicating that the state already exists
+          Swal.fire({
+            title: 'Data exists! Please try with another',
+            toast: true,
+            icon: "error",
+            showCloseButton: false,
+            showCancelButton: false,
+            showConfirmButton: true,
+            confirmButtonText: "OK"
+          });
+          this.customerTableForm.controls["customerCode"].reset();
+
         }
+      },
+      error: (err: any) => {
+        // Handle error if required
+        console.error(err);
+      }
     });
 
-}
-
+  }
   //#region Function Call Handler
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
@@ -534,4 +410,102 @@ getStateData() {
     }
   }
   //#endregion
+
+  // Get all dropdown data
+  async getAllMastersData() {
+    try {
+      // Prepare the requests for different collections
+      let pincodeReq = {
+        "companyCode": parseInt(localStorage.getItem("companyCode")),
+        "type": "masters",
+        "collection": "pincode_detail"
+      };
+
+      const pincodeRes = await this.masterService.masterPost('common/getall', pincodeReq).toPromise();
+
+      const mergedData = {
+        pincodeData: pincodeRes?.data,
+      };
+      this.pincodeDet = mergedData.pincodeData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Handle the error as needed
+    }
+  }
+  getPincodeData() {
+    const pincodeValue = this.customerTableForm.controls['pincode'].value;
+    if (!isNaN(pincodeValue)) { // Check if pincodeValue is a valid number
+      const pincodeList = this.pincodeDet.map((x) => ({ name: parseInt(x.pincode), value: parseInt(x.pincode) }));
+      const exactPincodeMatch = pincodeList.find(element => element.name === pincodeValue.value);
+      if (!exactPincodeMatch) {
+        if (pincodeValue.toString().length > 2) {
+          const filteredPincodeDet = pincodeList.filter(element => element.name.toString().includes(pincodeValue));
+          if (filteredPincodeDet.length === 0) {
+            // Show a popup indicating no data found for the given pincode
+            Swal.fire({
+              icon: "info",
+              title: "No Data Found",
+              text: `No data found for pincode ${pincodeValue}`,
+              showConfirmButton: true,
+            });
+            return; // Exit the function
+          } else {
+            this.filter.Filter(
+              this.jsonControlBillKycArray,
+              this.customerTableForm,
+              filteredPincodeDet,
+              this.pincodeData,
+              this.pincodeDataStatus
+            );
+          }
+        }
+      }
+    }
+  }
+  //#endregion
+
+  //#region Pincode Dropdown
+  getBillingPincodeData() {
+    const pincodeValue = this.customerTableForm.controls['billPincode'].value;
+
+    if (!isNaN(pincodeValue)) { // Check if pincodeValue is a valid number
+      const pincodeList = this.pincodeDet.map((x) => ({ name: parseInt(x.pincode), value: parseInt(x.pincode) }));
+
+      const exactPincodeMatch = pincodeList.find(element => element.name === pincodeValue.value);
+
+      if (!exactPincodeMatch) {
+        if (pincodeValue.toString().length > 2) {
+          const filteredPincodeDet = pincodeList.filter(element => element.name.toString().includes(pincodeValue));
+          if (filteredPincodeDet.length === 0) {
+            // Show a popup indicating no data found for the given pincode
+            Swal.fire({
+              icon: "info",
+              title: "No Data Found",
+              text: `No data found for pincode ${pincodeValue}`,
+              showConfirmButton: true,
+            });
+            return; // Exit the function
+          } else {
+            this.filter.Filter(
+              this.jsonControlBillKycArray,
+              this.customerTableForm,
+              filteredPincodeDet,
+              this.pincodeBill,
+              this.pincodeBillStatus
+            );
+          }
+        }
+      }
+    }
+  }
+  //#endregion
+  setStateCityData() {
+    const fetchData = this.pincodeDet.find(item => item.pincode == this.customerTableForm.controls.pincode.value.value)
+    this.customerTableForm.controls.state.setValue(fetchData.state)
+    this.customerTableForm.controls.city.setValue(fetchData.city)
+  }
+  setCityData() {
+    const fetchData = this.pincodeDet.find(item => item.pincode == this.customerTableForm.controls.billPincode.value.value)
+    this.customerTableForm.controls.billCity.setValue(fetchData.city)
+  }
 }

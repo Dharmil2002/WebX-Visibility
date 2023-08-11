@@ -1,13 +1,14 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
-import { utilityService } from "src/app/Utility/utility.service";
 import { VendorMaster } from "src/app/core/models/Masters/vendor-master";
 import { VendorControl } from "src/assets/FormControls/vendor-control";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
+import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { Subject, take, takeUntil } from "rxjs";
 
 @Component({
   selector: 'app-add-vendor-master',
@@ -18,7 +19,6 @@ export class AddVendorMasterComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   action: string;
   isUpdate = false;
-  lastUsedVendorCode = 0;
   vendorTabledata: VendorMaster;
   vendorTableForm: UntypedFormGroup;
   vendorFormControls: VendorControl;
@@ -26,20 +26,8 @@ export class AddVendorMasterComponent implements OnInit {
   jsonControlVendorOtherInfoArray: any;
   vendorType: any;
   vendorTypeStatus: any;
-  vTypelist: string;
-  jsonControlArray: any;
-  vCity: any;
-  vCityStatus: any;
-  vTypeStatus: any;
   data: any;
-  vendorCode: any;
-  vType: any;
-  updateVendorCity: any;
-  updateVendorType: any;
-  vendorName: any;
   accordionData: any;
-  vSubType: any;
-  vSubTypeStatus: any;
   vLocation: any;
   vLocationStatus: any;
   vendorCity: any;
@@ -50,31 +38,26 @@ export class AddVendorMasterComponent implements OnInit {
   tdsTypeStatus: any;
   lspName: any;
   lspNameStatus: any;
-  vehicleTypeData: any;
   vendorTypDetail: any;
   vendorTypeData: any;
-  vSubTypeData: any;
-  vLocationData: any;
-  vendorCityData: any;
   tdsSectionData: any;
   tdsTypeData: any;
   lspNameData: any;
-  selectData: any;
-  vSubTypeDetail: any;
-  vLocationDetail: any;
-  vendorCityDetail: any;
   tdsSectionDetail: any;
   tdsTypeDetail: any;
   lspNameDetail: any;
-  selectDetail: any;
-  select: any;
-  selectStatus: any;
-  vendorCityName: any;
   SelectFile: File;
   imageName: string;
   selectedFiles: boolean;
+  vendorPinCodeStatus: any;
+  vendorPinCode: any;
+  pincodeResponse: any;
+  pincodeData: any;
+  newVendorCode: string;
+
   ngOnInit(): void {
     this.getDropDownData();
+    this.getAllMastersData();
   }
   // Function to handle function calls
   functionCallHandler($event) {
@@ -88,9 +71,9 @@ export class AddVendorMasterComponent implements OnInit {
     }
   }
   constructor(
-    private route: Router, private fb: UntypedFormBuilder, private filter: FilterUtils, private service: utilityService, private masterService: MasterService,) {
+    private route: Router, private fb: UntypedFormBuilder, private filter: FilterUtils, private masterService: MasterService,) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.data = route.getCurrentNavigation().extras.state.data;
+      this.vendorTabledata = route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
       this.isUpdate = true;
     } else {
@@ -98,7 +81,6 @@ export class AddVendorMasterComponent implements OnInit {
     }
     if (this.action === 'edit') {
       this.isUpdate = true;
-      this.vendorTabledata = this.data;
       this.breadScrums = [
         {
           title: "Vendor Master",
@@ -126,35 +108,34 @@ export class AddVendorMasterComponent implements OnInit {
     this.jsonControlVendorOtherInfoArray = vehicleFormControls.getVendorOtherInfoFormControls();
     this.jsonControlVendorArray.forEach(data => {
       if (data.name === 'vendorType') {
-        // Set vendorType category-related variables
+        // Set vendorType related variables
         this.vendorType = data.name;
         this.vendorTypeStatus = data.additionalData.showNameAndValue;
       }
-
       if (data.name === 'vendorLocation') {
-        // Set vendorLocation category-related variables
+        // Set vendorLocation related variables
         this.vLocation = data.name;
         this.vLocationStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'vendorCity') {
-        // Set vendorCity category-related variables
-        this.vendorCityName = data.name;
-        this.vendorCityStatus = data.additionalData.showNameAndValue;
+      if (data.name === 'vendorPinCode') {
+        // Set vendorPinCode related variables
+        this.vendorPinCode = data.name;
+        this.vendorPinCodeStatus = data.additionalData.showNameAndValue;
       }
     });
     this.jsonControlVendorOtherInfoArray.forEach(data => {
       if (data.name === 'tdsSection') {
-        // Set tdsSection category-related variables
+        // Set tdsSection related variables
         this.tdsSection = data.name;
         this.tdsSectionStatus = data.additionalData.showNameAndValue;
       }
       if (data.name === 'tdsType') {
-        // Set tdsType category-related variables
+        // Set tdsType related variables
         this.tdsType = data.name;
         this.tdsTypeStatus = data.additionalData.showNameAndValue;
       }
       if (data.name === 'lspName') {
-        // Set lspName category-related variables
+        // Set lspName related variables
         this.lspName = data.name;
         this.lspNameStatus = data.additionalData.showNameAndValue;
       }
@@ -170,15 +151,11 @@ export class AddVendorMasterComponent implements OnInit {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       const {
         vendorTypeDropdown,
-        locdataDropDown,
-        cityLocDropDown,
         tdsSectionDropdown,
         tdsTypeDropdown,
         lspNameDropdown,
       } = res;
       this.vendorTypeData = vendorTypeDropdown;
-      this.vLocationData = locdataDropDown;
-      this.vendorCityData = cityLocDropDown;
       this.tdsSectionData = tdsSectionDropdown;
       this.tdsTypeData = tdsTypeDropdown;
       this.lspNameData = lspNameDropdown;
@@ -186,9 +163,6 @@ export class AddVendorMasterComponent implements OnInit {
       if (this.isUpdate) {
         this.vendorTypDetail = this.findDropdownItemByName(this.vendorTypeData, this.vendorTabledata.vendorType);
         this.vendorTableForm.controls.vendorType.setValue(this.vendorTypDetail);
-
-        this.vendorCityDetail = this.findDropdownItemByName(this.vendorCityData, this.vendorTabledata.vendorCity);
-        this.vendorTableForm.controls.vendorCity.setValue(this.vendorCityDetail);
 
         this.tdsSectionDetail = this.findDropdownItemByName(this.tdsSectionData, this.vendorTabledata.tdsSection);
         this.vendorTableForm.controls.tdsSection.setValue(this.tdsSectionDetail);
@@ -199,17 +173,12 @@ export class AddVendorMasterComponent implements OnInit {
         this.lspNameDetail = this.findDropdownItemByName(this.lspNameData, this.vendorTabledata.lspName);
         this.vendorTableForm.controls.lspName.setValue(this.lspNameDetail);
 
-        this.vendorTableForm.controls["vendorLocationDropdown"].patchValue(this.vLocationData.filter((element) =>
-          this.vendorTabledata.vendorLocation.includes(element.name)))
-
         this.vendorTableForm.controls["tdsSectionDropdown"].patchValue(this.tdsSectionData.filter((element) =>
           this.vendorTabledata.tdsSection.includes(element.name)))
       }
 
       const filterParams = [
         [this.jsonControlVendorArray, this.vendorTypeData, this.vendorType, this.vendorTypeStatus],
-        [this.jsonControlVendorArray, this.vLocationData, this.vLocation, this.vLocationStatus],
-        [this.jsonControlVendorArray, this.vendorCityData, this.vendorCityName, this.vendorCityStatus],
         [this.jsonControlVendorOtherInfoArray, this.tdsSectionData, this.tdsSection, this.tdsSectionStatus],
         [this.jsonControlVendorOtherInfoArray, this.tdsTypeData, this.tdsType, this.tdsTypeStatus],
         [this.jsonControlVendorOtherInfoArray, this.lspNameData, this.lspName, this.lspNameStatus],
@@ -222,24 +191,6 @@ export class AddVendorMasterComponent implements OnInit {
   }
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
-  }
-  generateNextVendorCode(): string {
-    // Get the last used vendor code from localStorage
-    const lastVendorCode = parseInt(localStorage.getItem('lastVendorCode') || '0', 10);
-
-    // Increment the last Vendor user code by 1 to generate the next one
-    const nextVendorCode = lastVendorCode + 1;
-
-    // Convert the number to a 4-digit string, padded with leading zeros
-    const paddedNumber = nextVendorCode.toString().padStart(4, '0');
-
-    // Combine the prefix "VDR" with the padded number to form the complete vendor code
-    const vendorCode = `VDR${paddedNumber}`;
-
-    // Update the last used Vendor code in localStorage
-    localStorage.setItem('lastVendorCode', nextVendorCode.toString());
-
-    return vendorCode;
   }
   selectedFileForTdsDocument(data) {
     let fileList: FileList = data.eventArgs;
@@ -334,30 +285,95 @@ export class AddVendorMasterComponent implements OnInit {
       });
     }
   }
-  onChange(event: any) {
-    // Get the value of the vendorSubType toggle
-    const vendorSubTypeEnabled = event.target.checked;
-    // Show/hide additional dropdown based on the toggle state
-    if (vendorSubTypeEnabled) {
-      this.vendorTableForm.controls['additionalDropdown'].enable();
-    } else {
-      this.vendorTableForm.controls['additionalDropdown'].disable();
-    }
-  }
   displayTds() {
-    const generateControl = this.vendorTableForm.value.tdsApplicable == true;  // Check if value is "Y" to generate control
+    const generateControl = this.vendorTableForm.value.tdsApplicable === true;
+
     this.jsonControlVendorOtherInfoArray.forEach(data => {
       if (data.name === 'tdsSection' || data.name === 'tdsRate' || data.name === 'tdsType') {
-        data.generatecontrol = generateControl;  // Set generatecontrol property based on the generateControl value
+        data.generatecontrol = generateControl;
+
+        // Get the corresponding form control
+        const formControl = this.vendorTableForm.get(data.name);
+
+        // Clear existing validators before adding the required validator
+        formControl.clearValidators();
+
+        if (generateControl) {
+          // Add the required validator if generateControl is true
+          formControl.setValidators([Validators.required]);
+        }
+
+        // Update the form control's validation status
+        formControl.updateValueAndValidity();
       }
     });
   }
+  /*get All Master Data*/
+  async getAllMastersData() {
+    try {
+      const reqBody = {
+        "companyCode": this.companyCode,
+        "type": "masters",
+        "collection": "location_detail"
+      }
+      const pincodeBody = {
+        "companyCode": this.companyCode,
+        "type": "masters",
+        "collection": "pincode_detail"
+      }
+      const locationBranchResponse = await this.masterService.masterPost('common/getall', reqBody).toPromise();
+      this.pincodeResponse = await this.masterService.masterPost('common/getall', pincodeBody).toPromise();
+      const locationBranchList = locationBranchResponse.data.map((x) => { { return { name: x.locName, value: x.locCode } } })
+
+      // Handle the response from the server
+      if (this.isUpdate) {
+        this.vendorTableForm.controls["vendorLocationDropdown"].patchValue(locationBranchList.filter((element) =>
+          this.vendorTabledata.vendorLocation.includes(element.name)
+        ));
+        this.pincodeData = this.pincodeResponse.data.map((x) => { { return { name: x.pincode, value: x.pincode } } }).find((x) => x.name == this.vendorTabledata.vendorPinCode);
+        this.vendorTableForm.controls.vendorPinCode.setValue(this.pincodeData);
+
+      }
+      this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, locationBranchList, this.vLocation, this.vLocationStatus);
+    } catch (error) {
+      // Handle any errors that occurred during the request
+      console.error('Error:', error);
+    }
+  }
+  getPincode() {
+    const pincodeValue = this.vendorTableForm.controls['vendorPinCode'].value;
+
+    if (!isNaN(pincodeValue)) { // Check if pincodeValue is a valid number
+      const pincodeList = this.pincodeResponse.data.map((x) => ({ name: parseInt(x.pincode), value: parseInt(x.pincode) }));
+
+      const exactPincodeMatch = pincodeList.find(element => element.name === pincodeValue);
+
+      if (!exactPincodeMatch) {
+        if (pincodeValue.toString().length > 2) {
+          const filteredPincodeDet = pincodeList.filter(element => element.name.toString().includes(pincodeValue));
+          if (filteredPincodeDet.length === 0) {
+            // Show a popup indicating no data found for the given pincode
+            Swal.fire({
+              icon: "info",
+              title: "No Data Found",
+              text: `No data found for pincode ${pincodeValue}`,
+              showConfirmButton: true,
+            });
+            return; // Exit the function
+          } else {
+            this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, filteredPincodeDet, this.vendorPinCode, this.vendorPinCodeStatus);
+          }
+        }
+      }
+    }
+  }
+
   save() {
     const formValue = this.vendorTableForm.value;
     const controlNames = [
       "vendorType",
-      "vendorCity",
       "tdsType",
+      "vendorPinCode",
       "lspName",
     ];
     controlNames.forEach(controlName => {
@@ -367,26 +383,28 @@ export class AddVendorMasterComponent implements OnInit {
     const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.name);
     this.vendorTableForm.controls["vendorLocation"].setValue(vendorLocationDropdown1);
 
-    const tdsSectionDropdown1 = this.vendorTableForm.value.tdsSectionDropdown.map((item: any) => item.name);
+    const tdsSectionDropdownValue = this.vendorTableForm.value.tdsSectionDropdown;
+    // Check if tdsSectionDropdownValue is empty string
+    const tdsSectionDropdown1 = tdsSectionDropdownValue !== '' ? tdsSectionDropdownValue.map((item: any) => item.name) : [];
+
     this.vendorTableForm.controls["tdsSection"].setValue(tdsSectionDropdown1);
 
-    this.vendorTableForm.controls["isActive"].setValue(this.vendorTableForm.value.isActive == true);
+    this.vendorTableForm.controls["isActive"].setValue(this.vendorTableForm.value.isActive);
     Object.values(this.vendorTableForm.controls).forEach(control => control.setErrors(null));
     // Remove  field from the form controls
-    this.vendorTableForm.removeControl("CompanyCode");
     this.vendorTableForm.removeControl("vendorLocationDropdown");
     this.vendorTableForm.removeControl("tdsSectionDropdown");
-    this.vendorTableForm.removeControl("isUpdate");
+    let data = convertNumericalStringsToInteger(this.vendorTableForm.value)
     if (this.isUpdate) {
-      let id = this.vendorTableForm.value.id;
+      let id = data.id;
       // Remove the "id" field from the form controls
-      this.vendorTableForm.removeControl("id");
+      delete data.id;
       let req = {
         companyCode: this.companyCode,
         type: "masters",
         collection: "vendor_detail",
         id: id,
-        updates: this.vendorTableForm.value
+        updates: data
       };
       this.masterService.masterPut('common/update', req).subscribe({
         next: (res: any) => {
@@ -404,32 +422,84 @@ export class AddVendorMasterComponent implements OnInit {
       });
     }
     else {
-      const nextVendorCode = this.generateNextVendorCode();
-      this.vendorTableForm.controls["vendorCode"].setValue(nextVendorCode);
-      this.vendorTableForm.controls["id"].setValue(nextVendorCode);
       let req = {
-        companyCode: this.companyCode,
-        type: "masters",
-        collection: "vendor_detail",
-        data: this.vendorTableForm.value
-      };
-      this.masterService.masterPost('common/create', req).subscribe({
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        "type": "masters",
+        "collection": "vendor_detail"
+      }
+      this.masterService.masterPost('common/getall', req).subscribe({
         next: (res: any) => {
           if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
+            // Generate srno for each object in the array
+            const lastCode = res.data[res.data.length - 1];
+            const lastVendorCode = lastCode ? parseInt(lastCode.vendorCode.substring(1)) : 0;
+            // Function to generate a new route code
+            function generateVendorCode(initialCode: number = 0) {
+              const nextVendorCode = initialCode + 1;
+              const vendorNumber = nextVendorCode.toString().padStart(4, '0');
+              const vendorCode = `V${vendorNumber}`;
+              return vendorCode;
+            }
+            this.newVendorCode = generateVendorCode(lastVendorCode);
+            data.vendorCode = this.newVendorCode;
+            data.id = this.newVendorCode;
+            let req = {
+              companyCode: this.companyCode,
+              type: "masters",
+              collection: "vendor_detail",
+              data: data
+            };
+            this.masterService.masterPost('common/create', req).subscribe({
+              next: (res: any) => {
+                if (res) {
+                  // Display success message
+                  Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                  });
+                  this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
+                }
+              }
             });
-            this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
           }
         }
-      });
+      })
     }
   }
   cancel() {
     window.history.back();
   }
+  setStateCityData() {
+    const fetchData = this.pincodeResponse.data.find(item => item.pincode == this.vendorTableForm.controls.vendorPinCode.value.value)
+    this.vendorTableForm.controls.vendorCity.setValue(fetchData.city)
+  }
+  protected _onDestroy = new Subject<void>();
+  // function handles select All feature of all multiSelect fields of one form.
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonControlVendorArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlVendorArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.vendorTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
+  //#endregion
+
+  displayCp() {
+    this.jsonControlVendorOtherInfoArray.forEach(data => {
+      if (data.name === 'cpCode') {
+        data.generatecontrol = this.vendorTableForm.controls.select.value === 'CP';
+      }
+    });
+  }
+
 }

@@ -7,7 +7,6 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { DriverMaster } from 'src/app/core/models/Masters/Driver';
 import Swal from 'sweetalert2';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { forkJoin, map } from 'rxjs';
 import { convertNumericalStringsToInteger } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 @Component({
   selector: 'app-add-driver-master',
@@ -34,9 +33,11 @@ export class AddDriverMasterComponent implements OnInit {
   breadscrums: { title: string; items: string[]; active: string; }[];
   selectedFiles: boolean;
   SelectFile: File;
+  vehicleDet: any;
   imageName: string;
   routeLocation: any;
   categoryDet: any;
+  LocationList: any;
   locData: any;
   pincode: any;
   pincodeStatus: any;
@@ -369,72 +370,40 @@ export class AddDriverMasterComponent implements OnInit {
   }
 
   // Get all dropdown data
-  getAllMastersData() {
-    // Prepare the requests for different collections
-    let locationReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "location_detail"
-    };
+  async getAllMastersData() {
+    try {
+      // Prepare the requests for different collections
+      let locationReq = {
+        "companyCode": parseInt(localStorage.getItem("companyCode")),
+        "type": "masters",
+        "collection": "location_detail"
+      };
 
-    let pincodeReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "pincode_detail"
-    };
-    let vehicleReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "vehicle_detail"
-    };
-    // Use forkJoin to make parallel requests and get all data at once
-    forkJoin([
-      this.masterService.masterPost('common/getall', locationReq),
-      this.masterService.masterPost('common/getall', pincodeReq),
-      this.masterService.masterPost('common/getall', vehicleReq),
-    ]).pipe(
-      map(([locationRes, pincodeRes, vehicleRes]) => {
-        // Combine all the data into a single object
-        return {
-          locationData: locationRes?.data,
-          pincodeData: pincodeRes?.data,
-          vehicleData: vehicleRes?.data,
-        };
-      })
-    ).subscribe((mergedData) => {
-      // Access the merged data here
+      let pincodeReq = {
+        "companyCode": parseInt(localStorage.getItem("companyCode")),
+        "type": "masters",
+        "collection": "pincode_detail"
+      };
+      let vehicleReq = {
+        "companyCode": parseInt(localStorage.getItem("companyCode")),
+        "type": "masters",
+        "collection": "vehicle_detail"
+      };
+
+      const locationRes = await this.masterService.masterPost('common/getall', locationReq).toPromise();
+      const pincodeRes = await this.masterService.masterPost('common/getall', pincodeReq).toPromise();
+      const vehicleRes = await this.masterService.masterPost('common/getall', vehicleReq).toPromise();
+
+      const mergedData = {
+        locationData: locationRes?.data,
+        pincodeData: pincodeRes?.data,
+        vehicleData: vehicleRes?.data,
+      };
       this.allData = mergedData;
       this.pincodeDet = mergedData.pincodeData.map(element => ({
         name: element.pincode,
         value: element.pincode
       }));
-      const pincodeValue = this.DriverTableForm.controls['pincode'].value;
-      // Check for an exact match in pincodeDet
-      const exactPincodeMatch = this.pincodeDet.find(element => element.name === pincodeValue.value);
-      if (!exactPincodeMatch) {
-        if (pincodeValue.length > 2) {
-          const filteredPincodeDet = this.pincodeDet.filter(element => element.name.includes(pincodeValue));
-          if (filteredPincodeDet.length === 0) {
-            // Show a popup indicating no data found for the given pincode
-            Swal.fire({
-              icon: "info",
-              title: "No Data Found",
-              text: `No data found for pincode ${pincodeValue}`,
-              showConfirmButton: true,
-            });
-            return; // Exit the function
-          }
-          else {
-            this.filter.Filter(
-              this.jsonControlPermanentArray,
-              this.DriverTableForm,
-              filteredPincodeDet,
-              this.pincode,
-              this.pincodeStatus
-            );
-          }
-        }
-      }
       const LocationList = mergedData.locationData.map(element => ({
         name: element.locName,
         value: element.locCode
@@ -443,17 +412,8 @@ export class AddDriverMasterComponent implements OnInit {
         name: element.vehicleNo,
         value: element.id,
       }));
-
-      if (this.isUpdate) {
-        this.locData = LocationList.find((x) => x.name == this.DriverTable.driverLocation);
-        this.DriverTableForm.controls.driverLocation.setValue(this.locData);
-
-        this.pincodeData = this.pincodeDet.find((x) => x.name == this.DriverTable.pincode);
-        this.DriverTableForm.controls.pincode.setValue(this.pincodeData);
-        
-        this.vehicleData = vehicleDet.find((x) => x.name == this.DriverTable.vehicleNo);
-        this.DriverTableForm.controls.vehicleNo.setValue(this.vehicleData);
-      }
+      this.LocationList = LocationList;
+      this.vehicleDet = vehicleDet;
       this.filter.Filter(
         this.jsonControlDriverArray,
         this.DriverTableForm,
@@ -469,11 +429,59 @@ export class AddDriverMasterComponent implements OnInit {
         this.vehicleNoStatus
       );
       this.tableLoad = true;
-    });
+      this.autofillDropdown();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Handle the error as needed
+    }
   }
 
   setStateCityData() {
     const fetchData = this.allData.pincodeData.find(item => item.pincode == this.DriverTableForm.controls.pincode.value.value)
     this.DriverTableForm.controls.city.setValue(fetchData.city)
+  }
+  autofillDropdown() {
+    if (this.isUpdate) {
+      this.locData = this.LocationList.find((x) => x.name == this.DriverTable.driverLocation);
+      this.DriverTableForm.controls.driverLocation.setValue(this.locData);
+
+      this.pincodeData = this.pincodeDet.find((x) => x.name == this.DriverTable.pincode);
+      this.DriverTableForm.controls.pincode.setValue(this.pincodeData);
+
+      this.vehicleData = this.vehicleDet.find((x) => x.name == this.DriverTable.vehicleNo);
+      this.DriverTableForm.controls.vehicleNo.setValue(this.vehicleData);
+    }
+  }
+  getPincodeData() {
+    const pincodeValue = this.DriverTableForm.controls['pincode'].value;
+    if (!isNaN(pincodeValue)) { // Check if pincodeValue is a valid number
+      const pincodeList = this.pincodeDet.map((x) => ({ name: parseInt(x.name), value: parseInt(x.value) }));
+
+      const exactPincodeMatch = pincodeList.find(element => element.name === pincodeValue.value);
+
+      if (!exactPincodeMatch) {
+        if (pincodeValue.toString().length > 2) {
+          const filteredPincodeDet = pincodeList.filter(element => element.name.toString().includes(pincodeValue));
+          if (filteredPincodeDet.length === 0) {
+            // Show a popup indicating no data found for the given pincode
+            Swal.fire({
+              icon: "info",
+              title: "No Data Found",
+              text: `No data found for pincode ${pincodeValue}`,
+              showConfirmButton: true,
+            });
+            return; // Exit the function
+          } else {
+            this.filter.Filter(
+              this.jsonControlPermanentArray,
+              this.DriverTableForm,
+              filteredPincodeDet,
+              this.pincode,
+              this.pincodeStatus
+            );
+          }
+        }
+      }
+    }
   }
 }

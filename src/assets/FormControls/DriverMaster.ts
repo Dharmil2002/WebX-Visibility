@@ -57,7 +57,7 @@ export class DriverControls {
                     label: "Driver Location",
                     placeholder: "Select location",
                     type: 'dropdown',
-                    value: DriverTable?.driverLocation,
+                    value: '',
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
@@ -80,7 +80,7 @@ export class DriverControls {
                     label: "Vehicle Number",
                     placeholder: "Enter Vehicle Number",
                     type: 'dropdown',
-                    value: DriverTable?.vehicleNo,
+                    value: '',
                     generatecontrol: true,
                     disable: false,
                     Validations: [
@@ -124,7 +124,9 @@ export class DriverControls {
                         {
                             name: "invalidAutocompleteObject",
                             message: "Choose proper value",
-                        }
+                        }, {
+                            name: "autocomplete",
+                        },
                     ],
                     additionalData: {
                         showNameAndValue: false
@@ -204,7 +206,7 @@ export class DriverControls {
                         showNameAndValue: false
                     },
                     functions: {
-                        onModel: "getAllMastersData",
+                        onModel: "getPincodeData",
                         onOptionSelect: "setStateCityData"
                     }
                 },

@@ -28,11 +28,11 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        message: "Please enter only 3 to 25 characters.",
-                        pattern: '^[a-zA-z 0-9]{3,25}$',
-                    },
+                        message: "Please Enter only text of length 3 to 25 characters",
+                        pattern: '^[a-zA-Z ]{3,25}$',
+                    }
                 ],
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: isUpdate ? true : false
             },
             {
                 name: 'vendorType',
@@ -44,22 +44,17 @@ export class VendorControl {
                     {
                         name: "required",
                         message: "Vendor Type is required"
-                    }
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
                 ],
                 additionalData: {
                     showNameAndValue: false
-                },
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'vendorSubType',
-                label: 'Vendor Sub Type',
-                placeholder: 'Vendor Sub Type',
-                type: 'toggle',
-                value: '',
-                Validations: [],
-                functions: {
-                    onChange: 'onChange',
                 },
                 generatecontrol: true, disable: false
             },
@@ -77,7 +72,7 @@ export class VendorControl {
                     {
                         name: "pattern",
                         message: "Please enter only 1 to 250 characters.",
-                        pattern: "^[a-zA-Z 0-9 -,.'()#]{1,250}$",
+                        pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,250}$",
                     },
                 ],
                 generatecontrol: true, disable: false
@@ -97,22 +92,8 @@ export class VendorControl {
                     Validations: [{
                     }]
                 },
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'vendorCity',
-                label: 'Vendor City',
-                placeholder: 'Vendor City',
-                type: 'dropdown',
-                value: '',
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Vendor City is required"
-                    }
-                ],
-                additionalData: {
-                    showNameAndValue: false
+                functions: {
+                    onToggleAll: 'toggleSelectAll'
                 },
                 generatecontrol: true, disable: false
             },
@@ -120,25 +101,44 @@ export class VendorControl {
                 name: 'vendorPinCode',
                 label: 'Vendor Pincode',
                 placeholder: 'Search Pincode',
-                type: 'text', value: vendorMasterTable.vendorPinCode,
+                type: 'dropdown',
+                value: vendorMasterTable.vendorPinCode,
                 Validations: [
                     {
                         name: "required",
                         message: "Vendor Pincode is required"
                     },
                     {
-                        name: "pattern",
-                        value: "^[1-9][0-9]{5}$",
-                        message: "Please enter a valid 6-digit pin code"
-                    }
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
                 ],
+                additionalData: {
+                    showNameAndValue: false
+                },
+                functions: {
+                    onModel: "getPincode",
+                    onOptionSelect: "setStateCityData"
+                },
                 generatecontrol: true, disable: false
+            },
+            {
+                name: 'vendorCity',
+                label: 'Vendor City',
+                placeholder: 'Vendor City',
+                type: 'text',
+                value: vendorMasterTable.vendorCity,
+                Validations: [],
+                generatecontrol: true, disable: true
             },
             {
                 name: 'vendorPhoneNo',
                 label: 'Vendor Phone No',
                 placeholder: 'Vendor Phone No',
-                type: 'text', value: vendorMasterTable.vendorPhoneNo,
+                type: 'number', value: vendorMasterTable.vendorPhoneNo,
                 Validations: [
                     {
                         name: "required",
@@ -146,7 +146,7 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        value: "^[0-9]{10}$",
+                        pattern: "^[0-9]{10}$",
                         message: "Please enter a valid 10-digit phone number"
                     }
                 ],
@@ -177,9 +177,9 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        message: "Please enter only 3 to 25 characters.",
-                        pattern: '^[a-zA-z 0-9]{3,25}$',
-                    },
+                        pattern: '^[A-Z]{5}[0-9]{4}[A-Z]{1}$',
+                        message: "Please enter a valid PAN NO (e.g., ABCDE1234F)"
+                    }
                 ],
                 generatecontrol: true, disable: false
             },
@@ -188,20 +188,15 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'CompanyCode', label: 'Company Code', placeholder: 'Company Code', type: 'text', value: localStorage.getItem("CompanyCode"), Validations: [],
-                generatecontrol: false, disable: false
-            },
-            {
-                name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
-                generatecontrol: false, disable: false
-            },
-            {
                 name: 'vendorLocationDropdown',
                 label: 'Vendor Location',
                 placeholder: 'Select Vendor Location',
                 type: '',
                 value: '',
-                Validations: [
+                Validations: [{
+                    name: "required",
+                    message: "Location is Required...!",
+                }
                 ],
                 generatecontrol: false, disable: false
             },
@@ -211,7 +206,7 @@ export class VendorControl {
                 name: 'accountNumber',
                 label: 'Account Number',
                 placeholder: 'Account Number',
-                type: 'text', value: vendorMasterTable.accountNumber,
+                type: 'number', value: vendorMasterTable.accountNumber,
                 Validations: [
                     {
                         name: "required",
@@ -219,8 +214,8 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        value: "^[0-9]+$",
-                        message: "Please enter a valid account number (only digits allowed)"
+                        message: "Please enter Bank Account No of length 14 digits",
+                        pattern: "^[0-9]{14}$",
                     }
                 ],
                 generatecontrol: true, disable: false
@@ -237,7 +232,7 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        value: "^[A-Za-z]{4}[0-9]{7}$",
+                        pattern: "^[A-Z]{4}[0-9]{7}$",
                         message: "Please enter a valid IFSC number (4 letters followed by 7 digits)"
                     }
                 ],
@@ -252,6 +247,11 @@ export class VendorControl {
                     {
                         name: "required",
                         message: "Bank Name is required"
+                    },
+                    {
+                        name: "pattern",
+                        pattern: "^[A-Za-z, ]+$",
+                        message: "Bank Name must contain only letters (alphabetic characters)"
                     }
                 ],
                 generatecontrol: true, disable: false
@@ -276,16 +276,18 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'logicloudLSP', label: 'Logicloud LSP', placeholder: 'Logicloud LSP', type: 'toggle', value: vendorMasterTable.logicloudLSP, Validations: [],
-                generatecontrol: true, disable: false
-            },
-            {
                 name: 'lspName',
                 label: 'LSP Name',
                 placeholder: 'Search LSP Name',
                 type: 'dropdown',
                 value: vendorMasterTable.lspName,
-                Validations: [
+                Validations: [{
+                    name: "invalidAutocompleteObject",
+                    message: "Choose proper value",
+                },
+                {
+                    name: "autocomplete",
+                },
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -307,33 +309,11 @@ export class VendorControl {
                 label: 'GST No',
                 placeholder: 'GST No',
                 type: 'text', value: vendorMasterTable.gstNo,
-                Validations: [
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'select',
-                label: 'Select',
-                placeholder: 'Select',
-                type: 'Staticdropdown',
-                value: [
-                    { value: 'CP', name: 'CP' },
-                    { value: 'NCP', name: 'Non-CP' }
-                ],
-                Validations: [
-
-                ],
-                additionalData: {
-                    showNameAndValue: true
+                Validations: [{
+                    name: "pattern",
+                    message: "Invalid GST Number format.",
+                    pattern: /^\d{2}[A-Z]{5}\d{4}[A-Z]\dZ\d$/,
                 },
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'cpCode',
-                label: 'CP Code',
-                placeholder: 'CP Code',
-                type: 'text', value: vendorMasterTable.cpCode,
-                Validations: [
                 ],
                 generatecontrol: true, disable: false
             },
@@ -370,6 +350,43 @@ export class VendorControl {
                 }
             },
             {
+                name: 'select',
+                label: 'Select',
+                placeholder: 'Select',
+                type: 'Staticdropdown',
+                value: [
+                    { value: 'CP', name: 'CP' },
+                    { value: 'NCP', name: 'Non-CP' }
+                ],
+                Validations: [
+
+                ],
+                additionalData: {
+                    showNameAndValue: true
+                },
+                functions: {
+                    onSelection: 'displayCp'
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'cpCode',
+                label: 'CP Code',
+                placeholder: 'CP Code',
+                type: 'text', value: vendorMasterTable.cpCode,
+                Validations: [
+                ],
+                generatecontrol: false, disable: false
+            },
+            {
+                name: 'entryBy', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("Username"), Validations: [],
+                generatecontrol: false, disable: false
+            },
+            {
+                name: 'isGstCharged', label: 'Is GST Charged', placeholder: 'Is GST Charged', type: 'toggle', value: vendorMasterTable.isGstCharged, Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
                 name: 'paymentEmail',
                 label: 'Payment Email',
                 placeholder: 'Payment Email',
@@ -379,6 +396,10 @@ export class VendorControl {
                 functions: {
                     onChange: 'onChange',
                 },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'logicloudLSP', label: 'Logicloud LSP', placeholder: 'Logicloud LSP', type: 'toggle', value: vendorMasterTable.logicloudLSP, Validations: [],
                 generatecontrol: true, disable: false
             },
             {
@@ -400,7 +421,7 @@ export class VendorControl {
                 value: vendorMasterTable.msme,
                 Validations: [],
                 functions: {
-                    onChange: 'onChange',
+                    onChange: 'onMsmeChange',
                 },
                 generatecontrol: true, disable: false
             },
@@ -451,9 +472,12 @@ export class VendorControl {
                 value: '',
                 Validations: [
                     {
-                        name: "required",
-                        message: "TDS Type is required"
-                    }
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -466,10 +490,6 @@ export class VendorControl {
                 placeholder: 'TDS Rate',
                 type: 'number', value: vendorMasterTable.tdsRate,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "TDS Rate is required"
-                    }
                 ],
                 generatecontrol: false, disable: false
             },
@@ -487,8 +507,17 @@ export class VendorControl {
                 disable: false
             },
             {
-                name: 'entryBy', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("Username"), Validations: [],
-                generatecontrol: false, disable: false
+                name: 'entryDate',
+                label: 'Entry Date',
+                placeholder: 'Select Entry Date',
+                type: 'date',
+                value: new Date(), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
             },
             {
                 name: 'tdsSectionDropdown',

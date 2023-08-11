@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { VendorMasterViewComponent } from "../vendor-master-view/vendor-master-view.component";
+import Swal from "sweetalert2";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -24,38 +25,38 @@ export class VendorMasterListComponent implements OnInit {
     }
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
-          "vendorCode": "Vendor Code",
-          "vendorName": "Vendor Name",
-          "vendorType": "Vendor Type",
-          "vendorAddress": "Vendor Address",
-          "vendorLocation": "Vendor Location",
-          "vendorCity": "Vendor City",
-          "vendorPinCode": "Vendor Pin Code",
-          "vendorPhoneNo": "Vendor Phone No",
-          "emailId": "Email ID",
-          "isActive": "Active Flag",
-          "blackListed": "Black Listed",
-          "panNo": "PAN NO",
-          "serviceTaxNo": "Service Tax No",
-          "remarks": "Remarks",
-          "paymentEmail": "Payment Email",
-          "tdsApplicable": "TDS Applicable",
-          "tdsType": "TDS Type",
-          "tdsRate": "TDS Rate",
-          "bankName": "Bank Name",
-          "accountNumber": "Account Number",
-          "ifscNumber": "IFSC Number",
-          "panDocument": "Pan Document",
-          "audited": "Audited",
-          "auditedBy": "Audited By",
-          "auditedDate": "Audited Date",
-          "tdsDocument": "TDS Document",
-          "cancelCheque": "Cancel Cheque",
-          "msme": "MSME",
-          "isMsmeApplicable": "IsMSMEApplicable",
-          "isGstCharged": "IsGSTCharged",
-          "franchise": "Franchise",
-          "integrateWithFinSystem": "Integrate With Fin System"
+    "vendorCode": "Vendor Code",
+    "vendorName": "Vendor Name",
+    "vendorType": "Vendor Type",
+    "vendorAddress": "Vendor Address",
+    "vendorLocation": "Vendor Location",
+    "vendorCity": "Vendor City",
+    "vendorPinCode": "Vendor Pin Code",
+    "vendorPhoneNo": "Vendor Phone No",
+    "emailId": "Email ID",
+    "isActive": "Active Flag",
+    "blackListed": "Black Listed",
+    "panNo": "PAN NO",
+    "serviceTaxNo": "Service Tax No",
+    "remarks": "Remarks",
+    "paymentEmail": "Payment Email",
+    "tdsApplicable": "TDS Applicable",
+    "tdsType": "TDS Type",
+    "tdsRate": "TDS Rate",
+    "bankName": "Bank Name",
+    "accountNumber": "Account Number",
+    "ifscNumber": "IFSC Number",
+    "panDocument": "Pan Document",
+    "audited": "Audited",
+    "auditedBy": "Audited By",
+    "auditedDate": "Audited Date",
+    "tdsDocument": "TDS Document",
+    "cancelCheque": "Cancel Cheque",
+    "msme": "MSME",
+    "isMsmeApplicable": "IsMSMEApplicable",
+    "isGstCharged": "IsGSTCharged",
+    "franchise": "Franchise",
+    "integrateWithFinSystem": "Integrate With Fin System"
   }
   //#endregion 
   breadScrums = [
@@ -87,21 +88,48 @@ export class VendorMasterListComponent implements OnInit {
       companyCode: this.companyCode,
       "type": "masters",
       "collection": "vendor_detail"
-  }
-  this.masterService.masterPost('common/getall', req).subscribe({
+    }
+    this.masterService.masterPost('common/getall', req).subscribe({
       next: (res: any) => {
-          if (res) {
-              // Generate srno for each object in the array
-              const dataWithSrno = res.data.map((obj, index) => {
-                  return {
-                      ...obj,
-                      srNo: index + 1
-                  };
-              });
-              this.csv = dataWithSrno;
-              this.tableLoad = false;
-          }
+        if (res) {
+          // Generate srno for each object in the array
+          const dataWithSrno = res.data.map((obj, index) => {
+            return {
+              ...obj,
+              srNo: index + 1
+            };
+          });
+          this.csv = dataWithSrno;
+          this.tableLoad = false;
+        }
       }
-  })
+    })
+  }
+  IsActiveFuntion(det) {
+    let id = det.id;
+    // Remove the "id" field from the form controls
+    delete det.id;
+    delete det.srNo;
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      type: "masters",
+      collection: "vendor_detail",
+      id: id,
+      updates: det
+    };
+    this.masterService.masterPut('common/update', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.getVendorDetails();
+        }
+      }
+    });
+  }
 }
-} 

@@ -28,10 +28,11 @@ export class AddressMasterAddComponent implements OnInit {
   addressData: any;
   newAddressCode: string;
   data: any;
+  allData: { pincodeData: any; };
   //#endregion
 
   ngOnInit() {
-    this.getPincodeData();
+    this.getPincodeList();
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -86,24 +87,38 @@ export class AddressMasterAddComponent implements OnInit {
     window.history.back();
   }
   //#region Pincode Dropdown
-  getPincodeData() {
-    const pincodeValue = this.addressTableForm.controls['pincode'].value;
-    let req = {
+  async getPincodeList() {
+    let pincodeReq = {
       "companyCode": this.companyCode,
       "type": "masters",
       "collection": "pincode_detail"
     };
-    if (pincodeValue.length > 2) {
-      this.masterService.masterPost('common/getall', req).subscribe({
-        next: (res: any) => {
-          // Assuming the API response contains an array named 'pincodeList'
-          this.pincodeDet = res.data;
-          const pincodeList = res.data.map(element => ({
-            name: element.pincode,
-            value: element.pincode
-          })).filter(item => item.name.includes(pincodeValue));
+    const pincodeRes = await this.masterService.masterPost('common/getall', pincodeReq).toPromise();
 
-          if (pincodeList.length === 0) {
+    const mergedData = {
+      pincodeData: pincodeRes?.data,
+    };
+    this.allData = mergedData;
+    this.pincodeDet = mergedData.pincodeData.map(element => ({
+      name: element.pincode,
+      value: element.pincode
+    }));
+    if (this.isUpdate) {
+      this.pincodeData = this.pincodeDet.find((x) => x.name == this.data.pincode);
+      this.addressTableForm.controls.pincode.setValue(this.pincodeData);
+    }
+  }
+  getPincodeData() {
+    const pincodeValue = this.addressTableForm.controls['pincode'].value;
+    if (!isNaN(pincodeValue)) { // Check if pincodeValue is a valid number
+      const pincodeList = this.pincodeDet.map((x) => ({ name: parseInt(x.name), value: parseInt(x.value) }));
+
+      const exactPincodeMatch = pincodeList.find(element => element.name === pincodeValue.value);
+
+      if (!exactPincodeMatch) {
+        if (pincodeValue.toString().length > 2) {
+          const filteredPincodeDet = pincodeList.filter(element => element.name.toString().includes(pincodeValue));
+          if (filteredPincodeDet.length === 0) {
             // Show a popup indicating no data found for the given pincode
             Swal.fire({
               icon: "info",
@@ -112,23 +127,20 @@ export class AddressMasterAddComponent implements OnInit {
               showConfirmButton: true,
             });
             return; // Exit the function
+          } else {
+            this.filter.Filter(
+              this.jsonControlGroupArray,
+              this.addressTableForm,
+              filteredPincodeDet,
+              this.pincodeList,
+              this.pincodeStatus
+            );
           }
-
-          if (this.isUpdate) {
-            this.pincodeData = pincodeList.find((x) => x.name == this.data.pincode);
-            this.addressTableForm.controls.pincode.setValue(this.pincodeData);
-          }
-          this.filter.Filter(
-            this.jsonControlGroupArray,
-            this.addressTableForm,
-            pincodeList,
-            this.pincodeList,
-            this.pincodeStatus
-          );
         }
-      });
+      }
     }
   }
+
   //#endregion
 
   //#region Save Data
@@ -199,7 +211,7 @@ export class AddressMasterAddComponent implements OnInit {
   //#endregion
 
   setStateCityData() {
-    const fetchData = this.pincodeDet.find(item => item.pincode == this.addressTableForm.controls.pincode.value.value)
+    const fetchData = this.allData.pincodeData.find(item => item.pincode == this.addressTableForm.controls.pincode.value.value)
     this.addressTableForm.controls.stateName.setValue(fetchData.state)
     this.addressTableForm.controls.cityName.setValue(fetchData.city)
   }

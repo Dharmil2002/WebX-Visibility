@@ -63,8 +63,8 @@
 
                                     <!-- Check if the column key is 'toggle' -->
                                     <ng-container *ngIf="columnHeader[item].key === 'toggle'">
-                                        <mat-slide-toggle color="primary" class="example-margin"
-                                            [(ngModel)]="row[item]">
+                                        <mat-slide-toggle color="primary" class="example-margin" [(ngModel)]="row[item]"
+                                            (change)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onChange })">
                                         </mat-slide-toggle>
                                     </ng-container>
 
@@ -116,6 +116,7 @@
                                     <ng-container *ngIf="columnHeader[item].key === 'Dropdown'">
                                         <mat-form-field appearance="outline" floatLabel="never">
                                             <mat-select [(value)]="row[item]" placeholder={{columnHeader[item].name}}
+                                                (selectionChange)="functionCalled({ row: row, index: i, functionName: columnHeader[item]?.functions?.onOptionSelect, eventArgs: $event})"
                                                 #singleSelect [disabled]="columnHeader[item]?.readonly">
                                                 <mat-option>
                                                     <ngx-mat-select-search
@@ -159,8 +160,8 @@
                                     <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
                                     <ng-container *ngIf="columnHeader[item].key==='time'">
                                         <mat-form-field appearance="outline" floatLabel="never">
-                                            <input matInput [owlDateTimeTrigger]="timepicker"
-                                                [formControlName]="columnHeader[item].name" [owlDateTime]="timepicker">
+                                            <input matInput [owlDateTimeTrigger]="timepicker" [owlDateTime]="timepicker"
+                                                [value]="row[item]" [(ngModel)]="row[item]">
                                             <mat-icon matSuffix [owlDateTimeTrigger]="timepicker"
                                                 class="date-icon">schedule</mat-icon>
                                             <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>

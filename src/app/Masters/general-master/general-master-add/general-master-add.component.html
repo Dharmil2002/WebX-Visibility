@@ -1,0 +1,9 @@
+<div class="block-header" *ngFor="let breadscrum of breadScrums">
+    <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+    </app-breadcrumb>
+</div>
+<form [formGroup]="generalTableForm">
+    <app-form-webxpress [form]="generalTableForm" [formData]="jsonControlGroupArray" [showSaveAndCancelButton]="true"
+        (functionCallEmitter)="functionCallHandler($event)">
+    </app-form-webxpress>
+</form>

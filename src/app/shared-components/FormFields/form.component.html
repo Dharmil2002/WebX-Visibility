@@ -78,9 +78,10 @@
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="(formItem.type=='Staticdropdown') && formItem.generatecontrol===true">
                 <mat-label>{{formItem.label}}</mat-label>
-                <mat-select formControlName={{formItem.name}} [multiple]="(formItem.additionalData?.multiple||false)">
-                    <mat-option *ngFor="let optValue of formItem.value" [value]="optValue.value" (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelection ,
-                           eventArgs: $event })">
+                <mat-select formControlName={{formItem.name}} [multiple]="(formItem.additionalData?.multiple||false)"
+                    (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelection ,
+                    eventArgs: $event })" [disabled]="formItem.disable">
+                    <mat-option *ngFor="let optValue of formItem.value" [value]="optValue.value">
                         {{optValue.name}}</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -136,7 +137,8 @@
                             [showToggleAllCheckbox]="true" toggleAllCheckboxTooltipMessage="Select / Unselect All"
                             [toggleAllCheckboxIndeterminate]="formItem.additionalData.isIndeterminate"
                             [toggleAllCheckboxChecked]="formItem.additionalData.isChecked"
-                            (toggleAll)="functionCalled({field :formItem , functionName:formItem.functions?.onToggleAll  , eventArgs: $event})">
+                            (toggleAll)="functionCalled({field :formItem , functionName:formItem.functions?.onToggleAll  , eventArgs: $event})"
+                            (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">
                             <mat-icon ngxMatSelectSearchClear>delete</mat-icon>
                         </ngx-mat-select-search>
                     </mat-option>

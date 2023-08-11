@@ -6,7 +6,7 @@ import { format, isValid, parseISO } from "date-fns";
  * @returns The KPI data array.
  */
 export function kpiData(StockCountData: any[]): any[] {
-  const lsCount= StockCountData.filter((x)=>x.lsNo!=="")
+  const lsCount = StockCountData.filter((x) => x.lsNo !== "")
   // Helper function to create a shipData object
   const createShipDataObject = (
     count: number,
@@ -57,19 +57,12 @@ export async function getDocketDetailsFromApi(
 
     // Filter docket details based on branch
     const docketDetails = res.data.filter(
-      (x: any) => x.orgLoc.toLowerCase() === branch.toLowerCase()
+      (x: any) => x.orgLoc.toLowerCase() === branch.toLowerCase() || x.unloadloc.toLowerCase() === branch.toLowerCase()
     );
 
     // Modify the data
     const modifiedData = docketDetails.map((item: any) => {
-      let actualWeight;
-
-      if (item.invoiceDetails) {
-        actualWeight = item.invoiceDetails.reduce(
-          (acc: number, total: any) => acc + (total.ACT_WT ?? 0),
-          0
-        );
-      }
+    
       let formattedDate = "";
 
       if (item.docketDate) {
@@ -78,7 +71,18 @@ export async function getDocketDetailsFromApi(
           formattedDate = format(parsedDate, "dd-MM-yy HH:mm");
         }
       }
-
+      const status =
+        item.isComplete === 0 && item?.unloading === 0 && item?.lsNo === "" && item?.mfNo === ""
+          ? "Quick Completion"
+          : item.isComplete === 1 && item?.lsNo === "" && !item?.unloading && item?.mfNo === ""
+            ? "Available for LS"
+            : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo === ""
+              ? "Available for manifest"
+              : item.isComplete === 1 && !item?.unloading && item?.lsNo && item?.mfNo
+                ? "Ready to Depart From " + localStorage.getItem("Branch")
+                : item.isComplete === 1 && item?.unloading && item?.lsNo && item?.mfNo
+                  ? "Going to Last Mile Delivery" + item.destination.split(":")[1]
+                  :"Quick Completion";
       return {
         no: item?.docketNumber ?? "",
         date: formattedDate,
@@ -88,12 +92,8 @@ export async function getDocketDetailsFromApi(
         fromCityToCity: `${item?.fromCity ?? ""} : ${item?.toCity ?? ""}`,
         noofPackages: parseInt(item?.totalChargedNoOfpkg ?? 0),
         chargedWeight: parseInt(item?.chrgwt ?? 0),
-        actualWeight: parseInt(actualWeight ?? 0),
-        status: item?.isComplete === 1
-          ? item?.lsNo === "" ? "Available for LS" : "Available for manifest"
-          : item?.unloading === 1 && item?.lsNo && item?.mfNo
-            ? "Waiting for unloading"
-            : "Quick Completion",
+        actualWeight: parseInt(item?.actualwt ?? 0),
+        status: status,
         // Determine the Action based on the conditions
         Action: item?.isComplete === 1
           ? item?.lsNo === 0 ? "" : ""

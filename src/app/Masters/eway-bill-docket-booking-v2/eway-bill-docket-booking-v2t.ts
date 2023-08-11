@@ -2,18 +2,21 @@ import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Subject } from "rxjs";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
-import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { EwayBillControls } from "src/assets/FormControls/ewayBillControl";
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
 import { Router } from "@angular/router";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
+import { addTracking, calculateInvoiceTotalCommon, getPincode } from "./docket.utility";
+import { getCity } from "src/app/operation/quick-booking/quick-utility";
+import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 
 @Component({
-  selector: 'app-eway-example',
-  templateUrl: './eway-bill-docket-booking-v2.html'
+  selector: "app-eway-example",
+  templateUrl: "./eway-bill-docket-booking-v2.html",
 })
 export class EwayBillDocketBookingV2Component implements OnInit {
   breadscrums = [
@@ -23,10 +26,10 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       active: "CNoteGeneration",
     },
   ];
-  ewayBillTab: EwayBillControls;         // a example of model , whose form we have to display
-  docketControlArray: FormControls[];         // array to hold form controls
-  consignorControlArray: FormControls[];         // array to hold form controls
-  consigneeControlArray: FormControls[];         // array to hold form controls
+  ewayBillTab: EwayBillControls; // a example of model , whose form we have to display
+  docketControlArray: FormControls[]; // array to hold form controls
+  consignorControlArray: FormControls[]; // array to hold form controls
+  consigneeControlArray: FormControls[]; // array to hold form controls
   containerControlArray: FormControls[];
   appointmentControlArray: FormControls[];
   contractControlArray: FormControls[];
@@ -47,7 +50,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   actionObject = {
     addRow: true,
     submit: false,
-    search: true
+    search: true,
   };
   DocketField: any;
   isLinear = true;
@@ -57,6 +60,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   fromCity: string;
   fromCityStatus: any;
   ewayData: any;
+  userName=localStorage.getItem("Username");
   // Displayed columns configuration
   displayedColumns1 = {
     srNo: {
@@ -72,61 +76,64 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     INVDT: {
       name: "Invoice Date",
       key: "date",
+      additionalData: {
+        minDate: new Date(),
+      },
       style: "",
     },
     LENGTH: {
       name: "Length (CM)",
       key: "inputnumber",
       style: "",
-      functions:{
-        onChange:"calculateInvoiceTotal"
-      }
+      functions: {
+        onChange: "calculateInvoiceTotal",
+      },
     },
     BREADTH: {
       name: "Breadth (CM)",
       key: "inputnumber",
       style: "",
-      functions:{
-        onChange:"calculateInvoiceTotal"
-      }
+      functions: {
+        onChange: "calculateInvoiceTotal",
+      },
     },
     HEIGHT: {
       name: "Height (CM)",
       key: "inputnumber",
-      functions:{
-        onChange:"calculateInvoiceTotal"
+      functions: {
+        onChange: "calculateInvoiceTotal",
       },
       style: "",
     },
     DECLVAL: {
       name: "Declared Value",
       key: "inputnumber",
-      functions:{
-        onChange:"calculateInvoiceTotal"
+      functions: {
+        onChange: "calculateInvoiceTotal",
       },
       style: "",
     },
     NO_PKGS: {
       name: "No. of Pkgs.",
       key: "inputnumber",
-      functions:{
-        onChange:"calculateInvoiceTotal"
+      functions: {
+        onChange: "calculateInvoiceTotal",
       },
       style: "",
     },
     CUB_WT: {
       name: "Cubic Weight",
       key: "inputnumber",
-      functions:{
-        onChange:"calculateInvoiceTotal"
+      functions: {
+        onChange: "calculateInvoiceTotal",
       },
       style: "",
     },
     ACT_WT: {
       name: "Actual Weight (KG)",
       key: "inputnumber",
-      functions:{
-        onChange:"calculateInvoiceTotal"
+      functions: {
+        onChange: "calculateInvoiceTotal",
       },
       style: "",
     },
@@ -146,10 +153,17 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       style: "",
     },
   };
+  /*below the varible for the
+   dropdow biding*/
+
   toCity: string;
   toCityStatus: any;
   customer: string;
   customerStatus: any;
+  consigneePincode: any;
+  consigneePincodeStatus: any;
+  consignorPinCode: any;
+  consignorPinCodeStatus: any;
   consignorName: string;
   consignorStatus: any;
   consignorCity: string;
@@ -158,6 +172,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   consigneeCityStatus: any;
   consigneeName: string;
   consigneeNameStatus: any;
+  /*End*/
   genralMaster: any;
   containerSize1: any;
   containerSize2: any;
@@ -167,6 +182,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   destinationStatus: boolean;
   quickDocket: boolean;
   companyCode = parseInt(localStorage.getItem("companyCode"));
+  branch = parseInt(localStorage.getItem("Branch"));
   dockNo: string;
   DocketDetails: any;
   vehicleNo: string;
@@ -177,16 +193,15 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     private filter: FilterUtils,
     private operationService: OperationService,
     private route: Router,
-    private _NavigationService:NavigationService
+    private _NavigationService: NavigationService
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.quickdocketDetaildata = route.getCurrentNavigation().extras.state.data.columnData;
-      this.quickDocket=true;
+      this.quickdocketDetaildata =
+        route.getCurrentNavigation().extras.state.data.columnData;
+      this.quickDocket = true;
     }
     this.bindQuickdocketData();
-    this.getCity();
-    this.customerDetails();
-    this.destionationDropDown();
+   ;
   }
 
   ngOnInit(): void {
@@ -197,13 +212,13 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
 
-    let field = $event.field;                   // the actual formControl instance
-    let functionName = $event.functionName;     // name of the function , we have to call
+    let field = $event.field; // the actual formControl instance
+    let functionName = $event.functionName; // name of the function , we have to call
 
     // we can add more arguments here, if needed. like as shown
     // $event['fieldName'] = field.name;
 
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {
@@ -220,15 +235,17 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     this.docketControlArray = this.ewayBillTab.getDocketFieldControls();
     this.consignorControlArray = this.ewayBillTab.getConsignorFieldControls();
     this.consigneeControlArray = this.ewayBillTab.getConsigneeFieldControls();
-    this.appointmentControlArray = this.ewayBillTab.getAppointmentFieldControls();
+    this.appointmentControlArray =
+      this.ewayBillTab.getAppointmentFieldControls();
     this.containerControlArray = this.ewayBillTab.getContainerFieldControls();
     this.contractControlArray = this.ewayBillTab.getContractFieldControls();
-    this.totalSummaryControlArray = this.ewayBillTab.getTotalSummaryFieldControls();
+    this.totalSummaryControlArray =
+      this.ewayBillTab.getTotalSummaryFieldControls();
     this.ewayBillControlArray = this.ewayBillTab.getEwayBillFieldControls();
 
     // Set up data for tabs and contracts
     this.tabData = {
-      "Details From Eway-Bill": this.docketControlArray,
+      "Cnote Details": this.docketControlArray,
       "Consignor Details": this.consignorControlArray,
       "Consignee Details": this.consigneeControlArray,
       "Appointment Based Delivery": this.appointmentControlArray,
@@ -246,65 +263,73 @@ export class EwayBillDocketBookingV2Component implements OnInit {
 
     // Build form groups
     this.tabForm = formGroupBuilder(this.fb, Object.values(this.tabData));
-    this.contractForm = formGroupBuilder(this.fb, Object.values(this.contractData));
+    this.contractForm = formGroupBuilder(
+      this.fb,
+      Object.values(this.contractData)
+    );
 
     // Set initial values for the form controls
-    this.tabForm.controls["appoint"].setValue('N');
+    this.tabForm.controls["appoint"].setValue("N");
 
     // bind Quick docket Data
     this.bindQuickdocketData();
   }
 
-
-  // Get city details
-  getCity() {
-    this.masterService.getJsonFileDetails('city').subscribe({
-      next: (res: any) => {
-        if (res) {
+  async getCity() {
+    try {
+      const cityDetail = await getCity(this.companyCode, this.masterService);
+      if (this.quickDocket) {
+        this.tabForm.controls["fromCity"].setValue(
+          cityDetail.find((x) => x.name === this.DocketDetails[0]?.fromCity || "")
+        );
+        this.tabForm.controls["toCity"].setValue(
+          cityDetail.find((x) => x.name === this.DocketDetails[0]?.toCity || "")
+        );
+      }
+      if (cityDetail) {
+        if (cityDetail) {
           this.filter.Filter(
             this.docketControlArray,
             this.tabForm,
-            res,
+            cityDetail,
             this.fromCity,
-            this.fromCityStatus,
-          );  // Filter the docket control array based on fromCity details
+            this.fromCityStatus
+          ); // Filter the docket control array based on fromCity details
 
           this.filter.Filter(
             this.docketControlArray,
             this.tabForm,
-            res,
+            cityDetail,
             this.toCity,
-            this.toCityStatus,
-          );  // Filter the docket control array based on toCity details
+            this.toCityStatus
+          ); // Filter the docket control array based on toCity details
 
           this.filter.Filter(
             this.consignorControlArray,
             this.tabForm,
-            res,
+            cityDetail,
             this.consignorCity,
-            this.consignorCityStatus,
-          );  // Filter the consignor control array based on consignorCity details
+            this.consignorCityStatus
+          ); // Filter the consignor control array based on consignorCity details
 
           this.filter.Filter(
             this.consigneeControlArray,
             this.tabForm,
-            res,
+            cityDetail,
             this.consigneeCity,
-            this.consigneeNameStatus,
-          );  // Filter the consignee control array based on consigneeCity details
-          if (this.quickDocket) {
-            this.tabForm.controls['fromCity'].setValue(res.find((x) => x.name === this.DocketDetails[0]?.fromCity || ""))
-            this.tabForm.controls['toCity'].setValue(res.find((x) => x.name === this.DocketDetails[0]?.toCity || ""))
-          }
+            this.consigneeNameStatus
+          ); // Filter the consignee control array based on consigneeCity details
+         
         }
       }
-    });
-  
+    } catch (error) {
+      console.error("Error getting city details:", error);
+    }
   }
 
   // Customer details
   customerDetails() {
-    this.masterService.getJsonFileDetails('customer').subscribe({
+    this.masterService.getJsonFileDetails("customer").subscribe({
       next: (res: any) => {
         if (res) {
           this.filter.Filter(
@@ -313,7 +338,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             res,
             this.customer,
             this.customerStatus
-          );  // Filter the docket control array based on customer details
+          ); // Filter the docket control array based on customer details
 
           this.filter.Filter(
             this.consignorControlArray,
@@ -321,7 +346,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             res,
             this.consignorName,
             this.consignorStatus
-          );  // Filter the consignor control array based on customer details
+          ); // Filter the consignor control array based on customer details
 
           this.filter.Filter(
             this.consigneeControlArray,
@@ -329,92 +354,114 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             res,
             this.consigneeName,
             this.consigneeNameStatus
-          );  // Filter the consignee control array based on customer details
+          ); // Filter the consignee control array based on customer details
           if (this.quickDocket) {
-            this.tabForm.controls['billingParty'].setValue(res.find((x) => x.name === this.DocketDetails[0]?.billingParty || ""))
+            this.tabForm.controls["billingParty"].setValue(
+              res.find(
+                (x) => x.name === this.DocketDetails[0]?.billingParty || ""
+              )
+            );
           }
         }
-      }
+      },
     });
   }
 
   // Get EwayBill data
 
   bindQuickdocketData() {
-    
-    if(this.quickDocket){
+    if (this.quickDocket) {
       let reqBody = {
         companyCode: this.companyCode,
         type: "operation",
         collection: "docket",
-         query: {
-          id:this.quickdocketDetaildata.no
-        }
-      }
-      this.operationService.operationPost('common/getOne', reqBody).subscribe({
+        query: {
+          id: this.quickdocketDetaildata.no,
+        },
+      };
+      this.operationService.operationPost("common/getOne", reqBody).subscribe({
         next: (res: any) => {
-           if(res){
-            this.DocketDetails=res.data.db.data.docket;
-            this.contractForm.controls['payType'].setValue(this.DocketDetails[0]?.payType||"");
-            this.vehicleNo= this.DocketDetails[0]?.vehNo;
-            this.contractForm.controls['totalChargedNoOfpkg'].setValue(this.DocketDetails[0]?.totalChargedNoOfpkg||"")
-            this.contractForm.controls['actualwt'].setValue(this.DocketDetails[0]?.actualwt||"");
-            this.contractForm.controls['chrgwt'].setValue(this.DocketDetails[0]?.chrgwt||"");
-            this.docketId=this.DocketDetails[0]?.id||"";
-            this.tabForm.controls['docketNumber'].setValue(this.DocketDetails[0]?.docketNumber||"")
-            this.tabForm.controls['docketDate'].setValue(this.DocketDetails[0]?.docketDate||"")
-            this.tableData[0].NO_PKGS=this.DocketDetails[0]?.totalChargedNoOfpkg||"";
-            this.tableData[0].ACT_WT=this.DocketDetails[0]?.actualwt||""
-           }
-        }
-      })
+          if (res) {
+            this.DocketDetails = res.data.db.data.docket;
+            this.contractForm.controls["payType"].setValue(
+              this.DocketDetails[0]?.payType || ""
+            );
+            this.vehicleNo = this.DocketDetails[0]?.vehNo;
+            this.contractForm.controls["totalChargedNoOfpkg"].setValue(
+              this.DocketDetails[0]?.totalChargedNoOfpkg || ""
+            );
+            this.contractForm.controls["actualwt"].setValue(
+              this.DocketDetails[0]?.actualwt || ""
+            );
+            this.contractForm.controls["chrgwt"].setValue(
+              this.DocketDetails[0]?.chrgwt || ""
+            );
+            this.docketId = this.DocketDetails[0]?.id || "";
+            this.tabForm.controls["docketNumber"].setValue(
+              this.DocketDetails[0]?.docketNumber || ""
+            );
+            this.tabForm.controls["docketDate"].setValue(
+              this.DocketDetails[0]?.docketDate || ""
+            );
+            this.tableData[0].NO_PKGS =
+              this.DocketDetails[0]?.totalChargedNoOfpkg || "";
+            this.tableData[0].ACT_WT = this.DocketDetails[0]?.actualwt || "";
+          }
+        },
+      });
     }
+    this.getCity();
+    this.customerDetails();
+    this.destionationDropDown();
+    this.getPincodeDetails()
   }
 
   // Load temporary data
   loadTempData() {
-    this.tableData = [{
-      documentType: [],   // Array to store document types
-      srNo: 0,            // Serial number
-      INVNO: "",          // Invoice number
-      INVDT: "",          // Invoice date
-      LENGTH: "",         // Length
-      BREADTH: "",        // Breadth
-      HEIGHT: "",         // Height
-      DECLVAL: "",        // Declaration value
-      NO_PKGS: "",        // Number of packages
-      CUB_WT: "",         // Cubic weight
-      ACT_WT: "",         // Actual weight
-      Invoice_Product: "",// Invoice product
-      HSN_CODE: ""        // HSN code
-    }];
+    this.tableData = [
+      {
+        documentType: [], // Array to store document types
+        srNo: 0, // Serial number
+        INVNO: "", // Invoice number
+        INVDT: "", // Invoice date
+        LENGTH: "", // Length
+        BREADTH: "", // Breadth
+        HEIGHT: "", // Height
+        DECLVAL: "", // Declaration value
+        NO_PKGS: "", // Number of packages
+        CUB_WT: "", // Cubic weight
+        ACT_WT: "", // Actual weight
+        Invoice_Product: "", // Invoice product
+        HSN_CODE: "", // HSN code
+      },
+    ];
   }
   // Add a new item to the table
   addItem() {
     const AddObj = {
-      documentType: [],     // Array to store document types
-      srNo: 0,              // Serial number
-      INVNO: "",            // Invoice number
-      INVDT: "",            // Invoice date
-      LENGTH: "",           // Length
-      BREADTH: "",          // Breadth
-      HEIGHT: "",           // Height
-      DECLVAL: "",          // Declaration value
-      NO_PKGS: "",          // Number of packages
-      CUB_WT: "",           // Cubic weight
-      ACT_WT: "",           // Actual weight
-      Invoice_Product: "",  // Invoice product
-      HSN_CODE: ""          // HSN code
+      documentType: [], // Array to store document types
+      srNo: 0, // Serial number
+      INVNO: "", // Invoice number
+      INVDT: "", // Invoice date
+      LENGTH: "", // Length
+      BREADTH: "", // Breadth
+      HEIGHT: "", // Height
+      DECLVAL: "", // Declaration value
+      NO_PKGS: "", // Number of packages
+      CUB_WT: "", // Cubic weight
+      ACT_WT: "", // Actual weight
+      Invoice_Product: "", // Invoice product
+      HSN_CODE: "", // HSN code
     };
-    this.tableData.splice(0, 0, AddObj);  // Insert the new object at the beginning of the tableData array
+    this.tableData.splice(0, 0, AddObj); // Insert the new object at the beginning of the tableData array
   }
 
   // Display appointment
   displayAppointment($event) {
-    const generateControl = $event.eventArgs.value === "Y";  // Check if value is "Y" to generate control
-    this.appointmentControlArray.forEach(data => {
-      if (data.name !== 'appoint') {
-        data.generatecontrol = generateControl;  // Set generatecontrol property based on the generateControl value
+    const generateControl = $event.eventArgs.value === "Y"; // Check if value is "Y" to generate control
+    this.appointmentControlArray.forEach((data) => {
+      if (data.name !== "appoint") {
+        data.generatecontrol = generateControl; // Set generatecontrol property based on the generateControl value
       }
     });
   }
@@ -423,156 +470,215 @@ export class EwayBillDocketBookingV2Component implements OnInit {
 
   commonDropDownMapping() {
     const mapControlArray = (controlArray, mappings) => {
-      controlArray.forEach(data => {
-        const mapping = mappings.find(mapping => mapping.name === data.name);
+      controlArray.forEach((data) => {
+        const mapping = mappings.find((mapping) => mapping.name === data.name);
         if (mapping) {
-          this[mapping.target] = data.name;  // Set the target property with the value of the name property
-          this[`${mapping.target}Status`] = data.additionalData.showNameAndValue;  // Set the targetStatus property with the value of additionalData.showNameAndValue
+          this[mapping.target] = data.name; // Set the target property with the value of the name property
+          this[`${mapping.target}Status`] =
+            data.additionalData.showNameAndValue; // Set the targetStatus property with the value of additionalData.showNameAndValue
         }
       });
     };
 
     const docketMappings = [
-      { name: 'fromCity', target: 'fromCity' },
-      { name: 'toCity', target: 'toCity' },
-      { name: 'billingParty', target: 'customer' }
+      { name: "fromCity", target: "fromCity" },
+      { name: "toCity", target: "toCity" },
+      { name: "billingParty", target: "customer" },
     ];
 
     const consignorMappings = [
-      { name: 'consignorName', target: 'consignorName' },
-      { name: 'consignorCity', target: 'consignorCity' }
+      { name: "consignorName", target: "consignorName" },
+      { name: "consignorCity", target: "consignorCity" },
+      { name: "consignorPinCode", target: "consignorPinCode" },
     ];
 
     const consigneeMappings = [
-      { name: 'consigneeCity', target: 'consigneeCity' },
-      { name: 'consigneeName', target: 'consigneeName' }
+      { name: "consigneeCity", target: "consigneeCity" },
+      { name: "consigneeName", target: "consigneeName" },
+      { name: "consigneePincode", target: "consigneePincode" },
     ];
-    const destinationMapping = [
-      { name: 'destination', target: 'destination' }
-    ]
-    mapControlArray(this.docketControlArray, docketMappings);  // Map docket control array
-    mapControlArray(this.consignorControlArray, consignorMappings);  // Map consignor control array
-    mapControlArray(this.consigneeControlArray, consigneeMappings);  // Map consignee control array
-    mapControlArray(this.contractControlArray, destinationMapping)
+    const destinationMapping = [{ name: "destination", target: "destination" }];
+    mapControlArray(this.docketControlArray, docketMappings); // Map docket control array
+    mapControlArray(this.consignorControlArray, consignorMappings); // Map consignor control array
+    mapControlArray(this.consigneeControlArray, consigneeMappings); // Map consignee control array
+    mapControlArray(this.contractControlArray, destinationMapping);
   }
   //End
   //destionation
   destionationDropDown() {
- 
-    this.masterService.getJsonFileDetails('destination').subscribe({
+    this.masterService.getJsonFileDetails("destination").subscribe({
       next: (res: any) => {
         if (res) {
-
           this.filter.Filter(
             this.contractControlArray,
             this.contractForm,
             res,
             this.destination,
-            this.destinationStatus,
+            this.destinationStatus
           );
           if (this.quickDocket) {
-            this.contractForm.controls['destination'].setValue(res.find((x) => x.name === this.DocketDetails[0]?.destination || ""))
+            this.contractForm.controls["destination"].setValue(
+              res.find(
+                (x) => x.name === this.DocketDetails[0]?.destination || ""
+              )
+            );
           }
         }
-      }
-    })
+      },
+    });
   }
-  //end 
-  saveData() {
-
-    const dynamicValue = localStorage.getItem('Branch'); // Replace with your dynamic value
-    const controlNames = ['svcType', 'payType', 'rskty', 'pkgs', 'trn'];
-    controlNames.forEach(controlName => {
+  //end
+  async saveData() {
+   // Remove all form errors
+   const tabcontrols = this.tabForm;
+   clearValidatorsAndValidate(tabcontrols);
+   const contractcontrols = this.contractForm;
+   clearValidatorsAndValidate(contractcontrols);
+   /*End*/
+    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
+    const controlNames = ["svcType", "payType", "rskty", "pkgs", "trn"];
+    controlNames.forEach((controlName) => {
       if (Array.isArray(this.contractForm.value[controlName])) {
-        this.contractForm.controls[controlName].setValue('');
+        this.contractForm.controls[controlName].setValue("");
       }
-    })
+    });
     let invoiceDetails = {
-      invoiceDetails:this.tableData
-    }
-    const controltabNames = ['containerCapacity','containerSize1','containerSize2','containerType'];
-    controltabNames.forEach(controlName => {
-      if (Array.isArray(this.contractForm.value[controlName])) {
-        this.tabForm.controls[controlName].setValue('');
+      invoiceDetails: this.tableData,
+    };
+    const controltabNames = [
+      "containerCapacity",
+      "containerSize1",
+      "containerSize2",
+      "containerType",
+    ];
+    controltabNames.forEach((controlName) => {
+      if (Array.isArray(this.tabForm.value[controlName])) {
+        this.tabForm.controls[controlName].setValue("");
       }
-    })
-    this.tabForm.controls['fromCity'].setValue(this.tabForm.value.fromCity?.name || '');
-    this.tabForm.controls['toCity'].setValue(this.tabForm.value.toCity?.name || '');
-    this.tabForm.controls['billingParty'].setValue(this.tabForm.value?.billingParty.name || '');
-    this.tabForm.controls['consignorName'].setValue(this.tabForm.value?.consignorName.name || '');
-    this.tabForm.controls['consignorCity'].setValue(this.tabForm.value?.consignorCity.name || '');
-    this.tabForm.controls['consigneeCity'].setValue(this.tabForm.value?.consigneeCity.name || '');
-    this.tabForm.controls['consigneeName'].setValue(this.tabForm.value?.consigneeName.name || '');
-    this.contractForm.controls['destination'].setValue(this.contractForm.value?.destination.name || '');
+    });
+    this.tabForm.controls["fromCity"].setValue(
+      this.tabForm.value.fromCity?.name || ""
+    );
+    this.tabForm.controls["toCity"].setValue(
+      this.tabForm.value.toCity?.name || ""
+    );
+    this.tabForm.controls["billingParty"].setValue(
+      this.tabForm.value?.billingParty.name || ""
+    );
+    this.tabForm.controls["consignorName"].setValue(
+      this.tabForm.value?.consignorName.name || ""
+    );
+    this.tabForm.controls["consignorCity"].setValue(
+      this.tabForm.value?.consignorCity.name || ""
+    );
+    this.tabForm.controls["consigneeCity"].setValue(
+      this.tabForm.value?.consigneeCity.name || ""
+    );
+    this.tabForm.controls["consigneeName"].setValue(
+      this.tabForm.value?.consigneeName.name || ""
+    );
+    this.contractForm.controls["destination"].setValue(
+      this.contractForm.value?.destination.name || ""
+    );
+    //here the function is calling for add docket Data in docket Tracking.
     if (this.quickDocket) {
-      let id = { isComplete: 1,unloading:0,lsNo:"",mfNo:"" }
-      let docketDetails = { ...this.tabForm.value, ...this.contractForm.value, ...invoiceDetails, ...id };
+      let id = { isComplete: 1, unloading: 0, lsNo: "", mfNo: "",unloadloc:""};
+      let docketDetails = {
+        ...this.tabForm.value,
+        ...this.contractForm.value,
+        ...invoiceDetails,
+        ...id,
+      };
+
+     await addTracking(this.companyCode,this.operationService,docketDetails)
+
       let reqBody = {
         companyCode: this.companyCode,
         type: "operation",
         collection: "docket",
         id: this.docketId,
         updates: {
-          ...docketDetails
-        }
-      }
-      this.operationService.operationPut('common/update', reqBody).subscribe({
+          ...docketDetails,
+        },
+      };
+      this.operationService.operationPut("common/update", reqBody).subscribe({
         next: (res: any) => {
-          this.Addseries()
-        }
-      })
-    }
-    else {
+          this.Addseries();
+        },
+      });
+    } else {
       const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-      const paddedNumber = dynamicNumber.toString().padStart(4, '0');
+      const paddedNumber = dynamicNumber.toString().padStart(4, "0");
       this.dockNo = `CN${dynamicValue}${paddedNumber}`;
-      this.tabForm.controls['docketNumber'].setValue(this.dockNo);
+      this.tabForm.controls["docketNumber"].setValue(this.dockNo);
 
-      let id = { id: this.dockNo, isComplete: 1,unloading:0,lsNo:"",mfNo:""}
-      let docketDetails = { ...this.tabForm.value, ...this.contractForm.value,...invoiceDetails, ...id };
+      let id = {
+        id: this.dockNo,
+        isComplete: 1,
+        unloading: 0,
+        lsNo: "",
+        mfNo: "",
+        entryBy:this.userName,
+        entryDate:new Date().toISOString(),
+        unloadloc:""
+      };
+      let docketDetails = {
+        ...this.tabForm.value,
+        ...this.contractForm.value,
+        ...invoiceDetails,
+        ...id,
+      };
+      await addTracking(this.companyCode,this.operationService,docketDetails)
       let reqBody = {
         companyCode: this.companyCode,
         type: "operation",
         collection: "docket",
-        data: docketDetails
-      }
-      this.operationService.operationPost('common/create', reqBody).subscribe({
+        data: docketDetails,
+      };
+      this.operationService.operationPost("common/create", reqBody).subscribe({
         next: (res: any) => {
-          this.Addseries()
-        }
-      })
+          this.Addseries();
+        },
+      });
     }
   }
   Addseries() {
-    const resultArray = this.generateArray(this.companyCode, this.tabForm.controls['docketNumber'].value, this.contractForm.controls['totalChargedNoOfpkg'].value);
+    const resultArray = this.generateArray(
+      this.companyCode,
+      this.tabForm.controls["docketNumber"].value,
+      this.contractForm.controls["totalChargedNoOfpkg"].value
+    );
     let reqBody = {
       companyCode: this.companyCode,
       type: "operation",
       collection: "docketScan",
-      data: resultArray
-    }
-    this.operationService.operationPost('common/create', reqBody).subscribe({
+      data: resultArray,
+    };
+    this.operationService.operationPost("common/create", reqBody).subscribe({
       next: (res: any) => {
         Swal.fire({
           icon: "success",
           title: "Booked Successfully",
-          text: "DocketNo: " + this.tabForm.controls['docketNumber'].value,
+          text: "DocketNo: " + this.tabForm.controls["docketNumber"].value,
           showConfirmButton: true,
         }).then((result) => {
           if (result.isConfirmed) {
             // Redirect to the desired page after the success message is confirmed.
-            this._NavigationService.navigateTotab(1,'dashboard/GlobeDashboardPage');
+            this._NavigationService.navigateTotab(
+              1,
+              "dashboard/GlobeDashboardPage"
+            );
           }
         });
-      }
-    })
+      },
+    });
   }
   generateArray(companyCode, dockno, pkg) {
     const array = Array.from({ length: pkg }, (_, index) => {
-      const serialNo = (index + 1).toString().padStart(3, '0');
+      const serialNo = (index + 1).toString().padStart(3, "0");
       const bcSerialNo = `${dockno}-${serialNo}`;
       const entryDateTime = new Date().toISOString();
-      const bcDockSf = '0';
+      const bcDockSf = "0";
       return {
         id: bcSerialNo,
         companyCode: companyCode,
@@ -580,6 +686,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         bcSerialNo: bcSerialNo,
         entryDateTime: entryDateTime,
         bcDockSf: bcDockSf,
+        loc:this.branch,
+        entryBy:this.userName,
+        entryDate:new Date().toISOString()
       };
     });
 
@@ -587,10 +696,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
 
   async delete(event) {
-  
     const index = event.index;
     const row = event.element;
-   
+
     const swalWithBootstrapButtons = await Swal.mixin({
       customClass: {
         confirmButton: "btn btn-success msr-2",
@@ -626,10 +734,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         allowOutsideClick: () => !Swal.isLoading(),
       })
       .then((result) => {
-
         if (result.isConfirmed) {
           this.tableData.splice(index, 1);
-          this.tableData=this.tableData;
+          this.tableData = this.tableData;
           swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
           event.callback(true);
         } else if (result.isConfirmed) {
@@ -645,37 +752,35 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         }
       });
 
-    return true
-  } 
+    return true;
+  }
 
- calculateInvoiceTotal() {
+  calculateInvoiceTotal() {
+    calculateInvoiceTotalCommon(this.tableData, this.contractForm);
+  }
+  async getPincodeDetails() {
+    try {
+      const pinCode = await getPincode(this.companyCode, this.masterService);
 
-  let totalChargedNoofPackages = 0;
-    let totalChargedWeight = 0;
-    let totalDeclaredValue = 0;
-    let totalActualValue=0;
-    let cftTotal = 0;
-    let totalPartQuantity = 0;
+      if (pinCode) {
+        this.filter.Filter(
+          this.consigneeControlArray,
+          this.tabForm,
+          pinCode,
+          this.consigneePincode,
+          this.consigneePincodeStatus
+        );
 
-    // let temp = event.controls.ChargedWeight?.value;
-    //Invoices.CalculateRowLevelChargeWeight(temp, false, isFromChargwt);
-   this.tableData.forEach((x) => {
-      totalChargedNoofPackages = totalChargedNoofPackages + parseFloat(x.NO_PKGS || 0);
-      totalChargedWeight = totalChargedWeight + parseFloat(x.ChargedWeight || 0);
-      totalDeclaredValue = totalDeclaredValue + parseFloat(x.DECLVAL || 0);
-      totalActualValue = totalActualValue + parseFloat(x.ACT_WT || 0);
-      if (x.PARTQUANTITY) {
-        totalPartQuantity = totalPartQuantity + x.PARTQUANTITY;
+        this.filter.Filter(
+          this.consignorControlArray,
+          this.tabForm,
+          pinCode,
+          this.consignorPinCode,
+          this.consignorPinCodeStatus
+        );
       }
-    })
-
-    this.contractForm.controls['totalChargedNoOfpkg'].setValue(totalChargedNoofPackages.toFixed(2));
-    this.contractForm.controls['chrgwt'].setValue(totalChargedWeight.toFixed(2));
-    this.contractForm.controls['totalDeclaredValue'].setValue(totalDeclaredValue.toFixed(2));
-    this.contractForm.controls['cft_tot'].setValue(cftTotal);
-    this.contractForm.controls['totalPartQuantity'].setValue(0);
-    this.contractForm.controls['actualwt'].setValue(totalActualValue);
-    //TotalPartQuantity calucation parts are pending 
+    } catch (error) {
+      console.error("Error getting pincode details:", error);
+    }
   }
 }
-

@@ -63,7 +63,6 @@ export const ROUTES: RouteInfo[] =
         submenu: []
       }],
     },
-    
     {
       "path": "Masters/DriverMaster/DriverMasterList",
       "title": "Master & Utilities",
@@ -99,6 +98,24 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
+            },
+            {
+              "path": "Masters/ClusterMaster/ClusterMasterList",
+              "title": "Cluster Master",
+              "moduleName": "Masters",
+              "icon": "",
+              "class": "",
+              "groupTitle": false,
+              "submenu": []
+            },
+            {
+              "path": "Masters/AddressMaster/AddressMasterList",
+              "title": "Address Master",
+              "moduleName": "Masters",
+              "icon": "",
+              "class": "",
+              "groupTitle": false,
+              "submenu": []
             },
             {
               "path": "Masters/LocationMaster/LocationMasterList",
@@ -151,17 +168,8 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
-              "path": "Masters/AirportMaster/AirportMasterList",
-              "title": "Airport Masters",
-              "moduleName": "Masters",
-              "icon": "",
-              "class": "",
-              "groupTitle": false,
-              "submenu": []
-            },
-            {
               "path": "Masters/PinCodeMaster/PinCodeMasterList",
-              "title": "Pin code Masters",
+              "title": "Pin code Master",
               "moduleName": "Masters",
               "icon": "",
               "class": "",
@@ -182,6 +190,26 @@ export const ROUTES: RouteInfo[] =
               "path": "Masters/VehicleTypeMaster/VehicleTypeMasterList",
               "title": "Vehicle Type Master",
               "moduleName": "Vehicle Type Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Masters/GeneralMaster/GeneralMasterList",
+              "title": "General Master",
+              "moduleName": "General Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Masters/PincodeLocation/PincodeLocationMapping",
+              "title": "Pincode to Location Mapping",
+              "moduleName": "Pincode to Location Mapping",
               "icon": "",
               "class": "ml-menu",
               "groupTitle": false,
@@ -266,6 +294,26 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
+            },
+            {
+              "path": "Masters/RouteScheduleMaster/RouteScheduleMasterList",
+              "title": "Route Schedule Master",
+              "moduleName": "Route Schedule Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
+              "path": "Masters/TripRouteMaster/TripRouteMasterList",
+              "title": "Trip Route Master",
+              "moduleName": "Trip Route Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
             }
           ]
         },
@@ -295,7 +343,25 @@ export const ROUTES: RouteInfo[] =
         class: "",
         groupTitle: false,
         submenu: []
+      },
+      {
+        path: "Operation/DocketTracking",
+        title: "Docket Tracking",
+        moduleName: "Docket Tracking",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      },
+      {
+        path: "Masters/Vehicle/Status",
+        title: "Vehicle Status",
+        moduleName: "Vehicle Status",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
       }
-     ],
+      ],
     },
   ]

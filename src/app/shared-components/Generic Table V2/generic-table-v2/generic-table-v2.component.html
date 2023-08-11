@@ -1,0 +1,138 @@
+<div class="materialTableHeader">
+    <div class="row">
+        <div class="col-auto">
+            <ul class="header-buttons-left ml-0">
+                <li class="dropdown m-l-20">
+                    <label for="search-input"><i class="material-icons search-icon">search</i>
+                    </label>
+                    <input placeholder="Search" type="text" #filter class="browser-default search-field"
+                        aria-label="Search box">
+                </li>
+                <li>
+                    <div class="export-button m-l-10" *ngIf="dynamicControls" matTooltip="ADD">
+                        <button *ngIf="!headercode && dynamicControls.add" mat-mini-fab color="primary">
+                            <mat-icon class="col-white" (click)="addNew()">add</mat-icon>
+                        </button>
+                        <button *ngIf="headercode && dynamicControls.add" mat-mini-fab color="primary">
+                            <mat-icon class="col-white" (click)="addNewGeneral()">add</mat-icon>
+                        </button>
+                    </div>
+                </li>
+                <li>
+                    <div class="export-button m-l-10" matTooltip="REFRESH">
+                        <button mat-mini-fab color="primary">
+                            <mat-icon class="col-white" (click)="refresh()">refresh
+                            </mat-icon>
+                        </button>
+                    </div>
+                </li>
+                <li>
+                    <div *ngIf="uploadComponent" class="export-button m-l-10" matTooltip="Bulk Upload"
+                        (click)="onUploadClick()">
+                        <button mat-mini-fab color="primary">
+                            <mat-icon class="col-white">upload</mat-icon>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="col-auto ms-auto">
+            <ul class="header-buttons">
+                <li>
+                    <div *ngIf="csvHeaders" class="export-button m-l-10" matTooltip="CSV">
+                        <img src="assets/images/icons/csv.png" alt="" (click)="ExportToCsv()" />
+                    </div>
+                </li>
+                <li *ngFor="let box of boxData" style="text-align: center;">
+                    <div class="msr-4 align-self-center">
+                        <h6 class="font-14 mb-1">{{box.title}}</h6>
+                        <p class="badge  shadow-style " [class]="box.class"
+                            style="width: -webkit-fill-available; font-size: 16px !important;">
+                            {{box.count}}
+                        </p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-4" *ngIf="dynamicControls.csv">
+        <ul class="header-buttons">
+            <li>
+                <div class="export-button m-l-10" matTooltip="CSV">
+                    <img src="assets/images/icons/csv.png" alt="" (click)="ExportToCsv()" />
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- Generic Table -->
+<div class="responsive_table">
+    <mat-table [dataSource]="dataSource" matSort>
+        <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)">
+            <ng-container *ngIf="!metaData.noColumnSort.includes(tableData); else elseBlock">
+                <mat-header-cell [style]="columnHeader[tableData].Style" *matHeaderCellDef mat-sort-header
+                    [class]="columnHeader[tableData].class">
+                    {{columnHeader[tableData].Title}}
+                </mat-header-cell>
+            </ng-container>
+            <ng-template #elseBlock>
+                <mat-header-cell *matHeaderCellDef [class]="columnHeader[tableData].class">
+                    {{columnHeader[tableData].Title}}
+                    <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;" *ngIf="tableData === 'checkBoxRequired'" color="primary"
+                        (change)="selectAll($event)" [(ngModel)]="AllChack" [indeterminate]="someComplete()"></mat-checkbox>
+                </mat-header-cell>
+            </ng-template>
+
+            <mat-cell *matCellDef="let element" [style]="columnHeader[tableData].Style"
+                [class]="columnHeader[tableData].class">
+                <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;" *ngIf="tableData=='checkBoxRequired'" color="primary" [(ngModel)]="element.isSelected"
+                    (change)="getCheckData($event)"></mat-checkbox>
+                <ng-container
+                    *ngIf="Link && !shouldDisplayLink(tableData) && toggleArray && !toggleArray.includes(tableData) ">
+                    <p style="text-decoration: none;">{{formatData(element[tableData], tableData )}}</p>
+                </ng-container>
+                <ng-container *ngIf="staticField.includes(tableData)">
+                    {{element[tableData]}}
+                </ng-container>
+                <ng-container *ngFor="let toggle of toggleArray">
+                    <mat-slide-toggle *ngIf="tableData==toggle" color="primary" (change)="isActive(element)"
+                        [(ngModel)]="element[tableData]">
+                    </mat-slide-toggle>
+                </ng-container>
+                <a *ngIf="shouldDisplayLink(tableData)" class="pointer" (click)="drillDownData(element,tableData)"
+                    (ngInit)="triggered = false"><u>{{ formatData(element[tableData], tableData) }}</u></a>
+                <button mat-icon-button *ngIf="tableData=='actions'" (click)="editCall(element)"
+                    [matMenuTriggerFor]="menuItemFlag ? menu : null" (click)="$event.stopPropagation()"
+                    class="tbl-action-btn">
+                    <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                </button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item *ngFor="let item of menuItems"
+                        (click)="handleMenuItemClick(item.label,element)">
+                        {{ item.label }}
+                    </button>
+                </mat-menu>
+                <button mat-icon-button *ngIf="tableData=='view'" (click)="$event.stopPropagation()"
+                    (click)="View(element)" class="tbl-action-btn">
+                    <app-feather-icons [icon]="'eye'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="objectKeys(columnHeader)"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]">
+    </mat-paginator>
+</div>
+
+
+<style>
+    .pointer u {
+        text-decoration: none !important;
+        color: #36cbe9;
+        font-weight: 900;
+    }
+    
+</style>

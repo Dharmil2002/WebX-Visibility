@@ -12,6 +12,7 @@ import { UpdateRunSheetComponent } from "./update-run-sheet/update-run-sheet.com
 import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.component";
 import { ViewPrintComponent } from "./view-print/view-print.component";
 import { QuickBookingComponent } from './quick-booking/quick-booking.component';
+import { DocketTrackingComponent } from "./docket-tracking/docket-tracking.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -60,6 +61,10 @@ const routes: Routes = [
   {
     path:"QuickCreateDocket",
     component:QuickBookingComponent
+  },
+  {
+    path:"DocketTracking",
+    component:DocketTrackingComponent
   }
 ]
 

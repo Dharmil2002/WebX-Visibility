@@ -4,13 +4,13 @@
  * @returns {Array} - The array with duplicate objects removed.
  */
 export function removeDuplicateObjects(objects: Array<any>): Array<any> {
-    const uniqueObjectsSet = new Set(objects.map(obj => JSON.stringify(obj) as string));
-    return Array.from(uniqueObjectsSet).map(str => JSON.parse(str));
-  }
+  const uniqueObjectsSet = new Set(objects.map(obj => JSON.stringify(obj) as string));
+  return Array.from(uniqueObjectsSet).map(str => JSON.parse(str));
+}
 
-  export function removeElementFromArray(arr: any[], key: string, value: any): any[] {
-    return arr.filter(item => item[key] !== value);
-  }
+export function removeElementFromArray(arr: any[], key: string, value: any): any[] {
+  return arr.filter(item => item[key] !== value);
+}
 
 export function getNextLocation(locationsArray: string[], currentLocation: string): string {
   let currentIndex = locationsArray.findIndex(loc => loc === currentLocation);
@@ -25,5 +25,27 @@ export function getNextLocation(locationsArray: string[], currentLocation: strin
   } else {
     console.error("Current location not found!");
   }
+
 }
-  
+// Function to format the date in "dd mm yy hh:mm" format
+// Function to format the date in "dd mm yy hh:mm" format
+export const formatDateTimeString = (date) => {
+  return new Intl.DateTimeFormat('en', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+};
+// Function to convert numerical strings to integers
+export function convertNumericalStringsToInteger(dataObj) {
+  for (const prop in dataObj) {
+    const value = dataObj[prop];
+    // Check if the value is a string, not empty, and a valid number
+    if (typeof value === 'string' && value.trim() !== '' && !isNaN(Date.parse(value))) {
+      dataObj[prop] = parseInt(value, 10);
+    }
+  }
+  return dataObj;
+  }

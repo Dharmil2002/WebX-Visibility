@@ -7,7 +7,6 @@ import { DCRControl } from 'src/assets/FormControls/dcrControl';
 import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { map } from 'rxjs/operators';
-import { utilityService } from 'src/app/Utility/utility.service';
 import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-split-dcr',
@@ -37,10 +36,9 @@ export class SplitDcrComponent implements OnInit {
   newCategoryStatus: any;
   newPerson: any;
   newPersonStatus: any;
-  constructor(private service: utilityService, private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
+  constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = this.route.getCurrentNavigation()?.extras.state.data;
-      console.log(this.data);
     }
   }
 
@@ -57,15 +55,15 @@ export class SplitDcrComponent implements OnInit {
         this.docType = data.name;
         this.docTypeStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'newLocation') {
+      if (data.name === 'allotTo') {
         this.newLocation = data.name;
         this.newLocationStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'newCategory') {
+      if (data.name === 'type') {
         this.newCategory = data.name;
         this.newCategoryStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'newPerson') {
+      if (data.name === 'allocateTo') {
         this.newPerson = data.name;
         this.newPersonStatus = data.additionalData.showNameAndValue;
       }
@@ -136,33 +134,65 @@ export class SplitDcrComponent implements OnInit {
   }
   save() {
     this.dcrSplitForm.controls["documentType"].setValue(this.dcrSplitForm.value.documentType.value);
-    this.dcrSplitForm.controls["newLocation"].setValue(this.dcrSplitForm.value.newLocation.value);
-    this.dcrSplitForm.controls["newCategory"].setValue(this.dcrSplitForm.value.newCategory.value);
-    this.dcrSplitForm.controls["newPerson"].setValue(this.dcrSplitForm.value.newPerson.value);
+    this.dcrSplitForm.controls["allotTo"].setValue(this.dcrSplitForm.value.allotTo.value);
+    this.dcrSplitForm.controls["type"].setValue(this.dcrSplitForm.value.type.value);
+    this.dcrSplitForm.controls["allocateTo"].setValue(this.dcrSplitForm.value.allocateTo.value);
     this.dcrSplitForm.controls["id"].setValue(this.dcrSplitForm.value.bookCode);
     this.dcrSplitForm.controls["action"].setValue('Split');
-
-    let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
-      type: "masters",
-      collection: "dcr",
-      data: this.dcrSplitForm.value
-    };
-    this.masterService.masterPost('common/create', req).subscribe({
+    let getReq = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "dcr"
+    }
+    this.masterService.masterPost('common/getall', getReq).subscribe({
       next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
+        if (res && res.data) {
+          const currentBookCode = this.dcrSplitForm.value.bookCode;
+          const existingData = res.data.filter((item: any) => item.id.includes(currentBookCode + '-'));
+          if (existingData.length > 0) {
+            // If bookCode with suffix exists, find the maximum suffix and increment it by 1
+            const maxSuffix = existingData.reduce((max: number, item: any) => {
+              const suffix = parseInt(item.id.split('-')[1]);
+              return isNaN(suffix) ? max : Math.max(max, suffix);
+            }, 0);
+
+            const newSuffix = maxSuffix + 1;
+            this.dcrSplitForm.controls["id"].setValue(`${currentBookCode}-${newSuffix}`);
+          } else {
+            // If no suffix exists, check if currentBookCode already has '-'
+            if (currentBookCode.includes('-')) {
+              // If currentBookCode already has '-', then just set the id as it is
+              this.dcrSplitForm.controls["id"].setValue(currentBookCode);
+            } else {
+              // If currentBookCode does not have '-', append '-1' to the id
+              this.dcrSplitForm.controls["id"].setValue(`${currentBookCode}-1`);
+            }
+
+          }
+          let req = {
+            companyCode: parseInt(localStorage.getItem("companyCode")),
+            type: "masters",
+            collection: "dcr",
+            data: this.dcrSplitForm.value
+          };
+          this.masterService.masterPost('common/create', req).subscribe({
+            next: (res: any) => {
+              if (res) {
+                // Display success message
+                Swal.fire({
+                  icon: "success",
+                  title: "Successful",
+                  text: res.message,
+                  showConfirmButton: true,
+                });
+              }
+            }
           });
-          window.location.reload();
+          this.route.navigateByUrl("/Masters/DocumentControlRegister/TrackDCR");
         }
       }
-    });
-    this.route.navigateByUrl("/Masters/DocumentControlRegister/TrackDCR");
+    })
+
   }
   getAllMastersData() {
     // Prepare the requests for different collections
@@ -239,7 +269,7 @@ export class SplitDcrComponent implements OnInit {
         ...vendordet,
         ...custdet,
       ];
-      const catData = allData.filter(item => item.type === this.dcrSplitForm.value.newCategory.value);
+      const catData = allData.filter(item => item.type === this.dcrSplitForm.value.type.value);
       this.filterDropdown(catData, this.newPerson, this.newPersonStatus);
       this.filterDropdown(locdet, this.newLocation, this.newLocationStatus);
     });

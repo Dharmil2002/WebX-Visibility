@@ -18,14 +18,14 @@ export class DCRControl {
                 displaywith: '',
                 Validations: [
                     {
-                        name: "invalidAutocomplete",
+                        name: "invalidAutocompleteObject",
                         message: "Choose proper value",
                     }
                 ],
                 additionalData: {
                     showNameAndValue: false
                 }, generatecontrol: true,
-                disable: true
+                disable: false
             },
 
             {
@@ -163,7 +163,7 @@ export class DCRControl {
                     displaywith: '',
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         }
                     ],
@@ -184,7 +184,7 @@ export class DCRControl {
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -205,7 +205,7 @@ export class DCRControl {
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -230,7 +230,7 @@ export class DCRControl {
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -257,7 +257,7 @@ export class DCRControl {
                     displaywith: '',
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObjectObject",
                             message: "Choose proper value",
                         },
                         {
@@ -323,14 +323,14 @@ export class DCRControl {
                     Validations: []
                 },
                 {
-                    name: 'newLocation',
+                    name: 'allotTo',
                     label: 'New Allocation Location',
                     placeholder: 'New Allocation Location',
                     type: 'dropdown',
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -344,14 +344,14 @@ export class DCRControl {
                     disable: false
                 },
                 {
-                    name: 'newCategory',
+                    name: 'type',
                     label: 'New Allocation Category',
                     placeholder: 'New Allocation Category',
                     type: 'dropdown',
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -369,14 +369,14 @@ export class DCRControl {
                     disable: false
                 },
                 {
-                    name: 'newPerson',
+                    name: 'allocateTo',
                     label: 'Person to be Assigned Series',
                     placeholder: 'Person to be Assigned Series',
                     type: 'dropdown',
                     value: "",
                     Validations: [
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         },
                         {
@@ -399,7 +399,7 @@ export class DCRControl {
                     generatecontrol: false, disable: false
                 },
                 {
-                    name: 'entrydate',
+                    name: 'entryDate',
                     label: 'Entry Date',
                     placeholder: 'Entry Date',
                     type: 'text',

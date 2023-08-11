@@ -4,8 +4,8 @@
             (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
-    <app-table-boilerplate *ngIf="tableData" [tableData]="tableData" [columnHeader]="displayedColumns1"
+    <app-table-boilerplate *ngIf="tableLoad" [tableData]="tableData" [columnHeader]="displayedColumns1"
         title="Pincode to Location Mapping Master" (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
         (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
-        [ActionObject]="actionObject"></app-table-boilerplate>
+        [ActionObject]="actionObject" (callFunction)="functionCallHandler($event)"></app-table-boilerplate>
 </app-common-wrapper-webxpress>

@@ -15,6 +15,10 @@ export class customerControl {
                         name: "required",
                         message: "Group Code is required"
                     },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: true
@@ -35,6 +39,9 @@ export class customerControl {
                         pattern: '^[a-zA-Z0-9]{4,10}$',
                     }
                 ],
+                functions: {
+                    onChange: 'dataExist',
+                },
 
             },
 
@@ -79,7 +86,7 @@ export class customerControl {
                         pattern: "^[.a-zA-Z0-9,-]{1,5}$",
                     }
                 ],
-              
+
             },
             {
                 name: 'industry', label: 'Industry', placeholder: 'Industry', type: 'text',
@@ -127,16 +134,16 @@ export class customerControl {
                 name: 'ownership', label: 'Type of Ownership', placeholder: 'Group Code', type: 'dropdown',
                 value: '', generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Type of Ownership is required"
-                    // },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
                 }
             },
-           
+
             {
                 name: 'customerControllingLocation',
                 label: 'Customer Controlling Locations',
@@ -156,7 +163,7 @@ export class customerControl {
                 },
                 generatecontrol: true, disable: false
             },
-           
+
             {
                 name: 'customerLocation',
                 label: 'Customer location',
@@ -316,36 +323,47 @@ export class customerControl {
                         {
                             name: "pattern",
                             message: "Please Enter alphanumeric Billing Addressof length 15",
-                            pattern: "^[a-zA-Z0-9]{3,15}$",
+                            pattern: "^[a-zA-Z0-9 ]{3,15}$",
                         }
                     ],
+
+                },
+                {
+                    name: 'billPincode', label: "Billing Pincode",
+                    placeholder: "Select Billing Pincode",
+                    type: 'dropdown',
+                    value: customerTable.billPincode,
+                    additionalData: {
+                        showNameAndValue: false
+                    },
+                    generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "autocomplete",
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
+                    ],
+                    functions: {
+                        onModel: "getBillingPincodeData",
+                        onOptionSelect: "setCityData"
+                    }
 
                 },
 
                 {
                     name: 'billCity', label: 'Billing City', placeholder: 'Billing City', type: 'text',
-                    value: customerTable?.billCity, generatecontrol: true, disable: false,
+                    value: '', generatecontrol: true, disable: true,
                     Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only text of length 3 to 25 characters",
-                            pattern: '^[a-zA-Z ]{3,25}$',
-                        }
                     ],
 
                 },
-
-                {
-                    name: 'billPincode', label: 'Billing Pincode', placeholder: 'Billing Pincode', type: 'text',
-                    value: customerTable?.billPincode, generatecontrol: true, disable: false,
-                    Validations: [],
-
-                },
-
                 {
                     name: 'sameAddres', label: 'Billing address same as customer address', placeholder: '', type: 'toggle', value: customerTable?.sameAddres, generatecontrol: true, disable: false,
                     Validations: [
-                        
+
                     ],
 
                 },
@@ -459,44 +477,43 @@ export class customerControl {
                     ],
 
                 },
-
                 {
-                    name: 'city', label: 'City', placeholder: 'City', type: 'text',
-                    value: customerTable?.city, generatecontrol: true, disable: false,
+                    name: 'pincode', label: "Pincode",
+                    placeholder: "Select Pincode",
+                    type: 'dropdown',
+                    value: customerTable.pincode,
+                    additionalData: {
+                        showNameAndValue: false
+                    },
+                    generatecontrol: true, disable: false,
                     Validations: [
                         {
-                            name: "pattern",
-                            message: "Please enter a City of length 3 to 15 characters",
-                            pattern: '^[a-zA-Z ]{3,15}$',
+                            name: "autocomplete",
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
                         }
+                    ],
+                    functions: {
+                        onModel: "getPincodeData",
+                        onOptionSelect: "setStateCityData"
+                    }
+
+                },
+                {
+                    name: 'city', label: 'City', placeholder: 'City', type: 'text',
+                    value: customerTable?.city, generatecontrol: true, disable: true,
+                    Validations: [
                     ],
 
                 },
                 {
                     name: 'state', label: 'State', placeholder: 'State', type: 'text',
-                    value: customerTable?.state, generatecontrol: true, disable: false,
+                    value: customerTable?.state, generatecontrol: true, disable: true, 
                     Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter a State of length 3 to 15 characters",
-                            pattern: '^[a-zA-Z ]{3,15}$',
-                        }
                     ],
-
-                },
-
-                {
-                    name: 'pincode', label: 'Pincode', placeholder: 'Pincode', type: 'number',
-                    value: customerTable?.pincode, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-
-                            name: "pattern",
-                            message: "Please enter Bank Account No of length 6 digits",
-                            pattern: "^[0-9]{6}$",
-
-                        }
-                    ],
+                    
 
                 },
                 {
@@ -532,7 +549,7 @@ export class customerControl {
                     ],
                     generatecontrol: false, disable: false
                 },
-                
+
             ]
 
     }

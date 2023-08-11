@@ -18,6 +18,7 @@
         <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableload"
           (click)="loadingSheetGenerate()">Generate LoadingSheet</button>
         <button class="msr-3" mat-raised-button color="primary" (click)="goBack(2)">Back</button>
+        <button class="msr-3" mat-raised-button color="primary" *ngIf="departFlag" (click)="departVehicle()">Depart Vehicle</button>
       </div>
     </div>
   </div>

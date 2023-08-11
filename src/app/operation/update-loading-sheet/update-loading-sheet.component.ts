@@ -1,15 +1,13 @@
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { Router } from '@angular/router';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
 import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival/mark-arrival.component';
-import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import Swal from 'sweetalert2';
-import { Shipment, autoBindData, filterShipments, kpiData } from '../shipment';
-import { updatePending } from './loadingSheetshipment';
+import { autoBindData, filterShipments, kpiData } from '../shipment';
+import { vehicleStatusUpdate } from './loadingSheetshipment';
 import { groupShipmentsByLeg } from './shipmentsUtils';
 import { handlePackageUpdate } from './packageUtils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
@@ -32,6 +30,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   loadingSheetTableForm: UntypedFormGroup;
   jsonControlArray: any;
   jsonscanControlArray: any;
+  scanPackage: string;
   shipingHeader = {
     "Leg": "Leg",
     "Shipment": "Shipments",
@@ -92,8 +91,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
   Scan: any;
   shipingDataTable: any;
   packageData: any;
+  updateTrip: any;
 
-  
+
   constructor(
     private Route: Router,
     public dialogRef: MatDialogRef<MarkArrivalComponent>,
@@ -102,22 +102,38 @@ export class UpdateLoadingSheetComponent implements OnInit {
     private _operation: OperationService,
     private cdr: ChangeDetectorRef
   ) {
+
     // Set the initial shipment status to 'Unloaded'
     this.shipmentStatus = 'Unloaded';
-  
+
     // Assign the item to the arrivalData property
     this.arrivalData = item;
-  
+
     // Call the getShippningData() function to fetch shipping data
-    this.getShippningData();
-  
+    this.getLoadingSheetDetail();
     // Initialize form controls for the loading sheet table
     this.IntializeFormControl();
   }
-  
 
-  getShippningData() {
+  getLoadingSheetDetail() {
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "menifest_detail"
+    }
+    this._operation.operationPost('common/getall', reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          const mfDetail = res.data.filter((x) => x.tripId === this.arrivalData?.TripID);
+          this.getShippningData(mfDetail)
+        }
+      }
+    })
+  }
 
+
+  getShippningData(menifestNo) {
+    ///element.mfNo
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
@@ -126,12 +142,16 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     this._operation.operationPost('common/getall', reqBody).subscribe(res => {
       if (res) {
-        const arrivalData  = res.data.filter((x)=>x.destination.split(":")[1].trim()===this.currentBranch);
+        this.updateTrip = res.data;
+        const arrivalData = res.data.filter((x) => {
+          const destinationParts = x.destination ? x.destination.split(":")[1].trim() : "";
+          return destinationParts === this.currentBranch && menifestNo.some((manifestItem) => manifestItem.mfNo === x.mfNo);
+        });
         // Filter shipments based on route and branch
         let filteredShipments = filterShipments(arrivalData, this.arrivalData?.Route, this.currentBranch);
-      
+
         // Update CSV and boxData
-        this.csv =  filteredShipments.map((shipment) => ({
+        this.csv = filteredShipments.map((shipment) => ({
           Shipment: shipment.docketNumber || "",
           Origin: shipment.orgLoc || "",
           Destination: shipment.destination ? shipment.destination.split(":")[1].trim() : "",
@@ -139,27 +159,27 @@ export class UpdateLoadingSheetComponent implements OnInit {
           Unloaded: 0,
           Pending: parseInt(shipment.totalChargedNoOfpkg),
           Leg: (shipment.orgLoc || "") + ":" + (shipment.destination ? shipment.destination.split(":")[1].trim() : ""),
-          KgWt:shipment?.actualwt||"",
-          CftVolume:shipment?.cft_tot||""
+          KgWt: parseInt(shipment?.actualwt) || 0,
+          CftVolume: shipment?.cft_tot || ""
         }));
         this.boxData = kpiData(this.csv, this.shipmentStatus, "");
         this.tableload = false;
-      
+
         let shipingTableData = this.csv;
-      
+
         // Group shipments by leg using the utility function
         let shipingTableDataArray = groupShipmentsByLeg(shipingTableData);
-      
+
         // Set the leg of the arrivalData
         this.arrivalData.Leg = shipingTableData[0]?.Leg;
-      
+
         // Set the shipingDataTable to the grouped data
         this.shipingDataTable = shipingTableDataArray;
         this.getPackagesData();
       }
     });
     // Update pending shipments
-   
+
   }
 
   getPackagesData() {
@@ -178,20 +198,20 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   updatePackage() {
-   
+
     this.tableload = true;
 
-  const scanValue = this.loadingSheetTableForm.value.Scan.trim();
-  const legValue = this.arrivalData.Route.trim();
+    const scanValue = this.scanPackage.trim();
+    const legValue = this.arrivalData.Route.trim();
 
-  // Call the imported function to handle the logic
-  let PackageUpdate =handlePackageUpdate(scanValue, legValue, this.currentBranch,this.packageData, this.csv, this.boxData, this.cdr);
+    // Call the imported function to handle the logic
+    let PackageUpdate = handlePackageUpdate(scanValue, legValue, this.currentBranch, this.packageData, this.csv, this.boxData, this.cdr);
     // Call kpiData function
-    if(PackageUpdate){
-    this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
+    if (PackageUpdate) {
+      this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
     }
     this.cdr.detectChanges(); // Trigger change detection
-    this.tableload=false;
+    this.tableload = false;
   }
 
 
@@ -221,32 +241,32 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
   ngOnInit(): void {
   }
-/**
- * Function to initialize form controls for the loading sheet table
- */
+  /**
+   * Function to initialize form controls for the loading sheet table
+   */
 
-IntializeFormControl() {
-  // Create an instance of UpdateloadingControl
-  const ManifestGeneratedFormControl = new UpdateloadingControl();
+  IntializeFormControl() {
+    // Create an instance of UpdateloadingControl
+    const ManifestGeneratedFormControl = new UpdateloadingControl();
 
-  // Get the form controls for the update list
-  this.jsonControlArray = ManifestGeneratedFormControl.getupdatelsFormControls();
+    // Get the form controls for the update list
+    this.jsonControlArray = ManifestGeneratedFormControl.getupdatelsFormControls();
 
-  // Get the form controls for the scan
-  this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
+    // Get the form controls for the scan
+    this.jsonscanControlArray = ManifestGeneratedFormControl.getScanFormControls();
 
-  // Filter out the "Scan" control from the update list
-  this.updateListData = this.jsonControlArray.filter((x) => x.name != "Scan");
+    // Filter out the "Scan" control from the update list
+    this.updateListData = this.jsonControlArray.filter((x) => x.name != "Scan");
 
-  // Get only the "Scan" control
-  this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
+    // Get only the "Scan" control
+    this.Scan = this.jsonControlArray.filter((x) => x.name == "Scan");
 
-  // Build the form group using the form control array
-  this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    // Build the form group using the form control array
+    this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
 
-  // Set the arrival data binding
-  this.setArrivalDataBindData();
-}
+    // Set the arrival data binding
+    this.setArrivalDataBindData();
+  }
 
   IsActiveFuntion($event) {
     this.loadingData = $event
@@ -268,55 +288,111 @@ IntializeFormControl() {
   }
 
 
-  CompleteScan() {
-  
+  async CompleteScan() {
     let packageChecked = false;
     let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
+
     if (exists) {
       packageChecked = locationWiseData.every(obj => obj.Packages === obj.Unloaded);
     }
+
+    // Create an array of promises for UpdateDocketDetail calls
+    const updatePromises = locationWiseData.map(element => {
+      return this.UpdateDocketDetail(element.Shipment);
+    });
+
+    // Wait for all UpdateDocketDetail promises to resolve
+    await Promise.all(updatePromises);
+
     if (packageChecked) {
-      this.updateTripStatus()
-      
-    }
-    else {
+      this.updateTripStatus();
+    } else {
       Swal.fire({
         icon: "error",
         title: "Unload Package",
-        text: `Please Unload All  Your Package`,
+        text: `Please Unload All Your Package`,
         showConfirmButton: true,
-      })
+      });
     }
-
   }
+
+  async UpdateDocketDetail(dkt) {
+    // if(dkt){
+    // await updateTracking(this.companyCode, this._operation, dkt);
+    // }
+    // const lsDetail = await loadingSheetDetails(this.companyCode, this._operation, this.arrivalData?.TripID);
+    // lsDetail.forEach(async element => {
+    //   await updateLoadingSheet(this.companyCode, this._operation, element.lsno, element.loadAddedKg, element.loadedVolumeCft)
+    // });
+    const reqbody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "docket",
+      "id": dkt,
+      "updates": {
+        "unloading": 1,
+        "unloadloc": this.currentBranch
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      this._operation.operationPut("common/update", reqbody).subscribe({
+        next: (res: any) => {
+          resolve(res);
+        },
+        error: (err: any) => {
+          reject(err);
+        }
+      });
+    });
+  }
+
   Close(): void {
     this.dialogRef.close()
+    this.goBack(2)
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
-  updateTripStatus(){
-    const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"),this.currentBranch);
+  async updateTripStatus() {
+    const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"), this.currentBranch);
     let tripDetails
-    if(next){
+    if (next) {
       tripDetails = {
-       nextUpComingLoc:next
+        orgLoc: this.currentBranch,
+        nextUpComingLoc: next,
+        status: "Update Trip"
+      }
+
+      const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation, false);
+    }
+    else {
+      tripDetails = {
+        status: "close",
+        nextUpComingLoc: "",
+        closeTime: new Date()
+      }
+      try {
+        // Call the vehicleStatusUpdate function here
+        const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation, true);
+        Swal.fire({
+          icon: "info",
+          title: "Trip is close",
+          text: "Trip is close at" + this.currentBranch,
+          showConfirmButton: true,
+        });
+        // Handle the result if needed
+      } catch (error) {
+        // Handle any errors that might occur
       }
     }
-    else{
-      tripDetails = {
-        status:"close",
-        nextUpComingLoc: "",
-        closeTime:new Date()
-       }
-    }
- 
+
     const reqBody = {
       "companyCode": this.companyCode,
       "type": "operation",
       "collection": "trip_detail",
-      "id": 'trip_' +  this.arrivalData?.Route.split(":")[0] || "",
+      "id": this.arrivalData.id,
       "updates": {
         ...tripDetails,
       }
@@ -324,7 +400,7 @@ IntializeFormControl() {
     this._operation.operationPut("common/update", reqBody).subscribe({
       next: (res: any) => {
         if (!next) {
-          this.tripHistoryUpdate() 
+          this.tripHistoryUpdate()
           Swal.fire({
             icon: "success",
             title: "Successful",
@@ -332,40 +408,41 @@ IntializeFormControl() {
             showConfirmButton: true,
           })
         }
-        else{
-          this.tripHistoryUpdate() 
+        else {
+          this.tripHistoryUpdate()
         }
       }
     })
   }
-  
+
   tripHistoryUpdate() {
 
-      let tripDetails = {
-        arrivalBranch:this.currentBranch,
+    let tripDetails = {
+      arrivalBranch: this.currentBranch,
+    }
+    const reqBody = {
+      "companyCode": this.companyCode,
+      "type": "operation",
+      "collection": "trip_transaction_history",
+      "id": this.arrivalData?.TripID || "",
+      "updates": {
+        ...tripDetails,
       }
-      const reqBody = {
-        "companyCode": this.companyCode,
-        "type": "operation",
-        "collection": "trip_transaction_history",
-        "id": this.arrivalData?.TripID||"",
-        "updates": {
-          ...tripDetails,
+    }
+    this._operation.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: `Arrival Scan done Successfully`,
+            showConfirmButton: true,
+          })
+          this.dialogRef.close(this.loadingSheetTableForm.value)
+          this.goBack(2)
         }
       }
-      this._operation.operationPut("common/update", reqBody).subscribe({
-        next: (res: any) => {
-          if (res) {
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: `Arrival Scan done Successfully`,
-              showConfirmButton: true,
-            })
-            this.dialogRef.close(this.loadingSheetTableForm.value)
-          }
-        }
-      })
+    })
   }
 
 }

@@ -14,7 +14,7 @@ export class UpdateloadingControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             }, {
                 name: 'Route',
                 label: 'Route',
@@ -22,7 +22,7 @@ export class UpdateloadingControl {
                 type: 'text',
                 value: '',
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: true
             },
             {
                 name: "tripID",
@@ -72,7 +72,7 @@ export class UpdateloadingControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             }, {
                 name: 'Route',
                 label: 'Route',
@@ -80,7 +80,7 @@ export class UpdateloadingControl {
                 type: 'text',
                 value: '',
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: true
             },
             {
                 name: "tripID",
@@ -108,7 +108,7 @@ export class UpdateloadingControl {
                 value: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
             {
                 name: 'Scan',

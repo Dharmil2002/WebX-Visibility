@@ -261,7 +261,7 @@ export class AddUserMasterComponent implements OnInit {
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "user_detail",
+                collection: "user_master",
                 id: this.data.id,
                 updates: this.userTableForm.value
             };
@@ -286,7 +286,7 @@ export class AddUserMasterComponent implements OnInit {
             let req = {
                 companyCode: this.companyCode,
                 type: "masters",
-                collection: "user_detail",
+                collection: "user_master",
                 data: mergedObject//this.userTableForm.value
             };
             this.masterService.masterPost('common/create', req).subscribe({

@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import { ReAllocateDcrComponent } from '../re-allocate-dcr/re-allocate-dcr.component';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-dcr-detail-page',
@@ -27,12 +28,12 @@ export class DcrDetailPageComponent implements OnInit {
     },
   ];
   columnHeader = {
-    "actionDesc": "Action",
-    'actionDate': 'Date',
-    'bookNumber': 'Book Number',
+    "action": "Action",
+    'entryDate': 'Date',
+    'bookCode': 'Book Number',
     'fromTo': 'Series Start-End',
     'location': 'Allocation Location',
-    "category": "Allocation Category",
+    "type": "Allocation Category",
     "person": "Person"
   };
   dynamicControls = {
@@ -40,6 +41,7 @@ export class DcrDetailPageComponent implements OnInit {
     edit: false,
     csv: false
   };
+  datePipe: DatePipe = new DatePipe("en-US");
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = [];
   linkArray = [];
@@ -50,13 +52,12 @@ export class DcrDetailPageComponent implements OnInit {
   action: any;
   actionStatus: any;
   docData: any;
+  allData: any[];
+  locdet: any;
   constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, public dialog: MatDialog) {
     if (this.route.getCurrentNavigation()?.extras != null) {
       this.type = this.route.getCurrentNavigation().extras?.state?.additionalData;
       this.data = this.route.getCurrentNavigation().extras?.state?.data;
-      if (this.type !== 'Manage') {
-        this.getDcrHistoryData();
-      }
     }
   }
 
@@ -121,7 +122,7 @@ export class DcrDetailPageComponent implements OnInit {
       })
     ).subscribe((mergedData) => {
       // Access the merged data here
-      const locdet = mergedData.locationData.map(element => ({
+      this.locdet = mergedData.locationData.map(element => ({
         name: element.locName,
         value: element.locCode,
         type: 'L',
@@ -146,9 +147,9 @@ export class DcrDetailPageComponent implements OnInit {
       }));
 
       // Combine all arrays into one flat array with extra data indicating the sections
-      const allData = [
+      this.allData = [
         { name: '---Location---', value: '', type: 'L' },
-        ...locdet,
+        ...this.locdet,
         { name: '---Employee---', value: '', type: 'E' },
         ...userdet,
         { name: '---BA---', value: '', type: 'B' },
@@ -158,10 +159,10 @@ export class DcrDetailPageComponent implements OnInit {
       ];
 
       // Options for allocateTo dropdown
-      const hierarchyLoc = mergedData.locationData.find(optItem => optItem.locCode === this.data.allotTo)
-      const allocateTo = allData.find(optItem => optItem.value === this.data.allocateTo);
-      const allotTo = locdet.find(optItem => optItem.value === this.data.allotTo);
-      const series = this.data?.seriesFrom && this.data?.seriesTo ? `${this.data.seriesFrom} - ${this.data.seriesTo}` : '';
+      const hierarchyLoc = mergedData.locationData.find(optItem => optItem.locCode === this.data?.allotTo)
+      const allocateTo = this.allData.find(optItem => optItem.value === this.data?.allocateTo);
+      const allotTo = this.locdet.find(optItem => optItem.value === this.data?.allotTo);
+      const series = this.data?.seriesFrom && this.data?.seriesTo ? `${this.data?.seriesFrom} - ${this.data?.seriesTo}` : '';
       const mappings = {
         'queryNumber': 'seriesFrom',
         'bookNumber': 'bookCode',
@@ -180,25 +181,50 @@ export class DcrDetailPageComponent implements OnInit {
         if (key === 'person') { value = allocateTo ? `${allocateTo.value} - ${allocateTo.name}` : ''; }
         if (key === 'location') { value = allotTo ? `${allotTo.value} - ${allotTo.name}` : ''; }
         if (key === 'locationHierarchy') { value = hierarchyLoc ? `${hierarchyLoc.reportLevel}` : ''; }
-        if (key === 'usedLeaves') { value = this.data.usedLeaves; }
+        if (key === 'usedLeaves') { value = this.data?.usedLeaves; }
         this.dcrDetailForm.controls[key].setValue(value);
       }
       // Set 'personCat' form control based on 'type'
       this.dcrDetailForm.controls['personCat'].setValue(this.data?.type === 'E' ? 'Employee' : this.data?.type === 'C' ? 'Customer' : this.data?.type === 'L' ? 'Location' : 'BA');
+      if (this.type !== 'Manage') {
+        this.getDcrHistoryData();
+      }
     });
   }
   close() {
     window.history.back();
   }
   getDcrHistoryData() {
-    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-      this.historyData = res.dcrTrackHistoryData[0];
-      this.historyDet = this.historyData.filter(item => parseInt(item.docKey) === parseInt(this.data.bookCode)).map((item) => {
-        item['location'] = item.allotedLoc + ' : ' + item.allotedLocName;
-        return item;
-      });
-      this.tableLoad = false;
-    });
+    let req = {
+      "companyCode": parseInt(localStorage.getItem("companyCode")),
+      "type": "masters",
+      "collection": "dcr"
+    }
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          const dataWithSrno = res.data.map((obj, index) => {
+            return {
+              ...obj,
+              srNo: index + 1
+            };
+          });
+          this.historyDet = dataWithSrno.filter(item => item.bookCode === this.data?.bookCode).map((item) => {
+            const loc = this.locdet.find(optItem => optItem.value === item.allotTo);
+            const allocateTo = this.allData.find(optItem => optItem.value === item.allocateTo);
+            item['location'] = loc ? `${loc.value} - ${loc.name}` : '';
+            item["entryDate"] = this.datePipe.transform(item.entryDate, "dd-MM-yyyy HH:mm:ss");
+            item['fromTo'] = item.seriesFrom + ' - ' + item.seriesTo;
+            item['type'] = item.type === 'E' ? 'Employee' : item.type === 'C' ? 'Customer' : item.type === 'L' ? 'Location' : 'BA'
+            item['person'] = allocateTo ? `${allocateTo.value} - ${allocateTo.name}` : '';
+            return item;
+          });
+          this.tableLoad = false;
+
+        }
+      }
+    })
   }
   manage() {
     const selectedValue = this.dcrDetailForm.value.action;
@@ -217,7 +243,7 @@ export class DcrDetailPageComponent implements OnInit {
         {
           width: '800px',
           height: '280px',
-          data: ''
+          data: this.data
         });
     }
     else {
@@ -231,7 +257,7 @@ export class DcrDetailPageComponent implements OnInit {
   bindDropdown() {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       this.docData = res.documentTypeDropDown;
-      const Select = this.docData.find(x => x.value == this.data.documentType)
+      const Select = this.docData.find(x => x.value == this.data?.documentType)
       this.dcrDetailForm.get('documentType').setValue(Select);
       this.bindData();
     });

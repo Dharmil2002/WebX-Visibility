@@ -4,6 +4,8 @@ import { MarkArrivalComponent } from '../../ActionPages/mark-arrival/mark-arriva
 import { UpdateLoadingSheetComponent } from 'src/app/operation/update-loading-sheet/update-loading-sheet.component';
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { DatePipe } from '@angular/common';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',
@@ -96,7 +98,8 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   // declararing properties
   constructor(
     private CnoteService: CnoteService,
-    private _operation: OperationService
+    private _operation: OperationService,
+    private datePipe: DatePipe
   ) {
 
     super();
@@ -138,74 +141,101 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     this._operation.operationPost('common/getall', reqbody).subscribe({
       next: (res: any) => {
         if (res) {
-        
-          const arrivalDetails = res.data.filter((x) => x.nextUpComingLoc.toLowerCase() === this.branch.toLowerCase());
-         let tableData=[];
+
+          const arrivalDetails = res.data.filter((x) => x.nextUpComingLoc.toLowerCase() === this.branch.toLowerCase() && x.status!="close");
+          let tableData = [];
           arrivalDetails.forEach(element => {
+            const currentDate = new Date();
+            /*here  the of schedule is not avaible so i can trying to ad delay manually*/
+            const expectedTime = new Date(currentDate.getTime() + 10 * 60000); // 10 minutes in milliseconds
+            const scheduleTime = new Date(); // Replace this line with your actual scheduleTime variable
+            const updatedISOString = expectedTime.toISOString();
+            const scheduleTimeISOString = scheduleTime.toISOString();
+            const diffScheduleTime = new Date(updatedISOString); // Replace 'element.scheduleTime' with the actual property containing the schedule time
+        
+            // Step 2: Get the expected time (replace this with your actual expectedTime variable)
+            const diffSexpectedTime = new Date(scheduleTimeISOString); // Replace 'element.expectedTime' with the actual property containing the expected time
+        
+            const timeDifferenceInMilliseconds = diffScheduleTime.getTime() - diffSexpectedTime.getTime();
+            const timeDifferenceInHours = timeDifferenceInMilliseconds / (1000 * 60 * 60);
+            const statusToActionMap = {
+              "depart": "Vehicle Arrival",
+              "arrival": "Arrival Scan"
+            };
+          
             let routeDetails = this.routeDetails.find((x) => x.routeCode == element.routeCode);
             const routeCode = routeDetails?.routeCode ?? 'Unknown';
             const routeName = routeDetails?.routeName ?? 'Unnamed';
-            let arrivalData = {
-              "Route": routeCode + ":" + routeName,
-              "VehicleNo": element?.vehicleNo || '',
-              "TripID": element?.tripId || '',
-              "Location": this.branch,
-              "Scheduled": routeDetails.routeStartDate,
-              "Expected": routeDetails.routeEndDate,
-              "Status":  "On Time",
-              "Hrs": 0,
-              "Action": element?.status==="depart"?"Vehicle Arrival":"Arrival Scan"
+            if (element.status === "depart" || element.status === "arrival") {
+              let arrivalData = {
+                "id": element?.id || "",
+                "Route": routeCode + ":" + routeName,
+                "VehicleNo": element?.vehicleNo || '',
+                "TripID": element?.tripId || '',
+                "Location": this.branch,
+                "Scheduled": this.datePipe.transform(scheduleTimeISOString, 'dd/MM/yyyy HH:mm'),
+                "Expected": this.datePipe.transform(updatedISOString, 'dd/MM/yyyy HH:mm'),
+                "Status": timeDifferenceInHours > 0 ? "Delay" : "On Time",
+                "Hrs": timeDifferenceInHours.toFixed(2),
+                "Action": statusToActionMap[element?.status]
+              };
+              tableData.push(arrivalData);
+              // Display or use arrivalData as needed
             }
-            tableData.push(arrivalData);
           });
           this.fetchShipmentData();
-          this.arrivalTableData=tableData;
-          this.tableload=false;
-    
-       
+          this.arrivalTableData = tableData;
+          this.tableload = false;
+
+
         }
       }
     })
   }
- /**
-   * Fetches shipment data from the API and updates the boxData and tableload properties.
-   */
- fetchShipmentData() {
- 
-  // Prepare request payload
-  let req = {
-    companyCode: this.companyCode,
-    type: "operation",
-    collection: "docket",
-  };
+  /**
+    * Fetches shipment data from the API and updates the boxData and tableload properties.
+    */
+  fetchShipmentData() {
 
-  // Send request and handle response
-  this._operation.operationPost("common/getall", req).subscribe({
-    next: async (res: any) => {
-      // Update shipmentData property with the received data
-      const boxData = res.data.filter((x)=>x.destination.split(":")[1].trim()===this.branch.trim() && x.unloading===0 && x.mfNo!=='');
-      const sumTotalChargedNoOfpkg =boxData.reduce((total, count) => {
-        return total + parseInt(count.totalChargedNoOfpkg);
-      }, 0);
-      
+    // Prepare request payload
+    let req = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "docket",
+    };
 
-      const createShipDataObject = (count, title, className) => ({
-        count,
-        title,
-        class: `info-box7 ${className} order-info-box7`
-      });
+    // Send request and handle response
+    this._operation.operationPost("common/getall", req).subscribe({
+      next: async (res: any) => {
+        const boxData = res.data.filter((x) => {
+          const destination = x.destination ? x.destination.split(":")[1].trim() : "";
+          return destination === this.branch.trim() && x.unloading === 0 && x.mfNo !== '';
+        });
+        const sumTotalChargedNoOfpkg = boxData.reduce((total, count) => {
+          return total + parseInt(count.totalChargedNoOfpkg);
+        }, 0);
 
-      const shipData = [
-        createShipDataObject(this.arrivalTableData.length, "Routes", "bg-white"),
-        createShipDataObject(this.arrivalTableData.length, "Vehicles", "bg-white"),
-        createShipDataObject(boxData.length, "Shipments", "bg-white"),
-        createShipDataObject(sumTotalChargedNoOfpkg, "Packages", "bg-white")
-      ];
 
-      this.boxData = shipData;
-    },
-  });
-}
+        const createShipDataObject = (count, title, className) => ({
+          count,
+          title,
+          class: `info-box7 ${className} order-info-box7`
+        });
+
+        const shipData = [
+          createShipDataObject(this.arrivalTableData.length, "Routes", "bg-white"),
+          createShipDataObject(this.arrivalTableData.length, "Vehicles", "bg-white"),
+          createShipDataObject(boxData.length, "Shipments", "bg-white"),
+          createShipDataObject(sumTotalChargedNoOfpkg, "Packages", "bg-white")
+        ];
+
+        this.boxData = shipData;
+        const shipmentStatus = boxData.length <= 0 ? 'noDkt' : 'dktAvail';
+        this._operation.setShipmentStatus(shipmentStatus);
+        
+      },
+    });
+  }
   updateDepartureData(event) {
 
     const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;

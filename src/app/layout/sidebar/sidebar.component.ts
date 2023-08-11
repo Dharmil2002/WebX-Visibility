@@ -28,6 +28,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   listMaxWidth: string;
   headerHeight = 60;
   routerObj = null;
+  userName: string;
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
@@ -87,9 +88,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
   ngOnInit() {
     // if (this.authService.currentUserValue) {
-          // }
-      this.sidebarItems = ROUTES.filter((sidebarItem) => sidebarItem);
-
+    // }
+    this.sidebarItems = ROUTES.filter((sidebarItem) => sidebarItem);
+    this.userName = localStorage.getItem('Username');
     this.initLeftSidebar();
     this.bodyTag = this.document.body;
   }

@@ -1,9 +1,7 @@
-<app-common-wrapper-webxpress [breadscrums]="breadscrums" > 
-    <form [formGroup]="DriverTableForm" >
-        <generic-accordion-webxpress 
-        [AccordionForm]="DriverTableForm"
-        [accordionGroup]="accordionData"
-        (functionCallEmitter)="functionCallHandler($event)" >
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <form [formGroup]="DriverTableForm">
+        <generic-accordion-webxpress [AccordionForm]="DriverTableForm" [accordionGroup]="accordionData"
+            (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)">
         </generic-accordion-webxpress>
     </form>
 </app-common-wrapper-webxpress>

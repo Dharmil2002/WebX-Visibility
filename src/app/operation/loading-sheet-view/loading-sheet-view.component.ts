@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA,MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GenericTableComponent } from '../../shared-components/Generic Table/generic-table.component';
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
@@ -9,6 +9,10 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
   templateUrl: './loading-sheet-view.component.html'
 })
 export class LoadingSheetViewComponent implements OnInit {
+  /* Business logic separation is pending in this code. 
+Currently, all flows are working together without proper separation.
+ The separation will be implemented by Dhaval Patel.
+  So, no need to worry about it for now. */
   arrivalData: [] | any;
   tableload = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
   tableData: any[];
@@ -33,7 +37,7 @@ export class LoadingSheetViewComponent implements OnInit {
   toggleArray = []
   IscheckBoxRequired: boolean;
   menuItemflag: boolean;
-  companyCode=parseInt(localStorage.getItem("companyCode"));
+  companyCode = parseInt(localStorage.getItem("companyCode"));
   menuItems = [
   ];
   columnHeader = {
@@ -45,7 +49,7 @@ export class LoadingSheetViewComponent implements OnInit {
     "KgWeight": "Weight",
     "CftVolume": "Volume",
   };
- centerAlignedData = ['Shipment', 'Packages', 'KgWeight', 'CftVolume'];
+  centerAlignedData = ['Shipment', 'Packages', 'KgWeight', 'CftVolume'];
 
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
@@ -67,7 +71,7 @@ export class LoadingSheetViewComponent implements OnInit {
   //#endregion
 
   constructor(
-    private cnoteService: CnoteService,
+    private _cnoteService: CnoteService,
     private operationService: OperationService,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any
@@ -78,7 +82,7 @@ export class LoadingSheetViewComponent implements OnInit {
     }
     this.getLoadingSheetDetails();
   }
-  
+
 
 
   ngOnInit(): void {
@@ -93,7 +97,7 @@ export class LoadingSheetViewComponent implements OnInit {
     let jsonShipping = {
       shipping: this.dataDetails ? this.dataDetails : this.tableData.filter((x) => x.isSelected == true)
     };
-  
+
     // Close the dialog and pass the JSON object as the result
     this.dialogRef.close(jsonShipping);
   }
@@ -104,31 +108,47 @@ export class LoadingSheetViewComponent implements OnInit {
       type: "operation",
       collection: "docket",
     };
-  // Retrieve arrival data from the operation service
-  this.operationService.operationPost('common/getall',req).subscribe(res => {
-    const shipingDetails = res.data;
-    let tableArray =shipingDetails.filter((x) => {
-      const orgLoc = x.orgLoc ? x.orgLoc.toLowerCase().trim() : '';
-      const legParts = this.loadinSheet.leg.split('-');
-      const legPart1 = legParts[0] ? legParts[0].toLowerCase().trim() : '';
-      const legPart2 = legParts[1] ? legParts[1].toLowerCase().trim() : '';
-    
-      return orgLoc === legPart1 && x.destination.split(':')[1]?.toLowerCase().trim() === legPart2;
-    });
-    
-    const shipmentDetails = tableArray.map((item) => ({
-      Shipment: item.docketNumber,
-      Origin: item.orgLoc,
-      Destination: item.destination.split(':')[1].trim(),
-      Packages: item.totalChargedNoOfpkg,
-      KgWeight: item.chrgwt,
-      CftVolume: item.cft_tot,
-    }));
-    this.tableData = shipmentDetails;
+    // Retrieve arrival data from the operation service
+    this.operationService.operationPost('common/getall', req).subscribe(res => {
+      const shipingDetails = res.data;
+      let tableArray = shipingDetails.filter((x) => {
+        const orgLoc = x.orgLoc ? x.orgLoc.toLowerCase().trim() : '';
+        const legParts = this.loadinSheet.leg.split('-');
+        const legPart1 = legParts[0] ? legParts[0].toLowerCase().trim() : '';
+        const legPart2 = legParts[1] ? legParts[1].toLowerCase().trim() : '';
 
-    this.tableload = false;
-  });
-}
+        return orgLoc === legPart1 && x.destination.split(':')[1]?.toLowerCase().trim() === legPart2 && x.lsNo == "";
+      });
+
+      const shipmentDetails = tableArray.map((item) => ({
+        isSelected: false,
+        Shipment: item.docketNumber,
+        Origin: item.orgLoc,
+        Destination: item.destination.split(':')[1].trim(),
+        Packages: parseInt(item.totalChargedNoOfpkg),
+        KgWeight: parseInt(item.chrgwt),
+        CftVolume: parseInt(item.cft_tot),
+      }));
+      let originalArray = this._cnoteService.getShipingData()
+     
+      const selectedShipmemt = originalArray;
+      // Assuming shipmentDetails and selectedShipmemt are your two arrays
+
+      // Loop through each item in shipmentDetails
+      shipmentDetails.forEach((shipment) => {
+        // Find the matching item in selectedShipmemt based on the docketNumber field
+        const matchingShipment = selectedShipmemt.find((selected) => selected.docketNumber === shipment.Shipment);
+
+        // If a matching item is found, update the isSelected field in shipmentDetails to true
+        if (matchingShipment) {
+          shipment.isSelected = true;
+        }
+      });
+      this.tableData = shipmentDetails;
+
+      this.tableload = false;
+    });
+  }
 
   goBack(): void {
     this.dialogRef.close()

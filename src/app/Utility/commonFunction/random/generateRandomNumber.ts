@@ -7,3 +7,7 @@ export function generateRandomNumber(min: number, max: number): number {
 
     return shortName;
 }
+
+export function generateString(initialString: string, sequentialIdentifier: string): string {
+  return `${initialString}-${sequentialIdentifier}`;
+}

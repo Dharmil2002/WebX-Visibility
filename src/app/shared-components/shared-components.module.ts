@@ -45,6 +45,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { GenericTableComponent } from './Generic Table/generic-table.component';
 import { FilterUtils } from '../Utility/Form Utilities/dropdownFilter';
 import { MatRadioModule } from '@angular/material/radio';
+import { GenericTableV2Component } from './Generic Table V2/generic-table-v2/generic-table-v2.component';
 import { ExpandableTableComponent } from './expandable-table/expandable-table/expandable-table.component';
 const MY_DATE_FORMAT = {
   parse: {
@@ -61,7 +62,8 @@ const MY_DATE_FORMAT = {
 @NgModule({
   declarations: [GenericAccordionComponent, GenericTableComponent,
     FormComponent, FormWithoutAutoCompleteComponent, GenericDashBoardComponent,
-    GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent,CustomeDatePickerComponent,CustomRangePanelComponent, TreeViewComponent,GenericChartDashboardComponent, GenericCardComponent,DecimaRangeValidatorDirective, ExpandableTableComponent],
+    GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent, CustomeDatePickerComponent, CustomRangePanelComponent, TreeViewComponent, GenericChartDashboardComponent, GenericCardComponent, DecimaRangeValidatorDirective, GenericTableV2Component
+  , ExpandableTableComponent],
   imports: [
     CommonModule,
     MatCardModule,
@@ -96,12 +98,12 @@ const MY_DATE_FORMAT = {
       provide: DateAdapter,
       useClass: MomentDateAdapter,
       deps: [MAT_DATE_LOCALE],
-     
+
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },
     FilterUtils
   ],
-  
+
   exports: [GenericAccordionComponent,
     GenericTableComponent,
     FormComponent,
@@ -121,8 +123,8 @@ const MY_DATE_FORMAT = {
     MatMenuModule,
     GenericChartDashboardComponent,
     GenericCardComponent,
-    DecimaRangeValidatorDirective
-
+    DecimaRangeValidatorDirective,
+    GenericTableV2Component
   ],
 
 })

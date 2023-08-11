@@ -40,6 +40,7 @@ import { PickupDelPageComponent } from './tabs/pickup-del-page/pickup-del-page.c
 import { ManageRunsheetComponent } from './tabs/manage-runsheet/manage-runsheet.component';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { StocksComponent } from './stocks/stocks.component';
+import { PodCodDashboardPageComponent } from './tabs/pod-cod-dashboard-page/pod-cod-dashboard-page.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { StocksComponent } from './stocks/stocks.component';
     PickupDeliveryPlannerComponent,
     PickupDelPageComponent,
     ManageRunsheetComponent,
-    StocksComponent
+    StocksComponent,
+    PodCodDashboardPageComponent
   ],
   imports: [
     CommonModule,

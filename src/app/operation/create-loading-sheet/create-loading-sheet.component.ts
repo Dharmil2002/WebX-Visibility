@@ -1,25 +1,29 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
-import { loadingControl } from 'src/assets/FormControls/loadingSheet';
-import { Router } from '@angular/router';
-import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
-import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
-import { LodingSheetGenerateSuccessComponent } from '../loding-sheet-generate-success/loding-sheet-generate-success.component';
-import { LoadingSheetViewComponent } from '../loading-sheet-view/loading-sheet-view.component';
-import { filterDataByLocation, groupShipments } from './loadingSheetCommon';
-import { OperationService } from 'src/app/core/service/operations/operation.service';
-import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
-import { setFormControlValue } from 'src/app/Utility/commonFunction/setFormValue/setFormValue';
-import { removeDuplicateObjects } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
-import { debug } from 'util';
+import { Component, OnInit } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
+import { FilterUtils } from "src/app/Utility/Form Utilities/dropdownFilter";
+import { loadingControl } from "src/assets/FormControls/loadingSheet";
+import { Router } from "@angular/router";
+import { SwalerrorMessage } from "src/app/Utility/Validation/Message/Message";
+import { CnoteService } from "src/app/core/service/Masters/CnoteService/cnote.service";
+import { LodingSheetGenerateSuccessComponent } from "../loding-sheet-generate-success/loding-sheet-generate-success.component";
+import { LoadingSheetViewComponent } from "../loading-sheet-view/loading-sheet-view.component";
+import { filterCnoteDetails, filterDataByLocation, getVehicleDetailFromApi, groupShipments, updateTracking } from "./loadingSheetCommon";
+import { OperationService } from "src/app/core/service/operations/operation.service";
+import { NavigationService } from "src/app/Utility/commonFunction/route/route";
+import { setFormControlValue } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
+import { getLoadingSheetDetail } from "../depart-vehicle/depart-vehicle/depart-common";
+import Swal from "sweetalert2";
 
 @Component({
-  selector: 'app-create-loading-sheet',
-  templateUrl: './create-loading-sheet.component.html'
+  selector: "app-create-loading-sheet",
+  templateUrl: "./create-loading-sheet.component.html",
 })
+/* Business logic separation is pending in this code. 
+Currently, all flows are working together without proper separation.
+ The separation will be implemented by Dhaval Patel.
+  So, no need to worry about it for now. */
 export class CreateLoadingSheetComponent implements OnInit {
   tableload = true;
   addAndEditPath: string;
@@ -29,13 +33,13 @@ export class CreateLoadingSheetComponent implements OnInit {
   dynamicControls = {
     add: false,
     edit: false,
-    csv: true
+    csv: true,
   };
-  height = '100vw';
-  width = '100vw';
-  maxWidth: '232vw';
+  height = "100vw";
+  width = "100vw";
+  maxWidth: "232vw";
   menuItems = [
-    { label: 'count', componentDetails: LoadingSheetViewComponent },
+    { label: "count", componentDetails: LoadingSheetViewComponent },
     // Add more menu items as needed
   ];
   // Declaring breadcrumbs
@@ -43,12 +47,10 @@ export class CreateLoadingSheetComponent implements OnInit {
     {
       title: "Create-Loading-Sheet",
       items: ["Loading-Sheet"],
-      active: "Loading-Sheet"
-    }
+      active: "Loading-Sheet",
+    },
   ];
-  linkArray = [
-    { Row: 'count', Path: '' }
-  ];
+  linkArray = [{ Row: "count", Path: "" }];
   toggleArray = [];
   menuItemflag: boolean = true;
   isShipmentUpdate: boolean = false;
@@ -62,27 +64,27 @@ export class CreateLoadingSheetComponent implements OnInit {
   shipmentData: any;
   tableData: any[];
   columnHeader = {
-    "checkBoxRequired": "",
-    "leg": "Leg",
-    "count": "Shipments",
-    "packages": "Packages",
-    "weightKg": "Weight Kg",
-    "volumeCFT": "Volume CFT"
+    checkBoxRequired: "",
+    leg: "Leg",
+    count: "Shipments",
+    packages: "Packages",
+    weightKg: "Weight Kg",
+    volumeCFT: "Volume CFT",
   };
-  centerAlignedData = ['leg', 'packages', 'weightKg', 'volumeCFT'];
+  centerAlignedData = ["leg", "packages", "weightKg", "volumeCFT"];
   // Declaring CSV file's header as key and value pair
   headerForCsv = {
-    "RouteandSchedule": "Leg",
-    "Shipments": "Shipments",
-    "Packages": "Packages",
-    "WeightKg": "Weight Kg",
-    "VolumeCFT": "Volume CFT"
+    RouteandSchedule: "Leg",
+    Shipments: "Shipments",
+    Packages: "Packages",
+    WeightKg: "Weight Kg",
+    VolumeCFT: "Volume CFT",
   };
 
   METADATA = {
     checkBoxRequired: false,
     // selectAllorRenderedData : false,
-    noColumnSort: ['checkBoxRequired']
+    noColumnSort: ["checkBoxRequired"],
   };
   loadingData: any;
   shippingData: any;
@@ -97,25 +99,33 @@ export class CreateLoadingSheetComponent implements OnInit {
   loadingSheetNo: any;
   docketApiRes: any;
   cnoteDetails: any;
+  userName = localStorage.getItem("Username");
+  lsDetails: any;
+  NoDocket: boolean;
+  departFlag: boolean = false;
+  alldocket: any;
   constructor(
     private Route: Router,
-    private CnoteService: CnoteService,
+    private _cnoteService: CnoteService,
     private _operationService: OperationService,
     private navigationService: NavigationService,
     private dialog: MatDialog,
     private fb: UntypedFormBuilder,
-    private filter: FilterUtils,
+    private filter: FilterUtils
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
 
       // Retrieve tripData and shippingData from the navigation state
-      this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data?.columnData || this.Route.getCurrentNavigation()?.extras?.state.data;
-      this.shippingData = this.Route.getCurrentNavigation()?.extras?.state.shipping;
+      this.tripData =
+        this.Route.getCurrentNavigation()?.extras?.state.data?.columnData ||
+        this.Route.getCurrentNavigation()?.extras?.state.data;
+      this.shippingData =
+        this.Route.getCurrentNavigation()?.extras?.state.shipping;
 
       // Check if tripData meets the condition for navigation
       const routeMap = {
-        "Depart Vehicle": 'Operation/DepartVehicle',
-        "Vehicle Loading": 'Operation/VehicleLoading',
+        "Depart Vehicle": "Operation/DepartVehicle",
+        "Vehicle Loading": "Operation/VehicleLoading",
       };
 
       const route = routeMap[this.tripData.Action];
@@ -124,12 +134,6 @@ export class CreateLoadingSheetComponent implements OnInit {
         this.navigationService.navigateTo(route, this.tripData);
       }
 
-      // Check if shippingData exists
-      if (this.shippingData) {
-        // Get loading form data and set isShipmentUpdate flag
-        this.getloadingFormData = this.CnoteService.getData();
-        this.isShipmentUpdate = true;
-      }
 
     }
 
@@ -140,24 +144,70 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.autoBindData();
   }
 
-  autoBindData() {
+  async autoBindData() {
     // Set the value of 'vehicle' form control with tripData's VehicleNo or getloadingFormData's vehicle or an empty string
     //setFormControlValue(this.loadingSheetTableForm.controls['vehicle'], this.tripData?.VehicleNo, this.getloadingFormData?.vehicle, '');
 
     // Set the value of 'Route' form control with tripData's RouteandSchedule or getloadingFormData's Route or an empty string
-    setFormControlValue(this.loadingSheetTableForm.controls['Route'], this.tripData?.RouteandSchedule, this.getloadingFormData?.Route, '');
+    setFormControlValue(
+      this.loadingSheetTableForm.controls["Route"],
+      this.tripData?.RouteandSchedule,
+      this.getloadingFormData?.Route,
+      ""
+    );
 
     // Set the value of 'tripID' form control with tripData's TripID or getloadingFormData's TripID or an empty string
-    setFormControlValue(this.loadingSheetTableForm.controls['tripID'], this.tripData?.TripID, this.getloadingFormData?.TripID, '');
-
+    setFormControlValue(
+      this.loadingSheetTableForm.controls["tripID"],
+      this.tripData?.TripID,
+      this.getloadingFormData?.TripID,
+      ""
+    );
+    setFormControlValue(
+      this.loadingSheetTableForm.controls["vehicle"],
+      { name: this.tripData?.VehicleNo, value: this.tripData?.VehicleNo },
+      ""
+    );
+    setFormControlValue(
+      this.loadingSheetTableForm.controls["tripID"],
+      this.tripData?.TripID,
+      this.getloadingFormData?.TripID,
+      ""
+    );
     // Set the value of 'Expected' form control with tripData's Expected or getloadingFormData's Expected or an empty string
-    setFormControlValue(this.loadingSheetTableForm.controls['Expected'], this.tripData?.Expected, this.getloadingFormData?.Expected, '');
+    setFormControlValue(
+      this.loadingSheetTableForm.controls["Expected"],
+      this.tripData?.Expected,
+      this.getloadingFormData?.Expected,
+      ""
+    );
 
     // Set the value of 'LoadingLocation' form control with the value retrieved from localStorage for 'Branch'
-    setFormControlValue(this.loadingSheetTableForm.controls['LoadingLocation'], localStorage.getItem('Branch'), '');
+    setFormControlValue(
+      this.loadingSheetTableForm.controls["LoadingLocation"],
+      localStorage.getItem("Branch"),
+      ""
+    );
 
-    this.vehicleTypeDropdown(); // Call the vehicleTypeDropdown() method
-    this.GetVehicleDropDown()
+    if (this.tripData.Action.replace(" ", "") === 'UpdateTrip') {
+      //this.loadingSheetTableForm.controls['VehicleNo'].setValue(this.tripData.VehicleNo);
+      this.loadVehicleDetails();
+      this.getshipmentData();
+      const lsDetail =
+        await getLoadingSheetDetail(
+          this.companyCode,
+          this.tripData.TripID,
+          this.tripData.VehicleNo,
+          this._operationService
+        );
+      this.lsDetails = lsDetail[lsDetail.length - 1];
+      this.departFlag = true;
+      this.getCapacity();
+    } else {
+
+      this.GetVehicleDropDown();
+      this.getshipmentData();
+    }
   }
 
   IntializeFormControl() {
@@ -165,39 +215,39 @@ export class CreateLoadingSheetComponent implements OnInit {
     const loadingControlFormControls = new loadingControl();
 
     // Get the form controls from the loadingControlFormControls instance
-    this.jsonControlArray = loadingControlFormControls.getMarkArrivalsertFormControls();
+    this.jsonControlArray =
+      loadingControlFormControls.getMarkArrivalsertFormControls();
 
     // Loop through the jsonControlArray to find the vehicleType control and set related properties
-    this.jsonControlArray.forEach(data => {
-      if (data.name === 'vehicleTypecontrolHandler') {
+    this.jsonControlArray.forEach((data) => {
+      if (data.name === "vehicleTypecontrolHandler") {
         this.vehicleType = data.name;
         this.vehicleTypeStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === 'vehicle') {
+      if (data.name === "vehicle") {
         this.vehicleNoControlName = data.name;
         this.vehicleControlStatus = data.additionalData.showNameAndValue;
       }
-
     });
 
     // Build the form group using the form controls obtained
-    this.loadingSheetTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    this.loadingSheetTableForm = formGroupBuilder(this.fb, [
+      this.jsonControlArray,
+    ]);
   }
 
-  ngOnInit(): void {
-
-  }
+  ngOnInit(): void { }
 
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
 
-    let field = $event.field;                   // the actual formControl instance
-    let functionName = $event.functionName;     // name of the function , we have to call
+    let field = $event.field; // the actual formControl instance
+    let functionName = $event.functionName; // name of the function , we have to call
 
     // we can add more arguments here, if needed. like as shown
     // $event['fieldName'] = field.name;
 
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {
@@ -209,62 +259,27 @@ export class CreateLoadingSheetComponent implements OnInit {
   IsActiveFuntion($event) {
     // Assign the value of $event to the loadingData property
     this.loadingData = $event;
+    if (!this.loadingSheetTableForm.value.vehicle.value) {
+      SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
+      this.tableData.forEach((x) => {
+        x.isSelected = false
+      })
+      return;
+    } else {
+      this.getCapacity();
+    }
   }
 
-  // Function to retrieve vehicle types from JSON file and populate the dropdown
-  vehicleTypeDropdown() {
 
-    this._operationService.getJsonFileDetails('loadingJsonUrl').subscribe(res => {
-      this.loadingSheetData = res;
-      let vehicleType: any[] = [];
-      if (this.loadingSheetData) {
-        this.loadingSheetData.data[0].forEach(element => {
-          let json = {
-            name: element.Type_Name,
-            value: element.Type_Code,
-          };
-          vehicleType.push(json);
-        });
-      }
-      // Apply filter to control array based on vehicle types
-      this.filter.Filter(
-        this.jsonControlArray,
-        this.loadingSheetTableForm,
-        vehicleType,
-        this.vehicleType,
-        this.vehicleTypeStatus
-      );
-
-      const vehTypeValue = this.tripData?.VehicleType?.trim() || ''
-      // Set the default vehicle type if it matches any in the dropdown options
-      let vehicleTypeDetails = vehicleType.find((x) => x.name.trim() == vehTypeValue);
-      if (vehicleTypeDetails) {
-        this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleTypeDetails);
-        this.vehicleTypeDataAutofill();
-      }
-    });
-    // Retrieve shipment data
-    this.getshipmentData()
-
-  }
-  // Function to retrieve departure details based on the route
-  getDepartueDetail(route) {
-    this._operationService.getJsonFileDetails('departureJsonUrl').subscribe(res => {
-      this.listDepartueDetail = res;
-      // Find the departure detail that matches the given route
-      this.tripData = this.listDepartueDetail.data.find((x) => x.RouteandSchedule == route);
-      if (!this.getloadingFormData) {
-        // Auto-bind data if loading form data is not available
-        this.autoBindData();
-      }
-    });
-  }
 
   // Function to retrieve shipment data
   getshipmentData() {
     if (!this.isShipmentUpdate) {
-      let routeDetail = this.tripData?.RouteandSchedule.split(":")[1].split("-");
-      routeDetail = routeDetail.map(str => String.prototype.replace.call(str, ' ', ''));
+      let routeDetail =
+        this.tripData?.RouteandSchedule.split(":")[1].split("-");
+      routeDetail = routeDetail.map((str) =>
+        String.prototype.replace.call(str, " ", "")
+      );
       // Update route details if shipment is not being updated
     }
     const req = {
@@ -272,238 +287,430 @@ export class CreateLoadingSheetComponent implements OnInit {
       type: "operation",
       collection: "docket",
     };
-    this._operationService.operationPost("common/getall", req).subscribe(res => {
-      this.shipmentData = res.data.filter((x)=>x.lsNo!=="");
-      // Filter shipment data based on location and trip details
-      const filterData = filterDataByLocation(this.shipmentData, this.tripData, this.orgBranch);
-      //Here i user cnoteDetails varible to used in updateDocketDetails() method
-      this.cnoteDetails = filterData.legWiseData;
-      const shipingfilterData = filterData.legWiseData;
-      // Call the function to group shipments based on criteria
-      const groupedShipments = groupShipments(shipingfilterData);
-      console.log(groupedShipments);
-      this.tableData = groupedShipments;
-      this.tableload = false;
-    });
-  }
-  // Function to autofill vehicle type data
-  vehicleTypeDataAutofill() {
-    // Check if tripID is not already set
+    this._operationService
+      .operationPost("common/getall", req)
+      .subscribe((res) => {
+        this.shipmentData = res.data.filter((x) => x.lsNo == "");
+        // Filter shipment data based on location and trip details
+        const filterData = filterDataByLocation(
+          this.shipmentData,
+          this.tripData,
+          this.orgBranch
+        );
+        //Here i user cnoteDetails varible to used in updateDocketDetails() method
+        this._cnoteService.setShipingData(filterData.legWiseData);
+        this.alldocket=filterData.legWiseData
+        this.cnoteDetails = filterData.legWiseData;
+        const shipingfilterData = filterData.legWiseData;
+        // Call the function to group shipments based on criteria
+        const groupedShipments = groupShipments(shipingfilterData);
+        if (groupedShipments.length > 0) {
+          this.tableload = false;
+        } else {
+          this.departFlag = true;
+        }
+        this.tableData = groupedShipments;
 
-    let loadingSheetDetails = this.loadingSheetData.data[0].find((x) => x.Type_Code == this.loadingSheetTableForm.value?.vehicleType.value || '');
-    // Find the matching vehicle type details
-
-    if (loadingSheetDetails) {
-      // Set control values based on loading sheet details
-      const controlNames = [
-        'CapacityKg',
-        'CapacityVolumeCFT',
-        'LoadaddedKg',
-        'LoadedKg',
-        'LoadedvolumeCFT',
-        'VolumeaddedCFT',
-        'VolumeUtilization',
-        'WeightUtilization',
-      ];
-
-      controlNames.forEach(controlName => {
-        this.loadingSheetTableForm.controls[controlName].setValue(loadingSheetDetails[controlName] || '');
       });
-
-      this.CnoteService.setData(this.loadingSheetTableForm.value);
-      // Set form data and save to service
-    }
   }
+
 
   loadingSheetGenerate() {
+
     if (!this.loadingSheetTableForm.value.vehicle) {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
-    }
-    else {
+    } else {
       if (this.loadingData) {
-        const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> = this.dialog.open(LodingSheetGenerateSuccessComponent, {
-          width: '100%', // Set the desired width
-          data: this.loadingData // Pass the data object
+        this.loadingData.forEach(obj => {
+          const randomNumber = "LS/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
+          obj.LoadingSheet = randomNumber;
+          obj.Action = "Print";
         });
+        this.addTripData();
+        const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
+          this.dialog.open(LodingSheetGenerateSuccessComponent, {
+            width: "100%", // Set the desired width
+            data: this.loadingData, // Pass the data object
+          });
 
-        dialogRef.afterClosed().subscribe(result => {
-          this.loadingSheetNo = result[0].LoadingSheet;
-          this.addTripData()
+        dialogRef.afterClosed().subscribe((result) => {
+          this.goBack(3);
           // Handle the result after the dialog is closed
         });
-      }
-      else {
+      } else {
         SwalerrorMessage("error", "Please Select Any one Record", "", true);
       }
     }
   }
 
   updateLoadingData(event) {
-    this.updatedShipment.push(event.shipping);
-    let packages = event.shipping.reduce((total, current) => total + current.Packages, 0);
-    let totalWeightKg = event.shipping.reduce((total, current) => total + current.KgWeight, 0);
-    let totalVolumeCFT = event.shipping.reduce((total, current) => total + current.CftVolume, 0)
+
+    let packages = event.shipping.reduce(
+      (total, current) => total + current.Packages,
+      0
+    );
+    let totalWeightKg = event.shipping.reduce(
+      (total, current) => total + current.KgWeight,
+      0
+    );
+    let totalVolumeCFT = event.shipping.reduce(
+      (total, current) => total + current.CftVolume,
+      0
+    );
     this.tableData.find((x) => {
-      if (x.leg === event.shipping[0].Leg) {
-        x.Shipment = event.shipping.length,
-          x.WeightKg = totalWeightKg,
-          x.VolumeCFT = totalVolumeCFT,
-          x.Packages = packages
+      if (
+        x.leg.replace(" ", "").trim() ===
+        (event.shipping[0].Origin + "-" + event.shipping[0].Destination).trim()
+      ) {
+        (x.count = event.shipping.length),
+          (x.weightKg = totalWeightKg),
+          (x.volumeCFT = totalVolumeCFT),
+          (x.packages = packages);
       }
     });
-    // this.getshipmentData(event) 
+    //this.getshipmentData(event)
+    this.cnoteDetails = filterCnoteDetails(this.alldocket,event.shipping)
+    this._cnoteService.setShipingData(this.cnoteDetails);
+    this.getCapacity();
   }
 
   // get vehicleNo
   GetVehicleDropDown() {
-
     const vehRequest = {
-      "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "vehicle_status"
-    }
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "vehicle_status",
+    };
 
     // Fetch data from the JSON endpoint
-    this._operationService.operationPost('common/getall', vehRequest).subscribe(res => {
-      if (res) {
-        let vehicleDetails = res.data.filter((x) => x.status === "").map((x) => { return { name: x.vehNo, value: x.vehNo } })
+    this._operationService
+      .operationPost("common/getall", vehRequest)
+      .subscribe((res) => {
+        if (res) {
 
-        this.filter.Filter(
-          this.jsonControlArray,
-          this.loadingSheetTableForm,
-          vehicleDetails,
-          this.vehicleNoControlName,
-          this.vehicleControlStatus
-        );
-      }
-    });
+          let vehicleDetails = res.data
+            .filter((x) => x.status === "available" && x.currentLocation === this.orgBranch)
+            .map((x) => {
+              return { name: x.vehNo, value: x.vehNo };
+            });
+
+          this.filter.Filter(
+            this.jsonControlArray,
+            this.loadingSheetTableForm,
+            vehicleDetails,
+            this.vehicleNoControlName,
+            this.vehicleControlStatus
+          );
+        }
+      });
   }
 
-  //Add tripData  
-  addTripData() {
-
-    if (!this.loadingSheetTableForm.controls['tripID'].value) {
-      const randomNumber = "TH/" + this.orgBranch + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
-      this.loadingSheetTableForm.controls['tripID'].setValue(randomNumber);
+  //Add tripData
+  async addTripData() {
+    if (this.loadingSheetTableForm.controls["tripID"].value === 'System Generated' || !this.loadingSheetTableForm.controls["tripID"].value) {
+      const randomNumber =
+        "TH/" +
+        this.orgBranch +
+        "/" +
+        2223 +
+        "/" +
+        Math.floor(Math.random() * 100000);
+      this.loadingSheetTableForm.controls["tripID"].setValue(randomNumber);
       // Generate and set a random tripID if not already set
     }
     let tripDetails = {
       startTime: new Date(),
       vehicleNo: this.loadingSheetTableForm.value.vehicle.value,
       tripId: this.loadingSheetTableForm.value.tripID,
-      status:"Vehicle Loading"
-    }
+      status: "Vehicle Loading",
+      updateBy: this.userName,
+      updateDate: new Date().toISOString()
+    };
     const reqBody = {
-      "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_detail",
-      "id": 'trip_' + this.loadingSheetTableForm.value.Route.split(":")[0] || "",
-      "updates": {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "trip_detail",
+      id: this.tripData.id,
+      updates: {
         ...tripDetails,
+      },
+    };
+    try {
+      // Await the API call's response before proceeding
+      const res = await this._operationService.operationPut("common/update", reqBody).toPromise();
+      if (res) {
+        // If response is successful, call the next function
+        await this.getDetailsByLeg();
       }
+    } catch (error) {
+      // Handle any errors that might occur during the API call
+      console.error('Error occurred during the API call:', error);
     }
-    this._operationService.operationPut("common/update", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.getDetailsByLeg();
-        }
-      }
-    })
   }
-  // Method to retrieve details for each leg in the leg_details array
-  getDetailsByLeg() {
-
+  async getDetailsByLeg() {
     for (const leg of this.loadingData) {
-      const org_loc = leg.leg.split("-")[0].trim();
-      const destination = leg.leg.split("-")[1].trim();
-
-      const matchingShipment = this.cnoteDetails.find(
+      const [org_loc, destination] = leg.leg.split("-").map(part => part.trim());
+  
+      const matchingShipments = this.cnoteDetails.filter(
         shipment =>
           shipment.orgLoc === org_loc &&
           shipment.destination.split(":")[1].trim() === destination
       );
-
-      if (matchingShipment) {
-       this.updateDocketDetails(matchingShipment.docketNumber)
-       this.addLsDetails(leg);
-      } else {
-        // console.log(`No matching details found for the leg: ${leg.leg}`);
+  
+      await this.addLsDetails(leg);
+  
+      if (matchingShipments.length > 0) {
+        const updatePromises = matchingShipments.map(matchingShipment =>
+          this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet)
+        );
+        await Promise.all(updatePromises);
       }
     }
-
   }
   
-  updateDocketDetails(docket) {
-
+  async updateDocketDetails(docket, lsNo) {
     let loadingSheetData = {
-      lsNo: this.loadingSheetNo
+      lsNo: lsNo
+    };
+    const trackingDocket = {
+      lsNo: lsNo,
+      tripId: this.loadingSheetTableForm.value.tripID,
+      vehNo: this.loadingSheetTableForm.controls["vehicle"].value?.value || "",
+      route: this.tripData?.RouteandSchedule || "",
+      dktNo: docket
+    };
+  
+    try {
+      await Promise.all([
+        updateTracking(this.companyCode, this._operationService, trackingDocket),
+        this.updateOperationService(docket, loadingSheetData)
+      ]);
+    } catch (error) {
+      console.error('Error occurred during the API call:', error);
     }
+  }
+  async addLsDetails(leg) {
+    const lsDetails = {
+      id: leg.LoadingSheet,
+      lsno: leg.LoadingSheet,
+      leg: leg.leg,
+      vehno: this.loadingSheetTableForm.value.vehicle.value,
+      tripId: this.loadingSheetTableForm.value?.tripID,
+      location: this.orgBranch,
+      pacakges: leg.packages,
+      weightKg: leg.weightKg,
+      volumeCFT: leg.volumeCFT,
+      entryBy: this.userName,
+      loadedKg: parseFloat(this.loadingSheetTableForm.value.LoadedKg),
+      loadedVolumeCft: parseFloat(this.loadingSheetTableForm.value.LoadedvolumeCFT),
+      loadAddedKg: parseFloat(this.loadingSheetTableForm.value.LoadaddedKg),
+      WeightUtilization: parseFloat(this.loadingSheetTableForm.value.WeightUtilization),
+      volumeUtilization: parseFloat(this.loadingSheetTableForm.value.VolumeUtilization),
+      capacity: this.loadingSheetTableForm.value?.Capacity || 0,
+      capacityVolumeCFT: this.loadingSheetTableForm.value?.CapacityVolumeCFT || 0,
+      volumeAddedCFT: this.loadingSheetTableForm.value?.VolumeaddedCFT || 0,
+      entryDate: new Date().toISOString()
+    };
+    const reqBody = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "loadingSheet_detail",
+      data: lsDetails,
+    };
+    try {
+      const res = await this._operationService.operationPost("common/create", reqBody).toPromise();
+      if (res) {
+        // Perform any necessary actions after the API call
+      }
+    } catch (error) {
+      console.error('Error occurred during the API call:', error);
+    }
+  }
+  updateVehicleStatus() {
+
+    const vehicleDetails = {
+      status: "On Transit",
+      tripId: this.loadingSheetTableForm.value?.tripID,
+      route: this.tripData?.RouteandSchedule
+    };
+    const reqBody = {
+      companyCode: this.companyCode,
+      type: "operation",
+      collection: "vehicle_status",
+      id: this.loadingSheetTableForm.value.vehicle.value,
+      updates: {
+        ...vehicleDetails,
+      },
+    };
+    this._operationService.operationPut("common/update", reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+
+        }
+      },
+    });
+  }
+  async loadVehicleDetails() {
+    try {
+      const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
+      this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
+      this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData.cft);
+      this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData.capacity);
+    } catch (error) {
+    }
+  }
+  goBack(tabIndex: number): void {
+    this.navigationService.navigateTotab(
+      tabIndex,
+      "/dashboard/GlobeDashboardPage"
+    );
+  }
+
+  getCapacity() {
+    // Check if this.loadingData is empty
+    // Set all values to 0
+    this.loadingSheetTableForm.controls['LoadedKg'].setValue(0);
+    this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(0);
+    this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(0);
+    this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(0);
+    this.loadingSheetTableForm.controls['WeightUtilization'].setValue(0);
+    this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(0);
+    if (this.lsDetails) {
+      this.loadingSheetTableForm.controls['LoadedKg'].setValue(this.lsDetails?.loadedKg || 0);
+      this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(this.lsDetails?.loadedVolumeCft || 0);
+    }
+    // Calculate the previously loaded values from the form
+    let loadedKgInput = parseInt(this.loadingSheetTableForm.value?.LoadedKg || 0);
+    let loadedCftInput = parseInt(this.loadingSheetTableForm.value?.LoadedvolumeCFT || 0);
+
+    // Initialize these variables to zero
+    let loadAddedKg = 0;
+    let volAddedCft = 0;
+
+    const processedLegs = new Set();
+
+    this.tableData.forEach(element => {
+      if (element?.isSelected) {
+        // Check if the leg has been processed already
+        if (!processedLegs.has(element?.leg)) {
+          loadAddedKg += parseInt(element?.weightKg || 0);
+          volAddedCft += parseInt(element?.volumeCFT || 0);
+
+          // Mark the leg as processed
+          processedLegs.add(element?.leg);
+        }
+      }
+    });
+
+    // Calculate the total loaded values, including previously loaded values
+    loadedKgInput += loadAddedKg;
+    loadedCftInput += volAddedCft;
+     let capacityTons = parseFloat(this.loadingSheetTableForm.controls['Capacity'].value); // Get the capacity value in tons
+    let loadedTons = loadedKgInput / 1000;
+    let percentage = (loadedTons * 100) / capacityTons;
+    // Update the form controls with the calculated values
+    this.loadingSheetTableForm.controls['LoadaddedKg'].setValue(loadAddedKg);
+    this.loadingSheetTableForm.controls['VolumeaddedCFT'].setValue(volAddedCft);
+    this.loadingSheetTableForm.controls['LoadedvolumeCFT'].setValue(loadedCftInput);
+    this.loadingSheetTableForm.controls['LoadedKg'].setValue(loadedKgInput);
+    this.loadingSheetTableForm.controls['WeightUtilization'].setValue(percentage.toFixed(2));
+    const volumeUtilization = loadedCftInput * 100 / parseFloat(this.loadingSheetTableForm.controls['CapacityVolumeCFT'].value);
+    this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(volumeUtilization.toFixed(2));
+    if (percentage > 100 || volumeUtilization > 100) {
+      let errorMessage = "Capacity has been exceeded.";
+    
+      if (volumeUtilization > 100) {
+        errorMessage = "Cubic feet volume is greater than vehicle volume.";
+      }
+    
+      Swal.fire({
+        icon: "error",
+        title: "Capacity Exceeded",
+        text: errorMessage,
+        showConfirmButton: true,
+      });
+      this.loadingData.forEach((loadingItem) => {
+        this.tableData = this.tableData.map((tableItem) => {
+          if (loadingItem.leg === tableItem.leg) {
+            return { ...tableItem, isSelected: false };
+          }
+          return tableItem;
+        });
+      });
+      
+      
+    }
+    
+
+  }
+  async departVehicle() {
+    if (this.loadingSheetTableForm.controls["tripID"].value === 'System Generated' || !this.loadingSheetTableForm.controls["tripID"].value) {
+      const randomNumber =
+        "TH/" +
+        this.orgBranch +
+        "/" +
+        2223 +
+        "/" +
+        Math.floor(Math.random() * 100000);
+      this.loadingSheetTableForm.controls["tripID"].setValue(randomNumber);
+      // Generate and set a random tripID if not already set
+    }
+    const vehicleValue = this.loadingSheetTableForm.controls["vehicle"].value.value;
+
+    if (vehicleValue) {
+      const tripDetails = {
+        tripId: this.loadingSheetTableForm.controls["tripID"].value,
+        vehicleNo: vehicleValue,
+        status: "Depart Vehicle",
+        updateBy: this.userName,
+        updateDate: new Date().toISOString(),
+      };
+
+      const reqBody = {
+        companyCode: this.companyCode,
+        type: "operation",
+        collection: "trip_detail",
+        id: this.tripData.id,
+        updates: { ...tripDetails },
+      };
+
+      try {
+        
+        await this._operationService.operationPut("common/update", reqBody).toPromise();
+
+        Swal.fire({
+          icon: "info",
+          title: "No Docket Added",
+          text: "Vehicle can depart as no docket is added for loading.",
+          showConfirmButton: true,
+        });
+
+        this.goBack(3);
+      } catch (error) {
+        console.error('Error occurred during the API call:', error);
+      }
+    } else {
+      SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
+    }
+  }
+  async updateOperationService(docket, loadingSheetData) {
     const reqBody = {
       companyCode: this.companyCode,
       type: "operation",
       collection: "docket",
       id: docket,
       updates: {
-        ...loadingSheetData,
+        ...loadingSheetData
       }
-    }
-    this._operationService.operationPut("common/update", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-         this.updateVehicleStatus();
-        }
-      }
-    })
-  }
+    };
   
-  addLsDetails(leg){
-    const lsDetails={
-      "id": this.loadingSheetNo,
-      "lsno":this.loadingSheetNo,
-      "leg": leg.leg,
-      "vehno":this.loadingSheetTableForm.value.vehicle.value,
-      "vehType":this.loadingSheetTableForm.value.vehicleType.name,
-      "tripId":this.loadingSheetTableForm.value?.tripID,
-      "location":this.orgBranch,
-      "pacakges":leg.packages,
-      "weightKg":leg.weightKg,
-      "volumeCFT": leg.volumeCFT
-    }
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "loadingSheet_detail",
-      "data":lsDetails
-    }
-    this._operationService.operationPost('common/create',reqBody).subscribe({next:(res:any)=>{
-      if(res){
-        this.goBack(3);
+    try {
+      const res = await this._operationService.operationPut("common/update", reqBody).toPromise();
+      if (res) {
+        await this.updateVehicleStatus();
       }
-    }})
-  }
-  updateVehicleStatus(){
-    const vehicleDetails={
-       "status":"On trip",
-       "tripId":this.loadingSheetTableForm.value?.tripID      
+    } catch (error) {
+      console.error('Error occurred during the API call:', error);
     }
-    const reqBody = {
-      "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "vehicle_status",
-      id: this.loadingSheetTableForm.value.vehicle.value,
-      updates: {
-        ...vehicleDetails,
-      }
-    }
-    this._operationService.operationPut("common/update", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-         
-        }
-      }
-    })
-  }
-  goBack(tabIndex: number): void {
-    this.navigationService.navigateTotab(tabIndex, '/dashboard/GlobeDashboardPage')
   }
 }

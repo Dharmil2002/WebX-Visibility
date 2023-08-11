@@ -18,10 +18,11 @@ export class CnoteService {
   VehiceLodingSheetData: any; // Contains the data for vehicle loading sheets.
   MeniFlexPackageData: any; // Stores the data for MeniFlex packages.
   vehicleArrivalData: any; // Represents the vehicle arrival information.
-  shipingData: any; // Contains the shipping-related data.
+  shipingData:any[]; // Contains the shipping-related data.
   meniFlexDetails: any; // Stores the MeniFlex details.
   departVehicleData: any; // Contains the data for departed vehicles.
   updateShipingData: any; // Holds the data for updating shipping information.
+  shipmentData: any;
 
   getData(): any {
     return this.savedData;
@@ -137,6 +138,11 @@ export class CnoteService {
     return this.departVehicleData
   }
   /*End*/
+  /* above  data will be removed once the API integration is completed. 
+    In this improved version, the comment specifies the purpose of the code as
+    temporary data storage for API integration and clarifies that the data will
+     be removed once the integration is done.*/
+
   constructor(private http: HttpClient) { }
   // GetCnoteFormcontrol() {
   //   return this.http.get<any>(
@@ -155,6 +161,7 @@ export class CnoteService {
       `${environment.APIBaseBetaURL}` + ApiURL + req
     );
   }
+
   cnotePost(ApiURL, Request) {
     return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
@@ -164,4 +171,14 @@ export class CnoteService {
   CnoteMongoPost(ApiURL, Request) {
     return this.http.post<any>(`${environment.APIMongoUrl}` + ApiURL, Request);
   }
+  /*below function is used set and get shipment data to used in loadingsheet */
+
+  setShipmentData(data) {
+    this.shipmentData = data;
+  }
+  getShipmentData() {
+
+    return this.shipmentData
+  }
+  /*End*/
 }

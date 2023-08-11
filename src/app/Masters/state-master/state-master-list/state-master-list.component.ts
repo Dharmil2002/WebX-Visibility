@@ -23,7 +23,6 @@ export class StateMasterListComponent implements OnInit {
             "country": "Country Name",
             "gstWiseStateCode": "GST Wise State Code",
             "isActive": "Active Flag",
-            "actions": "Actions",
         }
 
     headerForCsv = {
@@ -46,7 +45,7 @@ export class StateMasterListComponent implements OnInit {
     ];
 
     dynamicControls = {
-        add: true,
+        add: false,
         edit: true,
         csv: false
     }
@@ -60,7 +59,6 @@ export class StateMasterListComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        //throw new Error("Method not implemented.");
         this.getStateDetails();
     }
 
@@ -81,8 +79,6 @@ export class StateMasterListComponent implements OnInit {
                             srNo: index + 1
                         };
                     });
-
-
                     this.tableData = dataWithSrno;
                     this.tableLoad = false;
                 }

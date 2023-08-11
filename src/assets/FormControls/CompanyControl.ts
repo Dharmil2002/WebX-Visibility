@@ -316,7 +316,10 @@ export class CompanyControl {
                     value: '',
                     generatecontrol: true,
                     disable: false,
-                    Validations: [],
+                    Validations: [{
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }],
                     additionalData: {
                         showNameAndValue: true
                     }
@@ -356,7 +359,10 @@ export class CompanyControl {
                     name: 'color_Theme', label: "Select Theme", placeholder: "Select Theme", type: 'dropdown', value: CompanyDetailsResponse?.color_Theme,
                     generatecontrol: true,
                     disable: false,
-                    Validations: [],
+                    Validations: [{
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }],
                     additionalData: {
                         showNameAndValue: true
                     }
@@ -379,7 +385,7 @@ export class CompanyControl {
                     Validations: [],
                     generatecontrol: false,
                     disable: false
-    
+
                 }
             ]
 

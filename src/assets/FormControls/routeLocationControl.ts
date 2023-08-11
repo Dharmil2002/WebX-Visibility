@@ -64,7 +64,7 @@ export class RouteLocationControl {
                 label: 'Route KM',
                 placeholder: 'Route KM',
                 type: 'text',
-                value: routeLocationData?.routeKm ? routeLocationData.routeKm : "",
+                value: routeLocationData?.routeKm,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',
@@ -76,7 +76,7 @@ export class RouteLocationControl {
                 name: 'departureTime',
                 label: 'Departure time from starting Location',
                 placeholder: '',
-                type: 'date',
+                type: 'time',
                 value: new Date(2023, 6, 18, 13, 14),
                 Validations: [],
                 generatecontrol: true, disable: false
@@ -93,7 +93,7 @@ export class RouteLocationControl {
                         name: "autocomplete",
                     },
                     {
-                        name: "invalidAutocomplete",
+                        name: "invalidAutocompleteObject",
                         message: "Choose proper value",
                     }
                 ],
@@ -117,17 +117,53 @@ export class RouteLocationControl {
                 Validations: [
                 ],
                 generatecontrol: true,
-                disable: true
+                disable: false
+            },
+            {
+                name: 'scheduleType',
+                label: 'Schedule Type',
+                placeholder: 'Search Schedule Type',
+                type: 'Staticdropdown',
+                value: [
+                    { value: 'Daily', name: 'Daily' },
+                    { value: '2 Days', name: '2 Days' },
+                    { value: '3 Days', name: '3 Days' },
+                    { value: '4 Days', name: '4 Days' },
+                    { value: '5 Days', name: '5 Days' },
+                    { value: '6 Days', name: '6 Days' },
+                    { value: 'Alternate', name: 'Alternate' }
+                ],
+                Validations: [
+                ],
+                generatecontrol: true,
+                disable: false,
+                additionalData: {
+                    showNameAndValue: false
+                },
             },
             {
                 name: 'isActive',
                 label: 'Active Flag',
                 placeholder: 'Active Flag',
                 type: 'toggle',
-                value: '',
+                value: routeLocationData?.isActive,
                 Validations: [],
                 generatecontrol: true, disable: false
             },
+            {
+                name: 'id',
+                label: '',
+                placeholder: '',
+                type: 'text',
+                value: routeLocationData?.id,
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+
+            }
         ]
     }
     getFormControls() {

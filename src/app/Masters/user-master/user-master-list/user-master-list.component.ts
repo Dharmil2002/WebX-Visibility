@@ -76,7 +76,7 @@ export class UserMasterListComponent implements OnInit {
         let req = {
             "companyCode": this.companyCode,
             "type": "masters",
-            "collection": "user_detail"
+            "collection": "user_master"
         }
         this.masterService.masterPost('common/getall', req).subscribe({
             next: (res: any) => {

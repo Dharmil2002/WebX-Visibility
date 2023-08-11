@@ -8,9 +8,7 @@ import { utilityService } from 'src/app/Utility/utility.service';
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from "sweetalert2";
-import { generateRandomNumber, getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
 import { StateControl } from "src/assets/FormControls/StateControl";
-
 
 @Component({
     selector: 'app-add-state-master',
@@ -38,10 +36,8 @@ export class AddStateMasterComponent implements OnInit {
         this.getCountryList();
     }
 
-
     functionCallHandler($event) {
         // console.log("fn handler called" , $event);
-
         let field = $event.field;                   // the actual formControl instance
         let functionName = $event.functionName;     // name of the function , we have to call
 
@@ -59,39 +55,34 @@ export class AddStateMasterComponent implements OnInit {
         private masterService: MasterService
 
     ) {
-        if (this.route.getCurrentNavigation()?.extras?.state != null) {
-            this.data = route.getCurrentNavigation().extras.state.data;
+        const extrasState = this.route.getCurrentNavigation()?.extras?.state;
+        if (extrasState) {
+            this.data = extrasState.data;
             this.countryCode = this.data.country;
-            this.action = 'edit'
-            this.isUpdate = true;
-        } else {
-            this.action = "Add";
-        }
-        if (this.action === 'edit') {
+            this.action = 'edit';
             this.isUpdate = true;
             this.stateTabledata = this.data;
-            this.breadScrums = [
-                {
-                    title: "State Master",
-                    items: ["Home"],
-                    active: "Edit State",
-                },
-            ];
+            this.breadScrums = [{
+                title: "State Master",
+                items: ["Home"],
+                active: "Edit State",
+            }];
         } else {
-            this.breadScrums = [
-                {
-                    title: "State Master",
-                    items: ["Home"],
-                    active: "Add State",
-                },
-            ];
+            this.action = "Add";
+            this.isUpdate = false;
+            this.breadScrums = [{
+                title: "State Master",
+                items: ["Home"],
+                active: "Add State",
+            }];
             this.stateTabledata = new StateMaster({});
         }
         this.initializeFormControl();
-        this.isUpdate ? this.stateTableForm.controls["stateType"].setValue(this.stateTabledata.stateType) : "";
+        if (this.isUpdate) {
+            this.stateTableForm.controls["stateType"].setValue(this.stateTabledata.stateType);
+        }
     }
     initializeFormControl() {
-        // throw new Error("Method not implemented.");
         // Create StateFormControls instance to get form controls for different sections
         this.stateFormControls = new StateControl(this.stateTabledata, this.isUpdate);
         // Get form controls for State Details section
@@ -104,17 +95,13 @@ export class AddStateMasterComponent implements OnInit {
             }
         });
         this.stateTableForm = formGroupBuilder(this.fb, [this.jsonControlStateArray]);
-
-
     }
 
     cancel() {
         window.history.back();
-        //this.Route.navigateByUrl("/Masters/StateMaster/StateMasterView");
     }
 
     getCountryList() {
-        //throw new Error("Method not implemented.");
         this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
             this.Country = res;
             let tableArray = this.Country.countryList;
@@ -177,9 +164,9 @@ export class AddStateMasterComponent implements OnInit {
                 }
             });
         } else {
-            const randomNumber = getShortName(this.stateTableForm.value.stateName);
-            this.stateTableForm.controls["stateCode"].setValue(randomNumber);
-            this.stateTableForm.controls["id"].setValue(randomNumber);
+            this.stateTableForm.controls["stateCode"].setValue(this.stateTableForm.value.stateAlias);
+            this.stateTableForm.controls["id"].setValue(this.stateTableForm.value.stateAlias);
+
 
             let req = {
                 companyCode: this.companyCode,

@@ -5,7 +5,7 @@ export class PincodeLocationControl {
     constructor(isUpdate: boolean) {
         this.PinLocControlArray = [
             {
-                name: 'state',
+                name: 'area',
                 label: 'Destination Location',
                 placeholder: 'Search Destination Location',
                 type: 'dropdown',
@@ -24,10 +24,10 @@ export class PincodeLocationControl {
                     }
                 ],
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: true
                 },
                 functions: {
-                    onOptionSelect: 'getList',
+                    onOptionSelect: 'getData',
                 },
                 generatecontrol: true, disable: false
             },
@@ -48,8 +48,8 @@ export class PincodeLocationControl {
                         message: "Pin code should be of 6 digit number",
                         maxLength: '6',
                     }],
-                functions: {
-                    onOptionSelect: 'getList',
+                functions:{
+                    onOptionSelect: 'getData',
                 },
                 generatecontrol: true,
                 disable: isUpdate ? true : false,
@@ -62,9 +62,9 @@ export class PincodeLocationControl {
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: 'text',
-                value: '',
+                value: localStorage.getItem('Username'),
                 Validations: [],
-                generatecontrol: false, disable: false
+                generatecontrol: false, disable: true
             },
             {
                 name: 'entryDate',
@@ -77,8 +77,20 @@ export class PincodeLocationControl {
                 displaywith: '',
                 Validations: [],
                 generatecontrol: false,
-                disable: false
-            }
+                disable: true
+            },{
+                name: 'id',
+                label: '',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: true
+              },
         ]
     }
     getPinLocFormControls() {

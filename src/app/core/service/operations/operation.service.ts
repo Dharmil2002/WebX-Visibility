@@ -14,8 +14,9 @@ export class OperationService {
   loadingSheetJsonUrl = '../../../assets/data/shipmentDetails.json';
   arrivalUrl = '../../../assets/data/arrival-dashboard-data.json';
   runSheerUrl = "../../../assets/data/create-runsheet-data.json";
-
-  constructor(private http: HttpClient) {}
+  podcodDetails = '../../../assets/data/pod-data.json';
+  shipmentStatus: string;
+  constructor(private http: HttpClient) { }
   /**
    * Retrieves JSON file details from the specified API URL.
    * @param ApiURL The URL of the JSON file to retrieve.
@@ -25,11 +26,17 @@ export class OperationService {
   getJsonFileDetails(ApiURL) {
     return this.http.get<any>(this[ApiURL]);
   }
- //here is create for post request//
-  operationPost(ApiURL,Request){
-      return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  //here is create for post request//
+  operationPost(ApiURL, Request) {
+    return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
-  operationPut(ApiURL,Request){
+  operationPut(ApiURL, Request) {
     return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
-}
+  }
+  setShipmentStatus(data: string) {
+    this.shipmentStatus = data
+  }
+  getShipmentStatus() {
+    return this.shipmentStatus
+  }
 }

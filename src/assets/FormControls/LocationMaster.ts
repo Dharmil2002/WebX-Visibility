@@ -13,10 +13,10 @@ export class LocationControl {
                 name: 'locLevel', label: "Location Hierarchy", placeholder: "Select location Hierarchy", type: 'dropdown',
                 value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Location Hierarchy is required"
-                    // },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -27,10 +27,10 @@ export class LocationControl {
                 name: 'reportLevel', label: "Reporting To", placeholder: "Select Reporting To", type: 'dropdown',
                 value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Reporting To is required"
-                    // }  
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }  
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -40,10 +40,10 @@ export class LocationControl {
                 name: 'reportLoc', label: "Reporting Location", placeholder: "Select Reporting Location", type: 'dropdown',
                 value:'', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "Reporting Location is required"
-                    // }  
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -81,6 +81,10 @@ export class LocationControl {
             {
                 name: 'locPincode', label: 'Pincode', placeholder: 'Enter Pincode', type: 'dropdown', value: '', generatecontrol: true, disable: false,
                 Validations: [
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                     
                 ],
                 additionalData: {
@@ -91,10 +95,10 @@ export class LocationControl {
                 name: 'locState', label: "State", placeholder: "Select State", type: 'dropdown',
                 value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
-                    // {
-                    //     name: "required",
-                    //     message: "State is required"
-                    // }
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -104,11 +108,10 @@ export class LocationControl {
                 name: 'locCity', label: "City", placeholder: "Select City", type: 'dropdown',
                 value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
-                        // {
-                        //     name: "required",
-                        //     message: "City is required"
-                        // }
-                    
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -123,7 +126,7 @@ export class LocationControl {
                     }, {
                         name: "pattern",
                         message: "Please Enter alphanumeric Address of length 4 to 100",
-                        pattern: '^[a-zA-Z0-9]{4,100}$',
+                        pattern: '^[a-zA-Z0-9 ]{4,100}$',
                     }
 
                 ],
@@ -180,13 +183,10 @@ export class LocationControl {
                     name: 'locRegion', label: "Zone", placeholder: "Select zone", type: 'dropdown',
                     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
-                        // {
-                        //     name: "required",
-                        //     message: "Zone is required"
-                        // },
-                        // {
-                        //     name: "autocomplete",
-                        // },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
                         
                     ],
                     additionalData: {
@@ -197,6 +197,10 @@ export class LocationControl {
                     name: 'acctLoc', label: "Accounting Location", placeholder: "Select Accounting Location", type: 'dropdown',
                     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
                     ],
                     additionalData: {
                         showNameAndValue: false,
@@ -205,7 +209,12 @@ export class LocationControl {
                 {
                     name: 'dataLoc', label: "Data Entry Location", placeholder: "Select Data Entry Location", type: 'dropdown',
                     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
+                    ],
                     additionalData: {
                         showNameAndValue: false,
                     }
@@ -252,13 +261,10 @@ export class LocationControl {
                     name: 'nextLoc', label: "Default Next Location", placeholder: "Select Default Next Location", type: 'dropdown',
                     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
-                        // {
-                        //     name: "autocomplete",
-                        // },
-                        // {
-                        //     name: "invalidAutocomplete",
-                        //     message: "Choose proper value",
-                        // }
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
                     ],
                     additionalData: {
                         showNameAndValue: false,
@@ -268,13 +274,10 @@ export class LocationControl {
                     name: 'prevLoc', label: "Nearest Previous Location", placeholder: "Select Nearest Previous Location", type: 'dropdown',
                     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
-                        // {
-                        //     name: "autocomplete",
-                        // },
-                        // {
-                        //     name: "invalidAutocomplete",
-                        //     message: "Choose proper value",
-                        // }
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
                     ],
                     additionalData: {
                         showNameAndValue: false,
@@ -285,10 +288,10 @@ export class LocationControl {
                     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                       
-                        // {
-                        //     name: "required",
-                        //     message: "Location Ownership is required"
-                        // },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
                     ],
                     additionalData: {
                         showNameAndValue: false,
@@ -298,13 +301,10 @@ export class LocationControl {
                     name: 'contLoc', label: "Delivery Control Location", placeholder: "Select Delivery Control Location", type: 'dropdown',
                     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
-                        // {
-                        //     name: "autocomplete",
-                        // },
-                        // {
-                        //     name: "invalidAutocomplete",
-                        //     message: "Choose proper value",
-                        // }
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
                     ],
                     additionalData: {
                         showNameAndValue: false,

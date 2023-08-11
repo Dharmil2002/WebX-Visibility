@@ -42,7 +42,7 @@ export class customerModel {
 
   constructor(CustomerMaster) {
     {
-      this.customerCode = CustomerMaster.customerCode || 'System Generated';
+      this.customerCode = CustomerMaster.customerCode || '';
       this.groupCode = CustomerMaster.groupCode || ''
       this.customerName = CustomerMaster.customerName || ''
       this.customerPassword = CustomerMaster.customerPassword || ''

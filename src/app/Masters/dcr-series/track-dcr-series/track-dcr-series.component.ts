@@ -96,36 +96,47 @@ export class TrackDcrSeriesComponent implements OnInit {
               srNo: index + 1
             };
           });
-          const matchingData = dataWithSrno.find(item => {
-            return (
-              item.documentType === this.trackDcrForm.value.documentType.value &&
-              item.bookCode === this.trackDcrForm.value.documentNumber
-            );
-          });
-          if (matchingData) {
-            this.router.navigate(['Masters/DocumentControlRegister/DCRDetail'], {
-              state: {
-                data: matchingData, additionalData: additionalData,
-              }
-            });
-          }
-          else {
+          // Step 1: Filter records with bookCode = 'CN1234'
+          const filteredDataArray = dataWithSrno.filter((item) => item.bookCode === this.trackDcrForm.value.documentNumber && item.documentType === this.trackDcrForm.value.documentType.value);
+          if (filteredDataArray.length === 0) {
             Swal.fire({
               icon: "warning",
               title: "Alert",
               text: `No matching data found.`,
               showConfirmButton: true,
             });
+            return;
           }
+          // Step 2: Sort filteredDataArray based on entryDate in ascending order (earliest to latest)
+          filteredDataArray.sort((a, b) => new Date(a.entryDate).getTime() - new Date(b.entryDate).getTime());
+
+          // Step 3: Get the record with the latest entryDate (first item in sorted array)
+          const latestEntryData = filteredDataArray[filteredDataArray.length - 1];
+
+          // Step 4: Get the record with the last entryDate (last item in sorted array)
+          const lastEntryData = filteredDataArray[0];
+
+          // Now, you have the data with the latest entryDate in 'latestEntryData' and the data with the last entryDate in 'lastEntryData'.
+          const matchingData = {
+            "documentType": lastEntryData.documentType,
+            "bookCode": lastEntryData.bookCode,
+            "seriesFrom": lastEntryData.seriesFrom,
+            "seriesTo": latestEntryData.seriesTo,
+            "totalLeaf": latestEntryData.totalLeaf,
+            "allotTo": latestEntryData.allotTo,
+            "allocateTo": latestEntryData.allocateTo,
+            "type": latestEntryData.type,
+            "status": lastEntryData.status,
+            "action": latestEntryData.action,
+            "usedLeaves": lastEntryData.usedLeaves,
+          }
+          this.router.navigate(['Masters/DocumentControlRegister/DCRDetail'], {
+            state: {
+              data: matchingData, additionalData: additionalData,
+            }
+          });
         }
       }
     })
-  }
-  isInRange(value, start, end) {
-    return value >= start && value <= end;
-  }
-
-  hasSameLength(value1, value2) {
-    return value1.length === value2.length;
   }
 }

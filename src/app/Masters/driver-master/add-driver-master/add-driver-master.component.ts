@@ -1,17 +1,13 @@
-import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DriverControls } from 'src/assets/FormControls/DriverMaster';
-import { Inject } from "@angular/core";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { DriverMaster } from 'src/app/core/models/Masters/Driver';
-import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import Swal from 'sweetalert2';
-import { getShortName } from 'src/app/Utility/commonFunction/random/generateRandomNumber';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { convertNumericalStringsToInteger } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 @Component({
   selector: 'app-add-driver-master',
   templateUrl: './add-driver-master.component.html',
@@ -19,28 +15,10 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 export class AddDriverMasterComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   DriverTableForm: UntypedFormGroup;
-  error: string
-  isUpdate = false;
   DriverTable: DriverMaster;
-  LocationListAuto: AutoComplateCommon[];
-  DCategoryDropdown: AutoComplateCommon[];
-  VehicleDropdown: AutoComplateCommon[];
-  UpdateLocation: any;
+  //#region Variable declaration
+  isUpdate = false;
   action: any;
-  retrievedData: any;
-  userDetails: any;
-  LocationId: any;
-  DCategoryID: any
-  vehno: any
-  UpdateDCategory: any;
-  updatedVehno: any;
-  maxDate: Date;
-  minDate: Date;
-  ISManualDriverCode: boolean;
-  DriverLocation: any;
-  locationList: any;
-  DatePipe: DatePipe;
-  DriverFormControls: DriverControls;
   jsonControlDriverArray: any;
   jsonControlLicenseArray: any;
   jsonControlPermanentArray: any;
@@ -52,50 +30,34 @@ export class AddDriverMasterComponent implements OnInit {
   locationStatus: any;
   category: any;
   categoryStatus: any;
-  Vehicle: any;
-  vehicleStatus: any;
   breadscrums: { title: string; items: string[]; active: string; }[];
-  Routes: any;
-  RouteStatus: any;
   selectedFiles: boolean;
   SelectFile: File;
+  vehicleDet: any;
   imageName: string;
-  sampleDropdownData2 = [
-    { name: "HQTR", value: "HQTR" },
-    { name: "MUMB", value: "MUMB" },
-    { name: "AMDB", value: "AMDB" }
-  ]
-  routedropdown = [
-    {
-      value: "S0010 ",
-      name: "AMDB-BRDB-MUMB",
-    },
-    {
-      value: "S0003 ",
-      name: "AMDB-JAIB-DELB",
-    },
-    {
-      value: "S0002 ",
-      name: "MUMB-BRDB-AMDB",
-    }
-
-  ]
-  locationData: any;
   routeLocation: any;
-  routeDet: any;
   categoryDet: any;
+  LocationList: any;
+  locData: any;
+  pincode: any;
+  pincodeStatus: any;
+  tableLoad: boolean;
+  pincodeDet: any;
+  allData: { locationData: any; pincodeData: any; };
+  driverData: any;
+  newDriverId: string;
+  vehicleNo: any;
+  vehicleNoStatus: any;
+  pincodeData: any;
+  vehicleData: any;
+  //#endregion
 
-  constructor(private Route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
+  constructor(private Route: Router,
     private fb: UntypedFormBuilder, private filter: FilterUtils,
     private masterService: MasterService
   ) {
-    //super();
-    this.maxDate = new Date(new Date());
-    this.minDate = new Date("01 Jan 1900");
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.DriverTable = Route.getCurrentNavigation().extras.state.data;
-      this.LocationId = this.DriverTable.driverLocation
-      this.DCategoryID = this.DriverTable.dCategory
       this.isUpdate = true;
       this.action = 'edit'
 
@@ -121,8 +83,6 @@ export class AddDriverMasterComponent implements OnInit {
         },
       ];
       this.DriverTable = new DriverMaster({})
-      this.retrievedData = localStorage.getItem('currentUser');
-      this.userDetails = JSON.parse(this.retrievedData);
     }
     this.initializeFormControl()
 
@@ -136,7 +96,6 @@ export class AddDriverMasterComponent implements OnInit {
     this.jsonControlPermanentArray = driverFormControls.getFormControlsP();
     this.jsonControlUploadArray = driverFormControls.getFormControlsU();
     this.jsonControlBankDetailArray = driverFormControls.getFormControlsB();
-
     // Build the accordion data with section names as keys and corresponding form controls as values
     this.accordionData = {
       "Driver Details": this.jsonControlDriverArray,
@@ -145,62 +104,6 @@ export class AddDriverMasterComponent implements OnInit {
       "ID Proof Document Type": this.jsonControlUploadArray,
       "Bank Account Details": this.jsonControlBankDetailArray
     };
-
-    // Build the form group using formGroupBuilder function and the values of accordionData
-    this.DriverTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
-  }
-  //#endregion
-
-  ngOnInit(): void {
-    //throw new Error("Method not implemented.");
-    this.bindDropdown();
-    this.getDropDownData();
-  }
-
-  getDropDownData() {
-    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-      const {
-        locationDropdown,
-        routeLocationDropdown,
-      } = res;
-      this.locationData = locationDropdown;
-      this.routeLocation = routeLocationDropdown;
-      if (this.isUpdate) {
-
-        this.routeDet = this.findDropdownItemByName(this.routeLocation, this.DriverTable.dCategory);
-        this.DriverTableForm.controls.dCategory.setValue(this.routeDet);
-
-        this.categoryDet = this.findDropdownItemByName(this.locationData, this.DriverTable.driverLocation);
-        this.DriverTableForm.controls.driverLocation.setValue(this.categoryDet);
-      }
-
-      const filterParams = [
-
-        [
-          this.jsonControlDriverArray,
-          this.locationData,
-          this.location,
-          this.locationStatus
-        ],
-
-        [
-          this.jsonControlDriverArray,
-          this.routeLocation,
-          this.category,
-          this.categoryStatus
-        ],
-
-      ];
-
-      filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
-        this.filter.Filter(jsonControlArray, this.DriverTableForm, dropdownData, formControl, statusControl);
-      });
-    });
-  }
-  findDropdownItemByName(dropdownData, name) {
-    return dropdownData.find(item => item.name === name);
-  }
-  bindDropdown() {
     this.jsonControlDriverArray.forEach(data => {
       if (data.name === 'driverLocation') {
         // Set location-related variables
@@ -212,20 +115,54 @@ export class AddDriverMasterComponent implements OnInit {
         this.category = data.name;
         this.categoryStatus = data.additionalData.showNameAndValue;
       }
+      if (data.name === 'vehicleNo') {
+        // Set category-related variables
+        this.vehicleNo = data.name;
+        this.vehicleNoStatus = data.additionalData.showNameAndValue;
+      }
     });
-    this.filter.Filter(
-      this.jsonControlDriverArray,
-      this.DriverTableForm,
-      this.sampleDropdownData2,
-      this.location,
-      this.locationStatus,
-    ); this.filter.Filter(
-      this.jsonControlDriverArray,
-      this.DriverTableForm,
-      this.routedropdown,
-      this.category,
-      this.categoryStatus,
-    );
+    this.jsonControlPermanentArray.forEach(data => {
+      if (data.name === 'pincode') {
+        // Set pincode-related variables
+        this.pincode = data.name;
+        this.pincodeStatus = data.additionalData.showNameAndValue;
+      }
+    });
+    // Build the form group using formGroupBuilder function and the values of accordionData
+    this.DriverTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
+  }
+  //#endregion
+
+  ngOnInit(): void {
+    this.getDropDownData();
+    this.getAllMastersData();
+  }
+
+  getDropDownData() {
+    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
+      const {
+        routeLocationDropdown,
+      } = res;
+      this.routeLocation = routeLocationDropdown;
+      if (this.isUpdate) {
+        this.categoryDet = this.findDropdownItemByName(this.routeLocation, this.DriverTable.dCategory);
+        this.DriverTableForm.controls.dCategory.setValue(this.categoryDet);
+      }
+      const filterParams = [
+        [
+          this.jsonControlDriverArray,
+          this.routeLocation,
+          this.category,
+          this.categoryStatus
+        ],
+      ];
+      filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
+        this.filter.Filter(jsonControlArray, this.DriverTableForm, dropdownData, formControl, statusControl);
+      });
+    });
+  }
+  findDropdownItemByName(dropdownData, name) {
+    return dropdownData.find(item => item.name === name);
   }
   selectedJpgFile(data) {
     let fileList: FileList = data.eventArgs;
@@ -254,7 +191,6 @@ export class AddDriverMasterComponent implements OnInit {
     }
   }
   cancel() {
-    window.history.back();
     this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList");
   }
   selectedFile(data) {
@@ -284,27 +220,34 @@ export class AddDriverMasterComponent implements OnInit {
       alert("No file selected");
     }
   }
+  //#region Save function
   save() {
     const formValue = this.DriverTableForm.value;
     const controlNames = [
       "dCategory",
       "driverLocation",
+      "pincode",
+      "vehicleNo"
     ];
     controlNames.forEach(controlName => {
       const controlValue = formValue[controlName]?.name;
       this.DriverTableForm.controls[controlName].setValue(controlValue);
     });
-    this.DriverTableForm.controls["activeFlag"].setValue(this.DriverTableForm.value.activeFlag == true ? "Y" : "N");
+    let data = convertNumericalStringsToInteger(this.DriverTableForm.value);
+
+    // Clear any errors in the form controls
+    Object.values(this.DriverTableForm.controls).forEach(control => control.setErrors(null));
+
     if (this.isUpdate) {
-      let id = this.DriverTableForm.value.id;
+      let id = data.id;
       // Remove the "id" field from the form controls
-      this.DriverTableForm.removeControl("id");
+      delete data.id
       let req = {
         companyCode: this.companyCode,
         type: "masters",
         collection: "driver_detail",
         id: id,
-        updates: this.DriverTableForm.value
+        updates: data
       };
       this.masterService.masterPut('common/update', req).subscribe({
         next: (res: any) => {
@@ -321,13 +264,23 @@ export class AddDriverMasterComponent implements OnInit {
         }
       });
     } else {
-      const randomNumber = getShortName(this.DriverTableForm.value.manualDriverCode);
-      this.DriverTableForm.controls["id"].setValue(randomNumber);
+      const lastCode = this.driverData[this.driverData.length - 1];
+      const lastDriverCode = lastCode ? parseInt(lastCode.driverId.substring(1)) : 0;
+      // Function to generate a new address code
+      function generateDriverCode(initialCode: number = 0) {
+        const nextDriverCode = initialCode + 1;
+        const driverNumber = nextDriverCode.toString().padStart(4, '0');
+        const driverCode = `D${driverNumber}`;
+        return driverCode;
+      }
+      this.newDriverId = generateDriverCode(lastDriverCode);
+      data.id = this.newDriverId;
+      data.driverId = this.newDriverId;
       let req = {
         companyCode: this.companyCode,
         type: "masters",
         collection: "driver_detail",
-        data: this.DriverTableForm.value
+        data: data
       };
       this.masterService.masterPost('common/create', req).subscribe({
         next: (res: any) => {
@@ -345,6 +298,8 @@ export class AddDriverMasterComponent implements OnInit {
       });
     }
   }
+  //#endregion
+
   selectedPngFile(data) {
     let fileList: FileList = data.eventArgs;
     if (fileList.length > 0) {
@@ -372,6 +327,7 @@ export class AddDriverMasterComponent implements OnInit {
       alert("No file selected");
     }
   }
+
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
     let field = $event.field;                   // the actual formControl instance
@@ -382,6 +338,150 @@ export class AddDriverMasterComponent implements OnInit {
     } catch (error) {
       // we have to handle , if function not exists.
       console.log("failed");
+    }
+  }
+
+  getManualDriverCodeExists() {
+    let req = {
+      "companyCode": this.companyCode,
+      "type": "masters",
+      "collection": "driver_detail"
+    }
+    this.masterService.masterPost('common/getall', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.driverData = res.data;
+          const count = res.data.filter(item => item.manualDriverCode == this.DriverTableForm.controls.manualDriverCode.value)
+          if (count.length > 0) {
+            Swal.fire({
+              title: 'Driver Manual Code already exists! Please try with another',
+              toast: true,
+              icon: "error",
+              showCloseButton: false,
+              showCancelButton: false,
+              showConfirmButton: true,
+              confirmButtonText: "OK"
+            });
+            this.DriverTableForm.controls['manualDriverCode'].reset();
+          }
+        }
+      }
+    })
+  }
+
+  // Get all dropdown data
+  async getAllMastersData() {
+    try {
+      // Prepare the requests for different collections
+      let locationReq = {
+        "companyCode": parseInt(localStorage.getItem("companyCode")),
+        "type": "masters",
+        "collection": "location_detail"
+      };
+
+      let pincodeReq = {
+        "companyCode": parseInt(localStorage.getItem("companyCode")),
+        "type": "masters",
+        "collection": "pincode_detail"
+      };
+      let vehicleReq = {
+        "companyCode": parseInt(localStorage.getItem("companyCode")),
+        "type": "masters",
+        "collection": "vehicle_detail"
+      };
+
+      const locationRes = await this.masterService.masterPost('common/getall', locationReq).toPromise();
+      const pincodeRes = await this.masterService.masterPost('common/getall', pincodeReq).toPromise();
+      const vehicleRes = await this.masterService.masterPost('common/getall', vehicleReq).toPromise();
+
+      const mergedData = {
+        locationData: locationRes?.data,
+        pincodeData: pincodeRes?.data,
+        vehicleData: vehicleRes?.data,
+      };
+      this.allData = mergedData;
+      this.pincodeDet = mergedData.pincodeData.map(element => ({
+        name: element.pincode,
+        value: element.pincode
+      }));
+      const LocationList = mergedData.locationData.map(element => ({
+        name: element.locName,
+        value: element.locCode
+      }));
+      const vehicleDet = mergedData.vehicleData.map(element => ({
+        name: element.vehicleNo,
+        value: element.id,
+      }));
+      this.LocationList = LocationList;
+      this.vehicleDet = vehicleDet;
+      this.filter.Filter(
+        this.jsonControlDriverArray,
+        this.DriverTableForm,
+        LocationList,
+        this.location,
+        this.locationStatus
+      );
+      this.filter.Filter(
+        this.jsonControlDriverArray,
+        this.DriverTableForm,
+        vehicleDet,
+        this.vehicleNo,
+        this.vehicleNoStatus
+      );
+      this.tableLoad = true;
+      this.autofillDropdown();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Handle the error as needed
+    }
+  }
+
+  setStateCityData() {
+    const fetchData = this.allData.pincodeData.find(item => item.pincode == this.DriverTableForm.controls.pincode.value.value)
+    this.DriverTableForm.controls.city.setValue(fetchData.city)
+  }
+  autofillDropdown() {
+    if (this.isUpdate) {
+      this.locData = this.LocationList.find((x) => x.name == this.DriverTable.driverLocation);
+      this.DriverTableForm.controls.driverLocation.setValue(this.locData);
+
+      this.pincodeData = this.pincodeDet.find((x) => x.name == this.DriverTable.pincode);
+      this.DriverTableForm.controls.pincode.setValue(this.pincodeData);
+
+      this.vehicleData = this.vehicleDet.find((x) => x.name == this.DriverTable.vehicleNo);
+      this.DriverTableForm.controls.vehicleNo.setValue(this.vehicleData);
+    }
+  }
+  getPincodeData() {
+    const pincodeValue = this.DriverTableForm.controls['pincode'].value;
+    if (!isNaN(pincodeValue)) { // Check if pincodeValue is a valid number
+      const pincodeList = this.pincodeDet.map((x) => ({ name: parseInt(x.name), value: parseInt(x.value) }));
+
+      const exactPincodeMatch = pincodeList.find(element => element.name === pincodeValue.value);
+
+      if (!exactPincodeMatch) {
+        if (pincodeValue.toString().length > 2) {
+          const filteredPincodeDet = pincodeList.filter(element => element.name.toString().includes(pincodeValue));
+          if (filteredPincodeDet.length === 0) {
+            // Show a popup indicating no data found for the given pincode
+            Swal.fire({
+              icon: "info",
+              title: "No Data Found",
+              text: `No data found for pincode ${pincodeValue}`,
+              showConfirmButton: true,
+            });
+            return; // Exit the function
+          } else {
+            this.filter.Filter(
+              this.jsonControlPermanentArray,
+              this.DriverTableForm,
+              filteredPincodeDet,
+              this.pincode,
+              this.pincodeStatus
+            );
+          }
+        }
+      }
     }
   }
 }

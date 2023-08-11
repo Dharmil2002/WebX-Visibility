@@ -1,0 +1,41 @@
+<div class="paddingdiv">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-6" style="margin-bottom: 0px;">
+            <form [formGroup]="podCodForm">
+                <app-form-webxpress [form]="podCodForm" [formData]="jsonControlArray"
+                    (callFunction)="functionCaller($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6" style="margin-bottom: 0px;">
+            <!-- <div class="col-lg-4 col-md-4 col-sm-6 align-left" style="margin-bottom: 0px;"> -->
+            <form [formGroup]='range'>
+                <div class="row mt-2" align="end">
+                    <div class="col " style="margin-bottom: 5px;">
+                        <mat-form-field appearance="outline" class="datepickercss"
+                            style="width: 72%;margin: 0px 0px 0px 0px !important;">
+                            <mat-label>Select Date range</mat-label>
+                            <mat-date-range-input [rangePicker]="picker">
+                                <input matStartDate formControlName="start" />
+                                <input matEndDate formControlName="end" />
+                            </mat-date-range-input>
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-date-range-picker #picker [calendarHeaderComponent]="CustomeDatePickerComponent"
+                                [touchUi]="isTouchUIActivated"></mat-date-range-picker>
+                        </mat-form-field>
+                        <button type="button" (click)="get()"
+                            class="btn btn-outline-success btn-border-radius msl-2 mb-2">
+                            <i-feather style="width: 20px;height: 20px;" name="search"></i-feather>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <app-generic-card-webxpress *ngIf="!pod" [boxData]="this.podKpiData"></app-generic-card-webxpress>
+    <app-generic-card-webxpress *ngIf="pod" [boxData]="this.codKpiData"></app-generic-card-webxpress>
+    <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="data" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+        [staticField]="staticField" [Link]="linkArray" [boxData]="this.KPICountData">
+    </app-generic-table-v2>
+</div>

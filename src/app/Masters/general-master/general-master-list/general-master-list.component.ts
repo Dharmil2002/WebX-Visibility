@@ -1,20 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-general-master-list',
   templateUrl: './general-master-list.component.html',
 })
 export class GeneralMasterListComponent implements OnInit {
-  viewComponent: any;
-  data: [] | any;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  toggleArray = ["activeFlag"]
+  toggleArray = []
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = [];
-
   columnHeader = {
     "srNo": "Sr No",
     "headerDesc": "General Master",
@@ -42,11 +38,9 @@ export class GeneralMasterListComponent implements OnInit {
   }
   addAndEditPath: string;
   tableData: any[];
-  constructor(private masterService: MasterService, private route: Router) {
-    this.addAndEditPath = "/Masters/GeneralMaster/GeneralMasterCodeList";
-  }
+  constructor(private masterService: MasterService) { }
   ngOnInit(): void {
-    //throw new Error("Method not implemented.");
+    this.addAndEditPath = "/Masters/GeneralMaster/GeneralMasterCodeList";
     this.getGeneralDetails();
   }
   getGeneralDetails() {

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { GeneralMaster } from 'src/app/core/models/Masters/general-master';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
+import { GeneralMasterAddComponent } from '../general-master-add/general-master-add.component';
 
 @Component({
   selector: 'app-general-master-code-list',
@@ -13,23 +13,16 @@ export class GeneralMasterCodeListComponent {
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
-  generalTable: GeneralMaster
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = [];
   addAndEditPath: string;
-  tableData: any[];
   headerCode: string;
-  IsUpdate: any;
-  action: string;
-  res: any;
-  GeneralTable: GeneralMaster;
   columnHeader = {
     "srNo": "Sr No",
     "codeId": "Code ID",
     "codeDesc": "Description",
     "activeFlag": "Active Status",
-    "actions": "Actions"
-
+    "View": "Actions"
   };
   headerForCsv = {
     "srNo": "Sr No",
@@ -39,9 +32,9 @@ export class GeneralMasterCodeListComponent {
   }
   breadScrums = [
     {
-      title: "General Master",
+      title: this.route.getCurrentNavigation()?.extras?.state?.data.headerDesc + " General Master",
       items: ["Home"],
-      active: "General Master",
+      active: this.route.getCurrentNavigation()?.extras?.state?.data.headerDesc + " General Master",
     },
   ];
   dynamicControls = {
@@ -49,17 +42,29 @@ export class GeneralMasterCodeListComponent {
     edit: true,
     csv: false
   }
- 
-  constructor(private masterService: MasterService, private route: Router,
-  ) {
-    this.addAndEditPath = "/Masters/GeneralMaster/AddGeneralMaster";
-    if (this.route.getCurrentNavigation()?.extras?.state != null) {
+  viewComponent: any;
+  height = '300px';
+  width = '600px';
+  backPath: string;
+  constructor(private masterService: MasterService, private route: Router) {
+    if (this.route.getCurrentNavigation()?.extras?.state?.data != null) {
       this.data = route.getCurrentNavigation().extras.state.data;
-
     }
+  }
+  public onDialogClosed(result: any): void {
+    if (typeof result === 'string') {
+      this.data.headerCode = result;
+    } else {
+      this.data.headerCode = result.value.codeType;
+    }
+    this.getGeneralDetails();
   }
   ngOnInit(): void {
     this.getGeneralDetails();
+    this.addAndEditPath = "/Masters/GeneralMaster/AddGeneralMaster";
+    this.backPath = "/Masters/GeneralMaster/GeneralMasterList";
+    this.headerCode = this.data?.headerCode;
+    this.viewComponent = GeneralMasterAddComponent;
   }
   getGeneralDetails() {
     // Assuming tableData contains the array of objects
@@ -68,14 +73,14 @@ export class GeneralMasterCodeListComponent {
       "type": "masters",
       "collection": "General_master",
       "query": {
-        "codeType": this.data.headerCode
+        "codeType": this.data?.headerCode
       }
     };
 
     this.masterService.masterPost('common/getOne', req).subscribe({
       next: (res: any) => {
         if (res) {
-          this.masterService.setValueheaderCode(this.data.headerCode);
+          this.masterService.setValueheaderCode(this.data?.headerCode);
           // Generate srno for each object in the array
           const dataWithSrno = res.data.db.data.General_master.map((obj, index) => {
             return {
@@ -84,7 +89,6 @@ export class GeneralMasterCodeListComponent {
             };
           });
           this.csv = dataWithSrno;
-          this.tableData = dataWithSrno;
           this.tableLoad = false;
         }
       }
@@ -95,7 +99,7 @@ export class GeneralMasterCodeListComponent {
     let id = det.id;
     // Remove the "id" field from the form controls
     delete det.id;
-    //  delete det.srNo;
+    delete det.srNo;
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       type: "masters",
@@ -113,6 +117,7 @@ export class GeneralMasterCodeListComponent {
             text: res.message,
             showConfirmButton: true,
           });
+          this.getGeneralDetails();
         }
       }
     });

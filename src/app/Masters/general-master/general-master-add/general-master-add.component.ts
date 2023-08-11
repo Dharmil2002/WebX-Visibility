@@ -1,7 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GeneralMaster } from 'src/app/core/models/Masters/general-master';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { GeneralMasterControl } from 'src/assets/FormControls/general-master';
@@ -12,39 +11,31 @@ import Swal from 'sweetalert2';
   templateUrl: './general-master-add.component.html',
 })
 export class GeneralMasterAddComponent implements OnInit {
-  counter: number = 1;
   breadScrums: { title: string; items: string[]; active: string; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  countryCode: any;
   action: string;
   isUpdate = false;
-  generalTabledata: GeneralMaster;
+  generalTabledata: any;
   generalTableForm: UntypedFormGroup;
   generalFormControls: GeneralMasterControl;
   jsonControlGroupArray: any;
-  headerCode: string;
+  newGeneralId: string;
   ngOnInit() {
   }
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
-    private Route: Router, private fb: UntypedFormBuilder,
+    public dialogRef: MatDialogRef<GeneralMasterAddComponent>,
+    private fb: UntypedFormBuilder,
     private masterService: MasterService,
   ) {
-    if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.data = Route.getCurrentNavigation().extras.state.data;
-
-      //let headerCodeValue = JSON.parse(sessionStorage.getItem('headerCodeValue'));
-      this.countryCode = this.data.countryName;
-      this.action = 'edit'
-      this.isUpdate = true
-
+    if (data != null) {
+      this.generalTabledata = data;
+      this.isUpdate = this.data.codeId != null ? true : false;
+      this.action = this.isUpdate ? "edit" : "Add";
     } else {
       this.action = "Add";
-
     }
     if (this.action === 'edit') {
-      this.isUpdate = true;
-      this.generalTabledata = this.data;
       this.breadScrums = [
         {
           title: "General Master",
@@ -60,24 +51,27 @@ export class GeneralMasterAddComponent implements OnInit {
           active: "Add General Master",
         },
       ];
-      this.generalTabledata = new GeneralMaster({});
+      this.data = new GeneralMaster({});
     }
-    this.headerCode = masterService.getHeaderCode();
     this.initializeFormControl();
   }
   initializeFormControl() {
     // Create StateFormControls instance to get form controls for different sections
-    this.generalFormControls = new GeneralMasterControl(this.generalTabledata, this.isUpdate);
+    this.generalFormControls = new GeneralMasterControl(this.data, this.isUpdate);
     // Get form controls for Customer Group Details section
     this.jsonControlGroupArray = this.generalFormControls.getFormControls();
     this.generalTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
   }
   cancel() {
-    window.history.back();
+    if(this.isUpdate){
+      this.dialogRef.close(this.generalTableForm);
+    }
+    else{
+      this.dialogRef.close(this.generalTabledata);
+    }
   }
   //#region Save Function
   save() {
-    this.generalTableForm.controls["activeFlag"].setValue(this.generalTableForm.value.activeFlag == true ? "Y" : "N");
     if (this.isUpdate) {
       let id = this.generalTableForm.value.id;
       // Remove the "id" field from the form controls
@@ -99,54 +93,67 @@ export class GeneralMasterAddComponent implements OnInit {
               text: res.message,
               showConfirmButton: true,
             });
-            this.Route.navigateByUrl('/Masters/GeneralMaster/GeneralMasterList');
+            this.dialogRef.close(this.generalTableForm);
           }
         }
       });
     } else {
-      // Get the first 2 letters of the holidayNote and convert them to uppercase
-      const codeDesc = this.generalTableForm.value.codeDesc;
-      const shortName = codeDesc.substring(0, 2).toUpperCase();
-      // Generate the next ID
-      const nextId = this.generateNextId();
-      // Set the ID in the form control
-      this.generalTableForm.controls["id"].setValue(nextId);
-      this.generalTableForm.controls["codeId"].setValue(nextId);
-      this.generalTableForm.controls["codeType"].setValue(this.headerCode);
-      // sessionStorage.setItem('headerCodeValue', JSON.stringify(headerCodeValue));
       let req = {
-        companyCode: this.companyCode,
-        type: "masters",
-        collection: "General_master",
-        data: this.generalTableForm.value,
-        // "codeType": headerCodeValue
-      };
-      this.masterService.masterPost('common/create', req).subscribe({
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        "type": "masters",
+        "collection": "General_master"
+      }
+      this.masterService.masterPost('common/getall', req).subscribe({
         next: (res: any) => {
           if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
+            const lastCodeWithType = res.data
+              .filter(item => item.codeType === this.generalTabledata)
+              .sort((a, b) => b.codeId.localeCompare(a.codeId))
+            [0];
+
+            const lastGeneralCode = lastCodeWithType
+              ? parseInt(lastCodeWithType.codeId.split('-')[1])
+              : 0;
+
+            function generateGeneralCode(initialCode: number = 0, codeType: string) {
+              const nextGeneralCode = initialCode + 1;
+              const generalNumber = nextGeneralCode.toString().padStart(4, '0');
+              const generalCode = `${codeType}-${generalNumber}`;
+              return generalCode;
+            }
+            this.newGeneralId = generateGeneralCode(lastGeneralCode, this.generalTabledata);
+            this.generalTableForm.controls["id"].setValue(this.newGeneralId)
+            this.generalTableForm.controls["codeId"].setValue(this.newGeneralId)
+            this.generalTableForm.controls["codeType"].setValue(this.generalTabledata);
+            let req = {
+              companyCode: this.companyCode,
+              type: "masters",
+              collection: "General_master",
+              data: this.generalTableForm.value,
+            };
+            this.masterService.masterPost('common/create', req).subscribe({
+              next: (res: any) => {
+                if (res) {
+                  // Display success message
+                  Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                  });
+                  this.dialogRef.close(this.generalTableForm);
+                }
+              }
             });
-            this.Route.navigateByUrl('/Masters/GeneralMaster/GeneralMasterList');
           }
         }
-      });
+      })
     }
   }
   //#endregion
-  generateNextId() {
-    const nextId = `${String(this.counter).padStart(5, '0')}`;
-    this.counter++;
-    return nextId;
-  }
+
   //#region Function Call Handler
   functionCallHandler($event) {
-    // console.log("fn handler called" , $event);
-    let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
     // function of this name may not exists, hence try..catch 
     try {

@@ -29,6 +29,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() viewComponent;
   @Input() csvFileName;
   @Input() headercode;
+  @Input() backPath;
   @Input() IscheckBoxRequired;
   @Input() Link;
   @Input() toggleArray;
@@ -65,7 +66,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
-    
+
   }
   constructor(public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router, public dialog: MatDialog) {
@@ -145,6 +146,9 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   addNew() {
     this.router.navigateByUrl(this.addAndEditPath);
   }
+  cancel() {
+    this.router.navigateByUrl(this.backPath);
+  }
 
   //#region this function is called when rendering data in table and returns formatted data if required.
   formatData(val: string, key: string) {
@@ -172,20 +176,19 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     const dialogref = this.dialog.open(
       this.viewComponent,
       {
-        width: '600px',
-        height: '425px', data: item
+        width: this.width,
+        height: this.height, data: item
       });
     dialogref.afterClosed().subscribe(result => {
       this.dialogClosed.emit(result);
     })
-
   }
   addNewGeneral() {
     const dialogref = this.dialog.open(
       this.viewComponent,
       {
-        width: '600px',
-        height: '425px',
+        width: this.width,
+        height: this.height,
         data: this.headercode
       });
     dialogref.afterClosed().subscribe(result => {

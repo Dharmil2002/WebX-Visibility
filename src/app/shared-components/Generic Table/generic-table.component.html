@@ -10,6 +10,13 @@
                             aria-label="Search box">
                     </li>
                     <li>
+                        <div class="export-button m-l-10" matTooltip="BACK">
+                            <button *ngIf="backPath" mat-mini-fab color="primary">
+                                <mat-icon class="col-white" (click)="cancel()">keyboard_backspace</mat-icon>
+                            </button>
+                        </div>
+                    </li>
+                    <li>
                         <div class="export-button m-l-10" *ngIf="dynamicControls" matTooltip="ADD">
                             <button *ngIf="!headercode && dynamicControls.add" mat-mini-fab color="primary">
                                 <mat-icon class="col-white" (click)="addNew()">add</mat-icon>
@@ -91,6 +98,10 @@
                 <button mat-icon-button *ngIf="tableData=='view'" (click)="$event.stopPropagation()"
                     (click)="View(element)" class="tbl-action-btn">
                     <app-feather-icons [icon]="'eye'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                </button>
+                <button mat-icon-button *ngIf="tableData=='View'" [matMenuTriggerFor]="menuItemFlag ? menu : null"
+                    (click)="$event.stopPropagation()" (click)="GeneralView(element)" class="tbl-action-btn">
+                    <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
                 </button>
             </mat-cell>
         </ng-container>

@@ -28,7 +28,7 @@ export class vehicleModel {
     vendorType: string;
     gpsDeviceEnabled: boolean;
     rcBookNo: string;
-    isActive: boolean;
+    activeflag: boolean;
     blackListed: boolean;
     innerDimension: string;
     outerDimension: string;
@@ -46,27 +46,27 @@ export class vehicleModel {
     approvedBy: any;
     vendcode: any;
     vehno: any;
-    noOfDrivers:any;
-    vehregno:any;
-    permitValidityDate:any;
-    insuranceValidityDate:any;
-    unldWt:any;
-    gvw:any;
-    gpsDeviceId:any;
-    capacity:any;
-    fitnessValidityDate:any;
-    attachedDate:any;
-    rate_km:number;
-    innerLength:number;
-    innerHeight:number;
-    innerWidth:number;
-    cft:number;
-    route:any;
-    outerCft :number;
-    noOfPackages:any;
-    approvedOn:any;
-    startDateOfService:any;
-    date=new Date()
+    noOfDrivers: any;
+    vehregno: any;
+    permitValidityDate: any;
+    insuranceValidityDate: any;
+    unldWt: any;
+    gvw: any;
+    gpsDeviceId: any;
+    capacity: any;
+    fitnessValidityDate: any;
+    attachedDate: any;
+    rate_km: number;
+    innerLength: number;
+    innerHeight: number;
+    innerWidth: number;
+    cft: number;
+    route: any;
+    outerCft: number;
+    noOfPackages: any;
+    approvedOn: any;
+    startDateOfService: any;
+    date = new Date()
     controllBranch: any;
     assetName: any;
     vehicleType: any;
@@ -82,7 +82,8 @@ export class vehicleModel {
     regNo: any;
     permitState: any;
     tyreAttached: any;
-    constructor(vehicleModel){
+    tankCapacity: any;
+    constructor(vehicleModel) {
         this.vehregno = vehicleModel.vehregno || '';
         this.vehicleType = vehicleModel.vehicleType || '';
         this.controllBranch = vehicleModel.controllBranch || '';
@@ -93,15 +94,18 @@ export class vehicleModel {
         this.insuranceValidityDate = vehicleModel.insuranceValidityDate || this.date;
         this.fitnessValidityDate = vehicleModel.fitnessValidityDate || this.date;
         this.attachedDate = vehicleModel.attachedDate || this.date;
-        this.rate_km = vehicleModel.rate_km || 0;
         this.innerLength = vehicleModel.innerLength || 0;
         this.innerHeight = vehicleModel.innerHeight || 0;
         this.innerWidth = vehicleModel.innerWidth || 0;
         this.cft = vehicleModel.cft || 0;
+        this.outerCft = vehicleModel.outerCft || 0;
+        this.outerLength = vehicleModel.outerLength || 0;
+        this.outerHeigth = vehicleModel.outerHeigth || 0;
+        this.outerWidth = vehicleModel.outerWidth || 0;
         this.approvedOn = vehicleModel.approvedOn || this.date;
         this.startDateOfService = vehicleModel.startDateOfService || this.date;
         this.approvedBy = vehicleModel.approvedBy || '';
-        this.isActive = vehicleModel.isActive|| false;
+        this.activeflag = vehicleModel.activeflag || false;
         this.blackListed = vehicleModel.blackListed || false;
     }
 }

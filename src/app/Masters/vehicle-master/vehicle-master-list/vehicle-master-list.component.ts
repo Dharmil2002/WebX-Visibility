@@ -1,12 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import Swal from "sweetalert2";
 
 @Component({
     selector: 'app-vehicle-master-list',
     templateUrl: './vehicle-master-list.component.html'
 })
 export class VehicleMasterListComponent implements OnInit {
-    data: [] | any;
     csv: any[];
     companyCode: any = parseInt(localStorage.getItem("companyCode"));
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
@@ -74,5 +74,34 @@ export class VehicleMasterListComponent implements OnInit {
                 }
             }
         })
+    }
+    isActiveFuntion(det) {
+        let id = det.id;
+        // Remove the "id" field from the form controls
+        delete det.id;
+        delete det.srNo;
+        delete det.activeflag;
+        let req = {
+            companyCode: this.companyCode,
+            type: "masters",
+            collection: "vehicle_detail",
+            id: id,
+            updates: det
+        };
+
+        this.masterService.masterPut('common/update', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                }
+                this.getVehicleDetails();
+            }
+        });
     }
 }

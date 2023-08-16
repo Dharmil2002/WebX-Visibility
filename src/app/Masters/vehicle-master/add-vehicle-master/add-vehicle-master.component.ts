@@ -421,6 +421,5 @@ export class AddVehicleMasterComponent implements OnInit {
       }
     });
   }
-
 }
 

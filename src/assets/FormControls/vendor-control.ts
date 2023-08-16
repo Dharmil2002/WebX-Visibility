@@ -39,7 +39,7 @@ export class VendorControl {
                 label: 'Vendor Type',
                 placeholder: 'Search Vendor Type',
                 type: 'dropdown',
-                value: '',
+                value: isUpdate ? vendorMasterTable.vendorType : "",
                 Validations: [
                     {
                         name: "required",
@@ -184,7 +184,7 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isActive, Validations: [],
+                name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: isUpdate ? vendorMasterTable.isActive : false, Validations: [],
                 generatecontrol: true, disable: false
             },
             {
@@ -260,7 +260,7 @@ export class VendorControl {
                 name: 'ownerName',
                 label: 'Owner Name',
                 placeholder: 'Owner Name',
-                type: 'text', value: vendorMasterTable.ownerName,
+                type: 'text', value: isUpdate ? vendorMasterTable.ownerName : "",
                 Validations: [
                 ],
                 generatecontrol: true, disable: false
@@ -298,7 +298,7 @@ export class VendorControl {
                 name: 'dueDays',
                 label: 'Due Days',
                 placeholder: 'Due Days',
-                type: 'number', value: vendorMasterTable.dueDays,
+                type: 'number', value: isUpdate ? vendorMasterTable.dueDays : 0,
                 Validations: [
                 ],
                 generatecontrol: true, disable: false
@@ -308,7 +308,7 @@ export class VendorControl {
                 name: 'gstNo',
                 label: 'GST No',
                 placeholder: 'GST No',
-                type: 'text', value: vendorMasterTable.gstNo,
+                type: 'text', value: isUpdate ? vendorMasterTable.gstNo : "",
                 Validations: [{
                     name: "pattern",
                     message: "Invalid GST Number format.",
@@ -318,35 +318,35 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'tdsDocument', label: "TDS Document", placeholder: "", type: 'file', value: vendorMasterTable.tdsDocument,
+                name: 'tdsDocument', label: "TDS Document", placeholder: "", type: 'file', value: isUpdate ? vendorMasterTable.tdsDocument : "",
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
-                    onChange: 'selectedFileForTdsDocument',
+                    onChange: 'selectHandleFileSelection',
                 }
             },
             {
-                name: 'cancelCheque', label: "Cancel Cheque", placeholder: "", type: 'file', value: vendorMasterTable.cancelCheque,
+                name: 'cancelCheque', label: "Cancel Cheque", placeholder: "", type: 'file', value: isUpdate ? vendorMasterTable.cancelCheque : "",
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
-                    onChange: 'selectedFileForCancelCheque',
+                    onChange: 'selectHandleFileSelection',
                 }
             },
             {
-                name: 'pdfFileUpload', label: "PDF File Upload", placeholder: "", type: 'file', value: vendorMasterTable.pdfFileUpload,
+                name: 'pdfFileUpload', label: "PDF File Upload", placeholder: "", type: 'file', value: isUpdate ? vendorMasterTable.pdfFileUpload : "",
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
-                    onChange: 'selectedFileForPdfFile',
+                    onChange: 'selectHandleFileSelection',
                 }
             },
             {
-                name: 'reliableDocument', label: "Reliable Document", placeholder: "", type: 'file', value: vendorMasterTable.reliableDocument,
+                name: 'reliableDocument', label: "Reliable Document", placeholder: "", type: 'file', value: isUpdate ? vendorMasterTable.reliableDocument : "",
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {
-                    onChange: 'selectedFileForReliableDocument',
+                    onChange: 'selectHandleFileSelection',
                 }
             },
             {
@@ -373,7 +373,7 @@ export class VendorControl {
                 name: 'cpCode',
                 label: 'CP Code',
                 placeholder: 'CP Code',
-                type: 'text', value: vendorMasterTable.cpCode,
+                type: 'text', value: isUpdate ? vendorMasterTable.cpCode : "",
                 Validations: [
                 ],
                 generatecontrol: false, disable: false
@@ -383,7 +383,7 @@ export class VendorControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'isGstCharged', label: 'Is GST Charged', placeholder: 'Is GST Charged', type: 'toggle', value: vendorMasterTable.isGstCharged, Validations: [],
+                name: 'isGstCharged', label: 'Is GST Charged', placeholder: 'Is GST Charged', type: 'toggle', value: isUpdate ? vendorMasterTable.isGstCharged : false, Validations: [],
                 generatecontrol: true, disable: false
             },
             {
@@ -391,7 +391,7 @@ export class VendorControl {
                 label: 'Payment Email',
                 placeholder: 'Payment Email',
                 type: 'toggle',
-                value: vendorMasterTable.paymentEmail,
+                value: isUpdate ? vendorMasterTable.paymentEmail : "",
                 Validations: [],
                 functions: {
                     onChange: 'onChange',
@@ -399,18 +399,18 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'logicloudLSP', label: 'Logicloud LSP', placeholder: 'Logicloud LSP', type: 'toggle', value: vendorMasterTable.logicloudLSP, Validations: [],
+                name: 'logicloudLSP', label: 'Logicloud LSP', placeholder: 'Logicloud LSP', type: 'toggle', value: isUpdate ? vendorMasterTable.logicloudLSP : false, Validations: [],
                 generatecontrol: true, disable: false
             },
             {
-                name: 'deliveryPartner', label: 'Delivery Partner', placeholder: 'Delivery Partner', type: 'toggle', value: vendorMasterTable.deliveryPartner, Validations: [],
+                name: 'deliveryPartner', label: 'Delivery Partner', placeholder: 'Delivery Partner', type: 'toggle', value: isUpdate ? vendorMasterTable.deliveryPartner : false, Validations: [],
                 generatecontrol: true, disable: false
             },
 
 
 
             {
-                name: 'audited', label: 'Audit', placeholder: 'Audit', type: 'toggle', value: vendorMasterTable.audited, Validations: [],
+                name: 'audited', label: 'Audit', placeholder: 'Audit', type: 'toggle', value: isUpdate ? vendorMasterTable.audited : false, Validations: [],
                 generatecontrol: true, disable: false
             },
             {
@@ -418,7 +418,7 @@ export class VendorControl {
                 label: 'MSME',
                 placeholder: 'MSME',
                 type: 'toggle',
-                value: vendorMasterTable.msme,
+                value: isUpdate ? vendorMasterTable.msme : false,
                 Validations: [],
                 functions: {
                     onChange: 'onMsmeChange',
@@ -427,11 +427,11 @@ export class VendorControl {
             },
 
             {
-                name: 'franchise', label: 'Franchise', placeholder: 'Franchise', type: 'toggle', value: vendorMasterTable.franchise, Validations: [],
+                name: 'franchise', label: 'Franchise', placeholder: 'Franchise', type: 'toggle', value: isUpdate ? vendorMasterTable.franchise : false, Validations: [],
                 generatecontrol: true, disable: false
             },
             {
-                name: 'integrateWithFinSystem', label: 'Integrate With Fin System', placeholder: 'Integrate With Fin System', type: 'toggle', value: vendorMasterTable.integrateWithFinSystem, Validations: [],
+                name: 'integrateWithFinSystem', label: 'Integrate With Fin System', placeholder: 'Integrate With Fin System', type: 'toggle', value: isUpdate ? vendorMasterTable.integrateWithFinSystem : false, Validations: [],
                 generatecontrol: true, disable: false
             },
 
@@ -440,7 +440,7 @@ export class VendorControl {
                 label: 'TDS Applicable',
                 placeholder: 'Vendor Sub Type',
                 type: 'toggle',
-                value: '',
+                value: isUpdate ? vendorMasterTable.tdsApplicable : false,
                 Validations: [],
                 functions: {
                     onChange: 'displayTds',
@@ -471,13 +471,6 @@ export class VendorControl {
                 type: 'dropdown',
                 value: '',
                 Validations: [
-                    {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "autocomplete",
-                    },
                 ],
                 additionalData: {
                     showNameAndValue: false

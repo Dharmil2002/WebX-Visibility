@@ -33,7 +33,6 @@ export async function tripTransactionDetail(
 * @returns {Promise<any>} - A Promise resolving to the API response.
 */
 export async function updateTracking(companyCode, operationService,docketDetails) {
-   debugger
     try {
         const randomNumber = "MA/" + localStorage.getItem('Branch') + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
         const dockData = {
@@ -78,7 +77,6 @@ export async function updateTracking(companyCode, operationService,docketDetails
  * @returns {Promise<any>} - A Promise resolving to the docket details.
  */
 export async function getDocketFromApiDetail(companyCode, operationService,tripId) {
-  debugger
     const reqBody = {
         companyCode: companyCode,
         type: 'operation',

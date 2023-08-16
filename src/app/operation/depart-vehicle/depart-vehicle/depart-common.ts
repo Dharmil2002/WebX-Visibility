@@ -136,7 +136,6 @@ export function calculateBalanceAmount(form: FormGroup, totalTripAmt): void {
 * @returns {Promise<any>} - A Promise resolving to the API response.
 */
 export async function updateTracking(companyCode, operationService, dktNo, next) {
-    debugger
     try {
         const randomNumber = "TR/" + localStorage.getItem('Branch') + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
         const docketDetails = await getDocketFromApiDetail(companyCode, operationService, dktNo);

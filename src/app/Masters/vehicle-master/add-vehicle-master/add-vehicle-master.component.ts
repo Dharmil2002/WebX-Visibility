@@ -235,8 +235,18 @@ export class AddVehicleMasterComponent implements OnInit {
         "type": "masters",
         "collection": "routeMasterLocWise"
       }
+      const generalReqBody = {
+        "companyCode": this.companyCode,
+        "type": "masters",
+        "collection": "General_master"
+      }
       const stateResponse = await this.masterService.masterPost('common/getall', stateReqBody).toPromise();
       const routeResponse = await this.masterService.masterPost('common/getall', reqBody).toPromise();
+      const ftlTypeResponse = await this.masterService.masterPost('common/getall', generalReqBody).toPromise();
+      const ftlTypeList = ftlTypeResponse.data.filter(item => item.codeType === "FTLTYP").
+        map((x) => {
+          { return { name: x.codeDesc, value: x.codeId } }
+        });
       const routeList = routeResponse.data.map(element => ({
         name: element.loccd.join('-'),
         value: element.routeId,
@@ -250,9 +260,12 @@ export class AddVehicleMasterComponent implements OnInit {
         this.vehicleTableForm.controls["routeLocation"].patchValue(routeList.filter((element) =>
           this.vehicleTabledata.route.includes(element.name)
         ));
+        const ftlType = ftlTypeList.find((x) => x.name === this.vehicleTabledata.ftlTypeDesc);
+        this.vehicleTableForm.controls['ftlTypeDesc'].setValue(ftlType);
       }
       this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, stateList, this.permitState, this.permitStateStatus);
       this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, routeList, this.routeLoc, this.routeStatus);
+      this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, ftlTypeList, this.ftlTypeDesc, this.ftlTypeStatus);
     } catch (error) {
       // Handle any errors that occurred during the request
       console.error('Error:', error);
@@ -287,7 +300,6 @@ export class AddVehicleMasterComponent implements OnInit {
   async getDataAndPopulateForm() {
     await this.fetchDataAndPopulateForm(this.companyCode, "vehicleType_detail", "vehicleType", "vehicleTypeCode", "vehicleTypeName", true);
     await this.fetchDataAndPopulateForm(this.companyCode, "vendor_detail", "vendorName", "vendorCode", "vendorName", true);
-    await this.fetchDataAndPopulateForm(this.companyCode, "General_master", "ftlTypeDesc", "codeId", "codeDesc", true);
     await this.fetchDataAndPopulateForm(this.companyCode, "location_detail", "controllBranch", "locCode", "locName", true);
   }
   checkVehicleNumberExist() {

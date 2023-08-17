@@ -86,7 +86,7 @@ export async function addTracking(companyCode, operationService, data) {
   const req = {
     companyCode: companyCode,
     type: "operation",
-    collection: "cnote_trackingv3",
+    collection: "cnote_trackingv4",
     data:dockData
   };
 

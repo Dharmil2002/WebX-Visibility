@@ -1,0 +1,25 @@
+/**
+ * Extracts unique values from a specified property in an array of objects.
+ *
+ * @param data - The array of objects.
+ * @param property - The property to extract unique values from.
+ * @returns An array of unique values from the specified property.
+ */
+export function extractUniqueValues<T>(data: T[], property: keyof T): any[] {
+    const uniqueValues: any[] = [];
+    const uniqueSet = new Set();
+    // Loop through each entry in the data array
+    data.forEach(entry => {
+      const value = entry[property];
+      // Check if the value is not already in the unique set
+      if (!uniqueSet.has(value)) {
+        // Add the value to the unique set and unique values array
+        uniqueSet.add(value);
+        uniqueValues.push(entry);
+      }
+    });
+  
+    // Return the array of unique values
+    return uniqueValues;
+  }
+  

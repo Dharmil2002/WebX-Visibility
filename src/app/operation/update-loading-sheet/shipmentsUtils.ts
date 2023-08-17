@@ -1,3 +1,4 @@
+import { extractUniqueValues } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 
 // This utility function groups shipments by leg
 export function groupShipmentsByLeg(shipingTableData) {
@@ -63,7 +64,7 @@ export async function updateTracking(companyCode, operationService, dktNo) {
     const req = {
       companyCode: companyCode,
       type: 'operation',
-      collection: 'cnote_trackingv3',
+      collection: 'cnote_trackingv4',
       data: dockData
     };
 
@@ -87,7 +88,7 @@ export async function getDocketFromApiDetail(companyCode, operationService, dock
   const reqBody = {
     companyCode: companyCode,
     type: 'operation',
-    collection: 'cnote_trackingv3',
+    collection: 'cnote_trackingv4',
     query: {
       dktNo: docketNo,
     },
@@ -95,7 +96,8 @@ export async function getDocketFromApiDetail(companyCode, operationService, dock
 
   try {
     const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-    return res.data.db.data.cnote_trackingv3;
+    const uniqueDktNumbers = extractUniqueValues(res.data.db.data.cnote_trackingv4, 'dktNo');
+    return uniqueDktNumbers
   } catch (error) {
     console.error('Error retrieving docket details:', error);
     throw error; // Rethrow the error for higher-level error handling if needed.

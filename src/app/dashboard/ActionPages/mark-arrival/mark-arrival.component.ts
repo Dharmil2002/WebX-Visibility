@@ -13,6 +13,7 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { vehicleStatusUpdate } from 'src/app/operation/update-loading-sheet/loadingSheetshipment';
 import { getDocketFromApiDetail, tripTransactionDetail, updateTracking } from './mark-arrival-utlity';
+import { extractUniqueValues } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -100,7 +101,7 @@ export class MarkArrivalComponent implements OnInit {
   }
 
   save() {
-
+    debugger
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
@@ -109,6 +110,7 @@ export class MarkArrivalComponent implements OnInit {
 
     let tripDetailForm = this.MarkArrivalTableForm.value
     const tripId = this.MarkArrivalTableForm.value?.TripID || "";
+   
     delete tripDetailForm.Vehicle
     delete tripDetailForm.TripID
     delete tripDetailForm.Route
@@ -166,6 +168,7 @@ export class MarkArrivalComponent implements OnInit {
       next: async (res: any) => {
         if (res) {
           if (tripDetails.status==="close") {
+            this.getDocketTripWise(tripId);
             // Call the vehicleStatusUpdate function here
             const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode,this.MarkArrivalTable, this._operationService,true);
             Swal.fire({
@@ -176,8 +179,7 @@ export class MarkArrivalComponent implements OnInit {
             });
             this.getPreviousData();
           }else{
-            this.getPreviousData();
-            // this.getDocketTripWise(tripId);
+            this.getDocketTripWise(tripId);
           }
          
 
@@ -187,11 +189,11 @@ export class MarkArrivalComponent implements OnInit {
   }
   /*here i write a code becuase of update docket states*/
   async getDocketTripWise(tripId) {
-
+   debugger
     const detail = await getDocketFromApiDetail(this.companyCode, this._operationService,tripId.trim());
-    
+    const uniqueDktNumbers = extractUniqueValues(detail, 'dktNo');
     // Create an array of promises for updateTracking calls
-    const updatePromises = detail.map(async element => {
+    const updatePromises = uniqueDktNumbers.map(async element => {
         await updateTracking(this.companyCode, this._operationService, element);
     });
 

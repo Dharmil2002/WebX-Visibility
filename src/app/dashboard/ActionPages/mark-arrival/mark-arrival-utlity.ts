@@ -57,7 +57,7 @@ export async function updateTracking(companyCode, operationService,docketDetails
         const req = {
             companyCode: companyCode,
             type: 'operation',
-            collection: 'cnote_trackingv3',
+            collection: 'cnote_trackingv4',
             data: dockData
         };
 
@@ -80,7 +80,7 @@ export async function getDocketFromApiDetail(companyCode, operationService,tripI
     const reqBody = {
         companyCode: companyCode,
         type: 'operation',
-        collection: 'cnote_trackingv3',
+        collection: 'cnote_trackingv4',
         query: {
             tripId: tripId,
         },
@@ -88,7 +88,7 @@ export async function getDocketFromApiDetail(companyCode, operationService,tripI
 
     try {
         const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-        return res.data.db.data.cnote_trackingv3;
+        return res.data.db.data.cnote_trackingv4;
     } catch (error) {
         console.error('Error retrieving docket details:', error);
         throw error; // Rethrow the error for higher-level error handling if needed.

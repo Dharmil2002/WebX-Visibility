@@ -8,7 +8,7 @@ import { MarkArrivalComponent } from 'src/app/dashboard/ActionPages/mark-arrival
 import Swal from 'sweetalert2';
 import { autoBindData, filterShipments, kpiData } from '../shipment';
 import { vehicleStatusUpdate } from './loadingSheetshipment';
-import { groupShipmentsByLeg } from './shipmentsUtils';
+import { groupShipmentsByLeg, updateTracking } from './shipmentsUtils';
 import { handlePackageUpdate } from './packageUtils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
@@ -289,6 +289,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
 
   async CompleteScan() {
+ 
     let packageChecked = false;
     let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
@@ -318,9 +319,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   async UpdateDocketDetail(dkt) {
-    // if(dkt){
-    // await updateTracking(this.companyCode, this._operation, dkt);
-    // }
+    if(dkt){
+    await updateTracking(this.companyCode, this._operation, dkt);
+    }
     // const lsDetail = await loadingSheetDetails(this.companyCode, this._operation, this.arrivalData?.TripID);
     // lsDetail.forEach(async element => {
     //   await updateLoadingSheet(this.companyCode, this._operation, element.lsno, element.loadAddedKg, element.loadedVolumeCft)

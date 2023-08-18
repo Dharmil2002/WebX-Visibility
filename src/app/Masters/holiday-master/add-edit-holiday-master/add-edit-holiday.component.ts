@@ -9,7 +9,6 @@ import moment from 'moment';
 import Swal from 'sweetalert2';
 import { Holiday } from "src/app/core/models/Masters/holiday-master";
 import { HolidayControl } from "src/assets/FormControls/holiday-master";
-import { Router } from "@angular/router";
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { DatePipe } from '@angular/common';
 
@@ -47,7 +46,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
   action: string;
 
   constructor(public dialogRef: MatDialogRef<AddEditHolidayComponent>, private fb: UntypedFormBuilder, @Inject(MAT_DIALOG_DATA) public item: any, private filter: FilterUtils,
-    private route: Router, private masterService: MasterService, private datePipe: DatePipe) {
+    private masterService: MasterService, private datePipe: DatePipe) {
     super();
     if (item?.id) {
       this.isUpdate = true;
@@ -212,7 +211,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
             text: "Holiday Details Saved successfully",
             showConfirmButton: true,
           });
-           this.dialogRef.close();
+          this.dialogRef.close();
         }
       }
     });

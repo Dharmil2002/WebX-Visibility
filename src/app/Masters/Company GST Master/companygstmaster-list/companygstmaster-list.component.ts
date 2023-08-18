@@ -4,6 +4,7 @@ import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroy
 import { CompanyGSTControl } from 'src/assets/FormControls/CompanyGSTMaster';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-companygstmaster-list',
@@ -85,9 +86,9 @@ export class CompanygstmasterListComponent extends UnsubscribeOnDestroyAdapter i
   // viewComponent: any;
   boxData: { count: any; title: any; class: string; }[];
   // declararing properties
-  CompanyGSTTableForm: UntypedFormGroup;
+  companyGstTableForm: UntypedFormGroup;
 
-  constructor(private masterService: MasterService, private fb: UntypedFormBuilder,) {
+  constructor(private masterService: MasterService, private fb: UntypedFormBuilder, private router: Router) {
     super();
   }
 
@@ -99,7 +100,7 @@ export class CompanygstmasterListComponent extends UnsubscribeOnDestroyAdapter i
   intializeFormControl() {
     const companyGstFormControls = new CompanyGSTControl();
     this.jsonControlArray = companyGstFormControls.getCompanyGSTFormControls();
-    this.CompanyGSTTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    this.companyGstTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   functionCaller($event) {
 
@@ -128,9 +129,12 @@ export class CompanygstmasterListComponent extends UnsubscribeOnDestroyAdapter i
         item.CompanyName = this.data.lst_CompanyGSTHeaderDetails[0].COMPANY_NAME;
       });
       this.csv = this.data.lst_CompanyGSTDetailDetails
-      this.CompanyGSTTableForm.controls.CompanyName.setValue(this.data.lst_CompanyGSTHeaderDetails[0].COMPANY_NAME)
+      this.companyGstTableForm.controls.CompanyName.setValue(this.data.lst_CompanyGSTHeaderDetails[0].COMPANY_NAME)
       this.tableload = false;
     }
     );
+  }
+  addUpdate() {
+    this.router.navigateByUrl("/Masters/CompanyGSTMaster/AddCompanyGSTMaster")
   }
 }

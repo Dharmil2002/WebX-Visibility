@@ -73,6 +73,26 @@ export const ROUTES: RouteInfo[] =
       "submenu": [
         {
           "path": "Masters/DriverMaster/DriverMasterList",
+          "title": "Admin",
+          "moduleName": "Admin",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Masters/HolidayMaster/HolidayMasterList",
+              "title": "Holiday Master",
+              "moduleName": "Holiday Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            }
+          ]
+        },
+        {
+          "path": "Masters/DriverMaster/DriverMasterList",
           "title": "Company Structure",
           "moduleName": "Company Structure",
           "icon": "",
@@ -216,6 +236,16 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
+            {
+              "path": "Masters/CityLocationMapping/CityLocationIndex",
+              "title": "City Location Mapping",
+              "moduleName": "City Location Mapping",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            }
           ]
         },
         {

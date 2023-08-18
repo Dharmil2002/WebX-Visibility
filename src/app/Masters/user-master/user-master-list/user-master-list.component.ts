@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from "sweetalert2";
 
 @Component({
     selector: 'app-user-master-list',
@@ -17,7 +18,7 @@ export class UserMasterListComponent implements OnInit {
     linkArray = [];
     csv: any;
     tableData: any;
-    
+
     dynamicControls = {
         add: true,
         edit: true,
@@ -51,15 +52,15 @@ export class UserMasterListComponent implements OnInit {
         "branchCode": 'Location',
         "dateOfBirth": 'DateofBirth',
         "residentialAddress": 'ResidentialAddress',
-        "multiLocation":'Multi Location',
+        "multiLocation": 'Multi Location',
         "mobileNo": 'MobileNo',
         "emailId": 'EmailId',
         "role": 'Role',
         "userType": 'UserType',
         "userStatus": 'UserStatus',
-        "multiDivisionAccess":'Multi Division Access',
-        "entryBy":'EntryBy',
-        "entryDate":'Entry Date',
+        "multiDivisionAccess": 'Multi Division Access',
+        "entryBy": 'EntryBy',
+        "entryDate": 'Entry Date',
         "isActive": 'Activeflag'
     };
 
@@ -107,5 +108,33 @@ export class UserMasterListComponent implements OnInit {
             // we have to handle , if function not exists.
             console.log("failed");
         }
+    }
+
+    IsActiveFuntion(det) {
+        let id = det.id;
+        // Remove the "id" field from the form controls
+        delete det.id;
+        delete det.srNo;
+        let req = {
+            companyCode: parseInt(localStorage.getItem("companyCode")),
+            type: "masters",
+            collection: "user_master",
+            id: id,
+            updates: det
+        };
+        this.masterService.masterPut('common/update', req).subscribe({
+            next: (res: any) => {
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                    this.getUserDetails();
+                }
+            }
+        });
     }
 }

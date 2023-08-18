@@ -93,15 +93,14 @@ export class ClusterMasterAddComponent implements OnInit {
         next: (res: any) => {
           // Assuming the API response contains an array named 'pincodeList'
           const pincodeList = res.data.map(element => ({
-            name: element.pincode,
-            value: element.pincode,
+            name: parseInt(element.pincode),
+            value: parseInt(element.pincode),
           }));
           let filteredPincodeList = [];
           if (Array.isArray(pincodeValue)) {
-            const stringifiedPincodeValue = pincodeValue.map(val => val.toString()); // Convert to array of strings
-            filteredPincodeList = pincodeList.filter(item => stringifiedPincodeValue.includes(item.name));
+            filteredPincodeList = pincodeList.filter(item => pincodeValue.toString().includes(item.name.toString()));
           } else if (typeof pincodeValue === 'string' && pincodeValue.length >= 2) {
-            filteredPincodeList = pincodeList.filter(item => item.name.includes(pincodeValue));
+            filteredPincodeList = pincodeList.filter(item => item.name.toString().includes(pincodeValue));
           }
           if (this.isUpdate) {
             var filter = [];
@@ -125,7 +124,6 @@ export class ClusterMasterAddComponent implements OnInit {
       // You might want to reset or clear some form fields or values here
     }
   }
-
   //#endregion
 
   //#region Save Function

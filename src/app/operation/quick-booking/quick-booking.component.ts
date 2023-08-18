@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormControl, UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
@@ -218,7 +218,7 @@ export class QuickBookingComponent implements OnInit {
       this.quickDocketTableForm.value?.vehNo.name || ""
     );
 
-    let id = { id: docketNo, isComplete: false,unloadloc:"",entryBy:this.userName,entryDate:new Date().toISOString()};
+    let id = { id: docketNo, isComplete: false,unloading: 0, lsNo: "", mfNo: "",unloadloc:"",entryBy:this.userName,entryDate:new Date().toISOString()};
 
     let docketDetails = { ...this.quickDocketTableForm.value, ...id };
 

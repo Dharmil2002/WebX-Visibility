@@ -1,0 +1,408 @@
+.unique-class {
+    display: none !important;
+    overflow: hidden;
+}
+
+.page-with-hidden-navbar {
+    display: none !important;
+}
+
+.TripSheetViewPrint {
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        font-family: "verdana";
+        font-size: 15px;
+    }
+
+    div {
+        margin: 0;
+    }
+
+    th {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        background-color: #f2f2f2;
+        height: 42px;
+    }
+
+    td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    .hr1 {
+        margin-right: -8px !important;
+        margin-left: -18px;
+        margin-top: 4px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .hr2 {
+        margin-left: -8px !important;
+        margin-top: 4px !important;
+        margin-bottom: 4px !important;
+    }
+
+    img {
+        min-inline-size: auto;
+    }
+
+    .companylogo {
+        border: 1px solid white !important;
+        text-align: right;
+        padding-right: 50px;
+        max-height: 232px;
+        /* height: 202px; */
+        width: -moz-fit-content;
+        width: 42%;
+    }
+
+    .barcode {
+        position: absolute !important;
+        right: 10px !important;
+        top: 55px !important;
+        padding-right: 5px !important;
+    }
+
+    .TripSheet {
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .Orgdocu {
+        color: #464855;
+        font-size: 18px;
+    }
+
+    .tripno {
+        width: 50%;
+        color: #8C001A;
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .manualTripno {
+        font-weight: bold;
+        color: #464855;
+        font-size: 14px;
+    }
+
+
+    .detail {
+        font-weight: 500;
+        float: right
+    }
+
+    .Tripsummary {
+        font-size: 15pt;
+        font-weight: 700;
+        text-align: left;
+        font-weight: bold;
+        color: #6b6f82;
+    }
+
+    .status {
+        border-left: 1px solid #ddd;
+        background-color: #dcdada;
+        border-bottom: 0px;
+        border-right: 1px solid #ddd;
+    }
+
+    .statushdr {
+        font-weight: 100;
+        margin-left: 10px;
+    }
+
+    .statusDetail {
+        font-weight: bold;
+        color: #8C001A;
+        margin-left: 4px;
+    }
+
+    .routenm {
+        color: #8C001A;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .tripend {
+        font-weight: bold;
+        margin-left: 15px;
+    }
+
+
+    .categoryhdr {
+        border-right: 1px solid #ddd;
+        border-left: 1px solid #ddd
+    }
+
+    .categorydetail {
+        font-weight: bold;
+        margin-left: 23px;
+    }
+
+
+
+    .vehnodetail {
+        border-left: solid 2px;
+        color: #D8DAD9;
+        margin-right: 5px
+    }
+
+    .tripTdone {
+        border-left: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+    }
+
+
+
+    .driverDocument {
+        border-left: solid 2px;
+        color: #D8DAD9;
+        margin-right: 5px
+    }
+
+    .VehicleTrailer {
+        background-color: #F9F8F7;
+        border-top: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-left: 1px solid #ddd;
+        border-bottom: 0px solid #ddd;
+    }
+
+    .Vehicle {
+        font-weight: bold;
+        color: #464855;
+        font-size: 18px;
+        padding: 5px
+    }
+
+
+
+    .vehnotd {
+        border: none;
+        padding-left: 50px
+    }
+
+
+    .driver1 {
+        width: 50%;
+        font-weight: 500;
+    }
+
+    .driver1Name {
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .Phone {
+        font-weight: 500;
+        margin-right: -10px;
+
+    }
+
+    .driver1Phone {
+        font-weight: 100;
+        margin-left: 48px;
+    }
+
+
+    .typeheading {
+        font-weight: 500;
+    }
+
+    .typedetail {
+        font-weight: bold;
+        margin-left: 12%;
+    }
+
+    .capacity {
+        font-weight: 100;
+        margin-left: 4%;
+    }
+
+    .driver2td {
+        border-top: 1px solid #ddd;
+        border-bottom: 0;
+        padding-left: 50px;
+
+    }
+
+
+    .driverhdr {
+        width: 50%;
+        font-weight: 500;
+    }
+
+
+    .phonehdr {
+        font-weight: 500;
+        margin-right: -10px;
+    }
+
+    .phonedetail {
+        font-weight: 100;
+        margin-left: 48px;
+    }
+
+    .lichdr {
+        font-weight: 500;
+        margin-right: -10px;
+    }
+
+    .licdetail {
+        font-weight: 100;
+        margin-left: 48px;
+    }
+
+    .cctvtd {
+        border-left: 1px solid #ddd;
+    }
+
+
+    .driverdetail {
+        border-left: solid 2px;
+        color: #D8DAD9;
+        margin-right: 5px;
+    }
+
+
+    .Tripdtatetd {
+
+        background-color: #dcdada;
+        border-top: 1px solid #ddd;
+        border-right: 10px solid white;
+        border-left: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .startdate {
+        font-weight: 500;
+        margin-left: 50px;
+    }
+
+    .odoStart {
+        font-weight: bold;
+        float: right
+    }
+
+    .odoEnddiv {
+        padding: 5px
+    }
+
+    .odoEnd {
+        font-weight: 500;
+        margin-left: 142px;
+    }
+
+
+    .Totaltripstreet {
+        font-size: 15pt;
+        font-weight: 400;
+        text-align: left;
+        font-weight: bold;
+        color: #6b6f82;
+    }
+
+
+    .vouchers {
+        font-weight: bold;
+        color: darkgray;
+        float: right;
+    }
+
+
+
+    .document {
+        color: #8C001A;
+        font-weight: bold
+    }
+
+    .color {
+        color: gray;
+    }
+
+    .Remarks {
+        padding-bottom: 150px;
+    }
+
+    .remarkcolor {
+        background-color: gainsboro;
+        width: 50%;
+    }
+
+    .footertitle1 {
+        float: right;
+        font-size: 15px;
+        margin-top: 10px;
+    }
+
+    .footertitle2 {
+        float: left;
+        font-size: 15px;
+        margin-top: 10px;
+    }
+
+    #triptdiv {
+        margin-left: 15px;
+        border-left: solid 2px;
+        color: #D8DAD9;
+        padding: 40px;
+    }
+
+    .TripStreet {
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .TripStreethdr {
+        color: #464855;
+        font-size: 18px;
+    }
+
+    .tno {
+        color: black;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .trohdr {
+        font-weight: bold;
+        color: #464855;
+        font-size: 18px;
+    }
+
+    .DriverAdvancePayment {
+        color: #6b6f82;
+    }
+
+    .total {
+        background-color: #dcdada;
+        border-bottom: 0px;
+    }
+
+    .driveradvancePay {
+        background-color: #dcdada;
+        font-weight: bold;
+        border-bottom: 0px;
+    }
+
+    .odoEndhdr {
+        font-weight: 500;
+        margin-left: 142px;
+    }
+
+    .odoEnd {
+        font-weight: bold;
+        float: right
+    }
+
+    .fuelVendor {
+        background-color: #dcdada;
+        text-align: center;
+        font-weight: bold
+    }
+}

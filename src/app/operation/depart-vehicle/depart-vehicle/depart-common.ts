@@ -152,6 +152,7 @@ export async function updateTracking(companyCode, operationService, dktNo, next)
             dest: docketDetails[lastArray][lastArray]?.dest || '',
             lsno: docketDetails[lastArray]?.lsno || '',
             mfno: docketDetails[lastArray]?.mfno || '',
+            unload:false,
             dlSt: '',
             dlTm: '',
             evnCd: '',
@@ -175,13 +176,16 @@ export async function updateTracking(companyCode, operationService, dktNo, next)
 }
 
 /**
- * Retrieves loading sheet details for a specific docket.
+ * Retrieves docket details from the API using provided parameters.
+ *
  * @param {string} companyCode - The company code.
- * @param {any} operationService - The operation service object for API calls.
- * @param {string} docketNo - The docket number.
- * @returns {Promise<any>} - A Promise resolving to the docket details.
+ * @param {object} operationService - The operation service instance.
+ * @param {string} docketNo - The docket number to query.
+ * @returns {Array} An array of docket details without unload items.
+ * @throws {Error} If an error occurs during the retrieval process.
  */
 export async function getDocketFromApiDetail(companyCode, operationService, docketNo) {
+    // Prepare the request body
     const reqBody = {
         companyCode: companyCode,
         type: 'operation',
@@ -192,8 +196,14 @@ export async function getDocketFromApiDetail(companyCode, operationService, dock
     };
 
     try {
+        // Retrieve data from the API and filter for valid docket details
         const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-        return res.data.db.data.cnote_trackingv4;
+        const docketDetails = res.data.db.data.cnote_trackingv4.filter(x => {
+            if (typeof x.unload !== "boolean") throw new Error("Invalid unload value.");
+            return !x.unload;
+        });
+
+        return docketDetails;
     } catch (error) {
         console.error('Error retrieving docket details:', error);
         throw error; // Rethrow the error for higher-level error handling if needed.

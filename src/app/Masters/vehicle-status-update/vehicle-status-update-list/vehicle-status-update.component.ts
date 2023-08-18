@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getVehicleDashboardDetails, getVehicleStatusFromApi } from '../vehicle-status-utility';
+import { formatDate } from 'src/app/Utility/date/date-utils';
 
 @Component({
   selector: 'app-vehicle-status-update',
@@ -37,7 +38,7 @@ export class VehicleStatusUpdateComponent implements OnInit {
     "tripId": "Trip Id",
     "currentLocation": "Location",
     "route": "Route",
-    "rptLoc":"Reporting Location"
+    "updateDate":"Last Location Time"
   };
   headerForCsv = {
     "srNo": "Sr No",
@@ -45,8 +46,7 @@ export class VehicleStatusUpdateComponent implements OnInit {
     "status": "Status",
     "tripId": "Trip Id",
     "currentLocation": "Location",
-    "route": "Route",
-    "rptLoc":"Reporting Location"
+    "route": "Route"
   };
   boxData: any;
   constructor(
@@ -64,13 +64,26 @@ export class VehicleStatusUpdateComponent implements OnInit {
       const vehicleStatusData = await getVehicleStatusFromApi(this.companyCode, this._operationService);
       // Assuming vehicleDetail.data is an array of objects with 'id' property
       // Generate srno for each object in the array
-      this.tableData = vehicleStatusData.filter((x)=>x.currentLocation.trim()===this.branchCode.trim()||x.rptLoc.trim()===this.branchCode.trim()).map((obj, index) => {
+      const vehicleTableData = vehicleStatusData.filter((x)=>x.currentLocation.trim()===this.branchCode.trim()||x.rptLoc.trim()===this.branchCode.trim()).map((obj, index) => {
         return {
           ...obj,
           srNo: index + 1
         };
       });
-
+      const tableDetail=vehicleTableData.map((x)=>{if(x.updateDate){x.updateDate= formatDate(x.updateDate,'dd/MM/yyyy HH:mm') }return x})
+      const sortedTableDetail = tableDetail.sort((a, b) => {
+        if (a.updateDate && b.updateDate) {
+          return b.updateDate.localeCompare(a.updateDate); // Sorting by updateDate in descending lexicographical order
+        } else if (a.updateDate) {
+          return -1; // a has updateDate, but b doesn't, so a comes before b
+        } else if (b.updateDate) {
+          return 1; // b has updateDate, but a doesn't, so b comes before a
+        } else {
+          return 0; // neither a nor b has updateDate, no preference for order
+        }
+      });
+      
+      this.tableData=sortedTableDetail;
       this.tableLoad = false;
       this.boxData = getVehicleDashboardDetails(this.tableData)
     } catch (error) {

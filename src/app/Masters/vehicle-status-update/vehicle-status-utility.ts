@@ -50,9 +50,9 @@ export function getVehicleDashboardDetails(tableData: VehicleData[]) {
     });
 
     return [
-        createShipDataObject(totalTrips.length, "Total Trip", "bg-white"),
-        createShipDataObject(tableData.length, "Total Vehicle", "bg-white"),
-        createShipDataObject(availableVehicles.length, "Available Vehicle", "bg-white"),
+        createShipDataObject(totalTrips.length, "Total Trip", "bg-c-Bottle-light"),
+        createShipDataObject(tableData.length, "Total Vehicle", "bg-c-Grape-light"),
+        createShipDataObject(availableVehicles.length, "Available Vehicle", "bg-c-Daisy-light"),
     ];
 }
 

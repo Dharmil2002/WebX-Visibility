@@ -1,0 +1,105 @@
+.unique-class {
+    display: none !important;
+    overflow: hidden;
+}
+
+.page-with-hidden-navbar {
+    display: none !important;
+}
+
+.OrderNOViewPrint {
+    @media print {
+        .no-break {
+            page-break-inside: avoid !important;
+        }
+    }
+
+    .companylogo {
+        border: 1px solid white !important;
+        text-align: right;
+        padding-right: 50px;
+        max-height: 200px;
+        width: 35%;
+    }
+
+    .OrderNoHeader {
+        border-top: 1px solid white !important;
+        border-left: 1px solid white !important;
+        border-right: 1px solid white !important;
+        text-align: center;
+        border-bottom: 1px solid white !important;
+        color: black;
+        font-weight: bold;
+        font-size: 13.7px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-bordered {
+
+        margin-bottom:0;
+
+        tbody {
+            tr {
+
+                td,
+                th {
+                    padding: 10px 0px 10px 0px;
+                    color: black;
+                    font-size: 14.3px;
+                }
+                td{
+                  border-left: none !important;
+
+                }
+                th{
+                  border-right: none !important;
+
+                }
+
+            }
+        }
+        thead {
+            tr {
+                th {
+                    color: black;
+                    border: 1px solid #eee;
+                }
+            }
+        }
+    }
+    .flex{
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+
+    }
+    .display-inline{
+      width: 50%;
+    }
+    .ng-star-inserted{
+      padding: 0px;
+
+    }
+    .flex-aline{
+      display: flex;
+      align-items: center;
+    }
+    .OrderDetails {
+        color: black;
+        font-size: 14.3px;
+        font-weight: BOLD;
+        padding-left: 5%;
+
+    }
+
+    .border{
+      border: 1px solid black !important;
+     }
+     .borderextra{
+      border: 3px solid black !important;
+     }
+}

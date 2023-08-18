@@ -1,0 +1,123 @@
+﻿/*
+ *  Document   : _button.scss
+ *  Author     : Harikesh Jaiswal
+ *  Description: This scss file for Button style classes
+ */
+/* Success syling */
+
+.mat-button.mat-success,
+.mat-stroked-button.mat-success {
+  color: #28d094;
+}
+.mat-button.mat-success:hover,
+.mat-stroked-button.mat-success:hover {
+  background-color: #f0fff3;
+}
+
+.mat-raised-button.mat-success,
+.mat-flat-button.mat-success,
+.mat-fab.mat-success,
+.mat-mini-fab.mat-success {
+  color: #f0fff3;
+  background-color: #28d094;
+}
+
+.mat-icon-button.mat-success {
+  color: #28d094;
+}
+
+/* danger syling */
+
+.mat-button.mat-danger,
+.mat-stroked-button.mat-danger {
+  color: #ff4961;
+}
+.mat-button.mat-danger:hover,
+.mat-stroked-button.mat-danger:hover {
+  background-color: #f0fff3;
+}
+
+.mat-raised-button.mat-danger,
+.mat-flat-button.mat-danger,
+.mat-fab.mat-danger,
+.mat-mini-fab.mat-danger {
+  color: #f0fff3;
+  background-color: #ff4961;
+}
+
+.mat-icon-button.mat-danger {
+  color: #ff4961;
+}
+
+/* info syling */
+
+.mat-button.mat-info,
+.mat-stroked-button.mat-info {
+  color: #1e9ff2;
+}
+.mat-button.mat-info:hover,
+.mat-stroked-button.mat-info:hover {
+  background-color: #1e9ff2;
+}
+
+.mat-raised-button.mat-info,
+.mat-flat-button.mat-info,
+.mat-fab.mat-info,
+.mat-mini-fab.mat-info {
+  color: #f0fff3;
+  background-color: #1e9ff2;
+}
+
+.mat-icon-button.mat-info {
+  color: #1e9ff2;
+}
+
+/* orange syling */
+
+.mat-button.mat-orange,
+.mat-stroked-button.mat-orange {
+  color: #ef7215;
+}
+.mat-button.mat-orange:hover,
+.mat-stroked-button.mat-orange:hover {
+  background-color: #ef7215;
+}
+
+.mat-raised-button.mat-orange,
+.mat-flat-button.mat-orange,
+.mat-fab.mat-orange,
+.mat-mini-fab.mat-orange {
+  color: #f0fff3;
+  background-color: #ef7215;
+}
+
+.mat-icon-button.mat-orange {
+  color: #ef7215;
+}
+// .label-default {
+//   background-color: #777;
+// }
+
+// .label-primary {
+//   background-color: #1f91f3;
+// }
+
+// .label-success {
+//   background-color: #2b982b;
+// }
+
+// .label-info {
+//   background-color: #00b0e4;
+// }
+
+// .label-warning {
+//   background-color: #ff9600;
+// }
+
+// .label-danger {
+//   background-color: #fb483a;
+// }
+// .datatable-header-cell-label{
+//   font-weight: bold;
+//   font-size: 15px;
+// }

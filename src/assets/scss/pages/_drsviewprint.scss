@@ -1,0 +1,135 @@
+ /* #DRS ViewPrint  */
+ .DRSViewPrint {
+     .companylogo {
+         max-width: 60%;
+         padding-left: 4px !important;
+         padding-top: 6px !important;
+         padding-bottom: 8px !important;
+     }
+
+     .companylogoDRS {
+         max-width: 20% !important;
+     }
+
+     .Deliverytitle {
+         margin-bottom: 0.5rem;
+         font-family: Verdana;
+         font-weight: 200;
+         line-height: 1;
+         font-weight: bold !important;
+         color: black !important;
+         font-size: 20px !important;
+     }
+     
+     .OriginalCopy {
+         color: gray;
+         padding-right: 120px !important;
+         font-size: 15px !important;
+     }
+
+     .hederPlanID {
+         width: 33.33% !important;
+         text-align: left !important;
+         vertical-align: bottom;
+         padding-bottom: 8px !important;
+         color: brown !important;
+         font-weight: bold !important;
+         font-size: 14px !important;
+         padding-left: 4px !important;
+         padding-top: 6px !important;
+     }
+
+     .hederDRSNo {
+         width: 100% !important;
+         text-align: right !important;
+         vertical-align: bottom !important;
+         padding-bottom: 8px !important;
+         color: brown !important;
+         font-weight: bold !important;
+         font-size: 14px !important;
+     }
+
+     .tablerow {
+         font-weight: bold;
+         width: 25%;
+         padding-left: 8px;
+         padding-bottom: 8px;
+         padding-top: 8px;
+         font-size: 14px !important;
+         background-color: silver !important;
+     }
+
+     .tabletd {
+         font-weight: bold;
+         font-size: 14px !important;
+         width: 25%;
+         text-align: center;
+         vertical-align: middle;
+     }
+
+     .displaydata {
+         vertical-align: middle;
+         text-align: center;
+         font-weight: bold;
+         font-size: 14px !important;
+         background-color: lavender !important;
+         width: 15.66%;
+     }
+
+     .tablerowdata {
+         text-align: center;
+         font-size: 14px !important;
+         vertical-align: middle;
+         //  width: 16.66%
+         width: auto
+     }
+
+     p {
+         font-family: "Times New Roman";
+     }
+
+     .padding-main-divcls {
+         padding: 5px;
+     }
+
+     .text-center {
+         text-align: center
+     }
+
+     .width-full {
+         width: 100%;
+     }
+
+     .box {
+         border-width: 1px;
+         width: 65px;
+         height: 100px;
+         float: right;
+         margin-right: 50px;
+         font-size: 10px;
+         padding: 5px;
+     }
+
+     .table-bordered {
+         border: 1px solid black !important;
+     }
+
+
+     .table-bordered th,
+     .table-bordered td {
+         border: 1px solid black !important;
+     }
+
+     .table th,
+     .table td {
+         border-bottom: 1px solid black;
+         color: black;
+         font-size: 13.7px;
+     }
+
+
+     .TblManage th,
+     .TblManage td {
+         padding: 0.5cm !important;
+     }
+ }

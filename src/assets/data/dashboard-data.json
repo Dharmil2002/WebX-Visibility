@@ -5,22 +5,22 @@
             {
                 "count": 1435,
                 "title": "Booking Stock",
-                "class": "info-box7  bg-white order-info-box7"
+                "class": "info-box7  bg-c-Bottle-light order-info-box7"
             },
             {
                 "count": 1215,
                 "title": "Transhipment Stock",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Grape-light order-info-box7"
             },
             {
                 "count": 165,
                 "title": "Delivery Stock",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Daisy-light order-info-box7"
             },
             {
                 "count": 200,
                 "title": "Quick Book",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7  bg-c-Grape-light order-info-box7"
             }
         ]
     },
@@ -30,22 +30,22 @@
             {
                 "count": 31,
                 "title": "Arrival Enroute",
-                "class": "info-box7  bg-white order-info-box7"
+                "class": "info-box7 bg-c-Bottle-light order-info-box7"
             },
             {
                 "count": 29,
                 "title": "Scheduled",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Grape-light order-info-box7"
             },
             {
                 "count": 28,
                 "title": "Departed Enroute",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Daisy-light order-info-box7"
             },
             {
                 "count": 7,
                 "title": "Docked",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Grape-light order-info-box7"
             }
         ]
     },
@@ -55,17 +55,17 @@
             {
                 "count": 2211,
                 "title": "Out For Delivery",
-                "class": "info-box7  bg-white order-info-box7"
+                "class": "info-box7  bg-c-Bottle-light order-info-box7"
             },
             {
                 "count": 451,
                 "title": "RTO",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Grape-light order-info-box7"
             },
             {
                 "count": 200,
                 "title": "Failed Delivery",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Daisy-light order-info-box7"
             }
         ]
     },
@@ -75,22 +75,22 @@
             {
                 "count": 211,
                 "title": "Short Pkgs",
-                "class": "info-box7  bg-white order-info-box7"
+                "class": "info-box7  bg-c-Bottle-light order-info-box7"
             },
             {
                 "count": 451,
                 "title": "Extra Pkgs",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Grape-light order-info-box7"
             },
             {
                 "count": 232,
                 "title": "Damaged Pkgs",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Daisy-light order-info-box7"
             },
             {
                 "count": 120,
                 "title": "Open Deps TKTS",
-                "class": "info-box7 bg-white order-info-box7"
+                "class": "info-box7 bg-c-Grape-light order-info-box7"
             }
         ]
     }

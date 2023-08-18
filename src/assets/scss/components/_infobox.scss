@@ -454,11 +454,11 @@
   min-height: 140px;
 }
 .counter-box {
-  padding: 15px;
+  padding: 10px;
   color: #212529;
   margin: 8px 0px 25px 0px;
   border-radius: 10px;
-  min-height: 100px;
+  // min-height: 100px;
   background-color: #ffffff;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
 }
@@ -574,11 +574,57 @@
 .bg-c-green {
   background: linear-gradient(45deg, #2ed8b6, #59e0c5);
 }
+
 .bg-c-yellow {
   background: linear-gradient(45deg, #ffb64d, #ffcb80);
 }
 .bg-c-pink {
   background: linear-gradient(45deg, #ff5370, #ff869a);
+}
+.bg-c-purple {
+  background: linear-gradient(45deg, #384ffc, #6777ef);
+}
+.bg-c-Bottle-light {
+  background: rgba(17, 102, 119);
+}
+.bg-c-Grape-light {
+  background: rgba(119, 17, 136);
+}
+.bg-c-Daisy-light {
+  background: #cca643;
+}
+.bg-c-Success-light {
+  background: #3d9114;
+}
+.bg-c-Ocean-light {
+  background: #4165cf;
+}
+.bg-c-Ocean-danger {
+  background-color: #ef5350;
+}
+.bg-c-Generated-light {
+  background: #cca643;
+}
+.color-Bottle-light {
+  color: rgba(17, 102, 119);
+}
+.color-Grape-light {
+  color: rgba(119, 17, 136);
+}
+.color-Daisy-light {
+  color: #cca643;
+}
+.color-Success-light {
+  color: #3d9114;
+}
+.color-Ocean-light {
+  color: #4165cf;
+}
+.color-Ocean-danger {
+  color: #ef5350;
+}
+.color-Generated-light {
+  color: #cca643;
 }
 .info-box7 {
   border-radius: 5px;
@@ -588,7 +634,7 @@
   margin: 8px 0px 25px 0px;
   transition: all 0.3s ease-in-out;
   .info-box7-block {
-    padding: 25px;
+    padding: 15px;
   }
 }
 .order-info-box7 i {

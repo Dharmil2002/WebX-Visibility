@@ -101,7 +101,6 @@ export class MarkArrivalComponent implements OnInit {
   }
 
   save() {
-    debugger
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
@@ -189,7 +188,6 @@ export class MarkArrivalComponent implements OnInit {
   }
   /*here i write a code becuase of update docket states*/
   async getDocketTripWise(tripId) {
-   debugger
     const detail = await getDocketFromApiDetail(this.companyCode, this._operationService,tripId.trim());
     const uniqueDktNumbers = extractUniqueValues(detail, 'dktNo');
     // Create an array of promises for updateTracking calls

@@ -351,7 +351,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
   Close(): void {
     this.dialogRef.close()
-    this.goBack(2)
+    this.goBack(3)
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
@@ -440,7 +440,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
             showConfirmButton: true,
           })
           this.dialogRef.close(this.loadingSheetTableForm.value)
-          this.goBack(2)
+          this.goBack(3)
         }
       }
     })

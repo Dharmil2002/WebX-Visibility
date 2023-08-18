@@ -208,6 +208,7 @@ export async function updateTracking(companyCode, operationService, data) {
       loc: localStorage.getItem('Branch') || '',
       dest: docketDetails[lastArray]?.dest || '',
       lsno: data?.lsNo || '',
+      unload:false,
       mfno: '',
       dlSt: '',
       dlTm: '',
@@ -250,7 +251,8 @@ export async function getDocketFromApiDetail(companyCode, operationService, dock
 
   try {
     const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-    return res.data.db.data.cnote_trackingv4;
+    const docketDetails = res.data.db.data.cnote_trackingv4.filter((x) => x.unload === false);
+    return docketDetails;
   } catch (error) {
     console.error('Error retrieving docket details:', error);
     throw error; // Rethrow the error for higher-level error handling if needed.

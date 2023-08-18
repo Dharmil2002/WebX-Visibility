@@ -63,10 +63,10 @@ export function kpiData(csv, shipmentStatus, event) {
   
     // Create an array of shipData objects with dynamic values
     const shipData = [
-      createShipDataObject(csv.length, "Shipments", "bg-white"),
-      createShipDataObject(packages, "Packages", "bg-white"),
-      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + shipmentStatus, "bg-white"),
-      createShipDataObject(event?.Package || 0, "Packages" + ' ' + shipmentStatus, "bg-white"),
+      createShipDataObject(csv.length, "Shipments", "bg-c-Bottle-light"),
+      createShipDataObject(packages, "Packages", "bg-c-Grape-light"),
+      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + shipmentStatus, "bg-c-Daisy-light"),
+      createShipDataObject(event?.Package || 0, "Packages" + ' ' + shipmentStatus, "bg-c-Grape-light"),
     ];
   
     // Return the shipData array

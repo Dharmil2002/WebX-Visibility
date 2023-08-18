@@ -134,6 +134,7 @@ export class DepartureDashboardPageComponent
    * Fetches shipment data from the API and updates the boxData and tableload properties.
    */
   fetchShipmentData() {
+
     // Prepare request payload
     let req = {
       companyCode: this.companyCode,

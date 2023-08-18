@@ -161,9 +161,9 @@ export class PickupDelPageComponent extends UnsubscribeOnDestroyAdapter implemen
 
       // Prepare the shipData array with summary information
       const shipData = [
-        createShipDataObject(this.csv.length, "Clusters", "bg-white"),
-        createShipDataObject(deliveryShipments.length, "Shipments for Delivery", "bg-white"),
-        createShipDataObject(pickupRequests.length, "Pickup Requests", "bg-white"),
+        createShipDataObject(this.csv.length, "Clusters", "bg-c-Bottle-light"),
+        createShipDataObject(deliveryShipments.length, "Shipments for Delivery", "bg-c-Grape-light"),
+        createShipDataObject(pickupRequests.length, "Pickup Requests", "bg-c-Daisy-light"),
       ];
 
       // Store the shipData in boxData property

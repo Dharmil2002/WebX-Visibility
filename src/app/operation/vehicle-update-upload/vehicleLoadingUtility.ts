@@ -22,6 +22,7 @@ export async function updateTracking(companyCode, operationService, data,dktNo) 
       dest: docketDetails[lastArray]?.dest || '',
       lsno: docketDetails[lastArray]?.lsNo || '',
       mfno:data?.mfNo||"",
+      unload:false,
       dlSt: '',
       dlTm: '',
       evnCd: '',

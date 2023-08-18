@@ -20,10 +20,10 @@ export function kpiData(StockCountData: any[]): any[] {
 
   // Create an array of shipData objects with dynamic values
   const shipData = [
-    createShipDataObject(StockCountData.length, "Total", "bg-white"),
-    createShipDataObject(StockCountData.filter((x) => x.isComplete === 1).length, "Completion", "bg-white"),
-    createShipDataObject(lsCount.length, "Loading Sheet", "bg-white"),
-    createShipDataObject(0, "Delivery", "bg-white"),
+    createShipDataObject(StockCountData.length, "Total", "bg-c-Bottle-light"),
+    createShipDataObject(StockCountData.filter((x) => x.isComplete === 1).length, "Completion", "bg-c-Grape-light"),
+    createShipDataObject(lsCount.length, "Loading Sheet", "bg-c-Daisy-light"),
+    createShipDataObject(0, "Delivery", "bg-c-Grape-light"),
   ];
 
   // Return the shipData array

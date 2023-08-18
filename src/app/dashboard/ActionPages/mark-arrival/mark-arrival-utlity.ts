@@ -32,21 +32,22 @@ export async function tripTransactionDetail(
 * @param {Object} data - The data containing docket information.
 * @returns {Promise<any>} - A Promise resolving to the API response.
 */
-export async function updateTracking(companyCode, operationService,docketDetails) {
+export async function updateTracking(companyCode, operationService, docketDetails) {
     try {
         const randomNumber = "MA/" + localStorage.getItem('Branch') + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
         const dockData = {
-            tripId: docketDetails?.tripId||'',
+            tripId: docketDetails?.tripId || '',
             id: randomNumber,
             dktNo: docketDetails?.dktNo || '',
             vehNo: docketDetails?.vehNo || '',
             route: docketDetails?.route || '',
-            event:"Vehicle Arrival at " +" "+localStorage.getItem('Branch'),
+            event: "Vehicle Arrival at " + " " + localStorage.getItem('Branch'),
             orgn: docketDetails?.orgn || '',
             loc: localStorage.getItem('Branch') || '',
             dest: docketDetails?.dest || '',
             lsno: docketDetails?.lsno || '',
             mfno: docketDetails?.mfno || '',
+            unload: false,
             dlSt: '',
             dlTm: '',
             evnCd: '',
@@ -76,7 +77,7 @@ export async function updateTracking(companyCode, operationService,docketDetails
  * @param {string} docketNo - The docket number.
  * @returns {Promise<any>} - A Promise resolving to the docket details.
  */
-export async function getDocketFromApiDetail(companyCode, operationService,tripId) {
+export async function getDocketFromApiDetail(companyCode, operationService, tripId) {
     const reqBody = {
         companyCode: companyCode,
         type: 'operation',
@@ -88,7 +89,8 @@ export async function getDocketFromApiDetail(companyCode, operationService,tripI
 
     try {
         const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-        return res.data.db.data.cnote_trackingv4;
+        const docketDetails = res.data.db.data.cnote_trackingv4.filter((x) => x.unload === false);
+        return docketDetails;
     } catch (error) {
         console.error('Error retrieving docket details:', error);
         throw error; // Rethrow the error for higher-level error handling if needed.

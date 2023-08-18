@@ -31,6 +31,7 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, oper
                 ? {
                     tripId: "",
                     route: "",
+                    currentLocation:localStorage.getItem("Branch"),
                     updateBy: localStorage.getItem("Username"),
                     updateDate: new Date().toISOString()
                   }

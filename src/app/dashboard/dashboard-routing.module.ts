@@ -6,6 +6,7 @@ import { DashboardPageComponent } from "./dashboard-page/dashboard-page.componen
 import { PickupDeliveryPlannerComponent } from "./tabs/pickup-delivery-planner/pickup-delivery-planner.component";
 import { ManageRunsheetComponent } from "./tabs/manage-runsheet/manage-runsheet.component";
 import { StocksComponent } from "./stocks/stocks.component";
+import { UpdateStockComponent } from "./ActionPages/update-stock/update-stock.component";
 const routes: Routes = [
   {
     path: "",
@@ -35,6 +36,10 @@ const routes: Routes = [
   {
     path:"DocketStock",
     component:StocksComponent
+  },
+  {
+    path:"updateStock",
+    component:UpdateStockComponent
   },
 
 ];

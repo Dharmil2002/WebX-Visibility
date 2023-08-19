@@ -53,16 +53,56 @@ export class StocksComponent
   // < column name : Column name you want to display on table >
 
   columnHeader = {
-    no: "Cnote",
-    date: "Date",
-    paymentType: "Pay-Type",
-    contractParty: "Contract Party",
-    orgdest: "Org-Dest",
-    noofPackages: "Packages",
-    actualWeight: "Act-Wt(Kg)",
-    chargedWeight: "Chrg-Wt(Kg)",
-    status: "Status",
-    Action: "Action",
+    no: {
+      Title:"Cnote",
+      class: "matcolumnleft",
+      Style: "min-width:80px",
+    },
+    date: {
+      Title: "Date of Cnote",
+      class: "matcolumnleft",
+      Style: "min-width:80px",
+    },
+    paymentType: {
+      Title: "Payment Type",
+      class: "matcolumnleft",
+      Style: "min-width:2px",
+    },
+    contractParty: {
+      Title:"Contract Party",
+      class: "matcolumnleft",
+      Style: "min-width:200px",
+    },
+    orgdest: {
+      Title:"Origin-Destination",
+      class: "matcolumnleft",
+      Style: "min-width:80px",
+    },
+    noofPackages: {
+      Title: "No of Packages",
+      class: "matcolumnleft",
+      Style: "min-width:2px",
+    },
+    actualWeight: {
+      Title: "Actual Weight",
+      class: "matcolumnleft",
+      Style: "min-width:2px",
+    },
+    chargedWeight: {
+      Title: "Charged Weight",
+      class: "matcolumnleft",
+      Style: "min-width:2px",
+    },
+    status: {
+      Title: "Status",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+    Action: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
   };
   //#endregion
   //#region declaring Csv File's Header as key and value Pair
@@ -71,14 +111,26 @@ export class StocksComponent
     date: "Date of Cnote",
     paymentType: "Payment Type",
     contractParty: "Contract Party",
-    originDestination: "Origin-Destination",
+    orgdest: "Origin-Destination",
     fromCityToCity: "From City-To City",
     noofPackages: "No of Packages",
     actualWeight: "Actual Weight",
     chargedWeight: "Charged Weight",
     status: "Status",
-    // "Action": "Action"
+    //"Action": "Action"
   };
+
+  staticField = [
+    "no",
+    "date",
+    "paymentType",
+    "contractParty",
+    "orgdest",
+    "noofPackages",
+    "actualWeight",
+    "chargedWeight",
+    "status"
+  ];
   boxData: { count: any; title: any; class: string }[];
   branch = localStorage.getItem("Branch");
   // declararing properties

@@ -5,13 +5,11 @@
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
         </app-form-without-auto-complete-webxpress>
     </form>
-    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="tableData"
-        [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="headerForCsv"
-        [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-        [toggleArray]="toggleArray" [menuItems]="menuItems" [height]="height" [width]="width" [maxWidth]="maxWidth"
-        (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
-        [dynamicControls]="dynamicControls"  [centerAligned]="centerAlignedData">
-    </generic-table-webxpress>
+    <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+        [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [boxData]="boxData" [height]="height"
+        [width]="width" [maxWidth]="maxWidth">
+    </app-generic-table-v2>
     <div class="row" *ngIf="!tableload">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
             <div class="example-button-row d-flex justify-content-end">

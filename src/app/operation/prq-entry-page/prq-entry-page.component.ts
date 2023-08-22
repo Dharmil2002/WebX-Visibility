@@ -8,6 +8,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { getCity } from '../quick-booking/quick-utility';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-prq-entry-page',
@@ -41,7 +42,7 @@ export class PrqEntryPageComponent implements OnInit {
     },
   ];
   constructor(private fb: UntypedFormBuilder, private masterService: MasterService,
-    private filter: FilterUtils,) {
+    private filter: FilterUtils,private router:Router) {
     this.initializeFormControl();
   }
 
@@ -135,8 +136,12 @@ export class PrqEntryPageComponent implements OnInit {
     Swal.fire({
       icon: "success",
       title: "Generated Successfully",
-      html: `PRQ No: ${prqNo}<br><a href="/Operation/AssignVehicle">Proceed to Vehicle Assign Tab</a>`,
+      text: `PRQ No: ${prqNo}`,
       showConfirmButton: true,
+    }).then((result)=>{
+      if(result.isConfirmed){
+        this.router.navigate(['/Operation/AssignVehicle']);
+      }
     });
 
     console.log(this.prqEntryTableForm.value);

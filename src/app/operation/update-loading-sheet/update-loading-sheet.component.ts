@@ -118,10 +118,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
   getLoadingSheetDetail() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "menifest_detail"
+      "collectionName": "menifest_detail",
+      "filter":{}
     }
-    this._operation.operationPost('common/getall', reqBody).subscribe({
+    this._operation.operationMongoPost('generic/get', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           const mfDetail = res.data.filter((x) => x.tripId === this.arrivalData?.TripID);
@@ -133,14 +133,14 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
 
   getShippningData(menifestNo) {
-    ///element.mfNo
+
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "docket"
+      "collectionName": "docket",
+      "filter":{}
 
     }
-    this._operation.operationPost('common/getall', reqBody).subscribe(res => {
+    this._operation.operationPost('generic/get', reqBody).subscribe(res => {
       if (res) {
         this.updateTrip = res.data;
         const arrivalData = res.data.filter((x) => {
@@ -185,10 +185,10 @@ export class UpdateLoadingSheetComponent implements OnInit {
   getPackagesData() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "docketScan"
+      "collectionName": "docketScan",
+      "filter":{}
     }
-    this._operation.operationPost('common/getall', reqBody).subscribe({
+    this._operation.operationMongoPost('generic/get',reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           this.packageData = res.data;
@@ -329,16 +329,16 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const reqbody = {
       "companyCode": this.companyCode,
       "type": "operation",
-      "collection": "docket",
-      "id": dkt,
-      "updates": {
+      "collectionName": "docket",
+      "filter":{docketNumber: dkt},
+      "update": {
         "unloading": 1,
         "unloadloc": this.currentBranch
       }
     };
 
     return new Promise((resolve, reject) => {
-      this._operation.operationPut("common/update", reqbody).subscribe({
+      this._operation.operationPut("generic/update", reqbody).subscribe({
         next: (res: any) => {
           resolve(res);
         },
@@ -391,14 +391,13 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_detail",
-      "id": this.arrivalData.id,
-      "updates": {
+      "collectionName": "trip_detail",
+      "filter": {_id: this.arrivalData.id},
+      "update": {
         ...tripDetails,
       }
     }
-    this._operation.operationPut("common/update", reqBody).subscribe({
+    this._operation.operationPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (!next) {
           this.tripHistoryUpdate()
@@ -423,14 +422,13 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_transaction_history",
-      "id": this.arrivalData?.TripID || "",
-      "updates": {
-        ...tripDetails,
+      "collectionName": "trip_transaction_history",
+      "filter":{_id: this.arrivalData?.TripID},
+      "update": {
+        ...tripDetails
       }
     }
-    this._operation.operationPut("common/update", reqBody).subscribe({
+    this._operation.operationMongoPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           Swal.fire({

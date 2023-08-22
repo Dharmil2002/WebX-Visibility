@@ -171,15 +171,14 @@ export function filterCnoteDetails(cnoteDetails, shipping) {
 export async function getVehicleDetailFromApi(companyCode: number, operationService,vehicleNo) {
   const reqBody = {
     companyCode: companyCode,
-    type: "masters",
-    collection: "vehicle_detail",
-    query: {
+    collectionName: "vehicle_detail",
+    filter: {
       vehicleNo: vehicleNo
   }
   };
   try {
-    const res = await operationService.operationPost("common/getOne", reqBody).toPromise();
-    return res.data.db.data.vehicle_detail[0]
+    const res = await operationService.operationMongoPost("generic/get", reqBody).toPromise();
+    return res.data[0]
   } catch (error) {
     console.error('Error occurred during the API call:', error);
   }
@@ -199,7 +198,7 @@ export async function updateTracking(companyCode, operationService, data) {
     const lastArray=docketDetails.length-1;
     const dockData = {
       tripId: data?.tripId || '',
-      id: data?.lsNo,
+      _id: data?.lsNo,
       dktNo: data?.dktNo|| '',
       vehNo: data?.vehNo || '',
       route: data?.route || '',
@@ -219,12 +218,11 @@ export async function updateTracking(companyCode, operationService, data) {
 
     const req = {
       companyCode: companyCode,
-      type: 'operation',
-      collection: 'cnote_trackingv4',
+      collectionName: 'cnote_tracking',
       data:dockData
     };
 
-    const res = await operationService.operationPost('common/create', req).toPromise();
+    const res = await operationService.operationMongoPost('generic/create', req).toPromise();
     return res;
   } catch (error) {
     console.error('Error updating docket status:', error);
@@ -242,16 +240,15 @@ export async function updateTracking(companyCode, operationService, data) {
 export async function getDocketFromApiDetail(companyCode, operationService, docketNo) {
   const reqBody = {
     companyCode: companyCode,
-    type: 'operation',
-    collection: 'cnote_trackingv4',
-    query: {
+    collectionName: 'cnote_tracking',
+    filter: {
       dktNo: docketNo,
     },
   };
 
   try {
-    const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-    const docketDetails = res.data.db.data.cnote_trackingv4.filter((x) => x.unload === false);
+    const res = await operationService.operationMongoPost('generic/get', reqBody).toPromise();
+    const docketDetails = res.data.filter((x) => x.unload === false);
     return docketDetails;
   } catch (error) {
     console.error('Error retrieving docket details:', error);

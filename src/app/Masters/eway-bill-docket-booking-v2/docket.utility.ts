@@ -3,12 +3,12 @@ import { WebxConvert } from "src/app/Utility/commonfunction";
 export async function getPincode(companyCode, masterService) {
   const req = {
     companyCode: companyCode,
-    type: "masters",
-    collection: "pincode_detail",
+    collectionName: "pincode_detail",
+    filter: {}
   };
 
   try {
-    const res: any = await masterService.masterPost("common/getall", req).toPromise();
+    const res: any = await masterService.masterMongoPost("generic/get", req).toPromise();
     if (res && res.data) {
       const pincode = res.data
         .map((x) => ({ name: x.pincode, value: x.pincode }))
@@ -66,7 +66,7 @@ export function calculateInvoiceTotalCommon(tableData, contractForm) {
 
 export async function addTracking(companyCode, operationService, data) {
   const dockData = {
-    id:data?.docketNumber,
+    _id:data?.docketNumber,
     dktNo:data?.docketNumber||'',
     vehNo:"",
     route:"",
@@ -85,13 +85,12 @@ export async function addTracking(companyCode, operationService, data) {
 
   const req = {
     companyCode: companyCode,
-    type: "operation",
-    collection: "cnote_trackingv4",
+    collectionName: "cnote_tracking",
     data:dockData
   };
 
   try {
-    const res: any = await operationService.operationPost("common/create", req).toPromise();
+    const res: any = await operationService.operationMongoPost("generic/create", req).toPromise();
      return res;
   } catch (error) {
     console.error("Error update a docket Status:", error);

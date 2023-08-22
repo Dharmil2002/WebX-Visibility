@@ -45,14 +45,14 @@ export async function getDocketDetailsFromApi(
   // Prepare request payload
   const req = {
     companyCode,
-    type: "operation",
-    collection: "docket",
+    collectionName: "docket",
+    filter: {}
   };
 
   try {
     // Send request and await response
     const res: any = await operationService
-      .operationPost("common/getall", req)
+      .operationMongoPost("generic/get", req)
       .toPromise();
 
     // Filter docket details based on branch

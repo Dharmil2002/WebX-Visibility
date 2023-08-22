@@ -182,7 +182,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   destinationStatus: boolean;
   quickDocket: boolean;
   companyCode = parseInt(localStorage.getItem("companyCode"));
-  branch = parseInt(localStorage.getItem("Branch"));
+  branch = localStorage.getItem("Branch");
   dockNo: string;
   DocketDetails: any;
   vehicleNo: string;
@@ -207,6 +207,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   ngOnInit(): void {
     this.loadTempData();
     this.initializeFormControl();
+    this.getPincodeDetails();
   }
 
   functionCallHandler($event) {
@@ -369,52 +370,43 @@ export class EwayBillDocketBookingV2Component implements OnInit {
 
   // Get EwayBill data
 
-  bindQuickdocketData() {
+  async bindQuickdocketData() {
     if (this.quickDocket) {
-      let reqBody = {
+      const reqBody = {
         companyCode: this.companyCode,
-        type: "operation",
-        collection: "docket",
-        query: {
-          id: this.quickdocketDetaildata.no,
+        collectionName: "docket",
+        filter: {
+          docketNumber: this.quickdocketDetaildata.no,
         },
       };
-      this.operationService.operationPost("common/getOne", reqBody).subscribe({
-        next: (res: any) => {
-          if (res) {
-            this.DocketDetails = res.data.db.data.docket;
-            this.contractForm.controls["payType"].setValue(
-              this.DocketDetails[0]?.payType || ""
-            );
-            this.vehicleNo = this.DocketDetails[0]?.vehNo;
-            this.contractForm.controls["totalChargedNoOfpkg"].setValue(
-              this.DocketDetails[0]?.totalChargedNoOfpkg || ""
-            );
-            this.contractForm.controls["actualwt"].setValue(
-              this.DocketDetails[0]?.actualwt || ""
-            );
-            this.contractForm.controls["chrgwt"].setValue(
-              this.DocketDetails[0]?.chrgwt || ""
-            );
-            this.docketId = this.DocketDetails[0]?.id || "";
-            this.tabForm.controls["docketNumber"].setValue(
-              this.DocketDetails[0]?.docketNumber || ""
-            );
-            this.tabForm.controls["docketDate"].setValue(
-              this.DocketDetails[0]?.docketDate || ""
-            );
-            this.tableData[0].NO_PKGS =
-              this.DocketDetails[0]?.totalChargedNoOfpkg || "";
-            this.tableData[0].ACT_WT = this.DocketDetails[0]?.actualwt || "";
-          }
-        },
-      });
+  
+      try {
+        const res: any = await this.operationService.operationMongoPost("generic/get", reqBody).toPromise();
+  
+        if (res) {
+          this.DocketDetails = res.data;
+          this.contractForm.controls["payType"].setValue(this.DocketDetails[0]?.payType || "");
+          this.vehicleNo = this.DocketDetails[0]?.vehNo;
+          this.contractForm.controls["totalChargedNoOfpkg"].setValue(this.DocketDetails[0]?.totalChargedNoOfpkg || "");
+          this.contractForm.controls["actualwt"].setValue(this.DocketDetails[0]?.actualwt || "");
+          this.contractForm.controls["chrgwt"].setValue(this.DocketDetails[0]?.chrgwt || "");
+          this.docketId = this.DocketDetails[0]?.id || "";
+          this.tabForm.controls["docketNumber"].setValue(this.DocketDetails[0]?.docketNumber || "");
+          this.tabForm.controls["docketDate"].setValue(this.DocketDetails[0]?.docketDate || "");
+          this.tableData[0].NO_PKGS = this.DocketDetails[0]?.totalChargedNoOfpkg || "";
+          this.tableData[0].ACT_WT = this.DocketDetails[0]?.actualwt || "";
+        }
+      } catch (error) {
+        // Handle error here
+      }
     }
+  
     this.getCity();
     this.customerDetails();
     this.destionationDropDown();
-    this.getPincodeDetails()
+   
   }
+  
 
   // Load temporary data
   loadTempData() {
@@ -594,14 +586,13 @@ export class EwayBillDocketBookingV2Component implements OnInit {
 
       let reqBody = {
         companyCode: this.companyCode,
-        type: "operation",
-        collection: "docket",
-        id: this.docketId,
-        updates: {
+        collectionName: "docket",
+        filter:{docketNumber:  this.tabForm.controls["docketNumber"].value},
+        update: {
           ...docketDetails,
         },
       };
-      this.operationService.operationPut("common/update", reqBody).subscribe({
+      this.operationService.operationMongoPut("generic/update", reqBody).subscribe({
         next: (res: any) => {
           this.Addseries();
         },
@@ -631,11 +622,10 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       await addTracking(this.companyCode,this.operationService,docketDetails)
       let reqBody = {
         companyCode: this.companyCode,
-        type: "operation",
-        collection: "docket",
+        collectionName: "docket",
         data: docketDetails,
       };
-      this.operationService.operationPost("common/create", reqBody).subscribe({
+      this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
         next: (res: any) => {
           this.Addseries();
         },
@@ -650,11 +640,10 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     );
     let reqBody = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docketScan",
+      collectionName: "docketScan",
       data: resultArray,
     };
-    this.operationService.operationPost("common/create", reqBody).subscribe({
+    this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
       next: (res: any) => {
         Swal.fire({
           icon: "success",
@@ -680,7 +669,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       const entryDateTime = new Date().toISOString();
       const bcDockSf = "0";
       return {
-        id: bcSerialNo,
+        _id: bcSerialNo,
         companyCode: companyCode,
         dockNo: dockno,
         bcSerialNo: bcSerialNo,
@@ -761,7 +750,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   async getPincodeDetails() {
     try {
       const pinCode = await getPincode(this.companyCode, this.masterService);
-
       if (pinCode) {
         this.filter.Filter(
           this.consigneeControlArray,

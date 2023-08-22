@@ -33,6 +33,13 @@ export class OperationService {
   operationPut(ApiURL, Request) {
     return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
+  //here is create for post request//
+  operationMongoPost(ApiURL, Request) {
+    return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  }
+  operationMongoPut(ApiURL, Request) {
+    return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  }
   setShipmentStatus(data: string) {
     this.shipmentStatus = data
   }

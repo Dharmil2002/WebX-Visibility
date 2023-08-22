@@ -218,17 +218,16 @@ export class QuickBookingComponent implements OnInit {
       this.quickDocketTableForm.value?.vehNo.name || ""
     );
 
-    let id = { id: docketNo, isComplete: false,unloading: 0, lsNo: "", mfNo: "",unloadloc:"",entryBy:this.userName,entryDate:new Date().toISOString()};
+    let id = { _id: docketNo, isComplete: false,unloading: 0, lsNo: "", mfNo: "",unloadloc:"",entryBy:this.userName,entryDate:new Date().toISOString()};
 
     let docketDetails = { ...this.quickDocketTableForm.value, ...id };
 
     let reqBody = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
-      data: docketDetails,
+      collectionName: "docket",
+      data: docketDetails
     };
-    this.operationService.operationPost("common/create", reqBody).subscribe({
+    this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
       next: (res: any) => {
         Swal.fire({
           icon: "success",

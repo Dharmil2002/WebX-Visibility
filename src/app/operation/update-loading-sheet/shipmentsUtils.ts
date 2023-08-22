@@ -44,7 +44,7 @@ export async function updateTracking(companyCode, operationService, dktNo) {
     const lastArray = docketDetails.length - 1;
     const dockData = {
       tripId: docketDetails[lastArray]?.tripId || '',
-      id: randomNumber,
+      _id: randomNumber,
       dktNo: docketDetails[lastArray]?.dktNo || '',
       vehNo: docketDetails[lastArray]?.vehNo || '',
       route: docketDetails[lastArray]?.route || '',
@@ -64,12 +64,11 @@ export async function updateTracking(companyCode, operationService, dktNo) {
 
     const req = {
       companyCode: companyCode,
-      type: 'operation',
-      collection: 'cnote_trackingv4',
+      collectionName: 'cnote_tracking',
       data: dockData
     };
 
-    const res = await operationService.operationPost('common/create', req).toPromise();
+    const res = await operationService.operationMongoPost('generic/create', req).toPromise();
     return res;
 
   } catch (error) {
@@ -88,16 +87,15 @@ export async function updateTracking(companyCode, operationService, dktNo) {
 export async function getDocketFromApiDetail(companyCode, operationService, docketNo) {
   const reqBody = {
     companyCode: companyCode,
-    type: 'operation',
-    collection: 'cnote_trackingv4',
-    query: {
-      dktNo: docketNo,
+    collectionName: 'cnote_tracking',
+    filter: {
+      dktNo: docketNo
     },
   };
 
   try {
-    const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-    const uniqueDktNumbers = extractUniqueValues(res.data.db.data.cnote_trackingv4, 'dktNo');
+    const res = await operationService.operationMongoPost('generic/get', reqBody).toPromise();
+    const uniqueDktNumbers = extractUniqueValues(res.data, 'dktNo');
     return uniqueDktNumbers
   } catch (error) {
     console.error('Error retrieving docket details:', error);
@@ -121,10 +119,9 @@ export async function updateLoadingSheet(companyCode, operationService, lsno, lo
     }
     const req = {
       companyCode: companyCode,
-      type: 'operation',
-      collection: 'loadingSheet_detail',
-      id: lsno,
-      updates: {
+      collectionName: 'loadingSheet_detail',
+      filter:{ id: lsno},
+      update: {
         ...tripDetails,
       }
     };
@@ -148,16 +145,15 @@ export async function updateLoadingSheet(companyCode, operationService, lsno, lo
 export async function loadingSheetDetails(companyCode, operationService, tripId) {
   const reqBody = {
     companyCode: companyCode,
-    type: 'operation',
-    collection: 'loadingSheet_detail',
-    query: {
+    collectionName: 'loadingSheet_detail',
+    filter: {
       tripId: tripId,
     },
   };
 
   try {
-    const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-    return res.data.db.data.loadingSheet_detail;
+    const res = await operationService.operationMongoPost('generic/get', reqBody).toPromise();
+    return res.data;
   } catch (error) {
     console.error('Error retrieving docket details:', error);
     throw error; // Rethrow the error for higher-level error handling if needed.

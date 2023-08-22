@@ -13,16 +13,15 @@ export async function getLoadingSheetDetail(
 ) {
     const reqBody = {
         companyCode: companyCode,
-        type: "operation",
-        collection: "loadingSheet_detail",
-        query: {
+        collectionName: "loadingSheet_detail",
+        filter: {
             vehno: vehicleNo,
             tripId: tripId
         }
     };
     try {
-        const res = await operationService.operationPost("common/getOne", reqBody).toPromise();
-        return res.data.db.data.loadingSheet_detail;
+        const res = await operationService.operationMongoPost("generic/get", reqBody).toPromise();
+        return res.data;
     } catch (error) {
         console.error('Error occurred during the API call:', error);
     }
@@ -40,15 +39,14 @@ export async function getDriverDetail(
 ) {
     const reqBody = {
         companyCode: companyCode,
-        type: "masters",
-        collection: "driver_detail",
-        query: {
+        collectionName: "driver_detail",
+        filter: {
             vehicleNo: vehicleNo
         }
     };
     try {
-        const res = await operationService.operationPost("common/getOne", reqBody).toPromise();
-        return res.data.db.data.driver_detail;
+        const res = await operationService.operationMongoPost("common/get", reqBody).toPromise();
+        return res.data;
     } catch (error) {
         console.error('Error occurred during the API call:', error);
     }
@@ -142,7 +140,7 @@ export async function updateTracking(companyCode, operationService, dktNo, next)
         const lastArray = docketDetails.length - 1;
         const dockData = {
             tripId: docketDetails[lastArray]?.tripId || '',
-            id: randomNumber,
+            _id: randomNumber,
             dktNo: docketDetails[lastArray]?.dktNo || '',
             vehNo: docketDetails[lastArray]?.vehNo || '',
             route: docketDetails[lastArray]?.route || '',
@@ -162,12 +160,11 @@ export async function updateTracking(companyCode, operationService, dktNo, next)
 
         const req = {
             companyCode: companyCode,
-            type: 'operation',
-            collection: 'cnote_trackingv4',
+            collectionName: 'cnote_tracking',
             data: dockData
         };
 
-        const res = await operationService.operationPost('common/create', req).toPromise();
+        const res = await operationService.operationMongoPost('generic/create', req).toPromise();
         return res;
     } catch (error) {
         console.error('Error updating docket status:', error);
@@ -188,17 +185,16 @@ export async function getDocketFromApiDetail(companyCode, operationService, dock
     // Prepare the request body
     const reqBody = {
         companyCode: companyCode,
-        type: 'operation',
-        collection: 'cnote_trackingv4',
-        query: {
+        collectionName: 'cnote_tracking',
+        filter: {
             dktNo: docketNo,
         },
     };
 
     try {
         // Retrieve data from the API and filter for valid docket details
-        const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-        const docketDetails = res.data.db.data.cnote_trackingv4.filter(x => {
+        const res = await operationService.operationMongoPost('generic/get', reqBody).toPromise();
+        const docketDetails = res.data.filter(x => {
             if (typeof x.unload !== "boolean") throw new Error("Invalid unload value.");
             return !x.unload;
         });

@@ -12,15 +12,14 @@ export async function tripTransactionDetail(
 ) {
     const reqBody = {
         companyCode: companyCode,
-        type: "operation",
-        collection: "trip_transaction_history",
-        query: {
+        collectionName: "trip_transaction_history",
+        filter: {
             tripId: tripId
         }
     };
     try {
-        const res = await operationService.operationPost("common/getOne", reqBody).toPromise();
-        return res.data.db.data.trip_transaction_history;
+        const res = await operationService.operationMongoPost("generic/get", reqBody).toPromise();
+        return res.data;
     } catch (error) {
         console.error('Error occurred during the API call:', error);
     }
@@ -37,7 +36,7 @@ export async function updateTracking(companyCode, operationService, docketDetail
         const randomNumber = "MA/" + localStorage.getItem('Branch') + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
         const dockData = {
             tripId: docketDetails?.tripId || '',
-            id: randomNumber,
+            _id: randomNumber,
             dktNo: docketDetails?.dktNo || '',
             vehNo: docketDetails?.vehNo || '',
             route: docketDetails?.route || '',
@@ -57,12 +56,11 @@ export async function updateTracking(companyCode, operationService, docketDetail
 
         const req = {
             companyCode: companyCode,
-            type: 'operation',
-            collection: 'cnote_trackingv4',
+            collectionName: 'cnote_tracking',
             data: dockData
         };
 
-        const res = await operationService.operationPost('common/create', req).toPromise();
+        const res = await operationService.operationMongoPost('generic/create', req).toPromise();
         return res;
     } catch (error) {
         console.error('Error updating docket status:', error);
@@ -80,16 +78,15 @@ export async function updateTracking(companyCode, operationService, docketDetail
 export async function getDocketFromApiDetail(companyCode, operationService, tripId) {
     const reqBody = {
         companyCode: companyCode,
-        type: 'operation',
-        collection: 'cnote_trackingv4',
-        query: {
+        collectionName: 'cnote_tracking',
+        filter: {
             tripId: tripId,
-        },
+        }
     };
 
     try {
-        const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-        const docketDetails = res.data.db.data.cnote_trackingv4.filter((x) => x.unload === false);
+        const res = await operationService.operationMongoPost('generic/get', reqBody).toPromise();
+        const docketDetails = res.data.filter((x) => x.unload === false);
         return docketDetails;
     } catch (error) {
         console.error('Error retrieving docket details:', error);

@@ -120,10 +120,10 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   getRouteDetail() {
     let reqbody = {
       companyCode: this.companyCode,
-      type: "masters",
-      collection: "route",
+      collectionName: "route",
+      filter:{}
     };
-    this._operation.operationPost('common/getall', reqbody).subscribe({
+    this._operation.operationMongoPost('generic/get', reqbody).subscribe({
       next: (res: any) => {
         this.routeDetails = res.data;
         this.getArrivalDetails();
@@ -135,10 +135,10 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     const reqbody =
     {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_detail"
+      "collectionName": "trip_detail",
+       "filter":{}
     }
-    this._operation.operationPost('common/getall', reqbody).subscribe({
+    this._operation.operationMongoPost('generic/get', reqbody).subscribe({
       next: (res: any) => {
         if (res) {
 
@@ -168,7 +168,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
             const routeName = routeDetails?.routeName ?? 'Unnamed';
             if (element.status === "depart" || element.status === "arrival") {
               let arrivalData = {
-                "id": element?.id || "",
+                "id": element?._id || "",
                 "Route": routeCode + ":" + routeName,
                 "VehicleNo": element?.vehicleNo || '',
                 "TripID": element?.tripId || '',
@@ -200,12 +200,12 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     // Prepare request payload
     let req = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
+      collectionName: "docket",
+      filter:{}
     };
 
     // Send request and handle response
-    this._operation.operationPost("common/getall", req).subscribe({
+    this._operation.operationMongoPost("generic/get", req).subscribe({
       next: async (res: any) => {
         const boxData = res.data.filter((x) => {
           const destination = x.destination ? x.destination.split(":")[1].trim() : "";

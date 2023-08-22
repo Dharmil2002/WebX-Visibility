@@ -57,7 +57,7 @@ export class VehicleStatusControls {
                 Validations: [],
             },
             {
-                name: 'id', label: 'id', placeholder: '', type: '', value:"", generatecontrol: false, disable: false,
+                name: '_id', label: 'id', placeholder: '', type: '', value:"", generatecontrol: false, disable: false,
                 Validations: [],
             }
 

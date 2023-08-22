@@ -32,12 +32,11 @@ export async function updateTracking(companyCode, operationService, data,dktNo) 
 
     const req = {
       companyCode: companyCode,
-      type: 'operation',
-      collection: 'cnote_trackingv4',
+      collectionName: 'cnote_tracking',
       data: dockData 
     };
 
-    const res = await operationService.operationPost('common/create', req).toPromise();
+    const res = await operationService.operationMongoPost('generic/create', req).toPromise();
     return res;
   } catch (error) {
     console.error('Error updating docket status:', error);
@@ -55,16 +54,15 @@ export async function updateTracking(companyCode, operationService, data,dktNo) 
 export async function getDocketFromApiDetail(companyCode, operationService, docketNo) {
   const reqBody = {
     companyCode: companyCode,
-    type: 'operation',
-    collection: 'cnote_trackingv4',
-    query: {
+    collectionName: 'cnote_tracking',
+    filter: {
       dktNo: docketNo,
     },
   };
 
   try {
-    const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-    return res.data.db.data.cnote_trackingv4;
+    const res = await operationService.operationMongoPost('generic/get', reqBody).toPromise();
+    return res.data;
   } catch (error) {
     console.error('Error retrieving docket details:', error);
     throw error; // Rethrow the error for higher-level error handling if needed.

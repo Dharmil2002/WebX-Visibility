@@ -119,14 +119,13 @@ export class MarkArrivalComponent implements OnInit {
     }
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_transaction_history",
-      "id": tripId,
-      "updates": {
+      "collectionName": "trip_transaction_history",
+      "filter":{_id: tripId},
+      "update": {
         ...tripDetails.tripDetailForm,
       }
     }
-    this._operationService.operationPut("common/update", reqBody).subscribe({
+    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           this.updateTripData(tripId)
@@ -156,14 +155,13 @@ export class MarkArrivalComponent implements OnInit {
     }
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_detail",
-      "id": this.MarkArrivalTable.id,
-      "updates": {
+      "collectionName": "trip_detail",
+      "filter":{_id: this.MarkArrivalTable.id},
+      "update": {
         ...tripDetails
       }
     }
-    this._operationService.operationPut("common/update", reqBody).subscribe({
+    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: async (res: any) => {
         if (res) {
           if (tripDetails.status==="close") {

@@ -31,6 +31,12 @@ export class MasterService {
   masterPut(ApiURL, Request) {
     return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
+  masterMongoPost(ApiURL, Request) {
+    return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  }
+  masterMongoPut(ApiURL, Request) {
+    return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  }
   setValueheaderCode(data:string){
    this.headerCode=data
   }

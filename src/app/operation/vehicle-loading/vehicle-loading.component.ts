@@ -172,11 +172,11 @@ export class VehicleLoadingComponent implements OnInit {
   getLoadingSheetData() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "loadingSheet_detail"
+      "collectionName": "loadingSheet_detail",
+      "filter":{}
     }
     // Call the operationService to get JSON file details from 'arrivalUrl'
-    this.operationService.operationPost('common/getall', reqBody).subscribe({
+    this.operationService.operationPost('generic/get', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           this.tripDetails = res.data.filter((x) => x.tripId === this.tripData.TripID);
@@ -206,10 +206,10 @@ export class VehicleLoadingComponent implements OnInit {
   getDocketDetails() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "docket"
+      "collectionName": "docket",
+      "filter":{}
     }
-    this.operationService.operationPost('common/getall', reqBody).subscribe({
+    this.operationService.operationPost('generic/get', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
 

@@ -178,12 +178,12 @@ export class DepartureDashboardPageComponent
     // Prepare request payload
     let req = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
+      collectionName: "docket",
+      filter: {}
     };
 
     // Send request and handle response
-    this.operationService.operationPost("common/getall", req).subscribe({
+    this.operationService.operationPost("generic/get", req).subscribe({
       next: async (res: any) => {
         // Update shipmentData property with the received data
         this.shipmentData = res.data;

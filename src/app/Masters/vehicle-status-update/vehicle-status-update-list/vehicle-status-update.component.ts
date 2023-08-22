@@ -64,7 +64,7 @@ export class VehicleStatusUpdateComponent implements OnInit {
       const vehicleStatusData = await getVehicleStatusFromApi(this.companyCode, this._operationService);
       // Assuming vehicleDetail.data is an array of objects with 'id' property
       // Generate srno for each object in the array
-      const vehicleTableData = vehicleStatusData.filter((x)=>x.currentLocation.trim()===this.branchCode.trim()||x.rptLoc.trim()===this.branchCode.trim()).map((obj, index) => {
+      const vehicleTableData = vehicleStatusData.filter((x)=>x.currentLocation.trim()===this.branchCode.trim()).map((obj, index) => {
         return {
           ...obj,
           srNo: index + 1

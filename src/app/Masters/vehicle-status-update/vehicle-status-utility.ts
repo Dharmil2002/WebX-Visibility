@@ -19,12 +19,12 @@ interface VehicleData {
 export async function getVehicleStatusFromApi(companyCode, operationService) {
     const reqbody = {
         companyCode: companyCode,
-        "type": "operation",
-        "collection": "vehicle_status"
+        collectionName: "vehicle_status",
+        filter:{}
     };
 
     try {
-        const vehicleDetail = await operationService.operationPost("common/getall", reqbody).toPromise();
+        const vehicleDetail = await operationService.operationMongoPost("generic/get", reqbody).toPromise();
         // Do something with the vehicleDetail data here
         return vehicleDetail.data; // Optionally, return the vehicleDetail data
     } catch (error) {
@@ -59,12 +59,12 @@ export function getVehicleDashboardDetails(tableData: VehicleData[]) {
 export async function getLocationDetail(companyCode: number, _operationService) {
     const reqbody = {
         "companyCode": companyCode,
-        "type": "masters",
-        "collection": "location_detail"
+        "collectionName": "location_detail",
+        "filter":{}
     };
 
     try {
-        const locationData = await _operationService.operationPost("common/getall", reqbody).toPromise();
+        const locationData = await _operationService.operationMongoPost("generic/get", reqbody).toPromise();
         // Handle locationData or return it as needed
         const dropdownData = locationData.data.map(loc => { return { name: loc.locName, value: loc.locCode } })
         return dropdownData;
@@ -77,12 +77,12 @@ export async function getLocationDetail(companyCode: number, _operationService) 
 export async function getvehicleDetail(companyCode: number, _operationService) {
     const reqbody = {
         "companyCode": companyCode,
-        "type": "masters",
-        "collection": "vehicle_detail"
+        "collectionName": "vehicle_detail",
+        "filter":{}
     };
 
     try {
-        const vehicleData = await _operationService.operationPost("common/getall", reqbody).toPromise();
+        const vehicleData = await _operationService.operationMongoPost("generic/get", reqbody).toPromise();
         // Handle locationData or return it as needed
         const dropdownData = vehicleData.data.map(loc => { return { name: loc.vehicleNo, value: loc.vehicleNo } })
         return dropdownData;
@@ -95,13 +95,12 @@ export async function getvehicleDetail(companyCode: number, _operationService) {
 export async function addVehicleStatusData(companyCode: number, _operationService, data) {
     const reqbody = {
         "companyCode": companyCode,
-        "type": "operation",
-        "collection": "vehicle_status",
+        "collectionName": "vehicle_status",
         "data": data
     };
 
     try {
-        const response = await _operationService.operationPost("common/create", reqbody).toPromise();
+        const response = await _operationService.operationMongoPost("generic/create", reqbody).toPromise();
         // Handle locationData or return it as needed
         return response;
     } catch (error) {

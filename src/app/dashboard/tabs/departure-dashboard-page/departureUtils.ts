@@ -17,23 +17,21 @@ export async function fetchDepartureDetails(
   // Prepare request payload
   let req = {
     companyCode: companyCode,
-    type: "operation",
-    collection: "trip_detail",
+    collectionName: "trip_detail"
   };
   let routeReq = {
     companyCode: companyCode,
-    type: "masters",
-    collection: "route",
+    collectionName: "route"
   };
 
   try {
     // Send request and await response for  trip Detai;s
     const res: any = await operationService
-      .operationPost("common/getall", req)
+      .operationPost("generic/get", req)
       .toPromise();
     //Send Request and await response for route Details
     const routeRes: any = await operationService
-      .operationPost("common/getall", routeReq)
+      .operationPost("generic/get", routeReq)
       .toPromise();
     //End//
     // Filter departure data based on organization branch
@@ -146,7 +144,7 @@ function generateTableData(departureData: any[], routeData: any[], datePipe): an
 
     if (routeDetails) {
       let jsonDeparture = {
-        id:element?.id||"",
+        id:element?._id||"",
         RouteandSchedule: routeCode + ":" + routeName,
         VehicleNo: element?.vehicleNo || "",
         TripID: element?.tripId || "",
@@ -184,12 +182,11 @@ export function fetchShipmentData(
     // Prepare request payload
     let req = {
       companyCode: companyCode,
-      type: "operation",
-      collection: "docket",
+      collectionName: "docket"
     };
 
     // Send request and handle response
-    operationService.operationPost("common/getall", req).subscribe({
+    operationService.operationPost("generic/get", req).subscribe({
       next: (res: any) => {
         const shipmentData = res.data;
         const shipmentResult = getShipmentData(

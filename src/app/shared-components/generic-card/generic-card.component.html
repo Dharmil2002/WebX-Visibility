@@ -28,4 +28,18 @@
       </div>
     </div>
   </div>
+  <div *ngIf="kpiData" class="row clearfix dashboardcard">
+    <!-- This loop creates a box for each item in the kpiData array -->
+    <div class="col-lg-3 col-sm-3" *ngFor="let box of kpiData" [style]="style">
+      <div [class]="box.class" style="height: 80%; display: flex; align-items: center; justify-content: center;">
+        <div class="info-box7-block">
+          <h2 style="text-align: center;"><span>{{box.title}} </span>{{box.count}}
+          </h2>
+          <h2 style="text-align: center;"><span>{{box.title1}} </span>{{box.count1}}
+          </h2>
+          <h6 style="text-align: center;" class="m-b-10">{{box.Title}}</h6>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

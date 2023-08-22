@@ -41,6 +41,8 @@ import { ManageRunsheetComponent } from './tabs/manage-runsheet/manage-runsheet.
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { StocksComponent } from './stocks/stocks.component';
 import { PodCodDashboardPageComponent } from './tabs/pod-cod-dashboard-page/pod-cod-dashboard-page.component';
+import { PrqSummaryPageComponent } from './tabs/prq-summary-page/prq-summary-page.component';
+import { JobSummaryPageComponent } from './tabs/job-summary-page/job-summary-page.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +58,9 @@ import { PodCodDashboardPageComponent } from './tabs/pod-cod-dashboard-page/pod-
     PickupDelPageComponent,
     ManageRunsheetComponent,
     StocksComponent,
-    PodCodDashboardPageComponent
+    PodCodDashboardPageComponent,
+    PrqSummaryPageComponent,
+    JobSummaryPageComponent,
   ],
   imports: [
     CommonModule,

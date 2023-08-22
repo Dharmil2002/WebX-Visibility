@@ -1,3 +1,4 @@
+import { debug } from "console";
 
    /**
  * Updates tracking information for a docket.
@@ -6,13 +7,14 @@
  * @param {Object} data - The data containing docket information.
  * @returns {Promise<any>} - A Promise resolving to the API response.
  */
-export async function updateTracking(companyCode, operationService, data,dktNo) {
+export async function updateTracking(companyCode, operationService,data,dktNo) {
+  
   try {
     const docketDetails = await getDocketFromApiDetail(companyCode, operationService,dktNo);
     const lastArray=docketDetails.length-1;
     const dockData = {
       tripId:docketDetails[lastArray]?.tripId || '',
-      id:data?.mfNo,
+      _id:data?.mfNo,
       dktNo:dktNo || '',
       vehNo: docketDetails[lastArray]?.vehNo || '',
       route: docketDetails[lastArray]?.route || '',

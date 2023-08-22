@@ -430,7 +430,6 @@ export class DepartVehicleComponent implements OnInit {
     })
   }
   updateTrip() {
- 
     const next = getNextLocation(this.tripData.RouteandSchedule.split(":")[1].split("-"), this.orgBranch);
     this.next = next;
     Swal.fire({
@@ -452,7 +451,7 @@ export class DepartVehicleComponent implements OnInit {
         ...tripDetails,
       }
     }
-    this._operationService.operationPut("generic/update", reqBody).subscribe({
+    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
        

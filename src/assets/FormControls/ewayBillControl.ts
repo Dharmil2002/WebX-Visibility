@@ -216,9 +216,7 @@ export class EwayBillControls {
           {
             name: "required",
             message: "Consignor TelephoneNo is required",
-          },
-          { name: "autocomplete" },
-          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+          }
         ],
       },
       {

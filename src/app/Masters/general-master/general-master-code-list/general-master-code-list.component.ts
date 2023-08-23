@@ -69,15 +69,13 @@ export class GeneralMasterCodeListComponent {
   getGeneralDetails() {
     // Assuming tableData contains the array of objects
     let req = {
-      "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "General_master",
-      "query": {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      "collectionName": "General_master",
+      "filter": {
         "codeType": this.data?.headerCode
       }
     };
-
-    this.masterService.masterPost('common/getOne', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           this.masterService.setValueheaderCode(this.data?.headerCode);

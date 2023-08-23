@@ -42,7 +42,7 @@ export class PrqEntryPageComponent implements OnInit {
     },
   ];
   constructor(private fb: UntypedFormBuilder, private masterService: MasterService,
-    private filter: FilterUtils,private router:Router) {
+    private filter: FilterUtils, private router: Router) {
     this.initializeFormControl();
   }
 
@@ -135,11 +135,11 @@ export class PrqEntryPageComponent implements OnInit {
 
     Swal.fire({
       icon: "success",
-      title: "Generated Successfully",
+      title: "Generated Successfuly",
       text: `PRQ No: ${prqNo}`,
       showConfirmButton: true,
-    }).then((result)=>{
-      if(result.isConfirmed){
+    }).then((result) => {
+      if (result.isConfirmed) {
         this.router.navigate(['/Operation/AssignVehicle']);
       }
     });

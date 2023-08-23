@@ -104,7 +104,7 @@ export class PrqSummaryPageComponent implements OnInit {
         title: "PRQ Assigned",
         count1: 9500,
         title1: "Amount",
-        class: 'info-box7 bg-danger order-info-box7'
+        class: 'info-box7 bg-c-Bottle-light order-info-box7'
       },
       {
         Title: "Total Un-Billed",
@@ -120,7 +120,7 @@ export class PrqSummaryPageComponent implements OnInit {
         title: "PRQ Rejected",
         count1: 1000,
         title1: "Amount",
-        class: 'info-box7 bg-warning order-info-box7'
+        class: 'info-box7 bg-c-Grape-light order-info-box7'
       }
     ];
     this.getPrqDetails();

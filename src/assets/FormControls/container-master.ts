@@ -58,8 +58,8 @@ export class ContainerControl {
                 Validations: [
                     {
                         name: "pattern",
-                        message: "Please Enter Proper Length(Max 100)",
-                        pattern: '^\d*\\.?\\d+$'
+                        message: "Please Enter Proper Length(Max 100)(up to 2 decimal places)",
+                        pattern: '^([1-9][0-9]?(\.[0-9]{1,2})?|100(\.0{1,2})?)$'
                     }
                 ],
                 generatecontrol: true, disable: false
@@ -73,8 +73,8 @@ export class ContainerControl {
                 Validations: [
                     {
                         name: "pattern",
-                        message: "Please Enter Proper Width(Max 50)",
-                        pattern: '^\d*\\.?\\d+$'
+                        message: "Please Enter Proper Width(Max 50)(up to 2 decimal places)",
+                        pattern: '^([1-9][0-9]?(\.[0-9]{1,2})?|50(\.0{1,2})?)$'
                     }
                 ],
                 generatecontrol: true, disable: false
@@ -88,8 +88,8 @@ export class ContainerControl {
                 Validations: [
                     {
                         name: "pattern",
-                        message: "Please Enter Proper Height(Max 25)",
-                        pattern: '^\d*\\.?\\d+$'
+                        message: "Please Enter Proper Height(Max 25)(up to 2 decimal places)",
+                        pattern: '^([1-9][0-9]?(\.[0-9]{1,2})?|25(\.0{1,2})?)$'
                     }
                 ],
                 generatecontrol: true, disable: false

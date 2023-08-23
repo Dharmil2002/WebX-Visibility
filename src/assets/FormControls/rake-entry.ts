@@ -16,25 +16,8 @@ export class RakeEntryControl {
                 ]
             },
             {
-                name: "rakeGenerationDate",
-                label: "Rake Generation Date",
-                placeholder: "select Rake Generation Date",
-                type: "date",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: []
-            }, {
-                name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'dropdown',
-                value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                Validations: [
-                ],
-                additionalData: {
-                    showNameAndValue: false
-                }
-            }, {
-                name: 'billingParty', label: "Billing Party", placeholder: "Select Billing Party", type: 'dropdown',
-                value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'text',
+                value: 'Rail', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
                 Validations: [
                 ],
                 additionalData: {
@@ -51,14 +34,24 @@ export class RakeEntryControl {
                 Validations: [
                 ]
             }, {
-                name: 'vendorType', label: "Vendor Type", placeholder: "Select Vendor Type", type: 'dropdown',
+                name: 'vendorType', label: "Vendor Type", placeholder: "Select Vendor Type", type: 'text',
+                value: 'Attached', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
+                Validations: [
+                ],
+                additionalData: {
+                    showNameAndValue: false
+                }
+            },
+            {
+                name: 'vendorName', label: "Vendor Name", placeholder: "Select Vendor Name", type: 'dropdown',
                 value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                 ],
                 additionalData: {
                     showNameAndValue: false
                 }
-            }, {
+            },
+            {
                 name: 'fromCity', label: "From City", placeholder: "Enter From City", type: 'dropdown', value: '',
                 generatecontrol: true,
                 disable: false,
@@ -99,18 +92,10 @@ export class RakeEntryControl {
                     support: "viaControlHandler",
                     showNameAndValue: false,
                     Validations: [{
-                      name: "",
-                      message: ""
+                        name: "",
+                        message: ""
                     }]
-                  },
-            }, {
-                name: 'vendorNameAndCode', label: "Vendor Name And Code", placeholder: "Select Vendor Name And Code", type: 'dropdown',
-                value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                Validations: [
-                ],
-                additionalData: {
-                    showNameAndValue: false
-                }
+                },
             }, {
                 name: "documentType",
                 label: "Document Type",
@@ -119,7 +104,7 @@ export class RakeEntryControl {
                 value: [{ value: "CN", name: "CN Wise", select: true },
                 { value: "JOB", name: "Job Wise" }],
                 Validations: [
-                ],functions: {
+                ], functions: {
                     onSelection: "display"
                 },
                 generatecontrol: true,
@@ -156,7 +141,7 @@ export class RakeEntryControl {
                 ]
             }, {
                 name: "contractAmount",
-                label: "Contract Amount",
+                label: "Contract Amount (Rs)",
                 placeholder: "Enter Contract Amount",
                 type: "number",
                 value: "",
@@ -166,7 +151,7 @@ export class RakeEntryControl {
                 ]
             }, {
                 name: "advancedAmount",
-                label: "Advanced Amount",
+                label: "Advanced Amount (Rs)",
                 placeholder: "Enter Advanced Amount",
                 type: "number",
                 value: "",
@@ -176,7 +161,7 @@ export class RakeEntryControl {
                 ]
             }, {
                 name: "balanceAmount",
-                label: "Balance Amount",
+                label: "Balance Amount (Rs)",
                 placeholder: "Enter Balance Amount",
                 type: "number",
                 value: "",
@@ -261,7 +246,7 @@ export class RakeEntryControl {
                 Validations: [],
                 generatecontrol: false,
                 disable: true
-            },{
+            }, {
                 name: "viaControlHandler",
                 label: "Multi Via Location",
                 placeholder: "Multi Via Location",
@@ -273,22 +258,22 @@ export class RakeEntryControl {
                 generatecontrol: false,
                 disable: false,
                 Validations: [
-                  {
-                    name: "required",
-                    message: "Multi Via Location Access is Required...!",
-                  }
-                  , {
-                    name: "invalidAutocompleteObject",
-                    message: "Choose proper value",
-                  },
-                  {
-                    name: "autocomplete",
-                  }
+                    {
+                        name: "required",
+                        message: "Multi Via Location Access is Required...!",
+                    }
+                    , {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    }
                 ],
                 functions: {
-                  onToggleAll: 'toggleSelectAll',
+                    onToggleAll: 'toggleSelectAll',
                 },
-              },
+            },
         ]
     }
 

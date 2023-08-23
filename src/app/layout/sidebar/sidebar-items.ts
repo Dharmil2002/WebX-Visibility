@@ -100,9 +100,19 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": [
             {
+              "path": "Masters/ContainerMaster/ContainerMasterList",
+              "title": "Container master",
+              "moduleName": "Container master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
               "path": "Masters/StateMaster/StateMasterView",
-              "title": "State masters",
-              "moduleName": "State masters",
+              "title": "State master",
+              "moduleName": "State master",
               "icon": "",
               "class": "ml-menu",
               "groupTitle": false,
@@ -111,8 +121,8 @@ export const ROUTES: RouteInfo[] =
             },
             {
               "path": "Masters/CityMaster/CityMasterView",
-              "title": "City masters",
-              "moduleName": "City masters",
+              "title": "City master",
+              "moduleName": "City master",
               "icon": "",
               "class": "ml-menu",
               "groupTitle": false,

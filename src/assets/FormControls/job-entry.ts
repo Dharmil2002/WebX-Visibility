@@ -19,14 +19,17 @@ export class JobControl {
                 label: "Job Date",
                 placeholder: "select Job Date",
                 type: "date",
-                value: "",
+                value: new Date(),
                 generatecontrol: true,
                 disable: false,
-                Validations: []
+                Validations: [],
+                additionalData: {
+                    minDate: new Date(),
+                },
             },
             {
                 name: "weight",
-                label: "Weight",
+                label: "Weight (KGs)",
                 placeholder: "Enter weight",
                 type: "number",
                 value: "",
@@ -42,22 +45,33 @@ export class JobControl {
                     showNameAndValue: false
                 }
             }, {
-                name: 'fleetSize', label: "Fleet Size", placeholder: "Select Fleet Size", type: 'dropdown',
-                value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                name: 'vehicleSize', label: "Vehicle Size (MTs)", placeholder: "Select Vehicle Size", type: 'Staticdropdown',
+                value: [
+                    { value: '1-MT', name: '1-MT' },
+                    { value: '9-MT', name: '9-MT' },
+                    { value: '16-MT', name: '16-MT' },
+                    { value: '32-MT', name: '32-MT' }
+                ],
+                filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                 ],
                 additionalData: {
                     showNameAndValue: false
                 }
             }, {
-                name: "contactNo",
-                label: "Contact No",
-                placeholder: "Enter Contact No",
+                name: "mobileNo",
+                label: "Mobile No",
+                placeholder: "Enter Mobile No",
                 type: "number",
                 value: "",
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "pattern",
+                        message: "Please enter 10 digit mobile number",
+                        pattern: "^[0-9]{10}$",
+                    },
                 ],
             }, {
                 name: 'fromCity', label: "From City", placeholder: "Enter From City", type: 'dropdown', value: '',
@@ -105,20 +119,10 @@ export class JobControl {
                 ],
                 generatecontrol: true,
                 disable: false
-            }, {
-                name: "weightInMt",
-                label: "Weight in (MT)",
-                placeholder: "Enter Weight in (MT)",
-                type: "number",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                ]
             },
             {
                 name: "noOfPKts",
-                label: "No of Pakets",
+                label: "No of Packets",
                 placeholder: "Enter No of PKts",
                 type: "number",
                 value: "",
@@ -137,7 +141,7 @@ export class JobControl {
                 placeholder: 'Transported By',
                 type: "Staticdropdown",
                 value: [
-                    { value: 'I', name: 'By Party' },
+                    { value: 'I', name: 'Third Party' },
                     { value: 'E', name: 'Own' }
                 ],
                 Validations: [
@@ -146,16 +150,32 @@ export class JobControl {
                 disable: false
             },
             {
-                name: 'jobLocation', label: "Job Location", placeholder: "Select Job Location", type: 'dropdown',
-                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                name: "vendorName",
+                label: "Vendor Name",
+                placeholder: "Enter Vendor Name",
+                type: "text",//dropdown
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: 'jobLocation', label: "Job Location", placeholder: "Select Job Location", type: 'text',
+                value: localStorage.getItem('Branch'), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
                 Validations: [],
                 additionalData: {
                     showNameAndValue: false
                 }
             },
             {
-                name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'dropdown',
-                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                name: 'transportMode', label: "Transport Mode", placeholder: "Select Transport Mode", type: 'Staticdropdown',
+                value: [
+                    { value: 'Air', name: 'Air' },
+                    { value: 'Road', name: 'Road' },
+                    { value: 'Rail', name: 'Rail' }
+
+                ], filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [],
                 additionalData: {
                     showNameAndValue: false

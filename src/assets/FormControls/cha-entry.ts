@@ -13,16 +13,7 @@ export class ChaEntryControl {
                 disable: true,
                 Validations: [
                 ]
-            }, {
-                name: "jobDate",
-                label: "Job Date",
-                placeholder: "select Job Date",
-                type: "date",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: []
-            },
+            }, 
             {
                 name: " documentType",
                 label: " Document Type",
@@ -47,7 +38,7 @@ export class ChaEntryControl {
                 }
             }, 
             {
-                name: 'selectDocument ', label: "Select Document ", placeholder: "", type: 'file', value:"",
+                name: 'selectDocument ', label: "Job No/CN No", placeholder: "", type: 'text', value:"",
                 generatecontrol: true, disable: false,
                 Validations: [],
                 functions: {

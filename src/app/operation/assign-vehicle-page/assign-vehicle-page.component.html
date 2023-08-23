@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress>
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
     <div class="paddingdiv">
         <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
             [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"

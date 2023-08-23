@@ -16,11 +16,11 @@ export class PrqEntryControls {
                 Validations: [],
             },
             {
-                name: "prqDate",
-                label: "PRQ Date",
-                placeholder: "PRQ Date",
+                name: "pickupDate",
+                label: "PickUp Date",
+                placeholder: "PickUp Date",
                 type: "date",
-                value: "",
+                value: new Date(),
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
@@ -29,7 +29,7 @@ export class PrqEntryControls {
                 Validations: [
                     {
                         name: "required",
-                        message: "PRQ Date is required",
+                        message: "Pickup Date is required",
                     },
                 ],
                 additionalData: {
@@ -37,22 +37,13 @@ export class PrqEntryControls {
                 },
             },
             {
-                name: "weight",
-                label: "Weight",
-                placeholder: "Weight",
-                type: "number",
-                value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Weight is required",
-                    },
-                ],
+                name: 'pickUpTime',
+                label: 'Pickup Time',
+                placeholder: '',
+                type: 'time',
+                value: new Date(),
+                Validations: [],
+                generatecontrol: true, disable: false
             },
             {
                 name: "billingParty",
@@ -84,35 +75,6 @@ export class PrqEntryControls {
 
             },
             {
-                name: "fleetSize",
-                label: "Fleet Size",
-                placeholder: "Fleet Size",
-                type: "dropdown",
-                value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Fleet Size is required",
-                    },
-                    // {
-                    //     name: "autocomplete"
-                    // },
-                    // {
-                    //     name: "invalidAutocompleteObject",
-                    //     message: "Choose proper value",
-                    // }
-                ],
-                additionalData: {
-                    showNameAndValue: true,
-                }
-
-            },
-            {
                 name: "contactNo",
                 label: "Contact No",
                 placeholder: "Contact No",
@@ -124,6 +86,11 @@ export class PrqEntryControls {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
+                    {
+                        name: "pattern",
+                        message: "Please enter 10 digit mobile number",
+                        pattern: "^[0-9]{10}$",
+                    },
                     {
                         name: "required",
                         message: "Contact No is required",
@@ -190,11 +157,16 @@ export class PrqEntryControls {
                 },
             },
             {
-                name: "ftlType",
-                label: "FTL Type",
-                placeholder: "FTL Type",
-                type: "dropdown",
-                value: "",
+                name: "vehicleSize",
+                label: "Vehicle Size",
+                placeholder: "Vehicle Size",
+                type: "Staticdropdown",
+                value: [
+                    { value: '1-MT', name: '1-MT' },
+                    { value: '9-MT', name: '9-MT' },
+                    { value: '16-MT', name: '16-MT' },
+                    { value: '32-MT', name: '32-MT' }
+                ],
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
@@ -205,21 +177,18 @@ export class PrqEntryControls {
                     showNameAndValue: false,
                 },
             },
-            {
-                name: 'pickUpTime',
-                label: 'Pickup Date & Time',
-                placeholder: '',
-                type: 'time',
-                value: new Date(),
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
+
             {
                 name: "prqBranch",
                 label: "PRQ Branch",
                 placeholder: "PRQ Branch",
-                type: "dropdown",
-                value: "",
+                type: "Staticdropdown",
+                value: [
+                    { value: 'MUMBAI', name: 'MUMBAI' },
+                    { value: 'DELHI', name: 'DELHI' },
+                    { value: 'KOLKATA', name: 'KOLKATA' }
+
+                ],
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
@@ -234,8 +203,13 @@ export class PrqEntryControls {
                 name: "transMode",
                 label: "Transport Mode",
                 placeholder: "Transport Mode",
-                type: "dropdown",
-                value: "",
+                type: "Staticdropdown",
+                value: [
+                    { value: 'Air', name: 'Air' },
+                    { value: 'Road', name: 'Road' },
+                    { value: 'Rail', name: 'Rail' }
+
+                ],
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",

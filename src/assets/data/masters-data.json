@@ -4202,8 +4202,8 @@
       "fromCity": "Gurgaon",
       "toCity": "Kolkatta",
       "currentLocation": "Asansol",
-      "distance": "210 KM",
-      "ftlType": "20 MT",
+      "distance": 210,
+      "vehicleSize": 20,
       "action": "Assign"
     },
     {
@@ -4211,8 +4211,8 @@
       "fromCity": "Guwahati",
       "toCity": "Kolkatta",
       "currentLocation": "New Jalpaiguri",
-      "distance": "615 KM",
-      "ftlType": "18 MT",
+      "distance": 615,
+      "vehicleSize": 18,
       "action": "Assign"
     },
     {
@@ -4220,8 +4220,8 @@
       "fromCity": "Mumbai",
       "toCity": "Kolkatta",
       "currentLocation": "Srirampur",
-      "distance": "20 KM",
-      "ftlType": "16 MT",
+      "distance": 20,
+      "vehicleSize": 16,
       "action": "Assign"
     },
     {
@@ -4229,8 +4229,8 @@
       "fromCity": "Bhubneswar",
       "toCity": "Kolkatta",
       "currentLocation": "Panihati",
-      "distance": "13 KM",
-      "ftlType": "16 MT",
+      "distance": 13,
+      "vehicleSize": 16,
       "action": "Assign"
     },
     {
@@ -4238,8 +4238,8 @@
       "fromCity": "Siliguri",
       "toCity": "Kolkatta",
       "currentLocation": "Baranagar",
-      "distance": "8 KM",
-      "ftlType": "20 MT",
+      "distance": 8,
+      "vehicleSize": 20,
       "action": "Assign"
     }
   ]

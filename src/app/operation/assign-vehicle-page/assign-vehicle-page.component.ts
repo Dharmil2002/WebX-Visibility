@@ -16,6 +16,13 @@ export class AssignVehiclePageComponent implements OnInit {
     edit: true,
     csv: false,
   };
+  breadScrums = [
+    {
+      title: "Available Vehicle for Assignment",
+      items: ["Home"],
+      active: "Vehicle Assign",
+    },
+  ];
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
 
@@ -41,14 +48,14 @@ export class AssignVehiclePageComponent implements OnInit {
       Style: "min-width:200px",
     },
     distance: {
-      Title: "Distance",
-      class: "matcolumnleft",
-      Style: "min-width:80px",
+      Title: "Distance (KMs)",
+      class: "matcolumncenter",
+      Style: "min-width:40px",
     },
-    ftlType: {
-      Title: "FTL Type",
-      class: "matcolumnleft",
-      Style: "min-width:80px",
+    vehicleSize: {
+      Title: "Vehicle Size (MTs)",
+      class: "matcolumncenter",
+      Style: "min-width:100px",
     },
     action: {
       Title: "Action",
@@ -63,7 +70,7 @@ export class AssignVehiclePageComponent implements OnInit {
     "toCity",
     "currentLocation",
     "distance",
-    "ftlType"
+    "vehicleSize"
   ];
   linkArray = [
     { Row: 'action' }

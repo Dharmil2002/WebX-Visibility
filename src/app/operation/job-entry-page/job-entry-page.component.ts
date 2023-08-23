@@ -33,13 +33,13 @@ export class JobEntryPageComponent implements OnInit {
   cityData: any;
   breadScrums = [
     {
-      title: "Job Entry Master",
+      title: "Job Entry",
       items: ["Home"],
-      active: "Job Entry Master",
+      active: "Job Entry",
     },
   ];
 
-  constructor(private Route: Router, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) {
+  constructor(private router: Router, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) {
     this.initializeFormControl();
   }
 
@@ -116,22 +116,22 @@ export class JobEntryPageComponent implements OnInit {
     });
   }
   save() {
-    this.jobEntryTableForm.controls["billingParty"].setValue(this.jobEntryTableForm.value.billingParty);
-    this.jobEntryTableForm.controls["fleetSize"].setValue(this.jobEntryTableForm.value.fleetSize);
-    this.jobEntryTableForm.controls["fromCity"].setValue(this.jobEntryTableForm.value.fromCity);
-    this.jobEntryTableForm.controls["toCity"].setValue(this.jobEntryTableForm.value.toCity.value);
-    this.jobEntryTableForm.controls["jobLocation"].setValue(this.jobEntryTableForm.value.jobLocation);
-    this.jobEntryTableForm.controls["transportMode"].setValue(this.jobEntryTableForm.value.transportMode);
+    const thisYear = new Date().getFullYear();
+    const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
     const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-    let jeNo = `JE${dynamicValue}${paddedNumber}`;
+    let jeNo = `JE/${dynamicValue}/${financialYear}/${paddedNumber}`;
     Swal.fire({
       icon: "success",
-      title: "Generated SuccesFully",
+      title: "Generated Successfuly",
       text: "Job Entry No: " + jeNo,
       showConfirmButton: true,
-    })
+    }).then((result)=>{
+      if(result.isConfirmed){
+        this.router.navigate(['/Operation/CHAEntry']);
+      }
+    });
   }
 
   cancel() {

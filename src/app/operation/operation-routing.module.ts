@@ -13,6 +13,11 @@ import { VehicleLoadingComponent } from "./vehicle-loading/vehicle-loading.compo
 import { ViewPrintComponent } from "./view-print/view-print.component";
 import { QuickBookingComponent } from './quick-booking/quick-booking.component';
 import { DocketTrackingComponent } from "./docket-tracking/docket-tracking.component";
+import { PrqEntryPageComponent } from "./prq-entry-page/prq-entry-page.component";
+import { JobEntryPageComponent } from "./job-entry-page/job-entry-page.component";
+import { AssignVehiclePageComponent } from "./assign-vehicle-page/assign-vehicle-page.component";
+import { RakeEntryPageComponent } from "./rake-entry-page/rake-entry-page.component";
+import { ChaEntryPageComponent } from "./cha-entry-page/cha-entry-page.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -51,21 +56,41 @@ const routes: Routes = [
     component: UpdateRunSheetComponent,
   },
   {
-    path:"VehicleLoading",
-    component:VehicleLoadingComponent
+    path: "VehicleLoading",
+    component: VehicleLoadingComponent
   },
   {
-    path:"ViewPrint",
-    component:ViewPrintComponent
+    path: "ViewPrint",
+    component: ViewPrintComponent
   },
   {
-    path:"QuickCreateDocket",
-    component:QuickBookingComponent
+    path: "QuickCreateDocket",
+    component: QuickBookingComponent
   },
   {
-    path:"DocketTracking",
-    component:DocketTrackingComponent
-  }
+    path: "DocketTracking",
+    component: DocketTrackingComponent
+  },
+  {
+    path: "PRQEntry",
+    component: PrqEntryPageComponent
+  },
+  {
+    path: "JobEntry",
+    component: JobEntryPageComponent
+  },
+  {
+    path: "AssignVehicle",
+    component: AssignVehiclePageComponent
+  },
+  {
+    path: "RakeEntry",
+    component: RakeEntryPageComponent
+  },
+  {
+    path: "CHAEntry",
+    component: ChaEntryPageComponent
+  },
 ]
 
 @NgModule({

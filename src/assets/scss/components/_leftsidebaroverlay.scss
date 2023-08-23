@@ -577,24 +577,24 @@
     .menu .list {
       li {
         a:hover {
-          color: #14b3cf;
+          color: #03a9f3;
         }
         &.active {
           background-color: $theme-white-menu-list-active;
           .sidebarIcon .feather {
-            color: #14b3cf;
+            color:#03a9f3!important;
           }
           > :first-child {
             i,
             span {
-              color: #14b3cf;
+              color: #03a9f3;
             }
           }
         }
       }
       .active .menu-toggle {
         background: #f0f3fb;
-        color: $theme-white-active-color;
+        color: #03a9f3;
       }
 
       .ml-menu .active a {
@@ -620,7 +620,7 @@
         color: #e6e6e6;
 
         :hover {
-          background-color: $theme-black-menu-list-active;
+          background-color: #03a9f3;
         }
 
         span {
@@ -630,7 +630,7 @@
           color: #e6e6e6;
         }
         .sidebarIcon .feather {
-          color: #14b3cf;
+          color: #e6e6e6;
         }
       }
 
@@ -645,22 +645,22 @@
       .active {
         .menu-toggle {
           background-color: rgba(0, 0, 0, 0.4);
-          color: #14b3cf;
+          color: #03a9f3;
         }
       }
 
       li {
         &.active {
-          background-color: #14b3cf;
+          background-color: $theme-black-menu-list-active;
 
           > :first-child {
             i,
             span {
-              color: #14b3cf;
+              color: $theme-black-active-color;
             }
           }
           .sidebarIcon .feather {
-            color:#14b3cf;
+            color: #03a9f3!important;
           }
           .menu-top {
             background-color: rgba(0, 0, 0, 0.4);
@@ -668,34 +668,34 @@
         }
 
         a:hover {
-          color: #14b3cf;
+          color: #03a9f3;
         }
         &.active {
-          background-color: #14b3cf;
+          background-color: #03a9f3;
           .sidebarIcon .feather {
-            color: #14b3cf;
+            color:#03a9f3!important;
           }
           > :first-child {
             i,
             span {
-              color: #14b3cf;
+              color: #03a9f3;
             }
           }
         }
       }
 
       .ml-menu {
-        background-color: #14b3cf;
+        background-color: $theme-black-menu-list-submenu;
 
         li.active a.toggled:not(.menu-toggle):before {
-          background-color:#14b3cf;
-          border-color: #14b3cf;
+          background-color: $theme-black-active-color;
+          border-color: $theme-black-active-color;
         }
       }
     }
 
     .active .menu-toggle.toggled:after {
-      color: #14b3cf;
+      color: $theme-black-active-color;
     }
   }
 
@@ -782,7 +782,7 @@
   margin: auto;
 
   a {
-    color: #14b3cf;
+    color: #aaadb7;
 
     &:hover {
       background-color: transparent !important;
@@ -795,7 +795,7 @@
 }
 .sidebarIcon {
   .feather {
-    color: #14b3cf(76, 175, 80);
+    color:#03a9f3;
     height: 18px !important;
     width: 18px !important;
     text-align: center;

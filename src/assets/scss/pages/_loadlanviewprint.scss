@@ -1,0 +1,77 @@
+.unique-class {
+    display: none !important;
+    overflow: hidden;
+}
+
+.page-with-hidden-navbar {
+    display: none !important;
+}
+
+.LoadPlanViewPrint {
+    .companylogo {
+        max-height: 110px;
+        width: 25%;
+        float: right;
+    }
+    .noborder {
+        border: 0 !important;
+        width: fit-content;
+
+    }
+
+   .border{
+    border: 1px solid black !important;
+    padding: 2px;
+   }
+
+    .table-bordered {
+        border-top: 1px solid black;
+
+        tbody {
+            tr {
+
+                td,
+                th {
+                    padding: 2px;
+                    color: black;
+                    font-size: 14px;
+                    border: 1px solid black;
+                }
+            }
+        }
+    }
+
+    .LPDetails {
+        color: black;
+        font-size: 14px;
+        font-weight: BOLD;
+    }
+
+    /* by default, allow page breaks within the container */
+    .container {
+        display: block;
+    }
+
+    #myTable td:nth-child(2) {
+        width: 80px;
+        white-space: nowrap;
+    }
+
+    @media print {
+        #myTable td:nth-child(5) {
+            width: 120px;
+        }
+        // #myTable td:nth-child(1) {
+        //     width: 80px;
+        // }
+    }
+
+    table {
+        //display: block;
+        padding: 0;
+        margin: 0;
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+    }
+}

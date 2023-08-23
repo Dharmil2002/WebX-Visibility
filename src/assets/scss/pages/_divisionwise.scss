@@ -1,0 +1,35 @@
+.divisionwise {
+
+  .table {
+    border-top: 1px solid white !important;
+    border-left: 1px solid white !important;
+    border-right: 1px solid white !important;
+    text-align: center;
+    border-bottom: 1px solid black;
+    color: black;
+    font-size: 13.7px;
+    display: inline-table;
+    width: 100%;
+
+  }
+
+  mat-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .border {
+    td,
+    th {
+      padding: 10px;
+      color: black;
+      font-size: 14.3px;
+      border: 1px solid black;
+
+    }
+  }
+
+
+
+
+}

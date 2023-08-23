@@ -32,18 +32,58 @@ export class VehicleLoadingComponent implements OnInit {
   maxWidth: '232vw';
 
   columnHeader = {
-    "LoadingSheet": "Loading Sheet",
-    "Manifest": "Manifest",
-    "Leg": "Leg",
-    "Shipments": "Shipments",
-    "Packages": "Packages",
-    "ShipmentsLoaded": "ShipmentsLoaded",
-    "PackagesLoaded": "PackagesLoaded",
-    "Pending": "Pending",
-    "Action": "Action",
-    "printPending": "Print"
+    LoadingSheet: {
+      Title:"Loading Sheet",
+      class: "matcolumnleft",
+      Style: "min-width:200px",
+    },
+    Manifest: {
+      Title: "Manifest",
+      class: "matcolumnleft",
+      Style: "min-width:80px",
+    },
+    Leg: {
+      Title: "Leg",
+      class: "matcolumnleft",
+      Style: "min-width:200px",
+    },
+    ShipmentsLoaded: {
+      Title: "ShipmentsLoaded",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+    PackagesLoaded: {
+      Title: "PackagesLoaded",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+    Pending: {
+      Title: "Pending",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+  
+    Action: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+    printPending: {
+      Title: "Hrs",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
   };
-
+  staticField = [
+    "LoadingSheet",
+    "Manifest",
+    "Leg",
+    "Shipments",
+    "Packages",
+    "ShipmentsLoaded",
+    "PackagesLoaded",
+    "Pending"
+  ];
   centerAlignedData = ['Shipments', 'Packages', 'ShipmentsLoaded', 'PackagesLoaded', 'Pending'];
 
   // Declaring Csv File's Header as key and value Pair
@@ -132,11 +172,11 @@ export class VehicleLoadingComponent implements OnInit {
   getLoadingSheetData() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "loadingSheet_detail"
+      "collectionName": "loadingSheet_detail",
+      "filter":{}
     }
     // Call the operationService to get JSON file details from 'arrivalUrl'
-    this.operationService.operationPost('common/getall', reqBody).subscribe({
+    this.operationService.operationPost('generic/get', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           this.tripDetails = res.data.filter((x) => x.tripId === this.tripData.TripID);
@@ -166,10 +206,10 @@ export class VehicleLoadingComponent implements OnInit {
   getDocketDetails() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "docket"
+      "collectionName": "docket",
+      "filter":{}
     }
-    this.operationService.operationPost('common/getall', reqBody).subscribe({
+    this.operationService.operationPost('generic/get', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
 

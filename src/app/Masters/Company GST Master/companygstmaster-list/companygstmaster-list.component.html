@@ -1,9 +1,24 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
-    <form [formGroup]="CompanyGSTTableForm">
-        <app-form-webxpress [form]="CompanyGSTTableForm" [formData]="jsonControlArray"
-            (functionCallEmitter)="functionCaller($event)" [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-6" style="margin-bottom: 0px;">
+            <form [formGroup]="companyGstTableForm">
+                <app-form-webxpress [form]="companyGstTableForm" [formData]="jsonControlArray"
+                    (functionCallEmitter)="functionCaller($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6" style="margin-bottom: 0px;">
+            <div class="row mt-2">
+                <div class="row" align="end">
+                    <div class="example-button-row">
+                        <button type="button" mat-raised-button color="primary" (click)="addUpdate()">
+                            Add/Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Loading Generic table as parent component and passing  required data-->
     <!--
         columnHeader: a object that contains only that pair of column id:title that are to be shown on dashBoard.

@@ -55,6 +55,7 @@ roleId: any;
   userPwd: any;
   userTypeValue: any;
   userStatusData: any;
+  userpassword: any;
 
   constructor(UserMaster) {
     {

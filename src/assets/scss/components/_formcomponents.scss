@@ -1,12 +1,23 @@
-@import "ng-pick-datetime/assets/style/picker.min.css";
+@import "~ng-pick-datetime/assets/style/picker.min.css";
 .example-form {
   min-width: 150px;
   max-width: 500px;
   width: 100%;
 }
 
+.toggle {
+  margin-left: 16px !important;
+}
 .example-full-width {
   width: 100%;
+}
+.togglecls {
+  margin-top: 23px !important;
+  margin-left: -16px !important;
+}
+.togglemb {
+  margin-left: 19px !important;
+  margin-top: 23px !important;
 }
 .example-h2 {
   margin: 10px;
@@ -50,11 +61,33 @@
   width: 1.4em !important;
 }
 .mat-form-field {
+  margin: 10px !important;
+  font-size: 12px !important;
+  height: 44.5px !important;
   .date-icon {
     cursor: pointer;
   }
 }
+.Orbutton {
+  margin-top: -10px;
+  position: absolute;
+  top: 30%;
+}
+
+.Savebutton {
+  margin-top: -10px;
+
+  position: absolute;
+
+  top: 30%;
+}
 .mat-form-field-prefix,
 .mat-form-field-suffix {
   color: rgba(0, 0, 0, 0.54);
+}
+
+.datepickercss {
+  mat-label {
+    font-size: 15px !important;
+  }
 }

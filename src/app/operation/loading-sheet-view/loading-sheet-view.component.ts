@@ -105,11 +105,11 @@ Currently, all flows are working together without proper separation.
   getLoadingSheetDetails() {
     const req = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
+      collectionName: "docket",
+      filter:{}
     };
     // Retrieve arrival data from the operation service
-    this.operationService.operationPost('common/getall', req).subscribe(res => {
+    this.operationService.operationMongoPost('generic/get', req).subscribe(res => {
       const shipingDetails = res.data;
       let tableArray = shipingDetails.filter((x) => {
         const orgLoc = x.orgLoc ? x.orgLoc.toLowerCase().trim() : '';

@@ -1,0 +1,71 @@
+.sidebar {
+    display: none !important;
+}
+
+.LoadPlanViewPrint {
+    .companylogo {
+        // border: 1px solid white !important;
+        // text-align: right;
+        // padding-right: 50px;
+        // vertical-align: middle;
+        // border-style: none;
+        // max-height: 163px;
+        // max-width: 238px;
+        // vertical-align: middle
+        border: 1px solid white !important;
+        text-align: right;
+        padding-right: 50px;
+        border-style: none;
+        max-height: 160px;
+        width: -moz-fit-content;
+        width: 33%;
+    }
+
+    .LPHeading {
+        border-top: 1px solid white !important;
+        border-left: 1px solid white !important;
+        border-right: 1px solid white !important;
+        text-align: center;
+        border-bottom: 1px solid black;
+        color: black;
+        font-size: 13.7px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-bordered {
+        border-top: 1px solid black;
+
+        tbody {
+            tr {
+
+                td,
+                th {
+                    padding: 10px;
+                    color: black;
+                    font-size: 14.3px;
+                    border: 1px solid black;
+                }
+            }
+        }
+
+        thead {
+            tr {
+                th {
+                    padding: 10px;
+                    color: black;
+                    border: 1px solid bl;
+                }
+            }
+        }
+    }
+
+    .LPDetails {
+        color: black;
+        font-size: 14.3px;
+        font-weight: BOLD;
+    }
+}

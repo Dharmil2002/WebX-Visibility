@@ -1,12 +1,12 @@
 export async function getCity(companyCode, masterService) {
     const req = {
       companyCode: companyCode,
-      type: "masters",
-      collection: "city_detail",
+      collectionName: "city_detail",
+      filter:{}
     };
   
     try {
-      const res: any = await masterService.masterPost("common/getall", req).toPromise();
+      const res: any = await masterService.masterMongoPost("generic/get",req).toPromise();
       if (res && res.data) {
         const city = res.data
           .map((x) => ({ name: x.cityName, value: x.cityName }))

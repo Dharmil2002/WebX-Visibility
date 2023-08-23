@@ -11,11 +11,10 @@
         csvFileName : Name of the csv File.
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
-<div class="verticalScrollbar">
-    <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="tableData"
-        [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
-        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" (dialogClosed)="dailogData($event)">
-    </generic-table-webxpress>
-</div>
+    <div class="verticalScrollbar">
+        <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+            [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+            [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray">
+        </app-generic-table-v2>
+    </div>
 </div>

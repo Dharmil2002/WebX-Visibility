@@ -9,6 +9,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { Subject, take, takeUntil } from "rxjs";
+import { handleFileSelection } from "../vendor-utility";
 
 @Component({
   selector: 'app-add-vendor-master',
@@ -73,79 +74,62 @@ export class AddVendorMasterComponent implements OnInit {
   constructor(
     private route: Router, private fb: UntypedFormBuilder, private filter: FilterUtils, private masterService: MasterService,) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.vendorTabledata = route.getCurrentNavigation().extras.state.data;
-      this.action = 'edit'
+      this.vendorTabledata = this.route.getCurrentNavigation().extras.state.data;
+      this.action = 'edit';
       this.isUpdate = true;
     } else {
-      this.action = "Add";
+      this.action = 'Add';
     }
-    if (this.action === 'edit') {
-      this.isUpdate = true;
-      this.breadScrums = [
-        {
-          title: "Vendor Master",
-          items: ["Home"],
-          active: "Edit Vendor",
-        },
-      ];
-    } else {
-      this.breadScrums = [
-        {
-          title: "Vendor Master",
-          items: ["Home"],
-          active: "Add Vendor",
-        },
-      ];
+    const activeTitle = this.action === 'edit' ? 'Edit Vendor' : 'Add Vendor';
+    this.breadScrums = [
+      {
+        title: 'Vendor Master',
+        items: ['Home'],
+        active: activeTitle,
+      },
+    ];
+
+    if (this.action !== 'edit') {
       this.vendorTabledata = new VendorMaster({});
     }
     this.initializeFormControl()
-    this.isUpdate ? this.vendorTableForm.controls["vendorType"].setValue(this.vendorTabledata.vendorType) : "";
   }
   initializeFormControl() {
-    // Create vendorFormControls instance to get form controls for different sections
     const vehicleFormControls = new VendorControl(this.vendorTabledata, this.isUpdate);
     this.jsonControlVendorArray = vehicleFormControls.getVendorFormControls();
     this.jsonControlVendorOtherInfoArray = vehicleFormControls.getVendorOtherInfoFormControls();
+    const vendorPropertyMap = {
+      'vendorType': { property: 'vendorType', statusProperty: 'vendorTypeStatus' },
+      'vendorLocation': { property: 'vLocation', statusProperty: 'vLocationStatus' },
+      'vendorPinCode': { property: 'vendorPinCode', statusProperty: 'vendorPinCodeStatus' },
+    };
+    const otherInfoPropertyMap = {
+      'tdsSection': { property: 'tdsSection', statusProperty: 'tdsSectionStatus' },
+      'tdsType': { property: 'tdsType', statusProperty: 'tdsTypeStatus' },
+      'lspName': { property: 'lspName', statusProperty: 'lspNameStatus' },
+    };
     this.jsonControlVendorArray.forEach(data => {
-      if (data.name === 'vendorType') {
-        // Set vendorType related variables
-        this.vendorType = data.name;
-        this.vendorTypeStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === 'vendorLocation') {
-        // Set vendorLocation related variables
-        this.vLocation = data.name;
-        this.vLocationStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === 'vendorPinCode') {
-        // Set vendorPinCode related variables
-        this.vendorPinCode = data.name;
-        this.vendorPinCodeStatus = data.additionalData.showNameAndValue;
+      const mapping = vendorPropertyMap[data.name];
+      if (mapping) {
+        this[mapping.property] = data.name;
+        this[mapping.statusProperty] = data.additionalData.showNameAndValue;
       }
     });
     this.jsonControlVendorOtherInfoArray.forEach(data => {
-      if (data.name === 'tdsSection') {
-        // Set tdsSection related variables
-        this.tdsSection = data.name;
-        this.tdsSectionStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === 'tdsType') {
-        // Set tdsType related variables
-        this.tdsType = data.name;
-        this.tdsTypeStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === 'lspName') {
-        // Set lspName related variables
-        this.lspName = data.name;
-        this.lspNameStatus = data.additionalData.showNameAndValue;
+      const mapping = otherInfoPropertyMap[data.name];
+      if (mapping) {
+        this[mapping.property] = data.name;
+        this[mapping.statusProperty] = data.additionalData.showNameAndValue;
       }
     });
     this.accordionData = {
       "Vendor Details": this.jsonControlVendorArray,
       "Vendor Other Details": this.jsonControlVendorOtherInfoArray,
     };
-    // Build the form group using formGroupBuilder function and the values of accordionData
     this.vendorTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
+    this.vendorTableForm.controls['select'].setValue(this.vendorTabledata?.select || '');
+    this.displayTds();
+    this.displayCp();
   }
   getDropDownData() {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
@@ -159,7 +143,6 @@ export class AddVendorMasterComponent implements OnInit {
       this.tdsSectionData = tdsSectionDropdown;
       this.tdsTypeData = tdsTypeDropdown;
       this.lspNameData = lspNameDropdown;
-
       if (this.isUpdate) {
         this.vendorTypDetail = this.findDropdownItemByName(this.vendorTypeData, this.vendorTabledata.vendorType);
         this.vendorTableForm.controls.vendorType.setValue(this.vendorTypDetail);
@@ -176,7 +159,6 @@ export class AddVendorMasterComponent implements OnInit {
         this.vendorTableForm.controls["tdsSectionDropdown"].patchValue(this.tdsSectionData.filter((element) =>
           this.vendorTabledata.tdsSection.includes(element.name)))
       }
-
       const filterParams = [
         [this.jsonControlVendorArray, this.vendorTypeData, this.vendorType, this.vendorTypeStatus],
         [this.jsonControlVendorOtherInfoArray, this.tdsSectionData, this.tdsSection, this.tdsSectionStatus],
@@ -192,117 +174,44 @@ export class AddVendorMasterComponent implements OnInit {
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }
-  selectedFileForTdsDocument(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      this.SelectFile = file;
-      this.imageName = file.name;
-      this.selectedFiles = true;
-      this.vendorTableForm.controls["tdsDocument"].setValue(this.SelectFile.name);
-    } else {
-      this.selectedFiles = false;
-      Swal.fire({
-        icon: "warning",
-        title: "Alert",
-        text: "Please select a file.",
-        showConfirmButton: true,
-      });
+  selectHandleFileSelection(data, allowedExtensions) {
+    switch (data.field.name) {
+      case 'tdsDocument':
+        allowedExtensions = ["xls", "xlsx", "csv"];
+        break;
+      case 'cancelCheque':
+        allowedExtensions = ["jpeg", "png", "jpg"];
+        break;
+      case 'pdfFileUpload':
+        allowedExtensions = ["pdf"];
+        break;
+      case 'reliableDocument':
+        allowedExtensions = [];
+        break;
+      default:
+        allowedExtensions = [];
+        break;
     }
-  }
-  selectedFileForCancelCheque(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.vendorTableForm.controls["cancelCheque"].setValue(this.SelectFile.name);
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a CSV, JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
-  }
-  selectedFileForPdfFile(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["pdf"];
-      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.vendorTableForm.controls["pdfFileUpload"].setValue(this.SelectFile.name);
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a PDF`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      Swal.fire({
-        icon: "warning",
-        title: "Alert",
-        text: "Please select a file.",
-        showConfirmButton: true,
-      });
-    }
-  }
-  selectedFileForReliableDocument(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      this.SelectFile = file;
-      this.imageName = file.name;
-      this.selectedFiles = true;
-      this.vendorTableForm.controls["reliableDocument"].setValue(this.SelectFile.name);
-    } else {
-      this.selectedFiles = false;
-      Swal.fire({
-        icon: "warning",
-        title: "Alert",
-        text: "Please select a file.",
-        showConfirmButton: true,
-      });
-    }
+    handleFileSelection(data, data.field.name, allowedExtensions, this.vendorTableForm);
   }
   displayTds() {
     const generateControl = this.vendorTableForm.value.tdsApplicable === true;
-
     this.jsonControlVendorOtherInfoArray.forEach(data => {
-      if (data.name === 'tdsSection' || data.name === 'tdsRate' || data.name === 'tdsType') {
+      if (data.name === 'tdsSection' || data.name === 'tdsSectionDropdown' || data.name === 'tdsRate' || data.name === 'tdsType') {
         data.generatecontrol = generateControl;
-
         // Get the corresponding form control
         const formControl = this.vendorTableForm.get(data.name);
-
         // Clear existing validators before adding the required validator
         formControl.clearValidators();
-
         if (generateControl) {
-          // Add the required validator if generateControl is true
-          formControl.setValidators([Validators.required]);
+          if (data.name !== 'tdsSection') {
+            // Add the required validator if generateControl is true
+            formControl.setValidators([Validators.required])
+          }
         }
-
+        if (!this.isUpdate) {
+          formControl.setValue("");
+        }
         // Update the form control's validation status
         formControl.updateValueAndValidity();
       }
@@ -332,7 +241,6 @@ export class AddVendorMasterComponent implements OnInit {
         ));
         this.pincodeData = this.pincodeResponse.data.map((x) => { { return { name: x.pincode, value: x.pincode } } }).find((x) => x.name == this.vendorTabledata.vendorPinCode);
         this.vendorTableForm.controls.vendorPinCode.setValue(this.pincodeData);
-
       }
       this.filter.Filter(this.jsonControlVendorArray, this.vendorTableForm, locationBranchList, this.vLocation, this.vLocationStatus);
     } catch (error) {
@@ -367,9 +275,11 @@ export class AddVendorMasterComponent implements OnInit {
       }
     }
   }
-
   save() {
     const formValue = this.vendorTableForm.value;
+    if (Array.isArray(this.vendorTableForm.value.select)) {
+      this.vendorTableForm.controls['select'].setValue('');
+    }
     const controlNames = [
       "vendorType",
       "tdsType",
@@ -493,7 +403,6 @@ export class AddVendorMasterComponent implements OnInit {
       });
   }
   //#endregion
-
   displayCp() {
     this.jsonControlVendorOtherInfoArray.forEach(data => {
       if (data.name === 'cpCode') {
@@ -501,5 +410,4 @@ export class AddVendorMasterComponent implements OnInit {
       }
     });
   }
-
 }

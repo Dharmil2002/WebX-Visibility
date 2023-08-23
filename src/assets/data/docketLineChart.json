@@ -1,0 +1,52 @@
+[
+    {
+      "DateTime": "01-04-2023",
+      "DocketCount": 180,
+      "DocketWeight": 4448
+    },
+    {
+      "DateTime": "02-04-2023",
+      "DocketCount": 282,
+      "DocketWeight": 1550
+    },
+    {
+      "DateTime": "03-04-2023",
+      "DocketCount": 213,
+      "DocketWeight": 2651
+    },
+    {
+      "DateTime": "04-04-2023",
+      "DocketCount": 288,
+      "DocketWeight": 1264
+    },
+    {
+      "DateTime": "05-04-2023",
+      "DocketCount": 276,
+      "DocketWeight": 2239
+    },
+    {
+      "DateTime": "06-04-2023",
+      "DocketCount": 197,
+      "DocketWeight": 3900
+    },
+    {
+      "DateTime": "07-04-2023",
+      "DocketCount": 118,
+      "DocketWeight": 2125
+    },
+    {
+      "DateTime": "08-04-2023",
+      "DocketCount": 157,
+      "DocketWeight": 1757
+    },
+    {
+      "DateTime": "09-04-2023",
+      "DocketCount": 130,
+      "DocketWeight": 2671
+    },
+    {
+      "DateTime": "10-04-2023",
+      "DocketCount": 145,
+      "DocketWeight": 3687
+    }
+   ]

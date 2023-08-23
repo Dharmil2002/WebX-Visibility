@@ -1,0 +1,7 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="jobEntryTableForm">
+        <app-form-webxpress [form]="jobEntryTableForm" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

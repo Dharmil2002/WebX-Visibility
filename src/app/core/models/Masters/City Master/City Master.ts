@@ -13,6 +13,7 @@ export class CityMaster {
   zone: any;
   entryBy: any;
   odaFlag: any;
+  userpassword: any;
 
   constructor(CityMaster) {
     {

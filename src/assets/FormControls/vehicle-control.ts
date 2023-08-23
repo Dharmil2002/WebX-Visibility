@@ -4,11 +4,7 @@ import { vehicleModel } from "src/app/core/models/Masters/vehicle-master";
 export class VehicleControls {
     private vehicleDetailsControl: FormControls[];
     private registrationDetailsControls: FormControls[];
-    private otherDetailsControls: FormControls[];
-    private innerDimensionControls: FormControls[];
-    private outerDimensionControls: FormControls[];
-
-    // formControlsArray
+    private dimensionControls: FormControls[];
     constructor(vehicleTable: vehicleModel, isUpdate: boolean
     ) {
         const currentDate = new Date();
@@ -20,10 +16,17 @@ export class VehicleControls {
                         {
                             name: "required",
                             message: "Vehicle Number is required.."
-                        },
+                        }
+                        ,
+                        {
+                            name: "pattern",
+                            message: "Please enter a valid Vehicle Number (e.g., KA01AB1234)",
+                            pattern: '^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}',
+                        }
+
                     ],
                     functions: {
-                        onChange: 'GetVehicleDetails',
+                        onChange: 'checkVehicleNumberExist',
                     }
                 },
                 {
@@ -38,7 +41,7 @@ export class VehicleControls {
                             name: "autocomplete",
                         },
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         }
                     ],
@@ -58,7 +61,7 @@ export class VehicleControls {
                             name: "autocomplete",
                         },
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         }
                     ],
@@ -78,7 +81,7 @@ export class VehicleControls {
                             name: "autocomplete",
                         },
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         }
                     ],
@@ -98,7 +101,7 @@ export class VehicleControls {
                             name: "autocomplete",
                         },
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         }
                     ],
@@ -118,7 +121,7 @@ export class VehicleControls {
                             name: "autocomplete",
                         },
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         }
                     ],
@@ -157,10 +160,12 @@ export class VehicleControls {
                 },
                 {
                     name: 'gpsDeviceEnabled', label: 'GPS Device Enabled', placeholder: '', type: 'toggle', value: vehicleTable.gpsDeviceEnabled, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [], functions: {
+                        onChange: "enableGpsProvider"
+                    }
                 },
                 {
-                    name: 'gpsProvider', label: 'GPS Provider', placeholder: 'Search and select GPS Provider', type: 'dropdown', value: '', generatecontrol: true, disable: false,
+                    name: 'gpsProvider', label: 'GPS Provider', placeholder: 'Search and select GPS Provider', type: 'dropdown', value: '', generatecontrol: true, disable: true,
                     Validations: [
                     ],
                     additionalData: {
@@ -198,7 +203,7 @@ export class VehicleControls {
                             name: "autocomplete",
                         },
                         {
-                            name: "invalidAutocomplete",
+                            name: "invalidAutocompleteObject",
                             message: "Choose proper value",
                         }
                     ],
@@ -207,7 +212,7 @@ export class VehicleControls {
                     }
                 },
                 {
-                    name: 'gpsDeviceId', label: 'Device Id', placeholder: '', type: 'text', value: vehicleTable.gpsDeviceId, generatecontrol: true, disable: false,
+                    name: 'gpsDeviceId', label: 'Device Id', placeholder: '', type: 'number', value: vehicleTable.gpsDeviceId, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "pattern",
@@ -231,7 +236,7 @@ export class VehicleControls {
                     label: 'Tank Capacity',
                     placeholder: 'Enter Tank Capacity',
                     type: 'number',
-                    value: isUpdate ? vehicleTable.capacity : "",
+                    value: isUpdate ? vehicleTable.tankCapacity : "",
                     Validations: [
                         {
                             name: "pattern",
@@ -245,7 +250,7 @@ export class VehicleControls {
                     name: 'modelNo',
                     label: 'Model No.',
                     placeholder: 'Enter Model No.',
-                    type: 'text', value: isUpdate ? vehicleTable.modelNo : "",
+                    type: 'text', value: isUpdate ? vehicleTable.modelNo : 0,
                     Validations: [
                         {
                             name: "pattern",
@@ -254,6 +259,10 @@ export class VehicleControls {
                         }
                     ],
                     generatecontrol: true, disable: false
+                },
+                {
+                    name: 'isActive', label: 'Active Flag', placeholder: '', type: 'toggle', value: vehicleTable.activeflag, generatecontrol: true, disable: false,
+                    Validations: []
                 },
                 {
                     name: 'id',
@@ -308,6 +317,11 @@ export class VehicleControls {
                             name: "required",
                             message: "RC Book Number is required.."
                         },
+                        {
+                            name: "pattern",
+                            message: "Please enter a valid RC Book Number (e.g., AB12-34CD-56EF-GH78)",
+                            pattern: '^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}',
+                        }
                     ],
                     functions: {
                     }
@@ -317,7 +331,7 @@ export class VehicleControls {
                     Validations: [
                         {
                             name: "required",
-                            message: "RC Book Number is required.."
+                            message: "Registration Book Number is required.."
                         },
                         {
                             name: "pattern",
@@ -327,43 +341,39 @@ export class VehicleControls {
                     ],
                 },
                 {
-                    name: 'regDate', label: 'Registration Date', placeholder: '', type: 'date', value: vehicleTable.regDate, generatecontrol: true, disable: false,
+                    name: 'regDate', label: 'Registration Date', placeholder: '', type: 'date', value: isUpdate ? vehicleTable.regDate : Date(), generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
-                        // maxDate: new Date(),
-                        // minDate: new Date("01 Jan 1900")
+                        maxDate: new Date(),
+
+                        minDate: new Date("01 Jan 1900")
                     }
                 },
                 {
-                    name: 'permitValidityDate', label: "Vehicle Permit Valdity Date", placeholder: "", type: 'date', value: vehicleTable.permitValidityDate, generatecontrol: true, disable: false,
+                    name: 'permitValidityDate', label: "Vehicle Permit Valdity Date", placeholder: "", type: 'date', value: isUpdate ? vehicleTable.permitValidityDate : Date(), generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
-                        // maxDate: new Date(currentDate.getFullYear() + 10, currentDate.getMonth(), currentDate.getDate()),
-                        // minDate: new Date()
+                        maxDate: new Date(currentDate.getFullYear() + 10, currentDate.getMonth(), currentDate.getDate()),
+
+                        minDate: new Date()
                     }
                 },
                 {
-                    name: 'insuranceValidityDate', label: 'Vehicle Insurance Valdity Date', placeholder: '', type: 'date', value: vehicleTable.insuranceValidityDate, generatecontrol: true, disable: false,
+                    name: 'insuranceValidityDate', label: 'Vehicle Insurance Valdity Date', placeholder: '', type: 'date', value: isUpdate ? vehicleTable.insuranceValidityDate : Date(), generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
-                        // maxDate: new Date(currentDate.getFullYear() + 10, currentDate.getMonth(), currentDate.getDate()),
-                        // minDate: new Date()
                     }
                 },
                 {
-                    name: 'fitnessValidityDate', label: 'Fitness Certificate Date', placeholder: '', type: 'date', value: vehicleTable.fitnessValidityDate, generatecontrol: true, disable: false,
+                    name: 'fitnessValidityDate', label: 'Fitness Cericate Date', placeholder: '', type: 'date', value: isUpdate ? vehicleTable.fitnessValidityDate : Date(), generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
-                        // maxDate: new Date(currentDate.getFullYear() + 10, currentDate.getMonth(), currentDate.getDate()),
-                        // minDate: new Date()
                     }
                 },
                 {
-                    name: 'attachedDate', label: 'Date of Attaching', placeholder: '', type: 'date', value: vehicleTable.attachedDate, generatecontrol: true, disable: false,
+                    name: 'attachedDate', label: 'Date of Attaching', placeholder: '', type: 'date', value: isUpdate ? vehicleTable.attachedDate : Date(), generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
-                        // maxDate: new Date(),
-                        // minDate: new Date("01 Jan 1900")
                     }
                 },
                 {
@@ -373,6 +383,11 @@ export class VehicleControls {
                             name: "required",
                             message: "Chasis Number is required.."
                         },
+                        {
+                            name: "pattern",
+                            message: "Please enter a valid Chasis Number",
+                            pattern: '^[A-Z0-9\-]*$',
+                        }
                     ],
                     functions: {
                     }
@@ -384,6 +399,11 @@ export class VehicleControls {
                             name: "required",
                             message: "Engine Number is required.."
                         },
+                        {
+                            name: "pattern",
+                            message: "Please enter a valid Engine Number",
+                            pattern: '^[A-Z0-9\-]*$',
+                        }
                     ],
                     functions: {
                     }
@@ -395,6 +415,11 @@ export class VehicleControls {
                             name: "required",
                             message: "Certificate Number is required.."
                         },
+                        {
+                            name: "pattern",
+                            message: "Please enter a valid Certificate Number",
+                            pattern: '^[A-Z0-9\-]*$',
+                        }
                     ],
                     functions: {
                     }
@@ -406,6 +431,11 @@ export class VehicleControls {
                             name: "required",
                             message: "Insurance Number is required.."
                         },
+                        {
+                            name: "pattern",
+                            message: "Please enter a valid Insurance Number",
+                            pattern: '^[A-Z0-9\-]*$',
+                        }
                     ],
                     functions: {
                     }
@@ -420,14 +450,47 @@ export class VehicleControls {
                     ],
                     functions: {
                     }
-                },
-                {
-                    name: 'isActive', label: 'Active Flag', placeholder: '', type: 'toggle', value: vehicleTable.isActive, generatecontrol: true, disable: false,
-                    Validations: []
                 }
             ],
-
-            this.otherDetailsControls = [
+            this.dimensionControls = [
+                {
+                    name: '', label: 'Inner Dimension', placeholder: '', type: 'Title', value: "", generatecontrol: true, disable: false,
+                    Validations: []
+                },
+                {
+                    name: '', label: 'Outer Dimension', placeholder: '', type: 'Title', value: "", generatecontrol: true, disable: false,
+                    Validations: []
+                },
+                {
+                    name: '', label: 'Other Details', placeholder: '', type: 'Title', value: "", generatecontrol: true, disable: false,
+                    Validations: []
+                },
+                {
+                    name: 'innerLength', label: 'Inner Length(Feet)', placeholder: '', type: 'number', value: vehicleTable.innerLength == 0 ? 0 : vehicleTable.innerLength, generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter Proper Length(Max 100)",
+                            pattern: '^([1-9][0-9]?|100)$'
+                        }
+                    ],
+                    functions: {
+                        onChange: 'getData',
+                    }
+                },
+                {
+                    name: 'outerLength', label: 'Outer Length(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerLength == 0 ? 0 : vehicleTable.outerLength, generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter Proper Length(Max 100)",
+                            pattern: '^([1-9][0-9]?|100)$'
+                        }
+                    ],
+                    functions: {
+                        onChange: 'getData',
+                    }
+                },
                 {
                     name: 'gvw', label: 'GVW', placeholder: 'Enter GVW', type: 'number', value: vehicleTable.gvw, generatecontrol: true, disable: false,
                     Validations: [
@@ -443,6 +506,32 @@ export class VehicleControls {
                     ],
                     functions: {
                         onChange: 'calCapacity'
+                    }
+                },
+                {
+                    name: 'innerHeight', label: 'Inner Height(Feet)', placeholder: '', type: 'number', value: vehicleTable.innerHeight == 0 ? 0 : vehicleTable.innerHeight, generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter Proper Height(Max 50)",
+                            pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
+                        }
+                    ],
+                    functions: {
+                        onChange: 'getData',
+                    }
+                },
+                {
+                    name: 'outerHeigth', label: 'Outer Height(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerHeigth == 0 ? 0 : vehicleTable.outerHeigth, generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter Proper Height(Max 50)",
+                            pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
+                        }
+                    ],
+                    functions: {
+                        onChange: 'getData',
                     }
                 },
                 {
@@ -463,44 +552,21 @@ export class VehicleControls {
                     }
                 },
                 {
-                    name: 'capacity', label: 'Capacity(In Tons)', placeholder: 'Enter Payload Capacity', type: 'number', value: vehicleTable.capacity, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            // name: "required",
-                            // message: "Capacity is required"
-                        }
-                    ],
-                }
-            ],
-            this.innerDimensionControls = [
-                {
-                    name: 'innerLength', label: 'Length(Feet)', placeholder: '', type: 'number', value: vehicleTable.innerLength == 0 ? 1 : vehicleTable.innerLength, generatecontrol: true, disable: false,
+                    name: 'innerWidth', label: 'Inner Width(Feet)', placeholder: '', type: 'number', value: vehicleTable.innerWidth == 0 ? 0 : vehicleTable.innerWidth, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "pattern",
-                            message: "Please Enter Proper Length(Max 100)",
-                            pattern: '^([1-9][0-9]?|100)$'
+                            message: "Please Enter Proper Width(Max 25)",
+                            pattern: '^(?:[1-9]|1[0-9]|2[0-5])$'
                         }
                     ],
                     functions: {
                         onChange: 'getData',
                     }
                 },
+
                 {
-                    name: 'innerHeight', label: 'Height(Feet)', placeholder: '', type: 'number', value: vehicleTable.innerHeight == 0 ? 1 : vehicleTable.innerHeight, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Height(Max 50)",
-                            pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
-                        }
-                    ],
-                    functions: {
-                        onChange: 'getData',
-                    }
-                },
-                {
-                    name: 'innerWidth', label: 'Width(Feet)', placeholder: '', type: 'number', value: vehicleTable.innerWidth == 0 ? 1 : vehicleTable.innerWidth, generatecontrol: true, disable: false,
+                    name: 'outerWidth', label: 'Outer Width(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerWidth == 0 ? 0 : vehicleTable.outerWidth, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "pattern",
@@ -513,53 +579,16 @@ export class VehicleControls {
                     }
                 },
                 {
-                    name: 'cft', label: 'Volume CFT', placeholder: '', type: 'number', value: vehicleTable.cft == 0 ? 1.00 : vehicleTable.cft, generatecontrol: true, disable: true,
+                    name: 'capacity', label: 'Capacity(In Tons)', placeholder: 'Enter Payload Capacity', type: 'number', value: vehicleTable.capacity, generatecontrol: true, disable: false,
+                    Validations: [],
+                },
+                {
+                    name: 'cft', label: 'Inner Volume CFT', placeholder: '', type: 'number', value: vehicleTable.cft, generatecontrol: true, disable: true,
                     Validations: [],
 
                 },
-            ],
-            this.outerDimensionControls = [
                 {
-                    name: 'outerLength', label: 'Length(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerLength == 0 ? 1 : vehicleTable.outerLength, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Length(Max 100)",
-                            pattern: '^([1-9][0-9]?|100)$'
-                        }
-                    ],
-                    functions: {
-                        onChange: 'getData',
-                    }
-                },
-                {
-                    name: 'outerHeigth', label: 'Height(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerHeigth == 0 ? 1 : vehicleTable.outerHeigth, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Height(Max 50)",
-                            pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
-                        }
-                    ],
-                    functions: {
-                        onChange: 'getData',
-                    }
-                },
-                {
-                    name: 'outerWidth', label: 'Width(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerWidth == 0 ? 1 : vehicleTable.outerWidth, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Width(Max 25)",
-                            pattern: '^(?:[1-9]|1[0-9]|2[0-5])$'
-                        }
-                    ],
-                    functions: {
-                        onChange: 'getData',
-                    }
-                },
-                {
-                    name: 'outerCft', label: 'Volume CFT', placeholder: '', type: 'number', value: vehicleTable.outerCft == 0 ? 1.00 : vehicleTable.outerCft, generatecontrol: true, disable: true,
+                    name: 'outerCft', label: 'Outer Volume CFT', placeholder: '', type: 'number', value: vehicleTable.outerCft, generatecontrol: true, disable: true,
                     Validations: [],
 
                 },
@@ -580,14 +609,8 @@ export class VehicleControls {
     getFormControlsL() {
         return this.registrationDetailsControls;
     }
-    getFormControlsP() {
-        return this.otherDetailsControls;
-    }
-    getInnerDimensionControl() {
-        return this.innerDimensionControls;
-    }
-    getOuterDimensionControl() {
-        return this.outerDimensionControls;
+    getDimensionControl() {
+        return this.dimensionControls;
     }
 }
 

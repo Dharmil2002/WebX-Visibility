@@ -45,11 +45,11 @@ export class GeneralMasterListComponent implements OnInit {
   }
   getGeneralDetails() {
     let req = {
-      "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "CodeTypes"
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      "collectionName": "CodeTypes",
+      "filter": {}
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
@@ -59,6 +59,8 @@ export class GeneralMasterListComponent implements OnInit {
               srNo: index + 1
             };
           });
+          console.log(res);
+          
           this.csv = dataWithSrno
           this.tableLoad = false;
         }

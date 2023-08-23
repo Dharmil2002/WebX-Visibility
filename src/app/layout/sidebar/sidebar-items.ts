@@ -73,6 +73,26 @@ export const ROUTES: RouteInfo[] =
       "submenu": [
         {
           "path": "Masters/DriverMaster/DriverMasterList",
+          "title": "Admin",
+          "moduleName": "Admin",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Masters/HolidayMaster/HolidayMasterList",
+              "title": "Holiday Master",
+              "moduleName": "Holiday Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            }
+          ]
+        },
+        {
+          "path": "Masters/DriverMaster/DriverMasterList",
           "title": "Company Structure",
           "moduleName": "Company Structure",
           "icon": "",
@@ -80,9 +100,19 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": [
             {
+              "path": "Masters/ContainerMaster/ContainerMasterList",
+              "title": "Container master",
+              "moduleName": "Container master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
               "path": "Masters/StateMaster/StateMasterView",
-              "title": "State masters",
-              "moduleName": "State masters",
+              "title": "State master",
+              "moduleName": "State master",
               "icon": "",
               "class": "ml-menu",
               "groupTitle": false,
@@ -91,8 +121,8 @@ export const ROUTES: RouteInfo[] =
             },
             {
               "path": "Masters/CityMaster/CityMasterView",
-              "title": "City masters",
-              "moduleName": "City masters",
+              "title": "City master",
+              "moduleName": "City master",
               "icon": "",
               "class": "ml-menu",
               "groupTitle": false,
@@ -216,6 +246,16 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
+            {
+              "path": "Masters/CityLocationMapping/CityLocationIndex",
+              "title": "City Location Mapping",
+              "moduleName": "City Location Mapping",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            }
           ]
         },
         {

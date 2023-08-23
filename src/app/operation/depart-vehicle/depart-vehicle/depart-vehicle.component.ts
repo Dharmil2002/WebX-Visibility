@@ -110,7 +110,6 @@ export class DepartVehicleComponent implements OnInit {
   constructor(
     private Route: Router,
     private dialog: MatDialog,
-    private http: HttpClient,
     private fb: UntypedFormBuilder,
     private _operationService: OperationService
   ) {
@@ -161,10 +160,10 @@ export class DepartVehicleComponent implements OnInit {
   vehicleDetails() {
     const reqbody = {
       companyCode: this.companyCode,
-      type: "masters",
-      collection: "vehicle_detail",
+      collectionName: "vehicle_detail",
+      filter:{}
     };
-    this._operationService.operationPost("common/getall", reqbody).subscribe({
+    this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           this.vehicleDetail = res.data.find(
@@ -186,10 +185,10 @@ export class DepartVehicleComponent implements OnInit {
   getDriverDetails() {
     const reqbody = {
       companyCode: this.companyCode,
-      type: "masters",
-      collection: "driver_detail",
+      collectionName: "driver_detail",
+      filter:{}
     };
-    this._operationService.operationPost("common/getall", reqbody).subscribe({
+    this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           const driverDetails = res.data.find(
@@ -270,12 +269,12 @@ export class DepartVehicleComponent implements OnInit {
     // Prepare request payload
     let req = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
+      collectionName: "docket",
+      filter:{}
     };
 
     // Send request and handle response
-    this._operationService.operationPost("common/getall", req).subscribe({
+    this._operationService.operationMongoPost("generic/get", req).subscribe({
       next: async (res: any) => {
         // Update shipmentData property with the received data
         this.shipmentData = res.data;
@@ -287,10 +286,10 @@ export class DepartVehicleComponent implements OnInit {
 
     const reqbody = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "menifest_detail",
+      collectionName: "menifest_detail",
+      filter:{}
     };
-    this._operationService.operationPost("common/getall", reqbody).subscribe({
+    this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           // Filter menifestDetails based on mfNo and unloading=0
@@ -323,10 +322,10 @@ export class DepartVehicleComponent implements OnInit {
   docketDetails() {
     const reqbody = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "loadingSheet_detail",
+      collectionName: "loadingSheet_detail",
+      filter:{}
     };
-    this._operationService.operationPost("common/getall", reqbody).subscribe({
+    this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           this.lsDetails = res.data.find(
@@ -406,7 +405,7 @@ export class DepartVehicleComponent implements OnInit {
     const mergedData = this.mergeArrays(mergedArray);
     delete mergedData.vehicleTypecontrolHandler;
     mergedData['tripId'] = this.tripData.TripID;
-    mergedData['id'] = this.tripData.TripID;
+    mergedData['_id'] = this.tripData.TripID;
     mergedData['lsno'] = this.lsDetails?.lsno || '';
     mergedData['mfNo'] = this.lsDetails?.mfNo || '';
     this.addDepartData(mergedData);
@@ -418,11 +417,10 @@ export class DepartVehicleComponent implements OnInit {
 
     const reqbody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_transaction_history",
+      "collectionName": "trip_transaction_history",
       "data": departData
     }
-    this._operationService.operationPost('common/create', reqbody).subscribe({
+    this._operationService.operationMongoPost('generic/create', reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           this.updateTrip();
@@ -447,14 +445,13 @@ export class DepartVehicleComponent implements OnInit {
     }
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_detail",
-      "id": this.tripData.id,
-      "updates": {
+      "collectionName": "trip_detail",
+      "filter":{_id: this.tripData.id},
+      "update": {
         ...tripDetails,
       }
     }
-    this._operationService.operationPut("common/update", reqBody).subscribe({
+    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
        
@@ -509,16 +506,7 @@ export class DepartVehicleComponent implements OnInit {
     const lsDetail = loadingSheetDetail.length > 1
       ? loadingSheetDetail[loadingSheetDetail.length - 1]
       : (loadingSheetDetail[0] || null);
-    // Update departure vehicle form controls with driver details
-    if (driverDetail[0]) {
-      this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
-      this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
-      this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");
-      let convertedDate = driverDetail[0].valdityDt || '';
-      convertedDate = convertedDate ? formatDate(convertedDate, 'dd/MM/yyyy') : '';
-      this.departvehicleTableForm.controls['Expiry'].setValue(convertedDate);
-
-    }
+   
     // Update loading sheet table form controls with loading sheet details
     if (lsDetail) {
       this.loadingSheetTableForm.controls["Capacity"].setValue(
@@ -546,6 +534,16 @@ export class DepartVehicleComponent implements OnInit {
         lsDetail?.WeightUtilization || 0
       );
     }
+     // Update departure vehicle form controls with driver details
+     if (driverDetail[0]) {
+      this.departvehicleTableForm.controls['Driver'].setValue(driverDetail[0].driverName || "");
+      this.departvehicleTableForm.controls['DriverMob'].setValue(driverDetail[0].telno || "");
+      this.departvehicleTableForm.controls['License'].setValue(driverDetail[0].licenseNo || "");
+      let convertedDate = driverDetail[0].valdityDt || '';
+      convertedDate = convertedDate ? formatDate(convertedDate, 'dd/MM/yyyy') : '';
+      this.departvehicleTableForm.controls['Expiry'].setValue(convertedDate);
+
+    } 
     // Rest of your code that depends on loadingSheetDetail
   }
 

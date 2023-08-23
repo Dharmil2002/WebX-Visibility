@@ -31,6 +31,7 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, oper
                 ? {
                     tripId: "",
                     route: "",
+                    currentLocation:localStorage.getItem("Branch"),
                     updateBy: localStorage.getItem("Username"),
                     updateDate: new Date().toISOString()
                   }
@@ -39,13 +40,12 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, oper
         
         const reqBody = {
             companyCode,
-            type: "operation",
-            collection: "vehicle_status",
-            id: arrivalData.VehicleNo,
-            updates: { ...vehicleDetails },
+            collectionName: "vehicle_status",
+            filter:{_id: arrivalData.VehicleNo},
+            update: { ...vehicleDetails }
         };
 
-        const vehicleUpdate = await operation.operationPut("common/update", reqBody).toPromise();
+        const vehicleUpdate = await operation.operationPut("generic/update", reqBody).toPromise();
         return vehicleUpdate; // Optionally, you can return the updated vehicle data.
     } catch (error) {
         throw error; // Re-throw the error to be handled at a higher level or log it.

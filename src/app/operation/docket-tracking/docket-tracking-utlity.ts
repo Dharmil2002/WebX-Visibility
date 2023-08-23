@@ -10,15 +10,14 @@ export async function getDocketFromApiDetail(
 ) {
     const reqBody = {
         companyCode: companyCode,
-        type: "operation",
-        collection: "cnote_trackingv3",
-        query: {
+        collectionName: "cnote_tracking",
+        filter: {
             dktNo:docketNo
         }
     };
     try {
-        const res = await operationService.operationPost("common/getOne", reqBody).toPromise();
-        return res.data.db.data.cnote_trackingv3;
+        const res = await operationService.operationMongoPost("generic/get", reqBody).toPromise();
+        return res.data;
     } catch (error) {
         console.error('Error occurred during the API call:', error);
     }

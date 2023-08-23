@@ -12,15 +12,14 @@ export async function tripTransactionDetail(
 ) {
     const reqBody = {
         companyCode: companyCode,
-        type: "operation",
-        collection: "trip_transaction_history",
-        query: {
-            tripId: tripId
+        collectionName: "trip_transaction_history",
+        filter: {
+            tripID: tripId
         }
     };
     try {
-        const res = await operationService.operationPost("common/getOne", reqBody).toPromise();
-        return res.data.db.data.trip_transaction_history;
+        const res = await operationService.operationMongoPost("generic/get", reqBody).toPromise();
+        return res.data;
     } catch (error) {
         console.error('Error occurred during the API call:', error);
     }
@@ -32,22 +31,22 @@ export async function tripTransactionDetail(
 * @param {Object} data - The data containing docket information.
 * @returns {Promise<any>} - A Promise resolving to the API response.
 */
-export async function updateTracking(companyCode, operationService,docketDetails) {
-   debugger
+export async function updateTracking(companyCode, operationService, docketDetails) {
     try {
         const randomNumber = "MA/" + localStorage.getItem('Branch') + "/" + 2223 + "/" + Math.floor(Math.random() * 100000);
         const dockData = {
-            tripId: docketDetails?.tripId||'',
-            id: randomNumber,
+            tripId: docketDetails?.tripId || '',
+            _id: randomNumber,
             dktNo: docketDetails?.dktNo || '',
             vehNo: docketDetails?.vehNo || '',
             route: docketDetails?.route || '',
-            event:"Vehicle Arrival at " +" "+localStorage.getItem('Branch'),
+            event: "Vehicle Arrival at " + " " + localStorage.getItem('Branch'),
             orgn: docketDetails?.orgn || '',
             loc: localStorage.getItem('Branch') || '',
             dest: docketDetails?.dest || '',
             lsno: docketDetails?.lsno || '',
             mfno: docketDetails?.mfno || '',
+            unload: false,
             dlSt: '',
             dlTm: '',
             evnCd: '',
@@ -57,12 +56,11 @@ export async function updateTracking(companyCode, operationService,docketDetails
 
         const req = {
             companyCode: companyCode,
-            type: 'operation',
-            collection: 'cnote_trackingv3',
+            collectionName: 'cnote_tracking',
             data: dockData
         };
 
-        const res = await operationService.operationPost('common/create', req).toPromise();
+        const res = await operationService.operationMongoPost('generic/create', req).toPromise();
         return res;
     } catch (error) {
         console.error('Error updating docket status:', error);
@@ -77,20 +75,19 @@ export async function updateTracking(companyCode, operationService,docketDetails
  * @param {string} docketNo - The docket number.
  * @returns {Promise<any>} - A Promise resolving to the docket details.
  */
-export async function getDocketFromApiDetail(companyCode, operationService,tripId) {
-  debugger
+export async function getDocketFromApiDetail(companyCode, operationService, tripId) {
     const reqBody = {
         companyCode: companyCode,
-        type: 'operation',
-        collection: 'cnote_trackingv3',
-        query: {
+        collectionName: 'cnote_tracking',
+        filter: {
             tripId: tripId,
-        },
+        }
     };
 
     try {
-        const res = await operationService.operationPost('common/getOne', reqBody).toPromise();
-        return res.data.db.data.cnote_trackingv3;
+        const res = await operationService.operationMongoPost('generic/get', reqBody).toPromise();
+        const docketDetails = res.data.filter((x) => x.unload === false);
+        return docketDetails;
     } catch (error) {
         console.error('Error retrieving docket details:', error);
         throw error; // Rethrow the error for higher-level error handling if needed.

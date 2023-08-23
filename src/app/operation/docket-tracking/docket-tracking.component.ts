@@ -37,13 +37,13 @@ export class DocketTrackingComponent implements OnInit {
   userName = localStorage.getItem("Username");
   columnHeader = {
     upDt:"Date",
-    id: "Transaction Number",
+    _id: "Transaction Number",
     loc: "Location",
     event: "Event",
   };
   headerForCsv = {
     upDt:"Date",
-    id: "Transaction Number",
+    _id: "Transaction Number",
     loc: "Location",
     event: "Event",
   };

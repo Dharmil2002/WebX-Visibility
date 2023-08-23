@@ -1,0 +1,34 @@
+{
+    "data":[
+  
+    {
+      "DocketBranch": "BRDB",
+      "Count": 100,
+      "TotalPackage": 933,
+      "TotalWeight": 91262,
+      "TotalCFT": 125156.87
+    },
+   {
+     "DocketBranch": "AMDB",
+      "Count": 100,
+      "TotalPackage": 4314,
+      "TotalWeight": 94756.67,
+      "TotalCFT": 113902.61
+    },
+    {
+        "DocketBranch": "MUMB",
+         "Count": 150,
+         "TotalPackage": 4314,
+         "TotalWeight": 94756.67,
+         "TotalCFT": 113902.61
+    },
+    {
+        "DocketBranch": "DELB   ",
+         "Count": 120,
+         "TotalPackage": 4314,
+         "TotalWeight": 94756.67,
+         "TotalCFT": 113902.61
+    }
+  
+  ]
+  }

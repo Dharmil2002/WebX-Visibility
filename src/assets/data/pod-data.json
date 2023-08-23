@@ -115,17 +115,17 @@
       {
         "count": 147,
         "title": "Pending for Upload Document",
-        "class": "info-box7  bg-white order-info-box7"
+        "class": "info-box7  bg-c-Bottle-light order-info-box7"
       },
       {
         "count": 23,
         "title": "Pending for Forwarding",
-        "class": "info-box7 bg-white order-info-box7"
+        "class": "info-box7 bg-c-Grape-light order-info-box7"
       },
       {
         "count": 0,
         "title": "Pending for Acknowledge",
-        "class": "info-box7 bg-white order-info-box7"
+        "class": "info-box7 bg-c-Daisy-light order-info-box7"
       }
     ]
   },
@@ -135,22 +135,22 @@
       {
         "count": 147,
         "title": "Pending for Audit",
-        "class": "info-box7  bg-white order-info-box7"
+        "class": "info-box7  bg-c-Bottle-light order-info-box7"
       },
       {
         "count": 23,
         "title": "Rejected PODs",
-        "class": "info-box7 bg-white order-info-box7"
+        "class": "info-box7 bg-c-Grape-light order-info-box7"
       },
       {
         "count": 90,
         "title": "Pending for Forwarding",
-        "class": "info-box7 bg-white order-info-box7"
+        "class": "info-box7 bg-c-Daisy-light order-info-box7"
       },
       {
         "count": 0,
         "title": "Pending for Acknowledge",
-        "class": "info-box7 bg-white order-info-box7"
+        "class": "info-box7 bg-c-Grape-light order-info-box7"
       }
     ]
   }

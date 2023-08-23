@@ -34,12 +34,11 @@
     height: 100%;
     max-height: none !important;
   }
-.datepickercss{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-}
+  .datepickercss {
+    mat-label {
+      font-size: 20px;
+    }
+  }
 
   .settingSidebar-tab {
     display: flex;
@@ -196,19 +195,19 @@
 .hiddenradio [type="radio"]:checked + img {
   outline: 2px solid #2962ff;
 }
-.extraSize{
-  width: 317px!important;
-  height: 40px!important;
+.extraSize {
+  width: 317px !important;
+  height: 40px !important;
 }
 .date-range-picker-icon {
   margin-left: -25px;
   z-index: 1;
 }
 .md-drppicker .calendar-table {
-  border: 47px solid #fff!important;
-  padding: 4px!important;
-  border-radius: 4px!important;
-  background-color: #fff!important;
+  border: 47px solid #fff !important;
+  padding: 4px !important;
+  border-radius: 4px !important;
+  background-color: #fff !important;
 }
 // .md-drppicker .buttons {
 //   text-align: right;
@@ -227,7 +226,6 @@
 //     display: none;
 //   }
 // }
-
 
 // .drp-calendar .table-condensed th,
 // .drp-calendar .table-condensed td {

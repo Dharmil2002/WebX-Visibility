@@ -3960,130 +3960,69 @@
       "activeSchedule": false
     }
   ],
-  "pincodeToLoc":[
-
+  "pincodeToLoc": [
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "Mumbai",
-
       "pincode": "121344",
-
       "activeFlag": "Y"
-
     },
-
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "Mumbai",
-
       "pincode": "395001",
-
       "activeFlag": "Y"
-
     },
-
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "Andheri",
-
       "pincode": "400001",
-
       "activeFlag": "Y"
-
     },
-
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "Dadar",
-
       "pincode": "400001",
-
       "activeFlag": "Y"
-
     },
-
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "churchgate",
-
       "pincode": "400002",
-
       "activeFlag": "Y"
-
     },
-
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "lalbaugh",
-
       "pincode": "400003",
-
       "activeFlag": "Y"
-
     },
-
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "Parel",
-
       "pincode": "400004",
-
       "activeFlag": "Y"
-
     },
-
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "Marine Lines",
-
       "pincode": "400005",
-
       "activeFlag": "Y"
-
     },
-
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "Prabhadevi",
-
       "pincode": "400006",
-
       "activeFlag": "Y"
-
     },
-
     {
-
       "destinationLocationCode": "MUMB",
-
       "area": "Worli",
-
       "pincode": "400007",
-
       "activeFlag": "Y"
-
     }
-
-],
-  "holidayData":[
+  ],
+  "holidayData": [
     {
       "srNo": 1,
       "date": "26-1-2023",
@@ -4091,42 +4030,48 @@
       "holidayNote": "Republic Day",
       "isActive": true,
       "view": ""
-    },{
+    },
+    {
       "srNo": 2,
       "date": "01-3-2022",
       "day": "Tuesday",
       "holidayNote": "Maha Shivaratri",
       "isActive": true,
       "view": ""
-    },{
+    },
+    {
       "srNo": 3,
       "date": "18-3-2022",
       "day": "Friday",
       "holidayNote": "Holi",
       "isActive": true,
       "view": ""
-    },{
+    },
+    {
       "srNo": 4,
       "date": "14-4-2022",
       "day": "Thursday",
       "holidayNote": "Mahavir Jayanti",
       "isActive": true,
       "view": ""
-    },{
+    },
+    {
       "srNo": 5,
       "date": "15-4-2022",
       "day": "Friday",
       "holidayNote": "Good Friday",
       "isActive": true,
       "view": ""
-    },{
+    },
+    {
       "srNo": 6,
       "date": "03-5-2022",
       "day": "Tuesday",
       "holidayNote": "Idul Fitr",
       "isActive": true,
       "view": ""
-    },{
+    },
+    {
       "srNo": 7,
       "date": "09-8-2022",
       "day": "Tuesday",
@@ -4249,6 +4194,53 @@
       "restrictedHoursTo": null,
       "geofencesWithType": "HUB~8~GFS-1,Branch Office~21~SRTB",
       "lastModifyDate": "03:11.2"
+    }
+  ],
+  "assignVehicle": [
+    {
+      "vehicleNo": "HR55L3232",
+      "fromCity": "Gurgaon",
+      "toCity": "Kolkatta",
+      "currentLocation": "Asansol",
+      "distance": 210,
+      "vehicleSize": 20,
+      "action": "Assign"
+    },
+    {
+      "vehicleNo": "WB043223",
+      "fromCity": "Guwahati",
+      "toCity": "Kolkatta",
+      "currentLocation": "New Jalpaiguri",
+      "distance": 615,
+      "vehicleSize": 18,
+      "action": "Assign"
+    },
+    {
+      "vehicleNo": "WB093456",
+      "fromCity": "Mumbai",
+      "toCity": "Kolkatta",
+      "currentLocation": "Srirampur",
+      "distance": 20,
+      "vehicleSize": 16,
+      "action": "Assign"
+    },
+    {
+      "vehicleNo": "NL01GP2130",
+      "fromCity": "Bhubneswar",
+      "toCity": "Kolkatta",
+      "currentLocation": "Panihati",
+      "distance": 13,
+      "vehicleSize": 16,
+      "action": "Assign"
+    },
+    {
+      "vehicleNo": "WB10T3098",
+      "fromCity": "Siliguri",
+      "toCity": "Kolkatta",
+      "currentLocation": "Baranagar",
+      "distance": 8,
+      "vehicleSize": 20,
+      "action": "Assign"
     }
   ]
 }

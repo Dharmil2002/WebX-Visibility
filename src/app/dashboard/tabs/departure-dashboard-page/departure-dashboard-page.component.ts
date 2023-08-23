@@ -56,17 +56,6 @@ export class DepartureDashboardPageComponent
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
 
-  columnHeader = {
-    RouteandSchedule: "Route and Schedule",
-    VehicleNo: "Vehicle No",
-    TripID: "Trip ID",
-    Scheduled: "Scheduled",
-    Expected: "Expected",
-    Status: "Status",
-    Hrs: "Hrs.",
-    Action: "Action ",
-  };
-
   METADATA = {
     checkBoxRequired: true,
     // selectAllorRenderedData : false,
@@ -82,6 +71,57 @@ export class DepartureDashboardPageComponent
     Expected: "STA",
     Hrs: "Hrs.",
   };
+
+  columnHeader = {
+    RouteandSchedule: {
+      Title:"Route and Schedule",
+      class: "matcolumnleft",
+      Style: "min-width:200px",
+    },
+    VehicleNo: {
+      Title: "Vehicle No",
+      class: "matcolumnleft",
+      Style: "min-width:80px",
+    },
+    TripID: {
+      Title: "Trip ID",
+      class: "matcolumnleft",
+      Style: "min-width:200px",
+    },
+    Scheduled: {
+      Title: "Scheduled",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+    Expected: {
+      Title: "Expected",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+    Status: {
+      Title: "Status",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+    Hrs: {
+      Title: "Hrs",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+    Action: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+  };
+  staticField = [
+    "RouteandSchedule",
+    "VehicleNo",
+    "TripID",
+    "Scheduled",
+    "Expected",
+    "Hrs"
+  ];
   //#endregion
 
   IscheckBoxRequired: boolean;
@@ -134,15 +174,16 @@ export class DepartureDashboardPageComponent
    * Fetches shipment data from the API and updates the boxData and tableload properties.
    */
   fetchShipmentData() {
+
     // Prepare request payload
     let req = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
+      collectionName: "docket",
+      filter: {}
     };
 
     // Send request and handle response
-    this.operationService.operationPost("common/getall", req).subscribe({
+    this.operationService.operationPost("generic/get", req).subscribe({
       next: async (res: any) => {
         // Update shipmentData property with the received data
         this.shipmentData = res.data;

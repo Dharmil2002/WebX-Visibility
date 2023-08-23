@@ -57,6 +57,20 @@
                             <app-pod-cod-dashboard-page *ngIf="myTabGroup.selectedIndex== 5"
                                 (CurrentIndex)="GetSelectedIndex($event)"></app-pod-cod-dashboard-page>
                         </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                PRQ Summary
+                            </ng-template>
+                            <app-prq-summary-page *ngIf="myTabGroup.selectedIndex== 6"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-prq-summary-page>
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                Job Summary
+                            </ng-template>
+                            <app-job-summary-page *ngIf="myTabGroup.selectedIndex== 7"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-job-summary-page>
+                        </mat-tab>
                     </mat-tab-group>
                 </div>
             </div>

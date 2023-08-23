@@ -111,11 +111,11 @@ export class VehicleUpdateUploadComponent implements OnInit {
 
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_detail"
+      "collectionName": "trip_detail",
+      "filter":{}
 
     }
-    this.operationService.operationPost('common/getall', reqBody).subscribe(res => {
+    this.operationService.operationMongoPost('generic/get', reqBody).subscribe(res => {
       if (res) {
 
         this.tripDetails = res.data.find((x) => x.tripId === this.vehicelLoadData.tripId);
@@ -129,11 +129,11 @@ export class VehicleUpdateUploadComponent implements OnInit {
   getShipmentData() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "docket"
+      "collectionName": "docket",
+      "filter":{}
 
     }
-    this.operationService.operationPost('common/getall', reqBody).subscribe(res => {
+    this.operationService.operationMongoPost('generic/get', reqBody).subscribe(res => {
       if (res) {
         this.dktDetailFromApi = res.data
         this.getLoadingSheet();
@@ -144,11 +144,11 @@ export class VehicleUpdateUploadComponent implements OnInit {
 
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "loadingSheet_detail"
+      "collectionName": "loadingSheet_detail",
+      "filter":{}
 
     }
-    this.operationService.operationPost('common/getall', reqBody).subscribe(res => {
+    this.operationService.operationMongoPost('generic/get', reqBody).subscribe(res => {
       if (res.data) {
         let dataLoading = []
         const loadingSheetDetail = res.data.filter((x) => x.lsno === this.vehicelLoadData.LoadingSheet)
@@ -190,10 +190,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
   getPackagesData() {
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "docketScan"
+      "collectionName": "docketScan",
+      "filter":{},
     }
-    this.operationService.operationPost('common/getall', reqBody).subscribe({
+    this.operationService.operationMongoPost('generic/get', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           this.packageData = res.data;
@@ -230,10 +230,10 @@ export class VehicleUpdateUploadComponent implements OnInit {
     });
 
     const shipData = [
-      createShipDataObject(this.loadingTableData.length, "Shipments", "bg-white"),
-      createShipDataObject(packages, "Packages", "bg-white"),
-      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + this.shipmentStatus, "bg-white"),
-      createShipDataObject(event?.Package || 0, "Packages" + ' ' + this.shipmentStatus, "bg-white"),
+      createShipDataObject(this.loadingTableData.length, "Shipments", "bg-c-Bottle-light"),
+      createShipDataObject(packages, "Packages", "bg-c-Grape-light"),
+      createShipDataObject(event?.shipment || 0, "Shipments" + ' ' + this.shipmentStatus, "bg-c-Daisy-light"),
+      createShipDataObject(event?.Package || 0, "Packages" + ' ' + this.shipmentStatus, "bg-c-Grape-light"),
     ];
 
     this.boxData = shipData;
@@ -335,7 +335,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
       await this.updatedocketDetail(element.Shipment, menifestDetails.MFNumber);
 
       const jsonDetails = {
-        "id": menifestDetails?.MFNumber || "",
+        "_id": menifestDetails?.MFNumber || "",
         "mfNo": menifestDetails?.MFNumber || "",
         "leg": menifestDetails?.Leg || "",
         "lsNo": this.vehicelLoadData?.LoadingSheet || "",
@@ -353,12 +353,11 @@ export class VehicleUpdateUploadComponent implements OnInit {
 
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "menifest_detail",
+      "collectionName": "menifest_detail",
       "data": menifestData[0]
     };
 
-    this.operationService.operationPost('common/create', reqBody).subscribe({
+    this.operationService.operationMongoPost('generic/create', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           if (this.vehicelLoadData.count === 1) {
@@ -387,16 +386,15 @@ export class VehicleUpdateUploadComponent implements OnInit {
      await updateTracking(this.companyCode,this.operationService,mfDetails,dktNo)
     const reqBody = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
-      id: dktNo,
-      updates: {
+      collectionName: "docket",
+      filter:{_id: dktNo},
+      update: {
         ...mfDetails
       }
     };
 
     return new Promise((resolve, reject) => {
-      this.operationService.operationPut("common/update", reqBody).subscribe({
+      this.operationService.operationMongoPut("generic/update", reqBody).subscribe({
         next: (res: any) => {
           if (res) {
             resolve(res);
@@ -413,16 +411,16 @@ export class VehicleUpdateUploadComponent implements OnInit {
     let tripDetails = {
       status: "Depart Vehicle"
     }
+    const id=this.vehicelLoadData?.id || "";
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_detail",
-      "id": this.vehicelLoadData?.id || "",
-      "updates": {
+      "collectionName": "trip_detail",
+      "filter": {_id: id},
+      "update": {
         ...tripDetails,
       }
     }
-    this.operationService.operationPut("common/update", reqBody).subscribe({
+    this.operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           Swal.fire({

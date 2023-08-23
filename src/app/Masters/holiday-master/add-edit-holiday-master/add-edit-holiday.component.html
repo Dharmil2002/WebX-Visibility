@@ -1,0 +1,45 @@
+<div mat-dialog-title style="display: flex;
+    justify-content: space-between;margin: 0 0 0px;
+    align-items: center;">
+      <h3>Holiday Details</h3>
+      <button mat-icon-button aria-label="close dialog" mat-dialog-close>
+          <mat-icon>close</mat-icon>
+      </button>
+</div>
+<hr>
+    <form [formGroup]="holidayMasterForm" >
+        <app-form-webxpress
+        [form]="holidayMasterForm"
+        [formData]="holidayMasterControls.holidayControlArray"
+        (callFunction)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false" >
+        </app-form-webxpress>
+    </form>
+    <ng-container *ngIf="showDateWise">
+        <form [formGroup]="holidayDateWiseForm" >
+            <app-form-webxpress
+            [form]="holidayDateWiseForm"
+            [formData]="holidayMasterControls.dateWiseControls"
+            (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" >
+            </app-form-webxpress>
+        </form>
+    </ng-container>
+    <ng-container *ngIf="showDayWise">
+        <form [formGroup]="holidayDayWiseForm" >
+            <app-form-webxpress
+            [form]="holidayDayWiseForm"
+            [formData]="holidayMasterControls.dayWiseControls"
+            (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" >
+            </app-form-webxpress>
+        </form>
+    </ng-container>
+    <hr>
+    <div class="btn-sec m-2 d-flex justify-content-end">
+        <button class="msr-3" mat-raised-button color="success" (click)="save()">Save</button>
+        <button class="msr-3" mat-raised-button color="error" (click)="cancel()">Cancel</button>
+    </div> 
+
+    
+    

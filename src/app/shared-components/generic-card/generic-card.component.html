@@ -1,4 +1,4 @@
-<div class="responsive_table"><!-- This row holds the boxes of the dashboard -->
+<div><!-- This row holds the boxes of the dashboard -->
   <h4 class="m-b-10"><u>{{boxData?.Title}}</u></h4>
   <div *ngIf="boxData?.Items" class="row clearfix dashboardcard">
     <!-- This loop creates a box for each item in the boxData array -->
@@ -6,8 +6,8 @@
       <!-- This box is a clickable item -->
       <div [class]="box.value.class">
         <div class="info-box7-block">
-          <h6 class="m-b-10 black">{{box.value.title}}</h6>
-          <h2 class="text-end black"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
+          <h6 class="m-b-10 white">{{box.value.title}}</h6>
+          <h2 class="text-end white"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
         </div>
       </div>
       <div>
@@ -20,11 +20,25 @@
       <!-- This box is a clickable item -->
       <div [class]="box.value.class">
         <div class="info-box7-block">
-          <h6 class="m-b-10 black">{{box.value.title}}</h6>
-          <h2 class="text-end black"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
+          <h6 class="m-b-10 white">{{box.value.title}}</h6>
+          <h2 class="text-end white"><i [class]="box.value.icon"></i><span>{{box.value.count}}</span></h2>
         </div>
       </div>
       <div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="kpiData" class="row clearfix dashboardcard">
+    <!-- This loop creates a box for each item in the kpiData array -->
+    <div class="col-lg-3 col-sm-3" *ngFor="let box of kpiData" [style]="style">
+      <div [class]="box.class" style="height: 80%; display: flex; align-items: center; justify-content: center;">
+        <div class="info-box7-block">
+          <h2 style="text-align: center;"><span>{{box.title}} </span>{{box.count}}
+          </h2>
+          <h2 style="text-align: center;"><span>{{box.title1}} </span>{{box.count1}}
+          </h2>
+          <h6 style="text-align: center;" class="m-b-10">{{box.Title}}</h6>
+        </div>
       </div>
     </div>
   </div>

@@ -96,6 +96,11 @@ import { GeneralMasterAddComponent } from './general-master/general-master-add/g
 import { GeneralMasterCodeListComponent } from './general-master/general-master-code-list/general-master-code-list.component';
 import { AddVehicleStatusUpdateComponent } from './vehicle-status-update/add-vehicle-status-update/add-vehicle-status-update.component';
 import { VehicleStatusUpdateComponent } from './vehicle-status-update/vehicle-status-update-list/vehicle-status-update.component';
+import { AddEditHolidayComponent } from './holiday-master/add-edit-holiday-master/add-edit-holiday.component';
+import { HolidayMasterComponent } from './holiday-master/holiday-master-list/holiday-master-list.component';
+import { CityLocationMappingMaster } from './city-location-mapping-master/city-location-master/city-to-location-mapping.component';
+import { ContainerMasterListComponent } from './container-master/container-master-list/container-master-list.component';
+import { AddContainerMasterComponent } from './container-master/add-container-master/add-container-master.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -199,7 +204,8 @@ import { VehicleStatusUpdateComponent } from './vehicle-status-update/vehicle-st
     GeneralMasterListComponent,
     GeneralMasterAddComponent,
     GeneralMasterCodeListComponent,
-    AddVehicleStatusUpdateComponent,
+    AddVehicleStatusUpdateComponent, HolidayMasterComponent,
+    AddEditHolidayComponent,CityLocationMappingMaster, ContainerMasterListComponent, AddContainerMasterComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

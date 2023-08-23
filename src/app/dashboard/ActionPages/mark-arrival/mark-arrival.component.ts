@@ -13,6 +13,7 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { vehicleStatusUpdate } from 'src/app/operation/update-loading-sheet/loadingSheetshipment';
 import { getDocketFromApiDetail, tripTransactionDetail, updateTracking } from './mark-arrival-utlity';
+import { extractUniqueValues } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -100,7 +101,6 @@ export class MarkArrivalComponent implements OnInit {
   }
 
   save() {
-
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.
@@ -109,6 +109,7 @@ export class MarkArrivalComponent implements OnInit {
 
     let tripDetailForm = this.MarkArrivalTableForm.value
     const tripId = this.MarkArrivalTableForm.value?.TripID || "";
+   
     delete tripDetailForm.Vehicle
     delete tripDetailForm.TripID
     delete tripDetailForm.Route
@@ -118,14 +119,13 @@ export class MarkArrivalComponent implements OnInit {
     }
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_transaction_history",
-      "id": tripId,
-      "updates": {
+      "collectionName": "trip_transaction_history",
+      "filter":{_id: tripId},
+      "update": {
         ...tripDetails.tripDetailForm,
       }
     }
-    this._operationService.operationPut("common/update", reqBody).subscribe({
+    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           this.updateTripData(tripId)
@@ -155,17 +155,17 @@ export class MarkArrivalComponent implements OnInit {
     }
     const reqBody = {
       "companyCode": this.companyCode,
-      "type": "operation",
-      "collection": "trip_detail",
-      "id": this.MarkArrivalTable.id,
-      "updates": {
+      "collectionName": "trip_detail",
+      "filter":{_id: this.MarkArrivalTable.id},
+      "update": {
         ...tripDetails
       }
     }
-    this._operationService.operationPut("common/update", reqBody).subscribe({
+    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: async (res: any) => {
         if (res) {
           if (tripDetails.status==="close") {
+            this.getDocketTripWise(tripId);
             // Call the vehicleStatusUpdate function here
             const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode,this.MarkArrivalTable, this._operationService,true);
             Swal.fire({
@@ -176,8 +176,7 @@ export class MarkArrivalComponent implements OnInit {
             });
             this.getPreviousData();
           }else{
-            this.getPreviousData();
-            // this.getDocketTripWise(tripId);
+            this.getDocketTripWise(tripId);
           }
          
 
@@ -187,11 +186,10 @@ export class MarkArrivalComponent implements OnInit {
   }
   /*here i write a code becuase of update docket states*/
   async getDocketTripWise(tripId) {
-
     const detail = await getDocketFromApiDetail(this.companyCode, this._operationService,tripId.trim());
-    
+    const uniqueDktNumbers = extractUniqueValues(detail, 'dktNo');
     // Create an array of promises for updateTracking calls
-    const updatePromises = detail.map(async element => {
+    const updatePromises = uniqueDktNumbers.map(async element => {
         await updateTracking(this.companyCode, this._operationService, element);
     });
 

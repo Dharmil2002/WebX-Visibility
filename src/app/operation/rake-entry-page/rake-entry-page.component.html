@@ -1,0 +1,19 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="rakeEntryTableForm">
+        <app-form-webxpress [form]="rakeEntryTableForm" [formData]="jsonControlArray"
+            (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true">
+        </app-form-webxpress>
+    </form>
+    <div *ngIf="apiShow">
+        <app-table-boilerplate *ngIf="show" [tableData]="tableData" [columnHeader]="cnWiseDisplayedColumns"
+            title="Rake Entry Master" (DeleteAction)="delete($event,'tableData')" (AddRow)="addCNWise($event)"
+            (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
+            [ActionObject]="actionObject" (callFunction)="functionCallHandler($event)"></app-table-boilerplate>
+
+        <app-table-boilerplate *ngIf="!show" [tableData]="tableData1" [columnHeader]="jobWiseDisplayedColumns"
+            title="Rake Entry Master" (DeleteAction)="delete($event,'tableData1')" (AddRow)="addJobWise($event)"
+            (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
+            [ActionObject]="actionObject" (callFunction)="functionCallHandler($event)"></app-table-boilerplate>
+    </div>
+</app-common-wrapper-webxpress>

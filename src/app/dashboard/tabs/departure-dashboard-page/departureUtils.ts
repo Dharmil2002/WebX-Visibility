@@ -17,23 +17,21 @@ export async function fetchDepartureDetails(
   // Prepare request payload
   let req = {
     companyCode: companyCode,
-    type: "operation",
-    collection: "trip_detail",
+    collectionName: "trip_detail"
   };
   let routeReq = {
     companyCode: companyCode,
-    type: "masters",
-    collection: "route",
+    collectionName: "route"
   };
 
   try {
     // Send request and await response for  trip Detai;s
     const res: any = await operationService
-      .operationPost("common/getall", req)
+      .operationPost("generic/get", req)
       .toPromise();
     //Send Request and await response for route Details
     const routeRes: any = await operationService
-      .operationPost("common/getall", routeReq)
+      .operationPost("generic/get", routeReq)
       .toPromise();
     //End//
     // Filter departure data based on organization branch
@@ -70,7 +68,7 @@ function getShipmentData(
 
   // Filter shipment data based on organization branch
   shipmentFilter = shipmentDetails.filter(
-    (x) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase()
+    (x) => x.orgLoc.toLowerCase() === orgBranch.toLowerCase() && x.isComplete && x.lsNo.toLowerCase()=="" 
   );
 
   // Calculate shipPackage and shipmat
@@ -91,10 +89,10 @@ function getShipmentData(
   });
 
   const shipData = [
-    createShipDataObject(tableData.length, "Routes", "bg-white"),
-    createShipDataObject(tableData.length, "Vehicles", "bg-white"),
-    createShipDataObject(shipmentFilter.length, "Shipments", "bg-white"),
-    createShipDataObject(shipPackage, "Packages", "bg-white"),
+    createShipDataObject(tableData.length, "Routes", "bg-c-Bottle-light"),
+    createShipDataObject(tableData.length, "Vehicles", "bg-c-Grape-light"),
+    createShipDataObject(shipmentFilter.length, "Shipments", "bg-c-Daisy-light"),
+    createShipDataObject(shipPackage, "Packages", "bg-c-Grape-light"),
   ];
 
   return {
@@ -146,7 +144,7 @@ function generateTableData(departureData: any[], routeData: any[], datePipe): an
 
     if (routeDetails) {
       let jsonDeparture = {
-        id:element?.id||"",
+        id:element?._id||"",
         RouteandSchedule: routeCode + ":" + routeName,
         VehicleNo: element?.vehicleNo || "",
         TripID: element?.tripId || "",
@@ -180,15 +178,15 @@ export function fetchShipmentData(
   operationService: any
 ): any {
   return new Promise((resolve, reject) => {
+
     // Prepare request payload
     let req = {
       companyCode: companyCode,
-      type: "operation",
-      collection: "docket",
+      collectionName: "docket"
     };
 
     // Send request and handle response
-    operationService.operationPost("common/getall", req).subscribe({
+    operationService.operationPost("generic/get", req).subscribe({
       next: (res: any) => {
         const shipmentData = res.data;
         const shipmentResult = getShipmentData(

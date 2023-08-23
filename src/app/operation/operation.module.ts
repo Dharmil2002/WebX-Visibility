@@ -29,6 +29,11 @@ import { OperationService } from "../core/service/operations/operation.service";
 import { NavigationService } from "../Utility/commonFunction/route/route";
 import { QuickBookingComponent } from './quick-booking/quick-booking.component';
 import { DocketTrackingComponent } from './docket-tracking/docket-tracking.component';
+import { PrqEntryPageComponent } from "./prq-entry-page/prq-entry-page.component";
+import { JobEntryPageComponent } from './job-entry-page/job-entry-page.component';
+import { AssignVehiclePageComponent } from './assign-vehicle-page/assign-vehicle-page.component';
+import { RakeEntryPageComponent } from './rake-entry-page/rake-entry-page.component';
+import { ChaEntryPageComponent } from './cha-entry-page/cha-entry-page.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -43,7 +48,12 @@ import { DocketTrackingComponent } from './docket-tracking/docket-tracking.compo
     ViewPrintComponent,
     VehicleUpdateUploadComponent,
     QuickBookingComponent,
-    DocketTrackingComponent
+    DocketTrackingComponent,
+    PrqEntryPageComponent,
+    JobEntryPageComponent,
+    AssignVehiclePageComponent,
+    RakeEntryPageComponent,
+    ChaEntryPageComponent
   ],
   imports: [
     CommonModule,
@@ -61,7 +71,7 @@ import { DocketTrackingComponent } from './docket-tracking/docket-tracking.compo
     MatDialogModule,
     MatSnackBarModule
   ],
-  providers: [SnackBarUtilityService,OperationService,NavigationService,DatePipe,MatDialogModule ],
+  providers: [SnackBarUtilityService, OperationService, NavigationService, DatePipe, MatDialogModule],
   exports: []
 })
 export class OperationModule { }

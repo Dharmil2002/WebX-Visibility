@@ -55,6 +55,13 @@ import { GeneralMasterCodeListComponent } from './general-master/general-master-
 import { GeneralMasterAddComponent } from './general-master/general-master-add/general-master-add.component';
 import { VehicleStatusUpdateComponent } from './vehicle-status-update/vehicle-status-update-list/vehicle-status-update.component';
 import { AddVehicleStatusUpdateComponent } from './vehicle-status-update/add-vehicle-status-update/add-vehicle-status-update.component';
+import { AddEditHolidayComponent } from './holiday-master/add-edit-holiday-master/add-edit-holiday.component';
+import { HolidayMasterComponent } from './holiday-master/holiday-master-list/holiday-master-list.component';
+import { CityLocationMappingMaster } from './city-location-mapping-master/city-location-master/city-to-location-mapping.component';
+import { CompanygstmasterAddComponent } from './Company GST Master/companygstmaster-add/companygstmaster-add.component';
+import { ContainerMasterListComponent } from './container-master/container-master-list/container-master-list.component';
+import { AddContainerMasterComponent } from './container-master/add-container-master/add-container-master.component';
+
 
 const routes: Routes = [
   { path: 'Docket/Create', component: CNoteGenerationComponent },
@@ -67,6 +74,7 @@ const routes: Routes = [
   { path: 'Docket/DispatchVehicle', component: DispatchVehicleComponent },
   { path: 'Docket/ManifestGeneration', component: ManifestGenerationComponent },
   { path: 'CompanyGSTMaster/CompanyGSTMasterList', component: CompanygstmasterListComponent },
+  { path: 'CompanyGSTMaster/AddCompanyGSTMaster', component: CompanygstmasterAddComponent },
   { path: "StateMaster/StateMasterView", component: StateMasterListComponent },
   { path: "StateMaster/AddState", component: AddStateMasterComponent },
   { path: "CityMaster/CityMasterView", component: CityMasterListComponent },
@@ -111,7 +119,12 @@ const routes: Routes = [
   { path: "GeneralMaster/GeneralMasterCodeList", component: GeneralMasterCodeListComponent },
   { path: "GeneralMaster/AddGeneralMaster", component: GeneralMasterAddComponent },
   { path: "Vehicle/Status", component: VehicleStatusUpdateComponent },
-  { path: "Vehicle/Status/Add", component: AddVehicleStatusUpdateComponent }
+  { path: "Vehicle/Status/Add", component: AddVehicleStatusUpdateComponent },
+  { path: "HolidayMaster/HolidayMasterList", component: HolidayMasterComponent },
+  { path: "HolidayMaster/AddHolidayMaster", component: AddEditHolidayComponent },
+  { path: "CityLocationMapping/CityLocationIndex", component: CityLocationMappingMaster },
+  { path: "ContainerMaster/ContainerMasterList", component: ContainerMasterListComponent },
+  { path: "ContainerMaster/AddContainerMaster", component: AddContainerMasterComponent },
 ];
 
 @NgModule({

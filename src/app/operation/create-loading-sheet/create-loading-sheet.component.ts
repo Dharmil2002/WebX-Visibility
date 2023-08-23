@@ -114,7 +114,6 @@ export class CreateLoadingSheetComponent implements OnInit {
     private filter: FilterUtils
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-
       // Retrieve tripData and shippingData from the navigation state
       this.tripData =
         this.Route.getCurrentNavigation()?.extras?.state.data?.columnData ||
@@ -284,11 +283,11 @@ export class CreateLoadingSheetComponent implements OnInit {
     }
     const req = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
+      collectionName: "docket",
+      filter:{}
     };
     this._operationService
-      .operationPost("common/getall", req)
+      .operationMongoPost("generic/get", req)
       .subscribe((res) => {
         this.shipmentData = res.data.filter((x) => x.lsNo == "");
         // Filter shipment data based on location and trip details
@@ -299,7 +298,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         );
         //Here i user cnoteDetails varible to used in updateDocketDetails() method
         this._cnoteService.setShipingData(filterData.legWiseData);
-        this.alldocket=filterData.legWiseData
+        this.alldocket = filterData.legWiseData
         this.cnoteDetails = filterData.legWiseData;
         const shipingfilterData = filterData.legWiseData;
         // Call the function to group shipments based on criteria
@@ -369,7 +368,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       }
     });
     //this.getshipmentData(event)
-    this.cnoteDetails = filterCnoteDetails(this.alldocket,event.shipping)
+    this.cnoteDetails = filterCnoteDetails(this.alldocket, event.shipping)
     this._cnoteService.setShipingData(this.cnoteDetails);
     this.getCapacity();
   }
@@ -378,13 +377,13 @@ export class CreateLoadingSheetComponent implements OnInit {
   GetVehicleDropDown() {
     const vehRequest = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "vehicle_status",
+      collectionName: "vehicle_status",
+      filter:{}
     };
 
     // Fetch data from the JSON endpoint
     this._operationService
-      .operationPost("common/getall", vehRequest)
+      .operationMongoPost("generic/get", vehRequest)
       .subscribe((res) => {
         if (res) {
 
@@ -428,16 +427,15 @@ export class CreateLoadingSheetComponent implements OnInit {
     };
     const reqBody = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "trip_detail",
-      id: this.tripData.id,
-      updates: {
+      collectionName: "trip_detail",
+      filter: {_id:this.tripData.id},
+      update: {
         ...tripDetails,
       },
     };
     try {
       // Await the API call's response before proceeding
-      const res = await this._operationService.operationPut("common/update", reqBody).toPromise();
+      const res = await this._operationService.operationMongoPut("generic/update", reqBody).toPromise();
       if (res) {
         // If response is successful, call the next function
         await this.getDetailsByLeg();
@@ -450,15 +448,15 @@ export class CreateLoadingSheetComponent implements OnInit {
   async getDetailsByLeg() {
     for (const leg of this.loadingData) {
       const [org_loc, destination] = leg.leg.split("-").map(part => part.trim());
-  
+
       const matchingShipments = this.cnoteDetails.filter(
         shipment =>
           shipment.orgLoc === org_loc &&
           shipment.destination.split(":")[1].trim() === destination
       );
-  
+
       await this.addLsDetails(leg);
-  
+
       if (matchingShipments.length > 0) {
         const updatePromises = matchingShipments.map(matchingShipment =>
           this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet)
@@ -467,7 +465,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       }
     }
   }
-  
+
   async updateDocketDetails(docket, lsNo) {
     let loadingSheetData = {
       lsNo: lsNo
@@ -479,7 +477,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       route: this.tripData?.RouteandSchedule || "",
       dktNo: docket
     };
-  
+
     try {
       await Promise.all([
         updateTracking(this.companyCode, this._operationService, trackingDocket),
@@ -491,7 +489,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   async addLsDetails(leg) {
     const lsDetails = {
-      id: leg.LoadingSheet,
+      _id: leg.LoadingSheet,
       lsno: leg.LoadingSheet,
       leg: leg.leg,
       vehno: this.loadingSheetTableForm.value.vehicle.value,
@@ -513,12 +511,11 @@ export class CreateLoadingSheetComponent implements OnInit {
     };
     const reqBody = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "loadingSheet_detail",
+      collectionName: "loadingSheet_detail",
       data: lsDetails,
     };
     try {
-      const res = await this._operationService.operationPost("common/create", reqBody).toPromise();
+      const res = await this._operationService.operationMongoPost("generic/create", reqBody).toPromise();
       if (res) {
         // Perform any necessary actions after the API call
       }
@@ -535,14 +532,13 @@ export class CreateLoadingSheetComponent implements OnInit {
     };
     const reqBody = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "vehicle_status",
-      id: this.loadingSheetTableForm.value.vehicle.value,
-      updates: {
+      collectionName: "vehicle_status",
+      filter:{_id:this.loadingSheetTableForm.value.vehicle.value},
+      update: {
         ...vehicleDetails,
       },
     };
-    this._operationService.operationPut("common/update", reqBody).subscribe({
+    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
 
@@ -605,7 +601,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     // Calculate the total loaded values, including previously loaded values
     loadedKgInput += loadAddedKg;
     loadedCftInput += volAddedCft;
-     let capacityTons = parseFloat(this.loadingSheetTableForm.controls['Capacity'].value); // Get the capacity value in tons
+    let capacityTons = parseFloat(this.loadingSheetTableForm.controls['Capacity'].value); // Get the capacity value in tons
     let loadedTons = loadedKgInput / 1000;
     let percentage = (loadedTons * 100) / capacityTons;
     // Update the form controls with the calculated values
@@ -618,11 +614,11 @@ export class CreateLoadingSheetComponent implements OnInit {
     this.loadingSheetTableForm.controls['VolumeUtilization'].setValue(volumeUtilization.toFixed(2));
     if (percentage > 100 || volumeUtilization > 100) {
       let errorMessage = "Capacity has been exceeded.";
-    
+
       if (volumeUtilization > 100) {
         errorMessage = "Cubic feet volume is greater than vehicle volume.";
       }
-    
+
       Swal.fire({
         icon: "error",
         title: "Capacity Exceeded",
@@ -637,10 +633,10 @@ export class CreateLoadingSheetComponent implements OnInit {
           return tableItem;
         });
       });
-      
-      
+
+
     }
-    
+
 
   }
   async departVehicle() {
@@ -668,15 +664,14 @@ export class CreateLoadingSheetComponent implements OnInit {
 
       const reqBody = {
         companyCode: this.companyCode,
-        type: "operation",
-        collection: "trip_detail",
-        id: this.tripData.id,
-        updates: { ...tripDetails },
-      };
+        collectionName: "trip_detail",
+        filter:{_id:this.tripData.id},
+        update: { ...tripDetails }
+      }
 
       try {
-        
-        await this._operationService.operationPut("common/update", reqBody).toPromise();
+
+        await this._operationService.operationMongoPut("generic/update", reqBody).toPromise();
 
         Swal.fire({
           icon: "info",
@@ -696,16 +691,17 @@ export class CreateLoadingSheetComponent implements OnInit {
   async updateOperationService(docket, loadingSheetData) {
     const reqBody = {
       companyCode: this.companyCode,
-      type: "operation",
-      collection: "docket",
-      id: docket,
-      updates: {
+      collectionName: "docket",
+      filter: {
+        docketNumber: docket,
+      },
+      update: {
         ...loadingSheetData
       }
     };
-  
+
     try {
-      const res = await this._operationService.operationPut("common/update", reqBody).toPromise();
+      const res = await this._operationService.operationMongoPut("generic/update", reqBody).toPromise();
       if (res) {
         await this.updateVehicleStatus();
       }

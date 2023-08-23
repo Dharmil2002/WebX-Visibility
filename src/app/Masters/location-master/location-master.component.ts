@@ -7,7 +7,6 @@ import Swal from 'sweetalert2';
   templateUrl: './location-master.component.html',
 })
 export class LocationMasterComponent implements OnInit {
-  data: [] | any;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
@@ -40,16 +39,15 @@ export class LocationMasterComponent implements OnInit {
   dynamicControls = {
     add: true,
     edit: true,
-    csv: false
+    csv: true
   }
-  cityActiveFlag: any;
   addAndEditPath: string;
-  tableData: any;
+  csvFileName: string;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
+    this.csvFileName = "Location Details";
   }
   ngOnInit(): void {
-    //throw new Error("Method not implemented.");
     this.getLocationDetails();
   }
   getLocationDetails() {
@@ -69,8 +67,6 @@ export class LocationMasterComponent implements OnInit {
             };
           });
           this.csv = dataWithSrno
-          console.log(this.csv);
-          this.tableData = dataWithSrno;
           this.tableLoad = false;
         }
       }
@@ -81,27 +77,28 @@ export class LocationMasterComponent implements OnInit {
     let id = det.id;
     // Remove the "id" field from the form controls
     delete det.id;
-  //  delete det.srNo;
+    delete det.srNo;
     let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        type: "masters",
-        collection: "location_detail",
-        id: id,
-        updates: det
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      type: "masters",
+      collection: "location_detail",
+      id: id,
+      updates: det
     };
     this.masterService.masterPut('common/update', req).subscribe({
-        next: (res: any) => {
-            if (res) {
-                // Display success message
-                Swal.fire({
-                    icon: "success",
-                    title: "Successful",
-                    text: res.message,
-                    showConfirmButton: true,
-                });
-            }
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.getLocationDetails();
         }
+      }
     });
-}
-  
+  }
+
 }

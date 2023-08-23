@@ -59,6 +59,8 @@ import { AddEditHolidayComponent } from './holiday-master/add-edit-holiday-maste
 import { HolidayMasterComponent } from './holiday-master/holiday-master-list/holiday-master-list.component';
 import { CityLocationMappingMaster } from './city-location-mapping-master/city-location-master/city-to-location-mapping.component';
 import { CompanygstmasterAddComponent } from './Company GST Master/companygstmaster-add/companygstmaster-add.component';
+import { ContainerMasterListComponent } from './container-master/container-master-list/container-master-list.component';
+import { AddContainerMasterComponent } from './container-master/add-container-master/add-container-master.component';
 
 
 const routes: Routes = [
@@ -121,6 +123,8 @@ const routes: Routes = [
   { path: "HolidayMaster/HolidayMasterList", component: HolidayMasterComponent },
   { path: "HolidayMaster/AddHolidayMaster", component: AddEditHolidayComponent },
   { path: "CityLocationMapping/CityLocationIndex", component: CityLocationMappingMaster },
+  { path: "ContainerMaster/ContainerMasterList", component: ContainerMasterListComponent },
+  { path: "ContainerMaster/AddContainerMaster", component: AddContainerMasterComponent },
 ];
 
 @NgModule({

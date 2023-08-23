@@ -1,0 +1,121 @@
+import { FormControls } from "src/app/Models/FormControl/formcontrol";
+
+export class ContainerControl {
+    ContainerControlArray: FormControls[];
+    constructor(containerMasterTable, isUpdate: boolean) {
+        this.ContainerControlArray = [
+            {
+                name: 'containerCode',
+                label: 'Container Code',
+                placeholder: 'Container Code',
+                type: 'text',
+                value: containerMasterTable?.containerCode ? containerMasterTable.containerCode : "System Generated",
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Container Code is required"
+                    },
+                ],
+                generatecontrol: true, disable: true
+            },
+            {
+                name: 'containerName',
+                label: 'Container Name',
+                placeholder: 'Container Name',
+                type: 'text',
+                value: containerMasterTable?.containerName,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Container name is required"
+                    },
+                    {
+                        name: "pattern",
+                        message: "Please Enter only text with 1-20 alphabets",
+                        pattern: '^[a-zA-Z0-9 ]{1,20}$'
+                    }
+                ],
+                generatecontrol: true, disable: isUpdate ? true : false,
+                functions: {
+                    onChange: "checkContainerExists",
+                },
+            },
+            {
+                name: 'loadCapacity',
+                label: 'Load Capacity',
+                placeholder: 'Enter Load Capacity',
+                type: 'number',
+                value: containerMasterTable?.loadCapacity,
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'length',
+                label: 'Length(Ft)',
+                placeholder: 'Enter Length',
+                type: 'number',
+                value: containerMasterTable?.length,
+                Validations: [
+                    {
+                        name: "pattern",
+                        message: "Please Enter Proper Length(Max 100)",
+                        pattern: '^\d*\\.?\\d+$'
+                    }
+                ],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'width',
+                label: 'Width(Ft)',
+                placeholder: 'Enter Width',
+                type: 'number',
+                value: containerMasterTable?.width,
+                Validations: [
+                    {
+                        name: "pattern",
+                        message: "Please Enter Proper Width(Max 50)",
+                        pattern: '^\d*\\.?\\d+$'
+                    }
+                ],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'height',
+                label: 'Height(Ft)',
+                placeholder: 'Enter Height',
+                type: 'number',
+                value: containerMasterTable?.height,
+                Validations: [
+                    {
+                        name: "pattern",
+                        message: "Please Enter Proper Height(Max 25)",
+                        pattern: '^\d*\\.?\\d+$'
+                    }
+                ],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'activeFlag',
+                label: 'Active Flag',
+                placeholder: 'Active Flag',
+                type: 'toggle',
+                value: containerMasterTable?.activeFlag,
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: '_id',
+                label: '',
+                placeholder: '',
+                type: 'text',
+                value: containerMasterTable?._id,
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            }
+        ];
+    }
+    getContainerFormControls() {
+        return this.ContainerControlArray;
+    }
+}

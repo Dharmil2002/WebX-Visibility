@@ -99,6 +99,8 @@ import { VehicleStatusUpdateComponent } from './vehicle-status-update/vehicle-st
 import { AddEditHolidayComponent } from './holiday-master/add-edit-holiday-master/add-edit-holiday.component';
 import { HolidayMasterComponent } from './holiday-master/holiday-master-list/holiday-master-list.component';
 import { CityLocationMappingMaster } from './city-location-mapping-master/city-location-master/city-to-location-mapping.component';
+import { ContainerMasterListComponent } from './container-master/container-master-list/container-master-list.component';
+import { AddContainerMasterComponent } from './container-master/add-container-master/add-container-master.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -203,7 +205,7 @@ import { CityLocationMappingMaster } from './city-location-mapping-master/city-l
     GeneralMasterAddComponent,
     GeneralMasterCodeListComponent,
     AddVehicleStatusUpdateComponent, HolidayMasterComponent,
-    AddEditHolidayComponent,CityLocationMappingMaster
+    AddEditHolidayComponent,CityLocationMappingMaster, ContainerMasterListComponent, AddContainerMasterComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

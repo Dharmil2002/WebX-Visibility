@@ -187,7 +187,6 @@ export class PrqEntryControls {
                     { value: 'MUMBAI', name: 'MUMBAI' },
                     { value: 'DELHI', name: 'DELHI' },
                     { value: 'KOLKATA', name: 'KOLKATA' }
-
                 ],
                 filterOptions: "",
                 autocomplete: "",
@@ -219,6 +218,69 @@ export class PrqEntryControls {
                 additionalData: {
                     showNameAndValue: false,
                 },
+            },
+            {
+                name: '_id',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '',
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'status',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '0',
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'entryBy',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: localStorage.getItem("Username"),
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'entryDate',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: new Date(),
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'status',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '0',
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'vehicleNo',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '0',
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'dktNo',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '0',
+                Validations: [],
+                generatecontrol: true, disable: false
             },
 
         ];

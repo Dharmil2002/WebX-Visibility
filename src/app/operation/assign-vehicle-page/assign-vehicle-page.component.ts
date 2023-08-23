@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { ViewPrintComponent } from '../view-print/view-print.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-assign-vehicle-page',
@@ -75,11 +77,11 @@ export class AssignVehiclePageComponent implements OnInit {
   linkArray = [
     { Row: 'action' }
   ];
-  menuItems = [{ label: 'action', componentDetails: "" }];
+  menuItems = [{ label: 'action', componentDetails: ViewPrintComponent}];
   tableData: any;
-  constructor(private masterService: MasterService) {
+  nestedData: any;
+  constructor(private masterService: MasterService,private router: Router) {
   }
-
   ngOnInit(): void {
     this.getPrqDetails();
   }

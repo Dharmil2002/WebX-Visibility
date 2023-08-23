@@ -116,12 +116,14 @@ export class JobEntryPageComponent implements OnInit {
     });
   }
   save() {
+   
     const thisYear = new Date().getFullYear();
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
     const paddedNumber = dynamicNumber.toString().padStart(4, "0");
     let jeNo = `JE/${dynamicValue}/${financialYear}/${paddedNumber}`;
+  
     Swal.fire({
       icon: "success",
       title: "Generated Successfuly",

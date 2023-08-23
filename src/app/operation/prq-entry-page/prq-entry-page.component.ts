@@ -9,6 +9,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { getCity } from '../quick-booking/quick-utility';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { addPrqData, showConfirmationDialog, updatePrqStatus } from './prq-utitlity';
 
 @Component({
   selector: 'app-prq-entry-page',
@@ -41,9 +42,44 @@ export class PrqEntryPageComponent implements OnInit {
       active: "PRQ Entry",
     },
   ];
+  prqDetail: any;
+  isConfirm: boolean;
   constructor(private fb: UntypedFormBuilder, private masterService: MasterService,
     private filter: FilterUtils, private router: Router) {
-    this.initializeFormControl();
+    if (this.router.getCurrentNavigation()?.extras?.state != null) {
+      this.prqDetail = router.getCurrentNavigation().extras.state.data.columnData;
+      if (this.prqDetail.Action === "Confirmation") {
+        const tabIndex = 6; // Adjust the tab index as needed
+        showConfirmationDialog(this.prqDetail, masterService, this.goBack.bind(this), tabIndex);
+      }
+      else if(this.prqDetail.Action === "Assign Vehicle") {
+        this.masterService.setassignVehicleDetail(this.prqDetail);
+        this.router.navigate(['/Operation/AssignVehicle'], {
+          state: {
+            data: this.prqDetail,
+  
+          },
+        });
+      }
+      else if(this.prqDetail.Action === "Create Docket"){
+        this.router.navigate(['/Masters/Docket/EwayBillDocketBookingV2'], {
+          state: {
+            data: this.prqDetail,
+  
+          },
+        });
+      }
+      else {
+        this.isConfirm = true
+        this.initializeFormControl();
+      }
+      
+    }
+    else {
+      this.isConfirm = true
+     this.initializeFormControl();
+
+    }
   }
 
   ngOnInit(): void {
@@ -126,25 +162,34 @@ export class PrqEntryPageComponent implements OnInit {
   cancel() {
     window.history.back();
   }
-  save() {
+  async save() {
     const thisYear = new Date().getFullYear();
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
     const dynamicNumber = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
     const raise = this.prqEntryTableForm.value.prqBranch;
     const prqNo = `PRQ/${raise}/${financialYear}/${dynamicNumber}`;
+    this.prqEntryTableForm.controls['_id'].setValue(prqNo);
+    this.prqEntryTableForm.controls['prqId'].setValue(prqNo);
+    this.prqEntryTableForm.controls['billingParty'].setValue(this.prqEntryTableForm.controls['billingParty'].value?.name || "");
+    this.prqEntryTableForm.controls['fromCity'].setValue(this.prqEntryTableForm.controls['fromCity'].value?.name || "");
+    this.prqEntryTableForm.controls['toCity'].setValue(this.prqEntryTableForm.controls['toCity'].value?.name || "");
+    const res = await addPrqData(this.prqEntryTableForm.value, this.masterService);
 
-    Swal.fire({
-      icon: "success",
-      title: "Generated Successfuly",
-      text: `PRQ No: ${prqNo}`,
-      showConfirmButton: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.router.navigate(['/Operation/AssignVehicle']);
-      }
-    });
-
-    console.log(this.prqEntryTableForm.value);
+    if (res) {
+      Swal.fire({
+        icon: "success",
+        title: "Generated Successfuly",
+        text: `PRQ No: ${prqNo}`,
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.goBack(6)
+        }
+      });
+    }
+    // console.log(this.prqEntryTableForm.value);
   }
-
+  goBack(tabIndex: number): void {
+    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+  }
 }

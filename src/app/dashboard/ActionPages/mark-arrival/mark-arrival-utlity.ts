@@ -14,7 +14,7 @@ export async function tripTransactionDetail(
         companyCode: companyCode,
         collectionName: "trip_transaction_history",
         filter: {
-            tripId: tripId
+            tripID: tripId
         }
     };
     try {

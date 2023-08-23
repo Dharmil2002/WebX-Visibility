@@ -194,10 +194,7 @@ export async function getDocketFromApiDetail(companyCode, operationService, dock
     try {
         // Retrieve data from the API and filter for valid docket details
         const res = await operationService.operationMongoPost('generic/get', reqBody).toPromise();
-        const docketDetails = res.data.filter(x => {
-            if (typeof x.unload !== "boolean") throw new Error("Invalid unload value.");
-            return !x.unload;
-        });
+        const docketDetails = res.data.filter((x)=>x.unload==false);
 
         return docketDetails;
     } catch (error) {

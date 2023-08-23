@@ -428,7 +428,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "trip_detail",
-      filter: {_id:this.tripData._id},
+      filter: {_id:this.tripData.id},
       update: {
         ...tripDetails,
       },

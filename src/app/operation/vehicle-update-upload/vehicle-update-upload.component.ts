@@ -335,7 +335,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
       await this.updatedocketDetail(element.Shipment, menifestDetails.MFNumber);
 
       const jsonDetails = {
-        "id": menifestDetails?.MFNumber || "",
+        "_id": menifestDetails?.MFNumber || "",
         "mfNo": menifestDetails?.MFNumber || "",
         "leg": menifestDetails?.Leg || "",
         "lsNo": this.vehicelLoadData?.LoadingSheet || "",

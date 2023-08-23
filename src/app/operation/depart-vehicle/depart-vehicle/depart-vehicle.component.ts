@@ -286,7 +286,7 @@ export class DepartVehicleComponent implements OnInit {
 
     const reqbody = {
       companyCode: this.companyCode,
-      collectionName: "docket",
+      collectionName: "menifest_detail",
       filter:{}
     };
     this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
@@ -325,7 +325,7 @@ export class DepartVehicleComponent implements OnInit {
       collectionName: "loadingSheet_detail",
       filter:{}
     };
-    this._operationService.operationPost("generic/get", reqbody).subscribe({
+    this._operationService.operationMongoPost("generic/get", reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           this.lsDetails = res.data.find(
@@ -420,7 +420,7 @@ export class DepartVehicleComponent implements OnInit {
       "collectionName": "trip_transaction_history",
       "data": departData
     }
-    this._operationService.operationPost('generic/create', reqbody).subscribe({
+    this._operationService.operationMongoPost('generic/create', reqbody).subscribe({
       next: (res: any) => {
         if (res) {
           this.updateTrip();

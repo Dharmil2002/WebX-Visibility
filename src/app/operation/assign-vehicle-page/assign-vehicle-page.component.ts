@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
   selector: 'app-assign-vehicle-page',
@@ -34,7 +35,7 @@ export class AssignVehiclePageComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:2px",
     },
-    currentLoc: {
+    currentLocation: {
       Title: "Current Location",
       class: "matcolumnleft",
       Style: "min-width:200px",
@@ -49,7 +50,7 @@ export class AssignVehiclePageComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:80px",
     },
-    Action: {
+    action: {
       Title: "Action",
       class: "matcolumnleft",
       Style: "min-width:100px",
@@ -60,17 +61,27 @@ export class AssignVehiclePageComponent implements OnInit {
     "vehicleNo",
     "fromCity",
     "toCity",
-    "currentLoc",
+    "currentLocation",
     "distance",
-    "ftlType",
+    "ftlType"
   ];
-  constructor() {
+  linkArray = [
+    { Row: 'action' }
+  ];
+  menuItems = [{ label: 'action', componentDetails: "" }];
+  tableData: any;
+  constructor(private masterService: MasterService) {
   }
 
   ngOnInit(): void {
     this.getPrqDetails();
   }
   getPrqDetails() {
-    this.tableLoad = false;
+    this.masterService.getJsonFileDetails("masterUrl").subscribe((res) => {
+      if (res) {
+        this.tableData = res.assignVehicle
+        this.tableLoad = false;
+      }
+    });
   }
 }

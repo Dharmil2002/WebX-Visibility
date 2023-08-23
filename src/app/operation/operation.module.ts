@@ -32,6 +32,8 @@ import { DocketTrackingComponent } from './docket-tracking/docket-tracking.compo
 import { PrqEntryPageComponent } from "./prq-entry-page/prq-entry-page.component";
 import { JobEntryPageComponent } from './job-entry-page/job-entry-page.component';
 import { AssignVehiclePageComponent } from './assign-vehicle-page/assign-vehicle-page.component';
+import { RakeEntryPageComponent } from './rake-entry-page/rake-entry-page.component';
+import { ChaEntryPageComponent } from './cha-entry-page/cha-entry-page.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -49,7 +51,9 @@ import { AssignVehiclePageComponent } from './assign-vehicle-page/assign-vehicle
     DocketTrackingComponent,
     PrqEntryPageComponent,
     JobEntryPageComponent,
-    AssignVehiclePageComponent
+    AssignVehiclePageComponent,
+    RakeEntryPageComponent,
+    ChaEntryPageComponent
   ],
   imports: [
     CommonModule,

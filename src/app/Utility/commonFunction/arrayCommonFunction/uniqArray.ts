@@ -1,3 +1,5 @@
+import { format, isValid, parseISO } from "date-fns";
+
 /**
  * Extracts unique values from a specified property in an array of objects.
  *
@@ -22,4 +24,13 @@ export function extractUniqueValues<T>(data: T[], property: keyof T): any[] {
     // Return the array of unique values
     return uniqueValues;
   }
-  
+  ///date formater
+ export function formatDocketDate(dateString) {
+    if (dateString) {
+        const parsedDate = parseISO(dateString);
+        if (isValid(parsedDate)) {
+            return format(parsedDate, "dd-MM-yy HH:mm");
+        }
+    }
+    return null;
+}

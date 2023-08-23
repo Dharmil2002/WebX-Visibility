@@ -15,6 +15,7 @@ export class MasterService {
   generalMaster='../../../assets/data/generalMaster.json';
   destination='../../../assets/data/destination.json';
   headerCode: string;
+  vehicleDetail: any;
 
   constructor(private http: HttpClient) { }
   /**
@@ -42,5 +43,11 @@ export class MasterService {
   }
   getHeaderCode(){
     return this.headerCode
+  }
+  setassignVehicleDetail(data:any){
+    this.vehicleDetail=data;
+  }
+  getAssigneVehicleDetail(){
+    return this.vehicleDetail
   }
 }

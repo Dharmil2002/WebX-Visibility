@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { getPrqDetailFromApi } from './prq-summary-utitlity';
 
 @Component({
   selector: 'app-prq-summary-page',
@@ -23,42 +25,27 @@ export class PrqSummaryPageComponent implements OnInit {
     prqNo: {
       Title: "PRQ No",
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:250px",
     },
-    prqDate: {
-      Title: "PRQ Date",
-      class: "matcolumnleft",
-      Style: "min-width:80px",
-    },
-    ftlType: {
-      Title: "FTL Type",
+    vehicleSize: {
+      Title: "Vehicle Size",
       class: "matcolumnleft",
       Style: "min-width:2px",
     },
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:250px",
     },
     fromToCity: {
       Title: "From-To City",
       class: "matcolumnleft",
-      Style: "min-width:80px",
-    },
-    fleetSize: {
-      Title: "Fleet Size",
-      class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:250px",
     },
     pickUpDate: {
       Title: "Pick Up Date Time",
       class: "matcolumnleft",
-      Style: "min-width:2px",
-    },
-    weight: {
-      Title: "Weight",
-      class: "matcolumnleft",
-      Style: "min-width:2px",
+      Style: "min-width:250px",
     },
     status: {
       Title: "Status",
@@ -68,23 +55,22 @@ export class PrqSummaryPageComponent implements OnInit {
     Action: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "min-width:100px",
+      Style: "min-width:200px",
     },
   };
   //#endregion
   staticField = [
     "prqNo",
-    "prqDate",
-    "ftlType",
+    "pickUpDate",
     "billingParty",
     "fromToCity",
-    "fleetSize",
-    "pickUpDate",
-    "weight",
-    "status"
+    "status",
+    "vehicleSize"
   ];
   addAndEditPath: string;
-  constructor() {
+  tableData: any[];
+  linkArray = [{ Row: "Action", Path: "Operation/PRQEntry" }];
+  constructor(private _masterService:MasterService) {
     this.addAndEditPath = "Operation/PRQEntry";
   }
 
@@ -125,7 +111,11 @@ export class PrqSummaryPageComponent implements OnInit {
     ];
     this.getPrqDetails();
   }
-  getPrqDetails() {
+  async getPrqDetails() {
+  
+    let data= await getPrqDetailFromApi(this._masterService);
+    this.tableData=data;
     this.tableLoad = false;
   }
+
 }

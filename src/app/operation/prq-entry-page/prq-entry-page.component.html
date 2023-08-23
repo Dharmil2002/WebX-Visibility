@@ -1,7 +1,11 @@
+<div *ngIf="isConfirm">
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
+
     <form [formGroup]="prqEntryTableForm">
         <app-form-webxpress [form]="prqEntryTableForm" [formData]="jsonControlPrqArray" [showSaveAndCancelButton]="true"
             (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
+
 </app-common-wrapper-webxpress>
+</div>

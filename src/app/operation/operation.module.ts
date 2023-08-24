@@ -34,6 +34,7 @@ import { JobEntryPageComponent } from './job-entry-page/job-entry-page.component
 import { AssignVehiclePageComponent } from './assign-vehicle-page/assign-vehicle-page.component';
 import { RakeEntryPageComponent } from './rake-entry-page/rake-entry-page.component';
 import { ChaEntryPageComponent } from './cha-entry-page/cha-entry-page.component';
+import { HandedOverComponent } from './handed-over/handed-over.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -53,7 +54,8 @@ import { ChaEntryPageComponent } from './cha-entry-page/cha-entry-page.component
     JobEntryPageComponent,
     AssignVehiclePageComponent,
     RakeEntryPageComponent,
-    ChaEntryPageComponent
+    ChaEntryPageComponent,
+    HandedOverComponent
   ],
   imports: [
     CommonModule,

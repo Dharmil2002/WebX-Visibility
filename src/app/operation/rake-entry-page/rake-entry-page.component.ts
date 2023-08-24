@@ -6,7 +6,8 @@ import { RakeEntryControl } from "src/assets/FormControls/rake-entry";
 import { getCity } from "../quick-booking/quick-utility";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
+import { renameKeys } from "./rate-utility";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -27,7 +28,7 @@ export class RakeEntryPageComponent implements OnInit {
         addRow: false,
         submit: false,
         search: true,
-      };
+    };
     companyCode = parseInt(localStorage.getItem("companyCode"));
     fromCity: string; //it's used in getCity() for the binding a fromCity
     fromCityStatus: boolean; //it's used in getCity() for binding fromCity
@@ -41,31 +42,36 @@ export class RakeEntryPageComponent implements OnInit {
             active: "Rake Entry",
         },
     ];
+    jobDetail: any;
 
     ngOnInit(): void {
+        this.initializeFormControl();
         this.bindDropDown();
         this.getCity();
     }
 
-    constructor(private fb: UntypedFormBuilder,private Route: Router, private masterService: MasterService,
+    constructor(private fb: UntypedFormBuilder, private Route: Router, private routeActive: ActivatedRoute, private masterService: MasterService,
         private filter: FilterUtils) {
-        this.initializeFormControl();
+        if (this.Route.getCurrentNavigation()?.extras?.state != null) {
+            this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data;
+        }
+
     }
 
-    cnWiseDisplayedColumns = {
+    displayedColumns = {
         srNo: {
             name: "#",
             key: "checkbox",
             style: "",
         },
-        cnNo: {
-            name: "CN No",
+        jobNo: {
+            name: "Job No",
             key: "input",
             readonly: true,
             style: "",
         },
-        cnDate: {
-            name: "CN Date",
+        jobDate: {
+            name: "Job Date",
             key: "input",
             option: [],
             style: ""
@@ -122,45 +128,24 @@ export class RakeEntryPageComponent implements OnInit {
         // Build the form group using formGroupBuilder function and the values of jsonControlArray
         this.rakeEntryTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
         this.show = false;
-        this.loadTempData();
+        this.rakeEntryTableForm.controls['documentType'].setValue('JOB');
+        this.loadTempData(this.jobDetail);
     }
 
-    loadTempData() {
+    loadTempData(jobDetail) {
         this.tableData = [
-          {
-            srNo: true, // Serial number
-            cnNo: "CNMUMB000021",
-            cnDate:"12 JUN 2023",
-            noOfPkts: 2,
-            weight: 2,
-            fromCity: "MUMBAI",
-            toCity: "DELHI",
-            billingParty:"AAREN FURNITURES PALACE"
-          }
+            {
+                srNo: true, // Serial number
+                jobNo: jobDetail?.jobNo || "",
+                jobDate: jobDetail?.jobDate || "",
+                noOfPkts: jobDetail?.pkgs || 0,
+                weight: jobDetail?.weight || 0,
+                fromCity: jobDetail?.fromToCity.split("-")[0] || "",
+                toCity: jobDetail?.fromToCity.split("-")[1] || "",
+                billingParty: "AAREN FURNITURES PALACE"
+            }
         ]
-      }
-      // Add a new item to the table
-    
-    // // Load temporary data
-    // loadTempData(det) {
-    //     this.type = this.rakeEntryTableForm.value.documentType;
-    //     if (this.type == "C") {
-    //         this.tableData = det || [];
-    //         if (this.tableData.length === 0) {
-    //             this.addCNWise();
-    //         }
-    //     }
-    //     else {
-    //         this.tableData1 = det || [];
-    //         if (this.tableData1.length === 0) {
-    //             this.addJobWise();
-    //         }
-    //     }
-    // }
-
-    // addCNWise() { }
-    // addJobWise() { }
-
+    }
 
     //Checked Dropdown Option - Cn Wise / Job Wise
     display($event) {
@@ -171,7 +156,7 @@ export class RakeEntryPageComponent implements OnInit {
         if (generateControl === 'JOB') {
             this.show = false;
         }
-     //   this.loadTempData('');
+        //   this.loadTempData('');
     }
 
     functionCallHandler($event) {
@@ -215,7 +200,7 @@ export class RakeEntryPageComponent implements OnInit {
     goBack(tabIndex: number): void {
         this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
     }
-    save(){
-        
+    save() {
+
     }
 }

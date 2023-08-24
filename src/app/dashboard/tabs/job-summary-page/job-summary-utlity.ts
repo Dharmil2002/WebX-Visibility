@@ -20,7 +20,9 @@ export async function getJobDetailFromApi(masterServices) {
             "fromToCity": element?.fromCity + "-" + element?.toCity,
             "jobLocation":element?.jobLocation||"",
             "pkgs":element?.noOfPkg||"",
+            "weight":element?.noOfPkg||"",
             "vehicleSize":element?.vehicleSize||"",
+            "transportedBy":element?.transportedBy||"",
             "status": element?.status === "0" ? "Awaiting CHA Entry" : element.status === "1" ? "Awaiting Rake Entry" : "Awaiting Advance Payment",
             "Action": element?.status === "0" ? "CHA Entry" : element.status === "1" ? "Rake Entry" : "Advance Payment"
         }

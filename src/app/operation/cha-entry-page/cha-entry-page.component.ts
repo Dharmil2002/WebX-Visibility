@@ -7,7 +7,7 @@ import { Router } from "@angular/router";
 import { processProperties } from "src/app/Masters/processUtility";
 import Swal from "sweetalert2";
 import { ChaEntryControl } from "src/assets/FormControls/cha-entry";
-import {chaJobDetail, updateJobStatus } from "./cha-utility";
+import { chaJobDetail, updateJobStatus } from "./cha-utility";
 
 @Component({
   selector: 'app-cha-entry-page',
@@ -71,56 +71,83 @@ export class ChaEntryPageComponent implements OnInit {
   jobDetail: any;
   displayedColumns1 = {
     srNo: {
-      name: "#",
+      name: "Sl No",
       key: "index",
-      style: "",
+      Style: "",
+      HeaderStyle: {'min-width':'80px'},
+      class: "matcolumncenter"
     },
     docName: {
       name: "Name of Document",
-      key: "inputString",
-      style: "",
+      key: "Dropdown",
+      option: [
+        { name: "Incoming Invoice", value: "Incoming Invoice" },
+        { name: "Goods Movement", value: "Goods Movement" },
+        { name: "RC", value: "RC" },
+        { name: "Insurance", value: "Insurance" }
+      ],
+      Style: "",
+      HeaderStyle: { 'text-align': 'center' },
     },
     clrChrg: {
-      name: "Clearance Charge",
+      name: "Clearance Charge (Rs)",
       key: "inputnumber",
-      style: ""
+      Style: "",
+      HeaderStyle: { 'text-align': 'center' },
+      functions: {
+        onChange: "calculateTotaAmount",
+      },
     },
     gstRate: {
       name: "GST Rate",
       key: "inputnumber",
-      style: ""
+      Style: "",
+      HeaderStyle: { 'text-align': 'center' },
+      functions: {
+        onChange: "calculateTotaAmount",
+      },
     },
     gstAmt: {
-      name: "GST Amount",
+      name: "GST Amount (Rs)",
       key: "inputnumber",
-      style: ""
+      Style: "",
+      HeaderStyle: { 'text-align': 'center' },
+      readonly:true
     },
     totalAmt: {
-      name: "Total Amount",
+      name: "Total Amount (Rs)",
       key: "inputnumber",
-      style: ""
+      Style: "",
+      HeaderStyle: { 'text-align': 'center' },
+      readonly:true
     },
     action: {
       name: "Action",
       key: "Action",
-      style: "",
+      Style: "",
+      HeaderStyle: { 'text-align': 'center' },
     }
   };
   RakeEntry: boolean;
   constructor(private Route: Router, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.jobDetail=this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
-      if(this.jobDetail.Action=="Rake Entry"){
-        this.Route.navigateByUrl("Operation/RakeEntry");
-        this.RakeEntry=true;
-      
+      this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
+      if (this.jobDetail.Action == "Rake Entry") {
+        this.Route.navigate(['/Operation/RakeEntry'], {
+          state: {
+            data: this.jobDetail,
+  
+          },
+        });
+        this.RakeEntry = true;
+
       }
-      else{
+      else {
       }
       this.initializeFormControl();
 
     }
-  else{ this.initializeFormControl();}
+    else { this.initializeFormControl(); }
   }
 
   ngOnInit(): void {
@@ -197,16 +224,19 @@ export class ChaEntryPageComponent implements OnInit {
       }
     });
   }
-  autoBillData(){
-    if(this.jobDetail){
-    this.chaEntryTableForm.controls['jobType'].setValue(this.jobDetail.jobType==="Export"?"E":this.jobDetail.jobType==="Import"?"I":"");
-    const billingParty={
-      name:this.jobDetail?.billingParty||"",
-      value:this.jobDetail?.billingParty||""
+  autoBillData() {
+    if (this.jobDetail) {
+      this.chaEntryTableForm.controls['jobType'].setValue(this.jobDetail.jobType === "Export" ? "E" : this.jobDetail.jobType === "Import" ? "I" : "");
+      const billingParty = {
+        name: this.jobDetail?.billingParty || "",
+        value: this.jobDetail?.billingParty || ""
+      }
+
+      this.chaEntryTableForm.controls['billingParty'].setValue(billingParty);
+      this.chaEntryTableForm.controls['jobNo'].setValue(this.jobDetail.jobNo);
+      this.chaEntryTableForm.controls['transportedBy'].setValue(this.jobDetail?.transportedBy === "I" ? "Third Party" : this.jobDetail?.transportedBy === "E" ? "Own" : "");
     }
-    this.chaEntryTableForm.controls['billingParty'].setValue(billingParty);
-    this.chaEntryTableForm.controls['jobNo'].setValue(this.jobDetail.jobNo);
-  }
+
   }
   async save() {
     this.chaEntryTableForm.controls["billingParty"].setValue(this.chaEntryTableForm.value.billingParty.value);
@@ -223,9 +253,9 @@ export class ChaEntryPageComponent implements OnInit {
       ...this.chaEntryTableForm.value,
       ...docDetail,
     };
-    const res= await chaJobDetail(jobDetail,this.masterService);
-    const resUpdate=await updateJobStatus(this.jobDetail,this.masterService)
-    if(res){
+    const res = await chaJobDetail(jobDetail, this.masterService);
+    const resUpdate = await updateJobStatus(this.jobDetail, this.masterService)
+    if (res) {
       Swal.fire({
         icon: "success",
         title: "Generated SuccesFully",
@@ -237,7 +267,7 @@ export class ChaEntryPageComponent implements OnInit {
         }
       });
     }
- 
+
   }
 
   cancel() {
@@ -257,22 +287,22 @@ export class ChaEntryPageComponent implements OnInit {
       {
         srNo: 0, // Serial number
         docName: "",
-        clrChrg:"",
-        gstRate: 0,
-        gstAmt: 0,
-        totalAmt: 0
+        clrChrg:"0.00",
+        gstRate: "0.00",
+        gstAmt: "0.00",
+        totalAmt: "0.00"
       }
     ]
   }
   // Add a new item to the table
   addItem() {
     const AddObj = {
-        srNo: 0, // Serial number
-        docName: "",
-        clrChrg:"",
-        gstRate: 0,
-        gstAmt: 0,
-        totalAmt: 0
+      srNo: 0, // Serial number
+      docName: "",
+      clrChrg:"0.00",
+      gstRate: "0.00",
+      gstAmt: "0.00",
+      totalAmt: "0.00"
     };
     this.tableData.splice(0, 0, AddObj); // Insert the new object at the beginning of the tableData array
   }
@@ -338,4 +368,12 @@ export class ChaEntryPageComponent implements OnInit {
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
   }
+    calculateTotaAmount(event) {
+     let gstamount= parseFloat(event.row.clrChrg)*parseFloat(event.row.gstRate)/100
+     event.row.gstAmt=gstamount.toString();
+     let total=  parseFloat(event.row.clrChrg)+gstamount;
+     event.row.totalAmt=total.toString();
+
+}
+
 }

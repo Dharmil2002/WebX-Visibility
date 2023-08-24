@@ -20,3 +20,4 @@ export async function updateJobStatus(jobData,masterService) {
       const res= await masterService.masterMongoPut("generic/update", reqBody).toPromise();
       return res
 }
+

@@ -43,6 +43,7 @@ import { StocksComponent } from './stocks/stocks.component';
 import { PodCodDashboardPageComponent } from './tabs/pod-cod-dashboard-page/pod-cod-dashboard-page.component';
 import { PrqSummaryPageComponent } from './tabs/prq-summary-page/prq-summary-page.component';
 import { JobSummaryPageComponent } from './tabs/job-summary-page/job-summary-page.component';
+import { RakeUpdateComponent } from "../operation/rake-update/rake-update.component";
 
 @NgModule({
   declarations: [
@@ -61,6 +62,8 @@ import { JobSummaryPageComponent } from './tabs/job-summary-page/job-summary-pag
     PodCodDashboardPageComponent,
     PrqSummaryPageComponent,
     JobSummaryPageComponent,
+    RakeUpdateComponent
+
   ],
   imports: [
     CommonModule,

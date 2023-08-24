@@ -52,10 +52,10 @@ export class ClusterMasterListComponent implements OnInit {
   getClusterDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "cluster_detail"
+      "filter": {},
+      "collectionName": "cluster_detail"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
@@ -72,18 +72,17 @@ export class ClusterMasterListComponent implements OnInit {
     })
   }
   IsActiveFuntion(det) {
-    let id = det.id;
+    let id = det._id;
     // Remove the "id" field from the form controls
-    delete det.id;
+    delete det._id;
     delete det.srNo;
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      type: "masters",
-      collection: "cluster_detail",
-      id: id,
-      updates: det
+      collectionName: "cluster_detail",
+      filter: { _id: id },
+      update: det
     };
-    this.masterService.masterPut('common/update', req).subscribe({
+    this.masterService.masterPut('generic/update', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Display success message

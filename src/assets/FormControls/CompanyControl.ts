@@ -374,11 +374,11 @@ export class CompanyControl {
                     Validations: []
                 },
                 {
-                    name: 'id',
+                    name: '_id',
                     label: '',
                     placeholder: '',
                     type: 'text',
-                    value: CompanyDetailsResponse?.id,
+                    value: CompanyDetailsResponse?._id,
                     filterOptions: '',
                     autocomplete: '',
                     displaywith: '',

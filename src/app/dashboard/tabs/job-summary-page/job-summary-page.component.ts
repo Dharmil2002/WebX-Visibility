@@ -86,7 +86,7 @@ export class JobSummaryPageComponent implements OnInit {
     "status"
   ];
   addAndEditPath: string;
-  linkArray = [{ Row: "Action", Path: "Operation/PRQEntry" }];
+  linkArray = [{ Row: "Action", Path: "Operation/CHAEntry" }];
   constructor(private _masterService:MasterService) {
     this.addAndEditPath = "Operation/JobEntry";
   }

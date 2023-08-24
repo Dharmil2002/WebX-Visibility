@@ -15,7 +15,7 @@ export class ChaEntryControl {
                 ]
             }, 
             {
-                name: " documentType",
+                name: "documentType",
                 label: " Document Type",
                 placeholder: 'Document Type',
                 type: "Staticdropdown",
@@ -38,8 +38,8 @@ export class ChaEntryControl {
                 }
             }, 
             {
-                name: 'selectDocument ', label: "Job No/CN No", placeholder: "", type: 'text', value:"",
-                generatecontrol: true, disable: false,
+                name: 'jobNo', label: "Job No/CN No", placeholder: "", type: 'text', value:"",
+                generatecontrol: true, disable: true,
                 Validations: [],
                 functions: {
                     onChange: 'selectHandleFileSelection',
@@ -79,6 +79,33 @@ export class ChaEntryControl {
                 placeholder: 'IsUpdate',
                 type: 'text',
                 value: false,
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
+            {
+                name: '_id',
+                label: 'id',
+                placeholder: 'id',
+                type: '',
+                value: false,
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
+              {
+                name: 'entryBy',
+                label: 'entryBy',
+                placeholder: 'entryBy',
+                type: '',
+                value: localStorage.getItem("Username"),
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
+            {
+                name: 'entryDate',
+                label: 'entryDate',
+                placeholder: 'entryDate',
+                type: '',
+                value: new Date().toUTCString(),
                 Validations: [],
                 generatecontrol: false, disable: false
             },

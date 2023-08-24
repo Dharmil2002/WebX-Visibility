@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { getJobDetailFromApi } from './job-summary-utlity';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
   selector: 'app-job-summary-page',
@@ -10,6 +12,7 @@ export class JobSummaryPageComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
+  tableData: any[];
   dynamicControls = {
     add: true,
     edit: true,
@@ -22,12 +25,12 @@ export class JobSummaryPageComponent implements OnInit {
     jobNo: {
       Title: "Job No",
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:200px",
     },
     jobDate: {
       Title: "Job Date",
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:200px",
     },
     jobType: {
       Title: "Job Type",
@@ -37,37 +40,37 @@ export class JobSummaryPageComponent implements OnInit {
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:250px",
     },
     fromToCity: {
       Title: "From-To City",
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:250px",
     },
     jobLocation: {
       Title: "Job Location",
       class: "matcolumnleft",
-      Style: "min-width:80px",
+      Style: "min-width:110px",
     },
     pkgs: {
       Title: "Pkgs",
       class: "matcolumnleft",
       Style: "min-width:2px",
     },
-    weight: {
-      Title: "Weight",
+    vehicleSize: {
+      Title: "Vehicle Size",
       class: "matcolumnleft",
       Style: "min-width:2px",
     },
     status: {
       Title: "Status",
       class: "matcolumnleft",
-      Style: "min-width:100px",
+      Style: "min-width:200px",
     },
     Action: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "min-width:100px",
+      Style: "min-width:200px",
     },
   };
   //#endregion
@@ -79,18 +82,23 @@ export class JobSummaryPageComponent implements OnInit {
     "fromToCity",
     "jobLocation",
     "pkgs",
-    "weight",
+    "vehicleSize",
     "status"
   ];
   addAndEditPath: string;
-  constructor() {
+  linkArray = [{ Row: "Action", Path: "Operation/CHAEntry" }];
+  constructor(private _masterService:MasterService) {
     this.addAndEditPath = "Operation/JobEntry";
   }
 
   ngOnInit(): void {
-    this.getPrqDetails();
+    this.getJobDetails();
   }
-  getPrqDetails() {
+
+  async getJobDetails() {
+  
+    let data= await getJobDetailFromApi(this._masterService);
+    this.tableData=data;
     this.tableLoad = false;
   }
 }

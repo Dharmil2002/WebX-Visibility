@@ -1,7 +1,21 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
     <form [formGroup]="jobEntryTableForm">
         <app-form-webxpress [form]="jobEntryTableForm" [formData]="jsonControlArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
+    <app-table-boilerplate *ngIf="tableData" [tableData]="tableData" [columnHeader]="displayedColumns1"
+     (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
+    (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
+    [ActionObject]="actionObject"></app-table-boilerplate>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+            <div class="example-button-row  d-flex justify-content-end">
+
+                <button mat-button   (click)="cancel()">Back</button>
+                <button class="msr-3" mat-raised-button color="primary"
+                    (click)="save()">Save</button>
+            </div>
+        </div>  
+    </div>
 </app-common-wrapper-webxpress>

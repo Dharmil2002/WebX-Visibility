@@ -5,7 +5,7 @@ export class CustomerGroupMaster {
     activeFlag: any;
     updateBy: string;
     entryBy: string;
-    id:string;
+    _id:string;
     constructor(CustomerGroupMaster) {
         {
             this.groupCode = CustomerGroupMaster.groupCode || '';

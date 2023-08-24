@@ -67,7 +67,6 @@ export class DcrDetailPageComponent implements OnInit {
   }
   // Handle function calls
   functionCallHandler($event) {
-    let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
 
     try {
@@ -89,11 +88,11 @@ export class DcrDetailPageComponent implements OnInit {
   bindData() {
     const companyCode = parseInt(localStorage.getItem("companyCode"));
     // Helper function to generate request object
-    function generateRequest(collection) {
+    function generateRequest(collectionName) {
       return {
         companyCode,
-        type: "masters",
-        collection,
+        collectionName,
+        filter: {}
       };
     }
 
@@ -104,10 +103,10 @@ export class DcrDetailPageComponent implements OnInit {
     const customerReq = generateRequest("customer_detail");
 
     // Create separate observables for each HTTP request
-    const locationObs = this.masterService.masterPost('common/getall', locationReq);
-    const userObs = this.masterService.masterPost('common/getall', userReq);
-    const vendorObs = this.masterService.masterPost('common/getall', vendorReq);
-    const customerObs = this.masterService.masterPost('common/getall', customerReq);
+    const locationObs = this.masterService.masterPost('generic/get', locationReq);
+    const userObs = this.masterService.masterPost('generic/get', userReq);
+    const vendorObs = this.masterService.masterPost('generic/get', vendorReq);
+    const customerObs = this.masterService.masterPost('generic/get', customerReq);
 
     // Use forkJoin to make parallel requests and get all data at once
     forkJoin([locationObs, userObs, vendorObs, customerObs]).pipe(
@@ -158,7 +157,6 @@ export class DcrDetailPageComponent implements OnInit {
         ...custdet,
       ];
 
-      // Options for allocateTo dropdown
       const hierarchyLoc = mergedData.locationData.find(optItem => optItem.locCode === this.data?.allotTo)
       const allocateTo = this.allData.find(optItem => optItem.value === this.data?.allocateTo);
       const allotTo = this.locdet.find(optItem => optItem.value === this.data?.allotTo);
@@ -175,15 +173,32 @@ export class DcrDetailPageComponent implements OnInit {
         'locationHierarchy': 'locationHierarchy',
         'status': 'status',
       };
-      for (let key in mappings) {
-        let value = this.data?.[mappings[key]] || '';
-        if (key === 'seriesStartEnd') { value = series; }
-        if (key === 'person') { value = allocateTo ? `${allocateTo.value} - ${allocateTo.name}` : ''; }
-        if (key === 'location') { value = allotTo ? `${allotTo.value} - ${allotTo.name}` : ''; }
-        if (key === 'locationHierarchy') { value = hierarchyLoc ? `${hierarchyLoc.reportLevel}` : ''; }
-        if (key === 'usedLeaves') { value = this.data?.usedLeaves; }
+      Object.keys(mappings).forEach(key => {
+        let value = '';
+
+        switch (key) {
+          case 'seriesStartEnd':
+            value = series;
+            break;
+          case 'person':
+            value = allocateTo ? `${allocateTo.value} - ${allocateTo.name}` : '';
+            break;
+          case 'location':
+            value = allotTo ? `${allotTo.value} - ${allotTo.name}` : '';
+            break;
+          case 'locationHierarchy':
+            value = hierarchyLoc ? hierarchyLoc.reportLevel : '';
+            break;
+          case 'usedLeaves':
+            value = this.data?.usedLeaves || '';
+            break;
+          default:
+            value = this.data?.[mappings[key]] || '';
+        }
+
         this.dcrDetailForm.controls[key].setValue(value);
-      }
+      });
+
       // Set 'personCat' form control based on 'type'
       this.dcrDetailForm.controls['personCat'].setValue(this.data?.type === 'E' ? 'Employee' : this.data?.type === 'C' ? 'Customer' : this.data?.type === 'L' ? 'Location' : 'BA');
       if (this.type !== 'Manage') {
@@ -197,10 +212,10 @@ export class DcrDetailPageComponent implements OnInit {
   getDcrHistoryData() {
     let req = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "dcr"
+      "filter": {},
+      "collectionName": "dcr"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array

@@ -7,14 +7,13 @@ import Swal from 'sweetalert2';
   templateUrl: './customer-group-list.component.html',
 })
 export class CustomerGroupListComponent implements OnInit {
-  data: [] | any;
-  companyCode: any = parseInt(localStorage.getItem("companyCode")); 
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
   linkArray = []
   columnHeader = {
-    "srNo":"Sr No",
+    "srNo": "Sr No",
     "groupCode": "Group Code",
     "groupName": "Group Name",
     "activeFlag": "Active Status",
@@ -33,22 +32,20 @@ export class CustomerGroupListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
-  tableData: any;
   constructor(private masterService: MasterService) {
-  this.addAndEditPath = "/Masters/CustomerGroupMaster/AddCustomerGroupMaster";
+    this.addAndEditPath = "/Masters/CustomerGroupMaster/AddCustomerGroupMaster";
   }
   ngOnInit(): void {
-    //throw new Error("Method not implemented.");
     this.getCustomerDetails();
   }
   //To get List data for Customer Group MAster
   getCustomerDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "customerGroup_detail"
+      "collectionName": "customerGroup_detail",
+      "filter": {}
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
@@ -59,7 +56,6 @@ export class CustomerGroupListComponent implements OnInit {
             };
           });
           this.csv = dataWithSrno
-          this.tableData = dataWithSrno;
           this.tableLoad = false;
         }
       }
@@ -67,30 +63,30 @@ export class CustomerGroupListComponent implements OnInit {
   }
 
   IsActiveFuntion(det) {
-    let id = det.id;
+    let id = det._id;
     // Remove the "id" field from the form controls
-    delete det.id;
-  //  delete det.srNo;
+    delete det._id;
+    delete det.srNo;
     let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        type: "masters",
-        collection: "customerGroup_detail",
-        id: id,
-        updates: det
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      collectionName: "customerGroup_detail",
+      filter: { _id: id },
+      update: det
     };
-    this.masterService.masterPut('common/update', req).subscribe({
-        next: (res: any) => {
-            if (res) {
-                // Display success message
-                Swal.fire({
-                    icon: "success",
-                    title: "Successful",
-                    text: res.message,
-                    showConfirmButton: true,
-                });
-            }
+    this.masterService.masterPut('generic/update', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.getCustomerDetails();
         }
+      }
     });
-}
+  }
 
 }

@@ -5,7 +5,6 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import Swal from 'sweetalert2';
 import { map } from 'rxjs/operators';
-import { utilityService } from 'src/app/Utility/utility.service';
 
 @Component({
   selector: 'app-add-dcr-series',
@@ -99,7 +98,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   tableLoad: boolean;
 
   constructor(
-    private service: utilityService, public objSnackBarUtility: SnackBarUtilityService, private masterService: MasterService
+    public objSnackBarUtility: SnackBarUtilityService, private masterService: MasterService
   ) {
     super();
   }
@@ -147,37 +146,37 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     // Options for documentType dropdown
     this.displayedColumns1.documentType.option = this.documentTypeOptions;
 
-    // Prepare the requests for different collections
+    // Prepare the requests for different collectionNames
     let locationReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "location_detail"
+      "filter": {},
+      "collectionName": "location_detail"
     };
 
     let userReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "user_master"
+      "filter": {},
+      "collectionName": "user_master"
     };
 
     let vendorReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "vendor_detail"
+      "filter": {},
+      "collectionName": "vendor_detail"
     };
 
     let customerReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "customer_detail"
+      "filter": {},
+      "collectionName": "customer_detail"
     };
 
     // Use forkJoin to make parallel requests and get all data at once
     forkJoin([
-      this.masterService.masterPost('common/getall', locationReq),
-      this.masterService.masterPost('common/getall', userReq),
-      this.masterService.masterPost('common/getall', vendorReq),
-      this.masterService.masterPost('common/getall', customerReq)
+      this.masterService.masterPost('generic/get', locationReq),
+      this.masterService.masterPost('generic/get', userReq),
+      this.masterService.masterPost('generic/get', vendorReq),
+      this.masterService.masterPost('generic/get', customerReq)
     ]).pipe(
       map(([locationRes, userRes, vendorRes, customerRes]) => {
         // Combine all the data into a single object
@@ -335,17 +334,16 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       });
       // Now, add the 'id' property to each object in the 'tableData' array
       this.tableData = this.tableData.map(item => {
-        return { ...item, id: item.bookCode };
+        return { ...item, _id: item.bookCode };
       });
 
       // Continue with the rest of the code (e.g., exporting data)
       let req = {
         companyCode: parseInt(localStorage.getItem("companyCode")),
-        type: "masters",
-        collection: "dcr",
+        collectionName: "dcr",
         data: this.tableData
       };
-      this.masterService.masterPost('common/create', req).subscribe({
+      this.masterService.masterPost('generic/create', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message

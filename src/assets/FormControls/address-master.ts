@@ -115,11 +115,11 @@ export class AddressControl {
                 Validations: []
             },
             {
-                name: 'id',
+                name: '_id',
                 label: '',
                 placeholder: '',
                 type: 'text',
-                value: addressGroupTable.id,
+                value: addressGroupTable._id,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',

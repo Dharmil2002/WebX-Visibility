@@ -10,7 +10,7 @@ export class AddressMaster {
     activeFlag: any;
     updateBy: string;
     entryBy: string;
-    id:string;
+    _id:string;
     cityName: any;
     stateName: any;
     constructor(AddressMaster) {

@@ -18,6 +18,7 @@ import { JobEntryPageComponent } from "./job-entry-page/job-entry-page.component
 import { AssignVehiclePageComponent } from "./assign-vehicle-page/assign-vehicle-page.component";
 import { RakeEntryPageComponent } from "./rake-entry-page/rake-entry-page.component";
 import { ChaEntryPageComponent } from "./cha-entry-page/cha-entry-page.component";
+import { HandedOverComponent } from "./handed-over/handed-over.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -90,6 +91,10 @@ const routes: Routes = [
   {
     path: "CHAEntry",
     component: ChaEntryPageComponent
+  },
+  {
+    path: "HandedOver",
+    component: HandedOverComponent
   },
 ]
 

@@ -90,10 +90,10 @@ export class AddressMasterAddComponent implements OnInit {
   async getPincodeList() {
     let pincodeReq = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "pincode_detail"
+      "collectionName": "pincode_detail",
+      "filter": {}
     };
-    const pincodeRes = await this.masterService.masterPost('common/getall', pincodeReq).toPromise();
+    const pincodeRes = await this.masterService.masterPost('generic/get', pincodeReq).toPromise();
 
     const mergedData = {
       pincodeData: pincodeRes?.data,
@@ -150,16 +150,15 @@ export class AddressMasterAddComponent implements OnInit {
     Object.values(this.addressTableForm.controls).forEach(control => control.setErrors(null));
 
     if (this.isUpdate) {
-      let id = this.addressTableForm.value.id;
-      this.addressTableForm.removeControl("id");
+      let id = this.addressTableForm.value._id;
+      this.addressTableForm.removeControl("_id");
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "address_detail",
-        id: id,
-        updates: this.addressTableForm.value
+        collectionName: "address_detail",
+        filter: { _id: id },
+        update: this.addressTableForm.value
       };
-      this.masterService.masterPut('common/update', req).subscribe({
+      this.masterService.masterPut('generic/update', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message
@@ -184,15 +183,14 @@ export class AddressMasterAddComponent implements OnInit {
         return addressCode;
       }
       this.newAddressCode = generateAddressCode(lastAddressCode);
-      this.addressTableForm.controls["id"].setValue(this.newAddressCode);
+      this.addressTableForm.controls["_id"].setValue(this.newAddressCode);
       this.addressTableForm.controls["addressCode"].setValue(this.newAddressCode);
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "address_detail",
+        collectionName: "address_detail",
         data: this.addressTableForm.value
       };
-      this.masterService.masterPost('common/create', req).subscribe({
+      this.masterService.masterPost('generic/create', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message
@@ -218,10 +216,10 @@ export class AddressMasterAddComponent implements OnInit {
   checkCodeExists() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "address_detail"
+      "collectionName": "address_detail",
+      "filter": {}
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array

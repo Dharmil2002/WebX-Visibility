@@ -5,7 +5,7 @@ export class ClusterMaster {
     tableNo: any;
     city: string;
     activeFlag: any;
-    id:string;
+    _id:string;
     constructor(ClusterMaster) {
       {
         this.clusterCode = ClusterMaster.clusterCode || '';

@@ -1,7 +1,7 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
     <form [formGroup]="groupTableForm">
         <app-form-webxpress [form]="groupTableForm" [formData]="jsonControlGroupArray" [showSaveAndCancelButton]="true"
-            (functionCallEmitter)="functionCallHandler($event)">
+            (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

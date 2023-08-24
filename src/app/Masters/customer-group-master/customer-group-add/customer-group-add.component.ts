@@ -1,11 +1,9 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { CustomerGroupMaster } from "src/app/core/models/Masters/customer-group-master";
 import { CustomerGroupControl } from "src/assets/FormControls/customer-group-master";
-import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 
@@ -16,32 +14,26 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 export class CustomerGroupAddComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  countryCode: any;
   action: string;
   isUpdate = false;
   groupTabledata: CustomerGroupMaster;
   groupTableForm: UntypedFormGroup;
   customerGroupFormControls: CustomerGroupControl;
   jsonControlGroupArray: any;
-  savedData: CustomerGroupMaster;
   ngOnInit() {
   }
- 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,
-    private Route: Router, private fb: UntypedFormBuilder,
+
+  constructor(private Route: Router, private fb: UntypedFormBuilder,
     private masterService: MasterService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-      this.data = Route.getCurrentNavigation().extras.state.data;
-      this.countryCode = this.data.countryName;
+      this.groupTabledata = Route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
       this.isUpdate = true;
     } else {
       this.action = "Add";
     }
     if (this.action === 'edit') {
-      this.isUpdate = true;
-      this.groupTabledata = this.data;
       this.breadScrums = [
         {
           title: "Customer Group Master",
@@ -73,19 +65,17 @@ export class CustomerGroupAddComponent implements OnInit {
   }
   //#region Save Function
   save() {
-    this.groupTableForm.controls["activeFlag"].setValue(this.groupTableForm.value.activeFlag == true ? "Y" : "N");
     if (this.isUpdate) {
-      let id = this.groupTableForm.value.id;
+      let id = this.groupTableForm.value._id;
       // Remove the "id" field from the form controls
-      this.groupTableForm.removeControl("id");
+      this.groupTableForm.removeControl("_id");
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "customerGroup_detail",
-        id: id,
-        updates: this.groupTableForm.value
+        collectionName: "customerGroup_detail",
+        filter: { _id: id },
+        update: this.groupTableForm.value
       };
-      this.masterService.masterPut('common/update', req).subscribe({
+      this.masterService.masterPut('generic/update', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message
@@ -100,15 +90,13 @@ export class CustomerGroupAddComponent implements OnInit {
         }
       });
     } else {
-      const randomNumber = getShortName(this.groupTableForm.value.groupName);
-      this.groupTableForm.controls["id"].setValue(randomNumber);
+      this.groupTableForm.controls["_id"].setValue(this.groupTableForm.controls.groupCode.value);
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "customerGroup_detail",
+        collectionName: "customerGroup_detail",
         data: this.groupTableForm.value
       };
-      this.masterService.masterPost('common/create', req).subscribe({
+      this.masterService.masterPost('generic/create', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message
@@ -128,8 +116,6 @@ export class CustomerGroupAddComponent implements OnInit {
 
   //#region Function Call Handler
   functionCallHandler($event) {
-    // console.log("fn handler called" , $event);
-    let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
     // function of this name may not exists, hence try..catch 
     try {
@@ -140,4 +126,31 @@ export class CustomerGroupAddComponent implements OnInit {
     }
   }
   //#endregion
+  checkGroupCodeExists() {
+    let req = {
+      "companyCode": this.companyCode,
+      "collectionName": "customerGroup_detail",
+      "filter": {}
+    }
+    this.masterService.masterPost('generic/get', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Generate srno for each object in the array
+          const count = res.data.filter(item => item.groupCode == this.groupTableForm.controls.groupCode.value)
+          if (count.length > 0) {
+            Swal.fire({
+              title: 'Group Code already exists! Please try with another',
+              toast: true,
+              icon: "error",
+              showCloseButton: false,
+              showCancelButton: false,
+              showConfirmButton: true,
+              confirmButtonText: "OK"
+            });
+            this.groupTableForm.controls['groupCode'].reset();
+          }
+        }
+      }
+    })
+  }
 }

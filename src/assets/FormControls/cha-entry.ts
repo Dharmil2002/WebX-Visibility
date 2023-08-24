@@ -63,11 +63,8 @@ export class ChaEntryControl {
                 name: "transportedBy",
                 label: "Transported By",
                 placeholder: 'Transported By',
-                type: "Staticdropdown",
-                value: [
-                    { value: 'I', name: 'By Party' },
-                    { value: 'E', name: 'Own' }
-                ],
+                type: "text",
+                value:'',
                 Validations: [
                 ],
                 generatecontrol: true,

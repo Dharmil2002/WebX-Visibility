@@ -93,18 +93,18 @@ export class ReAllocateDcrComponent implements OnInit {
   reAlloc() {
     let getReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "dcr"
+      "filter": {},
+      "collectionName": "dcr"
     }
-    this.masterService.masterPost('common/getall', getReq).subscribe({
+    this.masterService.masterPost('generic/get', getReq).subscribe({
       next: (res: any) => {
         if (res && res.data) {
           const currentBookCode = this.data.bookCode;
-          const existingData = res.data.filter((item: any) => item.id.includes(currentBookCode + '-'));
+          const existingData = res.data.filter((item: any) => item._id.includes(currentBookCode + '-'));
           if (existingData.length > 0) {
             // If bookCode with suffix exists, find the maximum suffix and increment it by 1
             const maxSuffix = existingData.reduce((max: number, item: any) => {
-              const suffix = parseInt(item.id.split('-')[1]);
+              const suffix = parseInt(item._id.split('-')[1]);
               return isNaN(suffix) ? max : Math.max(max, suffix);
             }, 0);
 
@@ -122,8 +122,7 @@ export class ReAllocateDcrComponent implements OnInit {
           }
           let req = {
             companyCode: parseInt(localStorage.getItem("companyCode")),
-            type: "masters",
-            collection: "dcr",
+            collectionName: "dcr",
             data: {
               "documentType": this.data.documentType,
               "bookCode": this.data.bookCode,
@@ -135,11 +134,11 @@ export class ReAllocateDcrComponent implements OnInit {
               "allocateTo": this.dcrReallocateForm.value.newPerson.value,
               "entryBy": localStorage.getItem('Username'),
               "entryDate": new Date().toISOString(),
-              "id": this.id,
+              "_id": this.id,
               "action": "Re-Allocate"
             }
           };
-          this.masterService.masterPost('common/create', req).subscribe({
+          this.masterService.masterPost('generic/create', req).subscribe({
             next: (res: any) => {
               if (res) {
                 // Display success message
@@ -164,34 +163,34 @@ export class ReAllocateDcrComponent implements OnInit {
     // Prepare the requests for different collections
     let locationReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "location_detail"
+      "filter": {},
+      "collectionName": "location_detail"
     };
 
     let userReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "user_master"
+      "filter": {},
+      "collectionName": "user_master"
     };
 
     let vendorReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "vendor_detail"
+      "filter": {},
+      "collectionName": "vendor_detail"
     };
 
     let customerReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "customer_detail"
+      "filter": {},
+      "collectionName": "customer_detail"
     };
 
     // Use forkJoin to make parallel requests and get all data at once
     forkJoin([
-      this.masterService.masterPost('common/getall', locationReq),
-      this.masterService.masterPost('common/getall', userReq),
-      this.masterService.masterPost('common/getall', vendorReq),
-      this.masterService.masterPost('common/getall', customerReq)
+      this.masterService.masterPost('generic/get', locationReq),
+      this.masterService.masterPost('generic/get', userReq),
+      this.masterService.masterPost('generic/get', vendorReq),
+      this.masterService.masterPost('generic/get', customerReq)
     ]).pipe(
       map(([locationRes, userRes, vendorRes, customerRes]) => {
         // Combine all the data into a single object

@@ -85,17 +85,10 @@ export class AddCompanyComponent implements OnInit {
 
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.AddCompanyFormsValue = formGroupBuilder(this.fb, Object.values(this.accordionData));
-    this.AddCompanyFormsValue.controls["brand"].setValue(this.data.brand);
+    this.AddCompanyFormsValue.controls["brand"].setValue(this.data?.brand);
   }
   functionCallHandler($event) {
-    // console.log("fn handler called" , $event);
-
-    let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
-
-    // we can add more arguments here, if needed. like as shown
-    // $event['fieldName'] = field.name;
-
     // function of this name may not exists, hence try..catch 
     try {
       this[functionName]($event);
@@ -180,21 +173,20 @@ export class AddCompanyComponent implements OnInit {
     this.AddCompanyFormsValue.controls["color_Theme"].setValue(this.AddCompanyFormsValue.value.color_Theme.value);
     this.AddCompanyFormsValue.controls["timeZone"].setValue(this.AddCompanyFormsValue.value.timeZone.value);
 
-    let id = this.AddCompanyFormsValue.value.id;
+    let id = this.AddCompanyFormsValue.value._id;
     // Remove the "id" field from the form controls
-    this.AddCompanyFormsValue.removeControl("id");
+    this.AddCompanyFormsValue.removeControl("_id");
 
     // Prepare the request to update company details
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      type: "masters",
-      collection: "company_detail",
-      id: id,
-      updates: this.AddCompanyFormsValue.value
+      collectionName: "company_detail",
+      filter: { _id: id },
+      update: this.AddCompanyFormsValue.value
     };
 
     // Call the API to update company details
-    this.masterService.masterPut('common/update', req).subscribe({
+    this.masterService.masterPut('generic/update', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Display success message
@@ -218,12 +210,12 @@ export class AddCompanyComponent implements OnInit {
   getCompanyDet() {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "company_detail"
+      "collectionName": "company_detail",
+      "filter": {}
     };
 
     // Call the API to get company details
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Set the retrieved data in the 'data' variable and initialize the form controls and bind dropdowns

@@ -408,7 +408,7 @@ export class DCRControl {
                     generatecontrol: false, disable: false
                 },
                 {
-                    name: 'id',
+                    name: '_id',
                     label: 'Id',
                     placeholder: 'Id',
                     type: 'text',

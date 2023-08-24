@@ -86,10 +86,10 @@ export class ClusterMasterAddComponent implements OnInit {
     if (pincodeValue !== null && pincodeValue !== "") {
       let req = {
         "companyCode": this.companyCode,
-        "type": "masters",
-        "collection": "pincode_detail"
+        "collectionName": "pincode_detail",
+        "filter": {}
       };
-      this.masterService.masterPost('common/getall', req).subscribe({
+      this.masterService.masterPost('generic/get', req).subscribe({
         next: (res: any) => {
           // Assuming the API response contains an array named 'pincodeList'
           const pincodeList = res.data.map(element => ({
@@ -135,16 +135,15 @@ export class ClusterMasterAddComponent implements OnInit {
     Object.values(this.clusterTableForm.controls).forEach(control => control.setErrors(null));
 
     if (this.isUpdate) {
-      let id = this.clusterTableForm.value.id;
-      this.clusterTableForm.removeControl("id");
+      let id = this.clusterTableForm.value._id;
+      this.clusterTableForm.removeControl("_id");
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "cluster_detail",
-        id: id,
-        updates: this.clusterTableForm.value
+        collectionName: "cluster_detail",
+        filter: { _id: id },
+        update: this.clusterTableForm.value
       };
-      this.masterService.masterPut('common/update', req).subscribe({
+      this.masterService.masterPut('generic/update', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message
@@ -161,10 +160,10 @@ export class ClusterMasterAddComponent implements OnInit {
     } else {
       let req = {
         companyCode: parseInt(localStorage.getItem("companyCode")),
-        "type": "masters",
-        "collection": "cluster_detail"
+        "collectionName": "cluster_detail",
+        "filter": {}
       }
-      this.masterService.masterPost('common/getall', req).subscribe({
+      this.masterService.masterPost('generic/get', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Generate srno for each object in the array
@@ -178,16 +177,15 @@ export class ClusterMasterAddComponent implements OnInit {
               return clusterCode;
             }
             this.newClusterCode = generateClusterCode(lastClusterCode);
-            this.clusterTableForm.controls["id"].setValue(this.newClusterCode);
+            this.clusterTableForm.controls["_id"].setValue(this.newClusterCode);
             this.clusterTableForm.controls["clusterCode"].setValue(this.newClusterCode);
             this.clusterTableForm.removeControl("pincodeDropdown");
             let req = {
               companyCode: this.companyCode,
-              type: "masters",
-              collection: "cluster_detail",
+              collectionName: "cluster_detail",
               data: this.clusterTableForm.value
             };
-            this.masterService.masterPost('common/create', req).subscribe({
+            this.masterService.masterPost('generic/create', req).subscribe({
               next: (res: any) => {
                 if (res) {
                   // Display success message
@@ -239,10 +237,10 @@ export class ClusterMasterAddComponent implements OnInit {
   checkClusterExists() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "cluster_detail"
+      "collectionName": "cluster_detail",
+      "filter": {}
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array

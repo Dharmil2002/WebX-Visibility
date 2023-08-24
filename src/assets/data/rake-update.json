@@ -1,0 +1,57 @@
+{"data":[
+    {
+      "SlNo": 1,
+      "RakeNo": " Rake/DELB/2324/0000001 ",
+      "RakeEntryDate": 45160,
+      "TrainName": "Howrah Nagpur Exp",
+      "TrainNo": "122345",
+      "RRNo": 232455,
+      "ContainerNo": "2843885785P3848754",
+      "FromCity": "Kolkatta",
+      "ToCity": "Napur",
+      "IsEmpty": "No",
+      "Weight": 16,
+      "BillingParty": "ABC Pvt Ltd",
+      "CNNo": "CCU000001",
+      "JobNo": "-",
+      "CurrentStatus": "In-Transit between CCU to NAG",
+      "Action": "Handed over to Liner"
+    },
+    {
+      "SlNo": 2,
+      "RakeNo": " Rake/DELB/2324/0000002",
+      "RakeEntryDate": 45160,
+      "TrainName": "Howrah Goa Exp",
+      "TrainNo": "122349",
+      "RRNo": 232455,
+      "ContainerNo": "2843845785P3848778",
+      "FromCity": "Kolkatta",
+      "ToCity": "Napur",
+      "IsEmpty": "No",
+      "Weight": 32,
+      "BillingParty": "ABC Pvt Ltd",
+      "CNNo": "CCU000002",
+      "JobNo": "JE/CCU/2324/0000005",
+      "CurrentStatus": "In-Transit between CCU to NAG",
+      "Action": "Handed over to BillingParty"
+    },
+    {
+      "SlNo": 3,
+      "RakeNo": " Rake/DELB/2324/0000003",
+      "RakeEntryDate": 45161,
+      "TrainName": "Howrah Nagpur Exp",
+      "TrainNo": "122345",
+      "RRNo": 232455,
+      "ContainerNo": "2843885785P3848005",
+      "FromCity": "Kolkatta",
+      "ToCity": "Napur",
+      "IsEmpty": "Yes",
+      "Weight": 0,
+      "BillingParty": "ABC Pvt Ltd",
+      "CNNo": "",
+      "JobNo": "JE/CCU/2324/0000006",
+      "CurrentStatus": "In-Transit between CCU to NAG",
+      "Action": "In-Transit between CCU to NAG"
+    }
+   ]
+}

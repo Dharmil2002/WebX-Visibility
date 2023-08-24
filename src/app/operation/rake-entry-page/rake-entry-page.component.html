@@ -5,7 +5,7 @@
             [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
-    <app-table-boilerplate *ngIf="tableData" [tableData]="tableData" [columnHeader]="cnWiseDisplayedColumns"
+    <app-table-boilerplate *ngIf="tableData" [tableData]="tableData" [columnHeader]="displayedColumns"
         (DeleteAction)="delete($event,'tableData')" (functionCallEmitter)="functionCallHandler($event)"
         (Submit)="saveData($event)" [showsubmit]="true" [ActionObject]="actionObject"
         (callFunction)="functionCallHandler($event)"></app-table-boilerplate>

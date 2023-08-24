@@ -87,11 +87,11 @@ export class ClusterControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'id',
+                name: '_id',
                 label: '',
                 placeholder: '',
                 type: 'text',
-                value: clusterMasterTable.id,
+                value: clusterMasterTable._id,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',

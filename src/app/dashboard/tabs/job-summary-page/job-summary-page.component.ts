@@ -65,7 +65,7 @@ export class JobSummaryPageComponent implements OnInit {
     status: {
       Title: "Status",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:100px",
     },
     Action: {
       Title: "Action",
@@ -86,7 +86,7 @@ export class JobSummaryPageComponent implements OnInit {
     "status"
   ];
   addAndEditPath: string;
-  linkArray = [{ Row: "Action", Path: "Operation/CHAEntry" }];
+  linkArray = [{ Row: "Action", Path: "Operation/PRQEntry" }];
   constructor(private _masterService:MasterService) {
     this.addAndEditPath = "Operation/JobEntry";
   }

@@ -121,7 +121,7 @@ export class JobControl {
                 disable: false
             },
             {
-                name: "noOfPKts",
+                name: "noOfPkg",
                 label: "No of Packets",
                 placeholder: "Enter No of PKts",
                 type: "number",
@@ -201,7 +201,50 @@ export class JobControl {
                 Validations: [],
                 generatecontrol: false, disable: false
             },
-
+            {
+                name: "_id",
+                label: "id",
+                placeholder: "",
+                type: "",
+                value: "",
+                generatecontrol: false,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "entryBy",
+                label: "Entry by",
+                placeholder: "",
+                type: "",
+                value:localStorage.getItem("Username"),
+                generatecontrol: false,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "entryDate",
+                label: "Entry Date",
+                placeholder: "",
+                type: "",
+                value:new Date().toUTCString(),
+                generatecontrol: false,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "status",
+                label: "Status",
+                placeholder: "",
+                type: "",
+                value:"0",
+                generatecontrol: false,
+                disable: false,
+                Validations: [
+                ]
+            },
         ];
     }
 

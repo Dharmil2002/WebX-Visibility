@@ -10,19 +10,6 @@ export async function getPrqDetailFromApi(masterServices) {
     let prqList = [];
 
     res.data.map((element, index) => {
-        let statusText;
-
-        switch (element?.status) {
-            case 0:
-                statusText = "Confirmation";
-                break;
-            case 1:
-            case 2:
-                statusText = "Vehicle Assignment";
-                break;
-            default:
-                statusText = "Rejection";
-        }
 
         let pqrData = {
             "srNo": element.srNo = index + 1,
@@ -31,8 +18,8 @@ export async function getPrqDetailFromApi(masterServices) {
             "billingParty": element?.billingParty || '',
             "fromToCity": element?.fromCity + "-" + element?.toCity,
             "pickUpDate": formatDocketDate(element?.pickupDate || new Date()),
-            "status": element?.status === "0" ? "Confirmation" : element.status === "1" ? "Assign Vehicle" : "Awaiting For Docket",
-            "Action": element?.status === "0" ? "Confirmation" : element.status === "1" ? "Assign Vehicle" : "Create Docket"
+            "status": element?.status === "0" ? "Awaiting Confirmation" : element.status === "1" ? "Awaiting Assign Vehicle" : "Awaiting For Docket",
+            "Action": element?.status === "0" ? "Confirm" : element.status === "1" ? "Assign Vehicle" : "Create Docket"
         }
         prqList.push(pqrData)
         // You need to return the modified element

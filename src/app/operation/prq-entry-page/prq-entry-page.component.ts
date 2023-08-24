@@ -10,6 +10,7 @@ import { getCity } from '../quick-booking/quick-utility';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { addPrqData, showConfirmationDialog, updatePrqStatus } from './prq-utitlity';
+import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 
 @Component({
   selector: 'app-prq-entry-page',
@@ -48,7 +49,7 @@ export class PrqEntryPageComponent implements OnInit {
     private filter: FilterUtils, private router: Router) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.prqDetail = router.getCurrentNavigation().extras.state.data.columnData;
-      if (this.prqDetail.Action === "Confirmation") {
+      if (this.prqDetail.Action === "Confirm") {
         const tabIndex = 6; // Adjust the tab index as needed
         showConfirmationDialog(this.prqDetail, masterService, this.goBack.bind(this), tabIndex);
       }
@@ -163,6 +164,8 @@ export class PrqEntryPageComponent implements OnInit {
     window.history.back();
   }
   async save() {
+    const tabcontrols = this.prqEntryTableForm;
+    clearValidatorsAndValidate(tabcontrols);
     const thisYear = new Date().getFullYear();
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
     const dynamicNumber = Math.floor(Math.random() * 10000).toString().padStart(4, "0");

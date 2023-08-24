@@ -6,6 +6,7 @@ import { RakeEntryControl } from "src/assets/FormControls/rake-entry";
 import { getCity } from "../quick-booking/quick-utility";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { Router } from "@angular/router";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -22,6 +23,11 @@ export class RakeEntryPageComponent implements OnInit {
     type: any;
     show = false;
     apiShow = false;
+    actionObject = {
+        addRow: false,
+        submit: false,
+        search: true,
+      };
     companyCode = parseInt(localStorage.getItem("companyCode"));
     fromCity: string; //it's used in getCity() for the binding a fromCity
     fromCityStatus: boolean; //it's used in getCity() for binding fromCity
@@ -41,15 +47,15 @@ export class RakeEntryPageComponent implements OnInit {
         this.getCity();
     }
 
-    constructor(private fb: UntypedFormBuilder, private masterService: MasterService,
+    constructor(private fb: UntypedFormBuilder,private Route: Router, private masterService: MasterService,
         private filter: FilterUtils) {
         this.initializeFormControl();
     }
 
     cnWiseDisplayedColumns = {
         srNo: {
-            name: "checkBox",
-            key: "index",
+            name: "#",
+            key: "checkbox",
             style: "",
         },
         cnNo: {
@@ -60,52 +66,6 @@ export class RakeEntryPageComponent implements OnInit {
         },
         cnDate: {
             name: "CN Date",
-            key: "input",
-            option: [],
-            style: ""
-        },
-        noOfPkts: {
-            name: "No Of Pkts",
-            key: "input",
-            style: "min-width:100px;",
-            Headerstyle: { 'min-width': '10px' },
-        },
-        weight: {
-            name: "Weight",
-            key: "input",
-            style: "",
-        },
-        fromCity: {
-            name: "From City",
-            key: "input",
-            style: "",
-        },
-        toCity: {
-            name: "To City",
-            key: "input",
-            style: "",
-        },
-        billingParty: {
-            name: "Billing Party",
-            key: "input",
-            style: "",
-        }
-    };
-
-    jobWiseDisplayedColumns = {
-        srNo: {
-            name: "checkBox",
-            key: "index",
-            style: "",
-        },
-        jobNo: {
-            name: "Job No",
-            key: "input",
-            readonly: true,
-            style: "",
-        },
-        jobDate: {
-            name: "Job Date",
             key: "input",
             option: [],
             style: ""
@@ -162,28 +122,44 @@ export class RakeEntryPageComponent implements OnInit {
         // Build the form group using formGroupBuilder function and the values of jsonControlArray
         this.rakeEntryTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
         this.show = false;
-        this.loadTempData('');
+        this.loadTempData();
     }
 
-    // Load temporary data
-    loadTempData(det) {
-        this.type = this.rakeEntryTableForm.value.documentType;
-        if (this.type == "C") {
-            this.tableData = det || [];
-            if (this.tableData.length === 0) {
-                this.addCNWise();
-            }
-        }
-        else {
-            this.tableData1 = det || [];
-            if (this.tableData1.length === 0) {
-                this.addJobWise();
-            }
-        }
-    }
+    loadTempData() {
+        this.tableData = [
+          {
+            srNo: true, // Serial number
+            cnNo: "CNMUMB000021",
+            cnDate:"12 JUN 2023",
+            noOfPkts: 2,
+            weight: 2,
+            fromCity: "MUMBAI",
+            toCity: "DELHI",
+            billingParty:"AAREN FURNITURES PALACE"
+          }
+        ]
+      }
+      // Add a new item to the table
+    
+    // // Load temporary data
+    // loadTempData(det) {
+    //     this.type = this.rakeEntryTableForm.value.documentType;
+    //     if (this.type == "C") {
+    //         this.tableData = det || [];
+    //         if (this.tableData.length === 0) {
+    //             this.addCNWise();
+    //         }
+    //     }
+    //     else {
+    //         this.tableData1 = det || [];
+    //         if (this.tableData1.length === 0) {
+    //             this.addJobWise();
+    //         }
+    //     }
+    // }
 
-    addCNWise() { }
-    addJobWise() { }
+    // addCNWise() { }
+    // addJobWise() { }
 
 
     //Checked Dropdown Option - Cn Wise / Job Wise
@@ -195,7 +171,7 @@ export class RakeEntryPageComponent implements OnInit {
         if (generateControl === 'JOB') {
             this.show = false;
         }
-        this.loadTempData('');
+     //   this.loadTempData('');
     }
 
     functionCallHandler($event) {
@@ -232,5 +208,14 @@ export class RakeEntryPageComponent implements OnInit {
         } catch (error) {
             console.error("Error getting city details:", error);
         }
+    }
+    cancel() {
+        this.goBack(7)
+    }
+    goBack(tabIndex: number): void {
+        this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+    }
+    save(){
+        
     }
 }

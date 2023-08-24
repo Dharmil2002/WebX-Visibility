@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { HandoverControl } from 'src/assets/FormControls/hand-over-Control';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { HandoverControl } from 'src/assets/FormControls/hand-over-control';
 @Component({
   selector: 'app-handed-over',
   templateUrl: './handed-over.component.html'
@@ -15,7 +15,7 @@ export class HandedOverComponent implements OnInit {
   handTableForm: UntypedFormGroup;
     columnHeader = {
       checkBoxRequired:{
-        Title: "",
+        Title: "Select",
         class: "matcolumnleft",
         Style: "min-width:200px",
       },

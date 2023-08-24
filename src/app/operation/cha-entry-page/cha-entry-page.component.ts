@@ -226,6 +226,7 @@ export class ChaEntryPageComponent implements OnInit {
   }
   autoBillData() {
     if (this.jobDetail) {
+      this.chaEntryTableForm.controls['documentType'].setValue('jobNo')
       this.chaEntryTableForm.controls['jobType'].setValue(this.jobDetail.jobType === "Export" ? "E" : this.jobDetail.jobType === "Import" ? "I" : "");
       const billingParty = {
         name: this.jobDetail?.billingParty || "",
@@ -370,9 +371,9 @@ export class ChaEntryPageComponent implements OnInit {
   }
     calculateTotaAmount(event) {
      let gstamount= parseFloat(event.row.clrChrg)*parseFloat(event.row.gstRate)/100
-     event.row.gstAmt=gstamount.toString();
+     event.row.gstAmt=gstamount.toFixed(2);
      let total=  parseFloat(event.row.clrChrg)+gstamount;
-     event.row.totalAmt=total.toString();
+     event.row.totalAmt=total.toFixed(2);
 
 }
 

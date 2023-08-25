@@ -28,7 +28,7 @@ export class RakeUpdateComponent implements OnInit {
     RakeEntryDate: {
       Title: "Rake Entry Date",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:100px",
     },
     TrainName: {
       Title: "Train Name",
@@ -38,37 +38,37 @@ export class RakeUpdateComponent implements OnInit {
     TrainNo: {
       Title: "Train No",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:120px",
     },
     RRNo: {
       Title: "RRNo",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:120px",
     },
     ContainerNo: {
       Title: "Container No",
       class: "matcolumnleft",
-      Style: "min-width:110px",
+      Style: "min-width:200px",
     },
     FromCity: {
       Title: "From City",
       class: "matcolumnleft",
-      Style: "min-width:2px",
+      Style: "min-width:1px",
     },
     ToCity: {
       Title: "To City",
       class: "matcolumnleft",
-      Style: "min-width:2px",
+      Style: "min-width:1px",
     },
     IsEmpty: {
       Title: "IsEmpty",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:1px",
     },
     Weight: {
       Title: "Weight",
-      class: "matcolumnleft",
-      Style: "min-width:200px",
+      class: "matcolumncenter",
+      Style: "min-width:1px",
     },
     BillingParty: {
       Title: "Billing Party",

@@ -40,6 +40,10 @@ export class JobControl {
                 name: 'billingParty', label: "Billing Party", placeholder: "Select Billing Party", type: 'dropdown',
                 value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Billing Party is required"
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -116,6 +120,10 @@ export class JobControl {
                     { value: 'E', name: 'Export' }
                 ],
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Job Type is required"
+                    }
                 ],
                 generatecontrol: true,
                 disable: false
@@ -217,7 +225,7 @@ export class JobControl {
                 label: "Entry by",
                 placeholder: "",
                 type: "",
-                value:localStorage.getItem("Username"),
+                value: localStorage.getItem("Username"),
                 generatecontrol: false,
                 disable: false,
                 Validations: [
@@ -228,7 +236,7 @@ export class JobControl {
                 label: "Entry Date",
                 placeholder: "",
                 type: "",
-                value:new Date().toUTCString(),
+                value: new Date().toUTCString(),
                 generatecontrol: false,
                 disable: false,
                 Validations: [
@@ -239,7 +247,7 @@ export class JobControl {
                 label: "Status",
                 placeholder: "",
                 type: "",
-                value:"0",
+                value: "0",
                 generatecontrol: false,
                 disable: false,
                 Validations: [

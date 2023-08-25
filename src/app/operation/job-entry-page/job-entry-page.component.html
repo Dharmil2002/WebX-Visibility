@@ -14,7 +14,7 @@
 
                 <button mat-button   (click)="cancel()">Back</button>
                 <button class="msr-3" mat-raised-button color="primary"
-                    (click)="save()">Save</button>
+                    (click)="save()"  [disabled]="!jobEntryTableForm.valid">Save</button>
             </div>
         </div>  
     </div>

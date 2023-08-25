@@ -67,10 +67,10 @@ export class TripRouteMasterListComponent implements OnInit {
   getRouteScheduleDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "trip_route_details"
+      filter: {},
+      "collectionName": "trip_route_details"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array

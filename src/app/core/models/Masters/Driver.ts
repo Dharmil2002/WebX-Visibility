@@ -29,7 +29,7 @@ export class DriverMaster {
   joiningDate: string;
   driverId: string;
   blackListedReason: string;
-  id: string;
+  _id: string;
 
   bName: string;
   bAcct: string;

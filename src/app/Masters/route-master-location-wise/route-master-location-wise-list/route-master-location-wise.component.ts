@@ -52,10 +52,10 @@ export class RouteMasterLocationWiseComponent implements OnInit {
   getRouteDetails() {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "routeMasterLocWise"
+      "filter": {},
+      "collectionName": "routeMasterLocWise"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array

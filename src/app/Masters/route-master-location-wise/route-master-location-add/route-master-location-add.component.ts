@@ -164,10 +164,10 @@ export class RouteMasterLocationAddComponent implements OnInit {
   getAllMastersData() {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "location_detail"
+      filter: {},
+      "collectionName": "location_detail"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
@@ -199,10 +199,10 @@ export class RouteMasterLocationAddComponent implements OnInit {
   save() {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "routeMasterLocWise"
+      filter: {},
+      "collectionName": "routeMasterLocWise"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
@@ -216,7 +216,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
             return routeCode;
           }
           if (this.isUpdate) {
-            this.newRouteCode = this.data.id
+            this.newRouteCode = this.data._id
           } else {
             this.newRouteCode = generateRouteCode(lastRouteCode);
           }
@@ -230,7 +230,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
             routeType: this.routeMasterLocationForm.value.routeType,
             scheduleType: this.routeMasterLocationForm.value.scheduleType,
             isActive: this.routeMasterLocationForm.value.isActive,
-            id: this.newRouteCode,
+            _id: this.newRouteCode,
             loccd: this.tableData.map((item) => item.loccd),
             distKm: this.tableData.map((item) => parseInt(item.distKm)),
             trtimeHr: this.tableData.map((item) => parseInt(item.trtimeHr)),
@@ -245,17 +245,16 @@ export class RouteMasterLocationAddComponent implements OnInit {
           };
 
           if (this.isUpdate) {
-            let id = transformedData.id;
+            let id = transformedData._id;
             // Remove the "id" field from the form controls
-            delete transformedData.id;
+            delete transformedData._id;
             let req = {
               companyCode: parseInt(localStorage.getItem("companyCode")),
-              type: "masters",
-              collection: "routeMasterLocWise",
-              id: id,
-              updates: transformedData
+              collectionName: "routeMasterLocWise",
+              filter: { _id: id },
+              update: transformedData
             };
-            this.masterService.masterPut('common/update', req).subscribe({
+            this.masterService.masterPut('generic/update', req).subscribe({
               next: (res: any) => {
                 if (res) {
                   // Display success message
@@ -272,11 +271,10 @@ export class RouteMasterLocationAddComponent implements OnInit {
           } else {
             let req = {
               companyCode: parseInt(localStorage.getItem("companyCode")),
-              type: "masters",
-              collection: "routeMasterLocWise",
+              collectionName: "routeMasterLocWise",
               data: transformedData
             };
-            this.masterService.masterPost('common/create', req).subscribe({
+            this.masterService.masterPost('generic/create', req).subscribe({
               next: (res: any) => {
                 if (res) {
                   // Display success message

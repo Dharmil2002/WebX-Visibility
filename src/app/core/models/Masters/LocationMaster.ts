@@ -34,7 +34,7 @@ export class LocationMaster {
   profit: string;
   locEmail: string;
   contLoc: string;
-  id: string;
+  _id: string;
   reportLevel: any;
 
   constructor(LocationMaster) {

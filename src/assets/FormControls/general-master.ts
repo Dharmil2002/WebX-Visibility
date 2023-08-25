@@ -48,11 +48,11 @@ export class GeneralMasterControl {
         Validations: []
       },
       {
-        name: 'id',
+        name: '_id',
         label: '',
         placeholder: '',
         type: 'text',
-        value: generalTable.id,
+        value: generalTable._id,
         filterOptions: '',
         autocomplete: '',
         displaywith: '',

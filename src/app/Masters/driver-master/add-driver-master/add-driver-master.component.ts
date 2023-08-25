@@ -239,17 +239,16 @@ export class AddDriverMasterComponent implements OnInit {
     Object.values(this.DriverTableForm.controls).forEach(control => control.setErrors(null));
 
     if (this.isUpdate) {
-      let id = data.id;
+      let id = data._id;
       // Remove the "id" field from the form controls
-      delete data.id
+      delete data._id
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "driver_detail",
-        id: id,
-        updates: data
+        collectionName: "driver_detail",
+        filter: { _id: id },
+        update: data
       };
-      this.masterService.masterPut('common/update', req).subscribe({
+      this.masterService.masterPut('generic/update', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message
@@ -266,7 +265,7 @@ export class AddDriverMasterComponent implements OnInit {
     } else {
       const lastCode = this.driverData[this.driverData.length - 1];
       const lastDriverCode = lastCode ? parseInt(lastCode.driverId.substring(1)) : 0;
-      // Function to generate a new address code
+      // Function to generate a new driver code
       function generateDriverCode(initialCode: number = 0) {
         const nextDriverCode = initialCode + 1;
         const driverNumber = nextDriverCode.toString().padStart(4, '0');
@@ -274,15 +273,14 @@ export class AddDriverMasterComponent implements OnInit {
         return driverCode;
       }
       this.newDriverId = generateDriverCode(lastDriverCode);
-      data.id = this.newDriverId;
+      data._id = this.newDriverId;
       data.driverId = this.newDriverId;
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "driver_detail",
+        collectionName: "driver_detail",
         data: data
       };
-      this.masterService.masterPost('common/create', req).subscribe({
+      this.masterService.masterPost('generic/create', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message
@@ -344,10 +342,10 @@ export class AddDriverMasterComponent implements OnInit {
   getManualDriverCodeExists() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "driver_detail"
+      "filter": {},
+      "collectionName": "driver_detail"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           this.driverData = res.data;
@@ -375,24 +373,24 @@ export class AddDriverMasterComponent implements OnInit {
       // Prepare the requests for different collections
       let locationReq = {
         "companyCode": parseInt(localStorage.getItem("companyCode")),
-        "type": "masters",
-        "collection": "location_detail"
+        "filter": {},
+        "collectionName": "location_detail"
       };
 
       let pincodeReq = {
         "companyCode": parseInt(localStorage.getItem("companyCode")),
-        "type": "masters",
-        "collection": "pincode_detail"
+        "filter": {},
+        "collectionName": "pincode_detail"
       };
       let vehicleReq = {
         "companyCode": parseInt(localStorage.getItem("companyCode")),
-        "type": "masters",
-        "collection": "vehicle_detail"
+        "filter": {},
+        "collectionName": "vehicle_detail"
       };
 
-      const locationRes = await this.masterService.masterPost('common/getall', locationReq).toPromise();
-      const pincodeRes = await this.masterService.masterPost('common/getall', pincodeReq).toPromise();
-      const vehicleRes = await this.masterService.masterPost('common/getall', vehicleReq).toPromise();
+      const locationRes = await this.masterService.masterPost('generic/get', locationReq).toPromise();
+      const pincodeRes = await this.masterService.masterPost('generic/get', pincodeReq).toPromise();
+      const vehicleRes = await this.masterService.masterPost('generic/get', vehicleReq).toPromise();
 
       const mergedData = {
         locationData: locationRes?.data,

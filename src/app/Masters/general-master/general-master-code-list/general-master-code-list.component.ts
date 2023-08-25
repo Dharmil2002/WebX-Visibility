@@ -80,7 +80,7 @@ export class GeneralMasterCodeListComponent {
         if (res) {
           this.masterService.setValueheaderCode(this.data?.headerCode);
           // Generate srno for each object in the array
-          const dataWithSrno = res.data.db.data.General_master.map((obj, index) => {
+          const dataWithSrno = res.data?.map((obj, index) => {
             return {
               ...obj,
               srNo: index + 1
@@ -94,18 +94,18 @@ export class GeneralMasterCodeListComponent {
   }
 
   IsActiveFuntion(det) {
-    let id = det.id;
+    let id = det._id;
     // Remove the "id" field from the form controls
-    delete det.id;
+    delete det._id;
     delete det.srNo;
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       type: "masters",
-      collection: "General_master",
-      id: id,
-      updates: det
+      collectionName: "General_master",
+      filter: { _id: id },
+      update: det
     };
-    this.masterService.masterPut('common/update', req).subscribe({
+    this.masterService.masterPut('generic/update', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Display success message

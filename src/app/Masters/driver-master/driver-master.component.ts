@@ -7,7 +7,6 @@ import Swal from 'sweetalert2';
 })
 export class DriverMasterComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  data: [] | any;
   csv: any[];
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   toggleArray = ["activeFlag"]
@@ -40,9 +39,7 @@ export class DriverMasterComponent implements OnInit {
     edit: true,
     csv: false
   }
-  cityActiveFlag: any;
   addAndEditPath: string;
-  tableData: any;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/DriverMaster/AddDriverMaster";
   }
@@ -52,10 +49,10 @@ export class DriverMasterComponent implements OnInit {
   getDriverDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "driver_detail"
+      "filter": {},
+      "collectionName": "driver_detail"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
@@ -73,18 +70,17 @@ export class DriverMasterComponent implements OnInit {
   }
 
   IsActiveFuntion(det) {
-    let id = det.id;
+    let id = det._id;
     // Remove the "id" field from the form controls
-    delete det.id;
+    delete det._id;
     delete det.srNo;
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      type: "masters",
-      collection: "driver_detail",
-      id: id,
-      updates: det
+      collectionName: "driver_detail",
+      filter: { _id: id },
+      update: det
     };
-    this.masterService.masterPut('common/update', req).subscribe({
+    this.masterService.masterPut('generic/update', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Display success message

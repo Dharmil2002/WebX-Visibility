@@ -157,10 +157,10 @@ export class TripRouteMasterAddComponent implements OnInit {
   save() {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "trip_route_details"
+      filter: {},
+      "collectionName": "trip_route_details"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
@@ -174,7 +174,7 @@ export class TripRouteMasterAddComponent implements OnInit {
             return routeCode;
           }
           if (this.isUpdate) {
-            this.newRouteCode = this.data.id
+            this.newRouteCode = this.data._id
           } else {
             this.newRouteCode = generateRouteCode(lastRouteCode);
           }
@@ -188,7 +188,7 @@ export class TripRouteMasterAddComponent implements OnInit {
             departTime: this.tripRouteTableForm.value.departTime,
             roundTrip: this.tripRouteTableForm.value.roundTrip,
             isActive: this.tripRouteTableForm.value.isActive,
-            id: this.newRouteCode,
+            _id: this.newRouteCode,
             city: this.tableData.map((item) => item.cityName),
             distKm: this.tableData.map((item) => parseInt(item.distKm)),
             transitTime: this.tableData.map((item) => parseInt(item.transitTime)),
@@ -199,17 +199,16 @@ export class TripRouteMasterAddComponent implements OnInit {
           };
 
           if (this.isUpdate) {
-            let id = transformedData.id;
+            let id = transformedData._id;
             // Remove the "id" field from the form controls
-            delete transformedData.id;
+            delete transformedData._id;
             let req = {
               companyCode: parseInt(localStorage.getItem("companyCode")),
-              type: "masters",
-              collection: "trip_route_details",
-              id: id,
-              updates: transformedData
+              collectionName: "trip_route_details",
+              filter: { _id: id },
+              update: transformedData
             };
-            this.masterService.masterPut('common/update', req).subscribe({
+            this.masterService.masterPut('generic/update', req).subscribe({
               next: (res: any) => {
                 if (res) {
                   // Display success message
@@ -226,11 +225,10 @@ export class TripRouteMasterAddComponent implements OnInit {
           } else {
             let req = {
               companyCode: parseInt(localStorage.getItem("companyCode")),
-              type: "masters",
-              collection: "trip_route_details",
+              collectionName: "trip_route_details",
               data: transformedData
             };
-            this.masterService.masterPost('common/create', req).subscribe({
+            this.masterService.masterPost('generic/create', req).subscribe({
               next: (res: any) => {
                 if (res) {
                   // Display success message
@@ -361,19 +359,19 @@ export class TripRouteMasterAddComponent implements OnInit {
     // Prepare the requests for different collections
     let locationReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "location_detail"
+      filter: {},
+      "collectionName": "location_detail"
     };
 
     let cityReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "city_detail"
+      filter: {},
+      "collectionName": "city_detail"
     };
     // Use forkJoin to make parallel requests and get all data at once
     forkJoin([
-      this.masterService.masterPost('common/getall', locationReq),
-      this.masterService.masterPost('common/getall', cityReq),
+      this.masterService.masterPost('generic/get', locationReq),
+      this.masterService.masterPost('generic/get', cityReq),
     ]).pipe(
       map(([locationRes, cityRes]) => {
         // Combine all the data into a single object
@@ -383,7 +381,9 @@ export class TripRouteMasterAddComponent implements OnInit {
         };
       })
     ).subscribe((mergedData) => {
+      debugger
       this.allData = mergedData;
+      console.log(this.allData);
       // Access the merged data here
       const locationDet = mergedData.locationData.map(element => ({
         name: element.locName,

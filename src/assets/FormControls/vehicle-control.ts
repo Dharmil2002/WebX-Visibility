@@ -165,7 +165,8 @@ export class VehicleControls {
                     }
                 },
                 {
-                    name: 'gpsProvider', label: 'GPS Provider', placeholder: 'Search and select GPS Provider', type: 'dropdown', value: '', generatecontrol: true, disable: true,
+                    name: 'gpsProvider', label: 'GPS Provider', placeholder: 'Search and select GPS Provider', type: 'dropdown', value: '',
+                    generatecontrol: true, disable: true,
                     Validations: [
                     ],
                     additionalData: {
@@ -475,7 +476,7 @@ export class VehicleControls {
                         }
                     ],
                     functions: {
-                        onChange: 'getData',
+                        onChange: 'getDataForInnerOuter',
                     }
                 },
                 {
@@ -488,7 +489,7 @@ export class VehicleControls {
                         }
                     ],
                     functions: {
-                        onChange: 'getData',
+                        onChange: 'getDataForInnerOuter',
                     }
                 },
                 {
@@ -518,11 +519,11 @@ export class VehicleControls {
                         }
                     ],
                     functions: {
-                        onChange: 'getData',
+                        onChange: 'getDataForInnerOuter',
                     }
                 },
                 {
-                    name: 'outerHeigth', label: 'Outer Height(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerHeigth == 0 ? 0 : vehicleTable.outerHeigth, generatecontrol: true, disable: false,
+                    name: 'outerHeight', label: 'Outer Height(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerHeight == 0 ? 0 : vehicleTable.outerHeight, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "pattern",
@@ -531,7 +532,7 @@ export class VehicleControls {
                         }
                     ],
                     functions: {
-                        onChange: 'getData',
+                        onChange: 'getDataForInnerOuter',
                     }
                 },
                 {
@@ -561,7 +562,7 @@ export class VehicleControls {
                         }
                     ],
                     functions: {
-                        onChange: 'getData',
+                        onChange: 'getDataForInnerOuter',
                     }
                 },
 
@@ -575,7 +576,7 @@ export class VehicleControls {
                         }
                     ],
                     functions: {
-                        onChange: 'getData',
+                        onChange: 'getDataForInnerOuter',
                     }
                 },
                 {

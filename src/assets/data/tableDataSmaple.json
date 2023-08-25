@@ -1,31 +1,20 @@
 {
-    "data":[{
-        "Docket": "1",
-        "Count": "Beth",
-        "TotalPackage": "Roseby",
-        "TotalWeight": "broseby0@nytimes.com",
-        "TotalCFT": "Female",
-        "VehicleCapacity": "18.31.84.205"
-      }, {
-        "Docket":"2",
-        "Count": "Tom",
-        "TotalPackage": "Machent",
-        "TotalWeight": "tmachent1@dailymotion.com",
-        "TotalCFT": "Male",
-        "VehicleCapacity": "93.183.60.145"
-      }, {
-        "Docket": "3",
-        "Count": "Zahara",
-        "TotalPackage": "Belfitt",
-        "TotalWeight": "zbelfitt2@comsenz.com",
-        "TotalCFT": "Female",
-        "VehicleCapacity": "220.225.46.103"
-      }, {
-        "Docket": "4",
-        "Count": "Weston",
-        "TotalPackage": "Bugbee",
-        "TotalWeight": "wbugbee3@washingtonpost.com",
-        "TotalCFT": "Male",
-        "VehicleCapacity": "211.149.203.56"
-      }]
+  "data":[
+
+  {
+    "DocketBranch": "BRDB",
+    "Count": 100,
+    "TotalPackage": 933,
+    "TotalWeight": 91262,
+    "TotalCFT": 125156.87
+  },
+ {
+   "DocketBranch": "AMDB",
+    "Count": 100,
+    "TotalPackage": 4314,
+    "TotalWeight": 94756.67,
+    "TotalCFT": 113902.61
+  }
+
+]
 }

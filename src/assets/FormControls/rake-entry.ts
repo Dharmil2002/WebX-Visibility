@@ -5,7 +5,7 @@ export class RakeEntryControl {
     constructor() {
         this.rakeEntryArray = [
             {
-                name: "rakeID",
+                name: "rakeId",
                 label: "Rake ID",
                 placeholder: "Enter Rake ID",
                 type: "text",
@@ -27,12 +27,21 @@ export class RakeEntryControl {
                 name: "destination",
                 label: "Destination",
                 placeholder: "Enter destination",
-                type: "text",
+                type: "dropdown",
                 value: "",
                 generatecontrol: true,
                 disable: false,
-                Validations: [
-                ]
+                Validations: [{
+                    name: "autocomplete",
+                },
+                {
+                    name: "invalidAutocompleteObject",
+                    message: "Choose proper value",
+                }
+                ],
+                additionalData: {
+                    showNameAndValue: false
+                }
             }, {
                 name: 'vendorType', label: "Vendor Type", placeholder: "Select Vendor Type", type: 'text',
                 value: 'Attached', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
@@ -235,7 +244,7 @@ export class RakeEntryControl {
                 generatecontrol: false,
                 disable: true
             }, {
-                name: 'id',
+                name: '_id',
                 label: '',
                 placeholder: '',
                 type: 'text',
@@ -258,6 +267,7 @@ export class RakeEntryControl {
                 generatecontrol: false,
                 disable: false,
                 Validations: [
+                   
                 ],
                 functions: {
                     onToggleAll: 'toggleSelectAll',

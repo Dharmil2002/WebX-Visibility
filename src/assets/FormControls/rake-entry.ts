@@ -258,17 +258,6 @@ export class RakeEntryControl {
                 generatecontrol: false,
                 disable: false,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "Multi Via Location Access is Required...!",
-                    }
-                    , {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "autocomplete",
-                    }
                 ],
                 functions: {
                     onToggleAll: 'toggleSelectAll',

@@ -83,8 +83,7 @@ export class ChaEntryPageComponent implements OnInit {
       option: [
         { name: "Incoming Invoice", value: "Incoming Invoice" },
         { name: "Goods Movement", value: "Goods Movement" },
-        { name: "RC", value: "RC" },
-        { name: "Insurance", value: "Insurance" }
+        { name: "CFS Charges", value: "CFS Charges" }
       ],
       Style: "",
       HeaderStyle: { 'text-align': 'center' },
@@ -260,7 +259,7 @@ export class ChaEntryPageComponent implements OnInit {
       Swal.fire({
         icon: "success",
         title: "Generated SuccesFully",
-        text: "Job Entry No: " + jeNo,
+        text: "CHA No: " + jeNo,
         showConfirmButton: true,
       }).then((result) => {
         if (result.isConfirmed) {

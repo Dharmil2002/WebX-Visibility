@@ -84,7 +84,7 @@ export class TrackDcrSeriesComponent implements OnInit {
     let req = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
       "filter": {},
-      "collection": "dcr"
+      "collectionName": "dcr"
     }
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {

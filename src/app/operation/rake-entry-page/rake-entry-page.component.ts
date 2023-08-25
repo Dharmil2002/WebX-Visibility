@@ -8,6 +8,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { renameKeys } from "./rate-utility";
+import Swal from "sweetalert2";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -34,6 +35,9 @@ export class RakeEntryPageComponent implements OnInit {
     fromCityStatus: boolean; //it's used in getCity() for binding fromCity
     toCity: string; //it's used in getCity() for binding ToCity
     toCityStatus: boolean; //it's used in getCity() for binding ToCity
+    via: string;
+    viaStatus: boolean;
+
 
     breadScrums = [
         {
@@ -114,7 +118,7 @@ export class RakeEntryPageComponent implements OnInit {
             advancedLocation: { variable: 'advancedLocation', status: 'advancedLocationStatus' },
             balanceLocation: { variable: 'balanceLocation', status: 'balanceLocationStatus' },
             fromCity: { variable: 'fromCity', status: 'fromCityStatus' },
-            toCity: { variable: 'toCity', status: 'toCityStatus' }
+            toCity: { variable: 'toCity', status: 'toCityStatus' },
         };
         processProperties.call(this, this.jsonControlArray, jobPropertiesMapping);
     }
@@ -188,6 +192,13 @@ export class RakeEntryPageComponent implements OnInit {
                     cityDetail,
                     this.toCity,
                     this.toCityStatus
+                );
+                this.filter.Filter(
+                    this.jsonControlArray,
+                    this.rakeEntryTableForm,
+                    cityDetail,
+                    this.via,
+                    this.viaStatus
                 ); // Filter the docket control array based on toCity details
             }
         } catch (error) {
@@ -195,12 +206,27 @@ export class RakeEntryPageComponent implements OnInit {
         }
     }
     cancel() {
-        this.goBack(7)
+        this.goBack(8)
     }
     goBack(tabIndex: number): void {
         this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
     }
     save() {
-
+        const thisYear = new Date().getFullYear();
+        const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
+        const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
+        const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
+        const paddedNumber = dynamicNumber.toString().padStart(4, "0");
+        let rake = `Rake/${dynamicValue}/${financialYear}/${paddedNumber}`;
+            Swal.fire({
+              icon: "success",
+              title: "Generated Successfully",
+              text: "Rake No: " + rake,
+              showConfirmButton: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                this.goBack(8);
+              }
+            });
     }
 }

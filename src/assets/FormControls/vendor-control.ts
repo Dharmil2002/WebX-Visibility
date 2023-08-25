@@ -487,11 +487,11 @@ export class VendorControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'id',
+                name: '_id',
                 label: '',
                 placeholder: '',
                 type: 'text',
-                value: vendorMasterTable.id,
+                value: vendorMasterTable._id,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',

@@ -5,15 +5,17 @@ import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { utilityService } from 'src/app/Utility/utility.service';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
+// import { CityControl } from "src/assets/FormControls/CityControls";
 import Swal from "sweetalert2";
-import { CityControl } from "src/assets/FormControls/CityControls";
+import { forkJoin } from "rxjs";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import { CityControl } from "src/assets/FormControls/cityControls";
 
 @Component({
     selector: 'app-add-city-master',
     templateUrl: './add-city-master.component.html'
 })
+
 export class AddCityMasterComponent implements OnInit {
     companyCode: any = parseInt(localStorage.getItem("companyCode"));
     stateDetails: any;
@@ -27,34 +29,25 @@ export class AddCityMasterComponent implements OnInit {
     isUpdate = false;
     action: string;
     breadScrums: { title: string; items: string[]; active: string }[];
-    stateId: any;
-    zoneId: any;
     cityFormControls: CityControl;
     country: any;
     countryCode: any;
     updateCountry: any;
     stateList: any[];
-    stateData: any;
-    zoneData: any;
     prevUsedCityCode: number = 0;
+    stateName: any;
 
     constructor(private route: Router, @Inject(MAT_DIALOG_DATA) public data: any,
-        private fb: UntypedFormBuilder, private filter: FilterUtils,
-        private service: utilityService, private masterService: MasterService) {
-        if (this.route.getCurrentNavigation()?.extras?.state != null) {
-            this.data = route.getCurrentNavigation().extras.state.data;
-            this.stateId = this.data.stateName;
-            this.zoneId = this.data.zoneName;
+        private fb: UntypedFormBuilder, private filter: FilterUtils,private masterService: MasterService,
+        ) {
+        // Assuming "this.route" and "CityMaster" are already defined and initialized.
+        // Extract data from navigation extras, if available
+        const extrasState = this.route.getCurrentNavigation()?.extras?.state;
+        if (extrasState) {
+            this.data = extrasState.data;
             this.isUpdate = true;
             this.action = "edit";
-        } else {
-            this.action = "Add";
-        }
-        if (this.action === "edit") {
-            this.isUpdate = true;
-            this.cityTableData = this.data;
-            this.stateId = this.cityTableData.state;
-            this.zoneId = this.cityTableData.zone;
+            this.cityTableData = this.data; // Assuming this.data contains cityTableData when editing
             this.breadScrums = [
                 {
                     title: "City Master",
@@ -63,6 +56,7 @@ export class AddCityMasterComponent implements OnInit {
                 },
             ];
         } else {
+            this.action = "Add";
             this.breadScrums = [
                 {
                     title: "City Master",
@@ -72,159 +66,138 @@ export class AddCityMasterComponent implements OnInit {
             ];
             this.cityTableData = new CityMaster({});
         }
+        // You might want to handle the case when "this.data" is not available
+        // or does not contain the required properties (stateName, zoneName, etc.).
+        // In the current code, there's no handling for such cases, so you might need to add it.
         this.intializeFormControls();
     }
+
     intializeFormControls() {
+        // Initialize CityControl and get form controls
         this.cityFormControls = new CityControl(this.cityTableData, this.isUpdate);
         this.jsonControlCityArray = this.cityFormControls.getFormControls();
-        this.jsonControlCityArray.forEach(data => {
-            if (data.name === 'state') {
-                // Set State-related variables
-                this.state = data.name;
-                this.stateStatus = data.additionalData.showNameAndValue;
-            }
-            if (data.name === 'zone') {
-                // Set Zone-related variables
-                this.zone = data.name;
-                this.zoneStatus = data.additionalData.showNameAndValue;
-            }
-        });
+
+        // Set State-related and Zone-related variables
+        const stateControl = this.jsonControlCityArray.find(data => data.name === 'state');
+        this.state = stateControl.name;
+        this.stateStatus = stateControl.additionalData.showNameAndValue;
+
+        const zoneControl = this.jsonControlCityArray.find(data => data.name === 'zone');
+        this.zone = zoneControl.name;
+        this.zoneStatus = zoneControl.additionalData.showNameAndValue;
+
+        // Build the form group
         this.cityTableForm = formGroupBuilder(this.fb, [this.jsonControlCityArray]);
     }
 
     ngOnInit(): void {
-        this.getStateData();
-        this.getZoneData();
+        this.fetchAndPopulateData();
     }
 
     cancel() {
         window.history.back();
-        //this.Route.navigateByUrl("/Masters/CityMaster/CityMasterView);
     }
 
-    save() {
-        this.cityTableForm.controls["state"].setValue(this.cityTableForm.value.state.name);
-        this.cityTableForm.controls["zone"].setValue(this.cityTableForm.value.zone.name);
-        this.cityTableForm.controls["odaFlag"].setValue(this.cityTableForm.value.odaFlag === true ? true : false);
-        this.cityTableForm.controls["isActive"].setValue(this.cityTableForm.value.isActive === true ? true : false);
-         //generate unique userId
-         const cityId = this.generateCityCode();
-         this.cityTableForm.controls["id"].setValue(cityId);
-         this.cityTableForm.removeControl("CompanyCode");
+    async fetchAndPopulateData() {
+        const stateReq = {
+            companyCode: this.companyCode,
+            collectionName: "state_detail",
+            filter: {}
+        };
+        const zoneReq = {
+            companyCode: this.companyCode,
+            collectionName: "General_master",
+            filter: {}
+        };
+        const [stateRes, zoneRes] = await forkJoin([
+            this.masterService.masterPost("generic/get", stateReq).toPromise(),
+            this.masterService.masterPost("generic/get", zoneReq).toPromise()
+        ]).toPromise();
+        const stateList = stateRes.data
+            .filter(item => item.activeFlag)
+            .map(element => ({ name: element.stateName, value: element.stateName }));
+
+        const zoneList = zoneRes.data
+            .filter(item => item.codeType === "ZONE" && item.activeFlag)
+            .map(x => ({ name: x.codeDesc, value: x.codeId }));
 
         if (this.isUpdate) {
-            let id = this.cityTableForm.value.id;
-            this.cityTableForm.removeControl("id");
+            const selectedState = stateList.find(x => x.name === this.cityTableData.state);
+            this.cityTableForm.controls.state.setValue(selectedState);
+
+            const selectedZone = zoneList.find(x => x.name === this.cityTableData.zone);
+            this.cityTableForm.controls.zone.setValue(selectedZone);
+        }
+        this.filter.Filter(
+            this.jsonControlCityArray,
+            this.cityTableForm,
+            stateList,
+            this.state,
+            this.stateStatus
+        );
+        this.filter.Filter(
+            this.jsonControlCityArray,
+            this.cityTableForm,
+            zoneList,
+            this.zone,
+            this.zoneStatus
+        );
+    }
+
+    async save() {
+        this.cityTableForm.controls["state"].setValue(this.cityTableForm.value.state.name);
+        this.cityTableForm.controls["zone"].setValue(this.cityTableForm.value.zone.name);
+        this.cityTableForm.controls["odaFlag"].setValue(this.cityTableForm.value.odaFlag ? "Y" : "N");
+        this.cityTableForm.controls["isActive"].setValue(this.cityTableForm.value.isActive === true ? true : false);
+
+        //generate unique _id
+        this.cityTableForm.controls["_id"].setValue(this.cityTableForm.value.cityName.name);
+        this.cityTableForm.removeControl("CompanyCode");
+
+        // Clear any errors in the form controls
+        Object.values(this.cityTableForm.controls).forEach(control => control.setErrors(null));
+
+        if (this.isUpdate) {
+            let id = this.cityTableForm.value._id;
+            this.cityTableForm.removeControl("_id");
+
             let req = {
                 companyCode: this.companyCode,
-                type: "masters",
-                collection: "city_detail",
-                id: this.data.id,
-                updates: this.cityTableForm.value
+                collectionName: "city_detail",
+                filter: {
+                    _id: this.data._id,
+                },
+                update: this.cityTableForm.value
             };
-            this.masterService.masterPut('common/update', req).subscribe({
-                next: (res: any) => {
-                    if (res) {
-                        // Display success message
-                        Swal.fire({
-                            icon: "success",
-                            title: "edited successfully",
-                            text: res.message,
-                            showConfirmButton: true,
-                        });
-                        this.route.navigateByUrl('/Masters/CityMaster/CityMasterView');
-                    }
-                }
-            });
+            const res = await this.masterService.masterPut("generic/update", req).toPromise()
+            if (res) {
+                // Display success message
+                Swal.fire({
+                    icon: "success",
+                    title: "edited successfully",
+                    text: res.message,
+                    showConfirmButton: true,
+                });
+                this.route.navigateByUrl('/Masters/CityMaster/CityMasterView');
+            }
         } else {
             let req = {
                 companyCode: this.companyCode,
-                type: "masters",
-                collection: "city_detail",
+                collectionName: "city_detail",
                 data: this.cityTableForm.value
             };
-            this.masterService.masterPost('common/create', req).subscribe({
-                next: (res: any) => {
-                    if (res) {
-                        // Display success message
-                        Swal.fire({
-                            icon: "success",
-                            title: "data added successfully",
-                            text: res.message,
-                            showConfirmButton: true,
-                        });
-                        this.route.navigateByUrl('/Masters/CityMaster/CityMasterView');
-                    }
-                }
+            const res = await this.masterService.masterPost("generic/create", req).toPromise()
+            // Display success message
+            Swal.fire({
+                icon: "success",
+                title: "data added successfully",
+                text: res.message,
+                showConfirmButton: true,
             });
+            window.location.reload();
         }
     }
 
-    getZoneData() {
-        this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-            this.zoneData = res;
-            let tableArray = this.zoneData.zoneList;
-            let zone = [];
-            tableArray.forEach(element => {
-                let dropdownList = {
-                    name: element.zoneDesc,
-                    value: element.zoneId
-                }
-                zone.push(dropdownList)
-            });
-            if (this.isUpdate) {
-                this.updateCountry = zone.find((x) => x.name == this.zoneId);
-                this.cityTableForm.controls.zone.setValue(this.updateCountry);
-            }
-            this.filter.Filter(
-                this.jsonControlCityArray,
-                this.cityTableForm,
-                zone,
-                this.zone,
-                this.zoneStatus,
-            );
-        });
-    }
-
-    getStateData() {
-        this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-            this.stateData = res;
-            let tableArray = this.stateData.stateList;
-            let state = [];
-            tableArray.forEach(element => {
-                let dropdownList = {
-                    name: element.stateDesc,
-                    value: element.stateId
-                }
-                state.push(dropdownList)
-            });
-            if (this.isUpdate) {
-                this.updateCountry = state.find((x) => x.name == this.stateId);
-                this.cityTableForm.controls.state.setValue(this.updateCountry);
-            }
-            this.filter.Filter(
-                this.jsonControlCityArray,
-                this.cityTableForm,
-                state,
-                this.state,
-                this.stateStatus
-            );
-        });
-    }
-    //method to generate unique userCode
-    generateCityCode(): string {
-        // Get the last used user code from localStorage
-        const prevCityId = parseInt(localStorage.getItem('prevUsedCityCode') || '0', 10);
-        // Increment the last used user code by 1 to generate the next one
-        const nextCityId = prevCityId + 1;
-        // Convert the number to a 4-digit string, padded with leading zeros
-        const paddedNumber = nextCityId.toString().padStart(4, '0');
-        // Combine the prefix "USR" with the padded number to form the complete user code
-        const cityId = `city${paddedNumber}`;
-        // Update the last used user code in localStorage
-        localStorage.setItem('prevUsedCityCode', nextCityId.toString());
-        return cityId;
-    }
     functionCallHandler($event) {
         // console.log("fn handler called" , $event);
         let field = $event.field;                   // the actual formControl instance

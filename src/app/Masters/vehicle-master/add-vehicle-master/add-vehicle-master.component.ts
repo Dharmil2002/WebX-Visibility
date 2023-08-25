@@ -9,7 +9,7 @@ import { vehicleModel } from "src/app/core/models/Masters/vehicle-master";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
-
+import { calculateVolume } from "../vehicle-utility";
 @Component({
   selector: 'app-add-vehicle-master',
   templateUrl: './add-vehicle-master.component.html',
@@ -63,37 +63,29 @@ export class AddVehicleMasterComponent implements OnInit {
       console.log("failed");
     }
   }
-  constructor(private masterService: MasterService,
+  constructor(
+    private masterService: MasterService,
     public objSnackBarUtility: SnackBarUtilityService,
-    private route: Router, private fb: UntypedFormBuilder, private filter: FilterUtils) {
-    if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.vehicleTabledata = route.getCurrentNavigation().extras.state.data;
-      this.action = 'edit'
+    private route: Router,
+    private fb: UntypedFormBuilder,
+    private filter: FilterUtils
+  ) {
+    const navigationExtras = this.route.getCurrentNavigation()?.extras;
+    this.vehicleTabledata = navigationExtras?.state?.data || new vehicleModel({});
+    if (navigationExtras?.state != null) {
+      this.action = 'edit';
       this.isUpdate = true;
     } else {
       this.action = "Add";
     }
-    if (this.action === 'edit') {
-      this.isUpdate = true;
-      this.breadScrums = [
-        {
-          title: "Vehicle Details",
-          items: ["Home"],
-          active: "Edit Vehicle",
-        },
-      ];
-    } else {
-      this.breadScrums = [
-        {
-          title: "Add Vehicle Master",
-          items: ["Home"],
-          active: "Vehicle Details",
-        },
-      ];
-      this.vehicleTabledata = new vehicleModel({});
-    }
-    this.initializeFormControl()
+    this.breadScrums = [{
+      title: "Vehicle Master",
+      items: ["Home"],
+      active: this.action === 'edit' ? "Edit Vehicle" : "Add Vehicle",
+    }];
+    this.initializeFormControl();
   }
+
   initializeFormControl() {
     // Create vehicleFormControls instance to get form controls for different sections
     const vehicleFormControls = new VehicleControls(this.vehicleTabledata, this.isUpdate);
@@ -113,70 +105,38 @@ export class AddVehicleMasterComponent implements OnInit {
     this[statusPropertyName] = data.additionalData.showNameAndValue;
   }
   bindDropdown() {
+    const dataMappings = {
+      vehicleType: ['vehicleType', 'vehicleTypeStatus'],
+      controllBranch: ['controllBranch', 'controllBranchStatus'],
+      assetName: ['assetName', 'assetNameStatus'],
+      vendorType: ['vendorType', 'vendorTypeStatus'],
+      vendorName: ['vendorName', 'vendorNameStatus'],
+      gpsProvider: ['gpsProvider', 'gpsProviderStatus'],
+      ftlTypeDesc: ['ftlTypeDesc', 'ftlTypeStatus'],
+      permitState: ['permitState', 'permitStateStatus'],
+      route: ['routeLoc', 'routeStatus']
+    };
+
     this.jsonControlVehicleArray.forEach(data => {
-      switch (data.name) {
-        case 'vehicleType':
-          this.setData.call(this, data, 'vType', 'vTypeStatus');
-          break;
-        case 'controllBranch':
-          this.setData.call(this, data, 'cBranch', 'cBranchStatus');
-          break;
-        case 'assetName':
-          this.setData.call(this, data, 'assetName', 'assetNameStatus');
-          break;
-        case 'vendorType':
-          this.setData.call(this, data, 'vendorType', 'vendorTypeStatus');
-          break;
-        case 'vendorName':
-          this.setData.call(this, data, 'vendorName', 'vendorNameStatus');
-          break;
-        case 'gpsProvider':
-          this.setData.call(this, data, 'gpsProvider', 'gpsProviderStatus');
-          break;
-        case 'ftlTypeDesc':
-          this.setData.call(this, data, 'ftlTypeDesc', 'ftlTypeStatus');
-          break;
-        case 'permitState':
-          this.setData.call(this, data, 'permitState', 'permitStateStatus');
-          break;
-        case 'route':
-          this.setData.call(this, data, 'routeLoc', 'routeStatus');
-          break;
-        default:
-          // Handle the case where data.name doesn't match any of the cases
-          break;
+      const mapping = dataMappings[data.name];
+      if (mapping) {
+        this.setData.call(this, data, mapping[0], mapping[1]);
       }
     });
   }
   getDropDownData() {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       const {
-        assetNameDropdown,
-        vendorTypeDropdown,
         gpsProviderDropdown,
       } = res;
-
-      this.assetNameData = assetNameDropdown;
-      this.vendorTypeData = vendorTypeDropdown;
       this.gpsProviderData = gpsProviderDropdown;
-
       if (this.isUpdate) {
-        this.assetNameDetail = this.findDropdownItemByName(this.assetNameData, this.vehicleTabledata.assetName);
-        this.vehicleTableForm.controls.assetName.setValue(this.assetNameDetail);
-
-        this.vendorTypDetail = this.findDropdownItemByName(this.vendorTypeData, this.vehicleTabledata.vendorType);
-        this.vehicleTableForm.controls.vendorType.setValue(this.vendorTypDetail);
-
         this.gpsProviderDetail = this.findDropdownItemByName(this.gpsProviderData, this.vehicleTabledata.gpsProvider);
         this.vehicleTableForm.controls.gpsProvider.setValue(this.gpsProviderDetail);
       }
-
       const filterParams = [
-        [this.jsonControlVehicleArray, this.assetNameData, this.assetName, this.assetNameStatus],
-        [this.jsonControlVehicleArray, this.vendorTypeData, this.vendorType, this.vendorTypeStatus],
         [this.jsonControlVehicleArray, this.gpsProviderData, this.gpsProvider, this.gpsProviderStatus],
       ];
-
       filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
         this.filter.Filter(jsonControlArray, this.vehicleTableForm, dropdownData, formControl, statusControl);
       });
@@ -185,7 +145,6 @@ export class AddVehicleMasterComponent implements OnInit {
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }
-
   //#region to calculate capacity based on Gross Vehicle Weight and unload weight and send validation msg if condition not matched
   calCapacity() {
     if (
@@ -206,17 +165,18 @@ export class AddVehicleMasterComponent implements OnInit {
       );
     }
   }
-  //#endregion
-  getData(): void {
-    var innerDCal =
-      parseFloat(this.vehicleTableForm.value.innerLength) *
-      parseFloat(this.vehicleTableForm.value.innerHeight) *
-      parseFloat(this.vehicleTableForm.value.innerWidth);
+  getDataForInnerOuter(): void {
+    var innerDCal = calculateVolume(
+      this.vehicleTableForm.value.innerLength,
+      this.vehicleTableForm.value.innerHeight,
+      this.vehicleTableForm.value.innerWidth
+    );
     this.vehicleTableForm.controls["cft"].setValue(innerDCal.toFixed(2));
-    var outerDCal =
-      parseFloat(this.vehicleTableForm.value.outerLength) *
-      parseFloat(this.vehicleTableForm.value.outerHeigth) *
-      parseFloat(this.vehicleTableForm.value.outerWidth);
+    var outerDCal = calculateVolume(
+      this.vehicleTableForm.value.outerLength,
+      this.vehicleTableForm.value.outerHeight,
+      this.vehicleTableForm.value.outerWidth
+    );
     this.vehicleTableForm.controls["outerCft"].setValue(outerDCal.toFixed(2));
   }
   cancel() {
@@ -227,23 +187,34 @@ export class AddVehicleMasterComponent implements OnInit {
     try {
       const stateReqBody = {
         "companyCode": this.companyCode,
-        "type": "masters",
-        "collection": "state_detail"
+        "collectionName": "state_detail",
+        "filter": {}
       }
       const reqBody = {
         "companyCode": this.companyCode,
-        "type": "masters",
-        "collection": "routeMasterLocWise"
+        "collectionName": "routeMasterLocWise",
+        "filter": {}
       }
       const generalReqBody = {
         "companyCode": this.companyCode,
-        "type": "masters",
-        "collection": "General_master"
+        "collectionName": "General_master",
+        "filter": {}
       }
-      const stateResponse = await this.masterService.masterPost('common/getall', stateReqBody).toPromise();
-      const routeResponse = await this.masterService.masterPost('common/getall', reqBody).toPromise();
-      const ftlTypeResponse = await this.masterService.masterPost('common/getall', generalReqBody).toPromise();
-      const ftlTypeList = ftlTypeResponse.data.filter(item => item.codeType === "FTLTYP").
+      const stateResponse = await this.masterService.masterPost("generic/get", stateReqBody).toPromise();
+      const routeResponse = await this.masterService.masterPost("generic/get", reqBody).toPromise();
+      const generalMasterResponse = await this.masterService.masterPost("generic/get", generalReqBody).toPromise();
+      // FTL Type Description
+      const ftlTypeList = generalMasterResponse.data.filter(item => item.codeType === "FTLTYP").
+        map((x) => {
+          { return { name: x.codeDesc, value: x.codeId } }
+        });
+      // Asset Type Description
+      const assetTypeList = generalMasterResponse.data.filter(item => item.codeType === "VEHASSTYP" && item.activeFlag).
+        map((x) => {
+          { return { name: x.codeDesc, value: x.codeId } }
+        });
+      // Vendor Type Description
+      const vendorTypeList = generalMasterResponse.data.filter(item => item.codeType === "VENDTY" && item.activeFlag).
         map((x) => {
           { return { name: x.codeDesc, value: x.codeId } }
         });
@@ -262,24 +233,33 @@ export class AddVehicleMasterComponent implements OnInit {
         ));
         const ftlType = ftlTypeList.find((x) => x.name === this.vehicleTabledata.ftlTypeDesc);
         this.vehicleTableForm.controls['ftlTypeDesc'].setValue(ftlType);
+
+        const assetType = assetTypeList.find((x) => x.name === this.vehicleTabledata.assetName);
+        this.vehicleTableForm.controls['assetName'].setValue(assetType);
+
+        const vendorType = vendorTypeList.find((x) => x.name === this.vehicleTabledata.vendorType);
+        this.vehicleTableForm.controls['vendorType'].setValue(vendorType);
+
       }
       this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, stateList, this.permitState, this.permitStateStatus);
       this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, routeList, this.routeLoc, this.routeStatus);
       this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, ftlTypeList, this.ftlTypeDesc, this.ftlTypeStatus);
+      this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, assetTypeList, this.assetName, this.assetNameStatus);
+      this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, vendorTypeList, this.vendorType, this.vendorTypeStatus);
+
     } catch (error) {
       // Handle any errors that occurred during the request
       console.error('Error:', error);
     }
   }
-  async fetchDataAndPopulateForm(companyCode, collection, formControl, dataProperty, nameProperty, showNameAndValue) {
+  async fetchDataAndPopulateForm(collectionName, formControl, dataProperty, nameProperty, showNameAndValue) {
     try {
       const reqBody = {
-        "companyCode": companyCode,
-        "type": "masters",
-        "collection": collection
+        "companyCode": this.companyCode,
+        "collectionName": collectionName,
+        "filter": {}
       };
-
-      const response = await this.masterService.masterPost('common/getall', reqBody).toPromise();
+      const response = await this.masterService.masterPost("generic/get", reqBody).toPromise()
       const dataList = response.data.map(x => ({
         name: x[nameProperty],
         value: x[dataProperty]
@@ -289,7 +269,6 @@ export class AddVehicleMasterComponent implements OnInit {
         const selectedData = dataList.find(x => x.name === this.vehicleTabledata[formControl]);
         this.vehicleTableForm.controls[formControl].setValue(selectedData);
       }
-
       // Call the Filter function with the appropriate arguments
       this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, dataList, formControl, showNameAndValue);
     } catch (error) {
@@ -298,41 +277,38 @@ export class AddVehicleMasterComponent implements OnInit {
   }
   // Call the function for each data type with the appropriate showNameAndValue parameter
   async getDataAndPopulateForm() {
-    await this.fetchDataAndPopulateForm(this.companyCode, "vehicleType_detail", "vehicleType", "vehicleTypeCode", "vehicleTypeName", true);
-    await this.fetchDataAndPopulateForm(this.companyCode, "vendor_detail", "vendorName", "vendorCode", "vendorName", true);
-    await this.fetchDataAndPopulateForm(this.companyCode, "location_detail", "controllBranch", "locCode", "locName", true);
+    await this.fetchDataAndPopulateForm("vehicleType_detail", "vehicleType", "vehicleTypeCode", "vehicleTypeName", true);
+    await this.fetchDataAndPopulateForm("vendor_detail", "vendorName", "vendorCode", "vendorName", true);
+    await this.fetchDataAndPopulateForm("location_detail", "controllBranch", "locCode", "locName", true);
   }
-  checkVehicleNumberExist() {
+  async checkVehicleNumberExist() {
     let req = {
-      companyCode: this.companyCode,
-      type: "masters",
-      collection: "vehicle_detail"
+      "companyCode": this.companyCode,
+      "collectionName": "vehicle_detail",
+      "filter": {}
     };
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        const vehicleNoExists = res.data.some((res) => res.id === this.vehicleTableForm.value.id
-          || res.vehicleNo === this.vehicleTableForm.value.vehicleNo);
-        if (vehicleNoExists) {
-          // Show the popup indicating that the state already exists
-          Swal.fire({
-            title: 'Vehicle Number already exists! Please try with another',
-            toast: true,
-            icon: "error",
-            showCloseButton: false,
-            showCancelButton: false,
-            showConfirmButton: true,
-            confirmButtonText: "OK"
-          });
-          this.vehicleTableForm.controls["vehicleNo"].reset();
-        }
-      },
-      error: (err: any) => {
-        // Handle error if required
-        console.error(err);
-      }
-    });
+    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    const vehicleNoExists = res.data.some((res) => res._id === this.vehicleTableForm.value._id
+      || res.vehicleNo === this.vehicleTableForm.value.vehicleNo);
+    if (vehicleNoExists) {
+      // Show the popup indicating that the state already exists
+      Swal.fire({
+        title: 'Vehicle Number already exists! Please try with another',
+        toast: true,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+      this.vehicleTableForm.controls["vehicleNo"].reset();
+    }
+    error: (err: any) => {
+      // Handle error if required
+      console.error(err);
+    }
   }
-  save() {
+  async save() {
     const formValue = this.vehicleTableForm.value;
     const controlNames = [
       "vehicleType",
@@ -349,8 +325,8 @@ export class AddVehicleMasterComponent implements OnInit {
     });
     const permitStateDetail = this.vehicleTableForm.value.permitStateDropdown.map((item: any) => item.name);
     this.vehicleTableForm.controls["permitState"].setValue(permitStateDetail);
-
-    const routeLocation = this.vehicleTableForm.value.routeLocation.map((item: any) => item.name);
+    const routeDetail = this.vehicleTableForm.value.routeLocation;
+    const routeLocation = routeDetail ? routeDetail.map((item: any) => item.name) : "";
     this.vehicleTableForm.controls["route"].setValue(routeLocation);
 
     Object.values(this.vehicleTableForm.controls).forEach(control => control.setErrors(null));
@@ -360,56 +336,50 @@ export class AddVehicleMasterComponent implements OnInit {
     this.vehicleTableForm.removeControl("routeLocation");
     this.vehicleTableForm.removeControl("isUpdate");
     this.vehicleTableForm.removeControl("");
-    this.vehicleTableForm.controls["id"].setValue(this.vehicleTableForm.value.vehicleNo);
+    this.vehicleTableForm.controls["_id"].setValue(this.vehicleTableForm.value.vehicleNo);
     let data = convertNumericalStringsToInteger(this.vehicleTableForm.value)
 
     if (this.isUpdate) {
-      let id = this.vehicleTableForm.value.id;
+      let id = this.vehicleTableForm.value._id;
       // Remove the "id" field from the form controls
-      this.vehicleTableForm.removeControl("id");
+      this.vehicleTableForm.removeControl("_id");
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "vehicle_detail",
-        id: id,
-        updates: data
+        collectionName: "vehicle_detail",
+        filter: {
+          _id: id,
+        },
+        update: data
       };
-      this.masterService.masterPut('common/update', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.route.navigateByUrl('/Masters/VehicleMaster/VehicleMasterList');
-          }
-        }
-      });
+      const res = await this.masterService.masterPut("generic/update", req).toPromise()
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.route.navigateByUrl('/Masters/VehicleMaster/VehicleMasterList');
+      }
     }
     else {
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "vehicle_detail",
+        collectionName: "vehicle_detail",
         data: data
       };
-      this.masterService.masterPost('common/create', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.route.navigateByUrl('/Masters/VehicleMaster/VehicleMasterList');
-          }
-        }
-      });
+      const res = await this.masterService.masterPost("generic/create", req).toPromise()
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.route.navigateByUrl('/Masters/VehicleMaster/VehicleMasterList');
+      }
     }
   }
   enableGpsProvider($event) {
@@ -419,6 +389,17 @@ export class AddVehicleMasterComponent implements OnInit {
         // Update the form control's validation status
         this.vehicleTableForm.controls.gpsProvider.updateValueAndValidity();
       }
+    });
+  }
+  SwalMessage(message) {
+    Swal.fire({
+      title: message,//'Incorrect API',
+      toast: true,
+      icon: "error",
+      showCloseButton: true,
+      showCancelButton: false,
+      showConfirmButton: false,
+      confirmButtonText: "Yes"
     });
   }
 }

@@ -17,7 +17,7 @@ export class StateMaster {
     gstWiseStateCode: any;
     constructor(StateMaster) {
         {
-            this.id=StateMaster.id||''
+            this.id=StateMaster._id||''
             this.stcd = StateMaster.stcd || 'System Genrated';
             this.stateName = StateMaster.stateName || '';
             this.countryName = StateMaster.countryName || '';

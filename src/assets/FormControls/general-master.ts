@@ -32,7 +32,7 @@ export class GeneralMasterControl {
           {
             name: "pattern",
             message: "Please Enter only text of length 1 to 50 characters",
-            pattern: '^[a-zA-z 0-9]{1,50}$',
+            pattern: '^[a-zA-Z0-9 ()\\.\-]{1,50}$',
           }
         ]
       },

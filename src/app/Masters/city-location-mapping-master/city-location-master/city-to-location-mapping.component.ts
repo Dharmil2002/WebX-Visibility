@@ -5,7 +5,6 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import Swal from "sweetalert2";
-import { forkJoin } from "rxjs";
 
 @Component({
     selector: 'app-city-location-master',
@@ -187,130 +186,121 @@ export class CityLocationMappingMaster implements OnInit {
     }
 
     //DropDown of Form Control 
-    locationCityDropdownData() {
+    async locationCityDropdownData() {
         const locationReq = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "location_detail"
+            companyCode: this.companyCode,
+            collectionName: "location_detail",
+            filter: {}
         };
-
         const cityReq = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "city_detail"
+            companyCode: this.companyCode,
+            collectionName: "city_detail",
+            filter: {}
         };
+        try {
+            const [locationRes, cityRes] = await Promise.all([
+                this.masterService.masterPost("generic/get", locationReq).toPromise(),
+                this.masterService.masterPost("generic/get", cityReq).toPromise()
+            ]);
 
-        forkJoin([
-            this.masterService.masterPost('common/getall', locationReq),
-            this.masterService.masterPost('common/getall', cityReq)
-        ]).subscribe(
-            ([locationRes, cityRes]) => {
-                const locationList = locationRes.data;
-                const cityList = cityRes.data;
+            const locationList = locationRes.data;
+            const cityList = cityRes.data;
 
-                const locations = locationList
-                    .filter(element => element.locName != null && element.locName !== '')
-                    .map(element => ({
-                        name: String(element.locName),
-                        value: String(element.locCode)
-                    }));
+            const locations = locationList
+                .filter(element => element.locName != null && element.locName !== '')
+                .map(element => ({
+                    name: String(element.locName),
+                    value: String(element.locCode)
+                }));
 
-                const cities = cityList
-                    .filter(element => element.cityName != null && element.cityName !== '')
-                    .map(element => ({
-                        name: String(element.cityName),
-                        value: String(element.cityName)
-                    }));
+            const cities = cityList
+                .filter(element => element.cityName != null && element.cityName !== '')
+                .map(element => ({
+                    name: String(element.cityName),
+                    value: String(element.cityName)
+                }));
 
-                this.filter.Filter(this.jsonControlArray, this.cityLocationTableForm, locations, this.locationList, this.locationStatus);
-                this.filter.Filter(this.jsonControlArray, this.cityLocationTableForm, cities, this.cityList, this.cityStatus);
+            this.filter.Filter(this.jsonControlArray, this.cityLocationTableForm, locations, this.locationList, this.locationStatus);
+            this.filter.Filter(this.jsonControlArray, this.cityLocationTableForm, cities, this.cityList, this.cityStatus);
 
-                this.cityLocationDisplayedColumns.location.option = locations;
-                this.locationCityDisplayedColumns.city.option = cities;
-                this.apiShow = true;
-            },
-            error => {
-                this.SwalMessage(error + 'Incorrect API');
-            }
-        );
+            this.cityLocationDisplayedColumns.location.option = locations;
+            this.locationCityDisplayedColumns.city.option = cities;
+            this.apiShow = true;
+        } catch (error) {
+            this.SwalMessage(error + 'Incorrect API');
+        }
     }
 
+
     //get City and Location data City Wise From Dropdown
-    getCityAndLocationDetails() {
+    async getCityAndLocationDetails() {
         let req = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "city_location_detail"
+            companyCode: this.companyCode,
+            collectionName: "city_location_detail",
+            filter: {}
         };
-        this.masterService.masterPost('common/getAll', req).subscribe({
-            next: (res: any) => {
-                if (res && res.data) {
-                    this.data = res.data;
-                    const cityFilterData = this.cityLocationTableForm.value.city.name;
-                    // Filter the data based on the Location value
-                    const filteredData = this.data.filter(item => item.id === cityFilterData);
-                    if (filteredData.length > 0) {
-                        const items = filteredData[0].items; // Assuming there's only one item with the matching ID
-                        // Map the items to location and city
-                        const updatedItems = items.map(item => {
-                            return {
-                                city: item.city,
-                                location: item.location,
-                                isActive:item.active
-                            };
-                        });
-                        this.tableLoad = true;
-                        // Load the updated data using the loadTempData function
-                        this.loadTempData(updatedItems);
-                    }
-                    else{
-                        const city = this.cityLocationTableForm.value.city.name;
-                        this.tableLoad = true;
-                        this.loadTempData([{ city, location :'Your Location' }]);
-                    }
-                }
-            },
-            complete() { },
-        });
+        const res = await this.masterService.masterPost("generic/get", req).toPromise();
+        if (res && res.data) {
+            this.data = res.data;
+            const cityFilterData = this.cityLocationTableForm.value.city.name;
+            // Filter the data based on the Location value
+            const filteredData = this.data.filter(item => item._id === cityFilterData);
+            if (filteredData.length > 0) {
+                const items = filteredData[0].items; // Assuming there's only one item with the matching ID
+                // Map the items to location and city
+                const updatedItems = items.map(item => {
+                    return {
+                        city: item.city,
+                        location: item.location,
+                        isActive: item.active
+                    };
+                });
+                this.tableLoad = true;
+                // Load the updated data using the loadTempData function
+                this.loadTempData(updatedItems);
+            }
+            else {
+                const city = this.cityLocationTableForm.value.city.name;
+                this.tableLoad = true;
+                this.loadTempData([{ city, location: 'Your Location' }]);
+            }
+        }
+
     }
 
     //get Location and City on Location Wise Form Dropdown
-    getLocationAndCityDetails() {
+    async getLocationAndCityDetails() {
         let req = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "location_city_detail"
+            companyCode: this.companyCode,
+            collectionName: "location_city_detail",
+            filter: {}
         };
-        this.masterService.masterPost('common/getAll', req).subscribe({
-            next: (res: any) => {
-                if (res && res.data) {
-                    this.data = res.data;
-                    const locationFilterData = this.cityLocationTableForm.value.location.name;
-                    // Filter the data based on the Location value
-                    const filteredData = this.data.filter(item => item.id === locationFilterData);
-                    if (filteredData.length > 0) {
-                        const items = filteredData[0].items; // Assuming there's only one item with the matching ID
-                        // Map the items to city and location
-                        const mappedLocations = items.map(item => {
-                            return {
-                                city: item.city,
-                                location: item.location,
-                                isActive:item.active
-                            };
-                        });
-                        this.tableLoad = true;
-                        // Load the mapped data using the loadTempData function
-                        this.loadTempData(mappedLocations);
-                    }else {
-                        // If no match is found, still store your location
-                        const location = this.cityLocationTableForm.value.location.name;
-                        this.tableLoad = true;
-                        this.loadTempData([{ city: 'Your City', location }]);
-                    }
-                }
-            },
-            complete() { },
-        });
+        const res = await this.masterService.masterPost("generic/get", req).toPromise()
+        if (res && res.data) {
+            this.data = res.data;
+            const locationFilterData = this.cityLocationTableForm.value.location.name;
+            // Filter the data based on the Location value
+            const filteredData = this.data.filter(item => item._id === locationFilterData);
+            if (filteredData.length > 0) {
+                const items = filteredData[0].items; // Assuming there's only one item with the matching ID
+                // Map the items to city and location
+                const mappedLocations = items.map(item => {
+                    return {
+                        city: item.city,
+                        location: item.location,
+                        isActive: item.active
+                    };
+                });
+                this.tableLoad = true;
+                // Load the mapped data using the loadTempData function
+                this.loadTempData(mappedLocations);
+            } else {
+                // If no match is found, still store your location
+                const location = this.cityLocationTableForm.value.location.name;
+                this.tableLoad = true;
+                this.loadTempData([{ city: 'Your City', location }]);
+            }
+        }
     }
 
     saveData() {
@@ -322,8 +312,8 @@ export class CityLocationMappingMaster implements OnInit {
             this.saveLocationCityData();
         }
     }
-    
-    saveCityLocationData() {
+
+    async saveCityLocationData() {
         let hasDuplicate = false; // Flag to track duplicates
         let locations = new Set();
         this.tableData.forEach(element => {
@@ -357,41 +347,35 @@ export class CityLocationMappingMaster implements OnInit {
                     entryBy: this.cityLocationTableForm.value.entryBy,
                     entryDate: this.cityLocationTableForm.value.entryDate
                 };
-
                 transformedDataArray.push(transformedData);  // Push the transformed data object to the array
             });
             let req = {
                 companyCode: this.companyCode,
-                type: "masters",
-                collection: "city_location_detail",
+                collectionName: "city_location_detail",
                 data: {
-                    id: this.tableData[0]?.city, // Assuming all elements have the same location
+                    _id: this.tableData[0]?.city, // Assuming all elements have the same location
                     items: transformedDataArray,
-                },
+                }
             };
-            this.masterService.masterPost('common/create', req).subscribe({
-                next: (res: any) => {
-                    if (res) {
-                        // Display success message
-                        Swal.fire({
-                            icon: "success",
-                            title: "Successful",
-                            text: res.message,
-                            showConfirmButton: true,
-                        });
-                        window.location.reload();
-                    }
-                },
-                complete() { },
-            });
-        }else {
-            this.SwalMessage('Enter city');
+            const res = await this.masterService.masterPost("generic/create", req).toPromise();
+            if (res) {
+                // Display success message
+                Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                });
+                window.location.reload();
+            }
+        } else {
+           // this.SwalMessage('Enter city');
             hasDuplicate = true;
         }
 
     }
 
-    saveLocationCityData() {
+    async saveLocationCityData() {
         let hasDuplicate = false; // Flag to track duplicates
         let cities = new Set();
 
@@ -430,30 +414,26 @@ export class CityLocationMappingMaster implements OnInit {
             });
             let req = {
                 companyCode: this.companyCode,
-                type: "masters",
-                collection: "location_city_detail",
+                collectionName: "location_city_detail",
                 data: {
-                    id: this.tableData1[0]?.location, // Assuming all elements have the same location
+                    _id: this.tableData1[0]?.location, // Assuming all elements have the same location
                     items: transformedDataArray,
-                },
+                }
             };
-            this.masterService.masterPost('common/create', req).subscribe({
-                next: (res: any) => {
-                    if (res) {
-                        // Display success message
-                        Swal.fire({
-                            icon: "success",
-                            title: "Successful",
-                            text: res.message,
-                            showConfirmButton: true,
-                        });
-                        window.location.reload();
-                    }
-                },
-                complete() { },
-            });
-        }else {
-            this.SwalMessage('Enter Location');
+            const res = await this.masterService.masterPost("generic/create", req).toPromise()
+            if (res) {
+                // Display success message
+                Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                });
+                window.location.reload();
+            }
+
+        } else {
+           // this.SwalMessage('Enter Location');
             hasDuplicate = true;
         }
     }

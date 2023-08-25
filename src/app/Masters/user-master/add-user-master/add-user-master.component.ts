@@ -1,7 +1,8 @@
 
-import { Component, OnInit } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
+import { OperationService } from "src/app/core/service/operations/operation.service";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -22,7 +23,10 @@ export class AddUserMasterComponent implements OnInit {
     isUpdate = false;
     action: string;
     userTable: UserMaster;
+    branchCode: any;
     userType: any;
+    userLocations: string[];
+    userDetails: any;
     breadScrums = [{}];
     location: any;
     divisionStatus: any;
@@ -46,15 +50,23 @@ export class AddUserMasterComponent implements OnInit {
     multiLoc: any;
     locationList: any;
     userList: any;
+    roleId: any;
     countryList: any;
     updateLocation: any;
     updateUser: any;
     updateUserStatus: any;
     updateManagerId: any;
+    updateRoleId: any;
+    userData: any;
+    roleIdData: any;
+    userStatusData: any;
     managerIdData: any;
     divisionList: any;
     division: any;
+    data: any;
     confirmpassword: any;
+    userCodeCounter: number = 0;
+    previousUserCode: string = "";
     newUserCode: any;
     jsonControlArray: any[];
 
@@ -145,6 +157,7 @@ export class AddUserMasterComponent implements OnInit {
                 this.userTableForm.controls["division"].patchValue(this.divisionList.filter((element) =>
                     this.userTable.multiDivisionAccess.includes(element.name)
                 ));
+
             }
             const filterParams = [
                 [this.jsonControlUserArray, this.managerIdData, this.managerId, this.managerIdStatus],
@@ -156,6 +169,7 @@ export class AddUserMasterComponent implements OnInit {
             });
         });
     }
+
     findDropdownItemByName(dropdownData, name) {
         return dropdownData.find(item => item.name === name);
     }
@@ -164,17 +178,17 @@ export class AddUserMasterComponent implements OnInit {
     async getAllMastersData() {
         try {
             const locationReq = {
-                "companyCode": this.companyCode,
-                "type": "masters",
-                "collection": "location_detail"
+                companyCode: this.companyCode,
+                collectionName: "location_detail",
+                filter: {}
             };
             const generalReqBody = {
-                "companyCode": this.companyCode,
-                "type": "masters",
-                "collection": "General_master"
+                companyCode: this.companyCode,
+                collectionName: "General_master",
+                filter: {}
             }
-            const locationsResponse = await this.masterService.masterPost('common/getall', locationReq).toPromise();
-            const userStatusResponse = await this.masterService.masterPost('common/getall', generalReqBody).toPromise();
+            const locationsResponse = await this.masterService.masterPost("generic/get", locationReq).toPromise();
+            const userStatusResponse = await this.masterService.masterPost("generic/get", generalReqBody).toPromise();
 
             const locations = locationsResponse.data
                 .map(element => ({
@@ -222,15 +236,13 @@ export class AddUserMasterComponent implements OnInit {
             this.filter.Filter(this.jsonControlUserArray, this.userTableForm, userStatusList, this.userName, this.userStatus);
             this.filter.Filter(this.jsonControlUserArray, this.userTableForm, userTypeList, this.userType, this.userTypeStatus);
             this.filter.Filter(this.jsonControlUserArray, this.userTableForm, userRoleList, this.userRole, this.userRoleStatus);
-
         }
         catch (error) {
-            // Handle any errors that occurred during the request
             console.error('Error:', error);
         }
     }
 
-    save() {
+    async save() {
         this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.name);
         this.userTableForm.controls["managerId"].setValue(this.userTableForm.value.managerId.name);
         this.userTableForm.controls["userStatus"].setValue(this.userTableForm.value.userStatus.name);
@@ -243,6 +255,7 @@ export class AddUserMasterComponent implements OnInit {
 
         const multiLoc = this.userTableForm.value.userLocationscontrolHandler.map((item: any) => item.name);
         this.userTableForm.controls["multiLocation"].setValue(multiLoc);
+
         this.userTableForm.controls["isActive"].setValue(this.userTableForm.value.isActive === true ? true : false);
 
         //remove unwanted controlName
@@ -261,11 +274,11 @@ export class AddUserMasterComponent implements OnInit {
 
         let req = {
             companyCode: parseInt(localStorage.getItem("companyCode")),
-            "type": "masters",
-            "collection": "user_master"
+            collectionName: "user_master",
+            filter: {}
         }
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
+        this.masterService.masterPost("generic/get", req).subscribe({
+            next: async (res: any) => {
                 if (res) {
                     // Generate srno for each object in the array
                     const lastUserId = res.data[res.data.length - 1];
@@ -284,7 +297,6 @@ export class AddUserMasterComponent implements OnInit {
                     }
                     //generate unique userId
                     this.userTableForm.controls["userId"].setValue(this.newUserCode);
-
                     // Clear any errors in the form controls
                     Object.values(this.userTableForm.controls).forEach(control => control.setErrors(null));
 
@@ -292,64 +304,61 @@ export class AddUserMasterComponent implements OnInit {
                         // Remove the "id" field from the form controls
                         let req = {
                             companyCode: this.companyCode,
-                            type: "masters",
-                            collection: "user_master",
-                            id: this.userTable.id,
-                            updates: this.userTableForm.value
-                        };
-                        this.masterService.masterPut('common/update', req).subscribe({
-                            next: (res: any) => {
-                                if (res) {
-                                    // Display success message
-                                    Swal.fire({
-                                        icon: "success",
-                                        title: "Successful",
-                                        text: res.message,
-                                        showConfirmButton: true,
-                                    });
-                                    this.route.navigateByUrl('/Masters/UserMaster/UserMasterView');
-                                }
+                            collectionName: "user_master",
+                            filter: {
+                                _id: this.userTable.id,
                             },
-                            complete() { },
-                        });
+                            update: this.userTableForm.value
+                        };
+                        const res = await this.masterService.masterPut("generic/update", req).toPromise()
+                        if (res) {
+                            // Display success message
+                            Swal.fire({
+                                icon: "success",
+                                title: "Successful",
+                                text: res.message,
+                                showConfirmButton: true,
+                            });
+                            this.route.navigateByUrl('/Masters/UserMaster/UserMasterView');
+                        }
                     }
                     else {
                         const data = this.userTableForm.value;
-                        const id = { id: this.userTableForm.controls["userId"].value };
+                        const id = { _id: this.userTableForm.controls["userId"].value };
                         const mergedObject = { ...data, ...id };
                         let req = {
                             companyCode: this.companyCode,
-                            type: "masters",
-                            collection: "user_master",
-                            data: mergedObject//this.userTableForm.value
+                            collectionName: "user_master",
+                            data: mergedObject
                         };
-                        this.masterService.masterPost('common/create', req).subscribe({
-                            next: (res: any) => {
-                                if (res) {
-                                    // Display success message
-                                    Swal.fire({
-                                        icon: "success",
-                                        title: "Successful",
-                                        text: res.message,
-                                        showConfirmButton: true,
-                                    });
-                                    this.route.navigateByUrl('/Masters/UserMaster/UserMasterView');
-                                }
-                            },
-                            complete() { },
-                        });
+                        const res = await this.masterService.masterPost("generic/create", req).toPromise()
+                        if (res) {
+                            // Display success message
+                            Swal.fire({
+                                icon: "success",
+                                title: "Successful",
+                                text: res.message,
+                                showConfirmButton: true,
+                            });
+                            this.route.navigateByUrl('/Masters/UserMaster/UserMasterView');
+                        }
                     }
                 }
             },
             complete() { },
         });
     }
+
     cancel() {
         window.history.back();
     }
 
     functionCallHandler($event) {
+        // console.log("fn handler called" , $event);
+
+        let field = $event.field;                   // the actual formControl instance
         let functionName = $event.functionName;     // name of the function , we have to call
+
         // function of this name may not exists, hence try..catch 
         try {
             this[functionName]($event);
@@ -360,11 +369,13 @@ export class AddUserMasterComponent implements OnInit {
     }
 
     //check Updated Password
+
     getUpdateChangedPassword() {
         if (this.isUpdate) {
             this.changedPassword();
         }
     }
+
     //password function for top-up box and check the password in confimpassword filed if correct or not
     changedPassword() {
         this.password = this.userTableForm.get("userpassword").value;

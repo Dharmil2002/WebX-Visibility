@@ -46,62 +46,54 @@ export class VehicleMasterListComponent implements OnInit {
     linkArray = []
     addAndEditPath: string;
     csvFileName: string;
-    constructor(private masterService: MasterService) {
+    constructor(private masterService: MasterService,) {
         this.addAndEditPath = "/Masters/VehicleMaster/AddVehicle";
     }
     ngOnInit(): void {
         this.getVehicleDetails();
         this.csvFileName = "Vehicle Details";
     }
-    getVehicleDetails() {
+    async getVehicleDetails() {
         let req = {
             "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "vehicle_detail"
+            "collectionName": "vehicle_detail",
+            "filter": {}
         }
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
-                if (res) {
-                    // Generate srno for each object in the array
-                    const dataWithSrno = res.data.map((obj, index) => {
-                        return {
-                            ...obj,
-                            srNo: index + 1
-                        };
-                    });
-                    this.csv = dataWithSrno;
-                    this.tableLoad = false;
-                }
-            }
-        })
+        const res = await this.masterService.masterPost("generic/get", req).toPromise()
+        // Generate srno for each object in the array
+        const dataWithSrno = res.data.map((obj, index) => {
+            return {
+                ...obj,
+                srNo: index + 1
+            };
+        });
+        this.csv = dataWithSrno;
+        this.tableLoad = false;
     }
-    isActiveFuntion(det) {
-        let id = det.id;
+    async isActiveFuntion(det) {
+        let id = det._id;
         // Remove the "id" field from the form controls
-        delete det.id;
+        delete det._id;
         delete det.srNo;
         delete det.activeflag;
         let req = {
             companyCode: this.companyCode,
-            type: "masters",
-            collection: "vehicle_detail",
-            id: id,
-            updates: det
+            collectionName: "vehicle_detail",
+            filter: {
+                _id: id,
+            },
+            update: det
         };
-
-        this.masterService.masterPut('common/update', req).subscribe({
-            next: (res: any) => {
-                if (res) {
-                    // Display success message
-                    Swal.fire({
-                        icon: "success",
-                        title: "Successful",
-                        text: res.message,
-                        showConfirmButton: true,
-                    });
-                }
-                this.getVehicleDetails();
-            }
-        });
+        const res = await this.masterService.masterPut("generic/update", req).toPromise()
+        if (res) {
+            // Display success message
+            Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: res.message,
+                showConfirmButton: true,
+            });
+            this.getVehicleDetails();
+        }
     }
 }

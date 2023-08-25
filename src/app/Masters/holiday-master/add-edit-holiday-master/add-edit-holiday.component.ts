@@ -4,17 +4,25 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { Subject, take, takeUntil } from 'rxjs';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import moment from 'moment';
 import Swal from 'sweetalert2';
 import { Holiday } from "src/app/core/models/Masters/holiday-master";
 import { HolidayControl } from "src/assets/FormControls/holiday-master";
+import { Router } from "@angular/router";
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-add-edit-holiday-master',
   templateUrl: './add-edit-holiday.component.html',
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, // set the locale
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
+  ],
 })
 
 export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
@@ -32,6 +40,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
   holidayDateWiseForm: UntypedFormGroup;
   dayWiseData: any;
   addFormDateWise: any;
+  dialogData = "a";
   protected _onDestroy = new Subject<void>();
 
   breadscrums = [
@@ -41,14 +50,17 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
       active: "Add Holiday",
     },
   ];
+  data: any;
+  dateWiseData: any;
+  tableLoad: boolean;
   isUpdate = false;
   highestID: number = 0;
   action: string;
 
-  constructor(public dialogRef: MatDialogRef<AddEditHolidayComponent>, private fb: UntypedFormBuilder, @Inject(MAT_DIALOG_DATA) public item: any, private filter: FilterUtils,
-    private masterService: MasterService, private datePipe: DatePipe) {
+  constructor(public dialogRef: MatDialogRef<AddEditHolidayComponent>, private fb: UntypedFormBuilder, @Inject(MAT_DIALOG_DATA) public item: any,
+    private filter: FilterUtils, private route: Router, private masterService: MasterService, private datePipe: DatePipe) {
     super();
-    if (item?.id) {
+    if (item?._id) {
       this.isUpdate = true;
       this.holidayEditData = new Holiday(item);
     }
@@ -62,19 +74,18 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
     this.createHolidayDateWise();
     this.getHolidayDayDetails();
   }
-  getHolidayDayDetails() {
+
+  //get All holiday details in Table
+  async getHolidayDayDetails() {
     let req = {
-      "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "holiday_detail"
+      companyCode: this.companyCode,
+      collectionName: "holiday_detail",
+      filter: {}
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.bindDaysData();
-        }
-      }
-    });
+    const res = await this.masterService.masterPost("generic/get", req).toPromise();
+    if (res) {
+      this.bindDaysData();
+    }
   }
 
   createHolidayform() {
@@ -89,6 +100,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
   createHolidayDayWise() {
     this.holidayMasterControls.dayWiseControls.forEach(d => {
       if (d.name === "days") {
+        // Set DivisioncontrolHandler-related variables
         this.dayNameControl = d.name;
         this.dayValue = d.additionalData.showNameAndValue;
       }
@@ -104,7 +116,8 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
     this.holidayDateWiseForm = formGroupBuilder(this.fb, Object.values(this.addFormDateWise));
   }
 
-  showAndHideDateWise() {
+  //pop up for By Day and By Date
+  ShowAndHideDateWise() {
     const type = this.holidayMasterForm.controls.dateType.value;
     if (type === "DATE") {
       this.showDateWise = true;
@@ -116,6 +129,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
     }
   }
 
+  //Binding Days here
   bindDaysData() {
     if (this.dayWiseData) {
       const dayNameArray = this.dayWiseData.map(dayData => dayData.days);
@@ -136,62 +150,61 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
     );
   }
 
+  //check Holdiday exist on Date OR Day Wise 
   save() {
     if (!this.isUpdate) {
       if (this.holidayMasterForm.controls.dateType.value === "DATE")
-        this.checkHolidayExists();
+        this.CheckHolidayExists();
       else
-        this.saveDayWise();
+        this.SaveDayWise();
     }
     else {
       this.editDateWise();
     }
   }
 
-  editDateWise() {
+  async editDateWise() {
     const id = this.holidayEditData.Id;
     let req = {
       companyCode: this.companyCode,
-      type: "masters",
-      collection: "holiday_detail",
-      id: id,
-      //updates : this.holidayMasterForm.value
-      updates: {
+      collectionName: "holiday_detail",
+      filter: {
+        _id: id,
+      },
+      update: {
         holidayDate: this.datePipe.transform(this.holidayDateWiseForm.controls.holidayDate.value, 'yyyy-MM-dd'),
         holidayNote: this.holidayDateWiseForm.value.holidayNote,
         isActive: this.holidayDateWiseForm.value.isActive,
-        id: this.holidayEditData.Id,
+        _id: this.holidayEditData.Id,
         entryBy: this.holidayDateWiseForm.value.entryBy,
         entryDate: this.holidayDateWiseForm.value.entryDate
       }
     };
-    this.masterService.masterPut('common/update', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: "Holiday Details updated successfully",
-            showConfirmButton: true,
-          });
-          this.dialogRef.close();
-        }
-      }
-    });
+    const res = await this.masterService.masterPut("generic/update", req).toPromise()
+    if (res) {
+      // Display success message
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: "Holiday Details updated successfully",
+        showConfirmButton: true,
+      });
+    }
+    this.dialogRef.close();
   }
 
-  saveDayWise() {
+  async SaveDayWise() {
     const ControllerDays = [];
     this.holidayDayWiseForm.value.daysControllerHandler.forEach((element) => {
       ControllerDays.push(element.value);
     });
     let req = {
       companyCode: this.companyCode,
-      type: "masters",
-      collection: "holiday_detail",
-      data: {
-        id: '',
+      collectionName: "holiday_detail",
+      filter: {
+        // _id: this.holidayEditData.Id,
+      },
+      update: {
         holidayDate: '',
         days: ControllerDays,
         type: "DAY",
@@ -201,44 +214,38 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
         entryDate: new Date().toISOString(),
       }
     };
-    this.masterService.masterPut('common/update', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: "Holiday Details Saved successfully",
-            showConfirmButton: true,
-          });
-          this.dialogRef.close();
-        }
-      }
-    });
+    const res = await this.masterService.masterPut("generic/update", req).toPromise()
+    if (res) {
+      // Display success message
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: "Holiday Details Saved successfully",
+        showConfirmButton: true,
+      });
+      this.dialogRef.close();
+    }
   }
 
-  checkHolidayExists() {
-    const holidateDate = this.datePipe.transform(this.holidayDateWiseForm.controls.holidayDate.value, 'yyyy-MM-dd');
+  async CheckHolidayExists() {
+    const holiDayDate = this.datePipe.transform(this.holidayDateWiseForm.controls.holidayDate.value, 'yyyy-MM-dd');
+    const holidayNote = this.holidayDateWiseForm.value.holidayNote;
 
-    if (holidateDate) {
+    if (holiDayDate && holidayNote) {
       // Both holidayDate and holidayNote properties are present
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "holiday_detail",
-        query: {
-          holidayDate: holidateDate
-        }
+        collectionName: "holiday_detail",
+        filter: {}
       };
-      this.masterService.masterPost('common/getOne', req).subscribe({
+      this.masterService.masterPost('generic/get', req).subscribe({
         next: (res: any) => {
-
-          if (res.data.db.data.holiday_detail.length > 0) {
-            // Holiday already exists for the given date
+          const count = res.data.filter(item => item.holidayDate === holiDayDate)
+          if (count.length > 0) {
             this.swalMessage('Holiday already exists for the given date');
-          } else {
-            // No holiday exists for the given date, proceed to save
-            this.saveDateWise();
+          }
+          else {
+            this.SaveDateWise();
           }
         },
         error: (err: any) => {
@@ -253,22 +260,21 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
     }
   }
 
-  saveDateWise() {
+  async SaveDateWise() {
     const holidayDateData = moment(this.holidayDateWiseForm.controls.holidayDate.value).endOf('day').format('YYYY-MM-DD');
     const holidayNote = this.holidayDateWiseForm.value.holidayNote;
+
     // Get the first 2 letters of the holidayNote and convert them to uppercase
     const prefix = holidayNote.substr(0, 2).toUpperCase();
     let newID = this.generateID(prefix, this.highestID, 3);// Generate the new ID with 3 digits (e.g., "RA001", "RA002", etc.)
     this.highestID = parseInt(newID.substr(2), 10); // Update the highestID with the numeric part of the new ID
     // Get today's day name
     const todayDayName = moment(holidayDateData).format('dddd'); // e.g., "Monday", "Tuesday", etc.
-
     let req = {
       companyCode: this.companyCode,
-      type: "masters",
-      collection: "holiday_detail",
+      collectionName: "holiday_detail",
       data: {
-        id: newID,
+        _id: newID,
         holidayDate: holidayDateData,
         days: todayDayName,
         type: "DATE",
@@ -278,20 +284,17 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
         entryDate: new Date().toISOString(),
       }
     };
-    this.masterService.masterPost('common/create', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Holiday data added successfully",
-            text: res.message,
-            showConfirmButton: true,
-          });
-          this.dialogRef.close();
-        }
-      }
-    });
+    const res = await this.masterService.masterPost("generic/create", req).toPromise();
+    if (res) {
+      // Display success message
+      Swal.fire({
+        icon: "success",
+        title: "Holiday data added successfully",
+        text: res.message,
+        showConfirmButton: true,
+      });
+      this.dialogRef.close();
+    }
   }
 
   toggleSelectAll(argData: any) {
@@ -311,7 +314,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
       });
   }
 
-  // Function to generate ID based on prefix, highestID, and digits
+  // Function to generate ID based on prefix [calculated in the previous step], highestID, and digits
   generateID(prefix, highestID, digits) {
     const numericPart = (highestID + 1).toString().padStart(digits, '0');
     return prefix + numericPart;

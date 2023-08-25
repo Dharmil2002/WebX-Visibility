@@ -59,7 +59,7 @@ roleId: any;
 
   constructor(UserMaster) {
     {
-      this.id = UserMaster.id || this.getRandomID();
+      this.id = UserMaster._id || this.getRandomID();
       this.userId = UserMaster.userId || "";
       this.userStatus = UserMaster.userStatus || "";
       this.name = UserMaster.name || "";

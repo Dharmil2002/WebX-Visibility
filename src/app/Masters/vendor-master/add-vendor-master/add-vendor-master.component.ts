@@ -72,7 +72,10 @@ export class AddVendorMasterComponent implements OnInit {
     }
   }
   constructor(
-    private route: Router, private fb: UntypedFormBuilder, private filter: FilterUtils, private masterService: MasterService,) {
+    private route: Router, private fb: UntypedFormBuilder,
+    private filter: FilterUtils,
+    private masterService: MasterService,
+  ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vendorTabledata = this.route.getCurrentNavigation().extras.state.data;
       this.action = 'edit';
@@ -222,16 +225,16 @@ export class AddVendorMasterComponent implements OnInit {
     try {
       const reqBody = {
         "companyCode": this.companyCode,
-        "type": "masters",
-        "collection": "location_detail"
+        "collectionName": "location_detail",
+        "filter": {}
       }
       const pincodeBody = {
         "companyCode": this.companyCode,
-        "type": "masters",
-        "collection": "pincode_detail"
+        "collectionName": "pincode_detail",
+        "filter": {}
       }
-      const locationBranchResponse = await this.masterService.masterPost('common/getall', reqBody).toPromise();
-      this.pincodeResponse = await this.masterService.masterPost('common/getall', pincodeBody).toPromise();
+      const locationBranchResponse = await this.masterService.masterPost("generic/get", reqBody).toPromise();
+      this.pincodeResponse = await this.masterService.masterPost("generic/get", pincodeBody).toPromise();
       const locationBranchList = locationBranchResponse.data.map((x) => { { return { name: x.locName, value: x.locCode } } })
 
       // Handle the response from the server
@@ -275,7 +278,7 @@ export class AddVendorMasterComponent implements OnInit {
       }
     }
   }
-  save() {
+  async save() {
     const formValue = this.vendorTableForm.value;
     if (Array.isArray(this.vendorTableForm.value.select)) {
       this.vendorTableForm.controls['select'].setValue('');
@@ -306,76 +309,67 @@ export class AddVendorMasterComponent implements OnInit {
     this.vendorTableForm.removeControl("tdsSectionDropdown");
     let data = convertNumericalStringsToInteger(this.vendorTableForm.value)
     if (this.isUpdate) {
-      let id = data.id;
+      let id = data._id;
       // Remove the "id" field from the form controls
-      delete data.id;
+      delete data._id;
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "vendor_detail",
-        id: id,
-        updates: data
+        collectionName: "vendor_detail",
+        filter: { _id: id },
+        update: data
       };
-      this.masterService.masterPut('common/update', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
-          }
-        }
-      });
+      const res = await this.masterService.masterPut("generic/update", req).toPromise()
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
+      }
+
+
     }
     else {
       let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        "type": "masters",
-        "collection": "vendor_detail"
+        companyCode: this.companyCode,
+        collectionName: "vendor_detail",
+        filter: {},
       }
-      this.masterService.masterPost('common/getall', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Generate srno for each object in the array
-            const lastCode = res.data[res.data.length - 1];
-            const lastVendorCode = lastCode ? parseInt(lastCode.vendorCode.substring(1)) : 0;
-            // Function to generate a new route code
-            function generateVendorCode(initialCode: number = 0) {
-              const nextVendorCode = initialCode + 1;
-              const vendorNumber = nextVendorCode.toString().padStart(4, '0');
-              const vendorCode = `V${vendorNumber}`;
-              return vendorCode;
-            }
-            this.newVendorCode = generateVendorCode(lastVendorCode);
-            data.vendorCode = this.newVendorCode;
-            data.id = this.newVendorCode;
-            let req = {
-              companyCode: this.companyCode,
-              type: "masters",
-              collection: "vendor_detail",
-              data: data
-            };
-            this.masterService.masterPost('common/create', req).subscribe({
-              next: (res: any) => {
-                if (res) {
-                  // Display success message
-                  Swal.fire({
-                    icon: "success",
-                    title: "Successful",
-                    text: res.message,
-                    showConfirmButton: true,
-                  });
-                  this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
-                }
-              }
-            });
-          }
+      const resVendor = await this.masterService.masterPost("generic/get", req).toPromise()
+      if (resVendor) {
+        // Generate srno for each object in the array
+        const lastCode = resVendor.data[resVendor.data.length - 1];
+        const lastVendorCode = lastCode ? parseInt(lastCode.vendorCode.substring(1)) : 0;
+        // Function to generate a new route code
+        function generateVendorCode(initialCode: number = 0) {
+          const nextVendorCode = initialCode + 1;
+          const vendorNumber = nextVendorCode.toString().padStart(4, '0');
+          const vendorCode = `V${vendorNumber}`;
+          return vendorCode;
         }
-      })
+        this.newVendorCode = generateVendorCode(lastVendorCode);
+        data.vendorCode = this.newVendorCode;
+        data._id = this.newVendorCode;
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "vendor_detail",
+          data: data
+        };
+        const res = await this.masterService.masterPost("generic/create", req).toPromise()
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
+        }
+      }
     }
   }
   cancel() {

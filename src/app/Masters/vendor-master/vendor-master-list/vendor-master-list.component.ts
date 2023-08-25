@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { VendorMasterViewComponent } from "../vendor-master-view/vendor-master-view.component";
 import Swal from "sweetalert2";
+import { OperationService } from "src/app/core/service/operations/operation.service";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -83,53 +84,46 @@ export class VendorMasterListComponent implements OnInit {
     this.viewComponent = VendorMasterViewComponent
     this.csvFileName = "Vendor Details"  //setting csv file Name so file will be saved as per this name
   }
-  getVendorDetails() {
+  async getVendorDetails() {
     let req = {
-      companyCode: this.companyCode,
-      "type": "masters",
-      "collection": "vendor_detail"
+      "companyCode": this.companyCode,
+      "collectionName": "vendor_detail",
+      "filter": {}
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) => {
-            return {
-              ...obj,
-              srNo: index + 1
-            };
-          });
-          this.csv = dataWithSrno;
-          this.tableLoad = false;
-        }
-      }
-    })
+    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    if (res) {
+      // Generate srno for each object in the array
+      const dataWithSrno = res.data.map((obj, index) => {
+        return {
+          ...obj,
+          srNo: index + 1
+        };
+      });
+      this.csv = dataWithSrno;
+      this.tableLoad = false;
+    }
   }
-  IsActiveFuntion(det) {
-    let id = det.id;
-    // Remove the "id" field from the form controls
-    delete det.id;
+  async isActiveFuntion(det) {
+    let id = det._id;
+    // Remove the "_id" field from the form controls
+    delete det._id;
     delete det.srNo;
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      type: "masters",
-      collection: "vendor_detail",
-      id: id,
-      updates: det
+      collectionName: "vendor_detail",
+      filter: { _id: id },
+      update: det
     };
-    this.masterService.masterPut('common/update', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-          this.getVendorDetails();
-        }
-      }
-    });
+    const res = await this.masterService.masterPut("generic/update", req).toPromise()
+    if (res) {
+      // Display success message
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: res.message,
+        showConfirmButton: true,
+      });
+      this.getVendorDetails();
+    }
   }
 }

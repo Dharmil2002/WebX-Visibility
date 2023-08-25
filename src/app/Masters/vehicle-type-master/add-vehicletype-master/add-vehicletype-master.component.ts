@@ -4,11 +4,12 @@ import { Router } from "@angular/router";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { VehicleTypeControl } from "src/assets/FormControls/vehicle-type-control";
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { utilityService } from "src/app/Utility/utility.service";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { VehicleTypeMaster } from "src/app/core/models/Masters/vehicle-type-master/vehicle-type-master";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
+import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { calculateVolume } from "../../vehicle-master/vehicle-utility";
 @Component({
   selector: 'app-add-vehicletype-master',
   templateUrl: './add-vehicletype-master.component.html',
@@ -16,7 +17,6 @@ import Swal from "sweetalert2";
 export class AddVehicletypeMasterComponent implements OnInit {
   breadScrums: { title: string; items: string[]; active: string; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  lastUsedVehicleTypeCode: number = 0;
   action: string;
   isUpdate = false;
   vehicleTypeTableData: VehicleTypeMaster;
@@ -30,11 +30,11 @@ export class AddVehicletypeMasterComponent implements OnInit {
   data: any;
   updateVehicleTypeCategory: any;
   vehicleTypeCategory: any;
+  newVehicleTypeCode: any;
   ngOnInit(): void {
     this.getVehicleTypeCategoryList();
   }
   functionCallHandler($event) {
-    let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
     // function of this name may not exists, hence try..catch
     try {
@@ -44,38 +44,33 @@ export class AddVehicletypeMasterComponent implements OnInit {
       console.log("failed");
     }
   }
-  constructor(private service: utilityService, private masterService: MasterService,
+  constructor(
+    private masterService: MasterService,
     public ObjSnackBarUtility: SnackBarUtilityService,
-    private route: Router, private fb: UntypedFormBuilder, private filter: FilterUtils) {
-    if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.data = route.getCurrentNavigation().extras.state.data;
-      this.action = 'edit'
-      this.isUpdate = true;
-    } else {
-      this.action = "Add";
-    }
-    if (this.action === 'edit') {
+    private route: Router,
+    private fb: UntypedFormBuilder,
+    private filter: FilterUtils,
+  ) {
+    const navigationState = this.route.getCurrentNavigation()?.extras?.state;
+    if (navigationState != null) {
+      this.action = 'edit';
+      this.data = navigationState.data;
       this.isUpdate = true;
       this.vehicleTypeTableData = this.data;
       this.vehicleCategory = this.vehicleTypeTableData.vehicleTypeCategory;
-      this.breadScrums = [
-        {
-          title: "Vehicle Type Details",
-          items: ["Home"],
-          active: "Edit Vehicle Type",
-        },
-      ];
     } else {
-      this.breadScrums = [
-        {
-          title: "Add Vehicle Type Master",
-          items: ["Home"],
-          active: "Vehicle Type Details",
-        },
-      ];
+      this.action = 'Add';
       this.vehicleTypeTableData = new VehicleTypeMaster({});
     }
-    this.initializeFormControl()
+    this.isUpdate = this.action === 'edit';
+    this.breadScrums = [
+      {
+        title: 'Vehicle Type Master',
+        items: ['Home'],
+        active: this.isUpdate ? 'Edit Vehicle Type' : 'Add Vehicle Type',
+      },
+    ];
+    this.initializeFormControl();
   }
   initializeFormControl() {
     // Create VehicleFormControls instance to get form controls for different sections
@@ -147,91 +142,120 @@ export class AddVehicletypeMasterComponent implements OnInit {
   }
   //#endregion
   getData(): void {
-    var cal =
-      parseFloat(this.vehicleTypeTableForm.value.length) *
-      parseFloat(this.vehicleTypeTableForm.value.height) *
-      parseFloat(this.vehicleTypeTableForm.value.width);
-    this.vehicleTypeTableForm.controls["capacityDiscount"].setValue(cal.toFixed(2));
+    var calculateLhw = calculateVolume(
+      this.vehicleTypeTableForm.value.length,
+      this.vehicleTypeTableForm.value.height,
+      this.vehicleTypeTableForm.value.width
+    );
+    this.vehicleTypeTableForm.controls["capacityDiscount"].setValue(calculateLhw.toFixed(2));
   }
   cancel() {
     window.history.back();
   }
-  generateNextVehicleTypeCode(): string {
-    // Get the last used vehicle code from localStorage
-    const lastVehicleCode = parseInt(localStorage.getItem('lastVehicleCode') || '0', 10);
+  async checkVehicleTypeExist() {
+    let req = {
+      "companyCode": this.companyCode,
+      "collectionName": "state_detail",
+      "filter": {}
+    };
+    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    const vehicleTypeExists = res.data.some((res) => res.vehicleTypeName === this.vehicleTypeTableForm.value.vehicleTypeName);
+    if (vehicleTypeExists) {
+      // Show the popup indicating that the state already exists
+      Swal.fire({
+        title: 'Vehicle Type Name exists! Please try with another',
+        toast: true,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+      this.vehicleTypeTableForm.controls["vehicleTypeName"].reset();
+    }
 
-    // Increment the last vehicle user code by 1 to generate the next one
-    const nextVehicleCode = lastVehicleCode + 1;
+    error: (err: any) => {
+      // Handle error if required
+      console.error(err);
+    }
 
-    // Convert the number to a 4-digit string, padded with leading zeros
-    const paddedNumber = nextVehicleCode.toString().padStart(4, '0');
-
-    // Combine the prefix "VH" with the padded number to form the complete vendor code
-    const vehicleCode = `VH${paddedNumber}`;
-
-    // Update the last used vehicle code in localStorage
-    localStorage.setItem('lastVehicleCode', nextVehicleCode.toString());
-
-    return vehicleCode;
   }
-  save() {
+  async save() {
     this.vehicleTypeTableForm.controls["vehicleTypeCategory"].setValue(this.vehicleTypeTableForm.value.vehicleTypeCategory.name);
-    this.vehicleTypeTableForm.controls["isActive"].setValue(this.vehicleTypeTableForm.value.isActive == true);
+    this.vehicleTypeTableForm.controls["isActive"].setValue(this.vehicleTypeTableForm.value.isActive);
     // Remove field from the form controls
     this.vehicleTypeTableForm.removeControl("companyCode");
     this.vehicleTypeTableForm.removeControl("updateBy");
     this.vehicleTypeTableForm.removeControl("isUpdate");
+    let data = convertNumericalStringsToInteger(this.vehicleTypeTableForm.value)
 
-    if (this.isUpdate) {
-      let id = this.vehicleTypeTableForm.value.id;
-      // Remove the "id" field from the form controls
-      this.vehicleTypeTableForm.removeControl("id");
-      let req = {
-
-        companyCode: this.companyCode,
-        type: "masters",
-        collection: "vehicleType_detail",
-        id: id,
-        updates: this.vehicleTypeTableForm.value
-      };
-      this.masterService.masterPut('common/update', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
-          }
+    let req = {
+      "companyCode": this.companyCode,
+      "collectionName": "vehicleType_detail",
+      "filter": {}
+    }
+    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    if (res) {
+      // Generate srno for each object in the array
+      const lastUsedVehicleTypeCode = res.data[res.data.length - 1];
+      const lastVehicleTypeCode = lastUsedVehicleTypeCode ? parseInt(lastUsedVehicleTypeCode.vehicleTypeCode.substring(3)) : 0;
+      // Function to generate a new route code
+      function generateVehicleCode(initialCode: number = 0) {
+        const nextVehicleTypeCode = initialCode + 1;
+        const vehicleTypeNumber = nextVehicleTypeCode.toString().padStart(4, '0');
+        const vehicleTypeCode = `VT${vehicleTypeNumber}`;
+        return vehicleTypeCode;
+      }
+      if (this.isUpdate) {
+        this.newVehicleTypeCode = this.vehicleTypeTableData._id
+      } else {
+        this.newVehicleTypeCode = generateVehicleCode(lastVehicleTypeCode);
+      }
+      //generate unique vehicleTypeCode
+      this.vehicleTypeTableForm.controls["vehicleTypeCode"].setValue(this.newVehicleTypeCode);
+      if (this.isUpdate) {
+        let id = this.vehicleTypeTableForm.value._id;
+        // Remove the "_id" field from the form controls
+        this.vehicleTypeTableForm.removeControl("_id");
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "vehicleType_detail",
+          filter: { _id: id },
+          update: data
+        };
+        const res = await this.masterService.masterPut("generic/update", req).toPromise()
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
         }
-      });
-    } else {
-      const nextVehicleTypeCode = this.generateNextVehicleTypeCode();
-      this.vehicleTypeTableForm.controls["vehicleTypeCode"].setValue(nextVehicleTypeCode);
-      this.vehicleTypeTableForm.controls["id"].setValue(nextVehicleTypeCode);
-      let req = {
-        companyCode: this.companyCode,
-        type: "masters",
-        collection: "vehicleType_detail",
-        data: this.vehicleTypeTableForm.value
-      };
-      this.masterService.masterPost('common/create', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
-          }
+      }
+      else {
+        const data = this.vehicleTypeTableForm.value;
+        const id = { _id: this.vehicleTypeTableForm.controls["vehicleTypeCode"].value };
+        const mergedObject = { ...data, ...id };
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "vehicleType_detail",
+          data: mergedObject
+        };
+        const res = await this.masterService.masterPost("generic/create", req).toPromise()
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
         }
-      });
+      }
     }
   }
 }

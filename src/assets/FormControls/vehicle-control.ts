@@ -266,11 +266,11 @@ export class VehicleControls {
                     Validations: []
                 },
                 {
-                    name: 'id',
+                    name: '_id',
                     label: '',
                     placeholder: '',
                     type: 'text',
-                    value: vehicleTable.id,
+                    value: vehicleTable._id,
                     filterOptions: '',
                     autocomplete: '',
                     displaywith: '',

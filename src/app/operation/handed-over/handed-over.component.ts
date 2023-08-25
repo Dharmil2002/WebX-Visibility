@@ -36,7 +36,7 @@ export class HandedOverComponent implements OnInit {
     ]
   breadScrums = [
     {
-      title: "Handed",
+      title: "Handed over to Liner",
       items: ["Home"],
       active: "Handed over",
     },
@@ -64,6 +64,10 @@ tableData=[{
 }]
   tableLoad: boolean=true;
   constructor(private router: Router, private fb: UntypedFormBuilder, private masterService: MasterService) {
+    if (this.router.getCurrentNavigation()?.extras?.state != null) {
+      const data = this.router.getCurrentNavigation()?.extras?.state.data.columnData;
+      this.breadScrums[0].title=data.Action
+    }
     this.tableLoad=false;
     this.initializeFormControl();
    

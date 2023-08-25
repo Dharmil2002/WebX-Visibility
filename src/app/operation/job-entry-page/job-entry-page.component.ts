@@ -7,7 +7,7 @@ import { Router } from "@angular/router";
 import { processProperties } from "src/app/Masters/processUtility";
 import { JobControl } from "src/assets/FormControls/job-entry";
 import Swal from "sweetalert2";
-import { addJobDetail } from "./job-entry-utility";
+import { addJobDetail, getNextNumber } from "./job-entry-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 @Component({
   selector: 'app-job-entry-page',
@@ -185,14 +185,18 @@ export class JobEntryPageComponent implements OnInit {
   async save() {
     const tabcontrols = this.jobEntryTableForm;
     clearValidatorsAndValidate(tabcontrols);
+    const jobIndex= parseInt(localStorage.getItem("jobIndex"));
     const thisYear = new Date().getFullYear();
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
-    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
-    const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-    const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-    let jeNo = `JE/${dynamicValue}/${financialYear}/${paddedNumber}`;
-    this.jobEntryTableForm.controls['_id'].setValue(jeNo);
-    this.jobEntryTableForm.controls['jobId'].setValue(jeNo);
+    const location = localStorage.getItem("Branch"); // Replace with your dynamic value
+  //  const dynamicNumber = Math.floor(jobIndex * 10000); // Generate a random number between 0 and 9999
+    const paddedNumber =getNextNumber();
+    const blParty=this.jobEntryTableForm.controls['billingParty'].value?.name||"";
+    const jobType=this.jobEntryTableForm.controls['jobType'].value=="I"?"IM":"EX";
+ //  let jeNo = `JE/${dynamicValue}/${financialYear}/${paddedNumber}`;
+   let jeNo = `${location.substring(0,3)}${blParty.substring(0,3)}${jobType}${financialYear}${paddedNumber}`;
+    this.jobEntryTableForm.controls['_id'].setValue(jeNo.toUpperCase());
+    this.jobEntryTableForm.controls['jobId'].setValue(jeNo.toUpperCase());
     this.jobEntryTableForm.controls['billingParty'].setValue(this.jobEntryTableForm.controls['billingParty'].value.name);
     let containorDetail = {
       containorDetail: this.tableData,
@@ -201,13 +205,13 @@ export class JobEntryPageComponent implements OnInit {
       ...this.jobEntryTableForm.value,
       ...containorDetail,
     };
-    const res = await addJobDetail(jobDetail, this.masterService);
+   const res = await addJobDetail(jobDetail, this.masterService);
 
-    if (res) {
+     if (res) {
       Swal.fire({
         icon: "success",
         title: "Generated Successfuly",
-        text: "Job Entry No: " + jeNo,
+        text: "Job Entry No: " + jeNo.toUpperCase(),
         showConfirmButton: true,
       }).then((result) => {
         if (result.isConfirmed) {
@@ -294,4 +298,5 @@ export class JobEntryPageComponent implements OnInit {
 
     return true;
   }
+
 }

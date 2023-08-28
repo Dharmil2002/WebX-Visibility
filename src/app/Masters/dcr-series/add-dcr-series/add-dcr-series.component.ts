@@ -305,22 +305,34 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
 
   // Save data
   saveData() {
-    if (
-      this.tableData[0].documentType.length === 0 ||
-      this.tableData[0].bookCode === "" ||
-      this.tableData[0].seriesFrom === "" ||
-      this.tableData[0].seriesTo === "" ||
-      this.tableData[0].totalLeaf === "" ||
-      this.tableData[0].allotTo.length === 0 ||
-      this.tableData[0].allocateTo.length === 0
-    ) {
+    let incompleteData = false;
+
+    this.tableData.forEach(data => {
+      if (
+        data.documentType.length === 0 ||
+        data.bookCode === "" ||
+        data.seriesFrom === "" ||
+        data.seriesTo === "" ||
+        data.totalLeaf === "" ||
+        data.allotTo.length === 0 ||
+        data.allocateTo.length === 0
+      ) {
+        incompleteData = true;
+        return;
+      }
+    });
+
+    if (incompleteData) {
       Swal.fire({
         icon: "warning",
         title: "Incomplete Data",
         text: "Please fill in all the required fields.",
         showConfirmButton: true,
       });
-    } else if (this.isBookCodeUnique()) {
+      return;
+    }
+
+    if (this.isBookCodeUnique()) {
       this.tableData.forEach(tableItem => {
         const optionItem = this.displayedColumns1.allocateTo.option.find(optItem => optItem.value === tableItem.allocateTo);
         if (optionItem) {

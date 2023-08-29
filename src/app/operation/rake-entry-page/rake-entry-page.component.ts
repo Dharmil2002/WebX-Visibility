@@ -7,9 +7,7 @@ import { getCity } from "../quick-booking/quick-utility";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { ActivatedRoute, Router } from "@angular/router";
-import Swal from "sweetalert2";
-import { addRakeEntry, filterDocketDetail, genericGet, vendorDetailFromApi } from "./rate-utility";
-import { debug } from "console";
+import { filterDocketDetail, genericGet, vendorDetailFromApi } from "./rate-utility";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -205,7 +203,7 @@ export class RakeEntryPageComponent implements OnInit {
         if (generateControl === 'JOB') {
             // Define a mapping for changing keys back to original values
             const keyMapping = {
-                CNNO: "jobNo",
+                CNNo: "jobNo",
                 CNDate: "jobDate"
                 // ... define other mappings if needed
             };
@@ -227,11 +225,10 @@ export class RakeEntryPageComponent implements OnInit {
             }, {});
     
             // Load JOB data and set the show flag
-            this.loadTempData(this.jobDetail, "job");
+            this.loadTempData([this.jobDetail], "job");
             this.show = false;
         }
     
-        console.log(this.displayedColumns);
     }
     
 
@@ -312,44 +309,45 @@ export class RakeEntryPageComponent implements OnInit {
     }
 
     async save() {
-        const thisYear = new Date().getFullYear();
-        const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
-        const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
-        const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-        const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-        let rake = `Rake/${dynamicValue}/${financialYear}/${paddedNumber}`;
-        this.rakeEntryTableForm.controls['_id'].setValue(rake);
-        this.rakeEntryTableForm.controls['rakeId'].setValue(rake);
-        this.rakeEntryTableForm.controls['vendorName'].setValue(this.rakeEntryTableForm.controls['vendorName']?.value.name || "");
-        this.rakeEntryTableForm.controls['fromCity'].setValue(this.rakeEntryTableForm.controls['fromCity']?.value.name || "");
-        this.rakeEntryTableForm.controls['toCity'].setValue(this.rakeEntryTableForm.controls['toCity']?.value.name || "");
-        this.rakeEntryTableForm.controls['destination'].setValue(this.rakeEntryTableForm.controls['destination']?.value.value);
-        this.rakeEntryTableForm.controls['advancedLocation'].setValue(this.rakeEntryTableForm.controls['advancedLocation']?.value.value);
-        this.rakeEntryTableForm.controls['balanceLocation'].setValue(this.rakeEntryTableForm.controls['balanceLocation']?.value.value);
-        let data = this.rakeEntryTableForm.controls['viaControlHandler'].value.map((x) => x.name);
-        this.rakeEntryTableForm.controls['via'].setValue(data);
-        this.rakeEntryTableForm.removeControl('viaControlHandler');
-        this.tableData = this.tableData.map(({ srNo, ...rest }) => rest);
-        let docDetail = {
-            containorDetail: this.tableData,
-        };
-        let jobDetail = {
-            ...this.rakeEntryTableForm.value,
-            ...docDetail,
-        };
-        const res = await addRakeEntry(jobDetail, this.masterService)
-        if (res) {
-            Swal.fire({
-                icon: "success",
-                title: "Generated Successfully",
-                text: "Rake No: " + rake,
-                showConfirmButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.goBack(8);
-                }
-            });
-        }
+        console.log(this.tableData);
+        // const thisYear = new Date().getFullYear();
+        // const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
+        // const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
+        // const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
+        // const paddedNumber = dynamicNumber.toString().padStart(4, "0");
+        // let rake = `Rake/${dynamicValue}/${financialYear}/${paddedNumber}`;
+        // this.rakeEntryTableForm.controls['_id'].setValue(rake);
+        // this.rakeEntryTableForm.controls['rakeId'].setValue(rake);
+        // this.rakeEntryTableForm.controls['vendorName'].setValue(this.rakeEntryTableForm.controls['vendorName']?.value.name || "");
+        // this.rakeEntryTableForm.controls['fromCity'].setValue(this.rakeEntryTableForm.controls['fromCity']?.value.name || "");
+        // this.rakeEntryTableForm.controls['toCity'].setValue(this.rakeEntryTableForm.controls['toCity']?.value.name || "");
+        // this.rakeEntryTableForm.controls['destination'].setValue(this.rakeEntryTableForm.controls['destination']?.value.value);
+        // this.rakeEntryTableForm.controls['advancedLocation'].setValue(this.rakeEntryTableForm.controls['advancedLocation']?.value.value);
+        // this.rakeEntryTableForm.controls['balanceLocation'].setValue(this.rakeEntryTableForm.controls['balanceLocation']?.value.value);
+        // let data = this.rakeEntryTableForm.controls['viaControlHandler'].value.map((x) => x.name);
+        // this.rakeEntryTableForm.controls['via'].setValue(data);
+        // this.rakeEntryTableForm.removeControl('viaControlHandler');
+        // this.tableData = this.tableData.map(({ srNo, ...rest }) => rest);
+        // let docDetail = {
+        //     containorDetail: this.tableData,
+        // };
+        // let jobDetail = {
+        //     ...this.rakeEntryTableForm.value,
+        //     ...docDetail,
+        // };
+        // const res = await addRakeEntry(jobDetail, this.masterService)
+        // if (res) {
+        //     Swal.fire({
+        //         icon: "success",
+        //         title: "Generated Successfully",
+        //         text: "Rake No: " + rake,
+        //         showConfirmButton: true,
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             this.goBack(8);
+        //         }
+        //     });
+        // }
     }
     async getLocation() {
         const location = await genericGet(this.masterService, "location_detail");
@@ -375,5 +373,12 @@ export class RakeEntryPageComponent implements OnInit {
             this.destination,
             this.destinationStatus
         );
+    }
+    cityMapping(){
+        const fromCity=this.rakeEntryTableForm.controls['fromCity'].value.value;
+        const toCity=this.rakeEntryTableForm.controls['toCity'].value.value;
+        const city=fromCity+"-"+toCity
+        const docketDetail=this.cnDetail.filter((x)=>x.fromToCity===city);
+        this.cnDetail=docketDetail;
     }
 }

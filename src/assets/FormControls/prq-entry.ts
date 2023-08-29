@@ -106,13 +106,13 @@ export class PrqEntryControls {
             name: "required",
             message: "From City is required",
           },
-          // {
-          //     name: "autocomplete"
-          // },
-          // {
-          //     name: "invalidAutocompleteObject",
-          //     message: "Choose proper value",
-          // }
+          {
+              name: "autocomplete"
+          },
+          {
+              name: "invalidAutocompleteObject",
+              message: "Choose proper value",
+          }
         ],
         additionalData: {
           showNameAndValue: false,
@@ -134,13 +134,13 @@ export class PrqEntryControls {
             name: "required",
             message: "To City is required",
           },
-          // {
-          //     name: "autocomplete"
-          // },
-          // {
-          //     name: "invalidAutocompleteObject",
-          //     message: "Choose proper value",
-          // }
+          {
+              name: "autocomplete"
+          },
+          {
+              name: "invalidAutocompleteObject",
+              message: "Choose proper value",
+          }
         ],
         additionalData: {
           showNameAndValue: false,
@@ -152,10 +152,10 @@ export class PrqEntryControls {
         placeholder: "Vehicle Size",
         type: "Staticdropdown",
         value: [
-          { value: "1-MT", name: "1-MT" },
-          { value: "9-MT", name: "9-MT" },
-          { value: "16-MT", name: "16-MT" },
-          { value: "32-MT", name: "32-MT" },
+          { value: "1", name: "1-MT" },
+          { value: "9", name: "9-MT" },
+          { value: "16", name: "16-MT" },
+          { value: "32", name: "32-MT" },
         ],
         filterOptions: "",
         autocomplete: "",

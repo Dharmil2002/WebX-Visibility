@@ -87,6 +87,9 @@ export class RakeEntryControl {
                     message: "Choose proper value",
                 }
                 ],
+                functions: {
+                    onOptionSelect: "cityMapping"
+                },
                 additionalData: {
                     showNameAndValue: false
                 }

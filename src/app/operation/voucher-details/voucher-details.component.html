@@ -1,0 +1,23 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="handTableForm">
+        <app-form-webxpress [form]="handTableForm" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width"
+    [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [boxData]="this.KPICountData">
+    </app-generic-table-v2>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+            <div class="example-button-row  d-flex justify-content-end">
+  
+                <button mat-button (click)="cancel()">Back</button>
+                <button class="msr-3" mat-raised-button color="primary"
+                    (click)="save()">Save</button>
+            </div>
+        </div>
+    </div>
+  </app-common-wrapper-webxpress>
+  

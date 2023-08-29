@@ -15,6 +15,7 @@ export class MasterService {
   generalMaster='../../../assets/data/generalMaster.json';
   destination='../../../assets/data/destination.json';
   rakeUpdate='../../../assets/data/rake-update.json';
+  jobtracker='../../../assets/data/job-tracker.json';
   headerCode: string;
   vehicleDetail: any;
 

@@ -1,3 +1,5 @@
+import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+
 export function renameKeys(originalObject, keyNameMapping) {
     const modifiedObject = {};
 
@@ -43,3 +45,18 @@ export async function genericGet(masterService, collectionName) {
     return res.data;
 }
 
+export async function filterDocketDetail(data){
+  let docketList=[];
+  data.forEach(element => {
+    let docketDetails={
+        CNNo:element?.docketNumber||"",
+        CNDate:formatDocketDate(element?.docketDate || new Date()),
+        pkgs:element?.totalChargedNoOfpkg||0,
+        weight:element?.actualwt||0,
+        fromToCity:element?.fromCity +"-"+element?.toCity,
+        billingParty:element?.billingParty||""
+    }
+    docketList.push(docketDetails);
+  });
+      return docketList
+}

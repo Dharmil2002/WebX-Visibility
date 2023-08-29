@@ -7,6 +7,7 @@ import { PickupDeliveryPlannerComponent } from "./tabs/pickup-delivery-planner/p
 import { ManageRunsheetComponent } from "./tabs/manage-runsheet/manage-runsheet.component";
 import { StocksComponent } from "./stocks/stocks.component";
 import { UpdateStockComponent } from "./ActionPages/update-stock/update-stock.component";
+import { JobTrackerComponent } from "./tabs/job-tracker/job-tracker.component";
 const routes: Routes = [
   {
     path: "",
@@ -40,6 +41,10 @@ const routes: Routes = [
   {
     path:"updateStock",
     component:UpdateStockComponent
+  },
+  {
+    path:"JobTracker",
+    component:JobTrackerComponent
   },
 
 ];

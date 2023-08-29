@@ -7,7 +7,6 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { NgApexchartsModule } from "ng-apexcharts";
 import { NgModule } from "@angular/core";
-
 import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { NgxEchartsModule } from "ngx-echarts";
 import { NgxGaugeModule } from "ngx-gauge";
@@ -44,6 +43,7 @@ import { PodCodDashboardPageComponent } from './tabs/pod-cod-dashboard-page/pod-
 import { PrqSummaryPageComponent } from './tabs/prq-summary-page/prq-summary-page.component';
 import { JobSummaryPageComponent } from './tabs/job-summary-page/job-summary-page.component';
 import { RakeUpdateComponent } from "../operation/rake-update/rake-update.component";
+import { JobTrackerComponent } from './tabs/job-tracker/job-tracker.component';
 
 @NgModule({
   declarations: [
@@ -62,7 +62,8 @@ import { RakeUpdateComponent } from "../operation/rake-update/rake-update.compon
     PodCodDashboardPageComponent,
     PrqSummaryPageComponent,
     JobSummaryPageComponent,
-    RakeUpdateComponent
+    RakeUpdateComponent,
+    JobTrackerComponent
 
   ],
   imports: [

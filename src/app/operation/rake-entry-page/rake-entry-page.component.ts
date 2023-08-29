@@ -8,7 +8,8 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import Swal from "sweetalert2";
-import { addRakeEntry, vendorDetailFromApi } from "./rate-utility";
+import { addRakeEntry, genericGet, vendorDetailFromApi } from "./rate-utility";
+import { debug } from "console";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -41,6 +42,11 @@ export class RakeEntryPageComponent implements OnInit {
     destinationStatus: boolean;
     vendor: string;
     vendorStatus: boolean;
+    advancedLocation: string;
+    advancedLocationStatus:boolean;
+    balanceLocation:string;
+    displayedColumns:any
+    balanceLocationStatus:boolean;
     breadScrums = [
         {
             title: "Rake Entry",
@@ -54,8 +60,8 @@ export class RakeEntryPageComponent implements OnInit {
         this.initializeFormControl();
         this.bindDropDown();
         this.getCity();
-        this.destionationDropDown();
         this.vendorDetail();
+        this.getLocation();
     }
 
     constructor(private fb: UntypedFormBuilder, private Route: Router, private routeActive: ActivatedRoute, private masterService: MasterService,
@@ -63,54 +69,54 @@ export class RakeEntryPageComponent implements OnInit {
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
             this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data;
         }
+        this.displayedColumns = {
+            srNo: {
+                name: "#",
+                key: "checkbox",
+                style: "",
+            },
+            jobNo: {
+                name: "Job No",
+                key: "input",
+                readonly: true,
+                style: "",
+            },
+            jobDate: {
+                name: "Job Date",
+                key: "input",
+                option: [],
+                style: ""
+            },
+            noOfPkts: {
+                name: "No Of Pkts",
+                key: "input",
+                Headerstyle: { 'min-width': '10px' },
+            },
+            weight: {
+                name: "Weight",
+                key: "input",
+                style: "",
+            },
+            fromCity: {
+                name: "From City",
+                key: "input",
+                style: "",
+            },
+            toCity: {
+                name: "To City",
+                key: "input",
+                style: "",
+            },
+            billingParty: {
+                name: "Billing Party",
+                key: "input",
+                style: "",
+            }
+        };
 
     }
 
-    displayedColumns = {
-        srNo: {
-            name: "#",
-            key: "checkbox",
-            style: "",
-        },
-        jobNo: {
-            name: "Job No",
-            key: "input",
-            readonly: true,
-            style: "",
-        },
-        jobDate: {
-            name: "Job Date",
-            key: "input",
-            option: [],
-            style: ""
-        },
-        noOfPkts: {
-            name: "No Of Pkts",
-            key: "input",
-            style: "min-width:100px;",
-            Headerstyle: { 'min-width': '10px' },
-        },
-        weight: {
-            name: "Weight",
-            key: "input",
-            style: "",
-        },
-        fromCity: {
-            name: "From City",
-            key: "input",
-            style: "",
-        },
-        toCity: {
-            name: "To City",
-            key: "input",
-            style: "",
-        },
-        billingParty: {
-            name: "Billing Party",
-            key: "input",
-            style: "",
-        }
-    };
+   
 
     bindDropDown() {
         const jobPropertiesMapping = {
@@ -138,34 +144,76 @@ export class RakeEntryPageComponent implements OnInit {
         this.rakeEntryTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
         this.show = false;
         this.rakeEntryTableForm.controls['documentType'].setValue('JOB');
-        this.loadTempData(this.jobDetail);
+        this.loadTempData(this.jobDetail,"job");
     }
 
-    loadTempData(jobDetail) {
+    loadTempData(jobDetail,field) {
         this.tableData = [
             {
                 srNo: true, // Serial number
-                jobNo: jobDetail?.jobNo || "",
-                jobDate: jobDetail?.jobDate || "",
-                noOfPkts: jobDetail?.pkgs || 0,
-                weight: jobDetail?.weight || 0,
-                fromCity: jobDetail?.fromToCity.split("-")[0] || "",
-                toCity: jobDetail?.fromToCity.split("-")[1] || "",
-                billingParty: "AAREN FURNITURES PALACE"
+                [field+'No']:typeof(jobDetail)==="string"?"": jobDetail?.jobNo || "",
+                [field+'Date']:typeof(jobDetail)==="string"?"": jobDetail?.jobDate || "",
+                noOfPkts:typeof(jobDetail)==="string"?"": jobDetail?.pkgs || 0,
+                weight: typeof(jobDetail)==="string"?"":jobDetail?.weight || 0,
+                fromCity: typeof(jobDetail)==="string"?"":jobDetail?.fromToCity.split("-")[0] || "",
+                toCity: typeof(jobDetail)==="string"?"":jobDetail?.fromToCity.split("-")[1] || "",
+                billingParty:typeof(jobDetail)==="string"?"": jobDetail?.billingParty||""
             }
         ]
     }
 
     //Checked Dropdown Option - Cn Wise / Job Wise
     display($event) {
+
         const generateControl = $event?.eventArgs.value || $event;
         if (generateControl === 'CN') {
+            // this.displayedColumns.CNNO =  this.displayedColumns.jobNo;  // Creating a new property
+            // delete  this.displayedColumns.jobNo;  // Deleting the old property
+            // displayedColumns.CNNO.name = "CNNO";  // Changing the name property
+            const keyMapping = {
+                jobNo: "CNNO",
+                jobDate:"CNDate"
+                // ... define other mappings
+            };
+            Object.keys(this.displayedColumns).reduce((acc, key) => {
+                const newKey = keyMapping[key] || key;
+                acc[newKey] = this.displayedColumns[key];
+                if (newKey === "CNNO") {
+                    acc[newKey].name = "CN No";
+                  
+                }
+                if (newKey ==="CNDate") {
+                    acc[newKey].name = "CN Date";
+                   this.loadTempData("","CN") // Update the name property
+                }
+                
+                return acc;
+            }, {});
+           // this.loadTempData("");
             this.show = true;
         }
         if (generateControl === 'JOB') {
+            const keyMapping = {
+                CNNO: "jobNo",
+                CNDate:"jobDate"
+                // ... define other mappings
+            };
+            Object.keys(this.displayedColumns).reduce((acc, key) => {
+                const newKey = keyMapping[key] || key;
+                acc[newKey] = this.displayedColumns[key];
+                if (newKey === "jobNo") {
+                    acc[newKey].name = "Job No"; // Update the name property
+                }
+                if (newKey ==="jobDate") {
+                    acc[newKey].name = "Job Date"; // Update the name property
+                    this.loadTempData(this.jobDetail,"job")
+                }
+                return acc;
+            }, {});
             this.show = false;
         }
-        //   this.loadTempData('');
+        console.log(this.displayedColumns);
+         
     }
 
     functionCallHandler($event) {
@@ -216,23 +264,7 @@ export class RakeEntryPageComponent implements OnInit {
     goBack(tabIndex: number): void {
         this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
     }
-    //destionation
-    destionationDropDown() {
 
-        this.masterService.getJsonFileDetails("destination").subscribe({
-            next: (res: any) => {
-                if (res) {
-                    this.filter.Filter(
-                        this.jsonControlArray,
-                        this.rakeEntryTableForm,
-                        res,
-                        this.destination,
-                        this.destinationStatus
-                    );
-                }
-            },
-        });
-    }
     async vendorDetail() {
         const resDetail = await vendorDetailFromApi(this.masterService);
         const vendorData = resDetail.map((x) => { return { value: x.vendorCode, name: x.vendorName } });
@@ -255,13 +287,15 @@ export class RakeEntryPageComponent implements OnInit {
         this.rakeEntryTableForm.controls['_id'].setValue(rake);
         this.rakeEntryTableForm.controls['rakeId'].setValue(rake);
         this.rakeEntryTableForm.controls['vendorName'].setValue(this.rakeEntryTableForm.controls['vendorName']?.value.name || "");
-      //  this.rakeEntryTableForm.controls['destination'].setValue(this.rakeEntryTableForm.controls['destination']?.value.name || "");
         this.rakeEntryTableForm.controls['fromCity'].setValue(this.rakeEntryTableForm.controls['fromCity']?.value.name || "");
         this.rakeEntryTableForm.controls['toCity'].setValue(this.rakeEntryTableForm.controls['toCity']?.value.name || "");
         this.rakeEntryTableForm.controls['destination'].setValue(this.rakeEntryTableForm.controls['destination']?.value.value);
+        this.rakeEntryTableForm.controls['advancedLocation'].setValue(this.rakeEntryTableForm.controls['advancedLocation']?.value.value);
+        this.rakeEntryTableForm.controls['balanceLocation'].setValue(this.rakeEntryTableForm.controls['balanceLocation']?.value.value);
         let data=this.rakeEntryTableForm.controls['viaControlHandler'].value.map((x)=>x.name);
         this.rakeEntryTableForm.controls['via'].setValue(data);
         this.rakeEntryTableForm.removeControl('viaControlHandler');
+        this.tableData = this.tableData.map(({ srNo, ...rest }) => rest);
         let docDetail = {
             containorDetail: this.tableData,
           };
@@ -269,7 +303,7 @@ export class RakeEntryPageComponent implements OnInit {
             ...this.rakeEntryTableForm.value,
             ...docDetail,
           };
-        const res= await addRakeEntry(this.rakeEntryTableForm.value,this.masterService)
+        const res= await addRakeEntry(jobDetail,this.masterService)
       if(res){
         Swal.fire({
             icon: "success",
@@ -282,5 +316,30 @@ export class RakeEntryPageComponent implements OnInit {
             }
         });
     }
+    }
+    async getLocation(){
+        const location = await genericGet(this.masterService,"location_detail");
+        const locList=location.map((x)=>{return{name:x.locCode,value:x.locCode}});
+        this.filter.Filter(
+            this.jsonControlArray,
+            this.rakeEntryTableForm,
+            locList,
+            this.advancedLocation,
+            this.advancedLocationStatus
+        );
+        this.filter.Filter(
+            this.jsonControlArray,
+            this.rakeEntryTableForm,
+            locList,
+            this.balanceLocation,
+            this.balanceLocationStatus
+        );
+        this.filter.Filter(
+            this.jsonControlArray,
+            this.rakeEntryTableForm,
+            locList,
+            this.destination,
+            this.destinationStatus
+        );
     }
 }

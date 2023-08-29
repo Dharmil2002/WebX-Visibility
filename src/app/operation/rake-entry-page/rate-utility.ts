@@ -11,24 +11,35 @@ export function renameKeys(originalObject, keyNameMapping) {
     return modifiedObject;
 }
 
-export async function vendorDetailFromApi(masterService){
-    const reqBody={
-        companyCode:localStorage.getItem("companyCode"),
-        collectionName:"vendor_detail",
-        filter:{}
+export async function vendorDetailFromApi(masterService) {
+    const reqBody = {
+        companyCode: localStorage.getItem("companyCode"),
+        collectionName: "vendor_detail",
+        filter: {}
     }
-    const res= await masterService.masterMongoPost("generic/get",reqBody).toPromise();
+    const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
     return res.data
 
 }
-export async function addRakeEntry(data,masterService){
-    const reqBody={
-        companyCode:localStorage.getItem("companyCode"),
-        collectionName:"rake_detail",
-        data:data
+export async function addRakeEntry(data, masterService) {
+    
+    const reqBody = {
+        companyCode: localStorage.getItem("companyCode"),
+        collectionName: "rake_detail",
+        data: data
     }
-    const res= await masterService.masterMongoPost("generic/create",reqBody).toPromise();
-    return res.data
+    const res = await masterService.masterMongoPost("generic/create", reqBody).toPromise();
+    return res
 
+}
+export async function genericGet(masterService, collectionName) {
+    let req = {
+        "companyCode":localStorage.getItem("companyCode"),
+        "filter": {},
+        "collectionName": collectionName
+    }
+    
+    const res = await masterService.masterPost('generic/get', req).toPromise();
+    return res.data;
 }
 

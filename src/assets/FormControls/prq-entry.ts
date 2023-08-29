@@ -116,13 +116,13 @@ export class PrqEntryControls {
                         name: "required",
                         message: "From City is required",
                     },
-                    // {
-                    //     name: "autocomplete"
-                    // },
-                    // {
-                    //     name: "invalidAutocompleteObject",
-                    //     message: "Choose proper value",
-                    // }
+                    {
+                        name: "autocomplete"
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false,
@@ -144,13 +144,13 @@ export class PrqEntryControls {
                         name: "required",
                         message: "To City is required",
                     },
-                    // {
-                    //     name: "autocomplete"
-                    // },
-                    // {
-                    //     name: "invalidAutocompleteObject",
-                    //     message: "Choose proper value",
-                    // }
+                    {
+                        name: "autocomplete"
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false,

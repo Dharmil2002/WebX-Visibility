@@ -203,7 +203,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
   updatePackage() {
 
-    this.tableload = true;
+  
+    if(this.scanPackage){
+      this.tableload = true;
     // Get the trimmed values of scan and leg
     const scanValue = this.scanPackage;
     // Find the unload package based on scan and leg values
@@ -214,6 +216,15 @@ export class VehicleUpdateUploadComponent implements OnInit {
     }
     this.cdr.detectChanges(); // Trigger change detection
     this.tableload = false;
+  }
+  else{
+    Swal.fire({
+      icon: "error",
+        title: "Scan Package",
+        text: `Please Enter Package No`,
+        showConfirmButton: true,
+    })
+  }
   }
   kpiData(event) {
 

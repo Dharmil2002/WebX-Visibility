@@ -30,7 +30,7 @@ export class JobSummaryPageComponent implements OnInit {
     jobDate: {
       Title: "Job Date",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:350px",
     },
     jobType: {
       Title: "Job Type",
@@ -87,7 +87,7 @@ export class JobSummaryPageComponent implements OnInit {
   ];
   addAndEditPath: string;
   linkArray = [{ Row: "Action", Path: "Operation/CHAEntry" }];
-  constructor(private _masterService:MasterService) {
+  constructor(private _masterService: MasterService) {
     this.addAndEditPath = "Operation/JobEntry";
   }
 
@@ -96,9 +96,8 @@ export class JobSummaryPageComponent implements OnInit {
   }
 
   async getJobDetails() {
-  
-    let data= await getJobDetailFromApi(this._masterService);
-    this.tableData=data;
+    let data = await getJobDetailFromApi(this._masterService);
+    this.tableData = data;
     this.tableLoad = false;
   }
 }

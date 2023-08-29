@@ -10,6 +10,9 @@ export class VehicleStatusControls {
             {
                 name: 'vehNo', label: "Vehicle Number", placeholder: "Search and select Vehicle Number", type: 'dropdown',
                 value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                functions:{
+                    onOptionSelect: 'ValidationForVehno',
+                },
                 Validations: [
                     {
                         name: "required",

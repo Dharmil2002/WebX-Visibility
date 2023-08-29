@@ -6,7 +6,7 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { VehicleStatus } from 'src/app/core/models/Masters/vehicle-status/vehicle-status';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { VehicleStatusControls } from 'src/assets/FormControls/vehicle-status';
-import { addVehicleStatusData, getLocationDetail, getvehicleDetail } from '../vehicle-status-utility';
+import { addVehicleStatusData, getLocationDetail, getVehicleStatusFromApi, getvehicleDetail } from '../vehicle-status-utility';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -134,6 +134,21 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
     }
 
   }
+  async ValidationForVehno() {
+    const vehList = await getVehicleStatusFromApi(this.companyCode, this._operationService);
+    const existingVehicle = vehList.find(vehicle => vehicle.vehNo === this.vehicleStatusTableForm.value.vehNo.value);
+
+    if (existingVehicle) {
+      Swal.fire({
+        icon: "info",
+        title: "Vehicle Already Exists",
+        text: `Vehicle No ${existingVehicle.vehNo} is already exist!`,
+        showConfirmButton: true,
+    });
+    this.vehicleStatusTableForm.controls['vehNo'].setValue({name:"",value:""})
+    }
+}
+
   cancel() {
     window.history.back();
   }

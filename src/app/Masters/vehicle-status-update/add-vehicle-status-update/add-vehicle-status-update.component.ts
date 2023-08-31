@@ -28,6 +28,7 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
   locationStatus: any;
   vehicle: any;
   vehicleStatus: any;
+  vehicleData = [];
   constructor(
     private route: Router,
     private fb: UntypedFormBuilder,
@@ -96,13 +97,14 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
   }
   async getVehicleDetailFromApi() {
     try {
-      const vehicleData = await getvehicleDetail(this.companyCode, this._operationService);
+      this.vehicleData = await getvehicleDetail(this.companyCode, this._operationService);
+      let DropDownData = this.vehicleData.map(loc => { return { name: loc.vehicleNo, value: loc.vehicleNo } })
 
       // Handle  or do something with it
       this.filter.Filter(
         this.jsonControlVehicleArray,
         this.vehicleStatusTableForm,
-        vehicleData,
+        DropDownData,
         this.vehicle,
         this.vehicleStatus)
     } catch (error) {
@@ -111,7 +113,9 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
     }
   }
   async save() {
+    let capacity = this.vehicleData.find(item => item.vehicleNo == this.vehicleStatusTableForm.value.vehNo.value).capacity;
 
+    this.vehicleStatusTableForm.controls['capacity'].setValue(capacity != undefined ? capacity : '');
     this.vehicleStatusTableForm.controls['_id'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
     this.vehicleStatusTableForm.controls['vehNo'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
     try {
@@ -123,8 +127,8 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
           title: "Vehicle Added successfully",
           text: "",
           showConfirmButton: true,
-      });
-      this.route.navigateByUrl('Masters/Vehicle/Status');
+        });
+        this.route.navigateByUrl('Masters/Vehicle/Status');
       }
 
     }

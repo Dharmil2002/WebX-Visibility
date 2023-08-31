@@ -60,7 +60,19 @@ export class VehicleStatusControls {
                 Validations: [],
             },
             {
-                name: '_id', label: 'id', placeholder: '', type: '', value:"", generatecontrol: false, disable: false,
+                name: '_id', label: 'id', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'capacity', label: 'capacity', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'FromCity', label: 'FromCity', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'ToCity', label: 'ToCity', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
                 Validations: [],
             }
 

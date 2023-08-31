@@ -39,6 +39,7 @@ import { ChaDetailComponent } from './cha-detail/cha-detail.component';
 import { CustomerBillDetailsComponent } from './customer-bill-details/customer-bill-details.component';
 import { VendorBillDetailsComponent } from './vendor-bill-details/vendor-bill-details.component';
 import { VoucherDetailsComponent } from './voucher-details/voucher-details.component';
+import { AssignVehiclePageMethods } from "./assign-vehicle-page/assgine-vehicle-utility";
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -81,7 +82,7 @@ import { VoucherDetailsComponent } from './voucher-details/voucher-details.compo
     MatDialogModule,
     MatSnackBarModule
   ],
-  providers: [SnackBarUtilityService, OperationService, NavigationService, DatePipe, MatDialogModule],
+  providers: [SnackBarUtilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods],
   exports: []
 })
 export class OperationModule { }

@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
-import { updatePrqStatus } from "../prq-entry-page/prq-utitlity";
+import { updatePrqStatus, vehicleStatusUpdate } from "../prq-entry-page/prq-utitlity";
 
-export async function showVehicleConfirmationDialog(prqDetail, masterService, goBack, tabIndex,dialogRef) {
+export async function showVehicleConfirmationDialog(prqDetail, masterService, goBack, tabIndex, dialogRef, item) {
     const confirmationResult = await Swal.fire({
         icon: "success",
         title: "Confirmation",
@@ -14,10 +14,91 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
     if (confirmationResult.isConfirmed) {
         prqDetail.status = "2";
         const res = await updatePrqStatus(prqDetail, masterService);
-        if (res) {
+        let currentBranch = localStorage.getItem("Branch") || '';
+        let companyCode = parseInt(localStorage.getItem('companyCode'));
+        const result = await vehicleStatusUpdate(currentBranch, companyCode, item, prqDetail, masterService, true);
+        if (res && result) {
             goBack(tabIndex);
         }
     }
     dialogRef.close();
+
+}
+
+
+/**
+ * Fetches vehicle status data from the API.
+ *
+ * This function makes an asynchronous API call to retrieve vehicle status data from a service,
+ * using the company code and type "operation". It sends a request to the API endpoint "common/getall"
+ * with the specified request body containing the companyCode and collection name "vehicle_status".
+ *
+ * @returns {Promise<any>} A promise that resolves with the vehicleDetail data obtained from the API.
+ *                        The structure of the data may vary based on the API response.
+ *
+ * @throws {any} If an error occurs during the API call, it will be caught and re-thrown to propagate it
+ *              to the calling code. The error message will be logged to the console as well.
+ */
+export async function getVehicleStatusFromApi(companyCode, operationService) {
+    const reqbody = {
+        companyCode: companyCode,
+        collectionName: "vehicle_status",
+        filter: {
+            status: 'available'
+        }
+    };
+
+    try {
+        const vehicleDetail = await operationService.operationMongoPost("generic/get", reqbody).toPromise();
+        // Do something with the vehicleDetail data here
+        return vehicleDetail.data; // Optionally, return the vehicleDetail data
+    } catch (error) {
+        // Handle any errors that might occur during the API call
+        console.error("Error fetching vehicle details:", error);
+        throw error; // Optionally, re-throw the error to propagate it to the calling code
+    }
+}
+
+
+///////  ********** Tables *********** ////////////
+
+export class AssignVehiclePageMethods {
+    columnHeader = [{
+        vehNo: {
+            Title: "Vehicle No",
+            class: "matcolumnleft",
+            Style: "min-width:80px",
+        },
+        fromCity: {
+            Title: "From City",
+            class: "matcolumnleft",
+            Style: "min-width:80px",
+        },
+        toCity: {
+            Title: "To City",
+            class: "matcolumnleft",
+            Style: "min-width:2px",
+        },
+        currentLocation: {
+            Title: "Current Location",
+            class: "matcolumnleft",
+            Style: "min-width:200px",
+        },
+        distance: {
+            Title: "Distance (KMs)",
+            class: "matcolumncenter",
+            Style: "min-width:40px",
+        },
+        capacity: {
+            Title: "Vehicle Size (MTs)",
+            class: "matcolumncenter",
+            Style: "min-width:100px",
+        },
+        action: {
+            Title: "Action",
+            class: "matcolumnleft",
+            Style: "min-width:100px",
+        },
+    }];
 
 }

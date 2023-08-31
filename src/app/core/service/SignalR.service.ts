@@ -11,10 +11,10 @@ export class SignalRService {
   public data: any = [];
 
   constructor() {
-    if (this.hubConnection) {
-      this.hubConnection.stop();
-      this.hubConnection = undefined;
-    }
+    // if (this.hubConnection) {
+    //   this.hubConnection.stop();
+    //   this.hubConnection = undefined;
+    // }
   }
 
   private hubConnection: signalR.HubConnection;

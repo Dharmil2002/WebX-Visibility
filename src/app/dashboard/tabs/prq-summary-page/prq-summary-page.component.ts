@@ -25,27 +25,27 @@ export class PrqSummaryPageComponent implements OnInit {
     prqNo: {
       Title: "PRQ No",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:200px",
     },
     vehicleSize: {
       Title: "Vehicle Size",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:2px",
     },
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:200px",
     },
     fromToCity: {
       Title: "From-To City",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:200px",
     },
     pickUpDate: {
       Title: "Pick Up Date Time",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:200px",
     },
     status: {
       Title: "Status",
@@ -55,7 +55,7 @@ export class PrqSummaryPageComponent implements OnInit {
     Action: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:2px",
     },
   };
   //#endregion

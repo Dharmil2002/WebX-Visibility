@@ -2,7 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import Swal from 'sweetalert2';
 import { Router } from "@angular/router";
 import { forkJoin, map } from 'rxjs';
-import { UntypedFormBuilder } from "@angular/forms";
+
+import { UntypedFormBuilder, FormGroup } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { PincodeLocationControl } from "src/assets/FormControls/pincodeLocationMapping";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -16,6 +17,7 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 
 export class PincodeLocationMappingComponent implements OnInit {
     tableData: any = [];
+    nextId: number = 1;
     tableLoad = false;
     areaList: any;
     areaStatus: any;
@@ -23,9 +25,13 @@ export class PincodeLocationMappingComponent implements OnInit {
     pincodeStatus: any;
     pinLocTableForm: any;
     jsonControlArray: any;
+    myForm: FormGroup;
     pinLocListFormControls: any;
     isUpdate: boolean;
+    updateState: any;
+    stateData: any;
     data: [] | any;
+    csv: any[];
     companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
     // Action buttons configuration
@@ -42,12 +48,17 @@ export class PincodeLocationMappingComponent implements OnInit {
             active: "Pinocode to Location Mapping",
         },
     ];
+    tableDet: boolean;
+    pincodeData: any;
+    areaData: any;
     pincodeDataList: any;
+    filteredData: any;
 
     constructor(public ObjSnackBarUtility: SnackBarUtilityService, private filter: FilterUtils, private route: Router,
         private masterService: MasterService, private fb: UntypedFormBuilder) {
         this.loadTempData('');
     }
+
 
     ngOnInit(): void {
         this.intializeFormControl();
@@ -60,20 +71,15 @@ export class PincodeLocationMappingComponent implements OnInit {
         // Get form controls for Cluster Details section
         this.jsonControlArray = this.pinLocListFormControls.getPinLocFormControls();
 
+        const propertyMap = {
+            'area': { list: 'areaList', status: 'areaStatus' },
+            'pincode': { list: 'pincodeList', status: 'pincodeStatus' },
+        };
         this.jsonControlArray.forEach(data => {
-            switch (data.name) {
-                case 'area':
-                    // Set State-related variables
-                    this.areaList = data.name;
-                    this.areaStatus = data.additionalData.showNameAndValue;
-                    break;
-                case 'pincode':
-                    // Set Pincode category-related variables
-                    this.pincodeList = data.name;
-                    this.pincodeStatus = data.additionalData.showNameAndValue;
-                    break;
-                default:
-                    break;
+            const property = propertyMap[data.name];
+            if (property) {
+                this[property.list] = data.name;
+                this[property.status] = data.additionalData.showNameAndValue;
             }
         });
         // Build the form group using formGroupBuilder function and the values of jsonControlArray
@@ -99,7 +105,7 @@ export class PincodeLocationMappingComponent implements OnInit {
         city: {
             name: "Area",
             key: "inputString",
-            readonly: false,
+            readonly: true,
             style: "",
         },
         action: {
@@ -127,27 +133,52 @@ export class PincodeLocationMappingComponent implements OnInit {
         this.tableData.splice(0, 0, AddObj);
     }
 
-    getData() {
+    async getPincodeDataListing() {
+        const pincode = this.pinLocTableForm.value.pincode;
+        let req = {
+            companyCode: this.companyCode,
+            collectionName: "pincode_detail",
+            filter: {}
+        };
+        const res = await this.masterService.masterPost("generic/get", req).toPromise();
+        // Extracting area and pincode from the array and mapping them
+        const mappedData = res.data.map((item: any) => ({
+            area: item.area,
+            pincode: item.pincode
+        }));
+        // Find matching areas based on the selected pincode
+        const matchingAreas = mappedData.filter((item) => item.pincode == pincode.name);
+        //Extract only the "area" property from each object in the array
+        const areas = matchingAreas.map((item) => item.area);
+        //Update the table data
+        this.tableData[0].city = areas;
+        this.tableData[0].pincode = pincode.value;
+        this.tableLoad = true;
+    }
+
+    async getData() {
         const mappingReq = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "pincodeLocation_details"
+            companyCode: this.companyCode,
+            collectionName: "pincodeLocation_details",
+            filter: {}
         };
         const locationReq = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "location_detail"
+            companyCode: this.companyCode,
+            collectionName: "location_detail",
+            filter: {}
         };
+
+        
         const pincodeReq = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "pincode_detail"
+            companyCode: this.companyCode,
+            collectionName: "pincode_detail",
+            filter: {}
         };
         // Use forkJoin to make parallel requests and get all data at once
         forkJoin([
-            this.masterService.masterPost('common/getall', mappingReq),
-            this.masterService.masterPost('common/getall', locationReq),
-            this.masterService.masterPost('common/getall', pincodeReq),
+            this.masterService.masterPost("generic/get", mappingReq),
+            this.masterService.masterPost("generic/get", locationReq),
+            this.masterService.masterPost("generic/get", pincodeReq),
         ]).pipe(
             map(([mappingRes, locationRes, pincodeRes]) => {
                 // Combine all the data into a single object
@@ -157,60 +188,44 @@ export class PincodeLocationMappingComponent implements OnInit {
                     pincodeData: pincodeRes?.data,
                 };
             })
-        ).subscribe((mergedData) => {
-            this.data = mergedData.mappingData.filter(item => item.location == this.pinLocTableForm.value.area.name);
-            const transformedData = this.transformArrayProperties(this.data);
-            this.loadTempData(transformedData);
+        ).toPromise()
+            .then((mergedData) => {
+                this.data = mergedData.mappingData.filter(item => item.location == this.pinLocTableForm.value.area.name);
+                const transformedData = this.transformArrayProperties(this.data);
+                this.loadTempData(transformedData);
 
-            const locationList = mergedData.locationData;
-            const locations = this.filterData(locationList, 'locName', 'locCode');
-            this.filter.Filter(
-                this.jsonControlArray,
-                this.pinLocTableForm,
-                locations,
-                this.areaList,
-                this.areaStatus
-            );
+                const locationList = mergedData.locationData;
+                const locations = this.filterData(locationList, 'locName', 'locCode');
+                this.filter.Filter(
+                    this.jsonControlArray,
+                    this.pinLocTableForm,
+                    locations,
+                    this.areaList,
+                    this.areaStatus
+                );
 
-            this.pincodeDataList = mergedData.pincodeData;
-            let pincode = this.pincodeDataList
-                .filter(element => element.pincode != null && element.pincode !== '')
-                .map((element: any) => ({
-                    name: parseInt(element.pincode),
-                    value: parseInt(element.pincode)
-                }));
-            this.displayedColumns1.pincode.option = pincode;
-            this.filter.Filter(
-                this.jsonControlArray,
-                this.pinLocTableForm,
-                pincode,
-                this.pincodeList,
-                this.pincodeStatus
-            );
-            this.tableLoad = true;
-        });
+                this.pincodeDataList = mergedData.pincodeData;
+                let pincode = this.pincodeDataList
+                    .filter(element => element.pincode != null && element.pincode !== '')
+                    .map((element: any) => ({
+                        name: parseInt(element.pincode),
+                        value: parseInt(element.pincode)
+                    }));
+                this.displayedColumns1.pincode.option = pincode;
+                this.filter.Filter(
+                    this.jsonControlArray,
+                    this.pinLocTableForm,
+                    pincode,
+                    this.pincodeList,
+                    this.pincodeStatus
+                );
+                this.tableLoad = true;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     }
 
-    getAreaData($event) {
-        var selectedPincode = $event.row.pincode;
-        const mappedData = this.pincodeDataList.map((item: any) => ({
-            area: item.area,
-            pincode: item.pincode
-        }));
-        // Find the index of the item with the selected pincode in the tableData array
-        const indexToUpdate = this.tableData.findIndex((item) => item.pincode == selectedPincode);
-
-        if (indexToUpdate !== -1) {
-            // Find matching areas based on the selected pincode
-            const matchingAreas = mappedData.filter((item) => item.pincode == selectedPincode);
-            // Extract only the "area" property from each object in the array
-            const areas = matchingAreas.map((item) => item.area);
-            // Update the "area" property of the specific index in the tableData array
-            this.tableData[indexToUpdate].city = areas;
-
-            this.tableLoad = true;
-        }
-    }
 
     transformArrayProperties(data) {
         const transformedData = [];
@@ -219,6 +234,7 @@ export class PincodeLocationMappingComponent implements OnInit {
                 data[0].pincodeList.length,
                 data[0].city.length
             );
+
             for (let i = 0; i < len; i++) {
                 transformedData.push({
                     pincode: data[0].pincodeList[i],
@@ -245,8 +261,27 @@ export class PincodeLocationMappingComponent implements OnInit {
         }));
     }
 
+    getAreaData($event) {
+        var selectedPincode = $event.row.pincode;
+        const mappedData = this.pincodeDataList.map((item: any) => ({
+            area: item.area,
+            pincode: item.pincode
+        }));
+        // Find the index of the item with the selected pincode in the tableData array
+        const indexToUpdate = this.tableData.findIndex((item) => item.pincode == selectedPincode);
 
-    saveData() {
+        if (indexToUpdate !== -1) {
+            // Find matching areas based on the selected pincode
+            const matchingAreas = mappedData.filter((item) => item.pincode == selectedPincode);
+            // Extract only the "area" property from each object in the array
+            const areas = matchingAreas.map((item) => item.area);
+            // Update the "area" property of the specific index in the tableData array
+            this.tableData[indexToUpdate].city = areas;
+            this.tableLoad = true;
+        }
+    }
+
+    async saveData() {
         const pincodeSet = new Set();
         let hasDuplicate = false; // Flag to track duplicates
 
@@ -267,7 +302,7 @@ export class PincodeLocationMappingComponent implements OnInit {
             } else {
                 const transformedData = {
                     location: areaName,
-                    id: areaName,
+                    _id: areaName,
                     pincode: this.pinLocTableForm.value.pincode?.value || '',
                     pincodeList: Array.from(pincodeSet),
                     city: this.tableData.flatMap((item) => item.city), // Use flatMap to flatten the nested arrays           
@@ -276,25 +311,21 @@ export class PincodeLocationMappingComponent implements OnInit {
                 };
 
                 let req = {
-                    companyCode: parseInt(localStorage.getItem("companyCode")),
-                    type: "masters",
-                    collection: "pincodeLocation_details",
+                    companyCode: this.companyCode,
+                    collectionName: "pincodeLocation_details",
                     data: transformedData
                 };
-                this.masterService.masterPost('common/create', req).subscribe({
-                    next: (res: any) => {
-                        if (res) {
-                            // Display success message
-                            Swal.fire({
-                                icon: "success",
-                                title: "Successful",
-                                text: res.message,
-                                showConfirmButton: true,
-                            });
-                            window.location.reload();
-                        }
-                    }
-                });
+                const res = await this.masterService.masterPost("generic/create", req).toPromise();
+                if (res) {
+                    // Display success message
+                    Swal.fire({
+                        icon: "success",
+                        title: "Successful",
+                        text: res.message,
+                        showConfirmButton: true,
+                    });
+                    window.location.reload();
+                }
             }
         }
     }

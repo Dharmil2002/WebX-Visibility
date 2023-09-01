@@ -32,7 +32,7 @@ export class GeneralMasterControl {
           {
             name: "pattern",
             message: "Please Enter only text of length 1 to 50 characters",
-            pattern: '^[a-zA-z 0-9]{1,50}$',
+            pattern: '^[a-zA-Z0-9 ()\\.\-]{1,50}$',
           }
         ]
       },
@@ -48,11 +48,11 @@ export class GeneralMasterControl {
         Validations: []
       },
       {
-        name: 'id',
+        name: '_id',
         label: '',
         placeholder: '',
         type: 'text',
-        value: generalTable.id,
+        value: generalTable._id,
         filterOptions: '',
         autocomplete: '',
         displaywith: '',

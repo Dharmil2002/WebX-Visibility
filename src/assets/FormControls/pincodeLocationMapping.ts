@@ -79,7 +79,7 @@ export class PincodeLocationControl {
                 generatecontrol: false,
                 disable: true
             },{
-                name: 'id',
+                name: '_id',
                 label: '',
                 placeholder: '',
                 type: 'text',

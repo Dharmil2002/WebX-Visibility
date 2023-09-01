@@ -25,12 +25,12 @@ export class JobSummaryPageComponent implements OnInit {
     jobNo: {
       Title: "Job No",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:180px",
     },
     jobDate: {
       Title: "Job Date",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:150px",
     },
     jobType: {
       Title: "Job Type",
@@ -40,12 +40,12 @@ export class JobSummaryPageComponent implements OnInit {
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:180px",
     },
     fromToCity: {
       Title: "From-To City",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:150px",
     },
     jobLocation: {
       Title: "Job Location",
@@ -54,12 +54,12 @@ export class JobSummaryPageComponent implements OnInit {
     },
     pkgs: {
       Title: "Pkgs",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:2px",
     },
     vehicleSize: {
       Title: "Vehicle Size",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:2px",
     },
     status: {
@@ -70,7 +70,7 @@ export class JobSummaryPageComponent implements OnInit {
     Action: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:100px",
     },
   };
   //#endregion
@@ -87,7 +87,7 @@ export class JobSummaryPageComponent implements OnInit {
   ];
   addAndEditPath: string;
   linkArray = [{ Row: "Action", Path: "Operation/CHAEntry" }];
-  constructor(private _masterService:MasterService) {
+  constructor(private _masterService: MasterService) {
     this.addAndEditPath = "Operation/JobEntry";
   }
 
@@ -96,9 +96,8 @@ export class JobSummaryPageComponent implements OnInit {
   }
 
   async getJobDetails() {
-  
-    let data= await getJobDetailFromApi(this._masterService);
-    this.tableData=data;
+    let data = await getJobDetailFromApi(this._masterService);
+    this.tableData = data;
     this.tableLoad = false;
   }
 }

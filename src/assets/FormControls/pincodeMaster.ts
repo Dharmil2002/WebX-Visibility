@@ -164,11 +164,11 @@ export class PincodeControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'id',
+                name: '_id',
                 label: '',
                 placeholder: '',
                 type: 'text',
-                value: PincodeTable.id,
+                value: PincodeTable._id,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',

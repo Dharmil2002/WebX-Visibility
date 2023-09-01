@@ -11,14 +11,10 @@ export class UserMasterListComponent implements OnInit {
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
     companyCode: any = parseInt(localStorage.getItem("companyCode"));
     addAndEditPath: string;
-    data: [] | any;
-    uploadComponent: any;
     csvFileName: string;
     toggleArray = ["isActive"];
     linkArray = [];
     csv: any;
-    tableData: any;
-
     dynamicControls = {
         add: true,
         edit: true,
@@ -67,34 +63,29 @@ export class UserMasterListComponent implements OnInit {
     ngOnInit(): void {
         this.csvFileName = "User Details";
         this.addAndEditPath = "/Masters/UserMaster/AddUser";
-        //setting csv file Name so file will be saved as per this name
         this.getUserDetails();
     }
     constructor(private masterService: MasterService) {
     }
-    getUserDetails() {
-        // Fetch data from the JSON endpoint
+
+    async getUserDetails() {
         let req = {
             "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "user_master"
+            "collectionName": "user_master",
+            "filter": {}
         }
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
-                if (res) {
-                    // Generate srno for each object in the array
-                    const dataWithSrno = res.data.map((obj, index) => {
-                        return {
-                            ...obj,
-                            srNo: index + 1
-                        };
-                    });
-                    this.csv = dataWithSrno;
-                    this.tableData = dataWithSrno;
-                    this.tableLoad = false;
-                }
-            }
-        })
+        const res = await this.masterService.masterPost("generic/get", req).toPromise()
+        if (res) {
+            // Generate srno for each object in the array
+            const dataWithSrno = res.data.map((obj, index) => {
+                return {
+                    ...obj,
+                    srNo: index + 1
+                };
+            });
+            this.csv = dataWithSrno;
+            this.tableLoad = false;
+        }
     }
 
     functionCallHandler($event) {
@@ -110,31 +101,29 @@ export class UserMasterListComponent implements OnInit {
         }
     }
 
-    IsActiveFuntion(det) {
-        let id = det.id;
+    async IsActiveFuntion(det) {
+        let id = det._id;
         // Remove the "id" field from the form controls
-        delete det.id;
+        delete det._id;
         delete det.srNo;
         let req = {
             companyCode: parseInt(localStorage.getItem("companyCode")),
-            type: "masters",
-            collection: "user_master",
-            id: id,
-            updates: det
+            collectionName: "user_master",
+            filter: {
+                _id: id,
+            },
+            update: det
         };
-        this.masterService.masterPut('common/update', req).subscribe({
-            next: (res: any) => {
-                if (res) {
-                    // Display success message
-                    Swal.fire({
-                        icon: "success",
-                        title: "Successful",
-                        text: res.message,
-                        showConfirmButton: true,
-                    });
-                    this.getUserDetails();
-                }
-            }
-        });
+        const res = await this.masterService.masterPut("generic/update", req).toPromise()
+        if (res) {
+            // Display success message
+            Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: res.message,
+                showConfirmButton: true,
+            });
+            this.getUserDetails();
+        }
     }
 }

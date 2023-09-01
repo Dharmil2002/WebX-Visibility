@@ -132,7 +132,7 @@ export class LocationControl {
                     }
                 },
                 {
-                    name: 'locAddr', label: 'Address', placeholder: 'Enter Location Address', type: 'text', value: LocationTable.locAddr, generatecontrol: true, disable: IsUpdate ? true : false,
+                    name: 'locAddr', label: 'Address', placeholder: 'Enter Location Address', type: 'text', value: LocationTable.locAddr, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "required",
@@ -370,11 +370,11 @@ export class LocationControl {
                     Validations: []
                 },
                 {
-                    name: 'id',
+                    name: '_id',
                     label: '',
                     placeholder: '',
                     type: 'text',
-                    value: LocationTable.id,
+                    value: LocationTable._id,
                     filterOptions: '',
                     autocomplete: '',
                     displaywith: '',

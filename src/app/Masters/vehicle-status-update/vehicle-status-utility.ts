@@ -20,7 +20,7 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
     const reqbody = {
         companyCode: companyCode,
         collectionName: "vehicle_status",
-        filter:{}
+        filter: {}
     };
 
     try {
@@ -60,7 +60,7 @@ export async function getLocationDetail(companyCode: number, _operationService) 
     const reqbody = {
         "companyCode": companyCode,
         "collectionName": "location_detail",
-        "filter":{}
+        "filter": {}
     };
 
     try {
@@ -78,14 +78,14 @@ export async function getvehicleDetail(companyCode: number, _operationService) {
     const reqbody = {
         "companyCode": companyCode,
         "collectionName": "vehicle_detail",
-        "filter":{}
+        "filter": {}
     };
 
     try {
         const vehicleData = await _operationService.operationMongoPost("generic/get", reqbody).toPromise();
         // Handle locationData or return it as needed
-        const dropdownData = vehicleData.data.map(loc => { return { name: loc.vehicleNo, value: loc.vehicleNo } })
-        return dropdownData;
+        // const dropdownData = vehicleData.data.map(loc => { return { name: loc.vehicleNo, value: loc.vehicleNo } })
+        return vehicleData.data;
     } catch (error) {
         // Handle any errors that may occur during the API call
         console.error("Error fetching location data:", error);

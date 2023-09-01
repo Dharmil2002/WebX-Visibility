@@ -7,8 +7,10 @@ import { Router } from "@angular/router";
 import { processProperties } from "src/app/Masters/processUtility";
 import { JobControl } from "src/assets/FormControls/job-entry";
 import Swal from "sweetalert2";
-import { addJobDetail, getNextNumber } from "./job-entry-utility";
+import { addJobDetail, getNextNumber, getVendorDetails } from "./job-entry-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
+import { customerFromApi } from "../prq-entry-page/prq-utitlity";
+import { getCity } from "../quick-booking/quick-utility";
 @Component({
   selector: 'app-job-entry-page',
   templateUrl: './job-entry-page.component.html',
@@ -34,6 +36,8 @@ export class JobEntryPageComponent implements OnInit {
   jsonControlArray: any;
   jobEntryTableForm: UntypedFormGroup;
   cityData: any;
+  vendorNameCode: string;
+  vendorNameStatus: boolean;
   // Action buttons configuration
   actionObject = {
     addRow: true,
@@ -81,14 +85,13 @@ export class JobEntryPageComponent implements OnInit {
   ];
 
   constructor(private router: Router, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) {
-  
+
     this.initializeFormControl();
   }
 
   ngOnInit(): void {
     this.bindDropdown();
-    this.getCityList();
-    this.getCustomerDetails();
+    this.getDropDownDetail();
     this.loadTempData();
   }
 
@@ -99,6 +102,7 @@ export class JobEntryPageComponent implements OnInit {
       jobLocation: { variable: 'jobLocation', status: 'jobLocationStatus' },
       transportMode: { variable: 'transportMode', status: 'transportModeStatus' },
       fromCity: { variable: 'fromCity', status: 'fromCityStatus' },
+      vendorName: { variable: 'vendorNameCode', status: 'vendorNameStatus' },
       toCity: { variable: 'toCity', status: 'toCityStatus' }
     };
     processProperties.call(this, this.jsonControlArray, jobPropertiesMapping);
@@ -112,52 +116,32 @@ export class JobEntryPageComponent implements OnInit {
     this.jobEntryTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
 
-  getCustomerDetails() {
-    this.masterService.getJsonFileDetails("customer").subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.filter.Filter(
-            this.jsonControlArray,
-            this.jobEntryTableForm,
-            res,
-            this.billingParty,
-            this.billingPartyStatus
-          ); // Filter the docket control array based on customer details
-        }
-      },
-    });
-  }
+  async getDropDownDetail() {
+    // Fetch city details, customer list, and vendor details concurrently
+    const [cityDetail, resCust, vendorList] = await Promise.all([
+      getCity(this.companyCode, this.masterService),
+      customerFromApi(this.masterService),
+      getVendorDetails(this.masterService)
+    ]);
 
-  getCityList() {
-    let req = {
-      "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "city_detail"
+    // Define a helper function to filter the docket control array
+    const filterDocketControlArray = (details, statusProperty, filterProperty) => {
+      this.filter.Filter(
+        this.jsonControlArray,
+        this.jobEntryTableForm,
+        details,
+        filterProperty,
+        statusProperty
+      );
     };
-    this.masterService.masterPost('common/getall', req).subscribe({
-      next: (res: any) => {
-        const cityList = res.data.map(element => ({
-          name: element.cityName,
-          value: element.id
-        }));
-        this.filter.Filter(
-          this.jsonControlArray,
-          this.jobEntryTableForm,
-          cityList,
-          this.fromCity,
-          this.fromCityStatus
-        );
 
-        this.filter.Filter(
-          this.jsonControlArray,
-          this.jobEntryTableForm,
-          cityList,
-          this.toCity,
-          this.toCityStatus
-        );
-      }
-    });
+    // Use the helper function to filter based on different details
+    filterDocketControlArray(resCust, this.billingPartyStatus, this.billingParty);
+    filterDocketControlArray(cityDetail, this.fromCityStatus, this.fromCity);
+    filterDocketControlArray(cityDetail, this.toCityStatus, this.toCity);
+    filterDocketControlArray(vendorList, this.vendorNameStatus, this.vendorNameCode);
   }
+
   // Load temporary data
   loadTempData() {
     this.tableData = [
@@ -185,19 +169,25 @@ export class JobEntryPageComponent implements OnInit {
   async save() {
     const tabcontrols = this.jobEntryTableForm;
     clearValidatorsAndValidate(tabcontrols);
-    const jobIndex= parseInt(localStorage.getItem("jobIndex"));
+    // Create a new array without the 'srNo' property
+    let modifiedTableData = this.tableData.map(({ srNo, ...rest }) => rest);
+    // Assign the modified array back to 'this.tableData'
+    this.tableData = modifiedTableData;
     const thisYear = new Date().getFullYear();
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
     const location = localStorage.getItem("Branch"); // Replace with your dynamic value
-  //  const dynamicNumber = Math.floor(jobIndex * 10000); // Generate a random number between 0 and 9999
-    const paddedNumber =getNextNumber();
-    const blParty=this.jobEntryTableForm.controls['billingParty'].value?.name||"";
-    const jobType=this.jobEntryTableForm.controls['jobType'].value=="I"?"IM":"EX";
- //  let jeNo = `JE/${dynamicValue}/${financialYear}/${paddedNumber}`;
-   let jeNo = `${location.substring(0,3)}${blParty.substring(0,3)}${jobType}${financialYear}${paddedNumber}`;
+    //  const dynamicNumber = Math.floor(jobIndex * 10000); // Generate a random number between 0 and 9999
+    const paddedNumber = getNextNumber();
+    const blParty = this.jobEntryTableForm.controls['billingParty'].value?.name || "";
+    const jobType = this.jobEntryTableForm.controls['jobType'].value == "I" ? "IM" : "EX";
+    //  let jeNo = `JE/${dynamicValue}/${financialYear}/${paddedNumber}`;
+    let jeNo = `${location.substring(0, 3)}${blParty.substring(0, 3)}${jobType}${financialYear}${paddedNumber}`;
     this.jobEntryTableForm.controls['_id'].setValue(jeNo.toUpperCase());
     this.jobEntryTableForm.controls['jobId'].setValue(jeNo.toUpperCase());
     this.jobEntryTableForm.controls['billingParty'].setValue(this.jobEntryTableForm.controls['billingParty'].value.name);
+    this.jobEntryTableForm.controls['vendorName'].setValue(this.jobEntryTableForm.controls['vendorName'].value.name);
+    this.jobEntryTableForm.controls['fromCity'].setValue(this.jobEntryTableForm.controls['fromCity'].value.value);
+    this.jobEntryTableForm.controls['toCity'].setValue(this.jobEntryTableForm.controls['toCity'].value.value);
     let containorDetail = {
       containorDetail: this.tableData,
     };
@@ -205,9 +195,9 @@ export class JobEntryPageComponent implements OnInit {
       ...this.jobEntryTableForm.value,
       ...containorDetail,
     };
-   const res = await addJobDetail(jobDetail, this.masterService);
+    const res = await addJobDetail(jobDetail, this.masterService);
 
-     if (res) {
+    if (res) {
       Swal.fire({
         icon: "success",
         title: "Generated Successfuly",

@@ -35,6 +35,11 @@ import { AssignVehiclePageComponent } from './assign-vehicle-page/assign-vehicle
 import { RakeEntryPageComponent } from './rake-entry-page/rake-entry-page.component';
 import { ChaEntryPageComponent } from './cha-entry-page/cha-entry-page.component';
 import { HandedOverComponent } from './handed-over/handed-over.component';
+import { ChaDetailComponent } from './cha-detail/cha-detail.component';
+import { CustomerBillDetailsComponent } from './customer-bill-details/customer-bill-details.component';
+import { VendorBillDetailsComponent } from './vendor-bill-details/vendor-bill-details.component';
+import { VoucherDetailsComponent } from './voucher-details/voucher-details.component';
+import { AssignVehiclePageMethods } from "./assign-vehicle-page/assgine-vehicle-utility";
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -55,7 +60,11 @@ import { HandedOverComponent } from './handed-over/handed-over.component';
     AssignVehiclePageComponent,
     RakeEntryPageComponent,
     ChaEntryPageComponent,
-    HandedOverComponent
+    HandedOverComponent,
+    ChaDetailComponent,
+    CustomerBillDetailsComponent,
+    VendorBillDetailsComponent,
+    VoucherDetailsComponent
   ],
   imports: [
     CommonModule,
@@ -73,7 +82,7 @@ import { HandedOverComponent } from './handed-over/handed-over.component';
     MatDialogModule,
     MatSnackBarModule
   ],
-  providers: [SnackBarUtilityService, OperationService, NavigationService, DatePipe, MatDialogModule],
+  providers: [SnackBarUtilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods],
   exports: []
 })
 export class OperationModule { }

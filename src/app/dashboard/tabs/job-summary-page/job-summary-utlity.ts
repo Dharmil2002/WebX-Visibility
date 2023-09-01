@@ -1,6 +1,7 @@
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 
 export async function getJobDetailFromApi(masterServices) {
+
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "job_detail",
@@ -8,9 +9,9 @@ export async function getJobDetailFromApi(masterServices) {
     }
     const res = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
     let jobList = [];
-
+   
     res.data.map((element, index) => {
-
+    
         let jobData = {
             "srNo": element.srNo = index + 1,
             "jobNo": element?.jobId || '',

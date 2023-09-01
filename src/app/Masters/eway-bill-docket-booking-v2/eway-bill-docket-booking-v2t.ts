@@ -60,7 +60,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   fromCity: string;
   fromCityStatus: any;
   ewayData: any;
-  userName=localStorage.getItem("Username");
+  userName = localStorage.getItem("Username");
   // Displayed columns configuration
   displayedColumns1 = {
     srNo: {
@@ -187,6 +187,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   DocketDetails: any;
   vehicleNo: string;
   docketId: string;
+  prqFlag: boolean;
   constructor(
     private masterService: MasterService,
     private fb: UntypedFormBuilder,
@@ -194,15 +195,21 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     private operationService: OperationService,
     private route: Router,
     private _NavigationService: NavigationService
-  ) {
-    if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.quickdocketDetaildata =
-        route.getCurrentNavigation().extras.state.data.columnData;
-      this.quickDocket = true;
+) {
+    const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
+    if (navigationState != null) {
+        this.quickdocketDetaildata = navigationState.columnData || navigationState;
+        
+        if ('prqNo' in this.quickdocketDetaildata) {
+            this.prqFlag = true;
+        } else {
+            this.quickDocket = true;  
+        }
     }
+    
     this.bindQuickdocketData();
-   ;
-  }
+}
+
 
   ngOnInit(): void {
     this.loadTempData();
@@ -320,7 +327,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             this.consigneeCity,
             this.consigneeNameStatus
           ); // Filter the consignee control array based on consigneeCity details
-         
+
         }
       }
     } catch (error) {
@@ -371,6 +378,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   // Get EwayBill data
 
   async bindQuickdocketData() {
+   
     if (this.quickDocket) {
       const reqBody = {
         companyCode: this.companyCode,
@@ -379,10 +387,10 @@ export class EwayBillDocketBookingV2Component implements OnInit {
           docketNumber: this.quickdocketDetaildata.no,
         },
       };
-  
+
       try {
         const res: any = await this.operationService.operationMongoPost("generic/get", reqBody).toPromise();
-  
+
         if (res) {
           this.DocketDetails = res.data;
           this.contractForm.controls["payType"].setValue(this.DocketDetails[0]?.payType || "");
@@ -400,13 +408,36 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         // Handle error here
       }
     }
-  
+    if(this.prqFlag){
+      
+      const billingParty={
+        name:this.quickdocketDetaildata?.billingParty||"",
+        value:this.quickdocketDetaildata?.billingParty||""
+      }
+      const fromCity={
+        name:this.quickdocketDetaildata?.fromCity||"",
+        value:this.quickdocketDetaildata?.fromCity||""
+      }
+      const toCity={
+        name:this.quickdocketDetaildata?.toCity||"",
+        value:this.quickdocketDetaildata?.toCity||""
+      }
+      this.tabForm.controls['billingParty'].setValue(billingParty);
+      this.tabForm.controls['consignorName'].setValue(billingParty);
+      this.tabForm.controls['consignorCity'].setValue(fromCity);
+      this.tabForm.controls['docketDate'].setValue(new Date(this.quickdocketDetaildata?.pickUpDate||new Date()));
+      this.tabForm.controls['consignorMobileNo'].setValue(this.quickdocketDetaildata?.contactNo||"");
+      this.tabForm.controls['fromCity'].setValue(fromCity);
+      this.tabForm.controls['toCity'].setValue(toCity);
+      console.log(this.tabForm.value);
+    }
+
     this.getCity();
     this.customerDetails();
     this.destionationDropDown();
-   
+
   }
-  
+
 
   // Load temporary data
   loadTempData() {
@@ -521,12 +552,12 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   }
   //end
   async saveData() {
-   // Remove all form errors
-   const tabcontrols = this.tabForm;
-   clearValidatorsAndValidate(tabcontrols);
-   const contractcontrols = this.contractForm;
-   clearValidatorsAndValidate(contractcontrols);
-   /*End*/
+    // Remove all form errors
+    const tabcontrols = this.tabForm;
+    clearValidatorsAndValidate(tabcontrols);
+    const contractcontrols = this.contractForm;
+    clearValidatorsAndValidate(contractcontrols);
+    /*End*/
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const controlNames = ["svcType", "payType", "rskty", "pkgs", "trn"];
     controlNames.forEach((controlName) => {
@@ -574,7 +605,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     );
     //here the function is calling for add docket Data in docket Tracking.
     if (this.quickDocket) {
-      let id = { isComplete: 1, unloading: 0, lsNo: "", mfNo: "",unloadloc:""};
+      let id = { isComplete: 1, unloading: 0, lsNo: "", mfNo: "", unloadloc: "" };
       let docketDetails = {
         ...this.tabForm.value,
         ...this.contractForm.value,
@@ -582,12 +613,12 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         ...id,
       };
 
-     await addTracking(this.companyCode,this.operationService,docketDetails)
+      await addTracking(this.companyCode, this.operationService, docketDetails)
 
       let reqBody = {
         companyCode: this.companyCode,
         collectionName: "docket",
-        filter:{docketNumber:  this.tabForm.controls["docketNumber"].value},
+        filter: { docketNumber: this.tabForm.controls["docketNumber"].value },
         update: {
           ...docketDetails,
         },
@@ -609,9 +640,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         unloading: 0,
         lsNo: "",
         mfNo: "",
-        entryBy:this.userName,
-        entryDate:new Date().toISOString(),
-        unloadloc:""
+        entryBy: this.userName,
+        entryDate: new Date().toISOString(),
+        unloadloc: ""
       };
       let docketDetails = {
         ...this.tabForm.value,
@@ -619,7 +650,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         ...invoiceDetails,
         ...id,
       };
-      await addTracking(this.companyCode,this.operationService,docketDetails)
+      await addTracking(this.companyCode, this.operationService, docketDetails)
       let reqBody = {
         companyCode: this.companyCode,
         collectionName: "docket",
@@ -675,9 +706,9 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         bcSerialNo: bcSerialNo,
         entryDateTime: entryDateTime,
         bcDockSf: bcDockSf,
-        loc:this.branch,
-        entryBy:this.userName,
-        entryDate:new Date().toISOString()
+        loc: this.branch,
+        entryBy: this.userName,
+        entryDate: new Date().toISOString()
       };
     });
 

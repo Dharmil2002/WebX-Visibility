@@ -4,14 +4,14 @@ import { VehicleTypeMaster } from "src/app/core/models/Masters/vehicle-type-mast
 export class VehicleTypeControl {
     private vehicleTypeControlArray: FormControls[];
     private capacityInfoArray: FormControls[];
-    constructor(vehicleTypeTable: VehicleTypeMaster, IsUpdate: boolean) {
+    constructor(vehicleTypeTable: VehicleTypeMaster, isUpdate: boolean) {
         this.vehicleTypeControlArray = [
             {
                 name: 'vehicleTypeCode',
                 label: 'Vehicle Type Code',
                 placeholder: 'Vehicle Type Code',
                 type: 'text',
-                value: IsUpdate ? vehicleTypeTable.vehicleTypeCode : "System Generated",
+                value: isUpdate ? vehicleTypeTable.vehicleTypeCode : "System Generated",
                 Validations: [],
                 generatecontrol: true,
                 disable: true
@@ -21,7 +21,7 @@ export class VehicleTypeControl {
                 label: 'Vehicle Type Name',
                 placeholder: 'Enter Vehicle Type Name',
                 type: 'text',
-                value: IsUpdate ? vehicleTypeTable.vehicleTypeName : "",
+                value: isUpdate ? vehicleTypeTable.vehicleTypeName : "",
                 Validations: [
                     {
                         name: "required",
@@ -29,7 +29,7 @@ export class VehicleTypeControl {
                     }
                 ],
                 functions: {
-                    // onChange: 'GetVehNameExist'
+                    onChange: 'checkVehicleTypeExist',
                 },
                 generatecontrol: true, disable: false
             },
@@ -37,7 +37,7 @@ export class VehicleTypeControl {
                 name: 'vehicleManufacturerName',
                 label: 'Vehicle Manufacturer Name',
                 placeholder: 'Enter Vehicle Manufacturer Name',
-                type: 'text', value: IsUpdate ? vehicleTypeTable.vehicleManufacturerName : "",
+                type: 'text', value: isUpdate ? vehicleTypeTable.vehicleManufacturerName : "",
                 Validations: [
                     {
                         name: "required",
@@ -55,7 +55,7 @@ export class VehicleTypeControl {
                 name: 'modelNo',
                 label: 'Model No.',
                 placeholder: 'Enter Model No.',
-                type: 'text', value: IsUpdate ? vehicleTypeTable.modelNo : "",
+                type: 'text', value: isUpdate ? vehicleTypeTable.modelNo : "",
                 Validations: [
                     {
                         name: "pattern",
@@ -69,7 +69,7 @@ export class VehicleTypeControl {
                 name: 'vehicleTypeCategory',
                 label: 'Truck/Trailer',
                 placeholder: 'Search And Select Vehicle Type Category',
-                type: 'dropdown', value: '', filterOptions: "", autocomplete: "", displaywith: "",//IsUpdate ? VehicleTypeTable.VehicleTypeCategory : "",
+                type: 'dropdown', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                 Validations: [
                 ],
                 additionalData: {
@@ -82,7 +82,7 @@ export class VehicleTypeControl {
                 label: 'Tyre Rotation at Km',
                 placeholder: 'Enter KM',
                 type: 'number',
-                value: IsUpdate ? vehicleTypeTable.tyreRotationatKm : "",
+                value: isUpdate ? vehicleTypeTable.tyreRotationatKm : "",
                 Validations: [
                     {
                         name: "pattern",
@@ -96,7 +96,7 @@ export class VehicleTypeControl {
                 name: 'typeDescription',
                 label: 'Type Description',
                 placeholder: 'Enter Type Description',
-                type: 'text', value: IsUpdate ? vehicleTypeTable.typeDescription : "",
+                type: 'text', value: isUpdate ? vehicleTypeTable.typeDescription : "",
                 Validations: [
                     {
                         name: "pattern",
@@ -126,7 +126,7 @@ export class VehicleTypeControl {
                 label: 'Tank Capacity(Liters)',
                 placeholder: 'Enter Tank Capacity in Liters',
                 type: 'number',
-                value: IsUpdate ? vehicleTypeTable.tankCapacity : "",
+                value: isUpdate ? vehicleTypeTable.tankCapacity : "",
                 Validations: [
                     {
                         name: "pattern",
@@ -141,7 +141,7 @@ export class VehicleTypeControl {
                 label: 'Active Flag',
                 placeholder: 'Active Flag',
                 type: 'toggle',
-                value: IsUpdate ? vehicleTypeTable.isActive : "",
+                value: isUpdate ? vehicleTypeTable.isActive : "",
                 Validations: [],
                 generatecontrol: true, disable: false
             },
@@ -173,15 +173,15 @@ export class VehicleTypeControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
+                name: 'isUpdate', label: 'isUpdate', placeholder: 'isUpdate', type: 'text', value: false, Validations: [],
                 generatecontrol: false, disable: false
             },
             {
-                name: 'id',
+                name: '_id',
                 label: '',
                 placeholder: '',
                 type: 'text',
-                value: vehicleTypeTable.id,
+                value: vehicleTypeTable._id,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',
@@ -197,7 +197,7 @@ export class VehicleTypeControl {
                     label: 'Gross Vehicle Weight(Tons)',
                     placeholder: 'Enter Gross Vehicle Weight in Tons',
                     type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.grossVehicleWeight : "",
+                    value: isUpdate ? vehicleTypeTable.grossVehicleWeight : "",
                     Validations: [
                         {
                             name: "pattern",
@@ -215,7 +215,7 @@ export class VehicleTypeControl {
                     label: 'Unladen Weight(Tons)',
                     placeholder: 'Enter Unladen Weight in Tons',
                     type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.unladenWeight : "",
+                    value: isUpdate ? vehicleTypeTable.unladenWeight : "",
                     Validations: [
                         {
                             name: "pattern",
@@ -233,38 +233,8 @@ export class VehicleTypeControl {
                     label: 'Weight Capacity(Tons)',
                     placeholder: 'Enter Capacity in Tons',
                     type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.capacity : "",
+                    value: isUpdate ? vehicleTypeTable.capacity : "",
                     Validations: [],
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'ratePerKM',
-                    label: 'Rate per KM(Rs)',
-                    placeholder: 'Enter Rate per KM',
-                    type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.ratePerKM : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Packages(1-100000)",
-                            pattern: '[0-9]{1,5}'
-                        }
-                    ],
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'fuelType',
-                    label: 'Fuel Type',
-                    placeholder: 'Enter Fuel Type',
-                    type: 'text',
-                    value: IsUpdate ? vehicleTypeTable.fuelType : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Fuel Type(1-25 Character)",
-                            pattern: '.{1,25}'
-                        }
-                    ],
                     generatecontrol: true, disable: false
                 },
                 {
@@ -272,7 +242,7 @@ export class VehicleTypeControl {
                     label: 'Length(Ft)',
                     placeholder: 'Enter Length',
                     type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.length : "",
+                    value: isUpdate ? vehicleTypeTable.length : "",
                     Validations: [
                         {
                             name: "pattern",
@@ -290,7 +260,7 @@ export class VehicleTypeControl {
                     label: 'Width(Ft)',
                     placeholder: 'Enter Width',
                     type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.width : "",
+                    value: isUpdate ? vehicleTypeTable.width : "",
                     Validations: [
                         {
                             name: "pattern",
@@ -308,7 +278,7 @@ export class VehicleTypeControl {
                     label: 'Height(Ft)',
                     placeholder: 'Enter Height',
                     type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.height : "",
+                    value: isUpdate ? vehicleTypeTable.height : "",
                     Validations: [
                         {
                             name: "pattern",
@@ -326,16 +296,46 @@ export class VehicleTypeControl {
                     label: 'Total Volume (CFT)',
                     placeholder: 'Enter Total Volume',
                     type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.capacityDiscount : "",
+                    value: isUpdate ? vehicleTypeTable.capacityDiscount : "",
                     Validations: [],
                     generatecontrol: true, disable: true
+                },
+                {
+                    name: 'ratePerKM',
+                    label: 'Rate per KM(Rs)',
+                    placeholder: 'Enter Rate per KM',
+                    type: 'number',
+                    value: isUpdate ? vehicleTypeTable.ratePerKM : "",
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter Proper Packages(1-100000)",
+                            pattern: '[0-9]{1,5}'
+                        }
+                    ],
+                    generatecontrol: true, disable: false
+                },
+                {
+                    name: 'fuelType',
+                    label: 'Fuel Type',
+                    placeholder: 'Enter Fuel Type',
+                    type: 'text',
+                    value: isUpdate ? vehicleTypeTable.fuelType : "",
+                    Validations: [
+                        {
+                            name: "pattern",
+                            message: "Please Enter Proper Fuel Type(1-25 Character)",
+                            pattern: '.{1,25}'
+                        }
+                    ],
+                    generatecontrol: true, disable: false
                 },
                 {
                     name: 'tyreRotationAlertKMs',
                     label: 'Tyre Rotation Alert KMs',
                     placeholder: 'Enter KM',
                     type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.tyreRotationAlertKMs : "",
+                    value: isUpdate ? vehicleTypeTable.tyreRotationAlertKMs : "",
                     Validations: [
                         {
                             name: "pattern",
@@ -350,7 +350,7 @@ export class VehicleTypeControl {
                     label: 'No. Of Packages',
                     placeholder: 'Enter No. Of Packages',
                     type: 'number',
-                    value: IsUpdate ? vehicleTypeTable.noOfPackages : "",
+                    value: isUpdate ? vehicleTypeTable.noOfPackages : "",
                     Validations: [
                         {
                             name: "pattern",
@@ -361,7 +361,7 @@ export class VehicleTypeControl {
                     generatecontrol: true, disable: false
                 },
                 {
-                    name: 'isUpdate', label: 'IsUpdate', placeholder: 'IsUpdate', type: 'text', value: false, Validations: [],
+                    name: 'isUpdate', label: 'isUpdate', placeholder: 'isUpdate', type: 'text', value: false, Validations: [],
                     generatecontrol: false, disable: false
                 }
             ]

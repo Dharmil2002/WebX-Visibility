@@ -59,8 +59,6 @@ export class GeneralMasterListComponent implements OnInit {
               srNo: index + 1
             };
           });
-          console.log(res);
-          
           this.csv = dataWithSrno
           this.tableLoad = false;
         }

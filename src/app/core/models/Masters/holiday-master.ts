@@ -16,7 +16,7 @@ export class Holiday
             this.holidayNote=Holiday.holidayNote??"";
             this.isActive=Holiday.isActive??false;
             this.DateType=Holiday.type??"";
-            this.Id=Holiday.id??""
+            this.Id=Holiday._id??""
         }
         else
         {

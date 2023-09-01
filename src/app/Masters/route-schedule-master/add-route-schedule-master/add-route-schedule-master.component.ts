@@ -216,10 +216,10 @@ export class AddRouteScheduleMasterComponent implements OnInit {
     }
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "route_schedule_details"
+      filter: {},
+      "collectionName": "route_schedule_details"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
@@ -233,7 +233,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
             return routeCode;
           }
           if (this.isUpdate) {
-            this.newRouteCode = this.data.id
+            this.newRouteCode = this.data._id
           } else {
             this.newRouteCode = generateRouteCode(lastRouteCode);
           }
@@ -246,7 +246,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
             applyDate: this.datePipe.transform(this.routeScheduleTableForm.value.applyFrom, "dd-MM-yyyy"),
             scheduleType: this.routeScheduleTableForm.value.scheduleType,
             isActive: this.routeScheduleTableForm.value.isActive,
-            id: this.newRouteCode,
+            _id: this.newRouteCode,
             routeCode: this.tableData.map((item) => item.routeCode),
             weekDay: this.tableData.map((item) => parseInt(item.weekDay)),
             time: this.tableData.map((item) => new Date(item.time).toLocaleTimeString(undefined, options as Intl.DateTimeFormatOptions)),
@@ -259,17 +259,16 @@ export class AddRouteScheduleMasterComponent implements OnInit {
           };
 
           if (this.isUpdate) {
-            let id = transformedData.id;
+            let id = transformedData._id;
             // Remove the "id" field from the form controls
-            delete transformedData.id;
+            delete transformedData._id;
             let req = {
               companyCode: parseInt(localStorage.getItem("companyCode")),
-              type: "masters",
-              collection: "route_schedule_details",
-              id: id,
-              updates: transformedData
+              collectionName: "route_schedule_details",
+              filter: { _id: id },
+              update: transformedData
             };
-            this.masterService.masterPut('common/update', req).subscribe({
+            this.masterService.masterPut('generic/update', req).subscribe({
               next: (res: any) => {
                 if (res) {
                   // Display success message
@@ -286,11 +285,10 @@ export class AddRouteScheduleMasterComponent implements OnInit {
           } else {
             let req = {
               companyCode: parseInt(localStorage.getItem("companyCode")),
-              type: "masters",
-              collection: "route_schedule_details",
+              collectionName: "route_schedule_details",
               data: transformedData
             };
-            this.masterService.masterPost('common/create', req).subscribe({
+            this.masterService.masterPost('generic/create', req).subscribe({
               next: (res: any) => {
                 if (res) {
                   // Display success message
@@ -452,34 +450,34 @@ export class AddRouteScheduleMasterComponent implements OnInit {
     // Prepare the requests for different collections
     let routeReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "routeMasterLocWise"
+      filter: {},
+      "collectionName": "routeMasterLocWise"
     };
 
     let vehicleReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "vehicle_detail"
+      filter: {},
+      "collectionName": "vehicle_detail"
     };
 
     let vendorReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "vendor_detail"
+      filter: {},
+      "collectionName": "vendor_detail"
     };
 
     let vehicleTypeReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "type": "masters",
-      "collection": "vehicleType_detail"
+      filter: {},
+      "collectionName": "vehicleType_detail"
     };
 
     // Use forkJoin to make parallel requests and get all data at once
     forkJoin([
-      this.masterService.masterPost('common/getall', routeReq),
-      this.masterService.masterPost('common/getall', vehicleReq),
-      this.masterService.masterPost('common/getall', vendorReq),
-      this.masterService.masterPost('common/getall', vehicleTypeReq)
+      this.masterService.masterPost('generic/get', routeReq),
+      this.masterService.masterPost('generic/get', vehicleReq),
+      this.masterService.masterPost('generic/get', vendorReq),
+      this.masterService.masterPost('generic/get', vehicleTypeReq)
     ]).pipe(
       map(([routeRes, vehicleRes, vendorRes, vehicleTypeRes]) => {
         // Combine all the data into a single object

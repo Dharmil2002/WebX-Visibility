@@ -68,10 +68,10 @@ export class RouteScheduleMasterListComponent implements OnInit {
   getRouteScheduleDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "route_schedule_details"
+      filter: {},
+      "collectionName": "route_schedule_details"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array

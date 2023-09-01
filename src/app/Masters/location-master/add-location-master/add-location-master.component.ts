@@ -216,32 +216,30 @@ export class AddLocationMasterComponent implements OnInit {
     };
     Object.values(this.locationTableForm.controls).forEach(control => control.setErrors(null));
     if (this.isUpdate) {
-      const id = this.locationTableForm.value.id;
-      this.locationTableForm.removeControl("id");
+      const id = this.locationTableForm.value._id;
+      this.locationTableForm.removeControl("_id");
 
       const req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "location_detail",
-        id: id,
-        updates: this.locationTableForm.value
+        collectionName: "location_detail",
+        filter: { _id: id },
+        update: this.locationTableForm.value
       };
 
-      this.masterService.masterPut('common/update', req).pipe(takeUntil(this.unsubscribe$)).subscribe({
+      this.masterService.masterPut('generic/update', req).pipe(takeUntil(this.unsubscribe$)).subscribe({
         next: onSuccess
       });
 
     } else {
-      this.locationTableForm.controls['id'].setValue(this.locationTableForm.controls['locCode'].value);
+      this.locationTableForm.controls['_id'].setValue(this.locationTableForm.controls['locCode'].value);
 
       const createReq = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "location_detail",
+        collectionName: "location_detail",
         data: this.locationTableForm.value
       };
 
-      this.masterService.masterPost('common/create', createReq).pipe(takeUntil(this.unsubscribe$)).subscribe({
+      this.masterService.masterPost('generic/create', createReq).pipe(takeUntil(this.unsubscribe$)).subscribe({
         next: onSuccess
       });
     }
@@ -267,22 +265,22 @@ export class AddLocationMasterComponent implements OnInit {
     try {
       const locationReqBody = {
         "companyCode": this.companyCode,
-        "type": "masters",
-        "collection": "location_detail"
+        filter: {},
+        "collectionName": "location_detail"
       }
       const pincodeReqBody = {
         "companyCode": this.companyCode,
-        "type": "masters",
-        "collection": "pincode_detail"
+        filter: {},
+        "collectionName": "pincode_detail"
       }
       const generalReqBody = {
         "companyCode": this.companyCode,
-        "type": "masters",
-        "collection": "General_master"
+        filter: {},
+        "collectionName": "General_master"
       }
-      this.locationResponse = await this.masterService.masterPost('common/getall', locationReqBody).toPromise();
-      this.pincodeResponse = await this.masterService.masterPost('common/getall', pincodeReqBody).toPromise();
-      const generalResponse = await this.masterService.masterPost('common/getall', generalReqBody).toPromise();
+      this.locationResponse = await this.masterService.masterPost('generic/get', locationReqBody).toPromise();
+      this.pincodeResponse = await this.masterService.masterPost('generic/get', pincodeReqBody).toPromise();
+      const generalResponse = await this.masterService.masterPost('generic/get', generalReqBody).toPromise();
       this.locationFilterResponse = this.locationResponse.data.filter(item => item.activeFlag).map(element => ({
         name: element.locName,
         value: element.locCode,
@@ -378,10 +376,10 @@ export class AddLocationMasterComponent implements OnInit {
   checkLocationCodeExist() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "location_detail"
+      filter: {},
+      "collectionName": "location_detail"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array

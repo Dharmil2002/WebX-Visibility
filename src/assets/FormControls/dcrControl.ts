@@ -171,7 +171,7 @@ export class DCRControl {
                         showNameAndValue: false
                     },
                     generatecontrol: false,
-                    disable: true
+                    disable: false
                 },
 
             ],

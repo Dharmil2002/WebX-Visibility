@@ -33,7 +33,7 @@ export class vehicleModel {
     innerDimension: string;
     outerDimension: string;
     payloadCapacity: string;
-    id: number;
+    _id: string;
     entryBy: string;
     entryDate = new Date();
     updateBy: string;
@@ -46,27 +46,27 @@ export class vehicleModel {
     approvedBy: any;
     vendcode: any;
     vehno: any;
-    noOfDrivers: any;
-    vehregno: any;
-    permitValidityDate: any;
-    insuranceValidityDate: any;
-    unldWt: any;
-    gvw: any;
-    gpsDeviceId: any;
-    capacity: any;
-    fitnessValidityDate: any;
-    attachedDate: any;
-    rate_km: number;
-    innerLength: number;
-    innerHeight: number;
-    innerWidth: number;
-    cft: number;
-    route: any;
-    outerCft: number;
-    noOfPackages: any;
-    approvedOn: any;
-    startDateOfService: any;
-    date = new Date()
+    noOfDrivers:any;
+    vehregno:any;
+    permitValidityDate:any;
+    insuranceValidityDate:any;
+    unldWt:any;
+    gvw:any;
+    gpsDeviceId:any;
+    capacity:any;
+    fitnessValidityDate:any;
+    attachedDate:any;
+    rate_km:number;
+    innerLength:number;
+    innerHeight:number;
+    innerWidth:number;
+    cft:number;
+    route:any;
+    outerCft :number;
+    noOfPackages:any;
+    approvedOn:any;
+    startDateOfService:any;
+    date=new Date()
     controllBranch: any;
     assetName: any;
     vehicleType: any;
@@ -77,13 +77,13 @@ export class vehicleModel {
     vehicleInsurenceNo: any;
     rtoNo: any;
     outerLength: number;
-    outerHeigth: number;
+    outerHeight: number;
     outerWidth: number;
     regNo: any;
     permitState: any;
     tyreAttached: any;
     tankCapacity: any;
-    constructor(vehicleModel) {
+    constructor(vehicleModel){
         this.vehregno = vehicleModel.vehregno || '';
         this.vehicleType = vehicleModel.vehicleType || '';
         this.controllBranch = vehicleModel.controllBranch || '';
@@ -100,12 +100,12 @@ export class vehicleModel {
         this.cft = vehicleModel.cft || 0;
         this.outerCft = vehicleModel.outerCft || 0;
         this.outerLength = vehicleModel.outerLength || 0;
-        this.outerHeigth = vehicleModel.outerHeigth || 0;
+        this.outerHeight = vehicleModel.outerHeight || 0;
         this.outerWidth = vehicleModel.outerWidth || 0;
         this.approvedOn = vehicleModel.approvedOn || this.date;
         this.startDateOfService = vehicleModel.startDateOfService || this.date;
         this.approvedBy = vehicleModel.approvedBy || '';
-        this.activeflag = vehicleModel.activeflag || false;
+        this.activeflag = vehicleModel.activeflag|| false;
         this.blackListed = vehicleModel.blackListed || false;
     }
 }

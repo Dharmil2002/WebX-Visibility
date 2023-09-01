@@ -7,7 +7,6 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { NgApexchartsModule } from "ng-apexcharts";
 import { NgModule } from "@angular/core";
-
 import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { NgxEchartsModule } from "ngx-echarts";
 import { NgxGaugeModule } from "ngx-gauge";
@@ -21,7 +20,6 @@ import { MatTableExporterModule } from "mat-table-exporter";
 import { MatSortModule } from "@angular/material/sort";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { LoadPlanningComponent } from './load-planning/load-planning.component';
 import { DocketDashboardComponent } from './docket-dashboard/docket-dashboard.component';
 import { DashboardPageComponent } from './dashboard-page/dashboard-page.component';
 import { MatTabsModule } from "@angular/material/tabs";
@@ -44,10 +42,10 @@ import { PodCodDashboardPageComponent } from './tabs/pod-cod-dashboard-page/pod-
 import { PrqSummaryPageComponent } from './tabs/prq-summary-page/prq-summary-page.component';
 import { JobSummaryPageComponent } from './tabs/job-summary-page/job-summary-page.component';
 import { RakeUpdateComponent } from "../operation/rake-update/rake-update.component";
+import { JobTrackerComponent } from './tabs/job-tracker/job-tracker.component';
 
 @NgModule({
   declarations: [
-    LoadPlanningComponent,
     DocketDashboardComponent,
     DashboardPageComponent,
     DashboardCountPageComponent,
@@ -62,7 +60,8 @@ import { RakeUpdateComponent } from "../operation/rake-update/rake-update.compon
     PodCodDashboardPageComponent,
     PrqSummaryPageComponent,
     JobSummaryPageComponent,
-    RakeUpdateComponent
+    RakeUpdateComponent,
+    JobTrackerComponent
 
   ],
   imports: [

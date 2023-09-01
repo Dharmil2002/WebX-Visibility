@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
     <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
-        [csvHeaders]="headerForCsv" [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)"
+        [csvHeaders]="headerForCsv" [csvFileName]="csvFileName" (onFlagChange)="isActiveFuntion($event)"
         [metaData]="METADATA" [Link]="linkArray" [viewComponent]="viewComponent" [toggleArray]="toggleArray"
         [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
         [dynamicControls]="dynamicControls" [addAndEditPath]="addAndEditPath">

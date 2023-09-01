@@ -38,7 +38,7 @@ export class VehicleTypeMaster {
   unladenWeight: any
   ratePerKM: any
   fuelType: any
-  id: any
+  _id: string
   constructor(vehicleTypeMaster) {
     {
       this.vehicleTypeCode = vehicleTypeMaster.vehicleTypeCode || '';

@@ -63,27 +63,26 @@ export class GeneralMasterAddComponent implements OnInit {
     this.generalTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
   }
   cancel() {
-    if(this.isUpdate){
+    if (this.isUpdate) {
       this.dialogRef.close(this.generalTableForm);
     }
-    else{
+    else {
       this.dialogRef.close(this.generalTabledata);
     }
   }
   //#region Save Function
   save() {
     if (this.isUpdate) {
-      let id = this.generalTableForm.value.id;
+      let id = this.generalTableForm.value._id;
       // Remove the "id" field from the form controls
-      this.generalTableForm.removeControl("id");
+      this.generalTableForm.removeControl("_id");
       let req = {
         companyCode: this.companyCode,
-        type: "masters",
-        collection: "General_master",
-        id: id,
-        updates: this.generalTableForm.value
+        collectionName: "General_master",
+        filter: { _id: id },
+        update: this.generalTableForm.value
       };
-      this.masterService.masterPut('common/update', req).subscribe({
+      this.masterService.masterPut('generic/update', req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message
@@ -100,10 +99,10 @@ export class GeneralMasterAddComponent implements OnInit {
     } else {
       let req = {
         companyCode: parseInt(localStorage.getItem("companyCode")),
-        "type": "masters",
-        "collection": "General_master"
+        "collectionName": "General_master",
+        "filter": {}
       }
-      this.masterService.masterPost('common/getall', req).subscribe({
+      this.masterService.masterPost('generic/get', req).subscribe({
         next: (res: any) => {
           if (res) {
             const lastCodeWithType = res.data
@@ -122,16 +121,17 @@ export class GeneralMasterAddComponent implements OnInit {
               return generalCode;
             }
             this.newGeneralId = generateGeneralCode(lastGeneralCode, this.generalTabledata);
-            this.generalTableForm.controls["id"].setValue(this.newGeneralId)
+            this.generalTableForm.controls["_id"].setValue(this.newGeneralId)
             this.generalTableForm.controls["codeId"].setValue(this.newGeneralId)
             this.generalTableForm.controls["codeType"].setValue(this.generalTabledata);
             let req = {
               companyCode: this.companyCode,
-              type: "masters",
-              collection: "General_master",
+              collectionName: "General_master",
               data: this.generalTableForm.value,
             };
-            this.masterService.masterPost('common/create', req).subscribe({
+            console.log(req);
+
+            this.masterService.masterPost('generic/create', req).subscribe({
               next: (res: any) => {
                 if (res) {
                   // Display success message

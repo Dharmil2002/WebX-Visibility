@@ -4,18 +4,13 @@ export class GeneralMaster {
     activeFlag: string;
     updateBy: string;
     entryBy: string;
-    id:string;
-
+    _id: string;
     generalcode: string
-    //HeaderCode: string;
-    headerCode:string;
-    headerDesc:string;
-    codeType:string;
+    headerCode: string;
+    headerDesc: string;
+    codeType: string;
     isActive: any;
-   // CodeId: string;
-    //CodeDesc: string;
-    //IsEwayBillExempted: any;
-    item:any;
+    item: any;
     constructor(GeneralMaster) {
         {
             this.codeId = GeneralMaster.codeDesc || '';

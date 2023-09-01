@@ -87,7 +87,7 @@ export class CityLocationMappingControl {
                 }
             },
             {
-                name: 'active', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: '', generatecontrol: false, disable: false,
+                name: 'isActive', label: 'Active Flag', placeholder: '', type: 'toggle', value: '', generatecontrol: false, disable: false,
                 Validations: []
             },
             {
@@ -112,7 +112,7 @@ export class CityLocationMappingControl {
                 generatecontrol: false,
                 disable: true
             }, {
-                name: 'id',
+                name: '_id',
                 label: '',
                 placeholder: '',
                 type: 'text',

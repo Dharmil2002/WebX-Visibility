@@ -5,11 +5,9 @@ import { PincodeMaster } from "src/app/core/models/Masters/PinCode Master/PinCod
 import { UntypedFormGroup, UntypedFormBuilder } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { utilityService } from 'src/app/Utility/utility.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { PincodeControl } from "src/assets/FormControls/pincodeMaster";
 import Swal from "sweetalert2";
-
 
 @Component({
     selector: 'app-add-pincode-master',
@@ -48,7 +46,7 @@ export class AddPinCodeMasterComponent implements OnInit {
     }
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: any, private route: Router, private fb: UntypedFormBuilder,
-        private filter: FilterUtils, private service: utilityService, private masterService: MasterService) {
+         private filter: FilterUtils,  private masterService: MasterService) {
         if (this.route.getCurrentNavigation()?.extras?.state?.data != null) {
             this.data = this.route.getCurrentNavigation().extras.state.data;
             this.action = 'edit';
@@ -73,9 +71,7 @@ export class AddPinCodeMasterComponent implements OnInit {
                 },
             ];
         }
-
         this.initializeFormControl();
-
     }
 
     initializeFormControl() {
@@ -106,14 +102,14 @@ export class AddPinCodeMasterComponent implements OnInit {
     dataExist() {
         let req = {
             companyCode: this.companyCode,
-            type: "masters",
-            collection: "pincode_detail"
+            collectionName: "pincode_detail",
+            filter: {}
         };
-        this.masterService.masterPost('common/getall', req).subscribe({
+        this.masterService.masterPost("generic/get", req).subscribe({
             next: (res: any) => {
                 // Check if the Pincode already exists in this.data
                 const pincodeExists = res.data.some((pincode) => pincode.pincode === this.pincodeTableForm.value.pincode
-                   );
+                );
                 if (pincodeExists) {
                     // Show the popup indicating that the pincode already exists
                     Swal.fire({
@@ -126,7 +122,6 @@ export class AddPinCodeMasterComponent implements OnInit {
                         confirmButtonText: "OK"
                     });
                     this.pincodeTableForm.controls["pincode"].reset();
-                    
                 }
             },
             error: (err: any) => {
@@ -136,64 +131,59 @@ export class AddPinCodeMasterComponent implements OnInit {
         });
     }
 
-    getStateData() {
+    async getStateData() {
         let req = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "state_detail"
+            companyCode: this.companyCode,
+            collectionName: "state_detail",
+            filter: {}
         };
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
-                const stateList = res.data.map(element => ({
-                    name: element.stateName,
-                    value: element.id
-                }));
-                if (this.isUpdate) {
-                    this.stateData = stateList.find((x) => x.name == this.data.state);
-                    this.pincodeTableForm.controls.state.setValue(this.stateData);
-                }
-                this.filter.Filter(
-                    this.jsonControlArray,
-                    this.pincodeTableForm,
-                    stateList,
-                    this.stateList,
-                    this.stateStatus
-                );
-            }
-        });
+        const res = await this.masterService.masterPost("generic/get", req).toPromise();
+        const stateList = res.data.map(element => ({
+            name: element.stateName,
+            value: element._id
+        }));
+        if (this.isUpdate) {
+            this.stateData = stateList.find((x) => x.name == this.data.state);
+            this.pincodeTableForm.controls.state.setValue(this.stateData);
+        }
+        this.filter.Filter(
+            this.jsonControlArray,
+            this.pincodeTableForm,
+            stateList,
+            this.stateList,
+            this.stateStatus
+        );
     }
 
-    getCityList() {
+    async getCityList() {
         let req = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "city_detail"
+            companyCode: this.companyCode,
+            collectionName: "city_detail",
+            filter: {}
         };
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
-                const cityList = res.data.map(element => ({
-                    name: element.cityName,
-                    value: element.id
-                }));
-                if (this.isUpdate) {
-                    this.cityData = cityList.find((x) => x.name == this.data.city);
-                    this.pincodeTableForm.controls.city.setValue(this.cityData);
-                }
-                this.filter.Filter(
-                    this.jsonControlArray,
-                    this.pincodeTableForm,
-                    cityList,
-                    this.cityList,
-                    this.cityStatus
-                );
-            }
-        });
+        const res = await this.masterService.masterPost("generic/get", req).toPromise();
+        const cityList = res.data.map(element => ({
+            name: element.cityName,
+            value: element._id
+        }));
+        if (this.isUpdate) {
+            this.cityData = cityList.find((x) => x.name == this.data.city);
+            this.pincodeTableForm.controls.city.setValue(this.cityData);
+        }
+        this.filter.Filter(
+            this.jsonControlArray,
+            this.pincodeTableForm,
+            cityList,
+            this.cityList,
+            this.cityStatus
+        );
     }
 
     cancel() {
         window.history.back();
-      }
-    save() {
+    }
+
+    async save() {
         this.pincodeTableForm.controls["state"].setValue(this.pincodeTableForm.value.state.name);
         this.pincodeTableForm.controls["city"].setValue(this.pincodeTableForm.value.city.name);
         this.pincodeTableForm.controls["pincodeCategory"].setValue(this.pincodeTableForm.value.pincodeCategory);
@@ -203,53 +193,47 @@ export class AddPinCodeMasterComponent implements OnInit {
         this.pincodeTableForm.removeControl("companyCode");
 
         if (this.isUpdate) {
-            let id = this.pincodeTableForm.value.id;
+            let id = this.pincodeTableForm.value._id;
             // Remove the "id" field from the form controls
-            this.pincodeTableForm.removeControl("id");
+            this.pincodeTableForm.removeControl("_id");
             let req = {
                 companyCode: this.companyCode,
-                type: "masters",
-                collection: "pincode_detail",
-                id: this.data.id,
-                updates: this.pincodeTableForm.value
+                collectionName: "pincode_detail",
+                filter: {
+                    _id: id,
+                },
+                update: this.pincodeTableForm.value
             };
-            this.masterService.masterPut('common/update', req).subscribe({
-                next: (res: any) => {
-                    if (res) {
-                        // Display success message
-                        Swal.fire({
-                            icon: "success",
-                            title: "Successful",
-                            text: res.message,
-                            showConfirmButton: true,
-                        });
-                        this.route.navigateByUrl('/Masters/PinCodeMaster/PinCodeMasterList');
-                    }
-                }
-            });
+            const res = await this.masterService.masterPut("generic/update", req).toPromise()
+            if (res) {
+                // Display success message
+                Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                });
+                this.route.navigateByUrl('/Masters/PinCodeMaster/PinCodeMasterList');
+            }
+
         } else {
-           // const randomNumber = getShortName(this.pincodeTableForm.value.city);
-            this.pincodeTableForm.controls["id"].setValue(this.pincodeTableForm.value.pincode);
+            this.pincodeTableForm.controls["_id"].setValue(this.pincodeTableForm.value.pincode);
             let req = {
                 companyCode: this.companyCode,
-                type: "masters",
-                collection: "pincode_detail",
+                collectionName: "pincode_detail",
                 data: this.pincodeTableForm.value
             };
-            this.masterService.masterPost('common/create', req).subscribe({
-                next: (res: any) => {
-                    if (res) {
-                        // Display success message
-                        Swal.fire({
-                            icon: "success",
-                            title: "Successful",
-                            text: res.message,
-                            showConfirmButton: true,
-                        });
-                        this.route.navigateByUrl('/Masters/PinCodeMaster/PinCodeMasterList');
-                    }
-                }
-            });
+            const res = await this.masterService.masterPost("generic/create", req).toPromise()
+            if (res) {
+                // Display success message
+                Swal.fire({
+                    icon: "success",
+                    title: "Successful",
+                    text: res.message,
+                    showConfirmButton: true,
+                });
+                this.route.navigateByUrl('/Masters/PinCodeMaster/PinCodeMasterList');
+            }
         }
     }
 

@@ -78,6 +78,13 @@
                             <app-rake-update *ngIf="myTabGroup.selectedIndex== 8"
                                 (CurrentIndex)="GetSelectedIndex($event)"></app-rake-update>
                         </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                              Job Tracker
+                            </ng-template>
+                            <app-job-tracker *ngIf="myTabGroup.selectedIndex== 9"
+                                (CurrentIndex)="GetSelectedIndex($event)"></app-job-tracker>
+                        </mat-tab>
                     </mat-tab-group>
                 </div>
             </div>

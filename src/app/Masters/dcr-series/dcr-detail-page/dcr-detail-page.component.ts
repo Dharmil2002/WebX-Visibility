@@ -175,7 +175,6 @@ export class DcrDetailPageComponent implements OnInit {
       };
       Object.keys(mappings).forEach(key => {
         let value = '';
-
         switch (key) {
           case 'seriesStartEnd':
             value = series;
@@ -190,12 +189,11 @@ export class DcrDetailPageComponent implements OnInit {
             value = hierarchyLoc ? hierarchyLoc.reportLevel : '';
             break;
           case 'usedLeaves':
-            value = this.data?.usedLeaves || '';
+            value = this.data?.usedLeaves;
             break;
           default:
             value = this.data?.[mappings[key]] || '';
         }
-
         this.dcrDetailForm.controls[key].setValue(value);
       });
 

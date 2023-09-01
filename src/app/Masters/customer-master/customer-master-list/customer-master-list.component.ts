@@ -45,16 +45,15 @@ export class CustomerMasterListComponent implements OnInit {
     this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
   }
   ngOnInit(): void {
-    //throw new Error("Method not implemented.");
     this.getCustomerDetails();
   }
   getCustomerDetails() {
     let req = {
       "companyCode": this.companyCode,
-      "type": "masters",
-      "collection": "customer_detail"
+      "filter": {},
+      "collectionName": "customer_detail"
     }
-    this.masterService.masterPost('common/getall', req).subscribe({
+    this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
@@ -72,29 +71,29 @@ export class CustomerMasterListComponent implements OnInit {
     })
   }
   IsActiveFuntion(det) {
-    let id = det.id;
+    let id = det._id;
     // Remove the "id" field from the form controls
-    delete det.id;
-  //  delete det.srNo;
+    delete det._id;
+    delete det.srNo;
     let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        type: "masters",
-        collection: "customer_detail",
-        id: id,
-        updates: det
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      collectionName: "customer_detail",
+      filter: { _id: id },
+      update: det
     };
-    this.masterService.masterPut('common/update', req).subscribe({
-        next: (res: any) => {
-            if (res) {
-                // Display success message
-                Swal.fire({
-                    icon: "success",
-                    title: "Successful",
-                    text: res.message,
-                    showConfirmButton: true,
-                });
-            }
+    this.masterService.masterPut('generic/update', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.getCustomerDetails();
         }
+      }
     });
-}
+  }
 }

@@ -8,7 +8,7 @@ export class PincodeMaster {
   activeFlag: string;
   statename: any;
   isActive: any;
-    id: any
+    _id: any
 
   constructor(PincodeMaster) {
     {

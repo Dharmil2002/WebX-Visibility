@@ -138,7 +138,7 @@ export class HolidayControl {
                 ],
               },
               {
-                name: 'id',
+                name: '_id',
                 label: '',
                 placeholder: '',
                 type: 'text',

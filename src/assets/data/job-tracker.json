@@ -1,0 +1,41 @@
+{"data":[
+  {
+    "SLNo": 1,
+    "JobNo":"J-1",
+    "JobDate":"15 Aug 2023",
+    "Jobtype":"Import",
+    "BillingParty":"ABC Limited",
+    "FromCity":"Kolkata",
+    "ToCity":"Patna",
+    "JobLocation":"CCU",
+    "NoofPkgs": 1000,
+    "VehicleSize":"20 Ft",
+    "CHAAmount": 4000,
+    "CHADate":"23 Aug 2023",
+    "NoofVoucher": 4,
+    "VoucherAmount": 6000,
+    "VendorBillAmount": 1500,
+    "CustomerBillAmount": 0,
+    "CurrentStatus":"In-Transit between CCU to NAG"
+  },
+  {
+    "SLNo": 2,
+    "JobNo":"J-2",
+    "JobDate":"15 Aug 2023",
+    "Jobtype":"Export",
+    "BillingParty":"XYZ Limited",
+    "FromCity":"Kolkata",
+    "ToCity":"Nagpur",
+    "JobLocation":"CCU",
+    "NoofPkgs": 950,
+    "VehicleSize":"40 Ft",
+    "CHAAmount": 2000,
+    "CHADate":"23 Aug 2023",
+    "NoofVoucher": 1,
+    "VoucherAmount": 2000,
+    "VendorBillAmount": 1000,
+    "CustomerBillAmount": 2000,
+    "CurrentStatus":"Awaiting for Rake En"
+  }
+ ]
+}

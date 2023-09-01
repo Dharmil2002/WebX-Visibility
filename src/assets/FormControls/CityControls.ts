@@ -10,7 +10,7 @@ export class CityControl {
         label: 'City Code',
         placeholder: 'City Code',
         type: 'text',
-        value: IsUpdate? CityTable.id: "System Generated",
+        value: IsUpdate? CityTable._id: "System Generated",
         filterOptions: '',
         autocomplete: '',
         displaywith: '',
@@ -90,11 +90,11 @@ export class CityControl {
         name: 'isActive', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: CityTable.isActive, generatecontrol: true, disable: false,
         Validations: []
       }, {
-              name: 'id',
+              name: '_id',
               label: '',
               placeholder: '',
               type: 'text',
-              value: CityTable.id,
+              value: CityTable._id,
               filterOptions: '',
               autocomplete: '',
               displaywith: '',

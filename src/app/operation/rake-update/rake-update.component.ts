@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { rakeUpdateDetail } from './rake-update-utility';
+import { getGeneric, rakeFieldMapping } from './rake-update-utility';
 
 @Component({
   selector: 'app-rake-update',
@@ -149,9 +149,10 @@ export class RakeUpdateComponent implements OnInit {
     ];
   }
   async getRakeDetail(){
-   
-    const detail= await rakeUpdateDetail(this.masterService) ;
-    this.tableData=detail;
+    const detail= await getGeneric(this.masterService,"rake_detail") ;
+    const jobDetail= await getGeneric(this.masterService,"job_detail") ;
+    const rakeDetail=await rakeFieldMapping(detail,jobDetail);
+    this.tableData=rakeDetail;
     this.tableLoad=false;
   }
 

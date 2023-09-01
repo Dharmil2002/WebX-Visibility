@@ -7,7 +7,7 @@ export class CityMaster {
   zoneName: string;
   isActive: boolean;
   companyId: any;
-  id: any;
+  _id: any;
   srNo: any;
   state: any;
   zone: any;

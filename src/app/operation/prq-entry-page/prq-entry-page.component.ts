@@ -2,15 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { PrqEntryControls } from 'src/assets/FormControls/prq-entry';
-import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { processProperties } from 'src/app/Masters/processUtility';
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { getCity } from '../quick-booking/quick-utility';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-import { addPrqData, showConfirmationDialog, updatePrqStatus } from './prq-utitlity';
+import { addPrqData, customerFromApi, locationFromApi, showConfirmationDialog } from './prq-utitlity';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
+import { prqDetail } from 'src/app/core/models/operations/prq/prq';
+import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 
 @Component({
   selector: 'app-prq-entry-page',
@@ -36,6 +37,9 @@ export class PrqEntryPageComponent implements OnInit {
   prqRaiseOnStatus: boolean;
   transMode: string;
   transModeStatus: boolean;
+  isUpdate: boolean;
+  prqBranchCode:string;
+  prqBranchStatus:boolean;
   breadScrums = [
     {
       title: "PRQ Entry",
@@ -43,42 +47,41 @@ export class PrqEntryPageComponent implements OnInit {
       active: "PRQ Entry",
     },
   ];
-  prqDetail: any;
+  prqDetail: prqDetail;
   isConfirm: boolean;
   constructor(private fb: UntypedFormBuilder, private masterService: MasterService,
     private filter: FilterUtils, private router: Router) {
-    if (this.router.getCurrentNavigation()?.extras?.state != null) {
+      this.prqDetail = new prqDetail({});
+      if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.prqDetail = router.getCurrentNavigation().extras.state.data.columnData;
-      if (this.prqDetail.Action === "Confirm") {
-        const tabIndex = 6; // Adjust the tab index as needed
-        showConfirmationDialog(this.prqDetail, masterService, this.goBack.bind(this), tabIndex);
-      }
-      else if(this.prqDetail.Action === "Assign Vehicle") {
+  
+      if (this.prqDetail.Action === "Assign Vehicle") {
         this.masterService.setassignVehicleDetail(this.prqDetail);
         this.router.navigate(['/Operation/AssignVehicle'], {
           state: {
             data: this.prqDetail,
-  
+
           },
         });
       }
-      else if(this.prqDetail.Action === "Create Docket"){
+      else if (this.prqDetail.Action === "Create Docket") {
         this.router.navigate(['/Masters/Docket/EwayBillDocketBookingV2'], {
           state: {
             data: this.prqDetail,
-  
+
           },
         });
       }
       else {
+        this.isUpdate = true;
         this.isConfirm = true
         this.initializeFormControl();
       }
-      
+
     }
     else {
       this.isConfirm = true
-     this.initializeFormControl();
+      this.initializeFormControl();
 
     }
   }
@@ -87,10 +90,24 @@ export class PrqEntryPageComponent implements OnInit {
     this.bindDropDown();
     this.getCity();
     this.getCustomerDetails();
+    this.autoFill();
+    this.binDataFromDropdown();
+  }
+
+
+  autoFill() {
+
+    if (this.isUpdate) {
+      this.prqEntryTableForm.controls['transMode'].setValue(this.prqDetail.transMode);
+      this.prqEntryTableForm.controls['vehicleSize'].setValue(this.prqDetail?.vehicleSize?.split("-")[0] ?? '');
+      this.prqEntryTableForm.controls['fromCity'].setValue({ name: this.prqDetail.fromCity, value: this.prqDetail.fromCity });
+      this.prqEntryTableForm.controls['toCity'].setValue({ name: this.prqDetail.toCity, value: this.prqDetail.toCity });
+      this.prqEntryTableForm.controls['billingParty'].setValue({ name: this.prqDetail.billingParty, value: this.prqDetail.billingParty });
+    }
   }
   initializeFormControl() {
     // Create an instance of PrqEntryControls to get form controls for different sections
-    this.prqControls = new PrqEntryControls();
+    this.prqControls = new PrqEntryControls(this.prqDetail,this.isUpdate);
     // Get form controls for PRQ Entry section
     this.jsonControlPrqArray = this.prqControls.getPrqEntryFieldControls();
     // Create the form group using the form builder and the form controls array
@@ -104,7 +121,8 @@ export class PrqEntryPageComponent implements OnInit {
       toCity: { variable: 'toCity', status: 'toCityStatus' },
       ftlType: { variable: 'ftlType', status: 'ftlTypeStatus' },
       prqRaiseOn: { variable: 'prqRaiseOn', status: 'prqRaiseOnStatus' },
-      transMode: { variable: 'transModeOn', status: 'transModeOnStatus' }
+      transMode: { variable: 'transModeOn', status: 'transModeOnStatus' },
+      prqBranch: { variable: 'prqBranchCode', status: 'prqBranchStatus' }
     };
     processProperties.call(this, this.jsonControlPrqArray, locationPropertiesMapping);
   }
@@ -169,13 +187,15 @@ export class PrqEntryPageComponent implements OnInit {
     const thisYear = new Date().getFullYear();
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
     const dynamicNumber = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
-    const raise = this.prqEntryTableForm.value.prqBranch;
-    const prqNo = `PRQ/${raise}/${financialYear}/${dynamicNumber}`;
-    this.prqEntryTableForm.controls['_id'].setValue(prqNo);
-    this.prqEntryTableForm.controls['prqId'].setValue(prqNo);
+    const raise = this.prqEntryTableForm.value.prqBranch.value;
+    this.prqEntryTableForm.controls['prqBranch'].setValue(this.prqEntryTableForm.controls['prqBranch'].value?.value || "");
     this.prqEntryTableForm.controls['billingParty'].setValue(this.prqEntryTableForm.controls['billingParty'].value?.name || "");
     this.prqEntryTableForm.controls['fromCity'].setValue(this.prqEntryTableForm.controls['fromCity'].value?.name || "");
     this.prqEntryTableForm.controls['toCity'].setValue(this.prqEntryTableForm.controls['toCity'].value?.name || "");
+  if(!this.isUpdate){
+    const prqNo = `PRQ/${raise}/${financialYear}/${dynamicNumber}`;
+    this.prqEntryTableForm.controls['_id'].setValue(prqNo);
+    this.prqEntryTableForm.controls['prqId'].setValue(prqNo);
     const res = await addPrqData(this.prqEntryTableForm.value, this.masterService);
 
     if (res) {
@@ -190,9 +210,40 @@ export class PrqEntryPageComponent implements OnInit {
         }
       });
     }
+  }
+  else{
+      const tabIndex = 6; // Adjust the tab index as needed
+      showConfirmationDialog(this.prqEntryTableForm.value, this.masterService, this.goBack.bind(this), tabIndex);
+  }
     // console.log(this.prqEntryTableForm.value);
   }
   goBack(tabIndex: number): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
   }
+  async binDataFromDropdown() {
+    const resLoc=await locationFromApi(this.masterService);
+    const resCust=await customerFromApi(this.masterService);
+    
+    if(this.isUpdate){
+      const prqLoc=resLoc.find((x)=>x.value.trim()===this.prqDetail.prqBranch);
+      this.prqEntryTableForm.controls['prqBranch'].setValue(prqLoc);
+    }
+
+    this.filter.Filter(
+      this.jsonControlPrqArray,
+      this.prqEntryTableForm,
+      resLoc,
+      this.prqBranchCode,
+      this.prqBranchStatus
+    );
+    this.filter.Filter(
+      this.jsonControlPrqArray,
+      this.prqEntryTableForm,
+      resCust,
+      this.customer,
+      this.billingPartyStatus
+    );
+  }
+  
 }
+

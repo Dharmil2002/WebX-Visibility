@@ -108,7 +108,7 @@ export class StateControl {
         Validations: []
       },
       {
-        name: 'id',
+        name: '_id',
         label: '',
         placeholder: '',
         type: 'text',

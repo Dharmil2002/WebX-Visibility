@@ -6,6 +6,7 @@ import { PincodeListControl } from "src/assets/FormControls/pincodeMaster";
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
+import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
 
 @Component({
@@ -87,7 +88,7 @@ export class PincodeMasterListComponent implements OnInit {
         this.getPinocdeList();
     }
 
-    constructor(public ObjSnackBarUtility: SnackBarUtilityService, private fb: UntypedFormBuilder, private filter: FilterUtils, private masterService: MasterService) {
+    constructor(private operationService: OperationService, public ObjSnackBarUtility: SnackBarUtilityService, private fb: UntypedFormBuilder, private filter: FilterUtils, private masterService: MasterService) {
         this.intializeFormControl()
     }
 
@@ -126,93 +127,79 @@ export class PincodeMasterListComponent implements OnInit {
         this.pincodeTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     }
 
-    getStateData() {
+    async getStateData() {
         let req = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "state_detail"
+            companyCode: this.companyCode,
+            collectionName: "state_detail",
+            filter: {}
         };
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
-                const stateList = res.data.map(element => ({
-                    name: element.stateName,
-                    value: element.id
-                }));
-                if (this.isUpdate) {
-                    this.stateData = stateList.find((x) => x.name == this.data.stateName);
-                    this.pincodeTableForm.controls.stateName.setValue(this.stateData);
-                }
-                this.filter.Filter(
-                    this.jsonControlArray,
-                    this.pincodeTableForm,
-                    stateList,
-                    this.stateList,
-                    this.stateStatus
-                );
-            }
-        });
+        const res = await this.masterService.masterPost("generic/get", req).toPromise();
+        const stateList = res.data.map(element => ({
+            name: element.stateName,
+            value: element._id
+        }));
+        if (this.isUpdate) {
+            this.stateData = stateList.find((x) => x.name == this.data.stateName);
+            this.pincodeTableForm.controls.stateName.setValue(this.stateData);
+        }
+        this.filter.Filter(
+            this.jsonControlArray,
+            this.pincodeTableForm,
+            stateList,
+            this.stateList,
+            this.stateStatus
+        );
     }
 
-    getCityList() {
+    async getCityList() {
         let req = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "city_detail"
+            companyCode: this.companyCode,
+            collectionName: "city_detail",
+            filter: {}
         };
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
-                const cityList = res.data.map(element => ({
-                    name: element.cityName,
-                    value: element.id
-                }));
-                if (this.isUpdate) {
-                    this.cityData = cityList.find((x) => x.name == this.data.cityName);
-                    this.pincodeTableForm.controls.cityName.setValue(this.cityData);
-                }
-                this.filter.Filter(
-                    this.jsonControlArray,
-                    this.pincodeTableForm,
-                    cityList,
-                    this.cityList,
-                    this.cityStatus
-                );
-            }
-        });
+        const res = await this.masterService.masterPost("generic/get", req).toPromise();
+        const cityList = res.data.map(element => ({
+            name: element.cityName,
+            value: element._id
+        }));
+        if (this.isUpdate) {
+            this.cityData = cityList.find((x) => x.name == this.data.cityName);
+            this.pincodeTableForm.controls.cityName.setValue(this.cityData);
+        }
+        this.filter.Filter(
+            this.jsonControlArray,
+            this.pincodeTableForm,
+            cityList,
+            this.cityList,
+            this.cityStatus
+        );
     }
-    getPinocdeList() {
+
+    async getPinocdeList() {
         let req = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "pincode_detail"
+            companyCode: this.companyCode,
+            collectionName: "pincode_detail",
+            filter: {}
         };
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
-                // Assuming the API response contains an array named 'pincodeList'
-                const pincodeList = res.data;
-                let pincode = pincodeList
-                    .filter(element => element.pincode != null && element.pincode !== '')
-                    .map(element => {
-                        let pincodeValue = typeof element.pincode === 'object' ? element.pincode.name : element.pincode;
-                        return { name: String(pincodeValue), value: String(pincodeValue) };
-                    });
-                this.filter.Filter(
-                    this.jsonControlArray,
-                    this.pincodeTableForm,
-                    pincode,
-                    this.pincatList,
-                    this.pincatStatus
-                );
-            }
-        });
+        const res = await this.masterService.masterPost("generic/get", req).toPromise()
+        // Assuming the API response contains an array named 'pincodeList'
+        const pincode = res.data.map(element => ({
+            name: element.pincode,
+            value: element._id
+        }));
+        this.filter.Filter(
+            this.jsonControlArray,
+            this.pincodeTableForm,
+            pincode,
+            this.pincatList,
+            this.pincatStatus
+        );
     }
 
     functionCallHandler($event) {
         // console.log("fn handler called", $event);
         let field = $event.field;                   // the actual formControl instance
         let functionName = $event.functionName;     // name of the function , we have to call
-        // we can add more arguments here, if needed. like as shown
-        // $event['fieldName'] = field.name;
-
         // function of this name may not exists, hence try..catch 
         try {
             this[functionName]($event);
@@ -222,65 +209,62 @@ export class PincodeMasterListComponent implements OnInit {
         }
     }
 
-    save() {
-        this.stateRes = this.pincodeTableForm.value.state.name; // Assuming the name property holds the state name
-        this.cityRes = this.pincodeTableForm.value.city.name; // Assuming the name property holds the city name
+    async save() {
+        this.stateRes = this.pincodeTableForm.value.state.name; //the name property holds the state name
+        this.cityRes = this.pincodeTableForm.value.city.name; //the name property holds the city name
         this.pincodeRes = this.pincodeTableForm.value.pincode.value;
 
         let req = {
-            "companyCode": this.companyCode,
-            "type": "masters",
-            "collection": "pincode_detail"
+            companyCode: this.companyCode,
+            collectionName: "pincode_detail",
+            filter: {}
         };
+        const res = await this.masterService.masterPost("generic/get", req).toPromise()
+        if (res && res.data && res.data.length > 0 &&
+            res.data[0].hasOwnProperty('state') &&
+            res.data[0].hasOwnProperty('city')
+            || res.data[0].hasOwnProperty('pincode')) {
+            // Filter out objects with the specific state and city
+            const dataWithSpecificStateAndCity = res.data.filter(obj => obj.state === this.stateRes && obj.city === this.cityRes || obj.pincode === this.pincodeRes);
 
-        this.masterService.masterPost('common/getall', req).subscribe({
-            next: (res: any) => {
-                if (res && res.data && res.data.length > 0 && res.data[0].hasOwnProperty('state') && res.data[0].hasOwnProperty('city') || res.data[0].hasOwnProperty('pincode')) {
-                    // Filter out objects with the specific state and city
-                    const dataWithSpecificStateAndCity = res.data.filter(obj => obj.state === this.stateRes && obj.city === this.cityRes || obj.pincode === this.pincodeRes);
+            if (dataWithSpecificStateAndCity.length > 0) {
+                // Generate srno for each object in the filtered array
+                const dataWithSrno = dataWithSpecificStateAndCity.map((obj, index) => {
+                    return {
+                        ...obj,
+                        srNo: index + 1
+                    };
+                });
 
-                    if (dataWithSpecificStateAndCity.length > 0) {
-                        // Generate srno for each object in the filtered array
-                        const dataWithSrno = dataWithSpecificStateAndCity.map((obj, index) => {
-                            return {
-                                ...obj,
-                                srNo: index + 1
-                            };
-                        });
-
-                        this.csv = dataWithSrno;
-                        this.tableLoad = false;
-                    } else {
-                        this.ObjSnackBarUtility.showNotification(
-                            'snackbar-danger',
-                            'No Data Found...!!!',
-                            'bottom',
-                            'center'
-                        );
-                        // No data found for the selected state and city
-                        this.csv = []; // Empty the csv array to clear any previous data
-                        this.tableLoad = false;
-                    }
-                }
-            },
-            error: (error: any) => {
-                // Handle any errors that might occur during the HTTP request
-                console.error("Error fetching data:", error);
+                this.csv = dataWithSrno;
+                this.tableLoad = false;
+            } else {
+                this.ObjSnackBarUtility.showNotification(
+                    'snackbar-danger',
+                    'No Data Found...!!!',
+                    'bottom',
+                    'center'
+                );
+                // No data found for the selected state and city
+                this.csv = []; // Empty the csv array to clear any previous data
+                this.tableLoad = false;
             }
-        });
+        }
+
     }
 
     IsActiveFuntion(det) {
-        let id = det.id;
+        let id = det._id;
         // Remove the "id" field from the form controls
-        delete det.id;
+        delete det._id;
         delete det.srNo;
         let req = {
-            companyCode: parseInt(localStorage.getItem("companyCode")),
-            type: "masters",
-            collection: "city_detail",
-            id: id,
-            updates: det
+            companyCode: this.companyCode,
+            collectionName: "pincode_detail",
+            filter: {
+                _id: id,
+            },
+            update: det
         };
         this.masterService.masterPut('common/update', req).subscribe({
             next: (res: any) => {

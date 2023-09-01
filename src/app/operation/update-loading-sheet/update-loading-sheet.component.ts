@@ -119,7 +119,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "menifest_detail",
-      "filter":{}
+      "filter": {}
     }
     this._operation.operationMongoPost('generic/get', reqBody).subscribe({
       next: (res: any) => {
@@ -137,7 +137,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "docket",
-      "filter":{}
+      "filter": {}
 
     }
     this._operation.operationPost('generic/get', reqBody).subscribe(res => {
@@ -186,9 +186,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "docketScan",
-      "filter":{}
+      "filter": {}
     }
-    this._operation.operationMongoPost('generic/get',reqBody).subscribe({
+    this._operation.operationMongoPost('generic/get', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
           this.packageData = res.data;
@@ -198,20 +198,28 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   updatePackage() {
+    if (this.scanPackage) {
+      this.tableload = true;
+      const scanValue = this.scanPackage.trim();
+      const legValue = this.arrivalData.Route.trim();
 
-    this.tableload = true;
-
-    const scanValue = this.scanPackage.trim();
-    const legValue = this.arrivalData.Route.trim();
-
-    // Call the imported function to handle the logic
-    let PackageUpdate = handlePackageUpdate(scanValue, legValue, this.currentBranch, this.packageData, this.csv, this.boxData, this.cdr);
-    // Call kpiData function
-    if (PackageUpdate) {
-      this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
+      // Call the imported function to handle the logic
+      let PackageUpdate = handlePackageUpdate(scanValue, legValue, this.currentBranch, this.packageData, this.csv, this.boxData, this.cdr);
+      // Call kpiData function
+      if (PackageUpdate) {
+        this.boxData = kpiData(this.csv, this.shipmentStatus, PackageUpdate);
+      }
+      this.cdr.detectChanges(); // Trigger change detection
+      this.tableload = false;
     }
-    this.cdr.detectChanges(); // Trigger change detection
-    this.tableload = false;
+    else {
+      Swal.fire({
+        icon: "error",
+        title: "Scan Package",
+        text: `Please Enter Package No`,
+        showConfirmButton: true,
+      })
+    }
   }
 
 
@@ -289,7 +297,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
 
 
   async CompleteScan() {
- 
+
     let packageChecked = false;
     let locationWiseData = this.csv.filter((x) => x.Destination === this.currentBranch);
     const exists = locationWiseData.some(obj => obj.hasOwnProperty("Unloaded"));
@@ -319,8 +327,8 @@ export class UpdateLoadingSheetComponent implements OnInit {
   }
 
   async UpdateDocketDetail(dkt) {
-    if(dkt){
-    await updateTracking(this.companyCode, this._operation, dkt);
+    if (dkt) {
+      await updateTracking(this.companyCode, this._operation, dkt);
     }
     // const lsDetail = await loadingSheetDetails(this.companyCode, this._operation, this.arrivalData?.TripID);
     // lsDetail.forEach(async element => {
@@ -330,7 +338,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       "companyCode": this.companyCode,
       "type": "operation",
       "collectionName": "docket",
-      "filter":{docketNumber: dkt},
+      "filter": { docketNumber: dkt },
       "update": {
         "unloading": 1,
         "unloadloc": this.currentBranch
@@ -392,7 +400,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_detail",
-      "filter": {_id: this.arrivalData.id},
+      "filter": { _id: this.arrivalData.id },
       "update": {
         ...tripDetails,
       }
@@ -423,7 +431,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     const reqBody = {
       "companyCode": this.companyCode,
       "collectionName": "trip_transaction_history",
-      "filter":{_id: this.arrivalData?.TripID},
+      "filter": { _id: this.arrivalData?.TripID },
       "update": {
         ...tripDetails
       }

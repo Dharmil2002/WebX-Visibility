@@ -38,7 +38,7 @@ export class VendorMaster {
   franchise: any
   integrateWithFinSystem: any
   reliableDocument: any
-  id: any
+  _id: string
   tdsRate: any
   constructor(VendorMaster) {
     {

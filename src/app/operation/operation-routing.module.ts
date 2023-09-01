@@ -19,6 +19,10 @@ import { AssignVehiclePageComponent } from "./assign-vehicle-page/assign-vehicle
 import { RakeEntryPageComponent } from "./rake-entry-page/rake-entry-page.component";
 import { ChaEntryPageComponent } from "./cha-entry-page/cha-entry-page.component";
 import { HandedOverComponent } from "./handed-over/handed-over.component";
+import { VendorBillDetailsComponent } from "./vendor-bill-details/vendor-bill-details.component";
+import { CustomerBillDetailsComponent } from "./customer-bill-details/customer-bill-details.component";
+import { VoucherDetailsComponent } from "./voucher-details/voucher-details.component";
+import { ChaDetailComponent } from "./cha-detail/cha-detail.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -95,6 +99,22 @@ const routes: Routes = [
   {
     path: "HandedOver",
     component: HandedOverComponent
+  },
+  {
+    path: "ChaDetail",
+    component: ChaDetailComponent
+  },
+  {
+    path: "VoucherDetails",
+    component: VoucherDetailsComponent
+  },
+  {
+    path: "VendorBillDetails",
+    component: VendorBillDetailsComponent
+  },
+  {
+    path: "CustomerBillDetails",
+    component: CustomerBillDetailsComponent
   },
 ]
 

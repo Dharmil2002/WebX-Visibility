@@ -51,10 +51,10 @@ export class JobControl {
             }, {
                 name: 'vehicleSize', label: "Vehicle Size (MTs)", placeholder: "Select Vehicle Size", type: 'Staticdropdown',
                 value: [
-                    { value: '1-MT', name: '1-MT' },
-                    { value: '9-MT', name: '9-MT' },
-                    { value: '16-MT', name: '16-MT' },
-                    { value: '32-MT', name: '32-MT' }
+                    { value: '1', name: '1-MT' },
+                    { value: '9', name: '9-MT' },
+                    { value: '16', name: '16-MT' },
+                    { value: '32', name: '32-MT' }
                 ],
                 filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
@@ -82,13 +82,13 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                    //     {
-                    //     name: "autocomplete",
-                    // },
-                    // {
-                    //     name: "invalidAutocompleteObject",
-                    //     message: "Choose proper value",
-                    // }
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -98,13 +98,13 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                    //     {
-                    //     name: "autocomplete",
-                    // },
-                    // {
-                    //     name: "invalidAutocompleteObject",
-                    //     message: "Choose proper value",
-                    // }
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -161,12 +161,19 @@ export class JobControl {
                 name: "vendorName",
                 label: "Vendor Name",
                 placeholder: "Enter Vendor Name",
-                type: "text",//dropdown
+                type: "dropdown",//dropdown
                 value: "",
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                ]
+                    {
+                        name: "required",
+                        message: "Vendor Name is required"
+                    }
+                ],
+                additionalData: {
+                    showNameAndValue: false
+                }
             },
             {
                 name: 'jobLocation', label: "Job Location", placeholder: "Select Job Location", type: 'text',

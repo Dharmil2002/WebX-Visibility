@@ -151,6 +151,7 @@ export class ReAllocateDcrComponent implements OnInit {
               }
             }
           });
+          this.dialog.closeAll();
           this.route.navigateByUrl("/Masters/DocumentControlRegister/TrackDCR");
         }
       }

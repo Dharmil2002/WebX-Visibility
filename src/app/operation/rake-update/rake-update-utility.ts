@@ -14,7 +14,7 @@ export async function getGeneric(masterService, collectionName) {
  * @param {Array} data - The input array containing data to be transformed.
  * @returns {Array} - The transformed array with mapped values.
  */
-export async function rakeFieldMapping(data) {
+export async function rakeFieldMapping(data,jobDetail) {
     // Check if the input data is an array
     if (!Array.isArray(data)) {
         return [];
@@ -26,8 +26,13 @@ export async function rakeFieldMapping(data) {
         const entryDate = element?.entryDate || new Date();
 
         // Extract the first container detail or create an empty object
-        const containerDetail = element?.containorDetail[0] || {};
-
+        const status = element.hasOwnProperty("status") ? element.status : '';
+        const statusMessage =
+            status === 0
+                ? "Handed over to Liner"
+                : status === 1
+                    ? "Handed over to Billing Party"
+                    : "Kept it at Current Location";
         // Construct and return the mapped object for the current element
         return {
             SlNo: index + 1,
@@ -40,11 +45,17 @@ export async function rakeFieldMapping(data) {
             FromCity: element?.fromCity || "",
             ToCity: element?.toCity || "",
             IsEmpty: "",
-            Weight: containerDetail.weight || "",
-            BillingParty: containerDetail.billingParty || "",
-            CNNo: "",
-            JobNo: containerDetail.jobNo || "",
-            CurrentStatus: ""
+            Weight: element.containorDetail.reduce((sum, detail) => sum + (detail.weight || 0), 0),
+            BillingParty: element.containorDetail.map(detail => detail.billingParty) || "",
+            CNNo: element.containorDetail
+                .filter(detail => "CNNo" in detail)
+                .map(detail => detail.CNNo),
+            JobNo: element.containorDetail
+                .filter(detail => "jobNo" in detail)
+                .map(detail => detail.jobNo) || "",
+            CurrentStatus: "Vehicle At "+localStorage.getItem("Branch"),
+            Action:statusMessage
+            
         };
     });
 

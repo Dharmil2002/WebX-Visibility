@@ -1,4 +1,4 @@
-import { UntypedFormBuilder, Validators } from "@angular/forms";
+import { AbstractControl, UntypedFormBuilder, ValidatorFn, Validators } from "@angular/forms";
 //import { autocompleteValidator } from "../Validation/AutoComplateValidation";
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 
@@ -19,9 +19,9 @@ export function formGroupBuilder(fb: UntypedFormBuilder, arrayOfJsonData: any[])
                 } else if (errorName == 'email') {
                     validators.push(Validators.email)
                 }
-                // else if (errorName == 'autocomplete') {
-                //     validators.push(autocompleteValidator())
-                // }
+                else if (errorName == 'autocomplete') {
+                    validators.push(autocompleteValidator())
+                }
             }
             if (field.type == 'dropdown') {
                 if (field.additionalData.showNameAndValue) {
@@ -46,3 +46,13 @@ export function genericDisplayFunctionWithName(field: AutoComplateCommon) {
 export function genericDisplayFunctionWithNameValue(field: AutoComplateCommon) {
     return (field && field.value) ? field.value + ":" + field.name : "";
 }
+  //#region to validate dropdown text 
+  export function autocompleteValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+        if (typeof control.value === 'string'&& control.value.length > 0) {
+          return { invalidAutocomplete: { value: control.value } };
+        }
+        return null; /* valid option selected */
+    };
+  } 
+  //#endregion

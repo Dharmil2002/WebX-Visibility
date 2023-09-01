@@ -72,6 +72,9 @@ export class RakeEntryControl {
                     message: "Choose proper value",
                 }
                 ],
+                functions: {
+                    onOptionSelect: "cityMapping"
+                },
                 additionalData: {
                     showNameAndValue: false
                 }
@@ -252,6 +255,19 @@ export class RakeEntryControl {
                 placeholder: '',
                 type: 'text',
                 value: '',
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: true
+            },
+            {
+                name: 'status',
+                label: '',
+                placeholder: '',
+                type: 'text',
+                value: 0,
                 filterOptions: '',
                 autocomplete: '',
                 displaywith: '',

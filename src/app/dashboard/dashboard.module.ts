@@ -20,7 +20,6 @@ import { MatTableExporterModule } from "mat-table-exporter";
 import { MatSortModule } from "@angular/material/sort";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { LoadPlanningComponent } from './load-planning/load-planning.component';
 import { DocketDashboardComponent } from './docket-dashboard/docket-dashboard.component';
 import { DashboardPageComponent } from './dashboard-page/dashboard-page.component';
 import { MatTabsModule } from "@angular/material/tabs";
@@ -47,7 +46,6 @@ import { JobTrackerComponent } from './tabs/job-tracker/job-tracker.component';
 
 @NgModule({
   declarations: [
-    LoadPlanningComponent,
     DocketDashboardComponent,
     DashboardPageComponent,
     DashboardCountPageComponent,

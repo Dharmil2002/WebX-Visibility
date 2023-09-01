@@ -150,7 +150,8 @@ export class RakeUpdateComponent implements OnInit {
   }
   async getRakeDetail(){
     const detail= await getGeneric(this.masterService,"rake_detail") ;
-    const rakeDetail=await rakeFieldMapping(detail);
+    const jobDetail= await getGeneric(this.masterService,"job_detail") ;
+    const rakeDetail=await rakeFieldMapping(detail,jobDetail);
     this.tableData=rakeDetail;
     this.tableLoad=false;
   }

@@ -74,7 +74,7 @@ export class ChaEntryPageComponent implements OnInit {
       name: "Sl No",
       key: "index",
       Style: "",
-      HeaderStyle: {'min-width':'80px'},
+      HeaderStyle: { 'min-width': '80px' },
       class: "matcolumncenter"
     },
     docName: {
@@ -111,14 +111,14 @@ export class ChaEntryPageComponent implements OnInit {
       key: "inputnumber",
       Style: "",
       HeaderStyle: { 'text-align': 'center' },
-      readonly:true
+      readonly: true
     },
     totalAmt: {
       name: "Total Amount (Rs)",
       key: "inputnumber",
       Style: "",
       HeaderStyle: { 'text-align': 'center' },
-      readonly:true
+      readonly: true
     },
     action: {
       name: "Action",
@@ -135,7 +135,7 @@ export class ChaEntryPageComponent implements OnInit {
         this.Route.navigate(['/Operation/RakeEntry'], {
           state: {
             data: this.jobDetail,
-  
+
           },
         });
         this.RakeEntry = true;
@@ -239,6 +239,10 @@ export class ChaEntryPageComponent implements OnInit {
 
   }
   async save() {
+    // Create a new array without the 'srNo' property
+    let modifiedTableData = this.tableData.map(({ srNo, ...rest }) => rest);
+    // Assign the modified array back to 'this.tableData'
+    this.tableData = modifiedTableData;
     this.chaEntryTableForm.controls["billingParty"].setValue(this.chaEntryTableForm.value.billingParty.value);
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
@@ -287,7 +291,7 @@ export class ChaEntryPageComponent implements OnInit {
       {
         srNo: 0, // Serial number
         docName: "",
-        clrChrg:"0.00",
+        clrChrg: "0.00",
         gstRate: "0.00",
         gstAmt: "0.00",
         totalAmt: "0.00"
@@ -299,7 +303,7 @@ export class ChaEntryPageComponent implements OnInit {
     const AddObj = {
       srNo: 0, // Serial number
       docName: "",
-      clrChrg:"0.00",
+      clrChrg: "0.00",
       gstRate: "0.00",
       gstAmt: "0.00",
       totalAmt: "0.00"
@@ -368,12 +372,12 @@ export class ChaEntryPageComponent implements OnInit {
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
   }
-    calculateTotaAmount(event) {
-     let gstamount= parseFloat(event.row.clrChrg)*parseFloat(event.row.gstRate)/100
-     event.row.gstAmt=gstamount.toFixed(2);
-     let total=  parseFloat(event.row.clrChrg)+gstamount;
-     event.row.totalAmt=total.toFixed(2);
+  calculateTotaAmount(event) {
+    let gstamount = parseFloat(event.row.clrChrg) * parseFloat(event.row.gstRate) / 100
+    event.row.gstAmt = gstamount.toFixed(2);
+    let total = parseFloat(event.row.clrChrg) + gstamount;
+    event.row.totalAmt = total.toFixed(2);
 
-}
+  }
 
 }

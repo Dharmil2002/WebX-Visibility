@@ -1,16 +1,16 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
-
+import { prqDetail } from 'src/app/core/models/operations/prq/prq';
 /* here i create class for the bind controls in formGrop */
 export class PrqEntryControls {
   private fieldMapping: FormControls[];
-  constructor() {
+  constructor(prqDetail:prqDetail,isUpdate) {
     this.fieldMapping = [
       {
         name: "prqId",
         label: "PRQ ID",
         placeholder: "PRQ ID",
         type: "text",
-        value: "System Generated",
+        value: prqDetail.prqNo,
         generatecontrol: true,
         disable: true,
         Validations: [],
@@ -20,7 +20,7 @@ export class PrqEntryControls {
         label: "Pickup Date & Time",
         placeholder: "",
         type: "datetimerpicker",
-        value: new Date(),
+        value: prqDetail.pickupDate,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -33,7 +33,7 @@ export class PrqEntryControls {
           },
         ],
         additionalData: {
-          minDate: new Date(),
+          minDate: isUpdate?"":new Date(),
         },
       },
       {
@@ -69,7 +69,7 @@ export class PrqEntryControls {
         label: "Contact No",
         placeholder: "Contact No",
         type: "number",
-        value: "",
+        value: prqDetail.contactNo,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -110,7 +110,7 @@ export class PrqEntryControls {
               name: "autocomplete"
           },
           {
-              name: "invalidAutocompleteObject",
+              name: "invalidAutocomplete",
               message: "Choose proper value",
           }
         ],
@@ -138,7 +138,7 @@ export class PrqEntryControls {
               name: "autocomplete"
           },
           {
-              name: "invalidAutocompleteObject",
+              name: "invalidAutocomplete",
               message: "Choose proper value",
           }
         ],
@@ -172,20 +172,24 @@ export class PrqEntryControls {
         name: "prqBranch",
         label: "PRQ Branch",
         placeholder: "PRQ Branch",
-        type: "Staticdropdown",
-        value: [
-          { value: "MUMBAI", name: "MUMBAI" },
-          { value: "DELHI", name: "DELHI" },
-          { value: "KOLKATA", name: "KOLKATA" },
-        ],
+        type: "dropdown",
+        value:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
         },
       },
       {

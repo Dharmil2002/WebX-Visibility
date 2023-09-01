@@ -10,10 +10,12 @@ export async function addPrqData(prqData, masterService) {
 }
 
 export async function updatePrqStatus(prqData, masterService) {
+    delete prqData.srNo
+    delete prqData.Action
     const reqBody = {
         "companyCode": localStorage.getItem('companyCode'),
         "collectionName": "prq_detail",
-        "filter": { prqId: prqData.prqNo },
+        "filter": {prqId: prqData.prqNo || prqData.prqId || ""},
         "update": {
             ...prqData,
         }
@@ -35,6 +37,9 @@ export async function showConfirmationDialog(prqDetail, masterService, goBack, t
 
     if (confirmationResult.isConfirmed) {
         prqDetail.status = "1";
+        delete prqDetail._id
+        delete prqDetail.srNo
+
         const res = await updatePrqStatus(prqDetail, masterService);
         if (res) {
             goBack(tabIndex);
@@ -75,5 +80,36 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqd
         return vehicleUpdate; // Optionally, you can return the updated vehicle data.
     } catch (error) {
         throw error; // Re-throw the error to be handled at a higher level or log it.
+    }
+}
+
+export async function locationFromApi(masterService) {
+    const reqBody = {
+        companyCode: localStorage.getItem('companyCode'),
+        collectionName: "location_detail",
+    }
+    try {
+        const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
+        const filterMap = res?.data?.map(x => ({ value: x.locCode, name: x.locName })) ?? null;
+        return filterMap.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
+    } catch (error) {
+        console.error("An error occurred:", error);
+        return null;
+    }
+}
+
+
+export async function customerFromApi(masterService) {
+    const reqBody = {
+        companyCode: localStorage.getItem('companyCode'),
+        collectionName: "customer_detail",
+    }
+    try {
+        const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
+        const filterMap = res?.data?.map(x => ({ value: x.customerCode, name: x.customerName })) ?? null;
+        return filterMap.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
+    } catch (error) {
+        console.error("An error occurred:", error);
+        return null;
     }
 }

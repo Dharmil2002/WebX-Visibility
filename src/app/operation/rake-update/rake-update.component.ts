@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getGeneric, rakeFieldMapping } from './rake-update-utility';
+import { RakeDetailComponent } from '../rake-detail/rake-detail.component';
 
 @Component({
   selector: 'app-rake-update',
   templateUrl: './rake-update.component.html'
 })
 export class RakeUpdateComponent implements OnInit {
-  tableLoad:boolean=true;
+  tableLoad: boolean = true;
   tableData: any;
-  boxData:any;
+  boxData: any;
   METADATA = {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
@@ -23,22 +24,12 @@ export class RakeUpdateComponent implements OnInit {
     RakeNo: {
       Title: "Rake No",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:170px",
     },
     RakeEntryDate: {
       Title: "Rake Entry Date",
       class: "matcolumnleft",
       Style: "min-width:100px",
-    },
-    TrainName: {
-      Title: "Train Name",
-      class: "matcolumnleft",
-      Style: "min-width:2px",
-    },
-    TrainNo: {
-      Title: "Train No",
-      class: "matcolumnleft",
-      Style: "min-width:120px",
     },
     RRNo: {
       Title: "RRNo",
@@ -50,20 +41,10 @@ export class RakeUpdateComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:200px",
     },
-    FromCity: {
-      Title: "From City",
+    FromToCity: {
+      Title: "From-To City",
       class: "matcolumnleft",
-      Style: "min-width:1px",
-    },
-    ToCity: {
-      Title: "To City",
-      class: "matcolumnleft",
-      Style: "min-width:1px",
-    },
-    IsEmpty: {
-      Title: "IsEmpty",
-      class: "matcolumnleft",
-      Style: "min-width:1px",
+      Style: "min-width:100px",
     },
     Weight: {
       Title: "Weight",
@@ -72,23 +53,23 @@ export class RakeUpdateComponent implements OnInit {
     },
     BillingParty: {
       Title: "Billing Party",
-      class: "matcolumnleft",
-      Style: "min-width:200px",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
     CNNo: {
       Title: "CN No",
-      class: "matcolumnleft",
-      Style: "min-width:200px",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
     JobNo: {
       Title: "Job No",
-      class: "matcolumnleft",
-      Style: "min-width:200px",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
     CurrentStatus: {
       Title: "Current Status",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:100px",
     },
     Action: {
       Title: "Action",
@@ -101,23 +82,25 @@ export class RakeUpdateComponent implements OnInit {
     "SlNo",
     "RakeNo",
     "RakeEntryDate",
-    "TrainName",
-    "TrainNo",
     "RRNo",
     "ContainerNo",
-    "FromCity",
-    "ToCity",
-    "IsEmpty",
+    "FromToCity",
     "Weight",
-    "BillingParty",
-    "CNNo",
-    "JobNo",
     "CurrentStatus"
   ];
   linkArray = [
-    { Row: 'Action', Path: 'Operation/HandedOver',componentDetails: ""}
+    { Row: 'Action', Path: 'Operation/Handover', componentDetails: "" },
+    { Row: 'BillingParty', Path: '', componentDetails: RakeDetailComponent },
+    { Row: 'CNNo', Path: '', componentDetails: RakeDetailComponent },
+    { Row: 'JobNo', Path: '', componentDetails: RakeDetailComponent }
   ]
-  constructor(private masterService: MasterService) {  }
+  menuItems = [
+    { label: "CNNo", componentDetails: RakeDetailComponent },
+    { label: "JobNo", componentDetails: RakeDetailComponent },
+    { label: "BillingParty", componentDetails: RakeDetailComponent }
+    // Add more menu items as needed
+  ];
+  constructor(private masterService: MasterService) { }
 
   ngOnInit(): void {
     this.getRakeDetail();
@@ -145,15 +128,14 @@ export class RakeUpdateComponent implements OnInit {
         "title": "Mis-Routed Container",
         "class": "info-box7 bg-c-Grape-light order-info-box7"
       },
-     
+
     ];
   }
-  async getRakeDetail(){
-    const detail= await getGeneric(this.masterService,"rake_detail") ;
-    const jobDetail= await getGeneric(this.masterService,"job_detail") ;
-    const rakeDetail=await rakeFieldMapping(detail,jobDetail);
-    this.tableData=rakeDetail;
-    this.tableLoad=false;
+  async getRakeDetail() {
+    const detail = await getGeneric(this.masterService, "rake_detail");
+    const rakeDetail = await rakeFieldMapping(detail);
+    this.tableData = rakeDetail;
+    this.tableLoad = false;
   }
 
 }

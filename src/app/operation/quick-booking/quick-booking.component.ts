@@ -10,6 +10,7 @@ import { QuickBookingControls } from "src/assets/FormControls/quick-docket-booki
 import Swal from "sweetalert2";
 import { getCity } from "./quick-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
+import {  Router } from "@angular/router";
 
 @Component({
   selector: "app-quick-booking",
@@ -49,6 +50,7 @@ export class QuickBookingComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
+    private router:Router,
     private operationService: OperationService,
     private _NavigationService: NavigationService
   ) {
@@ -191,7 +193,13 @@ export class QuickBookingComponent implements OnInit {
       }
     });
   }
-
+  cancel() {
+    this._NavigationService.navigateTotab(
+      1,
+      "dashboard/GlobeDashboardPage"
+    );
+    }
+   
   save() {
     // Remove all form errors
     const controls = this.quickDocketTableForm;

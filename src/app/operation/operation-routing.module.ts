@@ -97,7 +97,7 @@ const routes: Routes = [
     component: ChaEntryPageComponent
   },
   {
-    path: "HandedOver",
+    path: "Handover",
     component: HandedOverComponent
   },
   {

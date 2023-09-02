@@ -11,6 +11,7 @@ export async function getCity(companyCode, masterService) {
         const city = res.data
           .map((x) => ({ name: x.cityName, value: x.cityName }))
           .filter((x) => x.name !== undefined && x.value !== undefined);
+        city.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order
         return city;
       } else {
         return null;

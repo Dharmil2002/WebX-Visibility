@@ -13,6 +13,7 @@ import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { addTracking, calculateInvoiceTotalCommon, getPincode } from "./docket.utility";
 import { getCity } from "src/app/operation/quick-booking/quick-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
+import { customerFromApi, locationFromApi } from "src/app/operation/prq-entry-page/prq-utitlity";
 
 @Component({
   selector: "app-eway-example",
@@ -195,20 +196,20 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     private operationService: OperationService,
     private route: Router,
     private _NavigationService: NavigationService
-) {
+  ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     if (navigationState != null) {
-        this.quickdocketDetaildata = navigationState.columnData || navigationState;
-        
-        if ('prqNo' in this.quickdocketDetaildata) {
-            this.prqFlag = true;
-        } else {
-            this.quickDocket = true;  
-        }
+      this.quickdocketDetaildata = navigationState.columnData || navigationState;
+
+      if ('prqNo' in this.quickdocketDetaildata) {
+        this.prqFlag = true;
+      } else {
+        this.quickDocket = true;
+      }
     }
-    
+
     this.bindQuickdocketData();
-}
+  }
 
 
   ngOnInit(): void {
@@ -334,8 +335,6 @@ export class EwayBillDocketBookingV2Component implements OnInit {
       console.error("Error getting city details:", error);
     }
   }
-
-  // Customer details
   customerDetails() {
     this.masterService.getJsonFileDetails("customer").subscribe({
       next: (res: any) => {
@@ -378,7 +377,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
   // Get EwayBill data
 
   async bindQuickdocketData() {
-   
+
     if (this.quickDocket) {
       const reqBody = {
         companyCode: this.companyCode,
@@ -408,25 +407,25 @@ export class EwayBillDocketBookingV2Component implements OnInit {
         // Handle error here
       }
     }
-    if(this.prqFlag){
-      
-      const billingParty={
-        name:this.quickdocketDetaildata?.billingParty||"",
-        value:this.quickdocketDetaildata?.billingParty||""
+    if (this.prqFlag) {
+
+      const billingParty = {
+        name: this.quickdocketDetaildata?.billingParty || "",
+        value: this.quickdocketDetaildata?.billingParty || ""
       }
-      const fromCity={
-        name:this.quickdocketDetaildata?.fromCity||"",
-        value:this.quickdocketDetaildata?.fromCity||""
+      const fromCity = {
+        name: this.quickdocketDetaildata?.fromCity || "",
+        value: this.quickdocketDetaildata?.fromCity || ""
       }
-      const toCity={
-        name:this.quickdocketDetaildata?.toCity||"",
-        value:this.quickdocketDetaildata?.toCity||""
+      const toCity = {
+        name: this.quickdocketDetaildata?.toCity || "",
+        value: this.quickdocketDetaildata?.toCity || ""
       }
       this.tabForm.controls['billingParty'].setValue(billingParty);
       this.tabForm.controls['consignorName'].setValue(billingParty);
       this.tabForm.controls['consignorCity'].setValue(fromCity);
-      this.tabForm.controls['docketDate'].setValue(new Date(this.quickdocketDetaildata?.pickUpDate||new Date()));
-      this.tabForm.controls['consignorMobileNo'].setValue(this.quickdocketDetaildata?.contactNo||"");
+      this.tabForm.controls['docketDate'].setValue(new Date(this.quickdocketDetaildata?.pickUpDate || new Date()));
+      this.tabForm.controls['consignorMobileNo'].setValue(this.quickdocketDetaildata?.contactNo || "");
       this.tabForm.controls['fromCity'].setValue(fromCity);
       this.tabForm.controls['toCity'].setValue(toCity);
       console.log(this.tabForm.value);
@@ -527,6 +526,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
     mapControlArray(this.contractControlArray, destinationMapping);
   }
   //End
+  //destionation
   //destionation
   destionationDropDown() {
     this.masterService.getJsonFileDetails("destination").subscribe({

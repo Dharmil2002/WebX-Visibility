@@ -160,7 +160,7 @@ export class QuickBookingControls {
           }
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
         },
       },
       {

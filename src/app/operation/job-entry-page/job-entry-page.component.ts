@@ -212,7 +212,7 @@ export class JobEntryPageComponent implements OnInit {
   }
 
   cancel() {
-    window.history.back();
+    this.goBack(7)
   }
   goBack(tabIndex: number): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });

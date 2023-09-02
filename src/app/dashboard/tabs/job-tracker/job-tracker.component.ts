@@ -52,17 +52,17 @@ export class JobTrackerComponent implements OnInit {
       Style: "",
     },
     JobLocation: {
-      Title: "Job Location",
+      Title: "Loc",
       class: "matcolumncenter",
       Style: "",
     },
     NoofPkgs: {
-      Title: "No of Pkgs",
+      Title: "Pkgs",
       class: "matcolumncenter",
       Style: "",
     },
     VehicleSize: {
-      Title: "Vehicle Size",
+      Title: "Size",
       class: "matcolumncenter",
       Style: "",
     },

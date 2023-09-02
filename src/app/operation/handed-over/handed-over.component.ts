@@ -16,17 +16,17 @@ export class HandedOverComponent implements OnInit {
     columnHeader = {
       checkBoxRequired:{
         Title: "Select",
-        class: "matcolumnleft",
+        class: "matcolumncenter",
         Style: "min-width:200px",
       },
       ContainerNo: {
         Title: "Container No",
-        class: "matcolumnleft",
+        class: "matcolumncenter",
         Style: "min-width:200px",
       },
       IsEmpty: {
         Title: "Is Empty",
-        class: "matcolumnleft",
+        class: "matcolumncenter",
         Style: "min-width:200px",
       }
     }
@@ -36,9 +36,9 @@ export class HandedOverComponent implements OnInit {
     ]
   breadScrums = [
     {
-      title: "Handed over to Liner",
+      title: "Handover to Liner",
       items: ["Home"],
-      active: "Handed over",
+      active: "Handover",
     },
   ];
   METADATA = {
@@ -97,7 +97,10 @@ tableData=[{
    
   }
   cancel() {
-    window.history.back();
+    this.goBack(8);
+  }
+  goBack(tabIndex: number): void {
+    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 save(){
 

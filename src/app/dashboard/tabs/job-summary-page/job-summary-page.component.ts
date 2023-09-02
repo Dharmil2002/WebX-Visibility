@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { getJobDetailFromApi } from './job-summary-utlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { getGeneric } from 'src/app/operation/rake-update/rake-update-utility';
 
 @Component({
   selector: 'app-job-summary-page',
@@ -30,12 +31,12 @@ export class JobSummaryPageComponent implements OnInit {
     jobDate: {
       Title: "Job Date",
       class: "matcolumnleft",
-      Style: "min-width:150px",
+      Style: "max-width:150px",
     },
     jobType: {
       Title: "Job Type",
       class: "matcolumnleft",
-      Style: "min-width:2px",
+      Style:  "max-width:70px",
     },
     billingParty: {
       Title: "Billing Party",
@@ -55,12 +56,12 @@ export class JobSummaryPageComponent implements OnInit {
     pkgs: {
       Title: "Pkgs",
       class: "matcolumncenter",
-      Style: "min-width:2px",
+      Style: "max-width:70px",
     },
     vehicleSize: {
       Title: "Vehicle Size",
       class: "matcolumncenter",
-      Style: "min-width:2px",
+      Style:  "max-width:150px",
     },
     status: {
       Title: "Status",

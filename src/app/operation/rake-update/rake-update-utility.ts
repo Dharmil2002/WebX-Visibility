@@ -14,25 +14,40 @@ export async function getGeneric(masterService, collectionName) {
  * @param {Array} data - The input array containing data to be transformed.
  * @returns {Array} - The transformed array with mapped values.
  */
-export async function rakeFieldMapping(data,jobDetail) {
-    // Check if the input data is an array
-    if (!Array.isArray(data)) {
-        return [];
-    }
+export async function rakeFieldMapping(data) {
+    // ... (previous code)
 
-    // Create a new array by mapping each element in the input data array
     const rakeArray = data.map((element, index) => {
-        // Extract entry date or use current date as default
-        const entryDate = element?.entryDate || new Date();
-
         // Extract the first container detail or create an empty object
         const status = element.hasOwnProperty("status") ? element.status : '';
         const statusMessage =
             status === 0
-                ? "Handed over to Liner"
+                ? "Handover to Liner"
                 : status === 1
-                    ? "Handed over to Billing Party"
+                    ? "Handover to Billing Party"
                     : "Kept it at Current Location";
+        const entryDate = element?.entryDate || new Date();
+
+        // Extract the first container detail or create an empty object
+        const uniqueCNNoSet = new Set();
+        const uniqueJobNoSet = new Set();
+        const uniqueBillingPartySet = new Set();
+
+        // Filter and map unique CNNo, JobNo, and BillingParty values
+        element.containorDetail.forEach(detail => {
+            if ("CNNo" in detail && !uniqueCNNoSet.has(detail.CNNo)) {
+                uniqueCNNoSet.add(detail.CNNo);
+            }
+
+            if ("jobNo" in detail && !uniqueJobNoSet.has(detail.jobNo)) {
+                uniqueJobNoSet.add(detail.jobNo);
+            }
+
+            if ("billingParty" in detail && !uniqueBillingPartySet.has(detail.billingParty)) {
+                uniqueBillingPartySet.add(detail.billingParty);
+            }
+        });
+
         // Construct and return the mapped object for the current element
         return {
             SlNo: index + 1,
@@ -42,24 +57,18 @@ export async function rakeFieldMapping(data,jobDetail) {
             TrainNo: element?.trainNo || "",
             RRNo: element?.rrNo || "",
             ContainerNo: "",
-            FromCity: element?.fromCity || "",
-            ToCity: element?.toCity || "",
+            FromToCity: element.fromCity +"-"+element?.toCity,
             IsEmpty: "",
             Weight: element.containorDetail.reduce((sum, detail) => sum + (detail.weight || 0), 0),
-            BillingParty: element.containorDetail.map(detail => detail.billingParty) || "",
-            CNNo: element.containorDetail
-                .filter(detail => "CNNo" in detail)
-                .map(detail => detail.CNNo),
-            JobNo: element.containorDetail
-                .filter(detail => "jobNo" in detail)
-                .map(detail => detail.jobNo) || "",
-            CurrentStatus: "Vehicle At "+localStorage.getItem("Branch"),
-            Action:statusMessage
-            
+            BillingParty: Array.from(uniqueBillingPartySet).length,
+            CNNo: Array.from(uniqueCNNoSet).length, // Count of unique CNNo values
+            JobNo: Array.from(uniqueJobNoSet).length, // Count of unique jobNo values
+            CurrentStatus: "At " + localStorage.getItem("Branch"),
+            Action: statusMessage,
         };
     });
-
-    // Return the final mapped array
     return rakeArray;
+    // ... (remaining code)
 }
+
 

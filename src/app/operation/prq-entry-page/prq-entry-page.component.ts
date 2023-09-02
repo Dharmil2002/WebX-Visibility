@@ -91,7 +91,7 @@ export class PrqEntryPageComponent implements OnInit {
     this.getCity();
     this.getCustomerDetails();
     this.autoFill();
-    this.binDataFromDropdown();
+    this.bindDataFromDropdown();
   }
 
 
@@ -103,6 +103,9 @@ export class PrqEntryPageComponent implements OnInit {
       this.prqEntryTableForm.controls['fromCity'].setValue({ name: this.prqDetail.fromCity, value: this.prqDetail.fromCity });
       this.prqEntryTableForm.controls['toCity'].setValue({ name: this.prqDetail.toCity, value: this.prqDetail.toCity });
       this.prqEntryTableForm.controls['billingParty'].setValue({ name: this.prqDetail.billingParty, value: this.prqDetail.billingParty });
+    }
+    else{
+      this.prqEntryTableForm.controls['transMode'].setValue("Road");
     }
   }
   initializeFormControl() {
@@ -179,8 +182,9 @@ export class PrqEntryPageComponent implements OnInit {
     }
   }
   cancel() {
-    window.history.back();
+    this.goBack(6)
   }
+
   async save() {
     const tabcontrols = this.prqEntryTableForm;
     clearValidatorsAndValidate(tabcontrols);
@@ -220,7 +224,7 @@ export class PrqEntryPageComponent implements OnInit {
   goBack(tabIndex: number): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
   }
-  async binDataFromDropdown() {
+  async bindDataFromDropdown() {
     const resLoc=await locationFromApi(this.masterService);
     const resCust=await customerFromApi(this.masterService);
     

@@ -180,7 +180,6 @@ export class CustomerMasterAddComponent implements OnInit {
     });
   }
   cancel() {
-    window.history.back();
     this.Route.navigateByUrl("/Masters/CustomerMaster/CustomerMasterList");
   }
 
@@ -345,20 +344,21 @@ export class CustomerMasterAddComponent implements OnInit {
         collection: "customer_detail",
         data: this.customerTableForm.value
       };
-      this.masterService.masterPost('common/create', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.Route.navigateByUrl('/Masters/CustomerMaster/CustomerMasterList');
-          }
-        }
-      });
+      console.log(req);
+      // this.masterService.masterPost('common/create', req).subscribe({
+      //   next: (res: any) => {
+      //     if (res) {
+      //       // Display success message
+      //       Swal.fire({
+      //         icon: "success",
+      //         title: "Successful",
+      //         text: res.message,
+      //         showConfirmButton: true,
+      //       });
+      //       this.Route.navigateByUrl('/Masters/CustomerMaster/CustomerMasterList');
+      //     }
+      //   }
+      // });
     }
   }
   //#endregion

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { CustomerbillControl } from 'src/assets/FormControls/customer-bill-details';
+import { calculateTotalField } from '../unbilled-prq/unbilled-utlity';
 
 @Component({
   selector: 'app-customer-bill-details',
@@ -121,14 +122,16 @@ export class CustomerBillDetailsComponent implements OnInit {
         this.router.getCurrentNavigation()?.extras?.state.data.columnData;
     }
     this.tableLoad = false;
+    const Gstamount = calculateTotalField(this.tableData, 'Gstamount');
+    const Totalamount = calculateTotalField(this.tableData, 'Totalamount');
     this.KPICountData = [
       {
-        count: 30240,
+        count: Gstamount,
         title: "GST Amount",
         class: `color-Grape-light`,
       },
       {
-        count: 30240,
+        count: Totalamount,
         title: "Total Amount",
         class: `color-Bottle-light`,
       },

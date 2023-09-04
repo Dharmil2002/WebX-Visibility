@@ -41,6 +41,7 @@ import { VendorBillDetailsComponent } from './vendor-bill-details/vendor-bill-de
 import { VoucherDetailsComponent } from './voucher-details/voucher-details.component';
 import { AssignVehiclePageMethods } from "./assign-vehicle-page/assgine-vehicle-utility";
 import { RakeDetailComponent } from './rake-detail/rake-detail.component';
+import { UnbilledPrqComponent } from './unbilled-prq/unbilled-prq.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -66,7 +67,8 @@ import { RakeDetailComponent } from './rake-detail/rake-detail.component';
     CustomerBillDetailsComponent,
     VendorBillDetailsComponent,
     VoucherDetailsComponent,
-    RakeDetailComponent
+    RakeDetailComponent,
+    UnbilledPrqComponent
   ],
   imports: [
     CommonModule,

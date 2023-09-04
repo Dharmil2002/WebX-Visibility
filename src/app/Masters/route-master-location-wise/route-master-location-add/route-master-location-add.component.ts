@@ -194,7 +194,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
     })
   }
   cancel() {
-    window.history.back();
+    this.route.navigateByUrl('/Masters/RouteLocationWise/RouteList');
   }
   save() {
     let req = {

@@ -275,7 +275,7 @@ export class ChaEntryPageComponent implements OnInit {
   }
 
   cancel() {
-    window.history.back();
+    this.goBack(7)
   }
 
   functionCallHandler($event) {

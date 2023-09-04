@@ -220,7 +220,7 @@ export class CompanygstmasterAddComponent implements OnInit {
     })
   }
   cancel() {
-    window.history.back();
+    this.route.navigateByUrl('/Masters/CompanyGSTMaster/CompanyGSTMasterList');
   }
   // Helper function to check if an array of GSTINs contains valid GSTIN format
   isValidGstInNumber(gstInNumbers: any[]): boolean {

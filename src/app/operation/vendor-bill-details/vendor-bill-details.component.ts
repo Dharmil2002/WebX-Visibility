@@ -97,8 +97,7 @@ export class VendorBillDetailsComponent implements OnInit {
   tableLoad: boolean = true;
   constructor(
     private router: Router,
-    private fb: UntypedFormBuilder,
-    private masterService: MasterService
+    private fb: UntypedFormBuilder
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data =

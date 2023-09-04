@@ -161,7 +161,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
     });
   }
   cancel() {
-    window.history.back();
+    this.route.navigateByUrl('/Masters/RouteScheduleMaster/RouteScheduleMasterList');
   }
 
   save() {

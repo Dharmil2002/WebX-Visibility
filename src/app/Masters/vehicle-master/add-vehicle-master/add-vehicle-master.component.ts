@@ -180,7 +180,7 @@ export class AddVehicleMasterComponent implements OnInit {
     this.vehicleTableForm.controls["outerCft"].setValue(outerDCal.toFixed(2));
   }
   cancel() {
-    window.history.back();
+    this.route.navigateByUrl('/Masters/VehicleMaster/VehicleMasterList');
   }
   /*get all Master Details*/
   async getAllMastersData() {

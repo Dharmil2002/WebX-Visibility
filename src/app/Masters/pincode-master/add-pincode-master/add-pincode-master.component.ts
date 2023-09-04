@@ -180,7 +180,7 @@ export class AddPinCodeMasterComponent implements OnInit {
     }
 
     cancel() {
-        window.history.back();
+        this.route.navigateByUrl('/Masters/PinCodeMaster/PinCodeMasterList');
     }
 
     async save() {

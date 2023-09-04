@@ -61,7 +61,7 @@ export class CustomerGroupAddComponent implements OnInit {
     this.groupTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
   }
   cancel() {
-    window.history.back();
+    this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
   }
   //#region Save Function
   save() {

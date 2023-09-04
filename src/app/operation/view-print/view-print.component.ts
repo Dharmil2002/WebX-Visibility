@@ -41,7 +41,7 @@ export class ViewPrintComponent implements OnInit {
 
   }
   Close(): void {
-    window.history.back();
+    this.goBack(6);
   }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });

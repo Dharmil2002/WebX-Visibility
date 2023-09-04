@@ -77,7 +77,7 @@ export class ClusterMasterAddComponent implements OnInit {
     this.clusterTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   cancel() {
-    window.history.back();
+    this.Route.navigateByUrl('/Masters/ClusterMaster/ClusterMasterList');
   }
   //#region Pincode Dropdown
   getPincodeData() {

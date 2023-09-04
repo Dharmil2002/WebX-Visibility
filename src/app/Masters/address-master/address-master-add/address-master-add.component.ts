@@ -84,7 +84,7 @@ export class AddressMasterAddComponent implements OnInit {
     this.addressTableForm = formGroupBuilder(this.fb, [this.jsonControlGroupArray]);
   }
   cancel() {
-    window.history.back();
+    this.Route.navigateByUrl('/Masters/AddressMaster/AddressMasterList');
   }
   //#region Pincode Dropdown
   async getPincodeList() {

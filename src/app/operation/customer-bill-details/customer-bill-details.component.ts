@@ -161,7 +161,11 @@ export class CustomerBillDetailsComponent implements OnInit {
     this.handTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   cancel() {
-    window.history.back();
-  }
+    this.goBack(9)
+  } 
   save() {}
+  
+  goBack(tabIndex: number): void {
+    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+  }
 }

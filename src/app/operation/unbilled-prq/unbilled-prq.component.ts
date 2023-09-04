@@ -45,13 +45,8 @@ export class UnbilledPrqComponent implements OnInit {
       class: "matcolumncenter",
       Style: "",
     },
-    Fcity: {
-      Title: "From City",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    Tcity: {
-      Title: "To City",
+    FTcity: {
+      Title: "From & To City",
       class: "matcolumncenter",
       Style: "",
     },
@@ -96,7 +91,7 @@ export class UnbilledPrqComponent implements OnInit {
       Style: "",
     },
   };
-  staticField = ["RequestiD", "Requesteddate", "Billingparty", "Vehicleno",  "Dokno", "Fcity", "Tcity",
+  staticField = ["RequestiD", "Requesteddate", "Billingparty", "Vehicleno",  "Dokno", "FTcity",
   "Famount", "Oamount", "Gtotal","Gstrate", "Gstamount", "Grandtotal", "mode", "Pdatetime"];
   breadScrums = [
     {
@@ -121,8 +116,7 @@ export class UnbilledPrqComponent implements OnInit {
       Billingparty: "ABC Roadways",
       Vehicleno: "MH46AA7686",
       Dokno:"CNDELB5889",
-      Fcity:"New Delhi",
-      Tcity:"Mumbai",
+      FTcity:"New Delhi-Mumbai",
       Famount:12200.00,
       Oamount:7800.00,
       Gtotal:20000.00,
@@ -138,8 +132,7 @@ export class UnbilledPrqComponent implements OnInit {
       Billingparty: "ABC Roadways",
       Vehicleno: "WB48BB9653",
       Dokno:"CNDELB5890",
-      Fcity:"New Delhi",
-      Tcity:"Mumbai",
+      FTcity:"New Delhi-Mumbai",
       Famount:12200.00,
       Oamount:5000.00,
       Gtotal:17200.00,
@@ -155,8 +148,7 @@ export class UnbilledPrqComponent implements OnInit {
       Billingparty: "ABC Roadways",
       Vehicleno: "UP56AH6325",
       Dokno:"CNDELB5891",
-      Fcity:"New Delhi",
-      Tcity:"Mumbai",
+      FTcity:"New Delhi-Mumbai",
       Famount:12200.00,
       Oamount:2000.00,
       Gtotal:14200.00,
@@ -210,7 +202,6 @@ export class UnbilledPrqComponent implements OnInit {
         class: `color-Grape-light`,
       },
     ]
-    //this.initializeFormControl();
   }
 
   ngOnInit(): void {}
@@ -226,14 +217,6 @@ export class UnbilledPrqComponent implements OnInit {
       console.log("failed");
     }
   }
-
-  // initializeFormControl() {
-  //   this.HandFormControls = new VoucherdetaisControl();
-  //   // Get form controls for job Entry form section
-  //   this.jsonControlArray = this.HandFormControls.getHandOverArrayControls();
-  //   // Build the form group using formGroupBuilder function
-  //   this.handTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-  // }
   cancel() {
     window.history.back();
   }

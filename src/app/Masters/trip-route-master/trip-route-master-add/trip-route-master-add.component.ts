@@ -151,7 +151,7 @@ export class TripRouteMasterAddComponent implements OnInit {
     }
   }
   cancel() {
-    window.history.back();
+    this.route.navigateByUrl('/Masters/TripRouteMaster/TripRouteMasterList');
   }
 
   save() {
@@ -381,7 +381,6 @@ export class TripRouteMasterAddComponent implements OnInit {
         };
       })
     ).subscribe((mergedData) => {
-      debugger
       this.allData = mergedData;
       console.log(this.allData);
       // Access the merged data here

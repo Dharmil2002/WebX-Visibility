@@ -1,11 +1,10 @@
-<mat-card class="mat-elevation-z3 Rangedate">
-    <button style="display: block;"
-      *ngFor="let item of customPresets"
-      mat-button
-      color="primary"
-      (click)="selectRange(item)"
-    >
-      {{ item }}
-    </button>
-  </mat-card>
-  
+<mat-card class="mat-elevation-z3 Rangedate" style="box-shadow: none; padding: 15px 15px 0px 15px;">
+  <mat-form-field appearance="outline" style="width: -webkit-fill-available;display: contents;">
+    <mat-label>Select a Date Range</mat-label>
+    <mat-select (selectionChange)="selectRange($event.value)" color="primary">
+      <mat-option *ngFor="let item of customPresets" [value]="item">
+        {{ item }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-card>

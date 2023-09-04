@@ -15,9 +15,9 @@ import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
-import { from } from "rxjs";
 import { MatCardModule } from "@angular/material/card";
 import { DatePickerComponent } from './date-picker/date-picker.component';
+import { MatSelectModule } from "@angular/material/select";
 
 const materialModules = [
   MatButtonModule,
@@ -32,6 +32,7 @@ const materialModules = [
   MatButtonToggleModule,
   MatFormFieldModule,
   MatSlideToggleModule,
+  MatSelectModule,
 ];
 @NgModule({
   declarations: [FileUploadComponent, BreadcrumbComponent, CustomeDatePickerComponent, CustomRangePanelComponent, DatePickerComponent],

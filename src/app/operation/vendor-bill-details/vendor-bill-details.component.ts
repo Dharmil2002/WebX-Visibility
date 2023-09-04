@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { VendorbillControl } from 'src/assets/FormControls/vendor-bill-details-control';
+import { calculateTotalField } from '../unbilled-prq/unbilled-utlity';
 
 @Component({
   selector: 'app-vendor-bill-details',
@@ -104,14 +104,16 @@ export class VendorBillDetailsComponent implements OnInit {
         this.router.getCurrentNavigation()?.extras?.state.data.columnData;
     }
     this.tableLoad = false;
+    const Gstamount = calculateTotalField(this.tableData, 'Gstamount');
+    const Totalamount = calculateTotalField(this.tableData, 'Totalamount');
     this.KPICountData = [
       {
-        count: 30240,
+        count: Gstamount,
         title: "GST Amount",
         class: `color-Grape-light`,
       },
       {
-        count: 30240,
+        count: Totalamount,
         title: "Total Amount",
         class: `color-Bottle-light`,
       },

@@ -67,7 +67,7 @@
 </div>
 <!-- Generic Table -->
 <div class="responsive_table">
-    <mat-table [dataSource]="dataSource" matSort>
+    <mat-table [style]="TableStyle" [dataSource]="dataSource" matSort>
         <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)">
             <ng-container *ngIf="!metaData.noColumnSort.includes(tableData); else elseBlock">
                 <mat-header-cell [style]="columnHeader[tableData].Style" *matHeaderCellDef mat-sort-header
@@ -76,7 +76,7 @@
                 </mat-header-cell>
             </ng-container>
             <ng-template #elseBlock>
-                <mat-header-cell *matHeaderCellDef [class]="columnHeader[tableData].class">
+                <mat-header-cell *matHeaderCellDef [class]="columnHeader[tableData].class" [style]="columnHeader[tableData].Style">
                     {{columnHeader[tableData].Title}}
                     <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;" *ngIf="tableData === 'checkBoxRequired'" color="primary"
                         (change)="selectAll($event)" [(ngModel)]="AllChack" [indeterminate]="someComplete()"></mat-checkbox>
@@ -134,5 +134,5 @@
         color: #36cbe9;
         font-weight: 900;
     }
-    
+
 </style>

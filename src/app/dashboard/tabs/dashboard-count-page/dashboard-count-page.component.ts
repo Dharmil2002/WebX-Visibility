@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { CustomeDatePickerComponent } from 'src/app/shared-components/custome-date-picker/custome-date-picker.component';
+import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-date-picker/custome-date-picker.component';
 
 @Component({
   selector: 'app-dashboard-count-page',

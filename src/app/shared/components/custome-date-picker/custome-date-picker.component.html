@@ -1,13 +1,8 @@
-<app-custom-range-panel></app-custom-range-panel> 
+<app-custom-range-panel></app-custom-range-panel>
 
-<div class="example-header">
+<div class="example-header" style="text-align-last: center;">
   <!-- "previous" buttons -->
-  <button
-    mat-icon-button
-    class="example-double-arrow"
-    (click)="previousClicked('year')"
-  >
-    <mat-icon>keyboard_arrow_left</mat-icon>
+  <button mat-icon-button class="example-double-arrow" (click)="previousClicked('year')">
     <mat-icon>keyboard_arrow_left</mat-icon>
   </button>
   <button mat-icon-button (click)="previousClicked('month')">
@@ -21,12 +16,7 @@
   <button mat-icon-button (click)="nextClicked('month')">
     <mat-icon>keyboard_arrow_right</mat-icon>
   </button>
-  <button
-    mat-icon-button
-    class="example-double-arrow"
-    (click)="nextClicked('year')"
-  >
-    <mat-icon>keyboard_arrow_right</mat-icon>
+  <button mat-icon-button class="example-double-arrow" (click)="nextClicked('year')">
     <mat-icon>keyboard_arrow_right</mat-icon>
   </button>
 </div>

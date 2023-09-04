@@ -6,7 +6,7 @@
         <mat-form-field class="example-full-width" appearance="outline"
           *ngIf="(formItem.type=='text' || formItem.type=='number' || formItem.type=='password') && formItem.generatecontrol===true ">
   
-          <mat-label class="labelsize">{{formItem.label}}</mat-label>
+          <mat-label class="fontbold">{{formItem.label}}</mat-label>
           <!-- password block -->
           <ng-container *ngIf="formItem.type=='password';else elseBlock">
             <input matInput [type]="formItem.additionalData.inputType" formControlName={{formItem.name}}
@@ -51,12 +51,12 @@
         <!--toggles---------------------------------------------------------->
         <mat-slide-toggle *ngIf="formItem.type=='toggle' && formItem.generatecontrol===true" color="primary"
           (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-          formControlName={{formItem.name}}>{{formItem.label}}</mat-slide-toggle>
+          formControlName={{formItem.name}}><span class="togglefontbold">{{formItem.label}}</span></mat-slide-toggle>
   
         <!--Datepicker---------------------------------------------------------->
         <mat-form-field class="example-full-width" appearance="outline"
           *ngIf="formItem.type=='date' && formItem.generatecontrol===true">
-          <mat-label class="labelsize">{{formItem.label}}</mat-label>
+          <mat-label class="fontbold">{{formItem.label}}</mat-label>
           <input matInput [matDatepicker]="picker" formControlName={{formItem.name}}
             [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
             [max]="formItem.additionalData?.maxDate" (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
@@ -76,7 +76,7 @@
         <!-- Static Dropdown Down Field -->
         <mat-form-field class="example-full-width" appearance="outline"
           *ngIf="(formItem.type=='Staticdropdown') && formItem.generatecontrol===true">
-          <mat-label class="labelsize">{{formItem.label}}</mat-label>
+          <mat-label class="fontbold">{{formItem.label}}</mat-label>
           <mat-select formControlName={{formItem.name}} [multiple]="(formItem.additionalData?.multiple||false)"
             (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelection ,
                       eventArgs: $event })" [disabled]="formItem.disable">
@@ -98,7 +98,7 @@
         <!--autocomplete dropdown ---------------------------------------------------------->
         <mat-form-field class="example-full-width" appearance="outline"
           *ngIf="formItem.type=='dropdown' && formItem.generatecontrol===true">
-          <mat-label class="labelsize">{{formItem.label}}</mat-label>
+          <mat-label class="fontbold">{{formItem.label}}</mat-label>
           <input matInput placeholder={{formItem.placeholder}} [matAutocomplete]="autocomplete"
             formControlName={{formItem.name}} [readonly]="formItem.disable"
             (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">
@@ -127,7 +127,7 @@
         <!-- multiselect Dropdown ---------------------------------------------------------->
         <mat-form-field class="example-full-width" appearance="outline"
           *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
-          <mat-label class="labelsize">{{formItem.label}}</mat-label>
+          <mat-label class="fontbold">{{formItem.label}}</mat-label>
           <mat-select [formControlName]="formItem.additionalData.support" placeholder={{formItem.placeholder}}
             [multiple]="true" #singleSelect>
             <mat-option>
@@ -162,7 +162,7 @@
         <!-- single select -->
         <mat-form-field appearance="outline" floatLabel="never" class="example-full-width"
           *ngIf="formItem.type=='select' && formItem.generatecontrol===true">
-          <mat-label class="labelsize">{{formItem.label}}</mat-label>
+          <mat-label class="fontbold">{{formItem.label}}</mat-label>
           <mat-select placeholder="{{formItem.label}}" formControlName={{formItem.additionalData.support}}>
             <mat-option>
               <ngx-mat-select-search placeholderLabel="Find bank..." noEntriesFoundLabel="'no matching bank found'"
@@ -231,7 +231,7 @@
         <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
         <mat-form-field class="example-full-width" appearance="outline"
           *ngIf="(formItem.type=='time') && formItem.generatecontrol">
-          <mat-label class="labelsize">{{formItem.label}}</mat-label>
+          <mat-label class="fontbold">{{formItem.label}}</mat-label>
           <input matInput [owlDateTimeTrigger]="timepicker" [formControlName]="formItem.name" [owlDateTime]="timepicker">
           <mat-icon matSuffix [owlDateTimeTrigger]="timepicker" class="date-icon">schedule</mat-icon>
           <owl-date-time [pickerType]="'timer'" #timepicker></owl-date-time>
@@ -250,7 +250,7 @@
         <!--textbox (input) Date Timer Picker controls---------------------------------------------------------->
         <mat-form-field class="example-full-width" appearance="outline" *ngIf="(formItem.type=='datetimerpicker')">
   
-          <mat-label class="labelsize">{{formItem.label}}</mat-label>
+          <mat-label class="fontbold">{{formItem.label}}</mat-label>
           <input matInput [owlDateTimeTrigger]="datetimepicker" [owlDateTime]="datetimepicker"
             [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
             [max]="formItem.additionalData?.maxDate" (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
@@ -270,7 +270,7 @@
         <!--Date Picker-->
         <mat-form-field class="datepickercss" style="width: 100%" *ngIf="(formItem.type=='daterangpicker')"
           appearance="outline">
-          <mat-label class="labelsize">Enter a date range</mat-label>
+          <mat-label class="fontbold">Enter a date range</mat-label>
           <mat-date-range-input [rangePicker]="picker">
             <input matStartDate [formControlName]="formItem.name" placeholder="Start date" />
             <input matEndDate [formControlName]="formItem.additionalData.support" placeholder="End date" />

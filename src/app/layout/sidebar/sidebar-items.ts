@@ -401,6 +401,15 @@ export const ROUTES: RouteInfo[] =
         class: "",
         groupTitle: false,
         submenu: []
+      },
+      {
+        path: "Operation/Unbilled",
+        title: "Unbilled",
+        moduleName: "Unbilled",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
       }
       ],
     },

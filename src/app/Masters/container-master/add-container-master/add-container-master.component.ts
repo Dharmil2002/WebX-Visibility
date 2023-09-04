@@ -67,7 +67,7 @@ export class AddContainerMasterComponent implements OnInit {
     this.containerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   cancel() {
-    window.history.back();
+    this.Route.navigateByUrl('/Masters/ContainerMaster/ContainerMasterList');
   }
 
   //#region Save Function

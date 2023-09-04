@@ -95,7 +95,7 @@ export class AddCityMasterComponent implements OnInit {
     }
 
     cancel() {
-        window.history.back();
+        this.route.navigateByUrl('/Masters/CityMaster/CityMasterView');
     }
 
     async fetchAndPopulateData() {

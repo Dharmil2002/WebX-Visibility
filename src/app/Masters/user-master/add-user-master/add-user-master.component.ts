@@ -350,7 +350,7 @@ export class AddUserMasterComponent implements OnInit {
     }
 
     cancel() {
-        window.history.back();
+        this.route.navigateByUrl('/Masters/UserMaster/UserMasterView');
     }
 
     functionCallHandler($event) {

@@ -195,8 +195,7 @@ export class AddStateMasterComponent implements OnInit {
     }
 
     cancel() {
-        window.history.back();
-        //this.Route.navigateByUrl("/Masters/StateMaster/StateMasterView");
+        this.route.navigateByUrl('/Masters/StateMaster/StateMasterView');
     }
 
     functionCallHandler($event) {

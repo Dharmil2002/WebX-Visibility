@@ -291,7 +291,7 @@ export class RakeEntryPageComponent implements OnInit {
     }
 
     cancel() {
-        this.goBack(8)
+        this.goBack(7)
     }
 
     goBack(tabIndex: number): void {

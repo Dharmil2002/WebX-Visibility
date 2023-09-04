@@ -154,6 +154,6 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
 }
 
   cancel() {
-    window.history.back();
+    this.route.navigateByUrl('Masters/Vehicle/Status');
   }
 }

@@ -258,7 +258,7 @@ export class AddLocationMasterComponent implements OnInit {
     }
   }
   cancel() {
-    window.history.back();
+    this.router.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
   }
   /*get all Master Details*/
   async getAllMastersData() {

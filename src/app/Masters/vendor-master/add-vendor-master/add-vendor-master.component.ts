@@ -373,7 +373,7 @@ export class AddVendorMasterComponent implements OnInit {
     }
   }
   cancel() {
-    window.history.back();
+    this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
   }
   setStateCityData() {
     const fetchData = this.pincodeResponse.data.find(item => item.pincode == this.vendorTableForm.controls.vendorPinCode.value.value)

@@ -150,7 +150,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
     this.vehicleTypeTableForm.controls["capacityDiscount"].setValue(calculateLhw.toFixed(2));
   }
   cancel() {
-    window.history.back();
+    this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
   }
   async checkVehicleTypeExist() {
     let req = {

@@ -23,28 +23,6 @@ const routes: Routes = [
         loadChildren: () =>
           import("./Masters/masters.module").then((m) => m.MastersModule),
       },
-
-      {
-        path: "widget",
-        loadChildren: () =>
-          import("./widget/widget.module").then((m) => m.WidgetModule),
-      },
-      {
-        path: "ui",
-        loadChildren: () => import("./ui/ui.module").then((m) => m.UiModule),
-      },
-
-      {
-        path: "tables",
-        loadChildren: () =>
-          import("./tables/tables.module").then((m) => m.TablesModule),
-      },
-
-      {
-        path: "timeline",
-        loadChildren: () =>
-          import("./timeline/timeline.module").then((m) => m.TimelineModule),
-      },
       {
         path: "icons",
         loadChildren: () =>

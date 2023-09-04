@@ -32,7 +32,6 @@ import { PageLoaderComponent } from "./layout/page-loader/page-loader.component"
 import { RightSidebarComponent } from "./layout/right-sidebar/right-sidebar.component";
 import { SharedModule } from "./shared/shared.module";
 import { SidebarComponent } from "./layout/sidebar/sidebar.component";
-import { SignalRService } from "./core/service/SignalR.service";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { WINDOW_PROVIDERS } from "./core/service/window.service";
 import { environment } from "src/environments/environment";
@@ -99,8 +98,7 @@ export function createTranslateLoader(http: HttpClient): any {
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     fakeBackendProvider,
-    WINDOW_PROVIDERS,
-    SignalRService,
+    WINDOW_PROVIDERS
   ],
   bootstrap: [AppComponent],
 })

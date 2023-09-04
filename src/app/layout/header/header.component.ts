@@ -11,7 +11,6 @@ import {
 import { Router } from "@angular/router";
 import { ConfigService } from "src/app/config/config.service";
 import { AuthService } from "src/app/core/service/auth.service";
-import { RightSidebarService } from "src/app/core/service/rightsidebar.service";
 import { WINDOW } from "src/app/core/service/window.service";
 import { LanguageService } from "src/app/core/service/language.service";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
@@ -42,7 +41,6 @@ export class HeaderComponent
     @Inject(WINDOW) private window: Window,
     private renderer: Renderer2,
     public elementRef: ElementRef,
-    private rightSidebarService: RightSidebarService,
     private configService: ConfigService,
     private authService: AuthService,
     private router: Router,
@@ -133,7 +131,7 @@ export class HeaderComponent
     } else {
       this.flagvalue = val.map((element) => element.flag);
     }
-    this.convertTimeFromUtc(new Date(), 'India Standard Timezone')
+    this.convertTimeFromUtc(new Date(), 'Asia/Kolkata');
     this.getCurrentFinancialYear();
   }
   ngAfterViewInit() {

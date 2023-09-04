@@ -3,7 +3,7 @@ import { AuthService } from "./core/service/auth.service";
 import { Component } from "@angular/core";
 import { NgxSpinnerService } from "ngx-spinner";
 import { PlatformLocation } from "@angular/common";
-import { SignalRService } from "./core/service/SignalR.service";
+
 
 @Component({
   selector: "app-root",
@@ -21,8 +21,7 @@ export class AppComponent {
     public appservice: AuthService,
     public _router: Router,
     location: PlatformLocation,
-    private spinner: NgxSpinnerService,
-    public signalservice: SignalRService
+    private spinner: NgxSpinnerService
   ) {
     this._router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
@@ -51,8 +50,6 @@ export class AppComponent {
           }
         },
       };
-      this.signalservice.startConnection(res.url, options);
-      this.signalservice.addTransferChartDataListener();
     });
   }
 }

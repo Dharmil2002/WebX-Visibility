@@ -80,17 +80,17 @@ export class StocksComponent
     },
     noofPackages: {
       Title: "No of Packages",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:2px",
     },
     actualWeight: {
       Title: "Actual Weight",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:2px",
     },
     chargedWeight: {
       Title: "Charged Weight",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "min-width:2px",
     },
     status: {

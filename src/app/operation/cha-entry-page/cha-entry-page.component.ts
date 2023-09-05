@@ -8,6 +8,8 @@ import { processProperties } from "src/app/Masters/processUtility";
 import Swal from "sweetalert2";
 import { ChaEntryControl } from "src/assets/FormControls/cha-entry";
 import { chaJobDetail, updateJobStatus } from "./cha-utility";
+import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
+import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
 
 @Component({
   selector: 'app-cha-entry-page',
@@ -128,7 +130,14 @@ export class ChaEntryPageComponent implements OnInit {
     }
   };
   RakeEntry: boolean;
-  constructor(private Route: Router, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) {
+  constructor(
+    private Route: Router,
+    private fb: UntypedFormBuilder,
+    private masterService: MasterService,
+    private filter: FilterUtils,
+    private retryAndDownloadService: RetryAndDownloadService,
+    private geoLocationService:GeolocationService,
+    ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
       if (this.jobDetail.Action == "Rake Entry") {
@@ -257,7 +266,7 @@ export class ChaEntryPageComponent implements OnInit {
       ...this.chaEntryTableForm.value,
       ...docDetail,
     };
-    const res = await chaJobDetail(jobDetail, this.masterService);
+    const res = await chaJobDetail(jobDetail, this.masterService,this.retryAndDownloadService,this.geoLocationService);
     const resUpdate = await updateJobStatus(this.jobDetail, this.masterService)
     if (res) {
       Swal.fire({

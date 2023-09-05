@@ -3,7 +3,7 @@ import { prqDetail } from 'src/app/core/models/operations/prq/prq';
 /* here i create class for the bind controls in formGrop */
 export class PrqEntryControls {
   private fieldMapping: FormControls[];
-  constructor(prqDetail:prqDetail,isUpdate) {
+  constructor(prqDetail: prqDetail, isUpdate) {
     this.fieldMapping = [
       {
         name: "prqId",
@@ -33,7 +33,7 @@ export class PrqEntryControls {
           },
         ],
         additionalData: {
-          minDate: isUpdate?"":new Date(),
+          minDate: isUpdate ? "" : new Date(),
         },
       },
       {
@@ -107,13 +107,16 @@ export class PrqEntryControls {
             message: "From City is required",
           },
           {
-              name: "autocomplete"
+            name: "autocomplete"
           },
           {
-              name: "invalidAutocomplete",
-              message: "Choose proper value",
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
           }
         ],
+        functions: {
+          onOptionSelect: 'GetBranchChanges'
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -135,11 +138,11 @@ export class PrqEntryControls {
             message: "To City is required",
           },
           {
-              name: "autocomplete"
+            name: "autocomplete"
           },
           {
-              name: "invalidAutocomplete",
-              message: "Choose proper value",
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
           }
         ],
         additionalData: {
@@ -173,7 +176,7 @@ export class PrqEntryControls {
         label: "PRQ Branch",
         placeholder: "PRQ Branch",
         type: "dropdown",
-        value:"",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",

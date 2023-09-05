@@ -24,6 +24,7 @@ import { CustomerBillDetailsComponent } from "./customer-bill-details/customer-b
 import { VoucherDetailsComponent } from "./voucher-details/voucher-details.component";
 import { ChaDetailComponent } from "./cha-detail/cha-detail.component";
 import { UnbilledPrqComponent } from "./unbilled-prq/unbilled-prq.component";
+import { ErrorHandingComponent } from "./error-handing/error-handing.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -120,6 +121,10 @@ const routes: Routes = [
   {
     path: "Unbilled",
     component: UnbilledPrqComponent
+  },
+  {
+    path: "IssueTracker",
+    component: ErrorHandingComponent
   }
 ]
 

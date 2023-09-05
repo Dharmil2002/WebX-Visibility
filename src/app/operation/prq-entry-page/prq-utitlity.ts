@@ -1,21 +1,35 @@
 import Swal from 'sweetalert2';
-export async function addPrqData(prqData, masterService) {
+import { geoDataServices } from '../error-handing/outbox-utility';
+export async function addPrqData(prqData, masterService, retryAndDownloadService, geoLocationService) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "prq_detail",
         data: prqData
     }
-    const res = await masterService.masterMongoPost("generic/create", reqBody).toPromise();
-    return res
+    const maxRetries = 3;
+    try {
+        const getlocation = await geoDataServices(geoLocationService);
+        const res = await retryAndDownloadService.retryWithDownload(
+            masterService,
+            "generic/create",
+            reqBody,
+            maxRetries,
+            "PrqEntry",
+            getlocation
+        );
+        return res
+    } catch (error) {
+
+    }
 }
 
-export async function updatePrqStatus(prqData, masterService) {
+export async function updatePrqStatus(prqData,masterService) {
     delete prqData.srNo
     delete prqData.Action
     const reqBody = {
         "companyCode": localStorage.getItem('companyCode'),
         "collectionName": "prq_detail",
-        "filter": {prqId: prqData.prqNo || prqData.prqId || ""},
+        "filter": { prqId: prqData.prqNo || prqData.prqId || "" },
         "update": {
             ...prqData,
         }
@@ -90,7 +104,7 @@ export async function locationFromApi(masterService) {
     }
     try {
         const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
-        const filterMap = res?.data?.map(x => ({ value: x.locCode, name: x.locName })) ?? null;
+        const filterMap = res?.data?.map(x => ({ value: x.locCode, name: x.locName, city: x.locCity })) ?? null;
         return filterMap.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
     } catch (error) {
         console.error("An error occurred:", error);

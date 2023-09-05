@@ -2225,6 +2225,6 @@ export class EwayBillDocketBookingComponent implements OnInit {
      "Invoice Details":  this.DocketEntity.Invoices
 
   }
- this.IjsonDataServiceService.exportData(ewayBillJsonDetail); 
+ //this.IjsonDataServiceService.exportData(ewayBillJsonDetail); 
   }
 }

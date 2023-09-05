@@ -12,6 +12,8 @@ import { addPrqData, customerFromApi, locationFromApi, showConfirmationDialog } 
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { prqDetail } from 'src/app/core/models/operations/prq/prq';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
+import { GeolocationService } from 'src/app/core/service/geo-service/geolocation.service';
 
 @Component({
   selector: 'app-prq-entry-page',
@@ -49,7 +51,11 @@ export class PrqEntryPageComponent implements OnInit {
   ];
   prqDetail: prqDetail;
   isConfirm: boolean;
-  constructor(private fb: UntypedFormBuilder, private masterService: MasterService,
+  locationDetail: any;
+  constructor(private fb: UntypedFormBuilder,
+    private retryAndDownloadService: RetryAndDownloadService,
+    private masterService: MasterService,
+    private geoLocationService:GeolocationService,
     private filter: FilterUtils, private router: Router) {
       this.prqDetail = new prqDetail({});
       if (this.router.getCurrentNavigation()?.extras?.state != null) {
@@ -184,7 +190,16 @@ export class PrqEntryPageComponent implements OnInit {
   cancel() {
     this.goBack(6)
   }
-
+  GetBranchChanges(){
+   const locationDetail= this.locationDetail.filter((x)=>x.city.toLowerCase()===this.prqEntryTableForm.value.fromCity.name.toLowerCase());
+   this.filter.Filter(
+    this.jsonControlPrqArray,
+    this.prqEntryTableForm,
+    locationDetail,
+    this.prqBranchCode,
+    this.prqBranchStatus
+  );
+  }
   async save() {
     const tabcontrols = this.prqEntryTableForm;
     clearValidatorsAndValidate(tabcontrols);
@@ -200,7 +215,7 @@ export class PrqEntryPageComponent implements OnInit {
     const prqNo = `PRQ/${raise}/${financialYear}/${dynamicNumber}`;
     this.prqEntryTableForm.controls['_id'].setValue(prqNo);
     this.prqEntryTableForm.controls['prqId'].setValue(prqNo);
-    const res = await addPrqData(this.prqEntryTableForm.value, this.masterService);
+    const res = await addPrqData(this.prqEntryTableForm.value,this.masterService,this.retryAndDownloadService,this.geoLocationService);
 
     if (res) {
       Swal.fire({
@@ -227,7 +242,7 @@ export class PrqEntryPageComponent implements OnInit {
   async bindDataFromDropdown() {
     const resLoc=await locationFromApi(this.masterService);
     const resCust=await customerFromApi(this.masterService);
-    
+      this.locationDetail=resLoc;
     if(this.isUpdate){
       const prqLoc=resLoc.find((x)=>x.value.trim()===this.prqDetail.prqBranch);
       this.prqEntryTableForm.controls['prqBranch'].setValue(prqLoc);

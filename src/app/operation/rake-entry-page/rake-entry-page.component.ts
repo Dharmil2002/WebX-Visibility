@@ -9,6 +9,8 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { addRakeEntry, filterDocketDetail, genericGet, vendorDetailFromApi } from "./rate-utility";
 import Swal from "sweetalert2";
+import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
+import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -66,7 +68,12 @@ export class RakeEntryPageComponent implements OnInit {
         this.getDocketDetail()
     }
 
-    constructor(private fb: UntypedFormBuilder, private Route: Router, private routeActive: ActivatedRoute, private masterService: MasterService,
+    constructor(
+        private fb: UntypedFormBuilder,
+        private Route: Router,
+        private retryAndDownloadService: RetryAndDownloadService,
+        private masterService: MasterService,
+        private geoLocationService: GeolocationService,
         private filter: FilterUtils) {
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
             this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -141,7 +148,6 @@ export class RakeEntryPageComponent implements OnInit {
         this.rakeEntryFormControl = new RakeEntryControl();
         // Get form controls for city Location Details section
         this.jsonControlArray = this.rakeEntryFormControl.getRakeEntryFormControls();
-
         // Build the form group using formGroupBuilder function and the values of jsonControlArray
         this.rakeEntryTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
         this.show = false;
@@ -341,7 +347,7 @@ export class RakeEntryPageComponent implements OnInit {
             ...this.rakeEntryTableForm.value,
             ...docDetail,
         };
-        const res = await addRakeEntry(jobDetail, this.masterService)
+        const res = await addRakeEntry(jobDetail, this.masterService, this.retryAndDownloadService, this.geoLocationService)
         if (res) {
             Swal.fire({
                 icon: "success",
@@ -381,12 +387,20 @@ export class RakeEntryPageComponent implements OnInit {
         );
     }
     cityMapping() {
-        const fromCityControl = this.rakeEntryTableForm.controls['fromCity'];
-        const toCityControl = this.rakeEntryTableForm.controls['toCity'];
-        if (fromCityControl.value && toCityControl.value) {
-            const city = `${fromCityControl.value.value}-${toCityControl.value.value}`;
-            this.cnDetail = this.allCn.filter(x => x.fromToCity === city);
-            this.display('CN');
+        if (this.rakeEntryTableForm.value.documentType !== "JOB") {
+            const fromCityControl = this.rakeEntryTableForm.controls['fromCity'];
+            const toCityControl = this.rakeEntryTableForm.controls['toCity'];
+            if (fromCityControl.value && toCityControl.value) {
+                const city = `${fromCityControl.value.value}-${toCityControl.value.value}`;
+                this.cnDetail = this.allCn.filter(x => x.fromToCity === city);
+                this.display('CN');
+            }
+            else{
+                this.display('CN');
+            }
+        }
+        else{
+            this.display('JOB');
         }
     }
 }

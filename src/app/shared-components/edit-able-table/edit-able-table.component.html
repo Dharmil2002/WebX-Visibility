@@ -35,7 +35,7 @@
 
                     </div>
                     <!-- Generic Table -->
-                    <div style="overflow-x: auto;">
+                    <div>
                         <table mat-table [dataSource]="dataSource" class="col-12" matSort>
                             <ng-container [matColumnDef]="item" *ngFor="let item of objKey(columnHeader)">
                                 <th [Style]="columnHeader[item].style" class="color-plet padding-24 border-dark-gray "

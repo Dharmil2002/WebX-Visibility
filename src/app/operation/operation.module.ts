@@ -42,6 +42,9 @@ import { VoucherDetailsComponent } from './voucher-details/voucher-details.compo
 import { AssignVehiclePageMethods } from "./assign-vehicle-page/assgine-vehicle-utility";
 import { RakeDetailComponent } from './rake-detail/rake-detail.component';
 import { UnbilledPrqComponent } from './unbilled-prq/unbilled-prq.component';
+import { ErrorHandingComponent } from './error-handing/error-handing.component';
+import { utilityService } from "../Utility/utility.service";
+import { ErrorHandlingViewComponent } from './error-handing/error-handling-view/error-handling-view.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -68,7 +71,9 @@ import { UnbilledPrqComponent } from './unbilled-prq/unbilled-prq.component';
     VendorBillDetailsComponent,
     VoucherDetailsComponent,
     RakeDetailComponent,
-    UnbilledPrqComponent
+    UnbilledPrqComponent,
+    ErrorHandingComponent,
+    ErrorHandlingViewComponent
   ],
   imports: [
     CommonModule,
@@ -86,7 +91,7 @@ import { UnbilledPrqComponent } from './unbilled-prq/unbilled-prq.component';
     MatDialogModule,
     MatSnackBarModule
   ],
-  providers: [SnackBarUtilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods],
+  providers: [SnackBarUtilityService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods],
   exports: []
 })
 export class OperationModule { }

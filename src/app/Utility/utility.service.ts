@@ -26,7 +26,7 @@ export class utilityService {
   //#region This function exports data in JSON format and downloads it as a file
 
   // @param {Object} Data - The data object to be exported.
-  exportData(Data) {
+  exportData(Data,fileName) {
     // Convert the data object to a JSON string.
     const json = JSON.stringify(Data);
 
@@ -41,7 +41,7 @@ export class utilityService {
 
     // Set the URL and filename for the anchor element.
     a.href = url;
-    a.download = 'FormData.json';
+    a.download =`${fileName}.json`;
 
     // Simulate a click on the anchor element to initiate the download.
     a.click();

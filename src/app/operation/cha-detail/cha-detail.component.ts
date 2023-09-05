@@ -4,6 +4,7 @@ import { Router } from "@angular/router";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { CHAControl } from "src/assets/FormControls/cha-detail-contorl";
+import { calculateTotalField } from "../unbilled-prq/unbilled-utlity";
 
 @Component({
   selector: "app-cha-detail",
@@ -13,7 +14,6 @@ export class ChaDetailComponent implements OnInit {
   HandFormControls: CHAControl;
   jsonControlArray: any;
   KPICountData: { count: any; title: string; class: string }[];
-
   handTableForm: UntypedFormGroup;
   columnHeader = {
     NOD: {
@@ -89,14 +89,16 @@ export class ChaDetailComponent implements OnInit {
         this.router.getCurrentNavigation()?.extras?.state.data.columnData;
     }
     this.tableLoad = false;
+    const GA = calculateTotalField(this.tableData, 'GA');
+    const TA = calculateTotalField(this.tableData, 'TA');
     this.KPICountData = [
       {
-        count: 9000,
+        count: GA,
         title: "GST Amount",
         class: `color-Grape-light`,
       },
       {
-        count: 13500,
+        count: TA,
         title: "Total Amount",
         class: `color-Bottle-light`,
       },
@@ -126,7 +128,10 @@ export class ChaDetailComponent implements OnInit {
     this.handTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   cancel() {
-    window.history.back();
-  }
+    this.goBack(9)
+  } 
   save() {}
+  goBack(tabIndex: number): void {
+    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+  }
 }

@@ -11,6 +11,8 @@ import { addJobDetail, getNextNumber, getVendorDetails } from "./job-entry-utili
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { customerFromApi } from "../prq-entry-page/prq-utitlity";
 import { getCity } from "../quick-booking/quick-utility";
+import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
+import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
 @Component({
   selector: 'app-job-entry-page',
   templateUrl: './job-entry-page.component.html',
@@ -84,7 +86,14 @@ export class JobEntryPageComponent implements OnInit {
     },
   ];
 
-  constructor(private router: Router, private fb: UntypedFormBuilder, private masterService: MasterService, private filter: FilterUtils) {
+  constructor(
+    private router: Router,
+    private fb: UntypedFormBuilder,
+    private masterService: MasterService,
+    private filter: FilterUtils,
+    private retryAndDownloadService: RetryAndDownloadService,
+    private geoLocationService:GeolocationService,
+    ) {
 
     this.initializeFormControl();
   }
@@ -195,7 +204,7 @@ export class JobEntryPageComponent implements OnInit {
       ...this.jobEntryTableForm.value,
       ...containorDetail,
     };
-    const res = await addJobDetail(jobDetail, this.masterService);
+    const res = await addJobDetail(jobDetail, this.masterService,this.retryAndDownloadService,this.geoLocationService);
 
     if (res) {
       Swal.fire({

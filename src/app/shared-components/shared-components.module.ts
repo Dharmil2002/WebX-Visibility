@@ -30,8 +30,6 @@ import { GenericTabbedFormComponent } from './generic-tabbed-form/generic-tabbed
 import { CommonWrapperComponent } from './wrappers/common-wrapper/table-wrapper.component';
 import { ComponentsModule } from '../shared/components/components.module';
 import { EditAbleTableComponent } from './edit-able-table/edit-able-table.component';
-import { CustomeDatePickerComponent } from './custome-date-picker/custome-date-picker.component';
-import { CustomRangePanelComponent } from './custome-date-picker/custom-range-panel/custom-range-panel.component';
 import { TreeViewComponent } from './tree-view/tree-view.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -62,7 +60,7 @@ const MY_DATE_FORMAT = {
 @NgModule({
   declarations: [GenericAccordionComponent, GenericTableComponent,
     FormComponent, FormWithoutAutoCompleteComponent, GenericDashBoardComponent,
-    GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent, CustomeDatePickerComponent, CustomRangePanelComponent, TreeViewComponent, GenericChartDashboardComponent, GenericCardComponent, DecimaRangeValidatorDirective, GenericTableV2Component
+    GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent, TreeViewComponent, GenericChartDashboardComponent, GenericCardComponent, DecimaRangeValidatorDirective, GenericTableV2Component
   , ExpandableTableComponent],
   imports: [
     CommonModule,

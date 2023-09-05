@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  Output,
-  SimpleChanges,
-  ViewChild,
-} from "@angular/core";
+import {AfterViewInit,Component,ElementRef,EventEmitter,Input,Output,SimpleChanges,ViewChild,} from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortable } from "@angular/material/sort";
@@ -34,6 +24,7 @@ export class GenericTableV2Component
   @Input() tableData;
   @Input() csvData;
   @Input() columnHeader;
+  @Input() TableStyle;
   @Input() addAndEditPath;
   @Input() uploadComponent;
   @Input() csvHeaders; // csvHeader contains object in form of 'column id: column Title' in a particular order

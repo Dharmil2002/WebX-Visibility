@@ -30,6 +30,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() csvFileName;
   @Input() headercode;
   @Input() backPath;
+  @Input()TableStyle;
   @Input() IscheckBoxRequired;
   @Input() Link;
   @Input() toggleArray;
@@ -201,8 +202,9 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     this.dialog.open(
       this.viewComponent,
       {
-        width: '800px',
-        height: '500px', data: item
+        width: this.width?this.width:'800px',
+        height: this.height?this.height:'500px', 
+        data: item
       });
   }
   //#endregion

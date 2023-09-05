@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +43,24 @@ export class MasterService {
   }
   setValueheaderCode(data:string){
    this.headerCode=data
+  }
+  
+  sendRequest(config: any): Observable<any> {
+    const { url, method, request } = config;
+    const apiUrl = `${environment.APIBaseURL}${url}`;
+
+    switch (method.toUpperCase()) {
+      case 'POST':
+        return this.http.post(apiUrl, request);
+      case 'PUT':
+        return this.http.put(apiUrl, request);
+      case 'GET':
+        // Add logic for GET requests if needed
+        break;
+      // Add more cases for other HTTP methods as needed
+      default:
+        break;
+    }
   }
   getHeaderCode(){
     return this.headerCode

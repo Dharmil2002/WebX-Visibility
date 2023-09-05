@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { VoucherdetaisControl } from 'src/assets/FormControls/voucher-details-control';
+import { calculateTotalField } from '../unbilled-prq/unbilled-utlity';
 
 @Component({
   selector: 'app-voucher-details',
@@ -98,9 +99,10 @@ export class VoucherDetailsComponent implements OnInit {
         this.router.getCurrentNavigation()?.extras?.state.data.columnData;
     }
     this.tableLoad = false;
+    const Voucheramount = calculateTotalField(this.tableData, 'Voucheramount');
     this.KPICountData = [
       {
-        count: 9000,
+        count: Voucheramount,
         title: "Voucher Amount",
         class: `color-Grape-light`,
       },
@@ -130,7 +132,11 @@ export class VoucherDetailsComponent implements OnInit {
     this.handTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   cancel() {
-    window.history.back();
+    this.goBack(9)
+  } 
+ 
+  goBack(tabIndex: number): void {
+    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
   }
   save() {}
 

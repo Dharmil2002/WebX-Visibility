@@ -6,7 +6,7 @@
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="(formItem.type=='text' || formItem.type=='number' || formItem.type=='password') && formItem.generatecontrol===true ">
 
-                <mat-label>{{formItem.label}}</mat-label>
+                <mat-label class="fontbold">{{formItem.label}}</mat-label>
                 <!-- password block -->
                 <ng-container *ngIf="formItem.type=='password';else elseBlock">
                     <input matInput [type]="formItem.additionalData.inputType" formControlName={{formItem.name}}
@@ -53,11 +53,12 @@
             <!--toggles---------------------------------------------------------->
             <mat-slide-toggle *ngIf="formItem.type=='toggle' && formItem.generatecontrol===true" color="primary"
                 formControlName={{formItem.name}}
-                (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">{{formItem.label}}</mat-slide-toggle>
+                (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
+                <span class="togglefontbold">{{formItem.label}}</span></mat-slide-toggle>
             <!-- single select -->
             <mat-form-field appearance="outline" floatLabel="never" class="example-full-width"
                 *ngIf="formItem.type=='select' && formItem.generatecontrol===true">
-                <mat-label>{{formItem.label}}</mat-label>
+                <mat-label class="fontbold">{{formItem.label}}</mat-label>
                 <mat-select placeholder="{{formItem.label}}"
                     (selectionChange)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
                     formControlName={{formItem.additionalData?.support}}>
@@ -86,7 +87,7 @@
             <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="(formItem.type=='time') && formItem.generatecontrol">
-                <mat-label>{{formItem.label}}</mat-label>
+                <mat-label class="fontbold">{{formItem.label}}</mat-label>
                 <input matInput [owlDateTimeTrigger]="timepicker" [formControlName]="formItem.name"
                     [owlDateTime]="timepicker">
                 <mat-icon matSuffix [owlDateTimeTrigger]="timepicker" class="date-icon">schedule</mat-icon>
@@ -102,7 +103,7 @@
             <!-- multiselect Dropdown ---------------------------------------------------------->
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
-                <mat-label>{{formItem.label}}</mat-label>
+                <mat-label class="fontbold">{{formItem.label}}</mat-label>
                 <mat-select [formControlName]="formItem.additionalData.support"
                     (selectionChange)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
                     placeholder={{formItem.placeholder}} [multiple]="true" #singleSelect>
@@ -135,7 +136,7 @@
             <!-- Static Dropdown Down Field -->
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="(formItem.type=='Staticdropdown') && formItem.generatecontrol===true">
-                <mat-label>{{formItem.label}}</mat-label>
+                <mat-label class="fontbold">{{formItem.label}}</mat-label>
                 <mat-select formControlName={{formItem.name}} [multiple]="(formItem.additionalData?.multiple||false)"
                     (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelection ,
     eventArgs: $event })" [disabled]="formItem.disable">
@@ -147,7 +148,7 @@
             <!--Datepicker---------------------------------------------------------->
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="formItem.type=='date' && formItem.generatecontrol===true">
-                <mat-label>{{formItem.label}}</mat-label>
+                <mat-label class="fontbold">{{formItem.label}}</mat-label>
                 <input matInput [matDatepicker]="picker" formControlName={{formItem.name}}
                     [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
                     [max]="formItem.additionalData?.maxDate"
@@ -185,7 +186,7 @@
             <!--file-->
             <mat-form-field appearance="outline" class="example-full-width"
                 *ngIf="formItem.type === 'file' && formItem.generatecontrol">
-                <mat-label>{{formItem.label}}</mat-label>
+                <mat-label class="fontbold">{{formItem.label}}</mat-label>
                 <input matInput style="cursor:pointer" [formControlName]="formItem.name" readonly="true"
                     (click)="fileInput.click()" class="example-full-width"
                     [multiple]="(formItem.additionalData?.multiple||false)">
@@ -199,7 +200,7 @@
             <!-- Dropdown -->
             <mat-form-field class="example-full-width" appearance="outline"
                 *ngIf="formItem.type=='dropdown' && formItem.generatecontrol===true">
-                <mat-label>{{formItem.label}}</mat-label>
+                <mat-label class="fontbold">{{formItem.label}}</mat-label>
                 <input matInput placeholder={{formItem.placeholder}} [matAutocomplete]="autocomplete"
                     formControlName={{formItem.name}} [readonly]="formItem.disable"
                     (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">

@@ -7,14 +7,14 @@
  *  Structure (with shortcodes):
                  [1. Common ]
                  [2. Fonts ]
-                 [3. Components ]       
-                 [4. Apps]                   
-                 [5. Pages ]    
-                 [6. Pugins ]        
-                 [7. UI ]     
-                 [8. Browser ]     
-   
-                
+                 [3. Components ]
+                 [4. Apps]
+                 [5. Pages ]
+                 [6. Pugins ]
+                 [7. UI ]
+                 [8. Browser ]
+
+
 /*                 [1. Common ]                   			*/
 @import "@angular/material/prebuilt-themes/indigo-pink.css";
 /* Importing Bootstrap SCSS file. */
@@ -220,7 +220,12 @@ th.mat-header-cell {
 mat-slide-toggle {
   margin-top: 10px;
 }
-
+.togglefontbold{
+  font-weight: 600;
+}
+.fontbold{
+  font-weight: 700;
+}
 .tblborder {
   border: 1px solid #e5e2e2 !important;
   padding-left: 10px !important;
@@ -438,7 +443,7 @@ a {
       outline: none;
     }
   }
-  
+
 }
 
 .textCenter {
@@ -446,6 +451,3 @@ a {
   justify-content: center !important;
 }
 .pointer {cursor: pointer;}
-
-.labelsize 
-{font-weight: 700}

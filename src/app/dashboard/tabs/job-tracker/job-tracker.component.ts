@@ -19,12 +19,12 @@ export class JobTrackerComponent implements OnInit {
     SLNo: {
       Title: "Sl No",
       class: "matcolumncenter",
-      Style: "",
+      Style: "max-width: 60px",
     },
     JobNo: {
       Title: "Job No",
       class: "matcolumncenter",
-      Style: "",
+      Style: "max-width: 60px",
     },
     JobDate: {
       Title: "Job Date",
@@ -34,40 +34,35 @@ export class JobTrackerComponent implements OnInit {
     Jobtype: {
       Title: "Job type",
       class: "matcolumncenter",
-      Style: "",
+      Style: "max-width: 90px",
     },
     BillingParty: {
       Title: "Billing Party",
       class: "matcolumncenter",
       Style: "",
     },
-    FromCity: {
-      Title: "From City",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    ToCity: {
-      Title: "To City",
+    FromToCity: {
+      Title: "From & To City",
       class: "matcolumncenter",
       Style: "",
     },
     JobLocation: {
       Title: "Loc",
       class: "matcolumncenter",
-      Style: "",
+      Style: "max-width: 60px",
     },
     NoofPkgs: {
       Title: "Pkgs",
       class: "matcolumncenter",
-      Style: "",
+      Style: "max-width: 60px",
     },
     VehicleSize: {
       Title: "Size",
       class: "matcolumncenter",
-      Style: "",
+      Style: "max-width: 70px",
     },
     CHAAmount: {
-      Title: "CHA Amount",
+      Title: "CHA Amount Rs.",
       class: "matcolumncenter",
       Style: "",
     },
@@ -82,17 +77,17 @@ export class JobTrackerComponent implements OnInit {
       Style: "",
     },
     VoucherAmount: {
-      Title: "Voucher Amount",
+      Title: "Voucher Amount Rs.",
       class: "matcolumncenter",
       Style: "",
     },
     VendorBillAmount: {
-      Title: "Vendor Bill Amount",
+      Title: "Vendor Bill Amount Rs.",
       class: "matcolumncenter",
       Style: "",
     },
     CustomerBillAmount: {
-      Title: "Customer Bill Amount",
+      Title: "Customer Bill Amount Rs.",
       class: "matcolumncenter",
       Style: "",
     },
@@ -109,8 +104,7 @@ export class JobTrackerComponent implements OnInit {
     "JobDate",
     "Jobtype",
     "BillingParty",
-    "FromCity",
-    "ToCity",
+    "FromToCity",
     "JobLocation",
     "NoofPkgs",
     "VehicleSize",

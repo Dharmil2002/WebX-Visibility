@@ -102,10 +102,11 @@ private calculateWeek(forDay: D): [start: D, end: D] {
 }
 
 private get today(): D {
-  const today = this.dateAdapter.getValidDateOrNull(new Date());
-  if (today === null) {
-    throw new Error('date creation failed');
-  }
-  return today;
+  // const today = this.dateAdapter.getValidDateOrNull(new Date());
+  // if (today === null) {
+  //   throw new Error('date creation failed');
+  // }
+  // return today;
+  return this.dateAdapter.today();
 }
 }

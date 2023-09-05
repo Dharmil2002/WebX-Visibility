@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { FormGroupDirective, UntypedFormGroup } from '@angular/forms';
-import { CustomeDatePickerComponent } from '../custome-date-picker/custome-date-picker.component';
+import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-date-picker/custome-date-picker.component';
 
 
 @Component({

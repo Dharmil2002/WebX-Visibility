@@ -23,6 +23,8 @@ import { VendorBillDetailsComponent } from "./vendor-bill-details/vendor-bill-de
 import { CustomerBillDetailsComponent } from "./customer-bill-details/customer-bill-details.component";
 import { VoucherDetailsComponent } from "./voucher-details/voucher-details.component";
 import { ChaDetailComponent } from "./cha-detail/cha-detail.component";
+import { UnbilledPrqComponent } from "./unbilled-prq/unbilled-prq.component";
+import { ErrorHandingComponent } from "./error-handing/error-handing.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -116,6 +118,14 @@ const routes: Routes = [
     path: "CustomerBillDetails",
     component: CustomerBillDetailsComponent
   },
+  {
+    path: "Unbilled",
+    component: UnbilledPrqComponent
+  },
+  {
+    path: "IssueTracker",
+    component: ErrorHandingComponent
+  }
 ]
 
 @NgModule({

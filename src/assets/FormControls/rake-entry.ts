@@ -120,7 +120,7 @@ export class RakeEntryControl {
                 { value: "JOB", name: "Job Wise" }],
                 Validations: [
                 ], functions: {
-                    onSelection: "display"
+                    onSelection: "cityMapping"
                 },
                 generatecontrol: true,
                 disable: false

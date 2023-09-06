@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { format, isValid, parseISO } from 'date-fns';
 import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import { sendRequest } from './outbox-utility';
 import { utilityService } from 'src/app/Utility/utility.service';
 import { ErrorHandlingViewComponent } from './error-handling-view/error-handling-view.component';
+import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
 @Component({
   selector: 'app-error-handing',
   templateUrl: './error-handing.component.html'
@@ -66,7 +67,8 @@ export class ErrorHandingComponent implements OnInit {
   constructor(
     private failedApiService: FailedApiServiceService,
     private masterService: MasterService,
-    private service: utilityService
+    private service: utilityService,
+    private retryAndDownloadService: RetryAndDownloadService,
   ) {
     this.getIssueDetail()
   }
@@ -145,4 +147,21 @@ export class ErrorHandingComponent implements OnInit {
   Download() {
     this.service.exportData(this.issueList.map((item) => item.request),"RequestBody");
   }
+    // Listen for page reload attempts
+    @HostListener('window:beforeunload', ['$event'])
+    unloadNotification($event: any): void {
+      this.dowloadData();
+      // Your custom message
+      const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+      // Set the custom message
+      $event.returnValue = confirmationMessage;
+  
+    }
+    dowloadData() {
+      const failedRequests = this.failedApiService.getFailedRequests();
+      if (failedRequests.length > 0) {
+        this.retryAndDownloadService.downloadFailedRequests();
+      }
+  
+    }
 }

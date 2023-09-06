@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { PrqEntryControls } from 'src/assets/FormControls/prq-entry';
@@ -6,14 +6,14 @@ import { processProperties } from 'src/app/Masters/processUtility';
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { getCity } from '../quick-booking/quick-utility';
-import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { addPrqData, customerFromApi, locationFromApi, showConfirmationDialog } from './prq-utitlity';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { prqDetail } from 'src/app/core/models/operations/prq/prq';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import Swal from 'sweetalert2';
 import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
-import { GeolocationService } from 'src/app/core/service/geo-service/geolocation.service';
+import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
 
 @Component({
   selector: 'app-prq-entry-page',
@@ -40,8 +40,9 @@ export class PrqEntryPageComponent implements OnInit {
   transMode: string;
   transModeStatus: boolean;
   isUpdate: boolean;
-  prqBranchCode:string;
-  prqBranchStatus:boolean;
+  prqBranchCode: string;
+  prqBranchStatus: boolean;
+  pendingOperations = false;
   breadScrums = [
     {
       title: "PRQ Entry",
@@ -53,14 +54,14 @@ export class PrqEntryPageComponent implements OnInit {
   isConfirm: boolean;
   locationDetail: any;
   constructor(private fb: UntypedFormBuilder,
-    private retryAndDownloadService: RetryAndDownloadService,
     private masterService: MasterService,
-    private geoLocationService:GeolocationService,
+    private failedApiService: FailedApiServiceService,
+    private retryAndDownloadService: RetryAndDownloadService,
     private filter: FilterUtils, private router: Router) {
-      this.prqDetail = new prqDetail({});
-      if (this.router.getCurrentNavigation()?.extras?.state != null) {
+    this.prqDetail = new prqDetail({});
+    if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.prqDetail = router.getCurrentNavigation().extras.state.data.columnData;
-  
+
       if (this.prqDetail.Action === "Assign Vehicle") {
         this.masterService.setassignVehicleDetail(this.prqDetail);
         this.router.navigate(['/Operation/AssignVehicle'], {
@@ -110,13 +111,13 @@ export class PrqEntryPageComponent implements OnInit {
       this.prqEntryTableForm.controls['toCity'].setValue({ name: this.prqDetail.toCity, value: this.prqDetail.toCity });
       this.prqEntryTableForm.controls['billingParty'].setValue({ name: this.prqDetail.billingParty, value: this.prqDetail.billingParty });
     }
-    else{
+    else {
       this.prqEntryTableForm.controls['transMode'].setValue("Road");
     }
   }
   initializeFormControl() {
     // Create an instance of PrqEntryControls to get form controls for different sections
-    this.prqControls = new PrqEntryControls(this.prqDetail,this.isUpdate);
+    this.prqControls = new PrqEntryControls(this.prqDetail, this.isUpdate);
     // Get form controls for PRQ Entry section
     this.jsonControlPrqArray = this.prqControls.getPrqEntryFieldControls();
     // Create the form group using the form builder and the form controls array
@@ -190,15 +191,15 @@ export class PrqEntryPageComponent implements OnInit {
   cancel() {
     this.goBack(6)
   }
-  GetBranchChanges(){
-   const locationDetail= this.locationDetail.filter((x)=>x.city.toLowerCase()===this.prqEntryTableForm.value.fromCity.name.toLowerCase());
-   this.filter.Filter(
-    this.jsonControlPrqArray,
-    this.prqEntryTableForm,
-    locationDetail,
-    this.prqBranchCode,
-    this.prqBranchStatus
-  );
+  GetBranchChanges() {
+    const locationDetail = this.locationDetail.filter((x) => x.city.toLowerCase() === this.prqEntryTableForm.value.fromCity.name.toLowerCase());
+    this.filter.Filter(
+      this.jsonControlPrqArray,
+      this.prqEntryTableForm,
+      locationDetail,
+      this.prqBranchCode,
+      this.prqBranchStatus
+    );
   }
   async save() {
     const tabcontrols = this.prqEntryTableForm;
@@ -211,40 +212,39 @@ export class PrqEntryPageComponent implements OnInit {
     this.prqEntryTableForm.controls['billingParty'].setValue(this.prqEntryTableForm.controls['billingParty'].value?.name || "");
     this.prqEntryTableForm.controls['fromCity'].setValue(this.prqEntryTableForm.controls['fromCity'].value?.name || "");
     this.prqEntryTableForm.controls['toCity'].setValue(this.prqEntryTableForm.controls['toCity'].value?.name || "");
-  if(!this.isUpdate){
-    const prqNo = `PRQ/${raise}/${financialYear}/${dynamicNumber}`;
-    this.prqEntryTableForm.controls['_id'].setValue(prqNo);
-    this.prqEntryTableForm.controls['prqId'].setValue(prqNo);
-    const res = await addPrqData(this.prqEntryTableForm.value,this.masterService,this.retryAndDownloadService,this.geoLocationService);
-
-    if (res) {
-      Swal.fire({
-        icon: "success",
-        title: "Generated Successfuly",
-        text: `PRQ No: ${prqNo}`,
-        showConfirmButton: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.goBack(6)
-        }
-      });
+    if (!this.isUpdate) {
+      const prqNo = `PRQ/${raise}/${financialYear}/${dynamicNumber}`;
+      this.prqEntryTableForm.controls['_id'].setValue(prqNo);
+      this.prqEntryTableForm.controls['prqId'].setValue(prqNo);
+      const res = await addPrqData(this.prqEntryTableForm.value, this.masterService);
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "Generated Successfuly",
+          text: `PRQ No: ${prqNo}`,
+          showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.goBack(6)
+          }
+        });
+      }
     }
-  }
-  else{
+    else {
       const tabIndex = 6; // Adjust the tab index as needed
       showConfirmationDialog(this.prqEntryTableForm.value, this.masterService, this.goBack.bind(this), tabIndex);
-  }
+    }
     // console.log(this.prqEntryTableForm.value);
   }
   goBack(tabIndex: number): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
   }
   async bindDataFromDropdown() {
-    const resLoc=await locationFromApi(this.masterService);
-    const resCust=await customerFromApi(this.masterService);
-      this.locationDetail=resLoc;
-    if(this.isUpdate){
-      const prqLoc=resLoc.find((x)=>x.value.trim()===this.prqDetail.prqBranch);
+    const resLoc = await locationFromApi(this.masterService);
+    const resCust = await customerFromApi(this.masterService);
+    this.locationDetail = resLoc;
+    if (this.isUpdate) {
+      const prqLoc = resLoc.find((x) => x.value.trim() === this.prqDetail.prqBranch);
       this.prqEntryTableForm.controls['prqBranch'].setValue(prqLoc);
     }
 
@@ -263,6 +263,27 @@ export class PrqEntryPageComponent implements OnInit {
       this.billingPartyStatus
     );
   }
-  
+  performOperation() {
+    // Your operation code here
+    this.pendingOperations = true;
+  }
+  // Listen for page reload attempts
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any): void {
+    this.dowloadData();
+    // Your custom message
+    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+    // Set the custom message
+    $event.returnValue = confirmationMessage;
+
+  }
+  dowloadData() {
+    const failedRequests = this.failedApiService.getFailedRequests();
+    if (failedRequests.length > 0) {
+      this.retryAndDownloadService.downloadFailedRequests();
+    }
+
+  }
+
 }
 

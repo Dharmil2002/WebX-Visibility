@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, HostListener, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
@@ -11,6 +11,8 @@ import Swal from "sweetalert2";
 import { getCity } from "./quick-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import {  Router } from "@angular/router";
+import { FailedApiServiceService } from "src/app/core/service/api-tracking-service/failed-api-service.service";
+import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
 
 @Component({
   selector: "app-quick-booking",
@@ -50,7 +52,8 @@ export class QuickBookingComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
-    private router:Router,
+    private failedApiService: FailedApiServiceService,
+    private retryAndDownloadService: RetryAndDownloadService,
     private operationService: OperationService,
     private _NavigationService: NavigationService
   ) {
@@ -254,4 +257,20 @@ export class QuickBookingComponent implements OnInit {
       },
     });
   }
+    // Listen for page reload attempts
+    @HostListener('window:beforeunload', ['$event'])
+    unloadNotification($event: any): void {
+      this.dowloadData();
+      // Your custom message
+      const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+      // Set the custom message
+      $event.returnValue = confirmationMessage;
+  
+    }
+    dowloadData() {
+      const failedRequests = this.failedApiService.getFailedRequests();
+      if (failedRequests.length > 0) {
+        this.retryAndDownloadService.downloadFailedRequests();
+      }
+    }
 }

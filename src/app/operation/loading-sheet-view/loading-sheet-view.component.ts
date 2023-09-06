@@ -1,8 +1,10 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GenericTableComponent } from '../../shared-components/Generic Table/generic-table.component';
 import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
+import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
 
 @Component({
   selector: 'app-loading-sheet-view',
@@ -73,6 +75,8 @@ Currently, all flows are working together without proper separation.
   constructor(
     private _cnoteService: CnoteService,
     private operationService: OperationService,
+    private failedApiService: FailedApiServiceService,
+    private retryAndDownloadService: RetryAndDownloadService,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any
   ) {
@@ -153,5 +157,19 @@ Currently, all flows are working together without proper separation.
   goBack(): void {
     this.dialogRef.close()
   }
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any): void {
+    this.dowloadData();
+    // Your custom message
+    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+    // Set the custom message
+    $event.returnValue = confirmationMessage;
 
+  }
+  dowloadData() {
+    const failedRequests = this.failedApiService.getFailedRequests();
+    if (failedRequests.length > 0) {
+      this.retryAndDownloadService.downloadFailedRequests();
+    }
+  }
 }

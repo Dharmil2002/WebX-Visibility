@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -14,6 +14,8 @@ import { getNextLocation } from 'src/app/Utility/commonFunction/arrayCommonFunct
 import { vehicleStatusUpdate } from 'src/app/operation/update-loading-sheet/loadingSheetshipment';
 import { getDocketFromApiDetail, tripTransactionDetail, updateTracking } from './mark-arrival-utlity';
 import { extractUniqueValues } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
+import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
+import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
 
 @Component({
   selector: 'app-mark-arrival',
@@ -41,6 +43,8 @@ export class MarkArrivalComponent implements OnInit {
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog,
     private http: HttpClient,
+    private failedApiService: FailedApiServiceService,
+    private retryAndDownloadService: RetryAndDownloadService,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     private Route: Router,
@@ -295,5 +299,19 @@ export class MarkArrivalComponent implements OnInit {
     }
   }
 
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any): void {
+    this.dowloadData();
+    // Your custom message
+    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+    // Set the custom message
+    $event.returnValue = confirmationMessage;
 
+  }
+  dowloadData() {
+    const failedRequests = this.failedApiService.getFailedRequests();
+    if (failedRequests.length > 0) {
+      this.retryAndDownloadService.downloadFailedRequests();
+    }
+  }
 }

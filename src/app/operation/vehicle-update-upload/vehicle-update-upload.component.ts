@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -9,6 +9,8 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { vehicleLoadingScan } from './packageUtilsvehiceLoading';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { updateTracking } from './vehicleLoadingUtility';
+import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
+import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
 
 @Component({
   selector: 'app-vehicle-update-upload',
@@ -94,6 +96,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private cdr: ChangeDetectorRef,
     private operationService: OperationService,
+    private failedApiService: FailedApiServiceService,
+    private retryAndDownloadService: RetryAndDownloadService
   ) {
     if (item.LoadingSheet) {
       this.shipmentStatus = 'Loaded'
@@ -446,7 +450,21 @@ export class VehicleUpdateUploadComponent implements OnInit {
       }
     })
   }
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any): void {
+    this.dowloadData();
+    // Your custom message
+    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+    // Set the custom message
+    $event.returnValue = confirmationMessage;
 
+  }
+  dowloadData() {
+    const failedRequests = this.failedApiService.getFailedRequests();
+    if (failedRequests.length > 0) {
+      this.retryAndDownloadService.downloadFailedRequests();
+    }
+  }
   goBack(tabIndex: number): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }

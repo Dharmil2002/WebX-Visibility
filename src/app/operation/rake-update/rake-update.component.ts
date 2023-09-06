@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getGeneric, rakeFieldMapping } from './rake-update-utility';
 import { RakeDetailComponent } from '../rake-detail/rake-detail.component';
+import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
+import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
 
 @Component({
   selector: 'app-rake-update',
@@ -100,7 +102,11 @@ export class RakeUpdateComponent implements OnInit {
     { label: "BillingParty", componentDetails: RakeDetailComponent }
     // Add more menu items as needed
   ];
-  constructor(private masterService: MasterService) { }
+  constructor(
+    private masterService: MasterService,
+    private failedApiService: FailedApiServiceService,
+    private retryAndDownloadService: RetryAndDownloadService,
+    ) { }
 
   ngOnInit(): void {
     this.getRakeDetail();
@@ -137,5 +143,19 @@ export class RakeUpdateComponent implements OnInit {
     this.tableData = rakeDetail;
     this.tableLoad = false;
   }
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any): void {
+    this.dowloadData();
+    // Your custom message
+    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+    // Set the custom message
+    $event.returnValue = confirmationMessage;
 
+  }
+  dowloadData() {
+    const failedRequests = this.failedApiService.getFailedRequests();
+    if (failedRequests.length > 0) {
+      this.retryAndDownloadService.downloadFailedRequests();
+    }
+  }
 }

@@ -37,6 +37,7 @@ import { WINDOW_PROVIDERS } from "./core/service/window.service";
 import { environment } from "src/environments/environment";
 import { fakeBackendProvider } from "./core/interceptor/fake-backend";
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { CustomHttpInterceptor } from "./core/interceptor/errorhandling.interceptor";
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
   wheelPropagation: false,
@@ -94,6 +95,11 @@ export function createTranslateLoader(http: HttpClient): any {
     {
       provide: PERFECT_SCROLLBAR_CONFIG,
       useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CustomHttpInterceptor,
+      multi: true
     },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },

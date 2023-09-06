@@ -8,7 +8,7 @@ export async function getPincode(companyCode, masterService) {
   };
 
   try {
-    const res: any = await masterService.masterMongoPost("generic/get", req).toPromise();
+    const res: any = await masterService.masterMongoPost("generic/get",req).toPromise();
     if (res && res.data) {
       const pincode = res.data
         .map((x) => ({ name: x.pincode, value: x.pincode }))

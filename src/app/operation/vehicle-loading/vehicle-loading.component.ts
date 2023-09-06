@@ -8,6 +8,8 @@ import { ViewPrintComponent } from '../view-print/view-print.component';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { setFormControlValue } from 'src/app/Utility/commonFunction/setFormValue/setFormValue';
+import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
+import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
 @Component({
   selector: 'app-vehicle-loading',
   templateUrl: './vehicle-loading.component.html'
@@ -126,7 +128,9 @@ export class VehicleLoadingComponent implements OnInit {
     private Route: Router, // Injecting Router service
     private navigationService: NavigationService, // Injecting NavigationService
     private operationService: OperationService, // Injecting OperationService
-    private fb: UntypedFormBuilder // Injecting UntypedFormBuilder
+    private fb: UntypedFormBuilder,// Injecting UntypedFormBuilder
+    private failedApiService: FailedApiServiceService,
+    private retryAndDownloadService: RetryAndDownloadService
   ) {
     // Check if there is data in the state passed through navigation
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -251,4 +255,5 @@ export class VehicleLoadingComponent implements OnInit {
   goBack(tabIndex: number): void {
     this.navigationService.navigateTotab(tabIndex, '/dashboard/GlobeDashboardPage');
   }
+  
 }

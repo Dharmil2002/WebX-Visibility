@@ -24,30 +24,15 @@ export async function vendorDetailFromApi(masterService) {
     return res.data
 
 }
-export async function addRakeEntry(data, masterService, retryAndDownloadService, geoLocationService) {
-
+export async function addRakeEntry(data, masterService) {
+    
     const reqBody = {
         companyCode: localStorage.getItem("companyCode"),
         collectionName: "rake_detail",
         data: data
     }
-    const maxRetries = 3;
-    try {
-        const getlocation = await geoDataServices(geoLocationService);
-        const res = await retryAndDownloadService.retryWithDownload(
-            masterService,
-            "generic/1s",
-            reqBody,
-            maxRetries,
-            "RakeEntry",
-            getlocation
-        );
-        return res
-
-    }
-    catch (err) {
-        console.log(err);
-    }
+    const res = await masterService.masterMongoPost("generic/create", reqBody).toPromise();
+    return res
 
 }
 export async function genericGet(masterService, collectionName) {

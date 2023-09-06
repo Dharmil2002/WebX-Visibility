@@ -6,7 +6,7 @@ export async function getPrqDetailFromApi(masterServices) {
         collectionName: "prq_detail",
         filter: {}
     }
-    const res = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
+    const res = await masterServices.masterMongoPost("generic/get",reqBody).toPromise();
     let prqList = [];
 
     res.data.map((element, index) => {

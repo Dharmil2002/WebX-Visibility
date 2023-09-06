@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
@@ -7,6 +7,8 @@ import { DocketTrackingControl } from 'src/assets/FormControls/docket-tracking';
 import { getDocketFromApiDetail } from './docket-tracking-utlity';
 import Swal from 'sweetalert2';
 import { formatDate } from 'src/app/Utility/date/date-utils';
+import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
+import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
 
 @Component({
   selector: 'app-docket-tracking',
@@ -64,6 +66,8 @@ export class DocketTrackingComponent implements OnInit {
   ];
   constructor(
     private fb: UntypedFormBuilder,
+    private failedApiService: FailedApiServiceService,
+    private retryAndDownloadService: RetryAndDownloadService,
     private operationService: OperationService) {
     this.initializeFormControl();
   }
@@ -126,5 +130,20 @@ export class DocketTrackingComponent implements OnInit {
 
   reset(){
     this.tableload = true;
+  }
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any): void {
+    this.dowloadData();
+    // Your custom message
+    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+    // Set the custom message
+    $event.returnValue = confirmationMessage;
+
+  }
+  dowloadData() {
+    const failedRequests = this.failedApiService.getFailedRequests();
+    if (failedRequests.length > 0) {
+      this.retryAndDownloadService.downloadFailedRequests();
+    }
   }
 }

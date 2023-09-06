@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, HostListener, OnInit } from "@angular/core";
 import { UntypedFormBuilder } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { processProperties } from "src/app/Masters/processUtility";
@@ -11,6 +11,7 @@ import { addRakeEntry, filterDocketDetail, genericGet, vendorDetailFromApi } fro
 import Swal from "sweetalert2";
 import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
 import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
+import { FailedApiServiceService } from "src/app/core/service/api-tracking-service/failed-api-service.service";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -71,9 +72,9 @@ export class RakeEntryPageComponent implements OnInit {
     constructor(
         private fb: UntypedFormBuilder,
         private Route: Router,
-        private retryAndDownloadService: RetryAndDownloadService,
         private masterService: MasterService,
-        private geoLocationService: GeolocationService,
+        private failedApiService: FailedApiServiceService,
+        private retryAndDownloadService: RetryAndDownloadService,
         private filter: FilterUtils) {
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
             this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -315,7 +316,21 @@ export class RakeEntryPageComponent implements OnInit {
             this.vendorStatus
         );
     }
-
+    @HostListener('window:beforeunload', ['$event'])
+    unloadNotification($event: any): void {
+      this.dowloadData();
+      // Your custom message
+      const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+      // Set the custom message
+      $event.returnValue = confirmationMessage;
+  
+    }
+    dowloadData() {
+      const failedRequests = this.failedApiService.getFailedRequests();
+      if (failedRequests.length > 0) {
+        this.retryAndDownloadService.downloadFailedRequests();
+      }
+    }
     async save() {
         // Create a new array without the 'srNo' property
         let modifiedTableData = this.tableData.map(({ srNo, ...rest }) => rest);
@@ -347,7 +362,7 @@ export class RakeEntryPageComponent implements OnInit {
             ...this.rakeEntryTableForm.value,
             ...docDetail,
         };
-        const res = await addRakeEntry(jobDetail, this.masterService, this.retryAndDownloadService, this.geoLocationService)
+        const res = await addRakeEntry(jobDetail, this.masterService)
         if (res) {
             Swal.fire({
                 icon: "success",
@@ -361,6 +376,7 @@ export class RakeEntryPageComponent implements OnInit {
             });
         }
     }
+
     async getLocation() {
         const location = await genericGet(this.masterService, "location_detail");
         const locList = location.map((x) => { return { name: x.locCode, value: x.locCode } });
@@ -386,6 +402,7 @@ export class RakeEntryPageComponent implements OnInit {
             this.destinationStatus
         );
     }
+
     cityMapping() {
         if (this.rakeEntryTableForm.value.documentType !== "JOB") {
             const fromCityControl = this.rakeEntryTableForm.controls['fromCity'];
@@ -403,4 +420,5 @@ export class RakeEntryPageComponent implements OnInit {
             this.display('JOB');
         }
     }
+    
 }

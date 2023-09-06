@@ -2,7 +2,6 @@ import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { VendorMasterViewComponent } from "../vendor-master-view/vendor-master-view.component";
 import Swal from "sweetalert2";
-import { OperationService } from "src/app/core/service/operations/operation.service";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',

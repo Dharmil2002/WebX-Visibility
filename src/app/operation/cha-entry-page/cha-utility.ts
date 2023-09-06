@@ -1,26 +1,12 @@
-import { geoDataServices } from "../error-handing/outbox-utility";
 
-export async function chaJobDetail(chaDetail,masterService,retryAndDownloadService,geoLocationService){
+export async function chaJobDetail(chaDetail,masterService){
     const reqBody={
         companyCode:localStorage.getItem('companyCode'),
-        collectionName:"cha_detaidl",
+        collectionName:"cha_detail",
         data:chaDetail
     }
-    const maxRetries = 3;
-    try {
-        const getlocation = await geoDataServices(geoLocationService);
-        const res = await retryAndDownloadService.retryWithDownload(
-            masterService,
-            "generic/create",
-            reqBody,
-            maxRetries,
-            "ChaEntry",
-            getlocation
-        );
-        return res
-    } catch (error) {
-
-    }
+    const res=await masterService.masterMongoPost("generic/create",reqBody).toPromise();
+    return res
 }
 
 export async function updateJobStatus(jobData,masterService) {

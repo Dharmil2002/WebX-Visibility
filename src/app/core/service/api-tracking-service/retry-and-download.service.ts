@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FailedApiServiceService } from './failed-api-service.service';
+import { format, isValid, parseISO } from 'date-fns';
 
 @Injectable({
   providedIn: 'root'
@@ -26,11 +27,11 @@ export class RetryAndDownloadService {
         retryCount++;
 
         if (retryCount >= maxRetries) {
-          const userConfirmed = window.confirm(
-            `You have had ${maxRetries} failed attempts. Do you want to download the failed requests?`
-          );
+          // const userConfirmed = window.confirm(
+          //   `You have had ${maxRetries} failed attempts. Do you want to download the failed requests?`
+          // );
           this.failedApiService.addFailedRequest({
-            id:this.failedApiService.getFailedRequests().length,
+            id: this.failedApiService.getFailedRequests().length,
             url: url,
             method: 'POST',
             request: req,
@@ -39,13 +40,13 @@ export class RetryAndDownloadService {
             createdOn: new Date().toUTCString(),
             createdBy: localStorage.getItem("Username"),
             createdAt: location,
-            attempts:0
+            attempts: 0
           });
 
-          if (userConfirmed) {
+          // if (userConfirmed) {
 
-            await this.downloadFailedRequests();
-          }
+          //   await this.downloadFailedRequests();
+          // }
         }
       }
     }
@@ -54,16 +55,33 @@ export class RetryAndDownloadService {
   }
 
   async downloadFailedRequests() {
+    const companyCode = localStorage.getItem("companyCode");
+    let formattedDate = "";
+
+    try {
+      const parsedDate = parseISO(new Date().toISOString());
+      if (isValid(parsedDate)) {
+        formattedDate = format(parsedDate, "dd-MM-yy HHmm"); // Remove spaces and colons
+      }
+    } catch (error) {
+      console.error("Error parsing date:", error);
+    }
+
     const failedRequests = this.failedApiService.getFailedRequests();
+
     // Trigger a download of the request body data (e.g., as a JSON file)
-    const blob = new Blob([JSON.stringify(failedRequests)], {
-      type: 'application/json',
-    });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'failed-requests.json';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    if (failedRequests) {
+      const blob = new Blob([JSON.stringify(failedRequests)], {
+        type: 'application/json',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `webxpress-velocity-${companyCode}-${formattedDate}-failedrequests.json`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
   }
+
+
 }

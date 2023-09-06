@@ -1,30 +1,19 @@
 import { geoDataServices } from "../error-handing/outbox-utility";
 
 // This function adds a job detail to a MongoDB collection using a master service.
-export async function addJobDetail(jobDetail, masterService,retryAndDownloadService,geoLocationService) {
-    // Prepare the request body with company code, collection name, and job detail data.
-    const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
-        collectionName: "job_detail",
-        data: jobDetail
-    }
-    // Send a POST request to create the job detail in the MongoDB collection.
-    const maxRetries = 3;
-    try {
-        const getlocation = await geoDataServices(geoLocationService);
-        const res = await retryAndDownloadService.retryWithDownload(
-            masterService,
-            "generic/create",
-            reqBody,
-            maxRetries,
-            "JobEntry",
-            getlocation
-        );
-        return res
-    } catch (error) {
-
-    }
-    // Return the response from the server.
+export async function addJobDetail(jobDetail, masterService) {
+  // Prepare the request body with company code, collection name, and job detail data.
+  const reqBody = {
+      companyCode: localStorage.getItem('companyCode'),
+      collectionName: "job_detail",
+      data: jobDetail
+  }
+  
+  // Send a POST request to create the job detail in the MongoDB collection.
+  const res = await masterService.masterMongoPost("generic/create", reqBody).toPromise();
+  
+  // Return the response from the server.
+  return res;
 }
 
 // This function retrieves vendor details from a MongoDB collection using a master service.

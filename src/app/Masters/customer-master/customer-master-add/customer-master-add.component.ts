@@ -642,7 +642,6 @@ export class CustomerMasterAddComponent implements OnInit {
     this.customerTableForm.controls.billCity.setValue(fetchData.city);
   }
    mapAndSetValue(form, formControlName, sourceArray) {
-    debugger
     const mappedValues = sourceArray ? sourceArray.map(item => item.name) : [];
     form.controls[formControlName].setValue(mappedValues);
   }

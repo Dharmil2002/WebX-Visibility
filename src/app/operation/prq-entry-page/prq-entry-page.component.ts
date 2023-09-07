@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { PrqEntryControls } from 'src/assets/FormControls/prq-entry';
@@ -12,8 +12,6 @@ import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remov
 import { prqDetail } from 'src/app/core/models/operations/prq/prq';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import Swal from 'sweetalert2';
-import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
-import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
 
 @Component({
   selector: 'app-prq-entry-page',
@@ -55,8 +53,6 @@ export class PrqEntryPageComponent implements OnInit {
   locationDetail: any;
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
-    private failedApiService: FailedApiServiceService,
-    private retryAndDownloadService: RetryAndDownloadService,
     private filter: FilterUtils, private router: Router) {
     this.prqDetail = new prqDetail({});
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
@@ -268,22 +264,8 @@ export class PrqEntryPageComponent implements OnInit {
     this.pendingOperations = true;
   }
   // Listen for page reload attempts
-  @HostListener('window:beforeunload', ['$event'])
-  unloadNotification($event: any): void {
-    this.dowloadData();
-    // Your custom message
-    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-    // Set the custom message
-    $event.returnValue = confirmationMessage;
+ 
 
-  }
-  dowloadData() {
-    const failedRequests = this.failedApiService.getFailedRequests();
-    if (failedRequests.length > 0) {
-      this.retryAndDownloadService.downloadFailedRequests();
-    }
-
-  }
 
 }
 

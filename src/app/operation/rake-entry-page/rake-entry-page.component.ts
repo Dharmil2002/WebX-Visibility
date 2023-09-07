@@ -6,12 +6,9 @@ import { RakeEntryControl } from "src/assets/FormControls/rake-entry";
 import { getCity } from "../quick-booking/quick-utility";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
 import { addRakeEntry, filterDocketDetail, genericGet, vendorDetailFromApi } from "./rate-utility";
 import Swal from "sweetalert2";
-import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
-import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
-import { FailedApiServiceService } from "src/app/core/service/api-tracking-service/failed-api-service.service";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -73,8 +70,6 @@ export class RakeEntryPageComponent implements OnInit {
         private fb: UntypedFormBuilder,
         private Route: Router,
         private masterService: MasterService,
-        private failedApiService: FailedApiServiceService,
-        private retryAndDownloadService: RetryAndDownloadService,
         private filter: FilterUtils) {
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
             this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -315,21 +310,6 @@ export class RakeEntryPageComponent implements OnInit {
             this.vendor,
             this.vendorStatus
         );
-    }
-    @HostListener('window:beforeunload', ['$event'])
-    unloadNotification($event: any): void {
-      this.dowloadData();
-      // Your custom message
-      const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-      // Set the custom message
-      $event.returnValue = confirmationMessage;
-  
-    }
-    dowloadData() {
-      const failedRequests = this.failedApiService.getFailedRequests();
-      if (failedRequests.length > 0) {
-        this.retryAndDownloadService.downloadFailedRequests();
-      }
     }
     async save() {
         // Create a new array without the 'srNo' property

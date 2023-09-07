@@ -5,8 +5,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getGeneric } from '../rake-update/rake-update-utility';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
-import { FailedApiServiceService } from 'src/app/core/service/api-tracking-service/failed-api-service.service';
-import { RetryAndDownloadService } from 'src/app/core/service/api-tracking-service/retry-and-download.service';
 
 
 
@@ -84,9 +82,8 @@ export class RakeDetailComponent implements OnInit {
   // Constructor for the component
   constructor(@Inject(MAT_DIALOG_DATA) public item: any,
   private masterService: MasterService, 
-  public dialogRef: MatDialogRef<GenericTableComponent>, 
-  private failedApiService: FailedApiServiceService,
-  private retryAndDownloadService: RetryAndDownloadService) { 
+  public dialogRef: MatDialogRef<GenericTableComponent> 
+  ) { 
      this.getRateDetail(item);
   }
 
@@ -103,19 +100,5 @@ export class RakeDetailComponent implements OnInit {
   close(){
     this.dialogRef.close();
   }
-  @HostListener('window:beforeunload', ['$event'])
-  unloadNotification($event: any): void {
-    this.dowloadData();
-    // Your custom message
-    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-    // Set the custom message
-    $event.returnValue = confirmationMessage;
-
-  }
-  dowloadData() {
-    const failedRequests = this.failedApiService.getFailedRequests();
-    if (failedRequests.length > 0) {
-      this.retryAndDownloadService.downloadFailedRequests();
-    }
-  }
+ 
 }

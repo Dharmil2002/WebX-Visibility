@@ -147,21 +147,4 @@ export class ErrorHandingComponent implements OnInit {
   Download() {
     this.service.exportData(this.issueList.map((item) => item.request),"RequestBody");
   }
-    // Listen for page reload attempts
-    @HostListener('window:beforeunload', ['$event'])
-    unloadNotification($event: any): void {
-      this.dowloadData();
-      // Your custom message
-      const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-      // Set the custom message
-      $event.returnValue = confirmationMessage;
-  
-    }
-    dowloadData() {
-      const failedRequests = this.failedApiService.getFailedRequests();
-      if (failedRequests.length > 0) {
-        this.retryAndDownloadService.downloadFailedRequests();
-      }
-  
-    }
 }

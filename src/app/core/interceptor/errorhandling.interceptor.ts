@@ -16,12 +16,11 @@ import { GeolocationService } from '../service/geo-service/geolocation.service';
 export class CustomHttpInterceptor implements HttpInterceptor {
   private retryLimit = 3;
   private requestTimeout = 5000; // Adjust the timeout value as needed (in milliseconds)
-
-
     constructor(
         private failedApiService: FailedApiServiceService,
         private geoLocationService: GeolocationService
-        ) {}
+        ) {
+        }
 
   intercept(
     request: HttpRequest<any>,
@@ -49,6 +48,7 @@ export class CustomHttpInterceptor implements HttpInterceptor {
       ),
       timeout(this.requestTimeout),
       catchError((error: any) => {
+        let Location=this.geoLocationService.getLocation();
         this.failedApiService.addFailedRequest({
             id: this.failedApiService.getFailedRequests().length+1,
             url:request.url.split("v1/")[1],
@@ -58,7 +58,7 @@ export class CustomHttpInterceptor implements HttpInterceptor {
             source:request.body.collectionName,
             createdOn: new Date().toUTCString(),
             createdBy: localStorage.getItem("Username") || 'Unknown', // Provide a default value
-            createdAt:this.geoLocationService.getCurrentLocation, // Use a valid date value
+            createdAt:Location, 
             attempts: 0
           });
         // Handle error, log, and perform additional actions as needed

@@ -1,15 +1,18 @@
 import { AuthLayoutComponent } from "./app-layout/auth-layout/auth-layout.component";
 import { CommonModule } from "@angular/common";
-import { MainLayoutComponent } from "./app-layout/main-layout/main-layout.component";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { MatTabsModule } from "@angular/material/tabs";
-import { NgModule } from "@angular/core";
+import { NgModule,CUSTOM_ELEMENTS_SCHEMA  } from "@angular/core";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
-import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgbDropdownModule, NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { SharedModule } from "../shared/shared.module";
-import { DashboardLayoutComponent } from "./app-layout/dashboard-layout/dashboard-layout.component";
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MainLayoutComponent } from "./app-layout/main-layout/main-layout.component";
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from "@angular/material/menu";
 
 @NgModule({
   imports: [
@@ -20,10 +23,18 @@ import { DashboardLayoutComponent } from "./app-layout/dashboard-layout/dashboar
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    MatFormFieldModule,
+    NgbDropdownModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatMenuModule,
     NgMultiSelectDropDownModule.forRoot(),
   ],
   declarations: [
-    AuthLayoutComponent
+    AuthLayoutComponent,
+    MainLayoutComponent
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // Add this line
 })
 export class LayoutModule {}

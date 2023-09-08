@@ -11,9 +11,6 @@ import { addJobDetail, getNextNumber, getVendorDetails } from "./job-entry-utili
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { customerFromApi } from "../prq-entry-page/prq-utitlity";
 import { getCity } from "../quick-booking/quick-utility";
-import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
-import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
-import { FailedApiServiceService } from "src/app/core/service/api-tracking-service/failed-api-service.service";
 @Component({
   selector: 'app-job-entry-page',
   templateUrl: './job-entry-page.component.html',
@@ -91,9 +88,7 @@ export class JobEntryPageComponent implements OnInit {
     private router: Router,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
-    private filter: FilterUtils,
-    private failedApiService: FailedApiServiceService,
-    private retryAndDownloadService: RetryAndDownloadService
+    private filter: FilterUtils
     ) {
 
     this.initializeFormControl();
@@ -298,19 +293,5 @@ export class JobEntryPageComponent implements OnInit {
 
     return true;
   }
-  @HostListener('window:beforeunload', ['$event'])
-  unloadNotification($event: any): void {
-    this.dowloadData();
-    // Your custom message
-    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-    // Set the custom message
-    $event.returnValue = confirmationMessage;
 
-  }
-  dowloadData() {
-    const failedRequests = this.failedApiService.getFailedRequests();
-    if (failedRequests.length > 0) {
-      this.retryAndDownloadService.downloadFailedRequests();
-    }
-  }
 }

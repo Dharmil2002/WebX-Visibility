@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
@@ -15,8 +15,6 @@ import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { setFormControlValue } from "src/app/Utility/commonFunction/setFormValue/setFormValue";
 import { getLoadingSheetDetail } from "../depart-vehicle/depart-vehicle/depart-common";
 import Swal from "sweetalert2";
-import { FailedApiServiceService } from "src/app/core/service/api-tracking-service/failed-api-service.service";
-import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -113,9 +111,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     private navigationService: NavigationService,
     private dialog: MatDialog,
     private fb: UntypedFormBuilder,
-    private filter: FilterUtils,
-    private failedApiService: FailedApiServiceService,
-    private retryAndDownloadService: RetryAndDownloadService,
+    private filter: FilterUtils
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       // Retrieve tripData and shippingData from the navigation state
@@ -713,19 +709,6 @@ export class CreateLoadingSheetComponent implements OnInit {
       console.error('Error occurred during the API call:', error);
     }
   }
-  @HostListener('window:beforeunload', ['$event'])
-  unloadNotification($event: any): void {
-    this.dowloadData();
-    // Your custom message
-    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-    // Set the custom message
-    $event.returnValue = confirmationMessage;
-
-  }
-  dowloadData() {
-    const failedRequests = this.failedApiService.getFailedRequests();
-    if (failedRequests.length > 0) {
-      this.retryAndDownloadService.downloadFailedRequests();
-    }
-  }
+  
+  
 }

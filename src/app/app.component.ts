@@ -1,8 +1,10 @@
 import { Event, NavigationEnd, NavigationStart, Router } from "@angular/router";
 import { AuthService } from "./core/service/auth.service";
-import { Component } from "@angular/core";
+import { Component, HostListener } from "@angular/core";
 import { NgxSpinnerService } from "ngx-spinner";
 import { PlatformLocation } from "@angular/common";
+import { FailedApiServiceService } from "./core/service/api-tracking-service/failed-api-service.service";
+import { RetryAndDownloadService } from "./core/service/api-tracking-service/retry-and-download.service";
 
 
 @Component({
@@ -21,6 +23,8 @@ export class AppComponent {
     public appservice: AuthService,
     public _router: Router,
     location: PlatformLocation,
+    private failedApiService: FailedApiServiceService,
+    private retryAndDownloadService: RetryAndDownloadService,
     private spinner: NgxSpinnerService
   ) {
     this._router.events.subscribe((routerEvent: Event) => {
@@ -52,4 +56,21 @@ export class AppComponent {
       };
     });
   }
+    // Listen for page reload attempts
+    @HostListener('window:beforeunload', ['$event'])
+    unloadNotification($event: any): void {
+      this.dowloadData();
+      // Your custom message
+      const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+      // Set the custom message
+      $event.returnValue = confirmationMessage;
+  
+    }
+    dowloadData() {
+      const failedRequests = this.failedApiService.getFailedRequests();
+      if (failedRequests.length > 0) {
+        this.retryAndDownloadService.downloadFailedRequests();
+      }
+  
+    }
 }

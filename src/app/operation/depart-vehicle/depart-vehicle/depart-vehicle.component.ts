@@ -2,7 +2,6 @@ import { Component, HostListener, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Router } from "@angular/router";
-import { HttpClient } from "@angular/common/http";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { loadingControl } from "src/assets/FormControls/loadingSheet";
 import { LodingSheetGenerateSuccessComponent } from "../../loding-sheet-generate-success/loding-sheet-generate-success.component";
@@ -18,8 +17,6 @@ import { getNextLocation } from "src/app/Utility/commonFunction/arrayCommonFunct
 import { getVehicleDetailFromApi } from "../../create-loading-sheet/loadingSheetCommon";
 import { calculateBalanceAmount, calculateTotal, calculateTotalAdvances, getDriverDetail, getLoadingSheetDetail, updateTracking } from "./depart-common";
 import { formatDate } from "src/app/Utility/date/date-utils";
-import { FailedApiServiceService } from "src/app/core/service/api-tracking-service/failed-api-service.service";
-import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
 
 
 @Component({
@@ -113,9 +110,7 @@ export class DepartVehicleComponent implements OnInit {
     private Route: Router,
     private dialog: MatDialog,
     private fb: UntypedFormBuilder,
-    private _operationService: OperationService,
-    private failedApiService: FailedApiServiceService,
-    private retryAndDownloadService: RetryAndDownloadService,
+    private _operationService: OperationService
   ) {
     // if (data) {
     //   this.tripData = data
@@ -637,19 +632,4 @@ export class DepartVehicleComponent implements OnInit {
   // await Promise.all(updatePromises);
 
   // }
-  @HostListener('window:beforeunload', ['$event'])
-  unloadNotification($event: any): void {
-    this.dowloadData();
-    // Your custom message
-    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-    // Set the custom message
-    $event.returnValue = confirmationMessage;
-
-  }
-  dowloadData() {
-    const failedRequests = this.failedApiService.getFailedRequests();
-    if (failedRequests.length > 0) {
-      this.retryAndDownloadService.downloadFailedRequests();
-    }
-  }
 }

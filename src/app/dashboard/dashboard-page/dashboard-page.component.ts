@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatTabGroup } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
 import{CnoteService} from 'src/app/core/service/Masters/CnoteService/cnote.service'
@@ -18,7 +18,10 @@ export class DashboardPageComponent implements OnInit {
   ]
   @ViewChild('myTabGroup') myTabGroup: MatTabGroup;
   detailtab: number;
-  constructor(private changeDetectorRef: ChangeDetectorRef,private activeRoute: ActivatedRoute,private Route:Router,private ICnoteServicevice: CnoteService) {
+  constructor(private changeDetectorRef: ChangeDetectorRef,
+     private activeRoute: ActivatedRoute,
+     private Route:Router
+     ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
     
     }
@@ -46,5 +49,5 @@ export class DashboardPageComponent implements OnInit {
       }
     });
   }
-
+ 
 }

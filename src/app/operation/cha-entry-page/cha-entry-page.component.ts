@@ -8,9 +8,6 @@ import { processProperties } from "src/app/Masters/processUtility";
 import Swal from "sweetalert2";
 import { ChaEntryControl } from "src/assets/FormControls/cha-entry";
 import { chaJobDetail, updateJobStatus } from "./cha-utility";
-import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
-import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
-import { FailedApiServiceService } from "src/app/core/service/api-tracking-service/failed-api-service.service";
 
 @Component({
   selector: 'app-cha-entry-page',
@@ -135,9 +132,7 @@ export class ChaEntryPageComponent implements OnInit {
     private Route: Router,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
-    private filter: FilterUtils,
-    private failedApiService: FailedApiServiceService,
-    private retryAndDownloadService: RetryAndDownloadService,
+    private filter: FilterUtils
     ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data.columnData;
@@ -389,19 +384,5 @@ export class ChaEntryPageComponent implements OnInit {
     event.row.totalAmt = total.toFixed(2);
 
   }
-  @HostListener('window:beforeunload', ['$event'])
-  unloadNotification($event: any): void {
-    this.dowloadData();
-    // Your custom message
-    const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-    // Set the custom message
-    $event.returnValue = confirmationMessage;
-
-  }
-  dowloadData() {
-    const failedRequests = this.failedApiService.getFailedRequests();
-    if (failedRequests.length > 0) {
-      this.retryAndDownloadService.downloadFailedRequests();
-    }
-  }
+  
 }

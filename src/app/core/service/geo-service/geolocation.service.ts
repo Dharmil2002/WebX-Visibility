@@ -23,7 +23,8 @@ export class GeolocationService {
     });
   }
   
-  getLocation(): Observable<{ latitude: number, longitude: number }> {
-    return this.getCurrentLocation();
+  async getLocation() {
+    const location=await this.getCurrentLocation().toPromise();
+    return location;
   }
 }

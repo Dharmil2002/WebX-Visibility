@@ -58,6 +58,7 @@ export class SigninComponent
     localStorage.setItem("companyCode", this.loginForm.value.companyCode)
     localStorage.setItem("Username", this.loginForm.value.Username);
     localStorage.setItem("Branch", this.loginForm.value.Branch);
+    localStorage.setItem("Mode","EXIM");
     this.router.navigate(["/dashboard/GlobeDashboardPage"]);
     }
   }

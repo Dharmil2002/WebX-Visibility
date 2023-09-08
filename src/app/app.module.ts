@@ -38,6 +38,9 @@ import { environment } from "src/environments/environment";
 import { fakeBackendProvider } from "./core/interceptor/fake-backend";
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { CustomHttpInterceptor } from "./core/interceptor/errorhandling.interceptor";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatMenuModule } from "@angular/material/menu";
+
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
   wheelPropagation: false,
@@ -67,8 +70,9 @@ export function createTranslateLoader(http: HttpClient): any {
     HttpClientModule,
     PerfectScrollbarModule,
     NgxDaterangepickerMd.forRoot(),
-    NgxSpinnerModule,
+    NgxSpinnerModule,MatDialogModule,
     ClickOutsideModule,
+    MatMenuModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

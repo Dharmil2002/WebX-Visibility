@@ -28,14 +28,18 @@ export class HeaderComponent
   implements OnInit, AfterViewInit {
   public config: any = {};
   isNavbarCollapsed = true;
+  isDropdownOpen: boolean = false;
   isNavbarShow = true;
   flagvalue;
   BaseTimeZone;
+  CurrentMode=localStorage.getItem('Mode');
   FinancialYear: string;
   countryName;
   langStoreValue: string;
   defaultFlag: string;
   isOpenSidebar: boolean;
+  Mode: string;
+  menuItems = ['LTL', 'FTL', 'Import', 'Export', 'EXIM'];
   constructor(
     @Inject(DOCUMENT) private document: Document,
     @Inject(WINDOW) private window: Window,
@@ -61,6 +65,7 @@ export class HeaderComponent
     { text: "Spanish", flag: "assets/images/flags/spain.jpg", lang: "es" },
     { text: "German", flag: "assets/images/flags/germany.jpg", lang: "de" },
   ];
+
   notifications: any[] = [
     // {
     //   userImg: "assets/images/user/user1.jpg",
@@ -121,16 +126,7 @@ export class HeaderComponent
   ngOnInit() {
     this.config = this.configService.configData;
 
-    this.langStoreValue = localStorage.getItem("lang");
-    const val = this.listLang.filter((x) => x.lang === this.langStoreValue);
-    this.countryName = val.map((element) => element.text);
-    if (val.length === 0) {
-      if (this.flagvalue === undefined) {
-        this.defaultFlag = "assets/images/flags/us.jpg";
-      }
-    } else {
-      this.flagvalue = val.map((element) => element.flag);
-    }
+    this.Mode = localStorage.getItem("Import");
     this.convertTimeFromUtc(new Date(), 'Asia/Kolkata');
     this.getCurrentFinancialYear();
   }
@@ -182,6 +178,9 @@ export class HeaderComponent
       }
     }
   }
+ 
+
+  
   callFullscreen() {
     if (
       !document.fullscreenElement &&
@@ -248,16 +247,7 @@ export class HeaderComponent
   get CompanyLogo(): any {
     return localStorage.getItem('company_Logo');
   }
-  // VirtualLogin() {
-  //   const dialogRef = this.dialogModel.open(VitualLoginComponent, {
-  //     width: "30%",
-  //     position: {
-  //       top: "20px",
-  //     },
-  //     disableClose: true,
-  //   });
 
-  // }
   convertTimeFromUtc(utcDate: Date, timeZone: string = ''): Date {
     const indianTimeZone = 'Asia/Kolkata';
     const convertedDate = moment.utc(utcDate).tz(timeZone || indianTimeZone).toDate();
@@ -268,5 +258,16 @@ export class HeaderComponent
     const thisYear = (new Date()).getFullYear();
     const lastYear = thisYear + 1;
     this.FinancialYear = `${thisYear}-${lastYear}`;
+  }
+ 
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  menuModeDetail(option: string) {
+    localStorage.setItem("Mode",option);
+    location.reload();
+    this.isDropdownOpen = false; // Close the dropdown when an option is selected
+    // Add any other logic you need here when a menu item is selected
   }
 }

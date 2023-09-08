@@ -16,8 +16,6 @@ import { LanguageService } from "src/app/core/service/language.service";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { BreakpointObserver, BreakpointState } from "@angular/cdk/layout";
 import * as moment from 'moment-timezone';
-import { MatDialog } from "@angular/material/dialog";
-import { MenuBidingAccessComponent } from "src/app/Masters/menu-biding-access/menu-biding-access.component";
 const document: any = window.document;
 
 @Component({
@@ -51,7 +49,6 @@ export class HeaderComponent
     private authService: AuthService,
     private router: Router,
     public languageService: LanguageService,
-    private dialogModel: MatDialog,
     private breakpointObserver: BreakpointObserver
   ) {
     super();
@@ -181,16 +178,7 @@ export class HeaderComponent
       }
     }
   }
-  menuMode(){
-      const dialogRef = this.dialogModel.open(MenuBidingAccessComponent, {
-        width: "30%",
-        position: {
-          top: "20px",
-        },
-        disableClose: true,
-      });
-  
-  }
+ 
 
   
   callFullscreen() {

@@ -45,6 +45,8 @@ import { UnbilledPrqComponent } from './unbilled-prq/unbilled-prq.component';
 import { ErrorHandingComponent } from './error-handing/error-handing.component';
 import { utilityService } from "../Utility/utility.service";
 import { ErrorHandlingViewComponent } from './error-handing/error-handling-view/error-handling-view.component';
+import { PrqListComponent } from './prq-entry-page/prq-list/prq-list.component';
+
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -73,7 +75,9 @@ import { ErrorHandlingViewComponent } from './error-handing/error-handling-view/
     RakeDetailComponent,
     UnbilledPrqComponent,
     ErrorHandingComponent,
-    ErrorHandlingViewComponent
+    ErrorHandlingViewComponent,
+    PrqListComponent
+    
   ],
   imports: [
     CommonModule,

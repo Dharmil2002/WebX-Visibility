@@ -1,0 +1,14 @@
+<div class="paddingdiv">
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+        [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width"
+        [maxWidth]="maxWidth"(onFlagChange)="IsActiveFuntion($event)" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+    </app-generic-table-v2>
+</div>
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+        <div class="example-button-row d-flex justify-content-end">
+            <button class="msr-3" mat-raised-button color="primary" (click)="close()">Close</button>
+        </div>
+    </div>
+</div>

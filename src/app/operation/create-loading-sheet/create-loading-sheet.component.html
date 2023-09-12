@@ -17,7 +17,7 @@
       <div class="example-button-row d-flex justify-content-end">
         <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableload"
           (click)="loadingSheetGenerate()">Generate LoadingSheet</button>
-        <button class="msr-3" mat-raised-button color="primary" (click)="goBack(3)">Back</button>
+        <button class="msr-3" mat-raised-button color="primary" (click)="goBack('Departures')">Back</button>
         <button class="msr-3" mat-raised-button color="primary" *ngIf="departFlag" (click)="departVehicle()">Depart Vehicle</button>
       </div>
     </div>

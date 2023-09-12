@@ -20,7 +20,7 @@ export class StocksComponent
   uploadComponent: any;
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
   companyCode: number = parseInt(localStorage.getItem("companyCode"));
-  menuItemflag: boolean = true;
+  menuItemflag: boolean = false;
   breadscrums = [
     {
       title: "Docket Stock",
@@ -42,10 +42,7 @@ export class StocksComponent
    Table it's Jst for set A Hyper Link on same You jst add row Name Which You
    want hyper link and add Path which you want to redirect*/
   linkArray = [{ Row: "Action", Path: "Masters/Docket/EwayBillDocketBookingV2" }];
-  menuItems = [
-    { label: "Create Run Sheet" },
-    // Add more menu items as needed
-  ];
+
   //Warning--It`s Used is not compasary if you does't add any link you just pass blank array
   /*End*/
   toggleArray = [];

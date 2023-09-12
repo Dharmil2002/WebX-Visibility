@@ -101,7 +101,13 @@ export class HolidayMasterComponent extends UnsubscribeOnDestroyAdapter implemen
                 title: "Successful",
                 text: res.message,
                 showConfirmButton: true,
-            });
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // Add your event code here
+                  // This code will run when the user clicks "OK"
+                }
+              });
+              
             this.getHolidayDetails();
         }
     }

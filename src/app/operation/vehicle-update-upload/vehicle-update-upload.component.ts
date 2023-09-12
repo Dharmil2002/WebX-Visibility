@@ -381,7 +381,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
                 text: `Vehicle Loaded Successfully`,
                 showConfirmButton: true,
               });
-              this.goBack(3);
+              this.goBack('Departures');
               this.dialogRef.close("");
             }
           }
@@ -440,14 +440,14 @@ export class VehicleUpdateUploadComponent implements OnInit {
             text: `Vehicle Load Successfully`,//
             showConfirmButton: true,
           })
-          this.goBack(3);
+          this.goBack('Departures');
           this.dialogRef.close("")
         }
       }
     })
   }
  
-  goBack(tabIndex: number): void {
+  goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 }

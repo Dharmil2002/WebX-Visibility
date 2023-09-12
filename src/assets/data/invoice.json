@@ -1,0 +1,31 @@
+{
+    "data": [
+        {
+            "customer": "Bosch Machine Tools",
+            "invoiceGenerated": 230,
+            "pendingSubmission": 210,
+            "value": "2,34,560.00",
+            "pValue": "34,560.00",
+            "pendingCollection": 110,
+            "pcValue": "65,000"
+        },
+        {
+            "customer": "Ritco Logistics",
+            "invoiceGenerated": 10,
+            "pendingSubmission": 10,
+            "value": "2,10,560.00",
+            "pValue": "34,560.00",
+            "pendingCollection": 110,
+            "pcValue": "55,000"
+        },
+        {
+            "customer": "DTDC Logistics",
+            "invoiceGenerated": 10,
+            "pendingSubmission": 20,
+            "value": "2,09,560.00",
+            "pValue": "34,560.00",
+            "pendingCollection": 110,
+            "pcValue": "50,000"
+        }
+    ]
+}

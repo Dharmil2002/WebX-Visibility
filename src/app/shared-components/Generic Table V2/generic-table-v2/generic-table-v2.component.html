@@ -76,16 +76,18 @@
                 </mat-header-cell>
             </ng-container>
             <ng-template #elseBlock>
-                <mat-header-cell *matHeaderCellDef [class]="columnHeader[tableData].class" [style]="columnHeader[tableData].Style">
+                <mat-header-cell *matHeaderCellDef [class]="columnHeader[tableData].class"
+                    [style]="columnHeader[tableData].Style">
                     {{columnHeader[tableData].Title}}
-                    <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;" *ngIf="tableData === 'checkBoxRequired'" color="primary"
-                        (change)="selectAll($event)" [(ngModel)]="AllChack" [indeterminate]="someComplete()"></mat-checkbox>
+                    <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;"
+                        *ngIf="tableData === 'checkBoxRequired'" color="primary" (change)="selectAll($event)"
+                        [(ngModel)]="AllChack" [indeterminate]="someComplete()"></mat-checkbox>
                 </mat-header-cell>
             </ng-template>
             <mat-cell *matCellDef="let element" [style]="columnHeader[tableData].Style"
                 [class]="columnHeader[tableData].class">
-                <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;" *ngIf="tableData=='checkBoxRequired'" color="primary" [(ngModel)]="element.isSelected"
-                    (change)="getCheckData($event)"></mat-checkbox>
+                <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;" *ngIf="tableData=='checkBoxRequired'"
+                    color="primary" [(ngModel)]="element.isSelected" (change)="getCheckData($event)"></mat-checkbox>
                 <ng-container
                     *ngIf="Link && !shouldDisplayLink(tableData) && toggleArray && !toggleArray.includes(tableData) ">
                     <p style="text-decoration: none;">{{formatData(element[tableData], tableData )}}</p>
@@ -98,11 +100,11 @@
                         [(ngModel)]="element[tableData]">
                     </mat-slide-toggle>
                 </ng-container>
-                <a *ngIf="shouldDisplayLink(tableData)" class="pointer" style="text-decoration: underline; color: #36cbe9;" (click)="drillDownData(element,tableData)"
+                <a *ngIf="shouldDisplayLink(tableData)" class="pointer"
+                    style="text-decoration: underline; color: #36cbe9;" (click)="drillDownData(element,tableData)"
                     (ngInit)="triggered = false"><u>{{ formatData(element[tableData], tableData) }}</u></a>
-                <button mat-icon-button *ngIf="tableData=='actions'" (click)="editCall(element)"
-                    [matMenuTriggerFor]="menuItemFlag ? menu : null" (click)="$event.stopPropagation()"
-                    class="tbl-action-btn">
+                <button mat-icon-button *ngIf="tableData=='actions'" [matMenuTriggerFor]="menuItemFlag ? menu : null"
+                    (click)="editCall(element)" (click)="$event.stopPropagation()" class="tbl-action-btn">
                     <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
                 </button>
                 <mat-menu #menu="matMenu">
@@ -111,6 +113,19 @@
                         {{ item.label }}
                     </button>
                 </mat-menu>
+                <ng-container *ngIf="tableData === 'actionsItems'">
+                    <button mat-icon-button [matMenuTriggerFor]="menuItemFlag ? actionsItems : null"
+                        (click)="$event.stopPropagation()" class="tbl-action-btn">
+                        <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                    </button>
+
+                    <mat-menu #actionsItems="matMenu">
+                        <button mat-menu-item *ngFor="let item of getMenuItems(element.actions)"
+                            (click)="handleMenuItemClick(item, element)">
+                            {{ item.label }}
+                        </button>
+                    </mat-menu>
+                </ng-container>
                 <button mat-icon-button *ngIf="tableData=='view'" (click)="$event.stopPropagation()"
                     (click)="View(element)" class="tbl-action-btn">
                     <app-feather-icons [icon]="'eye'" [class]="'tbl-fav-edit'"></app-feather-icons>
@@ -133,5 +148,4 @@
         color: #36cbe9;
         font-weight: 900;
     }
-
 </style>

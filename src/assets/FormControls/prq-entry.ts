@@ -60,6 +60,9 @@ export class PrqEntryControls {
             message: "Choose proper value",
           },
         ],
+        functions:{
+          onOptionSelect:"bilingChanged"
+        },
         additionalData: {
           showNameAndValue: true,
         },

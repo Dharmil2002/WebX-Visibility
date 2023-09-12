@@ -293,10 +293,10 @@ export class RakeEntryPageComponent implements OnInit {
     }
 
     cancel() {
-        this.goBack(7)
+        this.goBack('Job')
     }
 
-    goBack(tabIndex: number): void {
+    goBack(tabIndex: string): void {
         this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
     }
 
@@ -351,7 +351,7 @@ export class RakeEntryPageComponent implements OnInit {
                 showConfirmButton: true,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.goBack(8);
+                    this.goBack('Rake');
                 }
             });
         }

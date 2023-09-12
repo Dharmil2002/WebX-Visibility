@@ -470,7 +470,7 @@ export class DepartVehicleComponent implements OnInit {
       Math.floor(Math.random() * 100000);
     this.departureTableForm.controls["Cewb"].setValue(randomNumber);
   }
-  goBack(tabIndex: number): void {
+  goBack(tabIndex: string): void {
     this.Route.navigate(["/dashboard/GlobeDashboardPage"], {
       queryParams: { tab: tabIndex },
     });
@@ -618,7 +618,7 @@ export class DepartVehicleComponent implements OnInit {
       text: `Vehicle depart Successfully`,//
       showConfirmButton: true,
     })
-      this.goBack(3);
+      this.goBack('Departures');
 }
 
   // async docketStatus() {

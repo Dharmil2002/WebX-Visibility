@@ -451,3 +451,12 @@ a {
   justify-content: center !important;
 }
 .pointer {cursor: pointer;}
+
+/* Custom CSS for adjusting container width */
+.custom-container {
+  width: 33%; /* Adjust the width to your preference (e.g., 80%) */
+  margin: 0 auto; /* Center the container horizontally */
+}
+.margincenter{
+  margin-left: 349px;
+}

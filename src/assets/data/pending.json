@@ -1,0 +1,25 @@
+{
+    "data": [
+        {
+            "customer": "​​Bosch Machine Tools",
+            "shipment": 230,
+            "Podreceived": 210,
+            "UnbilledAmount": "2,34,560.00",
+            "Action": "Generate Invoice​"
+        },
+        {
+            "customer": "​Ritco Logistics",
+            "shipment": 10,
+            "Podreceived": 10,
+            "UnbilledAmount": "2,10,560.00",
+            "Action": "Generate Invoice​"
+        },
+        {
+            "customer": "DTDC Logistics",
+            "shipment": 10,
+            "Podreceived": 20,
+            "UnbilledAmount": "2,09,560.00",
+            "Action": "Generate Invoice​"
+        }
+    ]
+}

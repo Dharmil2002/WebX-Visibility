@@ -249,7 +249,7 @@ export class VehicleLoadingComponent implements OnInit {
       }
     })
   }
-  goBack(tabIndex: number): void {
+  goBack(tabIndex: string): void {
     this.navigationService.navigateTotab(tabIndex, '/dashboard/GlobeDashboardPage');
   }
   

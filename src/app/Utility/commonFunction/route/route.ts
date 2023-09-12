@@ -20,7 +20,7 @@ export class NavigationService {
   // End
 
  // Function to navigate to a specified route URL with data
- navigateTotab(tabIndex: number,path:string): void {
+ navigateTotab(tabIndex: string,path:string): void {
     this.router.navigate([path], { queryParams: { tab: tabIndex } });
   }
  // End

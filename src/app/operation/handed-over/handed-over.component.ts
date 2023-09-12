@@ -97,9 +97,9 @@ tableData=[{
    
   }
   cancel() {
-    this.goBack(8);
+    this.goBack('Rake');
   }
-  goBack(tabIndex: number): void {
+  goBack(tabIndex: string): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 save(){

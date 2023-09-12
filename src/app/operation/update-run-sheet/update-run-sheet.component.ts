@@ -221,7 +221,7 @@ export class UpdateRunSheetComponent implements OnInit {
       Action: "Update Delivery"
     }
     this.cnoteService.setdepartRunSheetData(updateStatus)
-    this.goBack(4);
+    this.goBack('Delivery');
   }
   getRunSheetDetails() {
 
@@ -230,7 +230,7 @@ export class UpdateRunSheetComponent implements OnInit {
       this.autoBindData(this.runsheetDetails)
     })
   }
-  goBack(tabIndex: number): void {
+  goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 }

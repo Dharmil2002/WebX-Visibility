@@ -272,7 +272,7 @@ export class ChaEntryPageComponent implements OnInit {
         showConfirmButton: true,
       }).then((result) => {
         if (result.isConfirmed) {
-          this.goBack(7)
+          this.goBack("Job")
         }
       });
     }
@@ -280,7 +280,7 @@ export class ChaEntryPageComponent implements OnInit {
   }
 
   cancel() {
-    this.goBack(7)
+    this.goBack("Job")
   }
 
   functionCallHandler($event) {
@@ -374,7 +374,7 @@ export class ChaEntryPageComponent implements OnInit {
 
     return true;
   }
-  goBack(tabIndex: number): void {
+  goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
   }
   calculateTotaAmount(event) {

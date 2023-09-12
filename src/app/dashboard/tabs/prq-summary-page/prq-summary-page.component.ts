@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getPrqDetailFromApi } from './prq-summary-utitlity';
+import { Router } from '@angular/router';
+import { showConfirmationDialog } from 'src/app/operation/prq-entry-page/prq-utitlity';
 
 @Component({
   selector: 'app-prq-summary-page',
@@ -52,7 +54,12 @@ export class PrqSummaryPageComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:100px",
     },
-    Action: {
+    createdDate: {
+      Title: "Created Date",
+      class: "matcolumnleft",
+      Style: "min-width:100px",
+    },
+    actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
       Style: "min-width:2px",
@@ -65,12 +72,21 @@ export class PrqSummaryPageComponent implements OnInit {
     "billingParty",
     "fromToCity",
     "status",
+    "createdDate",
     "vehicleSize"
   ];
+  menuItems = [
+    { label: 'Confirm' },
+    { label: 'Reject' },
+    { label: 'Assign Vehicle' },
+    { label: 'Create Docket' },
+    { label: 'Modify' },
+  ];
+  menuItemflag: boolean = true;
   addAndEditPath: string;
   tableData: any[];
   linkArray = [{ Row: "Action", Path: "Operation/PRQEntry" }];
-  constructor(private _masterService:MasterService) {
+  constructor(private _masterService:MasterService,private router: Router) {
     this.addAndEditPath = "Operation/PRQEntry";
   }
 
@@ -117,5 +133,45 @@ export class PrqSummaryPageComponent implements OnInit {
     this.tableData=data;
     this.tableLoad = false;
   }
+   async handleMenuItemClick(data) {
+    if (data.label.label === "Assign Vehicle") {
+      this._masterService.setassignVehicleDetail(data.data);
+      this.router.navigate(['/Operation/AssignVehicle'], {
+        state: {
+          data: data.data
 
+        },
+      });
+    }
+    else if (data.label.label === "Create Docket") {
+      this.router.navigate(['/Masters/Docket/EwayBillDocketBookingV2'], {
+        state: {
+          data: data.data
+        },
+      });
+    }
+    else if (data.label.label === "Confirm") {
+      const tabIndex = 6; // Adjust the tab index as needed
+      const status="1";
+      await showConfirmationDialog(data.data, this._masterService, this.goBack.bind(this),tabIndex,status);
+      this.getPrqDetails();
+    }
+    else if(data.label.label==="Modify"){
+      this.router.navigate(['/Operation/PRQEntry'], {
+        state: {
+          data: data.data
+        },
+      });
+    }
+    else if(data.label.label==="Reject"){
+      const tabIndex = "PRQ"; 
+      const status="3";
+      await showConfirmationDialog(data.data, this._masterService, this.goBack.bind(this),tabIndex,status);
+      this.getPrqDetails();
+    }
+    
+  }
+  goBack(tabIndex: number): void {
+    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+  }
 }

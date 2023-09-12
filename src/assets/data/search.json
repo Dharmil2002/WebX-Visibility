@@ -1,0 +1,76 @@
+{
+    "data": [
+        {
+            "title": "Location Master",
+            "tag": [
+                "Location",
+                "Loc",
+                "Loca",
+                "Master",
+                "master",
+                "LocationMaster",
+                "locationMaster",
+                "l"
+            ],
+            "router": "Masters/LocationMaster/LocationMasterList"
+        },
+        {
+            "title": "User Master",
+            "tag": [
+                "User",
+                "Master",
+                "master",
+                "use",
+                "UserMaster",
+                "user",
+                "usermaster",
+                "u"
+            ],
+            "router": "Masters/UserMaster/UserMasterView"
+        },
+        {
+            "title": "State Master",
+            "tag": [
+                "State",
+                "Stat",
+                "Sta",
+                "StateMaster",
+                "state",
+                "Master",
+                "master",
+                "statemaster",
+                "s"
+            ],
+            "router": "Masters/StateMaster/StateMasterView"
+        },
+        {
+            "title": "City Master",
+            "tag": [
+                "City",
+                "Cit",
+                "C",
+                "CityMaster",
+                "Master",
+                "master",
+                "city",
+                "citymaster"
+            ],
+            "router": "Masters/CityMaster/CityMasterView"
+        }, {
+            "title": "Customer Master",
+            "tag": [
+                "Customer",
+                "Cust",
+                "Custome",
+                "CustomeMaster",
+                "customer",
+                 "Master",
+                "master",
+                "custome",
+                "customeMaster",
+                "c"
+            ],
+            "router": "Masters/CustomerMaster/CustomerMasterList"
+        }
+    ]
+}

@@ -333,7 +333,7 @@ export class CreateLoadingSheetComponent implements OnInit {
           });
 
         dialogRef.afterClosed().subscribe((result) => {
-          this.goBack(3);
+          this.goBack('Departures');
           // Handle the result after the dialog is closed
         });
       } else {
@@ -555,7 +555,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     } catch (error) {
     }
   }
-  goBack(tabIndex: number): void {
+  goBack(tabIndex: string): void {
     this.navigationService.navigateTotab(
       tabIndex,
       "/dashboard/GlobeDashboardPage"
@@ -680,7 +680,7 @@ export class CreateLoadingSheetComponent implements OnInit {
           showConfirmButton: true,
         });
 
-        this.goBack(3);
+        this.goBack('Departures');
       } catch (error) {
         console.error('Error occurred during the API call:', error);
       }

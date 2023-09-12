@@ -210,16 +210,16 @@ export class JobEntryPageComponent implements OnInit {
         showConfirmButton: true,
       }).then((result) => {
         if (result.isConfirmed) {
-          this.goBack(7)
+          this.goBack('Job')
         }
       });
     }
   }
 
   cancel() {
-    this.goBack(7)
+    this.goBack('Job')
   }
-  goBack(tabIndex: number): void {
+  goBack(tabIndex: string): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
   }
   functionCallHandler($event) {

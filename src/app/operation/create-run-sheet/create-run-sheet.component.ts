@@ -142,7 +142,7 @@ export class CreateRunSheetComponent implements OnInit {
       runSheetDetails: json
     }
     this.CnoteService.setRunSheetData(runSheetDetils);
-    this.goBack(4)
+    this.goBack('Delivery')
     Swal.fire({
       icon: "success",
       title: "Successful",
@@ -150,7 +150,7 @@ export class CreateRunSheetComponent implements OnInit {
       showConfirmButton: true,
     })
   }
-  goBack(tabIndex: number): void {
+  goBack(tabIndex: string): void {
     this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 }

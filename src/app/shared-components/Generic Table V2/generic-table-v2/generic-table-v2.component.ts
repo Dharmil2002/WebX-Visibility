@@ -68,6 +68,7 @@ export class GenericTableV2Component
     this.maxWidth = changes.extraData?.currentValue ?? this.maxWidth;
     this.width = changes.width?.currentValue ?? this.width;
     this.height = changes.height?.currentValue ?? this.height;
+    this.menuItems = changes.menuItems?.currentValue ?? this.menuItems;
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
@@ -344,4 +345,14 @@ export class GenericTableV2Component
       !this.AllChack
     );
   }
+  getMenuItems(labels: string[]): any[] {
+    // Check if this.menuItems is defined and is an array before filtering
+    if (Array.isArray(this.menuItems)) {
+      return this.menuItems.filter(item => labels.includes(item.label));
+    } else {
+      // Handle the case where this.menuItems is undefined or not an array
+      return [];
+    }
+  }
+  
 }

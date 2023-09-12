@@ -43,6 +43,8 @@ import { PrqSummaryPageComponent } from './tabs/prq-summary-page/prq-summary-pag
 import { JobSummaryPageComponent } from './tabs/job-summary-page/job-summary-page.component';
 import { RakeUpdateComponent } from "../operation/rake-update/rake-update.component";
 import { JobTrackerComponent } from './tabs/job-tracker/job-tracker.component';
+import { PendingBillingComponent } from "../operation/pending-billing/pending-billing.component";
+import { InvoiceManagementComponent } from "../operation/invoice-management/invoice-management.component";
 
 @NgModule({
   declarations: [
@@ -61,7 +63,10 @@ import { JobTrackerComponent } from './tabs/job-tracker/job-tracker.component';
     PrqSummaryPageComponent,
     JobSummaryPageComponent,
     RakeUpdateComponent,
-    JobTrackerComponent
+    JobTrackerComponent,
+    PendingBillingComponent,
+    InvoiceManagementComponent
+    
 
   ],
   imports: [

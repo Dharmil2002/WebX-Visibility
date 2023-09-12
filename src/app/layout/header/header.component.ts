@@ -39,7 +39,7 @@ export class HeaderComponent
   defaultFlag: string;
   isOpenSidebar: boolean;
   Mode: string;
-  menuItems = ['LTL', 'FTL', 'Import', 'Export', 'EXIM'];
+  menuItems = ['LTL', 'FTL', 'Import', 'Export', 'EXIM','Billing​'];
   constructor(
     @Inject(DOCUMENT) private document: Document,
     @Inject(WINDOW) private window: Window,

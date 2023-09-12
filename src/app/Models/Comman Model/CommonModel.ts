@@ -53,7 +53,9 @@ export class TreeItemNode {
   children: TreeItemNode[];
   item: string;
 }
-
+export class menuAccesDropdown {
+  constructor(public name: string, public value: string) { }
+}
 export class TreeItemFlatNode {
   item: string;
   level: number;

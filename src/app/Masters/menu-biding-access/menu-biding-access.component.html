@@ -1,0 +1,15 @@
+<div style="margin: -24px;">
+    <div style="display: flex;justify-content: space-between;background: #1e9ff2 !important">
+        <h4 style="margin: 10px;color: white;">Menu Mode</h4>
+        <button mat-icon-button aria-label="close dialog" mat-dialog-close style="color: white;">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div  class="col-20">
+        <form [formGroup]="menuAccessFrom">
+            <app-form-webxpress [form]="menuAccessFrom" [formData]="jsonControlArray"
+                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+            </app-form-webxpress>
+        </form>
+        </div>
+</div>

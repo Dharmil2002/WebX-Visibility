@@ -10,6 +10,7 @@ export async function addPrqData(prqData, masterService) {
 }
 
 export async function updatePrqStatus(prqData,masterService) {
+    debugger
     delete prqData.srNo
     delete prqData.Action
     const reqBody = {
@@ -20,12 +21,12 @@ export async function updatePrqStatus(prqData,masterService) {
             ...prqData,
         }
     }
-    const res = masterService.masterMongoPut("generic/update", reqBody).toPromise();
+    const res = await masterService.masterMongoPut("generic/update", reqBody).toPromise();
     return res
 }
 
 
-export async function showConfirmationDialog(prqDetail, masterService, goBack, tabIndex) {
+export async function showConfirmationDialog(prqDetail, masterService, goBack, tabIndex,status) {
     const confirmationResult = await Swal.fire({
         icon: "success",
         title: "Confirmation",
@@ -36,7 +37,7 @@ export async function showConfirmationDialog(prqDetail, masterService, goBack, t
     });
 
     if (confirmationResult.isConfirmed) {
-        prqDetail.status = "1";
+        prqDetail.status =status;
         delete prqDetail._id
         delete prqDetail.srNo
 

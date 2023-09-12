@@ -77,6 +77,7 @@ export class RakeUpdateComponent implements OnInit {
       Style: "min-width:200px",
     },
   };
+  menuItemflag:boolean=true;
   //#endregion
   staticField = [
     "SlNo",
@@ -94,12 +95,7 @@ export class RakeUpdateComponent implements OnInit {
     { Row: 'CNNo', Path: '', componentDetails: RakeDetailComponent },
     { Row: 'JobNo', Path: '', componentDetails: RakeDetailComponent }
   ]
-  menuItems = [
-    { label: "CNNo", componentDetails: RakeDetailComponent },
-    { label: "JobNo", componentDetails: RakeDetailComponent },
-    { label: "BillingParty", componentDetails: RakeDetailComponent }
-    // Add more menu items as needed
-  ];
+
   constructor(
     private masterService: MasterService
     ) { }

@@ -1,0 +1,54 @@
+{
+    "Data": 
+    [
+        {
+            "id": "tab1",
+            "label": "Tab 1",
+            "permission": "LTL"
+        },
+        {
+            "id": "tab2",
+            "label": "Tab 2",
+            "permission": "LTL"
+        },
+        {
+            "id": "tab3",
+            "label": "Tab 3",
+            "permission": "LTL"
+        },
+        {
+            "id": "tab4",
+            "label": "Tab 4",
+            "permission": "LTL"
+        }, {
+            "id": "tab5",
+            "label": "Tab 5",
+            "permission": "LTL"
+        }, {
+            "id": "tab6",
+            "label": "Tab 6",
+            "permission": "LTL"
+        }, {
+            "id": "tab7",
+            "label": "Tab 7",
+            "permission": "Export"
+        }, {
+            "id": "tab8",
+            "label": "Tab 8",
+            "permission": "import"
+        }, {
+            "id": "tab9",
+            "label": "Tab 9",
+            "permission": "import"
+        }, {
+            "id": "tab10",
+            "label": "Tab 10",
+            "permission": "import"
+        },
+        {
+            "id": "tab11",
+            "label": "Tab 11",
+            "permission": "import"
+        }
+    ]
+}

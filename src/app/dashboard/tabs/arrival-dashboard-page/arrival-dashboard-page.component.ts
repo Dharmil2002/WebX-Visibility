@@ -5,7 +5,6 @@ import { UpdateLoadingSheetComponent } from 'src/app/operation/update-loading-sh
 import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { DatePipe } from '@angular/common';
-import Swal from 'sweetalert2';
 @Component({
   selector: 'app-arrival-dashboard-page',
   templateUrl: './arrival-dashboard-page.component.html',

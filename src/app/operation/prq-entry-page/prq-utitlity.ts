@@ -10,7 +10,6 @@ export async function addPrqData(prqData, masterService) {
 }
 
 export async function updatePrqStatus(prqData,masterService) {
-    debugger
     delete prqData.srNo
     delete prqData.Action
     const reqBody = {
@@ -116,3 +115,20 @@ export async function customerFromApi(masterService) {
         return null;
     }
 }
+
+export async function containerFromApi(masterService) {
+    const reqBody = {
+        companyCode: localStorage.getItem('companyCode'),
+        collectionName: "container_detail",
+        filter:{}
+    }
+    try {
+        const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
+        const filterMap = res?.data?.map(x => ({ value: x.containerCode, name: x.containerName })) ?? null;
+        return filterMap.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
+    } catch (error) {
+        console.error("An error occurred:", error);
+        return null;
+    }
+}
+

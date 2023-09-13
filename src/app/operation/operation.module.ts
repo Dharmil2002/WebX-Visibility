@@ -46,7 +46,9 @@ import { ErrorHandingComponent } from './error-handing/error-handing.component';
 import { utilityService } from "../Utility/utility.service";
 import { ErrorHandlingViewComponent } from './error-handing/error-handling-view/error-handling-view.component';
 import { PrqListComponent } from './prq-entry-page/prq-list/prq-list.component';
-
+import { ConsignmentEntryFormComponent } from './consignment-entry-form/consignment-entry-form.component';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { AddMarketVehicleComponent } from './add-market-vehicle/add-market-vehicle.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -76,7 +78,9 @@ import { PrqListComponent } from './prq-entry-page/prq-list/prq-list.component';
     UnbilledPrqComponent,
     ErrorHandingComponent,
     ErrorHandlingViewComponent,
-    PrqListComponent
+    PrqListComponent,
+    ConsignmentEntryFormComponent,
+    AddMarketVehicleComponent
     
   ],
   imports: [
@@ -93,7 +97,9 @@ import { PrqListComponent } from './prq-entry-page/prq-list/prq-list.component';
     MatTabsModule,
     SharedComponentsModule,
     MatDialogModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatSlideToggleModule
+    
   ],
   providers: [SnackBarUtilityService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods],
   exports: []

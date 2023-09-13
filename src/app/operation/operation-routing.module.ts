@@ -25,6 +25,7 @@ import { VoucherDetailsComponent } from "./voucher-details/voucher-details.compo
 import { ChaDetailComponent } from "./cha-detail/cha-detail.component";
 import { UnbilledPrqComponent } from "./unbilled-prq/unbilled-prq.component";
 import { ErrorHandingComponent } from "./error-handing/error-handing.component";
+import { ConsignmentEntryFormComponent } from "./consignment-entry-form/consignment-entry-form.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -125,6 +126,10 @@ const routes: Routes = [
   {
     path: "IssueTracker",
     component: ErrorHandingComponent
+  },
+  {
+    path: "ConsignmentEntryForm",
+    component: ConsignmentEntryFormComponent
   }
 ]
 

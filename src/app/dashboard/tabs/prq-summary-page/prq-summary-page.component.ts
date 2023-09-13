@@ -30,9 +30,9 @@ export class PrqSummaryPageComponent implements OnInit {
       Style: "min-width:200px",
     },
     vehicleSize: {
-      Title: "Vehicle Size",
+      Title: "(Vehicle/container) Size",
       class: "matcolumncenter",
-      Style: "min-width:2px",
+      Style: "min-width:200px",
     },
     billingParty: {
       Title: "Billing Party",

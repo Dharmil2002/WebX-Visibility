@@ -14,7 +14,7 @@ export async function getPrqDetailFromApi(masterServices) {
         let pqrData = {
             "srNo": element.srNo = index + 1,
             "prqNo": element?.prqId || '',
-            "vehicleSize": element?.vehicleSize || '',
+            "vehicleSize": element.vehicleSize?element.vehicleSize : element.containerSize?element.containerSize:"",
             "billingParty": element?.billingParty || '',
             "fromToCity": element?.fromCity + "-" + element?.toCity,
             "fromCity": element?.fromCity || "",
@@ -27,6 +27,10 @@ export async function getPrqDetailFromApi(masterServices) {
             "pickupDate": element?.pickUpTime || new Date(),
             "status": element?.status === "0" ? "Awaiting Confirmation" : element.status === "1" ? "Awaiting Assign Vehicle" : "Awaiting For Docket",
             "actions": element?.status === "0" ? ["Confirm", "Reject", "Modify"] : element.status === "1" ? ["Assign Vehicle"] : ["Create Docket"],
+            "containerSize":element?.containerSize||"",
+            "typeContainer":element?.typeContainer||"",
+            "pAddress":element?.pAddress||"",
+            "payType":element?.payType||"",
             "createdDate": formatDocketDate(element?.entryDate || new Date())
         }
         prqList.push(pqrData)

@@ -1,0 +1,34 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <form [formGroup]="consignmentTableForm">
+      <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArray"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)">
+      </app-form-webxpress>
+    </form>
+    <hr>
+    <h4 class="card-title" style="padding-left: 10px;">Container Details</h4>
+    <hr>
+    <div [style]="TableStyle">
+      <app-table-boilerplate *ngIf="tableData" [tableData]="tableData" [columnHeader]="displayedColumns1"
+        (DeleteAction)="delete($event)" (AddRow)="addItem($event)" (functionCallEmitter)="functionCallHandler($event)"
+        [showsubmit]="false" [ActionObject]="actionObject">
+      </app-table-boilerplate>
+    </div>
+    <hr>
+    <h4 class="card-title" style="padding-left: 10px;">Invoice Details</h4>
+    <hr>
+    <app-table-boilerplate *ngIf="tableData1" [tableData]="tableData1" [columnHeader]="displayedColumns2"
+      (DeleteAction)="delete($event)" (AddRow)="AddItem($event)" (functionCallEmitter)="functionCallHandler($event)"
+      [showsubmit]="false" [ActionObject]="actionObject">
+    </app-table-boilerplate>
+    <hr>
+    <h4 class="card-title" style="padding-left: 10px;">Freight Details</h4>
+    <hr>
+    <form [formGroup]="FreightTableForm">
+      <app-form-webxpress [form]="FreightTableForm" [formData]="jsonControlArray"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+        (callFunction)="functionCallHandler($event)">
+      </app-form-webxpress>
+    </form>
+  </app-common-wrapper-webxpress>
+  

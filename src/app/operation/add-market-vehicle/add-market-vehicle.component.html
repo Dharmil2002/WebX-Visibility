@@ -1,0 +1,8 @@
+<h1 mat-dialog-title>Add Market Vehicle</h1>
+
+<form [formGroup]="marketVehicleTableForm">
+      <app-form-webxpress [form]="marketVehicleTableForm" [formData]="jsonControlVehicleArray"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+        (callFunction)="functionCallHandler($event)">
+      </app-form-webxpress>
+    </form>

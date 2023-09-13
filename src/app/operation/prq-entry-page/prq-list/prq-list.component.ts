@@ -1,7 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-prq-list',

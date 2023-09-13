@@ -7,7 +7,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { getCity } from '../quick-booking/quick-utility';
 import { Router } from '@angular/router';
-import { addPrqData, customerFromApi, locationFromApi, showConfirmationDialog, updatePrqStatus } from './prq-utitlity';
+import { addPrqData, containerFromApi, customerFromApi, locationFromApi, updatePrqStatus } from './prq-utitlity';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { prqDetail } from 'src/app/core/models/operations/prq/prq';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -15,6 +15,8 @@ import Swal from 'sweetalert2';
 import { getPrqDetailFromApi } from 'src/app/dashboard/tabs/prq-summary-page/prq-summary-utitlity';
 import { MatDialog } from '@angular/material/dialog';
 import { PrqListComponent } from './prq-list/prq-list.component';
+import { getPrqNextNumber } from './prq-list/prq-list-utlity';
+import { setControlValue } from 'src/app/Utility/Form Utilities/setform';
 
 @Component({
   selector: 'app-prq-entry-page',
@@ -44,6 +46,10 @@ export class PrqEntryPageComponent implements OnInit {
   prqBranchCode: string;
   prqBranchStatus: boolean;
   pendingOperations = false;
+  typeContainerCode: string;
+  typeContainerStatus: boolean;
+  containerSizeCode: string;
+  containerSizeStatus: boolean;
   allPrqDetail: any;
   breadScrums = [
     {
@@ -55,6 +61,7 @@ export class PrqEntryPageComponent implements OnInit {
   prqDetail: prqDetail;
   isConfirm: boolean;
   locationDetail: any;
+  customerList: any;
 
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
@@ -76,7 +83,6 @@ export class PrqEntryPageComponent implements OnInit {
   ngOnInit(): void {
     this.bindDropDown();
     this.getCity();
-    this.getCustomerDetails();
     this.autoFill();
     this.bindDataFromDropdown();
   }
@@ -90,9 +96,13 @@ export class PrqEntryPageComponent implements OnInit {
       this.prqEntryTableForm.controls['fromCity'].setValue({ name: this.prqDetail.fromCity, value: this.prqDetail.fromCity });
       this.prqEntryTableForm.controls['toCity'].setValue({ name: this.prqDetail.toCity, value: this.prqDetail.toCity });
       this.prqEntryTableForm.controls['billingParty'].setValue({ name: this.prqDetail.billingParty, value: this.prqDetail.billingParty });
+      this.prqEntryTableForm.controls['containerSize'].setValue({ name: this.prqDetail.containerSize, value: this.prqDetail.containerSize });
+      this.prqEntryTableForm.controls['typeContainer'].setValue({ name: this.prqDetail.typeContainer, value: this.prqDetail.typeContainer });
+      this.prqEntryTableForm.controls['payType'].setValue(this.prqDetail.payType);
     }
     else {
       this.prqEntryTableForm.controls['transMode'].setValue("Road");
+      this.prqEntryTableForm.controls['payType'].setValue("TBB");
     }
   }
   initializeFormControl() {
@@ -112,7 +122,9 @@ export class PrqEntryPageComponent implements OnInit {
       ftlType: { variable: 'ftlType', status: 'ftlTypeStatus' },
       prqRaiseOn: { variable: 'prqRaiseOn', status: 'prqRaiseOnStatus' },
       transMode: { variable: 'transModeOn', status: 'transModeOnStatus' },
-      prqBranch: { variable: 'prqBranchCode', status: 'prqBranchStatus' }
+      prqBranch: { variable: 'prqBranchCode', status: 'prqBranchStatus' },
+      typeContainer: { variable: 'typeContainerCode', status: 'typeContainerStatus' },
+      containerSize: { variable: 'containerSizeCode', status: 'containerSizeStatus' }
     };
     processProperties.call(this, this.jsonControlPrqArray, locationPropertiesMapping);
   }
@@ -127,22 +139,7 @@ export class PrqEntryPageComponent implements OnInit {
     }
   }
 
-  // Customer details
-  getCustomerDetails() {
-    this.masterService.getJsonFileDetails("customer").subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.filter.Filter(
-            this.jsonControlPrqArray,
-            this.prqEntryTableForm,
-            res,
-            this.customer,
-            this.billingPartyStatus
-          ); // Filter the docket control array based on customer details
-        }
-      },
-    });
-  }
+
   async getCity() {
     try {
       const cityDetail = await getCity(this.companyCode, this.masterService);
@@ -164,6 +161,7 @@ export class PrqEntryPageComponent implements OnInit {
           this.toCityStatus
         ); // Filter the docket control array based on toCity details
       }
+      this.disableSize("Road")
     } catch (error) {
       console.error("Error getting city details:", error);
     }
@@ -184,16 +182,28 @@ export class PrqEntryPageComponent implements OnInit {
   async save() {
     const tabcontrols = this.prqEntryTableForm;
     clearValidatorsAndValidate(tabcontrols);
-    const thisYear = new Date().getFullYear();
-    const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
-    const dynamicNumber = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
-    const raise = this.prqEntryTableForm.value.prqBranch.value;
+    this.prqEntryTableForm.controls['typeContainer'].enable();
+    this.prqEntryTableForm.controls['containerSize'].enable();
+    this.prqEntryTableForm.controls['vehicleSize'].enable();
     this.prqEntryTableForm.controls['prqBranch'].setValue(this.prqEntryTableForm.controls['prqBranch'].value?.value || "");
     this.prqEntryTableForm.controls['billingParty'].setValue(this.prqEntryTableForm.controls['billingParty'].value?.name || "");
     this.prqEntryTableForm.controls['fromCity'].setValue(this.prqEntryTableForm.controls['fromCity'].value?.name || "");
     this.prqEntryTableForm.controls['toCity'].setValue(this.prqEntryTableForm.controls['toCity'].value?.name || "");
+    this.prqEntryTableForm.controls['typeContainer'].setValue(this.prqEntryTableForm.controls['typeContainer'].value?.name || "");
+    this.prqEntryTableForm.controls['containerSize'].setValue(this.prqEntryTableForm.controls['containerSize'].value?.name || "");
+    const controlNames = ["transMode", "payType", "vehicleSize"];
+    controlNames.forEach((controlName) => {
+      if (Array.isArray(this.prqEntryTableForm.value[controlName])) {
+        this.prqEntryTableForm.controls[controlName].setValue("");
+      }
+    });
     if (!this.isUpdate) {
-      const prqNo = `PRQ/${raise}/${financialYear}/${dynamicNumber}`;
+      const thisYear = new Date().getFullYear();
+      const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
+      const location = localStorage.getItem("Branch"); // Replace with your dynamic value
+      const paddedNumber = getPrqNextNumber();
+      const blParty = this.prqEntryTableForm.controls['billingParty'].value.toUpperCase();
+      let prqNo = `${location.substring(0, 3)}${blParty.substring(0, 3)}${financialYear}${paddedNumber}`;
       this.prqEntryTableForm.controls['_id'].setValue(prqNo);
       this.prqEntryTableForm.controls['prqId'].setValue(prqNo);
       const res = await addPrqData(this.prqEntryTableForm.value, this.masterService);
@@ -237,6 +247,8 @@ export class PrqEntryPageComponent implements OnInit {
   async bindDataFromDropdown() {
     const resLoc = await locationFromApi(this.masterService);
     const resCust = await customerFromApi(this.masterService);
+    this.customerList = resCust;
+    const resContainer = await containerFromApi(this.masterService);
     this.locationDetail = resLoc;
     if (this.isUpdate) {
       const prqLoc = resLoc.find((x) => x.value.trim() === this.prqDetail.prqBranch);
@@ -257,11 +269,27 @@ export class PrqEntryPageComponent implements OnInit {
       this.customer,
       this.billingPartyStatus
     );
+
+    this.filter.Filter(
+      this.jsonControlPrqArray,
+      this.prqEntryTableForm,
+      resContainer,
+      this.containerSizeCode,
+      this.containerSizeStatus
+    );
+
+    this.filter.Filter(
+      this.jsonControlPrqArray,
+      this.prqEntryTableForm,
+      resContainer,
+      this.typeContainerCode,
+      this.typeContainerStatus
+    );
     this.allPrqDetail = await getPrqDetailFromApi(this.masterService);
   }
 
   bilingChanged() {
-    const billingParty = this.prqEntryTableForm.controls['billingParty'].value?.value || "";
+    const billingParty = this.prqEntryTableForm.controls['billingParty'].value?.name || "";
     let prqDetail = this.allPrqDetail.filter((x) => x.billingParty.toLowerCase() === billingParty.toLowerCase()).slice(0, 5);;
     if (prqDetail.length > 0) {
       this.prqView(prqDetail);
@@ -295,18 +323,35 @@ export class PrqEntryPageComponent implements OnInit {
     });
   }
   autoFillPqrDetail(result) {
-    debugger
     if (result) {
-      this.prqEntryTableForm.controls['transMode'].setValue(result.transMode);
-      this.prqEntryTableForm.controls['vehicleSize'].setValue(result?.vehicleSize?.split("-")[0] ?? '');
-      this.prqEntryTableForm.controls['fromCity'].setValue({ name: result.fromCity, value: result.fromCity });
-      this.prqEntryTableForm.controls['toCity'].setValue({ name: result.toCity, value: result.toCity });
-      this.prqEntryTableForm.controls['billingParty'].setValue({ name: result.billingParty, value: result.billingParty });
-      this.prqEntryTableForm.controls['contactNo'].setValue(result.contactNo);
-      this.prqEntryTableForm.controls['prqBranch'].setValue({ name: result.prqBranch, value: result.prqBranch });
+      setControlValue(this.prqEntryTableForm.get('transMode'), result.transMode);
+      setControlValue(this.prqEntryTableForm.get('vehicleSize'), result?.vehicleSize?.split("-")[0] ?? '');
+      setControlValue(this.prqEntryTableForm.get('fromCity'), { name: result.fromCity, value: result.fromCity });
+      setControlValue(this.prqEntryTableForm.get('toCity'), { name: result.toCity, value: result.toCity });
+      const billingParty = this.customerList.find((x) => x.name.toLowerCase() === result.billingParty.toLowerCase());
+      setControlValue(this.prqEntryTableForm.get('billingParty'), billingParty);
+      setControlValue(this.prqEntryTableForm.get('contactNo'), result.contactNo);
+      setControlValue(this.prqEntryTableForm.get('prqBranch'), { name: result.prqBranch, value: result.prqBranch });
+      setControlValue(this.prqEntryTableForm.get('containerSize'), { name: result.containerSize, value: result.containerSize });
+      setControlValue(this.prqEntryTableForm.get('typeContainer'), { name: result.typeContainer, value: result.typeContainer });
+      setControlValue(this.prqEntryTableForm.get('pAddress'), result?.pAddress);
     }
   }
 
-  
+  disableSize(event) {
+    
+    if (typeof(event)==="object" && event.eventArgs.value == "Rail") {
+      this.prqEntryTableForm.controls['typeContainer'].enable();
+      this.prqEntryTableForm.controls['containerSize'].enable();
+      this.prqEntryTableForm.controls['vehicleSize'].disable();
+    }
+    else {
+
+      this.prqEntryTableForm.controls['typeContainer'].disable();
+      this.prqEntryTableForm.controls['containerSize'].disable();
+      this.prqEntryTableForm.controls['vehicleSize'].enable();
+    }
+
+  }
 }
 

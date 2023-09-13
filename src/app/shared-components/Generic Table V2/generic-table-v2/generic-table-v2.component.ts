@@ -50,6 +50,7 @@ export class GenericTableV2Component
   // @Input() checkBoxRequired;
   // @Input() selectAllorRenderedData;
   @Input() metaData;
+  @Input() addFlag;
   @ViewChild("table") table1: any;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild("filter", { static: true }) filter: ElementRef;
@@ -59,6 +60,7 @@ export class GenericTableV2Component
   tableLoad: boolean = true;
   @Output() onFlagChange: EventEmitter<any> = new EventEmitter();
   @Output() dialogClosed = new EventEmitter<any>();
+  @Output() addEmitter=new EventEmitter<any>();
   selectedItems: any[] = [];
   AllChack = false
   @Input() centerAligned;
@@ -69,6 +71,7 @@ export class GenericTableV2Component
     this.width = changes.width?.currentValue ?? this.width;
     this.height = changes.height?.currentValue ?? this.height;
     this.menuItems = changes.menuItems?.currentValue ?? this.menuItems;
+    this.addFlag = changes.addFlag?.currentValue ?? this.addFlag;
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
@@ -149,7 +152,12 @@ export class GenericTableV2Component
   // this function is called, when add button is clicked.
   // it navigates to the Add page using the url provided, from parent
   addNew() {
+    if(this.addAndEditPath){
     this.router.navigateByUrl(this.addAndEditPath);
+    }
+    if(this.addFlag){
+      this.addEmitter.emit();
+    }
   }
 
   //#region this function is called when rendering data in table and returns formatted data if required.

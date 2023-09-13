@@ -11,7 +11,12 @@ export class prqDetail {
     contactNo: number;
     pickupDate: Date;  // Changed the type to Date
     status: string;
+    containerSize:string;
+    typeContainer:string;
+    payType:string;
+    pAddress:string;
     Action: string;
+    
 
     constructor(data: any) {
         this.prqNo = data.prqNo ?? 'System Generated';
@@ -23,8 +28,12 @@ export class prqDetail {
         this.transMode = data.transMode ?? '';
         this.prqBranch=data.prqBranch??'';
         this.vehicleNo = data.vehicleNo ?? '';
+        this.containerSize = data.containerSize ?? '';
+        this.typeContainer = data.typeContainer ?? '';
+        this.pAddress = data.pAddress ?? '';
         this.pickupDate = data.pickupDate ? new Date(data.pickupDate) : new Date(); // Convert to Date
         this.status = data.status ?? '';
+        this.payType = data.payType ?? '';
         this.Action = data.Action ?? '';
     }
 }

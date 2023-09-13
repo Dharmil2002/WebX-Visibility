@@ -394,6 +394,15 @@ export const ROUTES: RouteInfo[] =
         submenu: []
       },
       {
+        path: "Operation/ConsignmentEntryForm",
+        title: "Consignment Entry",
+        moduleName: "Consignment Entry",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      },
+      {
         path: "Masters/Vehicle/Status",
         title: "Vehicle Status",
         moduleName: "Vehicle Status",

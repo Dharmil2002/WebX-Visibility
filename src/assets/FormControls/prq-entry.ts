@@ -3,12 +3,13 @@ import { prqDetail } from 'src/app/core/models/operations/prq/prq';
 /* here i create class for the bind controls in formGrop */
 export class PrqEntryControls {
   private fieldMapping: FormControls[];
+   // Constructor for initializing form controls.
   constructor(prqDetail: prqDetail, isUpdate) {
     this.fieldMapping = [
       {
         name: "prqId",
-        label: "PRQ ID",
-        placeholder: "PRQ ID",
+        label: "Request ID",
+        placeholder: "Request ID",
         type: "text",
         value: prqDetail.prqNo,
         generatecontrol: true,
@@ -16,29 +17,8 @@ export class PrqEntryControls {
         Validations: [],
       },
       {
-        name: "pickUpTime",
-        label: "Pickup Date & Time",
-        placeholder: "",
-        type: "datetimerpicker",
-        value: prqDetail.pickupDate,
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Pickup Date is required",
-          },
-        ],
-        additionalData: {
-          minDate: isUpdate ? "" : new Date(),
-        },
-      },
-      {
         name: "billingParty",
-        label: "Billing Party",
+        label: "Billing Party & Code",
         placeholder: "Billing Party",
         type: "dropdown",
         value: "",
@@ -68,9 +48,53 @@ export class PrqEntryControls {
         },
       },
       {
+        name: "transMode",
+        label: "Transport Mode",
+        placeholder: "Transport Mode",
+        type: "Staticdropdown",
+        value: [
+          { value: "Air", name: "Air" },
+          { value: "Road", name: "Road" },
+          { value: "Rail", name: "Rail" },
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        functions:{
+          onSelection:"disableSize"
+      },
+        Validations: [],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "pickUpTime",
+        label: "Pickup Date & Time",
+        placeholder: "",
+        type: "datetimerpicker",
+        value: prqDetail.pickupDate,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Pickup Date is required",
+          },
+        ],
+        additionalData: {
+          minDate: isUpdate ? "" : new Date(),
+        },
+      },
+      {
         name: "contactNo",
-        label: "Contact No",
-        placeholder: "Contact No",
+        label: "Contact Number",
+        placeholder: "Contact Number",
         type: "number",
         value: prqDetail.contactNo,
         filterOptions: "",
@@ -87,6 +111,27 @@ export class PrqEntryControls {
           {
             name: "required",
             message: "Contact No is required",
+          },
+        ],
+        functions: {
+          change: "",
+        },
+      },
+      {
+        name: "pAddress",
+        label: "Pick Up Address",
+        placeholder: "Pick Up Address",
+        type: "text",
+        value: prqDetail.pAddress,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Pick Up Address is required",
           },
         ],
         functions: {
@@ -153,27 +198,101 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "vehicleSize",
-        label: "Vehicle Size",
-        placeholder: "Vehicle Size",
+        name: "typeContainer",
+        label: "Type of Container",
+        placeholder: "Type of Container",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "containerSize",
+        label: "Container Size",
+        placeholder: "Container Size",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "payType",
+        label: "Payment Mode",
+        placeholder: "Payment Mode",
         type: "Staticdropdown",
         value: [
-          { value: "1", name: "1-MT" },
-          { value: "9", name: "9-MT" },
-          { value: "16", name: "16-MT" },
-          { value: "32", name: "32-MT" },
+          {
+            value: "PAID",
+            name: "PAID",
+          },
+          {
+            value: "TBB",
+            name: "TBB",
+          },
+          {
+            value: "TO PAY",
+            name: "TO PAY",
+          },
+          {
+            value: "FOC",
+            name: "FOC",
+          },
         ],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Payment Type is required",
+          },
+        ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
         },
       },
-
+      {
+        name: "contractAmt",
+        label: "Contract Amount",
+        placeholder: "Contract Amount",
+        type: "number",
+        value: 0,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
       {
         name: "prqBranch",
         label: "PRQ Branch",
@@ -199,14 +318,15 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "transMode",
-        label: "Transport Mode",
-        placeholder: "Transport Mode",
+        name: "vehicleSize",
+        label: "Vehicle Size",
+        placeholder: "Vehicle Size",
         type: "Staticdropdown",
         value: [
-          { value: "Air", name: "Air" },
-          { value: "Road", name: "Road" },
-          { value: "Rail", name: "Rail" },
+          { value: "1", name: "1-MT" },
+          { value: "9", name: "9-MT" },
+          { value: "16", name: "16-MT" },
+          { value: "32", name: "32-MT" },
         ],
         filterOptions: "",
         autocomplete: "",
@@ -218,6 +338,7 @@ export class PrqEntryControls {
           showNameAndValue: false,
         },
       },
+    // Additional hidden or metadata form controls.
       {
         name: "_id",
         label: "",

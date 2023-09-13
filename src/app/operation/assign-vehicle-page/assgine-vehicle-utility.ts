@@ -18,10 +18,20 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
         let companyCode = parseInt(localStorage.getItem('companyCode'));
         const result = await vehicleStatusUpdate(currentBranch, companyCode, item, prqDetail, masterService, true);
         if (res && result) {
-            goBack(tabIndex);
+            const confirmationResult = await Swal.fire({
+                icon: "success",
+                title: "Assignment Success",
+                text: "The vehicle has been successfully assigned.",
+                confirmButtonText: "OK",
+            });
+            
+            if (confirmationResult.isConfirmed) {
+                goBack(tabIndex);
+                dialogRef.close();
+            }
         }
     }
-    dialogRef.close();
+    
 
 }
 
@@ -84,7 +94,7 @@ export class AssignVehiclePageMethods {
             class: "matcolumnleft",
             Style: "min-width:200px",
         },
-        distance: {
+        distannce: {
             Title: "Distance (KMs)",
             class: "matcolumncenter",
             Style: "min-width:40px",
@@ -101,4 +111,14 @@ export class AssignVehiclePageMethods {
         },
     }];
 
+}
+//add here method to bind data using market vehicle 
+export async function bindMarketVehicle(vehicledata: any) {
+    const marketVehicle = {
+        vehNo:vehicledata?.vehicelNo||"",
+        distannce:0,
+        currentLocation:localStorage.getItem("Branch"),
+        capacity:vehicledata.vehicleSize,
+    }
+  return marketVehicle;
 }

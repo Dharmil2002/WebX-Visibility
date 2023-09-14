@@ -164,7 +164,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       HeaderStyle: { "text-align": "center" },
     },
   };
-  jsonControlArrayBasic: import("d:/newVelocity/angular/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  jsonControlArrayBasic: any;
 
   //#endregion
 

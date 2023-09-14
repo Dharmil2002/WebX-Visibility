@@ -182,7 +182,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   //#region initializeFormControl
   initializeFormControl() {
-    debugger
     // Create LocationFormControls instance to get form controls for different sections
     this.ConsignmentFormControls = new ConsignmentControl();
     this.FreightFromControl = new FreightControl();

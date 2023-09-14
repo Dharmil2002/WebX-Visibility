@@ -40,6 +40,7 @@ export class FormComponent {
   }
 
   functionCalled(context) {
+    debugger
     // console.log(context , "from form components");
     if ((context.functionName !== undefined || context.functionName != null) && context.functionName?.length > 0) {
       this.callFunction.emit(context)

@@ -14,7 +14,8 @@ export async function getPrqDetailFromApi(masterServices) {
         let pqrData = {
             "srNo": element.srNo = index + 1,
             "prqNo": element?.prqId || '',
-            "vehicleSize": element.vehicleSize?element.vehicleSize : element.containerSize?element.containerSize:"",
+            "vehicleSize": element?.vehicleSize||"",
+            "size":element.vehicleSize?element.vehicleSize+" "+"MT" : element.containerSize?element.containerSize:"",
             "billingParty": element?.billingParty || '',
             "fromToCity": element?.fromCity + "-" + element?.toCity,
             "fromCity": element?.fromCity || "",

@@ -20,6 +20,7 @@ export class MasterService {
   pending='../../../assets/data/pending.json';
   invoice='../../../assets/data/invoice.json';
   search='../../../assets/data/search.json';
+  manualVoucher='../../../assets/data/manual-voucher.json';
   headerCode: string;
   vehicleDetail: any;
 

@@ -180,7 +180,7 @@ export class AddVehicleMasterComponent implements OnInit {
     this.vehicleTableForm.controls["outerCft"].setValue(outerDCal.toFixed(2));
   }
   cancel() {
-    this.route.navigateByUrl('/Masters/VehicleMaster/VehicleMasterList');
+    window.history.back();
   }
   /*get all Master Details*/
   async getAllMastersData() {
@@ -323,7 +323,8 @@ export class AddVehicleMasterComponent implements OnInit {
       const controlValue = formValue[controlName]?.name;
       this.vehicleTableForm.controls[controlName].setValue(controlValue);
     });
-    const permitStateDetail = this.vehicleTableForm.value.permitStateDropdown.map((item: any) => item.name);
+    const permitState = this.vehicleTableForm.value.permitStateDropdown;
+    const permitStateDetail = permitState?this.vehicleTableForm.value.permitStateDropdown.map((item: any) => item.name):"";
     this.vehicleTableForm.controls["permitState"].setValue(permitStateDetail);
     const routeDetail = this.vehicleTableForm.value.routeLocation;
     const routeLocation = routeDetail ? routeDetail.map((item: any) => item.name) : "";

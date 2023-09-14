@@ -4,6 +4,8 @@ import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilde
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { ConsignmentControl, FreightControl } from "src/assets/FormControls/consignment-control";
 import Swal from "sweetalert2";
+import { customerFromApi, locationFromApi } from "../prq-entry-page/prq-utitlity";
+import { MasterService } from "src/app/core/service/Masters/master.service";
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -162,10 +164,15 @@ export class ConsignmentEntryFormComponent implements OnInit {
       HeaderStyle: { "text-align": "center" },
     },
   };
+  jsonControlArrayBasic: import("d:/newVelocity/angular/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
 
   //#endregion
 
-  constructor(private fb: UntypedFormBuilder,private _NavigationService: NavigationService) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    private _NavigationService: NavigationService,
+    private masterService: MasterService
+  ) {
     this.initializeFormControl();
     this.loadTempData();
   }
@@ -175,25 +182,20 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   //#region initializeFormControl
   initializeFormControl() {
+    debugger
     // Create LocationFormControls instance to get form controls for different sections
     this.ConsignmentFormControls = new ConsignmentControl();
     this.FreightFromControl = new FreightControl();
 
     // Get form controls for Driver Details section
-    this.jsonControlArray =
-      this.ConsignmentFormControls.getConsignmentControlControls();
+    this.jsonControlArrayBasic = this.ConsignmentFormControls.getConsignmentControlControls();
+
     this.jsonControlArray = this.FreightFromControl.getFreightControlControls();
-    this.jsonControlArray.forEach((data) => {
-      // if (data.name === "BranchCode") {
-      //   // Set BranchCode-related variables
-      //   this.location = data.name;
-      //   this.locationStatus = data.additionalData.showNameAndValue;
-      // }
-    });
+
 
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.consignmentTableForm = formGroupBuilder(this.fb, [
-      this.jsonControlArray,
+      this.jsonControlArrayBasic,
     ]);
     this.FreightTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
@@ -311,9 +313,13 @@ export class ConsignmentEntryFormComponent implements OnInit {
     return true;
   }
   //#endregion
+  async bindDataFromDropdown() {
+    const resLoc = await locationFromApi(this.masterService);
+    const resCust = await customerFromApi(this.masterService);
 
+  }
   //#region Save Function
-  save(){
+  save() {
 
   }
   //#endregion
@@ -324,7 +330,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       "docket",
       "dashboard/GlobeDashboardPage"
     );
-    }
+  }
   //#endregion
 
 }

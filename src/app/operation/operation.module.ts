@@ -49,6 +49,7 @@ import { PrqListComponent } from './prq-entry-page/prq-list/prq-list.component';
 import { ConsignmentEntryFormComponent } from './consignment-entry-form/consignment-entry-form.component';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { AddMarketVehicleComponent } from './add-market-vehicle/add-market-vehicle.component';
+import { FilterUtils } from "../Utility/dropdownFilter";
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -101,7 +102,7 @@ import { AddMarketVehicleComponent } from './add-market-vehicle/add-market-vehic
     MatSlideToggleModule
     
   ],
-  providers: [SnackBarUtilityService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods],
+  providers: [SnackBarUtilityService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods,FilterUtils],
   exports: []
 })
 export class OperationModule { }

@@ -6,11 +6,11 @@ export class ConsignmentControl {
   constructor() {
     this.ConsignmentControlArray = [
       {
-        name: "CONSNO", label: "Consignment Note No", placeholder: "Consignment Note No", type: "text",
+        name: "docketNumber", label: "Consignment Note No", placeholder: "Consignment Note No", type: "text",
         value: "System Generated", filterOptions: "", autocomplete: "", displaywith: "", Validations: [], generatecontrol: true, disable: true,
       },
       {
-        name: "CND",
+        name: "docketDate",
         label: 'Consignment Note Date',
         placeholder: 'Consignment Note Date',
         type: "datetimerpicker",
@@ -31,73 +31,252 @@ export class ConsignmentControl {
         },
       },
       {
-        name: 'billingParty', label: 'Billing Party', placeholder: 'Billing Party', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
+        name: "billingParty",
+        label: "Billing Party",
+        placeholder: "Billing Party",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          { name: "autocomplete" },
+          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
       },
       {
-        name: 'paymentMode', label: 'Payment Mode', placeholder: 'Payment Mode', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
+        name: "payType",
+        label: "Payment Mode",
+        placeholder: "Payment Mode",
+        type: "Staticdropdown",
+        value: [
+          {
+            value: "PAID",
+            name: "PAID",
+          },
+          {
+            value: "TBB",
+            name: "TBB",
+          },
+          {
+            value: "TO PAY",
+            name: "TO PAY",
+          },
+          {
+            value: "FOC",
+            name: "FOC",
+          },
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Payment Type is required",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
       },
       {
-        name: 'fromCity', label: 'From City', placeholder: 'From City', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
+        name: "fromCity",
+        label: "From City",
+        placeholder: "From City",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          { name: "autocomplete" },
+          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
       },
       {
-        name: 'toCity', label: 'To City', placeholder: 'To City', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
+        name: "toCity",
+        label: "To City",
+        placeholder: "To City",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          { name: "autocomplete" },
+          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
       },
       {
-        name: 'transportMode', label: 'Transport Mode ', placeholder: 'Transport Mode ', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
+        name: "transMode",
+        label: "Transport Mode",
+        placeholder: "Transport Mode",
+        type: "Staticdropdown",
+        value: [
+          { value: "Air", name: "Air" },
+          { value: "Road", name: "Road" },
+          { value: "Rail", name: "Rail" },
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        functions:{
+          onSelection:"disableSize"
+      },
+        Validations: [],
+        additionalData: {
+          showNameAndValue: false,
+        },
       },
       {
-        name: 'containerSize', label: 'Container Size', placeholder: 'Container Size', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
+        name: "containerSize",
+        label: "Container Size",
+        placeholder: "Container Size",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
       },
       {
         name: 'containerNumber', label: 'Container Number', placeholder: 'Container Number', type: 'text',
         value: '', Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'vendorType', label: 'Vendor Type', placeholder: 'Vendor Type', type: 'text',
+        name: 'vendorType', label: 'Vendor Type', placeholder: 'Vendor Type',  type: "Staticdropdown",
+        value: [
+          { value: "Own", name: "Own" },
+          { value: "Attached", name: "Attached" },
+          { value: "Service Provider", name: "Rail" },
+        ],Validations: [], generatecontrol: true, disable: false
+      },
+      {
+        name: 'vendorName', label: 'Vendor Name', placeholder: 'Vendor Name',type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+         {
+        name: "ccbp",
+        label: "consignor and consignee are same as the billing party",
+        placeholder: "",
+        type: "toggle",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        functions:{onChange:"onAutoBillingBased"},
+        Validations: [],
+      },
+      {
+        name: 'consignorName',   label: "Consignor Name",
+        placeholder: "Consignor Name & Code",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          { name: "autocomplete" },
+          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: 'pAddress', label: 'Pickup Address', placeholder: 'Pickup Address', type: 'text',
         value: '', Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'vendorName', label: 'Vendor Name', placeholder: 'Vendor Name', type: 'text',
+        name: 'ccontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'text',
         value: '', Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'consignorName', label: 'Consignor Name', placeholder: 'Consignor Name', type: 'text',
+        name: 'calternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'text',
         value: '', Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'pickupAddress', label: 'Pickup Address', placeholder: 'Pickup Address', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
-      },
-      {
-        name: 'code ', label: 'Code', placeholder: 'Code', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
-      },
-      {
-        name: 'contactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
-      },
-      {
-        name: 'alternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
-      },
-      {
-        name: 'consigneeNameCode', label: 'Consignee Name & Code', placeholder: 'Consignee Name & Code', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
+        name: "consigneeName",
+        label: "Consignee Name",
+        placeholder: "Consignee Name",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          { name: "autocomplete" },
+          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
       },
       {
         name: 'deliveryAddress', label: 'Delivery Address', placeholder: 'Delivery Address', type: 'text',
         value: '', Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'ccbp', label: 'ccbp', placeholder: '', type: 'text',
+        name: 'cncontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'text',
         value: '', Validations: [], generatecontrol: true, disable: false
       },
+      {
+        name: 'cnalternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'text',
+        value: '', Validations: [], generatecontrol: true, disable: false
+      }
     ]
   }
   getConsignmentControlControls() {

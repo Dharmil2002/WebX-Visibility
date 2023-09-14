@@ -128,7 +128,7 @@ const routes: Routes = [
     component: ErrorHandingComponent
   },
   {
-    path: "ConsignmentEntryForm",
+    path: "ConsignmentEntry",
     component: ConsignmentEntryFormComponent
   }
 ]

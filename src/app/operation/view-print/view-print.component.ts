@@ -16,7 +16,7 @@ export class ViewPrintComponent implements OnInit {
   constructor(private Route: Router, private masterService: MasterService, @Inject(MAT_DIALOG_DATA) public item: any, public dialogRef: MatDialogRef<GenericTableComponent>) {
     if (item) {
       this.prqDetail = this.masterService.getAssigneVehicleDetail();
-      this.prqDetail.vehicleNo = item.vehicleNo
+      this.prqDetail.vehicleNo = item?.vehicleNo||item.vehNo;
       const tabIndex = 6; // Adjust the tab index as needed
       showVehicleConfirmationDialog(this.prqDetail, masterService, this.goBack.bind(this), tabIndex, dialogRef, item);
     }

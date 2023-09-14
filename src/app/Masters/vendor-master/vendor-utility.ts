@@ -44,3 +44,17 @@ export function handleFileSelection(data, formControlName, allowedFormats, vendo
         });
     }
 }
+
+export async function  getVendorDetails(masterService) {
+    let req = {
+      "companyCode": this.companyCode,
+      "collectionName": "vendor_detail",
+      "filter": {}
+    }
+    const res = await masterService.masterPost("generic/get", req).toPromise()
+    if (res) {
+      // Generate srno for each object in the array
+      const resDetail = res.data.map((x)=>{return{value:x.vendorCode,name:x.vendorName}});
+      return resDetail;
+    }
+  }

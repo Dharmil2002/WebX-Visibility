@@ -144,7 +144,7 @@ export class PrqSummaryPageComponent implements OnInit {
       });
     }
     else if (data.label.label === "Create Docket") {
-      this.router.navigate(['/Masters/Docket/EwayBillDocketBookingV2'], {
+      this.router.navigate(['Operation/ConsignmentEntry'], {
         state: {
           data: data.data
         },

@@ -85,32 +85,20 @@ export class UserMasterListComponent implements OnInit {
             "collectionName": "user_master",
             "filter": {}
         };
-        const maxRetries = 3;
-        try {
-            const getlocation= await geoDataServices(this.geoLocationService);
-            const res = await this.retryAndDownloadService.retryWithDownload(
-                this.masterService,
-                "generic/get",
-                req,
-                maxRetries,
-                "UserMaster",
-                getlocation
-              );
-            // Handle successful API response
-            // ... your success logic here ...
-
-            if (res) {
-
-                const dataWithSrno = res.data.map((obj, index) => {
-                    return {
-                        ...obj,
-                        srNo: index + 1
-                    };
-                });
-
-                this.csv = dataWithSrno;
-                this.tableLoad = false;
-            }
+     try {
+        const res = await this.masterService.masterPost("generic/get", req).toPromise()
+        if (res) {
+            // Generate srno for each object in the array
+            const dataWithSrno = res.data.map((obj, index) => {
+                return {
+                    ...obj,
+                    srNo: index + 1
+                };
+            });
+            this.csv = dataWithSrno;
+            this.tableLoad = false;
+        }
+           
         } catch (error) {
 
         }

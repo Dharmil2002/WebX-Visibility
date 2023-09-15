@@ -12,6 +12,7 @@ import { getVendorDetails } from "../job-entry-page/job-entry-utility";
 import { Router } from "@angular/router";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { OperationService } from "src/app/core/service/operations/operation.service";
+import { pendingbilling } from "../pending-billing/pending-billing-utlity";
 
 
 @Component({
@@ -57,6 +58,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
   consigneeNameStatus: boolean;
   vendorName: string;
   vendorNameStatus: boolean;
+  prqNo:string;
+  prqNoStatus:boolean;
   userName = localStorage.getItem("Username");
   //#region columnHeader
   columnHeader = {
@@ -179,6 +182,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   prqFlag: boolean;
   prqData: any;
   billingParty: any;
+  prqNoDetail: any[];
   //#endregion
 
   constructor(
@@ -344,7 +348,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   //#endregion
   prqDetail() {
-    debugger
     const fromCity = {
       name: this.prqData?.fromCity || "",
       value: this.prqData?.fromCity || ""
@@ -370,6 +373,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const cityDetail = await getCity(this.companyCode, this.masterService);
     const resContainer = await containerFromApi(this.masterService);
     const vendorDetail = await getVendorDetails(this.masterService);
+    const prqNo= await pendingbilling(this.masterService);
+    this.prqNoDetail=prqNo;
     this.filter.Filter(
       this.jsonControlArrayBasic,
       this.consignmentTableForm,
@@ -420,6 +425,13 @@ export class ConsignmentEntryFormComponent implements OnInit {
       vendorDetail,
       this.vendorName,
       this.vendorNameStatus
+    );
+    this.filter.Filter(
+      this.jsonControlArrayBasic,
+      this.consignmentTableForm,
+      prqNo.map((x)=>{return {name:x.prqNo,value:x.prqNo}}),
+      this.prqNo,
+      this.prqNoStatus
     );
     this.prqDetail();
   }
@@ -551,7 +563,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
       { name: "containerSize", target: "containerSize" },
       { name: "consignorName", target: "consignorName" },
       { name: "consigneeName", target: "consigneeName" },
-      { name: "vendorName", target: "vendorName" }
+      { name: "vendorName", target: "vendorName" },
+      { name: "prqNo", target: "prqNo" }
     ];
     mapControlArray(this.jsonControlArrayBasic, docketMappings); // Map docket control array
     // mapControlArray(this.consignorControlArray, consignorMappings); // Map consignor control array
@@ -573,5 +586,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.consignmentTableForm.controls['consignorName'].setValue("");
       this.consignmentTableForm.controls['consigneeName'].setValue("");
     }
+  }
+  prqSelection(){
+   this.prqData= this.prqNoDetail.find((x)=>x.prqId===this.consignmentTableForm.controls['prqNo'].value.value);
+   this.prqDetail()
   }
 }

@@ -126,6 +126,28 @@ export class ConsignmentControl {
         },
       },
       {
+        name: "prqNo",
+        label: "Prq No",
+        placeholder: "Prq No",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        functions: {
+          onModel: "prqSelection" 
+      },
+        Validations: [
+          { name: "autocomplete" },
+          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
         name: "transMode",
         label: "Transport Mode",
         placeholder: "Transport Mode",

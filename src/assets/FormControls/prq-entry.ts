@@ -409,6 +409,16 @@ export class PrqEntryControls {
         generatecontrol: true,
         disable: false,
       },
+      {
+        name: "invoiceNo",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        Validations: [],
+        generatecontrol: true,
+        disable: false,
+      },
     ];
   }
   getPrqEntryFieldControls() {

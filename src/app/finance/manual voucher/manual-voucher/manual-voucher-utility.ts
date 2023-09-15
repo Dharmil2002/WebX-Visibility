@@ -1,4 +1,10 @@
+
 export async function manualvoucharDetail(masterService){
-    const res =await masterService.getJsonFileDetails("manualVoucher").toPromise();
-    return res.data
+    const req={
+        companyCode:localStorage.getItem('companyCode'),
+        collectionName: "voucher_detail",
+        filter: {}
+    }
+    const res =await masterService.masterPost("generic/get",req).toPromise();
+    return res.data; // Filter items where invoiceNo is empty (falsy)
 }

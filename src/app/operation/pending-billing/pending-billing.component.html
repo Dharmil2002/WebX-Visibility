@@ -1,4 +1,28 @@
 <div class="paddingdiv">
+    <div class="col-lg-4 col-md-4 col-sm-6 align-left" style="margin-bottom: 0px;">
+        <form [formGroup]='range'>
+                <div class="row mt-2">
+                        <div class="col " style="margin-bottom: 5px;">
+                                <mat-form-field appearance="outline" class="datepickercss"
+                                        style="width: 72%;margin: 0px 0px 0px 0px !important;">
+                                        <mat-label>Select Date range</mat-label>
+                                        <mat-date-range-input [rangePicker]="picker">
+                                                <input matStartDate formControlName="start" />
+                                                <input matEndDate formControlName="end" />
+                                        </mat-date-range-input>
+                                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                        <mat-date-range-picker #picker
+                                                [calendarHeaderComponent]="CustomeDatePickerComponent"
+                                                [touchUi]="isTouchUIActivated"></mat-date-range-picker>
+                                </mat-form-field>
+                                <button type="button" (click)="get()"
+                                        class="btn btn-outline-success btn-border-radius msl-2 mb-2">
+                                        <i-feather style="width: 20px;height: 20px;" name="search"></i-feather>
+                                </button>
+                        </div>
+                </div>
+        </form>
+</div>
     <div class="verticalScrollbar">
         <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
             [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"

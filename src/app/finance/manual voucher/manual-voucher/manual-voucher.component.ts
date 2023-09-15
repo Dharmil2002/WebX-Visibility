@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { manualvoucharDetail } from './manual-voucher-utility';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manual-voucher',
   templateUrl: './manual-voucher.component.html'
 })
 export class ManualVoucherComponent implements OnInit {
-
   tableLoad:boolean=true;
   tableData: any;
   addAndEditPath: string;
@@ -16,11 +17,12 @@ export class ManualVoucherComponent implements OnInit {
     edit: true,
     csv: false,
   };
+  TableStyle = "width:70%"
   columnHeader = {
     voucherNo: {
       Title: "Voucher No",
       class: "matcolumncenter",
-      Style: "min-width: 70px",
+      Style: "max-width: 160px",
     },
     voucherType: {
       Title: "Voucher Type",
@@ -52,7 +54,7 @@ export class ManualVoucherComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width: 110px",
     },
-    action: {
+    actionsItems: {
       Title: "Action",
       class: "matcolumncenter",
       Style: "max-width: 140px",
@@ -65,16 +67,24 @@ export class ManualVoucherComponent implements OnInit {
     "amount",
     "createdBy",
     "createdOn",
-    "status",
-    "action",
+    "status"
   ];
+  menuItems = [
+    { label: 'Modify' },
+    { label: 'Delete' }
+  ];
+  menuItemflag: boolean = true;
   linkArray = [
     // { Row: 'CHAAmount', Path: 'Operation/ChaDetail',componentDetails: ""},
     // { Row: 'NoofVoucher', Path: 'Operation/VoucherDetails',componentDetails: ""},
     // { Row: 'VendorBillAmount', Path: 'Operation/VendorBillDetails',componentDetails: ""},
     // { Row: 'CustomerBillAmount', Path: 'Operation/CustomerBillDetails',componentDetails: ""}
   ]
-  constructor(private masterService: MasterService) {
+    constructor(
+      private masterService: MasterService,
+      private datePipe: DatePipe,
+      private router:Router
+      ) {
     this.addAndEditPath = "Finance/AddManualVouchar";
   }
 
@@ -83,7 +93,31 @@ export class ManualVoucherComponent implements OnInit {
   }
   async getRakeDetail(){
     const detail= await manualvoucharDetail(this.masterService) ;
-    this.tableData=detail;
+    const result= detail.map((x) => {
+      if (x.status === "0") {
+        // Modify the status property to "Generated"
+        const formattedDate = this.datePipe.transform(x.voucherDate,'dd-MMM-yy HH-mm');
+        const createdDate = this.datePipe.transform(x.createdDate,'dd-MMM-yy HH-mm');
+        return { ...x, status: "Generated", voucherDate: formattedDate,createdOn:createdDate,
+        actions :["Modify","Delete"]
+      };
+      } else {
+        // Keep the object unchanged
+        return x;
+      }
+    });
+    
+    this.tableData= result;
     this.tableLoad=false;
+  }
+
+  async handleMenuItemClick(data) {
+    if (data.label.label==="Modify") {
+      this.router.navigate(['Finance/AddManualVouchar'], {
+        state: {
+          data: data.data
+        },
+      });
+    }
   }
 }

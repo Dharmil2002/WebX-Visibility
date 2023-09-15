@@ -13,7 +13,6 @@ import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { addTracking, calculateInvoiceTotalCommon, getPincode } from "./docket.utility";
 import { getCity } from "src/app/operation/quick-booking/quick-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
-import { customerFromApi, locationFromApi } from "src/app/operation/prq-entry-page/prq-utitlity";
 
 @Component({
   selector: "app-eway-example",

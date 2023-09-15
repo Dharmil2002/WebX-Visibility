@@ -1,5 +1,10 @@
 import { Component, OnInit } from "@angular/core";
+import { debug } from "console";
+import { ApiTracking } from "src/app/core/models/apitracking/api-tracking";
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { RetryAndDownloadService } from "src/app/core/service/api-tracking-service/retry-and-download.service";
+import { GeolocationService } from "src/app/core/service/geo-service/geolocation.service";
+import { geoDataServices } from "src/app/operation/error-handing/outbox-utility";
 import Swal from "sweetalert2";
 
 @Component({
@@ -14,6 +19,8 @@ export class UserMasterListComponent implements OnInit {
     csvFileName: string;
     toggleArray = ["isActive"];
     linkArray = [];
+    retryCount = 0;
+    maxRetries = 3;
     csv: any;
     dynamicControls = {
         add: true,
@@ -65,15 +72,20 @@ export class UserMasterListComponent implements OnInit {
         this.addAndEditPath = "/Masters/UserMaster/AddUser";
         this.getUserDetails();
     }
-    constructor(private masterService: MasterService) {
+    constructor(
+        private masterService: MasterService,
+        private retryAndDownloadService: RetryAndDownloadService, 
+        private geoLocationService:GeolocationService
+        ) {
     }
 
     async getUserDetails() {
-        let req = {
+            let req = {
             "companyCode": this.companyCode,
             "collectionName": "user_master",
             "filter": {}
-        }
+        };
+     try {
         const res = await this.masterService.masterPost("generic/get", req).toPromise()
         if (res) {
             // Generate srno for each object in the array
@@ -85,6 +97,10 @@ export class UserMasterListComponent implements OnInit {
             });
             this.csv = dataWithSrno;
             this.tableLoad = false;
+        }
+           
+        } catch (error) {
+
         }
     }
 
@@ -126,4 +142,7 @@ export class UserMasterListComponent implements OnInit {
             this.getUserDetails();
         }
     }
+    // Function to make the API call as a promise with retry logic
+   
+  
 }

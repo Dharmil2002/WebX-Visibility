@@ -38,6 +38,11 @@ const routes: Routes = [
         path: "Operation",
         loadChildren: () =>
           import("./operation/operation.module").then((m) => m.OperationModule),
+      }
+      ,{
+        path: "Finance",
+        loadChildren: () =>
+          import("./finance/finance.module").then((m)=>m.FinanceModule),
       },
     ],
   },

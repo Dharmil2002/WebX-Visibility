@@ -1,0 +1,22 @@
+<form [formGroup]="TdsTableForm">
+  <app-form-webxpress [form]="TdsTableForm" [formData]="jsonControlArray"
+    (callFunction)="functionCalled($event)" [showSaveAndCancelButton]="false">
+  </app-form-webxpress>
+</form>
+<app-generic-table-v2 *ngIf="!tableLoad&&tdsRec" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+  [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+  [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+  [addAndEditPath]="addAndEditPath">
+</app-generic-table-v2>
+
+  <form [formGroup]="TDSTableForm" *ngIf="!tdsRec">
+    <app-form-webxpress [form]="TDSTableForm" [formData]="jsonControlArrayDetail"
+      (callFunction)="functionCalled($event)" [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+  <app-generic-table-v2 *ngIf="!tableLoad&&!tdsRec" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader1"
+    [tableData]="tableData1" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="menuItems" [staticField]="staticField1" [Link]="linkArray" [height]="height" [width]="width"
+    [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath">
+  </app-generic-table-v2>
+

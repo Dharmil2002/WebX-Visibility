@@ -523,7 +523,7 @@ export class VehicleControls {
                     }
                 },
                 {
-                    name: 'outerHeight', label: 'Outer Height(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerHeight == 0 ? 0 : vehicleTable.outerHeight, generatecontrol: true, disable: false,
+                    name: 'outerHeight', label: 'Outer Height(Feet)', placeholder: '', type: 'number', value: "", generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "pattern",

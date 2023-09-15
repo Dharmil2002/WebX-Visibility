@@ -1,0 +1,33 @@
+{"data":[
+  {
+    "voucherNo":"VR/DELB/2324/0000001",
+    "voucherType":"Debit Voucher",
+    "voucherDate":"12 Sep 23",
+    "amount":"Rs. 20,000.00",
+    "createdBy":"Saroj : EMP0001",
+    "createdOn":"12 Sep 23",
+    "status":"Generated",
+    "action":"Modify & Delete"
+  },
+  {
+    "voucherNo":"VR/DELB/2324/0000002",
+    "voucherType":"Credit Voucher",
+    "voucherDate":"12 Sep 23",
+    "amount":"Rs. 60,000.00",
+    "createdBy":"Deepak : EMP0013",
+    "createdOn":"13 Sep 23",
+    "status":"Generated",
+    "action":"Modify & Delete"
+  },
+  {
+    "voucherNo":"VR/DELB/2324/0000003",
+    "voucherType":"Journal Voucher",
+    "voucherDate":"12 Sep 23",
+    "amount":"Rs. 10,000.00",
+    "createdBy":"Rishi : EMP0103",
+    "createdOn":"14 Sep 23",
+    "status":"Generated",
+    "action":"Modify & Delete"
+  }
+ ]
+}

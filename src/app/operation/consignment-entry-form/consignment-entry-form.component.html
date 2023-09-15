@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
     <form [formGroup]="consignmentTableForm">
-      <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArray"
+      <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayBasic"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>

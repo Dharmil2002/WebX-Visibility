@@ -5,106 +5,97 @@
       <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
       </app-breadcrumb>
     </div>
-    <div class="centered-container">
-      <div class="container margincenter">
+    <div>
+      <div>
         <form [formGroup]="docketForm">
           <app-form-webxpress [form]="docketForm" [formData]="jsonControlPrqArray" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)">
+            (callFunction)="functionCallHandler($event)" [FieldStyle]="'width: 75%; margin:auto;'"
+            (functionCallEmitter)="functionCallHandler($event)">
           </app-form-webxpress>
         </form>
       </div>
     </div>
-    
     <div class="container">
       <div class="row">
         <div>
           <div class="row" style="margin-left: 100px;margin-top: 50px;">
             <div class="col-md-4 col-xl-3" *ngIf="docket">
-              <div class="card bg-blue order-card pointer"
-                style="width: 130px; height: 130px; border-radius: 50%; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <div class="bg-blue  pointer card-shape">
                 <div class="card-block" (click)="docketBooking('FullTruckOperations')">
                   <h6 class="m-b-20"></h6>
-                  <h2 class="text-right"><i class="fa fa-cart-plus f-left"></i><span></span></h2>
-                  <p class="m-b-0"><span class="f-right">Full Truck Operations</span></p>
+                  <h2 class="text-right"><i class="fa fa-cart-plus card-icon"></i><span></span></h2>
                 </div>
               </div>
+              <p class="fontbold"><span>Full Truck Operations</span></p>
             </div>
             <div class="col-md-4 col-xl-3" *ngIf="docket">
-              <div class="card bg-green order-card pointer"
-                style="width: 130px; height: 130px; border-radius: 50%; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <div class="bg-green pointer card-shape">
                 <div class="card-block" (click)="docketBooking('ExpressMovement')">
                   <h6 class="m-b-20"></h6>
-                  <h2 class="text-right"><i class="fa fa-rocket f-left"></i><span></span></h2>
-                  <p class="m-b-0"><span class="f-right">Express Movement</span></p>
+                  <h2 class="text-right"><i class="fas fa-road card-icon"></i><span></span></h2>
                 </div>
               </div>
+              <p class="fontbold"><span>Express Movement</span></p>
             </div>
             <div class="col-md-4 col-xl-3" *ngIf="docket">
-              <div class="card bg-orange order-card pointer"
-                style="width: 130px; height: 130px; border-radius: 50%; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <div class="bg-orange pointer card-shape">
                 <div class="card-block" (click)="docketBooking('PlanningandDistribution')">
                   <h6 class="m-b-20"></h6>
-                  <h2 class="text-right"><i class="fa fa-cart-plus f-left"></i><span></span></h2>
-                  <p class="m-b-0"><span class="f-right">Planning and Distribution</span></p>
+                  <h2 class="text-right"><i class="fa fa-cart-plus card-icon"></i><span></span></h2>
                 </div>
               </div>
+              <p class="fontbold"><span>Planning and Distribution</span></p>
             </div>
             <div class="col-md-4 col-xl-3" *ngIf="docket">
-              <div class="card bg-pink order-card pointer"
-                style="width: 130px; height: 130px; border-radius: 50%; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <div class="bg-pink pointer card-shape">
                 <div class="card-block" (click)="docketBooking('EXIMTransportation')">
                   <h6 class="m-b-20"></h6>
-                  <h2 class="text-right"><i class="fa fa-rocket f-left"></i><span></span></h2>
-                  <p class="m-b-0"><span class="f-right">EXIM Transportation</span></p>
+                  <h2 class="text-right"><i class="fa fa-rocket card-icon"></i><span></span></h2>
                 </div>
               </div>
+              <p class="fontbold"><span>EXIM Transportation</span></p>
             </div>
           </div>
           <div class="row" style="margin-left: 100px">
             <div class="col-md-4 col-xl-3" *ngIf="docket">
-              <div class="card bg-blue order-card pointer"
-                style="width: 130px; height: 130px; border-radius: 50%; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <div class="card-block" (click)="docketBooking('CustomerContractsandBilling')">
+              <div class="bg-blue pointer card-shape">
+                <div class="card-block" (click)="docketBooking('FullTruckOperations')">
                   <h6 class="m-b-20"></h6>
-                  <h2 class="text-center"><i class="fa fa-credit-card"></i></h2>
-                  <p class="m-b-0">Customer Contracts and Billing</p>
+                  <h2 class="text-right"><i class="fa fa-cart-plus card-icon"></i><span></span></h2>
                 </div>
               </div>
+              <p class="fontbold" style="margin-right: 30px;"><span>Customer Contracts and Billing</span></p>
             </div>
             <div class="col-md-4 col-xl-3" *ngIf="docket">
-              <div class="card bg-green order-card pointer"
-                style="width: 130px; height: 130px; border-radius: 50%; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <div class="bg-green pointer card-shape">
                 <div class="card-block" (click)="docketBooking('VendorContracts&Payments')">
                   <h6 class="m-b-20"></h6>
-                  <h2 class="text-center"><i class="fa fa-credit-card"></i></h2>
-                  <p class="m-b-0">Vendor Contracts & Payments</p>
+                  <h2 class="text-center"><i class="fa fa-credit-card card-icon"></i></h2>
                 </div>
               </div>
+              <p class="fontbold" style="margin-right: 40px;"><span>Vendor Contracts & Payments</span></p>
             </div>
             <div class="col-md-4 col-xl-3" *ngIf="docket">
-              <div class="card bg-orange order-card pointer"
-                style="width: 130px; height: 130px; border-radius: 50%; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <div class="bg-orange pointer card-shape">
                 <div class="card-block" (click)="docketBooking('FinancialAccounts')">
                   <h6 class="m-b-20"></h6>
-                  <h2 class="text-center"><i class="fa fa-credit-card"></i></h2>
-                  <p class="m-b-0">Financial Accounts</p>
+                  <h2 class="text-center"><i class="fa fa-credit-card card-icon"></i></h2>
                 </div>
               </div>
+              <p class="fontbold"><span>Financial Accounts</span></p>
             </div>
             <div class="col-md-4 col-xl-3">
-              <div class="card bg-pink order-card pointer"
-                style="width: 130px; height: 130px; border-radius: 50%; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <div class="bg-pink pointer card-shape">
                 <div class="card-block" (click)="docketBooking('AdminPortal')">
                   <h6 class="m-b-20"></h6>
-                  <h2 class="text-right"><i class="fa fa-rocket f-left"></i><span></span></h2>
-                  <p class="m-b-0"><span class="f-right">Admin Portal</span></p>
+                  <h2 class="text-right"><i class="fas fa-money-bill-wave-alt card-icon"></i><span></span></h2>
                 </div>
               </div>
+              <p class="fontbold" style="margin-left: 10px;"><span>Admin Portal</span></p>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </section>

@@ -394,7 +394,7 @@ export const ROUTES: RouteInfo[] =
         submenu: []
       },
       {
-        path: "Operation/ConsignmentEntryForm",
+        path: "Operation/ConsignmentEntry",
         title: "Consignment Entry",
         moduleName: "Consignment Entry",
         icon: "star",

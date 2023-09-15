@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
+import { MatTabGroup } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CnoteService } from 'src/app/core/service/Masters/CnoteService/cnote.service'
 import { MenuAccessService } from 'src/app/core/service/menu-access/menu-access.service';
 @Component({
   selector: 'app-dashboard-page',

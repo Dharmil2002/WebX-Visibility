@@ -29,8 +29,8 @@ export class PrqSummaryPageComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:200px",
     },
-    vehicleSize: {
-      Title: "(Vehicle/container) Size",
+    size: {
+      Title: "(Vehicle / Container) Size",
       class: "matcolumncenter",
       Style: "min-width:200px",
     },
@@ -42,12 +42,12 @@ export class PrqSummaryPageComponent implements OnInit {
     fromToCity: {
       Title: "From-To City",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "max-width:80px",
     },
     pickUpDate: {
       Title: "Pick Up Date Time",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:100px",
     },
     status: {
       Title: "Status",
@@ -73,7 +73,7 @@ export class PrqSummaryPageComponent implements OnInit {
     "fromToCity",
     "status",
     "createdDate",
-    "vehicleSize"
+    "size"
   ];
   menuItems = [
     { label: 'Confirm' },
@@ -144,7 +144,7 @@ export class PrqSummaryPageComponent implements OnInit {
       });
     }
     else if (data.label.label === "Create Docket") {
-      this.router.navigate(['/Masters/Docket/EwayBillDocketBookingV2'], {
+      this.router.navigate(['Operation/ConsignmentEntry'], {
         state: {
           data: data.data
         },

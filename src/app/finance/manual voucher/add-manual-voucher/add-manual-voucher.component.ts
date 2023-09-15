@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { AddManualVoucharControl } from 'src/assets/FormControls/add-manual-vouchar-control';
+import { AddManualVoucherControl } from 'src/assets/FormControls/add-manual-voucher-control';
 import { addVoucherDetail, updateVoucher } from './manual-utlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
@@ -23,7 +23,7 @@ export class AddManualVoucherComponent implements OnInit {
   update:boolean;
   jsonControlArray: any;
   manualVoucharTableForm: UntypedFormGroup;
-  manualVoucharFormControls: AddManualVoucharControl;
+  manualVoucharFormControls: AddManualVoucherControl;
   voucherDetail: any;
 
   constructor(
@@ -44,7 +44,7 @@ export class AddManualVoucherComponent implements OnInit {
   }
 
   initializeFormControl() {
-    this.manualVoucharFormControls = new AddManualVoucharControl();
+    this.manualVoucharFormControls = new AddManualVoucherControl();
     // Get form controls for job Entry form section
     this.jsonControlArray = this.manualVoucharFormControls.getManualVoucharArrayControls();
     // Build the form group using formGroupBuilder function

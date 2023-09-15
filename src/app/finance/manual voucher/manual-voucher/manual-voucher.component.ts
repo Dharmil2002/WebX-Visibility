@@ -17,12 +17,12 @@ export class ManualVoucherComponent implements OnInit {
     edit: true,
     csv: false,
   };
-  TableStyle = "width:70%"
+  TableStyle = "width:80%"
   columnHeader = {
     voucherNo: {
       Title: "Voucher No",
       class: "matcolumncenter",
-      Style: "max-width: 160px",
+      Style: "max-width:200px",
     },
     voucherType: {
       Title: "Voucher Type",
@@ -32,22 +32,22 @@ export class ManualVoucherComponent implements OnInit {
     voucherDate: {
       Title: "Voucher  Date",
       class: "matcolumncenter",
-      Style: "max-width: 100px",
+      Style: "max-width: 200px",
     },
     amount: {
-      Title: "Amount",
+      Title: "Amount (Rs)",
       class: "matcolumncenter",
       Style: "max-width: 120px",
     },
     createdBy: {
       Title: "Created By",
       class: "matcolumncenter",
-      Style: "max-width: 170px",
+      Style: "max-width: 200px",
     },
     createdOn: {
       Title: "Created on",
       class: "matcolumncenter",
-      Style: "max-width: 100px",
+      Style: "max-width: 200px",
     },
     status: {
       Title: "Status",

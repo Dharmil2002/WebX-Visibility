@@ -1,6 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
-export class AddManualVoucharControl {
+export class AddManualVoucherControl {
   ManualVoucharArray: FormControls[];
   constructor() {
     this.ManualVoucharArray = [
@@ -20,9 +20,9 @@ export class AddManualVoucharControl {
         placeholder: "Voucher Type",
         type: "Staticdropdown",
         value:[
-          {name:"Debit Voucher",value:"Debit Voucher"},
-          {name:"Credit Voucher",value:"Credit Voucher"},
-          {name:"Journal Voucher",value:"Journal Voucher"}
+          {value:"Debit",name:"Debit Voucher"},
+          {value:"Credit",name:"Credit Voucher"},
+          {value:"Journal",name:"Journal Voucher"}
           ],
         generatecontrol: true,
         disable: false,
@@ -43,7 +43,7 @@ export class AddManualVoucharControl {
       },
       {
         name: "amount",
-        label: "Amount",
+        label: "Amount (Rs)",
         placeholder: "Amount",
         type: "number",
         value:"",

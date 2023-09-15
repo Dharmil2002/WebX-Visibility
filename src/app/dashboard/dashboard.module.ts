@@ -45,7 +45,7 @@ import { RakeUpdateComponent } from "../operation/rake-update/rake-update.compon
 import { JobTrackerComponent } from './tabs/job-tracker/job-tracker.component';
 import { PendingBillingComponent } from "../operation/pending-billing/pending-billing.component";
 import { InvoiceManagementComponent } from "../operation/invoice-management/invoice-management.component";
-import { ManualVoucherComponent } from "../finance/manual-voucher/manual-voucher.component";
+import { ManualVoucherComponent } from "../finance/manual voucher/manual-voucher/manual-voucher.component";
 import { BankReconciliationComponent } from "../finance/bank-reconciliation/bank-reconciliation.component";
 import { TdsReconciliationComponent } from "../finance/tds-reconciliation/tds-reconciliation.component";
 import { AnalyticsComponent } from "../finance/analytics/analytics.component";
@@ -73,7 +73,7 @@ import { AnalyticsComponent } from "../finance/analytics/analytics.component";
     BankReconciliationComponent,
     TdsReconciliationComponent,
     AnalyticsComponent
-    
+
 
   ],
   imports: [

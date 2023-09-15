@@ -36,11 +36,13 @@ import { NavigationService } from '../Utility/commonFunction/route/route';
 import { utilityService } from '../Utility/utility.service';
 import { OperationService } from '../core/service/operations/operation.service';
 import { AssignVehiclePageMethods } from '../operation/assign-vehicle-page/assgine-vehicle-utility';
+import { AddManualVoucherComponent } from './manual voucher/add-manual-voucher/add-manual-voucher.component';
 
 
 @NgModule({
     declarations: [
-        InvoiceSummaryBillComponent
+        InvoiceSummaryBillComponent,
+        AddManualVoucherComponent
     ],
     imports: [
         CommonModule,

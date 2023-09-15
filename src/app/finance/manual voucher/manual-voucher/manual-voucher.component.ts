@@ -10,6 +10,7 @@ export class ManualVoucherComponent implements OnInit {
 
   tableLoad:boolean=true;
   tableData: any;
+  addAndEditPath: string;
   dynamicControls = {
     add: true,
     edit: true,
@@ -73,7 +74,9 @@ export class ManualVoucherComponent implements OnInit {
     // { Row: 'VendorBillAmount', Path: 'Operation/VendorBillDetails',componentDetails: ""},
     // { Row: 'CustomerBillAmount', Path: 'Operation/CustomerBillDetails',componentDetails: ""}
   ]
-  constructor(private masterService: MasterService) { }
+  constructor(private masterService: MasterService) {
+    this.addAndEditPath = "Finance/AddManualVouchar";
+  }
 
   ngOnInit(): void {
     this.getRakeDetail();

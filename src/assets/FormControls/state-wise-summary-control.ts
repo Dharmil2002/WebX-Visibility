@@ -11,7 +11,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -21,7 +21,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -57,7 +57,7 @@ export class StateWiseSummaryControl {
         type: "number",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -67,7 +67,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -77,7 +77,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -87,7 +87,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -97,7 +97,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -107,7 +107,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -117,7 +117,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -127,7 +127,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -137,7 +137,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -147,7 +147,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -157,7 +157,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -167,7 +167,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -177,7 +177,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -187,7 +187,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -197,7 +197,7 @@ export class StateWiseSummaryControl {
         type: "text",
         value:"",
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {

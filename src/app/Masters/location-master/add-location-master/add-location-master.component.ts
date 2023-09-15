@@ -1,19 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-import { LocationMaster } from 'src/app/core/models/Masters/LocationMaster';
-import { LocationControl } from 'src/assets/FormControls/LocationMaster';
-import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
-import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
-import Swal from 'sweetalert2';
-import { processProperties } from '../../processUtility';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Component, OnInit } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
+import { Router } from "@angular/router";
+import { LocationMaster } from "src/app/core/models/Masters/LocationMaster";
+import { LocationControl } from "src/assets/FormControls/LocationMaster";
+import { FilterUtils } from "src/app/Utility/Form Utilities/dropdownFilter";
+import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import Swal from "sweetalert2";
+import { processProperties } from "../../processUtility";
+import { takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
 @Component({
-  selector: 'app-add-location-master',
-  templateUrl: './add-location-master.component.html',
+  selector: "app-add-location-master",
+  templateUrl: "./add-location-master.component.html",
 })
 export class AddLocationMasterComponent implements OnInit {
   locationTableForm: UntypedFormGroup;
@@ -28,11 +28,11 @@ export class AddLocationMasterComponent implements OnInit {
   isUpdate = false;
   action: any;
   locationTable: LocationMaster;
-  locationFormControls: LocationControl
+  locationFormControls: LocationControl;
   error: string;
   jsonControlLocationArray: any;
   jsonControlOtherArray: any;
-  accordionData: any
+  accordionData: any;
   breadScrums = [
     {
       title: "Add Location Master",
@@ -78,15 +78,20 @@ export class AddLocationMasterComponent implements OnInit {
   //#endregion
 
   constructor(
-    private fb: UntypedFormBuilder, public dialog: MatDialog, private router: Router, private filter: FilterUtils, private masterService: MasterService) {
+    private fb: UntypedFormBuilder,
+    public dialog: MatDialog,
+    private router: Router,
+    private filter: FilterUtils,
+    private masterService: MasterService
+  ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.locationTable = router.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
-      this.action = 'edit'
+      this.action = "edit";
     } else {
-      this.action = 'Add'
+      this.action = "Add";
     }
-    if (this.action === 'edit') {
+    if (this.action === "edit") {
       this.breadScrums = [
         {
           title: "Location Master",
@@ -109,8 +114,12 @@ export class AddLocationMasterComponent implements OnInit {
 
   //#region This method creates the form controls from the json array along with the validations.
   initializeFormControl() {
-    const locationFormControls = new LocationControl(this.locationTable, this.isUpdate);
-    this.jsonControlLocationArray = locationFormControls.getFormControlsLocation();
+    const locationFormControls = new LocationControl(
+      this.locationTable,
+      this.isUpdate
+    );
+    this.jsonControlLocationArray =
+      locationFormControls.getFormControlsLocation();
     this.jsonControlOtherArray = locationFormControls.getFormControlsOther();
     // Build the accordion data with section names as keys and corresponding form controls as values
     this.accordionData = {
@@ -118,7 +127,10 @@ export class AddLocationMasterComponent implements OnInit {
       "Other Details": this.jsonControlOtherArray,
     };
     // Build the form group using formGroupBuilder function and the values of accordionData
-    this.locationTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
+    this.locationTableForm = formGroupBuilder(
+      this.fb,
+      Object.values(this.accordionData)
+    );
   }
   //#endregion
   ngOnInit(): void {
@@ -127,34 +139,50 @@ export class AddLocationMasterComponent implements OnInit {
   }
   bindDropdown() {
     const locationPropertiesMapping = {
-      locLevel: { variable: 'locHierachy', status: 'locHierachyStatus' },
-      reportLevel: { variable: 'reportLoc', status: 'reportLocStatus' },
-      locPincode: { variable: 'pincode', status: 'pincodeStatus' },
-      reportLoc: { variable: 'report', status: 'reportStatus' }
+      locLevel: { variable: "locHierachy", status: "locHierachyStatus" },
+      reportLevel: { variable: "reportLoc", status: "reportLocStatus" },
+      locPincode: { variable: "pincode", status: "pincodeStatus" },
+      reportLoc: { variable: "report", status: "reportStatus" },
     };
     const otherPropertiesMapping = {
-      locRegion: { variable: 'zoneLoc', status: 'zoneLocStatus' },
-      ownership: { variable: 'locOwnership', status: 'locOwnershipStatus' },
-      acctLoc: { variable: 'accountLoc', status: 'accountLocStatus' },
-      dataLoc: { variable: 'locData', status: 'locDataStatus' },
-      nextLoc: { variable: 'nextLocation', status: 'nextLocationStatus' },
-      prevLoc: { variable: 'locPrev', status: 'locPrevStatus' },
-      contLoc: { variable: 'locCont', status: 'locContStatus' }
+      locRegion: { variable: "zoneLoc", status: "zoneLocStatus" },
+      ownership: { variable: "locOwnership", status: "locOwnershipStatus" },
+      acctLoc: { variable: "accountLoc", status: "accountLocStatus" },
+      dataLoc: { variable: "locData", status: "locDataStatus" },
+      nextLoc: { variable: "nextLocation", status: "nextLocationStatus" },
+      prevLoc: { variable: "locPrev", status: "locPrevStatus" },
+      contLoc: { variable: "locCont", status: "locContStatus" },
     };
-    processProperties.call(this, this.jsonControlLocationArray, locationPropertiesMapping);
-    processProperties.call(this, this.jsonControlOtherArray, otherPropertiesMapping);
+    processProperties.call(
+      this,
+      this.jsonControlLocationArray,
+      locationPropertiesMapping
+    );
+    processProperties.call(
+      this,
+      this.jsonControlOtherArray,
+      otherPropertiesMapping
+    );
   }
 
   getPincodeData() {
-    const pincodeValue = this.locationTableForm.controls['locPincode'].value;
-    if (!isNaN(pincodeValue)) { // Check if pincodeValue is a valid number
-      const pincodeList = this.pincodeDet.map((x) => ({ name: parseInt(x.name), value: parseInt(x.value) }));
+    const pincodeValue = this.locationTableForm.controls["locPincode"].value;
+    if (!isNaN(pincodeValue)) {
+      // Check if pincodeValue is a valid number
+      const pincodeList = this.pincodeDet.map((x) => ({
+        name: parseInt(x.name),
+        value: parseInt(x.value),
+      }));
 
-      const exactPincodeMatch = pincodeList.find(element => element.name === pincodeValue.value);
+      const exactPincodeMatch = pincodeList.find(
+        (element) => element.name === pincodeValue.value
+      );
 
       if (!exactPincodeMatch) {
         if (pincodeValue.toString().length > 2) {
-          const filteredPincodeDet = pincodeList.filter(element => element.name.toString().includes(pincodeValue));
+          const filteredPincodeDet = pincodeList.filter((element) =>
+            element.name.toString().includes(pincodeValue)
+          );
           if (filteredPincodeDet.length === 0) {
             // Show a popup indicating no data found for the given pincode
             Swal.fire({
@@ -198,7 +226,7 @@ export class AddLocationMasterComponent implements OnInit {
     ];
     const extractControlValue = (controlName) => formValue[controlName]?.name;
 
-    controlNames.forEach(controlName => {
+    controlNames.forEach((controlName) => {
       const controlValue = extractControlValue(controlName);
       this.locationTableForm.controls[controlName].setValue(controlValue);
     });
@@ -211,10 +239,12 @@ export class AddLocationMasterComponent implements OnInit {
           text: res.message,
           showConfirmButton: true,
         });
-        this.router.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
+        this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
       }
     };
-    Object.values(this.locationTableForm.controls).forEach(control => control.setErrors(null));
+    Object.values(this.locationTableForm.controls).forEach((control) =>
+      control.setErrors(null)
+    );
     if (this.isUpdate) {
       const id = this.locationTableForm.value._id;
       this.locationTableForm.removeControl("_id");
@@ -223,33 +253,40 @@ export class AddLocationMasterComponent implements OnInit {
         companyCode: this.companyCode,
         collectionName: "location_detail",
         filter: { _id: id },
-        update: this.locationTableForm.value
+        update: this.locationTableForm.value,
       };
 
-      this.masterService.masterPut('generic/update', req).pipe(takeUntil(this.unsubscribe$)).subscribe({
-        next: onSuccess
-      });
-
+      this.masterService
+        .masterPut("generic/update", req)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: onSuccess,
+        });
     } else {
-      this.locationTableForm.controls['_id'].setValue(this.locationTableForm.controls['locCode'].value);
+      this.locationTableForm.controls["_id"].setValue(
+        this.locationTableForm.controls["locCode"].value
+      );
 
       const createReq = {
         companyCode: this.companyCode,
         collectionName: "location_detail",
-        data: this.locationTableForm.value
+        data: this.locationTableForm.value,
       };
 
-      this.masterService.masterPost('generic/create', createReq).pipe(takeUntil(this.unsubscribe$)).subscribe({
-        next: onSuccess
-      });
+      this.masterService
+        .masterPost("generic/create", createReq)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe({
+          next: onSuccess,
+        });
     }
   }
   //#endregion
 
   functionCallHandler($event) {
-    let functionName = $event.functionName;     // name of the function , we have to call
+    let functionName = $event.functionName; // name of the function , we have to call
     // we can add more arguments here, if needed. like as shown
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {
@@ -258,147 +295,266 @@ export class AddLocationMasterComponent implements OnInit {
     }
   }
   cancel() {
-    this.router.navigateByUrl('/Masters/LocationMaster/LocationMasterList');
+    this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
   }
   /*get all Master Details*/
   async getAllMastersData() {
     try {
       const locationReqBody = {
-        "companyCode": this.companyCode,
+        companyCode: this.companyCode,
         filter: {},
-        "collectionName": "location_detail"
-      }
+        collectionName: "location_detail",
+      };
       const pincodeReqBody = {
-        "companyCode": this.companyCode,
+        companyCode: this.companyCode,
         filter: {},
-        "collectionName": "pincode_detail"
-      }
+        collectionName: "pincode_detail",
+      };
       const generalReqBody = {
-        "companyCode": this.companyCode,
+        companyCode: this.companyCode,
         filter: {},
-        "collectionName": "General_master"
-      }
-      this.locationResponse = await this.masterService.masterPost('generic/get', locationReqBody).toPromise();
-      this.pincodeResponse = await this.masterService.masterPost('generic/get', pincodeReqBody).toPromise();
-      const generalResponse = await this.masterService.masterPost('generic/get', generalReqBody).toPromise();
-      this.locationFilterResponse = this.locationResponse.data.filter(item => item.activeFlag).map(element => ({
-        name: element.locName,
-        value: element.locCode,
-      }));
-      this.locLevelList = generalResponse.data.filter(item => item.codeType === "HRCHY" && item.activeFlag).
-        map((x) => {
-          { return { name: x.codeDesc, value: x.codeId } }
+        collectionName: "General_master",
+      };
+      this.locationResponse = await this.masterService
+        .masterPost("generic/get", locationReqBody)
+        .toPromise();
+      this.pincodeResponse = await this.masterService
+        .masterPost("generic/get", pincodeReqBody)
+        .toPromise();
+      const generalResponse = await this.masterService
+        .masterPost("generic/get", generalReqBody)
+        .toPromise();
+      this.locationFilterResponse = this.locationResponse.data
+        .filter((item) => item.activeFlag)
+        .map((element) => ({
+          name: element.locName,
+          value: element.locCode,
+        }));
+      this.locLevelList = generalResponse.data
+        .filter((item) => item.codeType === "HRCHY" && item.activeFlag)
+        .map((x) => {
+          {
+            return { name: x.codeDesc, value: x.codeId };
+          }
         });
-      this.reportLevelList = generalResponse.data.filter(item => item.codeType === "HRCHY" && item.activeFlag).
-        map((x) => {
-          { return { name: x.codeDesc, value: x.codeId } }
+      this.reportLevelList = generalResponse.data
+        .filter((item) => item.codeType === "HRCHY" && item.activeFlag)
+        .map((x) => {
+          {
+            return { name: x.codeDesc, value: x.codeId };
+          }
         });
-      this.zoneList = generalResponse.data.filter(item => item.codeType === "ZONE" && item.activeFlag).
-        map((x) => {
-          { return { name: x.codeDesc, value: x.codeId } }
+      this.zoneList = generalResponse.data
+        .filter((item) => item.codeType === "ZONE" && item.activeFlag)
+        .map((x) => {
+          {
+            return { name: x.codeDesc, value: x.codeId };
+          }
         });
-      this.locOwnerShipList = generalResponse.data.filter(item => item.codeType === "LOC_OWN" && item.activeFlag).
-        map((x) => {
-          { return { name: x.codeDesc, value: x.codeId } }
+      this.locOwnerShipList = generalResponse.data
+        .filter((item) => item.codeType === "LOC_OWN" && item.activeFlag)
+        .map((x) => {
+          {
+            return { name: x.codeDesc, value: x.codeId };
+          }
         });
-      this.pincodeDet = this.pincodeResponse.data.filter(item => item.isActive).map(element => ({
-        name: element.pincode,
-        value: element.pincode
-      }));
+      this.pincodeDet = this.pincodeResponse.data
+        .filter((item) => item.isActive)
+        .map((element) => ({
+          name: element.pincode,
+          value: element.pincode,
+        }));
       // Handle the response from the server
       if (this.isUpdate) {
-        const locLevel = this.locLevelList.find((x) => x.name == this.locationTable.locLevel);
+        const locLevel = this.locLevelList.find(
+          (x) => x.name == this.locationTable.locLevel
+        );
         this.locationTableForm.controls.locLevel.setValue(locLevel);
         this.setReportLevelData(locLevel);
-        const prevLoc = this.locationFilterResponse.find((x) => x.name == this.locationTable.prevLoc);
+        const prevLoc = this.locationFilterResponse.find(
+          (x) => x.name == this.locationTable.prevLoc
+        );
         this.locationTableForm.controls.prevLoc.setValue(prevLoc);
 
-        const acctLoc = this.locationFilterResponse.find((x) => x.name == this.locationTable.acctLoc);
+        const acctLoc = this.locationFilterResponse.find(
+          (x) => x.name == this.locationTable.acctLoc
+        );
         this.locationTableForm.controls.acctLoc.setValue(acctLoc);
 
-        const dataLoc = this.locationFilterResponse.find((x) => x.name == this.locationTable.dataLoc);
+        const dataLoc = this.locationFilterResponse.find(
+          (x) => x.name == this.locationTable.dataLoc
+        );
         this.locationTableForm.controls.dataLoc.setValue(dataLoc);
 
-        const nextLoc = this.locationFilterResponse.find((x) => x.name == this.locationTable.nextLoc);
+        const nextLoc = this.locationFilterResponse.find(
+          (x) => x.name == this.locationTable.nextLoc
+        );
         this.locationTableForm.controls.nextLoc.setValue(nextLoc);
 
-        const contLoc = this.locationFilterResponse.find((x) => x.name == this.locationTable.contLoc);
+        const contLoc = this.locationFilterResponse.find(
+          (x) => x.name == this.locationTable.contLoc
+        );
         this.locationTableForm.controls.contLoc.setValue(contLoc);
 
-        const ownership = this.locOwnerShipList.find((x) => x.name == this.locationTable.ownership);
+        const ownership = this.locOwnerShipList.find(
+          (x) => x.name == this.locationTable.ownership
+        );
         this.locationTableForm.controls.ownership.setValue(ownership);
 
-        const pincodeDet = this.pincodeDet.find((x) => x.name == this.locationTable.locPincode);
+        const pincodeDet = this.pincodeDet.find(
+          (x) => x.name == this.locationTable.locPincode
+        );
         this.locationTableForm.controls.locPincode.setValue(pincodeDet);
 
-        const locRegion = this.zoneList.find((x) => x.name == this.locationTable.locRegion);
+        const locRegion = this.zoneList.find(
+          (x) => x.name == this.locationTable.locRegion
+        );
         this.locationTableForm.controls.locRegion.setValue(locRegion);
       }
-      this.filter.Filter(this.jsonControlLocationArray, this.locationTableForm, this.locLevelList, this.locHierachy, this.locHierachyStatus);
-      this.filter.Filter(this.jsonControlOtherArray, this.locationTableForm, this.locationFilterResponse, this.locPrev, this.locPrevStatus);
-      this.filter.Filter(this.jsonControlOtherArray, this.locationTableForm, this.locationFilterResponse, this.accountLoc, this.accountLocStatus);
-      this.filter.Filter(this.jsonControlOtherArray, this.locationTableForm, this.locationFilterResponse, this.locData, this.locDataStatus);
-      this.filter.Filter(this.jsonControlOtherArray, this.locationTableForm, this.locationFilterResponse, this.nextLocation, this.nextLocationStatus);
-      this.filter.Filter(this.jsonControlOtherArray, this.locationTableForm, this.locationFilterResponse, this.locCont, this.locContStatus);
-      this.filter.Filter(this.jsonControlOtherArray, this.locationTableForm, this.zoneList, this.zoneLoc, this.zoneLocStatus);
-      this.filter.Filter(this.jsonControlOtherArray, this.locationTableForm, this.locOwnerShipList, this.locOwnership, this.locOwnershipStatus);
+      this.filter.Filter(
+        this.jsonControlLocationArray,
+        this.locationTableForm,
+        this.locLevelList,
+        this.locHierachy,
+        this.locHierachyStatus
+      );
+      this.filter.Filter(
+        this.jsonControlOtherArray,
+        this.locationTableForm,
+        this.locationFilterResponse,
+        this.locPrev,
+        this.locPrevStatus
+      );
+      this.filter.Filter(
+        this.jsonControlOtherArray,
+        this.locationTableForm,
+        this.locationFilterResponse,
+        this.accountLoc,
+        this.accountLocStatus
+      );
+      this.filter.Filter(
+        this.jsonControlOtherArray,
+        this.locationTableForm,
+        this.locationFilterResponse,
+        this.locData,
+        this.locDataStatus
+      );
+      this.filter.Filter(
+        this.jsonControlOtherArray,
+        this.locationTableForm,
+        this.locationFilterResponse,
+        this.nextLocation,
+        this.nextLocationStatus
+      );
+      this.filter.Filter(
+        this.jsonControlOtherArray,
+        this.locationTableForm,
+        this.locationFilterResponse,
+        this.locCont,
+        this.locContStatus
+      );
+      this.filter.Filter(
+        this.jsonControlOtherArray,
+        this.locationTableForm,
+        this.zoneList,
+        this.zoneLoc,
+        this.zoneLocStatus
+      );
+      this.filter.Filter(
+        this.jsonControlOtherArray,
+        this.locationTableForm,
+        this.locOwnerShipList,
+        this.locOwnership,
+        this.locOwnershipStatus
+      );
     } catch (error) {
       // Handle any errors that occurred during the request
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   }
   setStateCityData() {
-    const fetchData = this.pincodeResponse.data.find(item => item.pincode == this.locationTableForm.controls.locPincode.value.value)
-    this.locationTableForm.controls.locState.setValue(fetchData.state)
-    this.locationTableForm.controls.locCity.setValue(fetchData.city)
+    const fetchData = this.pincodeResponse.data.find(
+      (item) =>
+        item.pincode == this.locationTableForm.controls.locPincode.value.value
+    );
+    this.locationTableForm.controls.locState.setValue(fetchData.state);
+    this.locationTableForm.controls.locCity.setValue(fetchData.city);
   }
   setReportLevelData(event) {
     if (this.isUpdate) {
-      const reportLevel = this.locLevelList.find((x) => x.name == this.locationTable.reportLevel);
+      const reportLevel = this.locLevelList.find(
+        (x) => x.name == this.locationTable.reportLevel
+      );
       this.locationTableForm.controls.reportLevel.setValue(reportLevel);
-      this.setReportLocData(this.isUpdate ? this.locationTable.reportLevel : event)
+      this.setReportLocData(
+        this.isUpdate ? this.locationTable.reportLevel : event
+      );
     }
-    this.filter.Filter(this.jsonControlLocationArray, this.locationTableForm, this.locLevelList, this.reportLoc, this.reportLocStatus);
+    this.filter.Filter(
+      this.jsonControlLocationArray,
+      this.locationTableForm,
+      this.locLevelList,
+      this.reportLoc,
+      this.reportLocStatus
+    );
   }
   setReportLocData(event) {
-    const locHierachy = this.isUpdate && (typeof event !== 'object' && !event.hasOwnProperty('value')) ? event : event.eventArgs.option.value.name;
-    const filter = this.locationResponse.data.filter((x) => x.locLevel == locHierachy);
-    const reportLoc = filter.map(element => ({
+    const locHierachy =
+      this.isUpdate &&
+      typeof event !== "object" &&
+      !event.hasOwnProperty("value")
+        ? event
+        : event.eventArgs.option.value.value;
+    const filter = this.locationResponse.data.filter(
+      (x) => x.locLevel === parseInt(locHierachy.split("000")[1])
+    );
+    const reportLoc = filter.map((element) => ({
       name: element.locName,
       value: element.locCode,
     }));
     if (this.isUpdate) {
-      const reportLocData = reportLoc.find((x) => x.name == this.locationTable.reportLoc);
+      const reportLocData = reportLoc.find(
+        (x) => x.name == this.locationTable.reportLoc
+      );
       this.locationTableForm.controls.reportLoc.setValue(reportLocData);
     }
-    this.filter.Filter(this.jsonControlLocationArray, this.locationTableForm, reportLoc, this.report, this.reportStatus);
+    this.filter.Filter(
+      this.jsonControlLocationArray,
+      this.locationTableForm,
+      reportLoc,
+      this.report,
+      this.reportStatus
+    );
   }
   checkLocationCodeExist() {
     let req = {
-      "companyCode": this.companyCode,
+      companyCode: this.companyCode,
       filter: {},
-      "collectionName": "location_detail"
-    }
-    this.masterService.masterPost('generic/get', req).subscribe({
+      collectionName: "location_detail",
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
           this.locationData = res.data;
-          const count = res.data.filter(item => item.locCode == this.locationTableForm.controls.locCode.value)
+          const count = res.data.filter(
+            (item) =>
+              item.locCode == this.locationTableForm.controls.locCode.value
+          );
           if (count.length > 0) {
             Swal.fire({
-              title: 'Location Code already exists! Please try with another',
+              title: "Location Code already exists! Please try with another",
               toast: true,
               icon: "error",
               showCloseButton: false,
               showCancelButton: false,
               showConfirmButton: true,
-              confirmButtonText: "OK"
+              confirmButtonText: "OK",
             });
-            this.locationTableForm.controls['locCode'].reset();
+            this.locationTableForm.controls["locCode"].reset();
           }
         }
-      }
-    })
+      },
+    });
   }
 }

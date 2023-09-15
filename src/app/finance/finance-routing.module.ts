@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ManualVoucherComponent } from './manual-voucher/manual-voucher.component';
+import { InvoiceSummaryBillComponent } from './invoice-summary-bill/invoice-summary-bill.component';
 
 const routes: Routes = [
-  { path: 'finance/manualvouchar', component: ManualVoucherComponent },
+  { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent }
 ];
 
 @NgModule({

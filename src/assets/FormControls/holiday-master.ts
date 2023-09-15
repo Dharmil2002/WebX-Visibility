@@ -16,10 +16,10 @@ export class HolidayControl {
 
                 },
                 functions: {
-                    onSelection: 'showAndHideDateWise',
+                    onSelection: 'ShowAndHideDateWise',
                 }
             },
-             
+
         ]
         this.dateWiseControls=[
             {

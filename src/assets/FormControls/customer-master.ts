@@ -49,7 +49,7 @@ export class customerControl {
           },
         ],
         functions: {
-          onChange: "dataExist",
+          onModelChange: "dataExist",
         },
       },
 
@@ -73,7 +73,7 @@ export class customerControl {
           },
         ],
         functions: {
-          onChange: "getCustomerDetails",
+          onModelChange: "getCustomerDetails",
         },
       },
       {

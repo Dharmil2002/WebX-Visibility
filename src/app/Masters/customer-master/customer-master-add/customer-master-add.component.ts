@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import { getShortName } from "src/app/Utility/commonFunction/random/generateRandomNumber";
 import { Subject, take, takeUntil } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
+import { debug } from "console";
 
 @Component({
   selector: "app-customer-master-add",
@@ -78,13 +79,13 @@ export class CustomerMasterAddComponent implements OnInit {
 
   constructor(
     private Route: Router,
-    @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
+
       this.isUpdate = true;
       this.action = "edit";
     } else {
@@ -120,7 +121,10 @@ export class CustomerMasterAddComponent implements OnInit {
     );
     this.jsonControlCustomerArray = customerFormControls.getFormControlsC();
     this.jsonControlBillKycArray = customerFormControls.getFormControlB();
-    this.allJson = [...this.jsonControlCustomerArray,...this.jsonControlBillKycArray];
+    this.allJson = [
+      ...this.jsonControlCustomerArray,
+      ...this.jsonControlBillKycArray,
+    ];
     // Build the accordion data with section names as keys and corresponding form controls as values
     this.accordionData = {
       "Customer Details": this.jsonControlCustomerArray,
@@ -197,14 +201,14 @@ export class CustomerMasterAddComponent implements OnInit {
   }
   getCustomerDetails() {
     let req = {
-      "companyCode": this.companyCode,
-      "filter": {customerName: this.customerTableForm.value.customerName},
-      "collectionName": "customer_detail"
-    }
-    this.masterService.masterPost('generic/get', req).subscribe({
+      companyCode: this.companyCode,
+      filter: { customerName: this.customerTableForm.value.customerName },
+      collectionName: "customer_detail",
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
       next: (res: any) => {
         if (res) {
-          if (res.data.length>0) {
+          if (res.data.length > 0) {
             Swal.fire({
               title: "CustomerName Already exist! Please try with another",
               toast: true,
@@ -222,10 +226,42 @@ export class CustomerMasterAddComponent implements OnInit {
           (err) => {
             if (err instanceof HttpErrorResponse) {
             }
-          }
+          };
         }
-      }
-    })
+      },
+    });
+  }
+  dataExist() {
+    let req = {
+      companyCode: this.companyCode,
+      filter: { customerCode: this.customerTableForm.value.customerCode },
+      collectionName: "customer_detail",
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          if (res.data.length > 0) {
+            Swal.fire({
+              title: "CustomerCode Already exist! Please try with another",
+              toast: true,
+              icon: "error",
+              showCloseButton: false,
+              showCancelButton: false,
+              showConfirmButton: true,
+              confirmButtonText: "OK",
+            });
+            this.customerTableForm.controls["customerCode"].setErrors({
+              customerExist: true,
+            });
+            this.customerTableForm.controls["customerCode"].setValue("");
+          }
+          (err) => {
+            if (err instanceof HttpErrorResponse) {
+            }
+          };
+        }
+      },
+    });
   }
   //#region Dropdown through Json
   getDropDownData() {
@@ -374,36 +410,37 @@ export class CustomerMasterAddComponent implements OnInit {
   //#region Save Data function
   async save() {
     const formValue = this.customerTableForm.value;
-    const controlNames = [
-      "groupCode",
-      "ownership",
-      "billPincode",
-      "pincode",
-    ];
+    const controlNames = ["groupCode", "ownership", "billPincode", "pincode"];
     controlNames.forEach((controlName) => {
       const controlValue = formValue[controlName]?.name;
       this.customerTableForm.controls[controlName].setValue(controlValue);
     });
-    
- this.mapAndSetValue(this.customerTableForm, 'customerControllingLocation', this.customerTableForm.value.controllingDropdown);
- this.mapAndSetValue(this.customerTableForm, 'customerLocation', this.customerTableForm.value.locationDropdown);
- this.mapAndSetValue(this.customerTableForm, 'nonOda', this.customerTableForm.value.nonOdaDropdown);
-    const payBasisDropdown = [];
-      this.customerTableForm.value.payBasisDropdown?
-      this.customerTableForm.value.payBasisDropdown.forEach((element) => {
-        payBasisDropdown.push(element.value);
-      }):[""];
-    this.customerTableForm.controls["payBasis"].setValue(payBasisDropdown);
 
-    const serviceOptedDropdown = [];
-      this.customerTableForm.value.serviceOptedDropdown?
-      this.customerTableForm.value.serviceOptedDropdown.forEach((element) => {
-        serviceOptedDropdown.push(element.value);
-      }):[""];
-    this.customerTableForm.controls["serviceOpted"].setValue(
-      serviceOptedDropdown
+    this.mapAndSetValue(
+      this.customerTableForm,
+      "customerControllingLocation",
+      this.customerTableForm.value.controllingDropdown
     );
-
+    this.mapAndSetValue(
+      this.customerTableForm,
+      "customerLocation",
+      this.customerTableForm.value.locationDropdown
+    );
+    this.mapAndSetValue(
+      this.customerTableForm,
+      "nonOda",
+      this.customerTableForm.value.nonOdaDropdown
+    );
+    this.mapAndSetValue(
+      this.customerTableForm,
+      "payBasis",
+      this.customerTableForm.value.payBasisDropdown
+    );
+    this.mapAndSetValue(
+      this.customerTableForm,
+      "serviceOpted",
+      this.customerTableForm.value.serviceOptedDropdown
+    );
     this.customerTableForm.controls["activeFlag"].setValue(
       this.customerTableForm.value.activeFlag == true ? "Y" : "N"
     );
@@ -418,20 +455,19 @@ export class CustomerMasterAddComponent implements OnInit {
         update: this.customerTableForm.value,
       };
       //API FOR UPDATE
-      const res = await this.masterService.
-      masterPut("generic/update", req).toPromise();
+      const res = await this.masterService
+        .masterPut("generic/update", req)
+        .toPromise();
       if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.Route.navigateByUrl(
-              "/Masters/CustomerMaster/CustomerMasterList"
-            );
-          }
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.Route.navigateByUrl("/Masters/CustomerMaster/CustomerMasterList");
+      }
     } else {
       const randomNumber = getShortName(this.customerTableForm.value.groupCode);
       this.customerTableForm.controls["_id"].setValue(randomNumber);
@@ -456,39 +492,6 @@ export class CustomerMasterAddComponent implements OnInit {
   }
   //#endregion
 
-  dataExist() {
-    let req = {
-      companyCode: this.companyCode,
-      type: "masters",
-      collection: "customer_detail",
-    };
-    this.masterService.masterPost("common/getall", req).subscribe({
-      next: (res: any) => {
-        // Convert user-input stateAlias to lowercase
-        const customerCodeExists = res.data.some(
-          (state) =>
-            state.customerCode === this.customerTableForm.value.customerCode
-        );
-        if (customerCodeExists) {
-          // Show the popup indicating that the state already exists
-          Swal.fire({
-            title: "Data exists! Please try with another",
-            toast: true,
-            icon: "error",
-            showCloseButton: false,
-            showCancelButton: false,
-            showConfirmButton: true,
-            confirmButtonText: "OK",
-          });
-          this.customerTableForm.controls["customerCode"].reset();
-        }
-      },
-      error: (err: any) => {
-        // Handle error if required
-        console.error(err);
-      },
-    });
-  }
   //#region Function Call Handler
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
@@ -516,11 +519,22 @@ export class CustomerMasterAddComponent implements OnInit {
       const pincodeRes = await this.masterService
         .masterPost("generic/get", pincodeReq)
         .toPromise();
-
       const mergedData = {
         pincodeData: pincodeRes?.data,
       };
       this.pincodeDet = pincodeRes?.data;
+      if (this.isUpdate) {
+        this.customerTableForm.controls["pincode"].setValue({
+          name: this.customerTable.pincode,
+          value: this.customerTable.pincode,
+        });
+        this.customerTableForm.controls["billPincode"].setValue({
+          name: this.customerTable.billPincode,
+          value: this.customerTable.billPincode,
+        });
+        this.setStateCityData();
+        this.setCityData();
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
       // Handle the error as needed
@@ -531,9 +545,7 @@ export class CustomerMasterAddComponent implements OnInit {
     let fieldName = argData.field.name;
     let autocompleteSupport = argData.field.additionalData.support;
     let isSelectAll = argData.eventArgs;
-    const index = this.allJson.findIndex(
-      (obj) => obj.name === fieldName
-    );
+    const index = this.allJson.findIndex((obj) => obj.name === fieldName);
     this.allJson[index].filterOptions
       .pipe(take(1), takeUntil(this._onDestroy))
       .subscribe((val) => {
@@ -586,18 +598,15 @@ export class CustomerMasterAddComponent implements OnInit {
   //#region Pincode Dropdown
   getBillingPincodeData() {
     const pincodeValue = this.customerTableForm.controls["billPincode"].value;
-
     if (!isNaN(pincodeValue)) {
       // Check if pincodeValue is a valid number
       const pincodeList = this.pincodeDet.map((x) => ({
         name: parseInt(x.pincode),
         value: parseInt(x.pincode),
       }));
-
       const exactPincodeMatch = pincodeList.find(
         (element) => element.name === pincodeValue.value
       );
-
       if (!exactPincodeMatch) {
         if (pincodeValue.toString().length > 2) {
           const filteredPincodeDet = pincodeList.filter((element) =>
@@ -613,6 +622,7 @@ export class CustomerMasterAddComponent implements OnInit {
             });
             return; // Exit the function
           } else {
+            console.log(filteredPincodeDet);
             this.filter.Filter(
               this.jsonControlBillKycArray,
               this.customerTableForm,
@@ -641,9 +651,10 @@ export class CustomerMasterAddComponent implements OnInit {
     );
     this.customerTableForm.controls.billCity.setValue(fetchData.city);
   }
-   mapAndSetValue(form, formControlName, sourceArray) {
-    const mappedValues = sourceArray ? sourceArray.map(item => item.name) : [];
+  mapAndSetValue(form, formControlName, sourceArray) {
+    const mappedValues = sourceArray
+      ? sourceArray.map((item) => item.name)
+      : [];
     form.controls[formControlName].setValue(mappedValues);
   }
-  
 }

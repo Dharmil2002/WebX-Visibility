@@ -16,6 +16,8 @@ import { LanguageService } from "src/app/core/service/language.service";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { BreakpointObserver, BreakpointState } from "@angular/cdk/layout";
 import * as moment from 'moment-timezone';
+import { searchbilling } from "src/app/dashboard/docket-dashboard/dashboard-utlity";
+import { MasterService } from "src/app/core/service/Masters/master.service";
 const document: any = window.document;
 
 @Component({
@@ -32,17 +34,25 @@ export class HeaderComponent
   isNavbarShow = true;
   flagvalue;
   BaseTimeZone;
-  CurrentMode=localStorage.getItem('Mode');
+  CurrentMode = localStorage.getItem('Mode');
   FinancialYear: string;
   countryName;
   langStoreValue: string;
   defaultFlag: string;
   isOpenSidebar: boolean;
   Mode: string;
-  menuItems = ['LTL', 'FTL', 'Import', 'Export', 'EXIM','Billing​'];
+  searchQuery: string = '';
+  autocompleteOptions: any;
+  showAutocomplete: boolean = false;
+  menuItems = ['LTL', 'FTL', 'Import', 'Export', 'EXIM', 'Billing​'];
+  // Replace this with your actual data source or API call
+  allOptions:any;
+  searchData: any;
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     @Inject(WINDOW) private window: Window,
+    private masterService: MasterService,
     private renderer: Renderer2,
     public elementRef: ElementRef,
     private configService: ConfigService,
@@ -59,57 +69,16 @@ export class HeaderComponent
           this.callSidemenuCollapse();
         }
       });
+    this.bindMenu();
   }
+
   listLang = [
     { text: "English", flag: "assets/images/flags/us.jpg", lang: "en" },
     { text: "Spanish", flag: "assets/images/flags/spain.jpg", lang: "es" },
     { text: "German", flag: "assets/images/flags/germany.jpg", lang: "de" },
   ];
 
-  notifications: any[] = [
-    // {
-    //   userImg: "assets/images/user/user1.jpg",
-    //   userName: "Sarah Smith",
-    //   time: "14 mins ago",
-    //   message: "Please check your mail",
-    // },
-    // {
-    //   userImg: "assets/images/user/user2.jpg",
-    //   userName: "Airi Satou",
-    //   time: "22 mins ago",
-    //   message: "Work Completed !!!",
-    // },
-    // {
-    //   userImg: "assets/images/user/user3.jpg",
-    //   userName: "John Doe",
-    //   time: "3 hours ago",
-    //   message: "kindly help me for code.",
-    // },
-    // {
-    //   userImg: "assets/images/user/user4.jpg",
-    //   userName: "Ashton Cox",
-    //   time: "5 hours ago",
-    //   message: "Lets break for lunch...",
-    // },
-    // {
-    //   userImg: "assets/images/user/user5.jpg",
-    //   userName: "Sarah Smith",
-    //   time: "14 mins ago",
-    //   message: "Please check your mail",
-    // },
-    // {
-    //   userImg: "assets/images/user/user6.jpg",
-    //   userName: "Airi Satou",
-    //   time: "22 mins ago",
-    //   message: "Work Completed !!!",
-    // },
-    // {
-    //   userImg: "assets/images/user/user7.jpg",
-    //   userName: "John Doe",
-    //   time: "3 hours ago",
-    //   message: "kindly help me for code.",
-    // },
-  ];
+  notifications: any[] = [];
   @HostListener("window:scroll", [])
   onWindowScroll() {
     const offset =
@@ -178,9 +147,9 @@ export class HeaderComponent
       }
     }
   }
- 
 
-  
+
+
   callFullscreen() {
     if (
       !document.fullscreenElement &&
@@ -259,15 +228,45 @@ export class HeaderComponent
     const lastYear = thisYear + 1;
     this.FinancialYear = `${thisYear}-${lastYear}`;
   }
- 
+
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
 
   menuModeDetail(option: string) {
-    localStorage.setItem("Mode",option);
+    localStorage.setItem("Mode", option);
     location.reload();
     this.isDropdownOpen = false; // Close the dropdown when an option is selected
     // Add any other logic you need here when a menu item is selected
+  }
+  onSearchInput() {
+    this.showAutocomplete = true;
+    this.autocompleteOptions = this.allOptions.filter((option) =>
+      option.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+  }
+
+  selectOption(option:any) {
+    this.searchQuery = option.name;
+    this.router.navigateByUrl(option.value);
+    this.showAutocomplete = false;
+  }
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: any) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      // Click occurred outside of the component, so hide autocomplete
+      this.showAutocomplete = false;
+    }
+  }
+  navigateToPage() {
+    this.goBack('0');
+  }
+  async bindMenu() {
+    this.searchData = await searchbilling(this.masterService);
+    const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
+    this.allOptions=searchDetail;
+  }
+  goBack(tabIndex: string): void {
+    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
   }
 }

@@ -19,8 +19,21 @@
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-left">
-        <li style="margin-left: 450px;position:fixed;">
-          <img src="assets/images/globe.png" height="50px" width="150px" alt="Company Logo">
+        <li style="position:fixed;margin-left: 29px;">
+          <img src="assets/images/globe.png" class="pointer" height="50px" width="150px" alt="Company Logo"  (click)="navigateToPage()">
+        </li>
+      </ul>
+      <!-- Search bar to the right of the logo -->
+      <ul class="nav navbar-nav" style="padding-top: 10px;margin-left: 205px;">
+        <li class="search-bar">
+          <input type="text" class="form-control custom-input" placeholder="Search" [(ngModel)]="searchQuery"
+            (input)="onSearchInput()" />
+          <ul class="google-autocomplete-list" *ngIf="showAutocomplete">
+            <li *ngFor="let option of autocompleteOptions" (click)="selectOption(option)"
+              class="google-autocomplete-item">
+              {{ option.name }}
+            </li>
+          </ul>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">

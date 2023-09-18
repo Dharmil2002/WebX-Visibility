@@ -476,3 +476,81 @@ a {
 .margincenter{
   margin-left: 349px;
 }
+/* Your component's CSS file or global styles */
+.autocomplete-list {
+  background-color: white; /* Set the background color to white */
+  border: 1px solid #ccc; /* Add a border for separation (optional) */
+  list-style-type: none; /* Remove bullet points (optional) */
+  padding: 0; /* Remove default padding (optional) */
+  margin: 0; /* Remove default margin (optional) */
+  position: absolute; /* Position the dropdown absolutely */
+  width: 100%; /* Set the width to match the input (optional) */
+  z-index: 1000; /* Ensure it appears above other elements (optional) */
+}
+/* Your component's CSS file or global styles */
+/* Your component's CSS file or global styles */
+.custom-input {
+  width: 550px; /* Set the default width for larger screens */
+  height: 40px; /* Set the default height */
+}
+
+/* Define styles for smaller screens (e.g., mobile) */
+@media (max-width: 768px) {
+  .google-autocomplete-list {
+    max-height: 150px; /* Reduce the max-height for smaller screens */
+  }
+
+  .google-autocomplete-item {
+    padding: 5px 5px; /* Adjust the padding for smaller screens */
+  }
+
+  .custom-input {
+    width: 100%; /* Make the input full-width on smaller screens */
+  }
+}
+
+/* Your component's CSS file or global styles */
+.custom-input::placeholder {
+  /* Set the desired width for the placeholder */
+  width: 200px; /* Adjust the width as needed */
+  /* Add other styling properties as needed */
+  font-weight: 700;
+}
+/* Your component's CSS file or global styles */
+.custom-list-item {
+  margin-bottom: 5px; /* Adjust the margin as needed to reduce spacing */
+  padding: 5px; /* Adjust the padding as needed to reduce spacing */
+}
+/* Your component's CSS file or global styles */
+.google-autocomplete-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-top: none;
+  position: absolute;
+  background-color: white;
+  z-index: 1;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.google-autocomplete-item {
+  padding: 5px 5px; /* Adjust the padding to control vertical and horizontal spacing */
+  cursor: pointer;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.google-autocomplete-item:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10px; /* Adjust the value to control the curve */
+  width: 10px;
+  height: 100%;
+  background-color: #ccc; /* Background color for the border */
+  border-radius: 0 5px 5px 0; /* Adjust the border-radius for the curve */
+  transform: translateY(-50%);
+}

@@ -10,7 +10,7 @@ import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 
 @Component({
   selector: 'app-add-manual-voucher',
-  templateUrl: './add-manual-voucher.component.html',
+  templateUrl: './add-manual-voucher.component.html', 
 })
 export class AddManualVoucherComponent implements OnInit {
   breadScrums = [
@@ -77,7 +77,7 @@ export class AddManualVoucherComponent implements OnInit {
         if (result.isConfirmed) {
           // Redirect to the desired page after the success message is confirmed.
           this._NavigationService.navigateTotab(
-            'PRQ',
+            'Voucher',
             "dashboard/GlobeDashboardPage"
           );
         }
@@ -109,7 +109,7 @@ export class AddManualVoucherComponent implements OnInit {
         if (result.isConfirmed) {
           // Redirect to the desired page after the success message is confirmed.
           this._NavigationService.navigateTotab(
-            'PRQ',
+            'Voucher',
             "dashboard/GlobeDashboardPage"
           );
         }

@@ -108,16 +108,23 @@ export class DashboardPageComponent implements OnInit {
      this.tabName=event.tab.textLabel;
   }
   ngAfterViewInit(): void {
+
     this.activeRoute.queryParams.subscribe(params => {
       const selectedTabName = params['tab'];
       if (selectedTabName) {
-        // Assuming you have an array of tab names
-        const index = this.tabName.indexOf(selectedTabName);
+        // Convert the QueryList to an array
+        const tabsArray = this.tabGroup._tabs.toArray();
+        // Find the index of the tab with the matching text label
+        const index = tabsArray.findIndex(tab => tab.textLabel === selectedTabName);
         if (index !== -1) {
+          // Set the selectedIndex of the TabGroup
           this.tabGroup.selectedIndex = index;
+        }
+        if(selectedTabName=="0"){
+          this.tabGroup.selectedIndex = 0;
         }
       }
     });
   }
-
+  
 }

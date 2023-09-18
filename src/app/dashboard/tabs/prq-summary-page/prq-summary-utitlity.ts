@@ -7,7 +7,7 @@ export async function getPrqDetailFromApi(masterServices) {
         filter: {}
     }
     const res = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
-    const prqData = res.data.filter((x) => x.status.trim() !== "3")
+    const prqData = res.data.filter((x) => x.status.trim() !== "4")
     let prqList = [];
 
     prqData.map((element, index) => {
@@ -26,8 +26,8 @@ export async function getPrqDetailFromApi(masterServices) {
             "prqBranch": element?.prqBranch || "",
             "pickUpDate": formatDocketDate(element?.pickUpTime || new Date()),
             "pickupDate": element?.pickUpTime || new Date(),
-            "status": element?.status === "0" ? "Awaiting Confirmation" : element.status === "1" ? "Awaiting Assign Vehicle" :element.status=="2"?"Invoice Generated": "Awaiting For Docket",
-            "actions": element?.status === "0" ? ["Confirm", "Reject", "Modify"] : element.status === "1" ? ["Assign Vehicle"] :element.status=="2"?["Invoice Generated"]: ["Create Docket"],
+            "status": element?.status === "0" ? "Awaiting Confirmation" : element.status === "1" ? "Awaiting Assign Vehicle" :element.status=="2"?"Awaiting For Docket":"Docket Generated",
+            "actions": element?.status === "0" ? ["Confirm", "Reject", "Modify"] : element.status === "1" ? ["Assign Vehicle"] :element.status=="2"?["Create Docket"]: "",
             "containerSize":element?.containerSize||"",
             "typeContainer":element?.typeContainer||"",
             "pAddress":element?.pAddress||"",

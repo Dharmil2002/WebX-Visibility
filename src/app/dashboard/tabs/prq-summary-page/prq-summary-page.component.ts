@@ -42,7 +42,7 @@ export class PrqSummaryPageComponent implements OnInit {
     fromToCity: {
       Title: "From-To City",
       class: "matcolumnleft",
-      Style: "max-width:80px",
+      Style: "max-width:150px",
     },
     pickUpDate: {
       Title: "Pick Up Date Time",

@@ -13,6 +13,7 @@ import { Router } from "@angular/router";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { pendingbilling } from "../pending-billing/pending-billing-utlity";
+import { updatePrq } from "./consigment-utlity";
 
 
 @Component({
@@ -196,9 +197,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
 
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     if (navigationState != null) {
-
       this.prqData = navigationState
       this.prqFlag = true;
+
     }
     this.initializeFormControl();
     this.loadTempData();
@@ -226,6 +227,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     ]);
     this.FreightTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.commonDropDownMapping();
+    if(this.prqData){
+    this.consignmentTableForm.controls['prqNo'].setValue({name:this.prqData.prqNo,value:this.prqData?.prqNo})
+    }
   }
   //#endregion
 
@@ -365,6 +369,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls['transMode'].setValue(this.prqData?.transMode);
     this.consignmentTableForm.controls['pAddress'].setValue(this.prqData?.pAddress);
     this.consignmentTableForm.controls['containerSize'].setValue(this.prqData?.containerSize);
+    this.consignmentTableForm.controls['ccbp'].setValue(true);
+    this.onAutoBillingBased("true");
 
   }
   async bindDataFromDropdown() {
@@ -436,7 +442,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.prqDetail();
   }
   //#region Save Function
-  save() {
+  async save() {
     // Remove all form errors
     const tabcontrols = this.consignmentTableForm;
     clearValidatorsAndValidate(tabcontrols);
@@ -514,6 +520,14 @@ export class ConsignmentEntryFormComponent implements OnInit {
       collectionName: "docket_temp",
       data: docketDetails,
     };
+    if(this.prqFlag){
+      const prqData={
+        prqId:this.consignmentTableForm.value?.prqNo.value||"",
+        dktNo:this.consignmentTableForm.controls["docketNumber"].value
+        
+      }
+        await updatePrq(this.operationService,prqData)
+    }
     this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
       next: (res: any) => {
         Swal.fire({
@@ -572,7 +586,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
     //mapControlArray(this.contractControlArray, destinationMapping);
   }
   onAutoBillingBased(event) {
-    if (event.eventArgs.checked) {
+    const checked=typeof(event)==="string"?event:event.eventArgs.checked
+    if (checked) {
 
       const billingParty = this.consignmentTableForm.controls['billingParty'].value;
       this.consignmentTableForm.controls['ccontactNumber'].setValue(this.prqData?.contactNo || "");

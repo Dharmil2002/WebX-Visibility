@@ -120,24 +120,31 @@
 
 // Declare the primary color variable
 $primary-color: #3f51b5;
+
 .tablewidth {
   max-width: 80px !important;
 }
+
 .tablewidthpincode {
   max-width: 200px !important;
 }
+
 .tablewidthCluster {
   min-width: 100px !important;
 }
+
 .tablewidthDriver {
   min-width: 160px !important;
 }
+
 .tablewidthGeneral {
   min-width: 100px !important;
 }
+
 th.mat-header-cell {
   background: #ebebee;
 }
+
 .example-tree-invisible {
   display: none;
 }
@@ -161,7 +168,7 @@ th.mat-header-cell {
    * Leaf nodes need to have padding so as to align with other non-leaf nodes
    * under the same parent.
    */
-.example-tree div[role="group"] > .mat-tree-node {
+.example-tree div[role="group"]>.mat-tree-node {
   padding-left: 40px;
 }
 
@@ -220,17 +227,21 @@ th.mat-header-cell {
 mat-slide-toggle {
   margin-top: 10px;
 }
-.togglefontbold{
+
+.togglefontbold {
   font-weight: 600;
 }
-.fontbold{
+
+.fontbold {
   font-weight: 700;
 }
+
 .tblborder {
   border: 1px solid #e5e2e2 !important;
   padding-left: 10px !important;
   border-bottom: none !important;
 }
+
 .BcSeries {
   width: 50%;
 }
@@ -302,19 +313,19 @@ body {
   font-size: 26px;
 }
 
-.card-shape{
+.card-shape {
   width: 110px;
   height: 110px;
   border-radius: 50%;
   text-align: center;
   display: flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 10px;
 }
 
-.card-icon{
+.card-icon {
   font-size: 65px;
 }
 
@@ -394,39 +405,49 @@ a {
 .black {
   color: rgb(87, 83, 83);
 }
-/* Custom loader styles */
-.customerloader{
-       /* Custom styles for the loader */
-        .loader-container {
-            width: 150px; /* Set the desired width */
-            height: 150px; /* Set the desired height */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
 
-        .loader {
-            width: 100%; /* Make the loader fill its container */
-            height: 100%;
-        }
+/* Custom loader styles */
+.customerloader {
+
+  /* Custom styles for the loader */
+  .loader-container {
+    width: 150px;
+    /* Set the desired width */
+    height: 150px;
+    /* Set the desired height */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  .loader {
+    width: 100%;
+    /* Make the loader fill its container */
+    height: 100%;
+  }
 }
+
 .paddingdiv {
   padding-left: 40px;
   padding-right: 40px;
   padding-top: 20px;
   padding-bottom: 20px;
 }
+
 .search-bar-container {
   display: flex;
   align-items: center;
-  justify-content: center; /* Align to the center horizontally */
-  margin-bottom: 20px; /* Add margin to create space below the search bar */
+  justify-content: center;
+  /* Align to the center horizontally */
+  margin-bottom: 20px;
+  /* Add margin to create space below the search bar */
   margin-top: 26px;
+
   .search-bar-input {
     padding: 8px;
     border: 1px solid #ccc;
@@ -438,13 +459,15 @@ a {
 
     &:focus {
       outline: none;
-      border-color: $primary-color; /* Use the primary color variable for the border when focused */
+      border-color: $primary-color;
+      /* Use the primary color variable for the border when focused */
     }
   }
 
   .search-bar-button {
     padding: 8px 16px;
-    background-color: $primary-color; /* Use the primary color variable for the background */
+    background-color: $primary-color;
+    /* Use the primary color variable for the background */
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -452,7 +475,8 @@ a {
     transition: background-color 0.3s;
 
     &:hover {
-      background-color: darken($primary-color, 10%); /* Darken the primary color on hover */
+      background-color: darken($primary-color, 10%);
+      /* Darken the primary color on hover */
     }
 
     &:focus {
@@ -466,61 +490,87 @@ a {
   display: flex;
   justify-content: center !important;
 }
-.pointer {cursor: pointer;}
+
+.pointer {
+  cursor: pointer;
+}
 
 /* Custom CSS for adjusting container width */
 .custom-container {
-  width: 33%; /* Adjust the width to your preference (e.g., 80%) */
-  margin: 0 auto; /* Center the container horizontally */
+  width: 33%;
+  /* Adjust the width to your preference (e.g., 80%) */
+  margin: 0 auto;
+  /* Center the container horizontally */
 }
-.margincenter{
+
+.margincenter {
   margin-left: 349px;
 }
+
 /* Your component's CSS file or global styles */
 .autocomplete-list {
-  background-color: white; /* Set the background color to white */
-  border: 1px solid #ccc; /* Add a border for separation (optional) */
-  list-style-type: none; /* Remove bullet points (optional) */
-  padding: 0; /* Remove default padding (optional) */
-  margin: 0; /* Remove default margin (optional) */
-  position: absolute; /* Position the dropdown absolutely */
-  width: 100%; /* Set the width to match the input (optional) */
-  z-index: 1000; /* Ensure it appears above other elements (optional) */
+  background-color: white;
+  /* Set the background color to white */
+  border: 1px solid #ccc;
+  /* Add a border for separation (optional) */
+  list-style-type: none;
+  /* Remove bullet points (optional) */
+  padding: 0;
+  /* Remove default padding (optional) */
+  margin: 0;
+  /* Remove default margin (optional) */
+  position: absolute;
+  /* Position the dropdown absolutely */
+  width: 100%;
+  /* Set the width to match the input (optional) */
+  z-index: 1000;
+  /* Ensure it appears above other elements (optional) */
 }
+
 /* Your component's CSS file or global styles */
 /* Your component's CSS file or global styles */
 .custom-input {
-  width: 550px; /* Set the default width for larger screens */
-  height: 40px; /* Set the default height */
+  width: 550px;
+  /* Set the default width for larger screens */
+  height: 40px;
+  /* Set the default height */
 }
 
 /* Define styles for smaller screens (e.g., mobile) */
 @media (max-width: 768px) {
   .google-autocomplete-list {
-    max-height: 150px; /* Reduce the max-height for smaller screens */
+    max-height: 150px;
+    /* Reduce the max-height for smaller screens */
   }
 
   .google-autocomplete-item {
-    padding: 5px 5px; /* Adjust the padding for smaller screens */
+    padding: 5px 5px;
+    /* Adjust the padding for smaller screens */
   }
 
   .custom-input {
-    width: 100%; /* Make the input full-width on smaller screens */
+    width: 100%;
+    /* Make the input full-width on smaller screens */
   }
 }
 
 /* Your component's CSS file or global styles */
 .custom-input::placeholder {
   /* Set the desired width for the placeholder */
-  width: 200px; /* Adjust the width as needed */
+  width: 200px;
+  /* Adjust the width as needed */
   /* Add other styling properties as needed */
   font-weight: 700;
 }
+
 /* Your component's CSS file or global styles */
 .custom-list-item {
-  margin-bottom: 5px; /* Adjust the margin as needed to reduce spacing */
-  padding: 5px; /* Adjust the padding as needed to reduce spacing */
+  margin-bottom: 5px;
+  /* Adjust the margin as needed to reduce spacing */
+  padding: 5px;
+  /* Adjust the padding as needed to reduce spacing */
 }
+
 /* Your component's CSS file or global styles */
 .google-autocomplete-list {
   list-style-type: none;
@@ -537,20 +587,25 @@ a {
 }
 
 .google-autocomplete-item {
-  padding: 5px 5px; /* Adjust the padding to control vertical and horizontal spacing */
+  padding: 5px 5px;
+  /* Adjust the padding to control vertical and horizontal spacing */
   cursor: pointer;
   transition: background-color 0.2s;
   position: relative;
+  margin-top: -24px;
 }
 
 .google-autocomplete-item:before {
   content: '';
   position: absolute;
   top: 0;
-  left: -10px; /* Adjust the value to control the curve */
+  left: -10px;
+  /* Adjust the value to control the curve */
   width: 10px;
   height: 100%;
-  background-color: #ccc; /* Background color for the border */
-  border-radius: 0 5px 5px 0; /* Adjust the border-radius for the curve */
+  background-color: #ccc;
+  /* Background color for the border */
+  border-radius: 0 5px 5px 0;
+  /* Adjust the border-radius for the curve */
   transform: translateY(-50%);
 }

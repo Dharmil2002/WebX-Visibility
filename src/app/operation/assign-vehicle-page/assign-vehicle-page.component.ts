@@ -63,8 +63,8 @@ export class AssignVehiclePageComponent implements OnInit {
         Swal.fire({
           icon: "question",
           title: "Add Market Vehicle",
-          text: "No vehicles are currently available at this location. Would you like to add  Market a vehicle + Button",
-          confirmButtonText: "Ok",
+          text: "No vehicles are currently available at this location.Please add market a vehicle  using '+' Button.",
+          confirmButtonText: "OK",
           showConfirmButton: true,
         })
         this.tableLoad = false;

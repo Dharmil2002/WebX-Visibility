@@ -15,7 +15,6 @@ import Swal from 'sweetalert2';
 import { getPrqDetailFromApi } from 'src/app/dashboard/tabs/prq-summary-page/prq-summary-utitlity';
 import { MatDialog } from '@angular/material/dialog';
 import { PrqListComponent } from './prq-list/prq-list.component';
-import { getPrqNextNumber } from './prq-list/prq-list-utlity';
 import { setControlValue } from 'src/app/Utility/Form Utilities/setform';
 
 @Component({
@@ -201,8 +200,9 @@ export class PrqEntryPageComponent implements OnInit {
       const thisYear = new Date().getFullYear();
       const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
       const location = localStorage.getItem("Branch"); // Replace with your dynamic value
-      const paddedNumber = getPrqNextNumber();
       const blParty = this.prqEntryTableForm.controls['billingParty'].value.toUpperCase();
+      const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
+      const paddedNumber = dynamicNumber.toString().padStart(7, "0");
       let prqNo = `${location.substring(0, 3)}${blParty.substring(0, 3)}${financialYear}${paddedNumber}`;
       this.prqEntryTableForm.controls['_id'].setValue(prqNo);
       this.prqEntryTableForm.controls['prqId'].setValue(prqNo);

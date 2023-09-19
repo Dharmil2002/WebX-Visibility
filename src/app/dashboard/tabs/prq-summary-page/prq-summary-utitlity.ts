@@ -7,7 +7,7 @@ export async function getPrqDetailFromApi(masterServices) {
         filter: {}
     }
     const res = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
-    const prqData = res.data.filter((x) => x.status.trim() !== "4")
+    const prqData = res.data.filter((x) => x.status.trim() !== "4" && x.status.trim() !== "5")
     let prqList = [];
 
     prqData.map((element, index) => {
@@ -46,7 +46,11 @@ export async function getPrqDetailFromApi(masterServices) {
         return dateB - dateA; // Sort in descending order
     });
 
+    const prqDetail={
+        tableData:sortedData,
+        allPrqDetail:res.data
 
-    return sortedData
+    }
+    return prqDetail
 }
 

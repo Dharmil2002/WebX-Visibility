@@ -7,6 +7,7 @@ import { ContainerControl } from 'src/assets/FormControls/container-master';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import Swal from 'sweetalert2';
 import { convertNumericalStringsToInteger } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 @Component({
   selector: 'app-add-container-master',
   templateUrl: './add-container-master.component.html',
@@ -87,10 +88,9 @@ export class AddContainerMasterComponent implements OnInit {
   //#region Save Function
   save() {
     this.containerTableForm.controls.containerType.setValue(this.containerTableForm.value.containerType.name);
-    Object.keys(this.containerTableForm.controls).forEach((key) => {
-      const control = this.containerTableForm.controls[key];
-      control.setErrors(null);
-    });
+    // Remove all form errors
+    const controls = this.containerTableForm;
+    clearValidatorsAndValidate(controls);
     if (this.isUpdate) {
       let id = this.containerTableForm.value._id;
       this.containerTableForm.removeControl("_id");

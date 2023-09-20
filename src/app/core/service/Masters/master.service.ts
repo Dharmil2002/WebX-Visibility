@@ -23,6 +23,7 @@ export class MasterService {
   manualVoucher='../../../assets/data/manual-voucher.json';
   headerCode: string;
   vehicleDetail: any;
+  containerTypeUrl='../../../assets/data/containerType.json'
 
   constructor(private http: HttpClient) { }
   /**

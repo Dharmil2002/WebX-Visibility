@@ -26,15 +26,21 @@ export class AddContainerMasterComponent implements OnInit {
   newContainerCode: string;
   data: any;
   containerData: any;
+  containerType: any;
+  containerTypeStatus: any;
+  containerTypeId: any;
   //#endregion
 
   ngOnInit() {
+    this.getContainerTypeData();
   }
   constructor(private Route: Router, private fb: UntypedFormBuilder,
     private masterService: MasterService, private filter: FilterUtils,
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
+      console.log(this.data);
+
       this.action = 'edit'
       this.isUpdate = true;
     } else {
@@ -43,6 +49,7 @@ export class AddContainerMasterComponent implements OnInit {
     if (this.action === 'edit') {
       this.isUpdate = true;
       this.containerTabledata = this.data;
+      this.containerTypeId = this.data.containerType;
       this.breadScrums = [
         {
           title: "Container Master",
@@ -64,6 +71,13 @@ export class AddContainerMasterComponent implements OnInit {
   initializeFormControl() {
     this.containerFormControls = new ContainerControl(this.containerTabledata, this.isUpdate);
     this.jsonControlArray = this.containerFormControls.getContainerFormControls();
+    this.jsonControlArray.forEach((data) => {
+      if (data.name === "containerType") {
+        // Set containerType-related variables
+        this.containerType = data.name;
+        this.containerTypeStatus = data.additionalData.showNameAndValue;
+      }
+    })
     this.containerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   cancel() {
@@ -72,9 +86,11 @@ export class AddContainerMasterComponent implements OnInit {
 
   //#region Save Function
   save() {
-    // Clear any errors in the form controls
-    Object.values(this.containerTableForm.controls).forEach(control => control.setErrors(null));
-
+    this.containerTableForm.controls.containerType.setValue(this.containerTableForm.value.containerType.name);
+    Object.keys(this.containerTableForm.controls).forEach((key) => {
+      const control = this.containerTableForm.controls[key];
+      control.setErrors(null);
+    });
     if (this.isUpdate) {
       let id = this.containerTableForm.value._id;
       this.containerTableForm.removeControl("_id");
@@ -146,7 +162,7 @@ export class AddContainerMasterComponent implements OnInit {
   }
   checkContainerExists() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.companyCode,
       "collectionName": "container_detail",
       "filter": {}
     }
@@ -171,4 +187,61 @@ export class AddContainerMasterComponent implements OnInit {
       }
     })
   }
+  //#region to get Container Type List 
+  getContainerTypeData() {
+    this.masterService.getJsonFileDetails("containerTypeUrl").subscribe((res) => {
+      const containerTypeList = res;
+
+      if (this.isUpdate) {
+        const updatedContainerType = containerTypeList.find((x) => x.value == this.containerTypeId);
+        this.containerTableForm.controls['containerType'].setValue(updatedContainerType);
+      }
+      //calling filter function and passing required data
+      this.filter.Filter(
+        this.jsonControlArray,
+        this.containerTableForm,
+        containerTypeList,
+        this.containerType,
+        this.containerTypeStatus
+      );
+
+    })
+  }
+
+  //#endregion
+
+  //#region to check Container Type Exists or not
+  checkIfContainerTypeExists() {
+    // Prepare the request object with necessary parameters
+    let req = {
+      companyCode: this.companyCode,
+      "collectionName": "container_detail",
+      "filter": {}
+    }
+
+    // Make an HTTP request to fetch container details
+    this.masterService.masterPost('generic/get', req).subscribe({
+      next: (res: any) => {
+        // Check if a response was received
+        if (res) {
+          // Find if the selected container type exists in the fetched data
+          const existingContainer = res.data.find(item => item.containerType === this.containerTableForm.controls.containerType.value.name);
+
+          // If the container type exists, display an info message
+          if (existingContainer) {
+            Swal.fire({
+              icon: "info",
+              title: "Container Type Exists",
+              text: `Container Type : ${existingContainer.containerType} is already exist!`,
+              showConfirmButton: true,
+            });
+
+            // Reset the container type form control
+            this.containerTableForm.controls['containerType'].setValue({ name: "", value: "" });
+          }
+        }
+      }
+    });
+  }
+  //#endregion
 }

@@ -29,6 +29,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
   };
   tableLoad: boolean = true;
   invoiceTableForm: UntypedFormGroup;
+  invoiceSummaryTableForm: UntypedFormGroup;
   invoiceFormControls: StateWiseSummaryControl;
   jsonControlArray: any;
   KPICountData: { count: any; title: string; class: string }[];
@@ -55,27 +56,27 @@ export class InvoiceSummaryBillComponent implements OnInit {
       Style: "",
     },
     cnoteCount: {
-      Title: "Cnote Count",
+      Title: "Shipment Count",
       class: "matcolumncenter",
       Style: "",
     },
     countSelected: {
-      Title: "CountSelected",
+      Title: "Shipment Selected",
       class: "matcolumncenter",
       Style: "",
     },
     subTotalAmount: {
-      Title: "Sub Total Amount",
+      Title: "Sub-total",
       class: "matcolumncenter",
       Style: "",
     },
     gstCharged: {
-      Title: "GST Charged",
+      Title: "GST",
       class: "matcolumncenter",
       Style: "",
     },
     totalBillingAmount: {
-      Title: "Total Billing Amount",
+      Title: "Shipment Total",
       class: "matcolumncenter",
       Style: "",
     }
@@ -167,6 +168,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
   staticField1 = ["count", "subTotal", "billTimeCharges", "totalAmount", "gstRate", "sgst", "utgst", "cgst", "igst", "gstTotal", "total"];
   navigateExtra: any;
   prqNo: any;
+  invoiceSummaryJsonArray: import("d:/docket/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -226,11 +228,14 @@ export class InvoiceSummaryBillComponent implements OnInit {
     this.invoiceFormControls = new StateWiseSummaryControl();
     // Get form controls for job Entry form section
     this.jsonControlArray = this.invoiceFormControls.getstateWiseSummaryArrayControls();
+    this.invoiceSummaryJsonArray=this.invoiceFormControls.getInvoiceSummaryArrayControls();
     // Build the form group using formGroupBuilder function
     this.invoiceTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    this.invoiceSummaryTableForm=formGroupBuilder(this.fb,[this.invoiceSummaryJsonArray])
     this.invoiceTableForm.controls['customerName'].setValue(this.navigateExtra.columnData.billingparty || "")
     this.invoiceTableForm.controls['unbilledAmount'].setValue(this.navigateExtra.columnData.sum || 0)
   }
+
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call
 

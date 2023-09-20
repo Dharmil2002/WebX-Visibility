@@ -23,8 +23,8 @@ export class AppComponent {
     public appservice: AuthService,
     public _router: Router,
     location: PlatformLocation,
-    private failedApiService: FailedApiServiceService,
-    private retryAndDownloadService: RetryAndDownloadService,
+    //private failedApiService: FailedApiServiceService,
+    //private retryAndDownloadService: RetryAndDownloadService,
     private spinner: NgxSpinnerService
   ) {
     this._router.events.subscribe((routerEvent: Event) => {
@@ -56,21 +56,21 @@ export class AppComponent {
       };
     });
   }
-    // Listen for page reload attempts
-    @HostListener('window:beforeunload', ['$event'])
-    unloadNotification($event: any): void {
-      this.dowloadData();
-      // Your custom message
-      const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-      // Set the custom message
-      $event.returnValue = confirmationMessage;
+    // // Listen for page reload attempts
+    // @HostListener('window:beforeunload', ['$event'])
+    // unloadNotification($event: any): void {
+    //   this.dowloadData();
+    //   // Your custom message
+    //   const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+    //   // Set the custom message
+    //   $event.returnValue = confirmationMessage;
   
-    }
-    dowloadData() {
-      const failedRequests = this.failedApiService.getFailedRequests();
-      if (failedRequests.length > 0) {
-        this.retryAndDownloadService.downloadFailedRequests();
-      }
+    // }
+    // dowloadData() {
+    //   const failedRequests = this.failedApiService.getFailedRequests();
+    //   if (failedRequests.length > 0) {
+    //     this.retryAndDownloadService.downloadFailedRequests();
+    //   }
   
-    }
+    // }
 }

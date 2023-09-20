@@ -39,7 +39,7 @@ export class AddDriverMasterComponent implements OnInit {
   categoryDet: any;
   LocationList: any;
   locData: any;
-  pincode: any;
+  Pincode: any;
   pincodeStatus: any;
   tableLoad: boolean;
   pincodeDet: any;
@@ -124,7 +124,7 @@ export class AddDriverMasterComponent implements OnInit {
     this.jsonControlPermanentArray.forEach(data => {
       if (data.name === 'pincode') {
         // Set pincode-related variables
-        this.pincode = data.name;
+        this.Pincode = data.name;
         this.pincodeStatus = data.additionalData.showNameAndValue;
       }
     });
@@ -246,7 +246,7 @@ export class AddDriverMasterComponent implements OnInit {
         companyCode: this.companyCode,
         collectionName: "driver_detail",
         filter: { _id: id },
-        update: data
+        update: this.DriverTableForm.value
       };
       this.masterService.masterPut('generic/update', req).subscribe({
         next: (res: any) => {
@@ -278,7 +278,7 @@ export class AddDriverMasterComponent implements OnInit {
       let req = {
         companyCode: this.companyCode,
         collectionName: "driver_detail",
-        data: data
+        data:this.DriverTableForm.value
       };
       this.masterService.masterPost('generic/create', req).subscribe({
         next: (res: any) => {
@@ -330,7 +330,7 @@ export class AddDriverMasterComponent implements OnInit {
     // console.log("fn handler called" , $event);
     let field = $event.field;                   // the actual formControl instance
     let functionName = $event.functionName;     // name of the function , we have to call
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {
@@ -474,7 +474,7 @@ export class AddDriverMasterComponent implements OnInit {
               this.jsonControlPermanentArray,
               this.DriverTableForm,
               filteredPincodeDet,
-              this.pincode,
+              this.Pincode,
               this.pincodeStatus
             );
           }

@@ -285,7 +285,7 @@ export class PrqEntryControls {
       },
       {
         name: "contractAmt",
-        label: "Contract Amount",
+        label: "Contract Amount(Rs)",
         placeholder: "Contract Amount",
         type: "number",
         value: 0,

@@ -46,7 +46,7 @@ export class HeaderComponent
   showAutocomplete: boolean = false;
   menuItems = ['LTL', 'FTL', 'Import', 'Export', 'EXIM', 'Billing​'];
   // Replace this with your actual data source or API call
-  allOptions:any;
+  allOptions: any;
   searchData: any;
 
   constructor(
@@ -241,12 +241,17 @@ export class HeaderComponent
   }
   onSearchInput() {
     this.showAutocomplete = true;
-    this.autocompleteOptions = this.allOptions.filter((option) =>
-      option.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
+    if (this.searchQuery.length > 0) {
+      this.autocompleteOptions = this.allOptions.filter((option) =>
+        option.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      )
+    }
+    else {
+      this.showAutocomplete = false;
+    }
   }
 
-  selectOption(option:any) {
+  selectOption(option: any) {
     this.searchQuery = option.name;
     this.router.navigateByUrl(option.value);
     this.showAutocomplete = false;
@@ -264,7 +269,7 @@ export class HeaderComponent
   async bindMenu() {
     this.searchData = await searchbilling(this.masterService);
     const searchDetail = this.searchData.map((x) => { return { name: x.title, value: x.router } })
-    this.allOptions=searchDetail;
+    this.allOptions = searchDetail;
   }
   goBack(tabIndex: string): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });

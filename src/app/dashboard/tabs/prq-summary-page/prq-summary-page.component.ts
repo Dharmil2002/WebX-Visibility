@@ -30,22 +30,22 @@ export class PrqSummaryPageComponent implements OnInit {
       Style: "min-width:200px",
     },
     size: {
-      Title: "(Vehicle / Container) Size",
+      Title: "Veh/Cont-Size",
       class: "matcolumncenter",
-      Style: "min-width:200px",
+      Style: "min-width:150px",
     },
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "min-width:200px",
+      Style: "min-width:100px",
     },
     fromToCity: {
       Title: "From-To City",
       class: "matcolumnleft",
-      Style: "max-width:80px",
+      Style: "max-width:150px",
     },
     pickUpDate: {
-      Title: "Pick Up Date Time",
+      Title: "Pk-Up Dt-Time",
       class: "matcolumnleft",
       Style: "min-width:100px",
     },
@@ -62,7 +62,7 @@ export class PrqSummaryPageComponent implements OnInit {
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "min-width:2px",
+      Style: "max-width:80px",
     },
   };
   //#endregion
@@ -86,51 +86,21 @@ export class PrqSummaryPageComponent implements OnInit {
   addAndEditPath: string;
   tableData: any[];
   linkArray = [{ Row: "Action", Path: "Operation/PRQEntry" }];
+  boxData: { count: number; title: string; class: string; }[];
+  allPrq: any;
   constructor(private _masterService:MasterService,private router: Router) {
     this.addAndEditPath = "Operation/PRQEntry";
   }
 
   ngOnInit(): void {
-    this.summaryCountData = [
-      {
-        Title: "",
-        count: 140,
-        title: 'PRQ Count',
-        count1: 12000,
-        title1: "Amount",
-        class: "info-box7 bg-success order-info-box7"
-      },
-      {
-        Title: "Total Billed",
-        count: 85,
-        title: "PRQ Assigned",
-        count1: 9500,
-        title1: "Amount",
-        class: 'info-box7 bg-c-Bottle-light order-info-box7'
-      },
-      {
-        Title: "Total Un-Billed",
-        count: 45,
-        title: "PRQ Not Assigned",
-        count1: 2500,
-        title1: "Amount",
-        class: 'info-box7 bg-danger order-info-box7'
-      },
-      {
-        Title: "Business Loss",
-        count: 12,
-        title: "PRQ Rejected",
-        count1: 1000,
-        title1: "Amount",
-        class: 'info-box7 bg-c-Grape-light order-info-box7'
-      }
-    ];
     this.getPrqDetails();
   }
   async getPrqDetails() {
   
     let data= await getPrqDetailFromApi(this._masterService);
-    this.tableData=data;
+    this.tableData=data.tableData;
+    this.allPrq=data.allPrqDetail;
+    this.getPrqKpiCount();
     this.tableLoad = false;
   }
    async handleMenuItemClick(data) {
@@ -165,7 +135,7 @@ export class PrqSummaryPageComponent implements OnInit {
     }
     else if(data.label.label==="Reject"){
       const tabIndex = "PRQ"; 
-      const status="3";
+      const status="5";
       await showConfirmationDialog(data.data, this._masterService, this.goBack.bind(this),tabIndex,status);
       this.getPrqDetails();
     }
@@ -174,4 +144,28 @@ export class PrqSummaryPageComponent implements OnInit {
   goBack(tabIndex: number): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
   }
+
+//Kpi count 
+  getPrqKpiCount() {
+    const createShipDataObject = (
+      count: number,
+      title: string,
+      className: string
+    ) => ({
+      count,
+      title,
+      class: `info-box7 ${className} order-info-box7`,
+    });
+      const prqAssign=this.allPrq.filter((x)=>x.status=="2");
+      const notPrqAssign=this.allPrq.filter((x)=>x.status=="1");
+      const rejectAssign=this.allPrq.filter((x)=>x.status=="5");
+    const shipData = [
+      createShipDataObject(this.allPrq.length, "PRQ Count", "bg-c-Bottle-light"),
+      createShipDataObject(prqAssign.length, "PRQ Assigned", "bg-c-Grape-light"),
+      createShipDataObject(notPrqAssign.length, "PRQ Not Assigned", "bg-c-Daisy-light"),
+      createShipDataObject(rejectAssign.length, "PRQ Rejected", "bg-c-Grape-light"),
+    ];
+    this.boxData=shipData
+  }
+
 }

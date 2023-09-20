@@ -45,7 +45,7 @@ export async function UpdateDetail(masterService, data) {
             },
             update: {
                 invoiceNo: data.invoiceNo, // Use the invoice number you want to update,
-                status: "2"
+                status: "4"
             }
         };
 

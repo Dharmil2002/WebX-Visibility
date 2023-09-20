@@ -182,7 +182,9 @@ th.mat-header-cell {
     margin-top: 0 !important;
     margin-left: 0 !important;
   }
-
+  .custom-input {
+    width: 50px;
+  }
   .Rangedate {
     right: 0 !important;
     position: inherit !important;
@@ -198,11 +200,12 @@ th.mat-header-cell {
     right: 0 !important;
     position: inherit !important;
   }
-
+ 
   .searchsym {
     margin-top: 10px;
   }
 }
+
 
 .snackbar-success {
   background-color: rgba(24, 206, 15, 0.8) !important;
@@ -536,23 +539,6 @@ a {
   /* Set the default height */
 }
 
-/* Define styles for smaller screens (e.g., mobile) */
-@media (max-width: 768px) {
-  .google-autocomplete-list {
-    max-height: 150px;
-    /* Reduce the max-height for smaller screens */
-  }
-
-  .google-autocomplete-item {
-    padding: 5px 5px;
-    /* Adjust the padding for smaller screens */
-  }
-
-  .custom-input {
-    width: 100%;
-    /* Make the input full-width on smaller screens */
-  }
-}
 
 /* Your component's CSS file or global styles */
 .custom-input::placeholder {
@@ -609,3 +595,20 @@ a {
   /* Adjust the border-radius for the curve */
   transform: translateY(-50%);
 }
+/* Apply styles when the screen width is less than or equal to 768px and the zoom level is greater than 1x */
+@media screen and (min-width: 768px) and (min-resolution: 1.0dppx) {
+   /* CSS styles to apply when the screen width is 872 pixels or wider */
+  /* Add your styles here */
+  .custom-input {
+    width: 250px;
+    margin-left: -39px;
+  }
+  .google-autocomplete-list {
+    margin-left: -39px;
+  }
+  // .globehide{
+  //   display:none!important;
+  //   }
+}
+
+

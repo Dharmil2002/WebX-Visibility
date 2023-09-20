@@ -44,7 +44,7 @@ export class HeaderComponent
   searchQuery: string = '';
   autocompleteOptions: any;
   showAutocomplete: boolean = false;
-  menuItems = ['LTL', 'FTL', 'Import', 'Export', 'EXIM', 'Billing​'];
+  menuItems = ['LTL', 'FTL', 'Import', 'Export', 'Billing​'];
   // Replace this with your actual data source or API call
   allOptions: any;
   searchData: any;

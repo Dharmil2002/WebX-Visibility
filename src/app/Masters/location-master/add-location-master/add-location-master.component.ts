@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import { processProperties } from "../../processUtility";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
+import { HttpErrorResponse } from "@angular/common/http";
 @Component({
   selector: "app-add-location-master",
   templateUrl: "./add-location-master.component.html",
@@ -224,7 +225,7 @@ export class AddLocationMasterComponent implements OnInit {
       "ownership",
       "contLoc",
     ];
-    const extractControlValue = (controlName) => formValue[controlName]?.name;
+    const extractControlValue = (controlName) => formValue[controlName]?.value;
 
     controlNames.forEach((controlName) => {
       const controlValue = extractControlValue(controlName);
@@ -297,6 +298,39 @@ export class AddLocationMasterComponent implements OnInit {
   cancel() {
     this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
   }
+
+  getLocationDetails() {
+    let req = {
+      companyCode: this.companyCode,
+      filter: { locCode: this.locationTableForm.value.locCode },
+      collectionName: "location_detail",
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          if (res.data.length > 0) {
+            Swal.fire({
+              title: "Location Code Already exist! Please try with another",
+              toast: true,
+              icon: "error",
+              showCloseButton: false,
+              showCancelButton: false,
+              showConfirmButton: true,
+              confirmButtonText: "OK",
+            });
+            this.locationTableForm.controls["locCode"].setErrors({
+              locCodeExist: true,
+            });
+            this.locationTableForm.controls["locCode"].setValue("");
+          }
+          (err) => {
+            if (err instanceof HttpErrorResponse) {
+            }
+          };
+        }
+      },
+    });
+  }
   /*get all Master Details*/
   async getAllMastersData() {
     try {
@@ -358,6 +392,7 @@ export class AddLocationMasterComponent implements OnInit {
             return { name: x.codeDesc, value: x.codeId };
           }
         });
+
       this.pincodeDet = this.pincodeResponse.data
         .filter((item) => item.isActive)
         .map((element) => ({
@@ -367,47 +402,48 @@ export class AddLocationMasterComponent implements OnInit {
       // Handle the response from the server
       if (this.isUpdate) {
         const locLevel = this.locLevelList.find(
-          (x) => x.name == this.locationTable.locLevel
+          (x) => x.value == this.locationTable.locLevel
         );
         this.locationTableForm.controls.locLevel.setValue(locLevel);
         this.setReportLevelData(locLevel);
+
         const prevLoc = this.locationFilterResponse.find(
-          (x) => x.name == this.locationTable.prevLoc
+          (x) => x.value == this.locationTable.prevLoc
         );
         this.locationTableForm.controls.prevLoc.setValue(prevLoc);
 
         const acctLoc = this.locationFilterResponse.find(
-          (x) => x.name == this.locationTable.acctLoc
+          (x) => x.value == this.locationTable.acctLoc
         );
         this.locationTableForm.controls.acctLoc.setValue(acctLoc);
 
         const dataLoc = this.locationFilterResponse.find(
-          (x) => x.name == this.locationTable.dataLoc
+          (x) => x.value == this.locationTable.dataLoc
         );
         this.locationTableForm.controls.dataLoc.setValue(dataLoc);
 
         const nextLoc = this.locationFilterResponse.find(
-          (x) => x.name == this.locationTable.nextLoc
+          (x) => x.value == this.locationTable.nextLoc
         );
         this.locationTableForm.controls.nextLoc.setValue(nextLoc);
 
         const contLoc = this.locationFilterResponse.find(
-          (x) => x.name == this.locationTable.contLoc
+          (x) => x.value == this.locationTable.contLoc
         );
         this.locationTableForm.controls.contLoc.setValue(contLoc);
 
         const ownership = this.locOwnerShipList.find(
-          (x) => x.name == this.locationTable.ownership
+          (x) => x.value == this.locationTable.ownership
         );
         this.locationTableForm.controls.ownership.setValue(ownership);
 
         const pincodeDet = this.pincodeDet.find(
-          (x) => x.name == this.locationTable.locPincode
+          (x) => x.value == this.locationTable.locPincode
         );
         this.locationTableForm.controls.locPincode.setValue(pincodeDet);
 
         const locRegion = this.zoneList.find(
-          (x) => x.name == this.locationTable.locRegion
+          (x) => x.value == this.locationTable.locRegion
         );
         this.locationTableForm.controls.locRegion.setValue(locRegion);
       }
@@ -483,7 +519,7 @@ export class AddLocationMasterComponent implements OnInit {
   setReportLevelData(event) {
     if (this.isUpdate) {
       const reportLevel = this.locLevelList.find(
-        (x) => x.name == this.locationTable.reportLevel
+        (x) => x.value == this.locationTable.reportLevel
       );
       this.locationTableForm.controls.reportLevel.setValue(reportLevel);
       this.setReportLocData(
@@ -506,7 +542,7 @@ export class AddLocationMasterComponent implements OnInit {
         ? event
         : event.eventArgs.option.value.value;
     const filter = this.locationResponse.data.filter(
-      (x) => x.locLevel === parseInt(locHierachy.split("000")[1])
+      (x) => parseInt(x.locLevel) === parseInt(locHierachy)
     );
     const reportLoc = filter.map((element) => ({
       name: element.locName,
@@ -514,7 +550,7 @@ export class AddLocationMasterComponent implements OnInit {
     }));
     if (this.isUpdate) {
       const reportLocData = reportLoc.find(
-        (x) => x.name == this.locationTable.reportLoc
+        (x) => x.value == this.locationTable.reportLoc
       );
       this.locationTableForm.controls.reportLoc.setValue(reportLocData);
     }

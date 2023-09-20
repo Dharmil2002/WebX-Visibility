@@ -61,7 +61,10 @@ export class LocationControl {
                     ],
                     additionalData: {
                         showNameAndValue: false
-                    }
+                    },
+                    functions: {
+                      onModelChange: "getLocationDetails",
+                    },
                 },
                 {
                     name: 'locCode', label: 'Location Code', placeholder: 'Enter Location Code', type: 'text', value: LocationTable.locCode, generatecontrol: true, disable: IsUpdate ? true : false,
@@ -140,7 +143,7 @@ export class LocationControl {
                         }, {
                             name: "pattern",
                             message: "Please Enter alphanumeric Address of length 4 to 100",
-                            pattern: '^[a-zA-Z0-9 ]{4,100}$',
+                            pattern: '^.{4,100}$',
                         }
 
                     ],
@@ -153,10 +156,6 @@ export class LocationControl {
                             name: "pattern",
                             message: "Please enter 10 to 12 digit mobile number",
                             pattern: "^[0-9]{8,12}$",
-                        },
-                        {
-                            name: "required",
-                            message: "Telephone No is required"
                         }
                     ]
                 },

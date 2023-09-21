@@ -37,7 +37,6 @@ export class AddPinCodeMasterComponent implements OnInit {
     city: any;
     cityRes: any;
     stateRes: any;
-    cityData: any;
     stateData: any;
 
     ngOnInit(): void {
@@ -95,7 +94,7 @@ export class AddPinCodeMasterComponent implements OnInit {
         this.pincodeTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
         //for set static dropdown
         this.pincodeTableForm.controls["pincodeCategory"].setValue(
-            this.pincodeTable.pincodeCategory
+            this.pincodeTable.category
         )
     }
 
@@ -167,8 +166,8 @@ export class AddPinCodeMasterComponent implements OnInit {
             value: element._id
         }));
         if (this.isUpdate) {
-            this.cityData = cityList.find((x) => x.name == this.data.city);
-            this.pincodeTableForm.controls.city.setValue(this.cityData);
+            const cityData = cityList.find((x) => x.name.toUpperCase() == this.data.city.toUpperCase());
+            this.pincodeTableForm.controls.city.setValue(cityData);
         }
         this.filter.Filter(
             this.jsonControlArray,

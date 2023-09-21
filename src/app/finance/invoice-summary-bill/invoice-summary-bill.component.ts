@@ -168,7 +168,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
   staticField1 = ["count", "subTotal", "billTimeCharges", "totalAmount", "gstRate", "sgst", "utgst", "cgst", "igst", "gstTotal", "total"];
   navigateExtra: any;
   prqNo: any;
-  invoiceSummaryJsonArray: import("d:/docket/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  invoiceSummaryJsonArray: any;
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,

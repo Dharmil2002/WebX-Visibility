@@ -8,64 +8,7 @@ export class LocationControl {
     constructor(LocationTable: LocationMaster, IsUpdate: boolean) {
         this.LocationDetailControl =
             [
-                {
-                    name: 'locLevel', label: "Location Hierarchy", placeholder: "Select location Hierarchy", type: 'dropdown',
-                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "autocomplete",
-                        },
-                        {
-                            name: "invalidAutocompleteObject",
-                            message: "Choose proper value",
-                        }
-                    ],
-                    additionalData: {
-                        showNameAndValue: false
-                    },
-                    functions: {
-                        onOptionSelect: "setReportLevelData"
-                    }
 
-                },
-                {
-                    name: 'reportLevel', label: "Reporting To", placeholder: "Select Reporting To", type: 'dropdown',
-                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "autocomplete",
-                        },
-                        {
-                            name: "invalidAutocompleteObject",
-                            message: "Choose proper value",
-                        }
-                    ],
-                    additionalData: {
-                        showNameAndValue: false
-                    },
-                    functions: {
-                        onOptionSelect: "setReportLocData"
-                    }
-                },
-                {
-                    name: 'reportLoc', label: "Reporting Location", placeholder: "Select Reporting Location", type: 'dropdown',
-                    value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "autocomplete",
-                        },
-                        {
-                            name: "invalidAutocompleteObject",
-                            message: "Choose proper value",
-                        }
-                    ],
-                    additionalData: {
-                        showNameAndValue: false
-                    },
-                    functions: {
-                      onModelChange: "getLocationDetails",
-                    },
-                },
                 {
                     name: 'locCode', label: 'Location Code', placeholder: 'Enter Location Code', type: 'text', value: LocationTable.locCode, generatecontrol: true, disable: IsUpdate ? true : false,
                     Validations: [
@@ -119,6 +62,14 @@ export class LocationControl {
                     }
                 },
                 {
+                  name: 'locCity', label: "City", placeholder: "Select City", type: 'text',
+                  value: LocationTable.locCity, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
+                  Validations: [],
+                  additionalData: {
+                      showNameAndValue: false
+                  }
+              },
+                {
                     name: 'locState', label: "State", placeholder: "Select State", type: 'text',
                     value: LocationTable.locState, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
                     Validations: [],
@@ -126,14 +77,7 @@ export class LocationControl {
                         showNameAndValue: false
                     },
                 },
-                {
-                    name: 'locCity', label: "City", placeholder: "Select City", type: 'text',
-                    value: LocationTable.locCity, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
-                    Validations: [],
-                    additionalData: {
-                        showNameAndValue: false
-                    }
-                },
+
                 {
                     name: 'locAddr', label: 'Address', placeholder: 'Enter Location Address', type: 'text', value: LocationTable.locAddr, generatecontrol: true, disable: false,
                     Validations: [
@@ -149,6 +93,64 @@ export class LocationControl {
                     ],
 
                 },
+                {
+                  name: 'locLevel', label: "Location Hierarchy", placeholder: "Select location Hierarchy", type: 'dropdown',
+                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                  Validations: [
+                      {
+                          name: "autocomplete",
+                      },
+                      {
+                          name: "invalidAutocompleteObject",
+                          message: "Choose proper value",
+                      }
+                  ],
+                  additionalData: {
+                      showNameAndValue: false
+                  },
+                  functions: {
+                      onOptionSelect: "setReportLevelData"
+                  }
+
+              },
+              {
+                  name: 'reportLevel', label: "Reporting To", placeholder: "Select Reporting To", type: 'dropdown',
+                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                  Validations: [
+                      {
+                          name: "autocomplete",
+                      },
+                      {
+                          name: "invalidAutocompleteObject",
+                          message: "Choose proper value",
+                      }
+                  ],
+                  additionalData: {
+                      showNameAndValue: false
+                  },
+                  functions: {
+                      onOptionSelect: "setReportLocData"
+                  }
+              },
+              {
+                  name: 'reportLoc', label: "Reporting Location", placeholder: "Select Reporting Location", type: 'dropdown',
+                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                  Validations: [
+                      {
+                          name: "autocomplete",
+                      },
+                      {
+                          name: "invalidAutocompleteObject",
+                          message: "Choose proper value",
+                      }
+                  ],
+                  additionalData: {
+                      showNameAndValue: false
+                  },
+                  functions: {
+                    onModelChange: "getLocationDetails",
+                  },
+              },
                 {
                     name: 'locTelno', label: "Telephone Number", placeholder: "Enter Telephone Number", type: 'number', value: LocationTable.locTelno, generatecontrol: true, disable: false,
                     Validations: [

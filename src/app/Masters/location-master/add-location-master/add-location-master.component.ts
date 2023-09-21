@@ -545,7 +545,7 @@ export class AddLocationMasterComponent implements OnInit {
       (x) => parseInt(x.locLevel) === parseInt(locHierachy)
     );
     const reportLoc = filter.map((element) => ({
-      name: element.locName,
+      name: element.locCode,
       value: element.locCode,
     }));
     if (this.isUpdate) {

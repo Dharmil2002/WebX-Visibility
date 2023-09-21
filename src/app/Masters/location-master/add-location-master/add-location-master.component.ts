@@ -69,7 +69,6 @@ export class AddLocationMasterComponent implements OnInit {
   locCont: any;
   locContStatus: any;
   reportLevelList: any;
-  zoneList: any;
   pincodeResponse: any;
   locationFilterResponse: any;
   locLevelList: any;
@@ -146,7 +145,6 @@ export class AddLocationMasterComponent implements OnInit {
       reportLoc: { variable: "report", status: "reportStatus" },
     };
     const otherPropertiesMapping = {
-      locRegion: { variable: "zoneLoc", status: "zoneLocStatus" },
       ownership: { variable: "locOwnership", status: "locOwnershipStatus" },
       acctLoc: { variable: "accountLoc", status: "accountLocStatus" },
       dataLoc: { variable: "locData", status: "locDataStatus" },
@@ -217,7 +215,6 @@ export class AddLocationMasterComponent implements OnInit {
       "reportLevel",
       "reportLoc",
       "locPincode",
-      "locRegion",
       "acctLoc",
       "dataLoc",
       "nextLoc",
@@ -331,6 +328,24 @@ export class AddLocationMasterComponent implements OnInit {
       },
     });
   }
+  getStateDetails() {
+    let req = {
+      companyCode: this.companyCode,
+      filter: { stateName: this.locationTableForm.value.locState },
+      collectionName: "state_detail",
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
+      next: (res: any) => {
+        this.locationTableForm.controls["locRegion"].setValue(res.data[0].zone);
+        if (res) {
+          (err) => {
+            if (err instanceof HttpErrorResponse) {
+            }
+          };
+        }
+      },
+    });
+  }
   /*get all Master Details*/
   async getAllMastersData() {
     try {
@@ -373,13 +388,6 @@ export class AddLocationMasterComponent implements OnInit {
         });
       this.reportLevelList = generalResponse.data
         .filter((item) => item.codeType === "HRCHY" && item.activeFlag)
-        .map((x) => {
-          {
-            return { name: x.codeDesc, value: x.codeId };
-          }
-        });
-      this.zoneList = generalResponse.data
-        .filter((item) => item.codeType === "ZONE" && item.activeFlag)
         .map((x) => {
           {
             return { name: x.codeDesc, value: x.codeId };
@@ -441,11 +449,6 @@ export class AddLocationMasterComponent implements OnInit {
           (x) => x.value == this.locationTable.locPincode
         );
         this.locationTableForm.controls.locPincode.setValue(pincodeDet);
-
-        const locRegion = this.zoneList.find(
-          (x) => x.value == this.locationTable.locRegion
-        );
-        this.locationTableForm.controls.locRegion.setValue(locRegion);
       }
       this.filter.Filter(
         this.jsonControlLocationArray,
@@ -492,13 +495,6 @@ export class AddLocationMasterComponent implements OnInit {
       this.filter.Filter(
         this.jsonControlOtherArray,
         this.locationTableForm,
-        this.zoneList,
-        this.zoneLoc,
-        this.zoneLocStatus
-      );
-      this.filter.Filter(
-        this.jsonControlOtherArray,
-        this.locationTableForm,
         this.locOwnerShipList,
         this.locOwnership,
         this.locOwnershipStatus
@@ -515,6 +511,7 @@ export class AddLocationMasterComponent implements OnInit {
     );
     this.locationTableForm.controls.locState.setValue(fetchData.state);
     this.locationTableForm.controls.locCity.setValue(fetchData.city);
+    this.getStateDetails();
   }
   setReportLevelData(event) {
     if (this.isUpdate) {

@@ -91,7 +91,7 @@ export async function locationFromApi(masterService) {
     }
     try {
         const res = await masterService.masterMongoPost("generic/get",reqBody).toPromise();
-        const filterMap = res?.data?.map(x => ({ value: x.locCode, name: x.locName, city: x.locCity })) ?? null;
+        const filterMap = res?.data?.map(x => ({ value: x.locCode, name: x.locName, city: x.locCity,state:x.locState})) ?? null;
         return filterMap.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
     } catch (error) {
         console.error("An error occurred:", error);

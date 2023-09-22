@@ -137,7 +137,7 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         functions: {
-          onModel: "prqSelection" 
+          onModel: "prqSelection"
       },
         Validations: [
           { name: "autocomplete" },
@@ -298,6 +298,15 @@ export class ConsignmentControl {
       {
         name: 'cnalternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'text',
         value: '', Validations: [], generatecontrol: true, disable: false
+      },
+      {
+        name: 'companyCode',
+        label: 'Company Code',
+        placeholder: 'Company Code',
+        type: 'text',
+        value: localStorage.getItem("companyCode"),
+        Validations: [],
+        generatecontrol: false, disable: false
       }
     ]
   }
@@ -311,7 +320,11 @@ export class FreightControl {
     this.FreightControlArray = [
       {
         name: 'freightAmount', label: 'Freight Amount', placeholder: 'Freight Amount', type: 'text',
-        value: '', Validations: [], generatecontrol: true, disable: false
+        value: '', Validations: [{
+          name: "required",
+          message: "Secret Freight Amount is required",
+        }
+        ], generatecontrol: true, disable: false
       },
       {
         name: 'freightRatetype', label: 'Freight Rate type', placeholder: 'Freight Rate type', type: 'text',
@@ -341,6 +354,15 @@ export class FreightControl {
         name: 'totalAmount', label: 'Total Amount', placeholder: 'Total Amount', type: 'text',
         value: '', Validations: [], generatecontrol: true, disable: false
       },
+      {
+        name: 'companyCode',
+        label: 'Company Code',
+        placeholder: 'Company Code',
+        type: 'text',
+        value: localStorage.getItem("companyCode"),
+        Validations: [],
+        generatecontrol: false, disable: false
+      }
     ]
   }
   getFreightControlControls() {

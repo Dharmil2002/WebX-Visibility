@@ -90,7 +90,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     // if (this.authService.currentUserValue) {
     // }
     this.sidebarItems = ROUTES.filter((sidebarItem) => sidebarItem);
-    this.userName = localStorage.getItem('Username');
+    this.userName = localStorage.getItem('UserName');
     this.initLeftSidebar();
     this.bodyTag = this.document.body;
   }

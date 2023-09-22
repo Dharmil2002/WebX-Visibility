@@ -13,7 +13,7 @@ import { Router } from "@angular/router";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { pendingbilling } from "../pending-billing/pending-billing-utlity";
-import { updatePrq } from "./consigment-utlity";
+import { containorConsigmentDetail, updatePrq } from "./consigment-utlity";
 
 
 @Component({
@@ -96,12 +96,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     containerType: {
       name: "Container Type",
       key: "Dropdown",
-      option: [
-        { name: "Incoming Invoice", value: "Incoming Invoice" },
-        { name: "Goods Movement", value: "Goods Movement" },
-        { name: "CFS Charges", value: "CFS Charges" },
-      ],
       Style: "",
+      option: [],
+      functions:{ onOptionSelect:"getCotanierType"},
       HeaderStyle: "",
     },
     containerCapacity: {
@@ -184,6 +181,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
   prqData: any;
   billingParty: any;
   prqNoDetail: any[];
+  isLoad: boolean=false;
+  ContainerType: any;
   //#endregion
 
   constructor(
@@ -257,7 +256,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
 
 
     ];
-  }
+  }54
   //#endregion
 
   //#region Add a new item to the table
@@ -283,7 +282,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.tableData1.splice(0, 0, AddObj); // Insert the new object at the beginning of the tableData array
   }
   //#endregion
-
+  getCotanierType(event){
+    const row = event.row.containerType;
+    const containerCapacity= this.ContainerType.find((x)=>x.name.trim()===row.trim());
+    event.row.containerCapacity=containerCapacity.loadCapacity;
+  }
   //#region functionCallHandler
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
@@ -371,15 +374,19 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls['containerSize'].setValue(this.prqData?.containerSize);
     this.consignmentTableForm.controls['ccbp'].setValue(true);
     this.onAutoBillingBased("true");
-
   }
   async bindDataFromDropdown() {
     const resCust = await customerFromApi(this.masterService);
     this.billingParty = resCust;
     const cityDetail = await getCity(this.companyCode, this.masterService);
     const resContainer = await containerFromApi(this.masterService);
+    const resContainerType=await containorConsigmentDetail(this.operationService);
+    this.ContainerType=resContainerType;
+    this.displayedColumns1.containerType.option=resContainerType;
     const vendorDetail = await getVendorDetails(this.masterService);
     const prqNo= await pendingbilling(this.masterService);
+    this.displayedColumns1.containerType
+    this.isLoad=true;
     this.prqNoDetail=prqNo;
     this.filter.Filter(
       this.jsonControlArrayBasic,
@@ -524,7 +531,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       const prqData={
         prqId:this.consignmentTableForm.value?.prqNo.value||"",
         dktNo:this.consignmentTableForm.controls["docketNumber"].value
-        
+
       }
         await updatePrq(this.operationService,prqData)
     }

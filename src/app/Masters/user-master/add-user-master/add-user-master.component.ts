@@ -7,6 +7,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { UserMaster } from "src/app/core/models/Masters/User Master/user-master";
 import { UserControl } from "src/assets/FormControls/userMaster";
 import Swal from "sweetalert2";
+import { Subject, take, takeUntil } from "rxjs";
 
 @Component({
   selector: "app-add-user-master",
@@ -18,6 +19,7 @@ export class AddUserMasterComponent implements OnInit {
   jsonControlUserArray: any;
   userTableForm: UntypedFormGroup;
   isUpdate = false;
+  protected _onDestroy = new Subject<void>();
   action: string;
   userTable: UserMaster;
   branchCode: any;
@@ -202,6 +204,22 @@ export class AddUserMasterComponent implements OnInit {
     return dropdownData.find((item) => item.name === name);
   }
 
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+
+    const index = this.jsonControlUserArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlUserArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.userTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
   //DropDown Binding from API
   async getAllMastersData() {
     try {
@@ -347,7 +365,7 @@ export class AddUserMasterComponent implements OnInit {
 
   async save() {
     this.userTableForm.controls["branchCode"].setValue(
-      this.userTableForm.value.branchCode.name
+      this.userTableForm.value.branchCode.value
     );
     this.userTableForm.controls["managerId"].setValue(
       this.userTableForm.value.managerId.name
@@ -371,7 +389,7 @@ export class AddUserMasterComponent implements OnInit {
     this.userTableForm.controls["multiDivisionAccess"].setValue(division);
 
     const multiLoc = this.userTableForm.value.userLocationscontrolHandler.map(
-      (item: any) => item.name
+      (item: any) => item.value
     );
     this.userTableForm.controls["multiLocation"].setValue(multiLoc);
 

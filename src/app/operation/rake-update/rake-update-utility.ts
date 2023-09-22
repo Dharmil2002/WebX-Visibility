@@ -27,7 +27,7 @@ export async function rakeFieldMapping(data) {
                     ? "Handover to Billing Party"
                     : "Kept it at Current Location";
         const entryDate = element?.entryDate || new Date();
-
+        const rrDate = element?.rrDate || new Date();
         // Extract the first container detail or create an empty object
         const uniqueCNNoSet = new Set();
         const uniqueJobNoSet = new Set();
@@ -53,10 +53,10 @@ export async function rakeFieldMapping(data) {
             SlNo: index + 1,
             RakeNo: element?.rakeId || "",
             RakeEntryDate: formatDate(entryDate, 'dd/MM/yyyy HH:mm'),
-            TrainName: element?.trainName || "",
-            TrainNo: element?.trainNo || "",
+            FNRNO: element?.fnrNo || "",
+            RRDate: formatDate(rrDate, 'dd/MM/yyyy HH:mm'),
             RRNo: element?.rrNo || "",
-            ContainerNo: "",
+            ContainerNo:element?.NFC||"",
             FromToCity: element.fromCity +"-"+element?.toCity,
             IsEmpty: "",
             Weight: element.containorDetail.reduce((sum, detail) => sum + (detail.weight || 0), 0),

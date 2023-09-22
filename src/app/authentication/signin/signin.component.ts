@@ -51,7 +51,6 @@ export class SigninComponent
   }
 
   onSubmit() {
-    debugger
     this.Islogin = true;
     this.submitted = true;
     this.error = "";
@@ -64,7 +63,6 @@ export class SigninComponent
       this.subs.sink = this.authService.login(this.loginForm.value).subscribe(
         (res) => {
           if (res) {
-            debugger
             const token = this.authService.currentUserValue.tokens.access.token;
             if (token) {
               this.Islogin = true;
@@ -80,7 +78,7 @@ export class SigninComponent
           }
         },
         (error) => {
-          this.error = error;
+          this.error = "Invalid username or password. Please check your credentials and try again.";
           this.Islogin = false;
           this.submitted = false;
         }

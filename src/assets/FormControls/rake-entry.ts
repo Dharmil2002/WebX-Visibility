@@ -78,7 +78,8 @@ export class RakeEntryControl {
                 additionalData: {
                     showNameAndValue: false
                 }
-            }, {
+            },
+             {
                 name: 'toCity', label: "To City", placeholder: "Enter To City", type: 'dropdown', value: '',
                 generatecontrol: true,
                 disable: false,
@@ -96,7 +97,8 @@ export class RakeEntryControl {
                 additionalData: {
                     showNameAndValue: false
                 }
-            }, {
+            },
+            {
                 name: 'via', label: "Via", placeholder: "Multiselect via", type: 'multiselect',
                 value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
@@ -124,37 +126,79 @@ export class RakeEntryControl {
                 },
                 generatecontrol: true,
                 disable: false
-            }, {
-                name: "trainName",
-                label: "Train Name",
-                placeholder: "Enter Train Name",
-                type: "text",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                ]
-            }, {
-                name: "trainNo",
-                label: "Train Number",
-                placeholder: "Enter Train Number",
-                type: "text",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                ]
-            }, {
-                name: "rrNo",
-                label: "RR No",
-                placeholder: "Enter RR No",
-                type: "text",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                ]
-            }, {
+            },
+            {
+              name: 'loadType', label: "Load Type", placeholder: "Enter Load Type", type: 'Staticdropdown',
+              value: [
+                {name:"Container",value:"container"},
+                {name:"Wagon",value:"wagon"}
+              ],
+              generatecontrol: true,
+              disable: false,
+              Validations: [],
+              // functions: {
+              //     onOptionSelect: "cityMapping"
+              // },
+              additionalData: {
+                  showNameAndValue: false
+              }
+            },
+            {
+              name: 'movementType', label: "Movement Type", placeholder: "Enter Movement Type", type: 'Staticdropdown',
+              value: [
+                {name:"Exim",value:"exim"},
+                {name:"Domestic",value:"domestic"}
+              ],
+              generatecontrol: true,
+              disable: false,
+              Validations: [],
+              // functions: {
+              //     onOptionSelect: "cityMapping"
+              // },
+              additionalData: {
+                  showNameAndValue: false
+              }
+            },
+            {
+              name: "NFC",
+              label: "No of Container",
+              placeholder: "Enter No of Container",
+              type: "text",
+              value: "",
+              generatecontrol: true,
+              disable: false,
+              Validations: [
+              ]
+            },
+            {
+              name: "fnrNo",
+              label: "FNR No",
+              placeholder: "Enter FNR No",
+              type: "text",
+              value: "",
+              generatecontrol: true,
+              disable: false,
+              Validations: [
+              ]
+            },
+            {
+              name: "rrNo",
+              label: "RR No",
+              placeholder: "Enter RR No",
+              type: "text",
+              value: "",
+              generatecontrol: true,
+              disable: false,
+              Validations: [
+              ]
+            },
+            {
+              name: 'rrDate', label: 'RR Date', placeholder: 'RR Date', type: 'date', value: "", filterOptions: '', autocomplete: '', displaywith: '',
+              generatecontrol: true, disable: false, Validations: [],
+              additionalData: {
+              }
+            },
+            {
                 name: "contractAmount",
                 label: "Contract Amount (Rs)",
                 placeholder: "Enter Contract Amount",
@@ -286,11 +330,20 @@ export class RakeEntryControl {
                 generatecontrol: false,
                 disable: false,
                 Validations: [
-                   
+
                 ],
                 functions: {
                     onToggleAll: 'toggleSelectAll',
                 },
+            },
+            {
+              name: 'companyCode',
+              label: 'Company Code',
+              placeholder: 'Company Code',
+              type: 'text',
+              value: localStorage.getItem("companyCode"),
+              Validations: [],
+              generatecontrol: false, disable: false
             },
         ]
     }

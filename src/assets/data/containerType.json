@@ -1,0 +1,98 @@
+[
+    {
+        "name": "20 ft Standard",
+        "value": "20 ft Standard"
+    },
+    {
+        "name": "40 ft Standard",
+        "value": "40 ft Standard"
+    },
+    {
+        "name": "40 ft High Cube",
+        "value": "40 ft High Cube"
+    },
+    {
+        "name": "45 ft High Cube",
+        "value": "45 ft High Cube"
+    },
+    {
+        "name": "20 ft Reefer",
+        "value": "20 ft Reefer"
+    },
+    {
+        "name": "40 ft Reefer",
+        "value": "40 ft Reefer"
+    },
+    {
+        "name": "40 ft High Cube Reefer",
+        "value": "40 ft High Cube Reefer"
+    },
+    {
+        "name": "20 ft Open Top",
+        "value": "20 ft Open Top"
+    },
+    {
+        "name": "40 ft Open Top",
+        "value": "40 ft Open Top"
+    },
+    {
+        "name": "20 ft Flat Rack",
+        "value": "20 ft Flat Rack"
+    },
+    {
+        "name": "40 ft Flat Rack",
+        "value": "40 ft Flat Rack"
+    },
+    {
+        "name": "20 ft Platform",
+        "value": "20 ft Platform"
+    },
+    {
+        "name": "40 ft Platform",
+        "value": "40 ft Platform"
+    },
+    {
+        "name": "20 ft Tank",
+        "value": "20 ft Tank"
+    },
+    {
+        "name": "20 ft Side Open",
+        "value": "20 ft Side Open"
+    },
+    {
+        "name": "40 ft Side Open",
+        "value": "40 ft Side Open"
+    },
+    {
+        "name": "20 ft Insulated",
+        "value": "20 ft Insulated"
+    },
+    {
+        "name": "20 ft Hardtop",
+        "value": "20 ft Hardtop"
+    },
+    {
+        "name": "40 ft Hardtop",
+        "value": "40 ft Hardtop"
+    },
+    {
+        "name": "20 ft Ventilated",
+        "value": "20 ft Ventilated"
+    },
+    {
+        "name": "20 ft Tunnel",
+        "value": "20 ft Tunnel"
+    },
+    {
+        "name": "40 ft Tunnel",
+        "value": "40 ft Tunnel"
+    },
+    {
+        "name": "Bulktainers",
+        "value": "Bulktainers"
+    },
+    {
+        "name": "Swap Bodies",
+        "value": "Swap Bodies"
+    }
+]

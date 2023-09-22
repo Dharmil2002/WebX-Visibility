@@ -15,10 +15,14 @@
                                                 [calendarHeaderComponent]="CustomeDatePickerComponent"
                                                 [touchUi]="isTouchUIActivated"></mat-date-range-picker>
                                 </mat-form-field>
-                                <button type="button" (click)="get()"
+                                <button type="button" (click)="get('')"
                                         class="btn btn-outline-success btn-border-radius msl-2 mb-2">
                                         <i-feather style="width: 20px;height: 20px;" name="search"></i-feather>
                                 </button>
+                                <button type="button"(click)="openFilterDialog()"
+                                class="btn btn-warning btn-border-radius waves-effect msl-2  mb-2">
+                                <i-feather style="width: 24px;height: 24px;color:white" name="filter"></i-feather>
+                            </button>
                         </div>
                 </div>
         </form>

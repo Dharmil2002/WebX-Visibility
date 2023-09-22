@@ -4,6 +4,7 @@ import { Router } from "@angular/router";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { DomSanitizer } from "@angular/platform-browser";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-signin",
@@ -16,6 +17,7 @@ export class SigninComponent
   submitted = false;
   MenuDetails: any;
   error = "";
+  Islogin = false;
   IsRegister = true;
   Menudetailarray: any;
   CompanyLogo;
@@ -26,17 +28,17 @@ export class SigninComponent
     private router: Router,
     private authService: AuthService,
     private sanitizer: DomSanitizer,
+    private storageService: StorageService
   ) {
     super();
   }
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
-      companyCode: ['', Validators.required],
-      Username: [
+      username: [
         "",
         [Validators.required],
       ],
-      Branch: ["", Validators.required],
+      password: ["", Validators.required],
     });
   }
   get f() {
@@ -49,18 +51,54 @@ export class SigninComponent
   }
 
   onSubmit() {
-    this.submitted=true;
+    debugger
+    this.Islogin = true;
+    this.submitted = true;
+    this.error = "";
     if (this.loginForm.invalid) {
       this.error = "Username and Password not valid !";
+      this.Islogin = false;
       return;
+    } else {
+     
+      this.subs.sink = this.authService.login(this.loginForm.value).subscribe(
+        (res) => {
+          if (res) {
+            debugger
+            const token = this.authService.currentUserValue.tokens.access.token;
+            if (token) {
+              this.Islogin = true;
+              this.router.navigate(["/dashboard/GlobeDashboardPage"]);
+            }
+            else{
+              this.Islogin = false;
+              this.error = "Something Is Wrong Please Try Again Later";
+            }
+          } else {
+            this.error = "Something Is Wrong";
+            this.Islogin = false;
+          }
+        },
+        (error) => {
+          this.error = error;
+          this.Islogin = false;
+          this.submitted = false;
+        }
+      );
     }
-    else{
-    localStorage.setItem("companyCode", this.loginForm.value.companyCode)
-    localStorage.setItem("Username", this.loginForm.value.Username);
-    localStorage.setItem("Branch", this.loginForm.value.Branch);
-    localStorage.setItem("Mode","Export");
-    this.router.navigate(["/dashboard/GlobeDashboardPage"]);
-    }
+    // debugger
+    // this.submitted=true;
+    // if (this.loginForm.invalid) {
+    //   this.error = "Username and Password not valid !";
+    //   return;
+    // }
+    // else{
+    // localStorage.setItem("companyCode", this.loginForm.value.companyCode)
+    // localStorage.setItem("Username", this.loginForm.value.Username);
+    // localStorage.setItem("Branch", this.loginForm.value.Branch);
+    // localStorage.setItem("Mode","Export");
+    // this.router.navigate(["/dashboard/GlobeDashboardPage"]);
+    // }
   }
 
 }

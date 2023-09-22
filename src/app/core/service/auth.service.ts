@@ -12,6 +12,7 @@ import { User } from "../models/user";
 import { environment } from "src/environments/environment";
 import { map} from "rxjs/operators";
 import { APICacheService } from "./API-cache.service";
+import { StorageService } from "./storage.service";
 
 @Injectable({
   providedIn: "root",
@@ -23,7 +24,8 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private _jwt: JwtHelperService,
-    private _APICacheService: APICacheService
+    private _APICacheService: APICacheService,
+    private storageService: StorageService
   ) {
     this.currentUserSubject = new BehaviorSubject<User>(
       JSON.parse(localStorage.getItem("currentUser"))
@@ -44,7 +46,7 @@ export class AuthService {
     this.FilterObs$.next(Filter);
   }
 
-  public get currentUserValue(): User {
+  public get currentUserValue(): any {
     return this.currentUserSubject.value;
   }
   GetCompany(CompanyCode) {
@@ -55,18 +57,32 @@ export class AuthService {
 
     return this.http.post<any>(`${environment.localHost}Master/Menu`, companyDetails)
   }
- 
   login(UserRequest) {
-
     return this.http
-      .post<any>(`${environment.localHost}Authenticate/GetToken`, UserRequest)
+      .post<any>(
+        `${environment.AuthAPIGetway}login`,
+        UserRequest
+      )
       .pipe(
-        map((user) => {
-          localStorage.setItem("currentUser", JSON.stringify(user));
-          localStorage.setItem("UserName", user.userName);
-          localStorage.setItem("branch", user.branch);
-          this.currentUserSubject.next(user);
-          return user;
+        map(async (user:any) => {
+          if (user.tokens) {
+
+            let userdetails = this._jwt.decodeToken(user.tokens.access.token);
+            this.storageService.setItem("currentUser", JSON.stringify(user));
+            this.storageService.setItem("UserName", user.usr.name);
+            this.storageService.setItem("Branch",user.usr.multiLocation[0]);
+            this.storageService.setItem("companyCode",user.usr.companyCode);
+            this.storageService.setItem("Mode","Export");
+            this.storageService.setItem("CurrentBranchCode", user.usr.multiLocation[0]);
+            this.storageService.setItem("userLocations", user.usr.multiLocation);
+            this.storageService.setItem("token",user.tokens.access.token);
+            this.storageService.setItem("refreshToken",user.tokens.refresh.token);
+            this.storageService.setItem("role", user.usr.role);
+            localStorage.setItem("Mode","Export");
+            localStorage.setItem("companyCode",user.usr.companyCode);
+            this.currentUserSubject.next(user);
+            return user;
+          }
         })
       );
   }

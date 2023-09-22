@@ -41,8 +41,34 @@ export class ContainerControl {
                 },
             },
             {
+                name: 'containerType',
+                label: "Container Type",
+                placeholder: "Container Type",
+                type: 'dropdown',
+                value: '',
+                generatecontrol: true, disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Container Type is required"
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }, {
+                        name: "autocomplete",
+                    },
+                ],
+                additionalData: {
+                    showNameAndValue: false
+                },
+                functions: {
+                    onOptionSelect: "checkIfContainerTypeExists",
+                },
+            },
+            {
                 name: 'loadCapacity',
-                label: 'Load Capacity',
+                label: 'Load Capacity(Ton)',
                 placeholder: 'Enter Load Capacity',
                 type: 'number',
                 value: containerMasterTable?.loadCapacity,

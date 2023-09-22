@@ -4,12 +4,13 @@ import { DashboardLayoutComponent } from "./layout/app-layout/dashboard-layout/d
 import { MainLayoutComponent } from "./layout/app-layout/main-layout/main-layout.component";
 import { NgModule } from "@angular/core";
 import { Page404Component } from "./authentication/page404/page404.component";
+import { AuthGuard } from "./core/guard/auth.guard";
 
 const routes: Routes = [
   {
     path: "",
     component: MainLayoutComponent,
-    //canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     children: [
       { path: "", redirectTo: "/authentication/signin", pathMatch: "full" },
       {

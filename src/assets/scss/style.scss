@@ -596,7 +596,7 @@ a {
   transform: translateY(-50%);
 }
 /* Apply styles when the screen width is less than or equal to 768px and the zoom level is greater than 1x */
-@media screen and (min-width: 768px) and (min-resolution: 1.0dppx) {
+@media screen and (min-width: 768px) and (min-resolution: 1.1dppx) {
    /* CSS styles to apply when the screen width is 872 pixels or wider */
   /* Add your styles here */
   .custom-input {

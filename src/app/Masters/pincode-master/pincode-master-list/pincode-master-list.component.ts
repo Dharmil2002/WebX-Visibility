@@ -72,9 +72,7 @@ export class PincodeMasterListComponent implements OnInit {
             active: "Pincode Master",
         },
     ];
-    pincode: any;
-    cityRes: any;
-    pincodeRes: any;
+
     isUpdate: any;
     stateData: any;
     cityData: any;
@@ -184,7 +182,7 @@ export class PincodeMasterListComponent implements OnInit {
         const res = await this.masterService.masterPost("generic/get", req).toPromise()
         // Assuming the API response contains an array named 'pincodeList'
         const pincode = res.data.map(element => ({
-            name: element.pincode,
+            name: element.pincode.toString(),
             value: element._id
         }));
         this.filter.Filter(
@@ -209,49 +207,51 @@ export class PincodeMasterListComponent implements OnInit {
         }
     }
 
+    //#region To get Pincode list
     async save() {
-        this.stateRes = this.pincodeTableForm.value.state.name; //the name property holds the state name
-        this.cityRes = this.pincodeTableForm.value.city.name; //the name property holds the city name
-        this.pincodeRes = this.pincodeTableForm.value.pincode.value;
-
-        let req = {
+        // Get values from the form
+        const stateName = this.pincodeTableForm.value.state.name;
+        const cityName = this.pincodeTableForm.value.city.name;
+        const pincodeName = parseInt(this.pincodeTableForm.value.pincode.name);
+        
+        // Prepare the request object for fetching data
+        const request = {
             companyCode: this.companyCode,
             collectionName: "pincode_detail",
             filter: {}
         };
-        const res = await this.masterService.masterPost("generic/get", req).toPromise()
-        if (res && res.data && res.data.length > 0 &&
-            res.data[0].hasOwnProperty('state') &&
-            res.data[0].hasOwnProperty('city')
-            || res.data[0].hasOwnProperty('pincode')) {
-            // Filter out objects with the specific state and city
-            const dataWithSpecificStateAndCity = res.data.filter(obj => obj.state === this.stateRes && obj.city === this.cityRes || obj.pincode === this.pincodeRes);
 
-            if (dataWithSpecificStateAndCity.length > 0) {
-                // Generate srno for each object in the filtered array
-                const dataWithSrno = dataWithSpecificStateAndCity.map((obj, index) => {
-                    return {
-                        ...obj,
-                        srNo: index + 1
-                    };
-                });
+        try {
+            // Fetch data from the server
+            const response = await this.masterService.masterPost("generic/get", request).toPromise();
 
-                this.csv = dataWithSrno;
-                this.tableLoad = false;
-            } else {
-                this.ObjSnackBarUtility.showNotification(
-                    'snackbar-danger',
-                    'No Data Found...!!!',
-                    'bottom',
-                    'center'
-                );
-                // No data found for the selected state and city
-                this.csv = []; // Empty the csv array to clear any previous data
-                this.tableLoad = false;
+            // Check if the response contains data
+            if (response && response.data && response.data.length > 0) {
+                // Filter the data based on state, city, and pincode
+                const filteredData = response.data.filter(obj => obj.state === stateName && obj.city === cityName.toUpperCase() || obj.pincode === pincodeName);
+
+                if (filteredData.length > 0) {
+                    // Add serial numbers to the filtered data
+                    const dataWithSrno = filteredData.map((obj, index) => ({ ...obj, srNo: index + 1 }));
+                    this.csv = dataWithSrno;
+                    this.tableLoad = false;
+                } else {
+                    // Show a notification if no data matches the criteria
+                    this.ObjSnackBarUtility.showNotification(
+                        'snackbar-danger',
+                        'No Data Found...!!!',
+                        'bottom',
+                        'center'
+                    );
+                    this.csv = [];
+                    this.tableLoad = false;
+                }
             }
+        } catch (error) {
+            console.error("Error fetching data:", error);
         }
-
     }
+    //#endregion
 
     IsActiveFuntion(det) {
         let id = det._id;

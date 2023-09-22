@@ -50,6 +50,7 @@ import { ConsignmentEntryFormComponent } from './consignment-entry-form/consignm
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { AddMarketVehicleComponent } from './add-market-vehicle/add-market-vehicle.component';
 import { FilterUtils } from "../Utility/dropdownFilter";
+import { FilterBillingComponent } from './pending-billing/filter-billing/filter-billing.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -81,7 +82,8 @@ import { FilterUtils } from "../Utility/dropdownFilter";
     ErrorHandlingViewComponent,
     PrqListComponent,
     ConsignmentEntryFormComponent,
-    AddMarketVehicleComponent
+    AddMarketVehicleComponent,
+    FilterBillingComponent
     
   ],
   imports: [

@@ -129,7 +129,7 @@
         *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
         <mat-label class="fontbold">{{formItem.label}}</mat-label>
         <mat-select [formControlName]="formItem.additionalData.support" placeholder={{formItem.placeholder}}
-          [multiple]="true" #singleSelect>
+          [multiple]="true" #singleSelect (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelect , eventArgs: $event })">
           <mat-option>
             <ngx-mat-select-search formControlName={{formItem.name}} placeholderLabel={{formItem.placeholder}}
               noEntriesFoundLabel="'no matching found'" [showToggleAllCheckbox]="true"
@@ -137,7 +137,8 @@
               [toggleAllCheckboxIndeterminate]="formItem.additionalData.isIndeterminate"
               [toggleAllCheckboxChecked]="formItem.additionalData.isChecked"
               (toggleAll)="functionCalled({field :formItem , functionName:formItem.functions?.onToggleAll  , eventArgs: $event})"
-              (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })">
+              (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })"
+              >
               <mat-icon ngxMatSelectSearchClear>delete</mat-icon>
             </ngx-mat-select-search>
           </mat-option>

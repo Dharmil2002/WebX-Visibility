@@ -4,7 +4,11 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-date-picker/custome-date-picker.component';
 import { DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
+import { ReplaySubject } from 'rxjs';
+import { menuAccesDropdown } from 'src/app/Models/Comman Model/CommonModel';
+import { MatDialog } from '@angular/material/dialog';
+import { FilterBillingComponent } from './filter-billing/filter-billing.component';
+
 
 @Component({
   selector: 'app-pending-billing',
@@ -23,6 +27,8 @@ export class PendingBillingComponent implements OnInit {
   csvFileName: string; // name of the csv file, when data is downloaded , we can also use function to generate filenames, based on dateTime.
   menuItemflag: boolean = true;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
+  public filteredMultiLocation: ReplaySubject<menuAccesDropdown[]> =
+    new ReplaySubject<menuAccesDropdown[]>(1);
   orgBranch: string = localStorage.getItem("Branch");
   companyCode: number = parseInt(localStorage.getItem("companyCode"));
   dynamicControls = {
@@ -80,16 +86,20 @@ export class PendingBillingComponent implements OnInit {
   constructor(
     private masterService: MasterService,  // Inject MasterService for data retrieval
     private datePipe: DatePipe,            // Inject DatePipe for date formatting
+    private matDialog: MatDialog,
     private DashboardFilterPage: FormBuilder, // Inject FormBuilder for form controls
   ) {
 
-  
-    this.get();
+
+    this.get("");
     this.range = this.DashboardFilterPage.group({
       start: new FormControl(),  // Create a form control for start date
-      end: new FormControl(),    // Create a form control for end date
+      end: new FormControl()   // Create a form control for end date
+
     });
+
   }
+
 
   ngOnInit(): void {
     const now = new Date();
@@ -104,20 +114,30 @@ export class PendingBillingComponent implements OnInit {
   }
 
 
-  async get() {
+  async get(data) {
     this.tableLoad = true;  // Set tableLoad to true while fetching data
-   // Fetch billing details asynchronously
-   this.billingDetail = await pendingbilling(this.masterService);
+    // Fetch billing details asynchronously
+    this.billingDetail = await pendingbilling(this.masterService);
     // Format the start and end dates using DatePipe
     const startDate = this.datePipe.transform(this.range.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     const endDate = this.datePipe.transform(this.range.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     // Filter billingDetail based on date range
     const filteredRecords = this.billingDetail.filter(record => {
+   
       const pickUpTime = new Date(record.pickUpTime);
-      return startDate <= pickUpTime.toISOString() && pickUpTime.toISOString() < endDate;
-    });
+      const isDateRangeValid = startDate <= pickUpTime.toISOString() && pickUpTime.toISOString() < endDate;
 
+      // Check the condition for data.customer
+      const isCustomerMatch = !data.customer||data.customer.some(customer => customer === record.billingParty);
+     
+      // Check the condition for data.multiLocation
+      const isMultiLocationMatch =
+        !data.bookLoc || data.bookLoc.some(location => location === record.prqBranch);
+
+      // Combine conditions
+      return isDateRangeValid && (isCustomerMatch || isMultiLocationMatch);
+    });
     // Group and calculate data for the filtered records
     const groupedData = groupAndCalculate(filteredRecords, 'billingParty', 'contractAmt');
 
@@ -126,4 +146,20 @@ export class PendingBillingComponent implements OnInit {
     this.tableLoad = false;
   }
 
+
+  openFilterDialog() {
+    const dialogRef = this.matDialog.open(FilterBillingComponent, {
+      width: "60%",
+      position: {
+        top: "20px",
+      },
+      disableClose: true,
+      data: "",
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+        this.get(result);
+      }
+    });
+  }
 }

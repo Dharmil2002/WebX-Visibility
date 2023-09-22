@@ -1,6 +1,6 @@
 export class PincodeMaster {
   pincode: string
-  pincodeCategory: number
+  category: string
   area: string
   serviceable: string
   cityname: string
@@ -8,12 +8,12 @@ export class PincodeMaster {
   activeFlag: string;
   statename: any;
   isActive: any;
-    _id: any
+  _id: any
 
   constructor(PincodeMaster) {
     {
       this.pincode = PincodeMaster.pincode || '';
-      this.pincodeCategory = PincodeMaster.pincodeCategory || '';
+      this.category = PincodeMaster.category || '';
       this.area = PincodeMaster.area || '';
       this.serviceable = PincodeMaster.serviceable || '';
       this.stateName = PincodeMaster.stateName || '';

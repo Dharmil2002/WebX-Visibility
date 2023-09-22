@@ -10,7 +10,7 @@ export class UserControl {
         label: "User ID",
         placeholder: "Enter User ID",
         type: "text",
-        value: isUpdate ? UserTable.userId : "System Generated",//UserTable.userId,//UserTable.userId,
+        value: isUpdate ? UserTable.userId : "System Generated", //UserTable.userId,//UserTable.userId,
         generatecontrol: true,
         disable: true,
         Validations: [
@@ -25,8 +25,8 @@ export class UserControl {
           },
         ],
         functions: {
-          onChange: 'GetUserDetails',
-        }
+          onChange: "GetUserDetails",
+        },
       },
       {
         name: "name",
@@ -152,11 +152,11 @@ export class UserControl {
       {
         name: "gender",
         label: "Gender",
-        placeholder: 'Search And Select Gender',
+        placeholder: "Search And Select Gender",
         type: "Staticdropdown",
         value: [
-          { value: 'M', name: 'Male' },
-          { value: 'F', name: 'Female' }
+          { value: "M", name: "Male" },
+          { value: "F", name: "Female" },
         ],
         Validations: [
           {
@@ -165,13 +165,21 @@ export class UserControl {
           },
         ],
         generatecontrol: true,
-        disable: false
+        disable: false,
       },
       {
-        name: 'dateOfBirth', label: 'Birth date', placeholder: 'Birth date', type: 'date', value: UserTable.dateOfBirth, filterOptions: '', autocomplete: '', displaywith: '',
-        generatecontrol: true, disable: false, Validations: [],
-        additionalData: {
-        }
+        name: "dateOfBirth",
+        label: "Birth date",
+        placeholder: "Birth date",
+        type: "date",
+        value: UserTable.dateOfBirth,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {},
       },
       {
         name: "dateOfJoining",
@@ -181,15 +189,23 @@ export class UserControl {
         value: UserTable.dateOfJoining,
         generatecontrol: true,
         disable: false,
-        Validations: []
+        Validations: [],
       },
       {
-        name: 'branchCode', label: "Location", placeholder: "Select Location", type: 'dropdown',
-        value: UserTable.branchCode, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: "branchCode",
+        label: "Location",
+        placeholder: "Select Location",
+        type: "dropdown",
+        value: UserTable.branchCode,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
         Validations: [
           {
             name: "required",
-            message: "Location is required.."
+            message: "Location is required..",
           },
           {
             name: "autocomplete",
@@ -197,39 +213,49 @@ export class UserControl {
           {
             name: "invalidAutocomplete",
             message: "Choose proper value",
-          }
+          },
         ],
         additionalData: {
-          showNameAndValue: false
-        }
+          showNameAndValue: true,
+        },
       },
       {
-        name: 'multiLocation',
-        label: 'Multi Locations Access',
-        placeholder: 'Multi Locations Access',
-        type: 'multiselect',
-        value: '',
+        name: "multiLocation",
+        label: "Multi Locations Access",
+        placeholder: "Multi Locations Access",
+        type: "multiselect",
+        value: "",
         Validations: [],
         additionalData: {
-         
           isIndeterminate: false,
           isChecked: false,
           support: "userLocationscontrolHandler",
-          showNameAndValue: false,
-          Validations: [{
-            name: "",
-            message: ""
-          }]
+          showNameAndValue: true,
+          Validations: [
+            {
+              name: "",
+              message: "",
+            },
+          ],
         },
-        generatecontrol: true, disable: false
+        generatecontrol: true,
+        disable: false,
       },
       {
-        name: 'userStatus', label: "User Status", placeholder: "Select User Status", type: 'dropdown',
-        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: "userStatus",
+        label: "User Status",
+        placeholder: "Select User Status",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
         Validations: [
           {
             name: "required",
-            message: "User Status is required.."
+            message: "User Status is required..",
           },
           {
             name: "autocomplete",
@@ -237,19 +263,27 @@ export class UserControl {
           {
             name: "invalidAutocomplete",
             message: "Choose proper value",
-          }
+          },
         ],
         additionalData: {
-          showNameAndValue: false
-        }
+          showNameAndValue: false,
+        },
       },
       {
-        name: 'userType', label: "User Type", placeholder: "Select User Type", type: 'dropdown',
-        value: UserTable.userType, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: "userType",
+        label: "User Type",
+        placeholder: "Select User Type",
+        type: "dropdown",
+        value: UserTable.userType,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
         Validations: [
           {
             name: "required",
-            message: "User Type is required.."
+            message: "User Type is required..",
           },
           {
             name: "autocomplete",
@@ -257,19 +291,27 @@ export class UserControl {
           {
             name: "invalidAutocomplete",
             message: "Choose proper value",
-          }
+          },
         ],
         additionalData: {
-          showNameAndValue: false
-        }
+          showNameAndValue: false,
+        },
       },
       {
-        name: 'managerId', label: "Manager Id", placeholder: "Select Manager Id", type: 'dropdown',
-        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: "managerId",
+        label: "Manager Id",
+        placeholder: "Select Manager Id",
+        type: "dropdown",
+        value: UserTable.managerId,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
         Validations: [
           {
             name: "required",
-            message: "Manager Id is required.."
+            message: "Manager Id is required..",
           },
           {
             name: "autocomplete",
@@ -277,19 +319,27 @@ export class UserControl {
           {
             name: "invalidAutocomplete",
             message: "Choose proper value",
-          }
+          },
         ],
         additionalData: {
-          showNameAndValue: false
-        }
+          showNameAndValue: true,
+        },
       },
       {
-        name: 'country', label: "Country Code", placeholder: "Country Code", type: 'dropdown',
-        value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: "country",
+        label: "Country Code",
+        placeholder: "Country Code",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
         Validations: [
           {
             name: "required",
-            message: "Country Code is required.."
+            message: "Country Code is required..",
           },
           {
             name: "autocomplete",
@@ -297,11 +347,11 @@ export class UserControl {
           {
             name: "invalidAutocomplete",
             message: "Choose proper value",
-          }
+          },
         ],
         additionalData: {
-          showNameAndValue: false
-        }
+          showNameAndValue: false,
+        },
       },
       {
         name: "mobileNo",
@@ -319,8 +369,7 @@ export class UserControl {
           {
             name: "pattern",
             message: "Please enter 6 to 15 digit mobile number",
-            pattern:
-              "^[0-9]{6,15}$",
+            pattern: "^[0-9]{6,15}$",
           },
         ],
       },
@@ -335,24 +384,32 @@ export class UserControl {
         Validations: [
           {
             name: "required",
-            message: "Email is required"
-          }
-          , {
+            message: "Email is required",
+          },
+          {
             name: "email",
             message: "Enter Valid Email ID!",
-          }
+          },
         ],
         functions: {
-          onChange: 'GetEmailDetails',
-        }
+          onChange: "GetEmailDetails",
+        },
       },
       {
-        name: 'role', label: "User Role", placeholder: "Select User Role", type: 'dropdown',
-        value: UserTable.roleId, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        name: "role",
+        label: "User Role",
+        placeholder: "Select User Role",
+        type: "dropdown",
+        value: UserTable.roleId,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
         Validations: [
           {
             name: "required",
-            message: "User Role is required.."
+            message: "User Role is required..",
           },
           {
             name: "autocomplete",
@@ -360,11 +417,11 @@ export class UserControl {
           {
             name: "invalidAutocomplete",
             message: "Choose proper value",
-          }
+          },
         ],
         additionalData: {
-          showNameAndValue: false
-        }
+          showNameAndValue: false,
+        },
       },
       {
         name: "residentialAddress",
@@ -392,22 +449,22 @@ export class UserControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [
-
-        ],
+        Validations: [],
         functions: {
-          onToggleAll: 'toggleSelectAll'
+          onToggleAll: "toggleSelectAll",
         },
         additionalData: {
           isIndeterminate: false,
           isChecked: false,
           support: "division",
           showNameAndValue: false,
-          Validations: [{
-            name: "",
-            message: ""
-          }]
-        }
+          Validations: [
+            {
+              name: "",
+              message: "",
+            },
+          ],
+        },
       },
       {
         name: "isActive",
@@ -420,52 +477,66 @@ export class UserControl {
         Validations: [],
       },
       {
-        name: 'division',
-        label: 'Multi Division Access',
-        placeholder: 'Multi Division Access',
-        type: '',
-        value: '',
+        name: "division",
+        label: "Multi Division Access",
+        placeholder: "Multi Division Access",
+        type: "",
+        value: "",
         Validations: [
           {
             name: "required",
             message: "Multi Division Access is Required...!",
-          }
-          , {
+          },
+          {
             name: "invalidAutocompleteObject",
             message: "Choose proper value",
-          }
-          , {
+          },
+          {
             name: "autocomplete",
-          }
+          },
         ],
-        generatecontrol: false, disable: false
-       },
+        generatecontrol: false,
+        disable: false,
+      },
       {
-        name: 'CompanyCode',
-        label: 'Company Code',
-        placeholder: 'Company Code',
-        type: 'text',
+        name: "CompanyCode",
+        label: "Company Code",
+        placeholder: "Company Code",
+        type: "text",
         value: localStorage.getItem("CompanyCode"),
         Validations: [],
-        generatecontrol: false, disable: false
+        generatecontrol: false,
+        disable: false,
       },
       {
-        name: 'entryBy',
-        label: 'Entry By',
-        placeholder: 'Entry By',
-        type: 'text',
-        value: '',
+        name: "entryBy",
+        label: "Entry By",
+        placeholder: "Entry By",
+        type: "text",
+        value: "",
         Validations: [],
-        generatecontrol: false, disable: false
+        generatecontrol: false,
+        disable: false,
       },
       {
-        name: 'isUpdate',
-        label: 'IsUpdate',
-        placeholder: 'IsUpdate',
-        type: 'text',
+        name: "isUpdate",
+        label: "IsUpdate",
+        placeholder: "IsUpdate",
+        type: "text",
         value: false,
         Validations: [],
-        generatecontrol: false, disable: false
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "companyCode",
+        label: "Company Code",
+        placeholder: "Company Code",
+        type: "text",
+        value: localStorage.getItem("companyCode"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
       },
 
       //   ---------------Add support Controllers at last -----------------------
@@ -484,7 +555,7 @@ export class UserControl {
             name: "",
           },
         ],
-       },
+      },
       {
         name: "userLocationscontrolHandler",
         label: "Multi Locations Access",
@@ -500,35 +571,33 @@ export class UserControl {
           {
             name: "required",
             message: "Multi Locations Access is Required...!",
-          }
-          , {
+          },
+          {
             name: "invalidAutocompleteObject",
             message: "Choose proper value",
           },
           {
             name: "autocomplete",
-          }
+          },
         ],
         functions: {
-          onToggleAll: 'toggleSelectAll',
+          onToggleAll: "toggleSelectAll",
         },
       },
       {
-        name: 'entryDate',
-        label: 'Entry Date',
-        placeholder: 'Select Entry Date',
-        type: 'date',
+        name: "entryDate",
+        label: "Entry Date",
+        placeholder: "Select Entry Date",
+        type: "date",
         value: new Date(), // Set the value to the current date
-        filterOptions: '',
-        autocomplete: '',
-        displaywith: '',
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
         Validations: [],
         generatecontrol: false,
-        disable: false
-      }
-      
+        disable: false,
+      },
     ];
-   
   }
   getFormControlsUser() {
     return this.UserControlArray;

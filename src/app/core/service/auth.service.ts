@@ -1,8 +1,10 @@
 import {
   BehaviorSubject,
   Observable,
+  ReplaySubject,
   of,
   throwError,
+  timer,
 } from "rxjs";
 
 import { HttpClient } from "@angular/common/http";
@@ -10,7 +12,7 @@ import { Injectable } from "@angular/core";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { User } from "../models/user";
 import { environment } from "src/environments/environment";
-import { map} from "rxjs/operators";
+import { map, share} from "rxjs/operators";
 import { APICacheService } from "./API-cache.service";
 import { StorageService } from "./storage.service";
 
@@ -87,7 +89,32 @@ export class AuthService {
       );
   }
  
- 
+  refreshtoken() {
+    let request = {
+      "token": this.storageService.getItem('token'),
+      "refreshToken": this.storageService.getItem('refreshToken'),
+
+    }
+    return this.http
+      .post<any>(
+        `${environment.AuthAPIGetway}refresh-tokens`,
+        request
+      )
+      .pipe(
+        share({
+          connector: () => new ReplaySubject(1),
+          resetOnComplete: () => timer(1000),
+        }),
+        map((user) => {
+          this.storageService.setItem("token", user.token);
+          this.storageService.setItem("refreshToken", user.refreshToken);
+          this.currentUserSubject.next(user);
+          return user;
+        })
+      );
+  }
+
+  
   GetConnectionInfo() {
     return this.http.post(
       environment.SignalRAPIGetway + "AlertSignalRInfo",

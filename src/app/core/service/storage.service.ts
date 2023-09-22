@@ -15,12 +15,24 @@ export class StorageService {
     this.storage = useSessionStorage ? sessionStorage : localStorage;
     this.storage.setItem(key, value);
   }
-
+  
   getItem<T>(key: string, useSessionStorage = false): T | null {
     this.storage = useSessionStorage ? sessionStorage : localStorage;
     const item = this.storage.getItem(key);
-    return item !== null ? (item as T) : null;
+  
+    if (item !== null) {
+      try {
+        const parsedItem = JSON.parse(item) as T;
+        return parsedItem;
+      } catch (error) {
+        console.error("Error parsing item:", error);
+        return null;
+      }
+    }
+  
+    return null;
   }
+  
 
   removeItem(key: string, useSessionStorage = false): void {
     this.storage = useSessionStorage ? sessionStorage : localStorage;

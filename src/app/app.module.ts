@@ -87,7 +87,7 @@ export function createTranslateLoader(http: HttpClient): any {
     JwtModule.forRoot({
       config: {
         tokenGetter: (request) => {
-          return localStorage.getItem("auth-token");
+          return localStorage.getItem("token");
         },
         disallowedRoutes: [environment.AuthAPIGetway + "RefreshToken"],
       },

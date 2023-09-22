@@ -7,7 +7,7 @@ export const environment = {
   apiUrl: "http://localhost:4200",
   APIGetway:
     "https://velocity-services-vendorportal-beta.azurewebsites.net/api/VendorPortal/VendorDashboard/",
-  AuthAPIGetway: "https://greenxpress-beta-api.azurewebsites.net/api/Auth/",
+  AuthAPIGetway: "https://webx-tms-api.azurewebsites.net/v1/auth/",
   MasterAPIGetway: "https://greenxpress-beta-api.azurewebsites.net/api/Master/",
   SignalRAPIGetway: "https://greenxpress-beta-api.azurewebsites.net/api/",
   TripApiGetway: "https://greenxpress-beta-api.azurewebsites.net/api/",

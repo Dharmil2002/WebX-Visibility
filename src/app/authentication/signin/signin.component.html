@@ -7,6 +7,16 @@
             <div class="col-lg-9">
               <div>
                 <div class="text-center">
+                  <div class="preloader pl-size-sm" *ngIf="Islogin==true">
+                    <div class="spinner-layer pl-purple">
+                      <div class="circle-clipper left">
+                        <div class="circle"></div>
+                      </div>
+                      <div class="circle-clipper right">
+                        <div class="circle"></div>
+                      </div>
+                    </div>
+                  </div>
                   <!-- <div>
                     <a routerLink="" class="logo-full"><img src="assets/images/banner/DMS.jpg" alt="logo-full"></a>
                   </div> -->
@@ -25,26 +35,22 @@
                   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                     <div *ngIf="error" class="alert alert-danger mb-3 mt-0">{{error}}</div>
                     <div class="form-group auth-form-group mb-4">
-                      <mat-icon matSuffix class="auth-page-icon">Company Code</mat-icon>
-                      <input type="text" formControlName="companyCode" class="form-control auth-control"
-                        id="companyCode" placeholder="Company Code" [ngClass]="{ 'is-invalid': submitted && f.companyCode.errors }">
-                      <div *ngIf="submitted && f.companyCode.errors" class="invalid-feedback">
-                          Company Code is required
-                      </div>
-                    </div>
-                    <div class="form-group auth-form-group mb-4">
                       <mat-icon matSuffix class="auth-page-icon">Username</mat-icon>
-                      <input type="Username" formControlName="Username"  class="form-control auth-control" id="Username"
-                        placeholder="User Name"  [ngClass]="{ 'is-invalid': submitted && f.Username.errors }">
-                      <div *ngIf="submitted && f.Username.errors" class="invalid-feedback">Username is required
+                      <input type="Username" formControlName="username"  class="form-control auth-control" id="username"
+                        placeholder="User Name"  [ngClass]="{ 'is-invalid': submitted && f.username.errors }">
+                      <div *ngIf="submitted && f.username.errors" class="invalid-feedback">Username is required
                       </div>
                     </div>
                     <div class="form-group auth-form-group mb-4">
-                      <mat-icon  matSuffix class="auth-page-icon" fontIcon="home"></mat-icon>
-                      <input type="text" formControlName="Branch"  class="form-control auth-control" id="Branch"
-                        [ngClass]="{ 'is-invalid': submitted && f.Branch.errors }" placeholder="Branch" />
-                      <div *ngIf="submitted && f.Branch.errors" class="invalid-feedback">
-                        <div *ngIf="f.Branch.errors.required">Branch is required</div>
+                      <div class="input-with-icon">
+                        <mat-icon class="auth-page-icon" (click)="hide = !hide">{{ hide ? 'visibility_off' :
+                          'visibility' }}</mat-icon>
+                        <input [type]="hide ? 'password' : 'text'" formControlName="password" 
+                          class="form-control auth-control" id="password"
+                          [ngClass]="{ 'is-invalid': submitted && f.password.errors }" placeholder="Password" />
+                      </div>
+                      <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+                        <div *ngIf="f.password.errors.required">Password is required</div>
                       </div>
                     </div>
                     <div class="container-login100-form-btn">

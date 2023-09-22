@@ -172,14 +172,21 @@ export class UserControl {
         label: "Birth date",
         placeholder: "Birth date",
         type: "date",
-        value: UserTable.dateOfBirth,
+        value:  UserTable.dateOfBirth,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
-        additionalData: {},
+        additionalData: {
+          maxDate: new Date(
+            new Date().getFullYear() - 18,
+            new Date().getMonth(),
+            new Date().getDate()
+          ),
+          minDate: new Date("01 Jan 1900"),
+        },
       },
       {
         name: "dateOfJoining",
@@ -226,6 +233,9 @@ export class UserControl {
         type: "multiselect",
         value: "",
         Validations: [],
+        functions: {
+          onToggleAll: "toggleSelectAll",
+        },
         additionalData: {
           isIndeterminate: false,
           isChecked: false,
@@ -499,21 +509,21 @@ export class UserControl {
         disable: false,
       },
       {
-        name: "CompanyCode",
-        label: "Company Code",
-        placeholder: "Company Code",
+        name: "entryBy",
+        label: "Entry By",
+        placeholder: "Entry By",
         type: "text",
-        value: localStorage.getItem("CompanyCode"),
+        value: localStorage.getItem("UserName"),
         Validations: [],
         generatecontrol: false,
         disable: false,
       },
       {
-        name: "entryBy",
-        label: "Entry By",
-        placeholder: "Entry By",
+        name: "updateBy",
+        label: "Update By",
+        placeholder: "Update By",
         type: "text",
-        value: "",
+        value: localStorage.getItem("UserName"),
         Validations: [],
         generatecontrol: false,
         disable: false,
@@ -533,7 +543,7 @@ export class UserControl {
         label: "Company Code",
         placeholder: "Company Code",
         type: "text",
-        value: localStorage.getItem("companyCode"),
+        value: parseInt(localStorage.getItem("companyCode")),
         Validations: [],
         generatecontrol: false,
         disable: false,
@@ -580,9 +590,7 @@ export class UserControl {
             name: "autocomplete",
           },
         ],
-        functions: {
-          onToggleAll: "toggleSelectAll",
-        },
+
       },
       {
         name: "entryDate",

@@ -189,7 +189,7 @@ export class customerControl {
           isIndeterminate: false,
           isChecked: false,
           support: "controllingDropdown",
-          showNameAndValue: false,
+          showNameAndValue: true,
           Validations: [
             {
               name: "",
@@ -218,7 +218,7 @@ export class customerControl {
           isIndeterminate: false,
           isChecked: false,
           support: "locationDropdown",
-          showNameAndValue: false,
+          showNameAndValue: true,
           Validations: [
             {
               name: "",
@@ -246,7 +246,7 @@ export class customerControl {
           isIndeterminate: false,
           isChecked: false,
           support: "nonOdaDropdown",
-          showNameAndValue: false,
+          showNameAndValue: true,
           Validations: [
             {
               name: "",

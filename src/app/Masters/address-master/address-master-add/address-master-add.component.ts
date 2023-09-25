@@ -117,7 +117,7 @@ export class AddressMasterAddComponent implements OnInit {
       const pincodeValue = this.addressTableForm.controls['pincode'].value;
 
       // Check if pincodeValue is a valid number
-      if (!isNaN(pincodeValue) && pincodeValue.toString().length > 2) {
+      if (!isNaN(pincodeValue) && pincodeValue.toString().length >= 3) {
         const exactPincodeMatch = pincodeList.find(
           (element) => element.name === pincodeValue
         );

@@ -5,7 +5,7 @@ export class LocationControl {
   LocationDetailControl: FormControls[];
   OtherDetailsControls: FormControls[];
 
-  constructor(LocationTable: LocationMaster, IsUpdate: boolean) {
+  constructor(LocationTable: LocationMaster, isUpdate: boolean) {
     (this.LocationDetailControl = [
       {
         name: "locCode",
@@ -14,7 +14,7 @@ export class LocationControl {
         type: "text",
         value: LocationTable.locCode,
         generatecontrol: true,
-        disable: IsUpdate ? true : false,
+        disable: isUpdate ? true : false,
         Validations: [
           {
             name: "required",
@@ -38,7 +38,7 @@ export class LocationControl {
         type: "text",
         value: LocationTable.locName,
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate ? true : false,
         Validations: [
           {
             name: "required",
@@ -50,6 +50,9 @@ export class LocationControl {
             pattern: "^[a-zA-Z ]{3,25}$",
           },
         ],
+        functions: {
+          onChange: "checkLocationCodeExist",
+        },
       },
       {
         name: "locPincode",
@@ -62,6 +65,10 @@ export class LocationControl {
         Validations: [
           {
             name: "autocomplete",
+          },
+          {
+            name: "required",
+            message: " ",
           },
           {
             name: "invalidAutocompleteObject",

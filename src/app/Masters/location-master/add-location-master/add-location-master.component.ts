@@ -164,42 +164,38 @@ export class AddLocationMasterComponent implements OnInit {
     );
   }
 
+  //#region Pincode Dropdown
   getPincodeData() {
     const pincodeValue = this.locationTableForm.controls["locPincode"].value;
-    if (!isNaN(pincodeValue)) {
-      // Check if pincodeValue is a valid number
-      const pincodeList = this.pincodeDet.map((x) => ({
-        name: parseInt(x.name),
-        value: parseInt(x.value),
-      }));
 
-      const exactPincodeMatch = pincodeList.find(
-        (element) => element.name === pincodeValue.value
-      );
+    // Check if pincodeValue is a valid number and has at least 3 characters
+    if (!isNaN(pincodeValue) && pincodeValue.length >= 3) {
+      // Find an exact pincode match in the pincodeDet array
+      const exactPincodeMatch = this.pincodeDet.find(element => element.name === pincodeValue);
 
       if (!exactPincodeMatch) {
-        if (pincodeValue.toString().length > 2) {
-          const filteredPincodeDet = pincodeList.filter((element) =>
-            element.name.toString().includes(pincodeValue)
+        // Filter pincodeDet for partial matches
+        const filteredPincodeDet = this.pincodeDet.filter(element =>
+          element.name.includes(pincodeValue)
+        );
+
+        if (filteredPincodeDet.length === 0) {
+          // Show a popup indicating no data found for the given pincode
+          Swal.fire({
+            icon: "info",
+            title: "No Data Found",
+            text: `No data found for pincode ${pincodeValue}`,
+            showConfirmButton: true,
+          });
+        } else {
+          // Call the filter function with the filtered data
+          this.filter.Filter(
+            this.jsonControlLocationArray,
+            this.locationTableForm,
+            filteredPincodeDet,
+            this.pincode,
+            this.pincodeStatus
           );
-          if (filteredPincodeDet.length === 0) {
-            // Show a popup indicating no data found for the given pincode
-            Swal.fire({
-              icon: "info",
-              title: "No Data Found",
-              text: `No data found for pincode ${pincodeValue}`,
-              showConfirmButton: true,
-            });
-            return; // Exit the function
-          } else {
-            this.filter.Filter(
-              this.jsonControlLocationArray,
-              this.locationTableForm,
-              filteredPincodeDet,
-              this.pincode,
-              this.pincodeStatus
-            );
-          }
         }
       }
     }
@@ -328,24 +324,35 @@ export class AddLocationMasterComponent implements OnInit {
       },
     });
   }
+  //#region to set zone according to statename
   getStateDetails() {
-    let req = {
+    const stateName = this.locationTableForm.value.locState;
+
+    const req = {
       companyCode: this.companyCode,
-      filter: { stateName: this.locationTableForm.value.locState },
-      collectionName: "state_detail",
+      filter: { STNM: stateName },
+      collectionName: "state_master",
     };
     this.masterService.masterPost("generic/get", req).subscribe({
       next: (res: any) => {
-        this.locationTableForm.controls["locRegion"].setValue(res.data[0].zone);
-        if (res) {
-          (err) => {
-            if (err instanceof HttpErrorResponse) {
-            }
-          };
+        if (res.data && res.data.length > 0) {
+          const firstStateData = res.data[0];
+          this.locationTableForm.controls["locRegion"].setValue(firstStateData.ZN);
+        } else {
+          // Handle the case where no data is found for the given stateName
+          console.error(`No data found for state: ${stateName}`);
+        }
+      },
+      error: (err) => {
+        if (err instanceof HttpErrorResponse) {
+          // Handle HTTP error if needed
+          console.error("HTTP error:", err);
         }
       },
     });
   }
+  //#endregion
+
   /*get all Master Details*/
   async getAllMastersData() {
     try {
@@ -357,7 +364,7 @@ export class AddLocationMasterComponent implements OnInit {
       const pincodeReqBody = {
         companyCode: this.companyCode,
         filter: {},
-        collectionName: "pincode_detail",
+        collectionName: "pincode_master",
       };
       const generalReqBody = {
         companyCode: this.companyCode,
@@ -402,10 +409,9 @@ export class AddLocationMasterComponent implements OnInit {
         });
 
       this.pincodeDet = this.pincodeResponse.data
-        .filter((item) => item.isActive)
         .map((element) => ({
-          name: element.pincode,
-          value: element.pincode,
+          name: element.PIN.toString(),
+          value: element.PIN.toString(),
         }));
       // Handle the response from the server
       if (this.isUpdate) {
@@ -504,15 +510,26 @@ export class AddLocationMasterComponent implements OnInit {
       console.error("Error:", error);
     }
   }
-  setStateCityData() {
+  //#region to set state and city according to pincode
+  async setStateCityData() {
     const fetchData = this.pincodeResponse.data.find(
       (item) =>
-        item.pincode == this.locationTableForm.controls.locPincode.value.value
+        item.PIN == this.locationTableForm.controls.locPincode.value.value
     );
-    this.locationTableForm.controls.locState.setValue(fetchData.state);
-    this.locationTableForm.controls.locCity.setValue(fetchData.city);
+    const request = {
+      "companyCode": this.companyCode,
+      "collectionName": "state_master",
+      "filter": { ST: fetchData.ST }
+    };
+
+    // Fetch pincode data
+    const state = await this.masterService.masterPost('generic/get', request).toPromise();
+    this.locationTableForm.controls.locState.setValue(state.data[0].STNM)
+    this.locationTableForm.controls.locCity.setValue(fetchData.CT);
     this.getStateDetails();
   }
+  //#endregion
+
   setReportLevelData(event) {
     if (this.isUpdate) {
       const reportLevel = this.locLevelList.find(
@@ -534,8 +551,8 @@ export class AddLocationMasterComponent implements OnInit {
   setReportLocData(event) {
     const locHierachy =
       this.isUpdate &&
-      typeof event !== "object" &&
-      !event.hasOwnProperty("value")
+        typeof event !== "object" &&
+        !event.hasOwnProperty("value")
         ? event
         : event.eventArgs.option.value.value;
     const filter = this.locationResponse.data.filter(
@@ -559,35 +576,73 @@ export class AddLocationMasterComponent implements OnInit {
       this.reportStatus
     );
   }
-  checkLocationCodeExist() {
-    let req = {
-      companyCode: this.companyCode,
-      filter: {},
-      collectionName: "location_detail",
-    };
-    this.masterService.masterPost("generic/get", req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          this.locationData = res.data;
-          const count = res.data.filter(
-            (item) =>
-              item.locCode == this.locationTableForm.controls.locCode.value
-          );
-          if (count.length > 0) {
-            Swal.fire({
-              title: "Location Code already exists! Please try with another",
-              toast: true,
-              icon: "error",
-              showCloseButton: false,
-              showCancelButton: false,
-              showConfirmButton: true,
-              confirmButtonText: "OK",
-            });
-            this.locationTableForm.controls["locCode"].reset();
-          }
+  //#region to check Existing location
+  async checkLocationCodeExist() {
+    // Extract locCode and locName form controls
+    const { locCode, locName } = this.locationTableForm.controls;
+
+    let codeExists = false;
+    let nameExists = false;
+
+    try {
+      // Prepare the request to fetch location data from the API
+      const req = {
+        companyCode: this.companyCode,
+        filter: {},
+        collectionName: "location_detail",
+      };
+
+      // Make the API call to fetch location data
+      const res = await this.masterService.masterPost("generic/get", req).toPromise();
+
+      // Check if the API response contains data
+      if (res && res.data) {
+        // Store the fetched location data
+        this.locationData = res.data;
+      }
+
+      // Iterate through the fetched location data
+      for (const item of this.locationData) {
+        // Check if locCode already exists
+        if (item.locCode === locCode.value) {
+          codeExists = true;
+          break;
         }
-      },
+
+        // Check if locName already exists
+        if (item.locName === locName.value) {
+          nameExists = true;
+          break;
+        }
+      }
+
+      // If codeExists flag is true, show an error message and reset locCode
+      if (codeExists) {
+        this.showDuplicateError("Location Code");
+        locCode.reset();
+      }
+
+      // If nameExists flag is true, show an error message and reset locName
+      if (nameExists) {
+        this.showDuplicateError("Location Name");
+        locName.reset();
+      }
+    } catch (error) {
+      console.error('Error fetching location data:', error);
+    }
+  }
+
+  // Helper function to display a Swal error message
+  private showDuplicateError(fieldName: string) {
+    Swal.fire({
+      title: `${fieldName} already exists! Please try with another`,
+      toast: true,
+      icon: "error",
+      showCloseButton: false,
+      showCancelButton: false,
+      showConfirmButton: true,
+      confirmButtonText: "OK",
     });
   }
+  //#endregion
 }

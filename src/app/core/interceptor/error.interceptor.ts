@@ -44,7 +44,6 @@ export class ErrorInterceptor implements HttpInterceptor {
                   console.log("Error In Refresh Token : " + err)
                   this.isRefreshing = false;
                   this.authenticationService.logout();
-                  location.reload();
                 }
               )
             ).subscribe();

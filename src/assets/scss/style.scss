@@ -200,7 +200,7 @@ th.mat-header-cell {
     right: 0 !important;
     position: inherit !important;
   }
- 
+
   .searchsym {
     margin-top: 10px;
   }
@@ -237,6 +237,21 @@ mat-slide-toggle {
 
 .fontbold {
   font-weight: 700;
+}
+.iconcolor{
+  color: white;
+}
+
+.custom-icon{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-pedding{
+  padding-bottom: 50px;
+  padding-top: 30px;
 }
 
 .tblborder {

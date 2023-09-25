@@ -84,6 +84,10 @@ export class AddressControl {
                         name: "autocomplete",
                     },
                     {
+                        name: "required",
+                        message: " ",
+                      },
+                    {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
                     }

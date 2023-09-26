@@ -8,35 +8,16 @@ export class LocationMaster {
   locState: string;
   locRegion: string;
   locAddr: string;
-  locTelno: string;
   locCity: string;
-  locTel: string;
-  locMobile: string;
-  endMile: string;
   locZone: string;
   ownership: string;
-  dataLoc: string;
-  nextLoc: string;
-  prevLoc: string;
-  acctLoc: string;
-  locStartDt: string;
-  locEndDt: string;
-  ctbs: string;
-  computerised: any;
-  cutoff: any;
-  time: any;
   activeFlag: any;
-  defaultLoc: string;
-  nearLoc: string;
-  conLoc: string;
-  paid: string;
-  pay: string;
-  profit: string;
-  locEmail: string;
-  contLoc: string;
-  _id: string;
+ _id: string;
   reportLevel: any;
-
+  locCountry: string
+  Latitude: string
+  Longitude: string
+  pincodeHandler:any[]
   constructor(LocationMaster) {
     {
       this.locLevel = LocationMaster.locLevel || '';
@@ -48,20 +29,11 @@ export class LocationMaster {
       this.locAddr = LocationMaster.locAddr || '';
       this.locState = LocationMaster.locState || '';
       this.locCity = LocationMaster.locCity || '';
-      this.locMobile = LocationMaster.locMobile || '';
-      this.locTel = LocationMaster.locTel || '';
       this.ownership = LocationMaster.ownership || '';
-      this.locEmail = LocationMaster.locEmail || '';
-      this.locStartDt = LocationMaster.locStrtDate || '';
-      this.locEndDt = LocationMaster.locEndDate || '';
       this.locZone = LocationMaster.locZone || '';
       this.activeFlag = LocationMaster.activeFlag || false;
-      this.endMile = LocationMaster.endMile || '';
-      this.contLoc = LocationMaster.contLoc || '';
-      this.acctLoc = LocationMaster.acctLoc || '';
-      this.dataLoc = LocationMaster.dataLoc || '';
-      this.defaultLoc = LocationMaster.defaultLoc || '';
-      this.nearLoc = LocationMaster.nearLoc || '';
+      this.Latitude = LocationMaster.latitude || '';
+      this.Longitude = LocationMaster.longitude || '';
     }
 
   }

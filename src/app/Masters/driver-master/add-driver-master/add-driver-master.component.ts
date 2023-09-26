@@ -408,7 +408,7 @@ export class AddDriverMasterComponent implements OnInit {
       }));
       const vehicleDet = mergedData.vehicleData.map(element => ({
         name: element.vehicleNo,
-        value: element.id,
+        value: element.vehicleNo,
       }));
       this.LocationList = LocationList;
       this.vehicleDet = vehicleDet;

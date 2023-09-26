@@ -10,6 +10,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { calculateVolume } from "../vehicle-utility";
+import { Subject, take, takeUntil } from "rxjs";
 @Component({
   selector: 'app-add-vehicle-master',
   templateUrl: './add-vehicle-master.component.html',
@@ -46,6 +47,7 @@ export class AddVehicleMasterComponent implements OnInit {
   permitStateDetail: any;
   routeLoc: any;
   routeStatus: any;
+  protected _onDestroy = new Subject<void>();
 
   ngOnInit(): void {
     this.bindDropdown();
@@ -339,7 +341,7 @@ export class AddVehicleMasterComponent implements OnInit {
     this.vehicleTableForm.removeControl("");
     this.vehicleTableForm.controls["_id"].setValue(this.vehicleTableForm.value.vehicleNo);
     let data = convertNumericalStringsToInteger(this.vehicleTableForm.value)
-
+    this.vehicleTableForm.controls["_id"].setValue(this.vehicleTableForm.value.isActive);
     if (this.isUpdate) {
       let id = this.vehicleTableForm.value._id;
       // Remove the "id" field from the form controls
@@ -402,6 +404,22 @@ export class AddVehicleMasterComponent implements OnInit {
       showConfirmButton: false,
       confirmButtonText: "Yes"
     });
+  }
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+
+    const index = this.jsonControlVehicleArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlVehicleArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.vehicleTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
   }
 }
 

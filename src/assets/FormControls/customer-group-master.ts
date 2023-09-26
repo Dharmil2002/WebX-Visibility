@@ -49,13 +49,16 @@ export class CustomerGroupControl {
         ]
       },
       {
-        name: 'groupPassword', label: "Group Password",
+        name: 'groupPassword',
+        label: "Group Password",
         placeholder: "Enter Group Password",
-        type: 'text',
+        type: 'password',
         value: customerGroupTable.groupPassword,
         generatecontrol: true, disable: false,
-        Validations: [
-        ]
+        Validations: [],
+        additionalData: {
+          inputType: "password",
+        },
       },
       {
         name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: customerGroupTable.activeFlag, generatecontrol: true, disable: false,

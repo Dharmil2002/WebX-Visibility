@@ -53,27 +53,31 @@ export class DriverControls {
                     }
                 },
                 {
-                    name: 'driverLocation',
-                    label: "Driver Location",
-                    placeholder: "Select location",
-                    type: 'dropdown',
-                    value: '',
-                    autocomplete: "",
-                    displaywith: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "invalidAutocompleteObject",
-                            message: "Choose proper value",
-                        },
-                        {
-                            name: "autocomplete",
-                        },
-                    ],
-                    additionalData: {
-                        showNameAndValue: false
-                    }
+                  name: 'driverLocation',
+                  label: "Driver Location",
+                  placeholder: "Select location",
+                  type: 'dropdown',
+                  value: '',
+                  autocomplete: "",
+                  displaywith: "",
+                  generatecontrol: true,
+                  disable: false,
+                  Validations: [
+                      {
+                          name: "required",
+                          message: "Driver Location is required..",
+                      },
+                      {
+                          name: "autocomplete",
+                      },
+                      {
+                          name: "invalidAutocomplete",
+                          message: "Choose proper value",
+                      },
+                  ],
+                  additionalData: {
+                      showNameAndValue: false
+                  }
                 },
                 {
                     name: 'vehicleNo',
@@ -112,7 +116,12 @@ export class DriverControls {
                 },
                 {
                     name: 'dDob', label: "Date of Birth", placeholder: "select Date Of Birth", type: 'date', value: DriverTable.dDob, generatecontrol: true, disable: false,
-                    Validations: [],
+                    Validations: [
+                      {
+                        name: "required",
+                        message: "Date of Birth is required"
+                      }
+                    ],
                     additionalData: {
                         maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
                         minDate: new Date("01 Jan 1900")
@@ -371,7 +380,17 @@ export class DriverControls {
                     generatecontrol: false,
                     disable: false,
                     Validations: [],
-                }
+                },
+                {
+                  name: "companyCode",
+                  label: "CompanyCode",
+                  placeholder: "",
+                  type: "",
+                  value: localStorage.getItem("companyCode"),
+                  generatecontrol: false,
+                  disable: false,
+                  Validations: [],
+              },
             ]
     }
     getFormControlsD() {

@@ -140,12 +140,15 @@ export class VehicleControls {
                         isIndeterminate: false,
                         isChecked: false,
                         support: "routeLocation",
-                        showNameAndValue: false,
+                        showNameAndValue: true,
                         Validations: [{
                             name: "",
                             message: ""
                         }]
                     },
+                    functions: {
+                      onToggleAll: "toggleSelectAll",
+                  },
                     generatecontrol: true, disable: false
                 },
                 {
@@ -190,7 +193,11 @@ export class VehicleControls {
                             message: ""
                         }]
                     },
+                    functions: {
+                      onToggleAll: "toggleSelectAll",
+                  },
                     generatecontrol: true, disable: false
+
                 },
                 {
                     name: 'ftlTypeDesc', label: "FTL Type", placeholder: "Search and select FTL Type", type: 'dropdown',
@@ -262,7 +269,7 @@ export class VehicleControls {
                     generatecontrol: true, disable: false
                 },
                 {
-                    name: 'isActive', label: 'Active Flag', placeholder: '', type: 'toggle', value: vehicleTable.activeflag, generatecontrol: true, disable: false,
+                    name: 'isActive', label: 'Active Flag', placeholder: '', type: 'toggle', value: vehicleTable.isActive, generatecontrol: true, disable: false,
                     Validations: []
                 },
                 {
@@ -304,7 +311,7 @@ export class VehicleControls {
                     Validations: []
                 },
                 {
-                    name: 'CompanyCode', label: 'CompanyCode', placeholder: '', type: 'text', value: localStorage.getItem("CompanyCode"), generatecontrol: false, disable: false,
+                    name: 'companyCode', label: 'companyCode', placeholder: '', type: 'text', value: localStorage.getItem("companyCode"), generatecontrol: false, disable: false,
                     Validations: []
                 },
 
@@ -342,7 +349,7 @@ export class VehicleControls {
                     ],
                 },
                 {
-                    name: 'regDate', label: 'Registration Date', placeholder: '', type: 'date', value: isUpdate ? vehicleTable.regDate : Date(), generatecontrol: true, disable: false,
+                    name: 'regDate', label: 'Registration Date', placeholder: '', type: 'date', value: vehicleTable.regDate, generatecontrol: true, disable: false,
                     Validations: [],
                     additionalData: {
                         maxDate: new Date(),
@@ -523,7 +530,7 @@ export class VehicleControls {
                     }
                 },
                 {
-                    name: 'outerHeight', label: 'Outer Height(Feet)', placeholder: '', type: 'number', value: "", generatecontrol: true, disable: false,
+                    name: 'outerHeight', label: 'Outer Height(Feet)', placeholder: '', type: 'number', value: vehicleTable.outerHeight == 0 ? 0 : vehicleTable.outerHeight, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "pattern",

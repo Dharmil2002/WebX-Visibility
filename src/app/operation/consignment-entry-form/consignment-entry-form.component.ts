@@ -355,6 +355,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   //#endregion
   prqDetail() {
+
     const fromCity = {
       name: this.prqData?.fromCity || "",
       value: this.prqData?.fromCity || ""
@@ -373,6 +374,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls['pAddress'].setValue(this.prqData?.pAddress);
     this.consignmentTableForm.controls['containerSize'].setValue(this.prqData?.containerSize);
     this.consignmentTableForm.controls['ccbp'].setValue(true);
+    this.consignmentTableForm.controls['vehicleNo'].setValue(this.prqData?.vehicleNo);
     this.onAutoBillingBased("true");
   }
   async bindDataFromDropdown() {
@@ -449,7 +451,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.prqDetail();
   }
   //#region Save Function
-  async save() {
+   async save() {
     // Remove all form errors
     const tabcontrols = this.consignmentTableForm;
     clearValidatorsAndValidate(tabcontrols);
@@ -501,6 +503,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls["consigneeName"].setValue(
       this.consignmentTableForm.value?.consigneeName.name || ""
     );
+    this.consignmentTableForm.controls["prqNo"].setValue(
+      this.consignmentTableForm.value?.prqNo.value || ""
+    );
     const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
     const paddedNumber = dynamicNumber.toString().padStart(4, "0");
     const dockNo = `CN${dynamicValue}${paddedNumber}`;
@@ -529,7 +534,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     };
     if(this.prqFlag){
       const prqData={
-        prqId:this.consignmentTableForm.value?.prqNo.value||"",
+        prqId:this.consignmentTableForm.value?.prqNo||"",
         dktNo:this.consignmentTableForm.controls["docketNumber"].value
 
       }

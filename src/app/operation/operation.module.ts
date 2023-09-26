@@ -51,6 +51,7 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { AddMarketVehicleComponent } from './add-market-vehicle/add-market-vehicle.component';
 import { FilterUtils } from "../Utility/dropdownFilter";
 import { FilterBillingComponent } from './pending-billing/filter-billing/filter-billing.component';
+import { ThcGenerationComponent } from './thc-generation/thc-generation.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -83,7 +84,8 @@ import { FilterBillingComponent } from './pending-billing/filter-billing/filter-
     PrqListComponent,
     ConsignmentEntryFormComponent,
     AddMarketVehicleComponent,
-    FilterBillingComponent
+    FilterBillingComponent,
+    ThcGenerationComponent
     
   ],
   imports: [

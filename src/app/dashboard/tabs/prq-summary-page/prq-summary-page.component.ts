@@ -79,8 +79,9 @@ export class PrqSummaryPageComponent implements OnInit {
     { label: 'Confirm' },
     { label: 'Reject' },
     { label: 'Assign Vehicle' },
-    { label: 'Create Docket' },
+    { label: 'Add Docket' },
     { label: 'Modify' },
+    { label: 'Create THC' },
   ];
   menuItemflag: boolean = true;
   addAndEditPath: string;
@@ -139,7 +140,12 @@ export class PrqSummaryPageComponent implements OnInit {
       await showConfirmationDialog(data.data, this._masterService, this.goBack.bind(this),tabIndex,status);
       this.getPrqDetails();
     }
-    
+    else if(data.label.label==="Create THC")
+    this.router.navigate(['/Operation/thc-create'], {
+      state: {
+        data: data.data
+      },
+    });
   }
   goBack(tabIndex: number): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });

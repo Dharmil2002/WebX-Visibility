@@ -49,6 +49,8 @@ import { ManualVoucherComponent } from "../finance/manual voucher/manual-voucher
 import { BankReconciliationComponent } from "../finance/bank-reconciliation/bank-reconciliation.component";
 import { TdsReconciliationComponent } from "../finance/tds-reconciliation/tds-reconciliation.component";
 import { AnalyticsComponent } from "../finance/analytics/analytics.component";
+import { ThcSummaryComponent } from "../operation/thc-summary/thc-summary.component";
+import { ThcUpdateComponent } from './tabs/thc-update/thc-update.component';
 @NgModule({
   declarations: [
     DocketDashboardComponent,
@@ -72,7 +74,9 @@ import { AnalyticsComponent } from "../finance/analytics/analytics.component";
     ManualVoucherComponent,
     BankReconciliationComponent,
     TdsReconciliationComponent,
-    AnalyticsComponent
+    AnalyticsComponent,
+    ThcSummaryComponent,
+    ThcUpdateComponent
 
 
   ],

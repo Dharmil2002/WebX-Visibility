@@ -137,7 +137,7 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         functions: {
-          onModel: "prqSelection"
+          onOptionSelect: 'prqSelection'
       },
         Validations: [
           { name: "autocomplete" },
@@ -305,6 +305,15 @@ export class ConsignmentControl {
         placeholder: 'Company Code',
         type: 'text',
         value: localStorage.getItem("companyCode"),
+        Validations: [],
+        generatecontrol: false, disable: false
+      },
+      {
+        name: 'vehicleNo',
+        label: 'vehicleNo',
+        placeholder: 'vehicleNo',
+        type: '',
+        value:"",
         Validations: [],
         generatecontrol: false, disable: false
       }

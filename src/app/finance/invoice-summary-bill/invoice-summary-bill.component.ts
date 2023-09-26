@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Route, Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { throwIfAlreadyLoaded } from 'src/app/core/guard/module-import.guard';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { pendingbilling } from 'src/app/operation/pending-billing/pending-billing-utlity';
 import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utlity';
 import { StateWiseSummaryControl } from 'src/assets/FormControls/state-wise-summary-control';
-import { UpdateDetail, addInvoiceDetail } from './invoice-utility';
+import { UpdateDetail, addInvoiceDetail, getApiCompanyDetail, getApiCustomerDetail, getInvoiceDetail, getLocationApiDetail, getPrqApiDetail } from './invoice-utility';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -138,17 +137,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
       Style: "",
     },
   };
-  tableData = [
-    {
-      sr: 1,
-      stateName: "Maharashtra",
-      cnoteCount: 1,
-      countSelected: 1,
-      subTotalAmount: 1110.00,
-      gstCharged: 133.20,
-      totalBillingAmount: 1243.20
-    }
-  ];
+  tableData = []
   tableData1 = [
     {
       count: 0,
@@ -181,41 +170,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
 
     this.tableLoad = false;
     //#region fist table count
-    const cnoteCount = calculateTotalField(this.tableData, 'cnoteCount');
-    const countSelected = calculateTotalField(this.tableData, 'countSelected');
-    const subTotalAmount = calculateTotalField(this.tableData, 'subTotalAmount');
-    const gstCharged = calculateTotalField(this.tableData, 'gstCharged');
-    const totalBillingAmount = calculateTotalField(this.tableData, 'totalBillingAmount');
-    //#endregion
-
-    //#region fist table KPICountData
-    this.KPICountData = [
-      {
-        count: cnoteCount,
-        title: "Total Cnote Count",
-        class: `color-Grape-light`,
-      },
-      {
-        count: countSelected,
-        title: "Total Count Selected",
-        class: `color-Bottle-light`,
-      },
-      {
-        count: subTotalAmount,
-        title: "Sub Total Amount",
-        class: `color-Daisy-light`,
-      },
-      {
-        count: gstCharged,
-        title: "Total GST Charged",
-        class: `color-Success-light`,
-      },
-      {
-        count: totalBillingAmount,
-        title: "Total Billing Amount",
-        class: `color-Grape-light`,
-      },
-    ]
+  
     //#endregion
   }
 
@@ -228,13 +183,15 @@ export class InvoiceSummaryBillComponent implements OnInit {
     this.invoiceFormControls = new StateWiseSummaryControl();
     // Get form controls for job Entry form section
     this.jsonControlArray = this.invoiceFormControls.getstateWiseSummaryArrayControls();
-    this.invoiceSummaryJsonArray=this.invoiceFormControls.getInvoiceSummaryArrayControls();
+    this.invoiceSummaryJsonArray = this.invoiceFormControls.getInvoiceSummaryArrayControls();
     // Build the form group using formGroupBuilder function
     this.invoiceTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.invoiceSummaryTableForm=formGroupBuilder(this.fb,[this.invoiceSummaryJsonArray])
+    this.invoiceSummaryTableForm = formGroupBuilder(this.fb, [this.invoiceSummaryJsonArray])
     this.invoiceTableForm.controls['customerName'].setValue(this.navigateExtra.columnData.billingparty || "")
     this.invoiceTableForm.controls['unbilledAmount'].setValue(this.navigateExtra.columnData.sum || 0)
+    this.getCustomerDetail();
   }
+
 
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call
@@ -288,5 +245,62 @@ export class InvoiceSummaryBillComponent implements OnInit {
   }
   cancel(tabIndex: string): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+  }
+
+  async getCustomerDetail() {
+    const custDetail = await getApiCustomerDetail(this.masterService, this.navigateExtra);
+    const tranDetail = await getApiCompanyDetail(this.masterService);
+    this.invoiceTableForm.controls['cGstin'].setValue(custDetail.data[0].gstNumber);
+    this.invoiceTableForm.controls['cState'].setValue(custDetail.data[0].state);
+    this.invoiceTableForm.controls['tState'].setValue(tranDetail.data[0].state);
+    this.invoiceTableForm.controls['tGstin'].setValue(tranDetail.data[0].gstNo);
+    const prqDetail = await getPrqApiDetail(this.masterService, this.navigateExtra.columnData.billingparty);
+    if (prqDetail) {
+      const locDetail = await getLocationApiDetail(this.masterService);
+      const invoiceDetail = await getInvoiceDetail(prqDetail, locDetail);
+      this.tableData = invoiceDetail;
+      this.IsActiveFuntion("")
+    }
+
+ 
+  }
+  IsActiveFuntion($event) {
+    
+    const invoice=$event?$event:"";
+    const cnoteCount =this.tableData.length;
+    const countSelected = invoice?invoice.length:0;
+    const subTotalAmount = invoice?calculateTotalField(invoice, 'subTotalAmount'):0;
+    const gstCharged = invoice?calculateTotalField(invoice, 'gstCharged'):0;
+    const totalBillingAmount =invoice? calculateTotalField(invoice, 'totalBillingAmount'):0;
+    //#endregion
+
+    //#region fist table KPICountData
+    this.KPICountData = [
+      {
+        count: cnoteCount,
+        title: "Total Cnote Count",
+        class: `color-Grape-light`,
+      },
+      {
+        count: countSelected,
+        title: "Total Count Selected",
+        class: `color-Bottle-light`,
+      },
+      {
+        count: subTotalAmount,
+        title: "Sub Total Amount",
+        class: `color-Daisy-light`,
+      },
+      {
+        count: gstCharged,
+        title: "Total GST Charged",
+        class: `color-Success-light`,
+      },
+      {
+        count: totalBillingAmount,
+        title: "Total Billing Amount",
+        class: `color-Grape-light`,
+      },
+    ]
   }
 }

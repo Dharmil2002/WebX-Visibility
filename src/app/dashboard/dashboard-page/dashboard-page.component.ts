@@ -73,6 +73,21 @@ export class DashboardPageComponent implements OnInit {
       "id": "invoiceBilling",
       "label": "Tab 10",
       "permission": ["Billing​"]
+    },
+    {
+      "id": "invoiceBilling",
+      "label": "Tab 10",
+      "permission": ["Billing​"]
+    },
+    {
+      "id": "THC",
+      "label": "Tab 11",
+      "permission": ["Export", "FTL", "EXIM"]
+    },
+    {
+      "id": "THCUpdate",
+      "label": "Tab 12",
+      "permission": ["Export", "FTL", "EXIM"]
     }
   ];
   tabName: any;

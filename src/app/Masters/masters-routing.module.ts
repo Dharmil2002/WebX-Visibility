@@ -61,6 +61,8 @@ import { CityLocationMappingMaster } from './city-location-mapping-master/city-l
 import { CompanygstmasterAddComponent } from './Company GST Master/companygstmaster-add/companygstmaster-add.component';
 import { ContainerMasterListComponent } from './container-master/container-master-list/container-master-list.component';
 import { AddContainerMasterComponent } from './container-master/add-container-master/add-container-master.component';
+import { VendorQueryPageComponent } from './Vendor Contract/vendor-query-page/vendor-query-page.component';
+import { AddContractProfileComponent } from './Vendor Contract/add-contract-profile/add-contract-profile.component';
 
 
 const routes: Routes = [
@@ -125,6 +127,8 @@ const routes: Routes = [
   { path: "CityLocationMapping/CityLocationIndex", component: CityLocationMappingMaster },
   { path: "ContainerMaster/ContainerMasterList", component: ContainerMasterListComponent },
   { path: "ContainerMaster/AddContainerMaster", component: AddContainerMasterComponent },
+  { path: "VendorContract/VendorQueryPage", component: VendorQueryPageComponent },
+  { path: "VendorContract/AddContractProfile", component: AddContractProfileComponent },
 ];
 
 @NgModule({

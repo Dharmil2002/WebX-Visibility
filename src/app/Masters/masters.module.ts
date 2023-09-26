@@ -102,6 +102,8 @@ import { CityLocationMappingMaster } from './city-location-mapping-master/city-l
 import { ContainerMasterListComponent } from './container-master/container-master-list/container-master-list.component';
 import { AddContainerMasterComponent } from './container-master/add-container-master/add-container-master.component';
 import { MenuBidingAccessComponent } from './menu-biding-access/menu-biding-access.component';
+import { VendorQueryPageComponent } from './Vendor Contract/vendor-query-page/vendor-query-page.component';
+import { AddContractProfileComponent } from './Vendor Contract/add-contract-profile/add-contract-profile.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -206,7 +208,9 @@ import { MenuBidingAccessComponent } from './menu-biding-access/menu-biding-acce
     GeneralMasterAddComponent,
     GeneralMasterCodeListComponent,
     AddVehicleStatusUpdateComponent, HolidayMasterComponent,
-    AddEditHolidayComponent,CityLocationMappingMaster, ContainerMasterListComponent,MenuBidingAccessComponent, AddContainerMasterComponent
+    AddEditHolidayComponent,CityLocationMappingMaster, ContainerMasterListComponent,MenuBidingAccessComponent, AddContainerMasterComponent,
+    VendorQueryPageComponent,
+    AddContractProfileComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

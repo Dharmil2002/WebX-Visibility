@@ -112,6 +112,7 @@ import { ServiceSelectionComponent } from './Vendor Contract/vendor-tabs/service
 import { FleetMasterListComponent } from './fleet-master/fleet-master-list/fleet-master-list.component';
 import { AddFleetMasterComponent } from './fleet-master/add-fleet-master/add-fleet-master.component';
 import { AddStandardChargesComponent} from './Vendor Contract/vendor-tabs/pop-UP/standard-charges/add-standard-charges.component';
+import { AddTripLaneBasedComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-trip-lane-based/add-trip-lane-based.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -226,7 +227,8 @@ import { AddStandardChargesComponent} from './Vendor Contract/vendor-tabs/pop-UP
    ServiceSelectionComponent,
    AddStandardChargesComponent,
    FleetMasterListComponent,
-   AddFleetMasterComponent
+   AddFleetMasterComponent,
+   AddTripLaneBasedComponent
 
   ],
 

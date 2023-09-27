@@ -109,6 +109,7 @@ import { BasicInformationComponent } from './Vendor Contract/vendor-tabs/basic-i
 import { VendorTabsIndexComponent } from './Vendor Contract/vendor-tabs-index/vendor-tabs-index.component';
 import { VendorContractListComponent } from './Vendor Contract/vendor-contract-list/vendor-contract-list.component';
 import { ServiceSelectionComponent } from './Vendor Contract/vendor-tabs/service-selection/service-selection.component';
+import { StandardChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/standard-charges/standard-charges.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -220,8 +221,8 @@ import { ServiceSelectionComponent } from './Vendor Contract/vendor-tabs/service
     BasicInformationComponent,
     VendorTabsIndexComponent,
     VendorContractListComponent,
-   ServiceSelectionComponent
-
+   ServiceSelectionComponent,
+   StandardChargesComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

@@ -49,24 +49,25 @@ export class BasicInformationComponent {
   constructor(private router: Router, private fb: UntypedFormBuilder, public ObjSnackBarUtility: SnackBarUtilityService, private filter: FilterUtils) {
   }
   ngOnInit() {
-    if (this.data) {
       this.createBasicInformationForm();
       //this.BindContractSigningLocation();
 
-    }
   }
   createBasicInformationForm() {
+    debugger
     this.AddProfileClass = new AddContractProfileModel();
-    this.AddProfileClass.VendorCode = this.data.vendorCode;
-    this.AddProfileClass.VendorName = this.data.vendorName;
-    this.AddProfileClass.VendorType = this.data.vendorType;
-    this.AddProfileClass.ContractCode = this.data.contractCode
-    this.AddProfileClass.ContractDate = this.formatDate(this.data.contractDate);
-    this.AddProfileClass.EffectiveDateFrom = this.formatDate(this.data.contractStartDate);
-    this.AddProfileClass.ValidUntil = this.formatDate(this.data.validUptoDate);
-    this.AddProfileClass.DocUrl = this.data.docURL;
+    if(this.data){
+    // this.AddProfileClass.VendorCode = this.data.vendorCode;
+    // this.AddProfileClass.VendorName = this.data.vendorName;
+    // this.AddProfileClass.VendorType = this.data.vendorType;
+    // this.AddProfileClass.ContractCode = this.data.contractCode
+    // this.AddProfileClass.ContractDate = this.formatDate(this.data.contractDate);
+    // this.AddProfileClass.EffectiveDateFrom = this.formatDate(this.data.contractStartDate);
+    // this.AddProfileClass.ValidUntil = this.formatDate(this.data.validUptoDate);
+    // this.AddProfileClass.DocUrl = this.data.docURL;
     // Create an instance of AddContractProfile and initialize its properties
     // with the AddProfileClass instance and a boolean value
+    }
     this.BasicInformationArray = new AddContractProfile(this.AddProfileClass, true);
     this.BasicInformationArray.AddContractProfileArray.forEach(x => {
       if (x.name == 'ContractBranchCode') {

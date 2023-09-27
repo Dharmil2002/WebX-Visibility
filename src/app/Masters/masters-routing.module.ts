@@ -68,7 +68,6 @@ import { VendorContractListComponent } from './Vendor Contract/vendor-contract-l
 import { VendorTabsIndexComponent } from './Vendor Contract/vendor-tabs-index/vendor-tabs-index.component';
 import { FleetMasterListComponent } from './fleet-master/fleet-master-list/fleet-master-list.component';
 import { AddFleetMasterComponent } from './fleet-master/add-fleet-master/add-fleet-master.component';
-import { StandardChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/standard-charges/add-standard-charges.component';
 
 
 const routes: Routes = [
@@ -142,7 +141,6 @@ const routes: Routes = [
    { path: "VendorContract/BasicInformation", component: BasicInformationComponent },
    { path: "VendorContract/VendorContractList", component: VendorContractListComponent },
    { path: "VendorContract/VendorIndex", component: VendorTabsIndexComponent },
-   { path: "VendorContract/StandardCharges", component: StandardChargesComponent },
 ];
 
 @NgModule({

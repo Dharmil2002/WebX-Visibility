@@ -256,8 +256,6 @@ export class AddFleetMasterComponent implements OnInit {
 
   //#region Function for save data
   async save() {
-    debugger
-    console.log("this.fleetTableForm.value", this.fleetTableForm.value)
     const formValue = this.fleetTableForm.value;
     const controlNames = ["vehicleNo"];
     controlNames.forEach((controlName) => {

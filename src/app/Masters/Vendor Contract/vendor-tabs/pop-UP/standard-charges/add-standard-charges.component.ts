@@ -6,10 +6,10 @@ import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 
 @Component({
-  selector: 'app-standard-chargesr',
+  selector: 'app-add-standard-charges',
   templateUrl: './add-standard-charges.component.html'
 })
-export class StandardChargesComponent implements OnInit {
+export class AddStandardChargesComponent implements OnInit {
 
   breadScrums = [
     {

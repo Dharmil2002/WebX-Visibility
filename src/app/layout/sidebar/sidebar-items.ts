@@ -168,6 +168,16 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
+              "path": "Masters/FleetMaster/FleetMasterList",
+              "title": "Fleet Master",
+              "moduleName": "Fleet Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
               "path": "Masters/VendorMaster/VendorMasterList",
               "title": "Vendor Master",
               "moduleName": "Vendor Master",
@@ -285,7 +295,28 @@ export const ROUTES: RouteInfo[] =
               "groupTitle": false,
               "submenu": [
               ]
-            },]
+            },
+          ]
+        },
+        {
+          "path": "",
+          "title": "Contract Management",
+          "moduleName": "Contract Management",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Masters/VendorContract/VendorQueryPage",
+              "title": "Vendor Contract",
+              "moduleName": "Vendor Contract",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            }
+          ]
         },
         {
           "path": "",

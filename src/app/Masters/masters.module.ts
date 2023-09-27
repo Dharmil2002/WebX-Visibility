@@ -110,6 +110,8 @@ import { VendorTabsIndexComponent } from './Vendor Contract/vendor-tabs-index/ve
 import { VendorContractListComponent } from './Vendor Contract/vendor-contract-list/vendor-contract-list.component';
 import { ServiceSelectionComponent } from './Vendor Contract/vendor-tabs/service-selection/service-selection.component';
 import { StandardChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/standard-charges/standard-charges.component';
+import { FleetMasterListComponent } from './fleet-master/fleet-master-list/fleet-master-list.component';
+import { AddFleetMasterComponent } from './fleet-master/add-fleet-master/add-fleet-master.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -222,7 +224,10 @@ import { StandardChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/s
     VendorTabsIndexComponent,
     VendorContractListComponent,
    ServiceSelectionComponent,
-   StandardChargesComponent
+   StandardChargesComponent,
+   FleetMasterListComponent,
+   AddFleetMasterComponent
+
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

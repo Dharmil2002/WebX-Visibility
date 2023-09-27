@@ -67,6 +67,8 @@ import { BasicInformationComponent } from './Vendor Contract/vendor-tabs/basic-i
 import { VendorContractListComponent } from './Vendor Contract/vendor-contract-list/vendor-contract-list.component';
 import { VendorTabsIndexComponent } from './Vendor Contract/vendor-tabs-index/vendor-tabs-index.component';
 import { StandardChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/standard-charges/standard-charges.component';
+import { FleetMasterListComponent } from './fleet-master/fleet-master-list/fleet-master-list.component';
+import { AddFleetMasterComponent } from './fleet-master/add-fleet-master/add-fleet-master.component';
 
 
 const routes: Routes = [
@@ -131,6 +133,8 @@ const routes: Routes = [
   { path: "CityLocationMapping/CityLocationIndex", component: CityLocationMappingMaster },
   { path: "ContainerMaster/ContainerMasterList", component: ContainerMasterListComponent },
   { path: "ContainerMaster/AddContainerMaster", component: AddContainerMasterComponent },
+  { path: 'FleetMaster/FleetMasterList', component: FleetMasterListComponent },
+  { path: 'FleetMaster/AddFleetMaster', component: AddFleetMasterComponent },
 
    // Vendor Contract Router
    { path: "VendorContract/VendorQueryPage", component: VendorQueryPageComponent },

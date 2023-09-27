@@ -56,6 +56,7 @@ roleId: any;
   userTypeValue: any;
   userStatusData: any;
   userpassword: any;
+  erpId:any;
 
   constructor(UserMaster) {
     {

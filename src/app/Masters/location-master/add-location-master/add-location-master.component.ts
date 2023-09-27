@@ -13,6 +13,7 @@ import { take, takeUntil } from "rxjs/operators";
 import { ReplaySubject, Subject } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { MapRender } from "src/app/Utility/Location Map/Maprendering";
+import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 @Component({
   selector: "app-add-location-master",
   templateUrl: "./add-location-master.component.html",
@@ -187,11 +188,11 @@ export class AddLocationMasterComponent implements OnInit {
       const controlValue = extractControlValue(controlName);
       this.locationTableForm.controls[controlName].setValue(controlValue);
     });
-        // Extract latitude and longitude from comma-separated string
-        const latLng = this.locationTableForm.value.Latitude.split(",");
-        this.locationTableForm.controls.Latitude.setValue(latLng[0] || 0);
-        this.locationTableForm.controls.Longitude.setValue(latLng[1] || 0);
-    
+    // Extract latitude and longitude from comma-separated string
+    const latLng = this.locationTableForm.value.Latitude.split(",");
+    this.locationTableForm.controls.Latitude.setValue(latLng[0] || 0);
+    this.locationTableForm.controls.Longitude.setValue(latLng[1] || 0);
+
     this.locationTableForm.controls["pincodeHandler"].setValue(resultArray)
     const onSuccess = (res) => {
       if (res) {
@@ -217,7 +218,7 @@ export class AddLocationMasterComponent implements OnInit {
         filter: { _id: id },
         update: this.locationTableForm.value,
       };
-            this.masterService
+      this.masterService
         .masterPut("generic/update", req)
         .pipe(takeUntil(this.unsubscribe$))
         .subscribe({
@@ -399,13 +400,17 @@ export class AddLocationMasterComponent implements OnInit {
           (x) => x.value == this.locationTable.locPincode
         );
         this.locationTableForm.controls.locPincode.setValue(pincodeDet);
-        const mappedPins = this.locationTable.pincodeHandler.map(pin => {
-          const mappedPin = this.pincodeDet.find(x => x.value === pin);
-          return mappedPin ? mappedPin.value : ''; // Handle cases where no match is found
-        }).join(', ');
-        
-        this.locationTableForm.controls.mappedPincode.setValue(mappedPins);
-        console.log(mappedPins);
+
+        var filter = [];
+        this.locationTable.pincodeHandler.forEach(item => {
+          filter.push(this.pincodeDet.find(element => element.value == item));
+        });
+
+        this.locationTableForm.controls['pincodeHandler'].patchValue(filter);
+        let index = this.jsonControlLocationArray.findIndex(obj => obj.name === 'mappedPincode');
+        this.jsonControlLocationArray[index].filterOptions = new ReplaySubject<AutoComplateCommon[]>(1)
+        this.jsonControlLocationArray[index].filterOptions.next(this.pincodeDet.slice());
+
       }
       this.filter.Filter(
         this.jsonControlLocationArray,

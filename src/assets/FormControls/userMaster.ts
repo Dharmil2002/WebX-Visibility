@@ -18,15 +18,26 @@ export class UserControl {
             name: "required",
             message: "User ID is required",
           },
-          {
-            name: "pattern",
-            message: "Please Enter only text and number!",
-            pattern: "^[a-zA-Z 0-9]*$",
-          },
         ],
         functions: {
           onChange: "GetUserDetails",
         },
+      },
+      {
+        name: "erpId",
+        label: "ERP id",
+        placeholder: "Enter User ERP id",
+        type: "text",
+        value: UserTable.erpId,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter alphanumeric of length 25!",
+            pattern: "^[a-zA-Z0-9]{0,25}$",
+          },
+        ],
       },
       {
         name: "name",
@@ -44,7 +55,7 @@ export class UserControl {
           {
             name: "pattern",
             message: "Please Enter only text!",
-            pattern: "^[a-zA-Z]*$",
+            pattern: "^[a-zA-Z ]{0,100}$",
           },
         ],
       },
@@ -99,56 +110,6 @@ export class UserControl {
           onChange: "changedPassword",
         },
       },
-      // {
-      //   name: "internalId",
-      //   label: "Intenal ID",
-      //   placeholder: "Enter Intenal ID",
-      //   type: "text",
-      //   value: UserTable.internalId,
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [
-      //     {
-      //       name: "required",
-      //       message: "Intenal ID is required",
-      //     },
-      //     {
-      //       name: "pattern",
-      //       message: "Please Enter only text and number!",
-      //       pattern: "^[a-zA-Z 0-9]*$",
-      //     },
-      //   ],
-      // },
-      {
-        name: "secretQuestion",
-        label: "Secret Question",
-        placeholder: "Enter Secret Question",
-        type: "text",
-        value: UserTable.secretQuestion,
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Secret Question is required",
-          },
-        ],
-      },
-      {
-        name: "secretAnswer",
-        label: "Secret Answer",
-        placeholder: "Enter Secret Answer",
-        type: "text",
-        value: UserTable.secretAnswer,
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Secret Answer is required",
-          },
-        ],
-      },
       {
         name: "gender",
         label: "Gender",
@@ -158,12 +119,7 @@ export class UserControl {
           { value: "M", name: "Male" },
           { value: "F", name: "Female" },
         ],
-        Validations: [
-          {
-            name: "required",
-            message: "Gender is required..",
-          },
-        ],
+        Validations: [],
         generatecontrol: true,
         disable: false,
       },
@@ -172,7 +128,7 @@ export class UserControl {
         label: "Birth date",
         placeholder: "Birth date",
         type: "date",
-        value:  UserTable.dateOfBirth,
+        value: UserTable.dateOfBirth,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -186,44 +142,6 @@ export class UserControl {
             new Date().getDate()
           ),
           minDate: new Date("01 Jan 1900"),
-        },
-      },
-      {
-        name: "dateOfJoining",
-        label: "Date Of Joining",
-        placeholder: "select Date Of Joining",
-        type: "date",
-        value: UserTable.dateOfJoining,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
-      {
-        name: "branchCode",
-        label: "Location",
-        placeholder: "Select Location",
-        type: "dropdown",
-        value: UserTable.branchCode,
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Location is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocomplete",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
         },
       },
       {
@@ -252,95 +170,37 @@ export class UserControl {
         disable: false,
       },
       {
-        name: "userStatus",
-        label: "User Status",
-        placeholder: "Select User Status",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
+        name: "dateOfJoining",
+        label: "Date Of Joining",
+        placeholder: "select Date Of Joining",
+        type: "date",
+        value: UserTable.dateOfJoining,
         generatecontrol: true,
         disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "User Status is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocomplete",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
-        },
+        Validations: [],
       },
       {
-        name: "userType",
-        label: "User Type",
-        placeholder: "Select User Type",
-        type: "dropdown",
-        value: UserTable.userType,
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
+        name: "residentialAddress",
+        label: "Residential Address",
+        placeholder: "Enter Residential Address",
+        type: "text",
+        value: UserTable.residentialAddress,
         generatecontrol: true,
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "User Type is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocomplete",
-            message: "Choose proper value",
+            name: "pattern",
+            message: "Please Enter alphanumeric 250 digit!",
+            pattern: "^[a-zA-Z 0-9 , ]{0,250}$",
           },
         ],
-        additionalData: {
-          showNameAndValue: false,
-        },
-      },
-      {
-        name: "managerId",
-        label: "Manager Id",
-        placeholder: "Select Manager Id",
-        type: "dropdown",
-        value: UserTable.managerId,
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Manager Id is required..",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocomplete",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
       },
       {
         name: "country",
         label: "Country Code",
         placeholder: "Country Code",
         type: "dropdown",
-        value: "",
+        value: UserTable.country,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -360,7 +220,7 @@ export class UserControl {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
         },
       },
       {
@@ -406,6 +266,30 @@ export class UserControl {
         },
       },
       {
+        name: "userType",
+        label: "User Type",
+        placeholder: "Select User Type",
+        type: "dropdown",
+        value: UserTable.userType,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
         name: "role",
         label: "User Role",
         placeholder: "Select User Role",
@@ -432,21 +316,6 @@ export class UserControl {
         additionalData: {
           showNameAndValue: false,
         },
-      },
-      {
-        name: "residentialAddress",
-        label: "Residential Address",
-        placeholder: "Enter Residential Address",
-        type: "text",
-        value: UserTable.residentialAddress,
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Residential Address is required",
-          },
-        ],
       },
       {
         name: "multiDivisionAccess",
@@ -550,22 +419,6 @@ export class UserControl {
       },
 
       //   ---------------Add support Controllers at last -----------------------
-      {
-        name: "controlHandler",
-        label: "",
-        placeholder: "Multi Locations Access",
-        type: "",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        generatecontrol: false,
-        disable: true,
-        Validations: [
-          {
-            name: "",
-          },
-        ],
-      },
       {
         name: "userLocationscontrolHandler",
         label: "Multi Locations Access",

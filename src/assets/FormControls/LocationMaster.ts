@@ -337,10 +337,11 @@ export class LocationControl {
         label: "Latitude ,Longitude",
         placeholder: "Enter Latitude , Longitude",
         type: "text",
-        value:LocationTable.Latitude,
-        //  LocationTable.latitude +
-        //   "," +
-        //   LocationTable.longitude,
+        value:
+        //LocationTable.Latitude,
+         LocationTable.Latitude +
+          "," +
+          LocationTable.Longitude,
         generatecontrol: true,
         disable: false,
         Validations: [{

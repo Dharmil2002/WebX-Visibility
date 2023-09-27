@@ -38,7 +38,8 @@ export class UserMasterListComponent implements OnInit {
         "srNo": "Sr No",
         "userId": "User Code",
         "name": "User Name",
-        "branchCode": "User Branch",
+        "multiLocation": "Locations",
+        "role": "User Role",
         "isActive": "Active Flag",
         "actions": "Action"
     };
@@ -75,29 +76,29 @@ export class UserMasterListComponent implements OnInit {
     constructor(
         private masterService: MasterService,
         private retryAndDownloadService: RetryAndDownloadService,
-        private geoLocationService:GeolocationService
-        ) {
+        private geoLocationService: GeolocationService
+    ) {
     }
 
     async getUserDetails() {
-            let req = {
+        let req = {
             "companyCode": this.companyCode,
             "collectionName": "user_master",
             "filter": {}
         };
-     try {
-        const res = await this.masterService.masterPost("generic/get", req).toPromise()
-        if (res) {
-            // Generate srno for each object in the array
-            const dataWithSrno = res.data.map((obj, index) => {
-                return {
-                    ...obj,
-                    srNo: index + 1
-                };
-            });
-            this.csv = dataWithSrno;
-            this.tableLoad = false;
-        }
+        try {
+            const res = await this.masterService.masterPost("generic/get", req).toPromise()
+            if (res) {
+                // Generate srno for each object in the array
+                const dataWithSrno = res.data.map((obj, index) => {
+                    return {
+                        ...obj,
+                        srNo: index + 1
+                    };
+                });
+                this.csv = dataWithSrno;
+                this.tableLoad = false;
+            }
 
         } catch (error) {
 

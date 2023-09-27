@@ -1,32 +1,32 @@
 {
     "countryList": [
         {
-            "codeId": "1",
-            "codeDesc": "India"
+            "value": "91",
+            "name": "India"
         },
         {
-            "codeId": "2",
-            "codeDesc": "USA"
+            "value": "1",
+            "name": "USA"
         },
         {
-            "codeId": "3",
-            "codeDesc": "Oman"
+            "value": "968",
+            "name": "Oman"
         },
         {
-            "codeId": "4",
-            "codeDesc": "Australia"
+            "value": "61",
+            "name": "Australia"
         },
         {
-            "codeId": "5",
-            "codeDesc": "New Zealand"
+            "value": "64",
+            "name": "New Zealand"
         },
         {
-            "codeId": "6",
-            "codeDesc": "Afghanistan"
+            "value": "93",
+            "name": "Afghanistan"
         },
         {
-            "codeId": "7",
-            "codeDesc": "Sri Lanka"
+            "value": "94",
+            "name": "Sri Lanka"
         }
     ],
     "stateList": [

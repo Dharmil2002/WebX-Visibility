@@ -22,7 +22,7 @@ export class AddUserMasterComponent implements OnInit {
   protected _onDestroy = new Subject<void>();
   action: string;
   userTable: UserMaster;
-  branchCode: any;
+  // branchCode: any;
   userType: any;
   userLocations: string[];
   userDetails: any;
@@ -33,9 +33,9 @@ export class AddUserMasterComponent implements OnInit {
   userLocationStatus: any;
   userRoleStatus: any;
   userRole: any;
-  managerIdStatus: any;
-  managerId: any;
-  userStatus: any;
+  // managerIdStatus: any;
+  // managerId: any;
+  // userStatus: any;
   userName: any;
   countryCodeStatus: any;
   countryCode: any;
@@ -53,13 +53,13 @@ export class AddUserMasterComponent implements OnInit {
   countryList: any;
   updateLocation: any;
   updateUser: any;
-  updateUserStatus: any;
-  updateManagerId: any;
+  // updateUserStatus: any;
+  // updateManagerId: any;
   updateRoleId: any;
   userData: any;
   roleIdData: any;
-  userStatusData: any;
-  managerIdData: any;
+  // userStatusData: any;
+  // managerIdData: any;
   divisionList: any;
   division: any;
   data: any;
@@ -86,6 +86,8 @@ export class AddUserMasterComponent implements OnInit {
     this.action = extrasState ? "edit" : "add";
     if (this.action === "edit") {
       this.userTable = extrasState.data;
+      console.log(this.userTable);
+
       this.isUpdate = true;
       this.breadScrums = [
         {
@@ -117,11 +119,11 @@ export class AddUserMasterComponent implements OnInit {
 
   bindDropdown() {
     const propertyMappings = {
-      branchCode: { property: "location", statusProperty: "locationStatus" },
+      // branchCode: { property: "location", statusProperty: "locationStatus" },
       userType: { property: "userType", statusProperty: "userTypeStatus" },
       country: { property: "countryCode", statusProperty: "countryCodeStatus" },
-      userStatus: { property: "userName", statusProperty: "userStatus" },
-      managerId: { property: "managerId", statusProperty: "managerIdStatus" },
+      // userStatus: { property: "userName", statusProperty: "userStatus" },
+      // managerId: { property: "managerId", statusProperty: "managerIdStatus" },
       role: { property: "userRole", statusProperty: "userRoleStatus" },
       multiLocation: {
         property: "locationName",
@@ -154,9 +156,9 @@ export class AddUserMasterComponent implements OnInit {
   //JSON data call for Dropdown
   getDropDownData() {
     this.masterService.getJsonFileDetails("dropDownUrl").subscribe((res) => {
-      const { divisionAccess, countryData } = res;
+      const { divisionAccess, countryList } = res;
       this.divisionList = divisionAccess;
-      this.countryList = countryData;
+      this.countryList = countryList;
 
       if (this.isUpdate) {
         this.updateCountry = this.findDropdownItemByName(
@@ -201,7 +203,7 @@ export class AddUserMasterComponent implements OnInit {
   }
 
   findDropdownItemByName(dropdownData, name) {
-    return dropdownData.find((item) => item.name === name);
+    return dropdownData.find((item) => item.value === name);
   }
 
   toggleSelectAll(argData: any) {
@@ -253,13 +255,13 @@ export class AddUserMasterComponent implements OnInit {
       }));
 
       //Code Type = 'EMPST'
-      const userStatusList = userStatusResponse.data
-        .filter((item) => item.codeType === "EMPST" && item.activeFlag)
-        .map((x) => {
-          {
-            return { name: x.codeDesc, value: x.codeId };
-          }
-        });
+      // const userStatusList = userStatusResponse.data
+      //   .filter((item) => item.codeType === "EMPST" && item.activeFlag)
+      //   .map((x) => {
+      //     {
+      //       return { name: x.codeDesc, value: x.codeId };
+      //     }
+      //   });
 
       const managerList = managerResponse.data.map((element) => ({
         name: String(element.name),
@@ -285,15 +287,15 @@ export class AddUserMasterComponent implements OnInit {
         });
 
       if (this.isUpdate) {
-        const userLocation = locations.find(
-          (x) => x.name === this.userTable.branchCode
-        );
-        this.userTableForm.controls["branchCode"].setValue(userLocation);
+        // const userLocation = locations.find(
+        //   (x) => x.name === this.userTable.branchCode
+        // );
+        // this.userTableForm.controls["branchCode"].setValue(userLocation);
 
-        const userStatus = userStatusList.find(
-          (x) => x.name === this.userTable.userStatus
-        );
-        this.userTableForm.controls["userStatus"].setValue(userStatus);
+        // const userStatus = userStatusList.find(
+        //   (x) => x.name === this.userTable.userStatus
+        // );
+        // this.userTableForm.controls["userStatus"].setValue(userStatus);
 
         const userType = userTypeList.find(
           (x) => x.name === this.userTable.userType
@@ -305,14 +307,13 @@ export class AddUserMasterComponent implements OnInit {
         );
         this.userTableForm.controls["role"].setValue(userRole);
 
-        const managerId = managerList.find(
-          (x) => x.name === this.userTable.managerId
-        );
-        this.userTableForm.controls["managerId"].setValue(managerId);
-
+        // const managerId = managerList.find(
+        //   (x) => x.name === this.userTable.managerId
+        // );
+        // this.userTableForm.controls["managerId"].setValue(managerId);
         this.userTableForm.controls["userLocationscontrolHandler"].patchValue(
           locations.filter((element) =>
-            this.userTable.multiLocation.includes(element.name)
+            this.userTable.multiLocation.includes(element.value)
           )
         );
       }
@@ -322,20 +323,6 @@ export class AddUserMasterComponent implements OnInit {
         locations,
         this.locationName,
         this.userLocationStatus
-      );
-      this.filter.Filter(
-        this.jsonControlUserArray,
-        this.userTableForm,
-        locations,
-        this.location,
-        this.locationStatus
-      );
-      this.filter.Filter(
-        this.jsonControlUserArray,
-        this.userTableForm,
-        userStatusList,
-        this.userName,
-        this.userStatus
       );
       this.filter.Filter(
         this.jsonControlUserArray,
@@ -351,33 +338,17 @@ export class AddUserMasterComponent implements OnInit {
         this.userRole,
         this.userRoleStatus
       );
-      this.filter.Filter(
-        this.jsonControlUserArray,
-        this.userTableForm,
-        managerList,
-        this.managerId,
-        this.managerIdStatus
-      );
     } catch (error) {
       console.error("Error:", error);
     }
   }
 
   async save() {
-    this.userTableForm.controls["branchCode"].setValue(
-      this.userTableForm.value.branchCode.value
-    );
-    this.userTableForm.controls["managerId"].setValue(
-      this.userTableForm.value.managerId.name
-    );
-    this.userTableForm.controls["userStatus"].setValue(
-      this.userTableForm.value.userStatus.name
-    );
     this.userTableForm.controls["userType"].setValue(
       this.userTableForm.value.userType.name
     );
     this.userTableForm.controls["country"].setValue(
-      this.userTableForm.value.country.name
+      this.userTableForm.value.country.value
     );
     this.userTableForm.controls["role"].setValue(
       this.userTableForm.value.role.name
@@ -396,7 +367,6 @@ export class AddUserMasterComponent implements OnInit {
     this.userTableForm.controls["isActive"].setValue(
       this.userTableForm.value.isActive === true ? true : false
     );
-
     //remove unwanted controlName
     const controlsToRemove = [
       "confirmpassword",
@@ -491,7 +461,7 @@ export class AddUserMasterComponent implements OnInit {
           }
         }
       },
-      complete() {},
+      complete() { },
     });
   }
 

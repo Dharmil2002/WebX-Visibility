@@ -7,7 +7,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 
 @Component({
   selector: 'app-standard-chargesr',
-  templateUrl: './standard-charges.component.html'
+  templateUrl: './add-standard-charges.component.html'
 })
 export class StandardChargesComponent implements OnInit {
 

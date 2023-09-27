@@ -4,6 +4,7 @@ import { StandardCharges } from 'src/assets/FormControls/VendorContractControls/
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-standard-charges',
@@ -73,7 +74,7 @@ export class AddStandardChargesComponent implements OnInit {
 
 
 
-  constructor(private fb: UntypedFormBuilder,private filter: FilterUtils,private Route: Router) { }
+  constructor(private fb: UntypedFormBuilder,private filter: FilterUtils,private Route: Router ,public dialogRef: MatDialogRef<AddStandardChargesComponent>) { }
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -154,5 +155,9 @@ export class AddStandardChargesComponent implements OnInit {
   SubmitFunction(){
     console.log('this.standardChargesTableForm' ,this.standardChargesTableForm.value)
     this.Route.navigateByUrl('/Masters/VendorContract/VendorIndex')
+  }
+
+  CancleEntry(){
+    this.dialogRef.close()
   }
 }

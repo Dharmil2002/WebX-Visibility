@@ -6,20 +6,17 @@
         <button mat-raised-button color="success" type="button">Submit</button>
     </div>
 </div>
-<!-- <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Matrix Type</h4>
-    <hr> -->
 <div>
-
-    <form [formGroup]="VendorContractCriteriaForm">
-    <app-form-webxpress [form]="VendorContractCriteriaForm"
-        [formData]="MovementByControlArrayF.ServiceMatrixTypeControlArray"
-         [showSaveAndCancelButton]="false">
-    </app-form-webxpress>
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Movement By
+    <form [formGroup]="MatrixTypeCriteriaForm">
+        <app-form-webxpress [form]="MatrixTypeCriteriaForm" [formData]="MatrixType" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Movement
+        By
     </h4>
     <hr>
-    <app-form-webxpress [form]="VendorContractCriteriaForm" [formData]="MovementByControlArrayF.MovementByControlArray"
-         [showSaveAndCancelButton]="false">
-    </app-form-webxpress>
+    <form [formGroup]="MovementByCriteriaForm">
+        <app-form-webxpress [form]="MovementByCriteriaForm" [formData]="MovementBy" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
     </form>
 </div>

@@ -1,14 +1,17 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
-  <div>
-    <form [formGroup]="standardChargesTableForm">
-      <app-form-webxpress [form]="standardChargesTableForm" [formData]="jsonControlArray"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)">
-      </app-form-webxpress>
-    </form>
-    <div style="padding: 0px 20px 0px 20px;">
-      <button class="primarybutton" (click)="SubmitFunction()" [disabled]="!standardChargesTableForm.valid" mat-raised-button
-        color="primary">Submit</button>
-    </div>
+<div>
+  <div style="width: 100%; font-weight: 600; margin: 10px 0px; padding: 10px 0px; background-color: rgba(0, 0, 0, 0.1); text-align: center; font-size: 1.3rem;">
+    Add Standard Charges
   </div>
-</app-common-wrapper-webxpress>
+  <form [formGroup]="standardChargesTableForm">
+    <app-form-webxpress [form]="standardChargesTableForm" [formData]="jsonControlArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+      (callFunction)="functionCallHandler($event)">
+    </app-form-webxpress>
+  </form>
+  <div style="padding: 0px 30px">
+    <button class="primarybutton" (click)="SubmitFunction()" [disabled]="!standardChargesTableForm.valid"
+      mat-raised-button color="primary">Submit</button>
+      <button class="primarybutton" style="margin: 0px 10px;" (click)="CancleEntry()" 
+      mat-raised-button >Cancle</button>
+  </div>
+</div>

@@ -3,6 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { AddContractProfile } from 'src/assets/FormControls/VendorContractControls/add-contract-profile';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-contract-profile',
@@ -36,7 +37,7 @@ export class AddContractProfileComponent implements OnInit {
   ]
   contractBranchCodeValue: any;
   contractBranchCodeName: any;
-  constructor(private fb: UntypedFormBuilder,private filter: FilterUtils) { }
+  constructor(private fb: UntypedFormBuilder,private filter: FilterUtils,private Route: Router) { }
 
   ngOnInit(): void {
     this.initializeFormControl();
@@ -79,5 +80,8 @@ export class AddContractProfileComponent implements OnInit {
   }
   save(){
     console.log(this.addContractTableForm.value)
+  }
+  cancel() {
+    this.Route.navigateByUrl("/Masters/VendorContract/VendorContractList");
   }
 }

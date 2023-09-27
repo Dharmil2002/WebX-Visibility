@@ -64,6 +64,8 @@ import { AddContainerMasterComponent } from './container-master/add-container-ma
 import { VendorQueryPageComponent } from './Vendor Contract/vendor-query-page/vendor-query-page.component';
 import { AddContractProfileComponent } from './Vendor Contract/add-contract-profile/add-contract-profile.component';
 import { BasicInformationComponent } from './Vendor Contract/vendor-tabs/basic-information/basic-information.component';
+import { VendorContractListComponent } from './Vendor Contract/vendor-contract-list/vendor-contract-list.component';
+import { VendorTabsIndexComponent } from './Vendor Contract/vendor-tabs-index/vendor-tabs-index.component';
 
 
 const routes: Routes = [
@@ -128,9 +130,13 @@ const routes: Routes = [
   { path: "CityLocationMapping/CityLocationIndex", component: CityLocationMappingMaster },
   { path: "ContainerMaster/ContainerMasterList", component: ContainerMasterListComponent },
   { path: "ContainerMaster/AddContainerMaster", component: AddContainerMasterComponent },
-  { path: "VendorContract/VendorQueryPage", component: VendorQueryPageComponent },
-  { path: "VendorContract/AddContractProfile", component: AddContractProfileComponent },
-  { path: "VendorContract/BasicInformation", component: BasicInformationComponent },
+
+   // Vendor Contract Router
+   { path: "VendorContract/VendorQueryPage", component: VendorQueryPageComponent },
+   { path: "VendorContract/AddContractProfile", component: AddContractProfileComponent },
+   { path: "VendorContract/BasicInformation", component: BasicInformationComponent },
+   { path: "VendorContract/VendorContractList", component: VendorContractListComponent },
+   { path: "VendorContract/VendorIndex", component: VendorTabsIndexComponent },
 ];
 
 @NgModule({

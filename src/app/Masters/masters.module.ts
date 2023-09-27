@@ -106,6 +106,9 @@ import { VendorQueryPageComponent } from './Vendor Contract/vendor-query-page/ve
 import { AddContractProfileComponent } from './Vendor Contract/add-contract-profile/add-contract-profile.component';
 import { VendorContractHeaderComponent } from './Vendor Contract/vendor-contract-header/vendor-contract-header.component';
 import { BasicInformationComponent } from './Vendor Contract/vendor-tabs/basic-information/basic-information.component';
+import { VendorTabsIndexComponent } from './Vendor Contract/vendor-tabs-index/vendor-tabs-index.component';
+import { VendorContractListComponent } from './Vendor Contract/vendor-contract-list/vendor-contract-list.component';
+import { ServiceSelectionComponent } from './Vendor Contract/vendor-tabs/service-selection/service-selection.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -214,7 +217,11 @@ import { BasicInformationComponent } from './Vendor Contract/vendor-tabs/basic-i
     VendorQueryPageComponent,
     AddContractProfileComponent,
     VendorContractHeaderComponent,
-    BasicInformationComponent
+    BasicInformationComponent,
+    VendorTabsIndexComponent,
+    VendorContractListComponent,
+   ServiceSelectionComponent
+
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

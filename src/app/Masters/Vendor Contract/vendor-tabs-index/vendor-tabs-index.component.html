@@ -1,0 +1,93 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12">
+                <div class="card">
+                    <!-- (selectedTabChange)="onTabChange($event)" (CurrentIndex)="GetSelectedIndex($event)" (selectedIndexChange)="GetSelectedIndex($event,'tab')" -->
+                    <mat-tab-group style="font-size: 16px;">
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <div class="mattablable">
+                                    <mat-icon class="example-tab-icon msr-2">info</mat-icon>
+                                    Basic Information
+                                </div>
+                            </ng-template>
+                            <div>
+                                <h1>
+                                    Basic Information
+                                </h1>
+                            </div>
+
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <div class="mattablable">
+
+                                <mat-icon class="example-tab-icon msr-2">create</mat-icon>
+                                Service Selection
+                                </div>
+                            </ng-template>
+                            <div>
+                                <app-service-selection></app-service-selection>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <div class="mattablable">
+
+                                <mat-icon class="example-tab-icon msr-2"> money</mat-icon>
+                                Standard Charges
+                                </div>
+                            </ng-template>
+                            <div>
+                                <h1>
+                                    Standard Charges
+                                </h1>
+                            </div>
+                        </mat-tab>
+                        <!-- <ng-container *ngIf="showcity">
+                            <mat-tab>
+                                <ng-template mat-tab-label>
+                                    <mat-icon class="example-tab-icon msr-2">location_city</mat-icon>
+                                    {{this.data.contractTypeDescription}}
+                                </ng-template>
+                                <app-city-based-charges *ngIf="this.showcity && tabGroup.selectedIndex== 3"
+                                    [data]="data"></app-city-based-charges>
+                            </mat-tab>
+                        </ng-container>
+                        <ng-container *ngIf="showdistance">
+                            <mat-tab>
+                                <ng-template mat-tab-label>
+                                    <mat-icon class="example-tab-icon msr-2"> local_shipping</mat-icon>
+                                    Trip Distance Based
+                                </ng-template>
+                                <app-trip-distance-based *ngIf="this.showdistance && tabGroup.selectedIndex== 3"
+                                    [data]="data"></app-trip-distance-based>
+                            </mat-tab>
+                        </ng-container> -->
+                        <!-- <mat-tab>
+                            <ng-template mat-tab-label>
+                                <mat-icon class="example-tab-icon msr-2"> money</mat-icon>
+                                Special Charges
+                            </ng-template>
+                            
+                        </mat-tab> -->
+                    </mat-tab-group>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .mattablable {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+    }
+</style>

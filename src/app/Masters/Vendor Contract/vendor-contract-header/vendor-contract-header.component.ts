@@ -15,11 +15,7 @@ export class VendorContractHeaderComponent {
   }
   GotoListing()
   {
-    this.VendorDetails=new VendorContract();
-    this.VendorDetails.VendorCode=this.formItem.vendorCode;
-    this.VendorDetails.VendorType=this.formItem.vendorType;
-    this.VendorDetails.VendorName=this.formItem.vendorName;
-    this.router.navigate(['/Masters/VendorContract/VendorContractList'], { state: { data: this.VendorDetails, queryParams: { details: btoa(JSON.stringify(this.VendorDetails))}}});
+    this.router.navigate(['/Masters/VendorContract/VendorContractList']);
   }
 
 }

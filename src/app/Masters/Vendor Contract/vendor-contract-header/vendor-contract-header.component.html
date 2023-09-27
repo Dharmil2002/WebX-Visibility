@@ -1,0 +1,50 @@
+<head>
+  <style>
+    table,
+    tr,
+    td,
+    th {
+      border: 1px solid #e4e7ed;
+    }
+  
+    td,
+    th {
+      padding: 5px;
+    }
+  
+    th {
+      text-align: center;
+    }
+    
+    .flex-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding-top:10px;
+      padding-left:10px;
+    }
+    
+    .rowpad {
+      padding: 10px;
+    }
+  </style>
+</head>
+<div>
+  <ng-container *ngIf="formItem">
+    <div class="flex-container">
+      <table>
+        <tr>
+          <td class="rowpad"><b>Contract Code:</b> {{formItem.contractCode}}</td>
+          <td class="rowpad"><b>Vendor Code:</b> {{formItem.vendorCode}}</td>
+          <td class="rowpad"><b>Vendor Name:</b> {{formItem.vendorName}}</td>
+        </tr>
+      </table>
+      <section>
+        <div class="example-button-row">
+          <button mat-raised-button color="info" type="button" (click)="GotoListing()">Go to Listing</button>
+      </div>
+      </section>
+    </div>
+  </ng-container>
+</div>

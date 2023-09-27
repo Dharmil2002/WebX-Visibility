@@ -104,6 +104,8 @@ import { AddContainerMasterComponent } from './container-master/add-container-ma
 import { MenuBidingAccessComponent } from './menu-biding-access/menu-biding-access.component';
 import { VendorQueryPageComponent } from './Vendor Contract/vendor-query-page/vendor-query-page.component';
 import { AddContractProfileComponent } from './Vendor Contract/add-contract-profile/add-contract-profile.component';
+import { VendorContractHeaderComponent } from './Vendor Contract/vendor-contract-header/vendor-contract-header.component';
+import { BasicInformationComponent } from './Vendor Contract/vendor-tabs/basic-information/basic-information.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -210,7 +212,9 @@ import { AddContractProfileComponent } from './Vendor Contract/add-contract-prof
     AddVehicleStatusUpdateComponent, HolidayMasterComponent,
     AddEditHolidayComponent,CityLocationMappingMaster, ContainerMasterListComponent,MenuBidingAccessComponent, AddContainerMasterComponent,
     VendorQueryPageComponent,
-    AddContractProfileComponent
+    AddContractProfileComponent,
+    VendorContractHeaderComponent,
+    BasicInformationComponent
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]

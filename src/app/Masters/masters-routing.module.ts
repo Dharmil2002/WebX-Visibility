@@ -63,6 +63,7 @@ import { ContainerMasterListComponent } from './container-master/container-maste
 import { AddContainerMasterComponent } from './container-master/add-container-master/add-container-master.component';
 import { VendorQueryPageComponent } from './Vendor Contract/vendor-query-page/vendor-query-page.component';
 import { AddContractProfileComponent } from './Vendor Contract/add-contract-profile/add-contract-profile.component';
+import { BasicInformationComponent } from './Vendor Contract/vendor-tabs/basic-information/basic-information.component';
 
 
 const routes: Routes = [
@@ -129,6 +130,7 @@ const routes: Routes = [
   { path: "ContainerMaster/AddContainerMaster", component: AddContainerMasterComponent },
   { path: "VendorContract/VendorQueryPage", component: VendorQueryPageComponent },
   { path: "VendorContract/AddContractProfile", component: AddContractProfileComponent },
+  { path: "VendorContract/BasicInformation", component: BasicInformationComponent },
 ];
 
 @NgModule({

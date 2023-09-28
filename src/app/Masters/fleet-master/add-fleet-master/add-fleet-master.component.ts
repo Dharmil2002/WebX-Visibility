@@ -110,7 +110,7 @@ export class AddFleetMasterComponent implements OnInit {
       let vehTypeReq = {
         "companyCode": parseInt(localStorage.getItem("companyCode")),
         "filter": {},
-        "collectionName": "vehicle_detail"
+        "collectionName": "vehicleType_detail"
       };
 
       const vehicleRes = await this.masterService.masterPost('generic/get', vehicleReq).toPromise();
@@ -128,8 +128,8 @@ export class AddFleetMasterComponent implements OnInit {
         value: element.vehicleNo,
       }));
       const vehTypeDet = mergedData.vehTypeData.map(element => ({
-        name: element.vehicleType,
-        value: element.vehicleType,
+        name: element.vehicleTypeCode,
+        value: element.vehicleTypeName,
       }));
       this.vehicleDet = vehicleDet;
       this.vehTypeDet = vehTypeDet;
@@ -257,7 +257,7 @@ export class AddFleetMasterComponent implements OnInit {
   //#region Function for save data
   async save() {
     const formValue = this.fleetTableForm.value;
-    const controlNames = ["vehicleNo"];
+    const controlNames = ["vehicleNo","vehicleType"];
     controlNames.forEach((controlName) => {
       const controlValue = formValue[controlName]?.name;
       this.fleetTableForm.controls[controlName].setValue(controlValue);

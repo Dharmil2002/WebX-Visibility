@@ -8,6 +8,53 @@ export class LocationControl {
   constructor(LocationTable: LocationMaster, isUpdate: boolean) {
     (this.LocationDetailControl = [
       {
+        name: "locCode",
+        label: "Location Code",
+        placeholder: "Enter Location Code",
+        type: "text",
+        value: LocationTable.locCode,
+        generatecontrol: true,
+        disable: isUpdate ? true : false,
+        Validations: [
+          {
+            name: "required",
+            message: "Location Code is required",
+          },
+          {
+            name: "pattern",
+            message:
+              "Please Enter A-Z Char Or 0-9 with no Space and Location Code should be limited to 5 characters",
+            pattern: "^[.a-zA-Z0-9,-]{0,5}$",
+          },
+        ],
+        functions: {
+          onChange: "checkLocationCodeExist",
+        },
+      },
+      {
+        name: "locName",
+        label: "Location Name",
+        placeholder: "Enter Location Name",
+        type: "text",
+        value: LocationTable.locName,
+        generatecontrol: true,
+        disable: isUpdate ? true : false,
+        Validations: [
+          {
+            name: "required",
+            message: "Location Name is required",
+          },
+          {
+            name: "pattern",
+            message: "Please Enter only text of length 3 to 25 characters",
+            pattern: "^[a-zA-Z ]{3,25}$",
+          },
+        ],
+        functions: {
+          onChange: "checkLocationCodeExist",
+        },
+      },
+      {
         name: "locLevel",
         label: "Location Hierarchy",
         placeholder: "Select location Hierarchy",
@@ -100,51 +147,34 @@ export class LocationControl {
           onModelChange: "getLocationDetails",
         },
       },
+
       {
-        name: "locCode",
-        label: "Location Code",
-        placeholder: "Enter Location Code",
-        type: "text",
-        value: LocationTable.locCode,
+        name: "locPincode",
+        label: "Pincode",
+        placeholder: "Enter Pincode",
+        type: "dropdown",
+        value: "",
         generatecontrol: true,
-        disable: isUpdate ? true : false,
+        disable: false,
         Validations: [
           {
-            name: "required",
-            message: "Location Code is required",
+            name: "autocomplete",
           },
           {
-            name: "pattern",
-            message:
-              "Please Enter A-Z Char Or 0-9 with no Space and Location Code should be limited to 5 characters",
-            pattern: "^[.a-zA-Z0-9,-]{0,5}$",
+            name: "required",
+            message: " ",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
           },
         ],
-        functions: {
-          onChange: "checkLocationCodeExist",
+        additionalData: {
+          showNameAndValue: false,
         },
-      },
-      {
-        name: "locName",
-        label: "Location Name",
-        placeholder: "Enter Location Name",
-        type: "text",
-        value: LocationTable.locName,
-        generatecontrol: true,
-        disable: isUpdate ? true : false,
-        Validations: [
-          {
-            name: "required",
-            message: "Location Name is required",
-          },
-          {
-            name: "pattern",
-            message: "Please Enter only text of length 3 to 25 characters",
-            pattern: "^[a-zA-Z ]{3,25}$",
-          },
-        ],
         functions: {
-          onChange: "checkLocationCodeExist",
+          onModel: "getPincodeData",
+          onOptionSelect: "setStateCityData",
         },
       },
       {
@@ -186,35 +216,7 @@ export class LocationControl {
           showNameAndValue: false,
         }
       },
-      {
-        name: "locPincode",
-        label: "Pincode",
-        placeholder: "Enter Pincode",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "required",
-            message: " ",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
-        },
-        functions: {
-          onModel: "getPincodeData",
-          onOptionSelect: "setStateCityData",
-        },
-      },
+
       {
         name: "locCity",
         label: "City",
@@ -338,8 +340,8 @@ export class LocationControl {
         placeholder: "Enter Latitude , Longitude",
         type: "text",
         value:
-        //LocationTable.Latitude,
-         LocationTable.Latitude +
+          //LocationTable.Latitude,
+          LocationTable.Latitude +
           "," +
           LocationTable.Longitude,
         generatecontrol: true,
@@ -414,6 +416,20 @@ export class LocationControl {
         }],
         generatecontrol: false, disable: false
       },
+      {
+        name: '_id',
+        label: '',
+        placeholder: '',
+        type: 'text',
+        value: LocationTable._id,
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: false,
+        disable: false
+
+    }
     ])
   }
   getFormControlsLocation() {

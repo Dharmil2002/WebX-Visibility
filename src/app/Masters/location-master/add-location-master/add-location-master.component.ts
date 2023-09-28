@@ -174,7 +174,6 @@ export class AddLocationMasterComponent implements OnInit {
   //#region Save function
   save() {
     const formValue = this.locationTableForm.value;
-
     const controlNames = [
       "locLevel",
       "reportLevel",
@@ -194,17 +193,6 @@ export class AddLocationMasterComponent implements OnInit {
     this.locationTableForm.controls.Longitude.setValue(latLng[1] || 0);
 
     this.locationTableForm.controls["pincodeHandler"].setValue(resultArray)
-    const onSuccess = (res) => {
-      if (res) {
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: res.message,
-          showConfirmButton: true,
-        });
-        this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
-      }
-    };
     Object.values(this.locationTableForm.controls).forEach((control) =>
       control.setErrors(null)
     );
@@ -218,12 +206,17 @@ export class AddLocationMasterComponent implements OnInit {
         filter: { _id: id },
         update: this.locationTableForm.value,
       };
-      this.masterService
-        .masterPut("generic/update", req)
-        .pipe(takeUntil(this.unsubscribe$))
-        .subscribe({
-          next: onSuccess,
+      const res = this.masterService.masterPut("generic/update", req).toPromise()
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Record updated Successfully",
+          showConfirmButton: true,
         });
+        this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
+      }
     } else {
       this.locationTableForm.controls["_id"].setValue(
         this.locationTableForm.controls["locCode"].value
@@ -234,13 +227,17 @@ export class AddLocationMasterComponent implements OnInit {
         collectionName: "location_detail",
         data: this.locationTableForm.value,
       };
-
-      this.masterService
-        .masterPost("generic/create", createReq)
-        .pipe(takeUntil(this.unsubscribe$))
-        .subscribe({
-          next: onSuccess,
+      const res = this.masterService.masterPost("generic/create", createReq).toPromise()
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Record added Successfully",
+          showConfirmButton: true,
         });
+        this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
+      }
     }
   }
   //#endregion

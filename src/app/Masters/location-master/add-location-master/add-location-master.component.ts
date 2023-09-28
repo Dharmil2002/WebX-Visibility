@@ -493,6 +493,7 @@ export class AddLocationMasterComponent implements OnInit {
       this.report,
       this.reportStatus
     );
+    this.locationTableForm.controls.reportLoc.setValue("");
   }
   //#region to check Existing location
   async checkLocationCodeExist() {

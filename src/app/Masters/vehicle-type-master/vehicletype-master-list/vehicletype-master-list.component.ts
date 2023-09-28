@@ -24,25 +24,11 @@ export class VehicletypeMasterListComponent implements OnInit {
     headerForCsv = {
         "vehicleTypeCode": "Vehicle Type Code",
         "vehicleTypeName": "Vehicle Type Name",
-        "vehicleManufacturerName": "Vehicle Manufacturer Name",
-        "modelNo": "Model No.",
         "vehicleTypeCategory": "Vehicle Type Category",
-        "tyreRotationatKm": "Tyre Rotation at KM",
-        "typeDescription": "Type Description",
-        "vehicleSize": "Vehicle Size",
-        "tankCapacity": "Tank Capacity",
-        "isActive": "Active Flag",
-        "grossVehicleWeight": "Gross Vehicle Weight",
-        "unladenWeight": "Unladen Weight",
-        "capacity": "Capacity",
-        "ratePerKM": "Rate Per KM",
         "fuelType": "Fuel Type",
-        "length": "Length",
-        "width": "Width",
-        "height": "Height",
-        "capacityDiscount": "Capacity Discount",
-        "tyreRotationAlertKMs": "Tyre Rotation Alert KMs",
-        "noOfPackages": "No. Of Packages",
+        "oem": "OEM",
+        "oemmodel": "OEM MODEL",
+        "isActive": "Active Flag"
     }
     breadScrums = [
         {

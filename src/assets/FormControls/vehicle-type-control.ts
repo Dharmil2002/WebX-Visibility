@@ -119,124 +119,15 @@ export class VehicleTypeControl {
                         pattern: "^[a-zA-Z 0-9 ]{0,100}$",
                     },
                 ],
-               
+
                 generatecontrol: true, disable: false
             },
-            // {
-            //     name: "oemModel",
-            //     label: "OEM Model",
-            //     placeholder: "Enter OEM Model",
-            //     type: "text",
-            //     value: vehicleTypeTable.oemModel,
-            //     generatecontrol: true,
-            //     disable: false,
-            //     Validations: [
-            //         {
-            //             name: "required",
-            //             message: "OEM Model is required"
-            //         },
-            //         {
-            //             name: "pattern",
-            //             message: "Please Enter alphanumeric 100 digit! OEM Model",
-            //             pattern: "^[a-zA-Z 0-9 ]{0,100}$",
-            //         },
-            //     ],
-            // },
-            // {
-            //     name: 'vehicleManufacturerName',
-            //     label: 'Vehicle Manufacturer Name',
-            //     placeholder: 'Enter Vehicle Manufacturer Name',
-            //     type: 'text', value: isUpdate ? vehicleTypeTable.vehicleManufacturerName : "",
-            //     Validations: [
-            //         {
-            //             name: "required",
-            //             message: "Vehicle Manufacturer Name is required"
-            //         },
-            //         {
-            //             name: "pattern",
-            //             message: "Please Enter Proper value(1-25 character)",
-            //             pattern: '.{1,25}'
-            //         }
-            //     ],
-            //     generatecontrol: true, disable: false
-            // },
-            // {
-            //     name: 'modelNo',
-            //     label: 'Model No.',
-            //     placeholder: 'Enter Model No.',
-            //     type: 'text', value: isUpdate ? vehicleTypeTable.modelNo : "",
-            //     Validations: [
-            //         {
-            //             name: "pattern",
-            //             message: "Please Enter Proper Model No(1-25 character)",
-            //             pattern: '.{1,25}'
-            //         }
-            //     ],
-            //     generatecontrol: true, disable: false
-            // },
-            // {
-            //     name: 'vehicleTypeCategory',
-            //     label: 'Truck/Trailer',
-            //     placeholder: 'Search And Select Vehicle Type Category',
-            //     type: 'dropdown', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-            //     Validations: [
-            //     ],
-            //     additionalData: {
-            //         showNameAndValue: false
-            //     },
-            //     generatecontrol: true, disable: false
-            // },
-            // {
-            //     name: 'tyreRotationatKm',
-            //     label: 'Tyre Rotation at Km',
-            //     placeholder: 'Enter KM',
-            //     type: 'number',
-            //     value: isUpdate ? vehicleTypeTable.tyreRotationatKm : "",
-            //     Validations: [
-            //         {
-            //             name: "pattern",
-            //             message: "Please Enter Proper Average Speed(1-200)",
-            //             pattern: '^(?:[1-9]|[1-9][0-9]|1[0-9]{2}|200)$'
-            //         }
-            //     ],
-            //     generatecontrol: true, disable: false
-            // },
-            // {
-            //     name: 'typeDescription',
-            //     label: 'Type Description',
-            //     placeholder: 'Enter Type Description',
-            //     type: 'text', value: isUpdate ? vehicleTypeTable.typeDescription : "",
-            //     Validations: [
-            //         {
-            //             name: "pattern",
-            //             message: "Please Enter Proper Type Description(1-25 Character)",
-            //             pattern: '.{1,25}'
-            //         }
-            //     ],
-            //     generatecontrol: true, disable: false
-            // },
-
-            // {
-            //     name: 'tankCapacity',
-            //     label: 'Tank Capacity(Liters)',
-            //     placeholder: 'Enter Tank Capacity in Liters',
-            //     type: 'number',
-            //     value: isUpdate ? vehicleTypeTable.tankCapacity : "",
-            //     Validations: [
-            //         {
-            //             name: "pattern",
-            //             message: "Please Enter Proper Tank Capacity(1-1000)",
-            //             pattern: '^(?:[1-9]|[1-9][0-9]{1,2}|1000)$'
-            //         }
-            //     ],
-            //     generatecontrol: true, disable: false
-            // },
             {
                 name: 'isActive',
                 label: 'Active Flag',
                 placeholder: 'Active Flag',
                 type: 'toggle',
-                value: isUpdate ? vehicleTypeTable.isActive : "",
+                value: vehicleTypeTable.isActive,
                 Validations: [],
                 generatecontrol: true, disable: false
             },

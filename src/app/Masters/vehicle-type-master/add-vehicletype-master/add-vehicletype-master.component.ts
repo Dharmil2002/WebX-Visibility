@@ -119,13 +119,11 @@ export class AddVehicletypeMasterComponent implements OnInit {
 
   }
   async save() {
-    this.vehicleTypeTableForm.controls["isActive"].setValue(this.vehicleTypeTableForm.value.isActive);
     // Remove field from the form controls
     this.vehicleTypeTableForm.removeControl("companyCode");
     this.vehicleTypeTableForm.removeControl("updateBy");
     this.vehicleTypeTableForm.removeControl("isUpdate");
-    let data = convertNumericalStringsToInteger(this.vehicleTypeTableForm.value)
-
+    
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "vehicleType_detail",
@@ -158,7 +156,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
           companyCode: this.companyCode,
           collectionName: "vehicleType_detail",
           filter: { _id: id },
-          update: data
+          update: this.vehicleTypeTableForm.value
         };
         const res = await this.masterService.masterPut("generic/update", req).toPromise()
         if (res) {

@@ -4,6 +4,7 @@ import { TripLaneBased } from "src/assets/FormControls/VendorContractControls/ad
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
+import { MatDialogRef } from "@angular/material/dialog";
 
 @Component({
   selector: "app-add-trip-lane-based",
@@ -104,7 +105,8 @@ export class AddTripLaneBasedComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private Route: Router
+    private Route: Router,
+    public dialogRef: MatDialogRef<AddTripLaneBasedComponent>
   ) {}
 
   ngOnInit(): void {
@@ -214,7 +216,7 @@ export class AddTripLaneBasedComponent implements OnInit {
     );
   }
   cancel(){
-    this.Route.navigateByUrl("/Masters/VendorContract/VendorIndex");
+    this.dialogRef.close()
   }
 }
 

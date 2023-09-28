@@ -116,6 +116,8 @@ import { AddTripLaneBasedComponent } from './Vendor Contract/vendor-tabs/pop-UP/
 import { StandardChargesComponent } from './Vendor Contract/vendor-tabs/standard-charges/standard-charges.component';
 import { AddAdditionalDeliveryChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-additional-delivery-charges/add-additional-delivery-charges.component';
 import { AddWaitingChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-waiting-charges/add-waiting-charges.component';
+import { TripLaneBasedComponent } from './Vendor Contract/vendor-tabs/trip-lane-based/trip-lane-based.component';
+import { SpecialChargesComponent } from './Vendor Contract/vendor-tabs/special-charges/special-charges.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -219,8 +221,13 @@ import { AddWaitingChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP
     GeneralMasterListComponent,
     GeneralMasterAddComponent,
     GeneralMasterCodeListComponent,
-    AddVehicleStatusUpdateComponent, HolidayMasterComponent,
-    AddEditHolidayComponent,CityLocationMappingMaster, ContainerMasterListComponent,MenuBidingAccessComponent, AddContainerMasterComponent,
+    AddVehicleStatusUpdateComponent,
+     HolidayMasterComponent,
+    AddEditHolidayComponent,
+    CityLocationMappingMaster,
+    ContainerMasterListComponent,
+    MenuBidingAccessComponent,
+    AddContainerMasterComponent,
     VendorQueryPageComponent,
     AddContractProfileComponent,
     VendorContractHeaderComponent,
@@ -234,7 +241,9 @@ import { AddWaitingChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP
    AddTripLaneBasedComponent,
    StandardChargesComponent,
    AddAdditionalDeliveryChargesComponent,
-   AddWaitingChargesComponent
+   AddWaitingChargesComponent,
+   TripLaneBasedComponent,
+   SpecialChargesComponent
 
   ],
 

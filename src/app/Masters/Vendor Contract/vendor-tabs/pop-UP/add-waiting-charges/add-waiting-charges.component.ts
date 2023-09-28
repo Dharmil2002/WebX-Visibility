@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from "@angular/forms";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
-import { Router } from "@angular/router";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { WaitingChargesControls } from 'src/assets/FormControls/VendorContractControls/add-waiting-charges-control';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-waiting-charges',
@@ -57,7 +57,7 @@ export class AddWaitingChargesComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private Route: Router
+    public dialogRef: MatDialogRef<AddWaitingChargesComponent>
   ) {}
 
   ngOnInit(): void {
@@ -123,7 +123,7 @@ export class AddWaitingChargesComponent implements OnInit {
     );
   }
   cancel(){
-    this.Route.navigateByUrl("/Masters/VendorContract/VendorIndex");
+    this.dialogRef.close()
   }
 
 }

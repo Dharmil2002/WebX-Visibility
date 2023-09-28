@@ -4,6 +4,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { AdditionalDeliveryCharges } from 'src/assets/FormControls/VendorContractControls/add-additional-delivery-charges-control';
+import { MatDialogRef } from '@angular/material/dialog';
 @Component({
   selector: 'app-add-additional-delivery-charges',
   templateUrl: './add-additional-delivery-charges.component.html'
@@ -40,7 +41,8 @@ export class AddAdditionalDeliveryChargesComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private Route: Router
+    private Route: Router,
+    public dialogRef: MatDialogRef<AddAdditionalDeliveryChargesComponent>
   ) {}
 
   ngOnInit(): void {
@@ -91,7 +93,7 @@ export class AddAdditionalDeliveryChargesComponent implements OnInit {
     );
   }
   cancel(){
-    this.Route.navigateByUrl("/Masters/VendorContract/VendorIndex");
+    this.dialogRef.close()
   }
 
 }

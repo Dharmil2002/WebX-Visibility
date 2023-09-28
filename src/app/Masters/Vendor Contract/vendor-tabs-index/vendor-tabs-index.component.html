@@ -17,7 +17,7 @@
                                 </div>
                             </ng-template>
                             <div>
-                             <app-basic-information></app-basic-information>
+                                <app-basic-information></app-basic-information>
                             </div>
 
                         </mat-tab>
@@ -25,8 +25,8 @@
                             <ng-template mat-tab-label>
                                 <div class="mattablable">
 
-                                <mat-icon class="example-tab-icon msr-2">create</mat-icon>
-                                Service Selection
+                                    <mat-icon class="example-tab-icon msr-2">create</mat-icon>
+                                    Service Selection
                                 </div>
                             </ng-template>
                             <div>
@@ -38,41 +38,34 @@
                             <ng-template mat-tab-label>
                                 <div class="mattablable">
 
-                                <mat-icon class="example-tab-icon msr-2"> money</mat-icon>
-                                Standard Charges
+                                    <mat-icon class="example-tab-icon msr-2"> money</mat-icon>
+                                    Standard Charges
                                 </div>
                             </ng-template>
                             <div>
                                 <app-standard-charges></app-standard-charges>
                             </div>
                         </mat-tab>
-                        <!-- <ng-container *ngIf="showcity">
+                        <ng-container>
                             <mat-tab>
                                 <ng-template mat-tab-label>
                                     <mat-icon class="example-tab-icon msr-2">location_city</mat-icon>
-                                    {{this.data.contractTypeDescription}}
+                                    Trip Lane Based (Location - Area)
                                 </ng-template>
-                                <app-city-based-charges *ngIf="this.showcity && tabGroup.selectedIndex== 3"
-                                    [data]="data"></app-city-based-charges>
+                                <app-trip-lane-based></app-trip-lane-based>
                             </mat-tab>
                         </ng-container>
-                        <ng-container *ngIf="showdistance">
-                            <mat-tab>
-                                <ng-template mat-tab-label>
-                                    <mat-icon class="example-tab-icon msr-2"> local_shipping</mat-icon>
-                                    Trip Distance Based
-                                </ng-template>
-                                <app-trip-distance-based *ngIf="this.showdistance && tabGroup.selectedIndex== 3"
-                                    [data]="data"></app-trip-distance-based>
-                            </mat-tab>
-                        </ng-container> -->
-                        <!-- <mat-tab>
+                        <mat-tab>
                             <ng-template mat-tab-label>
-                                <mat-icon class="example-tab-icon msr-2"> money</mat-icon>
-                                Special Charges
+                                <div class="mattablable">
+                                    <mat-icon class="example-tab-icon msr-2"> money</mat-icon>
+                                    Special Charges
+                                </div>
                             </ng-template>
-
-                        </mat-tab> -->
+                            <div>
+                                <app-special-charges></app-special-charges>
+                            </div>
+                        </mat-tab>
                     </mat-tab-group>
                 </div>
             </div>

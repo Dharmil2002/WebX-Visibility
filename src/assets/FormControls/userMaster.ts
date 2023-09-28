@@ -232,10 +232,10 @@ export class UserControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "required",
-            message: "Mobile Number is required!",
-          },
+          // {
+          //   name: "required",
+          //   message: "Mobile Number is required!",
+          // },
           {
             name: "pattern",
             message: "Please enter 6 to 15 digit mobile number",

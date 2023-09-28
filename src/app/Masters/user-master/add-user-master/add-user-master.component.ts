@@ -431,7 +431,7 @@ export class AddUserMasterComponent implements OnInit {
               Swal.fire({
                 icon: "success",
                 title: "Successful",
-                text: res.message,
+                text: "Record updated Successfully",
                 showConfirmButton: true,
               });
               this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");
@@ -453,7 +453,7 @@ export class AddUserMasterComponent implements OnInit {
               Swal.fire({
                 icon: "success",
                 title: "Successful",
-                text: res.message,
+                text: "Record added Successfully",
                 showConfirmButton: true,
               });
               this.route.navigateByUrl("/Masters/UserMaster/UserMasterView");

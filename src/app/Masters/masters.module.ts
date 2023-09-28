@@ -114,6 +114,8 @@ import { AddFleetMasterComponent } from './fleet-master/add-fleet-master/add-fle
 import { AddStandardChargesComponent} from './Vendor Contract/vendor-tabs/pop-UP/standard-charges/add-standard-charges.component';
 import { AddTripLaneBasedComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-trip-lane-based/add-trip-lane-based.component';
 import { StandardChargesComponent } from './Vendor Contract/vendor-tabs/standard-charges/standard-charges.component';
+import { AddAdditionalDeliveryChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-additional-delivery-charges/add-additional-delivery-charges.component';
+import { AddWaitingChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-waiting-charges/add-waiting-charges.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -230,7 +232,9 @@ import { StandardChargesComponent } from './Vendor Contract/vendor-tabs/standard
    FleetMasterListComponent,
    AddFleetMasterComponent,
    AddTripLaneBasedComponent,
-   StandardChargesComponent
+   StandardChargesComponent,
+   AddAdditionalDeliveryChargesComponent,
+   AddWaitingChargesComponent
 
   ],
 

@@ -75,6 +75,7 @@ export class AuthService {
             this.storageService.setItem("Branch",user.usr.multiLocation[0]);
             this.storageService.setItem("companyCode",user.usr.companyCode);
             this.storageService.setItem("Mode","Export");
+            //localStorage.setItem("company_Name", "Velocity");
             this.storageService.setItem("CurrentBranchCode", user.usr.multiLocation[0]);
             this.storageService.setItem("userLocations", user.usr.multiLocation);
             this.storageService.setItem("token",user.tokens.access.token);

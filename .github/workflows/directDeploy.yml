@@ -46,5 +46,5 @@ jobs:
           AZURE_SP_CLIENT_ID: ${{ secrets.AZURE_SP_CLIENT_ID }}
           AZURE_SP_CLIENT_SECRET: ${{ secrets.AZURE_SP_CLIENT_SECRET }}
           AZURE_SP_TENANT_ID: ${{ secrets.AZURE_SP_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: '83d54f47-c1b1-4042-a336-5455f49e2e80'
+          AZURE_SUBSCRIPTION_ID: 'webxpress Microsoft Azure Enterprise'
           AZURE_RESOURCE_GROUP: 'velocity'

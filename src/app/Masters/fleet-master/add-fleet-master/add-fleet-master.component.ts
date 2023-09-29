@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { fleetModel } from 'src/app/core/models/Masters/fleetMaster';
@@ -128,8 +129,8 @@ export class AddFleetMasterComponent implements OnInit {
         value: element.vehicleNo,
       }));
       const vehTypeDet = mergedData.vehTypeData.map(element => ({
-        name: element.vehicleTypeCode,
-        value: element.vehicleTypeName,
+        name: element.vehicleTypeName,
+        value: element.vehicleTypeCode,
       }));
       this.vehicleDet = vehicleDet;
       this.vehTypeDet = vehTypeDet;
@@ -258,6 +259,8 @@ export class AddFleetMasterComponent implements OnInit {
   async save() {
     const formValue = this.fleetTableForm.value;
     const controlNames = ["vehicleNo","vehicleType"];
+    const controls = this.fleetTableForm;
+    clearValidatorsAndValidate(controls);
     controlNames.forEach((controlName) => {
       const controlValue = formValue[controlName]?.name;
       this.fleetTableForm.controls[controlName].setValue(controlValue);

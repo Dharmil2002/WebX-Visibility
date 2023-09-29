@@ -67,22 +67,22 @@ export class FleetControls {
                 ],
             },
             {
-                name: 'registrationNo', label: 'Registration No', placeholder: 'Enter Registration No', type: 'text', 
+                name: 'registrationNo', label: 'Registration No', placeholder: 'Enter Registration No', type: 'text',
                 value: FleetTable?.registrationNo, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Registration No is required"
                     },
                 ],
             },
             {
-                name: 'RegistrationDate', label: "Registration Date", placeholder: "", type: 'date', 
+                name: 'RegistrationDate', label: "Registration Date", placeholder: "", type: 'date',
                 value: FleetTable.RegistrationDate, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Registration Date is required"
                     },
                 ],
                 additionalData: {
@@ -100,7 +100,7 @@ export class FleetControls {
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Registration Scan is required"
                     },
                 ],
                 functions: {
@@ -108,48 +108,48 @@ export class FleetControls {
                 },
             },
             {
-                name: 'vehicleInsurancePolicy', label: "Vehicle Insurance Policy", placeholder: "Enter Vehicle Insurance Policy", 
+                name: 'vehicleInsurancePolicy', label: "Vehicle Insurance Policy", placeholder: "Enter Vehicle Insurance Policy",
                 type: 'text', value: FleetTable?.vehicleInsurancePolicy, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Vehicle Insurance Policy is required"
                     },
                     {
                         // [Prefix]-[Policy Number]-[Suffix]
                         name: "pattern",
                         message: "Please enter a valid Vehicle Insurance Policy (e.g., VH-123456-01)",
-                        pattern: "[A-Z]{2}-[0-9]{6}-[0-9]{02}" 
+                        pattern: "[A-Z]{2}-[0-9]{6}-[0-9]{02}"
                     },
                 ],
             },
             {
-                name: 'insuranceProvider', label: "Insurance Provider", placeholder: "Enter Insurance Provider", 
+                name: 'insuranceProvider', label: "Insurance Provider", placeholder: "Enter Insurance Provider",
                 type: 'text', value: FleetTable?.insuranceProvider, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Insurance Provider is required"
                     },
                 ],
             },
             {
-                name: 'insuranceExpiryDate', label: "Insurance Expiry Date", placeholder: "Enter Insurance Expiry Date", 
+                name: 'insuranceExpiryDate', label: "Insurance Expiry Date", placeholder: "Enter Insurance Expiry Date",
                 type: 'date', value: FleetTable.insuranceExpiryDate, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Insurance Expiry Date is required"
                     },
                 ],
             },
             {
-                name: 'insuranceScan', label: "Insurance Scan", placeholder: "Enter Insurance Scan", type: 'file', 
+                name: 'insuranceScan', label: "Insurance Scan", placeholder: "Enter Insurance Scan", type: 'file',
                 value: FleetTable.insuranceScan, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Insurance Scan is required"
                     },
                 ],
                 functions: {
@@ -157,12 +157,12 @@ export class FleetControls {
                 }
             },
             {
-                name: 'fitnessValidityDate', label: "Fitness Validity Date", placeholder: "", type: 'date', 
+                name: 'fitnessValidityDate', label: "Fitness Validity Date", placeholder: "", type: 'date',
                 value: FleetTable.fitnessValidityDate, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Fitness Validity Date is required"
                     },
                 ],
             },
@@ -172,7 +172,7 @@ export class FleetControls {
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Fitness certificate Scan is required"
                     },
                 ],
                 functions: {
@@ -180,22 +180,22 @@ export class FleetControls {
                 },
             },
             {
-                name: 'chassisNo', label: "Chassis No", placeholder: "Enter Chassis No", type: 'text', 
+                name: 'chassisNo', label: "Chassis No", placeholder: "Enter Chassis No", type: 'text',
                 value: FleetTable?.chassisNo, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Chassis No is required"
                     },
                 ],
             },
             {
-                name: 'engineNo', label: "Engine No", placeholder: "Enter Engine No", type: 'text', 
+                name: 'engineNo', label: "Engine No", placeholder: "Enter Engine No", type: 'text',
                 value: FleetTable?.engineNo, generatecontrol: true, disable: false,
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Engine No is required"
                     },
                     {
                         // [Manufacturer Code] [Plant Code] [Production Sequence]

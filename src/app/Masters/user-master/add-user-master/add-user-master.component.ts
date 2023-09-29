@@ -509,4 +509,52 @@ export class AddUserMasterComponent implements OnInit {
       this.userTableForm.controls["confirmpassword"].reset();
     }
   }
+  //#region to check if a value already exists in user list
+  async checkValueExists(fieldName, errorMessage) {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.userTableForm.controls[fieldName].value;
+
+      // Create a request object with the filter criteria
+      const req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "user_master",
+        filter: { [fieldName]: fieldValue },
+      };
+
+      // Send the request to fetch user data
+      const userlist = await this.masterService.masterPost("generic/get", req).toPromise();
+
+      // Check if data exists for the given filter criteria
+      if (userlist.data.length > 0) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          title: `${errorMessage} already exists! Please try with another !`,
+          toast: true,
+          icon: "error",
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: "OK"
+        });
+
+        // Reset the input field
+        this.userTableForm.controls[fieldName].reset();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+    }
+  }
+
+  // Function to check if ERP Id already exists
+  async CheckERPId() {
+    await this.checkValueExists("erpId", "ERP Id");
+  }
+
+  // Function to check if User Name already exists
+  async CheckUserName() {
+    await this.checkValueExists("name", "User Name");
+  }
+  //#endregion
 }

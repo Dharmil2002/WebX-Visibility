@@ -19,9 +19,6 @@ export class UserControl {
             message: "User ID is required",
           },
         ],
-        functions: {
-          onChange: "GetUserDetails",
-        },
       },
       {
         name: "erpId",
@@ -38,6 +35,9 @@ export class UserControl {
             pattern: "^[a-zA-Z0-9]{0,25}$",
           },
         ],
+        functions: {
+          onChange: "CheckERPId",
+        },
       },
       {
         name: "name",
@@ -58,6 +58,9 @@ export class UserControl {
             pattern: "^[a-zA-Z ]{0,100}$",
           },
         ],
+        functions: {
+          onChange: "CheckUserName",
+        },
       },
       {
         name: "userpassword",

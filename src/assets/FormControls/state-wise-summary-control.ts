@@ -176,16 +176,16 @@ export class StateWiseSummaryControl {
       //   Validations: [],
       // },
 
-      // {
-      //   name: "unbilledAmount",
-      //   label: "Unbilled Amount",
-      //   placeholder: "Unbilled Amount",
-      //   type: "number",
-      //   value: "",
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [],
-      // },
+      {
+        name: "unbilledAmount",
+        label: "Unbilled Amount",
+        placeholder: "Unbilled Amount",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
       // {
       //   name: "remark",
       //   label: "Remark",

@@ -28,10 +28,11 @@ export class AddressMasterAddComponent implements OnInit {
   addressData: any;
   newAddressCode: string;
   data: any;
+  pincodeDataFetched = false;
   //#endregion
 
   ngOnInit() {
-   this.getPincodeData();
+    this.getPincodeData();
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -87,41 +88,45 @@ export class AddressMasterAddComponent implements OnInit {
   }
   //#region Pincode Dropdown
   async getPincodeData() {
+    // Check if data has already been fetched
+    if (this.isUpdate && this.pincodeDataFetched) {
+      return;
+    }
     const pincodeReq = {
       "companyCode": this.companyCode,
       "collectionName": "pincode_master",
       "filter": {}
     };
-  
+
     try {
       // Fetch pincode data
       const pincodeRes = await this.masterService.masterPost('generic/get', pincodeReq).toPromise();
       this.pincodeDet = pincodeRes?.data || [];
-  
+
       const pincodeList = this.pincodeDet.map((x) => ({
         name: x.PIN.toString(),
         value: x.PIN.toString(),
       }));
-  
+
       // Update the form control if it's an update operation
       if (this.isUpdate) {
         const updatePin = pincodeList.find((x) => x.value == this.data.pincode);
         this.addressTableForm.controls['pincode'].setValue(updatePin);
       }
-  
+
       const pincodeValue = this.addressTableForm.controls['pincode'].value;
-  
+
       // Check if pincodeValue is a valid number
-      if (!isNaN(pincodeValue) && pincodeValue.toString().length > 2) {
+      if (!isNaN(pincodeValue) && pincodeValue.toString().length >= 3) {
         const exactPincodeMatch = pincodeList.find(
           (element) => element.name === pincodeValue
         );
-  
+
         if (!exactPincodeMatch) {
           const filteredPincodeDet = pincodeList.filter((element) =>
             element.name.includes(pincodeValue.toString())
           );
-  
+
           if (filteredPincodeDet.length === 0) {
             // Show a popup indicating no data found for the given pincode
             Swal.fire({
@@ -141,11 +146,11 @@ export class AddressMasterAddComponent implements OnInit {
           }
         }
       }
+      this.pincodeDataFetched = true;
     } catch (error) {
       console.error('Error fetching pincode data:', error);
-      // Handle the error gracefully, e.g., show an error message to the user
     }
-  }  
+  }
   //#endregion
 
   //#region Save Data

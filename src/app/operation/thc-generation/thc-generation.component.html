@@ -1,0 +1,28 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+<form [formGroup]="thcTableForm">
+    <app-form-without-auto-complete-webxpress [form]="thcTableForm" [formData]="jsonControlArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    </app-form-without-auto-complete-webxpress>
+  </form>
+  <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
+    [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+    (menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"
+    [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles">
+  </app-generic-table-v2>
+<div class="row" *ngIf="!isView">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+    <div class="example-button-row d-flex justify-content-end">
+      <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad"
+        (click)="createThc()">  {{ isUpdate ? 'Update THC' : 'Generate THC' }}</button>
+      <button class="msr-3" mat-raised-button color="primary" >Back</button>
+    </div>
+  </div>
+</div>
+</app-common-wrapper-webxpress>

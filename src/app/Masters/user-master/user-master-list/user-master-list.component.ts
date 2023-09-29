@@ -13,7 +13,7 @@ import Swal from "sweetalert2";
 })
 
 export class UserMasterListComponent implements OnInit {
-    tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation 
+    tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     companyCode: any = parseInt(localStorage.getItem("companyCode"));
     addAndEditPath: string;
     csvFileName: string;
@@ -38,20 +38,21 @@ export class UserMasterListComponent implements OnInit {
         "srNo": "Sr No",
         "userId": "User Code",
         "name": "User Name",
-        "branchCode": "User Branch",
+        "multiLocation": "Locations",
+        "role": "User Role",
         "isActive": "Active Flag",
         "actions": "Action"
     };
     headerForCsv = {
-        "internalId": 'InternalID',
+        // "internalId": 'InternalID',
         "userId": 'UserId',
-        "password": 'Password',
+        "userpassword": 'Password',
         "name": 'Name',
         "gender": 'Gender',
         "secretQuestion": 'SecretQuestion',
         "secretAnswer": 'SecretAnswer',
         "dateOfJoining": 'DateofJoining',
-        "managerID": 'ManagerID',
+        "managerId": 'ManagerID',
         "branchCode": 'Location',
         "dateOfBirth": 'DateofBirth',
         "residentialAddress": 'ResidentialAddress',
@@ -74,31 +75,31 @@ export class UserMasterListComponent implements OnInit {
     }
     constructor(
         private masterService: MasterService,
-        private retryAndDownloadService: RetryAndDownloadService, 
-        private geoLocationService:GeolocationService
-        ) {
+        private retryAndDownloadService: RetryAndDownloadService,
+        private geoLocationService: GeolocationService
+    ) {
     }
 
     async getUserDetails() {
-            let req = {
+        let req = {
             "companyCode": this.companyCode,
             "collectionName": "user_master",
             "filter": {}
         };
-     try {
-        const res = await this.masterService.masterPost("generic/get", req).toPromise()
-        if (res) {
-            // Generate srno for each object in the array
-            const dataWithSrno = res.data.map((obj, index) => {
-                return {
-                    ...obj,
-                    srNo: index + 1
-                };
-            });
-            this.csv = dataWithSrno;
-            this.tableLoad = false;
-        }
-           
+        try {
+            const res = await this.masterService.masterPost("generic/get", req).toPromise()
+            if (res) {
+                // Generate srno for each object in the array
+                const dataWithSrno = res.data.map((obj, index) => {
+                    return {
+                        ...obj,
+                        srNo: index + 1
+                    };
+                });
+                this.csv = dataWithSrno;
+                this.tableLoad = false;
+            }
+
         } catch (error) {
 
         }
@@ -108,7 +109,7 @@ export class UserMasterListComponent implements OnInit {
         // console.log("fn handler called", $event);
         let field = $event.field;                   // the actual formControl instance
         let functionName = $event.functionName;     // name of the function , we have to call
-        // function of this name may not exists, hence try..catch 
+        // function of this name may not exists, hence try..catch
         try {
             this[functionName]($event);
         } catch (error) {
@@ -143,6 +144,6 @@ export class UserMasterListComponent implements OnInit {
         }
     }
     // Function to make the API call as a promise with retry logic
-   
-  
+
+
 }

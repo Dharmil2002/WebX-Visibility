@@ -3,101 +3,129 @@ import { DriverMaster } from "src/app/core/models/Masters/Driver";
 
 export class DriverControls {
     private DriverDetailsControl: FormControls[];
-    private LicenseDetailsControls: FormControls[];
-    private PermanentAddressControls: FormControls[];
-    private UploadsControls: FormControls[];
-    private BankDetailsControls: FormControls[];
-    constructor(DriverTable: DriverMaster, IsUpdate: boolean) {
+    constructor(DriverTable: DriverMaster, isUpdate: boolean) {
         this.DriverDetailsControl =
             [
                 {
-                    name: 'driverName', label: ' Driver Name', placeholder: 'Enter Driver Name', type: 'text', value: DriverTable.driverName, generatecontrol: true, disable: false,
+                    name: 'manualDriverCode',
+                    label: 'Manual Driver Code',
+                    placeholder: 'Manual Driver Code',
+                    type: 'text',
+                    value: isUpdate ? DriverTable.manualDriverCode : "System Generated",
+                    Validations: [],
+                    generatecontrol: true,
+                    disable: true
+                },
+                {
+                    name: 'driverName', label: 'Driver Name', placeholder: 'Enter Driver Name', type: 'text', value: DriverTable.driverName, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "required",
                             message: "Driver Name is required"
-                        }
-                        , {
-                            name: "pattern",
-                            message: "Please Enter only text of length 3 to 25 characters",
-                            pattern: '^[a-zA-Z ]{3,25}$',
-                        }
-                    ]
-                },
-                {
-                    name: 'dFatherName', label: "Driver's Father Name", placeholder: "Enter Driver's Father  Name", type: 'text', value: DriverTable.dFatherName, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only text of length 3 to 25 characters",
-                            pattern: '^[a-zA-Z ]{3,25}$',
-                        }
-                    ]
-                },
-                {
-                    name: 'manualDriverCode', label: "Manual Driver Code", placeholder: "For example DC0001", type: 'text', value: DriverTable.manualDriverCode, generatecontrol: true, disable: IsUpdate ? true : false,
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "Manual Driver Code is required"
                         },
                         {
                             name: "pattern",
-                            message: "Please Enter alphanumeric Manual Driver Code of length 4 to 10",
-                            pattern: '^[a-zA-Z0-9]{4,10}$',
+                            message: "Please Enter only text of length 3 to 200 characters",
+                            pattern: '^[a-zA-Z]{3,200}$',
                         }
-
-                    ],
-                    functions: {
-                        onChange: 'getManualDriverCodeExists',
-                    }
+                    ]
                 },
                 {
-                    name: 'driverLocation',
-                    label: "Driver Location",
-                    placeholder: "Select location",
-                    type: 'dropdown',
-                    value: '',
+                    name: 'driverPhoto',
+                    label: 'Driver Photo',
+                    placeholder: '',
+                    type: 'file',
+                    value: DriverTable.driverPhoto,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Driver Name is required"
+                        },
+                    ],
+                    additionalData: {
+                        multiple: true
+                    },
+                    functions: {
+                        onChange: 'selectedFileDriverPhoto',
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: 'licenseNo', label: 'License No', placeholder: 'Enter License No', type: 'text', value: DriverTable.licenseNo, generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "License No is required"
+                        },
+                        {
+                            name: "pattern",
+                            message: "Please Enter alphanumeric License No of length 8 (eg. AZ-125487)",
+                            pattern: "^[A-Z]{2}-[0-9]{6}$",
+                        }
+                    ]
+                },
+                {
+                    name: 'valdityDt', label: "License Valdity Date", placeholder: "", type: 'date',
+                    value: DriverTable.valdityDt, generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "License Valdity Date is required"
+                        },
+                    ],
+                },
+                {
+                    name: 'licenseScan',
+                    label: 'License Scan',
+                    placeholder: '',
+                    type: 'file',
+                    value: DriverTable.licenseScan,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Driver Name is required"
+                        },
+                    ],
+                    additionalData: {
+                        multiple: true
+                    },
+                    functions: {
+                        onChange: 'selectedFileLicenseScan',
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: "country",
+                    label: "Country Code",
+                    placeholder: "Country Code",
+                    type: "dropdown",
+                    value: DriverTable.country,
+                    filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
                     disable: false,
                     Validations: [
                         {
-                            name: "invalidAutocompleteObject",
-                            message: "Choose proper value",
+                            name: "required",
+                            message: "Country Code is required..",
                         },
                         {
                             name: "autocomplete",
                         },
-                    ],
-                    additionalData: {
-                        showNameAndValue: false
-                    }
-                },
-                {
-                    name: 'vehicleNo',
-                    label: "Vehicle Number",
-                    placeholder: "Enter Vehicle Number",
-                    type: 'dropdown',
-                    value: '',
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
                         {
-                            name: "autocomplete",
-                        },
-                        {
-                            name: "invalidAutocompleteObject",
+                            name: "invalidAutocomplete",
                             message: "Choose proper value",
-                        }
+                        },
                     ],
                     additionalData: {
-                        showNameAndValue: false
+                        showNameAndValue: true,
                     },
                 },
                 {
-                    name: 'telno', label: "Contact Number", placeholder: "Enter Contact Number", type: 'number', value: DriverTable.telno, generatecontrol: true, disable: false,
+                    name: 'telno', label: "Mobile Number", placeholder: "Enter Mobile Number", type: 'number', value: DriverTable.telno, generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "required",
@@ -105,68 +133,11 @@ export class DriverControls {
                         },
                         {
                             name: "pattern",
-                            message: "Please enter 6 to 10 digit mobile number",
+                            message: "Please enter 10 to 12 digit Mobile number",
                             pattern: "^[0-9]{10,12}$",
                         }
                     ]
                 },
-                {
-                    name: 'dDob', label: "Date of Birth", placeholder: "select Date Of Birth", type: 'date', value: DriverTable.dDob, generatecontrol: true, disable: false,
-                    Validations: [],
-                    additionalData: {
-                        maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
-                        minDate: new Date("01 Jan 1900")
-                    }
-                },
-                {
-                    name: 'dCategory', label: "Driver Category", placeholder: "", type: 'dropdown', value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "invalidAutocompleteObject",
-                            message: "Choose proper value",
-                        }, {
-                            name: "autocomplete",
-                        },
-                    ],
-                    additionalData: {
-                        showNameAndValue: false
-                    }
-                },
-                {
-                    name: 'joiningDate', label: 'Joining Date', placeholder: 'Enter Joining Date', type: 'date', value: DriverTable.joiningDate ? DriverTable.joiningDate : new Date(), generatecontrol: true, disable: false,
-                    Validations: [],
-                    additionalData: {
-                        minDate: new Date("01 Jan 1900")
-                    }
-                },
-                {
-                    name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: DriverTable.activeFlag, generatecontrol: true, disable: false,
-                    Validations: []
-                },
-
-            ],
-            this.LicenseDetailsControls =
-            [
-                {
-                    name: 'licenseNo', label: 'License No', placeholder: 'Enter License No', type: 'text', value: DriverTable.licenseNo, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter alphanumeric License No of length 10 to 15",
-                            pattern: "^[a-zA-Z0-9 ]{10,15}$",
-                        }
-                    ]
-                },
-                {
-                    name: 'valdityDt', label: "License Valdity Date", placeholder: "select Valdity Date", type: 'date', value: DriverTable.valdityDt, generatecontrol: true, disable: false,
-                    Validations: [],
-                    additionalData: {
-                        minDate: new Date("01 Jan 1900")
-                    }
-                },
-
-            ],
-            this.PermanentAddressControls = [
                 {
                     name: 'address', label: 'Address', placeholder: 'Enter Permanent Address', type: 'text', value: DriverTable.address, generatecontrol: true, disable: false,
                     Validations: [
@@ -176,8 +147,8 @@ export class DriverControls {
                         },
                         {
                             name: "pattern",
-                            message: "Please enter Address of length 5 to 150 characters",
-                            pattern: "^[a-zA-Z0-9 ]{5,150}$",
+                            message: "Please enter Address of length 5 to 200 characters",
+                            pattern: "^[a-zA-Z0-9]{5,200}$",
                         }
                     ]
                 },
@@ -186,7 +157,7 @@ export class DriverControls {
                     label: 'Pincode',
                     placeholder: 'Enter Permanent Pincode',
                     type: 'dropdown',
-                    value: "",
+                    value: DriverTable.pincode,
                     generatecontrol: true,
                     disable: false,
                     Validations: [
@@ -217,176 +188,174 @@ export class DriverControls {
                             name: "required",
                             message: "City is required"
                         }
+                    ]
+                },
+                {
+                    name: 'addressProofDocNo', label: 'Address Proof Doc No', placeholder: 'Enter Permanent City', type: 'text', value: DriverTable.addressProofDocNo, generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Address Proof Doc No is required"
+                        },
+                        {
+                            name: "pattern",
+                            message: "Please enter Address Proof Doc No of length 3 to 200 characters",
+                            pattern: '^[a-zA-Z0-9]{3,200}$',
+                        }
+                    ]
+                },
+                {
+                    name: 'addressProofScan',
+                    label: 'Address Proof Scan',
+                    placeholder: '',
+                    type: 'file',
+                    value: DriverTable.addressProofScan,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Driver Name is required"
+                        },
+                    ],
+                    additionalData: {
+                        multiple: true
+                    },
+                    functions: {
+                        onChange: 'selectedFileAddressProofScan',
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: 'vehicleNo',
+                    label: "Assigned Vehicle No",
+                    placeholder: "Select Assigned Vehicle No",
+                    type: 'dropdown',
+                    value: DriverTable.vehicleNo,
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [
+                        {
+                            name: "autocomplete",
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        }
+                    ],
+                    additionalData: {
+                        showNameAndValue: false
+                    },
+                },
+                {
+                    name: 'dDob', label: "Date of Birth", placeholder: "select Date Of Birth", type: 'date', value: DriverTable.dDob, generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Date of Birth is required"
+                        }
+                    ],
+                    additionalData: {
+                        maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
+                        minDate: new Date("01 Jan 1900")
+                    }
+                },
+                {
+                    name: 'DOBProofDocNo', label: 'DOB proof doc no', placeholder: 'Enter Permanent City', type: 'text', value: DriverTable.DOBProofDocNo, generatecontrol: true, disable: false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Address Proof Doc No is required"
+                        }
                         , {
                             name: "pattern",
-                            message: "Please enter a City of length 3 to 10 characters",
-                            pattern: '^[a-zA-Z ]{3,10}$',
+                            message: "Please enter Address Proof Doc No of length 3 to 200 characters",
+                            pattern: '^[a-zA-Z0-9]{3,200}$',
                         }
                     ]
                 },
-
-            ],
-            this.UploadsControls = [
                 {
-                    name: 'license',
-                    label: 'Driving License',
+                    name: 'DOBProofScan',
+                    label: 'DOB proof scan',
                     placeholder: '',
                     type: 'file',
-                    value: '',
-                    Validations: [],
+                    value: DriverTable.DOBProofScan,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "DOB proof scan is required"
+                        },
+                    ],
                     additionalData: {
                         multiple: true
                     },
                     functions: {
-                        onChange: 'selectedFile',
-                    },
-                    generatecontrol: true,
-                    disable: false
-                },
-
-                {
-                    name: 'panCard',
-                    label: 'PAN Card',
-                    placeholder: '',
-                    type: 'file',
-                    value: '',
-                    Validations: [],
-                    additionalData: {
-                        multiple: true
-                    },
-                    functions: {
-                        onChange: 'selectedPngFile',
+                        onChange: 'selectedFileDOBProofScan',
                     },
                     generatecontrol: true,
                     disable: false
                 },
                 {
-                    name: 'aadhar',
-                    label: 'Aadhar Card',
-                    placeholder: '',
-                    type: 'file',
-                    value: '',
-                    Validations: [],
-                    additionalData: {
-                        multiple: true
-                    },
-                    functions: {
-                        onChange: 'selectedJpgFile',
-                    },
-                    generatecontrol: true,
-                    disable: false
-                },
-
-            ],
-            this.BankDetailsControls = [
-                {
-                    name: 'bName', label: 'Bank Name', placeholder: 'Enter Bank Name', type: 'text', value: DriverTable.bName, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter a Bank Name of length 3 to 15 characters",
-                            pattern: '^[a-zA-Z ]{3,15}$',
-                        }
-                    ]
+                    name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: DriverTable.activeFlag, generatecontrol: true, disable: false,
+                    Validations: []
                 },
                 {
-                    name: 'bAcct', label: 'Bank Account No', placeholder: 'Enter Bank Account No', type: 'number', value: DriverTable.bAcct, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter Bank Account No of length 14 digits",
-                            pattern: "^[0-9]{14}$",
-                        }
-                    ]
-                },
-                {
-                    name: 'branch', label: 'Branch Name', placeholder: 'Enter Branch Name', type: 'text', value: DriverTable.branch, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter a Branch Name of length 3 to 15 characters",
-                            pattern: '^[a-zA-Z ]{3,15}$',
-                        }
-                    ]
-                },
-                {
-                    name: 'acctName', label: 'Account Name', placeholder: 'Enter Account Name', type: 'text', value: DriverTable.acctName, generatecontrol: true, disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter a Account Name of length 3 to 25 characters",
-                            pattern: '^[a-zA-Z ]{3,25}$',
-                        }
-                    ]
-                },
-                {
-                    name: 'ifsc', label: 'IFSC Code', placeholder: 'Enter IFSC Code', type: 'text', value: DriverTable.ifsc, generatecontrol: true, disable: false,
-                    Validations: [{
-
-                        name: "pattern",
-                        pattern: "^[A-Z]{4}[0-9]{7}$",
-                        message: "Please enter a valid IFSC Code (4 letters followed by 7 digits)"
-
-                    }]
-                },
-                {
-                    name: '_id',
-                    label: '',
-                    placeholder: '',
-                    type: 'text',
-                    value: DriverTable._id,
-                    filterOptions: '',
-                    autocomplete: '',
-                    displaywith: '',
-                    Validations: [],
-                    generatecontrol: false,
-                    disable: false
-                },
-                {
-                    name: "driverId",
-                    label: "Driver Id",
+                    name: "_id",
+                    label: "",
                     placeholder: "",
                     type: "text",
-                    value: DriverTable.driverId,
+                    value: DriverTable._id,
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [],
                     generatecontrol: false,
                     disable: false,
+                },
+                {
+                    name: "updateBy",
+                    label: "Update By",
+                    placeholder: "Update By",
+                    type: "text",
+                    value: localStorage.getItem("UserName"),
                     Validations: [],
+                    generatecontrol: false,
+                    disable: false,
+                },
+                {
+                    name: "isUpdate",
+                    label: "IsUpdate",
+                    placeholder: "IsUpdate",
+                    type: "text",
+                    value: false,
+                    Validations: [],
+                    generatecontrol: false,
+                    disable: false,
+                },
+                {
+                    name: "companyCode",
+                    label: "Company Code",
+                    placeholder: "Company Code",
+                    type: "text",
+                    value: parseInt(localStorage.getItem("companyCode")),
+                    Validations: [],
+                    generatecontrol: false,
+                    disable: false,
                 },
                 {
                     name: "entryBy",
                     label: "Entry By",
-                    placeholder: "",
+                    placeholder: "Entry By",
                     type: "text",
-                    value: localStorage.getItem('Username'),
+                    value: localStorage.getItem("UserName"),
+                    Validations: [],
                     generatecontrol: false,
                     disable: false,
-                    Validations: [],
                 },
-                {
-                    name: "entryDate",
-                    label: "Entry Date",
-                    placeholder: "",
-                    type: "text",
-                    value: new Date(),
-                    generatecontrol: false,
-                    disable: false,
-                    Validations: [],
-                }
+
             ]
     }
     getFormControlsD() {
         return this.DriverDetailsControl;
     }
-    getFormControlsL() {
-        return this.LicenseDetailsControls;
-    }
-    getFormControlsP() {
-        return this.PermanentAddressControls;
-    }
-    getFormControlsU() {
-        return this.UploadsControls;
-    }
-    getFormControlsB() {
-        return this.BankDetailsControls;
-    }
+
 }

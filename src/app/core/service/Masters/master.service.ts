@@ -24,6 +24,7 @@ export class MasterService {
   headerCode: string;
   vehicleDetail: any;
   containerTypeUrl='../../../assets/data/containerType.json'
+  countryList='../../../assets/data/country.json'
 
   constructor(private http: HttpClient) { }
   /**

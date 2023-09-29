@@ -1,5 +1,6 @@
 
 export class vehicleModel {
+    isActive: boolean;
     companyId: number;
     vehicleId: number;
     vehicleNo: string;
@@ -28,7 +29,6 @@ export class vehicleModel {
     vendorType: string;
     gpsDeviceEnabled: boolean;
     rcBookNo: string;
-    activeflag: boolean;
     blackListed: boolean;
     innerDimension: string;
     outerDimension: string;
@@ -105,7 +105,6 @@ export class vehicleModel {
         this.approvedOn = vehicleModel.approvedOn || this.date;
         this.startDateOfService = vehicleModel.startDateOfService || this.date;
         this.approvedBy = vehicleModel.approvedBy || '';
-        this.activeflag = vehicleModel.activeflag|| false;
         this.blackListed = vehicleModel.blackListed || false;
     }
 }

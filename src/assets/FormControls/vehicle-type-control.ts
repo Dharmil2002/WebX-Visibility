@@ -26,7 +26,12 @@ export class VehicleTypeControl {
                     {
                         name: "required",
                         message: "Vehicle Type name is required"
-                    }
+                    },
+                    {
+                        name: "pattern",
+                        message: "Please Enter alphanumeric 200 digit! Vehicle Type name",
+                        pattern: "^[a-zA-Z 0-9 ]{0,200}$",
+                    },
                 ],
                 functions: {
                     onChange: 'checkVehicleTypeExist',
@@ -34,43 +39,20 @@ export class VehicleTypeControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'vehicleManufacturerName',
-                label: 'Vehicle Manufacturer Name',
-                placeholder: 'Enter Vehicle Manufacturer Name',
-                type: 'text', value: isUpdate ? vehicleTypeTable.vehicleManufacturerName : "",
+                name: "vehicleCategory",
+                label: "Vehicle Category",
+                placeholder: 'Search And Select Vehicle Category',
+                type: "Staticdropdown",
+                value: [
+                    { value: 'HCV', name: 'HCV' },
+                    { value: 'LCV', name: 'LCV' }
+                ],
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Manufacturer Name is required"
-                    },
-                    {
-                        name: "pattern",
-                        message: "Please Enter Proper value(1-25 character)",
-                        pattern: '.{1,25}'
+                        message: "Vehicle Category is required"
                     }
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'modelNo',
-                label: 'Model No.',
-                placeholder: 'Enter Model No.',
-                type: 'text', value: isUpdate ? vehicleTypeTable.modelNo : "",
-                Validations: [
-                    {
-                        name: "pattern",
-                        message: "Please Enter Proper Model No(1-25 character)",
-                        pattern: '.{1,25}'
-                    }
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'vehicleTypeCategory',
-                label: 'Truck/Trailer',
-                placeholder: 'Search And Select Vehicle Type Category',
-                type: 'dropdown', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-                Validations: [
+
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -78,62 +60,66 @@ export class VehicleTypeControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'tyreRotationatKm',
-                label: 'Tyre Rotation at Km',
-                placeholder: 'Enter KM',
-                type: 'number',
-                value: isUpdate ? vehicleTypeTable.tyreRotationatKm : "",
-                Validations: [
-                    {
-                        name: "pattern",
-                        message: "Please Enter Proper Average Speed(1-200)",
-                        pattern: '^(?:[1-9]|[1-9][0-9]|1[0-9]{2}|200)$'
-                    }
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'typeDescription',
-                label: 'Type Description',
-                placeholder: 'Enter Type Description',
-                type: 'text', value: isUpdate ? vehicleTypeTable.typeDescription : "",
-                Validations: [
-                    {
-                        name: "pattern",
-                        message: "Please Enter Proper Type Description(1-25 Character)",
-                        pattern: '.{1,25}'
-                    }
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: "vehicleSize",
-                label: "Vehicle Size",
-                placeholder: 'Search And Select Vehicle Size',
+                name: 'fuelType',
+                label: 'Fuel Type',
+                placeholder: 'select Fuel Type',
                 type: "Staticdropdown",
                 value: [
-                    { value: 'HeavyVehicle', name: 'Heavy Vehicle' },
-                    { value: 'LightVehicle', name: 'Light Vehicle' }
+                    { value: 'Diesel', name: 'Diesel' },
+                    { value: 'Petrol', name: 'Petrol' },
+                    { value: 'CNG', name: 'CNG' },
+                    { value: 'EV', name: 'EV' }
                 ],
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Fuel Type name is required"
+                    }
+
+                ],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: "oem",
+                label: "OEM",
+                placeholder: 'Search And Select OEM',
+                type: "Staticdropdown",
+                value: [
+                    { value: 'Tata', name: 'Tata' },
+                    { value: 'AshokLeyland', name: 'AshokLeyland' },
+                    { value: 'Mahindra', name: 'Mahindra' },
+                    { value: 'Eicher', name: 'Eicher' }
+                ],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "OEM is required"
+                    }
+
+                ],
                 additionalData: {
-                    showNameAndValue: true
+                    showNameAndValue: false
                 },
                 generatecontrol: true, disable: false
             },
             {
-                name: 'tankCapacity',
-                label: 'Tank Capacity(Liters)',
-                placeholder: 'Enter Tank Capacity in Liters',
-                type: 'number',
-                value: isUpdate ? vehicleTypeTable.tankCapacity : "",
+                name: 'oemmodel',
+                label: 'OEM Model',
+                placeholder: 'Enter OEM Model',
+                type: 'text',
+                value: vehicleTypeTable.oemmodel,
                 Validations: [
                     {
+                        name: "required",
+                        message: "OEM Model is required"
+                    },
+                    {
                         name: "pattern",
-                        message: "Please Enter Proper Tank Capacity(1-1000)",
-                        pattern: '^(?:[1-9]|[1-9][0-9]{1,2}|1000)$'
-                    }
+                        message: "Please Enter alphanumeric 100 digit! OEM Model",
+                        pattern: "^[a-zA-Z 0-9 ]{0,100}$",
+                    },
                 ],
+
                 generatecontrol: true, disable: false
             },
             {
@@ -141,7 +127,7 @@ export class VehicleTypeControl {
                 label: 'Active Flag',
                 placeholder: 'Active Flag',
                 type: 'toggle',
-                value: isUpdate ? vehicleTypeTable.isActive : "",
+                value: vehicleTypeTable.isActive,
                 Validations: [],
                 generatecontrol: true, disable: false
             },
@@ -150,7 +136,7 @@ export class VehicleTypeControl {
                 label: 'Entry By',
                 placeholder: 'Entry By',
                 type: 'text',
-                value: localStorage.getItem("Username"),
+                value: localStorage.getItem("UserName"),
                 Validations: [],
                 generatecontrol: false, disable: false
             },
@@ -192,174 +178,160 @@ export class VehicleTypeControl {
             }
         ],
             this.capacityInfoArray = [
-                {
-                    name: 'grossVehicleWeight',
-                    label: 'Gross Vehicle Weight(Tons)',
-                    placeholder: 'Enter Gross Vehicle Weight in Tons',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.grossVehicleWeight : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter a decimal value between 0.10 and 100.00 (up to 2 decimal places)",
-                            pattern: '^(?:0.[1-9][0-9]?|[1-9][0-9]?(?:.[0-9]{1,2})?|100(?:.0{1,2})?)$'
-                        }
-                    ],
-                    functions: {
-                        onChange: 'calCapacity',
-                    },
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'unladenWeight',
-                    label: 'Unladen Weight(Tons)',
-                    placeholder: 'Enter Unladen Weight in Tons',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.unladenWeight : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please enter a decimal value between 0.10 and 100.00 (up to 2 decimal places)",
-                            pattern: '^(?:0.[1-9][0-9]?|[1-9][0-9]?(?:.[0-9]{1,2})?|100(?:.0{1,2})?)$'
-                        }
-                    ],
-                    functions: {
-                        onChange: 'calCapacity',
-                    },
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'capacity',
-                    label: 'Weight Capacity(Tons)',
-                    placeholder: 'Enter Capacity in Tons',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.capacity : "",
-                    Validations: [],
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'length',
-                    label: 'Length(Ft)',
-                    placeholder: 'Enter Length',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.length : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Length(Max 100)",
-                            pattern: '^([1-9][0-9]?|100)$'
-                        }
-                    ],
-                    functions: {
-                        onClick: 'getData',
-                    },
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'width',
-                    label: 'Width(Ft)',
-                    placeholder: 'Enter Width',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.width : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Width(Max 50)",
-                            pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
-                        }
-                    ],
-                    functions: {
-                        onClick: 'getData',
-                    },
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'height',
-                    label: 'Height(Ft)',
-                    placeholder: 'Enter Height',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.height : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Height(Max 25)",
-                            pattern: '^(?:[1-9]|1[0-9]|2[0-5])$'
-                        }
-                    ],
-                    functions: {
-                        onClick: 'getData',
-                    },
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'capacityDiscount',
-                    label: 'Total Volume (CFT)',
-                    placeholder: 'Enter Total Volume',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.capacityDiscount : "",
-                    Validations: [],
-                    generatecontrol: true, disable: true
-                },
-                {
-                    name: 'ratePerKM',
-                    label: 'Rate per KM(Rs)',
-                    placeholder: 'Enter Rate per KM',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.ratePerKM : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Packages(1-100000)",
-                            pattern: '[0-9]{1,5}'
-                        }
-                    ],
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'fuelType',
-                    label: 'Fuel Type',
-                    placeholder: 'Enter Fuel Type',
-                    type: 'text',
-                    value: isUpdate ? vehicleTypeTable.fuelType : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Fuel Type(1-25 Character)",
-                            pattern: '.{1,25}'
-                        }
-                    ],
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'tyreRotationAlertKMs',
-                    label: 'Tyre Rotation Alert KMs',
-                    placeholder: 'Enter KM',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.tyreRotationAlertKMs : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Tyre Rotation Alert KMs(1-200)",
-                            pattern: '^(?:[1-9]|[1-9][0-9]|1[0-9]{2}|200)$'
-                        }
-                    ],
-                    generatecontrol: true, disable: false
-                },
-                {
-                    name: 'noOfPackages',
-                    label: 'No. Of Packages',
-                    placeholder: 'Enter No. Of Packages',
-                    type: 'number',
-                    value: isUpdate ? vehicleTypeTable.noOfPackages : "",
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter Proper Packages(1-6 Digit)",
-                            pattern: '[0-9]{1,6}'
-                        }
-                    ],
-                    generatecontrol: true, disable: false
-                },
+                // {
+                //     name: 'grossVehicleWeight',
+                //     label: 'Gross Vehicle Weight(Tons)',
+                //     placeholder: 'Enter Gross Vehicle Weight in Tons',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.grossVehicleWeight : "",
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please enter a decimal value between 0.10 and 100.00 (up to 2 decimal places)",
+                //             pattern: '^(?:0.[1-9][0-9]?|[1-9][0-9]?(?:.[0-9]{1,2})?|100(?:.0{1,2})?)$'
+                //         }
+                //     ],
+                //     functions: {
+                //         onChange: 'calCapacity',
+                //     },
+                //     generatecontrol: true, disable: false
+                // },
+                // {
+                //     name: 'unladenWeight',
+                //     label: 'Unladen Weight(Tons)',
+                //     placeholder: 'Enter Unladen Weight in Tons',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.unladenWeight : "",
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please enter a decimal value between 0.10 and 100.00 (up to 2 decimal places)",
+                //             pattern: '^(?:0.[1-9][0-9]?|[1-9][0-9]?(?:.[0-9]{1,2})?|100(?:.0{1,2})?)$'
+                //         }
+                //     ],
+                //     functions: {
+                //         onChange: 'calCapacity',
+                //     },
+                //     generatecontrol: true, disable: false
+                // },
+                // {
+                //     name: 'capacity',
+                //     label: 'Weight Capacity(Tons)',
+                //     placeholder: 'Enter Capacity in Tons',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.capacity : "",
+                //     Validations: [],
+                //     generatecontrol: true, disable: false
+                // },
+                // {
+                //     name: 'length',
+                //     label: 'Length(Ft)',
+                //     placeholder: 'Enter Length',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.length : "",
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please Enter Proper Length(Max 100)",
+                //             pattern: '^([1-9][0-9]?|100)$'
+                //         }
+                //     ],
+                //     functions: {
+                //         onClick: 'getData',
+                //     },
+                //     generatecontrol: true, disable: false
+                // },
+                // {
+                //     name: 'width',
+                //     label: 'Width(Ft)',
+                //     placeholder: 'Enter Width',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.width : "",
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please Enter Proper Width(Max 50)",
+                //             pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
+                //         }
+                //     ],
+                //     functions: {
+                //         onClick: 'getData',
+                //     },
+                //     generatecontrol: true, disable: false
+                // },
+                // {
+                //     name: 'height',
+                //     label: 'Height(Ft)',
+                //     placeholder: 'Enter Height',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.height : "",
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please Enter Proper Height(Max 25)",
+                //             pattern: '^(?:[1-9]|1[0-9]|2[0-5])$'
+                //         }
+                //     ],
+                //     functions: {
+                //         onClick: 'getData',
+                //     },
+                //     generatecontrol: true, disable: false
+                // },
+                // {
+                //     name: 'capacityDiscount',
+                //     label: 'Total Volume (CFT)',
+                //     placeholder: 'Enter Total Volume',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.capacityDiscount : "",
+                //     Validations: [],
+                //     generatecontrol: true, disable: true
+                // },
+                // {
+                //     name: 'ratePerKM',
+                //     label: 'Rate per KM(Rs)',
+                //     placeholder: 'Enter Rate per KM',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.ratePerKM : "",
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please Enter Proper Packages(1-100000)",
+                //             pattern: '[0-9]{1,5}'
+                //         }
+                //     ],
+                //     generatecontrol: true, disable: false
+                // },
+
+                // {
+                //     name: 'tyreRotationAlertKMs',
+                //     label: 'Tyre Rotation Alert KMs',
+                //     placeholder: 'Enter KM',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.tyreRotationAlertKMs : "",
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please Enter Proper Tyre Rotation Alert KMs(1-200)",
+                //             pattern: '^(?:[1-9]|[1-9][0-9]|1[0-9]{2}|200)$'
+                //         }
+                //     ],
+                //     generatecontrol: true, disable: false
+                // },
+                // {
+                //     name: 'noOfPackages',
+                //     label: 'No. Of Packages',
+                //     placeholder: 'Enter No. Of Packages',
+                //     type: 'number',
+                //     value: isUpdate ? vehicleTypeTable.noOfPackages : "",
+                //     Validations: [
+                //         {
+                //             name: "pattern",
+                //             message: "Please Enter Proper Packages(1-6 Digit)",
+                //             pattern: '[0-9]{1,6}'
+                //         }
+                //     ],
+                //     generatecontrol: true, disable: false
+                // },
                 {
                     name: 'isUpdate', label: 'isUpdate', placeholder: 'isUpdate', type: 'text', value: false, Validations: [],
                     generatecontrol: false, disable: false
@@ -368,8 +340,5 @@ export class VehicleTypeControl {
     }
     getVehicleTypeFormControls() {
         return this.vehicleTypeControlArray;
-    }
-    getCapacityInfoFormControl() {
-        return this.capacityInfoArray;
     }
 }

@@ -6,7 +6,7 @@
   </form>
   <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
     [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-    [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width"
+    [menuItems]="menuItems" [staticField]="staticField" (onFlagChange)="IsActiveFuntion($event)" [Link]="linkArray" [height]="height" [width]="width"
     [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [boxData]="this.KPICountData">
   </app-generic-table-v2>
   <!-- <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader1"

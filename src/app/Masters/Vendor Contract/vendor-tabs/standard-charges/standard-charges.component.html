@@ -1,0 +1,88 @@
+<div class="col-lg-12 col-md-12">
+    <div class="project_widget">
+        <div class="body" style="padding-bottom: 0px;">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="row" style="margin:0px">
+                    <div class="col-lg-11 col-sm-12 col-md-10">
+                        <app-vendor-contract-header></app-vendor-contract-header>
+                    </div>
+                    <div class="col" style="padding:10px; margin-top: 3px;margin-left: -17px;">
+                        <button mat-raised-button color="success" type="button">Submit</button>
+                    </div>
+                </div>
+                <br />
+                <h4><mat-icon style="padding-top:4px;">view_list</mat-icon>Standard Charges Details</h4>
+                <hr>
+                <div class="materialTableHeader">
+                    <ul class="header-buttons-left ml-0" style="display: flex; justify-content: space-between;">
+                        <li class="dropdown m-l-20">
+                            <label for="search-input"><i class="material-icons search-icon">search</i>
+                            </label>
+                            <input placeholder="Search" type="text" #filter class="browser-default search-field"
+                                aria-label="Search box">
+                        </li>
+                        <li>
+                            <div class="export-button m-l-10" matTooltip="Add New">
+                                <button mat-raised-button (click)="openDialog()" color="primary"
+                                    style="display: flex; align-items: center; justify-content: space-between; padding-left:5px;"><mat-icon>add</mat-icon>
+                                    Add New</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row responsive_table">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <mat-table #table matTableExporter [dataSource]="dataSource" matSort class="mat-cell">
+                            <ng-container *ngFor="let displayedColumn of objectKeys(columnHeader)"
+                                [matColumnDef]="displayedColumn">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header class="matcolumncenter bg-light-gray"
+                                    [style]="columnHeader[displayedColumn].Style">
+                                    <div style="font-weight: 600; font-size: 1.1rem;">
+                                        {{columnHeader[displayedColumn].Title}}
+                                    </div>
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let element; let i = index;"
+                                    [style]="columnHeader[displayedColumn].Style" class="matcolumncenter">
+                                    <ng-container *ngIf="columnHeader[displayedColumn].Key === 'index'">
+                                        {{i + 1}}
+                                    </ng-container>
+                                    <ng-container *ngIf="columnHeader[displayedColumn].Key === 'static'">
+                                        {{element[displayedColumn]}}
+                                    </ng-container>
+                                    <ng-container *ngIf="columnHeader[displayedColumn].Key === 'date'">
+                                        {{element[displayedColumn] | date: 'dd/MM/yyyy'}}
+                                    </ng-container>
+                                    <ng-container *ngIf="columnHeader[displayedColumn].Key === 'delete'">
+                                        <div style="display: flex; justify-content: space-between; width: 80%;">
+                                            <button (click)="ActionEdit()" mat-icon-button class="tbl-action-btn">
+                                                <app-feather-icons [icon]="'edit'"
+                                                    [class]="'tbl-fav-edit'"></app-feather-icons>
+                                            </button>
+                                            <button (click)="ActionDelete()" mat-icon-button class="tbl-action-btn">
+                                                <mat-icon [class]="'tbl-fav-edit'"
+                                                    style=" color: rgb(83, 83, 83);">delete</mat-icon>
+                                            </button>
+                                        </div>
+                                    </ng-container>
+                                </mat-cell>
+                            </ng-container>
+                            <mat-header-row *matHeaderRowDef="objectKeys(columnHeader);"></mat-header-row>
+                            <mat-row *matRowDef="let row; columns: objectKeys(columnHeader);" [style.cursor]="'pointer'"
+                                matRipple>
+                            </mat-row>
+                        </mat-table>
+                        <div style="height: 70px;">
+                            <mat-paginator #paginator [pageIndex]="0" [pageSize]="5"
+                                [pageSizeOptions]="[5, 10, 25, 100]">
+                            </mat-paginator>
+                        </div>
+                    </div>
+                    <!-- <div *ngIf="isTblLoading" class="tbl-spinner">
+                        <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                        </mat-progress-spinner>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

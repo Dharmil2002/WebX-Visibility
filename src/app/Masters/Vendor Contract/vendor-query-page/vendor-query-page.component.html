@@ -1,0 +1,20 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <div>
+        <form [formGroup]="VendorQueryForm">
+            <app-form-webxpress [form]="VendorQueryForm" [formData]="jsonControlVendorArray"
+                [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+                (functionCallEmitter)="functionCallHandler($event)">
+            </app-form-webxpress>
+        </form>
+        <div style="padding: 0px 20px 0px 20px;">
+            <button class="primarybutton" (click)="SubmitFunction()" [disabled]="!VendorQueryForm.valid" mat-raised-button color="primary">Submit</button>
+        </div>
+    </div>
+</app-common-wrapper-webxpress>
+
+<style>
+    .primarybutton{
+        margin: 10px;
+        font-size: 1.2rem;
+    }
+</style>

@@ -15,7 +15,7 @@ import { GeolocationService } from '../service/geo-service/geolocation.service';
 @Injectable()
 export class CustomHttpInterceptor implements HttpInterceptor {
   private retryLimit = 3;
-  private requestTimeout = 5000; // Adjust the timeout value as needed (in milliseconds)
+  private requestTimeout = 20000; // Adjust the timeout value as needed (in milliseconds)
     constructor(
         private failedApiService: FailedApiServiceService,
         private geoLocationService: GeolocationService

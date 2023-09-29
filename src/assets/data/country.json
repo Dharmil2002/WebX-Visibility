@@ -1,0 +1,27 @@
+[
+    {
+        "Country": "India",
+        "Code": "IN",
+        "PhoneCode": "+91"
+    },
+    {
+        "Country": "Malaysia",
+        "Code": "MY",
+        "PhoneCode": "+60"
+    },
+    {
+        "Country": "Oman",
+        "Code": "OM",
+        "PhoneCode": "+968"
+    },
+    {
+        "Country": "Thailand",
+        "Code": "TH",
+        "PhoneCode": "+66"
+    },
+    {
+        "Country": "United Arab Emirates",
+        "Code": "AE",
+        "PhoneCode": "+971"
+    }
+]

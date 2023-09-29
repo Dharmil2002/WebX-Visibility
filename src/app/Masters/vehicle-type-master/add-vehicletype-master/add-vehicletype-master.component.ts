@@ -23,8 +23,6 @@ export class AddVehicletypeMasterComponent implements OnInit {
   vehicleTypeTableForm: UntypedFormGroup;
   vehicleTypeControl: VehicleTypeControl;
   jsonControlVehicleTypeArray: any;
-  jsonControlCapacityInfoArray: any;
-  accordionData: any;
   vehicleCategory: any;
   vehicleCategoryStatus: any;
   data: any;
@@ -32,7 +30,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
   vehicleTypeCategory: any;
   newVehicleTypeCode: any;
   ngOnInit(): void {
-    this.getVehicleTypeCategoryList();
+    //this.getVehicleTypeCategoryList();
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -55,6 +53,8 @@ export class AddVehicletypeMasterComponent implements OnInit {
     if (navigationState != null) {
       this.action = 'edit';
       this.data = navigationState.data;
+      console.log(this.data);
+
       this.isUpdate = true;
       this.vehicleTypeTableData = this.data;
       this.vehicleCategory = this.vehicleTypeTableData.vehicleTypeCategory;
@@ -77,78 +77,16 @@ export class AddVehicletypeMasterComponent implements OnInit {
     const vehicleTypeTableData = new VehicleTypeControl(this.vehicleTypeTableData, this.isUpdate);
     this.jsonControlVehicleTypeArray = vehicleTypeTableData.getVehicleTypeFormControls();
     this.jsonControlVehicleTypeArray.forEach(data => {
-      if (data.name === 'vehicleTypeCategory') {
-        this.vehicleCategory = data.name;
-        this.vehicleCategoryStatus = data.additionalData.showNameAndValue;
-      }
     });
-    this.jsonControlCapacityInfoArray = vehicleTypeTableData.getCapacityInfoFormControl();
-    // Build the accordion data with section names as keys and corresponding form controls as values
-    this.accordionData = {
-      "Vehicle Type Details": this.jsonControlVehicleTypeArray,
-      "Capacity Information in Ton": this.jsonControlCapacityInfoArray
-    };
     // Build the form group using formGroupBuilder function and the values of accordionData
-    this.vehicleTypeTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
-    this.vehicleTypeTableForm.controls["vehicleSize"].setValue(
-      this.vehicleTypeTableData.vehicleSize
-    )
+    this.vehicleTypeTableForm = formGroupBuilder(this.fb, [this.jsonControlVehicleTypeArray]);
+    this.vehicleTypeTableForm.controls["vehicleCategory"].setValue("HCV")
+    this.vehicleTypeTableForm.controls["fuelType"].setValue("Petrol")
+    this.vehicleTypeTableForm.controls["oem"].setValue("Tata")
   }
-  getVehicleTypeCategoryList() {
-    this.masterService.getJsonFileDetails('masterUrl').subscribe(res => {
-      this.vehicleTypeCategory = res;
-      let tableArray = this.vehicleTypeCategory.vehicleTypeCategory;
-      let vehicleTypeCategory = [];
-      tableArray.forEach(element => {
-        let dropdownList = {
-          name: element.codeDesc,
-          value: element.codeId
-        }
-        vehicleTypeCategory.push(dropdownList)
-      });
-      if (this.isUpdate) {
-        this.updateVehicleTypeCategory = vehicleTypeCategory.find((x) => x.name == this.vehicleTypeTableData.vehicleTypeCategory);
-        this.vehicleTypeTableForm.controls.vehicleTypeCategory.setValue(this.updateVehicleTypeCategory);
-      }
 
-      this.filter.Filter(
-        this.jsonControlVehicleTypeArray,
-        this.vehicleTypeTableForm,
-        vehicleTypeCategory,
-        this.vehicleCategory,
-        this.vehicleCategoryStatus,
-      );
-    });
-  }
-  //#region to calculate capacity based on Gross Vehicle Weight and unload weight and send validation msg if condition not matched
-  calCapacity() {
-    if (
-      parseFloat(this.vehicleTypeTableForm.value.grossVehicleWeight) <
-      parseFloat(this.vehicleTypeTableForm.value.unladenWeight)
-    ) {
-      this.ObjSnackBarUtility.showNotification(
-        "snackbar-danger",
-        "Gross Vehicle Weight must be greater than Unladen Weight !",
-        "bottom",
-        "center"
-      );
-      this.vehicleTypeTableForm.get("capacity").setValue(0);
-    } else {
-      this.vehicleTypeTableForm.get("capacity").setValue(
-        parseFloat(this.vehicleTypeTableForm.value.grossVehicleWeight) -
-        parseFloat(this.vehicleTypeTableForm.value.unladenWeight)
-      );
-    }
-  }
   //#endregion
-  getData(): void {
-    var calculateLhw = calculateVolume(
-      this.vehicleTypeTableForm.value.length,
-      this.vehicleTypeTableForm.value.height,
-      this.vehicleTypeTableForm.value.width
-    );
-    this.vehicleTypeTableForm.controls["capacityDiscount"].setValue(calculateLhw.toFixed(2));
-  }
+
   cancel() {
     this.route.navigateByUrl('/Masters/VehicleTypeMaster/VehicleTypeMasterList');
   }
@@ -181,14 +119,11 @@ export class AddVehicletypeMasterComponent implements OnInit {
 
   }
   async save() {
-    this.vehicleTypeTableForm.controls["vehicleTypeCategory"].setValue(this.vehicleTypeTableForm.value.vehicleTypeCategory.name);
-    this.vehicleTypeTableForm.controls["isActive"].setValue(this.vehicleTypeTableForm.value.isActive);
     // Remove field from the form controls
     this.vehicleTypeTableForm.removeControl("companyCode");
     this.vehicleTypeTableForm.removeControl("updateBy");
     this.vehicleTypeTableForm.removeControl("isUpdate");
-    let data = convertNumericalStringsToInteger(this.vehicleTypeTableForm.value)
-
+    
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "vehicleType_detail",
@@ -221,7 +156,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
           companyCode: this.companyCode,
           collectionName: "vehicleType_detail",
           filter: { _id: id },
-          update: data
+          update: this.vehicleTypeTableForm.value
         };
         const res = await this.masterService.masterPut("generic/update", req).toPromise()
         if (res) {

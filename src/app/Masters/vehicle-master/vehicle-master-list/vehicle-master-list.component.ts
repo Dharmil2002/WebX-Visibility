@@ -8,7 +8,6 @@ import Swal from "sweetalert2";
 })
 export class VehicleMasterListComponent implements OnInit {
     csv: any[];
-    companyCode: any = parseInt(localStorage.getItem("companyCode"));
     tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
     // Define column headers for the table
     columnHeader =
@@ -55,7 +54,7 @@ export class VehicleMasterListComponent implements OnInit {
     }
     async getVehicleDetails() {
         let req = {
-            "companyCode": this.companyCode,
+            "companyCode": parseInt(localStorage.getItem("companyCode")),
             "collectionName": "vehicle_detail",
             "filter": {}
         }
@@ -75,13 +74,10 @@ export class VehicleMasterListComponent implements OnInit {
         // Remove the "id" field from the form controls
         delete det._id;
         delete det.srNo;
-        delete det.activeflag;
         let req = {
-            companyCode: this.companyCode,
+            companyCode: parseInt(localStorage.getItem("companyCode")),
             collectionName: "vehicle_detail",
-            filter: {
-                _id: id,
-            },
+            filter: {_id: id},
             update: det
         };
         const res = await this.masterService.masterPut("generic/update", req).toPromise()

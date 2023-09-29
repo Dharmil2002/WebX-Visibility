@@ -1,0 +1,112 @@
+<style>
+    mat-divider {
+        background-color: black;
+        opacity: 0.8;
+    }
+
+    ::ng-deep .mat-header-cell {
+        background-color: white;
+        text-align: center;
+    }
+
+    ::ng-deep .mat-cell {
+        text-align: center;
+    }
+
+    .mat-table {
+        border: 1px solid #e4e7ed;
+    }
+
+    ::ng-deep .app-vendor-contract-header {
+        margin-right: 100px;
+        padding-right: 70px;
+    }
+
+    table,
+    td,
+    tr {
+        border: 1px solid #e4e7ed;
+        ;
+    }
+
+    td {
+        padding: 5px;
+    }
+    .bg-light-gray{
+        background-color: rgba(65, 65, 65, 0.005);
+    }
+</style>
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" *ngFor="let breadcrumb of breadscrums">
+            <app-breadcrumb [title]="breadcrumb.title" [items]="breadcrumb.items"
+                [active_item]="breadcrumb.active"></app-breadcrumb>
+        </div>
+        <div class="row clearfix">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="card">
+                    <div class="body">
+                        <section align="end">
+                            <div class="example-button-row">
+                                <button mat-raised-button color="success" type="button" (click)="AddNewContract()">Add
+                                    New Contract</button>
+                            </div>
+                            <table>
+                                <tr>
+                                    <td><b>Vendor Code :</b> 1234567</td>
+                                    <td><b>Vendor Name :</b> 1234567</td>
+                                </tr>
+                            </table><br />
+                        </section>
+
+                        <div class="row">
+                            <h4><mat-icon style="padding-top:4px;">view_list</mat-icon> Vendor Contract List</h4>
+                            <hr><br>
+                            <div style="max-height: 390px;" class="responsive_table">
+                                <mat-table #table matTableExporter [dataSource]="dataSource" matSort class="mat-cell">
+                                    <ng-container *ngFor="let displayedColumn of objectKeys(columnHeader)"
+                                        [matColumnDef]="displayedColumn">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header class="matcolumncenter bg-light-gray" 
+                                            [style]="columnHeader[displayedColumn].Style">
+                                            <div style="font-weight: 600; font-size: 1.1rem;">
+                                                {{columnHeader[displayedColumn].Title}}
+                                            </div>
+                                        </mat-header-cell>
+                                        <mat-cell *matCellDef="let element"
+                                            [style]="columnHeader[displayedColumn].Style" class="matcolumncenter">
+                                            <ng-container *ngIf="columnHeader[displayedColumn].Key === 'static'">
+                                                {{element[displayedColumn]}}
+                                            </ng-container>
+                                            <ng-container *ngIf="columnHeader[displayedColumn].Key === 'date'">
+                                                {{element[displayedColumn] | date: 'dd/MM/yyyy'}}
+                                            </ng-container>
+                                            <ng-container *ngIf="columnHeader[displayedColumn].Key === 'edit'">
+                                                <button (click)="ActionEdit()" mat-icon-button class="tbl-action-btn">
+                                                    <app-feather-icons [icon]="'edit'"
+                                                        [class]="'tbl-fav-edit'"></app-feather-icons>
+                                                </button>
+                                            </ng-container>
+                                            <ng-container *ngIf="columnHeader[displayedColumn].Key === 'status'">
+                                                <mat-checkbox
+                                                    [checked]="element[displayedColumn]"></mat-checkbox>
+                                            </ng-container>
+                                        </mat-cell>
+                                    </ng-container>
+                                    <mat-header-row *matHeaderRowDef="objectKeys(columnHeader);"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"
+                                        [style.cursor]="'pointer'" matRipple>
+                                    </mat-row>
+                                </mat-table>
+                                <div style="height: 70px;">
+                                    <mat-paginator #paginator [pageIndex]="0" [pageSize]="5"
+                                    [pageSizeOptions]="[5, 10, 25, 100]">
+                                </mat-paginator>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

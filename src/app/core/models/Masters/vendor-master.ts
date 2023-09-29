@@ -1,8 +1,9 @@
 export class VendorMaster {
   vendorCode: string
   vendorName: any
-  vendorbrcd: string
   vendorCity: string
+  vendorState: string
+  vendorCountry: string
   vendorType: any
   vendorSubType: any
   vendorAddress: any
@@ -10,41 +11,29 @@ export class VendorMaster {
   vendorPinCode: any
   vendorPhoneNo: any
   emailId: any
-  isGstCharged: any
   isActive: any
-  tdsSection: any
-  tdsType: any
-  lspName: any
-  select: any
-  tdsApplicable: any
   panNo: any
-  tdsDocument: any
-  cancelCheque: any
-  remark: any
-  paymentEmail: any
-  deliveryPartner: any
-  logicloudLSP: any
-  lSPName: any
-  accountNumber: any
-  ifscNumber: any
-  bankName: any
-  pdfFileUpload: any
-  audited: any
-  msme: any
-  dueDays: any
-  ownerName: any
-  gstNo: any
-  cpCode: any
-  franchise: any
-  integrateWithFinSystem: any
-  reliableDocument: any
+  panCardScan: any
   _id: string
-  tdsRate: any
+  noPANRegistration: boolean
+  cinNumber: string;
+  msmeNumber: string
+  msmeScan: any
+  isBlackListed: boolean
+  gstNumber: string
+  gstState: string
+  gstAddress: string
+  gstCity: string
+  gstPincode: string
+  msmeRegistered: boolean
   constructor(VendorMaster) {
     {
       this.vendorCode = VendorMaster.vendorCode || 'System Genrated';
       this.vendorName = VendorMaster.vendorName || '';
+      this.isActive = VendorMaster.isActive || false;
+      this.noPANRegistration = VendorMaster.noPANRegistration || false;
+      this.isBlackListed = VendorMaster.isBlackListed || false;
+      this.msmeRegistered = VendorMaster.msmeRegistered || false;
     }
   }
 }
-

@@ -1,0 +1,113 @@
+<div class="container-fluid">
+    <mat-icon color="primary" (click)="close()">close</mat-icon>
+    <mat-icon color="primary" (click)="printPage()">print</mat-icon>
+
+    <div id="printableArea">
+        <table style="margin-top: 0; border:0; margin-bottom:0;" class="table" cellpadding="0" cellspacing="0"
+            width="100%">
+            <tr>
+                <td
+                    style="text-align:center; border:0 !important; width:20%; vertical-align:bottom !important; padding:0;">
+                    <h3><b>Thc Detail</b></h3>
+                </td>
+            </tr>
+        </table>
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    <div>
+                        <b>Route</b>
+                        <br />
+                        <span>{{docketDetail.route}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <b>Prq No</b>
+                        <br />
+                        <span>{{docketDetail.prqNo}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <b>Vehicle No</b>
+                        <br />
+                        <span>{{docketDetail.vehicle}}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div> <b>Vehicle Type</b>
+                        <br />
+                        <span>{{docketDetail.vehicleType}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Trip ID</b>
+                        <br />
+                        <span>{{docketDetail.tripId}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Docket Count</b>
+                        <br />
+                        <span>{{docketDetail.docket.length}}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div> <b>Vendor Phone No.</b>
+                        <br />
+                        <span>{{docketDetail.vendorPhoneNo}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Loaded Kg</b>
+                        <br />
+                        <span>{{docketDetail.loadedKg}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Weight Utilization</b>
+                        <br />
+                        <div style="word-wrap: break-word;width:200px; ">
+                            {{docketDetail.weightUtilization}}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div> <b>status</b>
+                        <br />
+                        <span *ngIf="docketDetail.status=='1'">Not Delivered</span>
+                        <span *ngIf="docketDetail.status=='2'">Delivered</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Capacity</b>
+                        <br />
+                        <span>{{docketDetail.capacity}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div> <b>Last Update By</b>
+                        <br />
+                        <span>{{docketDetail.updateBy}}</span>
+                    </div>
+                </td>
+               
+            </tr>
+            <tr>
+                <td>
+                    <div> <b>Last Update Date</b>
+                        <br />
+                        <span>{{docketDetail.updateDate}}</span><br />
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

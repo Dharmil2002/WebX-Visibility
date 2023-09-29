@@ -14,13 +14,13 @@
     [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
     [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
     (menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"
-    [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+    [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles">
   </app-generic-table-v2>
-<div class="row">
+<div class="row" *ngIf="!isView">
   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
     <div class="example-button-row d-flex justify-content-end">
       <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad"
-        (click)="createThc()">Generate THC</button>
+        (click)="createThc()">  {{ isUpdate ? 'Update THC' : 'Generate THC' }}</button>
       <button class="msr-3" mat-raised-button color="primary" >Back</button>
     </div>
   </div>

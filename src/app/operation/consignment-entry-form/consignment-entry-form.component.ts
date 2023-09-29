@@ -4,7 +4,7 @@ import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilde
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { ConsignmentControl, FreightControl } from "src/assets/FormControls/consignment-control";
 import Swal from "sweetalert2";
-import { containerFromApi, customerFromApi, locationFromApi } from "../prq-entry-page/prq-utitlity";
+import { containerFromApi, customerFromApi } from "../prq-entry-page/prq-utitlity";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { getCity } from "../quick-booking/quick-utility";
 import { FilterUtils } from "src/app/Utility/Form Utilities/dropdownFilter";
@@ -14,6 +14,11 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { pendingbilling } from "../pending-billing/pending-billing-utlity";
 import { containorConsigmentDetail, updatePrq } from "./consigment-utlity";
+import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { formatDate } from "src/app/Utility/date/date-utils";
+import { trigger } from "@angular/animations";
+import { parse } from "date-fns";
+import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 
 
 @Component({
@@ -24,9 +29,14 @@ import { containorConsigmentDetail, updatePrq } from "./consigment-utlity";
 export class ConsignmentEntryFormComponent implements OnInit {
 
   consignmentTableForm: UntypedFormGroup;
+  containerTableForm: UntypedFormGroup;
   FreightTableForm: UntypedFormGroup;
-  tableData: any;
+  invoiceTableForm: UntypedFormGroup;
+  tableData: any = [];
+  invoiceData:any=[];
+  tableLoadIn:boolean=true;
   tableData1: any;
+  tableLoad: boolean = true;
   isTableLoad: boolean = true;
   jsonControlArray: any;
   TableStyle = "width:82%;"
@@ -40,11 +50,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
       active: "ConsignmentEntryForm",
     },
   ];
-  actionObject = {
-    addRow: true,
-    submit: false,
-    search: true,
-  };
   fromCity: string;
   fromCityStatus: any;
   customer: string;
@@ -59,131 +64,139 @@ export class ConsignmentEntryFormComponent implements OnInit {
   consigneeNameStatus: boolean;
   vendorName: string;
   vendorNameStatus: boolean;
-  prqNo:string;
-  prqNoStatus:boolean;
+  prqNo: string;
+  prqNoStatus: boolean;
+  containerType: string;
+  containerTypeStatus: boolean;
   userName = localStorage.getItem("Username");
   //#region columnHeader
   columnHeader = {
-    containerNumber: "Container Number",
-    containerType: "Container Type",
-    containerCapacity: "Container Capacity",
-    actions: "Actions",
-  };
-  //#endregion
-
-  //#region columnHeader1
-  columnHeader1 = {
-    ewayBillNo: "Eway Bill No",
-    expiryDate: "Expiry Date",
-    invoiceNo: "Invoice No",
-    invoiceAmount: "Invoice Amount",
-    noofPkts: "No of Pkts",
-    materialName: "Material Name",
-    actualWeight: "Actual Weight",
-    chargedWeight: "Charged Weight",
-    actions: "Actions",
-  };
-  //#endregion
-
-  //#region displayedColumns1
-  displayedColumns1 = {
     containerNumber: {
-      name: "Container Number",
-      key: "inputString",
-      Style: "",
-      HeaderStyle: "",
+      Title: "Container Number",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
     },
     containerType: {
-      name: "Container Type",
-      key: "Dropdown",
-      Style: "",
-      option: [],
-      functions:{ onOptionSelect:"getCotanierType"},
-      HeaderStyle: "",
+      Title: "Container Type",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
     },
     containerCapacity: {
-      name: "Container Capacity",
-      key: "inputString",
-      Style: "",
+      Title: "Container Capacity",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
-    action: {
-      name: "Action",
-      key: "Action",
-      Style: "",
-      HeaderStyle: "",
-    },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    }
   };
-  //#endregion
-
-  //#region displayedColumns2
-  displayedColumns2 = {
+  /*Invoice Detail*/
+  columnInvoice = {
     ewayBillNo: {
-      name: "Eway Bill No",
-      key: "inputString",
-      Style: "",
-      HeaderStyle: { "text-align": "center" },
+      Title: "Eway Bill No",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
     },
     expiryDate: {
-      name: "Expiry Date",
-      key: "date",
-      additionalData: {
-        minDate: new Date(),
-      },
-      style: "",
-      HeaderStyle: { "text-align": "center" },
+      Title: "Expiry Date",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
     },
     invoiceNo: {
-      name: "Invoice No",
-      key: "inputString",
-      Style: "",
-      HeaderStyle: { "text-align": "center" },
+      Title: "Invoice No",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
     invoiceAmount: {
-      name: "Invoice Amount",
-      key: "inputString",
-      Style: "",
-      HeaderStyle: { "text-align": "center" },
+      Title: "Invoice Amount",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
     noofPkts: {
-      name: "No of Pkts",
-      key: "inputString",
-      Style: "",
-      HeaderStyle: { "text-align": "center" },
+      Title:  "No of Pkts",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
     materialName: {
-      name: "Material Name",
-      key: "inputString",
-      Style: "",
-      HeaderStyle: { "text-align": "center" },
+      Title:  "Material Name",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
     actualWeight: {
-      name: "Actual Weight",
-      key: "inputString",
-      Style: "",
-      HeaderStyle: { "text-align": "center" },
+      Title: "Actual Weight",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
     chargedWeight: {
-      name: "Charged Weight",
-      key: "inputString",
-      Style: "",
-      HeaderStyle: { "text-align": "center" },
+      Title: "Charged Weight",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
     },
-    action: {
-      name: "Action",
-      key: "Action",
-      Style: "",
-      HeaderStyle: { "text-align": "center" },
-    },
-  };
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    }
+  }
+  /*End*/
+  staticFieldInvoice=
+  [
+    'ewayBillNo',
+    'expiryDate',
+    'invoiceNo',
+    'invoiceAmount',
+    'noofPkts',
+    'materialName',
+    'actualWeight',
+    'chargedWeight'  
+  ]
+  staticField =
+    [
+      'containerNumber',
+      'containerType',
+      'containerCapacity'
+    ]
+  menuItems = [
+    { label: 'Edit' },
+    { label: 'Remove' }
+  ]
+  menuItemflag = true;
+  //#endregion
+
+  //#endregion
   jsonControlArrayBasic: any;
+  jsonContainerDetail: any;
   companyCode = parseInt(localStorage.getItem("companyCode"));
   prqFlag: boolean;
   prqData: any;
   billingParty: any;
   prqNoDetail: any[];
-  isLoad: boolean=false;
+  isLoad: boolean = false;
   ContainerType: any;
   //#endregion
+  branchCode = localStorage.getItem("Branch");
+  addFlag = true;
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
+  breadScrums = [
+    {
+      title: "Available Vehicle for Assignment",
+      items: ["Home"],
+      active: "Vehicle Assign",
+    },
+  ];
+  //#region create columnHeader object,as data of only those columns will be shown in table.
+  // < column name : Column name you want to display on table >
+
+  linkArray = [
+  ];
+  jsonInvoiceDetail: any;
+  loadIn: boolean;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -201,7 +214,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
 
     }
     this.initializeFormControl();
-    this.loadTempData();
   }
 
   ngOnInit(): void {
@@ -219,73 +231,31 @@ export class ConsignmentEntryFormComponent implements OnInit {
 
     this.jsonControlArray = this.FreightFromControl.getFreightControlControls();
 
-
+    this.jsonContainerDetail = this.ConsignmentFormControls.getContainerDetail();
+    this.jsonInvoiceDetail = this.ConsignmentFormControls.getInvoiceDetail();
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.consignmentTableForm = formGroupBuilder(this.fb, [
       this.jsonControlArrayBasic,
     ]);
     this.FreightTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    this.containerTableForm = formGroupBuilder(this.fb, [this.jsonContainerDetail]);
+    this.invoiceTableForm = formGroupBuilder(this.fb, [this.jsonInvoiceDetail]);
     this.commonDropDownMapping();
-    if(this.prqData){
-    this.consignmentTableForm.controls['prqNo'].setValue({name:this.prqData.prqNo,value:this.prqData?.prqNo})
+    if (this.prqData) {
+      this.consignmentTableForm.controls['prqNo'].setValue({ name: this.prqData.prqNo, value: this.prqData?.prqNo })
     }
   }
   //#endregion
 
-  //#region Load temporary data
-  loadTempData() {
-    this.tableData = [
-      {
-        documentType: [], // Array to store document types
-        containerNumber: "", // Invoice number
-        containerType: "", // Invoice date
-        containerCapacity: "", // Length
-      },
-    ];
-    this.tableData1 = [
-      {
-        ewayBillNo: "",
-        expiryDate: "",
-        invoiceNo: "",
-        invoiceAmount: 0,
-        noofPkts: 0,
-        materialName: "",
-        actualWeight: 0,
-        chargedWeight: 0
-      }
 
-
-    ];
-  }54
-  //#endregion
-
-  //#region Add a new item to the table
-  addItem() {
-    const AddObj = {
-      documentType: [], // Array to store document types
-      containerNumber: "", // Invoice number
-      containerType: "", // Invoice date
-      containerCapacity: "", // Length
-    };
-    this.tableData.splice(0, 0, AddObj); // Insert the new object at the beginning of the tableData array
-  }
-  //#endregion
 
   //#region  Add a new item to the table
-  AddItem() {
-    const AddObj = {
-      documentType: [], // Array to store document types
-      containerNumber: "", // Invoice number
-      containerType: "", // Invoice date
-      containerCapacity: "", // Length
-    };
-    this.tableData1.splice(0, 0, AddObj); // Insert the new object at the beginning of the tableData array
-  }
+
   //#endregion
-  getCotanierType(event){
-    const row = event.row.containerType;
-    const containerCapacity= this.ContainerType.find((x)=>x.name.trim()===row.trim());
-    event.row.containerCapacity=containerCapacity.loadCapacity;
+  getContainerType(event) {
+    const containerType = this.containerTableForm.controls['containerType'].value.value;
+    const containerCapacity = this.ContainerType.find((x) => x.name.trim() === containerType.trim());
+    this.containerTableForm.controls['containerCapacity'].setValue(containerCapacity.loadCapacity)
   }
   //#region functionCallHandler
   functionCallHandler($event) {
@@ -382,14 +352,13 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.billingParty = resCust;
     const cityDetail = await getCity(this.companyCode, this.masterService);
     const resContainer = await containerFromApi(this.masterService);
-    const resContainerType=await containorConsigmentDetail(this.operationService);
-    this.ContainerType=resContainerType;
-    this.displayedColumns1.containerType.option=resContainerType;
+    const resContainerType = await containorConsigmentDetail(this.operationService);
+    this.ContainerType = resContainerType;
+    // this.displayedColumns1.containerType.option=resContainerType;
     const vendorDetail = await getVendorDetails(this.masterService);
-    const prqNo= await pendingbilling(this.masterService);
-    this.displayedColumns1.containerType
-    this.isLoad=true;
-    this.prqNoDetail=prqNo;
+    const prqNo = await pendingbilling(this.masterService);
+    //this.displayedColumns1.containerType
+    this.prqNoDetail = prqNo;
     this.filter.Filter(
       this.jsonControlArrayBasic,
       this.consignmentTableForm,
@@ -444,20 +413,30 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.filter.Filter(
       this.jsonControlArrayBasic,
       this.consignmentTableForm,
-      prqNo.map((x)=>{return {name:x.prqNo,value:x.prqNo}}),
+      prqNo.map((x) => { return { name: x.prqNo, value: x.prqNo } }),
       this.prqNo,
       this.prqNoStatus
+    );
+
+    this.filter.Filter(
+      this.jsonContainerDetail,
+      this.containerTableForm,
+      this.ContainerType,
+      this.containerType,
+      this.containerTypeStatus
     );
     this.prqDetail();
   }
   //#region Save Function
-   async save() {
+  async save() {
     // Remove all form errors
     const tabcontrols = this.consignmentTableForm;
     clearValidatorsAndValidate(tabcontrols);
     const contractcontrols = this.consignmentTableForm;
     clearValidatorsAndValidate(contractcontrols);
     /*End*/
+    const vendorType = this.consignmentTableForm.value.vendorType;
+    const vendorName = this.consignmentTableForm.value.vendorName;
     const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const controlNames = ["containerSize", "transMode", "payType", "vendorType"];
     controlNames.forEach((controlName) => {
@@ -465,11 +444,14 @@ export class ConsignmentEntryFormComponent implements OnInit {
         this.consignmentTableForm.controls[controlName].setValue("");
       }
     });
+    const fieldsToRemove = ['id', 'actions','invoice'];
+    const invoiceList= removeFieldsFromArray( this.invoiceData, fieldsToRemove);
+    const containerlist = removeFieldsFromArray( this.tableData, fieldsToRemove);
     let invoiceDetails = {
-      invoiceDetails: this.tableData1,
+      invoiceDetails: invoiceList,
     };
     let containerDetail = {
-      containerDetail: this.tableData,
+      containerDetail: containerlist,
     };
     const controltabNames = [
       "containerCapacity",
@@ -477,6 +459,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       "containerSize2",
       "containerType",
     ];
+   
     controltabNames.forEach((controlName) => {
       if (Array.isArray(this.consignmentTableForm.value[controlName])) {
         this.consignmentTableForm.controls[controlName].setValue("");
@@ -488,9 +471,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls["containerSize"].setValue(
       this.consignmentTableForm.value.containerSize?.name || ""
     );
+
     this.consignmentTableForm.controls["vendorName"].setValue(
-      this.consignmentTableForm.value.vendorName?.name || ""
+      vendorType === "Market" ? vendorName : vendorName?.name || ""
     );
+    
     this.consignmentTableForm.controls["toCity"].setValue(
       this.consignmentTableForm.value.toCity?.name || ""
     );
@@ -511,7 +496,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const dockNo = `CN${dynamicValue}${paddedNumber}`;
     this.consignmentTableForm.controls["docketNumber"].setValue(dockNo);
     let id = {
-     _id:dockNo ,
+      _id: dockNo,
       isComplete: 1,
       unloading: 0,
       lsNo: "",
@@ -532,13 +517,13 @@ export class ConsignmentEntryFormComponent implements OnInit {
       collectionName: "docket_temp",
       data: docketDetails,
     };
-    if(this.prqFlag){
-      const prqData={
-        prqId:this.consignmentTableForm.value?.prqNo||"",
-        dktNo:this.consignmentTableForm.controls["docketNumber"].value
+    if (this.prqFlag) {
+      const prqData = {
+        prqId: this.consignmentTableForm.value?.prqNo || "",
+        dktNo: this.consignmentTableForm.controls["docketNumber"].value
 
       }
-        await updatePrq(this.operationService,prqData)
+      await updatePrq(this.operationService, prqData, "3")
     }
     this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
       next: (res: any) => {
@@ -559,7 +544,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       },
     });
   }
-    //here the function is calling for add docket Data in docket Tracking.
+  //here the function is calling for add docket Data in docket Tracking.
 
   //#region cancel Function
   cancel() {
@@ -592,13 +577,17 @@ export class ConsignmentEntryFormComponent implements OnInit {
       { name: "vendorName", target: "vendorName" },
       { name: "prqNo", target: "prqNo" }
     ];
-    mapControlArray(this.jsonControlArrayBasic, docketMappings); // Map docket control array
+    const containerMapping = [
+      { name: "containerType", target: "containerType" }
+    ]
+    mapControlArray(this.jsonControlArrayBasic, docketMappings);
+    mapControlArray(this.jsonContainerDetail, containerMapping);// Map docket control array
     // mapControlArray(this.consignorControlArray, consignorMappings); // Map consignor control array
     // mapControlArray(this.consigneeControlArray, consigneeMappings); // Map consignee control array
     //mapControlArray(this.contractControlArray, destinationMapping);
   }
   onAutoBillingBased(event) {
-    const checked=typeof(event)==="string"?event:event.eventArgs.checked
+    const checked = typeof (event) === "string" ? event : event.eventArgs.checked
     if (checked) {
 
       const billingParty = this.consignmentTableForm.controls['billingParty'].value;
@@ -614,8 +603,107 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.consignmentTableForm.controls['consigneeName'].setValue("");
     }
   }
-  prqSelection(){
-   this.prqData= this.prqNoDetail.find((x)=>x.prqId===this.consignmentTableForm.controls['prqNo'].value.value);
-   this.prqDetail()
+  prqSelection() {
+    this.prqData = this.prqNoDetail.find((x) => x.prqId === this.consignmentTableForm.controls['prqNo'].value.value);
+    this.prqDetail()
+  }
+  async addData() {
+
+    this.tableLoad = true;
+    this.isLoad = true;
+    const tableData=this.tableData;
+    const delayDuration = 1000;
+    // Create a promise that resolves after the specified delay
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Use async/await to introduce the delay
+    await delay(delayDuration);
+    const json = {
+      id:tableData.length+1,
+      containerNumber: this.containerTableForm.value.containerNumber,
+      containerType: this.containerTableForm.value.containerType.value,
+      containerCapacity: this.containerTableForm.value.containerCapacity,
+      invoice:false,
+      actions: ['Edit', 'Remove']
+    }
+    this.tableData.push(json);
+    this.isLoad = false;
+    this.tableLoad = false;
+  }
+  handleMenuItemClick(data) {
+
+    if(data.data.invoice){
+      this.fillInvoice(data);
+    }
+    else{
+     this.fillContainer(data);
+    }
+   
+  }
+
+  fillInvoice(data: any) {
+    if(data.label.label==='Remove'){
+      this.invoiceData=this.invoiceData.filter((x)=>x.id!==data.data.id);
+    }
+    else{
+      const container=this.ContainerType.find((x) => x.name.trim() === data.data?.containerType.trim())
+      this.invoiceTableForm.controls['containerNumber'].setValue(data.data?.ewayBillNo||"");
+      this.invoiceTableForm.controls['containerCapacity'].setValue(data.data?.containerCapacity||"");
+      this.invoiceTableForm.controls['containerType'].setValue(data.data?.containerType||"");
+      this.invoiceData=this.invoiceData.filter((x)=>x.id!==data.data.id);
+    }
+    
+  }
+  fillContainer(data:any){
+    if(data.label.label==='Remove'){
+      this.tableData=this.tableData.filter((x)=>x.id!==data.data.id);
+    }
+    else{
+      this.invoiceTableForm.controls['ewayBillNo'].setValue(data.data?.ewayBillNo||"");
+      this.invoiceTableForm.controls['expiryDate'].setValue(data.data?.expiryDate?parse(data.data?.expiryDate, 'yy-MM-dd HH:mm', new Date()):new Date());
+      this.invoiceTableForm.controls['invoiceNo'].setValue(data.data?.invoiceNo||"");
+      this.invoiceTableForm.controls['invoiceAmount'].setValue(data.data?.invoiceAmount||"");
+      this.invoiceTableForm.controls['noofPkts'].setValue(data.data?.noofPkts||"");
+      this.invoiceTableForm.controls['materialName'].setValue(data.data?.materialName||"");
+      this.invoiceTableForm.controls['actualWeight'].setValue(data.data?.actualWeight||"");
+      this.invoiceTableForm.controls['chargedWeight'].setValue(data.data?.chargedWeight||"");
+      this.tableData=this.tableData.filter((x)=>x.id!==data.data.id);
+    }
+  }
+  async addInvoiceData(){
+
+    const invoice=this.invoiceData;
+    this.tableLoadIn=true
+    this.loadIn=true;
+    const delayDuration = 1000;
+    // Create a promise that resolves after the specified delay
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Use async/await to introduce the delay
+    await delay(delayDuration);
+    const json = {
+      id:invoice+1,
+      ewayBillNo: this.invoiceTableForm.value.ewayBillNo,
+      expiryDate: this.invoiceTableForm.value.expiryDate?formatDate(this.invoiceTableForm.value.expiryDate, 'dd-MM-yy HH:mm'):formatDate(new Date().toUTCString(),'dd-MM-yy HH:mm'),
+      invoiceNo: this.invoiceTableForm.value.invoiceNo,
+      invoiceAmount: this.invoiceTableForm.value.invoiceAmount,
+      noofPkts: this.invoiceTableForm.value.noofPkts,
+      materialName: this.invoiceTableForm.value.materialName,
+      actualWeight: this.invoiceTableForm.value.actualWeight,
+      chargedWeight: this.invoiceTableForm.value.chargedWeight,
+      invoice:true,
+      actions: ['Edit', 'Remove']
+    }
+    this.invoiceData.push(json);
+    this.tableLoadIn = false;
+    this.loadIn=false;
+  }
+
+  vendorFieldChanged() {
+    const vendorType = this.consignmentTableForm.value.vendorType;
+    
+    this.jsonControlArrayBasic.forEach((x) => {
+      if (x.name === "vendorName") {
+        x.type = (vendorType === "Market") ? "text" : "dropdown";
+      }
+    });
   }
 }

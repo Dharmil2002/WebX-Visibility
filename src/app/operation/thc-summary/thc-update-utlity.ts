@@ -15,7 +15,7 @@ export async function showConfirmationDialogThc(data,operationService) {
         return res
     }
       
-}
+}   
 async function updateThcStatus(data,operationService) {
 
     const reqBody = {

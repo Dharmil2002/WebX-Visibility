@@ -52,6 +52,7 @@ import { AddMarketVehicleComponent } from './add-market-vehicle/add-market-vehic
 import { FilterUtils } from "../Utility/dropdownFilter";
 import { FilterBillingComponent } from './pending-billing/filter-billing/filter-billing.component';
 import { ThcGenerationComponent } from './thc-generation/thc-generation.component';
+import { ThcViewComponent } from './thc-summary/thc-view/thc-view.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -85,7 +86,8 @@ import { ThcGenerationComponent } from './thc-generation/thc-generation.componen
     ConsignmentEntryFormComponent,
     AddMarketVehicleComponent,
     FilterBillingComponent,
-    ThcGenerationComponent
+    ThcGenerationComponent,
+    ThcViewComponent
     
   ],
   imports: [

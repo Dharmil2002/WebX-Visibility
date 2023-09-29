@@ -51,6 +51,7 @@ import { TdsReconciliationComponent } from "../finance/tds-reconciliation/tds-re
 import { AnalyticsComponent } from "../finance/analytics/analytics.component";
 import { ThcSummaryComponent } from "../operation/thc-summary/thc-summary.component";
 import { ThcUpdateComponent } from './tabs/thc-update/thc-update.component';
+import { DocketListComponent } from './tabs/docket-list/docket-list.component';
 @NgModule({
   declarations: [
     DocketDashboardComponent,
@@ -76,7 +77,8 @@ import { ThcUpdateComponent } from './tabs/thc-update/thc-update.component';
     TdsReconciliationComponent,
     AnalyticsComponent,
     ThcSummaryComponent,
-    ThcUpdateComponent
+    ThcUpdateComponent,
+    DocketListComponent
 
 
   ],

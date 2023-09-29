@@ -51,42 +51,48 @@ export class DashboardPageComponent implements OnInit {
       "id": "PRQ",
       "label": "Tab 7",
       "permission": ["Export", "FTL", "EXIM"]
-    }, {
-      "id": "Job",
+    },
+    {
+      "id": "docket",
       "label": "Tab 8",
+      "permission": ["Export", "FTL", "EXIM"]
+    },
+     {
+      "id": "Job",
+      "label": "Tab 9",
       "permission": ["Export", "Import", "EXIM"]
     }, {
       "id": "Rake",
-      "label": "Tab 9",
+      "label": "Tab 10",
       "permission": ["Import", "EXIM"]
     }, {
       "id": "Tracker",
-      "label": "Tab 10",
+      "label": "Tab 11",
       "permission": ["Export", "Import", "EXIM"]
     },
     {
       "id": "pending",
-      "label": "Tab 10",
+      "label": "Tab 12",
       "permission": ["Billing​"]
     },
     {
       "id": "invoiceBilling",
-      "label": "Tab 10",
+      "label": "Tab 13",
       "permission": ["Billing​"]
     },
     {
       "id": "invoiceBilling",
-      "label": "Tab 10",
+      "label": "Tab 14",
       "permission": ["Billing​"]
     },
     {
       "id": "THC",
-      "label": "Tab 11",
+      "label": "Tab 15",
       "permission": ["Export", "FTL", "EXIM"]
     },
     {
       "id": "THCUpdate",
-      "label": "Tab 12",
+      "label": "Tab 16",
       "permission": ["Export", "FTL", "EXIM"]
     }
   ];

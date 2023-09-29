@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getThcDetail } from '../thc-generation/thc-utlity';
 import { formatDate } from 'src/app/Utility/date/date-utils';
-import { showConfirmationDialogThc } from './thc-update-utlity';
 import { MatDialog } from '@angular/material/dialog';
 import { ThcUpdateComponent } from 'src/app/dashboard/tabs/thc-update/thc-update.component';
+import { ThcViewComponent } from './thc-view/thc-view.component';
 
 @Component({
   selector: 'app-thc-summary',
@@ -21,28 +21,28 @@ export class ThcSummaryComponent implements OnInit {
   //add dyamic controls for generic table
   dynamicControls = {
     add: true,
-    edit: true,
+    edit: false,
     csv: false,
   };
   tableData: any[];
-  TableStyle = "width:60%"
+  TableStyle = "width:70%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {
     tripId: {
       Title: "THC No",
       class: "matcolumnleft",
-      Style: "max-width:200px",
+      Style: "max-width:220px",
     },
     route: {
       Title: "Route",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "max-width:200px",
     },
     vehicle: {
       Title: "Vehicle No",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:200px",
     },
     loadedKg: {
       Title: "Loaded Kg",
@@ -52,7 +52,7 @@ export class ThcSummaryComponent implements OnInit {
     updateDate: {
       Title: "CreateAt",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:200px",
     },
     actionsItems: {
       Title: "Action",
@@ -70,7 +70,7 @@ export class ThcSummaryComponent implements OnInit {
   ];
   addAndEditPath: string;
   menuItemflag: boolean = true;
-  menuItems = [{label:"Update THC"},{label:"Delivered"}];
+  menuItems = [{label:"Update THC"},{label:"Delivered"},{label:"View"}];
 
   //here declare varible for the KPi
   boxData: { count: number; title: string; class: string; }[];
@@ -91,7 +91,7 @@ export class ThcSummaryComponent implements OnInit {
     .map((item) => {
       if (item.updateDate) {
         item.updateDate = formatDate(item.updateDate, 'dd-MM-yy HH:mm');
-        item.actions = item?.status === "1" ? ["Update THC"] :["Delivered"]
+        item.actions = item?.status === "1" ? ["Update THC","View"] :["Delivered","View"]
       }
       return item;
     });
@@ -103,15 +103,27 @@ export class ThcSummaryComponent implements OnInit {
   ngOnInit(): void {
   }
   async handleMenuItemClick(data) {
+    const thcDetail=this.tableData.find((x)=>x._id===data.data._id);
     if (data.label.label === "Update THC") {
-      const dialogref = this.dialog.open(ThcUpdateComponent, {
-        width: "800px",
-        height: "400px",
-        data: data.data,
+      this.router.navigate([this.addAndEditPath], {
+        state: {
+          data: {data:thcDetail,isUpdate:true},
+        },
       });
-      dialogref.afterClosed().subscribe((result) => {
-          this.getThcDetails();
+    }
+    if (data.label.label === "View") {
+      this.router.navigate([this.addAndEditPath], {
+        state: {
+          data: {data:thcDetail,isView:true},
+        },
       });
+      // const dialogref = this.dialog.open(ThcViewComponent, {
+      //   width: "800px",
+      //   height: "500px",
+      //   data: data.data,
+      // });
+      // dialogref.afterClosed().subscribe((result) => {
+      // });
     }
     
   }

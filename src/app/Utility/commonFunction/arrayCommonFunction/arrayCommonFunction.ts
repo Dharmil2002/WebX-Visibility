@@ -49,3 +49,13 @@ export function convertNumericalStringsToInteger(dataObj) {
   }
   return dataObj;
   }
+
+  export function removeFieldsFromArray(array, fieldsToRemove) {
+    return array.map(obj => {
+      const newObj = { ...obj }; // Create a shallow copy of the object
+      for (const field of fieldsToRemove) {
+        delete newObj[field]; // Delete the specified field from the object
+      }
+      return newObj; // Return the object without the specified fields
+    });
+  }

@@ -114,7 +114,7 @@ export class PrqSummaryPageComponent implements OnInit {
         },
       });
     }
-    else if (data.label.label === "Create Docket") {
+    else if (data.label.label === "Add Docket") {
       this.router.navigate(['Operation/ConsignmentEntry'], {
         state: {
           data: data.data

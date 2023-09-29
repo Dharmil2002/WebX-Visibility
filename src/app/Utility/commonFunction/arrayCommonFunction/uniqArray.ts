@@ -34,3 +34,34 @@ export function extractUniqueValues<T>(data: T[], property: keyof T): any[] {
     }
     return null;
 }
+
+function formatDate(dateString: string | null): string {
+  if (!dateString) {
+    return '';
+  }
+
+  try {
+    const parsedDate = new Date(dateString);
+
+    if (!isNaN(parsedDate.getTime())) {
+      // Use the desired format here
+      return parsedDate.toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short',
+      });
+    } else {
+      // Handle the case where the date string is not valid
+      return 'Invalid Date';
+    }
+  } catch (error) {
+    // Handle any parsing errors
+    console.error('Error parsing date:', error);
+    return 'Error';
+  }
+}
+
+// Example usage:

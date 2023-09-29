@@ -1,4 +1,4 @@
-export async function updatePrq(operationService, data) {
+export async function updatePrq(operationService, data,status) {
   const reqBody = {
     companyCode: localStorage.getItem("companyCode"),
     collectionName: "prq_detail",
@@ -6,7 +6,7 @@ export async function updatePrq(operationService, data) {
       _id: data.prqId, // Use the current PRQ ID in the filter
     },
     update: {
-      status: "3",
+      status: status,
     },
   };
   const res = await operationService

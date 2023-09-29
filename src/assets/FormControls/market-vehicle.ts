@@ -9,8 +9,11 @@ export class marketVehicleControls {
                 name: 'vehicelNo', label: "Vehicle Number", placeholder: "Vehicle Number", type: 'text',
                 value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
-
-                ]
+                    {
+                      name: "required",
+                      message: "Vehicle Number is required",
+                    },
+                  ],
             },
             {
                 name: "vehicleSize",
@@ -28,7 +31,12 @@ export class marketVehicleControls {
                 displaywith: "",
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [
+                    {
+                      name: "required",
+                      message: "Vehicle Size is required",
+                    },
+                  ],
                 functions:{
                     onSelection:"checkVehicleSize"
                 },

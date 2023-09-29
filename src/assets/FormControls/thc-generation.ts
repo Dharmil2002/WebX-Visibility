@@ -2,9 +2,18 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class thcControl {
     private thcControlArray: FormControls[];
-    constructor() {
+    constructor(update:boolean,view:boolean) {
         this.thcControlArray =
          [
+            {
+                name: "tripId",
+                label: "Trip ID",
+                placeholder: '',
+                type: "text",
+                value: 'System Generated',
+                Validations: [],
+                generatecontrol: true, disable:view?view:true
+            },
             {
                 name: 'route',
                 label: 'Route',
@@ -12,7 +21,7 @@ export class thcControl {
                 type: 'text',
                 value: '',
                 Validations: [],
-                generatecontrol: true, disable: true
+                generatecontrol: true, disable:view?view: true
                 
             },
             {
@@ -29,13 +38,13 @@ export class thcControl {
                 functions: {
                     onOptionSelect: 'getShipmentDetails'
                 },
-                disable: false
+                disable: view?view:update
             },
             {
                 name: 'vehicle',
                 label: 'Vehicle',
                 placeholder: '',
-                type: 'dropdown',
+                type: 'text',
                 value: '',
                 Validations: [],
                 generatecontrol: true,
@@ -45,11 +54,11 @@ export class thcControl {
                 functions: {
                     onOptionSelect: ''
                 },
-                disable: false
+                disable:view?view: true
             },
             {
-                name: "vehicleType",
-                label: "Vehicle Type",
+                name: "VendorType",
+                label: "Vendor Type",
                 placeholder: "VehicleType",
                 type: "text",
                 value: "",
@@ -57,20 +66,107 @@ export class thcControl {
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: true,
+                disable:view?view: true,
                 Validations: [
                 ],
                 functions: { },
                 additionalData: {}
             },
             {
-                name: "tripId",
-                label: "Trip ID",
-                placeholder: '',
+                name: "vendorName",
+                label: "Vendor Name",
+                placeholder: "Vendor Name",
                 type: "text",
-                value: 'System Generated',
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: view?view:update,
+                Validations: [
+                ],
+                functions: { },
+                additionalData: {}
+            },
+            {
+                name: "panNo",
+                label: "PAN Number",
+                placeholder: "PAN Number",
+                type: "text",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: view?view:update,
+                Validations: [
+                ],
+                functions: { },
+                additionalData: {}
+            },
+            {
+                name: 'driverName',
+                label: 'Driver Name',
+                placeholder: '',
+                type: 'text',
+                value: '',
                 Validations: [],
-                generatecontrol: true, disable: true
+                generatecontrol: true,
+                additionalData: {
+                    showNameAndValue: false
+                },
+                functions: {
+                    onOptionSelect: ''
+                },
+                disable:view?view: update
+            },
+            {
+                name: 'driverMno',
+                label: 'Driver Mobile No',
+                placeholder: '',
+                type: 'number',
+                value: '',
+                Validations: [],
+                generatecontrol: true,
+                additionalData: {
+                    showNameAndValue: false
+                },
+                functions: {
+                    onOptionSelect: ''
+                },
+                disable:view?view: update
+            },
+            {
+                name: 'driverLno',
+                label: 'Driver License No',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [],
+                generatecontrol: true,
+                additionalData: {
+                    showNameAndValue: false
+                },
+                functions: {
+                    onOptionSelect: ''
+                },
+                disable:view?view: update
+            },
+            {
+                name: 'driverLexd',
+                label: 'Driver License Expiry Date',
+                placeholder: '',
+                type: 'date',
+                value: '',
+                Validations: [],
+                generatecontrol: true,
+                additionalData: {
+                    showNameAndValue: false
+                },
+                functions: {
+                    onOptionSelect: ''
+                },
+                disable:view?view: update
             },
             {
                 name: 'capacity',
@@ -90,17 +186,7 @@ export class thcControl {
                 value:'',
                 Validations: [],
                 generatecontrol: true,
-                disable: true
-            },
-            {
-                name: 'loadaddedKg',
-                label: 'Load added Kg',
-                placeholder: '',
-                type: 'text',
-                value:'',
-                Validations: [],
-                generatecontrol: true,
-                disable: true
+                disable:view?view: true
             },
             {
                 name: 'weightUtilization',
@@ -111,6 +197,124 @@ export class thcControl {
                 Validations: [],
                 generatecontrol: true,
                 disable: true
+            },
+            {
+                name: 'contAmt',
+                label: 'Contract Amount(Rs)',
+                placeholder: '',
+                type: 'text',
+                value:'',
+                Validations: [],
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                },
+                generatecontrol: true,
+                disable: view?view:update
+            },
+            {
+                name: 'advAmt',
+                label: 'Advance Amount(Rs)',
+                placeholder: '',
+                type: 'text',
+                value:'',
+                Validations: [],
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                },
+                generatecontrol: true,
+                disable: view?view:update
+            },
+              {
+                name: 'balAmt',
+                label: 'Balance Amount(Rs)',
+                placeholder: '',
+                type: 'text',
+                value:'',
+                functions:{
+                    onModelChange:'onCalculateTotal'
+                },
+                Validations: [],
+                generatecontrol: true,
+                disable:view?view: update
+            },
+            {
+                name: 'advPdAt',
+                label: 'Advance Paid At',
+                placeholder: '',
+                type: 'dropdown',
+                value:'',
+                additionalData: {
+                    showNameAndValue: true
+                },
+                Validations: [],
+                generatecontrol: true,
+                disable:view?view: update
+            },
+            {
+                name: 'balAmtAt',
+                label: 'Balance Paid At',
+                placeholder: '',
+                type: 'dropdown',
+                value:'',
+                additionalData: {
+                    showNameAndValue: true
+                },
+                Validations: [],
+                generatecontrol: true,
+                disable:view?view: update
+            },
+            {
+                name: 'overload',
+                label: 'Overload',
+                placeholder: '',
+                type: 'toggle',
+                value:'',
+                Validations: [],
+                generatecontrol: true,
+                disable:view?view: true
+            },
+            {
+                name: 'arrivalTime',
+                label: 'Arrival Time',
+                placeholder: '',
+                type: 'time',
+                value: '',
+                Validations: [],
+                generatecontrol: update, disable:view?view: update
+            },
+            {
+                name: 'podUpload',
+                label: 'POD Upload',
+                placeholder: '',
+                type: 'file',
+                value: '',
+                Validations: [],
+                additionalData: {
+                    multiple: true
+                },
+                functions: {
+                    onChange: 'GetFileList',
+                },
+                generatecontrol: update,
+                disable: view?view:false
+            },
+            {
+                name: 'remarks',
+                label: 'Remarks',
+                placeholder: '',
+                type: 'textarea',
+                value: '',
+                Validations: [],
+                generatecontrol: update, disable: view?view:false
+            },
+            {
+                name: 'receivedBy',
+                label: 'Received By',
+                placeholder: '',
+                type: 'text',   
+                value: '',
+                Validations: [],
+                generatecontrol: update, disable: false
             },
             {
                 name: 'docket',

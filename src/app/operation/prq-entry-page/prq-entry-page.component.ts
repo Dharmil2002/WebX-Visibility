@@ -1,25 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { FormControls } from 'src/app/Models/FormControl/formcontrol';
-import { PrqEntryControls } from 'src/assets/FormControls/prq-entry';
-import { processProperties } from 'src/app/Masters/processUtility';
+import { Component, OnInit } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { PrqEntryControls } from "src/assets/FormControls/prq-entry";
+import { processProperties } from "src/app/Masters/processUtility";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
-import { MasterService } from "src/app/core/service/Masters/master.service";
-import { getCity } from '../quick-booking/quick-utility';
-import { Router } from '@angular/router';
-import { addPrqData, containerFromApi, customerFromApi, locationFromApi, updatePrqStatus } from './prq-utitlity';
-import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
-import { prqDetail } from 'src/app/core/models/operations/prq/prq';
-import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import Swal from 'sweetalert2';
-import { getPrqDetailFromApi } from 'src/app/dashboard/tabs/prq-summary-page/prq-summary-utitlity';
-import { MatDialog } from '@angular/material/dialog';
-import { PrqListComponent } from './prq-list/prq-list.component';
-import { setControlValue } from 'src/app/Utility/Form Utilities/setform';
+import { Router } from "@angular/router";
+import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
+import { prqDetail } from "src/app/core/models/operations/prq/prq";
+import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
+import Swal from "sweetalert2";
+import { MatDialog } from "@angular/material/dialog";
+import { PrqListComponent } from "./prq-list/prq-list.component";
+import { setControlValue } from "src/app/Utility/Form Utilities/setform";
+import { ContainerService } from "src/app/Utility/module/masters/container/container.service";
+import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
+import { PrqService } from "src/app/Utility/module/operation/prq/prq.service";
+import { CityService } from "src/app/Utility/module/masters/city/city.service";
 
 @Component({
-  selector: 'app-prq-entry-page',
-  templateUrl: './prq-entry-page.component.html',
+  selector: "app-prq-entry-page",
+  templateUrl: "./prq-entry-page.component.html",
   providers: [FilterUtils],
 })
 export class PrqEntryPageComponent implements OnInit {
@@ -62,20 +63,24 @@ export class PrqEntryPageComponent implements OnInit {
   locationDetail: any;
   customerList: any;
 
-  constructor(private fb: UntypedFormBuilder,
-    private masterService: MasterService,
-    private filter: FilterUtils, private router: Router,
-    public dialog: MatDialog
+  constructor(
+    private fb: UntypedFormBuilder,
+    private filter: FilterUtils,
+    private router: Router,
+    public dialog: MatDialog,
+    private containerService: ContainerService,
+    private customerService: CustomerService,
+    private locationService: LocationService,
+    private cityService:CityService,
+    private prqService: PrqService
   ) {
     this.prqDetail = new prqDetail({});
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.prqDetail = router.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
       this.initializeFormControl();
-    }
-    else {
+    } else {
       this.initializeFormControl();
-
     }
   }
 
@@ -86,22 +91,40 @@ export class PrqEntryPageComponent implements OnInit {
     this.bindDataFromDropdown();
   }
 
-
   autoFill() {
-
     if (this.isUpdate) {
-      this.prqEntryTableForm.controls['transMode'].setValue(this.prqDetail.transMode);
-      this.prqEntryTableForm.controls['vehicleSize'].setValue(this.prqDetail?.vehicleSize?.split("-")[0] ?? '');
-      this.prqEntryTableForm.controls['fromCity'].setValue({ name: this.prqDetail.fromCity, value: this.prqDetail.fromCity });
-      this.prqEntryTableForm.controls['toCity'].setValue({ name: this.prqDetail.toCity, value: this.prqDetail.toCity });
-      this.prqEntryTableForm.controls['billingParty'].setValue({ name: this.prqDetail.billingParty, value: this.prqDetail.billingParty });
-      this.prqEntryTableForm.controls['containerSize'].setValue({ name: this.prqDetail.containerSize, value: this.prqDetail.containerSize });
-      this.prqEntryTableForm.controls['typeContainer'].setValue({ name: this.prqDetail.typeContainer, value: this.prqDetail.typeContainer });
-      this.prqEntryTableForm.controls['payType'].setValue(this.prqDetail.payType);
-    }
-    else {
-      this.prqEntryTableForm.controls['transMode'].setValue("Road");
-      this.prqEntryTableForm.controls['payType'].setValue("TBB");
+      this.prqEntryTableForm.controls["transMode"].setValue(
+        this.prqDetail.transMode
+      );
+      this.prqEntryTableForm.controls["vehicleSize"].setValue(
+        this.prqDetail?.vehicleSize?.split("-")[0] ?? ""
+      );
+      this.prqEntryTableForm.controls["fromCity"].setValue({
+        name: this.prqDetail.fromCity,
+        value: this.prqDetail.fromCity,
+      });
+      this.prqEntryTableForm.controls["toCity"].setValue({
+        name: this.prqDetail.toCity,
+        value: this.prqDetail.toCity,
+      });
+      this.prqEntryTableForm.controls["billingParty"].setValue({
+        name: this.prqDetail.billingParty,
+        value: this.prqDetail.billingParty,
+      });
+      this.prqEntryTableForm.controls["containerSize"].setValue({
+        name: this.prqDetail.containerSize,
+        value: this.prqDetail.containerSize,
+      });
+      this.prqEntryTableForm.controls["typeContainer"].setValue({
+        name: this.prqDetail.typeContainer,
+        value: this.prqDetail.typeContainer,
+      });
+      this.prqEntryTableForm.controls["payType"].setValue(
+        this.prqDetail.payType
+      );
+    } else {
+      this.prqEntryTableForm.controls["transMode"].setValue("Road");
+      this.prqEntryTableForm.controls["payType"].setValue("TBB");
     }
   }
   initializeFormControl() {
@@ -110,22 +133,34 @@ export class PrqEntryPageComponent implements OnInit {
     // Get form controls for PRQ Entry section
     this.jsonControlPrqArray = this.prqControls.getPrqEntryFieldControls();
     // Create the form group using the form builder and the form controls array
-    this.prqEntryTableForm = formGroupBuilder(this.fb, [this.jsonControlPrqArray]);
+    this.prqEntryTableForm = formGroupBuilder(this.fb, [
+      this.jsonControlPrqArray,
+    ]);
   }
   bindDropDown() {
     const locationPropertiesMapping = {
-      billingParty: { variable: 'customer', status: 'billingPartyStatus' },
-      fleetSize: { variable: 'fleetSize', status: 'fleetSizeStatus' },
-      fromCity: { variable: 'fromCity', status: 'fromCityStatus' },
-      toCity: { variable: 'toCity', status: 'toCityStatus' },
-      ftlType: { variable: 'ftlType', status: 'ftlTypeStatus' },
-      prqRaiseOn: { variable: 'prqRaiseOn', status: 'prqRaiseOnStatus' },
-      transMode: { variable: 'transModeOn', status: 'transModeOnStatus' },
-      prqBranch: { variable: 'prqBranchCode', status: 'prqBranchStatus' },
-      typeContainer: { variable: 'typeContainerCode', status: 'typeContainerStatus' },
-      containerSize: { variable: 'containerSizeCode', status: 'containerSizeStatus' }
+      billingParty: { variable: "customer", status: "billingPartyStatus" },
+      fleetSize: { variable: "fleetSize", status: "fleetSizeStatus" },
+      fromCity: { variable: "fromCity", status: "fromCityStatus" },
+      toCity: { variable: "toCity", status: "toCityStatus" },
+      ftlType: { variable: "ftlType", status: "ftlTypeStatus" },
+      prqRaiseOn: { variable: "prqRaiseOn", status: "prqRaiseOnStatus" },
+      transMode: { variable: "transModeOn", status: "transModeOnStatus" },
+      prqBranch: { variable: "prqBranchCode", status: "prqBranchStatus" },
+      typeContainer: {
+        variable: "typeContainerCode",
+        status: "typeContainerStatus",
+      },
+      containerSize: {
+        variable: "containerSizeCode",
+        status: "containerSizeStatus",
+      },
     };
-    processProperties.call(this, this.jsonControlPrqArray, locationPropertiesMapping);
+    processProperties.call(
+      this,
+      this.jsonControlPrqArray,
+      locationPropertiesMapping
+    );
   }
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call
@@ -138,10 +173,9 @@ export class PrqEntryPageComponent implements OnInit {
     }
   }
 
-
   async getCity() {
     try {
-      const cityDetail = await getCity(this.companyCode, this.masterService);
+      const cityDetail = await this.cityService.getCity();
 
       if (cityDetail) {
         this.filter.Filter(
@@ -160,16 +194,20 @@ export class PrqEntryPageComponent implements OnInit {
           this.toCityStatus
         ); // Filter the docket control array based on toCity details
       }
-      this.disableSize("Road")
+      this.disableSize("Road");
     } catch (error) {
       console.error("Error getting city details:", error);
     }
   }
   cancel() {
-    this.goBack(6)
+    this.goBack(6);
   }
   GetBranchChanges() {
-    const locationDetail = this.locationDetail.filter((x) => x.city.toLowerCase() === this.prqEntryTableForm.value.fromCity.name.toLowerCase());
+    const locationDetail = this.locationDetail.filter(
+      (x) =>
+        x.city.toLowerCase() ===
+        this.prqEntryTableForm.value.fromCity.name.toLowerCase()
+    );
     this.filter.Filter(
       this.jsonControlPrqArray,
       this.prqEntryTableForm,
@@ -181,15 +219,27 @@ export class PrqEntryPageComponent implements OnInit {
   async save() {
     const tabcontrols = this.prqEntryTableForm;
     clearValidatorsAndValidate(tabcontrols);
-    this.prqEntryTableForm.controls['typeContainer'].enable();
-    this.prqEntryTableForm.controls['containerSize'].enable();
-    this.prqEntryTableForm.controls['vehicleSize'].enable();
-    this.prqEntryTableForm.controls['prqBranch'].setValue(this.prqEntryTableForm.controls['prqBranch'].value?.value || "");
-    this.prqEntryTableForm.controls['billingParty'].setValue(this.prqEntryTableForm.controls['billingParty'].value?.name || "");
-    this.prqEntryTableForm.controls['fromCity'].setValue(this.prqEntryTableForm.controls['fromCity'].value?.name || "");
-    this.prqEntryTableForm.controls['toCity'].setValue(this.prqEntryTableForm.controls['toCity'].value?.name || "");
-    this.prqEntryTableForm.controls['typeContainer'].setValue(this.prqEntryTableForm.controls['typeContainer'].value?.name || "");
-    this.prqEntryTableForm.controls['containerSize'].setValue(this.prqEntryTableForm.controls['containerSize'].value?.name || "");
+    this.prqEntryTableForm.controls["typeContainer"].enable();
+    this.prqEntryTableForm.controls["containerSize"].enable();
+    this.prqEntryTableForm.controls["vehicleSize"].enable();
+    this.prqEntryTableForm.controls["prqBranch"].setValue(
+      this.prqEntryTableForm.controls["prqBranch"].value?.value || ""
+    );
+    this.prqEntryTableForm.controls["billingParty"].setValue(
+      this.prqEntryTableForm.controls["billingParty"].value?.name || ""
+    );
+    this.prqEntryTableForm.controls["fromCity"].setValue(
+      this.prqEntryTableForm.controls["fromCity"].value?.name || ""
+    );
+    this.prqEntryTableForm.controls["toCity"].setValue(
+      this.prqEntryTableForm.controls["toCity"].value?.name || ""
+    );
+    this.prqEntryTableForm.controls["typeContainer"].setValue(
+      this.prqEntryTableForm.controls["typeContainer"].value?.name || ""
+    );
+    this.prqEntryTableForm.controls["containerSize"].setValue(
+      this.prqEntryTableForm.controls["containerSize"].value?.name || ""
+    );
     const controlNames = ["transMode", "payType", "vehicleSize"];
     controlNames.forEach((controlName) => {
       if (Array.isArray(this.prqEntryTableForm.value[controlName])) {
@@ -198,15 +248,24 @@ export class PrqEntryPageComponent implements OnInit {
     });
     if (!this.isUpdate) {
       const thisYear = new Date().getFullYear();
-      const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
+      const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1)
+        .toString()
+        .slice(-2)}`;
       const location = localStorage.getItem("Branch"); // Replace with your dynamic value
-      const blParty = this.prqEntryTableForm.controls['billingParty'].value.toUpperCase();
+      const blParty =
+        this.prqEntryTableForm.controls["billingParty"].value.toUpperCase();
       const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
       const paddedNumber = dynamicNumber.toString().padStart(7, "0");
-      let prqNo = `${location.substring(0, 3)}${blParty.substring(0, 3)}${financialYear}${paddedNumber}`;
-      this.prqEntryTableForm.controls['_id'].setValue(prqNo);
-      this.prqEntryTableForm.controls['prqId'].setValue(prqNo);
-      const res = await addPrqData(this.prqEntryTableForm.value, this.masterService);
+      let prqNo = `${location.substring(0, 3)}${blParty.substring(
+        0,
+        3
+      )}${financialYear}${paddedNumber}`;
+      this.prqEntryTableForm.controls["_id"].setValue(prqNo);
+      this.prqEntryTableForm.controls["prqId"].setValue(prqNo);
+
+      const res = await this.prqService.addPrqData(
+        this.prqEntryTableForm.value,
+      );
       if (res) {
         Swal.fire({
           icon: "success",
@@ -215,24 +274,26 @@ export class PrqEntryPageComponent implements OnInit {
           showConfirmButton: true,
         }).then((result) => {
           if (result.isConfirmed) {
-            this.goBack(6)
+            this.goBack(6);
           }
         });
       }
-    }
-    else {
-      const prqNo = this.prqEntryTableForm.controls['prqId'].value.value;
-      this.prqEntryTableForm.controls['_id'].setValue(prqNo);
-      const res = await updatePrqStatus(this.prqEntryTableForm.value, this.masterService)
+    } else {
+      const prqNo = this.prqEntryTableForm.controls["prqId"].value.value;
+      this.prqEntryTableForm.controls["_id"].setValue(prqNo);
+      const res = await this.prqService.updatePrqStatus(
+        this.prqEntryTableForm.value,
+      );
+
       if (res) {
         Swal.fire({
           icon: "success",
           title: "Update Successfuly",
-          text: `PRQ No: ${this.prqEntryTableForm.controls['prqId'].value}`,
+          text: `PRQ No: ${this.prqEntryTableForm.controls["prqId"].value}`,
           showConfirmButton: true,
         }).then((result) => {
           if (result.isConfirmed) {
-            this.goBack(6)
+            this.goBack(6);
           }
         });
       }
@@ -242,17 +303,22 @@ export class PrqEntryPageComponent implements OnInit {
     // console.log(this.prqEntryTableForm.value);
   }
   goBack(tabIndex: number): void {
-    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+    this.router.navigate(["/dashboard/GlobeDashboardPage"], {
+      queryParams: { tab: tabIndex },
+      state: [],
+    });
   }
   async bindDataFromDropdown() {
-    const resLoc = await locationFromApi(this.masterService);
-    const resCust = await customerFromApi(this.masterService);
+    const resLoc = await this.locationService.locationFromApi();
+    const resCust = await this.customerService.customerFromApi();
     this.customerList = resCust;
-    const resContainer = await containerFromApi(this.masterService);
+    const resContainer = await this.containerService.containerFromApi();
     this.locationDetail = resLoc;
     if (this.isUpdate) {
-      const prqLoc = resLoc.find((x) => x.value.trim() === this.prqDetail.prqBranch);
-      this.prqEntryTableForm.controls['prqBranch'].setValue(prqLoc);
+      const prqLoc = resLoc.find(
+        (x) => x.value.trim() === this.prqDetail.prqBranch
+      );
+      this.prqEntryTableForm.controls["prqBranch"].setValue(prqLoc);
     }
 
     this.filter.Filter(
@@ -285,12 +351,17 @@ export class PrqEntryPageComponent implements OnInit {
       this.typeContainerCode,
       this.typeContainerStatus
     );
-    this.allPrqDetail = await getPrqDetailFromApi(this.masterService);
+    this.allPrqDetail = await this.prqService.getPrqDetailFromApi();
   }
 
   bilingChanged() {
-    const billingParty = this.prqEntryTableForm.controls['billingParty'].value?.name || "";
-    let prqDetail = this.allPrqDetail.filter((x) => x.billingParty.toLowerCase() === billingParty.toLowerCase()).slice(0, 5);;
+    const billingParty =
+      this.prqEntryTableForm.controls["billingParty"].value?.name || "";
+    let prqDetail = this.allPrqDetail
+      .filter(
+        (x) => x.billingParty.toLowerCase() === billingParty.toLowerCase()
+      )
+      .slice(0, 5);
     if (prqDetail.length > 0) {
       this.prqView(prqDetail);
       // Swal.fire({
@@ -308,7 +379,6 @@ export class PrqEntryPageComponent implements OnInit {
       //     this.prqView(prqDetail)
       //   }
       // });
-
     }
   }
   prqView(prqDetail) {
@@ -324,34 +394,55 @@ export class PrqEntryPageComponent implements OnInit {
   }
   autoFillPqrDetail(result) {
     if (result) {
-      setControlValue(this.prqEntryTableForm.get('transMode'), result.transMode);
-      setControlValue(this.prqEntryTableForm.get('vehicleSize'), result?.vehicleSize?.split("-")[0] ?? '');
-      setControlValue(this.prqEntryTableForm.get('fromCity'), { name: result.fromCity, value: result.fromCity });
-      setControlValue(this.prqEntryTableForm.get('toCity'), { name: result.toCity, value: result.toCity });
-      const billingParty = this.customerList.find((x) => x.name.toLowerCase() === result.billingParty.toLowerCase());
-      setControlValue(this.prqEntryTableForm.get('billingParty'), billingParty);
-      setControlValue(this.prqEntryTableForm.get('contactNo'), result.contactNo);
-      setControlValue(this.prqEntryTableForm.get('prqBranch'), { name: result.prqBranch, value: result.prqBranch });
-      setControlValue(this.prqEntryTableForm.get('containerSize'), { name: result.containerSize, value: result.containerSize });
-      setControlValue(this.prqEntryTableForm.get('typeContainer'), { name: result.typeContainer, value: result.typeContainer });
-      setControlValue(this.prqEntryTableForm.get('pAddress'), result?.pAddress);
+      setControlValue(
+        this.prqEntryTableForm.get("transMode"),
+        result.transMode
+      );
+      setControlValue(
+        this.prqEntryTableForm.get("vehicleSize"),
+        result?.vehicleSize?.split("-")[0] ?? ""
+      );
+      setControlValue(this.prqEntryTableForm.get("fromCity"), {
+        name: result.fromCity,
+        value: result.fromCity,
+      });
+      setControlValue(this.prqEntryTableForm.get("toCity"), {
+        name: result.toCity,
+        value: result.toCity,
+      });
+      const billingParty = this.customerList.find(
+        (x) => x.name.toLowerCase() === result.billingParty.toLowerCase()
+      );
+      setControlValue(this.prqEntryTableForm.get("billingParty"), billingParty);
+      setControlValue(
+        this.prqEntryTableForm.get("contactNo"),
+        result.contactNo
+      );
+      setControlValue(this.prqEntryTableForm.get("prqBranch"), {
+        name: result.prqBranch,
+        value: result.prqBranch,
+      });
+      setControlValue(this.prqEntryTableForm.get("containerSize"), {
+        name: result.containerSize,
+        value: result.containerSize,
+      });
+      setControlValue(this.prqEntryTableForm.get("typeContainer"), {
+        name: result.typeContainer,
+        value: result.typeContainer,
+      });
+      setControlValue(this.prqEntryTableForm.get("pAddress"), result?.pAddress);
     }
   }
 
   disableSize(event) {
-    
-    if (typeof(event)==="object" && event.eventArgs.value == "Rail") {
-      this.prqEntryTableForm.controls['typeContainer'].enable();
-      this.prqEntryTableForm.controls['containerSize'].enable();
-      this.prqEntryTableForm.controls['vehicleSize'].disable();
+    if (typeof event === "object" && event.eventArgs.value == "Rail") {
+      this.prqEntryTableForm.controls["typeContainer"].enable();
+      this.prqEntryTableForm.controls["containerSize"].enable();
+      this.prqEntryTableForm.controls["vehicleSize"].disable();
+    } else {
+      this.prqEntryTableForm.controls["typeContainer"].disable();
+      this.prqEntryTableForm.controls["containerSize"].disable();
+      this.prqEntryTableForm.controls["vehicleSize"].enable();
     }
-    else {
-
-      this.prqEntryTableForm.controls['typeContainer'].disable();
-      this.prqEntryTableForm.controls['containerSize'].disable();
-      this.prqEntryTableForm.controls['vehicleSize'].enable();
-    }
-
   }
 }
-

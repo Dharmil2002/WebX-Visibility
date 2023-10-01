@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { getPrqDetailFromApi } from './prq-summary-utitlity';
 import { Router } from '@angular/router';
 import { showConfirmationDialog } from 'src/app/operation/prq-entry-page/prq-utitlity';
+import { PrqService } from 'src/app/Utility/module/operation/prq/prq.service';
 
 @Component({
   selector: 'app-prq-summary-page',
@@ -89,7 +88,10 @@ export class PrqSummaryPageComponent implements OnInit {
   linkArray = [{ Row: "Action", Path: "Operation/PRQEntry" }];
   boxData: { count: number; title: string; class: string; }[];
   allPrq: any;
-  constructor(private _masterService:MasterService,private router: Router) {
+  constructor(
+    private router: Router,
+    private prqService:PrqService
+    ) {
     this.addAndEditPath = "Operation/PRQEntry";
   }
 
@@ -98,7 +100,7 @@ export class PrqSummaryPageComponent implements OnInit {
   }
   async getPrqDetails() {
   
-    let data= await getPrqDetailFromApi(this._masterService);
+    let data= await this.prqService.getPrqDetailFromApi();
     this.tableData=data.tableData;
     this.allPrq=data.allPrqDetail;
     this.getPrqKpiCount();
@@ -106,7 +108,7 @@ export class PrqSummaryPageComponent implements OnInit {
   }
    async handleMenuItemClick(data) {
     if (data.label.label === "Assign Vehicle") {
-      this._masterService.setassignVehicleDetail(data.data);
+      this.prqService.setassignVehicleDetail(data.data);
       this.router.navigate(['/Operation/AssignVehicle'], {
         state: {
           data: data.data
@@ -124,7 +126,7 @@ export class PrqSummaryPageComponent implements OnInit {
     else if (data.label.label === "Confirm") {
       const tabIndex = 6; // Adjust the tab index as needed
       const status="1";
-      await showConfirmationDialog(data.data, this._masterService, this.goBack.bind(this),tabIndex,status);
+      await this.prqService.showConfirmationDialog(data.data, this.goBack.bind(this),tabIndex,status);
       this.getPrqDetails();
     }
     else if(data.label.label==="Modify"){
@@ -137,7 +139,7 @@ export class PrqSummaryPageComponent implements OnInit {
     else if(data.label.label==="Reject"){
       const tabIndex = "PRQ"; 
       const status="5";
-      await showConfirmationDialog(data.data, this._masterService, this.goBack.bind(this),tabIndex,status);
+      await this.prqService.showConfirmationDialog(data.data, this.goBack.bind(this),tabIndex,status);
       this.getPrqDetails();
     }
     else if(data.label.label==="Create THC")

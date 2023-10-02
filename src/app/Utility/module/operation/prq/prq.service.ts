@@ -87,6 +87,7 @@ export class PrqService {
       prqDetail.status = status;
       delete prqDetail._id;
       delete prqDetail.srNo;
+      delete prqDetail.actions;
 
       const res = await updatePrqStatus(prqDetail, this.masterService);
       if (res) {

@@ -22,7 +22,7 @@ export class VehicleMasterListComponent implements OnInit {
         }
     headerForCsv = {
         "srNo": "Sr No",
-        "vehicleNo": "Vehicle No.",
+        "vehicleNo": "Vehicle Number",
         "vehicleType": "Vehicle Type",
         "vendorName": "Vendor Code",
         "vendorType": "Vendor Type",

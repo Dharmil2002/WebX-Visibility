@@ -434,8 +434,18 @@
           "title": "ConsignmentEntry",
           "tag": ["ConsignmentEntry"],
           "router": "Operation/ConsignmentEntry"
+        },
+        {
+          "title": "FleetMaster/AddFleet",
+          "tag": ["FleetMaster", "AddFleet"],
+          "router": "Masters/FleetMaster/AddFleetMaster"
+        },
+        {
+          "title": "FleetMaster/FleetmasterList",
+          "tag": ["FleetMaster", "FleetmasterList"],
+          "router": "Masters/FleetMaster/FleetMasterList"
         }
+
       ]
-    
+
   }
-  

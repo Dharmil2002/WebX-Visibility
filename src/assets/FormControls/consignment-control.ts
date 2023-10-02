@@ -90,6 +90,23 @@ export class ConsignmentControl {
         },
       },
       {
+        name: "origin",
+        label: "Origin",
+        placeholder: "Origin",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
         name: "fromCity",
         label: "From City",
         placeholder: "From City",
@@ -122,6 +139,23 @@ export class ConsignmentControl {
         Validations: [
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "destination",
+        label: "Destination",
+        placeholder: "Destination",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [
         ],
         additionalData: {
           showNameAndValue: false,

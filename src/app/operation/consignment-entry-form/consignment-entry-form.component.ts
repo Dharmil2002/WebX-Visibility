@@ -19,6 +19,8 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 import { trigger } from "@angular/animations";
 import { parse } from "date-fns";
 import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 
 
 @Component({
@@ -33,8 +35,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
   FreightTableForm: UntypedFormGroup;
   invoiceTableForm: UntypedFormGroup;
   tableData: any = [];
-  invoiceData:any=[];
-  tableLoadIn:boolean=true;
+  invoiceData: any = [];
+  tableLoadIn: boolean = true;
   tableData1: any;
   tableLoad: boolean = true;
   isTableLoad: boolean = true;
@@ -115,12 +117,12 @@ export class ConsignmentEntryFormComponent implements OnInit {
       Style: "min-width:2px",
     },
     noofPkts: {
-      Title:  "No of Pkts",
+      Title: "No of Pkts",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
     materialName: {
-      Title:  "Material Name",
+      Title: "Material Name",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -141,17 +143,17 @@ export class ConsignmentEntryFormComponent implements OnInit {
     }
   }
   /*End*/
-  staticFieldInvoice=
-  [
-    'ewayBillNo',
-    'expiryDate',
-    'invoiceNo',
-    'invoiceAmount',
-    'noofPkts',
-    'materialName',
-    'actualWeight',
-    'chargedWeight'  
-  ]
+  staticFieldInvoice =
+    [
+      'ewayBillNo',
+      'expiryDate',
+      'invoiceNo',
+      'invoiceAmount',
+      'noofPkts',
+      'materialName',
+      'actualWeight',
+      'chargedWeight'
+    ]
   staticField =
     [
       'containerNumber',
@@ -202,9 +204,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private _NavigationService: NavigationService,
     private masterService: MasterService,
+    private pinCodeService:PinCodeService,
     private filter: FilterUtils,
     private route: Router,
     private operationService: OperationService,
+    private locationService: LocationService
   ) {
 
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -345,9 +349,12 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls['containerSize'].setValue(this.prqData?.containerSize);
     this.consignmentTableForm.controls['ccbp'].setValue(true);
     this.consignmentTableForm.controls['vehicleNo'].setValue(this.prqData?.vehicleNo);
+    this.getLocBasedOnCity();
     this.onAutoBillingBased("true");
   }
+
   async bindDataFromDropdown() {
+
     const resCust = await customerFromApi(this.masterService);
     this.billingParty = resCust;
     const cityDetail = await getCity(this.companyCode, this.masterService);
@@ -428,6 +435,16 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.prqDetail();
   }
   //#region Save Function
+  async getLocBasedOnCity() {
+    
+    const toCity = this.prqData?.toCity;
+    const fromCity = this.prqData?.fromCity;
+    this.consignmentTableForm.controls['destination'].setValue(toCity);
+    this.consignmentTableForm.controls['origin'].setValue(fromCity);
+   // this.locationService.setCityLocationInForm(this.consignmentTableForm.get('destination'), toCity, location);
+    //this.locationService.setCityLocationInForm(this.consignmentTableForm.get('origin'), fromCity, location);
+  }
+
   async save() {
     // Remove all form errors
     const tabcontrols = this.consignmentTableForm;
@@ -444,9 +461,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
         this.consignmentTableForm.controls[controlName].setValue("");
       }
     });
-    const fieldsToRemove = ['id', 'actions','invoice'];
-    const invoiceList= removeFieldsFromArray( this.invoiceData, fieldsToRemove);
-    const containerlist = removeFieldsFromArray( this.tableData, fieldsToRemove);
+    const fieldsToRemove = ['id', 'actions', 'invoice'];
+    const invoiceList = removeFieldsFromArray(this.invoiceData, fieldsToRemove);
+    const containerlist = removeFieldsFromArray(this.tableData, fieldsToRemove);
     let invoiceDetails = {
       invoiceDetails: invoiceList,
     };
@@ -459,7 +476,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       "containerSize2",
       "containerType",
     ];
-   
+
     controltabNames.forEach((controlName) => {
       if (Array.isArray(this.consignmentTableForm.value[controlName])) {
         this.consignmentTableForm.controls[controlName].setValue("");
@@ -475,7 +492,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls["vendorName"].setValue(
       vendorType === "Market" ? vendorName : vendorName?.name || ""
     );
-    
+
     this.consignmentTableForm.controls["toCity"].setValue(
       this.consignmentTableForm.value.toCity?.name || ""
     );
@@ -607,99 +624,134 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.prqData = this.prqNoDetail.find((x) => x.prqId === this.consignmentTableForm.controls['prqNo'].value.value);
     this.prqDetail()
   }
+
   async addData() {
 
     this.tableLoad = true;
     this.isLoad = true;
-    const tableData=this.tableData;
+    const tableData = this.tableData;
+    if (tableData.length > 0) {
+      const exist = tableData.find((x) => x.containerNumber === this.containerTableForm.value.containerNumber);
+      if (exist) {
+        this.containerTableForm.controls['containerNumber'].setValue('');
+        Swal.fire({
+          icon: "info", // Use the "info" icon for informational messages
+          title: "Information",
+          text: "Please avoid duplicate entering Container Number.",
+          showConfirmButton: true,
+        });
+        this.tableLoad = false;
+        this.isLoad = false;
+        return false
+
+      }
+    }
+
     const delayDuration = 1000;
     // Create a promise that resolves after the specified delay
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     // Use async/await to introduce the delay
     await delay(delayDuration);
     const json = {
-      id:tableData.length+1,
+      id: tableData.length + 1,
       containerNumber: this.containerTableForm.value.containerNumber,
       containerType: this.containerTableForm.value.containerType.value,
       containerCapacity: this.containerTableForm.value.containerCapacity,
-      invoice:false,
+      invoice: false,
       actions: ['Edit', 'Remove']
     }
     this.tableData.push(json);
     this.isLoad = false;
     this.tableLoad = false;
   }
+
   handleMenuItemClick(data) {
 
-    if(data.data.invoice){
+    if (data.data.invoice) {
       this.fillInvoice(data);
     }
-    else{
-     this.fillContainer(data);
+    else {
+      this.fillContainer(data);
     }
-   
+
   }
 
   fillInvoice(data: any) {
-    if(data.label.label==='Remove'){
-      this.invoiceData=this.invoiceData.filter((x)=>x.id!==data.data.id);
+    if (data.label.label === 'Remove') {
+      this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
     }
-    else{
-      const container=this.ContainerType.find((x) => x.name.trim() === data.data?.containerType.trim())
-      this.invoiceTableForm.controls['containerNumber'].setValue(data.data?.ewayBillNo||"");
-      this.invoiceTableForm.controls['containerCapacity'].setValue(data.data?.containerCapacity||"");
-      this.invoiceTableForm.controls['containerType'].setValue(data.data?.containerType||"");
-      this.invoiceData=this.invoiceData.filter((x)=>x.id!==data.data.id);
+    else {
+      this.invoiceTableForm.controls['ewayBillNo'].setValue(data.data?.ewayBillNo || "");
+      this.invoiceTableForm.controls['expiryDate'].setValue(data.data?.expiryDateO || new Date());
+      this.invoiceTableForm.controls['invoiceNo'].setValue(data.data?.invoiceNo || "");
+      this.invoiceTableForm.controls['invoiceAmount'].setValue(data.data?.invoiceAmount || "");
+      this.invoiceTableForm.controls['noofPkts'].setValue(data.data?.noofPkts || "");
+      this.invoiceTableForm.controls['materialName'].setValue(data.data?.materialName || "");
+      this.invoiceTableForm.controls['actualWeight'].setValue(data.data?.actualWeight || "");
+      this.invoiceTableForm.controls['chargedWeight'].setValue(data.data?.chargedWeight || "");
+      this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
     }
-    
-  }
-  fillContainer(data:any){
-    if(data.label.label==='Remove'){
-      this.tableData=this.tableData.filter((x)=>x.id!==data.data.id);
-    }
-    else{
-      this.invoiceTableForm.controls['ewayBillNo'].setValue(data.data?.ewayBillNo||"");
-      this.invoiceTableForm.controls['expiryDate'].setValue(data.data?.expiryDate?parse(data.data?.expiryDate, 'yy-MM-dd HH:mm', new Date()):new Date());
-      this.invoiceTableForm.controls['invoiceNo'].setValue(data.data?.invoiceNo||"");
-      this.invoiceTableForm.controls['invoiceAmount'].setValue(data.data?.invoiceAmount||"");
-      this.invoiceTableForm.controls['noofPkts'].setValue(data.data?.noofPkts||"");
-      this.invoiceTableForm.controls['materialName'].setValue(data.data?.materialName||"");
-      this.invoiceTableForm.controls['actualWeight'].setValue(data.data?.actualWeight||"");
-      this.invoiceTableForm.controls['chargedWeight'].setValue(data.data?.chargedWeight||"");
-      this.tableData=this.tableData.filter((x)=>x.id!==data.data.id);
-    }
-  }
-  async addInvoiceData(){
 
-    const invoice=this.invoiceData;
-    this.tableLoadIn=true
-    this.loadIn=true;
+  }
+
+  fillContainer(data: any) {
+    if (data.label.label === 'Remove') {
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    }
+    else {
+      const container = this.ContainerType.find((x) => x.name.trim() === data.data?.containerType.trim())
+      this.containerTableForm.controls['containerNumber'].setValue(data.data?.containerNumber || "");
+      this.containerTableForm.controls['containerCapacity'].setValue(data.data?.containerCapacity || "");
+      this.containerTableForm.controls['containerType'].setValue(container);
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    }
+  }
+
+  async addInvoiceData() {
+
+    const invoice = this.invoiceData;
+    if (invoice.length > 0) {
+      const exist = invoice.find((x) => x.invoiceNo === this.invoiceTableForm.value.invoiceNo);
+      if (exist) {
+        this.invoiceTableForm.controls['invoiceNo'].setValue('');
+        Swal.fire({
+          icon: "info", // Use the "info" icon for informational messages
+          title: "Information",
+          text: "Please avoid entering duplicate Invoice.",
+          showConfirmButton: true,
+        });
+        return false
+      }
+    }
+    this.tableLoadIn = true
+    this.loadIn = true;
     const delayDuration = 1000;
     // Create a promise that resolves after the specified delay
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     // Use async/await to introduce the delay
     await delay(delayDuration);
     const json = {
-      id:invoice+1,
+      id: invoice.length + 1,
       ewayBillNo: this.invoiceTableForm.value.ewayBillNo,
-      expiryDate: this.invoiceTableForm.value.expiryDate?formatDate(this.invoiceTableForm.value.expiryDate, 'dd-MM-yy HH:mm'):formatDate(new Date().toUTCString(),'dd-MM-yy HH:mm'),
+      expiryDate: this.invoiceTableForm.value.expiryDate ? formatDate(this.invoiceTableForm.value.expiryDate, 'dd-MM-yy HH:mm') : formatDate(new Date().toUTCString(), 'dd-MM-yy HH:mm'),
       invoiceNo: this.invoiceTableForm.value.invoiceNo,
       invoiceAmount: this.invoiceTableForm.value.invoiceAmount,
       noofPkts: this.invoiceTableForm.value.noofPkts,
       materialName: this.invoiceTableForm.value.materialName,
       actualWeight: this.invoiceTableForm.value.actualWeight,
       chargedWeight: this.invoiceTableForm.value.chargedWeight,
-      invoice:true,
+      invoice: true,
+      expiryDateO: this.invoiceTableForm.value.expiryDate,
       actions: ['Edit', 'Remove']
     }
     this.invoiceData.push(json);
     this.tableLoadIn = false;
-    this.loadIn=false;
+    this.loadIn = false;
   }
 
   vendorFieldChanged() {
     const vendorType = this.consignmentTableForm.value.vendorType;
-    
+
     this.jsonControlArrayBasic.forEach((x) => {
       if (x.name === "vendorName") {
         x.type = (vendorType === "Market") ? "text" : "dropdown";

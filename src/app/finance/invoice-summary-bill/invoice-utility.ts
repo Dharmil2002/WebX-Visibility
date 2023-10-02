@@ -110,7 +110,7 @@ export async function getLocationApiDetail(masterService) {
     const req = {
         companyCode: companyCode,
         collectionName: "location_detail"
-        
+
     }
     try {
         const resLoc = await masterService.masterPost("generic/get", req).toPromise();
@@ -141,36 +141,91 @@ export async function getPrqApiDetail(masterService, billingParty) {
     }
 }
 /*End*/
+/*get location api Detail*/
+export async function getThcDetail(masterService, billingParty) {
+    const req = {
+        companyCode: companyCode,
+        collectionName: "trip_detail",
+        filter: {
+            "billingParty": billingParty
+        }
+    }
+    try {
+        const resPrq = await masterService.masterPost("generic/get", req).toPromise();
+        return resPrq.data.filter((x) => !x.invoiceNo);
+    }
+    catch (error) {
+        console.error(`Error getting records: ${error.message}`);
+    }
+}
+/*End*/
 
 /*Filtering the shipment invoice Data*/
-export async function getInvoiceDetail(prqDetail,locDetail) {
+export async function getInvoiceDetail(prqDetail, locDetail, shipment) {
+    
+    // Create a map to store the state-wise invoice details
+    const stateInvoiceMap = new Map();
 
-    const newArray = prqDetail.map((element, index) => {
-        // Filter locDetail based on element.prqBranch
-        const matchingLocDetail = locDetail.find((x) => x.locCode === element.prqBranch);
-    
-        return {
-            stateName: matchingLocDetail ? matchingLocDetail.locState : "",
-            cnoteCount: index + 1,
-            countSelected: 0,
-            subTotalAmount: 0,
-            gstCharged: 0,
-            totalBillingAmount: element?.contractAmt || ""
-        };
-    });
-    
-    // Group the newArray by stateName
-    const groupedByState = newArray.reduce((result, item) => {
-        if (!result[item.stateName]) {
-            result[item.stateName] = [];
+    // Iterate through prqDetail
+    for (const element of prqDetail) {
+        // Find the matching location detail
+        const matchingLocDetail = locDetail.find((loc) => loc.locCode === element.prqBranch);
+
+        // Initialize variables
+        let totalChargedWeight = 0;
+        let totalgstAmount=0;
+        let subTotalAmount=0;
+        // Filter shipment for the current prqNo
+        const prqWiseShipment = shipment.filter((shipmentItem) => shipmentItem.prqNo === element.prqNo);
+
+        // Loop through prqWiseShipment and calculate totalChargedWeight
+        for (const shipmentItem of prqWiseShipment) {
+            totalgstAmount += parseFloat(shipmentItem.gstAmount);
+            subTotalAmount += parseFloat(shipmentItem.totalAmount);
+            for (const invoice of shipmentItem.invoiceDetails) {
+                totalChargedWeight += parseFloat(invoice.chargedWeight);
+              
+            }
         }
-        result[item.stateName].push(item);
-        return result;
-    }, {});
-    
-    const result = Object.values(groupedByState).flatMap(arr => arr);
+
+        // Create or update the state-wise invoice details
+        const stateName = matchingLocDetail ? matchingLocDetail.locState : "";
+        if (!stateInvoiceMap.has(stateName)) {
+            stateInvoiceMap.set(stateName, {
+                stateName,
+                cnoteCount: 1,
+                countSelected: 0,
+                subTotalAmount: subTotalAmount,
+                gstCharged: totalgstAmount,
+                totalBillingAmount: totalChargedWeight
+            });
+        } else {
+            const stateInvoice = stateInvoiceMap.get(stateName);
+            stateInvoice.cnoteCount += 1;
+            stateInvoice.totalBillingAmount += totalChargedWeight;
+        }
+    }
+
+    // Convert the map values to an array
+    const result = Array.from(stateInvoiceMap.values());
+
     return result;
-   
 }
+
 /* End */
+
+export async function shipmentDetail(masterService) {
+    const req = {
+        companyCode: companyCode,
+        collectionName: "docket_temp",
+        filter: {}
+    }
+    try {
+        const res = await masterService.masterPost("generic/get", req).toPromise();
+        return res.data;
+    }
+    catch (error) {
+        console.error(`Error getting records: ${error.message}`);
+    }
+}
 

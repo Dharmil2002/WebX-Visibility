@@ -12,7 +12,7 @@ export class DocketListComponent implements OnInit {
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:220px",
     },
     vehicleNo: {
       Title: "Vehicle No",
@@ -62,7 +62,7 @@ export class DocketListComponent implements OnInit {
   };
   tableData: any;
   tableLoad: boolean;
-  TableStyle="width:70%";
+  TableStyle="width:82%";
   addAndEditPath='Operation/ConsignmentEntry';
   constructor(private operationService: OperationService) {
     this.getShipmentDetail();

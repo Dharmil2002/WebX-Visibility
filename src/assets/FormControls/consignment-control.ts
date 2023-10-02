@@ -360,7 +360,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Container No is required",
+        }],
         generatecontrol: true,
         disable: false,
       },
@@ -373,7 +376,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Container Type is required",
+        }],
         additionalData: {
           showNameAndValue: false,
         },
@@ -392,7 +398,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Container Capacity is required",
+        }],
         generatecontrol: true,
         disable: true,
       },
@@ -408,7 +417,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Eway Bill No is required",
+        }],
         generatecontrol: true,
         disable: false,
       },
@@ -421,7 +433,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Expiry Date is required",
+        }],
         additionalData: {
           minDate: new Date()
         },
@@ -437,7 +452,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Invoice No is required",
+        }],
         additionalData: {
           showNameAndValue: false,
         },
@@ -453,7 +471,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Invoice Amount is required",
+        }],
         additionalData: {
           showNameAndValue: false,
         },
@@ -469,7 +490,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "No of Pkts is required",
+        }],
         additionalData: {
           showNameAndValue: false,
         },
@@ -485,7 +509,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Material Name is required",
+        }],
         additionalData: {
           showNameAndValue: false,
         },
@@ -501,7 +528,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Actual Weight is required",
+        }],
         additionalData: {
           showNameAndValue: false,
         },
@@ -517,7 +547,10 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [    {
+          name: "required",
+          message: "Charged Weight is required",
+        }],
         additionalData: {
           showNameAndValue: false,
         },

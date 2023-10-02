@@ -4,8 +4,6 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { getThcDetail } from '../thc-generation/thc-utlity';
 import { formatDate } from 'src/app/Utility/date/date-utils';
 import { MatDialog } from '@angular/material/dialog';
-import { ThcUpdateComponent } from 'src/app/dashboard/tabs/thc-update/thc-update.component';
-import { ThcViewComponent } from './thc-view/thc-view.component';
 
 @Component({
   selector: 'app-thc-summary',
@@ -25,7 +23,7 @@ export class ThcSummaryComponent implements OnInit {
     csv: false,
   };
   tableData: any[];
-  TableStyle = "width:70%"
+  TableStyle = "width:85%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {

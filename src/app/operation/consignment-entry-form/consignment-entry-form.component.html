@@ -16,7 +16,7 @@
     </app-form-webxpress>
   </form>
   <button matTooltip="Add Data" mat-stroked-button
-  class="filter_btn"  style="margin-left: 91%;" (click)="addData()">
+  class="filter_btn" [disabled]="!containerTableForm.valid"  style="margin-left: 91%;" (click)="addData()">
   <mat-icon>add</mat-icon>
   Add New
 </button>
@@ -43,7 +43,7 @@
     </app-form-webxpress>
   </form>
   <button matTooltip="Add Data" mat-stroked-button
-  class="filter_btn"  style="margin-left: 91%;" (click)="addInvoiceData()">
+  class="filter_btn" [disabled]="!invoiceTableForm.valid" style="margin-left: 91%;" (click)="addInvoiceData()">
   <mat-icon>add</mat-icon>
   Add New
 </button>

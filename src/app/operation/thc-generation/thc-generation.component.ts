@@ -111,6 +111,7 @@ export class ThcGenerationComponent implements OnInit {
   locationData: any;
   prqlist: any;
   isView: any;
+  selectedData: any;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -121,11 +122,11 @@ export class ThcGenerationComponent implements OnInit {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     if (navigationState != null) {
       this.isUpdate = navigationState.hasOwnProperty('isUpdate') ? true : false;
-      this.isView=navigationState.hasOwnProperty('isView')?true:false;
+      this.isView = navigationState.hasOwnProperty('isView') ? true : false;
       if (this.isUpdate) {
         this.thcDetail = navigationState.data;
       }
-      else if(this.isView){
+      else if (this.isView) {
         this.thcDetail = navigationState.data;
       }
       else {
@@ -152,7 +153,7 @@ export class ThcGenerationComponent implements OnInit {
 
   IntializeFormControl() {
     // Create an instance of loadingControl class
-    const loadingControlFormControls = new thcControl(this.isUpdate,this.isView);
+    const loadingControlFormControls = new thcControl(this.isUpdate, this.isView);
 
     // Get the form controls from the loadingControlFormControls instance
     this.jsonControlArray =
@@ -267,13 +268,13 @@ export class ThcGenerationComponent implements OnInit {
     });
     this.thcTableForm.controls['vendorName'].setValue(shipment ? shipment[0].vendorName : "");
     if (this.isUpdate || this.isView) {
-        const thcDetail=this.thcDetail
-        this.tableData.forEach(item => {
-          if (thcDetail.docket.includes(item.docketNumber)) {
-            item.isSelected = true;
-          }
-        });
-        
+      const thcDetail = this.thcDetail
+      this.tableData.forEach(item => {
+        if (thcDetail.docket.includes(item.docketNumber)) {
+          item.isSelected = true;
+        }
+      });
+
     }
     // Sum all the calculated actualWeights
   }
@@ -289,6 +290,7 @@ export class ThcGenerationComponent implements OnInit {
     let percentage = (loadedTons * 100) / capacityTons;
     this.thcTableForm.controls['loadedKg'].setValue(totalActualWeight);
     this.thcTableForm.controls['weightUtilization'].setValue(percentage.toFixed(2));
+    this.selectedData=event;
   }
   autoFillThc() {
     const propertiesToSet = [
@@ -332,14 +334,26 @@ export class ThcGenerationComponent implements OnInit {
 
     const balAmtAt = this.locationData.find(x => x.value === this.thcDetail?.balAmtAt);
     this.thcTableForm.controls['balAmtAt'].setValue(balAmtAt);
-    
+
     this.getShipmentDetails();
   }
 
 
   async createThc() {
-
-    const docket = this.tableData.map((x) => x.docketNumber);
+    
+    if (!this.selectedData && !this.isUpdate) {
+      Swal.fire({
+        icon: "info", // You can use the "info" icon for informational messages
+        title: "Information",
+        text: "You must select any one of Shipment",
+        showConfirmButton: true,
+      });
+      return false
+    }
+    else{
+      this.selectedData=this.tableData;
+    }
+    const docket = this.selectedData.map((x) => x.docketNumber);
     this.thcTableForm.controls["docket"].setValue(docket);
     const prqNo = this.thcTableForm.controls["prqNo"].value.value;
     const advPdAt = this.thcTableForm.controls["advPdAt"].value?.value || "";
@@ -348,18 +362,19 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls["advPdAt"].setValue(advPdAt);
     this.thcTableForm.controls["balAmtAt"].setValue(balAmtAt);
     if (this.isUpdate) {
+
       this.thcTableForm.controls["status"].setValue('2');
       this.thcTableForm.controls["_id"].setValue(this.thcTableForm.controls["tripId"].value);
-     const res= await showConfirmationDialogThc(this.thcTableForm.value, this.operationService);
-     if(res){
-      Swal.fire({
-        icon: "success",
-        title: "Update Successfuly",
-        text: `THC Number is ${this.thcTableForm.controls["tripId"].value}`,
-        showConfirmButton: true,
-      })
-      this.goBack('THC');
-     }
+      const res = await showConfirmationDialogThc(this.thcTableForm.value, this.operationService);
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "Update Successfuly",
+          text: `THC Number is ${this.thcTableForm.controls["tripId"].value}`,
+          showConfirmButton: true,
+        })
+        this.goBack('THC');
+      }
     }
     else {
       const randomNumber =
@@ -377,7 +392,7 @@ export class ThcGenerationComponent implements OnInit {
           prqId: this.thcTableForm.controls["prqNo"].value,
         }
         await updatePrq(this.operationService, prqData, "7")
-     
+
       }
       const resThc = await thcGeneration(this.operationService, this.thcTableForm.value)
       if (resThc) {

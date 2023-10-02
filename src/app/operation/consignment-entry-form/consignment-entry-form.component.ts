@@ -204,11 +204,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private _NavigationService: NavigationService,
     private masterService: MasterService,
-    private pinCodeService:PinCodeService,
     private filter: FilterUtils,
     private route: Router,
     private operationService: OperationService,
-    private locationService: LocationService
   ) {
 
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -661,6 +659,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       actions: ['Edit', 'Remove']
     }
     this.tableData.push(json);
+    this.containerTableForm.reset();
     this.isLoad = false;
     this.tableLoad = false;
   }
@@ -745,6 +744,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       actions: ['Edit', 'Remove']
     }
     this.invoiceData.push(json);
+    this.invoiceTableForm.reset();
     this.tableLoadIn = false;
     this.loadIn = false;
   }

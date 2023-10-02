@@ -6,7 +6,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { pendingbilling } from 'src/app/operation/pending-billing/pending-billing-utlity';
 import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utlity';
 import { StateWiseSummaryControl } from 'src/assets/FormControls/state-wise-summary-control';
-import { UpdateDetail, addInvoiceDetail, getApiCompanyDetail, getApiCustomerDetail, getInvoiceDetail, getLocationApiDetail, getPrqApiDetail } from './invoice-utility';
+import { UpdateDetail, addInvoiceDetail, getApiCompanyDetail, getApiCustomerDetail, getInvoiceDetail, getLocationApiDetail, getPrqApiDetail, shipmentDetail } from './invoice-utility';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -212,6 +212,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
       .join(', ');
 
   }
+  
   async save() {
     if (this.invoiceTableForm.value?.MIN) {
       this.invoiceTableForm.controls['invoiceNo'].setValue(this.invoiceTableForm.value?.MIN || "");
@@ -257,13 +258,15 @@ export class InvoiceSummaryBillComponent implements OnInit {
     const prqDetail = await getPrqApiDetail(this.masterService, this.navigateExtra.columnData.billingparty);
     if (prqDetail) {
       const locDetail = await getLocationApiDetail(this.masterService);
-      const invoiceDetail = await getInvoiceDetail(prqDetail, locDetail);
+      const shipment =  await shipmentDetail(this.masterService);
+      const invoiceDetail = await getInvoiceDetail(prqDetail, locDetail,shipment);
       this.tableData = invoiceDetail;
       this.IsActiveFuntion("")
     }
 
  
   }
+
   IsActiveFuntion($event) {
     
     const invoice=$event?$event:"";

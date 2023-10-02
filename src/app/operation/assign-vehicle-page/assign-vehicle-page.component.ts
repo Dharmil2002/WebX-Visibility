@@ -41,10 +41,12 @@ export class AssignVehiclePageComponent implements OnInit {
   NavData: any;
   constructor(private Route: Router, private _operationService: OperationService, public dialog: MatDialog, private _assignVehiclePageMethods: AssignVehiclePageMethods
   ) {
-    this.staticField.pop()
+
+     this.staticField.pop();
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.NavData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
+    
   }
   ngOnInit(): void {
     this.fetchAvailabelVehicles();

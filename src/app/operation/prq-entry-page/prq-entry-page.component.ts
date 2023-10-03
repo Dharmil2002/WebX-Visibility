@@ -345,7 +345,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async bilingChanged() {
-debugger
+
     this.allPrqDetail = await this.prqService.getAllPrqDetail();
     const billingParty =
       this.prqEntryTableForm.controls["billingParty"].value?.name || "";

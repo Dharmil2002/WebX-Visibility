@@ -73,19 +73,24 @@ export class PrqListComponent implements OnInit {
   addAndEditPath: string;
   tableData: any[];
   linkArray = [{ Row: "", Path: "" }];
+  items: any;
   constructor(public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any) {
     if (item) {
-      this.tableData = item.map((x) => {
-        x.isSelected = false;
-        return x;
-      });
-
-      this.tableLoad = false;
+      this.items=item;     
     }
   }
 
   ngOnInit(): void {
+    this.getShipment();
+  }
+  getShipment() {
+    this.tableData = this.items.map((x) => {
+      x.isSelected = false;
+      return x;
+    });
+
+    this.tableLoad = false;
   }
 
   IsActiveFuntion(event) {

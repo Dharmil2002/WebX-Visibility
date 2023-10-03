@@ -14,14 +14,8 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { pendingbilling } from "../pending-billing/pending-billing-utlity";
 import { containorConsigmentDetail, updatePrq } from "./consigment-utlity";
-import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { formatDate } from "src/app/Utility/date/date-utils";
-import { trigger } from "@angular/animations";
-import { parse } from "date-fns";
 import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
-import { LocationService } from "src/app/Utility/module/masters/location/location.service";
-import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
-
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -645,8 +639,20 @@ export class ConsignmentEntryFormComponent implements OnInit {
         return false
 
       }
-    }
 
+    }
+    if (typeof (this.containerTableForm.value.containerType) === 'string') {
+      this.containerTableForm.controls['containerType'].setValue('');
+      Swal.fire({
+        icon: "info", // Use the "info" icon for informational messages
+        title: "Information",
+        text: "Please Select Proper value.",
+        showConfirmButton: true,
+      });
+      this.isLoad = false;
+      this.tableLoad = false;
+      return false
+    }
     const delayDuration = 1000;
     // Create a promise that resolves after the specified delay
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

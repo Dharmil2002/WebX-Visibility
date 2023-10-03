@@ -12,6 +12,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
 import { updatePrq } from '../consignment-entry-form/consigment-utlity';
 import { showConfirmationDialogThc } from '../thc-summary/thc-update-utlity';
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 
 @Component({
   selector: 'app-thc-generation',
@@ -39,7 +40,7 @@ export class ThcGenerationComponent implements OnInit {
     edit: false,
     csv: false,
   };
-  TableStyle = "width:49%"
+  TableStyle = "width:75%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {
@@ -51,12 +52,12 @@ export class ThcGenerationComponent implements OnInit {
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:260px",
     },
     docketNumber: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:180px",
     },
     fromCity: {
       Title: "From City",
@@ -66,17 +67,17 @@ export class ThcGenerationComponent implements OnInit {
     toCity: {
       Title: "To City",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:160px",
     },
     transMode: {
       Title: "Trans Mode",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:160px",
     },
     actualWeight: {
       Title: "Actual Weight",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:160px",
     }
   };
   //#endregion
@@ -117,7 +118,8 @@ export class ThcGenerationComponent implements OnInit {
     private filter: FilterUtils,
     private operationService: OperationService,
     private masterService: MasterService,
-    private route: Router
+    private route: Router,
+    private docketService:DocketService
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     if (navigationState != null) {
@@ -394,6 +396,10 @@ export class ThcGenerationComponent implements OnInit {
         await updatePrq(this.operationService, prqData, "7")
 
       }
+      for (const element of docket) {
+        await this.docketService.updateDocket(element);
+      }
+      
       const resThc = await thcGeneration(this.operationService, this.thcTableForm.value)
       if (resThc) {
         Swal.fire({

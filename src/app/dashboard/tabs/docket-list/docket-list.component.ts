@@ -12,7 +12,7 @@ export class DocketListComponent implements OnInit {
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "max-width:220px",
+      Style: "max-width:300px",
     },
     vehicleNo: {
       Title: "Vehicle No",
@@ -62,8 +62,8 @@ export class DocketListComponent implements OnInit {
   };
   tableData: any;
   tableLoad: boolean;
-  TableStyle="width:82%";
   addAndEditPath='Operation/ConsignmentEntry';
+  menuItems = [{label:"Edit Docket"},{label:"Edit Docket"}];
   constructor(private operationService: OperationService) {
     this.getShipmentDetail();
   }
@@ -79,7 +79,8 @@ export class DocketListComponent implements OnInit {
       });
       // Sum all the calculated actualWeights
       const totalActualWeight = actualWeights.reduce((acc, weight) => acc + weight, 0);
-      x.actualWeight = totalActualWeight
+      x.actualWeight = totalActualWeight,
+      x.actions=x.status
       return x; // Make sure to return x to update the original object in the 'tableData' array.
     });
     //this.tableData = [];

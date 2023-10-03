@@ -29,7 +29,7 @@ export class ConsignmentControl {
           },
         ],
         additionalData: {
-          minDate: new Date(),
+          minDate: new Date("01 Jan 2023"),
         },
       },
       {
@@ -44,8 +44,10 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          { name: "autocomplete" },
-          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+            {
+            name: "required",
+            message: "Billing Party is required",
+          }
         ],
         additionalData: {
           showNameAndValue: true,
@@ -118,8 +120,6 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          { name: "autocomplete" },
-          { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
         functions: {
           onOptionSelect: 'getLocBasedOnCity'
@@ -140,8 +140,6 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          { name: "autocomplete" },
-          { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
         functions: {
           onOptionSelect: 'getLocBasedOnCity'
@@ -182,8 +180,6 @@ export class ConsignmentControl {
           onOptionSelect: 'prqSelection'
         },
         Validations: [
-          { name: "autocomplete" },
-          { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
         additionalData: {
           showNameAndValue: false,
@@ -224,13 +220,6 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
         ],
         additionalData: {
           showNameAndValue: true,
@@ -287,8 +276,7 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          { name: "autocomplete" },
-          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+          
         ],
         additionalData: {
           showNameAndValue: true,
@@ -318,8 +306,7 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          { name: "autocomplete" },
-          { name: "invalidAutocompleteObject", message: "Choose proper value" }
+       
         ],
         additionalData: {
           showNameAndValue: true,
@@ -352,6 +339,15 @@ export class ConsignmentControl {
         placeholder: 'vehicleNo',
         type: '',
         value: "",
+        Validations: [],
+        generatecontrol: false, disable: false
+      },
+      {
+        name: 'status',
+        label: 'status',
+        placeholder: 'status',
+        type: '',
+        value:0,
         Validations: [],
         generatecontrol: false, disable: false
       }

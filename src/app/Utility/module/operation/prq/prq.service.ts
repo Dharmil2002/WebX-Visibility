@@ -247,13 +247,81 @@ export class PrqService {
     const res = await this.masterService
       .masterMongoPost("generic/get", reqBody)
       .toPromise();
-    return res.data
+      let prqList = [];
 
+      // Map and transform the PRQ data
+      res.data.map((element, index) => {
+        let prqDataItem = {
+          srNo: (element.srNo = index + 1),
+          prqNo: element?.prqId || "",
+          vehicleSize: element?.vehicleSize || "",
+          size: element.vehicleSize
+            ? element.vehicleSize + " " + "MT"
+            : element.containerSize
+              ? element.containerSize
+              : "",
+          billingParty: element?.billingParty || "",
+          fromToCity: element?.fromCity + "-" + element?.toCity,
+          fromCity: element?.fromCity || "",
+          contactNo: element?.contactNo || "",
+          toCity: element?.toCity || "",
+          transMode: element?.transMode || "",
+          vehicleNo: element?.vehicleNo || "",
+          prqBranch: element?.prqBranch || "",
+          pickUpDate: formatDocketDate(element?.pickUpTime || new Date()),
+          pickupDate: element?.pickUpTime || new Date(),
+          status:
+            element?.status === "0"
+              ? "Awaiting Confirmation"
+              : element.status === "1"
+                ? "Awaiting Assign Vehicle"
+                : element.status == "2"
+                  ? "Awaiting For Docket"
+                  : element.status == "3"
+                    ? "Ready For THC"
+                    : "THC Generated",
+          actions:
+            element?.status === "0"
+              ? ["Confirm", "Reject", "Modify"]
+              : element.status === "1"
+                ? ["Assign Vehicle"]
+                : element.status == "2"
+                  ? ["Add Docket"]
+                  : element.status == "3"
+                    ? ["Add Docket", "Create THC"]
+                    : [""],
+          containerSize: element?.containerSize || "",
+          typeContainer: element?.typeContainer || "",
+          pAddress: element?.pAddress || "",
+          payType: element?.payType || "",
+          contractAmt: element?.contractAmt || "",
+          createdDate: formatDocketDate(element?.entryDate || new Date()),
+        };
+        prqList.push(prqDataItem);
+      });
+  
+      // Sort the PRQ list by pickupDate in descending order
+      const sortedData = prqList.sort((a, b) => {
+        const dateA: Date | any = new Date(a.pickupDate);
+        const dateB: Date | any = new Date(b.pickupDate);
+  
+        // Compare the date objects
+        return dateB - dateA; // Sort in descending order
+      });
+  
+      // Create an object with sorted PRQ data and all PRQ details
+      const prqDetail = {
+        tableData: sortedData,
+        allPrqDetail: res.data,
+      };
+  
+      return prqDetail;
 
   }
   // This function sets the assigned vehicle details.
   setassignVehicleDetail(data: any) {
     this.vehicleDetail = data;
+    
   }
 
   // This function retrieves the assigned vehicle details.

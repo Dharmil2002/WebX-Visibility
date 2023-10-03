@@ -16,6 +16,7 @@ export class ThcSummaryComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
+  branch:string=localStorage.getItem("Branch");
   //add dyamic controls for generic table
   dynamicControls = {
     add: true,
@@ -23,14 +24,14 @@ export class ThcSummaryComponent implements OnInit {
     csv: false,
   };
   tableData: any[];
-  TableStyle = "width:70%"
+  TableStyle = "width:75%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {
     tripId: {
       Title: "THC No",
       class: "matcolumnleft",
-      Style: "max-width:250px",
+      Style: "max-width:270px",
     },
     route: {
       Title: "Route",
@@ -40,7 +41,7 @@ export class ThcSummaryComponent implements OnInit {
     vehicle: {
       Title: "Vehicle No",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:130px",
     },
     loadedKg: {
       Title: "Loaded Kg",
@@ -50,7 +51,7 @@ export class ThcSummaryComponent implements OnInit {
     updateDate: {
       Title: "CreateAt",
       class: "matcolumnleft",
-      Style: "max-width:120px",
+      Style: "max-width:250px",
     },
     statusAction:{
       Title:"Status",
@@ -92,12 +93,14 @@ export class ThcSummaryComponent implements OnInit {
   async getThcDetails() {
 
     const thcList = await getThcDetail(this._operationService);
+
     const thcDetail= thcList.data
     .map((item) => {
+      const action= item.route.split('-')[1].toLowerCase() === this.branch.toLowerCase();
       if (item.updateDate) {
         item.updateDate = formatDate(item.updateDate, 'dd-MM-yy HH:mm');
         item.statusAction=item?.status === "1" ? "In Transit" :"Delivered",
-        item.actions = item?.status === "1" ? ["Update THC","View"] :["Delivered","View"]
+        item.actions =item.status === "1" && action?  ["Update THC","View"] :item.status === "1"?["View"]:["Delivered","View"];
       }
       return item;
     });

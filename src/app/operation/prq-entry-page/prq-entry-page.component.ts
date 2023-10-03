@@ -345,11 +345,11 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async bilingChanged() {
-
+debugger
     this.allPrqDetail = await this.prqService.getAllPrqDetail();
     const billingParty =
       this.prqEntryTableForm.controls["billingParty"].value?.name || "";
-    let prqDetail = this.allPrqDetail
+    let prqDetail = this.allPrqDetail.tableData
       .filter(
         (x) => x.billingParty.toLowerCase() === billingParty.toLowerCase()
       )
@@ -410,10 +410,6 @@ export class PrqEntryPageComponent implements OnInit {
         this.prqEntryTableForm.get("contactNo"),
         result.contactNo
       );
-      setControlValue(this.prqEntryTableForm.get("prqBranch"), {
-        name: result.prqBranch,
-        value: result.prqBranch,
-      });
       setControlValue(this.prqEntryTableForm.get("containerSize"), {
         name: result.containerSize,
         value: result.containerSize,

@@ -74,8 +74,8 @@ export class VendorControl {
                     },
                     {
                         name: "pattern",
-                        message: "Please enter upto 250 characters.",
-                        pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,250}$",
+                        message: "Please enter upto 200 characters.",
+                        pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,200}$",
                     },
                 ],
                 generatecontrol: true, disable: false
@@ -192,13 +192,10 @@ export class VendorControl {
                         name: "required",
                         message: " Email ID is required",
                     },
-                    {
-                        name: "email",
-                        pattern: "^([\w+-.%]+@[\w-.]+\.[A-Za-z]{2,4},?)+$",
-                        message: "Please enter a valid email address"
-                    }
-
                 ],
+                functions: {
+                    onChange: "onChangeEmail",
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -299,6 +296,9 @@ export class VendorControl {
                         message: "Please enter a valid MSME Number upto 100 alphanumeric characters"
                     }
                 ],
+                functions: {
+                    onChange: "CheckmsmeNumber",
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -350,10 +350,11 @@ export class VendorControl {
                 placeholder: 'Select Vendor Location',
                 type: '',
                 value: '',
-                Validations: [{
-                    name: "required",
-                    message: "Location is Required...!",
-                }
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Location is Required...!",
+                    }
                 ],
                 generatecontrol: false, disable: false
             },
@@ -411,12 +412,13 @@ export class VendorControl {
                 },
                 {
                     name: "pattern",
-                    pattern: '^[A-Za-z0-9 ]{1,100}$',
-                    message: "Please enter a valid GST Number upto 100 alphanumeric characters"
+                    pattern: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
+                    message: "Please enter a valid GST Number alphanumeric characters"
                 }
                 ],
                 functions: {
-                    onChange: "setState"
+                    onChange: "setState",
+                    //onModel:"CheckGstNo"
                 },
                 generatecontrol: true, disable: false
             },
@@ -442,7 +444,13 @@ export class VendorControl {
                 Validations: [{
                     name: "required",
                     message: "GST Address is required"
-                },],
+                },
+                {
+                    name: "pattern",
+                    message: "Please enter upto 200 characters.",
+                    pattern: "^[a-zA-Z 0-9 -,.'()#/]{1,200}$",
+                },
+                ],
                 generatecontrol: true, disable: false
             },
             {

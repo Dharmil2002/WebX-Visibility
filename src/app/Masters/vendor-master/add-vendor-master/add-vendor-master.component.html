@@ -15,7 +15,8 @@
             (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
-    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 91%;" (click)="addData()">
+    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 91%;"
+        [disabled]="!otherDetailForm.valid" (click)="addData()">
         <mat-icon>add</mat-icon>
         Add New
     </button>
@@ -34,10 +35,13 @@
         </app-generic-table-v2>
     </div>
     <div style="padding-left: 35px;">
-          <button type="button"  mat-raised-button color="primary" >
-        Submit
-      </button>
+        <button type="button" mat-raised-button color="primary" (click)="save()" [disabled]="!vendorTableForm.valid">
+            Submit
+        </button>&nbsp;&nbsp;
+        <button type="button" mat-raised-button (click)="cancel()">
+            Cancel
+        </button>
     </div>
-  
+
 </app-common-wrapper-webxpress>
-<!-- (click)="save()" [disabled]="!form.valid"-->
+<!--  [disabled]="!form.valid"-->

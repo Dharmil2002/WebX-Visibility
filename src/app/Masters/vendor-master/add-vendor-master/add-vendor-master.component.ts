@@ -12,6 +12,7 @@ import { Subject, take, takeUntil } from "rxjs";
 import { handleFileSelection } from "../vendor-utility";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
+import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 
 @Component({
   selector: 'app-add-vendor-master',
@@ -35,23 +36,8 @@ export class AddVendorMasterComponent implements OnInit {
   vLocationStatus: any;
   vendorCity: any;
   vendorCityStatus: any;
-  tdsSection: any;
-  tdsSectionStatus: any;
-  tdsType: any;
-  tdsTypeStatus: any;
-  lspName: any;
-  lspNameStatus: any;
   vendorTypDetail: any;
   vendorTypeData: any;
-  tdsSectionData: any;
-  tdsTypeData: any;
-  lspNameData: any;
-  tdsSectionDetail: any;
-  tdsTypeDetail: any;
-  lspNameDetail: any;
-  SelectFile: File;
-  imageName: string;
-  selectedFiles: boolean;
   vendorPinCodeStatus: any;
   vendorPinCode: any;
   pincodeResponse: any;
@@ -124,10 +110,21 @@ export class AddVendorMasterComponent implements OnInit {
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vendorTabledata = this.route.getCurrentNavigation().extras.state.data;
-      console.log(this.vendorTabledata);
 
       this.action = 'edit';
       this.isUpdate = true;
+      this.isLoad = true;
+      this.tableLoad = true;
+      // setting data in table at update time
+      this.vendorTabledata.otherdetails.forEach((item, index) => {
+        item.id = index + 1;
+        item.actions = ['Edit', 'Remove'];
+
+        // Push the modified object into this.tableData
+        this.tableData.push(item);
+      });
+      this.isLoad = false;
+      this.tableLoad = false;
     } else {
       this.action = 'Add';
     }
@@ -271,6 +268,8 @@ export class AddVendorMasterComponent implements OnInit {
   //#endregion
 
   async save() {
+    clearValidatorsAndValidate(this.otherDetailForm)
+    clearValidatorsAndValidate(this.vendorTableForm)
     const formValue = this.vendorTableForm.value;
     const controlNames = [
       "vendorType",
@@ -286,8 +285,14 @@ export class AddVendorMasterComponent implements OnInit {
     this.vendorTableForm.removeControl('');
     Object.values(this.vendorTableForm.controls).forEach(control => control.setErrors(null));
     // Remove  field from the form controls
-
     let data = convertNumericalStringsToInteger(this.vendorTableForm.value)
+
+    const newData = this.tableData.map(x => {
+      const { actions, id, ...rest } = x;
+      return rest;
+    });
+    this.vendorTableForm.value.otherdetails = newData;
+
     if (this.isUpdate) {
       let id = data._id;
       // Remove the "id" field from the form controls
@@ -298,7 +303,6 @@ export class AddVendorMasterComponent implements OnInit {
         filter: { _id: id },
         update: this.vendorTableForm.value
       };
-      console.log(req);
       const res = await this.masterService.masterPut("generic/update", req).toPromise()
       if (res) {
         // Display success message
@@ -310,8 +314,6 @@ export class AddVendorMasterComponent implements OnInit {
         });
         this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
       }
-
-
     }
     else {
       let req = {
@@ -334,12 +336,17 @@ export class AddVendorMasterComponent implements OnInit {
         this.newVendorCode = generateVendorCode(lastVendorCode);
         data.vendorCode = this.newVendorCode;
         data._id = this.newVendorCode;
+        const newData = this.tableData.map(x => {
+          const { actions, id, ...rest } = x;
+          return rest;
+        });
+
+        data.otherdetails = newData;
         let req = {
           companyCode: this.companyCode,
           collectionName: "vendor_detail",
           data: data
         };
-        console.log(req);
         const res = await this.masterService.masterPost("generic/create", req).toPromise()
         if (res) {
           // Display success message
@@ -357,31 +364,55 @@ export class AddVendorMasterComponent implements OnInit {
   cancel() {
     this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
   }
-  //#region to set city,state,country
+  //#region to Set the vendor's city and state based on the provided PIN code
   async setStateCityData() {
-    const fetchData = this.pincodeResponse.data.find(item =>
-      item.PIN == this.vendorTableForm.controls.vendorPinCode.value.value)
-    this.vendorTableForm.controls.vendorCity.setValue(fetchData.CT)
-    const stateName = await this.objState.fetchStateByFilterId(fetchData.ST);
-    this.vendorTableForm.controls.vendorState.setValue(stateName[0].STNM);
+    try {
+      const fetchData = this.pincodeResponse.data.find(item =>
+        item.PIN == this.vendorTableForm.controls.vendorPinCode.value.value);
 
-    this.masterService.getJsonFileDetails('countryList').subscribe((res) => {
-      const country = res.find(x => x.Code === stateName[0]?.CNTR);
-      const countryName = country?.Country || '';
-      this.vendorTableForm.controls.vendorCountry.setValue(countryName);
-    });
+      // Set the vendor's city
+      this.vendorTableForm.controls.vendorCity.setValue(fetchData.CT);
+
+      // Fetch and set the state name based on the state code
+      const stateName = await this.objState.fetchStateByFilterId(fetchData.ST);
+      this.vendorTableForm.controls.vendorState.setValue(stateName[0].STNM);
+
+      // Fetch and set the vendor's country based on the state's country code
+      this.masterService.getJsonFileDetails('countryList').subscribe((res) => {
+        const country = res.find(x => x.Code === stateName[0]?.CNTR);
+        const countryName = country?.Country || '';
+        this.vendorTableForm.controls.vendorCountry.setValue(countryName);
+      });
+    } catch (error) {
+      console.error('An error occurred while setting state and city data:', error);
+    }
   }
 
+  // Set the GST state based on the provided GST number
   async setState() {
-    const gstNumber = this.otherDetailForm.value.gstNumber;
-    const filterId = gstNumber.substring(0, 2);
-    const stateName = await this.objState.fetchStateByFilterId(filterId);
-    this.otherDetailForm.controls.gstState.setValue(stateName[0].STNM);
+    try {
+      const gstNumber = this.otherDetailForm.value.gstNumber;
+      const filterId = gstNumber.substring(0, 2);
+
+      // Fetch and set the GST state name based on the state code
+      const stateName = await this.objState.fetchStateByFilterId(filterId);
+      this.otherDetailForm.controls.gstState.setValue(stateName[0].STNM);
+    } catch (error) {
+      console.error('An error occurred while setting the GST state:', error);
+    }
   }
+
+  // Set the GST city based on the provided GST pincode
   setGSTCity() {
-    const fetchData = this.pincodeResponse.data.find(item =>
-      item.PIN == this.otherDetailForm.controls.gstPincode.value.value)
-    this.otherDetailForm.controls.gstCity.setValue(fetchData.CT)
+    try {
+      const fetchData = this.pincodeResponse.data.find(item =>
+        item.PIN == this.otherDetailForm.controls.gstPincode.value.value);
+
+      // Set the GST city
+      this.otherDetailForm.controls.gstCity.setValue(fetchData.CT);
+    } catch (error) {
+      console.error('An error occurred while setting the GST city:', error);
+    }
   }
   //#endregion
 
@@ -461,6 +492,28 @@ export class AddVendorMasterComponent implements OnInit {
     this.tableLoad = true;
     this.isLoad = true;
     const tableData = this.tableData;
+    const gstNumber = this.otherDetailForm.controls.gstNumber.value;
+    if (tableData.length > 0) {
+      // Check if the gstNumber already exists in tableData
+      const isDuplicate = this.tableData.some((item) => item.gstNumber === gstNumber);
+
+      if (isDuplicate) {
+        this.otherDetailForm.controls['gstNumber'].setValue('');
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          title: 'GST Number already exists! Please try with another.',
+          toast: true,
+          icon: 'error',
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: 'OK'
+        });
+        this.tableLoad = false;
+        this.isLoad = false;
+        return false
+      }
+    }
     const delayDuration = 1000;
     // Create a promise that resolves after the specified delay
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -477,21 +530,13 @@ export class AddVendorMasterComponent implements OnInit {
       actions: ['Edit', 'Remove']
     }
     this.tableData.push(json);
+    this.otherDetailForm.reset(); // Reset form values
     this.isLoad = false;
     this.tableLoad = false;
   }
 
   handleMenuItemClick(data) {
-    console.log(data);
-
-
-    if (data.data.invoice) {
-
-    }
-    else {
-      this.fillTable(data);
-    }
-
+    this.fillTable(data);
   }
   fillTable(data: any) {
     if (data.label.label === 'Remove') {
@@ -501,9 +546,48 @@ export class AddVendorMasterComponent implements OnInit {
       this.otherDetailForm.controls['gstNumber'].setValue(data.data?.gstNumber || "");
       this.otherDetailForm.controls['gstState'].setValue(data.data?.gstState || "");
       this.otherDetailForm.controls['gstAddress'].setValue(data.data?.gstAddress || "");
-      this.otherDetailForm.controls['gstPincode'].setValue(data.data?.gstPincode);
+      const updatedData = this.pincodeData.find((x) => x.name == data.data.gstPincode);
+      this.otherDetailForm.controls.gstPincode.setValue(updatedData);
       this.otherDetailForm.controls['gstCity'].setValue(data.data?.gstCity || "");
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
   }
+  //#region to check Vendor emails
+  onChangeEmail() {
+    const input = this.vendorTableForm.value.emailId.trim();
+    var emailAddresses = input.split(","); // Split the input string into an array of email addresses
+    // Define the email validation regular expression
+    var emailRegex = /[\w._%+-]+@[\w.-]+\.[a-zA-Z]{2,}/;
+    var validEmails = [];
+    var invalidEmails = [];
+    // Loop through each email address and validate it
+    for (var i = 0; i < emailAddresses.length; i++) {
+      var email = emailAddresses[i].trim(); // Remove any leading/trailing whitespace
+      if (emailRegex.test(email)) {
+        validEmails.push(email);
+      } else {
+        invalidEmails.push(email);
+      }
+    }
+    if (invalidEmails.length > 0) {
+      let EmailString = "";
+      invalidEmails.forEach((x) => {
+        EmailString = `${EmailString != ""
+          ? EmailString + "<li style='margin:0px;'>" + x + "<li>"
+          : "<li style='margin:0px;'>" + x + "<li>"
+          }`;
+      });
+      Swal.fire({
+        title: 'This Email is not valid. Please try with another!',
+        toast: true,
+        icon: 'error',
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: 'OK'
+      });
+      this.vendorTableForm.controls['emailId'].setValue(validEmails.join(','))
+    }
+  }
+  //#endregion
 }

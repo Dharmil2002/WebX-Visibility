@@ -15,6 +15,7 @@ export class FormComponent {
   locationIsupdate: boolean;
   minDate: Date;
   maxDate: Date
+  @Input() submit:string='Save'
   @Output() callFunction = new EventEmitter();
   @Input() showSaveAndCancelButton: boolean
   @Input() showSaveButton: boolean

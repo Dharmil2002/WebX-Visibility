@@ -23,14 +23,14 @@ export class ThcSummaryComponent implements OnInit {
     csv: false,
   };
   tableData: any[];
-  TableStyle = "width:85%"
+  TableStyle = "width:70%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {
     tripId: {
       Title: "THC No",
       class: "matcolumnleft",
-      Style: "max-width:220px",
+      Style: "max-width:250px",
     },
     route: {
       Title: "Route",
@@ -40,22 +40,27 @@ export class ThcSummaryComponent implements OnInit {
     vehicle: {
       Title: "Vehicle No",
       class: "matcolumnleft",
-      Style: "max-width:200px",
+      Style: "max-width:150px",
     },
     loadedKg: {
       Title: "Loaded Kg",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "max-width:100px",
     }, 
     updateDate: {
       Title: "CreateAt",
       class: "matcolumnleft",
-      Style: "max-width:200px",
+      Style: "max-width:120px",
+    },
+    statusAction:{
+      Title:"Status",
+      class: "matcolumnleft",
+      Style: "max-width:100px",
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:100px",
     }
   };
   //#endregion
@@ -64,6 +69,7 @@ export class ThcSummaryComponent implements OnInit {
     "route",
     "vehicle",
     "loadedKg",
+    "statusAction",
     "updateDate",
   ];
   addAndEditPath: string;
@@ -84,11 +90,13 @@ export class ThcSummaryComponent implements OnInit {
 
     //here the code which is get details of Thc Which is Display in Fron-end
   async getThcDetails() {
+
     const thcList = await getThcDetail(this._operationService);
     const thcDetail= thcList.data
     .map((item) => {
       if (item.updateDate) {
         item.updateDate = formatDate(item.updateDate, 'dd-MM-yy HH:mm');
+        item.statusAction=item?.status === "1" ? "In Transit" :"Delivered",
         item.actions = item?.status === "1" ? ["Update THC","View"] :["Delivered","View"]
       }
       return item;

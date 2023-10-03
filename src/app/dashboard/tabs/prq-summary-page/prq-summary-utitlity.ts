@@ -32,6 +32,7 @@ export async function getPrqDetailFromApi(masterServices) {
             "typeContainer":element?.typeContainer||"",
             "pAddress":element?.pAddress||"",
             "payType":element?.payType||"",
+            "contractAmt":element?.contractAmt||"",
             "createdDate": formatDocketDate(element?.entryDate || new Date())
         }
         prqList.push(pqrData)

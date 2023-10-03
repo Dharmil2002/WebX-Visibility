@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { ConsignmentControl, FreightControl } from "src/assets/FormControls/consignment-control";
@@ -94,6 +94,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       Style: "max-width:150px",
     }
   };
+  /*End*/
   /*Invoice Detail*/
   columnInvoice = {
     ewayBillNo: {
@@ -176,7 +177,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   billingParty: any;
   prqNoDetail: any[];
   isLoad: boolean = false;
-  ContainerType: any;
+  containerTypeList: any;
   //#endregion
   branchCode = localStorage.getItem("Branch");
   addFlag = true;
@@ -256,7 +257,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   //#endregion
   getContainerType(event) {
     const containerType = this.containerTableForm.controls['containerType'].value.value;
-    const containerCapacity = this.ContainerType.find((x) => x.name.trim() === containerType.trim());
+    const containerCapacity = this.containerTypeList.find((x) => x.name.trim() === containerType.trim());
     this.containerTableForm.controls['containerCapacity'].setValue(containerCapacity.loadCapacity)
   }
   //#region functionCallHandler
@@ -358,7 +359,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const cityDetail = await getCity(this.companyCode, this.masterService);
     const resContainer = await containerFromApi(this.masterService);
     const resContainerType = await containorConsigmentDetail(this.operationService);
-    this.ContainerType = resContainerType;
+    this.containerTypeList = resContainerType;
     // this.displayedColumns1.containerType.option=resContainerType;
     const vendorDetail = await getVendorDetails(this.masterService);
     const prqNo = await pendingbilling(this.masterService);
@@ -426,7 +427,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.filter.Filter(
       this.jsonContainerDetail,
       this.containerTableForm,
-      this.ContainerType,
+      this.containerTypeList,
       this.containerType,
       this.containerTypeStatus
     );
@@ -434,12 +435,13 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   //#region Save Function
   async getLocBasedOnCity() {
-    
-    const toCity = this.prqData?.toCity;
-    const fromCity = this.prqData?.fromCity;
+
+    const toCity = this.prqData?.toCity ?? this.consignmentTableForm.get('toCity')?.value?.value ?? '';
+    const fromCity = this.prqData?.fromCity ?? this.consignmentTableForm.get('fromCity')?.value?.value ?? '';
+
     this.consignmentTableForm.controls['destination'].setValue(toCity);
     this.consignmentTableForm.controls['origin'].setValue(fromCity);
-   // this.locationService.setCityLocationInForm(this.consignmentTableForm.get('destination'), toCity, location);
+    // this.locationService.setCityLocationInForm(this.consignmentTableForm.get('destination'), toCity, location);
     //this.locationService.setCityLocationInForm(this.consignmentTableForm.get('origin'), fromCity, location);
   }
 
@@ -659,11 +661,24 @@ export class ConsignmentEntryFormComponent implements OnInit {
       actions: ['Edit', 'Remove']
     }
     this.tableData.push(json);
-    this.containerTableForm.reset();
+    Object.keys(this.containerTableForm.controls).forEach(key => {
+      this.containerTableForm.get(key).clearValidators();
+      this.containerTableForm.get(key).updateValueAndValidity();
+    });
+
+    this.containerTableForm.controls['containerNumber'].setValue('');
+    this.containerTableForm.controls['containerType'].setValue('');
+    this.containerTableForm.controls['containerCapacity'].setValue('');
+    // Remove all validation  
+
     this.isLoad = false;
     this.tableLoad = false;
+    // Add the "required" validation rule
+    Object.keys(this.containerTableForm.controls).forEach(key => {
+      this.containerTableForm.get(key).setValidators(Validators.required);
+    });
+    this.consignmentTableForm.updateValueAndValidity();
   }
-
   handleMenuItemClick(data) {
 
     if (data.data.invoice) {
@@ -698,7 +713,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
     else {
-      const container = this.ContainerType.find((x) => x.name.trim() === data.data?.containerType.trim())
+      const container = this.containerTypeList.find((x) => x.name.trim() === data.data?.containerType.trim())
       this.containerTableForm.controls['containerNumber'].setValue(data.data?.containerNumber || "");
       this.containerTableForm.controls['containerCapacity'].setValue(data.data?.containerCapacity || "");
       this.containerTableForm.controls['containerType'].setValue(container);

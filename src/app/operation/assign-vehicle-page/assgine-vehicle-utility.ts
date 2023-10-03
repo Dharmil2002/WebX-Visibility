@@ -13,6 +13,7 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
 
     if (confirmationResult.isConfirmed) {
         prqDetail.status = "2";
+        delete prqDetail.actions
         const res = await updatePrqStatus(prqDetail, masterService);
         let currentBranch = localStorage.getItem("Branch") || '';
         let companyCode = parseInt(localStorage.getItem('companyCode'));

@@ -48,29 +48,6 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "transMode",
-        label: "Transport Mode",
-        placeholder: "Transport Mode",
-        type: "Staticdropdown",
-        value: [
-          { value: "Air", name: "Air" },
-          { value: "Road", name: "Road" },
-          { value: "Rail", name: "Rail" },
-        ],
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        functions:{
-          onSelection:"disableSize"
-      },
-        Validations: [],
-        additionalData: {
-          showNameAndValue: false,
-        },
-      },
-      {
         name: "pickUpTime",
         label: "Pickup Date & Time",
         placeholder: "",
@@ -87,8 +64,102 @@ export class PrqEntryControls {
             message: "Pickup Date is required",
           },
         ],
+        functions:{
+          onDate:'format'
+        },
         additionalData: {
           minDate: isUpdate ? "" : new Date(),
+        },
+      },
+      {
+        name: "transMode",
+        label: "Transport Mode",
+        placeholder: "Transport Mode",
+        type: "Staticdropdown",
+        value: [
+          { value: "truck", name: "Truck" },
+          { value: "trailer", name: "Trailer" },
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        functions:{
+          onSelection:"disableSize"
+      },
+        Validations: [],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "typeContainer",
+        label: "Type of Container",
+        placeholder: "Type of Container",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "containerSize",
+        label: "Container Size",
+        placeholder: "Container Size",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
+      {
+        name: "vehicleSize",
+        label: "Truck Capacity",
+        placeholder: "Truck Capacity",
+        type: "Staticdropdown",
+        value: [
+          { value: "1", name: "1-MT" },
+          { value: "9", name: "9-MT" },
+          { value: "16", name: "16-MT" },
+          { value: "32", name: "32-MT" },
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          showNameAndValue: false,
         },
       },
       {
@@ -197,54 +268,7 @@ export class PrqEntryControls {
           showNameAndValue: false,
         },
       },
-      {
-        name: "typeContainer",
-        label: "Type of Container",
-        placeholder: "Type of Container",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
-      {
-        name: "containerSize",
-        label: "Container Size",
-        placeholder: "Container Size",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
+  
       {
         name: "payType",
         label: "Payment Mode",
@@ -288,7 +312,7 @@ export class PrqEntryControls {
         label: "Contract Amount(Rs)",
         placeholder: "Contract Amount",
         type: "number",
-        value: 0,
+        value: prqDetail.contractAmt,
         generatecontrol: true,
         disable: false,
         Validations: [],
@@ -297,47 +321,20 @@ export class PrqEntryControls {
         name: "prqBranch",
         label: "PRQ Branch",
         placeholder: "PRQ Branch",
-        type: "dropdown",
-        value: "",
+        type: "text",
+        value: localStorage.getItem('Branch'),
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
         ],
         additionalData: {
           showNameAndValue: true,
         },
       },
-      {
-        name: "vehicleSize",
-        label: "Vehicle Size",
-        placeholder: "Vehicle Size",
-        type: "Staticdropdown",
-        value: [
-          { value: "1", name: "1-MT" },
-          { value: "9", name: "9-MT" },
-          { value: "16", name: "16-MT" },
-          { value: "32", name: "32-MT" },
-        ],
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-        additionalData: {
-          showNameAndValue: false,
-        },
-      },
+     
     // Additional hidden or metadata form controls.
       {
         name: "_id",

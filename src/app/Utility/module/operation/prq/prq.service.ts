@@ -13,7 +13,7 @@ export class PrqService {
   constructor(
     private masterService: MasterService,
     private operation: OperationService
-  ) {}
+  ) { }
 
   // the function for prq generation
   getPrqNextNumber() {
@@ -117,15 +117,15 @@ export class PrqService {
         status: isClose ? "In Transit" : "available",
         ...(isClose
           ? {
-              tripId: prqdata.prqNo,
-              capacity: prqdata.vehicleSize,
-              FromCity: arrivalData.fromCity,
-              ToCity: arrivalData.toCity,
-              distance: arrivalData.distance,
-              currentLocation: localStorage.getItem("Branch"),
-              updateBy: localStorage.getItem("Username"),
-              updateDate: new Date().toISOString(),
-            }
+            tripId: prqdata.prqNo,
+            capacity: prqdata.vehicleSize,
+            FromCity: arrivalData.fromCity,
+            ToCity: arrivalData.toCity,
+            distance: arrivalData.distance,
+            currentLocation: localStorage.getItem("Branch"),
+            updateBy: localStorage.getItem("Username"),
+            updateDate: new Date().toISOString(),
+          }
           : {}),
       };
 
@@ -176,8 +176,8 @@ export class PrqService {
         size: element.vehicleSize
           ? element.vehicleSize + " " + "MT"
           : element.containerSize
-          ? element.containerSize
-          : "",
+            ? element.containerSize
+            : "",
         billingParty: element?.billingParty || "",
         fromToCity: element?.fromCity + "-" + element?.toCity,
         fromCity: element?.fromCity || "",
@@ -192,26 +192,27 @@ export class PrqService {
           element?.status === "0"
             ? "Awaiting Confirmation"
             : element.status === "1"
-            ? "Awaiting Assign Vehicle"
-            : element.status == "2"
-            ? "Awaiting For Docket"
-            : element.status == "3"
-            ? "Ready For THC"
-            : "THC Generated",
+              ? "Awaiting Assign Vehicle"
+              : element.status == "2"
+                ? "Awaiting For Docket"
+                : element.status == "3"
+                  ? "Ready For THC"
+                  : "THC Generated",
         actions:
           element?.status === "0"
             ? ["Confirm", "Reject", "Modify"]
             : element.status === "1"
-            ? ["Assign Vehicle"]
-            : element.status == "2"
-            ? ["Add Docket"]
-            : element.status == "3"
-            ? ["Add Docket", "Create THC"]
-            : [""],
+              ? ["Assign Vehicle"]
+              : element.status == "2"
+                ? ["Add Docket"]
+                : element.status == "3"
+                  ? ["Add Docket", "Create THC"]
+                  : [""],
         containerSize: element?.containerSize || "",
         typeContainer: element?.typeContainer || "",
         pAddress: element?.pAddress || "",
         payType: element?.payType || "",
+        contractAmt: element?.contractAmt || "",
         createdDate: formatDocketDate(element?.entryDate || new Date()),
       };
       prqList.push(prqDataItem);
@@ -235,6 +236,21 @@ export class PrqService {
     return prqDetail;
   }
 
+  async getAllPrqDetail() {
+    const reqBody = {
+      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      collectionName: "prq_detail",
+      filter: {},
+    };
+
+    // Make an asynchronous request to the API using masterMongoPost method
+    const res = await this.masterService
+      .masterMongoPost("generic/get", reqBody)
+      .toPromise();
+    return res.data
+
+
+  }
   // This function sets the assigned vehicle details.
   setassignVehicleDetail(data: any) {
     this.vehicleDetail = data;

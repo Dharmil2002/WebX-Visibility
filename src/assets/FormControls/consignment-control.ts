@@ -121,6 +121,9 @@ export class ConsignmentControl {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -140,6 +143,9 @@ export class ConsignmentControl {
           { name: "autocomplete" },
           { name: "invalidAutocompleteObject", message: "Choose proper value" }
         ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
         additionalData: {
           showNameAndValue: false,
         },

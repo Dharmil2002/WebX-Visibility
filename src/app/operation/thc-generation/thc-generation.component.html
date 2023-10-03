@@ -16,12 +16,12 @@
     (menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"
     [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles">
   </app-generic-table-v2>
-<div class="row" *ngIf="!isView">
+<div class="row">
   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
     <div class="example-button-row d-flex justify-content-end">
-      <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad"
+      <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad&&!isView"
         (click)="createThc()" [disabled]="!thcTableForm.valid">  {{ isUpdate ? 'Update THC' : 'Generate THC' }}</button>
-      <button class="msr-3" mat-raised-button color="primary" >Back</button>
+      <button class="msr-3" mat-raised-button color="primary"  (click)="goBack('THC')" >Back</button>
     </div>
   </div>
 </div>

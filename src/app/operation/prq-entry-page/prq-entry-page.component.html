@@ -4,7 +4,7 @@
         <form [formGroup]="prqEntryTableForm">
             <app-form-webxpress [form]="prqEntryTableForm" [formData]="jsonControlPrqArray"
                 [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)"
-                (functionCallEmitter)="functionCallHandler($event)">
+                (functionCallEmitter)="functionCallHandler($event)" [submit]="submit">
             </app-form-webxpress>
         </form>
      

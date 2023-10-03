@@ -118,6 +118,8 @@ import { AddAdditionalDeliveryChargesComponent } from './Vendor Contract/vendor-
 import { AddWaitingChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-waiting-charges/add-waiting-charges.component';
 import { TripLaneBasedComponent } from './Vendor Contract/vendor-tabs/trip-lane-based/trip-lane-based.component';
 import { SpecialChargesComponent } from './Vendor Contract/vendor-tabs/special-charges/special-charges.component';
+import { PinCodeService } from '../Utility/module/masters/pincode/pincode.service';
+import { StateService } from '../Utility/module/masters/state/state.service';
 @NgModule({
   imports: [
     CommonModule,
@@ -247,7 +249,8 @@ import { SpecialChargesComponent } from './Vendor Contract/vendor-tabs/special-c
 
   ],
 
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService,
+  PinCodeService,StateService]
 })
 
 export class MastersModule { }

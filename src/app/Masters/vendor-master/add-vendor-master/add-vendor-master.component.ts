@@ -10,6 +10,8 @@ import Swal from "sweetalert2";
 import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { Subject, take, takeUntil } from "rxjs";
 import { handleFileSelection } from "../vendor-utility";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { StateService } from "src/app/Utility/module/masters/state/state.service";
 
 @Component({
   selector: 'app-add-vendor-master',
@@ -22,8 +24,10 @@ export class AddVendorMasterComponent implements OnInit {
   isUpdate = false;
   vendorTabledata: VendorMaster;
   vendorTableForm: UntypedFormGroup;
+  otherDetailForm: UntypedFormGroup;
   vendorFormControls: VendorControl;
   jsonControlVendorArray: any;
+  jsonControlOtherArray: any;
   vendorType: any;
   vendorTypeStatus: any;
   data: any;
@@ -53,17 +57,75 @@ export class AddVendorMasterComponent implements OnInit {
   pincodeResponse: any;
   pincodeData: any;
   newVendorCode: string;
-
-
+  tableData: any = [];
+  tableLoad: boolean;
+  isLoad: boolean;
+  gstPincode: string;
+  gstPincodeStatus: boolean;
+  addFlag = true;
+  columnHeader = {
+    gstNumber: {
+      Title: "GST Number",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
+    },
+    gstState: {
+      Title: "GST State",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
+    },
+    gstAddress: {
+      Title: "GST Address",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    gstPincode: {
+      Title: "GST Pincode",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    gstCity: {
+      Title: "GST City",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    }
+  };
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
+  menuItems = [
+    { label: 'Edit' },
+    { label: 'Remove' }
+  ]
+  menuItemflag = true;
+  staticField =
+    [
+      'gstNumber',
+      'gstState',
+      'gstAddress',
+      'gstPincode',
+      'gstCity',
+    ]
+  linkArray = [
+  ];
   constructor(
     private route: Router, private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
+    private objPinCodeService: PinCodeService,
+    private objState: StateService
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vendorTabledata = this.route.getCurrentNavigation().extras.state.data;
       console.log(this.vendorTabledata);
-      
+
       this.action = 'edit';
       this.isUpdate = true;
     } else {
@@ -103,15 +165,25 @@ export class AddVendorMasterComponent implements OnInit {
     const vehicleFormControls = new VendorControl(this.vendorTabledata, this.isUpdate);
     this.jsonControlVendorArray = vehicleFormControls.getVendorFormControls();
     this.vendorTableForm = formGroupBuilder(this.fb, [this.jsonControlVendorArray]);
-
+    this.jsonControlOtherArray = vehicleFormControls.getVendorOtherInfoFormControls();
+    this.otherDetailForm = formGroupBuilder(this.fb, [this.jsonControlOtherArray])
     const vendorPropertyMap = {
       'vendorType': { property: 'vendorType', statusProperty: 'vendorTypeStatus' },
       'vendorLocation': { property: 'vLocation', statusProperty: 'vLocationStatus' },
       'vendorPinCode': { property: 'vendorPinCode', statusProperty: 'vendorPinCodeStatus' },
     };
-
+    const OtherDetails = {
+      'gstPincode': { property: "gstPincode", statusProperty: 'gstPincodeStatus' }
+    }
     this.jsonControlVendorArray.forEach(data => {
       const mapping = vendorPropertyMap[data.name];
+      if (mapping) {
+        this[mapping.property] = data.name;
+        this[mapping.statusProperty] = data.additionalData.showNameAndValue;
+      }
+    });
+    this.jsonControlOtherArray.forEach(data => {
+      const mapping = OtherDetails[data.name];
       if (mapping) {
         this[mapping.property] = data.name;
         this[mapping.statusProperty] = data.additionalData.showNameAndValue;
@@ -189,40 +261,15 @@ export class AddVendorMasterComponent implements OnInit {
       console.error('Error:', error);
     }
   }
+  //#region to call pincode
   getPincode() {
-    const pincodeValue = this.vendorTableForm.controls['vendorPinCode'].value
-    // Check if pincodeValue is a valid number and has at least 3 characters
-    if (!isNaN(pincodeValue) && pincodeValue.length >= 3) {
-      // Find an exact pincode match in the pincodeDet array
-      const exactPincodeMatch = this.pincodeData.find(element => element.name === pincodeValue);
-
-      if (!exactPincodeMatch) {
-        // Filter pincodeDet for partial matches
-        const filteredPincodeDet = this.pincodeData.filter(element =>
-          element.name.includes(pincodeValue)
-        );
-
-        if (filteredPincodeDet.length === 0) {
-          // Show a popup indicating no data found for the given pincode
-          Swal.fire({
-            icon: "info",
-            title: "No Data Found",
-            text: `No data found for pincode ${pincodeValue}`,
-            showConfirmButton: true,
-          });
-        } else {
-          // Call the filter function with the filtered data
-          this.filter.Filter(
-            this.jsonControlVendorArray,
-            this.vendorTableForm,
-            filteredPincodeDet,
-            this.vendorPinCode,
-            this.vendorPinCodeStatus
-          );
-        }
-      }
-    }
+    this.objPinCodeService.validateAndFilterPincode(this.vendorTableForm, this.jsonControlVendorArray, 'vendorPinCode', this.vendorPinCodeStatus);
   }
+  getGstPincode() {
+    this.objPinCodeService.validateAndFilterPincode(this.otherDetailForm, this.jsonControlOtherArray, 'gstPincode', this.gstPincodeStatus);
+  }
+  //#endregion
+
   async save() {
     const formValue = this.vendorTableForm.value;
     const controlNames = [
@@ -314,23 +361,30 @@ export class AddVendorMasterComponent implements OnInit {
   async setStateCityData() {
     const fetchData = this.pincodeResponse.data.find(item =>
       item.PIN == this.vendorTableForm.controls.vendorPinCode.value.value)
-    this.vendorTableForm.controls.vendorCity.setValue(fetchData.city)
-    const request = {
-      "companyCode": this.companyCode,
-      "collectionName": "state_master",
-      "filter": { ST: fetchData.ST }
-    };
+    this.vendorTableForm.controls.vendorCity.setValue(fetchData.CT)
+    const stateName = await this.objState.fetchStateByFilterId(fetchData.ST);
+    this.vendorTableForm.controls.vendorState.setValue(stateName[0].STNM);
 
-    // Fetch pincode data
-    const state = await this.masterService.masterPost('generic/get', request).toPromise();
-    this.vendorTableForm.controls.vendorState.setValue(state.data[0].STNM)
-    this.vendorTableForm.controls.vendorCity.setValue(fetchData.CT);
-    this.masterService.getJsonFileDetails("countryList").subscribe((res) => {
-      const countryName = res.find(x => x.Code == state.data[0].CNTR)
-      this.vendorTableForm.controls["vendorCountry"].setValue(countryName.Country);
-    })
+    this.masterService.getJsonFileDetails('countryList').subscribe((res) => {
+      const country = res.find(x => x.Code === stateName[0]?.CNTR);
+      const countryName = country?.Country || '';
+      this.vendorTableForm.controls.vendorCountry.setValue(countryName);
+    });
+  }
+
+  async setState() {
+    const gstNumber = this.otherDetailForm.value.gstNumber;
+    const filterId = gstNumber.substring(0, 2);
+    const stateName = await this.objState.fetchStateByFilterId(filterId);
+    this.otherDetailForm.controls.gstState.setValue(stateName[0].STNM);
+  }
+  setGSTCity() {
+    const fetchData = this.pincodeResponse.data.find(item =>
+      item.PIN == this.otherDetailForm.controls.gstPincode.value.value)
+    this.otherDetailForm.controls.gstCity.setValue(fetchData.CT)
   }
   //#endregion
+
   protected _onDestroy = new Subject<void>();
   // function handles select All feature of all multiSelect fields of one form.
   toggleSelectAll(argData: any) {
@@ -402,4 +456,54 @@ export class AddVendorMasterComponent implements OnInit {
     await this.checkValueExists("msmeNumber", "MSME Number");
   }
   //#endregion
+
+  async addData() {
+    this.tableLoad = true;
+    this.isLoad = true;
+    const tableData = this.tableData;
+    const delayDuration = 1000;
+    // Create a promise that resolves after the specified delay
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Use async/await to introduce the delay
+    await delay(delayDuration);
+    const json = {
+      id: tableData.length + 1,
+      gstNumber: this.otherDetailForm.value.gstNumber,
+      gstState: this.otherDetailForm.value.gstState,
+      gstAddress: this.otherDetailForm.value.gstAddress,
+      gstPincode: this.otherDetailForm.value.gstPincode.value,
+      gstCity: this.otherDetailForm.value.gstCity,
+      // invoice: false,
+      actions: ['Edit', 'Remove']
+    }
+    this.tableData.push(json);
+    this.isLoad = false;
+    this.tableLoad = false;
+  }
+
+  handleMenuItemClick(data) {
+    console.log(data);
+
+
+    if (data.data.invoice) {
+
+    }
+    else {
+      this.fillTable(data);
+    }
+
+  }
+  fillTable(data: any) {
+    if (data.label.label === 'Remove') {
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    }
+    else {
+      this.otherDetailForm.controls['gstNumber'].setValue(data.data?.gstNumber || "");
+      this.otherDetailForm.controls['gstState'].setValue(data.data?.gstState || "");
+      this.otherDetailForm.controls['gstAddress'].setValue(data.data?.gstAddress || "");
+      this.otherDetailForm.controls['gstPincode'].setValue(data.data?.gstPincode);
+      this.otherDetailForm.controls['gstCity'].setValue(data.data?.gstCity || "");
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    }
+  }
 }

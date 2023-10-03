@@ -42,6 +42,15 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
   addFormDateWise: any;
   dialogData = "a";
   protected _onDestroy = new Subject<void>();
+  data: any;
+  dateWiseData: any;
+  tableLoad: boolean;
+  isUpdate = false;
+  highestID: number = 0;
+  action: string;
+  daynamecntrl: any;
+  dayvalue: any;
+  AddFormDayWise: {};
 
   breadscrums = [
     {
@@ -50,12 +59,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
       active: "Add Holiday",
     },
   ];
-  data: any;
-  dateWiseData: any;
-  tableLoad: boolean;
-  isUpdate = false;
-  highestID: number = 0;
-  action: string;
+
 
   constructor(public dialogRef: MatDialogRef<AddEditHolidayComponent>, private fb: UntypedFormBuilder, @Inject(MAT_DIALOG_DATA) public item: any,
     private filter: FilterUtils, private route: Router, private masterService: MasterService, private datePipe: DatePipe) {
@@ -84,6 +88,7 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
     }
     const res = await this.masterService.masterPost("generic/get", req).toPromise();
     if (res) {
+      this.dayWiseData=res;
       this.bindDaysData();
     }
   }
@@ -132,10 +137,12 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
   //Binding Days here
   bindDaysData() {
     if (this.dayWiseData) {
-      const dayNameArray = this.dayWiseData.map(dayData => dayData.days);
+      const dayNameArray = this.dayWiseData.data
+      .filter(holiday => holiday.type === 'DAY')
+      .map(holiday => holiday.days);
       const filter =
         this.holidayMasterControls.days.filter((element) =>
-          dayNameArray.includes(element.value)
+          dayNameArray[0].includes(element.value)
         )
       this.holidayDayWiseForm.controls[
         "daysControllerHandler"
@@ -150,8 +157,9 @@ export class AddEditHolidayComponent extends UnsubscribeOnDestroyAdapter impleme
     );
   }
 
-  //check Holdiday exist on Date OR Day Wise 
+  //check Holdiday exist on Date OR Day Wise
   save() {
+
     if (!this.isUpdate) {
       if (this.holidayMasterForm.controls.dateType.value === "DATE")
         this.CheckHolidayExists();

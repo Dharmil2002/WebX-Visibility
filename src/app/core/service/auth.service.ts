@@ -91,10 +91,8 @@ export class AuthService {
   }
 
   refreshtoken() {
-    let request = {
-      "token": this.storageService.getItem('token'),
-      "refreshToken": this.storageService.getItem('refreshToken'),
-
+    let request = {     
+      "refreshToken": this.storageService.getItem('refreshToken')
     }
     return this.http
       .post<any>(
@@ -107,8 +105,8 @@ export class AuthService {
           resetOnComplete: () => timer(1000),
         }),
         map((user) => {
-          this.storageService.setItem("token", user.token);
-          this.storageService.setItem("refreshToken", user.refreshToken);
+          this.storageService.setItem("token", user.access.token);
+          this.storageService.setItem("refreshToken", user.refresh.token);
           this.currentUserSubject.next(user);
           return user;
         })

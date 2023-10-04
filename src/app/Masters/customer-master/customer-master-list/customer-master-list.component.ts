@@ -14,7 +14,7 @@ export class CustomerMasterListComponent implements OnInit {
   linkArray = []
   columnHeader = {
     "srNo": "Sr No",
-    "groupCode": "Group Code",
+    "customerGroup": "Customer Group",
     "customerCode": "Customer Code",
     "customerName": "Customer Name",
     "activeFlag": "Active Status",
@@ -22,7 +22,7 @@ export class CustomerMasterListComponent implements OnInit {
   };
   headerForCsv = {
     "srNo": "Sr No",
-    "groupCode": "Group Code",
+    "customerGroup": "Customer Group",
     "customerCode": "Customer Code",
     "customerName": "Customer Name",
     "activeFlag": "Active Status",
@@ -60,7 +60,8 @@ export class CustomerMasterListComponent implements OnInit {
           const dataWithSrno = res.data.map((obj, index) => {
             return {
               ...obj,
-              srNo: index + 1
+              srNo: index + 1,
+              activeFlag:obj.activeFlag == 'Y'?true:false
             };
           });
           this.csv = dataWithSrno

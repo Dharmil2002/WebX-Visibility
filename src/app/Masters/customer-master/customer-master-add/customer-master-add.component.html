@@ -1,7 +1,57 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
+  <div>
     <form [formGroup]="customerTableForm">
-      <generic-accordion-webxpress [AccordionForm]="customerTableForm" [accordionGroup]="accordionData"
-        (functionCallEmitter)="functionCallHandler($event)" >
-      </generic-accordion-webxpress>
+      <app-form-webxpress [form]="customerTableForm" [formData]="jsonControlCustomerArray"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+        (functionCallEmitter)="functionCallHandler($event)">
+      </app-form-webxpress>
     </form>
-  </app-common-wrapper-webxpress>
+    <div style="margin-top: 50px;">
+      <div
+        style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+        <h3 style="font-size: 1.5rem; padding: 5px 0px;">GST Details</h3>
+      </div>
+      <div>
+        <div>
+          <form [formGroup]="GSTcustomerTableForm">
+            <app-form-webxpress [form]="GSTcustomerTableForm" [formData]="jsonControlGSTArray"
+              [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+              (functionCallEmitter)="functionCallHandler($event)">
+            </app-form-webxpress>
+          </form>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: end;">
+          <button matTooltip="Add New Record" [disabled]="!GSTcustomerTableForm.valid" mat-stroked-button (click)="ValidAndAddEditData()" class="filter_btn"
+            style="margin-right: 30px;">
+            <mat-icon>add</mat-icon>
+            Add New
+          </button>
+        </div>
+        <div class="row">
+          <div *ngIf="!tableLode" class="d-flex justify-content-center align-items-center">
+            <!-- Bootstrap loader -->
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <app-generic-table-v2 *ngIf="tableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+            [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+            [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width"
+            [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
+            [menuItemFlag]="menuItemflag">
+          </app-generic-table-v2>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 30px; margin-left: 10px;">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+        <div class="example-button-row">
+          <button type="button" [disabled]="!customerTableForm.valid" mat-raised-button color="primary" (click)="save()">
+            Save
+          </button>
+          <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-common-wrapper-webxpress>

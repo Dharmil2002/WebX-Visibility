@@ -6,9 +6,9 @@
     </app-form-webxpress>
   </form>
   <hr>
-  <h4 class="card-title" style="padding-left: 10px;">Container Details</h4>
-  <hr>
-
+  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Container Detail</h3>
+  </div>
   <form [formGroup]="containerTableForm">
     <app-form-webxpress [form]="containerTableForm" [formData]="jsonContainerDetail"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
@@ -33,9 +33,9 @@
       [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
   </app-generic-table-v2>
 </div>
-  <hr>
-  <h4 class="card-title" style="padding-left: 10px;">Invoice Details</h4>
-  <hr>
+  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Invoice Details</h3>
+  </div>
   <form [formGroup]="invoiceTableForm">
     <app-form-webxpress [form]="invoiceTableForm" [formData]="jsonInvoiceDetail"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"

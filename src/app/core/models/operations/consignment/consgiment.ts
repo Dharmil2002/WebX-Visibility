@@ -1,0 +1,118 @@
+export class DocketDetail {
+    _id: string
+    docketNumber: string
+    docketDate: string
+    billingParty: string
+    payType: string
+    origin: string
+    fromCity: string
+    toCity: string
+    destination: string
+    prqNo: string
+    transMode: string
+    containerSize: string
+    containerNumber: string
+    vendorType: string
+    vendorName: string
+    ccbp: boolean
+    consignorName: string
+    pAddress: string
+    ccontactNumber: string
+    calternateContactNo: string
+    consigneeName: string
+    deliveryAddress: string
+    cncontactNumber: string
+    cnalternateContactNo: string
+    companyCode: string
+    vehicleNo: string
+    status: number
+    freightAmount: string
+    freightRatetype: string
+    otherAmount: string
+    grossAmount: string
+    rcm: string
+    gstAmount: string
+    gstChargedAmount: string
+    totalAmount: string
+    isComplete: number
+    unloading: number
+    lsNo: string
+    mfNo: string
+    entryBy: any
+    entryDate: string
+    unloadloc: string
+    actualWeight: number
+    invoiceDetails: InvoiceDetail[]
+    containerDetail: ContainerDetail[]
+
+    constructor(data: any) {
+        this._id = data._id ?? '';
+        this.docketNumber = data.docketNumber ?? 'System Generated';
+        this.docketDate = data.docketDate ?? '';
+        this.billingParty = data.billingParty ?? '';
+        this.payType = data.payType ?? '';
+        this.origin = data.origin ?? '';
+        this.fromCity = data.fromCity ?? '';
+        this.toCity = data.toCity ?? '';
+        this.destination = data.destination ?? '';
+        this.prqNo = data.prqNo ?? '';
+        this.transMode = data.transMode ?? '';
+        this.containerSize = data.containerSize ?? '';
+        this.containerNumber = data.containerNumber ?? '';
+        this.vendorType = data.vendorType ?? '';
+        this.vendorName = data.vendorName ?? '';
+        this.ccbp = data.ccbp ?? false;
+        this.consignorName = data.consignorName ?? '';
+        this.pAddress = data.pAddress ?? '';
+        this.ccontactNumber = data.ccontactNumber ?? '';
+        this.calternateContactNo = data.calternateContactNo ?? '';
+        this.consigneeName = data.consigneeName ?? '';
+        this.deliveryAddress = data.deliveryAddress ?? '';
+        this.cncontactNumber = data.cncontactNumber ?? '';
+        this.cnalternateContactNo = data.cnalternateContactNo ?? '';
+        this.companyCode = data.companyCode ?? '';
+        this.vehicleNo = data.vehicleNo ?? '';
+        this.status = data.status ?? 0;
+        this.freightAmount = data.freightAmount ?? '';
+        this.freightRatetype = data.freightRatetype ?? '';
+        this.otherAmount = data.otherAmount ?? '';
+        this.grossAmount = data.grossAmount ?? '';
+        this.rcm = data.rcm ?? '';
+        this.gstAmount = data.gstAmount ?? '';
+        this.gstChargedAmount = data.gstChargedAmount ?? '';
+        this.totalAmount = data.totalAmount ?? '';
+        this.isComplete = data.isComplete ?? 0;
+        this.unloading = data.unloading ?? 0;
+        this.lsNo = data.lsNo ?? '';
+        this.mfNo = data.mfNo ?? '';
+        this.unloadloc = data.unloadloc ?? '';
+        this.actualWeight = data.actualWeight ?? 0;
+        this.invoiceDetails = data.invoiceDetails ?? []
+        this.containerDetail = data.containerDetail ?? []
+    }
+
+}
+
+export class InvoiceDetail {
+    id:number
+    ewayBillNo: string
+    expiryDate: string
+    invoiceNo: string
+    invoiceAmount: string
+    noofPkts: string
+    materialName: string
+    actualWeight: string
+    chargedWeight: string
+    expiryDateO: string
+    invoice: boolean=true
+    actions: ['Edit', 'Remove']
+}
+
+export class ContainerDetail {
+    id:number
+    containerNumber: string
+    containerType: string
+    containerCapacity: string
+    invoice: boolean
+    actions: ['Edit', 'Remove']
+}

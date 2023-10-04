@@ -18,11 +18,24 @@ export class DocketService {
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
             collectionName: "docket_temp",
-            filter: {"docketNumber":data},
-            update:{"status":"1"}
+            filter: { "docketNumber": data },
+            update: { "status": "1" }
         };
         // Perform an asynchronous operation to fetch data from the operation service
         const result = await this.operation.operationMongoPut("generic/update", reqBody).toPromise();
         return result;
+    }
+
+    bindData(dataArray, targetArray) {
+        if (dataArray.length > 0) {
+            const modifiedData = dataArray.map((x, index) => {
+                if (x) {
+                    x.id = index;
+                    return x;
+                }
+                return x;
+            });
+            targetArray = modifiedData;
+        }
     }
 }

@@ -16,6 +16,8 @@ import { pendingbilling } from "../pending-billing/pending-billing-utlity";
 import { containorConsigmentDetail, updatePrq } from "./consigment-utlity";
 import { formatDate } from "src/app/Utility/date/date-utils";
 import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { DocketDetail } from "src/app/core/models/operations/consignment/consgiment";
+import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -65,6 +67,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   containerType: string;
   containerTypeStatus: boolean;
   userName = localStorage.getItem("Username");
+  docketDetail: DocketDetail;
   //#region columnHeader
   columnHeader = {
     containerNumber: {
@@ -194,6 +197,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
   ];
   jsonInvoiceDetail: any;
   loadIn: boolean;
+  isUpdate: boolean;
+  vendorDetail: any;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -202,12 +207,23 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private filter: FilterUtils,
     private route: Router,
     private operationService: OperationService,
+    private docketService: DocketService
   ) {
 
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
+    this.docketDetail = new DocketDetail({});
+
     if (navigationState != null) {
-      this.prqData = navigationState
-      this.prqFlag = true;
+
+      this.isUpdate = navigationState.hasOwnProperty('actions') && navigationState.actions[0] === 'Edit Docket';
+      if (this.isUpdate) {
+        this.docketDetail = navigationState
+      }
+      else {
+        this.prqData = navigationState
+        this.prqFlag = true;
+      }
+
 
     }
     this.initializeFormControl();
@@ -220,8 +236,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
   //#region initializeFormControl
   initializeFormControl() {
     // Create LocationFormControls instance to get form controls for different sections
-    this.ConsignmentFormControls = new ConsignmentControl();
-    this.FreightFromControl = new FreightControl();
+    this.ConsignmentFormControls = new ConsignmentControl(this.docketDetail);
+    this.FreightFromControl = new FreightControl(this.docketDetail);
 
     // Get form controls for Driver Details section
     this.jsonControlArrayBasic = this.ConsignmentFormControls.getConsignmentControlControls();
@@ -243,17 +259,12 @@ export class ConsignmentEntryFormComponent implements OnInit {
     }
   }
   //#endregion
-
-
-
-  //#region  Add a new item to the table
-
-  //#endregion
   getContainerType(event) {
     const containerType = this.containerTableForm.controls['containerType'].value.value;
     const containerCapacity = this.containerTypeList.find((x) => x.name.trim() === containerType.trim());
     this.containerTableForm.controls['containerCapacity'].setValue(containerCapacity.loadCapacity)
   }
+
   //#region functionCallHandler
   functionCallHandler($event) {
     // console.log("fn handler called" , $event);
@@ -273,54 +284,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   //#endregion
 
-  //#region delete function
-  async delete(event) {
-    const index = event.index;
-    const row = event.element;
-
-    const swalWithBootstrapButtons = await Swal.mixin({
-      customClass: {
-        confirmButton: "btn btn-success msr-2",
-        cancelButton: "btn btn-danger",
-      },
-      buttonsStyling: false,
-    });
-
-    swalWithBootstrapButtons
-      .fire({
-        title: `<h4><strong>Are you sure you want to delete ?</strong></h4>`,
-        // color: "#03a9f3",
-        showCancelButton: true,
-        cancelButtonColor: "#d33",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-        showLoaderOnConfirm: true,
-        allowOutsideClick: () => !Swal.isLoading(),
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          this.tableData.splice(index, 1);
-          this.tableData1.splice(index, 1);
-          this.tableData = this.tableData;
-          this.tableData1 = this.tableData1;
-          swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
-          event.callback(true);
-        } else if (result.isConfirmed) {
-          swalWithBootstrapButtons.fire("Not Deleted!", "Your Message", "info");
-          event.callback(false);
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire(
-            "Cancelled",
-            "Your item is safe :)",
-            "error"
-          );
-          event.callback(false);
-        }
-      });
-
-    return true;
-  }
-  //#endregion
   prqDetail() {
 
     const fromCity = {
@@ -354,11 +317,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const resContainer = await containerFromApi(this.masterService);
     const resContainerType = await containorConsigmentDetail(this.operationService);
     this.containerTypeList = resContainerType;
-    // this.displayedColumns1.containerType.option=resContainerType;
     const vendorDetail = await getVendorDetails(this.masterService);
+    this.vendorDetail = vendorDetail
     const prqNo = await pendingbilling(this.masterService);
-    //this.displayedColumns1.containerType
     this.prqNoDetail = prqNo;
+    const prqDetail = prqNo.map((x) => ({ name: x.prqId, value: x.prqId }))
     this.filter.Filter(
       this.jsonControlArrayBasic,
       this.consignmentTableForm,
@@ -413,7 +376,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.filter.Filter(
       this.jsonControlArrayBasic,
       this.consignmentTableForm,
-      prqNo.map((x) => { return { name: x.prqNo, value: x.prqNo } }),
+      prqDetail,
       this.prqNo,
       this.prqNoStatus
     );
@@ -425,9 +388,10 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.containerType,
       this.containerTypeStatus
     );
-    this.prqDetail();
+    this.prqFlag && this.prqDetail();
+    this.isUpdate && this.autofillDropDown()
   }
-  //#region Save Function
+
   async getLocBasedOnCity() {
 
     const toCity = this.prqData?.toCity ?? this.consignmentTableForm.get('toCity')?.value?.value ?? '';
@@ -439,122 +403,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     //this.locationService.setCityLocationInForm(this.consignmentTableForm.get('origin'), fromCity, location);
   }
 
-  async save() {
-    // Remove all form errors
-    const tabcontrols = this.consignmentTableForm;
-    clearValidatorsAndValidate(tabcontrols);
-    const contractcontrols = this.consignmentTableForm;
-    clearValidatorsAndValidate(contractcontrols);
-    /*End*/
-    const vendorType = this.consignmentTableForm.value.vendorType;
-    const vendorName = this.consignmentTableForm.value.vendorName;
-    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
-    const controlNames = ["containerSize", "transMode", "payType", "vendorType"];
-    controlNames.forEach((controlName) => {
-      if (Array.isArray(this.consignmentTableForm.value[controlName])) {
-        this.consignmentTableForm.controls[controlName].setValue("");
-      }
-    });
-    const fieldsToRemove = ['id', 'actions', 'invoice'];
-    const invoiceList = removeFieldsFromArray(this.invoiceData, fieldsToRemove);
-    const containerlist = removeFieldsFromArray(this.tableData, fieldsToRemove);
-    let invoiceDetails = {
-      invoiceDetails: invoiceList,
-    };
-    let containerDetail = {
-      containerDetail: containerlist,
-    };
-    const controltabNames = [
-      "containerCapacity",
-      "containerSize1",
-      "containerSize2",
-      "containerType",
-    ];
 
-    controltabNames.forEach((controlName) => {
-      if (Array.isArray(this.consignmentTableForm.value[controlName])) {
-        this.consignmentTableForm.controls[controlName].setValue("");
-      }
-    });
-    this.consignmentTableForm.controls["fromCity"].setValue(
-      this.consignmentTableForm.value.fromCity?.name || ""
-    );
-    this.consignmentTableForm.controls["containerSize"].setValue(
-      this.consignmentTableForm.value.containerSize?.name || ""
-    );
-
-    this.consignmentTableForm.controls["vendorName"].setValue(
-      vendorType === "Market" ? vendorName : vendorName?.name || ""
-    );
-
-    this.consignmentTableForm.controls["toCity"].setValue(
-      this.consignmentTableForm.value.toCity?.name || ""
-    );
-    this.consignmentTableForm.controls["billingParty"].setValue(
-      this.consignmentTableForm.value?.billingParty.name || ""
-    );
-    this.consignmentTableForm.controls["consignorName"].setValue(
-      this.consignmentTableForm.value?.consignorName.name || ""
-    );
-    this.consignmentTableForm.controls["consigneeName"].setValue(
-      this.consignmentTableForm.value?.consigneeName.name || ""
-    );
-    this.consignmentTableForm.controls["prqNo"].setValue(
-      this.consignmentTableForm.value?.prqNo.value || ""
-    );
-    const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-    const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-    const dockNo = `CN${dynamicValue}${paddedNumber}`;
-    this.consignmentTableForm.controls["docketNumber"].setValue(dockNo);
-    let id = {
-      _id: dockNo,
-      isComplete: 1,
-      unloading: 0,
-      lsNo: "",
-      mfNo: "",
-      entryBy: this.userName,
-      entryDate: new Date().toISOString(),
-      unloadloc: ""
-    };
-    let docketDetails = {
-      ...this.consignmentTableForm.value,
-      ...this.FreightTableForm.value,
-      ...invoiceDetails,
-      ...containerDetail,
-      ...id,
-    };
-    let reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "docket_temp",
-      data: docketDetails,
-    };
-    if (this.prqFlag) {
-      const prqData = {
-        prqId: this.consignmentTableForm.value?.prqNo || "",
-        dktNo: this.consignmentTableForm.controls["docketNumber"].value
-
-      }
-      await updatePrq(this.operationService, prqData, "3")
-    }
-    this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
-      next: (res: any) => {
-        Swal.fire({
-          icon: "success",
-          title: "Booked Successfully",
-          text: "DocketNo: " + this.consignmentTableForm.controls["docketNumber"].value,
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Redirect to the desired page after the success message is confirmed.
-            this._NavigationService.navigateTotab(
-              'PRQ',
-              "dashboard/GlobeDashboardPage"
-            );
-          }
-        });
-      },
-    });
-  }
   //here the function is calling for add docket Data in docket Tracking.
 
   //#region cancel Function
@@ -565,6 +414,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     );
   }
   //#endregion
+
   commonDropDownMapping() {
 
     const mapControlArray = (controlArray, mappings) => {
@@ -597,7 +447,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     // mapControlArray(this.consigneeControlArray, consigneeMappings); // Map consignee control array
     //mapControlArray(this.contractControlArray, destinationMapping);
   }
+
   onAutoBillingBased(event) {
+
     const checked = typeof (event) === "string" ? event : event.eventArgs.checked
     if (checked) {
 
@@ -614,9 +466,22 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.consignmentTableForm.controls['consigneeName'].setValue("");
     }
   }
+
   prqSelection() {
     this.prqData = this.prqNoDetail.find((x) => x.prqId === this.consignmentTableForm.controls['prqNo'].value.value);
     this.prqDetail()
+  }
+
+
+  handleMenuItemClick(data) {
+
+    if (data.data.invoice) {
+      this.fillInvoice(data);
+    }
+    else {
+      this.fillContainer(data);
+    }
+
   }
 
   async addData() {
@@ -685,34 +550,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     });
     this.consignmentTableForm.updateValueAndValidity();
   }
-  handleMenuItemClick(data) {
-
-    if (data.data.invoice) {
-      this.fillInvoice(data);
-    }
-    else {
-      this.fillContainer(data);
-    }
-
-  }
-
-  fillInvoice(data: any) {
-    if (data.label.label === 'Remove') {
-      this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
-    }
-    else {
-      this.invoiceTableForm.controls['ewayBillNo'].setValue(data.data?.ewayBillNo || "");
-      this.invoiceTableForm.controls['expiryDate'].setValue(data.data?.expiryDateO || new Date());
-      this.invoiceTableForm.controls['invoiceNo'].setValue(data.data?.invoiceNo || "");
-      this.invoiceTableForm.controls['invoiceAmount'].setValue(data.data?.invoiceAmount || "");
-      this.invoiceTableForm.controls['noofPkts'].setValue(data.data?.noofPkts || "");
-      this.invoiceTableForm.controls['materialName'].setValue(data.data?.materialName || "");
-      this.invoiceTableForm.controls['actualWeight'].setValue(data.data?.actualWeight || "");
-      this.invoiceTableForm.controls['chargedWeight'].setValue(data.data?.chargedWeight || "");
-      this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
-    }
-
-  }
 
   fillContainer(data: any) {
     if (data.label.label === 'Remove') {
@@ -770,6 +607,25 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.loadIn = false;
   }
 
+  fillInvoice(data: any) {
+    if (data.label.label === 'Remove') {
+      this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
+    }
+    else {
+      this.invoiceTableForm.controls['ewayBillNo'].setValue(data.data?.ewayBillNo || "");
+      this.invoiceTableForm.controls['expiryDate'].setValue(data.data?.expiryDateO || new Date());
+      this.invoiceTableForm.controls['invoiceNo'].setValue(data.data?.invoiceNo || "");
+      this.invoiceTableForm.controls['invoiceAmount'].setValue(data.data?.invoiceAmount || "");
+      this.invoiceTableForm.controls['noofPkts'].setValue(data.data?.noofPkts || "");
+      this.invoiceTableForm.controls['materialName'].setValue(data.data?.materialName || "");
+      this.invoiceTableForm.controls['actualWeight'].setValue(data.data?.actualWeight || "");
+      this.invoiceTableForm.controls['chargedWeight'].setValue(data.data?.chargedWeight || "");
+      this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
+    }
+
+  }
+
+
   vendorFieldChanged() {
     const vendorType = this.consignmentTableForm.value.vendorType;
 
@@ -779,4 +635,235 @@ export class ConsignmentEntryFormComponent implements OnInit {
       }
     });
   }
+
+  autofillDropDown() {
+    const fromCity = {
+      name: this.docketDetail.fromCity,
+      value: this.docketDetail.fromCity
+    }
+    this.consignmentTableForm.controls['fromCity'].setValue(fromCity);
+    const toCity = {
+      name: this.docketDetail.toCity,
+      value: this.docketDetail.toCity
+    }
+
+    this.consignmentTableForm.controls['toCity'].setValue(toCity);
+    const billingParty = this.billingParty.find((x) => x.name == this.docketDetail.billingParty);
+    const consignorName = this.billingParty.find((x) => x.name == this.docketDetail.consignorName);
+    const consigneeName = this.billingParty.find((x) => x.name == this.docketDetail.consigneeName);
+    const containerTypeList = this.containerTypeList.find((x) => x.name == this.docketDetail.containerSize);
+    const prqNo = {
+      name: this.docketDetail.prqNo,
+      value: this.docketDetail.prqNo
+    }
+    this.consignmentTableForm.controls['vendorType'].setValue(this.docketDetail.vendorType);
+    if (this.docketDetail.vendorType === 'Market') {
+      this.consignmentTableForm.controls['vendorName'].setValue(this.docketDetail.vendorName);
+      this.vendorFieldChanged();
+    }
+    else {
+      const vendorName = this.vendorDetail.find((x) => x.name == this.vendorDetail.vendorName);
+      this.consignmentTableForm.controls['vendorName'].setValue(vendorName);
+    }
+
+    this.consignmentTableForm.controls['prqNo'].setValue(prqNo);
+    this.consignmentTableForm.controls['consignorName'].setValue(consignorName);
+    this.consignmentTableForm.controls['consigneeName'].setValue(consigneeName);
+    this.consignmentTableForm.controls['billingParty'].setValue(billingParty);
+    this.consignmentTableForm.controls['containerSize'].setValue(containerTypeList);
+    this.consignmentTableForm.controls['payType'].setValue(this.docketDetail.payType);
+    this.consignmentTableForm.controls['transMode'].setValue(this.docketDetail.transMode);
+    this.FreightTableForm.controls['freightRatetype'].setValue(this.docketDetail.freightRatetype);
+    this.bindTableData()
+  }
+
+  bindTableData() {
+
+    if (this.docketDetail.invoiceDetails.length > 0) {
+      this.tableLoadIn = true
+      this.loadIn = true;
+      const invoiceDetail = this.docketDetail.invoiceDetails.map((x, index) => {
+        if (x) {
+          // You can use 'x' and 'index' here
+          x.id = index + 1
+          x.actions = ['Edit', 'Remove']
+          return x;
+        }
+        return x; // Return the original element if no modification is needed
+      });
+      this.invoiceData = invoiceDetail
+      this.tableLoadIn = false
+      this.loadIn = false;
+    }
+    if (this.docketDetail.containerDetail.length > 0) {
+      this.tableLoad = true;
+      this.isLoad = true;
+      const containerDetail = this.docketDetail.containerDetail.map((x, index) => {
+        if (x) {
+          // Modify 'x' if needed
+          // For example, you can add the index to the element
+          x.id = index + 1;
+          x.actions = ['Edit', 'Remove']
+          return x;
+        }
+        return x; // Return the original element if no modification is needed
+      });
+      this.tableData = containerDetail
+      this.tableLoad = false;
+      this.isLoad = false;
+
+    }
+  }
+  /*region Save*/
+
+  async save() {
+    // Remove all form errors
+    const tabcontrols = this.consignmentTableForm;
+    clearValidatorsAndValidate(tabcontrols);
+    const contractcontrols = this.consignmentTableForm;
+    clearValidatorsAndValidate(contractcontrols);
+    /*End*/
+    const vendorType = this.consignmentTableForm.value.vendorType;
+    const vendorName = this.consignmentTableForm.value.vendorName;
+    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
+    const controlNames = ["containerSize", "transMode", "payType", "vendorType"];
+    controlNames.forEach((controlName) => {
+      if (Array.isArray(this.consignmentTableForm.value[controlName])) {
+        this.consignmentTableForm.controls[controlName].setValue("");
+      }
+    });
+    const fieldsToRemove = ['id', 'actions', 'invoice'];
+    const invoiceList = removeFieldsFromArray(this.invoiceData, fieldsToRemove);
+    const containerlist = removeFieldsFromArray(this.tableData, fieldsToRemove);
+    let invoiceDetails = {
+      invoiceDetails: invoiceList,
+    };
+    let containerDetail = {
+      containerDetail: containerlist,
+    };
+    const controltabNames = [
+      "containerCapacity",
+      "containerSize1",
+      "containerSize2",
+      "containerType",
+    ];
+
+    controltabNames.forEach((controlName) => {
+      if (Array.isArray(this.consignmentTableForm.value[controlName])) {
+        this.consignmentTableForm.controls[controlName].setValue("");
+      }
+    });
+    this.consignmentTableForm.controls["fromCity"].setValue(
+      this.consignmentTableForm.value.fromCity?.name || ""
+    );
+    this.consignmentTableForm.controls["containerSize"].setValue(
+      this.consignmentTableForm.value.containerSize?.name || ""
+    );
+
+    this.consignmentTableForm.controls["vendorName"].setValue(
+      vendorType === "Market" ? vendorName : vendorName?.name || ""
+    );
+
+    this.consignmentTableForm.controls["toCity"].setValue(
+      this.consignmentTableForm.value.toCity?.name || ""
+    );
+    this.consignmentTableForm.controls["billingParty"].setValue(
+      this.consignmentTableForm.value?.billingParty.name || ""
+    );
+    this.consignmentTableForm.controls["consignorName"].setValue(
+      this.consignmentTableForm.value?.consignorName.name || ""
+    );
+    this.consignmentTableForm.controls["consigneeName"].setValue(
+      this.consignmentTableForm.value?.consigneeName.name || ""
+    );
+    this.consignmentTableForm.controls["prqNo"].setValue(
+      this.consignmentTableForm.value?.prqNo.value || ""
+    );
+    if (!this.isUpdate) {
+      const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
+      const paddedNumber = dynamicNumber.toString().padStart(4, "0");
+      const dockNo = `CN${dynamicValue}${paddedNumber}`;
+      this.consignmentTableForm.controls["docketNumber"].setValue(dockNo);
+      let id = {
+        _id: dockNo,
+        isComplete: 1,
+        unloading: 0,
+        lsNo: "",
+        mfNo: "",
+        entryBy: this.userName,
+        entryDate: new Date().toISOString(),
+        unloadloc: ""
+      };
+      let docketDetails = {
+        ...this.consignmentTableForm.value,
+        ...this.FreightTableForm.value,
+        ...invoiceDetails,
+        ...containerDetail,
+        ...id,
+      };
+      let reqBody = {
+        companyCode: this.companyCode,
+        collectionName: "docket_temp",
+        data: docketDetails,
+      };
+      if (this.prqFlag) {
+        const prqData = {
+          prqId: this.consignmentTableForm.value?.prqNo || "",
+          dktNo: this.consignmentTableForm.controls["docketNumber"].value
+
+        }
+        await updatePrq(this.operationService, prqData, "3")
+      }
+      this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
+        next: (res: any) => {
+          Swal.fire({
+            icon: "success",
+            title: "Booked Successfully",
+            text: "DocketNo: " + this.consignmentTableForm.controls["docketNumber"].value,
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirect to the desired page after the success message is confirmed.
+              this._NavigationService.navigateTotab(
+                'PRQ',
+                "dashboard/GlobeDashboardPage"
+              );
+            }
+          });
+        },
+      });
+    } else {
+      
+      let docketDetails = {
+        ...this.consignmentTableForm.value,
+        ...this.FreightTableForm.value,
+        ...invoiceDetails,
+        ...containerDetail,
+      };
+      let reqBody = {
+        companyCode: this.companyCode,
+        collectionName: "docket_temp",
+        filter: { docketNumber: this.consignmentTableForm.controls["docketNumber"].value },
+        update: docketDetails,
+      };
+      const res = await this.operationService.operationMongoPut("generic/update", reqBody).toPromise();
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "Docket Update Successfully",
+          text: "DocketNo: " + this.consignmentTableForm.controls["docketNumber"].value,
+          showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Redirect to the desired page after the success message is confirmed.
+            this._NavigationService.navigateTotab(
+              'PRQ',
+              "dashboard/GlobeDashboardPage"
+            );
+          }
+        });
+      }
+    }
+  }
+  /*End Save*/
 }

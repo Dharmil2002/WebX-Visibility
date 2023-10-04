@@ -475,7 +475,7 @@ export class customerControl {
           },
         ],
         functions: {
-          onChange: "setGSTState",
+          onChange: "ValidGSTNumber",
         },
       },
       {

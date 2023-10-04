@@ -695,6 +695,29 @@ export class CustomerMasterAddComponent implements OnInit {
       error: (err) => {},
     });
   }
+
+  async ValidGSTNumber(){
+    var isGST = false
+    for (let index = 0; index < this.tableData.length; index++) {
+      const element = this.tableData[index];
+      if(element.gstNo == this.GSTcustomerTableForm.value.gstNo){
+        isGST = true
+        this.GSTcustomerTableForm.controls["gstNo"].setValue("")
+        Swal.fire({
+          title: `GST No. already exists! Please try with another !`,
+          toast: true,
+          icon: "error",
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: "OK"
+        })
+      }
+    }
+    if(this.GSTcustomerTableForm.value.gstNo != ""){
+      this.setGSTState()
+    }
+  }
   // ------------------------------------------------------#endregion😃----------------------------------------------
 
   // ******************************************************/Save Edit Remove And Set Function/**********************************************
@@ -796,46 +819,30 @@ export class CustomerMasterAddComponent implements OnInit {
     }
   }
 
-  ValidAndAddEditData() {
-    Swal.fire({
-      title: `<h5> are you sure you want to ${
-        this.GstTableEdit ? "edit" : "add"
-      } data ? </h5>`,
-      toast: true,
-      icon: "success",
-      showCloseButton: false,
-      showCancelButton: true,
-      showConfirmButton: true,
-      confirmButtonText: "SUBMIT",
-    }).then((res) => {
-      if (res.isConfirmed) {
-        this.AddRowData();
-      }
-    });
-  }
+  // ValidAndAddEditData() {
+  //   Swal.fire({
+  //     title: `<h5> are you sure you want to ${
+  //       this.GstTableEdit ? "edit" : "add"
+  //     } data ? </h5>`,
+  //     toast: true,
+  //     icon: "success",
+  //     showCloseButton: false,
+  //     showCancelButton: true,
+  //     showConfirmButton: true,
+  //     confirmButtonText: "SUBMIT",
+  //   }).then((res) => {
+  //     if (res.isConfirmed) {
+  //       this.AddRowData();
+  //     }
+  //   });
+  // }
 
   async AddRowData() {
     this.tableLode = false;
-    if (this.GstTableEdit) {
-      var index = this.tableData.indexOf(this.GstTableEditData);
-      if (index !== -1) {
-        const Body = {
-          Srno: this.GstTableEditData.Srno,
-          gstAddres: this.GSTcustomerTableForm.value.gstAddres,
-          gstCity: this.GSTcustomerTableForm.value.gstCity,
-          gstNo: this.GSTcustomerTableForm.value.gstNo,
-          gstPinCode: this.GSTcustomerTableForm.value.gstPinCode.name,
-          gstState: this.GSTcustomerTableForm.value.gstState,
-          actions: ["Edit", "Remove"],
-        };
-        this.tableData[index] = Body;
-      }
-      this.GstTableEdit = false;
-    } else {
-      const Index =
-        this.tableData.length == 0 ? 0 : this.tableData.slice(-1)[0].Srno;
+    const Index =this.GstTableEdit?this.GstTableEditData.Srno:
+        this.tableData.length == 0 ? 1 : this.tableData.slice(-1)[0].Srno + 1;
       const Body = {
-        Srno: parseInt(Index) + 1,
+        Srno: parseInt(Index),
         gstAddres: this.GSTcustomerTableForm.value.gstAddres,
         gstCity: this.GSTcustomerTableForm.value.gstCity,
         gstNo: this.GSTcustomerTableForm.value.gstNo,
@@ -844,23 +851,20 @@ export class CustomerMasterAddComponent implements OnInit {
         actions: ["Edit", "Remove"],
       };
       this.tableData.push(Body);
-    }
     // Create a promise that resolves after the specified delay
-    this.isGstForm = false;
     const delayDuration = 1000;
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await delay(delayDuration);
-    await this.addRemoveGSTValue(null);
-    this.isGstForm = true;
+    await this.addRemoveGSTValue(null , 'add');
     this.tableLode = true;
   }
 
-  addRemoveGSTValue(data) {
-    if (this.GstTableEdit) {
+  addRemoveGSTValue(data , type) {
+    if (type == 'edit') {
       const GstPin = this.pinCodeResData.find((x) => x.PIN == data?.gstPinCode);
       var SElectValue = {
-        name: `${GstPin.PIN}`,
-        value: GstPin.PIN,
+        name: `${GstPin?.PIN}`,
+        value: GstPin?.PIN,
       };
     }
     this.GSTcustomerTableForm.controls["gstNo"].setValue(
@@ -885,12 +889,19 @@ export class CustomerMasterAddComponent implements OnInit {
   }
 
   async handleMenuItemClick(data) {
+    this.tableLode = false;
     if (data.label.label == "Edit") {
-      this.GstTableEdit = true;
+      this.GstTableEdit=true;
       this.GstTableEditData = data.data;
-      this.addRemoveGSTValue(data.data);
+      const index = this.tableData.indexOf(data.data);
+      if (index > -1) {
+        this.tableData.splice(index, 1); // 2nd parameter means remove one item only
+      }
+      this.addRemoveGSTValue(data.data , 'edit');
+      const delayDuration = 1000;
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      await delay(delayDuration);
     } else {
-      this.tableLode = false;
       const index = this.tableData.indexOf(data.data);
       if (index > -1) {
         this.tableData.splice(index, 1); // 2nd parameter means remove one item only
@@ -898,8 +909,8 @@ export class CustomerMasterAddComponent implements OnInit {
       const delayDuration = 1000;
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       await delay(delayDuration);
-      this.tableLode = true;
     }
+    this.tableLode = true;
   }
 
   //#endregion

@@ -777,13 +777,10 @@ export class CustomerMasterAddComponent implements OnInit {
           );
           if (res.success) {
             Swal.fire({
-              title: `Resource updated successfully`,
-              toast: true,
               icon: "success",
-              showCloseButton: false,
-              showCancelButton: false,
+              title: "Successful",
+              text: res.message,
               showConfirmButton: true,
-              confirmButtonText: "OK",
             });
           }
           //

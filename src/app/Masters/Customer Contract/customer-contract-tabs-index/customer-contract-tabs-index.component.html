@@ -1,0 +1,33 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12">
+                <div class="card">
+                    <mat-tab-group [(selectedIndex)]="selectedTabIndex" #tabGroup>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <mat-icon class="example-tab-icon msr-2">info</mat-icon>
+                                Basic Information
+                            </ng-template>
+                            <app-basic-information *ngIf="tabGroup.selectedIndex== 0"
+                                [data]="data"></app-basic-information>
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <mat-icon class="example-tab-icon msr-2">create</mat-icon>
+                                Service Selection
+                            </ng-template>
+                            <app-service-selection *ngIf="tabGroup.selectedIndex== 1"
+                                (showcity)="onValueEmitted($event)" [data]="data"></app-service-selection>
+                        </mat-tab>
+                    </mat-tab-group>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

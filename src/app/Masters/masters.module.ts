@@ -120,6 +120,11 @@ import { TripLaneBasedComponent } from './Vendor Contract/vendor-tabs/trip-lane-
 import { SpecialChargesComponent } from './Vendor Contract/vendor-tabs/special-charges/special-charges.component';
 import { PinCodeService } from '../Utility/module/masters/pincode/pincode.service';
 import { StateService } from '../Utility/module/masters/state/state.service';
+import { CustomerQueryPageComponent } from './Customer Contract/customer-query-page/customer-query-page.component';
+import { CustomerContractListComponent } from './Customer Contract/customer-contract-list/customer-contract-list.component';
+import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
+import { CustomerContractBasicInformationComponent } from './Customer Contract/CustomerContractTabs/customer-contract-basic-information/customer-contract-basic-information.component';
+import { CustomerContractServiceSelectionComponent } from './Customer Contract/CustomerContractTabs/customer-contract-service-selection/customer-contract-service-selection.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -245,7 +250,12 @@ import { StateService } from '../Utility/module/masters/state/state.service';
    AddAdditionalDeliveryChargesComponent,
    AddWaitingChargesComponent,
    TripLaneBasedComponent,
-   SpecialChargesComponent
+   SpecialChargesComponent,
+   CustomerQueryPageComponent,
+   CustomerContractListComponent,
+   CustomerContractTabsIndexComponent,
+   CustomerContractBasicInformationComponent,
+   CustomerContractServiceSelectionComponent
 
   ],
 

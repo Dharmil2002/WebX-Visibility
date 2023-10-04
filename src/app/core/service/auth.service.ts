@@ -12,7 +12,7 @@ import { Injectable } from "@angular/core";
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { User } from "../models/user";
 import { environment } from "src/environments/environment";
-import { map, share} from "rxjs/operators";
+import { map, share } from "rxjs/operators";
 import { APICacheService } from "./API-cache.service";
 import { StorageService } from "./storage.service";
 
@@ -66,30 +66,30 @@ export class AuthService {
         UserRequest
       )
       .pipe(
-        map(async (user:any) => {
+        map(async (user: any) => {
           if (user.tokens) {
 
             let userdetails = this._jwt.decodeToken(user.tokens.access.token);
             this.storageService.setItem("currentUser", JSON.stringify(user));
             this.storageService.setItem("UserName", user.usr.name);
-            this.storageService.setItem("Branch",user.usr.multiLocation[0]);
-            this.storageService.setItem("companyCode",user.usr.companyCode);
-            this.storageService.setItem("Mode","Export");
+            this.storageService.setItem("Branch", user.usr.multiLocation[0]);
+            this.storageService.setItem("companyCode", user.usr.companyCode);
+            this.storageService.setItem("Mode", "Export");
             //localStorage.setItem("company_Name", "Velocity");
             this.storageService.setItem("CurrentBranchCode", user.usr.multiLocation[0]);
             this.storageService.setItem("userLocations", user.usr.multiLocation);
-            this.storageService.setItem("token",user.tokens.access.token);
-            this.storageService.setItem("refreshToken",user.tokens.refresh.token);
+            this.storageService.setItem("token", user.tokens.access.token);
+            this.storageService.setItem("refreshToken", user.tokens.refresh.token);
             this.storageService.setItem("role", user.usr.role);
-            localStorage.setItem("Mode","Export");
-            localStorage.setItem("companyCode",user.usr.companyCode);
+            localStorage.setItem("Mode", "Export");
+            localStorage.setItem("companyCode", user.usr.companyCode);
             this.currentUserSubject.next(user);
             return user;
           }
         })
       );
   }
- 
+
   refreshtoken() {
     let request = {
       "token": this.storageService.getItem('token'),
@@ -115,13 +115,8 @@ export class AuthService {
       );
   }
 
-  
-  GetConnectionInfo() {
-    return this.http.post(
-      environment.SignalRAPIGetway + "AlertSignalRInfo",
-      ""
-    );
-  }
+
+
 
   logout() {
     // remove user from local storage to log user out
@@ -129,5 +124,5 @@ export class AuthService {
     this.currentUserSubject.next(null);
     return of({ success: false });
   }
- 
+
 }

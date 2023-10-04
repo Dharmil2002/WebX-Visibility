@@ -40,6 +40,33 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { CustomHttpInterceptor } from "./core/interceptor/errorhandling.interceptor";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatMenuModule } from "@angular/material/menu";
+import {
+  BrowserCacheLocation,
+  IPublicClientApplication,
+  InteractionType,
+  PublicClientApplication,
+} from '@azure/msal-browser';
+import {
+  MSAL_GUARD_CONFIG,
+  MSAL_INSTANCE,
+  MsalBroadcastService,
+  MsalGuard,
+  MsalGuardConfiguration,
+  MsalRedirectComponent,
+  MsalService,
+  MsalModule
+} from '@azure/msal-angular';
+import { msalConfig } from "./core/service/msal-config/msal-config";
+
+
+export function MSALInstanceFactory(): IPublicClientApplication {
+  return new PublicClientApplication(msalConfig);
+}
+export function MSALGuardConfigFactory(): MsalGuardConfiguration {
+  return {
+    interactionType: InteractionType.Redirect,
+  };
+}
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -60,7 +87,7 @@ export function createTranslateLoader(http: HttpClient): any {
     AuthLayoutComponent,
     MainLayoutComponent,
     DashboardLayoutComponent
-  
+
   ],
   imports: [
     BrowserModule,
@@ -70,7 +97,7 @@ export function createTranslateLoader(http: HttpClient): any {
     HttpClientModule,
     PerfectScrollbarModule,
     NgxDaterangepickerMd.forRoot(),
-    NgxSpinnerModule,MatDialogModule,
+    NgxSpinnerModule, MatDialogModule,
     ClickOutsideModule,
     MatMenuModule,
     TranslateModule.forRoot({
@@ -92,10 +119,11 @@ export function createTranslateLoader(http: HttpClient): any {
         disallowedRoutes: [environment.AuthAPIGetway + "RefreshToken"],
       },
     }),
+    MsalModule
   ],
 
   providers: [
-    { provide: LocationStrategy, useClass: HashLocationStrategy },
+    //{ provide: LocationStrategy, useClass: HashLocationStrategy },
     {
       provide: PERFECT_SCROLLBAR_CONFIG,
       useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
@@ -108,8 +136,19 @@ export function createTranslateLoader(http: HttpClient): any {
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     fakeBackendProvider,
-    WINDOW_PROVIDERS
+    WINDOW_PROVIDERS,
+    {
+      provide: MSAL_INSTANCE,
+      useFactory: MSALInstanceFactory,
+    },
+    {
+      provide: MSAL_GUARD_CONFIG,
+      useFactory: MSALGuardConfigFactory,
+    },
+    MsalService,
+    MsalGuard,
+    MsalBroadcastService,
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

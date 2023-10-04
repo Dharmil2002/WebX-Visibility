@@ -31,7 +31,7 @@ export class AppComponent {
       if (routerEvent instanceof NavigationStart) {
         this.spinner.show();
         location.onPopState(() => {
-          window.location.reload();
+          // window.location.reload();
         });
         this.currentUrl = routerEvent.url.substring(
           routerEvent.url.lastIndexOf("/") + 1
@@ -44,33 +44,23 @@ export class AppComponent {
     });
   }
   ngOnInit(): void {
-    this.appservice.GetConnectionInfo().subscribe((res: any) => {
-      let accessToken = res.accessToken;
-      const options = {
-        accessTokenFactory: async function () {
-          if (accessToken) {
-            const _accessToken = accessToken;
-            return _accessToken;
-          }
-        },
-      };
-    });
+
   }
-    // // Listen for page reload attempts
-    // @HostListener('window:beforeunload', ['$event'])
-    // unloadNotification($event: any): void {
-    //   this.dowloadData();
-    //   // Your custom message
-    //   const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
-    //   // Set the custom message
-    //   $event.returnValue = confirmationMessage;
-  
-    // }
-    // dowloadData() {
-    //   const failedRequests = this.failedApiService.getFailedRequests();
-    //   if (failedRequests.length > 0) {
-    //     this.retryAndDownloadService.downloadFailedRequests();
-    //   }
-  
-    // }
+  // // Listen for page reload attempts
+  // @HostListener('window:beforeunload', ['$event'])
+  // unloadNotification($event: any): void {
+  //   this.dowloadData();
+  //   // Your custom message
+  //   const confirmationMessage = 'Are you sure you want to leave this page? Your changes may not be saved.';
+  //   // Set the custom message
+  //   $event.returnValue = confirmationMessage;
+
+  // }
+  // dowloadData() {
+  //   const failedRequests = this.failedApiService.getFailedRequests();
+  //   if (failedRequests.length > 0) {
+  //     this.retryAndDownloadService.downloadFailedRequests();
+  //   }
+
+  // }
 }

@@ -444,6 +444,11 @@
           "title": "FleetMaster/FleetmasterList",
           "tag": ["FleetMaster", "FleetmasterList"],
           "router": "Masters/FleetMaster/FleetMasterList"
+        },
+        {
+          "title": "ProductMaster/ListProduct",
+          "tag": ["ProductMaster", "ListProduct"],
+          "router": "Masters/ProductMaster/ListProduct"
         }
 
       ]

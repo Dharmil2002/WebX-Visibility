@@ -165,7 +165,9 @@ export class customerControl {
             message: "Please enter a valid PAN NO (e.g., ABCDE1234F)",
           },
         ],
-        functions: {},
+        functions: {
+          onChange: "CheckPANNo",
+        },
       },
       // {
       //   name: "uplodPANcard",
@@ -215,7 +217,9 @@ export class customerControl {
             pattern: "^[a-zA-Z0-9]{4,100}$",
           },
         ],
-        functions: {},
+        functions: {
+          onChange: "CheckCINnumber",
+        },
       },
 
       {
@@ -336,7 +340,9 @@ export class customerControl {
             pattern: "^[a-zA-Z0-9]{4,100}$",
           },
         ],
-        functions: {},
+        functions: {
+          onChange: "CheckmsmeNumber",
+        },
       },
       // {
       //   name: "MSMEscan",
@@ -377,40 +383,40 @@ export class customerControl {
         disable: false,
       },
 
-      {
-        name: "isPANregistration",
-        label: "PAN registration",
-        placeholder: "",
-        type: "toggle",
-        value: isUpdate
-          ? customerTable.isPANregistration == "Y"
-            ? true
-            : false
-          : false,
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
+      // {
+      //   name: "isPANregistration",
+      //   label: "PAN registration",
+      //   placeholder: "",
+      //   type: "toggle",
+      //   value: isUpdate
+      //     ? customerTable.isPANregistration == "Y"
+      //       ? true
+      //       : false
+      //     : false,
+      //   generatecontrol: true,
+      //   disable: true,
+      //   Validations: [],
+      // },
 
-      {
-        name: "MSMEregistered",
-        label: "MSME registered",
-        placeholder: "",
-        type: "toggle",
-        value: isUpdate
-          ? customerTable.MSMEregistered == "Y"
-            ? true
-            : false
-          : false,
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "MSME registered is required",
-          },
-        ],
-      },
+      // {
+      //   name: "MSMEregistered",
+      //   label: "MSME registered",
+      //   placeholder: "",
+      //   type: "toggle",
+      //   value: isUpdate
+      //     ? customerTable.MSMEregistered == "Y"
+      //       ? true
+      //       : false
+      //     : false,
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [
+      //     {
+      //       name: "required",
+      //       message: "MSME registered is required",
+      //     },
+      //   ],
+      // },
       {
         name: "BlackListed",
         label: "Black Listed",

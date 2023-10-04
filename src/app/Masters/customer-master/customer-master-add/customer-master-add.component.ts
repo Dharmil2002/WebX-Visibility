@@ -903,4 +903,54 @@ export class CustomerMasterAddComponent implements OnInit {
   }
 
   //#endregion
+
+   //#region to check if a value already exists in vendor list
+   async checkValueExists(fieldName, errorMessage) {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.customerTableForm.controls[fieldName].value;
+
+      // Create a request object with the filter criteria
+      const req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "customer_detail",
+        filter: { [fieldName]: fieldValue },
+      };
+
+      // Send the request to fetch user data
+      const customerList = await this.masterService.masterPost("generic/get", req).toPromise();
+
+      // Check if data exists for the given filter criteria
+      if (customerList.data.length > 0) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          title: `${errorMessage} already exists! Please try with another !`,
+          toast: true,
+          icon: "error",
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: "OK"
+        });
+
+        // Reset the input field
+        this.customerTableForm.controls[fieldName].reset();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+    }
+  }
+
+  // Function to check if ERP Id already exists
+  async CheckPANNo() {
+    await this.checkValueExists("PANnumber", "PAN No");
+  }
+  async CheckCINnumber() {
+    await this.checkValueExists("CINnumber", "CIN number");
+  }
+  async CheckmsmeNumber() {
+    await this.checkValueExists("MSMENumber", "MSME Number");
+  }
+  //#endregion 
 }

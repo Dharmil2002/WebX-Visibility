@@ -32,38 +32,38 @@ export class PinCodeService {
       return null; // Return null to indicate an error occurred
     }
   }
-  
   //#region To filter and set pincode 
-  async validateAndFilterPincode(form, jsondata, pincodeControlName, pincodeStatus) {
-
-    // Prepare the pincodeBody with the companyCode and an empty filter
-    const pincodeBody = {
-      companyCode: this.companyCode,
-      collectionName: "pincode_master",
-      filter: {},
-    };
-
+  async validateAndFilterPincode(form, filterValue, jsondata, pincodeControlName, pincodeStatus) {
     try {
-      // Fetch pincode data from the masterService asynchronously
-      const pincodeResponse = await this.masterService.masterPost("generic/get", pincodeBody).toPromise();
-
-      // Extract the pincodeData from the response
-      const pincodeData = pincodeResponse.data.map((element) => ({
-        name: element.PIN.toString(),
-        value: element.PIN.toString(),
-      }));
-
       const pincodeValue = form.controls[pincodeControlName].value;
 
-      // Check if pincodeValue is a valid number and has at least 3 characters
-      if (!isNaN(pincodeValue) && pincodeValue.length >= 3) {
+      // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+      if (!isNaN(pincodeValue) && pincodeValue.toString().length >= 3) {
+        const filter = typeof filterValue === 'number' ? { ST: filterValue } : {};
+
+        // Prepare the pincodeBody with the companyCode and the determined filter
+        const pincodeBody = {
+          companyCode: this.companyCode,
+          collectionName: "pincode_master",
+          filter,
+        };
+
+        // Fetch pincode data from the masterService asynchronously
+        const pincodeResponse = await this.masterService.masterPost("generic/get", pincodeBody).toPromise();
+
+        // Extract the pincodeData from the response
+        const pincodeData = pincodeResponse.data.map((element) => ({
+          name: element.PIN.toString(),
+          value: element.PIN.toString(),
+        }));
+
         // Find an exact pincode match in the pincodeData array
-        const exactPincodeMatch = pincodeData.find((element) => element.name === pincodeValue);
+        const exactPincodeMatch = pincodeData.find((element) => element.name === pincodeValue.toString());
 
         if (!exactPincodeMatch) {
           // Filter pincodeData for partial matches
           const filteredPincodeData = pincodeData.filter((element) =>
-            element.name.includes(pincodeValue)
+            element.name.includes(pincodeValue.toString())
           );
 
           if (filteredPincodeData.length === 0) {

@@ -260,10 +260,12 @@ export class AddVendorMasterComponent implements OnInit {
   }
   //#region to call pincode
   getPincode() {
-    this.objPinCodeService.validateAndFilterPincode(this.vendorTableForm, this.jsonControlVendorArray, 'vendorPinCode', this.vendorPinCodeStatus);
+    this.objPinCodeService.validateAndFilterPincode(this.vendorTableForm, "", this.jsonControlVendorArray, 'vendorPinCode', this.vendorPinCodeStatus);
   }
-  getGstPincode() {
-    this.objPinCodeService.validateAndFilterPincode(this.otherDetailForm, this.jsonControlOtherArray, 'gstPincode', this.gstPincodeStatus);
+  async getGstPincode() {
+    const stateName = this.otherDetailForm.value.gstState;
+    const stateDataByName = await this.objState.fetchStateByFilterId(stateName, 'STNM'); // for filter by STNM
+    this.objPinCodeService.validateAndFilterPincode(this.otherDetailForm, stateDataByName[0].ST, this.jsonControlOtherArray, 'gstPincode', this.gstPincodeStatus);
   }
   //#endregion
 
@@ -367,14 +369,14 @@ export class AddVendorMasterComponent implements OnInit {
   //#region to Set the vendor's city and state based on the provided PIN code
   async setStateCityData() {
     try {
-      const fetchData = this.pincodeResponse.data.find(item =>
+      let fetchData = this.pincodeResponse.data.find(item =>
         item.PIN == this.vendorTableForm.controls.vendorPinCode.value.value);
 
       // Set the vendor's city
       this.vendorTableForm.controls.vendorCity.setValue(fetchData.CT);
-
+      fetchData.ST = parseInt(fetchData.ST)
       // Fetch and set the state name based on the state code
-      const stateName = await this.objState.fetchStateByFilterId(fetchData.ST);
+      const stateName = await this.objState.fetchStateByFilterId(fetchData.ST, 'ST');
       this.vendorTableForm.controls.vendorState.setValue(stateName[0].STNM);
 
       // Fetch and set the vendor's country based on the state's country code
@@ -392,10 +394,10 @@ export class AddVendorMasterComponent implements OnInit {
   async setState() {
     try {
       const gstNumber = this.otherDetailForm.value.gstNumber;
-      const filterId = gstNumber.substring(0, 2);
-
+      let filterId = gstNumber.substring(0, 2);
+      filterId = parseInt(filterId);
       // Fetch and set the GST state name based on the state code
-      const stateName = await this.objState.fetchStateByFilterId(filterId);
+      const stateName = await this.objState.fetchStateByFilterId(filterId, 'ST');
       this.otherDetailForm.controls.gstState.setValue(stateName[0].STNM);
     } catch (error) {
       console.error('An error occurred while setting the GST state:', error);

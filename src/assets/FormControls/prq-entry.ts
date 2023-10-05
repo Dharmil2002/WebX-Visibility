@@ -3,7 +3,7 @@ import { prqDetail } from 'src/app/core/models/operations/prq/prq';
 /* here i create class for the bind controls in formGrop */
 export class PrqEntryControls {
   private fieldMapping: FormControls[];
-   // Constructor for initializing form controls.
+  // Constructor for initializing form controls.
   constructor(prqDetail: prqDetail, isUpdate) {
     this.fieldMapping = [
       {
@@ -40,8 +40,8 @@ export class PrqEntryControls {
             message: "Choose proper value",
           },
         ],
-        functions:{
-          onOptionSelect:"bilingChanged"
+        functions: {
+          onOptionSelect: "bilingChanged"
         },
         additionalData: {
           showNameAndValue: true,
@@ -64,8 +64,8 @@ export class PrqEntryControls {
             message: "Pickup Date is required",
           },
         ],
-        functions:{
-          onDate:'format'
+        functions: {
+          onDate: 'format'
         },
         additionalData: {
           minDate: isUpdate ? "" : new Date(),
@@ -85,9 +85,9 @@ export class PrqEntryControls {
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        functions:{
-          onSelection:"disableSize"
-      },
+        functions: {
+          onSelection: "disableSize"
+        },
         Validations: [],
         additionalData: {
           showNameAndValue: false,
@@ -116,30 +116,22 @@ export class PrqEntryControls {
         additionalData: {
           showNameAndValue: true,
         },
+        functions: {
+          onOptionSelect: "setContainerSize"
+        },
       },
       {
         name: "containerSize",
-        label: "Container Size",
-        placeholder: "Container Size",
-        type: "dropdown",
+        label: "Container Capacity(Tons)",
+        placeholder: "Container Capacity",
+        type: "text",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
+        disable: true,
+        Validations: [],
       },
       {
         name: "vehicleSize",
@@ -268,7 +260,24 @@ export class PrqEntryControls {
           showNameAndValue: false,
         },
       },
-  
+
+      {
+        name: "prqBranch",
+        label: "PRQ Branch",
+        placeholder: "PRQ Branch",
+        type: "text",
+        value: localStorage.getItem('Branch'),
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+      },
       {
         name: "payType",
         label: "Payment Mode",
@@ -317,25 +326,8 @@ export class PrqEntryControls {
         disable: false,
         Validations: [],
       },
-      {
-        name: "prqBranch",
-        label: "PRQ Branch",
-        placeholder: "PRQ Branch",
-        type: "text",
-        value: localStorage.getItem('Branch'),
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: true,
-        Validations: [
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
-     
-    // Additional hidden or metadata form controls.
+
+      // Additional hidden or metadata form controls.
       {
         name: "_id",
         label: "",

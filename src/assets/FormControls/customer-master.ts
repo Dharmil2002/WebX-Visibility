@@ -80,34 +80,31 @@ export class customerControl {
         },
       },
       {
-        name: "CustomerLocations",
-        label: "Customer Locations",
-        placeholder: "Customer Locations",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
+        name: 'customerLocations',
+        label: 'Customer Locations',
+        placeholder: 'Search and select Customer Locations',
+        type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
         Validations: [
-          {
-            name: "required",
-            message: "Customer Locations is required",
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocomplete",
-            message: "Choose proper value",
-          },
         ],
         additionalData: {
+          isIndeterminate: false,
+          isChecked: false,
+          support: "customerLocationsDrop",
           showNameAndValue: true,
+          Validations: [{
+            name: "",
+            message: ""
+          }]
         },
+        functions: {
+          onToggleAll: "toggleSelectAll",
+        },
+        generatecontrol: true, disable: false
       },
       {
         name: "Customer_Emails",
-        label: "Customer e-mails",
-        placeholder: "Customer e-mails",
+        label: "Customer E-mails",
+        placeholder: "Customer E-mails",
         type: "text",
         value: isUpdate ? customerTable.Customer_Emails : "",
         generatecontrol: true,
@@ -239,7 +236,7 @@ export class customerControl {
             name: "pattern",
             message:
               "Please Enter alphanumeric Registered Address of length 4 to 100",
-            pattern: "^[a-zA-Z0-9]{4,200}$",
+            pattern: "^[a-zA-Z0-9,-/ ]{4,200}$",
           },
         ],
         functions: {},
@@ -451,6 +448,15 @@ export class customerControl {
           },
         ],
       },
+      {
+        name: 'customerLocationsDrop',
+        label: 'Customer Locations',
+        placeholder: 'Select CustomerLocations',
+        type: '',
+        value: '',
+        Validations: [],
+        generatecontrol: false, disable: false
+      },
     ];
 
     this.GSTKycControlArray = [
@@ -550,6 +556,7 @@ export class customerControl {
         ],
         functions: {},
       },
+      
     ];
   }
 

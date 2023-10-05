@@ -11,7 +11,7 @@ import { Router } from "@angular/router";
 import { customerModel } from "src/app/core/models/Masters/customerMaster";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import { Subject } from "rxjs";
+import { Subject, take, takeUntil } from "rxjs";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
@@ -127,6 +127,7 @@ export class CustomerMasterAddComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
+      
       this.isUpdate = true;
       this.action = "edit";
     } else {
@@ -195,13 +196,12 @@ export class CustomerMasterAddComponent implements OnInit {
   //#endregion
 
   ngOnInit(): void {
-    // this.getCustomerDetails()
     this.bindDropdown();
     this.bindGSTDropdown();
     this.getCustomerGroupDropdown();
-    this.getcustomerLocationDropdown();
     this.getCustomerCategoryDropdown();
     this.getPinCode();
+    this.getDataAndPopulateForm();
   }
 
   bindGSTDropdown() {
@@ -226,11 +226,11 @@ export class CustomerMasterAddComponent implements OnInit {
         this.CustomerCategory = data.name;
         this.CustomerCategoryStatus = data.additionalData.showNameAndValue;
       }
-      if (data.name === "CustomerLocations") {
-        // Set category-related variables
-        this.location = data.name;
-        this.locationStatus = data.additionalData.showNameAndValue;
-      }
+      // if (data.name === "customerLocations") {
+      //   // Set category-related variables
+      //   this.location = data.name;
+      //   this.locationStatus = data.additionalData.showNameAndValue;
+      // }
       if (data.name === "PinCode") {
         // Set category-related variables
         this.PinCode = data.name;
@@ -259,7 +259,7 @@ export class CustomerMasterAddComponent implements OnInit {
           this.getGSTPinCodeDropdown();
         }
       },
-      error: (err) => {},
+      error: (err) => { },
     });
   }
   // ******************************************************/Get ALL Dropdown/**********************************************
@@ -392,44 +392,39 @@ export class CustomerMasterAddComponent implements OnInit {
     }
   }
 
-  getcustomerLocationDropdown() {
-    let req = {
-      companyCode: this.companyCode,
-      filter: {},
-      collectionName: "location_detail",
-    };
-    this.masterService.masterPost("generic/get", req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          const dropdownData = res.data.map((x) => {
-            return {
-              name: x.locName,
-              value: x.locCode,
-            };
-          });
+  async fetchDataAndPopulateForm(collectionName, formControl, dataProperty, nameProperty, showNameAndValue) {
+    
+    try {
+      const reqBody = {
+        "companyCode": this.companyCode,
+        "collectionName": collectionName,
+        "filter": {}
+      };
+      const response = await this.masterService.masterPost("generic/get", reqBody).toPromise()
+      const dataList = response.data.map(x => ({
+        name: x[nameProperty],
+        value: x[dataProperty]
+      }));
 
-          if (this.isUpdate) {
-            res.data.forEach((x) => {
-              if (x.locName == this.customerTable.CustomerLocations) {
-                this.customerTableForm.controls["CustomerLocations"].setValue({
-                  name: x.locName,
-                  value: x.locCode,
-                });
-              }
-            });
-          }
-
-          this.filter.Filter(
-            this.jsonControlCustomerArray,
-            this.customerTableForm,
-            dropdownData,
-            this.location,
-            this.locationStatus
-          );
+      if (this.isUpdate) {
+        const selectedData = dataList.find(x => x.name === this.customerTable[formControl]);
+        this.customerTableForm.controls[formControl].setValue(selectedData);
+        if (formControl == 'customerLocations') {
+          const selectedData = dataList.filter(x => this.customerTable[formControl].includes(x.name));
+          this.customerTableForm.controls['customerLocationsDrop'].setValue(selectedData);
         }
-      },
-    });
+      }
+      // Call the Filter function with the appropriate arguments
+      this.filter.Filter(this.jsonControlCustomerArray, this.customerTableForm, dataList, formControl, showNameAndValue);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }
+  
+  async getDataAndPopulateForm() {
+    await this.fetchDataAndPopulateForm("location_detail", "customerLocations", "locCode", "locName", true);
+  }
+  
 
   selectedFileMSMEScan(data) {
     let fileList: FileList = data.eventArgs;
@@ -594,7 +589,7 @@ export class CustomerMasterAddComponent implements OnInit {
             if (
               !this.isUpdate &&
               this.customerTableForm.value.customerName !=
-                this.customerTable.customerName
+              this.customerTable.customerName
             ) {
               Swal.fire({
                 title: "CustomerName Already exist! Please try with another",
@@ -613,7 +608,7 @@ export class CustomerMasterAddComponent implements OnInit {
           }
         }
       },
-      error: (err) => {},
+      error: (err) => { },
     });
   }
 
@@ -639,14 +634,13 @@ export class CustomerMasterAddComponent implements OnInit {
     if (invalidEmails.length > 0) {
       let EmailString = "";
       invalidEmails.forEach((x) => {
-        EmailString = `${
-          EmailString != ""
-            ? EmailString + "<li style='margin:0px;'>" + x + "<li>"
-            : "<li style='margin:0px;'>" + x + "<li>"
-        }`;
+        EmailString = `${EmailString != ""
+          ? EmailString + "<li style='margin:0px;'>" + x + "<li>"
+          : "<li style='margin:0px;'>" + x + "<li>"
+          }`;
       });
       Swal.fire({
-        title: `<b style="color: rgb(0, 141, 141);">This Emails is not valid:</b><ul style="margin-left: 10px;color: gray; list-style: disc;">${EmailString}</ul> <b style="color: red;">! Please try with another</b>`,
+        title: "Email ID is not valid! Please try with another",
         toast: true,
         icon: "error",
         showCloseButton: false,
@@ -692,15 +686,15 @@ export class CustomerMasterAddComponent implements OnInit {
           }
         }
       },
-      error: (err) => {},
+      error: (err) => { },
     });
   }
 
-  async ValidGSTNumber(){
+  async ValidGSTNumber() {
     var isGST = false
     for (let index = 0; index < this.tableData.length; index++) {
       const element = this.tableData[index];
-      if(element.gstNo == this.GSTcustomerTableForm.value.gstNo){
+      if (element.gstNo == this.GSTcustomerTableForm.value.gstNo) {
         isGST = true
         this.GSTcustomerTableForm.controls["gstNo"].setValue("")
         Swal.fire({
@@ -714,7 +708,7 @@ export class CustomerMasterAddComponent implements OnInit {
         })
       }
     }
-    if(this.GSTcustomerTableForm.value.gstNo != ""){
+    if (this.GSTcustomerTableForm.value.gstNo != "") {
       this.setGSTState()
     }
   }
@@ -722,10 +716,15 @@ export class CustomerMasterAddComponent implements OnInit {
 
   // ******************************************************/Save Edit Remove And Set Function/**********************************************
   async save() {
+    const controlDetail = this.customerTableForm.value.customerLocationsDrop;
+    const customerLocationsDrop = controlDetail ? controlDetail.map((item: any) => item.name) : "";
+    this.customerTableForm.controls["customerLocations"].setValue(customerLocationsDrop);
+
     const Body = {
       ...this.customerTableForm.value,
       CustomerCategory: this.customerTableForm.value.CustomerCategory.name,
-      CustomerLocations: this.customerTableForm.value.CustomerLocations.name,
+      customerLocations: customerLocationsDrop,
+      // CustomerLocations: this.customerTableForm.value.CustomerLocations.name,
       PinCode: this.customerTableForm.value.PinCode.name,
       customerGroup: this.customerTableForm.value.customerGroup.name,
       activeFlag: this.customerTableForm.value.activeFlag ? "Y" : "N",
@@ -734,18 +733,17 @@ export class CustomerMasterAddComponent implements OnInit {
       isPANregistration: this.customerTableForm.value.isPANregistration
         ? "Y"
         : "N",
-      _id: `${
-        this.customerTableForm.value.customerGroup.value
-      }-${this.customerTableForm.value.customerName.substring(
-        0,
-        4
-      )}-${Math.floor(Math.random() * (5000 - 1 + 1) + 1)}`,
+      _id: `${this.customerTableForm.value.customerGroup.value
+        }-${this.customerTableForm.value.customerName.substring(
+          0,
+          4
+        )}-${Math.floor(Math.random() * (5000 - 1 + 1) + 1)}`,
       customerCode: this.isUpdate
         ? this.customerTable.customerCode
         : `${this.customerTableForm.value.customerName
-            .trim()
-            .split(" ")
-            .join("")}${Math.floor(Math.random() * (100 - 1 + 1) + 1)}`,
+          .trim()
+          .split(" ")
+          .join("")}${Math.floor(Math.random() * (100 - 1 + 1) + 1)}`,
       companyCode: localStorage.getItem("companyCode"),
       updatedDate: new Date(),
       updatedBy: localStorage.getItem("UserName"),
@@ -760,6 +758,7 @@ export class CustomerMasterAddComponent implements OnInit {
       }),
     };
 
+    // this.customerTableForm.removeControl("customerLocationsDrop")
     if (this.isUpdate) {
       delete Body._id;
       delete Body.customerCode;
@@ -836,27 +835,27 @@ export class CustomerMasterAddComponent implements OnInit {
 
   async AddRowData() {
     this.tableLode = false;
-    const Index =this.GstTableEdit?this.GstTableEditData.Srno:
-        this.tableData.length == 0 ? 1 : this.tableData.slice(-1)[0].Srno + 1;
-      const Body = {
-        Srno: parseInt(Index),
-        gstAddres: this.GSTcustomerTableForm.value.gstAddres,
-        gstCity: this.GSTcustomerTableForm.value.gstCity,
-        gstNo: this.GSTcustomerTableForm.value.gstNo,
-        gstPinCode: this.GSTcustomerTableForm.value.gstPinCode.name,
-        gstState: this.GSTcustomerTableForm.value.gstState,
-        actions: ["Edit", "Remove"],
-      };
-      this.tableData.push(Body);
+    const Index = this.GstTableEdit ? this.GstTableEditData.Srno :
+      this.tableData.length == 0 ? 1 : this.tableData.slice(-1)[0].Srno + 1;
+    const Body = {
+      Srno: parseInt(Index),
+      gstAddres: this.GSTcustomerTableForm.value.gstAddres,
+      gstCity: this.GSTcustomerTableForm.value.gstCity,
+      gstNo: this.GSTcustomerTableForm.value.gstNo,
+      gstPinCode: this.GSTcustomerTableForm.value.gstPinCode.name,
+      gstState: this.GSTcustomerTableForm.value.gstState,
+      actions: ["Edit", "Remove"],
+    };
+    this.tableData.push(Body);
     // Create a promise that resolves after the specified delay
     const delayDuration = 1000;
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await delay(delayDuration);
-    await this.addRemoveGSTValue(null , 'add');
+    await this.addRemoveGSTValue(null, 'add');
     this.tableLode = true;
   }
 
-  addRemoveGSTValue(data , type) {
+  addRemoveGSTValue(data, type) {
     if (type == 'edit') {
       const GstPin = this.pinCodeResData.find((x) => x.PIN == data?.gstPinCode);
       var SElectValue = {
@@ -888,13 +887,13 @@ export class CustomerMasterAddComponent implements OnInit {
   async handleMenuItemClick(data) {
     this.tableLode = false;
     if (data.label.label == "Edit") {
-      this.GstTableEdit=true;
+      this.GstTableEdit = true;
       this.GstTableEditData = data.data;
       const index = this.tableData.indexOf(data.data);
       if (index > -1) {
         this.tableData.splice(index, 1); // 2nd parameter means remove one item only
       }
-      this.addRemoveGSTValue(data.data , 'edit');
+      this.addRemoveGSTValue(data.data, 'edit');
       const delayDuration = 1000;
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       await delay(delayDuration);
@@ -912,8 +911,8 @@ export class CustomerMasterAddComponent implements OnInit {
 
   //#endregion
 
-   //#region to check if a value already exists in vendor list
-   async checkValueExists(fieldName, errorMessage) {
+  //#region to check if a value already exists in vendor list
+  async checkValueExists(fieldName, errorMessage) {
     try {
       // Get the field value from the form controls
       const fieldValue = this.customerTableForm.controls[fieldName].value;
@@ -961,4 +960,24 @@ export class CustomerMasterAddComponent implements OnInit {
     await this.checkValueExists("MSMENumber", "MSME Number");
   }
   //#endregion
+
+  //#region 
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+
+    const index = this.jsonControlCustomerArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlCustomerArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.customerTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
+  //#endregion
+
 }

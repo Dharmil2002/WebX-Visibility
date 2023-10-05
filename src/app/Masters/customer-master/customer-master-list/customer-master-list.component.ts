@@ -14,12 +14,14 @@ export class CustomerMasterListComponent implements OnInit {
   linkArray = []
   columnHeader = {
     "srNo": "Sr No",
+    "updatedDate": "Created Date",
     "customerGroup": "Customer Group",
     "customerCode": "Customer Code",
     "customerName": "Customer Name",
     "activeFlag": "Active Status",
     "actions": "Actions"
   };
+
   headerForCsv = {
     "srNo": "Sr No",
     "customerGroup": "Customer Group",
@@ -27,6 +29,7 @@ export class CustomerMasterListComponent implements OnInit {
     "customerName": "Customer Name",
     "activeFlag": "Active Status",
   }
+
   breadScrums = [
     {
       title: "Customer Master",
@@ -34,43 +37,88 @@ export class CustomerMasterListComponent implements OnInit {
       active: "Customer Master",
     },
   ];
+
   dynamicControls = {
     add: true,
     edit: true,
     csv: false
   }
+
   addAndEditPath: string;
   tableData: any;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
   }
+
   ngOnInit(): void {
     this.getCustomerDetails();
   }
+
+  // getCustomerDetails() {
+  //   let req = {
+  //     "companyCode": this.companyCode,
+  //     "filter": {},
+  //     "collectionName": "customer_detail"
+  //   }
+  //   this.masterService.masterPost('generic/get', req).subscribe({
+  //     next: (res: any) => {
+  //       if (res) {
+  //         debugger
+  //         // Generate srno for each object in the array
+  //         const dataWithSrno = res.data.map((obj, index) => {
+  //           return {
+  //             ...obj,
+  //             srNo: index + 1,
+  //             activeFlag:obj.activeFlag == 'Y'?true:false
+  //           };
+  //         });
+  //         this.csv = dataWithSrno
+  //         this.tableData = dataWithSrno;
+  //         this.tableLoad = false;
+  //       }
+  //     }
+  //   })
+  // }
+
   getCustomerDetails() {
     let req = {
       "companyCode": this.companyCode,
       "filter": {},
       "collectionName": "customer_detail"
-    }
+    };
+
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
+
+          // Sort the data based on updatedDate in descending order
+          const sortedData = res.data.sort((a, b) => {
+            return new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime();
+          });
+
           // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) => {
+          const dataWithSrno = sortedData.map((obj, index) => {
             return {
               ...obj,
               srNo: index + 1,
-              activeFlag:obj.activeFlag == 'Y'?true:false
+              activeFlag: obj.activeFlag === 'Y',
             };
           });
-          this.csv = dataWithSrno
+
+          // Extract the updatedDate from the first element (latest record)
+          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].updatedDate : null;
+
+          // Use latestUpdatedDate as needed
+          console.log('Latest Updated Date:', latestUpdatedDate);
+
+          this.csv = dataWithSrno;
           this.tableData = dataWithSrno;
           this.tableLoad = false;
         }
       }
-    })
+    });
   }
+
   IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls

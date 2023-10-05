@@ -7,7 +7,7 @@ export class PrqEntryControls {
   constructor(prqDetail: prqDetail, isUpdate) {
     this.fieldMapping = [
       {
-        name: "prqId",
+        name: "prqNo",
         label: "Request ID",
         placeholder: "Request ID",
         type: "text",
@@ -329,21 +329,21 @@ export class PrqEntryControls {
 
       // Additional hidden or metadata form controls.
       {
-        name: "_id",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: "",
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
-      {
         name: "status",
         label: "",
         placeholder: "",
         type: "",
         value: "0",
+        Validations: [],
+        generatecontrol: true,
+        disable: false,
+      },
+      {
+        name: "companyCode",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: localStorage.getItem("companyCode"),
         Validations: [],
         generatecontrol: true,
         disable: false,
@@ -364,16 +364,6 @@ export class PrqEntryControls {
         placeholder: "",
         type: "",
         value: new Date(),
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
-      {
-        name: "status",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: "0",
         Validations: [],
         generatecontrol: true,
         disable: false,

@@ -355,16 +355,6 @@ export class LocationControl {
         },
       },
       {
-        name: "activeFlag",
-        label: "Active Flag",
-        placeholder: "",
-        type: "toggle",
-        value: LocationTable.activeFlag,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
-      {
         name: "mappedPincode",
         label: "Mapped Pincode",
         placeholder: "Mapped Pincode",
@@ -387,6 +377,16 @@ export class LocationControl {
         },
         generatecontrol: true,
         disable: false,
+      },
+      {
+        name: "activeFlag",
+        label: "Active Flag",
+        placeholder: "",
+        type: "toggle",
+        value: LocationTable.activeFlag,
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
       },
       {
         name: "Longitude",
@@ -429,7 +429,30 @@ export class LocationControl {
         generatecontrol: false,
         disable: false
 
-    }
+      },
+      {
+        name: 'updateDate',
+        label: ' ',
+        placeholder: ' ',
+        type: 'date',
+        value: new Date(), // Set the value to the current date
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: false,
+        disable: false
+      },
+      {
+        name: "updateBy",
+        label: "Update By",
+        placeholder: "Update By",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
     ])
   }
   getFormControlsLocation() {

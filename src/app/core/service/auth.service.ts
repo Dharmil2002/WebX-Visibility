@@ -104,11 +104,11 @@ export class AuthService {
           connector: () => new ReplaySubject(1),
           resetOnComplete: () => timer(1000),
         }),
-        map((user) => {
-          this.storageService.setItem("token", user.access.token);
-          this.storageService.setItem("refreshToken", user.refresh.token);
-          this.currentUserSubject.next(user);
-          return user;
+        map((res) => {
+          this.storageService.setItem("token", res.access.token);
+          this.storageService.setItem("refreshToken", res.refresh.token);
+          var user = this.storageService.getItem("currentUser");          
+          return res;
         })
       );
   }

@@ -12,10 +12,10 @@ import { customerModel } from "src/app/core/models/Masters/customerMaster";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { Subject } from "rxjs";
-import { columnHeader, staticField } from "./CustomerMasterFunction";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
+import { columnHeader, staticField } from "./customer-utlity";
 
 @Component({
   selector: "app-customer-master-add",
@@ -960,5 +960,5 @@ export class CustomerMasterAddComponent implements OnInit {
   async CheckmsmeNumber() {
     await this.checkValueExists("MSMENumber", "MSME Number");
   }
-  //#endregion 
+  //#endregion
 }

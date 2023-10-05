@@ -122,7 +122,7 @@ export class PrqEntryControls {
       },
       {
         name: "containerSize",
-        label: "Container Capacity",
+        label: "Container Capacity(Tons)",
         placeholder: "Container Capacity",
         type: "text",
         value: "",
@@ -278,24 +278,6 @@ export class PrqEntryControls {
           showNameAndValue: true,
         },
       },
-      // {
-      //   name: '',
-      //   label: '',
-      //   placeholder: '',
-      //   type: '', value: "",
-      //   Validations: [
-      //   ],
-      //   generatecontrol: true, disable: false
-      // },
-      // {
-      //   name: 'hide',
-      //   label: '',
-      //   placeholder: '',
-      //   type: '', value: "",
-      //   Validations: [
-      //   ],
-      //   generatecontrol: false, disable: false
-      // },
       {
         name: "payType",
         label: "Payment Mode",

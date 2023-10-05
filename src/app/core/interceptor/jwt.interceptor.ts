@@ -18,16 +18,16 @@ export class JwtInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    let token:string = this.storageService.getItem('token');
-    if (token) {
-      if(this._jwt.isTokenExpired(token))
+    let accessToken  = this.storageService.getItem("token");    
+    if (accessToken) {      
+      if(this._jwt.isTokenExpired(accessToken))
       {
         return this.refreshTokenAndRetry(request, next);
       }
       
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
     }
@@ -51,10 +51,10 @@ export class JwtInterceptor implements HttpInterceptor {
     return this.authenticationService.refreshtoken().pipe(
       switchMap((res) => {
         if (res) {
-          let token:string = this.storageService.getItem('token');
+          let accessToken = this.storageService.getItem("token");    
           req = req.clone({
             setHeaders: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           });
           return next.handle(req);

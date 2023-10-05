@@ -16,7 +16,7 @@ export class StorageService {
     this.storage.setItem(key, value);
   }
   
-  getItem<T>(key: string, useSessionStorage = false): T | null {
+  getItemObject<T>(key: string, useSessionStorage = false): T | null {
     this.storage = useSessionStorage ? sessionStorage : localStorage;
     const item = this.storage.getItem(key);
   
@@ -31,6 +31,13 @@ export class StorageService {
     }
   
     return null;
+  }
+
+  getItem(key: string, useSessionStorage = false): string | null {
+    this.storage = useSessionStorage ? sessionStorage : localStorage;
+    const item = this.storage.getItem(key);
+  
+    return item !== null ? item : null;
   }
   
 

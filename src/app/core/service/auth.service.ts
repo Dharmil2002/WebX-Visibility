@@ -107,7 +107,6 @@ export class AuthService {
         map((res) => {
           this.storageService.setItem("token", res.access.token);
           this.storageService.setItem("refreshToken", res.refresh.token);
-          var user = this.storageService.getItem("currentUser");          
           return res;
         })
       );

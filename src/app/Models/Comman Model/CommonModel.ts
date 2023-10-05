@@ -61,3 +61,7 @@ export class TreeItemFlatNode {
   level: number;
   expandable: boolean;
 }
+
+export class BranchDropdown {
+  constructor(public locCode: string, public location: string, public CountryId: Number) { }
+}

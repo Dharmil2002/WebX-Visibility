@@ -18,6 +18,8 @@ import { BreakpointObserver, BreakpointState } from "@angular/cdk/layout";
 import * as moment from 'moment-timezone';
 import { searchbilling } from "src/app/dashboard/docket-dashboard/dashboard-utlity";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { MatDialog } from "@angular/material/dialog";
+import { VirtualLoginComponent } from "../virtual-login/virtual-login.component";
 const document: any = window.document;
 
 @Component({
@@ -50,6 +52,7 @@ export class HeaderComponent
   searchData: any;
 
   constructor(
+    private dialogModel: MatDialog,
     @Inject(DOCUMENT) private document: Document,
     @Inject(WINDOW) private window: Window,
     private masterService: MasterService,
@@ -273,5 +276,16 @@ export class HeaderComponent
   }
   goBack(tabIndex: string): void {
     this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
+  }
+
+  VirtualLogin() {
+    const dialogRef = this.dialogModel.open(VirtualLoginComponent, {
+      width: "30%",
+      position: {
+        top: "20px",
+      },
+      disableClose: true,
+    });
+
   }
 }

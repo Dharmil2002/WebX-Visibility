@@ -1,0 +1,33 @@
+<div style="margin: -24px;">
+    <div style="display: flex;justify-content: space-between;background: #1e9ff2 !important">
+        <h4 style="margin: 10px;color: white;">virtual Login</h4>
+        <button mat-icon-button aria-label="close dialog" mat-dialog-close style="color: white;">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div class="body">
+        <form class="register-form m-4" [formGroup]="VitualLoginForm">
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Branch</mat-label>
+                        <input matInput placeholder="Search And Branch" [matAutocomplete]="autobranch"
+                            formControlName="Branch">
+                        <mat-autocomplete #autobranch="matAutocomplete" [displayWith]="displayBranch">
+                            <mat-option *ngFor="let option of filteredBranch | async" [value]="option">
+                                {{ option.location }}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+            </div>
+            <h5 class="b-b" style="margin-left: -19px;margin-right: -19px;"></h5>
+            <div class="row">
+                <div class="col-12">
+                    <button class="msr-3" mat-raised-button color="primary"
+                        style="float: right;margin-right: 0px !important;" (click)="Onsubmit()">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

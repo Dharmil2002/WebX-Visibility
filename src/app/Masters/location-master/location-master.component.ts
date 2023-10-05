@@ -13,12 +13,14 @@ export class LocationMasterComponent implements OnInit {
   linkArray = []
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   columnHeader = {
-    "srNo": "Sr No",
-    'locCode': 'Location Code',
-    'locName': 'Location Name',
-    'locAddr': 'Location Address',
-    'reportLoc': 'Reporting Location',
-    "activeFlag": "Active Status",
+    'locCode': 'Code',
+    'locName': 'Name',
+    'updateDate': 'Created Date',
+    'ownership': 'Ownership',
+    'locPincode': 'Pincode',
+    'locCity': 'City',
+    'reportLoc': 'Report To',
+    "activeFlag": "Active",
     "actions": "Actions"
   };
   headerForCsv = {
@@ -48,30 +50,69 @@ export class LocationMasterComponent implements OnInit {
     this.csvFileName = "Location Details";
   }
   ngOnInit(): void {
+    this.getOwnership();
     this.getLocationDetails();
   }
-  getLocationDetails() {
+  async getOwnership() {
+    const generalReqBody = {
+      companyCode: this.companyCode,
+      filter: {},
+      collectionName: "General_master",
+    };
+
+    const generalResponse = await this.masterService
+      .masterPost("generic/get", generalReqBody)
+      .toPromise();
+    return generalResponse.data
+  }
+  //#region to get location Details
+  async getLocationDetails() {
     let req = {
       "companyCode": this.companyCode,
       "filter": {},
       "collectionName": "location_detail"
     }
     this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
+      next: async (res: any) => {
         if (res) {
-          // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) => {
-            return {
-              ...obj,
-              srNo: index + 1
-            };
+          // Get the ownership descriptions using the getOwnership() function
+          const ownershipDescriptions = await this.getOwnership();
+
+          // Modify each object in res.data
+          const modifiedData = res.data.map((obj, index) => {
+            // Find the matching ownership description
+            const ownershipObject = ownershipDescriptions.find(
+              (x) => x.codeId === obj.ownership
+            );
+
+            // Set the ownership property to the codeDesc if found, or an empty string if not found
+            const ownership = ownershipObject ? ownershipObject.codeDesc : '';
+
+            // Convert locCode and locName to uppercase
+            const locCode = obj.locCode.toUpperCase();
+            const locName = obj.locName.toUpperCase();
+
+            // Create a modified object
+            return { ...obj, ownership, locCode, locName };
           });
-          this.csv = dataWithSrno
+
+          // Sort the modified data by updateDate in descending order
+            const sortedData = modifiedData.sort((a, b) => {
+            const dateA: Date | any = new Date(a.updateDate);
+            const dateB: Date | any = new Date(b.updateDate);
+
+            // Compare the date objects
+            return dateB - dateA; // Sort in descending order
+          });
+
+          // Assign the modified and sorted data back to this.csv
+          this.csv = sortedData;
           this.tableLoad = false;
         }
       }
-    })
+    });
   }
+  //#endregion
 
   IsActiveFuntion(det) {
     let id = det._id;

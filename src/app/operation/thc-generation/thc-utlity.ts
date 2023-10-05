@@ -43,13 +43,17 @@ export async function thcGeneration(operationService,data){
      const reqBody = {
         companyCode: localStorage.getItem("companyCode"),
         collectionName: "thc_detail",
-        data: data
+        data: data,
+        docType: "TH",
+        branch: "MUMB",
+        finYear: "2223"
     };
     // Perform an asynchronous operation to fetch data from the operation service
-    const result = await operationService.operationMongoPost("generic/create", reqBody).toPromise();
+    const result = await operationService.operationMongoPost("operation/thc/create", reqBody).toPromise();
     return result;
 }
 export async function getThcDetail(operationService){
+    
     // Define the request body with companyCode, collectionName, and an empty filter
     const reqBody = {
        companyCode: localStorage.getItem("companyCode"),

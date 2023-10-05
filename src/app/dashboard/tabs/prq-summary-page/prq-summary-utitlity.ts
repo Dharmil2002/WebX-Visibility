@@ -13,9 +13,9 @@ export async function getPrqDetailFromApi(masterServices) {
     prqData.map((element, index) => {
         let pqrData = {
             "srNo": element.srNo = index + 1,
-            "prqNo": element?.prqId || '',
+            "prqNo": element?.prqNo || '',
             "vehicleSize": element?.vehicleSize||"",
-            "size":element.vehicleSize?element.vehicleSize+" "+"MT" : element.containerSize?element.containerSize:"",
+            "size":element.vehicleSize?element.vehicleSize+" "+"MT" : element.containerSize?element.containerSize+" "+"MT":"",
             "billingParty": element?.billingParty || '',
             "fromToCity": element?.fromCity + "-" + element?.toCity,
             "fromCity": element?.fromCity || "",

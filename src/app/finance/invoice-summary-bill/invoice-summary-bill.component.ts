@@ -208,7 +208,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
     const prqDetail = await pendingbilling(this.masterService);
     this.prqNo = prqDetail
       .filter((x) => x.billingParty === this.navigateExtra.columnData.billingparty)
-      .map((x) => x.prqId)
+      .map((x) => x.prqNo)
       .join(', ');
 
   }

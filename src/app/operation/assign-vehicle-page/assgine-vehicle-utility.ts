@@ -55,7 +55,7 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
         companyCode: companyCode,
         collectionName: "vehicle_status",
         filter: {
-            status: 'available'
+            status: 'Available'
         }
     };
 

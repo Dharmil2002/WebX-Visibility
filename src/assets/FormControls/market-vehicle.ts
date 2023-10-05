@@ -17,20 +17,20 @@ export class marketVehicleControls {
             },
             {
                 name: "vehicleSize",
-                label: "Vehicle Size",
+                label: "Vehicle Size (MT)",
                 placeholder: "Vehicle Size",
-                type: "Staticdropdown",
+                type: "text",
                 value: [
-                  { value: "1", name: "1-MT" },
-                  { value: "9", name: "9-MT" },
-                  { value: "16", name: "16-MT" },
-                  { value: "32", name: "32-MT" },
+                  // { value: "1", name: "1-MT" },
+                  // { value: "9", name: "9-MT" },
+                  // { value: "16", name: "16-MT" },
+                  // { value: "32", name: "32-MT" },
                 ],
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: [
                     {
                       name: "required",

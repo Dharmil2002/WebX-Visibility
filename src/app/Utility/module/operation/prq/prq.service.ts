@@ -40,13 +40,19 @@ export class PrqService {
 
   //here the function for add prq Detail
   async addPrqData(prqData) {
+
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"),
       collectionName: "prq_detail",
       data: prqData,
+      docType: "PRQ",
+      branch: localStorage.getItem("Branch"),
+      party: prqData?.billingParty.toUpperCase()||'',
+      finYear: "2223",
     };
+
     const res = await this.masterService
-      .masterMongoPost("generic/create", reqBody)
+      .masterMongoPost("operation/prq/create", reqBody)
       .toPromise();
     return res;
   }
@@ -60,7 +66,7 @@ export class PrqService {
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"),
       collectionName: "prq_detail",
-      filter: { prqId: prqData.prqNo || prqData.prqId || "" },
+      filter: { prqNo: prqData.prqNo || prqData.prqId || "" },
       update: {
         ...prqData,
       },
@@ -171,12 +177,12 @@ export class PrqService {
     prqData.map((element, index) => {
       let prqDataItem = {
         srNo: (element.srNo = index + 1),
-        prqNo: element?.prqId || "",
+        prqNo: element?.prqNo || "",
         vehicleSize: element?.vehicleSize || "",
         size: element.vehicleSize
           ? element.vehicleSize + " " + "MT"
           : element.containerSize
-            ? element.containerSize
+            ? element.containerSize+ " " + "MT"
             : "",
         billingParty: element?.billingParty || "",
         fromToCity: element?.fromCity + "-" + element?.toCity,
@@ -253,7 +259,7 @@ export class PrqService {
       res.data.map((element, index) => {
         let prqDataItem = {
           srNo: (element.srNo = index + 1),
-          prqNo: element?.prqId || "",
+          prqNo: element?.prqNo || "",
           vehicleSize: element?.vehicleSize || "",
           size: element.vehicleSize
             ? element.vehicleSize + " " + "MT"

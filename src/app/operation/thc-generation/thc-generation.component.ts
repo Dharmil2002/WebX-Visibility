@@ -366,7 +366,6 @@ export class ThcGenerationComponent implements OnInit {
     if (this.isUpdate) {
 
       this.thcTableForm.controls["status"].setValue('2');
-      this.thcTableForm.controls["_id"].setValue(this.thcTableForm.controls["tripId"].value);
       const res = await showConfirmationDialogThc(this.thcTableForm.value, this.operationService);
       if (res) {
         Swal.fire({
@@ -379,19 +378,10 @@ export class ThcGenerationComponent implements OnInit {
       }
     }
     else {
-      const randomNumber =
-        "TH/" +
-        this.orgBranch +
-        "/" +
-        2223 +
-        "/" +
-        Math.floor(Math.random() * 100000);
-      this.thcTableForm.controls["tripId"].setValue(randomNumber);
-      this.thcTableForm.controls["_id"].setValue(randomNumber);
 
       if (this.prqFlag) {
         const prqData = {
-          prqId: this.thcTableForm.controls["prqNo"].value,
+          prqNo: this.thcTableForm.controls["prqNo"].value,
         }
         await updatePrq(this.operationService, prqData, "7")
 
@@ -404,8 +394,8 @@ export class ThcGenerationComponent implements OnInit {
       if (resThc) {
         Swal.fire({
           icon: "success",
-          title: "THC Generated Successfuly",
-          text: `THC Number is ${randomNumber}`,
+          title: "THC Generated Successfully",
+          text: `THC Number  Generated Successfully `,
           showConfirmButton: true,
         }).then((result) => {
           if (result.isConfirmed) {

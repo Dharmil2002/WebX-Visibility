@@ -43,9 +43,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
   FreightFromControl: FreightControl;
   breadscrums = [
     {
-      title: "ConsignmentEntryForm",
+      title: "Consignment Entry",
       items: ["Operation"],
-      active: "ConsignmentEntryForm",
+      active: "ConsignmentForm",
     },
   ];
   fromCity: string;
@@ -183,13 +183,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     edit: false,
     csv: false,
   };
-  breadScrums = [
-    {
-      title: "Available Vehicle for Assignment",
-      items: ["Home"],
-      active: "Vehicle Assign",
-    },
-  ];
+
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
 
@@ -207,17 +201,16 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private filter: FilterUtils,
     private route: Router,
     private operationService: OperationService,
-    private docketService: DocketService
   ) {
 
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
-    this.docketDetail = new DocketDetail({});
-
+    this.docketDetail = new DocketDetail({});;
     if (navigationState != null) {
 
       this.isUpdate = navigationState.hasOwnProperty('actions') && navigationState.actions[0] === 'Edit Docket';
       if (this.isUpdate) {
         this.docketDetail = navigationState
+        this.breadscrums[0].title = "Consignment Edit"
       }
       else {
         this.prqData = navigationState
@@ -321,7 +314,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.vendorDetail = vendorDetail
     const prqNo = await pendingbilling(this.masterService);
     this.prqNoDetail = prqNo;
-    const prqDetail = prqNo.map((x) => ({ name: x.prqId, value: x.prqId }))
+    const prqDetail = prqNo.map((x) => ({ name: x.prqNo, value: x.prqNo }))
     this.filter.Filter(
       this.jsonControlArrayBasic,
       this.consignmentTableForm,
@@ -468,7 +461,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
 
   prqSelection() {
-    this.prqData = this.prqNoDetail.find((x) => x.prqId === this.consignmentTableForm.controls['prqNo'].value.value);
+    this.prqData = this.prqNoDetail.find((x) => x.prqNo === this.consignmentTableForm.controls['prqNo'].value.value);
     this.prqDetail()
   }
 
@@ -780,12 +773,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.consignmentTableForm.value?.prqNo.value || ""
     );
     if (!this.isUpdate) {
-      const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-      const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-      const dockNo = `CN${dynamicValue}${paddedNumber}`;
-      this.consignmentTableForm.controls["docketNumber"].setValue(dockNo);
       let id = {
-        _id: dockNo,
         isComplete: 1,
         unloading: 0,
         lsNo: "",
@@ -804,7 +792,10 @@ export class ConsignmentEntryFormComponent implements OnInit {
       let reqBody = {
         companyCode: this.companyCode,
         collectionName: "docket_temp",
-        data: docketDetails,
+        docType: "CN",
+        branch:localStorage.getItem("Branch"),
+        finYear: "2223",
+        data: docketDetails
       };
       if (this.prqFlag) {
         const prqData = {
@@ -814,7 +805,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         }
         await updatePrq(this.operationService, prqData, "3")
       }
-      this.operationService.operationMongoPost("generic/create", reqBody).subscribe({
+      this.operationService.operationMongoPost("operation/docket/create", reqBody).subscribe({
         next: (res: any) => {
           Swal.fire({
             icon: "success",
@@ -833,7 +824,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         },
       });
     } else {
-      
+
       let docketDetails = {
         ...this.consignmentTableForm.value,
         ...this.FreightTableForm.value,

@@ -10,12 +10,13 @@ export async function addPrqData(prqData, masterService) {
 }
 
 export async function updatePrqStatus(prqData,masterService) {
+    debugger
     delete prqData.srNo
     delete prqData.Action
     const reqBody = {
         "companyCode": localStorage.getItem('companyCode'),
         "collectionName": "prq_detail",
-        "filter": { prqId: prqData.prqNo || prqData.prqId || "" },
+        "filter": { prqNo: prqData.prqNo || prqData.prqId || "" },
         "update": {
             ...prqData,
         }

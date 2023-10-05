@@ -398,16 +398,6 @@ export class thcControl {
                     Validations: [],
                     generatecontrol: false,
                     disable: true
-                },
-                {
-                    name: '_id',
-                    label: '',
-                    placeholder: '',
-                    type: '',
-                    value: '',
-                    Validations: [],
-                    generatecontrol: false,
-                    disable: true
                 }
 
 

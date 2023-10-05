@@ -30,6 +30,7 @@ export class AddMarketVehicleComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder) { 
       if(item){
+        debugger
         this.prqDetail=item
       }
 
@@ -37,7 +38,7 @@ export class AddMarketVehicleComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.marketVehicleTableForm.controls['vehicleSize']?.setValue(this.prqDetail?.vehicleSize||'')
+    this.marketVehicleTableForm.controls['vehicleSize']?.setValue(this.prqDetail?.vehicleSize||this.prqDetail?.containerSize||"")
   }
 
   functionCallHandler($event) {

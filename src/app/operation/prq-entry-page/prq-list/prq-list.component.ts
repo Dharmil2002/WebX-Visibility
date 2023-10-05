@@ -29,8 +29,8 @@ export class PrqListComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:200px",
     },
-    vehicleSize: {
-      Title: "Vehicle Size",
+    size: {
+      Title: "Veh/Cont-Size",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -67,7 +67,7 @@ export class PrqListComponent implements OnInit {
     "fromToCity",
     "status",
     "createdDate",
-    "vehicleSize"
+    "size"
   ];
   menuItemflag: boolean = false;
   addAndEditPath: string;
@@ -77,6 +77,7 @@ export class PrqListComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any) {
     if (item) {
+      debugger
       this.items=item;     
     }
   }
@@ -87,6 +88,7 @@ export class PrqListComponent implements OnInit {
   getShipment() {
     this.tableData = this.items.map((x) => {
       x.isSelected = false;
+      x.size=x.vehicleSize?x.vehicleSize+" "+"MT" : x.containerSize?x.containerSize+" "+"MT":""
       return x;
     });
 

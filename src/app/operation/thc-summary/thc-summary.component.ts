@@ -24,14 +24,14 @@ export class ThcSummaryComponent implements OnInit {
     csv: false,
   };
   tableData: any[];
-  TableStyle = "width:75%"
+  TableStyle = "width:80%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {
     tripId: {
       Title: "THC No",
       class: "matcolumnleft",
-      Style: "max-width:270px",
+      Style: "max-width:350px",
     },
     route: {
       Title: "Route",

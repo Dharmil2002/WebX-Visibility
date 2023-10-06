@@ -207,7 +207,7 @@ export class AddVendorMasterComponent implements OnInit {
     });
   }
   findDropdownItemByName(dropdownData, name) {
-    return dropdownData.find(item => item.name === name);
+    return dropdownData.find(item => item.name.toUpperCase() === name);
   }
   selectHandleFileSelection(data, allowedExtensions) {
     switch (data.field.name) {

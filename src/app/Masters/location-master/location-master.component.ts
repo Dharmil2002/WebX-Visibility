@@ -79,7 +79,7 @@ export class LocationMasterComponent implements OnInit {
           const ownershipDescriptions = await this.getOwnership();
 
           // Modify each object in res.data
-          const modifiedData = res.data.map((obj, index) => {
+          const modifiedData = res.data.map(obj => {
             // Find the matching ownership description
             const ownershipObject = ownershipDescriptions.find(
               (x) => x.codeId === obj.ownership
@@ -91,13 +91,14 @@ export class LocationMasterComponent implements OnInit {
             // Convert locCode and locName to uppercase
             const locCode = obj.locCode.toUpperCase();
             const locName = obj.locName.toUpperCase();
-
+            const locCity = obj.locCity.toUpperCase();
+            const locPincode = parseInt(obj.locPincode)
             // Create a modified object
-            return { ...obj, ownership, locCode, locName };
+            return { ...obj, ownership, locCode, locName, locCity, locPincode };
           });
 
           // Sort the modified data by updateDate in descending order
-            const sortedData = modifiedData.sort((a, b) => {
+          const sortedData = modifiedData.sort((a, b) => {
             const dateA: Date | any = new Date(a.updateDate);
             const dateB: Date | any = new Date(b.updateDate);
 

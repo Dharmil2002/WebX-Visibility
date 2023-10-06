@@ -13,7 +13,6 @@ export class CustomerMasterListComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = []
   columnHeader = {
-    // "srNo": "Sr No",
     "updatedDate": "Created Date",
     "customerGroup": "Customer Group",
     "customerCode": "Customer Code",
@@ -23,11 +22,30 @@ export class CustomerMasterListComponent implements OnInit {
   };
 
   headerForCsv = {
-    // "srNo": "Sr No",
-    "customerGroup": "Customer Group",
-    "customerCode": "Customer Code",
-    "customerName": "Customer Name",
-    "activeFlag": "Active Status",
+  "companyCode": "companyCode",
+  "updatedDate": "Created Date",
+  "customerCode": "Customer Code",
+  "customerGroup": "Customer Group",
+  "customerName": "Customer Name",
+  "CustomerCategory": "Customer Category",
+  "customerLocations": "Customer Locations",
+  "Customer_Emails": "Customer E-mails",
+  "ERPcode": "ERP code",
+  "PANnumber": "PAN No",
+  "CINnumber": "CIN number",
+  "RegisteredAddress":"Registered Address",
+  "PinCode": "Pin Code",
+  "city": "City",
+  "state": "State",
+  "Country": "Country",
+  "MSMENumber":"MSME Number",
+  "gstNo": "GST Number",
+  "gstState":"GST State",
+  "gstPinCode":"GST Pin Code",
+  "gstCity":"GST City",
+  "gstAddres": "GST Address",
+  "BlackListed": "Black Listed",
+  "activeFlag":"Active Status",
   }
 
   breadScrums = [
@@ -56,32 +74,6 @@ export class CustomerMasterListComponent implements OnInit {
     this.getCustomerDetails();
   }
 
-  // getCustomerDetails() {
-  //   let req = {
-  //     "companyCode": this.companyCode,
-  //     "filter": {},
-  //     "collectionName": "customer_detail"
-  //   }
-  //   this.masterService.masterPost('generic/get', req).subscribe({
-  //     next: (res: any) => {
-  //       if (res) {
-  //         debugger
-  //         // Generate srno for each object in the array
-  //         const dataWithSrno = res.data.map((obj, index) => {
-  //           return {
-  //             ...obj,
-  //             srNo: index + 1,
-  //             activeFlag:obj.activeFlag == 'Y'?true:false
-  //           };
-  //         });
-  //         this.csv = dataWithSrno
-  //         this.tableData = dataWithSrno;
-  //         this.tableLoad = false;
-  //       }
-  //     }
-  //   })
-  // }
-
   getCustomerDetails() {
     let req = {
       "companyCode": this.companyCode,
@@ -92,7 +84,6 @@ export class CustomerMasterListComponent implements OnInit {
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
-
           // Sort the data based on updatedDate in descending order
           const sortedData = res.data.sort((a, b) => {
             return new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime();
@@ -111,7 +102,6 @@ export class CustomerMasterListComponent implements OnInit {
           const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].updatedDate : null;
 
           // Use latestUpdatedDate as needed
-          console.log('Latest Updated Date:', latestUpdatedDate);
 
           this.csv = dataWithSrno;
           this.tableData = dataWithSrno;

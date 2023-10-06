@@ -10,7 +10,7 @@ export async function addPrqData(prqData, masterService) {
 }
 
 export async function updatePrqStatus(prqData,masterService) {
-    debugger
+
     delete prqData.srNo
     delete prqData.Action
     const reqBody = {
@@ -47,7 +47,7 @@ export async function showConfirmationDialog(prqDetail, masterService, goBack, t
         }
     }
 }
-export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqdata, operation, isClose) {
+export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqdata, operation,isClose) {
     try {
         if (!rptLoc || !companyCode || !arrivalData || !arrivalData.vehNo) {
             throw new Error("Missing required data for vehicle status update. Ensure all parameters are provided.");
@@ -65,7 +65,7 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqd
                     distance: arrivalData.distance,
                     currentLocation: localStorage.getItem("Branch"),
                     updateBy: localStorage.getItem("Username"),
-                    updateDate: new Date().toISOString()
+                    updateDate: new Date()
                 }
                 : {})
         };

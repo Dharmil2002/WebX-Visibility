@@ -13,6 +13,9 @@ import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoi
 import { updatePrq } from '../consignment-entry-form/consigment-utlity';
 import { showConfirmationDialogThc } from '../thc-summary/thc-update-utlity';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ThcUpdateComponent } from 'src/app/dashboard/tabs/thc-update/thc-update.component';
+import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
 
 @Component({
   selector: 'app-thc-generation',
@@ -40,7 +43,6 @@ export class ThcGenerationComponent implements OnInit {
     edit: false,
     csv: false,
   };
-  TableStyle = "width:75%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {
@@ -57,7 +59,7 @@ export class ThcGenerationComponent implements OnInit {
     docketNumber: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "max-width:180px",
+      Style: "max-width:200px",
     },
     fromCity: {
       Title: "From City",
@@ -78,7 +80,27 @@ export class ThcGenerationComponent implements OnInit {
       Title: "Actual Weight",
       class: "matcolumnleft",
       Style: "max-width:160px",
-    }
+    },
+    pod: {
+      Title: "Pod",
+      class: "matcolumnleft",
+      Style: "max-width:160px",
+    },
+    receiveBy: {
+      Title: "Receive By",
+      class: "matcolumnleft",
+      Style: "max-width:160px",
+    },
+    arrivalTime: {
+      Title: "Arrival Time",
+      class: "matcolumnleft",
+      Style: "max-width:160px",
+    },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:80px",
+    },
   };
   //#endregion
   staticField = [
@@ -113,25 +135,37 @@ export class ThcGenerationComponent implements OnInit {
   prqlist: any;
   isView: any;
   selectedData: any;
+  menuItems = [
+    { label: 'Update' },
+  ];
+  menuItemflag: boolean = true;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private operationService: OperationService,
     private masterService: MasterService,
     private route: Router,
-    private docketService:DocketService
+    private docketService:DocketService,
+    private vehicleStatusService:VehicleStatusService,
+    public dialog: MatDialog
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
+    delete this.columnHeader.pod;
+    delete this.columnHeader.receiveBy;
+    delete this.columnHeader.actionsItems;
+    delete this.columnHeader.arrivalTime;
     if (navigationState != null) {
       this.isUpdate = navigationState.hasOwnProperty('isUpdate') ? true : false;
       this.isView = navigationState.hasOwnProperty('isView') ? true : false;
       if (this.isUpdate) {
+        
         this.thcDetail = navigationState.data;
       }
       else if (this.isView) {
         this.thcDetail = navigationState.data;
       }
       else {
+     
         this.prqDetail = navigationState;
         this.prqFlag = true;
       }
@@ -141,8 +175,6 @@ export class ThcGenerationComponent implements OnInit {
 
   async getShipmentDetail() {
     const shipmentList = await getShipment(this.operationService, false);
-    //this.tableData = shipmentList;
-    //this.tableData = [];
     this.allShipment = shipmentList;
     this.tableLoad = false;
   }
@@ -233,11 +265,17 @@ export class ThcGenerationComponent implements OnInit {
     this.bindPrqData();
     this.getShipmentDetails();
   }
-  bindPrqData() {
+  async bindPrqData() {
+   const vehicleDetail= await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
     this.thcTableForm.controls['vehicle'].setValue(this.prqDetail?.vehicleNo);
     this.thcTableForm.controls['VendorType'].setValue('Market');
     this.thcTableForm.controls['route'].setValue(this.prqDetail?.fromToCity || "");
     this.thcTableForm.controls['capacity'].setValue(this.prqDetail?.vehicleSize || "");
+    this.thcTableForm.controls['driverName'].setValue(vehicleDetail?.driver || "");
+    this.thcTableForm.controls['driverMno'].setValue(vehicleDetail?.dMobNo || "");
+    this.thcTableForm.controls['driverLno'].setValue(vehicleDetail?.lcNo || "");
+    this.thcTableForm.controls['driverLexd'].setValue(vehicleDetail?.lcExpireDate || "");
+    this.thcTableForm.controls['panNo'].setValue(vehicleDetail?.driverPan || "");
   }
   async getShipmentDetails() {
 
@@ -266,6 +304,7 @@ export class ThcGenerationComponent implements OnInit {
       const totalActualWeight = actualWeights.reduce((acc, weight) => acc + weight, 0);
 
       x.actualWeight = totalActualWeight
+      x.actions=['Update']
       return x; // Make sure to return x to update the original object in the 'tableData' array.
     });
     this.thcTableForm.controls['vendorName'].setValue(shipment ? shipment[0].vendorName : "");
@@ -339,8 +378,15 @@ export class ThcGenerationComponent implements OnInit {
 
     this.getShipmentDetails();
   }
-
-
+  async handleMenuItemClick(data) {
+    if (data.label.label === "Update") {
+      const dialogref = this.dialog.open(ThcUpdateComponent, {
+        data: data.data,
+      });
+      dialogref.afterClosed().subscribe((result) => {
+      });
+    }
+  }
   async createThc() {
     
     if (!this.selectedData && !this.isUpdate) {

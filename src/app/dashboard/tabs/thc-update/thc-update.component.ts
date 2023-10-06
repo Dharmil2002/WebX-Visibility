@@ -12,6 +12,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { ThcUpdateControls } from 'src/assets/FormControls/thc-update';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { ThcUpdate } from 'src/app/core/models/operations/thc/thc-update';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-thc-update',
@@ -32,6 +33,7 @@ export class ThcUpdateComponent implements OnInit {
   ];
   menuItemflag: boolean = true;
   thcDetail: ThcUpdate;
+  selectedFiles: boolean;
   constructor(
     public dialogRef: MatDialogRef<GenericTableComponent>,
     public dialog: MatDialog,
@@ -39,6 +41,7 @@ export class ThcUpdateComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     ) {
+    
     this.thcDetail = item;
   }
 
@@ -61,7 +64,6 @@ export class ThcUpdateComponent implements OnInit {
 
   ngOnInit(): void {
     this.IntializeFormControl();
-    this.autoFill();
   }
 
   IntializeFormControl() {
@@ -69,15 +71,37 @@ export class ThcUpdateComponent implements OnInit {
     const thcFormControls = new ThcUpdateControls();
     this.jsonControlArray = thcFormControls.getThcFormControls();
     this.thcTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    this.thcTableForm.controls['shipment'].setValue(this.thcDetail.shipment);
   }
 
-  autoFill() {
-   this.thcTableForm.controls['tripId'].setValue(this.thcDetail?.tripId||"");
-   this.thcTableForm.controls['vehicle'].setValue(this.thcDetail?.vehicle||"");
-   this.thcTableForm.controls['route'].setValue(this.thcDetail?.route||"");
-  }
   cancel() {
     this.dialogRef.close()
+  }
+  
+  getFilePod(data) {
+    let fileList: FileList = data.eventArgs;
+    if (fileList.length > 0) {
+      const file: File = fileList[0];
+      const allowedFormats = ["jpeg", "png", "jpg"];
+      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
+
+      if (allowedFormats.includes(fileFormat)) {
+        const podUpload = file.name;
+        this.selectedFiles = true;
+        this.thcTableForm.controls["podUpload"].setValue(podUpload);
+      } else {
+        this.selectedFiles = false;
+        Swal.fire({
+          icon: "warning",
+          title: "Alert",
+          text: `Please select a JPEG, PNG, or JPG file.`,
+          showConfirmButton: true,
+        });
+      }
+    } else {
+      this.selectedFiles = false;
+      alert("No file selected");
+    }
   }
   async save(){
     await showConfirmationDialogThc(this.thcTableForm.value,this._operationService);

@@ -18,6 +18,7 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { DocketDetail } from "src/app/core/models/operations/consignment/consgiment";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
+import { VehicleStatusService } from "src/app/Utility/module/operation/vehicleStatus/vehicle.service";
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -199,6 +200,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private _NavigationService: NavigationService,
     private masterService: MasterService,
     private filter: FilterUtils,
+    private vehicleStatusService:VehicleStatusService,
     private route: Router,
     private operationService: OperationService,
   ) {
@@ -227,7 +229,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.isTableLoad = false;
   }
   //#region initializeFormControl
-  initializeFormControl() {
+  async initializeFormControl() {
     // Create LocationFormControls instance to get form controls for different sections
     this.ConsignmentFormControls = new ConsignmentControl(this.docketDetail);
     this.FreightFromControl = new FreightControl(this.docketDetail);
@@ -277,7 +279,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   //#endregion
 
-  prqDetail() {
+  async prqDetail() {
 
     const fromCity = {
       name: this.prqData?.fromCity || "",
@@ -287,17 +289,22 @@ export class ConsignmentEntryFormComponent implements OnInit {
       name: this.prqData?.toCity || "",
       value: this.prqData?.toCity || ""
     }
+    let vehicleDetail= await this.vehicleStatusService.vehiclList(this.prqData.prqNo)
     const billingParty = this.billingParty.find((x) => x.name === this.prqData?.billingParty);
     this.consignmentTableForm.controls['billingParty'].setValue(billingParty);
     this.consignmentTableForm.controls['fromCity'].setValue(fromCity);
     this.consignmentTableForm.controls['toCity'].setValue(toCity);
     this.consignmentTableForm.controls['payType'].setValue(this.prqData?.payType);
     this.consignmentTableForm.controls['docketDate'].setValue(this.prqData?.pickupDate);
-    this.consignmentTableForm.controls['transMode'].setValue(this.prqData?.transMode);
+    this.consignmentTableForm.controls['transMode'].setValue('Road');
     this.consignmentTableForm.controls['pAddress'].setValue(this.prqData?.pAddress);
     this.consignmentTableForm.controls['containerSize'].setValue(this.prqData?.containerSize);
     this.consignmentTableForm.controls['ccbp'].setValue(true);
     this.consignmentTableForm.controls['vehicleNo'].setValue(this.prqData?.vehicleNo);
+    this.consignmentTableForm.controls['vendorType'].setValue(vehicleDetail?.vendorType);
+    this.consignmentTableForm.controls['vendorName'].setValue(vehicleDetail?.vendor);
+
+    this.vendorFieldChanged()
     this.getLocBasedOnCity();
     this.onAutoBillingBased("true");
   }

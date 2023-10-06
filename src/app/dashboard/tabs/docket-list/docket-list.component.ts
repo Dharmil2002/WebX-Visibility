@@ -27,16 +27,11 @@ export class DocketListComponent implements OnInit {
     docketNumber: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:250px",
     },
-    fromCity: {
-      Title: "From City",
+    ftCity: {
+      Title: "From-To City",
       class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    toCity: {
-      Title: "To City",
-      class: "matcolumnleft",
       Style: "max-width:150px",
     },
     transMode: {
@@ -53,7 +48,7 @@ export class DocketListComponent implements OnInit {
       Title: "Action",
       class: "matcolumnleft",
       Style: "max-width:80px",
-    },
+    }
   };
   //#endregion
 
@@ -62,8 +57,7 @@ export class DocketListComponent implements OnInit {
     "billingParty",
     "vehicleNo",
     "docketNumber",
-    "fromCity",
-    "toCity",
+    "ftCity",
     "transMode",
     "actualWeight"
   ];
@@ -72,6 +66,7 @@ export class DocketListComponent implements OnInit {
   /* here the varible declare for menu Item option Both is required */
   menuItems=[{label:"Edit Docket"}]
   menuItemflag: boolean = true;
+  TableStyle = "width:85%"
   /*.......End................*/
   /*Here the Controls which Is Hide search or add Button in table*/
   dynamicControls = {
@@ -104,6 +99,7 @@ export class DocketListComponent implements OnInit {
       // Sum all the calculated actualWeights
       const totalActualWeight = actualWeights.reduce((acc, weight) => acc + weight, 0);
       x.actualWeight = totalActualWeight,
+      x.ftCity=`${x.fromCity}-${x.toCity}`,
       x.actions=x.status=="0"?["Edit Docket"]:""
       return x; // Make sure to return x to update the original object in the 'tableData' array.
     });

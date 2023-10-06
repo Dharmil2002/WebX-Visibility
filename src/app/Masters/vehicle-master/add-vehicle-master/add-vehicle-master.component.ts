@@ -438,7 +438,7 @@ export class AddVehicleMasterComponent implements OnInit {
 
   //#region
   async save() {
-    debugger
+
     const controls = this.vehicleTableForm;
     clearValidatorsAndValidate(controls);
     const formValue = this.vehicleTableForm.value;

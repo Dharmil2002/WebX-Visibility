@@ -129,7 +129,6 @@ export class CustomerMasterAddComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
-
       this.isUpdate = true;
       this.submit = 'Modify';
       this.action = "edit";
@@ -321,20 +320,12 @@ export class CustomerMasterAddComponent implements OnInit {
   getCustomerCategoryDropdown() {
     const dropdownData = [
       {
-        name: "Urgent",
-        value: "Urgent",
+        name: "Primary",
+        value: "Primary",
       },
       {
-        name: "High",
-        value: "High",
-      },
-      {
-        name: "Medium",
-        value: "Medium",
-      },
-      {
-        name: "Low",
-        value: "Low",
+        name: "Secondary",
+        value: "Secondary",
       },
     ];
     if (this.isUpdate) {

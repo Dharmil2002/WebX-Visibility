@@ -54,8 +54,8 @@ export class UserControl {
           },
           {
             name: "pattern",
-            message: "Please Enter only text!",
-            pattern: "^[A-Z]{1}[a-zA-Z ]{50}",
+            message: "frist letter is UpeerCase (A-Z) Please Enter only text!",
+            pattern: "^[A-Z]{1}[a-zA-Z ]{50}$",
           },
         ],
         functions: {

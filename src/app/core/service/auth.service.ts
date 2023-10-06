@@ -53,18 +53,16 @@ export class AuthService {
   }
   GetCompany(CompanyCode) {
 
-    return this.http.post<any>(`${environment.localHost}Master/Company`, CompanyCode)
+    return this.http.post<any>(`${environment.APIBaseURL}Master/Company`, CompanyCode)
   }
   GetDmsMenu(companyDetails) {
 
-    return this.http.post<any>(`${environment.localHost}Master/Menu`, companyDetails)
+    return this.http.post<any>(`${environment.APIBaseURL}Master/Menu`, companyDetails)
   }
   login(UserRequest) {
+    let url = `${environment.AuthAPIGetway}login`;
     return this.http
-      .post<any>(
-        `${environment.AuthAPIGetway}login`,
-        UserRequest
-      )
+      .post<any>(url,UserRequest)
       .pipe(
         map(async (user: any) => {
           if (user.tokens) {

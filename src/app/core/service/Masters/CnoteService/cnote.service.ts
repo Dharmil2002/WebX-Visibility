@@ -169,7 +169,7 @@ export class CnoteService {
     return this.http.post<any>(`${environment.APIBaseBetaURL}` + ApiURL, Request);
   }
   CnoteMongoPost(ApiURL, Request) {
-    return this.http.post<any>(`${environment.APIMongoUrl}` + ApiURL, Request);
+    return this.http.post<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
   /*below function is used set and get shipment data to used in loadingsheet */
 

@@ -12,7 +12,7 @@ export class DriverMasterComponent implements OnInit {
   toggleArray = ["activeFlag"]
   linkArray = []
   columnHeader = {
-    "srNo": "Sr No",
+    // "srNo": "Sr No",
     'manualDriverCode': 'Driver Code',
     'driverName': 'Driver Name',
     'licenseNo': 'License No',
@@ -20,11 +20,11 @@ export class DriverMasterComponent implements OnInit {
     "actions": "Actions"
   };
   headerForCsv = {
-    "SrNo": "Sr No",
-    'ManualDriverCode': 'Driver Code',
-    'DriverName': 'Driver Name',
-    'LicenseNo': 'License No',
-    "ActiveFlag": "Active Status",
+    // "srNo": "Sr No",
+    'manualDriverCode': 'Driver Code',
+    'driverName': 'Driver Name',
+    'licenseNo': 'License No',
+    "activeFlag": "Active Status",
   }
   breadScrums = [
     {
@@ -37,13 +37,15 @@ export class DriverMasterComponent implements OnInit {
   dynamicControls = {
     add: true,
     edit: true,
-    csv: false
+    csv: true
   }
   addAndEditPath: string;
+  csvFileName: string;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/DriverMaster/AddDriverMaster";
   }
   ngOnInit(): void {
+    this.csvFileName = "Driver Details";
     this.getDriverDetails();
   }
   getDriverDetails() {
@@ -59,7 +61,7 @@ export class DriverMasterComponent implements OnInit {
           const dataWithSrno = res.data.map((obj, index) => {
             return {
               ...obj,
-              srNo: index + 1
+              // srNo: index + 1
             };
           });
           this.csv = dataWithSrno
@@ -68,6 +70,7 @@ export class DriverMasterComponent implements OnInit {
       }
     })
   }
+  
 
   IsActiveFuntion(det) {
     let id = det._id;

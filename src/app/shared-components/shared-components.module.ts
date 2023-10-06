@@ -35,7 +35,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MatMenuModule } from '@angular/material/menu';
 import { ChartsModule as chartjsModule } from 'ng2-charts';
-import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angular-datetime-picker';
+import { OWL_DATE_TIME_LOCALE, OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angular-datetime-picker';
 import { GenericChartDashboardComponent } from './generic-chart-dashboard/generic-chart-dashboard.component';
 import { GenericCardComponent } from './generic-card/generic-card.component';
 import { DecimaRangeValidatorDirective } from '../core/Directives/decimal-range-validator';
@@ -99,6 +99,7 @@ const MY_DATE_FORMAT = {
 
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },
+    {provide: OWL_DATE_TIME_LOCALE, useValue: 'fr'},
     FilterUtils
   ],
 

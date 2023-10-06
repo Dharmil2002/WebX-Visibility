@@ -1,0 +1,28 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-6" style="margin-bottom: 0px;">
+            <form [formGroup]="customerGstTableForm">
+                <app-form-webxpress [form]="customerGstTableForm" [formData]="jsonControlArray"
+                    (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+    </div>
+    <!-- Loading Generic table as parent component and passing  required data-->
+    <!--
+        columnHeader: a object that contains only that pair of column id:title that are to be shown on dashBoard.
+        tableData : api Response.
+        addAndEditPath : path of the page where Add and edit is handled.
+        uploadComponent : REference of component, which is to be opened in dialog box.
+        csvHeaders : a object that contains ordered pair of column id:title that are to be shown in csv file.
+        csvFileName : Name of the csv File.
+        activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
+         -->
+    <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
+        [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
+        [csvHeaders]="headerForCsv" [toggleArray]="toggleArray" [menuItems]="menuItems"
+        (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
+        [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)">
+    </generic-table-webxpress>
+</app-common-wrapper-webxpress>

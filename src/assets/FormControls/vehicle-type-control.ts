@@ -29,8 +29,8 @@ export class VehicleTypeControl {
                     },
                     {
                         name: "pattern",
-                        message: "Please Enter alphanumeric 200 digit! Vehicle Type name",
-                        pattern: "^[a-zA-Z 0-9 ]{0,200}$",
+                        message: "Please Enter alphanumeric 3 to 200 digit! Vehicle Type name",
+                        pattern: "^[a-zA-Z 0-9 ,-]{3,200}$",
                     },
                 ],
                 functions: {

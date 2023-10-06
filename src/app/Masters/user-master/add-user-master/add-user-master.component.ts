@@ -22,7 +22,6 @@ export class AddUserMasterComponent implements OnInit {
   protected _onDestroy = new Subject<void>();
   action: string;
   userTable: UserMaster;
-  // branchCode: any;
   userType: any;
   userLocations: string[];
   userDetails: any;
@@ -33,9 +32,6 @@ export class AddUserMasterComponent implements OnInit {
   userLocationStatus: any;
   userRoleStatus: any;
   userRole: any;
-  // managerIdStatus: any;
-  // managerId: any;
-  // userStatus: any;
   userName: any;
   countryCodeStatus: any;
   countryCode: any;
@@ -53,13 +49,9 @@ export class AddUserMasterComponent implements OnInit {
   countryList: any;
   updateLocation: any;
   updateUser: any;
-  // updateUserStatus: any;
-  // updateManagerId: any;
   updateRoleId: any;
   userData: any;
   roleIdData: any;
-  // userStatusData: any;
-  // managerIdData: any;
   divisionList: any;
   division: any;
   data: any;
@@ -68,7 +60,7 @@ export class AddUserMasterComponent implements OnInit {
   previousUserCode: string = "";
   newUserCode: any;
   jsonControlArray: any[];
-
+  submit = 'Save';
   ngOnInit(): void {
     this.bindDropdown();
     this.getDropDownData();
@@ -89,19 +81,24 @@ export class AddUserMasterComponent implements OnInit {
       console.log(this.userTable);
 
       this.isUpdate = true;
+      this.submit = 'Modify';
       this.breadScrums = [
         {
-          title: "User Master",
+          title: "Modify Master",
           items: ["Master"],
-          active: "Edit User",
+          active: "Modify User",
+          generatecontrol: true,
+          toggle: this.userTable.isActive
         },
       ];
     } else {
       this.breadScrums = [
         {
-          title: "User Master",
+          title: "Add Master",
           items: ["Master"],
           active: "Add User",
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.userTable = new UserMaster({});
@@ -364,15 +361,14 @@ export class AddUserMasterComponent implements OnInit {
     );
     this.userTableForm.controls["multiLocation"].setValue(multiLoc);
 
-    this.userTableForm.controls["isActive"].setValue(
-      this.userTableForm.value.isActive === true ? true : false
-    );
+    // this.userTableForm.controls["isActive"].setValue(
+    //   this.userTableForm.value.isActive === true ? true : false
+    // );
     //remove unwanted controlName
     const controlsToRemove = [
       "confirmpassword",
       "division",
       "CompanyCode",
-      "isUpdate",
       "controlHandler",
       "userLocationscontrolHandler",
     ];
@@ -380,7 +376,6 @@ export class AddUserMasterComponent implements OnInit {
     controlsToRemove.forEach((controlName) => {
       this.userTableForm.removeControl(controlName);
     });
-
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "user_master",
@@ -402,7 +397,7 @@ export class AddUserMasterComponent implements OnInit {
             return userCode;
           }
           if (this.isUpdate) {
-            this.newUserCode = this.userTable.id;
+            this.newUserCode = this.userTable._id;
           } else {
             this.newUserCode = generateUserCode(lastUserCode);
           }
@@ -412,14 +407,14 @@ export class AddUserMasterComponent implements OnInit {
           Object.values(this.userTableForm.controls).forEach((control) =>
             control.setErrors(null)
           );
-
           if (this.isUpdate) {
             // Remove the "id" field from the form controls
+            this.userTableForm.removeControl('isUpdate')
             let req = {
               companyCode: this.companyCode,
               collectionName: "user_master",
               filter: {
-                _id: this.userTable.id,
+                _id: this.userTable._id,
               },
               update: this.userTableForm.value,
             };
@@ -557,4 +552,10 @@ export class AddUserMasterComponent implements OnInit {
     await this.checkValueExists("name", "User Name");
   }
   //#endregion
+
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.userTableForm.controls['isActive'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
 }

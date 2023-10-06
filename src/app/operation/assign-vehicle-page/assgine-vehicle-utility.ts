@@ -13,6 +13,7 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
 
     if (confirmationResult.isConfirmed) {
         prqDetail.status = "2";
+        delete prqDetail.actions
         const res = await updatePrqStatus(prqDetail, masterService);
         let currentBranch = localStorage.getItem("Branch") || '';
         let companyCode = parseInt(localStorage.getItem('companyCode'));
@@ -54,7 +55,7 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
         companyCode: companyCode,
         collectionName: "vehicle_status",
         filter: {
-            status: 'available'
+            status: 'Available'
         }
     };
 
@@ -108,17 +109,31 @@ export class AssignVehiclePageMethods {
             Title: "Action",
             class: "matcolumnleft",
             Style: "min-width:100px",
-        },
+        }
     }];
 
 }
 //add here method to bind data using market vehicle 
 export async function bindMarketVehicle(vehicledata: any) {
+    let currentDate = new Date();
+    let threeHoursLater = new Date(currentDate.getTime() + 3 * 60 * 60 * 1000);
+
     const marketVehicle = {
         vehNo:vehicledata?.vehicelNo||"",
         distannce:0,
         currentLocation:localStorage.getItem("Branch"),
         capacity:vehicledata.vehicleSize,
+        vendorType:'Market',
+        vendor:vehicledata.vendor,
+        vMobNo:vehicledata.vMobileNo,
+        driver:vehicledata.driver,
+        dMobNo:vehicledata.dmobileNo,
+        lcNo:vehicledata.lcNo,
+        driverPan:vehicledata.driverPan,
+        lcExpireDate:vehicledata.lcExpireDate,
+        eta:threeHoursLater,
+        updateBy:localStorage.getItem('UserName'),
+        updateDate:new Date()
     }
   return marketVehicle;
 }

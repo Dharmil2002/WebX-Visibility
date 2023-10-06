@@ -13,20 +13,41 @@ export class CustomerMasterListComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = []
   columnHeader = {
-    "srNo": "Sr No",
-    "groupCode": "Group Code",
+    "updatedDate": "Created Date",
+    "customerGroup": "Customer Group",
     "customerCode": "Customer Code",
     "customerName": "Customer Name",
     "activeFlag": "Active Status",
     "actions": "Actions"
   };
+
   headerForCsv = {
-    "srNo": "Sr No",
-    "groupCode": "Group Code",
-    "customerCode": "Customer Code",
-    "customerName": "Customer Name",
-    "activeFlag": "Active Status",
+  "companyCode": "companyCode",
+  "updatedDate": "Created Date",
+  "customerCode": "Customer Code",
+  "customerGroup": "Customer Group",
+  "customerName": "Customer Name",
+  "CustomerCategory": "Customer Category",
+  "customerLocations": "Customer Locations",
+  "Customer_Emails": "Customer E-mails",
+  "ERPcode": "ERP code",
+  "PANnumber": "PAN No",
+  "CINnumber": "CIN number",
+  "RegisteredAddress":"Registered Address",
+  "PinCode": "Pin Code",
+  "city": "City",
+  "state": "State",
+  "Country": "Country",
+  "MSMENumber":"MSME Number",
+  "gstNo": "GST Number",
+  "gstState":"GST State",
+  "gstPinCode":"GST Pin Code",
+  "gstCity":"GST City",
+  "gstAddres": "GST Address",
+  "BlackListed": "Black Listed",
+  "activeFlag":"Active Status",
   }
+
   breadScrums = [
     {
       title: "Customer Master",
@@ -34,47 +55,68 @@ export class CustomerMasterListComponent implements OnInit {
       active: "Customer Master",
     },
   ];
+
   dynamicControls = {
     add: true,
     edit: true,
-    csv: false
+    csv: true
   }
+
   addAndEditPath: string;
   tableData: any;
+  csvFileName: string;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
   }
+
   ngOnInit(): void {
+    this.csvFileName = "Customer Details";
     this.getCustomerDetails();
   }
+
   getCustomerDetails() {
     let req = {
       "companyCode": this.companyCode,
       "filter": {},
       "collectionName": "customer_detail"
-    }
+    };
+
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
         if (res) {
+          // Sort the data based on updatedDate in descending order
+          const sortedData = res.data.sort((a, b) => {
+            return new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime();
+          });
+
           // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) => {
+          const dataWithSrno = sortedData.map((obj, index) => {
             return {
               ...obj,
-              srNo: index + 1
+              customerGroup: obj.customerGroup.toUpperCase(),
+              customerCode: obj.customerCode.toUpperCase(),
+              customerName: obj.customerName.toUpperCase()
             };
           });
-          this.csv = dataWithSrno
+
+          // Extract the updatedDate from the first element (latest record)
+          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].updatedDate : null;
+
+          // Use latestUpdatedDate as needed
+
+          this.csv = dataWithSrno;
           this.tableData = dataWithSrno;
           this.tableLoad = false;
         }
       }
-    })
+    });
   }
+
   IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls
     delete det._id;
-    delete det.srNo;
+    // delete det.srNo;
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "customer_detail",

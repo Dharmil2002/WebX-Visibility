@@ -1,6 +1,6 @@
 <form class="register-form m-4" *ngIf="formData" [formGroup]="form">
   <div class="row">
-    <div *ngFor="let formItem of formData" [style]="FieldStyle" class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2">
+    <div *ngFor="let formItem of formData" [style]="FieldStyle" [ngClass]=className>
 
       <!--textbox (input) controls---------------------------------------------------------->
       <mat-form-field class="example-full-width" appearance="outline"
@@ -51,11 +51,11 @@
         *ngIf="formItem.type=='textarea'&& formItem.generatecontrol===true">
         <mat-label class="fontbold">{{formItem.label}}</mat-label>
         <textarea matInput formControlName="{{formItem.name}}" [readonly]="formItem.disable"
-        placeholder="{{formItem.placeholder}}" autocomplete="off" cdkTextareaAutosize
-        cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5" cdkAutosizeAutogrow
-        (change)="functionCalled({field: formItem, functionName: formItem.functions?.onChange, eventArgs: $event})"
-        (click)="functionCalled({field: formItem, functionName: formItem.functions?.onClick, eventArgs: $event})"
-        (ngModelChange)="functionCalled({field: formItem, functionName: formItem.functions?.onModel, eventArgs: $event})">
+          placeholder="{{formItem.placeholder}}" autocomplete="off" cdkTextareaAutosize cdkAutosizeMinRows="1"
+          cdkAutosizeMaxRows="5" cdkAutosizeAutogrow
+          (change)="functionCalled({field: formItem, functionName: formItem.functions?.onChange, eventArgs: $event})"
+          (click)="functionCalled({field: formItem, functionName: formItem.functions?.onClick, eventArgs: $event})"
+          (ngModelChange)="functionCalled({field: formItem, functionName: formItem.functions?.onModel, eventArgs: $event})">
       </textarea>
       </mat-form-field>
       <!--toggles---------------------------------------------------------->
@@ -207,10 +207,13 @@
       </ng-container>
       <!--Radio Button-->
       <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
-        <mat-label>{{formItem.label}}</mat-label>&nbsp;
-        <mat-radio-group [formControlName]="formItem.name"
+        <mat-label id="example-radio-group-label">{{formItem.label}}</mat-label>&nbsp;
+        <mat-radio-group [formControlName]="formItem.name" aria-labelledby="example-radio-group-label" style="display: flex;
+  flex-direction: column;
+  margin: 5px 5px;
+  align-items: flex-start;"
           (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
-          <mat-radio-button *ngFor="let option of formItem.value" [value]="option.value">
+          <mat-radio-button style=" margin: 5px;" *ngFor="let option of formItem.value" [value]="option.value">
             {{ option.name }}
           </mat-radio-button>
         </mat-radio-group>
@@ -298,7 +301,7 @@
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
         <div class="example-button-row">
           <button type="button" [disabled]="!form.valid" mat-raised-button color="primary" (click)="save()">
-            Save
+            {{submit}}
           </button>
           <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>
         </div>

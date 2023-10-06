@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
 })
 export class AddFleetMasterComponent implements OnInit {
   FleetTable: fleetModel;
-  breadScrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean;}[];
   action: string;
   isUpdate = false;
   fleetTableForm: UntypedFormGroup;
@@ -35,6 +35,7 @@ export class AddFleetMasterComponent implements OnInit {
   selectedFiles: boolean;
   vehicleType: any;
   vehicleTypeStatus: any;
+  submit = 'Save';
 
   constructor(
     private filter: FilterUtils,
@@ -47,6 +48,7 @@ export class AddFleetMasterComponent implements OnInit {
       console.log(this.FleetTable);
 
       this.isUpdate = true;
+      this.submit = 'Modify';
       this.action = "edit";
     } else {
       this.action = "Add";
@@ -55,9 +57,11 @@ export class AddFleetMasterComponent implements OnInit {
       this.isUpdate = true;
       this.breadScrums = [
         {
-          title: "Fleet Master",
+          title: "Modify Master",
           items: ["Masters"],
-          active: "Edit Fleet",
+          active: "Modify Fleet",
+          generatecontrol: true,
+          toggle: this.FleetTable.activeFlag
         },
       ];
     } else {
@@ -66,6 +70,8 @@ export class AddFleetMasterComponent implements OnInit {
           title: "Fleet Master",
           items: ["Masters"],
           active: "Add Fleet",
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.FleetTable = new fleetModel({});
@@ -335,5 +341,11 @@ export class AddFleetMasterComponent implements OnInit {
     }
   }
   //#endregion
+
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.fleetTableForm.controls['activeFlag'].setValue(event);
+    console.log("Toggle value :", event);
+  }
 
 }

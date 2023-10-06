@@ -40,6 +40,12 @@ export class SigninComponent
       ],
       password: ["", Validators.required],
     });
+
+    //Redirect if user already logged in
+    if (this.authService.currentUserValue) {
+      this.Islogin = true;
+      this.router.navigate(["/dashboard/GlobeDashboardPage"]);
+    }
   }
   get f() {
     return this.loginForm.controls;

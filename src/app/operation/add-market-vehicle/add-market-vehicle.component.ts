@@ -37,7 +37,7 @@ export class AddMarketVehicleComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.marketVehicleTableForm.controls['vehicleSize']?.setValue(this.prqDetail?.vehicleSize||'')
+    this.marketVehicleTableForm.controls['vehicleSize']?.setValue(this.prqDetail?.vehicleSize||this.prqDetail?.containerSize||"")
   }
 
   functionCallHandler($event) {

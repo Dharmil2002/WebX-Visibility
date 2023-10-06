@@ -6,11 +6,11 @@
     </form>
 </app-common-wrapper-webxpress> -->
 
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" (toggleChange)="onToggleChange($event)">
   <form [formGroup]="DriverTableForm">
     <app-form-webxpress [form]="DriverTableForm" [formData]="jsonControlDriverArray"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
-      (callFunction)="functionCallHandler($event)">
+      (callFunction)="functionCallHandler($event)" [submit]="submit">
     </app-form-webxpress>
   </form>
 </app-common-wrapper-webxpress>

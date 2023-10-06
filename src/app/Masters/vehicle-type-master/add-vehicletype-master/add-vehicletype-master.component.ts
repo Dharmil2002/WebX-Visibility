@@ -10,6 +10,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { calculateVolume } from "../../vehicle-master/vehicle-utility";
+import { HttpErrorResponse } from "@angular/common/http";
 @Component({
   selector: 'app-add-vehicletype-master',
   templateUrl: './add-vehicletype-master.component.html',
@@ -84,7 +85,6 @@ export class AddVehicletypeMasterComponent implements OnInit {
     this.vehicleTypeTableForm.controls["fuelType"].setValue("Petrol")
     this.vehicleTypeTableForm.controls["oem"].setValue("Tata")
   }
-
   //#endregion
 
   cancel() {
@@ -93,7 +93,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
   async checkVehicleTypeExist() {
     let req = {
       "companyCode": this.companyCode,
-      "collectionName": "state_detail",
+      "collectionName": "vehicleType_detail",
       "filter": {}
     };
     const res = await this.masterService.masterPost("generic/get", req).toPromise()
@@ -123,7 +123,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
     this.vehicleTypeTableForm.removeControl("companyCode");
     this.vehicleTypeTableForm.removeControl("updateBy");
     this.vehicleTypeTableForm.removeControl("isUpdate");
-    
+
     let req = {
       "companyCode": this.companyCode,
       "collectionName": "vehicleType_detail",

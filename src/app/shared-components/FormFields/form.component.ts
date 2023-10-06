@@ -15,11 +15,13 @@ export class FormComponent {
   locationIsupdate: boolean;
   minDate: Date;
   maxDate: Date
+  @Input() submit: string = 'Save'
   @Output() callFunction = new EventEmitter();
   @Input() showSaveAndCancelButton: boolean
   @Input() showSaveButton: boolean
   @Output() functionCallEmitter = new EventEmitter();
   @Input() uploadedFiles;
+  @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   selectedValue: any;
   isTouchUIActivated = false;
   // field required for password input.

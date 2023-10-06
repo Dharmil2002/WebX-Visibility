@@ -25,7 +25,9 @@ export class MasterService {
   vehicleDetail: any;
   containerTypeUrl='../../../assets/data/containerType.json'
   countryList='../../../assets/data/country.json'
-
+  vendorGst: any;
+  customerGst: any;
+  companyGst : any;
   constructor(private http: HttpClient) { }
   /**
    * Retrieves JSON file details from the specified API URL.
@@ -50,7 +52,10 @@ export class MasterService {
   setValueheaderCode(data:string){
    this.headerCode=data
   }
-  
+  setValueVendorGst(data:any){
+    this.vendorGst =data;
+  }
+
   sendRequest(config: any): Observable<any> {
     const { url, method, request } = config;
     const apiUrl = `${environment.APIBaseURL}${url}`;
@@ -76,5 +81,20 @@ export class MasterService {
   }
   getAssigneVehicleDetail(){
     return this.vehicleDetail
+  }
+  getVendor(){
+    return  this.vendorGst;
+  }
+  setValueCustomerGst(data:any){
+    this.customerGst =data;
+  }
+  getCustomer(){
+    return  this.customerGst;
+  }
+  setValueCompanyGst(data:any){
+    this.companyGst =data;
+  }
+  getCompany(){
+    return  this.companyGst;
   }
 }

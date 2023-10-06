@@ -10,12 +10,13 @@ export async function addPrqData(prqData, masterService) {
 }
 
 export async function updatePrqStatus(prqData,masterService) {
+
     delete prqData.srNo
     delete prqData.Action
     const reqBody = {
         "companyCode": localStorage.getItem('companyCode'),
         "collectionName": "prq_detail",
-        "filter": { prqId: prqData.prqNo || prqData.prqId || "" },
+        "filter": { prqNo: prqData.prqNo || prqData.prqId || "" },
         "update": {
             ...prqData,
         }
@@ -46,7 +47,7 @@ export async function showConfirmationDialog(prqDetail, masterService, goBack, t
         }
     }
 }
-export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqdata, operation, isClose) {
+export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqdata, operation,isClose) {
     try {
         if (!rptLoc || !companyCode || !arrivalData || !arrivalData.vehNo) {
             throw new Error("Missing required data for vehicle status update. Ensure all parameters are provided.");
@@ -64,7 +65,7 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqd
                     distance: arrivalData.distance,
                     currentLocation: localStorage.getItem("Branch"),
                     updateBy: localStorage.getItem("Username"),
-                    updateDate: new Date().toISOString()
+                    updateDate: new Date()
                 }
                 : {})
         };

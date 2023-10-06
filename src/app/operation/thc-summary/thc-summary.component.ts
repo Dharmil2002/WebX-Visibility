@@ -4,8 +4,6 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { getThcDetail } from '../thc-generation/thc-utlity';
 import { formatDate } from 'src/app/Utility/date/date-utils';
 import { MatDialog } from '@angular/material/dialog';
-import { ThcUpdateComponent } from 'src/app/dashboard/tabs/thc-update/thc-update.component';
-import { ThcViewComponent } from './thc-view/thc-view.component';
 
 @Component({
   selector: 'app-thc-summary',
@@ -18,6 +16,7 @@ export class ThcSummaryComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
+  branch:string=localStorage.getItem("Branch");
   //add dyamic controls for generic table
   dynamicControls = {
     add: true,
@@ -25,14 +24,14 @@ export class ThcSummaryComponent implements OnInit {
     csv: false,
   };
   tableData: any[];
-  TableStyle = "width:70%"
+  TableStyle = "width:80%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {
     tripId: {
       Title: "THC No",
       class: "matcolumnleft",
-      Style: "max-width:220px",
+      Style: "max-width:350px",
     },
     route: {
       Title: "Route",
@@ -42,22 +41,27 @@ export class ThcSummaryComponent implements OnInit {
     vehicle: {
       Title: "Vehicle No",
       class: "matcolumnleft",
-      Style: "max-width:200px",
+      Style: "max-width:130px",
     },
     loadedKg: {
       Title: "Loaded Kg",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "max-width:100px",
     }, 
     updateDate: {
       Title: "CreateAt",
       class: "matcolumnleft",
-      Style: "max-width:200px",
+      Style: "max-width:250px",
+    },
+    statusAction:{
+      Title:"Status",
+      class: "matcolumnleft",
+      Style: "max-width:100px",
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:100px",
     }
   };
   //#endregion
@@ -66,6 +70,7 @@ export class ThcSummaryComponent implements OnInit {
     "route",
     "vehicle",
     "loadedKg",
+    "statusAction",
     "updateDate",
   ];
   addAndEditPath: string;
@@ -86,12 +91,16 @@ export class ThcSummaryComponent implements OnInit {
 
     //here the code which is get details of Thc Which is Display in Fron-end
   async getThcDetails() {
+
     const thcList = await getThcDetail(this._operationService);
+
     const thcDetail= thcList.data
     .map((item) => {
+      const action= item.route.split('-')[1].toLowerCase() === this.branch.toLowerCase();
       if (item.updateDate) {
         item.updateDate = formatDate(item.updateDate, 'dd-MM-yy HH:mm');
-        item.actions = item?.status === "1" ? ["Update THC","View"] :["Delivered","View"]
+        item.statusAction=item?.status === "1" ? "In Transit" :"Delivered",
+        item.actions =item.status === "1" && action?  ["Update THC","View"] :item.status === "1"?["View"]:["Delivered","View"];
       }
       return item;
     });

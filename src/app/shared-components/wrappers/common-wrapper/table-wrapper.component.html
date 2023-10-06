@@ -8,8 +8,13 @@
 
                         <ng-container *ngIf="breadscrums !== undefined">
                             <div class="block-header" *ngFor="let breadscrum of breadscrums">
-                                <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items"
-                                    [active_item]="breadscrum.active">
+                                <app-breadcrumb 
+                                    [title]="breadscrum.title" 
+                                    [items]="breadscrum.items"
+                                    [active_item]="breadscrum.active"                            
+                                    [generatecontrol]="breadscrum.generatecontrol"
+                                    (toggleChange)="onToggleChange($event)"
+                                    [toggle]="breadscrum.toggle">
                                 </app-breadcrumb>
                             </div>
                         </ng-container>

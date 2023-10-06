@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-common-wrapper-webxpress',
@@ -8,9 +8,14 @@ export class CommonWrapperComponent implements OnInit {
 
   @Input() breadscrums:any
   @Input() loadTable:any
+  @Output() toggleChange = new EventEmitter<boolean>();
+  @Input() toggle: boolean;
   constructor() { }
 
   ngOnInit(): void {    
   }
-
+ 
+  onToggleChange(event: any) {
+    this.toggleChange.emit(event);
+  }
 }

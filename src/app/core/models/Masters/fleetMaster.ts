@@ -1,6 +1,6 @@
 export class fleetModel {
 
-  activeFlag: string;
+  activeFlag: any;
   id: number; //user
   vehicleNo: string;
   vehicleType: string;

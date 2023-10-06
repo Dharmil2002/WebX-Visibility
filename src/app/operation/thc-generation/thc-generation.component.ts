@@ -12,6 +12,10 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
 import { updatePrq } from '../consignment-entry-form/consigment-utlity';
 import { showConfirmationDialogThc } from '../thc-summary/thc-update-utlity';
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ThcUpdateComponent } from 'src/app/dashboard/tabs/thc-update/thc-update.component';
+import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
 
 @Component({
   selector: 'app-thc-generation',
@@ -39,7 +43,6 @@ export class ThcGenerationComponent implements OnInit {
     edit: false,
     csv: false,
   };
-  TableStyle = "width:49%"
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {
@@ -51,12 +54,12 @@ export class ThcGenerationComponent implements OnInit {
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:260px",
     },
     docketNumber: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:200px",
     },
     fromCity: {
       Title: "From City",
@@ -66,18 +69,38 @@ export class ThcGenerationComponent implements OnInit {
     toCity: {
       Title: "To City",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:160px",
     },
     transMode: {
       Title: "Trans Mode",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "max-width:160px",
     },
     actualWeight: {
       Title: "Actual Weight",
       class: "matcolumnleft",
-      Style: "max-width:150px",
-    }
+      Style: "max-width:160px",
+    },
+    pod: {
+      Title: "Pod",
+      class: "matcolumnleft",
+      Style: "max-width:160px",
+    },
+    receiveBy: {
+      Title: "Receive By",
+      class: "matcolumnleft",
+      Style: "max-width:160px",
+    },
+    arrivalTime: {
+      Title: "Arrival Time",
+      class: "matcolumnleft",
+      Style: "max-width:160px",
+    },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:80px",
+    },
   };
   //#endregion
   staticField = [
@@ -111,24 +134,38 @@ export class ThcGenerationComponent implements OnInit {
   locationData: any;
   prqlist: any;
   isView: any;
+  selectedData: any;
+  menuItems = [
+    { label: 'Update' },
+  ];
+  menuItemflag: boolean = true;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private operationService: OperationService,
     private masterService: MasterService,
-    private route: Router
+    private route: Router,
+    private docketService:DocketService,
+    private vehicleStatusService:VehicleStatusService,
+    public dialog: MatDialog
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
+    delete this.columnHeader.pod;
+    delete this.columnHeader.receiveBy;
+    delete this.columnHeader.actionsItems;
+    delete this.columnHeader.arrivalTime;
     if (navigationState != null) {
       this.isUpdate = navigationState.hasOwnProperty('isUpdate') ? true : false;
-      this.isView=navigationState.hasOwnProperty('isView')?true:false;
+      this.isView = navigationState.hasOwnProperty('isView') ? true : false;
       if (this.isUpdate) {
+        
         this.thcDetail = navigationState.data;
       }
-      else if(this.isView){
+      else if (this.isView) {
         this.thcDetail = navigationState.data;
       }
       else {
+     
         this.prqDetail = navigationState;
         this.prqFlag = true;
       }
@@ -138,8 +175,6 @@ export class ThcGenerationComponent implements OnInit {
 
   async getShipmentDetail() {
     const shipmentList = await getShipment(this.operationService, false);
-    //this.tableData = shipmentList;
-    //this.tableData = [];
     this.allShipment = shipmentList;
     this.tableLoad = false;
   }
@@ -152,7 +187,7 @@ export class ThcGenerationComponent implements OnInit {
 
   IntializeFormControl() {
     // Create an instance of loadingControl class
-    const loadingControlFormControls = new thcControl(this.isUpdate,this.isView);
+    const loadingControlFormControls = new thcControl(this.isUpdate, this.isView);
 
     // Get the form controls from the loadingControlFormControls instance
     this.jsonControlArray =
@@ -230,11 +265,17 @@ export class ThcGenerationComponent implements OnInit {
     this.bindPrqData();
     this.getShipmentDetails();
   }
-  bindPrqData() {
+  async bindPrqData() {
+   const vehicleDetail= await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
     this.thcTableForm.controls['vehicle'].setValue(this.prqDetail?.vehicleNo);
     this.thcTableForm.controls['VendorType'].setValue('Market');
     this.thcTableForm.controls['route'].setValue(this.prqDetail?.fromToCity || "");
     this.thcTableForm.controls['capacity'].setValue(this.prqDetail?.vehicleSize || "");
+    this.thcTableForm.controls['driverName'].setValue(vehicleDetail?.driver || "");
+    this.thcTableForm.controls['driverMno'].setValue(vehicleDetail?.dMobNo || "");
+    this.thcTableForm.controls['driverLno'].setValue(vehicleDetail?.lcNo || "");
+    this.thcTableForm.controls['driverLexd'].setValue(vehicleDetail?.lcExpireDate || "");
+    this.thcTableForm.controls['panNo'].setValue(vehicleDetail?.driverPan || "");
   }
   async getShipmentDetails() {
 
@@ -263,17 +304,18 @@ export class ThcGenerationComponent implements OnInit {
       const totalActualWeight = actualWeights.reduce((acc, weight) => acc + weight, 0);
 
       x.actualWeight = totalActualWeight
+      x.actions=['Update']
       return x; // Make sure to return x to update the original object in the 'tableData' array.
     });
     this.thcTableForm.controls['vendorName'].setValue(shipment ? shipment[0].vendorName : "");
     if (this.isUpdate || this.isView) {
-        const thcDetail=this.thcDetail
-        this.tableData.forEach(item => {
-          if (thcDetail.docket.includes(item.docketNumber)) {
-            item.isSelected = true;
-          }
-        });
-        
+      const thcDetail = this.thcDetail
+      this.tableData.forEach(item => {
+        if (thcDetail.docket.includes(item.docketNumber)) {
+          item.isSelected = true;
+        }
+      });
+
     }
     // Sum all the calculated actualWeights
   }
@@ -289,6 +331,7 @@ export class ThcGenerationComponent implements OnInit {
     let percentage = (loadedTons * 100) / capacityTons;
     this.thcTableForm.controls['loadedKg'].setValue(totalActualWeight);
     this.thcTableForm.controls['weightUtilization'].setValue(percentage.toFixed(2));
+    this.selectedData=event;
   }
   autoFillThc() {
     const propertiesToSet = [
@@ -332,14 +375,33 @@ export class ThcGenerationComponent implements OnInit {
 
     const balAmtAt = this.locationData.find(x => x.value === this.thcDetail?.balAmtAt);
     this.thcTableForm.controls['balAmtAt'].setValue(balAmtAt);
-    
+
     this.getShipmentDetails();
   }
-
-
+  async handleMenuItemClick(data) {
+    if (data.label.label === "Update") {
+      const dialogref = this.dialog.open(ThcUpdateComponent, {
+        data: data.data,
+      });
+      dialogref.afterClosed().subscribe((result) => {
+      });
+    }
+  }
   async createThc() {
-
-    const docket = this.tableData.map((x) => x.docketNumber);
+    
+    if (!this.selectedData && !this.isUpdate) {
+      Swal.fire({
+        icon: "info", // You can use the "info" icon for informational messages
+        title: "Information",
+        text: "You must select any one of Shipment",
+        showConfirmButton: true,
+      });
+      return false
+    }
+    else{
+      this.selectedData=this.tableData;
+    }
+    const docket = this.selectedData.map((x) => x.docketNumber);
     this.thcTableForm.controls["docket"].setValue(docket);
     const prqNo = this.thcTableForm.controls["prqNo"].value.value;
     const advPdAt = this.thcTableForm.controls["advPdAt"].value?.value || "";
@@ -348,43 +410,38 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls["advPdAt"].setValue(advPdAt);
     this.thcTableForm.controls["balAmtAt"].setValue(balAmtAt);
     if (this.isUpdate) {
+
       this.thcTableForm.controls["status"].setValue('2');
-      this.thcTableForm.controls["_id"].setValue(this.thcTableForm.controls["tripId"].value);
-     const res= await showConfirmationDialogThc(this.thcTableForm.value, this.operationService);
-     if(res){
-      Swal.fire({
-        icon: "success",
-        title: "Update Successfuly",
-        text: `THC Number is ${this.thcTableForm.controls["tripId"].value}`,
-        showConfirmButton: true,
-      })
-      this.goBack('THC');
-     }
+      const res = await showConfirmationDialogThc(this.thcTableForm.value, this.operationService);
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "Update Successfuly",
+          text: `THC Number is ${this.thcTableForm.controls["tripId"].value}`,
+          showConfirmButton: true,
+        })
+        this.goBack('THC');
+      }
     }
     else {
-      const randomNumber =
-        "TH/" +
-        this.orgBranch +
-        "/" +
-        2223 +
-        "/" +
-        Math.floor(Math.random() * 100000);
-      this.thcTableForm.controls["tripId"].setValue(randomNumber);
-      this.thcTableForm.controls["_id"].setValue(randomNumber);
 
       if (this.prqFlag) {
         const prqData = {
-          prqId: this.thcTableForm.controls["prqNo"].value,
+          prqNo: this.thcTableForm.controls["prqNo"].value,
         }
         await updatePrq(this.operationService, prqData, "7")
-     
+
       }
+      for (const element of docket) {
+        await this.docketService.updateDocket(element);
+      }
+      
       const resThc = await thcGeneration(this.operationService, this.thcTableForm.value)
       if (resThc) {
         Swal.fire({
           icon: "success",
-          title: "THC Generated Successfuly",
-          text: `THC Number is ${randomNumber}`,
+          title: "THC Generated Successfully",
+          text: `THC Number  Generated Successfully `,
           showConfirmButton: true,
         }).then((result) => {
           if (result.isConfirmed) {

@@ -39,6 +39,7 @@ export class ErrorInterceptor implements HttpInterceptor {
               tap(
                 (res) => {
                   this.isRefreshing = false;
+                  location.reload();
                 },
                 (err) => {
                   console.log("Error In Refresh Token : " + err)

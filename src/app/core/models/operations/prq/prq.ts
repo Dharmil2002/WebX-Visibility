@@ -15,6 +15,7 @@ export class prqDetail {
     typeContainer:string;
     payType:string;
     pAddress:string;
+    contractAmt:number;
     Action: string;
     
 
@@ -35,5 +36,6 @@ export class prqDetail {
         this.status = data.status ?? '';
         this.payType = data.payType ?? '';
         this.Action = data.Action ?? '';
+        this.contractAmt=data.contractAmt??0;
     }
 }

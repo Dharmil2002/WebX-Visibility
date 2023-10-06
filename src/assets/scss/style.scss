@@ -288,7 +288,6 @@ mat-slide-toggle {
 }
 
 body {
-  margin-top: 20px;
   background: #FAFAFA;
 }
 
@@ -543,6 +542,7 @@ a {
   /* Set the width to match the input (optional) */
   z-index: 1000;
   /* Ensure it appears above other elements (optional) */
+  
 }
 
 /* Your component's CSS file or global styles */
@@ -577,7 +577,7 @@ a {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  width: 118%;
+  width: 101%;
   border: 1px solid #ccc;
   border-top: none;
   position: absolute;
@@ -620,6 +620,7 @@ a {
   }
   .google-autocomplete-list {
     margin-left: -39px;
+    width: 118%;
   }
   // .globehide{
   //   display:none!important;

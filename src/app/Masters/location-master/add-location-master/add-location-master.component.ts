@@ -14,6 +14,9 @@ import { ReplaySubject, Subject } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { MapRender } from "src/app/Utility/Location Map/Maprendering";
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { StateService } from "src/app/Utility/module/masters/state/state.service";
+import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 @Component({
   selector: "app-add-location-master",
   templateUrl: "./add-location-master.component.html",
@@ -25,7 +28,6 @@ export class AddLocationMasterComponent implements OnInit {
   protected _onDestroy = new Subject<void>();
   mappedPincode: string;
   mappedPincodeStatus: boolean;
-
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -37,13 +39,7 @@ export class AddLocationMasterComponent implements OnInit {
   locationFormControls: LocationControl;
   error: string;
   jsonControlLocationArray: any;
-  breadScrums = [
-    {
-      title: "Add Location Master",
-      items: ["Masters"],
-      active: "Location Master",
-    },
-  ];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: boolean; }[];
   locHierachy: any;
   locHierachyStatus: any;
   reportLoc: any;
@@ -66,6 +62,7 @@ export class AddLocationMasterComponent implements OnInit {
   locationResponse: any;
   locOwnerShipList: any;
   locationData: any;
+  submit = 'Save';
   //#endregion
 
   constructor(
@@ -73,13 +70,15 @@ export class AddLocationMasterComponent implements OnInit {
     public dialog: MatDialog,
     private router: Router,
     private filter: FilterUtils,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private objPinCodeService: PinCodeService,
+    private objState: StateService
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.locationTable = router.getCurrentNavigation().extras.state.data;
 
-      console.log(this.locationTable);
       this.isUpdate = true;
+      this.submit = 'Modify';
       this.action = "edit";
     } else {
       this.action = "Add";
@@ -87,17 +86,21 @@ export class AddLocationMasterComponent implements OnInit {
     if (this.action === "edit") {
       this.breadScrums = [
         {
-          title: "Location Master",
+          title: "Modify Location",
           items: ["Masters"],
-          active: "Edit Location",
+          active: "Modify Location",
+          generatecontrol: true,
+          toggle: this.locationTable.activeFlag
         },
       ];
     } else {
       this.breadScrums = [
         {
-          title: "Location Master",
+          title: "Add Location",
           items: ["Masters"],
           active: "Add Location",
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.locationTable = new LocationMaster({});
@@ -135,45 +138,20 @@ export class AddLocationMasterComponent implements OnInit {
 
   //#region Pincode Dropdown
   getPincodeData() {
-    const pincodeValue = this.locationTableForm.controls["locPincode"].value;
-
-    // Check if pincodeValue is a valid number and has at least 3 characters
-    if (!isNaN(pincodeValue) && pincodeValue.length >= 3) {
-      // Find an exact pincode match in the pincodeDet array
-      const exactPincodeMatch = this.pincodeDet.find(element => element.name === pincodeValue);
-
-      if (!exactPincodeMatch) {
-        // Filter pincodeDet for partial matches
-        const filteredPincodeDet = this.pincodeDet.filter(element =>
-          element.name.includes(pincodeValue)
-        );
-
-        if (filteredPincodeDet.length === 0) {
-          // Show a popup indicating no data found for the given pincode
-          Swal.fire({
-            icon: "info",
-            title: "No Data Found",
-            text: `No data found for pincode ${pincodeValue}`,
-            showConfirmButton: true,
-          });
-        } else {
-          // Call the filter function with the filtered data
-          this.filter.Filter(
-            this.jsonControlLocationArray,
-            this.locationTableForm,
-            filteredPincodeDet,
-            this.pincode,
-            this.pincodeStatus
-          );
-        }
-      }
-    }
+    this.objPinCodeService.validateAndFilterPincode(this.locationTableForm, "", this.jsonControlLocationArray, 'locPincode', this.pincodeStatus);
   }
   //#endregion
 
   //#region Save function
-  save() {
-    const formValue = this.locationTableForm.value;
+  async save() {
+    // Convert locName and locCode to uppercase
+    this.locationTableForm.value.locName = this.locationTableForm.value.locName.toUpperCase();
+    this.locationTableForm.value.locCode = this.locationTableForm.value.locCode.toUpperCase();
+
+    const locValue = this.locationTableForm.value;
+    const { locLevel, reportLevel } = locValue;
+
+    // Prepare a list of control names to process
     const controlNames = [
       "locLevel",
       "reportLevel",
@@ -181,33 +159,40 @@ export class AddLocationMasterComponent implements OnInit {
       "locPincode",
       "ownership",
     ];
-    const extractControlValue = (controlName) => formValue[controlName]?.value;
-    const resultArray = this.locationTableForm.value.pincodeHandler.map(item => item.value);
+
+    // Extract and set control values
     controlNames.forEach((controlName) => {
-      const controlValue = extractControlValue(controlName);
+      const controlValue = locValue[controlName]?.value;
       this.locationTableForm.controls[controlName].setValue(controlValue);
     });
-    // Extract latitude and longitude from comma-separated string
-    const latLng = this.locationTableForm.value.Latitude.split(",");
-    this.locationTableForm.controls.Latitude.setValue(latLng[0] || 0);
-    this.locationTableForm.controls.Longitude.setValue(latLng[1] || 0);
 
-    this.locationTableForm.controls["pincodeHandler"].setValue(resultArray)
+    // Extract latitude and longitude from comma-separated string
+    const [latitude, longitude] = this.locationTableForm.value.Latitude.split(",");
+    this.locationTableForm.controls.Latitude.setValue(latitude || 0);
+    this.locationTableForm.controls.Longitude.setValue(longitude || 0);
+
+    // Extract and set pincodeHandler values
+    const pincodeHandlerValues = this.locationTableForm.value.pincodeHandler.map(item => item.value);
+    this.locationTableForm.controls.pincodeHandler.setValue(pincodeHandlerValues);
+    this.locationTableForm.removeControl('mappedPincode')
+    // Clear form validation errors
     Object.values(this.locationTableForm.controls).forEach((control) =>
       control.setErrors(null)
     );
-    if (this.isUpdate) {
-      const id = this.locationTableForm.value._id;
-      this.locationTableForm.removeControl("_id");
 
+    if (this.isUpdate) {
+
+      //let data = convertNumericalStringsToInteger(this.locationTableForm.value)
+      // Update an existing record
+      const id = this.locationTableForm.value._id;
       const req = {
         companyCode: this.companyCode,
         collectionName: "location_detail",
         filter: { _id: id },
         update: this.locationTableForm.value,
       };
-      const res = this.masterService.masterPut("generic/update", req).toPromise()
-      if (res) {
+      try {
+        await this.masterService.masterPut("generic/update", req).toPromise();
         // Display success message
         Swal.fire({
           icon: "success",
@@ -216,19 +201,39 @@ export class AddLocationMasterComponent implements OnInit {
           showConfirmButton: true,
         });
         this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
+      } catch (error) {
+        // Handle the error, e.g., display an error message
+        console.error("Error updating record:", error);
       }
     } else {
+      if (locLevel.name === 'Head Office' && reportLevel.name === 'Head Office') {
+        // Reset form controls and show an error message
+        this.locationTableForm.patchValue({
+          locLevel: '',
+          reportLevel: '',
+        });
+        Swal.fire({
+          title: 'You cannot add Multiple Location as Head Office. Please try with another location.',
+          toast: true,
+          icon: 'error',
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: 'OK',
+        });
+        return;
+      }
+      // Create a new record
       this.locationTableForm.controls["_id"].setValue(
         this.locationTableForm.controls["locCode"].value
       );
-
       const createReq = {
         companyCode: this.companyCode,
         collectionName: "location_detail",
         data: this.locationTableForm.value,
       };
-      const res = this.masterService.masterPost("generic/create", createReq).toPromise()
-      if (res) {
+      try {
+        await this.masterService.masterPost("generic/create", createReq).toPromise();
         // Display success message
         Swal.fire({
           icon: "success",
@@ -237,9 +242,13 @@ export class AddLocationMasterComponent implements OnInit {
           showConfirmButton: true,
         });
         this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
+      } catch (error) {
+        // Handle the error, e.g., display an error message
+        console.error("Error adding record:", error);
       }
     }
   }
+
   //#endregion
 
   functionCallHandler($event) {
@@ -257,67 +266,31 @@ export class AddLocationMasterComponent implements OnInit {
     this.router.navigateByUrl("/Masters/LocationMaster/LocationMasterList");
   }
 
-  getLocationDetails() {
-    let req = {
-      companyCode: this.companyCode,
-      filter: { locCode: this.locationTableForm.value.locCode },
-      collectionName: "location_detail",
-    };
-    this.masterService.masterPost("generic/get", req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          if (res.data.length > 0) {
-            Swal.fire({
-              title: "Location Code Already exist! Please try with another",
-              toast: true,
-              icon: "error",
-              showCloseButton: false,
-              showCancelButton: false,
-              showConfirmButton: true,
-              confirmButtonText: "OK",
-            });
-            this.locationTableForm.controls["locCode"].setErrors({
-              locCodeExist: true,
-            });
-            this.locationTableForm.controls["locCode"].setValue("");
-          }
-          (err) => {
-            if (err instanceof HttpErrorResponse) {
-            }
-          };
-        }
-      },
-    });
-  }
-  //#region to set zone according to statename
-  getStateDetails() {
+  //#region to set zone , Country according to statename
+  async getStateDetails() {
+    // Get the state name from the form input
     const stateName = this.locationTableForm.value.locState;
-    const req = {
-      companyCode: this.companyCode,
-      filter: { STNM: stateName },
-      collectionName: "state_master",
-    };
-    this.masterService.masterPost("generic/get", req).subscribe({
-      next: (res: any) => {
-        if (res.data && res.data.length > 0) {
-          const firstStateData = res.data[0];
-          this.locationTableForm.controls["locRegion"].setValue(firstStateData.ZN);
-          this.masterService.getJsonFileDetails("countryList").subscribe((res) => {
-            const countryName = res.find(x => x.Code == firstStateData.CNTR)
-            this.locationTableForm.controls["locCountry"].setValue(countryName.Country);
-          })
-        } else {
-          // Handle the case where no data is found for the given stateName
-          console.error(`No data found for state: ${stateName}`);
+
+    // Fetch state details by state name
+    const stateDetails = await this.objState.fetchStateByFilterId(stateName, 'STNM');
+
+    // Check if state details were found
+    if (stateDetails.length > 0) {
+      const { ZN, CNTR } = stateDetails[0];
+
+      // Set the region value in the form
+      this.locationTableForm.controls["locRegion"].setValue(ZN);
+
+      // Fetch the list of countries from a JSON file
+      this.masterService.getJsonFileDetails("countryList").subscribe((res) => {
+        // Find the country name that matches the state's country code
+        const countryName = res.find(x => x.Code === CNTR);
+        if (countryName) {
+          // Set the country value in the form if found
+          this.locationTableForm.controls["locCountry"].setValue(countryName.Country);
         }
-      },
-      error: (err) => {
-        if (err instanceof HttpErrorResponse) {
-          // Handle HTTP error if needed
-          console.error("HTTP error:", err);
-        }
-      },
-    });
+      });
+    }
   }
   //#endregion
 
@@ -389,7 +362,7 @@ export class AddLocationMasterComponent implements OnInit {
         this.locationTableForm.controls.locLevel.setValue(locLevel);
         this.setReportLevelData(locLevel);
         const ownership = this.locOwnerShipList.find(
-          (x) => x.value == this.locationTable.ownership
+          (x) => x.name == this.locationTable.ownership
         );
         this.locationTableForm.controls.ownership.setValue(ownership);
 
@@ -434,15 +407,10 @@ export class AddLocationMasterComponent implements OnInit {
       (item) =>
         item.PIN == this.locationTableForm.controls.locPincode.value.value
     );
-    const request = {
-      "companyCode": this.companyCode,
-      "collectionName": "state_master",
-      "filter": { ST: fetchData.ST }
-    };
-
-    // Fetch pincode data
-    const state = await this.masterService.masterPost('generic/get', request).toPromise();
-    this.locationTableForm.controls.locState.setValue(state.data[0].STNM)
+    fetchData.ST = parseInt(fetchData.ST)
+    // Fetch and set the state name based on the state code
+    const stateName = await this.objState.fetchStateByFilterId(fetchData.ST, 'ST');
+    this.locationTableForm.controls.locState.setValue(stateName[0].STNM)
     this.locationTableForm.controls.locCity.setValue(fetchData.CT);
     this.getStateDetails();
   }
@@ -476,10 +444,12 @@ export class AddLocationMasterComponent implements OnInit {
     const filter = this.locationResponse.data.filter(
       (x) => parseInt(x.locLevel) === parseInt(locHierachy)
     );
-    const reportLoc = filter.map((element) => ({
-      name: element.locCode,
-      value: element.locCode,
-    }));
+    const reportLoc = filter
+      .filter((item) => item.activeFlag)
+      .map((element) => ({
+        name: element.locName,
+        value: element.locCode,
+      }));
     if (this.isUpdate) {
       const reportLocData = reportLoc.find(
         (x) => x.value == this.locationTable.reportLoc
@@ -493,7 +463,6 @@ export class AddLocationMasterComponent implements OnInit {
       this.report,
       this.reportStatus
     );
-    this.locationTableForm.controls.reportLoc.setValue("");
   }
   //#region to check Existing location
   async checkLocationCodeExist() {
@@ -617,4 +586,9 @@ export class AddLocationMasterComponent implements OnInit {
       });
   }
   //#endregion
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.locationTableForm.controls['activeFlag'].setValue(event);
+    //console.log("Toggle value :", event);
+  }
 }

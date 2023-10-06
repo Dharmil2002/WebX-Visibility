@@ -7,29 +7,57 @@ import Swal from 'sweetalert2';
   templateUrl: './address-master-list.component.html',
 })
 export class AddressMasterListComponent implements OnInit {
-  data: [] | any;
+  tableData: any[];
   csv: any[];
+  menuItemflag: boolean = false;
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  toggleArray = ["activeFlag"]
+  toggleArray = ["activeFlag"];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = []
   columnHeader = {
-    "srNo": "Sr No",
-    "addressCode": "Address Code",
-    "manualCode": "Manual Code",
-    "cityName": "City Name",
-    "address": "Address",
-    "activeFlag": "Active Status",
-    "actions": "Actions"
+    srNo: {
+      Title: "Sr No",
+      class: "matcolumnleft",
+      Style: "max-width:90px",
+    },
+    addressCode: {
+      Title: "Address Code",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    },
+    manualCode: {
+      Title: "Manual Code",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    },
+    cityName: {
+      Title: "City Name",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    },
+    address: {
+      Title: "Address",
+      class: "matcolumnleft",
+      Style: "max-width:480px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;",
+    },
+    activeFlag: {
+      Title: "Active Status",
+      class: "matcolumnleft",
+      Style: "max-width:100px",
+    },
+    actions: {
+      Title: "Active Status",
+      class: "matcolumnleft",
+      Style: "max-width:100px",
+    },
   };
-  headerForCsv = {
-    "srNo": "Sr No",
-    "addressCode": "Address Code",
-    "manualCode": "Manual Code",
-    "cityName": "City Name",
-    "address": "Address",
-    "activeFlag": "Active Status",
-  }
+  staticField = [
+    "srNo",
+    "addressCode",
+    "manualCode",
+    "cityName",
+    "address",
+  ];
   breadScrums = [
     {
       title: "Address Master",
@@ -43,7 +71,6 @@ export class AddressMasterListComponent implements OnInit {
     csv: false
   }
   addAndEditPath: string;
-  tableData: any;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/AddressMaster/AddAddressMaster";
   }

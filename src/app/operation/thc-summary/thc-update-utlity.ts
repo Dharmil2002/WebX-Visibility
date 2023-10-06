@@ -21,7 +21,7 @@ async function updateThcStatus(data,operationService) {
     const reqBody = {
         "companyCode": localStorage.getItem('companyCode'),
         "collectionName": "thc_detail",
-        "filter": {_id:data.tripId},
+        "filter": {tripId:data.tripId},
         "update":data
     }
     const res = await operationService.operationMongoPut("generic/update", reqBody).toPromise();

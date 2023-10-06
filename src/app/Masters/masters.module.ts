@@ -118,6 +118,14 @@ import { AddAdditionalDeliveryChargesComponent } from './Vendor Contract/vendor-
 import { AddWaitingChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-waiting-charges/add-waiting-charges.component';
 import { TripLaneBasedComponent } from './Vendor Contract/vendor-tabs/trip-lane-based/trip-lane-based.component';
 import { SpecialChargesComponent } from './Vendor Contract/vendor-tabs/special-charges/special-charges.component';
+import { PinCodeService } from '../Utility/module/masters/pincode/pincode.service';
+import { StateService } from '../Utility/module/masters/state/state.service';
+import { VirtualLoginComponent } from '../layout/virtual-login/virtual-login.component';
+import { CustomerContractBasicInformationComponent } from './Customer Contract/CustomerContractTabs/customer-contract-basic-information/customer-contract-basic-information.component';
+import { CustomerContractServiceSelectionComponent } from './Customer Contract/CustomerContractTabs/customer-contract-service-selection/customer-contract-service-selection.component';
+import { CustomerContractListComponent } from './Customer Contract/customer-contract-list/customer-contract-list.component';
+import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
+import { CustomerQueryPageComponent } from './Customer Contract/customer-query-page/customer-query-page.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -157,10 +165,10 @@ import { SpecialChargesComponent } from './Vendor Contract/vendor-tabs/special-c
     MatStepperModule,
     NgxMaterialTimepickerModule,
     ReactiveFormsModule
-
   ],
 
   declarations: [
+    VirtualLoginComponent,
     CNoteGenerationComponent,
     EwaybillConfigComponent,
     EwayBillDetailsComponent,
@@ -243,11 +251,17 @@ import { SpecialChargesComponent } from './Vendor Contract/vendor-tabs/special-c
    AddAdditionalDeliveryChargesComponent,
    AddWaitingChargesComponent,
    TripLaneBasedComponent,
-   SpecialChargesComponent
+   SpecialChargesComponent,
+   CustomerQueryPageComponent,
+   CustomerContractListComponent,
+   CustomerContractTabsIndexComponent,
+   CustomerContractBasicInformationComponent,
+   CustomerContractServiceSelectionComponent
 
   ],
 
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService]
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService,
+  PinCodeService,StateService]
 })
 
 export class MastersModule { }

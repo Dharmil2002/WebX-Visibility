@@ -5,29 +5,67 @@ import {
   HttpEvent,
   HttpInterceptor,
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, switchMap, tap, throwError } from 'rxjs';
+import { StorageService } from '../service/storage.service';
 import { AuthService } from '../service/auth.service';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  constructor(private authenticationService: AuthService) {}
+  constructor( private authenticationService: AuthService, private _jwt: JwtHelperService, private storageService: StorageService) {}
 
   intercept(
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    // add authorization header with jwt token if available
-    let currentUser = this.authenticationService.currentUserValue;
-    if (currentUser && currentUser.tokens.access) {
-      if(request.body){
+    let accessToken  = this.storageService.getItem("token");    
+    if (accessToken) {      
+      if(this._jwt.isTokenExpired(accessToken))
+      {
+        return this.refreshTokenAndRetry(request, next);
+      }
+      
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${currentUser.tokens.access.token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
     }
-    }
+    
+    return next.handle(request).pipe(
+      catchError((error) => {
+        if (error.status === 401) {
+          // Unauthorized error, token might have expired, attempt to refresh
+          return this.refreshTokenAndRetry(request, next);
+        } else {
+          return throwError(error);
+        }
+      })
+    );
+  }
 
-    return next.handle(request);
+  private refreshTokenAndRetry(
+    req: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+    return this.authenticationService.refreshtoken().pipe(
+      switchMap((res) => {
+        if (res) {
+          let accessToken = this.storageService.getItem("token");    
+          req = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          return next.handle(req);
+        } else {
+          // If token refresh fails, you can handle it as needed
+          // For example, logout the user or redirect to the login page
+          this.authenticationService.logout();
+          location.reload();
+        }
+      })
+    );
   }
 }
+

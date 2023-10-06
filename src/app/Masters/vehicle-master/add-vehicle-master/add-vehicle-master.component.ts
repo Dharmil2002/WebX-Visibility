@@ -8,9 +8,9 @@ import { VehicleControls } from "src/assets/FormControls/vehicle-control";
 import { vehicleModel } from "src/app/core/models/Masters/vehicle-master";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { calculateVolume } from "../vehicle-utility";
 import { Subject, take, takeUntil } from "rxjs";
+import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 @Component({
   selector: 'app-add-vehicle-master',
   templateUrl: './add-vehicle-master.component.html',
@@ -20,11 +20,9 @@ export class AddVehicleMasterComponent implements OnInit {
   action: string;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   isUpdate = false;
-  vehicleTabledata: vehicleModel;
+  vehicleTable: vehicleModel;
   vehicleTableForm: UntypedFormGroup;
   jsonControlVehicleArray: any;
-  jsonControlRegistrationArray: any;
-  jsonControlDimensionArray: any;
   accordionData: any;
   assetName: any;
   assetNameStatus: any;
@@ -48,23 +46,37 @@ export class AddVehicleMasterComponent implements OnInit {
   routeLoc: any;
   routeStatus: any;
   protected _onDestroy = new Subject<void>();
+  vehicleFormControls: VehicleControls
+  vehicleType: any;
+  vehicleTypeStatus: any;
+  allData: {
+    // vehicleData: vehicleRes?.data,
+    vehTypeData: any;
+    venTypeData: any;
+    routeData: any;
+    venNameData: any;
+  };
+  vehTypeDet: any;
+  vehTypeData: any;
+  divisionList: any;
+  division: any;
+  divisionStatus: any;
+  venTypeDet: any;
+  venTypeData: any;
+  venNameDet: any;
+  routeDet: any;
+  routeName: any;
+  ftlTypeDescStatus: any;
+  ftlTypeDescName: any;
+  ftlTypeDet: any;
+  updateCountry: any;
+  divisionAccess: any;
+  vendorData: any;
+  RouteData: any;
+  controllBranch: any;
+  location: any;
+  locationStatus: any;
 
-  ngOnInit(): void {
-    this.bindDropdown();
-    this.getDropDownData();
-    this.getDataAndPopulateForm();
-    this.getAllMastersData();
-  }
-  functionCallHandler($event) {
-    let functionName = $event.functionName;     // name of the function , we have to call
-    // function of this name may not exists, hence try..catch
-    try {
-      this[functionName]($event);
-    } catch (error) {
-      // we have to handle , if function not exists.
-      console.log("failed");
-    }
-  }
   constructor(
     private masterService: MasterService,
     public objSnackBarUtility: SnackBarUtilityService,
@@ -72,81 +84,117 @@ export class AddVehicleMasterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils
   ) {
-    const navigationExtras = this.route.getCurrentNavigation()?.extras;
-    this.vehicleTabledata = navigationExtras?.state?.data || new vehicleModel({});
-    if (navigationExtras?.state != null) {
-      this.action = 'edit';
+    if (this.route.getCurrentNavigation()?.extras?.state != null) {
+      this.vehicleTable = route.getCurrentNavigation().extras.state.data;
+
       this.isUpdate = true;
+      this.action = 'edit'
+
     } else {
-      this.action = "Add";
+      this.action = 'Add'
     }
-    this.breadScrums = [{
-      title: "Vehicle Master",
-      items: ["Home"],
-      active: this.action === 'edit' ? "Edit Vehicle" : "Add Vehicle",
-    }];
-    this.initializeFormControl();
+    if (this.action === 'edit') {
+      this.isUpdate = true;
+      this.breadScrums = [
+        {
+          title: "Vehicle Master",
+          items: ["Masters"],
+          active: "Edit Vehicle",
+        },
+      ];
+
+    } else {
+      this.breadScrums = [
+        {
+          title: "Vehicle Master",
+          items: ["Masters"],
+          active: "Add Vehicle",
+        },
+      ];
+      this.vehicleTable = new vehicleModel({})
+    }
+    this.initializeFormControl()
+  }
+
+
+  ngOnInit(): void {
+    this.getDropDownData();
+    this.getDataAndPopulateForm();
+    this.getAllMastersData();
   }
 
   initializeFormControl() {
-    // Create vehicleFormControls instance to get form controls for different sections
-    const vehicleFormControls = new VehicleControls(this.vehicleTabledata, this.isUpdate);
-    this.jsonControlVehicleArray = vehicleFormControls.getFormControlsD();
-    this.jsonControlRegistrationArray = vehicleFormControls.getFormControlsL();
-    this.jsonControlDimensionArray = vehicleFormControls.getDimensionControl();
-    this.accordionData = {
-      "Vehicle Details": this.jsonControlVehicleArray,
-      "Registration Details": this.jsonControlRegistrationArray,
-      "Dimension in ft": this.jsonControlDimensionArray,
-    };
-    // Build the form group using formGroupBuilder function and the values of accordionData
-    this.vehicleTableForm = formGroupBuilder(this.fb, Object.values(this.accordionData));
-  }
-  setData(data, propertyName, statusPropertyName) {
-    this[propertyName] = data.name;
-    this[statusPropertyName] = data.additionalData.showNameAndValue;
-  }
-  bindDropdown() {
-    const dataMappings = {
-      vehicleType: ['vehicleType', 'vehicleTypeStatus'],
-      controllBranch: ['controllBranch', 'controllBranchStatus'],
-      assetName: ['assetName', 'assetNameStatus'],
-      vendorType: ['vendorType', 'vendorTypeStatus'],
-      vendorName: ['vendorName', 'vendorNameStatus'],
-      gpsProvider: ['gpsProvider', 'gpsProviderStatus'],
-      ftlTypeDesc: ['ftlTypeDesc', 'ftlTypeStatus'],
-      permitState: ['permitState', 'permitStateStatus'],
-      route: ['routeLoc', 'routeStatus']
-    };
 
+    this.vehicleFormControls = new VehicleControls(this.vehicleTable, this.isUpdate);
+    // Get form controls for Driver Details section
+    this.jsonControlVehicleArray = this.vehicleFormControls.getFormControlsD();
     this.jsonControlVehicleArray.forEach(data => {
-      const mapping = dataMappings[data.name];
-      if (mapping) {
-        this.setData.call(this, data, mapping[0], mapping[1]);
+      if (data.name === 'vehicleType') {
+        // Set category-related variables
+        this.vehicleType = data.name;
+        this.vehicleTypeStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'vendorType') {
+        // Set category-related variables
+        this.vendorType = data.name;
+        this.vendorTypeStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'vendorName') {
+        // Set category-related variables
+        this.vendorName = data.name;
+        this.vendorNameStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'route') {
+        // Set category-related variables
+        this.routeName = data.name;
+        this.routeStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'ftlTypeDesc') {
+        // Set category-related variables
+        this.ftlTypeDescName = data.name;
+        this.ftlTypeDescStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === 'division') {
+        // Set category-related variables
+        this.division = data.name;
+        this.divisionStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name === "controllBranch") {
+        // Set category-related variables
+        this.location = data.name;
+        this.locationStatus = data.additionalData.showNameAndValue;
       }
     });
+    // Build the form group using formGroupBuilder function
+    this.vehicleTableForm = formGroupBuilder(this.fb, [this.jsonControlVehicleArray]);
   }
+
+  //#region
   getDropDownData() {
-    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-      const {
-        gpsProviderDropdown,
-      } = res;
-      this.gpsProviderData = gpsProviderDropdown;
-      if (this.isUpdate) {
-        this.gpsProviderDetail = this.findDropdownItemByName(this.gpsProviderData, this.vehicleTabledata.gpsProvider);
-        this.vehicleTableForm.controls.gpsProvider.setValue(this.gpsProviderDetail);
-      }
-      const filterParams = [
-        [this.jsonControlVehicleArray, this.gpsProviderData, this.gpsProvider, this.gpsProviderStatus],
-      ];
-      filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
-        this.filter.Filter(jsonControlArray, this.vehicleTableForm, dropdownData, formControl, statusControl);
-      });
+    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(response => {
+      this.divisionList = response.divisionAccess;
+
+      this.vehicleTableForm.controls["DivisionDrop"].patchValue(
+        this.divisionList.filter(element =>
+          this.vehicleTable.division.includes(element.name)
+        )
+      );
+      //}
+      this.filter.Filter(
+        this.jsonControlVehicleArray,
+        this.vehicleTableForm,
+        this.divisionList,
+        this.division,
+        this.divisionStatus
+      );
     });
   }
+  //#endregion
+
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name === name);
   }
+
   //#region to calculate capacity based on Gross Vehicle Weight and unload weight and send validation msg if condition not matched
   calCapacity() {
     if (
@@ -167,93 +215,162 @@ export class AddVehicleMasterComponent implements OnInit {
       );
     }
   }
+  //#endregion
+
+  //#region
   getDataForInnerOuter(): void {
     var innerDCal = calculateVolume(
-      this.vehicleTableForm.value.innerLength,
-      this.vehicleTableForm.value.innerHeight,
-      this.vehicleTableForm.value.innerWidth
+      this.vehicleTableForm.value.lengthinFeet,
+      this.vehicleTableForm.value.heightinFeet,
+      this.vehicleTableForm.value.widthinFeet
     );
     this.vehicleTableForm.controls["cft"].setValue(innerDCal.toFixed(2));
-    var outerDCal = calculateVolume(
-      this.vehicleTableForm.value.outerLength,
-      this.vehicleTableForm.value.outerHeight,
-      this.vehicleTableForm.value.outerWidth
-    );
-    this.vehicleTableForm.controls["outerCft"].setValue(outerDCal.toFixed(2));
   }
-  cancel() {
-    window.history.back();
-  }
-  /*get all Master Details*/
+  //#endregion
+
+  //#region  get all Master Details
   async getAllMastersData() {
     try {
-      const stateReqBody = {
-        "companyCode": this.companyCode,
-        "collectionName": "state_detail",
-        "filter": {}
-      }
-      const reqBody = {
-        "companyCode": this.companyCode,
-        "collectionName": "routeMasterLocWise",
-        "filter": {}
-      }
       const generalReqBody = {
         "companyCode": this.companyCode,
         "collectionName": "General_master",
         "filter": {}
       }
-      const stateResponse = await this.masterService.masterPost("generic/get", stateReqBody).toPromise();
-      const routeResponse = await this.masterService.masterPost("generic/get", reqBody).toPromise();
+      let vehTypeReq = {
+        "companyCode": this.companyCode,
+        "filter": {},
+        "collectionName": "vehicleType_detail"
+      };
+      let venTypeReq = {
+        "companyCode": this.companyCode,
+        "filter": {},
+        "collectionName": "vendor_detail"
+      };
+      let venNameReq = {
+        "companyCode": this.companyCode,
+        "filter": {},
+        "collectionName": "vendor_detail"
+      };
+      let routeReq = {
+        "companyCode": this.companyCode,
+        "filter": {},
+        "collectionName": "routeMasterLocWise"
+      };
+      const routeRes = await this.masterService.masterPost('generic/get', routeReq).toPromise();
+      const venNameRes = await this.masterService.masterPost('generic/get', venNameReq).toPromise();
+      const venTypeRes = await this.masterService.masterPost('generic/get', venTypeReq).toPromise();
+      const vehTypeRes = await this.masterService.masterPost('generic/get', vehTypeReq).toPromise();
       const generalMasterResponse = await this.masterService.masterPost("generic/get", generalReqBody).toPromise();
-      // FTL Type Description
-      const ftlTypeList = generalMasterResponse.data.filter(item => item.codeType === "FTLTYP").
-        map((x) => {
-          { return { name: x.codeDesc, value: x.codeId } }
-        });
-      // Asset Type Description
-      const assetTypeList = generalMasterResponse.data.filter(item => item.codeType === "VEHASSTYP" && item.activeFlag).
-        map((x) => {
-          { return { name: x.codeDesc, value: x.codeId } }
-        });
-      // Vendor Type Description
-      const vendorTypeList = generalMasterResponse.data.filter(item => item.codeType === "VENDTY" && item.activeFlag).
-        map((x) => {
-          { return { name: x.codeDesc, value: x.codeId } }
-        });
-      const routeList = routeResponse.data.map(element => ({
-        name: element.loccd.join('-'),
-        value: element.routeId,
+      const mergedData = {
+        // vehicleData: vehicleRes?.data,
+        vehTypeData: vehTypeRes?.data,
+        venTypeData: venTypeRes?.data,
+        venNameData: venNameRes?.data,
+        routeData: routeRes?.data,
+        fltType: generalMasterResponse.data
+      };
+
+      this.allData = mergedData;
+
+      const vehTypeDet = mergedData.vehTypeData.map(element => ({
+        name: element.vehicleTypeName.toString(),
+        value: element.vehicleTypeCode.toString(),
       }));
-      const stateList = stateResponse.data.map((x) => { { return { name: x.stateName, value: x.stateCode } } })
-      // Handle the response from the server
-      if (this.isUpdate) {
-        this.vehicleTableForm.controls["permitStateDropdown"].patchValue(stateList.filter((element) =>
-          this.vehicleTabledata.permitState.includes(element.name)
-        ));
-        this.vehicleTableForm.controls["routeLocation"].patchValue(routeList.filter((element) =>
-          this.vehicleTabledata.route.includes(element.name)
-        ));
-        const ftlType = ftlTypeList.find((x) => x.name === this.vehicleTabledata.ftlTypeDesc);
-        this.vehicleTableForm.controls['ftlTypeDesc'].setValue(ftlType);
+      const venTypeDet = mergedData.venTypeData.map(element => ({
+        name: element.vendorType.toString(),
+        value: element.vendorCode.toString(),
+      }));
+      const venNameDet = mergedData.venNameData.map(element => ({
+        name: element.vendorName.toString(),
+        value: element.vendorCode.toString(),
+      }));
+      const routeDet = mergedData.routeData.map(element => ({
+        name: element.loccd.join('-'),
+        value: element.routeId.toString(),
+      }));
+      const FTLtype = mergedData.fltType.filter(item => item.codeType === "FTLTYP").
+        map((x) => {
+          { return { name: x.codeDesc, value: x.codeId } }
+        });
 
-        const assetType = assetTypeList.find((x) => x.name === this.vehicleTabledata.assetName);
-        this.vehicleTableForm.controls['assetName'].setValue(assetType);
+      this.vehTypeDet = vehTypeDet;
+      this.venTypeDet = venTypeDet;
+      this.venNameDet = venNameDet;
+      this.routeDet = routeDet;
+      // this.ftlTypeDet = ftlTypeDet;
 
-        const vendorType = vendorTypeList.find((x) => x.name === this.vehicleTabledata.vendorType);
-        this.vehicleTableForm.controls['vendorType'].setValue(vendorType);
+      this.filter.Filter(
+        this.jsonControlVehicleArray,
+        this.vehicleTableForm,
+        vehTypeDet,
+        this.vehicleType,
+        this.vehicleTypeStatus
+      );
 
-      }
-      this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, stateList, this.permitState, this.permitStateStatus);
-      this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, routeList, this.routeLoc, this.routeStatus);
-      this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, ftlTypeList, this.ftlTypeDesc, this.ftlTypeStatus);
-      this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, assetTypeList, this.assetName, this.assetNameStatus);
-      this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, vendorTypeList, this.vendorType, this.vendorTypeStatus);
+      this.filter.Filter(
+        this.jsonControlVehicleArray,
+        this.vehicleTableForm,
+        venTypeDet,
+        this.vendorType,
+        this.vendorTypeStatus
+      );
 
+      this.filter.Filter(
+        this.jsonControlVehicleArray,
+        this.vehicleTableForm,
+        venNameDet,
+        this.vendorName,
+        this.vendorNameStatus
+      );
+
+      this.filter.Filter(
+        this.jsonControlVehicleArray,
+        this.vehicleTableForm,
+        routeDet,
+        this.routeName,
+        this.routeStatus
+      );
+
+      this.filter.Filter(
+        this.jsonControlVehicleArray,
+        this.vehicleTableForm,
+        FTLtype,
+        this.ftlTypeDescName,
+        this.ftlTypeDescStatus
+      );
+
+      const ftlType = FTLtype.find((x) => x.name === this.vehicleTable.ftlTypeDesc);
+      this.vehicleTableForm.controls['ftlTypeDesc'].setValue(ftlType);
+
+      this.autofillDropdown();
     } catch (error) {
       // Handle any errors that occurred during the request
       console.error('Error:', error);
     }
   }
+  //#endregion
+
+  //#region
+  autofillDropdown() {
+    if (this.isUpdate) {
+
+      this.vehTypeData = this.vehTypeDet.find((x) => x.name == this.vehicleTable.vehicleType);
+      this.vehicleTableForm.controls.vehicleType.setValue(this.vehTypeData);
+
+      this.vendorData = this.venNameDet.find((x) => x.name == this.vehicleTable.vendorName);
+      this.vehicleTableForm.controls.vendorName.setValue(this.vendorData);
+
+      this.venTypeData = this.venTypeDet.find((x) => x.name == this.vehicleTable.vendorType);
+      this.vehicleTableForm.controls.vendorType.setValue(this.venTypeData);
+
+      this.RouteData = this.routeDet.find((x) => x.name == this.vehicleTable.route);
+      this.vehicleTableForm.controls.route.setValue(this.RouteData);
+
+    }
+  }
+  //#endregion
+
+  //#region mutliselection dropdown
   async fetchDataAndPopulateForm(collectionName, formControl, dataProperty, nameProperty, showNameAndValue) {
     try {
       const reqBody = {
@@ -268,8 +385,12 @@ export class AddVehicleMasterComponent implements OnInit {
       }));
 
       if (this.isUpdate) {
-        const selectedData = dataList.find(x => x.name === this.vehicleTabledata[formControl]);
+        const selectedData = dataList.find(x => x.name === this.vehicleTable[formControl]);
         this.vehicleTableForm.controls[formControl].setValue(selectedData);
+        if (formControl == 'controllBranch') {
+          const selectedData = dataList.filter(x => this.vehicleTable[formControl].includes(x.name));
+          this.vehicleTableForm.controls['controllBranchDrop'].setValue(selectedData);
+        }
       }
       // Call the Filter function with the appropriate arguments
       this.filter.Filter(this.jsonControlVehicleArray, this.vehicleTableForm, dataList, formControl, showNameAndValue);
@@ -277,12 +398,15 @@ export class AddVehicleMasterComponent implements OnInit {
       console.error('Error:', error);
     }
   }
-  // Call the function for each data type with the appropriate showNameAndValue parameter
+  //#endregion
+
+  //#region Call the function for each data type with the appropriate showNameAndValue parameter
   async getDataAndPopulateForm() {
-    await this.fetchDataAndPopulateForm("vehicleType_detail", "vehicleType", "vehicleTypeCode", "vehicleTypeName", true);
-    await this.fetchDataAndPopulateForm("vendor_detail", "vendorName", "vendorCode", "vendorName", true);
     await this.fetchDataAndPopulateForm("location_detail", "controllBranch", "locCode", "locName", true);
   }
+  //#endregion
+
+  //#region
   async checkVehicleNumberExist() {
     let req = {
       "companyCode": this.companyCode,
@@ -310,51 +434,52 @@ export class AddVehicleMasterComponent implements OnInit {
       console.error(err);
     }
   }
+  //#endregion
+
+  //#region
   async save() {
+
+    const controls = this.vehicleTableForm;
+    clearValidatorsAndValidate(controls);
     const formValue = this.vehicleTableForm.value;
     const controlNames = [
       "vehicleType",
-      "controllBranch",
-      "assetName",
       "vendorType",
       "vendorName",
-      "gpsProvider",
-      "ftlTypeDesc",
-    ];
-    controlNames.forEach(controlName => {
+      "route",
+      "ftlTypeDesc"];
+    controlNames.forEach((controlName) => {
       const controlValue = formValue[controlName]?.name;
       this.vehicleTableForm.controls[controlName].setValue(controlValue);
     });
-    const permitState = this.vehicleTableForm.value.permitStateDropdown;
-    const permitStateDetail = permitState?this.vehicleTableForm.value.permitStateDropdown.map((item: any) => item.name):"";
-    this.vehicleTableForm.controls["permitState"].setValue(permitStateDetail);
-    const routeDetail = this.vehicleTableForm.value.routeLocation;
-    const routeLocation = routeDetail ? routeDetail.map((item: any) => item.name) : "";
-    this.vehicleTableForm.controls["route"].setValue(routeLocation);
 
-    Object.values(this.vehicleTableForm.controls).forEach(control => control.setErrors(null));
-    // Remove field from the form controls
-    this.vehicleTableForm.removeControl("CompanyCode");
-    this.vehicleTableForm.removeControl("permitStateDropdown");
-    this.vehicleTableForm.removeControl("routeLocation");
-    this.vehicleTableForm.removeControl("isUpdate");
-    this.vehicleTableForm.removeControl("");
-    this.vehicleTableForm.controls["_id"].setValue(this.vehicleTableForm.value.vehicleNo);
-    let data = convertNumericalStringsToInteger(this.vehicleTableForm.value)
-    this.vehicleTableForm.controls["_id"].setValue(this.vehicleTableForm.value.isActive);
+    const controlDetail = this.vehicleTableForm.value.controllBranchDrop;
+    const controllBranchDrop = controlDetail ? controlDetail.map((item: any) => item.name) : "";
+    this.vehicleTableForm.controls["controllBranch"].setValue(controllBranchDrop);
+    console.log("controlDetail", controlDetail);
+
+    const divisionDetail = this.vehicleTableForm.value.DivisionDrop;
+    const DivisionDrop = divisionDetail ? divisionDetail.map((item: any) => item.name) : "";
+    this.vehicleTableForm.controls["division"].setValue(DivisionDrop);
+    console.log("divisionDetail", divisionDetail);
+
+    this.vehicleTableForm.controls["isActive"].setValue(this.vehicleTableForm.value.isActive === true ? true : false);
+    this.vehicleTableForm.removeControl("DivisionDrop")
+    this.vehicleTableForm.removeControl("controllBranchDrop")
     if (this.isUpdate) {
-      let id = this.vehicleTableForm.value._id;
+      let id = this.vehicleTableForm.value.vehicleNo;
       // Remove the "id" field from the form controls
       this.vehicleTableForm.removeControl("_id");
       let req = {
         companyCode: this.companyCode,
         collectionName: "vehicle_detail",
-        filter: {
-          _id: id,
-        },
-        update: data
+        filter: { vehicleNo: id },
+        update: this.vehicleTableForm.value,
       };
-      const res = await this.masterService.masterPut("generic/update", req).toPromise()
+      //API FOR UPDATE
+      const res = await this.masterService
+        .masterPut("generic/update", req)
+        .toPromise();
       if (res) {
         // Display success message
         Swal.fire({
@@ -363,28 +488,35 @@ export class AddVehicleMasterComponent implements OnInit {
           text: res.message,
           showConfirmButton: true,
         });
-        this.route.navigateByUrl('/Masters/VehicleMaster/VehicleMasterList');
+        this.route.navigateByUrl("/Masters/VehicleMaster/VehicleMasterList");
       }
-    }
-    else {
+    } else {
+      console.log("save", this.vehicleTableForm.value);
+      const randomNumber = (this.vehicleTableForm.value.vehicleNo);
+      this.vehicleTableForm.controls["_id"].setValue(randomNumber);
       let req = {
         companyCode: this.companyCode,
         collectionName: "vehicle_detail",
-        data: data
+        data: this.vehicleTableForm.value,
       };
-      const res = await this.masterService.masterPost("generic/create", req).toPromise()
+      //API FOR ADD
+      const res = await this.masterService
+        .masterPost("generic/create", req)
+        .toPromise();
       if (res) {
-        // Display success message
         Swal.fire({
           icon: "success",
           title: "Successful",
           text: res.message,
           showConfirmButton: true,
         });
-        this.route.navigateByUrl('/Masters/VehicleMaster/VehicleMasterList');
+        this.route.navigateByUrl("/Masters/VehicleMaster/VehicleMasterList");
       }
     }
   }
+  //#endregion
+
+  //#endregion
   enableGpsProvider($event) {
     this.jsonControlVehicleArray.forEach(data => {
       if (data.name === 'gpsProvider') {
@@ -394,6 +526,9 @@ export class AddVehicleMasterComponent implements OnInit {
       }
     });
   }
+  //#endregion
+
+  //#region
   SwalMessage(message) {
     Swal.fire({
       title: message,//'Incorrect API',
@@ -405,6 +540,9 @@ export class AddVehicleMasterComponent implements OnInit {
       confirmButtonText: "Yes"
     });
   }
+  //#region
+
+  //#region
   toggleSelectAll(argData: any) {
     let fieldName = argData.field.name;
     let autocompleteSupport = argData.field.additionalData.support;
@@ -421,5 +559,23 @@ export class AddVehicleMasterComponent implements OnInit {
         );
       });
   }
-}
+  //#endregion
 
+  cancel() {
+    window.history.back();
+  }
+
+  //#region
+  functionCallHandler($event) {
+    let functionName = $event.functionName;     // name of the function , we have to call
+    // function of this name may not exists, hence try..catch
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      // we have to handle , if function not exists.
+      console.log("failed");
+    }
+  }
+  //#endregion
+
+}

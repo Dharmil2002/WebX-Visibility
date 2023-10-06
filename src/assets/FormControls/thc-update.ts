@@ -5,38 +5,6 @@ export class ThcUpdateControls {
     constructor() {
         this.thcUpdateControlArray = [
             {
-                name: "tripId",
-                label: "Trip ID",
-                placeholder: '',
-                type: "text",
-                value: '',
-                Validations: [],
-                generatecontrol: true, disable: true
-            },
-            {
-                name: 'vehicle',
-                label: 'Vehicle',
-                placeholder: '',
-                type: 'text',
-                value: '',
-                Validations: [
-                ],
-                functions: {
-                    // onChange: 'GetVehicleDetails',
-                },
-                generatecontrol: true,
-                disable: true
-            },
-            {
-                name: 'route',
-                label: 'Route',
-                placeholder: '',
-                type: 'text',
-                value: '',
-                Validations: [],
-                generatecontrol: true, disable: true
-            },
-            {
                 name: 'arrivalTime',
                 label: 'Arrival Time',
                 placeholder: '',
@@ -46,7 +14,7 @@ export class ThcUpdateControls {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'Upload',
+                name: 'podUpload',
                 label: 'POD Upload',
                 placeholder: '',
                 type: 'file',
@@ -56,7 +24,7 @@ export class ThcUpdateControls {
                     multiple: true
                 },
                 functions: {
-                    onChange: 'GetFileList',
+                    onChange: 'getFilePod',
                 },
                 generatecontrol: true,
                 disable: false
@@ -71,13 +39,13 @@ export class ThcUpdateControls {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'status',
-                label: 'status',
+                name: 'shipment',
+                label: '',
                 placeholder: '',
                 type: '',
-                value: '2',
+                value: '',
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: false, disable: false
             }
         ];
     }

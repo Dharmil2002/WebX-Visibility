@@ -115,6 +115,7 @@ export class PendingBillingComponent implements OnInit {
 
 
   async get(data) {
+    
     this.tableLoad = true;  // Set tableLoad to true while fetching data
     // Fetch billing details asynchronously
     this.billingDetail = await pendingbilling(this.masterService);
@@ -124,7 +125,7 @@ export class PendingBillingComponent implements OnInit {
 
     // Filter billingDetail based on date range
     const filteredRecords = this.billingDetail.filter(record => {
-   
+
       const pickUpTime = new Date(record.pickUpTime);
       const isDateRangeValid = startDate <= pickUpTime.toISOString() && pickUpTime.toISOString() < endDate;
 

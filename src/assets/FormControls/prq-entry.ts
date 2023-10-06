@@ -3,11 +3,11 @@ import { prqDetail } from 'src/app/core/models/operations/prq/prq';
 /* here i create class for the bind controls in formGrop */
 export class PrqEntryControls {
   private fieldMapping: FormControls[];
-   // Constructor for initializing form controls.
+  // Constructor for initializing form controls.
   constructor(prqDetail: prqDetail, isUpdate) {
     this.fieldMapping = [
       {
-        name: "prqId",
+        name: "prqNo",
         label: "Request ID",
         placeholder: "Request ID",
         type: "text",
@@ -40,34 +40,11 @@ export class PrqEntryControls {
             message: "Choose proper value",
           },
         ],
-        functions:{
-          onOptionSelect:"bilingChanged"
+        functions: {
+          onOptionSelect: "bilingChanged"
         },
         additionalData: {
           showNameAndValue: true,
-        },
-      },
-      {
-        name: "transMode",
-        label: "Transport Mode",
-        placeholder: "Transport Mode",
-        type: "Staticdropdown",
-        value: [
-          { value: "Air", name: "Air" },
-          { value: "Road", name: "Road" },
-          { value: "Rail", name: "Rail" },
-        ],
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        functions:{
-          onSelection:"disableSize"
-      },
-        Validations: [],
-        additionalData: {
-          showNameAndValue: false,
         },
       },
       {
@@ -87,8 +64,94 @@ export class PrqEntryControls {
             message: "Pickup Date is required",
           },
         ],
+        functions: {
+          onDate: 'format'
+        },
         additionalData: {
           minDate: isUpdate ? "" : new Date(),
+        },
+      },
+      {
+        name: "transMode",
+        label: "Transport Mode",
+        placeholder: "Transport Mode",
+        type: "Staticdropdown",
+        value: [
+          { value: "truck", name: "Truck" },
+          { value: "trailer", name: "Trailer" },
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        functions: {
+          onSelection: "disableSize"
+        },
+        Validations: [],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "typeContainer",
+        label: "Type of Container",
+        placeholder: "Type of Container",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        functions: {
+          onOptionSelect: "setContainerSize"
+        },
+      },
+      {
+        name: "containerSize",
+        label: "Container Capacity(Tons)",
+        placeholder: "Container Capacity",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "vehicleSize",
+        label: "Truck Capacity",
+        placeholder: "Truck Capacity",
+        type: "Staticdropdown",
+        value: [
+          { value: "1", name: "1-MT" },
+          { value: "9", name: "9-MT" },
+          { value: "16", name: "16-MT" },
+          { value: "32", name: "32-MT" },
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          showNameAndValue: false,
         },
       },
       {
@@ -197,49 +260,19 @@ export class PrqEntryControls {
           showNameAndValue: false,
         },
       },
+
       {
-        name: "typeContainer",
-        label: "Type of Container",
-        placeholder: "Type of Container",
-        type: "dropdown",
-        value: "",
+        name: "prqBranch",
+        label: "PRQ Branch",
+        placeholder: "PRQ Branch",
+        type: "text",
+        value: localStorage.getItem('Branch'),
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
-      {
-        name: "containerSize",
-        label: "Container Size",
-        placeholder: "Container Size",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
         ],
         additionalData: {
           showNameAndValue: true,
@@ -288,73 +321,29 @@ export class PrqEntryControls {
         label: "Contract Amount(Rs)",
         placeholder: "Contract Amount",
         type: "number",
-        value: 0,
+        value: prqDetail.contractAmt,
         generatecontrol: true,
         disable: false,
         Validations: [],
       },
-      {
-        name: "prqBranch",
-        label: "PRQ Branch",
-        placeholder: "PRQ Branch",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
-      {
-        name: "vehicleSize",
-        label: "Vehicle Size",
-        placeholder: "Vehicle Size",
-        type: "Staticdropdown",
-        value: [
-          { value: "1", name: "1-MT" },
-          { value: "9", name: "9-MT" },
-          { value: "16", name: "16-MT" },
-          { value: "32", name: "32-MT" },
-        ],
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-        additionalData: {
-          showNameAndValue: false,
-        },
-      },
-    // Additional hidden or metadata form controls.
-      {
-        name: "_id",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: "",
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
+
+      // Additional hidden or metadata form controls.
       {
         name: "status",
         label: "",
         placeholder: "",
         type: "",
         value: "0",
+        Validations: [],
+        generatecontrol: true,
+        disable: false,
+      },
+      {
+        name: "companyCode",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: localStorage.getItem("companyCode"),
         Validations: [],
         generatecontrol: true,
         disable: false,
@@ -375,16 +364,6 @@ export class PrqEntryControls {
         placeholder: "",
         type: "",
         value: new Date(),
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
-      {
-        name: "status",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: "0",
         Validations: [],
         generatecontrol: true,
         disable: false,

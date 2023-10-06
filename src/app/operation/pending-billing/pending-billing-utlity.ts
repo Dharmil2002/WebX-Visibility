@@ -1,11 +1,13 @@
 export async function pendingbilling(masterService){
+ 
     const req={
         companyCode:localStorage.getItem('companyCode'),
         collectionName: "prq_detail",
         filter: {}
     }
     const res =await masterService.masterPost("generic/get",req).toPromise();
-    return res.data.filter((x) => !x.invoiceNo); // Filter items where invoiceNo is empty (falsy)
+    const prqDetail= res.data.filter((x) => x.status==0); 
+    return prqDetail;// Filter items where invoiceNo is empty (falsy)
 }
 
 export function groupAndCalculate<T>(

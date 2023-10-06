@@ -1,10 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
 import { GenericTableComponent } from '../../shared-components/Generic Table/generic-table.component';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { showVehicleConfirmationDialog } from '../assign-vehicle-page/assgine-vehicle-utility';
+import { PrqService } from 'src/app/Utility/module/operation/prq/prq.service';
+import { AssignedVehicleService } from 'src/app/Utility/module/operation/assgine-vehicle/assigned-vehicle-service';
 
 @Component({
   selector: 'app-view-print',
@@ -13,12 +14,18 @@ import { showVehicleConfirmationDialog } from '../assign-vehicle-page/assgine-ve
 export class ViewPrintComponent implements OnInit {
   prqDetail: any;
 
-  constructor(private Route: Router, private masterService: MasterService, @Inject(MAT_DIALOG_DATA) public item: any, public dialogRef: MatDialogRef<GenericTableComponent>) {
+  constructor(private Route: Router,
+     private prqService:PrqService,
+     private masterService:MasterService,
+     private assignedVehicleService:AssignedVehicleService,
+    @Inject(MAT_DIALOG_DATA) public item: any, 
+    public dialogRef: MatDialogRef<GenericTableComponent>) {
     if (item) {
-      this.prqDetail = this.masterService.getAssigneVehicleDetail();
+      
+      this.prqDetail = this.prqService.getAssigneVehicleDetail();
       this.prqDetail.vehicleNo = item?.vehicleNo||item.vehNo;
       const tabIndex = 6; // Adjust the tab index as needed
-      showVehicleConfirmationDialog(this.prqDetail, masterService, this.goBack.bind(this), tabIndex, dialogRef, item);
+      this.assignedVehicleService.showVehicleConfirmationDialog(this.prqDetail,this.masterService, this.goBack.bind(this), tabIndex, dialogRef, item,item.isMarket);
     }
     else {
       Swal.fire({

@@ -40,7 +40,7 @@ export class VehicleStatusControls {
 
             },
             {
-                name: 'status', label: 'status', placeholder: '', type: '', value: "available", generatecontrol: false, disable: false,
+                name: 'status', label: 'status', placeholder: '', type: '', value: "Available", generatecontrol: false, disable: false,
                 Validations: [],
             },
             {
@@ -52,11 +52,11 @@ export class VehicleStatusControls {
                 Validations: [],
             },
             {
-                name: 'entryDate', label: 'entryDate', placeholder: '', type: '', value: currentDate, generatecontrol: false, disable: false,
+                name: 'updateDate', label: 'updateDate', placeholder: '', type: '', value: new Date(), generatecontrol: false, disable: false,
                 Validations: [],
             },
             {
-                name: 'entryBy', label: 'entryDate', placeholder: '', type: '', value: localStorage.getItem("Username"), generatecontrol: false, disable: false,
+                name: 'updateBy', label: 'updateBy', placeholder: '', type: '', value: localStorage.getItem("Username"), generatecontrol: false, disable: false,
                 Validations: [],
             },
             {

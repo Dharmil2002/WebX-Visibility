@@ -29,8 +29,8 @@ export class PrqListComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:200px",
     },
-    vehicleSize: {
-      Title: "Vehicle Size",
+    size: {
+      Title: "Veh/Cont-Size",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -67,25 +67,32 @@ export class PrqListComponent implements OnInit {
     "fromToCity",
     "status",
     "createdDate",
-    "vehicleSize"
+    "size"
   ];
   menuItemflag: boolean = false;
   addAndEditPath: string;
   tableData: any[];
   linkArray = [{ Row: "", Path: "" }];
+  items: any;
   constructor(public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any) {
     if (item) {
-      this.tableData = item.map((x) => {
-        x.isSelected = false;
-        return x;
-      });
-
-      this.tableLoad = false;
+      debugger
+      this.items=item;     
     }
   }
 
   ngOnInit(): void {
+    this.getShipment();
+  }
+  getShipment() {
+    this.tableData = this.items.map((x) => {
+      x.isSelected = false;
+      x.size=x.vehicleSize?x.vehicleSize+" "+"MT" : x.containerSize?x.containerSize+" "+"MT":""
+      return x;
+    });
+
+    this.tableLoad = false;
   }
 
   IsActiveFuntion(event) {

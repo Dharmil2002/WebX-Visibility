@@ -28,7 +28,7 @@ export class AddDriverMasterComponent implements OnInit {
   locationStatus: any;
   category: any;
   categoryStatus: any;
-  breadScrums: { title: string; items: string[]; active: string, generatecontrol: true }[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
   selectedFiles: boolean;
   SelectFile: File;
   vehicleDet: any;
@@ -78,6 +78,7 @@ export class AddDriverMasterComponent implements OnInit {
           items: ["Masters"],
           active: "Modify Driver",
           generatecontrol: true,
+          toggle: this.DriverTable.activeFlag
         },
       ];
     } else {
@@ -86,7 +87,8 @@ export class AddDriverMasterComponent implements OnInit {
           title: "Driver Master",
           items: ["Masters"],
           active: "Add Driver",
-          generatecontrol: true
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.DriverTable = new DriverMaster({});
@@ -459,15 +461,21 @@ export class AddDriverMasterComponent implements OnInit {
   async save() {
     const controls = this.DriverTableForm;
     clearValidatorsAndValidate(controls);
-    this.DriverTableForm.controls["country"].setValue(
-      this.DriverTableForm.value.country.name
-    );
-    this.DriverTableForm.controls["pincode"].setValue(
-      this.DriverTableForm.value.pincode.name
-    );
-    this.DriverTableForm.controls["vehicleNo"].setValue(
-      this.DriverTableForm.value.vehicleNo.name
-    );
+    const formValue = this.DriverTableForm.value;
+    const controlNames = ["country","pincode","vehicleNo"];
+    controlNames.forEach((controlName) => {
+      const controlValue = formValue[controlName]?.name;
+      this.DriverTableForm.controls[controlName].setValue(controlValue);
+    });
+    // this.DriverTableForm.controls["country"].setValue(
+    //   this.DriverTableForm.value.country.name
+    // );
+    // this.DriverTableForm.controls["pincode"].setValue(
+    //   this.DriverTableForm.value.pincode.name
+    // );
+    // this.DriverTableForm.controls["vehicleNo"].setValue(
+    //   this.DriverTableForm.value.vehicleNo.name
+    // );
     // Remove field from the form controls
     this.DriverTableForm.removeControl("companyCode");
     this.DriverTableForm.removeControl("updateBy");
@@ -729,5 +737,10 @@ export class AddDriverMasterComponent implements OnInit {
       // we have to handle , if function not exists.
       console.log("failed");
     }
+  }
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.DriverTableForm.controls['activeFlag'].setValue(event);
+    console.log("Toggle value :", event);
   }
 }

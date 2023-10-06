@@ -23,7 +23,7 @@ export class DriverMaster {
   licenseNo: string;
   valdityDt: any;
   //IssueByRTO:string;
-  activeFlag: boolean;
+  activeFlag: any;
   //DriverStatus:string;
   IsBlackListed: boolean;
   telno: string;

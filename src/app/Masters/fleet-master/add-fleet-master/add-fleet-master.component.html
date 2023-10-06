@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" (toggleChange)="onToggleChange($event)">
   <form [formGroup]="fleetTableForm">
     <app-form-webxpress [form]="fleetTableForm" [formData]="jsonControlFleetArray"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"

@@ -55,7 +55,6 @@ export class CustomerMasterAddComponent implements OnInit {
   jsonControlCustomerArray: any;
   jsonControlBillKycArray: any;
   accordionData: any;
-  breadScrums: { title: string; items: string[]; active: string, generatecontrol: true }[];
   groupCode: any;
   groupCodedet: any;
   payBasisData: any;
@@ -116,6 +115,7 @@ export class CustomerMasterAddComponent implements OnInit {
   slectGstState: any;
   submit = 'Save';
   customerIndex: any;
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
   // DriverTableForm: any;
   //#endregion
 
@@ -147,19 +147,21 @@ export class CustomerMasterAddComponent implements OnInit {
       });
       this.breadScrums = [
         {
-          title: "Modify Master",
+          title: "Modify Customer",
           items: ["Masters"],
           active: "Modify Customer",
-          generatecontrol: true
+          generatecontrol: true,
+          toggle: this.customerTable.activeFlag
         },
       ];
     } else {
       this.breadScrums = [
         {
-          title: "Customer Master",
+          title: "Add Customer",
           items: ["Masters"],
           active: "Add Customer",
-          generatecontrol: true
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.customerTable = new customerModel({});
@@ -743,16 +745,16 @@ export class CustomerMasterAddComponent implements OnInit {
       // CustomerLocations: this.customerTableForm.value.CustomerLocations.name,
       PinCode: this.customerTableForm.value.PinCode.name,
       customerGroup: this.customerTableForm.value.customerGroup.name,
-      activeFlag: this.customerTableForm.value.activeFlag ? "Y" : "N",
-      BlackListed: this.customerTableForm.value.BlackListed ? "Y" : "N",
-      _id: `${this.customerTableForm.value.customerGroup.value.replaceAll(/ /g , "")
-        }-${this.customerTableForm.value.customerName.replaceAll(/ /g , "").substring(
+      activeFlag: this.customerTableForm.value.activeFlag ,
+      BlackListed: this.customerTableForm.value.BlackListed,
+      _id: `${this.customerTableForm.value.customerGroup.value.replaceAll(/ /g, "")
+        }-${this.customerTableForm.value.customerName.replaceAll(/ /g, "").substring(
           0,
           4
         )}-${Math.floor(Math.random() * (5000 - 1 + 1) + 1)}`,
       customerCode: this.isUpdate
         ? this.customerTable.customerCode
-        : `${this.customerTableForm.value.customerGroup.value.trim().replaceAll(/ /g , "").substring(0, 4) + this.customerTableForm.value.customerName.toUpperCase().trim().replaceAll(/ /g , "").substring(0, 4) + this.customerIndex}`,
+        : `${this.customerTableForm.value.customerGroup.value.trim().replaceAll(/ /g, "").substring(0, 4) + this.customerTableForm.value.customerName.toUpperCase().trim().replaceAll(/ /g, "").substring(0, 4) + this.customerIndex}`,
       companyCode: localStorage.getItem("companyCode"),
       updatedDate: new Date(),
       updatedBy: localStorage.getItem("UserName"),
@@ -970,5 +972,9 @@ export class CustomerMasterAddComponent implements OnInit {
       });
   }
   //#endregion
-
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.customerTableForm.controls['activeFlag'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
 }

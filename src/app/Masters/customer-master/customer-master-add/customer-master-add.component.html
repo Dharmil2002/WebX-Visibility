@@ -1,4 +1,5 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums"
+(toggleChange)="onToggleChange($event)">
   <div>
     <form [formGroup]="customerTableForm">
       <app-form-webxpress [form]="customerTableForm" [formData]="jsonControlCustomerArray"

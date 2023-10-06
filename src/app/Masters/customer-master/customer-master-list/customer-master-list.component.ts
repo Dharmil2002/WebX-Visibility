@@ -93,8 +93,9 @@ export class CustomerMasterListComponent implements OnInit {
           const dataWithSrno = sortedData.map((obj, index) => {
             return {
               ...obj,
-              // srNo: index + 1,
-              activeFlag: obj.activeFlag === 'Y',
+              customerGroup: obj.customerGroup.toUpperCase(),
+              customerCode: obj.customerCode.toUpperCase(),
+              customerName: obj.customerName.toUpperCase()
             };
           });
 

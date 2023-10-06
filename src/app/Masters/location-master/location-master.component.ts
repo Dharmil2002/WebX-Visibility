@@ -115,11 +115,19 @@ export class LocationMasterComponent implements OnInit {
   }
   //#endregion
 
-  IsActiveFuntion(det) {
+  async IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls
     delete det._id;
     delete det.srNo;
+
+    const ownershipDescriptions = await this.getOwnership();
+    const ownershipObject = ownershipDescriptions.find(
+      (x) => x.codeDesc === det.ownership
+    );
+    // Set the ownership property to the codeDesc if found, or an empty string if not found
+    const ownership = ownershipObject ? ownershipObject.codeId : '';
+    det.ownership = ownership
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "location_detail",

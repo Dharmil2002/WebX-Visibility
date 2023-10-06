@@ -589,6 +589,6 @@ export class AddLocationMasterComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.locationTableForm.controls['activeFlag'].setValue(event);
-    console.log("Toggle value :", event);
+    //console.log("Toggle value :", event);
   }
 }

@@ -13,9 +13,9 @@ export class LocationMasterComponent implements OnInit {
   linkArray = []
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   columnHeader = {
+    'updateDate': 'Created Date',
     'locCode': 'Code',
     'locName': 'Name',
-    'updateDate': 'Created Date',
     'ownership': 'Ownership',
     'locPincode': 'Pincode',
     'locCity': 'City',

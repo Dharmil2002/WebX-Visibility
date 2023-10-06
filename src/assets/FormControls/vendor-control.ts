@@ -184,8 +184,8 @@ export class VendorControl {
             },
             {
                 name: 'emailId',
-                label: 'Vendor E-mail',
-                placeholder: 'Vendor E-mail',
+                label: 'Vendor E-mails',
+                placeholder: 'Enter Vendor E-mails',
                 type: 'text', value: vendorMasterTable.emailId,
                 Validations: [
                     {

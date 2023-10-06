@@ -21,8 +21,8 @@
           </form>
         </div>
         <div style="width: 100%; display: flex; justify-content: end;">
-          <button matTooltip="Add New Record" [disabled]="!GSTcustomerTableForm.valid" mat-stroked-button (click)="AddRowData()" class="filter_btn"
-            style="margin-right: 30px;">
+          <button matTooltip="Add New Record" [disabled]="!GSTcustomerTableForm.valid" mat-stroked-button
+            (click)="AddRowData()" class="filter_btn" style="margin-right: 30px;">
             <mat-icon>add</mat-icon>
             Add New
           </button>
@@ -46,8 +46,10 @@
     <div class="row" style="margin-top: 30px; margin-left: 10px;">
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
         <div class="example-button-row">
-          <button type="button" [disabled]="!customerTableForm.valid" mat-raised-button color="primary" (click)="save()">
-            Save
+          <button type="button" [disabled]="!customerTableForm.valid" mat-raised-button color="primary"
+            (click)="save()">
+            <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
+            <ng-template #saveButton>Save</ng-template>
           </button>
           <button type="button" mat-raised-button mat-button (click)="cancel()">Cancel</button>
         </div>

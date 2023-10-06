@@ -439,7 +439,7 @@ export class customerControl {
         placeholder: "",
         type: "toggle",
         value: isUpdate ? customerTable.activeFlag : false,
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         Validations: [
           {

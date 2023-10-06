@@ -206,7 +206,7 @@ export class FleetControls {
                 ],
             },
             {
-                name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: FleetTable?.activeFlag, generatecontrol: true, disable: false,
+                name: 'activeFlag', label: 'Active Flag', placeholder: '', type: 'toggle', value: FleetTable?.activeFlag, generatecontrol: false, disable: false,
                 Validations: []
             },
             {

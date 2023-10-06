@@ -365,7 +365,7 @@ export class DriverControls {
         placeholder: "",
         type: "toggle",
         value: DriverTable.activeFlag,
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         Validations: [],
       },

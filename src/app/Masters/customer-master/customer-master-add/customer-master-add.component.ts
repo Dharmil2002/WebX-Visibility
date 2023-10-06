@@ -15,7 +15,7 @@ import { Subject, take, takeUntil } from "rxjs";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
-import { columnHeader, staticField } from "./customer-utlity";
+import { columnHeader, staticField } from "../customer-master-list/customer-utlity";
 
 @Component({
   selector: "app-customer-master-add",
@@ -55,7 +55,7 @@ export class CustomerMasterAddComponent implements OnInit {
   jsonControlCustomerArray: any;
   jsonControlBillKycArray: any;
   accordionData: any;
-  breadScrums: { title: string; items: string[]; active: string }[];
+  breadScrums: { title: string; items: string[]; active: string, generatecontrol: true }[];
   groupCode: any;
   groupCodedet: any;
   payBasisData: any;
@@ -114,6 +114,7 @@ export class CustomerMasterAddComponent implements OnInit {
   EditGstTable: any;
   isGstUpdate: boolean;
   slectGstState: any;
+  submit = 'Save';
   customerIndex: any;
   // DriverTableForm: any;
   //#endregion
@@ -130,6 +131,7 @@ export class CustomerMasterAddComponent implements OnInit {
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
 
       this.isUpdate = true;
+      this.submit = 'Modify';
       this.action = "edit";
     } else {
       this.action = "Add";
@@ -145,9 +147,10 @@ export class CustomerMasterAddComponent implements OnInit {
       });
       this.breadScrums = [
         {
-          title: "Customer Master",
+          title: "Modify Master",
           items: ["Masters"],
-          active: "Edit Customer",
+          active: "Modify Customer",
+          generatecontrol: true
         },
       ];
     } else {
@@ -156,6 +159,7 @@ export class CustomerMasterAddComponent implements OnInit {
           title: "Customer Master",
           items: ["Masters"],
           active: "Add Customer",
+          generatecontrol: true
         },
       ];
       this.customerTable = new customerModel({});
@@ -203,8 +207,19 @@ export class CustomerMasterAddComponent implements OnInit {
     this.getCustomerCategoryDropdown();
     this.getPinCode();
     this.getDataAndPopulateForm();
+    this.CustomerCodeIndex()
   }
-  // CustomerContractServiceSelectionComponent
+
+  bindGSTDropdown() {
+    this.jsonControlGSTArray.forEach((data) => {
+      if (data.name === "gstPinCode") {
+        // Set category-related variables
+        this.gstPinCode = data.name;
+        this.gstPinCodeStatus = data.additionalData.showNameAndValue;
+      }
+    });
+  }
+
   CustomerCodeIndex() {
     let req = {
       companyCode: this.companyCode,
@@ -217,17 +232,7 @@ export class CustomerMasterAddComponent implements OnInit {
           this.customerIndex = res.data.length;
         }
       },
-      error: (err) => {},
-    });
-  }
-
-  bindGSTDropdown() {
-    this.jsonControlGSTArray.forEach((data) => {
-      if (data.name === "gstPinCode") {
-        // Set category-related variables
-        this.gstPinCode = data.name;
-        this.gstPinCodeStatus = data.additionalData.showNameAndValue;
-      }
+      error: (err) => { },
     });
   }
 
@@ -276,7 +281,7 @@ export class CustomerMasterAddComponent implements OnInit {
           this.getGSTPinCodeDropdown();
         }
       },
-      error: (err) => {},
+      error: (err) => { },
     });
   }
   // ******************************************************/Get ALL Dropdown/**********************************************
@@ -409,62 +414,35 @@ export class CustomerMasterAddComponent implements OnInit {
     }
   }
 
-  async fetchDataAndPopulateForm(
-    collectionName,
-    formControl,
-    dataProperty,
-    nameProperty,
-    showNameAndValue
-  ) {
+  async fetchDataAndPopulateForm(collectionName, formControl, dataProperty, nameProperty, showNameAndValue) {
     try {
       const reqBody = {
-        companyCode: this.companyCode,
-        collectionName: collectionName,
-        filter: {},
+        "companyCode": this.companyCode,
+        "collectionName": collectionName,
+        "filter": {}
       };
-      const response = await this.masterService
-        .masterPost("generic/get", reqBody)
-        .toPromise();
-      const dataList = response.data.map((x) => ({
+      const response = await this.masterService.masterPost("generic/get", reqBody).toPromise()
+      const dataList = response.data.map(x => ({
         name: x[nameProperty],
-        value: x[dataProperty],
+        value: x[dataProperty]
       }));
 
       if (this.isUpdate) {
-        const selectedData = dataList.find(
-          (x) => x.name === this.customerTable[formControl]
-        );
+        const selectedData = dataList.find(x => x.name === this.customerTable[formControl]);
         this.customerTableForm.controls[formControl].setValue(selectedData);
-        if (formControl == "customerLocations") {
-          const selectedData = dataList.filter((x) =>
-            this.customerTable[formControl].includes(x.name)
-          );
-          this.customerTableForm.controls["customerLocationsDrop"].setValue(
-            selectedData
-          );
+        if (formControl == 'customerLocations') {
+          const selectedData = dataList.filter(x => this.customerTable[formControl].includes(x.name));
+          this.customerTableForm.controls['customerLocationsDrop'].setValue(selectedData);
         }
       }
       // Call the Filter function with the appropriate arguments
-      this.filter.Filter(
-        this.jsonControlCustomerArray,
-        this.customerTableForm,
-        dataList,
-        formControl,
-        showNameAndValue
-      );
+      this.filter.Filter(this.jsonControlCustomerArray, this.customerTableForm, dataList, formControl, showNameAndValue);
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   }
-
   async getDataAndPopulateForm() {
-    await this.fetchDataAndPopulateForm(
-      "location_detail",
-      "customerLocations",
-      "locCode",
-      "locName",
-      true
-    );
+    await this.fetchDataAndPopulateForm("location_detail", "customerLocations", "locCode", "locName", true);
   }
 
   selectedFileMSMEScan(data) {
@@ -630,7 +608,7 @@ export class CustomerMasterAddComponent implements OnInit {
             if (
               !this.isUpdate &&
               this.customerTableForm.value.customerName !=
-                this.customerTable.customerName
+              this.customerTable.customerName
             ) {
               Swal.fire({
                 title: "CustomerName Already exist! Please try with another",
@@ -649,7 +627,7 @@ export class CustomerMasterAddComponent implements OnInit {
           }
         }
       },
-      error: (err) => {},
+      error: (err) => { },
     });
   }
 
@@ -675,11 +653,10 @@ export class CustomerMasterAddComponent implements OnInit {
     if (invalidEmails.length > 0) {
       let EmailString = "";
       invalidEmails.forEach((x) => {
-        EmailString = `${
-          EmailString != ""
-            ? EmailString + "<li style='margin:0px;'>" + x + "<li>"
-            : "<li style='margin:0px;'>" + x + "<li>"
-        }`;
+        EmailString = `${EmailString != ""
+          ? EmailString + "<li style='margin:0px;'>" + x + "<li>"
+          : "<li style='margin:0px;'>" + x + "<li>"
+          }`;
       });
       Swal.fire({
         title: "Email ID is not valid! Please try with another",
@@ -728,17 +705,17 @@ export class CustomerMasterAddComponent implements OnInit {
           }
         }
       },
-      error: (err) => {},
+      error: (err) => { },
     });
   }
 
   async ValidGSTNumber() {
-    var isGST = false;
+    var isGST = false
     for (let index = 0; index < this.tableData.length; index++) {
       const element = this.tableData[index];
       if (element.gstNo == this.GSTcustomerTableForm.value.gstNo) {
-        isGST = true;
-        this.GSTcustomerTableForm.controls["gstNo"].setValue("");
+        isGST = true
+        this.GSTcustomerTableForm.controls["gstNo"].setValue("")
         Swal.fire({
           title: `GST No. already exists! Please try with another !`,
           toast: true,
@@ -746,12 +723,12 @@ export class CustomerMasterAddComponent implements OnInit {
           showCloseButton: false,
           showCancelButton: false,
           showConfirmButton: true,
-          confirmButtonText: "OK",
-        });
+          confirmButtonText: "OK"
+        })
       }
     }
     if (this.GSTcustomerTableForm.value.gstNo != "") {
-      this.setGSTState();
+      this.setGSTState()
     }
   }
   // ------------------------------------------------------#endregion😃----------------------------------------------
@@ -759,15 +736,12 @@ export class CustomerMasterAddComponent implements OnInit {
   // ******************************************************/Save Edit Remove And Set Function/**********************************************
   async save() {
     const controlDetail = this.customerTableForm.value.customerLocationsDrop;
-    const customerLocationsDrop = controlDetail
-      ? controlDetail.map((item: any) => item.name)
-      : "";
-    this.customerTableForm.controls["customerLocations"].setValue(
-      customerLocationsDrop
-    );
+    const customerLocationsDrop = controlDetail ? controlDetail.map((item: any) => item.name) : "";
+    this.customerTableForm.controls["customerLocations"].setValue(customerLocationsDrop);
 
     const Body = {
       ...this.customerTableForm.value,
+      customerName: this.customerTableForm.value.customerName.toUpperCase(), // Convert to uppercase
       CustomerCategory: this.customerTableForm.value.CustomerCategory.name,
       customerLocations: customerLocationsDrop,
       // CustomerLocations: this.customerTableForm.value.CustomerLocations.name,
@@ -779,16 +753,15 @@ export class CustomerMasterAddComponent implements OnInit {
       isPANregistration: this.customerTableForm.value.isPANregistration
         ? "Y"
         : "N",
-      _id: `${
-        this.customerTableForm.value.customerGroup.value
-      }-${this.customerTableForm.value.customerName.substring(
-        0,
-        4
-      )}-${Math.floor(Math.random() * (5000 - 1 + 1) + 1)}`,
+      _id: `${this.customerTableForm.value.customerGroup.value
+        }-${this.customerTableForm.value.customerName.substring(
+          0,
+          4
+        )}-${Math.floor(Math.random() * (5000 - 1 + 1) + 1)}`,
       customerCode: this.isUpdate
         ? this.customerTable.customerCode
-        : `${this.customerTableForm.value.customerGroup.value.substring(0, 4)}
-        ${this.customerTableForm.value.customerName.substring(0, 4)}
+        : `${this.customerTableForm.value.customerGroup.value.trim().substring(0, 4)}
+        ${this.customerTableForm.value.customerName.trim().substring(0, 4)}
         ${this.customerIndex}`,
       companyCode: localStorage.getItem("companyCode"),
       updatedDate: new Date(),
@@ -881,11 +854,8 @@ export class CustomerMasterAddComponent implements OnInit {
 
   async AddRowData() {
     this.tableLode = false;
-    const Index = this.GstTableEdit
-      ? this.GstTableEditData.Srno
-      : this.tableData.length == 0
-      ? 1
-      : this.tableData.slice(-1)[0].Srno + 1;
+    const Index = this.GstTableEdit ? this.GstTableEditData.Srno :
+      this.tableData.length == 0 ? 1 : this.tableData.slice(-1)[0].Srno + 1;
     const Body = {
       Srno: parseInt(Index),
       gstAddres: this.GSTcustomerTableForm.value.gstAddres,
@@ -900,12 +870,12 @@ export class CustomerMasterAddComponent implements OnInit {
     const delayDuration = 1000;
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await delay(delayDuration);
-    await this.addRemoveGSTValue(null, "add");
+    await this.addRemoveGSTValue(null, 'add');
     this.tableLode = true;
   }
 
   addRemoveGSTValue(data, type) {
-    if (type == "edit") {
+    if (type == 'edit') {
       const GstPin = this.pinCodeResData.find((x) => x.PIN == data?.gstPinCode);
       var SElectValue = {
         name: `${GstPin?.PIN}`,
@@ -942,7 +912,7 @@ export class CustomerMasterAddComponent implements OnInit {
       if (index > -1) {
         this.tableData.splice(index, 1); // 2nd parameter means remove one item only
       }
-      this.addRemoveGSTValue(data.data, "edit");
+      this.addRemoveGSTValue(data.data, 'edit');
       const delayDuration = 1000;
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       await delay(delayDuration);
@@ -974,9 +944,7 @@ export class CustomerMasterAddComponent implements OnInit {
       };
 
       // Send the request to fetch user data
-      const customerList = await this.masterService
-        .masterPost("generic/get", req)
-        .toPromise();
+      const customerList = await this.masterService.masterPost("generic/get", req).toPromise();
 
       // Check if data exists for the given filter criteria
       if (customerList.data.length > 0) {
@@ -988,7 +956,7 @@ export class CustomerMasterAddComponent implements OnInit {
           showCloseButton: false,
           showCancelButton: false,
           showConfirmButton: true,
-          confirmButtonText: "OK",
+          confirmButtonText: "OK"
         });
 
         // Reset the input field
@@ -996,10 +964,7 @@ export class CustomerMasterAddComponent implements OnInit {
       }
     } catch (error) {
       // Handle errors that may occur during the operation
-      console.error(
-        `An error occurred while fetching ${fieldName} details:`,
-        error
-      );
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
     }
   }
 
@@ -1015,7 +980,7 @@ export class CustomerMasterAddComponent implements OnInit {
   }
   //#endregion
 
-  //#region
+  //#region 
   toggleSelectAll(argData: any) {
     let fieldName = argData.field.name;
     let autocompleteSupport = argData.field.additionalData.support;
@@ -1033,4 +998,5 @@ export class CustomerMasterAddComponent implements OnInit {
       });
   }
   //#endregion
+
 }

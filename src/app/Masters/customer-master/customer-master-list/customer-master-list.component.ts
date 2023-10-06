@@ -13,7 +13,7 @@ export class CustomerMasterListComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = []
   columnHeader = {
-    "srNo": "Sr No",
+    // "srNo": "Sr No",
     "updatedDate": "Created Date",
     "customerGroup": "Customer Group",
     "customerCode": "Customer Code",
@@ -23,7 +23,7 @@ export class CustomerMasterListComponent implements OnInit {
   };
 
   headerForCsv = {
-    "srNo": "Sr No",
+    // "srNo": "Sr No",
     "customerGroup": "Customer Group",
     "customerCode": "Customer Code",
     "customerName": "Customer Name",
@@ -41,16 +41,18 @@ export class CustomerMasterListComponent implements OnInit {
   dynamicControls = {
     add: true,
     edit: true,
-    csv: false
+    csv: true
   }
 
   addAndEditPath: string;
   tableData: any;
+  csvFileName: string;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/CustomerMaster/AddCustomerMaster";
   }
 
   ngOnInit(): void {
+    this.csvFileName = "Customer Details";
     this.getCustomerDetails();
   }
 
@@ -100,7 +102,7 @@ export class CustomerMasterListComponent implements OnInit {
           const dataWithSrno = sortedData.map((obj, index) => {
             return {
               ...obj,
-              srNo: index + 1,
+              // srNo: index + 1,
               activeFlag: obj.activeFlag === 'Y',
             };
           });
@@ -123,7 +125,7 @@ export class CustomerMasterListComponent implements OnInit {
     let id = det._id;
     // Remove the "id" field from the form controls
     delete det._id;
-    delete det.srNo;
+    // delete det.srNo;
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "customer_detail",

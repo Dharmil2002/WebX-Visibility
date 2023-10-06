@@ -28,7 +28,7 @@ export class AddDriverMasterComponent implements OnInit {
   locationStatus: any;
   category: any;
   categoryStatus: any;
-  breadScrums: { title: string; items: string[]; active: string }[];
+  breadScrums: { title: string; items: string[]; active: string, generatecontrol: true }[];
   selectedFiles: boolean;
   SelectFile: File;
   vehicleDet: any;
@@ -52,6 +52,7 @@ export class AddDriverMasterComponent implements OnInit {
   countryCode: any;
   countryCodeStatus: any;
   newDriverCode: any;
+  submit = 'Save';
   //#endregion
 
   constructor(
@@ -64,6 +65,7 @@ export class AddDriverMasterComponent implements OnInit {
       this.DriverTable = Route.getCurrentNavigation().extras.state.data;
 
       this.isUpdate = true;
+      this.submit = 'Modify';
       this.action = "edit";
     } else {
       this.action = "Add";
@@ -72,9 +74,10 @@ export class AddDriverMasterComponent implements OnInit {
       this.isUpdate = true;
       this.breadScrums = [
         {
-          title: "Driver Master",
+          title: "Modify Driver",
           items: ["Masters"],
-          active: "Edit Driver",
+          active: "Modify Driver",
+          generatecontrol: true,
         },
       ];
     } else {
@@ -83,6 +86,7 @@ export class AddDriverMasterComponent implements OnInit {
           title: "Driver Master",
           items: ["Masters"],
           active: "Add Driver",
+          generatecontrol: true
         },
       ];
       this.DriverTable = new DriverMaster({});

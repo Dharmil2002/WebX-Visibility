@@ -354,7 +354,7 @@ export class UserControl {
         placeholder: "",
         type: "toggle",
         value: UserTable.isActive,
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         Validations: [],
       },

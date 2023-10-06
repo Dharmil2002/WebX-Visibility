@@ -35,7 +35,7 @@ export class UserMasterListComponent implements OnInit {
         },
     ];
     columnHeader = {
-        "srNo": "Sr No",
+        "entryDate": "Created Date",
         "userId": "User Code",
         "name": "User Name",
         "multiLocation": "Locations",
@@ -75,8 +75,6 @@ export class UserMasterListComponent implements OnInit {
     }
     constructor(
         private masterService: MasterService,
-        private retryAndDownloadService: RetryAndDownloadService,
-        private geoLocationService: GeolocationService
     ) {
     }
 
@@ -93,10 +91,17 @@ export class UserMasterListComponent implements OnInit {
                 const dataWithSrno = res.data.map((obj, index) => {
                     return {
                         ...obj,
-                        srNo: index + 1
+                        //srNo: index + 1
                     };
                 });
-                this.csv = dataWithSrno;
+                const sortedData = dataWithSrno.sort((a, b) => {
+                    const dateA: Date | any = new Date(a.entryDate);
+                    const dateB: Date | any = new Date(b.entryDate);
+
+                    // Compare the date objects
+                    return dateB - dateA; // Sort in descending order
+                });
+                this.csv = sortedData;
                 this.tableLoad = false;
             }
 

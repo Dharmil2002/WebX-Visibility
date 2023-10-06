@@ -316,7 +316,7 @@ export class VendorControl {
             },
             {
                 name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isActive, Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: false, disable: false
             },
 
             {

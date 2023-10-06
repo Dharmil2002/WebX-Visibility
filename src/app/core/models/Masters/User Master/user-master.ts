@@ -1,12 +1,10 @@
 export class UserMaster {
-  id: number;
-  secretAnswer: string;
-  secretQuestion: string;
+  _id: number;
   dateOfBirth: any;
   dateOfJoining: any;
   location: any;
-  residentialAddress:string;
-  mobileNo:number;
+  residentialAddress: string;
+  mobileNo: number;
   userId: string;
   companyId: number;
   name: string;
@@ -17,12 +15,10 @@ export class UserMaster {
   address: string;
   userRole: any;
   department: any;
-  srNo: any;
   isActive: boolean;
   entryBy: string;
   entryDate: Date;
   updateBy: string;
-  isSuccess: string;
   message: string;
   updateDate: Date;
   emailId: any;
@@ -34,7 +30,6 @@ export class UserMaster {
   empId: string;
   emptype: string;
   userLocations: string;
-  branchCode: string;
   managerId: any;
   deptId: string;
   countryCode: any;
@@ -49,7 +44,7 @@ export class UserMaster {
   locationName: any;
   manager: any;
   locationList: any;
-roleId: any;
+  roleId: any;
   divId: any;
   userCode: any;
   userPwd: any;
@@ -60,7 +55,7 @@ roleId: any;
 
   constructor(UserMaster) {
     {
-      this.id = UserMaster._id || this.getRandomID();
+      this._id = UserMaster._id || this.getRandomID();
       this.userId = UserMaster.userId || "";
       this.userStatus = UserMaster.userStatus || "";
       this.name = UserMaster.name || "";

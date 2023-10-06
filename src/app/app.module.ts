@@ -57,6 +57,7 @@ import {
   MsalModule
 } from '@azure/msal-angular';
 import { msalConfig } from "./core/service/msal-config/msal-config";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
 
 
 export function MSALInstanceFactory(): IPublicClientApplication {
@@ -90,6 +91,7 @@ export function createTranslateLoader(http: HttpClient): any {
 
   ],
   imports: [
+    MatAutocompleteModule ,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,

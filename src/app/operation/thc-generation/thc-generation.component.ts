@@ -144,7 +144,7 @@ export class ThcGenerationComponent implements OnInit {
   menuItemflag: boolean = true;
   jsonControlBasicArray: any;
   jsonControlVehLoadArray: any;
-  jsonControlDriverArray: import("d:/velocityDocket/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  jsonControlDriverArray:any;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,

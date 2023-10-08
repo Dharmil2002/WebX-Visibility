@@ -84,7 +84,6 @@ export class CustomHttpInterceptor implements HttpInterceptor {
           attempts: 0,
         });
         // Handle error, log, and perform additional actions as needed
-        console.error("HTTP Request Error:", error);
         if (
           error.status === 401 ||
           error.status === 400 ||
@@ -95,6 +94,11 @@ export class CustomHttpInterceptor implements HttpInterceptor {
             location.reload();
           } else {
             attempt++;
+              if(!accessToken){
+              this.authenticationService.logout();
+              location.reload();
+             return throwError(error);
+            }
             return this.refreshTokenAndRetry(request, next);
           }
         } else if (error.status === 500 || error.status === 502) {
@@ -104,7 +108,15 @@ export class CustomHttpInterceptor implements HttpInterceptor {
           this.router.navigate(["authentication/page500"]);
           return EMPTY;
         }
-        return throwError("An error occurred.");
+        else{
+            // For example, logout the user or redirect to the login page
+            if(!accessToken){
+              this.authenticationService.logout();
+              location.reload();
+            }
+            return throwError(error);
+        }
+       
       })
     );
   }

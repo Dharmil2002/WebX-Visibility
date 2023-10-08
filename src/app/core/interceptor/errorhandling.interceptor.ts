@@ -77,10 +77,13 @@ export class CustomHttpInterceptor implements HttpInterceptor {
         // Handle error, log, and perform additional actions as needed
         console.error('HTTP Request Error:', error);
         if (error.status === 401 || error.status === 400 || error.status === 403) {
-    
-          // Handle specific error statuses as needed, e.g., navigate to an error page
-          // this.router.navigateByUrl('abort-access', { replaceUrl: true });
+          if(attempt>3){
+            this.authenticationService.logout();
+            location.reload();
+          }
+          else{
           return this.refreshTokenAndRetry(request, next);
+          }
         } else if (error.status === 500 || error.status === 502) {
           // Handle specific error statuses as needed, e.g., navigate to an error page
           // this.router.navigateByUrl('server-error', { replaceUrl: true });

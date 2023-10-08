@@ -40,7 +40,7 @@ export class VehicleStatusService {
   async vehicleStatusUpdate(arrivalData: any, prqdata: any, market: boolean) {
     try {
       // Check if essential data is provided
-      if (!arrivalData || !market) {
+      if (!arrivalData) {
         throw new Error("Missing required data for vehicle status update. Ensure all parameters are provided.");
       }
 

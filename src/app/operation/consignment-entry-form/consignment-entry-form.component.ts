@@ -191,8 +191,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
   loadIn: boolean;
   isUpdate: boolean;
   vendorDetail: any;
-  jsonControlArrayConsignor: import("d:/velocityDocket/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
-  jsonControlArrayConsignee: import("d:/velocityDocket/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  jsonControlArrayConsignor: any;
+  jsonControlArrayConsignee: any;
 
   constructor(
     private fb: UntypedFormBuilder,

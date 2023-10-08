@@ -99,7 +99,7 @@ const MY_DATE_FORMAT = {
 
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },
-    {provide: OWL_DATE_TIME_LOCALE, useValue: 'fr'},
+    { provide: OWL_DATE_TIME_LOCALE, useValue: 'en-IN' },
     FilterUtils
   ],
 

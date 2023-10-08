@@ -10,6 +10,9 @@ export class ConsignmentControl {
       {
         name: "docketNumber", label: "Consignment Note No", placeholder: "Consignment Note No", type: "text",
         value: docketDetail.docketNumber, filterOptions: "", autocomplete: "", displaywith: "", Validations: [], generatecontrol: true, disable: true,
+        additionalData: {
+          metaData:"Basic"
+        },
       },
       {
         name: "docketDate",
@@ -30,6 +33,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           minDate: new Date("01 Jan 2023"),
+          metaData:"Basic"
         },
       },
       {
@@ -51,6 +55,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData:"Basic"
         },
       },
       {
@@ -89,6 +94,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData:"Basic"
         },
       },
       {
@@ -106,6 +112,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: false,
+          metaData:"Basic"
         },
       },
       {
@@ -126,6 +133,7 @@ export class ConsignmentControl {
         },
         additionalData: {
           showNameAndValue: false,
+          metaData:"Basic"
         },
       },
       {
@@ -146,6 +154,7 @@ export class ConsignmentControl {
         },
         additionalData: {
           showNameAndValue: false,
+          metaData:"Basic"
         },
       },
       {
@@ -163,6 +172,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: false,
+          metaData:"Basic"
         },
       },
       {
@@ -183,6 +193,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: false,
+          metaData:"Basic"
         },
       },
       {
@@ -206,6 +217,7 @@ export class ConsignmentControl {
         Validations: [],
         additionalData: {
           showNameAndValue: false,
+          metaData:"Basic"
         },
       },
       {
@@ -223,14 +235,19 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData:"Basic"
         },
       },
       {
         name: 'containerNumber', label: 'Container Number', placeholder: 'Container Number', type: 'text',
-        value: docketDetail.containerNumber, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.containerNumber, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData:"Basic"
+        }
       },
       {
         name: 'vendorType', label: 'Vendor Type', placeholder: 'Vendor Type', type: "Staticdropdown",
+        
         value: [
           { value: "Own", name: "Own" },
           { value: "Attached", name: "Attached" },
@@ -238,7 +255,11 @@ export class ConsignmentControl {
           { value: "Market", name: "Market" }
         ], Validations: [], functions: {
           onSelection: "vendorFieldChanged"
-        }, generatecontrol: true, disable: false
+        }, 
+        additionalData: {
+          metaData:"Basic"
+        },
+        generatecontrol: true, disable: false
       },
       {
         name: 'vendorName', label: 'Vendor Name', placeholder: 'Vendor Name', type: "dropdown",
@@ -251,8 +272,23 @@ export class ConsignmentControl {
         Validations: [
         ],
         additionalData: {
-          showNameAndValue: true,
+            showNameAndValue: true,
+            metaData:"Basic",
+        }
+      },
+      {
+        name: 'pAddress', label: 'Pickup Address', placeholder: 'Pickup Address', type: 'text',
+        value: docketDetail.pAddress, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData:"Basic",
         },
+      },
+      {
+        name: 'deliveryAddress', label: 'Delivery Address', placeholder: 'Delivery Address', type: 'text',
+        value:docketDetail.deliveryAddress, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData:"Basic"
+        }
       },
       {
         name: "ccbp",
@@ -264,6 +300,10 @@ export class ConsignmentControl {
         disable: false,
         functions: { onChange: "onAutoBillingBased" },
         Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+          metaData:"Basic",
+        }
       },
       {
         name: 'consignorName', label: "Consignor Name",
@@ -280,19 +320,24 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData:"consignor",
         },
       },
-      {
-        name: 'pAddress', label: 'Pickup Address', placeholder: 'Pickup Address', type: 'text',
-        value: docketDetail.pAddress, Validations: [], generatecontrol: true, disable: false
-      },
+    
       {
         name: 'ccontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'text',
-        value:docketDetail.ccontactNumber, Validations: [], generatecontrol: true, disable: false
+        value:docketDetail.ccontactNumber, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData:"consignor",
+        }
       },
       {
         name: 'calternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'text',
-        value: docketDetail.calternateContactNo, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.calternateContactNo, Validations: [], generatecontrol: true,
+         disable: false,
+         additionalData: {
+          metaData:"consignor",
+        }
       },
       {
         name: "consigneeName",
@@ -310,19 +355,22 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData:"consignee",
         },
       },
       {
-        name: 'deliveryAddress', label: 'Delivery Address', placeholder: 'Delivery Address', type: 'text',
-        value:docketDetail.deliveryAddress, Validations: [], generatecontrol: true, disable: false
-      },
-      {
         name: 'cncontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'text',
-        value: docketDetail.cncontactNumber, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.cncontactNumber, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData:"consignee"
+        }
       },
       {
         name: 'cnalternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'text',
-        value:  docketDetail.cnalternateContactNo, Validations: [], generatecontrol: true, disable: false
+        value:  docketDetail.cnalternateContactNo, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData:"consignee"
+        }
       },
       {
         name: 'companyCode',

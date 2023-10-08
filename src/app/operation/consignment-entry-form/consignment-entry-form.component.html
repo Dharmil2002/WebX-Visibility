@@ -1,6 +1,31 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
+  <hr>
+  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Basic Detail</h3>
+  </div>
   <form [formGroup]="consignmentTableForm">
     <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayBasic"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+      (callFunction)="functionCallHandler($event)">
+    </app-form-webxpress>
+  </form>
+  <hr>
+  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Consignor Detail</h3>
+  </div>
+  <form [formGroup]="consignmentTableForm">
+    <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayConsignor"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+      (callFunction)="functionCallHandler($event)">
+    </app-form-webxpress>
+  </form>
+    
+  <hr>
+  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Consignee Detail</h3>
+  </div>
+  <form [formGroup]="consignmentTableForm">
+    <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayConsignee"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
       (callFunction)="functionCallHandler($event)">
     </app-form-webxpress>

@@ -12,12 +12,15 @@ export class LocationMaster {
   locZone: string;
   ownership: string;
   activeFlag: any;
- _id: string;
+  _id: string;
   reportLevel: any;
   locCountry: string
   Latitude: string
   Longitude: string
-  pincodeHandler:any[]
+  mappedCity: string;
+  mappedState: string;
+  mappedPinCode: string;
+  pincodeHandler: any[]
   constructor(LocationMaster) {
     {
       this.locLevel = LocationMaster.locLevel || '';
@@ -34,6 +37,10 @@ export class LocationMaster {
       this.activeFlag = LocationMaster.activeFlag || false;
       this.Latitude = LocationMaster.latitude || '';
       this.Longitude = LocationMaster.longitude || '';
+      this.mappedCity = LocationMaster.mappedCity || '';
+      this.mappedState = LocationMaster.mappedState || '';
+      this.mappedPinCode = LocationMaster.mappedPinCode || '';
+
     }
 
   }

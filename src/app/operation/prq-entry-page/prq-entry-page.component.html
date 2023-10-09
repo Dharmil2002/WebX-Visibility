@@ -1,5 +1,5 @@
 
-    <app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
 
         <form [formGroup]="prqEntryTableForm">
             <app-form-webxpress [form]="prqEntryTableForm" [formData]="jsonControlPrqArray"
@@ -7,5 +7,5 @@
                 (functionCallEmitter)="functionCallHandler($event)" [submit]="submit">
             </app-form-webxpress>
         </form>
-     
+
     </app-common-wrapper-webxpress>

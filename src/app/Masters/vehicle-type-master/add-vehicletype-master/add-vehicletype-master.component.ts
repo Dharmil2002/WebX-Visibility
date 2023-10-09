@@ -23,6 +23,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
   vehicleTypeTableData: VehicleTypeMaster;
   vehicleTypeTableForm: UntypedFormGroup;
   vehicleTypeControl: VehicleTypeControl;
+  backPath:string;
   jsonControlVehicleTypeArray: any;
   vehicleCategory: any;
   vehicleCategoryStatus: any;
@@ -32,6 +33,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
   newVehicleTypeCode: any;
   ngOnInit(): void {
     //this.getVehicleTypeCategoryList();
+    this.backPath = "/Masters/VehicleTypeMaster/VehicleTypeMasterList";
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call

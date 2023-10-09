@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums"
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath"
 (toggleChange)="onToggleChange($event)">
     <form [formGroup]="vendorTableForm">
         <app-form-webxpress [form]="vendorTableForm" [formData]="jsonControlVendorArray"

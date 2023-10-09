@@ -38,6 +38,7 @@ export class JobEntryPageComponent implements OnInit {
   cityData: any;
   vendorNameCode: string;
   vendorNameStatus: boolean;
+  backPath:string;
   // Action buttons configuration
   actionObject = {
     addRow: true,
@@ -98,6 +99,7 @@ export class JobEntryPageComponent implements OnInit {
     this.bindDropdown();
     this.getDropDownDetail();
     this.loadTempData();
+    this.backPath = "/dashboard/GlobeDashboardPage?tab=6";
   }
 
   bindDropdown() {
@@ -225,7 +227,7 @@ export class JobEntryPageComponent implements OnInit {
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
 
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {

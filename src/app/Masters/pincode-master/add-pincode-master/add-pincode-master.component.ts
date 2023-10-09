@@ -38,10 +38,12 @@ export class AddPinCodeMasterComponent implements OnInit {
     cityRes: any;
     stateRes: any;
     stateData: any;
+    backPath:string;
 
     ngOnInit(): void {
         this.getStateData();
         this.getCityList();
+        this.backPath = "/Masters/PinCodeMaster/PinCodeMasterList";
     }
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: any, private route: Router, private fb: UntypedFormBuilder,
@@ -241,7 +243,7 @@ export class AddPinCodeMasterComponent implements OnInit {
         let field = $event.field;                   // the actual formControl instance
         let functionName = $event.functionName;     // name of the function , we have to call
 
-        // function of this name may not exists, hence try..catch 
+        // function of this name may not exists, hence try..catch
         try {
             this[functionName]($event);
         } catch (error) {

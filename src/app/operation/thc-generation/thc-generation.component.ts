@@ -32,6 +32,7 @@ export class ThcGenerationComponent implements OnInit {
   jsonControlArray: any;
   tableData: any;
   tableLoad: boolean;
+  backPath:string;
   // Declaring breadcrumbs
   breadscrums = [
     {
@@ -185,6 +186,7 @@ export class ThcGenerationComponent implements OnInit {
   ngOnInit(): void {
     this.IntializeFormControl();
     this.getDropDownDetail();
+    this.backPath = "/dashboard/GlobeDashboardPage?tab=6";
   }
 
   IntializeFormControl() {

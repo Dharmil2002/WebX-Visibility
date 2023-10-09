@@ -41,6 +41,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   tableData: any = [];
   invoiceData: any = [];
   tableLoadIn: boolean = true;
+  backPath:string;
   tableData1: any;
   tableLoad: boolean = true;
   isTableLoad: boolean = true;
@@ -224,6 +225,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   ngOnInit(): void {
     this.bindDataFromDropdown();
     this.isTableLoad = false;
+    this.backPath = "/dashboard/GlobeDashboardPage?tab=6";
   }
   //#region initializeFormControl
   async initializeFormControl() {

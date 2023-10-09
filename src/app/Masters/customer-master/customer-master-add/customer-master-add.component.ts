@@ -113,6 +113,7 @@ export class CustomerMasterAddComponent implements OnInit {
   EditGstTable: any;
   isGstUpdate: boolean;
   slectGstState: any;
+  backPath: string;
   submit = 'Save';
   customerIndex: any;
   breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
@@ -209,6 +210,7 @@ export class CustomerMasterAddComponent implements OnInit {
     this.getPinCode();
     this.getDataAndPopulateForm();
     this.CustomerCodeIndex()
+    this.backPath = "/Masters/CustomerMaster/CustomerMasterList";
   }
 
   bindGSTDropdown() {

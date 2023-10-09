@@ -28,6 +28,7 @@ export class AddFleetMasterComponent implements OnInit {
   allData: { vehicleData: any; };
   tableLoad: boolean;
   vehicleData: any;
+  backPath:string;
   vehicleDet: any;
   vehTypeDet: any;
   SelectFile: File;
@@ -102,6 +103,7 @@ export class AddFleetMasterComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAllMastersData();
+    this.backPath = "/Masters/FleetMaster/FleetMasterList";
   }
 
   //#region Function for Getting dropdown Data

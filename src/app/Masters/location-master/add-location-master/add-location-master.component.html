@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
   <form [formGroup]="locationTableForm">
     <app-form-webxpress [form]="locationTableForm" [formData]="jsonControlLocationArray"
       (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"

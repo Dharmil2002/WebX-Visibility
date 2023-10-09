@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-common-wrapper-webxpress',
@@ -7,14 +8,18 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 export class CommonWrapperComponent implements OnInit {
 
   @Input() breadscrums:any
+  @Input() backPath;
   @Input() loadTable:any
   @Output() toggleChange = new EventEmitter<boolean>();
   @Input() toggle: boolean;
-  constructor() { }
+  constructor(private router: Router) { }
 
-  ngOnInit(): void {    
+  ngOnInit(): void {
   }
- 
+  cancel() {
+    this.router.navigateByUrl(this.backPath);
+  }
+
   onToggleChange(event: any) {
     this.toggleChange.emit(event);
   }

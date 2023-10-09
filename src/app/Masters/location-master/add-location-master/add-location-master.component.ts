@@ -55,6 +55,7 @@ export class AddLocationMasterComponent implements OnInit {
   reportLocStatus: any;
   pincodeDet: any;
   pincode: any;
+  backPath:string;
   pincodeStatus: any;
   locationCity: any;
   locationCityStatus: any;
@@ -123,6 +124,7 @@ export class AddLocationMasterComponent implements OnInit {
   ngOnInit(): void {
     this.bindDropdown();
     this.getAllMastersData();
+    this.backPath = "/Masters/LocationMaster/LocationMasterList";
   }
   bindDropdown() {
     const locationPropertiesMapping = {

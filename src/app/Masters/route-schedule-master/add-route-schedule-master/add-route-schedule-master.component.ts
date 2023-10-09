@@ -31,6 +31,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
   routeNameStatus: any;
   action: string;
   data: any;
+  backPath:string;
   isUpdate: any;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   // Displayed columns configuration
@@ -132,6 +133,7 @@ export class AddRouteScheduleMasterComponent implements OnInit {
     this.intializeFormControls();
     this.getDropDownData();
     this.getAllMastersData();
+    this.backPath = "/Masters/RouteScheduleMaster/RouteScheduleMasterList";
   }
   intializeFormControls() {
     this.routeScheduleFormControls = new RouteScheduleControl(this.data, this.isUpdate);

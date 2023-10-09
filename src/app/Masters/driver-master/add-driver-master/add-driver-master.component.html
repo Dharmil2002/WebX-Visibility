@@ -6,7 +6,7 @@
     </form>
 </app-common-wrapper-webxpress> -->
 
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" (toggleChange)="onToggleChange($event)">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
   <form [formGroup]="DriverTableForm">
     <app-form-webxpress [form]="DriverTableForm" [formData]="jsonControlDriverArray"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"

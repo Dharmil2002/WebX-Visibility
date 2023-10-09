@@ -25,6 +25,7 @@ export class AddDriverMasterComponent implements OnInit {
   jsonControlDriverArray: any;
   accordionData: any;
   location: any;
+  backPath:string;
   locationStatus: any;
   category: any;
   categoryStatus: any;
@@ -127,6 +128,7 @@ export class AddDriverMasterComponent implements OnInit {
     this.bindDropdown();
     this.getDropDownData();
     this.getAllMastersData();
+    this.backPath = "/Masters/DriverMaster/DriverMasterList";
   }
 
   //#region

@@ -43,6 +43,7 @@ export class PrqEntryPageComponent implements OnInit {
   transMode: string;
   transModeStatus: boolean;
   isUpdate: boolean;
+  backPath:string;
   prqBranchCode: string;
   prqBranchStatus: boolean;
   pendingOperations = false;
@@ -94,6 +95,7 @@ export class PrqEntryPageComponent implements OnInit {
     this.bindDropDown();
     this.getCity();
     this.bindDataFromDropdown();
+    this.backPath = "dashboard/GlobeDashboardPage?tab=6";
   }
 
   autoFill() {
@@ -142,7 +144,7 @@ export class PrqEntryPageComponent implements OnInit {
       this.jsonControlPrqArray,
     ]);
     this.allFormGrop = this.jsonControlPrqArray;
-   
+
   }
   bindDropDown() {
     const locationPropertiesMapping = {
@@ -228,7 +230,7 @@ export class PrqEntryPageComponent implements OnInit {
   //   );
   // }
   async save() {
- 
+
     const tabcontrols = this.prqEntryTableForm;
     clearValidatorsAndValidate(tabcontrols);
     this.prqEntryTableForm.controls["typeContainer"].enable();
@@ -409,7 +411,7 @@ export class PrqEntryPageComponent implements OnInit {
         this.prqEntryTableForm.get("contactNo"),
         result.contactNo
       );
-     
+
       setControlValue(this.prqEntryTableForm.get("pAddress"), result?.pAddress);
     }
   }
@@ -444,7 +446,7 @@ export class PrqEntryPageComponent implements OnInit {
       this.jsonControlPrqArray = this.allFormGrop.filter((x) => x.name != "containerSize" && x.name != "typeContainer");
     }
   }
-  //#region to set size of container 
+  //#region to set size of container
   async setContainerSize() {
     const containerType = this.prqEntryTableForm.value.typeContainer.value
     let size = await this.containerService.getContainersByFilter(containerType)

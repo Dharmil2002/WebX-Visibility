@@ -43,7 +43,6 @@ export class CustomHttpInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     let attempt = 0;
     let accessToken = this.storageService.getItem("token");
-
     request = request.clone({
       setHeaders: {
         Authorization: `Bearer ${accessToken}`,

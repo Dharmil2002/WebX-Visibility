@@ -238,7 +238,8 @@ export class HeaderComponent
 
   menuModeDetail(option: string) {
     localStorage.setItem("Mode", option);
-    location.reload();
+    //location.reload();
+    this.router.navigate(['/']); 
     this.isDropdownOpen = false; // Close the dropdown when an option is selected
     // Add any other logic you need here when a menu item is selected
   }

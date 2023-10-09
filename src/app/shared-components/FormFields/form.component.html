@@ -139,7 +139,8 @@
         *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
         <mat-label class="fontbold">{{formItem.label}}</mat-label>
         <mat-select [formControlName]="formItem.additionalData.support" placeholder={{formItem.placeholder}}
-          [multiple]="true" #singleSelect
+          [multiple]="true" (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick,
+                          eventArgs: $event })" #singleSelect
           (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelect , eventArgs: $event })">
           <mat-option>
             <ngx-mat-select-search formControlName={{formItem.name}} placeholderLabel={{formItem.placeholder}}
@@ -207,11 +208,8 @@
       </ng-container>
       <!--Radio Button-->
       <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
-        <mat-label id="example-radio-group-label">{{formItem.label}}</mat-label>&nbsp;
-        <mat-radio-group [formControlName]="formItem.name" aria-labelledby="example-radio-group-label" style="display: flex;
-  flex-direction: column;
-  margin: 5px 5px;
-  align-items: flex-start;"
+        <mat-label>{{formItem.label}}</mat-label>&nbsp;
+        <mat-radio-group [formControlName]="formItem.name"
           (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
           <mat-radio-button style=" margin: 5px;" *ngFor="let option of formItem.value" [value]="option.value">
             {{ option.name }}

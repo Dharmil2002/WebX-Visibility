@@ -5,7 +5,7 @@ export class LocationControl {
   LocationDetailControl: FormControls[];
   OtherDetailsControls: FormControls[];
 
-  constructor(LocationTable: LocationMaster, isUpdate: boolean) {
+  constructor(LocationTable: LocationMaster, isUpdate: boolean, isChecked: boolean) {
     (this.LocationDetailControl = [
       {
         name: "locCode",
@@ -355,9 +355,19 @@ export class LocationControl {
         },
       },
       {
+        name: "activeFlag",
+        label: "Active Flag",
+        placeholder: "",
+        type: "toggle",
+        value: LocationTable.activeFlag,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
         name: "mappedPincode",
-        label: "Mapped Pincode",
-        placeholder: "Mapped Pincode",
+        label: "Mapped Area",
+        placeholder: "Mapped Area",
         type: "multiselect",
         value: "",
         filterOptions: "",
@@ -366,27 +376,19 @@ export class LocationControl {
         Validations: [],
         additionalData: {
           isIndeterminate: false,
-          isChecked: false,
+          isChecked: isChecked,
           support: "pincodeHandler",
           showNameAndValue: false,
 
         },
         functions: {
           onToggleAll: 'toggleSelectAll',
-          onModel: 'getMappedPincode'
+          onModel: 'getMappedPincode',
+          onSelect: "setSelectedPincodeData",
+          onClick: "resetPinCode",
         },
         generatecontrol: true,
         disable: false,
-      },
-      {
-        name: "activeFlag",
-        label: "Active Flag",
-        placeholder: "",
-        type: "toggle",
-        value: LocationTable.activeFlag,
-        generatecontrol: false,
-        disable: false,
-        Validations: [],
       },
       {
         name: "Longitude",
@@ -431,28 +433,47 @@ export class LocationControl {
 
       },
       {
-        name: 'updateDate',
-        label: ' ',
-        placeholder: ' ',
-        type: 'date',
-        value: new Date(), // Set the value to the current date
+        name: 'mappedPinCode',
+        label: 'Mapped Area - Pin Code',
+        placeholder: 'Mapped Area - Pin Code',
+        type: 'text',
+        value: "",
         filterOptions: '',
         autocomplete: '',
         displaywith: '',
         Validations: [],
-        generatecontrol: false,
-        disable: false
+        generatecontrol: true,
+        disable: true
+
       },
       {
-        name: "updateBy",
-        label: "Update By",
-        placeholder: "Update By",
-        type: "text",
-        value: localStorage.getItem("UserName"),
+        name: 'mappedCity',
+        label: 'Mapped Area - City',
+        placeholder: 'Mapped Area - City',
+        type: 'text',
+        value: "",
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
         Validations: [],
-        generatecontrol: false,
-        disable: false,
+        generatecontrol: true,
+        disable: true
+
       },
+      {
+        name: 'mappedState',
+        label: 'Mapped Area - State',
+        placeholder: 'Mapped Area - State',
+        type: 'text',
+        value: "",
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: true,
+        disable: true
+
+      }
     ])
   }
   getFormControlsLocation() {

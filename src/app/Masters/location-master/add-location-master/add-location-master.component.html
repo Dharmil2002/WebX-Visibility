@@ -1,12 +1,8 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums"
- (toggleChange)="onToggleChange($event)">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
   <form [formGroup]="locationTableForm">
-      <app-form-webxpress [form]="locationTableForm"
-        [formData]="jsonControlLocationArray"
-        (functionCallEmitter)="functionCallHandler($event)" 
-        (callFunction)="functionCallHandler($event)" 
-        [showSaveAndCancelButton]="true"
-        [submit]="submit">
-      </app-form-webxpress>
+    <app-form-webxpress [form]="locationTableForm" [formData]="jsonControlLocationArray"
+      (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="true">
+    </app-form-webxpress>
   </form>
 </app-common-wrapper-webxpress>

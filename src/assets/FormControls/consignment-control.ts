@@ -379,7 +379,10 @@ export class ConsignmentControl {
         type: 'text',
         value: localStorage.getItem("companyCode"),
         Validations: [],
-        generatecontrol: false, disable: false
+        generatecontrol: false, disable: false,
+        additionalData: {
+          metaData:"consignee"
+        }
       },
       {
         name: 'vehicleNo',
@@ -388,7 +391,10 @@ export class ConsignmentControl {
         type: '',
         value:docketDetail.vehicleNo,
         Validations: [],
-        generatecontrol: false, disable: false
+        generatecontrol: false, disable: false,
+        additionalData: {
+          metaData:"consignee"
+        }
       },
       {
         name: 'status',
@@ -397,7 +403,10 @@ export class ConsignmentControl {
         type: '',
         value:0,
         Validations: [],
-        generatecontrol: false, disable: false
+        generatecontrol: false, disable: false,
+         additionalData: {
+          metaData:"consignee"
+        }
       }
     ]
     this.containordetail = [

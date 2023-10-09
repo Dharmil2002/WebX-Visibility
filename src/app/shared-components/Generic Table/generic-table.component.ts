@@ -154,11 +154,10 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   //#region this function is called when rendering data in table and returns formatted data if required.
   formatData(val: string, key: string) {
     if (key.includes('Date') && val !== null) {
-      let dt = new Date(val)
-      return moment(dt).format('DD/MM/YYYY');
-      // return this.datePipe.transform(dt, "dd/MM/yyyy");
+      let dt = new Date(val);
+      return moment(dt).format('DD-MM-YYYY HH:mm'); // <-- Use 'DD-MM-YYYY HH:mm' instead of 'DD/MM/YYYY HH:MM'
     }
-    return val
+    return val;
   }
   //#endregion
 

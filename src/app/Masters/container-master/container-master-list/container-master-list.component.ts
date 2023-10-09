@@ -15,14 +15,16 @@ export class ContainerMasterListComponent implements OnInit {
   linkArray = []
   columnHeader =
     {
-      "srNo": "Sr No.",
+      // "srNo": "Sr No.",
+      "entryDate": "Created Date",
       "containerCode": "Container Code",
       "containerName": "Container Name",
       "activeFlag": "Active Status",
       "actions": "Actions"
     }
   headerForCsv = {
-    "srNo": "Sr No.",
+    // "srNo": "Sr No.",
+    "entryDate": "Created Date",
     "containerCode": "Container Code",
     "containerName": "Container Name",
     "activeFlag": "Active Status",
@@ -37,14 +39,16 @@ export class ContainerMasterListComponent implements OnInit {
   dynamicControls = {
     add: true,
     edit: true,
-    csv: false
+    csv: true
   }
   addAndEditPath: string;
   tableData: any;
+  csvFileName: string;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/ContainerMaster/AddContainerMaster";
   }
   ngOnInit(): void {
+    this.csvFileName = "Container Master";
     this.getContainerDetails();
   }
   getContainerDetails() {
@@ -52,23 +56,38 @@ export class ContainerMasterListComponent implements OnInit {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       "collectionName": "container_detail",
       "filter": {}
-    }
+    };
+  
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) => {
+        
+        if (res && res.data && res.data.length > 0) {
+          // Sort the data based on entryDate in descending order
+          const sortedData = res.data.sort((a, b) => {
+            return new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime();
+          });
+  
+          // Display the latest record
+          const latestRecord = sortedData[0];
+          const latestEntryDate = latestRecord.entryDate;
+  
+          // You can use the latestRecord object or latestEntryDate as needed for display.
+  
+          // If you want to add srNo to each object in the array, you can still do that
+          const dataWithSrno = sortedData.map((obj, index) => {
             return {
               ...obj,
-              srNo: index + 1
+              // srNo: index + 1
             };
           });
-          this.csv = dataWithSrno
+  
+          this.csv = dataWithSrno;
           this.tableLoad = false;
         }
       }
-    })
+    });
   }
+  
   isActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls

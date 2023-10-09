@@ -62,7 +62,7 @@ export class PrqSummaryPageComponent implements OnInit {
       Title: "Action",
       class: "matcolumnleft",
       Style: "max-width:80px",
-    },
+    }
   };
   //#endregion
   staticField = [

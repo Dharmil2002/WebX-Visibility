@@ -18,9 +18,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { ClickOutsideModule } from "ng-click-outside";
 import { CoreModule } from "./core/core.module";
 import { DashboardLayoutComponent } from "./layout/app-layout/dashboard-layout/dashboard-layout.component";
-import { ErrorInterceptor } from "./core/interceptor/error.interceptor";
 import { HeaderComponent } from "./layout/header/header.component";
-import { JwtInterceptor } from "./core/interceptor/jwt.interceptor";
 import { JwtModule } from "@auth0/angular-jwt";
 import { MainLayoutComponent } from "./layout/app-layout/main-layout/main-layout.component";
 import { MatSelectModule } from "@angular/material/select";
@@ -135,8 +133,6 @@ export function createTranslateLoader(http: HttpClient): any {
       useClass: CustomHttpInterceptor,
       multi: true
     },
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     fakeBackendProvider,
     WINDOW_PROVIDERS,
     {

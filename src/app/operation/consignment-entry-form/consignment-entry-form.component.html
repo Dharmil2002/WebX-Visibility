@@ -1,12 +1,50 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
+  <!--  Basic Detail-->
+  <hr>
+  <div
+    style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Basic Detail</h3>
+  </div>
   <form [formGroup]="consignmentTableForm">
     <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayBasic"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
       (callFunction)="functionCallHandler($event)">
     </app-form-webxpress>
   </form>
+  <!-- End -->
+
+  <!-- Consignor Detail -->
   <hr>
-  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+  <div
+    style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Consignor Detail</h3>
+  </div>
+  <form [formGroup]="consignmentTableForm">
+    <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayConsignor"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+      (callFunction)="functionCallHandler($event)">
+    </app-form-webxpress>
+  </form>
+  <!-- End -->
+
+  <!-- Consignee Detail -->
+  <hr>
+  <div
+    style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Consignee Detail</h3>
+  </div>
+  <form [formGroup]="consignmentTableForm">
+    <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayConsignee"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+      (callFunction)="functionCallHandler($event)">
+    </app-form-webxpress>
+  </form>
+  <!-- ENd -->
+
+  <!--  Container Detail-->
+  <hr>
+  <div
+    style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
     <h3 style="font-size: 1.5rem; padding: 5px 0px;">Container Detail</h3>
   </div>
   <form [formGroup]="containerTableForm">
@@ -15,25 +53,29 @@
       (callFunction)="functionCallHandler($event)">
     </app-form-webxpress>
   </form>
-  <button matTooltip="Add Data" mat-stroked-button
-  class="filter_btn" [disabled]="!containerTableForm.valid"  style="margin-left: 91%;" (click)="addData()">
-  <mat-icon>add</mat-icon>
-  Add New
-</button>
-<div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
-  <!-- Bootstrap loader -->
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
+  <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!containerTableForm.valid"
+    style="margin-left: 91%;" (click)="addData()">
+    <mat-icon>add</mat-icon>
+    Add New
+  </button>
+  <!-- End -->
+  <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
-</div>
-<div class="paddingdiv">
-  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+  <div class="paddingdiv">
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
       [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
       [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-  </app-generic-table-v2>
-</div>
-  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
+      [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+    </app-generic-table-v2>
+  </div>
+  <!--  Invoice Details-->
+  <div
+    style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
     <h3 style="font-size: 1.5rem; padding: 5px 0px;">Invoice Details</h3>
   </div>
   <form [formGroup]="invoiceTableForm">
@@ -42,40 +84,47 @@
       (callFunction)="functionCallHandler($event)">
     </app-form-webxpress>
   </form>
-  <button matTooltip="Add Data" mat-stroked-button
-  class="filter_btn" [disabled]="!invoiceTableForm.valid" style="margin-left: 91%;" (click)="addInvoiceData()">
-  <mat-icon>add</mat-icon>
-  Add New
-</button>
-<div *ngIf="loadIn" class="d-flex justify-content-center align-items-center">
-  <!-- Bootstrap loader -->
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
+
+  <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!invoiceTableForm.valid"
+    style="margin-left: 91%;" (click)="addInvoiceData()">
+    <mat-icon>add</mat-icon>
+    Add New
+  </button>
+  <div *ngIf="loadIn" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
-</div>
-<div class="paddingdiv">
-  <app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="dynamicControls" [columnHeader]="columnInvoice"
+  <!-- End -->
+  <div class="paddingdiv">
+    <app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="dynamicControls" [columnHeader]="columnInvoice"
       [tableData]="invoiceData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
       [staticField]="staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-  </app-generic-table-v2>
-</div>
-  <hr>
-  <h4 class="card-title" style="padding-left: 10px;">Freight Details</h4>
-  <hr>
+      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
+      [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+    </app-generic-table-v2>
+  </div>
+  <!--Freight Detail  -->
+  <div
+    style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Freight Detail</h3>
+  </div>
   <form [formGroup]="FreightTableForm">
     <app-form-webxpress [form]="FreightTableForm" [formData]="jsonControlArray"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
       (callFunction)="functionCallHandler($event)">
     </app-form-webxpress>
   </form>
-  <div class="row paddingdiv" >
+  <div class="row paddingdiv">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
       <div class="example-button-row d-flex justify-content-start">
-        <button class="msr-3" mat-raised-button color="primary"
-          (click)="save()" [disabled]="!consignmentTableForm.valid || !FreightTableForm.valid">{{isUpdate?"Edit Docket":"Generate Docket"}} </button>
-        <button class="msr-3" mat-raised-button color="primary" >Back</button>
+        <button class="msr-3" mat-raised-button color="primary" (click)="save()"
+          [disabled]="!consignmentTableForm.valid || !FreightTableForm.valid">{{isUpdate?"Edit Docket":"Generate
+          Docket"}} </button>
+        <button class="msr-3" mat-raised-button color="primary">Back</button>
       </div>
     </div>
   </div>
+  <!-- ENd -->
 </app-common-wrapper-webxpress>

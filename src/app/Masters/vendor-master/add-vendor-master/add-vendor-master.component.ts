@@ -19,7 +19,6 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
   templateUrl: './add-vendor-master.component.html',
 })
 export class AddVendorMasterComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   action: string;
   isUpdate = false;
@@ -101,6 +100,7 @@ export class AddVendorMasterComponent implements OnInit {
     ]
   linkArray = [
   ];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
   constructor(
     private route: Router, private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -128,12 +128,14 @@ export class AddVendorMasterComponent implements OnInit {
     } else {
       this.action = 'Add';
     }
-    const activeTitle = this.action === 'edit' ? 'Edit Vendor' : 'Add Vendor';
+    const activeTitle = this.action === 'edit' ? 'Modify Vendor' : 'Add Vendor';
     this.breadScrums = [
       {
-        title: 'Vendor Master',
+        title: activeTitle,
         items: ['Home'],
         active: activeTitle,
+        generatecontrol: true,
+        toggle: this.isUpdate ? this.vendorTabledata.isActive : false
       },
     ];
 
@@ -207,7 +209,7 @@ export class AddVendorMasterComponent implements OnInit {
     });
   }
   findDropdownItemByName(dropdownData, name) {
-    return dropdownData.find(item => item.name === name);
+    return dropdownData.find(item => item.name.toUpperCase() === name);
   }
   selectHandleFileSelection(data, allowedExtensions) {
     switch (data.field.name) {
@@ -592,4 +594,9 @@ export class AddVendorMasterComponent implements OnInit {
     }
   }
   //#endregion
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.vendorTableForm.controls['isActive'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
 }

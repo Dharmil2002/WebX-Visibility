@@ -28,7 +28,6 @@ export class AddLocationMasterComponent implements OnInit {
   protected _onDestroy = new Subject<void>();
   mappedPincode: string;
   mappedPincodeStatus: boolean;
-
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -40,14 +39,7 @@ export class AddLocationMasterComponent implements OnInit {
   locationFormControls: LocationControl;
   error: string;
   jsonControlLocationArray: any;
-  breadScrums = [
-    {
-      title: "Add Location Master",
-      items: ["Masters"],
-      active: "Location Master",
-      generatecontrol: true
-    },
-  ];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: boolean; }[];
   locHierachy: any;
   locHierachyStatus: any;
   reportLoc: any;
@@ -85,7 +77,6 @@ export class AddLocationMasterComponent implements OnInit {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.locationTable = router.getCurrentNavigation().extras.state.data;
 
-      console.log(this.locationTable);
       this.isUpdate = true;
       this.submit = 'Modify';
       this.action = "edit";
@@ -99,6 +90,7 @@ export class AddLocationMasterComponent implements OnInit {
           items: ["Masters"],
           active: "Modify Location",
           generatecontrol: true,
+          toggle: this.locationTable.activeFlag
         },
       ];
     } else {
@@ -108,6 +100,7 @@ export class AddLocationMasterComponent implements OnInit {
           items: ["Masters"],
           active: "Add Location",
           generatecontrol: true,
+          toggle: false
         },
       ];
       this.locationTable = new LocationMaster({});
@@ -213,7 +206,7 @@ export class AddLocationMasterComponent implements OnInit {
         console.error("Error updating record:", error);
       }
     } else {
-      if (locLevel.name && reportLevel.name === 'Head Office') {
+      if (locLevel.name === 'Head Office' && reportLevel.name === 'Head Office') {
         // Reset form controls and show an error message
         this.locationTableForm.patchValue({
           locLevel: '',
@@ -596,6 +589,6 @@ export class AddLocationMasterComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.locationTableForm.controls['activeFlag'].setValue(event);
-    console.log("Toggle value :", event);
+    //console.log("Toggle value :", event);
   }
 }

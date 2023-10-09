@@ -1,9 +1,40 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums">
+  <!-- Basic Detail -->
+  <hr>
+  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Basic Detail</h3>
+  </div>
   <form [formGroup]="thcTableForm">
-    <app-form-without-auto-complete-webxpress [form]="thcTableForm" [formData]="jsonControlArray"
+    <app-form-without-auto-complete-webxpress [form]="thcTableForm" [formData]="jsonControlBasicArray"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
     </app-form-without-auto-complete-webxpress>
   </form>
+  <!-- End -->
+
+  <!-- Driver Detail -->
+  <hr>
+  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;">Driver Detail</h3>
+  </div>
+  <form [formGroup]="thcTableForm">
+    <app-form-without-auto-complete-webxpress [form]="thcTableForm" [formData]="jsonControlDriverArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    </app-form-without-auto-complete-webxpress>
+  </form>
+
+  <!-- End -->
+
+  <!-- Vehicle Loading Detail -->
+  <hr>
+  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;"> Vehicel Loading Detail</h3>
+  </div>
+  <form [formGroup]="thcTableForm">
+    <app-form-without-auto-complete-webxpress [form]="thcTableForm" [formData]="jsonControlVehLoadArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    </app-form-without-auto-complete-webxpress>
+  </form>
+  <!-- End -->
   <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
     <!-- Bootstrap loader -->
     <div class="spinner-border text-primary" role="status">
@@ -20,7 +51,7 @@
     <div class="row">
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content-start">
-          <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad&&!isView" (click)="createThc()"
+          <button class="msr-3" mat-raised-button color="primary" *ngIf="!isView" (click)="createThc()"
             [disabled]="!thcTableForm.valid"> {{ isUpdate ? 'Update THC' : 'Generate THC' }}</button>
           <button class="msr-3" mat-raised-button color="primary" (click)="goBack('THC')">Back</button>
         </div>

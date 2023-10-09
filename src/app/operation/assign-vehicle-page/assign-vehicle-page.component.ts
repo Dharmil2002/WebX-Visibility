@@ -41,7 +41,7 @@ export class AssignVehiclePageComponent implements OnInit {
   NavData: any;
   constructor(private Route: Router, private _operationService: OperationService, public dialog: MatDialog, private _assignVehiclePageMethods: AssignVehiclePageMethods
   ) {
-
+   
      this.staticField.pop();
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.NavData = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -58,7 +58,7 @@ export class AssignVehiclePageComponent implements OnInit {
       const vehicleStatusData = await getVehicleStatusFromApi(this.companyCode, this._operationService);
       if (vehicleStatusData.length > 0) {
         const [fromCity, ToCity] = this.NavData.fromToCity.split('-');
-        this.tableData = vehicleStatusData.map(item => ({ ...item, action: 'Assign', fromCity: fromCity, toCity: ToCity, distance: 0 }));
+        this.tableData = vehicleStatusData.map(item => ({ ...item, action: 'Assign', fromCity: fromCity, toCity: ToCity, distance: 0,isMarket:false }));
         this.tableLoad = false;
       }
       else {
@@ -100,7 +100,7 @@ export class AssignVehiclePageComponent implements OnInit {
     }
 
     const [fromCity, toCity] = fromToCitySplit;
-    const marketData = [tableData].map(item => ({ ...item, action: 'Assign', fromCity, toCity, distance: 0 }));
+    const marketData = [tableData].map(item => ({ ...item, action: 'Assign', fromCity, toCity, distance: 0,isMarket:true }));
 
     this.tableData = this.tableData?this.tableData.concat(marketData):marketData;
     this.tableLoad = false;

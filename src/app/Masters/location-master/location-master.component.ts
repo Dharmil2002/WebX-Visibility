@@ -13,9 +13,9 @@ export class LocationMasterComponent implements OnInit {
   linkArray = []
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   columnHeader = {
+    'updateDate': 'Created Date',
     'locCode': 'Code',
     'locName': 'Name',
-    'updateDate': 'Created Date',
     'ownership': 'Ownership',
     'locPincode': 'Pincode',
     'locCity': 'City',
@@ -79,7 +79,7 @@ export class LocationMasterComponent implements OnInit {
           const ownershipDescriptions = await this.getOwnership();
 
           // Modify each object in res.data
-          const modifiedData = res.data.map((obj, index) => {
+          const modifiedData = res.data.map(obj => {
             // Find the matching ownership description
             const ownershipObject = ownershipDescriptions.find(
               (x) => x.codeId === obj.ownership
@@ -91,13 +91,14 @@ export class LocationMasterComponent implements OnInit {
             // Convert locCode and locName to uppercase
             const locCode = obj.locCode.toUpperCase();
             const locName = obj.locName.toUpperCase();
-
+            const locCity = obj.locCity.toUpperCase();
+            const locPincode = parseInt(obj.locPincode)
             // Create a modified object
-            return { ...obj, ownership, locCode, locName };
+            return { ...obj, ownership, locCode, locName, locCity, locPincode };
           });
 
           // Sort the modified data by updateDate in descending order
-            const sortedData = modifiedData.sort((a, b) => {
+          const sortedData = modifiedData.sort((a, b) => {
             const dateA: Date | any = new Date(a.updateDate);
             const dateB: Date | any = new Date(b.updateDate);
 
@@ -114,11 +115,19 @@ export class LocationMasterComponent implements OnInit {
   }
   //#endregion
 
-  IsActiveFuntion(det) {
+  async IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls
     delete det._id;
     delete det.srNo;
+
+    const ownershipDescriptions = await this.getOwnership();
+    const ownershipObject = ownershipDescriptions.find(
+      (x) => x.codeDesc === det.ownership
+    );
+    // Set the ownership property to the codeDesc if found, or an empty string if not found
+    const ownership = ownershipObject ? ownershipObject.codeId : '';
+    det.ownership = ownership
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "location_detail",

@@ -184,8 +184,8 @@ export class VendorControl {
             },
             {
                 name: 'emailId',
-                label: 'Vendor E-mail',
-                placeholder: 'Vendor E-mail',
+                label: 'Vendor E-mails',
+                placeholder: 'Enter Vendor E-mails',
                 type: 'text', value: vendorMasterTable.emailId,
                 Validations: [
                     {
@@ -316,7 +316,7 @@ export class VendorControl {
             },
             {
                 name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isActive, Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: false, disable: false
             },
 
             {

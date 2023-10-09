@@ -10,52 +10,65 @@ import Swal from "sweetalert2";
 })
 export class PrqService {
   vehicleDetail: any;
+  statusActions = {
+    "0": ["Confirm", "Reject", "Modify"],
+    "1": ["Assign Vehicle"],
+    "2": ["Add Docket"],
+    "3": ["Add Docket", "Create THC"],
+    "default": [""]
+  };
+  status = {
+    "0": "Awaiting Confirmation",
+    "1": "Awaiting Assign Vehicle",
+    "2": "Awaiting For Docket",
+    "3": "Ready For THC",
+    "default": "THC Generated"
+  }
+
   constructor(
     private masterService: MasterService,
     private operation: OperationService
   ) { }
 
-  // the function for prq generation
-  getPrqNextNumber() {
-    // Get the current number from localStorage
-    let currentNum = parseInt(localStorage.getItem("sequenceNumber"));
-
-    // If the number doesn't exist in localStorage, initialize it to 1
-    if (!currentNum) {
-      currentNum = 1;
-    } else {
-      currentNum = currentNum + 1;
-    }
-
-    // Format the number with leading zeros (e.g., 001, 002, ...)
-    const formattedNumber = currentNum.toString().padStart(7, "0");
-
-    // Store the new number in localStorage
-    localStorage.setItem("sequenceNumber", currentNum.toString());
-
-    // Return the formatted number
-    return formattedNumber;
-  }
-  //................end.............//
 
   //here the function for add prq Detail
+  /**
+ * Adds Purchase Requisition (PRQ) data to the database.
+ *
+ * @param {Object} prqData - The PRQ data to be added.
+ * @returns {Promise<any>} A promise that resolves with the result of the API request.
+ */
   async addPrqData(prqData) {
+    // Retrieve the company code and branch from localStorage
+    const companyCode = localStorage.getItem("companyCode");
+    const branch = localStorage.getItem("Branch");
 
+    // Ensure prqData is not undefined and set party to uppercase if it exists
+    prqData = prqData || {};
+    const party = prqData.billingParty ? prqData.billingParty.toUpperCase() : '';
+
+    // Construct the request body
     const reqBody = {
-      companyCode: localStorage.getItem("companyCode"),
+      companyCode: companyCode,
       collectionName: "prq_detail",
       data: prqData,
       docType: "PRQ",
-      branch: localStorage.getItem("Branch"),
-      party: prqData?.billingParty.toUpperCase()||'',
-      finYear: "2223",
+      branch: branch,
+      party: party,
+      finYear: "2223", // Replace with a dynamic value if needed
     };
 
-    const res = await this.masterService
-      .masterMongoPost("operation/prq/create", reqBody)
-      .toPromise();
-    return res;
+    try {
+      // Make an API request to create the PRQ
+      const res = await this.masterService.masterMongoPost("operation/prq/create", reqBody).toPromise();
+      return res;
+    } catch (error) {
+      // Handle errors gracefully and log them
+      console.error("Error adding PRQ data:", error);
+      throw error; // Re-throw the error for higher-level error handling
+    }
   }
+
 
   //................end.............//
 
@@ -182,7 +195,7 @@ export class PrqService {
         size: element.vehicleSize
           ? element.vehicleSize + " " + "MT"
           : element.containerSize
-            ? element.containerSize+ " " + "MT"
+            ? element.containerSize + " " + "MT"
             : "",
         billingParty: element?.billingParty || "",
         fromToCity: element?.fromCity + "-" + element?.toCity,
@@ -194,26 +207,8 @@ export class PrqService {
         prqBranch: element?.prqBranch || "",
         pickUpDate: formatDocketDate(element?.pickUpTime || new Date()),
         pickupDate: element?.pickUpTime || new Date(),
-        status:
-          element?.status === "0"
-            ? "Awaiting Confirmation"
-            : element.status === "1"
-              ? "Awaiting Assign Vehicle"
-              : element.status == "2"
-                ? "Awaiting For Docket"
-                : element.status == "3"
-                  ? "Ready For THC"
-                  : "THC Generated",
-        actions:
-          element?.status === "0"
-            ? ["Confirm", "Reject", "Modify"]
-            : element.status === "1"
-              ? ["Assign Vehicle"]
-              : element.status == "2"
-                ? ["Add Docket"]
-                : element.status == "3"
-                  ? ["Add Docket", "Create THC"]
-                  : [""],
+        status: this.status[element.status] || this.status.default,
+        actions: this.statusActions[element.status] || this.statusActions.default,
         containerSize: element?.containerSize || "",
         typeContainer: element?.typeContainer || "",
         pAddress: element?.pAddress || "",
@@ -253,85 +248,68 @@ export class PrqService {
     const res = await this.masterService
       .masterMongoPost("generic/get", reqBody)
       .toPromise();
-      let prqList = [];
+    let prqList = [];
 
-      // Map and transform the PRQ data
-      res.data.map((element, index) => {
-        let prqDataItem = {
-          srNo: (element.srNo = index + 1),
-          prqNo: element?.prqNo || "",
-          vehicleSize: element?.vehicleSize || "",
-          size: element.vehicleSize
-            ? element.vehicleSize + " " + "MT"
-            : element.containerSize
-              ? element.containerSize
-              : "",
-          billingParty: element?.billingParty || "",
-          fromToCity: element?.fromCity + "-" + element?.toCity,
-          fromCity: element?.fromCity || "",
-          contactNo: element?.contactNo || "",
-          toCity: element?.toCity || "",
-          transMode: element?.transMode || "",
-          vehicleNo: element?.vehicleNo || "",
-          prqBranch: element?.prqBranch || "",
-          pickUpDate: formatDocketDate(element?.pickUpTime || new Date()),
-          pickupDate: element?.pickUpTime || new Date(),
-          status:
-            element?.status === "0"
-              ? "Awaiting Confirmation"
-              : element.status === "1"
-                ? "Awaiting Assign Vehicle"
-                : element.status == "2"
-                  ? "Awaiting For Docket"
-                  : element.status == "3"
-                    ? "Ready For THC"
-                    : "THC Generated",
-          actions:
-            element?.status === "0"
-              ? ["Confirm", "Reject", "Modify"]
-              : element.status === "1"
-                ? ["Assign Vehicle"]
-                : element.status == "2"
-                  ? ["Add Docket"]
-                  : element.status == "3"
-                    ? ["Add Docket", "Create THC"]
-                    : [""],
-          containerSize: element?.containerSize || "",
-          typeContainer: element?.typeContainer || "",
-          pAddress: element?.pAddress || "",
-          payType: element?.payType || "",
-          contractAmt: element?.contractAmt || "",
-          createdDate: formatDocketDate(element?.entryDate || new Date()),
-        };
-        prqList.push(prqDataItem);
-      });
-  
-      // Sort the PRQ list by pickupDate in descending order
-      const sortedData = prqList.sort((a, b) => {
-        const dateA: Date | any = new Date(a.pickupDate);
-        const dateB: Date | any = new Date(b.pickupDate);
-  
-        // Compare the date objects
-        return dateB - dateA; // Sort in descending order
-      });
-  
-      // Create an object with sorted PRQ data and all PRQ details
-      const prqDetail = {
-        tableData: sortedData,
-        allPrqDetail: res.data,
+    // Map and transform the PRQ data
+    res.data.map((element, index) => {
+      let prqDataItem = {
+        srNo: (element.srNo = index + 1),
+        prqNo: element?.prqNo || "",
+        vehicleSize: element?.vehicleSize || "",
+        size: element.vehicleSize
+          ? element.vehicleSize + " " + "MT"
+          : element.containerSize
+            ? element.containerSize
+            : "",
+        billingParty: element?.billingParty || "",
+        fromToCity: element?.fromCity + "-" + element?.toCity,
+        fromCity: element?.fromCity || "",
+        contactNo: element?.contactNo || "",
+        toCity: element?.toCity || "",
+        transMode: element?.transMode || "",
+        vehicleNo: element?.vehicleNo || "",
+        prqBranch: element?.prqBranch || "",
+        pickUpDate: formatDocketDate(element?.pickUpTime || new Date()),
+        pickupDate: element?.pickUpTime || new Date(),
+        status: this.status[element.status] || this.status.default,
+        actions: this.statusActions[element.status] || this.statusActions.default,
+        containerSize: element?.containerSize || "",
+        typeContainer: element?.typeContainer || "",
+        pAddress: element?.pAddress || "",
+        payType: element?.payType || "",
+        contractAmt: element?.contractAmt || "",
+        createdDate: formatDocketDate(element?.entryDate || new Date()),
       };
-  
-      return prqDetail;
+      prqList.push(prqDataItem);
+    });
+
+    // Sort the PRQ list by pickupDate in descending order
+    const sortedData = prqList.sort((a, b) => {
+      const dateA: Date | any = new Date(a.pickupDate);
+      const dateB: Date | any = new Date(b.pickupDate);
+
+      // Compare the date objects
+      return dateB - dateA; // Sort in descending order
+    });
+
+    // Create an object with sorted PRQ data and all PRQ details
+    const prqDetail = {
+      tableData: sortedData,
+      allPrqDetail: res.data,
+    };
+
+    return prqDetail;
 
   }
   // This function sets the assigned vehicle details.
   setassignVehicleDetail(data: any) {
     this.vehicleDetail = data;
-    
+
   }
 
   // This function retrieves the assigned vehicle details.
   getAssigneVehicleDetail() {
     return this.vehicleDetail;
   }
+
 }

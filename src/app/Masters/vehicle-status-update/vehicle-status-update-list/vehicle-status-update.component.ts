@@ -34,9 +34,9 @@ export class VehicleStatusUpdateComponent implements OnInit {
   columnHeader = {
     "srNo": "Sr No",
     "vehNo": "Vehicle No",
-    "driveNM":"Drivename & Mobile",
-    "vendorname":"Vendor Name",
-    "vedortype":"Vedor Type",
+    "driver":"Driver Name&Mobile",
+    "vendor":"Vendor Name",
+    "vendorType":"Vedor Type",
     "status": "Status",
     "tripId": "Trip Id",
     "currentLocation": "Location",
@@ -76,7 +76,8 @@ export class VehicleStatusUpdateComponent implements OnInit {
       const vehicleTableData = vehicleStatusData.filter((x)=>x.currentLocation.trim()===this.branchCode.trim()).map((obj, index) => {
         return {
           ...obj,
-          srNo: index + 1
+          srNo: index + 1,
+          route:`${obj.fromCity}-${obj.toCity}`
         };
       });
       const sortedTableDetail = vehicleTableData.sort((a, b) => {
@@ -90,7 +91,7 @@ export class VehicleStatusUpdateComponent implements OnInit {
           return 0; // neither a nor b has updateDate, no preference for order
         }
       });
-      const tableDetail=sortedTableDetail.map((x)=>{if(x.updateDate){x.updateDt= formatDate(x.updateDate,'dd/MM/yyyy HH:mm') }return x})
+      const tableDetail=sortedTableDetail.map((x)=>{if(x.updateDate){x.updateDt= formatDate(x.updateDate,'dd/MM/yyyy HH:mm'),x.eta= formatDate(x.updateDate,'dd/MM/yyyy HH:mm'),x.tripId=`${x.tripId} `}return x})
 
       this.tableData=tableDetail;
       this.tableLoad = false;

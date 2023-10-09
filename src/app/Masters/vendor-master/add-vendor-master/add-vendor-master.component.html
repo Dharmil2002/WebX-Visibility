@@ -1,4 +1,5 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums"
+(toggleChange)="onToggleChange($event)">
     <form [formGroup]="vendorTableForm">
         <app-form-webxpress [form]="vendorTableForm" [formData]="jsonControlVendorArray"
             (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
@@ -35,9 +36,10 @@
         </app-generic-table-v2>
     </div>
     <div style="padding-left: 35px;">
-        <button type="button" mat-raised-button color="primary" (click)="save()" [disabled]="!vendorTableForm.valid">
-            Submit
-        </button>&nbsp;&nbsp;
+        <button type="button" [disabled]="!vendorTableForm.valid" mat-raised-button color="primary" (click)="save()">
+            <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
+            <ng-template #saveButton>Save</ng-template>
+          </button>&nbsp;&nbsp;
         <button type="button" mat-raised-button (click)="cancel()">
             Cancel
         </button>

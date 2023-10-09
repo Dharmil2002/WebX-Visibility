@@ -15,7 +15,7 @@ import { Subject, take, takeUntil } from "rxjs";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
-import { columnHeader, staticField } from "./customer-utlity";
+import { columnHeader, staticField } from "../customer-master-list/customer-utlity";
 
 @Component({
   selector: "app-customer-master-add",
@@ -55,7 +55,6 @@ export class CustomerMasterAddComponent implements OnInit {
   jsonControlCustomerArray: any;
   jsonControlBillKycArray: any;
   accordionData: any;
-  breadScrums: { title: string; items: string[]; active: string }[];
   groupCode: any;
   groupCodedet: any;
   payBasisData: any;
@@ -114,6 +113,9 @@ export class CustomerMasterAddComponent implements OnInit {
   EditGstTable: any;
   isGstUpdate: boolean;
   slectGstState: any;
+  submit = 'Save';
+  customerIndex: any;
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
   // DriverTableForm: any;
   //#endregion
 
@@ -127,8 +129,8 @@ export class CustomerMasterAddComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
-      
       this.isUpdate = true;
+      this.submit = 'Modify';
       this.action = "edit";
     } else {
       this.action = "Add";
@@ -144,17 +146,21 @@ export class CustomerMasterAddComponent implements OnInit {
       });
       this.breadScrums = [
         {
-          title: "Customer Master",
+          title: "Modify Customer",
           items: ["Masters"],
-          active: "Edit Customer",
+          active: "Modify Customer",
+          generatecontrol: true,
+          toggle: this.customerTable.activeFlag
         },
       ];
     } else {
       this.breadScrums = [
         {
-          title: "Customer Master",
+          title: "Add Customer",
           items: ["Masters"],
           active: "Add Customer",
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.customerTable = new customerModel({});
@@ -202,6 +208,7 @@ export class CustomerMasterAddComponent implements OnInit {
     this.getCustomerCategoryDropdown();
     this.getPinCode();
     this.getDataAndPopulateForm();
+    this.CustomerCodeIndex()
   }
 
   bindGSTDropdown() {
@@ -211,6 +218,22 @@ export class CustomerMasterAddComponent implements OnInit {
         this.gstPinCode = data.name;
         this.gstPinCodeStatus = data.additionalData.showNameAndValue;
       }
+    });
+  }
+
+  CustomerCodeIndex() {
+    let req = {
+      companyCode: this.companyCode,
+      filter: {},
+      collectionName: "customer_detail",
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.customerIndex = res.data.length;
+        }
+      },
+      error: (err) => { },
     });
   }
 
@@ -226,11 +249,6 @@ export class CustomerMasterAddComponent implements OnInit {
         this.CustomerCategory = data.name;
         this.CustomerCategoryStatus = data.additionalData.showNameAndValue;
       }
-      // if (data.name === "customerLocations") {
-      //   // Set category-related variables
-      //   this.location = data.name;
-      //   this.locationStatus = data.additionalData.showNameAndValue;
-      // }
       if (data.name === "PinCode") {
         // Set category-related variables
         this.PinCode = data.name;
@@ -302,20 +320,12 @@ export class CustomerMasterAddComponent implements OnInit {
   getCustomerCategoryDropdown() {
     const dropdownData = [
       {
-        name: "Urgent",
-        value: "Urgent",
+        name: "Primary",
+        value: "Primary",
       },
       {
-        name: "High",
-        value: "High",
-      },
-      {
-        name: "Medium",
-        value: "Medium",
-      },
-      {
-        name: "Low",
-        value: "Low",
+        name: "Secondary",
+        value: "Secondary",
       },
     ];
     if (this.isUpdate) {
@@ -393,7 +403,6 @@ export class CustomerMasterAddComponent implements OnInit {
   }
 
   async fetchDataAndPopulateForm(collectionName, formControl, dataProperty, nameProperty, showNameAndValue) {
-    
     try {
       const reqBody = {
         "companyCode": this.companyCode,
@@ -420,11 +429,9 @@ export class CustomerMasterAddComponent implements OnInit {
       console.error('Error:', error);
     }
   }
-  
   async getDataAndPopulateForm() {
     await this.fetchDataAndPopulateForm("location_detail", "customerLocations", "locCode", "locName", true);
   }
-  
 
   selectedFileMSMEScan(data) {
     let fileList: FileList = data.eventArgs;
@@ -477,7 +484,7 @@ export class CustomerMasterAddComponent implements OnInit {
       alert("No file selected");
     }
   }
-  // ------------------------------------------------------#endregion😃----------------------------------------------
+  // ------------------------------------------------------#endregion----------------------------------------------
 
   // ******************************************************/All Control Function/**********************************************
   functionCallHandler($event) {
@@ -712,38 +719,33 @@ export class CustomerMasterAddComponent implements OnInit {
       this.setGSTState()
     }
   }
-  // ------------------------------------------------------#endregion😃----------------------------------------------
+  // ------------------------------------------------------#endregion----------------------------------------------
 
   // ******************************************************/Save Edit Remove And Set Function/**********************************************
   async save() {
     const controlDetail = this.customerTableForm.value.customerLocationsDrop;
     const customerLocationsDrop = controlDetail ? controlDetail.map((item: any) => item.name) : "";
     this.customerTableForm.controls["customerLocations"].setValue(customerLocationsDrop);
+    this.customerTableForm.removeControl('customerLocationsDrop')
 
     const Body = {
       ...this.customerTableForm.value,
+      customerName: this.customerTableForm.value.customerName.toUpperCase(), // Convert to uppercase
       CustomerCategory: this.customerTableForm.value.CustomerCategory.name,
       customerLocations: customerLocationsDrop,
       // CustomerLocations: this.customerTableForm.value.CustomerLocations.name,
       PinCode: this.customerTableForm.value.PinCode.name,
       customerGroup: this.customerTableForm.value.customerGroup.name,
-      activeFlag: this.customerTableForm.value.activeFlag ? "Y" : "N",
-      BlackListed: this.customerTableForm.value.BlackListed ? "Y" : "N",
-      MSMEregistered: this.customerTableForm.value.MSMEregistered ? "Y" : "N",
-      isPANregistration: this.customerTableForm.value.isPANregistration
-        ? "Y"
-        : "N",
-      _id: `${this.customerTableForm.value.customerGroup.value
-        }-${this.customerTableForm.value.customerName.substring(
+      activeFlag: this.customerTableForm.value.activeFlag ,
+      BlackListed: this.customerTableForm.value.BlackListed,
+      _id: `${this.customerTableForm.value.customerGroup.value.replaceAll(/ /g, "")
+        }-${this.customerTableForm.value.customerName.replaceAll(/ /g, "").substring(
           0,
           4
         )}-${Math.floor(Math.random() * (5000 - 1 + 1) + 1)}`,
       customerCode: this.isUpdate
         ? this.customerTable.customerCode
-        : `${this.customerTableForm.value.customerName
-          .trim()
-          .split(" ")
-          .join("")}${Math.floor(Math.random() * (100 - 1 + 1) + 1)}`,
+        : `${this.customerTableForm.value.customerGroup.value.trim().replaceAll(/ /g, "").substring(0, 4) + this.customerTableForm.value.customerName.toUpperCase().trim().replaceAll(/ /g, "").substring(0, 4) + this.customerIndex}`,
       companyCode: localStorage.getItem("companyCode"),
       updatedDate: new Date(),
       updatedBy: localStorage.getItem("UserName"),
@@ -814,24 +816,6 @@ export class CustomerMasterAddComponent implements OnInit {
       });
     }
   }
-
-  // ValidAndAddEditData() {
-  //   Swal.fire({
-  //     title: `<h5> are you sure you want to ${
-  //       this.GstTableEdit ? "edit" : "add"
-  //     } data ? </h5>`,
-  //     toast: true,
-  //     icon: "success",
-  //     showCloseButton: false,
-  //     showCancelButton: true,
-  //     showConfirmButton: true,
-  //     confirmButtonText: "SUBMIT",
-  //   }).then((res) => {
-  //     if (res.isConfirmed) {
-  //       this.AddRowData();
-  //     }
-  //   });
-  // }
 
   async AddRowData() {
     this.tableLode = false;
@@ -961,7 +945,7 @@ export class CustomerMasterAddComponent implements OnInit {
   }
   //#endregion
 
-  //#region 
+  //#region
   toggleSelectAll(argData: any) {
     let fieldName = argData.field.name;
     let autocompleteSupport = argData.field.additionalData.support;
@@ -979,5 +963,9 @@ export class CustomerMasterAddComponent implements OnInit {
       });
   }
   //#endregion
-
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.customerTableForm.controls['activeFlag'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
 }

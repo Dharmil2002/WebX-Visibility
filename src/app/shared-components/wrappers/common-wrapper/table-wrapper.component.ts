@@ -9,6 +9,7 @@ export class CommonWrapperComponent implements OnInit {
   @Input() breadscrums:any
   @Input() loadTable:any
   @Output() toggleChange = new EventEmitter<boolean>();
+  @Input() toggle: boolean;
   constructor() { }
 
   ngOnInit(): void {    

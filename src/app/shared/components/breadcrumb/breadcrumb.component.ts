@@ -10,7 +10,7 @@ export class BreadcrumbComponent {
   @Input() items: string[];
   @Input() active_item: string;
   @Input() generatecontrol: boolean; // Assuming this controls the toggle visibility
-  toggle:string
+  @Input() toggle: boolean;
   @Output() toggleChange = new EventEmitter<boolean>();
 
   onToggleChange(event: any) {

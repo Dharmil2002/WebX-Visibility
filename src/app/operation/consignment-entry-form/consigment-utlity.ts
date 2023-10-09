@@ -1,5 +1,5 @@
 export async function updatePrq(operationService, data,status) {
-  debugger
+
   const reqBody = {
     companyCode: localStorage.getItem("companyCode"),
     collectionName: "prq_detail",

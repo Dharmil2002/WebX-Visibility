@@ -183,7 +183,7 @@ export class DriverControls {
           {
             name: "pattern",
             message: "Please enter Address of length 5 to 200 characters",
-            pattern: "^[a-zA-Z0-9]{5,200}$",
+            pattern: "^[a-zA-Z0-9,-/ ]{5,200}$",
           },
         ],
       },
@@ -365,7 +365,7 @@ export class DriverControls {
         placeholder: "",
         type: "toggle",
         value: DriverTable.activeFlag,
-        generatecontrol: true,
+        generatecontrol: false,
         disable: false,
         Validations: [],
       },

@@ -15,7 +15,7 @@ export class VendorMasterListComponent implements OnInit {
   // Define column headers for the table
   columnHeader =
     {
-      "srNo": "Sr No.",
+      'entryDate': 'Created Date',
       "vendorCode": "Vendor Code",
       "vendorName": "Vendor Name",
       "vendorType": "Vendor Type",
@@ -95,10 +95,19 @@ export class VendorMasterListComponent implements OnInit {
       const dataWithSrno = res.data.map((obj, index) => {
         return {
           ...obj,
-          srNo: index + 1
+         // srNo: index + 1,
+          vendorName: obj.vendorName.toUpperCase(),
+          vendorType: obj.vendorType.toUpperCase()
         };
       });
-      this.csv = dataWithSrno;
+      const sortedData = dataWithSrno.sort((a, b) => {
+        const dateA: Date | any = new Date(a.entryDate);
+        const dateB: Date | any = new Date(b.entryDate);
+
+        // Compare the date objects
+        return dateB - dateA; // Sort in descending order
+      });
+      this.csv = sortedData;
       this.tableLoad = false;
     }
   }

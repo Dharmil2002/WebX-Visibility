@@ -18,18 +18,21 @@ export class JwtInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    let accessToken  = this.storageService.getItem("token");    
-    if (accessToken) {      
-      if(this._jwt.isTokenExpired(accessToken))
-      {
-        return this.refreshTokenAndRetry(request, next);
+
+    if(!request.url.endsWith('/auth/login') && !request.url.endsWith('/auth/refresh-tokens')) {
+      let accessToken  = this.storageService.getItem("token");    
+      if (accessToken) {      
+        if(this._jwt.isTokenExpired(accessToken))
+        {
+          return this.refreshTokenAndRetry(request, next);
+        }
+        
+        request = request.clone({
+          setHeaders: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
       }
-      
-      request = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
     }
     
     return next.handle(request).pipe(

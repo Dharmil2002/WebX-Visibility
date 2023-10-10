@@ -36,7 +36,7 @@ export class PendingBillingComponent implements OnInit {
     edit: false,
     csv: false,
   };
-  TableStyle = "width:42%"
+  TableStyle = "width:60%"
   /*Below is Link Array it will Used When We Want a DrillDown
  Table it's Jst for set A Hyper Link on same You jst add row Name Which You
  want hyper link and add Path which you want to redirect*/
@@ -67,7 +67,7 @@ export class PendingBillingComponent implements OnInit {
     action: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "max-width: 90px",
+      Style: "max-width: 200px",
     }
   }
   linkArray = [{ Row: "action", Path: "Finance/InvoiceSummaryBill" }];
@@ -126,8 +126,8 @@ export class PendingBillingComponent implements OnInit {
     // Filter billingDetail based on date range
     const filteredRecords = this.billingDetail.filter(record => {
 
-      const pickUpTime = new Date(record.pickUpTime);
-      const isDateRangeValid = startDate <= pickUpTime.toISOString() && pickUpTime.toISOString() < endDate;
+      const entryTime = new Date(record.entryDate);
+      const isDateRangeValid = startDate <= entryTime.toISOString() && entryTime.toISOString() < endDate;
 
       // Check the condition for data.customer
       const isCustomerMatch = !data.customer||data.customer.some(customer => customer === record.billingParty);
@@ -140,10 +140,10 @@ export class PendingBillingComponent implements OnInit {
       return isDateRangeValid && (isCustomerMatch || isMultiLocationMatch);
     });
     // Group and calculate data for the filtered records
-    const groupedData = groupAndCalculate(filteredRecords, 'billingParty', 'contractAmt');
+    const groupedData = await groupAndCalculate(filteredRecords, 'billingParty');
 
     // Update tableData with the grouped data and set tableLoad to false
-    this.tableData = groupedData;
+    this.tableData =  groupedData;
     this.tableLoad = false;
   }
 

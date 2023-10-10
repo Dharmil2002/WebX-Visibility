@@ -41,7 +41,6 @@ export class ThcUpdateComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     ) {
-    
     this.thcDetail = item;
   }
 
@@ -71,7 +70,7 @@ export class ThcUpdateComponent implements OnInit {
     const thcFormControls = new ThcUpdateControls();
     this.jsonControlArray = thcFormControls.getThcFormControls();
     this.thcTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.thcTableForm.controls['shipment'].setValue(this.thcDetail.shipment);
+    this.thcTableForm.controls['shipment'].setValue(this.thcDetail.docketNumber);
   }
 
   cancel() {
@@ -104,8 +103,8 @@ export class ThcUpdateComponent implements OnInit {
     }
   }
   async save(){
-    await showConfirmationDialogThc(this.thcTableForm.value,this._operationService);
-    this.dialogRef.close()
+   // await showConfirmationDialogThc(this.thcTableForm.value,this._operationService);
+    this.dialogRef.close(this.thcTableForm.value)
   }
  
 }

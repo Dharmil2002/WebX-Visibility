@@ -131,6 +131,20 @@ export class thcControl {
                     additionalData: { metaData:"Basic"}
                 },
                 {
+                    name: 'closingBranch',
+                    label: 'Closing Branch',
+                    placeholder: '',
+                    type: 'dropdown',
+                    value: '',
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
+                    Validations: [],
+                    generatecontrol: true,
+                    disable: view ? view : update
+                },
+                {
                     name: 'driverName',
                     label: 'Driver Name',
                     placeholder: '',
@@ -389,6 +403,10 @@ export class thcControl {
                     type: '',
                     value: '',
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 },
@@ -399,6 +417,10 @@ export class thcControl {
                     type: '',
                     value: '1',
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 },
@@ -409,6 +431,10 @@ export class thcControl {
                     type: '',
                     value: localStorage.getItem("companyCode"),
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 },
@@ -419,6 +445,10 @@ export class thcControl {
                     type: '',
                     value: localStorage.getItem("UserName"),
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 },
@@ -429,6 +459,24 @@ export class thcControl {
                     type: '',
                     value: new Date(),
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
+                    generatecontrol: false,
+                    disable: true
+                },
+                {
+                    name: 'podDetail',
+                    label: '',
+                    placeholder: '',
+                    type: '',
+                    value: new Date(),
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 }

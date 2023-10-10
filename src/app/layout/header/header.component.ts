@@ -258,6 +258,7 @@ export class HeaderComponent
   selectOption(option: any) {
     this.searchQuery = option.name;
     this.router.navigateByUrl(option.value);
+    this.searchQuery="";
     this.showAutocomplete = false;
   }
   @HostListener('document:click', ['$event'])

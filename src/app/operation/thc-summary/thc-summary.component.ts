@@ -96,7 +96,7 @@ export class ThcSummaryComponent implements OnInit {
 
     const thcDetail= thcList.data
     .map((item) => {
-      const action= item.route.split('-')[1].toLowerCase() === this.branch.toLowerCase();
+      const action= item.closingBranch.toLowerCase() === this.branch.toLowerCase();
       if (item.updateDate) {
         item.updateDate = formatDate(item.updateDate, 'dd-MM-yy HH:mm');
         item.statusAction=item?.status === "1" ? "In Transit" :"Delivered",

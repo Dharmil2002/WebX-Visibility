@@ -77,7 +77,6 @@ export class PrqListComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any) {
     if (item) {
-      debugger
       this.items=item;     
     }
   }

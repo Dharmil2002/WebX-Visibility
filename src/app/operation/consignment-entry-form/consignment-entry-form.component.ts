@@ -38,6 +38,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
   containerTableForm: UntypedFormGroup;
   FreightTableForm: UntypedFormGroup;
   invoiceTableForm: UntypedFormGroup;
+  ewayBillTableForm:UntypedFormGroup;
+  dynamicUrl: string = 'https://www.example.com';
   tableData: any = [];
   invoiceData: any = [];
   tableLoadIn: boolean = true;
@@ -48,11 +50,12 @@ export class ConsignmentEntryFormComponent implements OnInit {
   jsonControlArray: any;
   TableStyle = "width:82%;";
   // TableStyle1 = "width:82%"
+ ewayBillButton: string = 'Next'
   ConsignmentFormControls: ConsignmentControl;
   FreightFromControl: FreightControl;
   breadscrums = [
     {
-      title: "Consignment Entry",
+      title: "Eway Bill",
       items: ["Operation"],
       active: "ConsignmentForm",
     },
@@ -186,7 +189,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
 
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
-
+  ewayBill=true;
   linkArray = [];
   jsonInvoiceDetail: any;
   loadIn: boolean;
@@ -194,7 +197,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   vendorDetail: any;
   jsonControlArrayConsignor: any;
   jsonControlArrayConsignee: any;
-
+  jsonEwayBill:any;
   constructor(
     private fb: UntypedFormBuilder,
     private _NavigationService: NavigationService,
@@ -214,9 +217,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
       if (this.isUpdate) {
         this.docketDetail = navigationState;
         this.breadscrums[0].title = "Consignment Edit";
+        this.ewayBill=false
       } else {
         this.prqData = navigationState;
         this.prqFlag = true;
+        this.ewayBill=false
       }
     }
     this.initializeFormControl();
@@ -256,6 +261,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.jsonContainerDetail =
       this.ConsignmentFormControls.getContainerDetail();
     this.jsonInvoiceDetail = this.ConsignmentFormControls.getInvoiceDetail();
+    this.jsonEwayBill= this.ConsignmentFormControls.getEwayBillDetail();
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.consignmentTableForm = formGroupBuilder(this.fb, [formControl]);
     this.FreightTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -263,6 +269,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.jsonContainerDetail,
     ]);
     this.invoiceTableForm = formGroupBuilder(this.fb, [this.jsonInvoiceDetail]);
+    this.ewayBillTableForm=formGroupBuilder(this.fb, [this.jsonEwayBill]);
     this.commonDropDownMapping();
     if (this.prqData) {
       this.consignmentTableForm.controls["prqNo"].setValue({
@@ -809,7 +816,10 @@ export class ConsignmentEntryFormComponent implements OnInit {
     }
   }
   /*region Save*/
-
+  flagEwayBill(){
+    this.ewayBill=false;
+    this.breadscrums[0].title = "Consignment Entry";
+  }
   async save() {
     // Remove all form errors
     const tabcontrols = this.consignmentTableForm;

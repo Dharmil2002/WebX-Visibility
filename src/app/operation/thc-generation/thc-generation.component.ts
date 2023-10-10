@@ -21,6 +21,8 @@ import { DocketService } from "src/app/Utility/module/operation/docket/docket.se
 import { MatDialog } from "@angular/material/dialog";
 import { ThcUpdateComponent } from "src/app/dashboard/tabs/thc-update/thc-update.component";
 import { VehicleStatusService } from "src/app/Utility/module/operation/vehicleStatus/vehicle.service";
+import { formatDate } from "src/app/Utility/date/date-utils";
+import { debug } from "console";
 
 @Component({
   selector: "app-thc-generation",
@@ -65,7 +67,7 @@ export class ThcGenerationComponent implements OnInit {
     docketNumber: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "max-width:200px",
+      Style: "max-width:250px",
     },
     fromCity: {
       Title: "From City",
@@ -98,6 +100,11 @@ export class ThcGenerationComponent implements OnInit {
       Style: "max-width:160px",
     },
     arrivalTime: {
+      Title: "Arrival Time",
+      class: "matcolumnleft",
+      Style: "max-width:160px",
+    },
+    remarks: {
       Title: "Arrival Time",
       class: "matcolumnleft",
       Style: "max-width:160px",
@@ -145,7 +152,9 @@ export class ThcGenerationComponent implements OnInit {
   menuItemflag: boolean = true;
   jsonControlBasicArray: any;
   jsonControlVehLoadArray: any;
-  jsonControlDriverArray:any;
+  jsonControlDriverArray: any;
+  unloadName: any;
+  unloadStatus: any;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -158,21 +167,38 @@ export class ThcGenerationComponent implements OnInit {
   ) {
     const navigationState =
       this.route.getCurrentNavigation()?.extras?.state?.data;
-    delete this.columnHeader.pod;
-    delete this.columnHeader.receiveBy;
-    delete this.columnHeader.actionsItems;
-    delete this.columnHeader.arrivalTime;
+
     if (navigationState != null) {
       this.isUpdate = navigationState.hasOwnProperty("isUpdate") ? true : false;
       this.isView = navigationState.hasOwnProperty("isView") ? true : false;
       if (this.isUpdate) {
         this.thcDetail = navigationState.data;
+        const field =
+          ["pod", "receiveBy", "arrivalTime", "remarks"]
+        this.staticField.push(...field)
       } else if (this.isView) {
+        const field =
+          ["pod", "receiveBy", "arrivalTime", "remarks"]
+        this.staticField.push(...field)
+        delete this.columnHeader.actionsItems;
         this.thcDetail = navigationState.data;
       } else {
+        delete this.columnHeader.pod;
+        delete this.columnHeader.receiveBy;
+        delete this.columnHeader.actionsItems;
+        delete this.columnHeader.arrivalTime;
+        delete this.columnHeader.remarks;
         this.prqDetail = navigationState;
         this.prqFlag = true;
       }
+
+    }
+    else {
+      delete this.columnHeader.pod;
+      delete this.columnHeader.receiveBy;
+      delete this.columnHeader.actionsItems;
+      delete this.columnHeader.arrivalTime;
+      delete this.columnHeader.remarks;
     }
     this.getShipmentDetail();
   }
@@ -205,13 +231,13 @@ export class ThcGenerationComponent implements OnInit {
       .filter(
         (x) => x.additionalData && x.additionalData.metaData === "vehLoad"
       );
-      this.jsonControlDriverArray = loadingControlFormControls
+    this.jsonControlDriverArray = loadingControlFormControls
       .getThcFormControls()
       .filter(
         (x) => x.additionalData && x.additionalData.metaData === "driver"
       );
-      this.jsonControlArray=[...this.jsonControlBasicArray,...this.jsonControlVehLoadArray,...this.jsonControlDriverArray]
-       // Loop through the jsonControlArray to find the vehicleType control and set related properties
+    this.jsonControlArray = [...this.jsonControlBasicArray, ...this.jsonControlVehLoadArray, ...this.jsonControlDriverArray]
+    // Loop through the jsonControlArray to find the vehicleType control and set related properties
     this.vehicleName = this.jsonControlArray.find(
       (data) => data.name === "vehicle"
     )?.name;
@@ -235,6 +261,12 @@ export class ThcGenerationComponent implements OnInit {
     )?.name;
     this.balanceStatus = this.jsonControlArray.find(
       (data) => data.name === "balAmtAt"
+    )?.additionalData.showNameAndValue;
+    this.unloadName = this.jsonControlArray.find(
+      (data) => data.name === "closingBranch"
+    )?.name;
+    this.unloadStatus = this.jsonControlArray.find(
+      (data) => data.name === "closingBranch"
     )?.additionalData.showNameAndValue;
     // Build the form group using the form controls obtained
     this.thcTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -282,6 +314,13 @@ export class ThcGenerationComponent implements OnInit {
       this.locationData,
       this.balanceName,
       this.balanceStatus
+    );
+    this.filter.Filter(
+      this.jsonControlArray,
+      this.thcTableForm,
+      this.locationData,
+      this.unloadName,
+      this.unloadStatus
     );
     if (this.prqFlag) {
       this.bindDataPrq();
@@ -438,12 +477,14 @@ export class ThcGenerationComponent implements OnInit {
       (x) => x.value === this.thcDetail?.advPdAt
     );
     this.thcTableForm.controls["advPdAt"].setValue(location);
-
     const balAmtAt = this.locationData.find(
       (x) => x.value === this.thcDetail?.balAmtAt
     );
     this.thcTableForm.controls["balAmtAt"].setValue(balAmtAt);
-
+    const closingBranch = this.locationData.find(
+      (x) => x.value === this.thcDetail?.balAmtAt
+    );
+    this.thcTableForm.controls["closingBranch"].setValue(closingBranch);
     this.getShipmentDetails();
   }
   async handleMenuItemClick(data) {
@@ -451,21 +492,53 @@ export class ThcGenerationComponent implements OnInit {
       const dialogref = this.dialog.open(ThcUpdateComponent, {
         data: data.data,
       });
-      dialogref.afterClosed().subscribe((result) => {});
+      dialogref.afterClosed().subscribe((result) => {
+        if (result) {
+          const { shipment, remarks, podUpload, arrivalTime } = result;
+          this.tableData.forEach((x) => {
+            if (x.docketNumber === shipment) {
+              x.remarks = remarks || "";
+              x.pod = podUpload || "";
+              x.arrivalTime = arrivalTime ? formatDate(arrivalTime, 'HH:mm') : "";
+              x.receiveBy = localStorage.getItem("UserName");
+            }
+          });
+        }
+
+      });
     }
   }
   async createThc() {
-    if (!this.selectedData && !this.isUpdate) {
-      Swal.fire({
-        icon: "info", // You can use the "info" icon for informational messages
-        title: "Information",
-        text: "You must select any one of Shipment",
-        showConfirmButton: true,
-      });
+    let extractedData = {};
+    this.selectedData = this.tableData;
+    if (!this.selectedData || (this.isUpdate && this.hasBlankFields())) {
+      if (!this.selectedData) {
+        Swal.fire({
+          icon: "info",
+          title: "Information",
+          text: "You must select any one of Shipment",
+          showConfirmButton: true,
+        });
+      } else if (this.isUpdate && this.hasBlankFields()) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `The following fields are blank: ${this.getBlankFields()}`,
+        });
+      }
       return false;
     } else {
-      this.selectedData = this.tableData;
+      extractedData = this.selectedData.map((item) => ({
+        docketNumber: item.docketNumber,
+        remarks: item.remarks,
+        pod: item.pod,
+        arrivalTime: item.arrivalTime,
+      }));
     }
+
+
+
+
     const docket = this.selectedData.map((x) => x.docketNumber);
     this.thcTableForm.controls["docket"].setValue(docket);
     const prqNo = this.thcTableForm.controls["prqNo"].value.value;
@@ -474,7 +547,10 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls["prqNo"].setValue(prqNo);
     this.thcTableForm.controls["advPdAt"].setValue(advPdAt);
     this.thcTableForm.controls["balAmtAt"].setValue(balAmtAt);
-    if (this.isUpdate) {
+    const branch = this.thcTableForm.controls["closingBranch"].value?.value || "";
+    this.thcTableForm.controls["closingBranch"].setValue(branch);
+    if (this.isUpdate) { 
+      this.thcTableForm.controls["podDetail"].setValue(extractedData);
       this.thcTableForm.controls["status"].setValue("2");
       const res = await showConfirmationDialogThc(
         this.thcTableForm.value,
@@ -517,6 +593,30 @@ export class ThcGenerationComponent implements OnInit {
         });
       }
     }
+  }
+
+
+  // Helper function to check for blank fields
+  hasBlankFields() {
+    const fieldMap = {
+      remarks: 'Remarks',
+      pod: 'POD Upload',
+      arrivalTime: 'Arrival Time',
+    };
+
+    return Object.keys(fieldMap).some(fieldName => this.selectedData.some(item => !item[fieldName]));
+  }
+
+  // Helper function to get the names of blank fields
+  getBlankFields() {
+    const fieldMap = {
+      remarks: 'Remarks',
+      pod: 'POD Upload',
+      arrivalTime: 'Arrival Time',
+    };
+
+    const blankFields = Object.keys(fieldMap).filter(fieldName => this.selectedData.some(item => !item[fieldName]));
+    return blankFields.map(fieldName => fieldMap[fieldName]).join(', ');
   }
   goBack(tabIndex: string): void {
     this.route.navigate(["/dashboard/GlobeDashboardPage"], {

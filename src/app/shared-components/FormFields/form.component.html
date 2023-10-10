@@ -21,14 +21,17 @@
 
         <ng-template #elseBlock>
           <!-- text and number type input ----------------------------------------------------------->
-          <ng-container *ngIf="(formItem.type=='text'|| formItem.type=='number'||formItem.type=='mobile-number'); else textInput">
-            <input matInput type="{{formItem.type}}" formControlName={{formItem.name}} [readonly]="formItem.disable"
+          <ng-container
+            *ngIf="(formItem.type=='text'|| formItem.type=='number'||formItem.type=='mobile-number'); else textInput">
+            <input matInput type="{{formItem.type == 'mobile-number'? 'number' :formItem.type}}"
+              formControlName={{formItem.name}} [readonly]="formItem.disable" appdecimalrangevalidator
               placeholder={{formItem.placeholder}} suffix={{formItem.suffix}} mask="{{formItem.mask}}"
               autocomplete="off"
               (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
               (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
               (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})"
-              [maxlength]="formItem.type === 'mobile-number' ? formItem.maxlength ? formItem.maxlength: 10 : formItem?.maxlength">
+              [MinValue]="0" [MaxAllowed]="0"
+              [MaxValue]="formItem.type === 'mobile-number' ? formItem.maxlength ? formItem.maxlength: 10 : formItem?.maxlength">
           </ng-container>
           <!-- rest of the input types ... ---------------------------------------------------------->
           <ng-template #textInput>

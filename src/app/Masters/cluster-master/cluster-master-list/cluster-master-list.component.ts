@@ -58,35 +58,43 @@ export class ClusterMasterListComponent implements OnInit {
       "companyCode": this.companyCode,
       "filter": {},
       "collectionName": "cluster_detail"
-    }
+    };
+  
     this.masterService.masterPost('generic/get', req).subscribe({
       next: (res: any) => {
-        if (res) {
-           // Sort the data based on entryDate in descending order
-           const sortedData = res.data.sort((a, b) => {
+        if (res && res.data) {
+          // Sort the data based on entryDate in descending order
+          const sortedData = res.data.sort((a, b) => {
             return new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime();
           });
+  
           // Generate srno for each object in the array
           const dataWithSrno = sortedData.map((obj, index) => {
+            // Check and format the "pincode" column if it exists
+            const formattedPincode = obj.pincode && Array.isArray(obj.pincode) ? obj.pincode.join(', ') : obj.pincode;
+  
             return {
               ...obj,
+              pincode: formattedPincode,
               // srNo: index + 1
             };
           });
+  
           const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].entryDate : null;
-          this.csv = dataWithSrno
+          this.csv = dataWithSrno;
           this.tableLoad = false;
         }
       }
-    })
+    });
   }
+  
   IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls
     delete det._id;
     delete det.srNo;
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.companyCode,
       collectionName: "cluster_detail",
       filter: { _id: id },
       update: det

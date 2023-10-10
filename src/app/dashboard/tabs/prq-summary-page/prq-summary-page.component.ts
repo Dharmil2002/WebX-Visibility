@@ -19,6 +19,7 @@ export class PrqSummaryPageComponent implements OnInit {
     edit: true,
     csv: false,
   };
+  isLoad:boolean=false;
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
 
@@ -127,6 +128,7 @@ export class PrqSummaryPageComponent implements OnInit {
       const tabIndex = 6; // Adjust the tab index as needed
       const status="1";
       await this.prqService.showConfirmationDialog(data.data, this.goBack.bind(this),tabIndex,status);
+      this.tableLoad=true;
       this.getPrqDetails();
     }
     else if(data.label.label==="Modify"){
@@ -139,6 +141,7 @@ export class PrqSummaryPageComponent implements OnInit {
     else if(data.label.label==="Reject"){
       const tabIndex = "PRQ"; 
       const status="5";
+      this.tableLoad=true;
       await this.prqService.showConfirmationDialog(data.data, this.goBack.bind(this),tabIndex,status);
       this.getPrqDetails();
     }

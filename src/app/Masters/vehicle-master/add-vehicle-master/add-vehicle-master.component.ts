@@ -76,6 +76,7 @@ export class AddVehicleMasterComponent implements OnInit {
   controllBranch: any;
   location: any;
   locationStatus: any;
+  backPath:string;
 
   constructor(
     private masterService: MasterService,
@@ -121,6 +122,7 @@ export class AddVehicleMasterComponent implements OnInit {
     this.getDropDownData();
     this.getDataAndPopulateForm();
     this.getAllMastersData();
+    this.backPath = "/Masters/VehicleMaster/VehicleMasterList";
   }
 
   initializeFormControl() {

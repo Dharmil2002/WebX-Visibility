@@ -20,7 +20,9 @@ export class CustomerGroupAddComponent implements OnInit {
   groupTableForm: UntypedFormGroup;
   customerGroupFormControls: CustomerGroupControl;
   jsonControlGroupArray: any;
+  backPath:string;
   ngOnInit() {
+    this.backPath = "/Masters/CustomerGroupMaster/CustomerGroupMasterList";
   }
 
   constructor(private Route: Router, private fb: UntypedFormBuilder,
@@ -117,7 +119,7 @@ export class CustomerGroupAddComponent implements OnInit {
   //#region Function Call Handler
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {

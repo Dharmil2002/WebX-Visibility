@@ -11,6 +11,7 @@ export class FormControls {
     disable: boolean
     mask?: string;
     suffix?: string;
+    maxlength?: number;
     Validations: any[];
 
     additionalData ?: any;

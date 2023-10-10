@@ -80,23 +80,33 @@ export class AssignVehiclePageMethods {
             class: "matcolumnleft",
             Style: "min-width:80px",
         },
-        fromCity: {
-            Title: "From City",
+        fromToCitySplit: {
+            Title: "From-To City",
             class: "matcolumnleft",
             Style: "min-width:80px",
-        },
-        toCity: {
-            Title: "To City",
-            class: "matcolumnleft",
-            Style: "min-width:2px",
         },
         currentLocation: {
             Title: "Current Location",
             class: "matcolumnleft",
-            Style: "min-width:200px",
+            Style: "min-width:40px",
         },
-        distannce: {
-            Title: "Distance (KMs)",
+        vendorType: {
+            Title: "Vendor Type",
+            class: "matcolumnleft",
+            Style: "min-width:40px",
+        },
+        driver_info: {
+            Title: "Driver Name-Mobile",
+            class: "matcolumnleft",
+            Style: "min-width:70px",
+        },
+        vendor_info: {
+            Title: "Vendor Name-Mobile",
+            class: "matcolumnleft",
+            Style: "min-width:70px",
+        },
+        eta: {
+            Title: "ETA",
             class: "matcolumncenter",
             Style: "min-width:40px",
         },
@@ -115,8 +125,6 @@ export class AssignVehiclePageMethods {
 }
 //add here method to bind data using market vehicle 
 export async function bindMarketVehicle(vehicledata: any) {
-    let currentDate = new Date();
-    let threeHoursLater = new Date(currentDate.getTime() + 3 * 60 * 60 * 1000);
 
     const marketVehicle = {
         vehNo:vehicledata?.vehicelNo||"",
@@ -131,7 +139,9 @@ export async function bindMarketVehicle(vehicledata: any) {
         lcNo:vehicledata.lcNo,
         driverPan:vehicledata.driverPan,
         lcExpireDate:vehicledata.lcExpireDate,
-        eta:threeHoursLater,
+        eta:vehicledata?.ETA || new Date(),
+        driver_info:`${vehicledata.driver}-${vehicledata.dmobileNo}`,
+        vendor_info:`${vehicledata.vendor}-${vehicledata.vMobileNo}`,
         updateBy:localStorage.getItem('UserName'),
         updateDate:new Date()
     }

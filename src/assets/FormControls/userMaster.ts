@@ -230,7 +230,7 @@ export class UserControl {
         name: "mobileNo",
         label: "Mobile",
         placeholder: "Enter mobileno",
-        type: "number",
+        type: "mobile-number",
         value: UserTable.mobileNo,
         generatecontrol: true,
         disable: false,

@@ -5,33 +5,30 @@ import {
   HttpEvent,
   HttpInterceptor,
 } from '@angular/common/http';
-import { Observable, catchError, switchMap, tap, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { StorageService } from '../service/storage.service';
 import { AuthService } from '../service/auth.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  constructor( private authenticationService: AuthService, private _jwt: JwtHelperService, private storageService: StorageService) {}
+  constructor(
+    private authenticationService: AuthService,
+    private _jwt: JwtHelperService,
+    private storageService: StorageService
+  ) {}
 
   intercept(
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    let accessToken  = this.storageService.getItem("token");    
-    if (accessToken) {      
-      if(this._jwt.isTokenExpired(accessToken))
-      {
-        return this.refreshTokenAndRetry(request, next);
-      }
-      
-      request = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+    const excludedPaths = ['/auth/login', '/auth/refresh-tokens'];
+
+    if (!excludedPaths.some(path => request.url.endsWith(path))) {
+      request = this.addAuthorizationHeader(request);
     }
-    
+
     return next.handle(request).pipe(
       catchError((error) => {
         if (error.status === 401) {
@@ -44,28 +41,39 @@ export class JwtInterceptor implements HttpInterceptor {
     );
   }
 
+  private addAuthorizationHeader(
+    request: HttpRequest<any>
+  ): HttpRequest<any> {
+    const accessToken = this.storageService.getItem('token');
+
+    if (accessToken && !this._jwt.isTokenExpired(accessToken)) {
+      return request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    }
+
+    return request;
+  }
+
   private refreshTokenAndRetry(
-    req: HttpRequest<any>,
+    request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     return this.authenticationService.refreshtoken().pipe(
       switchMap((res) => {
         if (res) {
-          let accessToken = this.storageService.getItem("token");    
-          req = req.clone({
-            setHeaders: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-          return next.handle(req);
+          request = this.addAuthorizationHeader(request);
+          return next.handle(request);
         } else {
           // If token refresh fails, you can handle it as needed
           // For example, logout the user or redirect to the login page
           this.authenticationService.logout();
           location.reload();
+          return throwError('Token refresh failed');
         }
       })
     );
   }
 }
-

@@ -5,11 +5,15 @@ export class ConsignmentControl {
   private ConsignmentControlArray: FormControls[];
   private containordetail: FormControls[];
   private invoiceDetail: FormControls[];
+  private ewayBillDetail: FormControls[];
   constructor(docketDetail) {
     this.ConsignmentControlArray = [
       {
         name: "docketNumber", label: "Consignment Note No", placeholder: "Consignment Note No", type: "text",
         value: docketDetail.docketNumber, filterOptions: "", autocomplete: "", displaywith: "", Validations: [], generatecontrol: true, disable: true,
+        additionalData: {
+          metaData: "Basic"
+        },
       },
       {
         name: "docketDate",
@@ -30,6 +34,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           minDate: new Date("01 Jan 2023"),
+          metaData: "Basic"
         },
       },
       {
@@ -44,13 +49,14 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-            {
+          {
             name: "required",
             message: "Billing Party is required",
           }
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData: "Basic"
         },
       },
       {
@@ -89,6 +95,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData: "Basic"
         },
       },
       {
@@ -106,6 +113,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: false,
+          metaData: "Basic"
         },
       },
       {
@@ -126,6 +134,7 @@ export class ConsignmentControl {
         },
         additionalData: {
           showNameAndValue: false,
+          metaData: "Basic"
         },
       },
       {
@@ -146,6 +155,7 @@ export class ConsignmentControl {
         },
         additionalData: {
           showNameAndValue: false,
+          metaData: "Basic"
         },
       },
       {
@@ -153,7 +163,7 @@ export class ConsignmentControl {
         label: "Destination",
         placeholder: "Destination",
         type: "text",
-        value:docketDetail.destination,
+        value: docketDetail.destination,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -163,6 +173,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: false,
+          metaData: "Basic"
         },
       },
       {
@@ -183,6 +194,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: false,
+          metaData: "Basic"
         },
       },
       {
@@ -206,31 +218,12 @@ export class ConsignmentControl {
         Validations: [],
         additionalData: {
           showNameAndValue: false,
+          metaData: "Basic"
         },
-      },
-      {
-        name: "containerSize",
-        label: "Container Size",
-        placeholder: "Container Size",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
-      {
-        name: 'containerNumber', label: 'Container Number', placeholder: 'Container Number', type: 'text',
-        value: docketDetail.containerNumber, Validations: [], generatecontrol: true, disable: false
       },
       {
         name: 'vendorType', label: 'Vendor Type', placeholder: 'Vendor Type', type: "Staticdropdown",
+
         value: [
           { value: "Own", name: "Own" },
           { value: "Attached", name: "Attached" },
@@ -238,11 +231,15 @@ export class ConsignmentControl {
           { value: "Market", name: "Market" }
         ], Validations: [], functions: {
           onSelection: "vendorFieldChanged"
-        }, generatecontrol: true, disable: false
+        },
+        additionalData: {
+          metaData: "Basic"
+        },
+        generatecontrol: true, disable: false
       },
       {
         name: 'vendorName', label: 'Vendor Name', placeholder: 'Vendor Name', type: "dropdown",
-        value:docketDetail.vendorName,
+        value: docketDetail.vendorName,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -252,18 +249,52 @@ export class ConsignmentControl {
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData: "Basic",
+        }
+      },
+      {
+        name: 'pAddress', label: 'Pickup Address', placeholder: 'Pickup Address', type: 'text',
+        value: docketDetail.pAddress, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
         },
+      },
+      {
+        name: 'deliveryAddress', label: 'Delivery Address', placeholder: 'Delivery Address', type: 'text',
+        value: docketDetail.deliveryAddress, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic"
+        }
       },
       {
         name: "ccbp",
         label: "consignor and consignee are same as the billing party",
         placeholder: "",
         type: "toggle",
-        value:docketDetail.ccbp,
+        value: docketDetail.ccbp,
         generatecontrol: true,
         disable: false,
         functions: { onChange: "onAutoBillingBased" },
         Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic",
+        }
+      },
+      {
+        name: "cd",
+        label: "Container Detail",
+        placeholder: "",
+        type: "toggle",
+        value: docketDetail.ccbp,
+        generatecontrol: true,
+        disable: false,
+        functions: { onChange: "containerDetail" },
+        Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic",
+        }
       },
       {
         name: 'consignorName', label: "Consignor Name",
@@ -276,23 +307,28 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          
+
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData: "consignor",
         },
       },
-      {
-        name: 'pAddress', label: 'Pickup Address', placeholder: 'Pickup Address', type: 'text',
-        value: docketDetail.pAddress, Validations: [], generatecontrol: true, disable: false
-      },
+
       {
         name: 'ccontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'text',
-        value:docketDetail.ccontactNumber, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.ccontactNumber, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "consignor",
+        }
       },
       {
         name: 'calternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'text',
-        value: docketDetail.calternateContactNo, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.calternateContactNo, Validations: [], generatecontrol: true,
+        disable: false,
+        additionalData: {
+          metaData: "consignor",
+        }
       },
       {
         name: "consigneeName",
@@ -306,23 +342,26 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-       
+
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData: "consignee",
         },
       },
       {
-        name: 'deliveryAddress', label: 'Delivery Address', placeholder: 'Delivery Address', type: 'text',
-        value:docketDetail.deliveryAddress, Validations: [], generatecontrol: true, disable: false
-      },
-      {
         name: 'cncontactNumber', label: 'Contact Number', placeholder: 'Contact Number', type: 'text',
-        value: docketDetail.cncontactNumber, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.cncontactNumber, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "consignee"
+        }
       },
       {
         name: 'cnalternateContactNo', label: 'Alternate Contact No', placeholder: 'Alternate Contact No', type: 'text',
-        value:  docketDetail.cnalternateContactNo, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.cnalternateContactNo, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "consignee"
+        }
       },
       {
         name: 'companyCode',
@@ -331,28 +370,50 @@ export class ConsignmentControl {
         type: 'text',
         value: localStorage.getItem("companyCode"),
         Validations: [],
-        generatecontrol: false, disable: false
+        generatecontrol: false, disable: false,
+        additionalData: {
+          metaData: "consignee"
+        }
       },
       {
         name: 'vehicleNo',
         label: 'vehicleNo',
         placeholder: 'vehicleNo',
         type: '',
-        value:docketDetail.vehicleNo,
+        value: docketDetail.vehicleNo,
         Validations: [],
-        generatecontrol: false, disable: false
+        generatecontrol: false, disable: false,
+        additionalData: {
+          metaData: "consignee"
+        }
       },
       {
         name: 'status',
         label: 'status',
         placeholder: 'status',
         type: '',
-        value:0,
+        value: 0,
         Validations: [],
-        generatecontrol: false, disable: false
+        generatecontrol: false, disable: false,
+        additionalData: {
+          metaData: "consignee"
+        }
       }
     ]
     this.containordetail = [
+      {
+        name: "Company_file",
+        label: "Select File",
+        placeholder: "",
+        type: "file",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [".xls, .xlsx, .csv"],
+        functions: {
+            onChange: "selectedFile",
+        },
+    },
       {
         name: "containerNumber",
         label: "Container No",
@@ -362,7 +423,7 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Container No is required",
         }],
@@ -378,7 +439,7 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Container Type is required",
         }],
@@ -400,7 +461,7 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Container Capacity is required",
         }],
@@ -408,7 +469,6 @@ export class ConsignmentControl {
         disable: true,
       },
     ]
-
     this.invoiceDetail = [
       {
         name: "ewayBillNo",
@@ -419,7 +479,7 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Eway Bill No is required",
         }],
@@ -435,7 +495,7 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Expiry Date is required",
         }],
@@ -454,7 +514,7 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Invoice No is required",
         }],
@@ -466,14 +526,14 @@ export class ConsignmentControl {
       },
       {
         name: "invoiceAmount",
-        label: "Invoice Amount",
+        label: "Invoice Amount (Rs)",
         placeholder: "Invoice Amount",
         type: "text",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Invoice Amount is required",
         }],
@@ -485,16 +545,16 @@ export class ConsignmentControl {
       },
       {
         name: "noofPkts",
-        label: "No of Pkts",
-        placeholder: "No of Pkts",
+        label: "No of Package",
+        placeholder: "No of Package",
         type: "text",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
-          message: "No of Pkts is required",
+          message: "No of Package is required",
         }],
         additionalData: {
           showNameAndValue: false,
@@ -511,7 +571,7 @@ export class ConsignmentControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Material Name is required",
         }],
@@ -523,14 +583,14 @@ export class ConsignmentControl {
       },
       {
         name: "actualWeight",
-        label: "Actual Weight",
+        label: "Actual Weight (Kg)",
         placeholder: "Actual Weight",
         type: "text",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Actual Weight is required",
         }],
@@ -542,14 +602,14 @@ export class ConsignmentControl {
       },
       {
         name: "chargedWeight",
-        label: "Charged Weight",
+        label: "Charged Weight  (Kg)",
         placeholder: "Charged Weight",
         type: "text",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [    {
+        Validations: [{
           name: "required",
           message: "Charged Weight is required",
         }],
@@ -559,6 +619,25 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
       }
+    ]
+
+    this.ewayBillDetail = [
+      {
+        name: "ewayBillNo",
+        label: "Eway Bill No",
+        placeholder: "Eway Bill No",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        Validations: [{
+          name: "required",
+          message: "Eway Bill No is required",
+        }],
+        generatecontrol: true,
+        disable: false,
+      },
     ]
   }
   getConsignmentControlControls() {
@@ -571,7 +650,9 @@ export class ConsignmentControl {
   getInvoiceDetail() {
     return this.invoiceDetail
   }
-
+  getEwayBillDetail() {
+    return this.ewayBillDetail;
+  }
 }
 
 export class FreightControl {
@@ -579,7 +660,7 @@ export class FreightControl {
   constructor(docketDetail) {
     this.FreightControlArray = [
       {
-        name: 'freightAmount', label: 'Freight Amount', placeholder: 'Freight Amount', type: 'text',
+        name: 'freightAmount', label: 'Freight Amount (Rs)', placeholder: 'Freight Amount', type: 'text',
         value: docketDetail.freightAmount, Validations: [{
           name: "required",
           message: "Secret Freight Amount is required",
@@ -588,7 +669,7 @@ export class FreightControl {
       },
       {
         name: 'freightRatetype', label: 'Freight Rate type', placeholder: 'Freight Rate type', type: 'Staticdropdown',
-        value:[
+        value: [
           {
             "value": "B",
             "name": "Per Pcs"
@@ -629,14 +710,14 @@ export class FreightControl {
             "value": "Y",
             "name": "Per TON Per KM"
           }
-         ], Validations: [], generatecontrol: true, disable: false
+        ], Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'otherAmount', label: 'Other Amount', placeholder: 'Other Amount', type: 'text',
-        value:docketDetail.otherAmount, Validations: [], generatecontrol: true, disable: false
+        name: 'otherAmount', label: 'Other Amount (Rs)', placeholder: 'Other Amount', type: 'text',
+        value: docketDetail.otherAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'grossAmount', label: 'Gross Amount', placeholder: 'Gross Amount', type: 'text',
+        name: 'grossAmount', label: 'Gross Amount (Rs)', placeholder: 'Gross Amount', type: 'text',
         value: docketDetail.grossAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
@@ -644,16 +725,16 @@ export class FreightControl {
         value: docketDetail.rcm, Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'gstAmount', label: 'GST Amount', placeholder: 'GST Amount', type: 'text',
+        name: 'gstAmount', label: 'GST Amount (Rs)', placeholder: 'GST Amount', type: 'text',
         value: docketDetail.gstAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'gstChargedAmount', label: 'GST Charged Amount', placeholder: 'GST Charged Amount', type: 'text',
+        name: 'gstChargedAmount', label: 'GST Charged Amount (Rs)', placeholder: 'GST Charged Amount', type: 'text',
         value: docketDetail.gstChargedAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'totalAmount', label: 'Total Amount', placeholder: 'Total Amount', type: 'text',
-        value:docketDetail.totalAmount, Validations: [], generatecontrol: true, disable: false
+        name: 'totalAmount', label: 'Total Amount (Rs)', placeholder: 'Total Amount', type: 'text',
+        value: docketDetail.totalAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
         name: 'companyCode',
@@ -670,3 +751,4 @@ export class FreightControl {
     return this.FreightControlArray;
   }
 }
+

@@ -28,6 +28,7 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
   locationStatus: any;
   vehicle: any;
   vehicleStatus: any;
+  backPath:string;
   vehicleData = [];
   constructor(
     private route: Router,
@@ -43,6 +44,7 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
   ngOnInit(): void {
     this.getLocationDetailFromApi();
     this.getVehicleDetailFromApi();
+    this.backPath = "/Masters/Vehicle/Status";
   }
 
   functionCallHandler($event) {

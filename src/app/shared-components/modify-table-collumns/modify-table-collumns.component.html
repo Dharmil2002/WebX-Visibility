@@ -1,0 +1,29 @@
+<div mat-dialog-content Style='overflow: visible;'>
+    <p>Filter Collumns </p>
+    <mat-form-field appearance="fill">
+        <mat-label>Collumns</mat-label>
+        <mat-select [formControl]="CheckBoox" multiple>
+            <mat-select-trigger>
+                {{CheckBoox.value?.[0] || ''}}
+                <span *ngIf="(CheckBoox.value?.length || 0) > 1" class="example-additional-selection">
+                    (+{{ (CheckBoox.value?.length || 0) - 1 }}
+                    {{ CheckBoox.value?.length === 2 ? "other" : "others" }})
+                </span>
+            </mat-select-trigger>
+            <div cdkDropList [cdkDropListData]="data" class="example-list" (cdkDropListDropped)="drop($event)">
+                <div class="example-box" *ngFor="let item of data" cdkDrag>
+                    <mat-option [value]="item.Key">{{ item.title }}</mat-option>
+                </div>
+            </div>
+        </mat-select>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button (click)="onSaveClick({event:false})" type="button" mat-button>
+        No Thanks
+    </button>
+    <button type="button" (click)="onSaveClick({event:true})" mat-button>
+        Ok
+    </button>
+
+</div>

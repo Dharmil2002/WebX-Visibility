@@ -27,17 +27,19 @@ export class AddressMasterAddComponent implements OnInit {
   pincodeDet: any;
   addressData: any;
   newAddressCode: string;
+  backPath: string;
   data: any;
   pincodeDataFetched = false;
   //#endregion
 
   ngOnInit() {
     this.getPincodeData();
+    this.backPath = "/Masters/AddressMaster/AddressMasterList";
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
 
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {

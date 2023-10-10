@@ -12,7 +12,10 @@ export class thcControl {
                     type: "text",
                     value: 'System Generated',
                     Validations: [],
-                    generatecontrol: true, disable: view ? view : true
+                    generatecontrol: true, disable: view ? view : true,
+                    additionalData: {
+                     metaData:"Basic"
+                    }
                 },
                 {
                     name: 'route',
@@ -21,7 +24,10 @@ export class thcControl {
                     type: 'text',
                     value: '',
                     Validations: [],
-                    generatecontrol: true, disable: view ? view : true
+                    generatecontrol: true, disable: view ? view : true,
+                    additionalData: {
+                        metaData:"Basic"
+                       }
 
                 },
                 {
@@ -37,7 +43,9 @@ export class thcControl {
                         }],
                     generatecontrol: true,
                     additionalData: {
-                        showNameAndValue: false
+                        showNameAndValue: false,
+                        metaData:"Basic"
+
                     },
                     functions: {
                         onOptionSelect: 'getShipmentDetails'
@@ -57,7 +65,8 @@ export class thcControl {
                         }],
                     generatecontrol: true,
                     additionalData: {
-                        showNameAndValue: false
+                        showNameAndValue: false,
+                        metaData:"Basic"
                     },
                     functions: {
                         onOptionSelect: ''
@@ -81,7 +90,7 @@ export class thcControl {
                             message: "Vendor Type  is required",
                         }],
                     functions: {},
-                    additionalData: {}
+                    additionalData: { metaData:"Basic"}
                 },
                 {
                     name: "vendorName",
@@ -100,7 +109,7 @@ export class thcControl {
                             message: "Vendor Name  is required",
                         }],
                     functions: {},
-                    additionalData: {}
+                    additionalData: { metaData:"Basic"}
                 },
                 {
                     name: "panNo",
@@ -119,7 +128,24 @@ export class thcControl {
                             message: "PAN Number  is required",
                         }],
                     functions: {},
-                    additionalData: {}
+                    additionalData: { metaData:"Basic"}
+                },
+                {
+                    name: 'closingBranch',
+                    label: 'Closing Branch',
+                    placeholder: '',
+                    type: 'dropdown',
+                    value: '',
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
+                    Validations: [  {
+                        name: "required",
+                        message: "Closing Branch  is required",
+                    }],
+                    generatecontrol: true,
+                    disable: view ? view : update
                 },
                 {
                     name: 'driverName',
@@ -134,7 +160,8 @@ export class thcControl {
                         }],
                     generatecontrol: true,
                     additionalData: {
-                        showNameAndValue: false
+                        showNameAndValue: false,
+                        metaData:"driver"
                     },
                     functions: {
                         onOptionSelect: ''
@@ -154,7 +181,8 @@ export class thcControl {
                         }],
                     generatecontrol: true,
                     additionalData: {
-                        showNameAndValue: false
+                        showNameAndValue: false,
+                        metaData:"driver"
                     },
                     functions: {
                         onOptionSelect: ''
@@ -170,11 +198,12 @@ export class thcControl {
                     Validations: [
                         {
                             name: "required",
-                            message: "Driver License No is required",
+                            message: "Driver License No is required"
                         }],
                     generatecontrol: true,
                     additionalData: {
-                        showNameAndValue: false
+                        showNameAndValue: false,
+                        metaData:"driver"
                     },
                     functions: {
                         onOptionSelect: ''
@@ -194,7 +223,8 @@ export class thcControl {
                         }],
                     generatecontrol: true,
                     additionalData: {
-                        showNameAndValue: false
+                        showNameAndValue: false,
+                        metaData:"driver"
                     },
                     functions: {
                         onOptionSelect: ''
@@ -209,6 +239,9 @@ export class thcControl {
                     value: '',
                     Validations: [],
                     generatecontrol: true,
+                    additionalData: {
+                        metaData:"vehLoad"
+                    },
                     disable: true
                 },
                 {
@@ -219,6 +252,9 @@ export class thcControl {
                     value: '',
                     Validations: [],
                     generatecontrol: true,
+                    additionalData: {
+                        metaData:"vehLoad"
+                    },
                     disable: view ? view : true
                 },
                 {
@@ -229,11 +265,14 @@ export class thcControl {
                     value: '',
                     Validations: [],
                     generatecontrol: true,
+                    additionalData: {
+                        metaData:"vehLoad"
+                    },
                     disable: true
                 },
                 {
                     name: 'contAmt',
-                    label: 'Contract Amount(Rs)',
+                    label: 'Vendor Contract  Amount(Rs)',
                     placeholder: '',
                     type: 'text',
                     value: '',
@@ -242,6 +281,9 @@ export class thcControl {
                         onModelChange: 'onCalculateTotal'
                     },
                     generatecontrol: true,
+                    additionalData: {
+                        metaData:"vehLoad"
+                    },
                     disable: view ? view : update
                 },
                 {
@@ -255,6 +297,9 @@ export class thcControl {
                         onModelChange: 'onCalculateTotal'
                     },
                     generatecontrol: true,
+                    additionalData: {
+                        metaData:"vehLoad"
+                    },
                     disable: view ? view : update
                 },
                 {
@@ -268,6 +313,9 @@ export class thcControl {
                     },
                     Validations: [],
                     generatecontrol: true,
+                    additionalData: {
+                        metaData:"vehLoad"
+                    },
                     disable: view ? view : update
                 },
                 {
@@ -277,9 +325,13 @@ export class thcControl {
                     type: 'dropdown',
                     value: '',
                     additionalData: {
-                        showNameAndValue: true
+                        showNameAndValue: true,
+                        metaData:"vehLoad"
                     },
-                    Validations: [],
+                    Validations: [  {
+                        name: "required",
+                        message: "Advance Paid At  is required",
+                    }],
                     generatecontrol: true,
                     disable: view ? view : update
                 },
@@ -290,9 +342,13 @@ export class thcControl {
                     type: 'dropdown',
                     value: '',
                     additionalData: {
-                        showNameAndValue: true
+                        showNameAndValue: true,
+                        metaData:"vehLoad"
                     },
-                    Validations: [],
+                    Validations: [  {
+                        name: "required",
+                        message: "Balance Paid At is required",
+                    }],
                     generatecontrol: true,
                     disable: view ? view : update
                 },
@@ -356,6 +412,10 @@ export class thcControl {
                     type: '',
                     value: '',
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 },
@@ -366,6 +426,10 @@ export class thcControl {
                     type: '',
                     value: '1',
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 },
@@ -376,6 +440,10 @@ export class thcControl {
                     type: '',
                     value: localStorage.getItem("companyCode"),
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 },
@@ -386,6 +454,10 @@ export class thcControl {
                     type: '',
                     value: localStorage.getItem("UserName"),
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 },
@@ -396,6 +468,24 @@ export class thcControl {
                     type: '',
                     value: new Date(),
                     Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
+                    generatecontrol: false,
+                    disable: true
+                },
+                {
+                    name: 'podDetail',
+                    label: '',
+                    placeholder: '',
+                    type: '',
+                    value: new Date(),
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"Basic"
+                    },
                     generatecontrol: false,
                     disable: true
                 }

@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" *ngIf="tableLoad">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" *ngIf="tableLoad" [backPath]="backPath">
     <form [formGroup]="routeScheduleTableForm">
         <app-form-webxpress [form]="routeScheduleTableForm" [formData]="jsonControlArray"
             (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false"

@@ -138,7 +138,20 @@ export class ContainerControl {
                 Validations: [],
                 generatecontrol: false,
                 disable: false
-            }
+            },
+            {
+                name: "entryDate",
+                label: "Entry Date",
+                placeholder: "Select Entry Date",
+                type: "date",
+                value: new Date(), // Set the value to the current date
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
         ];
     }
     getContainerFormControls() {

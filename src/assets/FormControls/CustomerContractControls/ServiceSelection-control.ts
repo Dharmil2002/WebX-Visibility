@@ -9,6 +9,9 @@ export class ContractServiceSelectionControl {
   private ContractDemurrageSelectionControlArray: FormControls[];
   private ContractInsuranceCarrierRiskSelectionControlArray: FormControls[];
   private ContractInsuranceCustomerRiskSelectionControlArray: FormControls[];
+  private ContractCutOfftimeControlArray: FormControls[];
+  private ContractYieldProtectionSelectionControlArray: FormControls[];
+  private ContractFuelSurchargeSelectionControlArray: FormControls[];
 
   constructor() {
     this.ContractProductSelectionControlArray = [
@@ -123,29 +126,24 @@ export class ContractServiceSelectionControl {
         label: "Volumetric",
         placeholder: "Volumetric",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Yes", checked: true },
-          { value: "N", name: "No" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
       },
+
       {
         name: "ODA",
         label: "ODA",
         placeholder: "ODA",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Yes", checked: true },
-          { value: "N", name: "No" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
@@ -155,13 +153,10 @@ export class ContractServiceSelectionControl {
         label: "DACC",
         placeholder: "DACC",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Yes", checked: true },
-          { value: "N", name: "No" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
@@ -171,13 +166,10 @@ export class ContractServiceSelectionControl {
         label: "Fuel Surcharge",
         placeholder: "Fuel Surcharge",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Yes", checked: true },
-          { value: "N", name: "No" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
@@ -187,13 +179,10 @@ export class ContractServiceSelectionControl {
         label: "Cut off time",
         placeholder: "Cut off time",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Yes", checked: true },
-          { value: "N", name: "No" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
@@ -203,13 +192,10 @@ export class ContractServiceSelectionControl {
         label: "COD/DOD",
         placeholder: "COD/DOD",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Yes", checked: true },
-          { value: "N", name: "No" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
@@ -219,13 +205,10 @@ export class ContractServiceSelectionControl {
         label: "Demurrage",
         placeholder: "Demurrage",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Yes", checked: true },
-          { value: "N", name: "No" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
@@ -235,13 +218,10 @@ export class ContractServiceSelectionControl {
         label: "DPH",
         placeholder: "DPH",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Yes", checked: true },
-          { value: "N", name: "No" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
@@ -251,13 +231,10 @@ export class ContractServiceSelectionControl {
         label: "Insurance",
         placeholder: "Insurance",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Yes", checked: true },
-          { value: "N", name: "No" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
@@ -267,13 +244,10 @@ export class ContractServiceSelectionControl {
         label: "Yield Protection",
         placeholder: "Yield Protection",
         type: "toggle",
-        value: [
-          { value: "Y", name: "Carrier", checked: true },
-          { value: "N", name: "Customer" },
-        ],
+        value: false,
         Validations: [],
         functions: {
-          onChange: "displayAppointment",
+          onChange: "OnChangeServiceSelections",
         },
         generatecontrol: true,
         disable: false,
@@ -565,7 +539,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         Validations: [{
           name: "required",
-          message: "nvoice Value From is required",
+          message: "Invoice Value From is required",
         }],
         generatecontrol: true,
         disable: false,
@@ -656,6 +630,271 @@ export class ContractServiceSelectionControl {
         generatecontrol: true,
         disable: false,
       },
+    ];
+    this.ContractCutOfftimeControlArray = [
+      {
+        name: "Timeofday",
+        label: 'Time of day',
+        placeholder: 'Time of day',
+        type: "datetimerpicker",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Time of day is required",
+          },
+        ],
+        additionalData: {
+          minDate: new Date("01 Jan 2023"),
+        },
+      },
+      {
+        name: "AdditionalTransitdays",
+        label: "Additional Transit days",
+        placeholder: "Additional Transit days",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        Validations: [{
+          name: "required",
+          message: "Additional Transit days is required",
+        }],
+        generatecontrol: true,
+        disable: false,
+      },
+    ];
+    this.ContractYieldProtectionSelectionControlArray = [
+      {
+        name: "MinimumweightKg",
+        label: "Minimum weight- Kg",
+        placeholder: "Minimum weight- Kg",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "MinimumpackagesNo",
+        label: "Minimum packages - No",
+        placeholder: "Minimum packages - No",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+
+      {
+        name: "MinimumFreightvalueINR",
+        label: "Minimum Freight value- INR",
+        placeholder: "Minimum Freight value- INR",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "Yieldtype",
+        label: "Yield Type",
+        placeholder: "Yield Type",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "MinimumyieldINR",
+        label: "Minimum yield - INR",
+        placeholder: "Minimum yield - INR",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "CalculateYieldon",
+        label: "Calculate Yield on",
+        placeholder: "Calculate Yield on",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+    ]
+    this.ContractFuelSurchargeSelectionControlArray = [
+      {
+        name: "FuelType",
+        label: "Fuel Type",
+        placeholder: "Fuel Type",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "RateType",
+        label: "Rate Type",
+        placeholder: "Rate Type",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+
+      {
+        name: "Rate",
+        label: "Rate",
+        placeholder: "Rate",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "MinCharge",
+        label: "Min Charge",
+        placeholder: "Min Charge",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "MaxCharge",
+        label: "Max Charge",
+        placeholder: "Max Charge",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+        ],
+        functions: {
+          onOptionSelect: 'getLocBasedOnCity'
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
     ]
   }
   getContractProductSelectionControlControls() {
@@ -680,6 +919,15 @@ export class ContractServiceSelectionControl {
     return this.ContractInsuranceCarrierRiskSelectionControlArray;
   }
 
+  getContractCutOfftimeControlControls() {
+    return this.ContractCutOfftimeControlArray;
+  }
+  getContractYieldProtectionSelectionControlControls() {
+    return this.ContractYieldProtectionSelectionControlArray;
+  }
+  getContractFuelSurchargeSelectionControlControls() {
+    return this.ContractFuelSurchargeSelectionControlArray;
+  }
 
 }
 

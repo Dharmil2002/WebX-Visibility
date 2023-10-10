@@ -29,6 +29,15 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   InsuranceCarrierRiskForm: UntypedFormGroup;
   jsonControlArrayInsuranceCarrierRiskForm: any;
 
+  CutOfftimeForm: UntypedFormGroup;
+  jsonControlArrayCutOfftimeForm: any;
+
+  YieldProtectionForm: UntypedFormGroup;
+  jsonControlArrayYieldProtectionForm: any;
+
+  FuelSurchargeForm: UntypedFormGroup;
+  jsonControlArrayFuelSurchargeForm: any;
+
   className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   ServiceclassName = "col-xl-2 col-lg-3 col-md-12 col-sm-12";
   breadscrums = [
@@ -39,15 +48,84 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     },
   ];
 
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
+  menuItems = [
+    { label: 'Edit' },
+    { label: 'Remove' }
+  ]
   //#endregion
   isLoad: boolean = false;
+  //#region columnHeader
+  columnHeader = {
+    InvoiceValueFrom: {
+      Title: "Invoice Value From",
+      class: "matcolumnfirst",
+      Style: "min-width:80px",
+    },
+    tovalue: {
+      Title: "To value",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
+    },
+    rateType: {
+      Title: "Rate Type",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    Rate: {
+      Title: "Rate",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    MinCharge: {
+      Title: "Min Charge",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    MaxCharge: {
+      Title: "Max Charge",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    }
+  };
 
+  staticField =
+    [
+      'InvoiceValueFrom',
+      'tovalue',
+      'rateType',
+      'Rate',
+      'MinCharge',
+      'MaxCharge'
+    ]
+  /*End*/
   linkArray = [
   ];
+  addFlag = true;
+  menuItemflag = true;
   loadIn: boolean;
   tableLoad: boolean = true;
   isTableLoad: boolean = true;
   tableData: any = [];
+
+
+  DisplayCODDODSection = false;
+  DisplayVolumetricSection = false;
+  DisplayDemurragericSection = false;
+  DisplayInsuranceSection = false;
+  DisplayCutOfftimeSection = false;
+  DisplayYieldProtectionSection = false;
+  DisplayFuelSurchargeSection = false;
+
   constructor(private fb: UntypedFormBuilder) {
     this.initializeFormControl();
   }
@@ -81,9 +159,54 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     this.jsonControlArrayInsuranceCarrierRiskForm = this.ContractServiceSelectionControls.getContractInsuranceCarrierRiskSelectionControlControls();
     this.InsuranceCarrierRiskForm = formGroupBuilder(this.fb, [this.jsonControlArrayInsuranceCarrierRiskForm]);
 
+    this.jsonControlArrayCutOfftimeForm = this.ContractServiceSelectionControls.getContractCutOfftimeControlControls();
+    this.CutOfftimeForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayCutOfftimeForm,
+    ]);
+
+    this.jsonControlArrayYieldProtectionForm = this.ContractServiceSelectionControls.getContractYieldProtectionSelectionControlControls();
+    this.YieldProtectionForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayYieldProtectionForm,
+    ]);
+
+    this.jsonControlArrayFuelSurchargeForm = this.ContractServiceSelectionControls.getContractFuelSurchargeSelectionControlControls();
+    this.FuelSurchargeForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayFuelSurchargeForm,
+    ]);
+
   }
   //#endregion
 
+  OnChangeServiceSelections(event) {
+    const fieldName = typeof event === "string" ? event : event.field.name;
+    const checked = typeof event === "string" ? event : event.eventArgs.checked;
+
+    switch (fieldName) {
+      case "Volumetric":
+        this.DisplayVolumetricSection = checked;
+        break;
+      case "ODA":
+        this.DisplayCODDODSection = checked;
+        break;
+      case "Demurrage":
+        this.DisplayDemurragericSection = checked;
+        break;
+      case "Insurance":
+        this.DisplayInsuranceSection = checked;
+        break;
+      case "cutofftime":
+        this.DisplayCutOfftimeSection = checked;
+        break;
+      case "YieldProtection":
+        this.DisplayYieldProtectionSection = checked;
+        break;
+      case "fuelSurcharge":
+        this.DisplayFuelSurchargeSection = checked;
+        break;
+      default:
+        break;
+    }
+  }
   //#region functionCallHandler
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
@@ -100,35 +223,20 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     this.tableLoad = true;
     this.isLoad = true;
     const tableData = this.tableData;
-    if (tableData.length > 0) {
-      const exist = tableData.find((x) => x.containerNumber === this.InsuranceCarrierRiskForm.value.containerNumber);
-      if (exist) {
-        this.InsuranceCarrierRiskForm.controls['containerNumber'].setValue('');
-        Swal.fire({
-          icon: "info", // Use the "info" icon for informational messages
-          title: "Information",
-          text: "Please avoid duplicate entering Container Number.",
-          showConfirmButton: true,
-        });
-        this.tableLoad = false;
-        this.isLoad = false;
-        return false
-
-      }
-
-    }
-    if (typeof (this.InsuranceCarrierRiskForm.value.containerType) === 'string') {
-      this.InsuranceCarrierRiskForm.controls['containerType'].setValue('');
-      Swal.fire({
-        icon: "info", // Use the "info" icon for informational messages
-        title: "Information",
-        text: "Please Select Proper value.",
-        showConfirmButton: true,
-      });
-      this.isLoad = false;
-      this.tableLoad = false;
-      return false
-    }
+    // if (typeof (this.InsuranceCarrierRiskForm.value.tovalue) === 'string') {
+    //   this.InsuranceCarrierRiskForm.controls['tovalue'].setValue('');
+    //   Swal.fire({
+    //     icon: "info", // Use the "info" icon for informational messages
+    //     title: "Information",
+    //     text: "Please Select Proper value.",
+    //     showConfirmButton: true,
+    //   });
+    //   this.isLoad = false;
+    //   this.tableLoad = false;
+    //   return false
+    // }
+    console.log(this.InsuranceCarrierRiskForm)
+    debugger
     const delayDuration = 1000;
     // Create a promise that resolves after the specified delay
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -136,10 +244,12 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     await delay(delayDuration);
     const json = {
       id: tableData.length + 1,
-      containerNumber: this.InsuranceCarrierRiskForm.value.containerNumber,
-      containerType: this.InsuranceCarrierRiskForm.value.containerType.value,
-      containerCapacity: this.InsuranceCarrierRiskForm.value.containerCapacity,
-      invoice: false,
+      InvoiceValueFrom: this.InsuranceCarrierRiskForm.value.InvoiceValueFrom,
+      tovalue: this.InsuranceCarrierRiskForm.value.tovalue,
+      rateType: this.InsuranceCarrierRiskForm.value.rateType,
+      Rate: this.InsuranceCarrierRiskForm.value.Rate,
+      MinCharge: this.InsuranceCarrierRiskForm.value.MinCharge,
+      MaxCharge: this.InsuranceCarrierRiskForm.value.MaxCharge,
       actions: ['Edit', 'Remove']
     }
     this.tableData.push(json);
@@ -148,9 +258,12 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       this.InsuranceCarrierRiskForm.get(key).updateValueAndValidity();
     });
 
-    this.InsuranceCarrierRiskForm.controls['containerNumber'].setValue('');
-    this.InsuranceCarrierRiskForm.controls['containerType'].setValue('');
-    this.InsuranceCarrierRiskForm.controls['containerCapacity'].setValue('');
+    this.InsuranceCarrierRiskForm.controls['InvoiceValueFrom'].setValue('');
+    this.InsuranceCarrierRiskForm.controls['tovalue'].setValue('');
+    this.InsuranceCarrierRiskForm.controls['rateType'].setValue('');
+    this.InsuranceCarrierRiskForm.controls['Rate'].setValue('');
+    this.InsuranceCarrierRiskForm.controls['MinCharge'].setValue('');
+    this.InsuranceCarrierRiskForm.controls['MaxCharge'].setValue('');
     // Remove all validation  
 
     this.isLoad = false;
@@ -163,7 +276,24 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   }
 
 
+  handleMenuItemClick(data) {
+    this.fillContainer(data);
+  }
 
+  fillContainer(data: any) {
+    if (data.label.label === 'Remove') {
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    }
+    else {
+      this.InsuranceCarrierRiskForm.controls['InvoiceValueFrom'].setValue(data.data?.InvoiceValueFrom || "");
+      this.InsuranceCarrierRiskForm.controls['tovalue'].setValue(data.data?.tovalue || "");
+      this.InsuranceCarrierRiskForm.controls['rateType'].setValue(data.data?.rateType || "");
+      this.InsuranceCarrierRiskForm.controls['Rate'].setValue(data.data?.Rate || "");
+      this.InsuranceCarrierRiskForm.controls['MinCharge'].setValue(data.data?.MinCharge || "");
+      this.InsuranceCarrierRiskForm.controls['MaxCharge'].setValue(data.data?.MaxCharge || "");
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    }
+  }
 
 }
 

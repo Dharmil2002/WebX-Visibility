@@ -4,7 +4,7 @@
 
       <!--textbox (input) controls---------------------------------------------------------->
       <mat-form-field class="example-full-width" appearance="outline"
-        *ngIf="(formItem.type=='text' || formItem.type=='number' || formItem.type=='password') && formItem.generatecontrol===true ">
+        *ngIf="(formItem.type=='text' || formItem.type=='number' || formItem.type=='password' ||formItem.type=='mobile-number'||formItem.type=='government-id') && formItem.generatecontrol===true ">
 
         <mat-label class="fontbold">{{formItem.label}}</mat-label>
         <!-- password block -->
@@ -21,13 +21,34 @@
 
         <ng-template #elseBlock>
           <!-- text and number type input ----------------------------------------------------------->
-          <ng-container *ngIf="(formItem.type=='text'||formItem.type=='number'); else textInput">
-            <input matInput type="{{formItem.type}}" formControlName={{formItem.name}} [readonly]="formItem.disable"
-              placeholder={{formItem.placeholder}} suffix={{formItem.suffix}} mask="{{formItem.mask}}"
-              autocomplete="off"
-              (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-              (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
-              (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})">
+          <ng-container
+            *ngIf="(formItem.type === 'government-id' || formItem.type=='text'|| formItem.type=='number'||formItem.type=='mobile-number') ; else textInput">
+            <ng-container *ngIf="(formItem.type=='text'|| formItem.type=='number')">
+              <input matInput type="{{formItem.type}}" formControlName={{formItem.name}} [readonly]="formItem.disable"
+                placeholder={{formItem.placeholder}} suffix={{formItem.suffix}} mask="{{formItem.mask}}"
+                autocomplete="off"
+                (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
+                (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})">
+            </ng-container>
+            <ng-container *ngIf="(formItem.type=='mobile-number')">
+              <input matInput type="{{'number'}}" formControlName={{formItem.name}} [readonly]="formItem.disable"
+                appdecimalrangevalidator placeholder={{formItem.placeholder}} suffix={{formItem.suffix}}
+                mask="{{formItem.mask}}" autocomplete="off"
+                (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
+                (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})"
+                [MinValue]="0" [MaxAllowed]="0"
+                [MaxValue]="formItem.type === 'mobile-number' ? formItem.maxlength ? formItem.maxlength: 10 : formItem?.maxlength">
+            </ng-container>
+            <ng-container *ngIf="formItem.type === 'government-id';">
+              <input matInput formControlName="{{formItem.name}}" [readonly]="formItem.disable"
+                type="{{formItem.type == 'government-id'? 'text' :formItem.type}}"
+                placeholder="{{formItem.placeholder}}" [ngModel]="form.get(formItem.name).value | uppercase"
+                (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
+                (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
+                (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})">
+            </ng-container>
           </ng-container>
           <!-- rest of the input types ... ---------------------------------------------------------->
           <ng-template #textInput>
@@ -139,7 +160,8 @@
         *ngIf="formItem.type === 'multiselect'  && formItem.generatecontrol===true">
         <mat-label class="fontbold">{{formItem.label}}</mat-label>
         <mat-select [formControlName]="formItem.additionalData.support" placeholder={{formItem.placeholder}}
-          [multiple]="true" #singleSelect
+          [multiple]="true" (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick,
+                          eventArgs: $event })" #singleSelect
           (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelect , eventArgs: $event })">
           <mat-option>
             <ngx-mat-select-search formControlName={{formItem.name}} placeholderLabel={{formItem.placeholder}}
@@ -207,11 +229,8 @@
       </ng-container>
       <!--Radio Button-->
       <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
-        <mat-label id="example-radio-group-label">{{formItem.label}}</mat-label>&nbsp;
-        <mat-radio-group [formControlName]="formItem.name" aria-labelledby="example-radio-group-label" style="display: flex;
-  flex-direction: column;
-  margin: 5px 5px;
-  align-items: flex-start;"
+        <mat-label>{{formItem.label}}</mat-label>&nbsp;
+        <mat-radio-group [formControlName]="formItem.name"
           (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
           <mat-radio-button style=" margin: 5px;" *ngFor="let option of formItem.value" [value]="option.value">
             {{ option.name }}

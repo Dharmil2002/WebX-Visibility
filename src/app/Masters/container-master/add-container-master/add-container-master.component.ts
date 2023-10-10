@@ -26,6 +26,7 @@ export class AddContainerMasterComponent implements OnInit {
   isUpdate = false;
   newContainerCode: string;
   data: any;
+  backPath:string;
   containerData: any;
   containerType: any;
   containerTypeStatus: any;
@@ -34,6 +35,7 @@ export class AddContainerMasterComponent implements OnInit {
 
   ngOnInit() {
     this.getContainerTypeData();
+    this.backPath = "/Masters/ContainerMaster/ContainerMasterList";
   }
   constructor(private Route: Router, private fb: UntypedFormBuilder,
     private masterService: MasterService, private filter: FilterUtils,
@@ -152,7 +154,7 @@ export class AddContainerMasterComponent implements OnInit {
 
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {
@@ -187,7 +189,7 @@ export class AddContainerMasterComponent implements OnInit {
       }
     })
   }
-  //#region to get Container Type List 
+  //#region to get Container Type List
   getContainerTypeData() {
     this.masterService.getJsonFileDetails("containerTypeUrl").subscribe((res) => {
       const containerTypeList = res;

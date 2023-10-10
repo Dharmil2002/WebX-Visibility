@@ -19,6 +19,11 @@ export class CustomerGroupListComponent implements OnInit {
     "activeFlag": "Active Status",
     "actions": "Actions"
   };
+  headerForCsv = {
+    "groupCode": "Group Code",
+    "groupName": "Group Name",
+    "activeFlag": "Active Status"
+    }
   breadScrums = [
     {
       title: "Customer Group Master",
@@ -29,13 +34,15 @@ export class CustomerGroupListComponent implements OnInit {
   dynamicControls = {
     add: true,
     edit: true,
-    csv: false
+    csv: true
   }
   addAndEditPath: string;
+  csvFileName: string;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/CustomerGroupMaster/AddCustomerGroupMaster";
   }
   ngOnInit(): void {
+    this.csvFileName = "Customer Group Details";
     this.getCustomerDetails();
   }
   //To get List data for Customer Group MAster

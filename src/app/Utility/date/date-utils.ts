@@ -21,3 +21,7 @@ export class DateFormatPipe implements PipeTransform {
 export function parseCustomDate(dateString, format) {
   return parse(dateString, format, new Date());
 }
+ const thisYear = new Date().getFullYear();
+export const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1)
+  .toString()
+  .slice(-2)}`;

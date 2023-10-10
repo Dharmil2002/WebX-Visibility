@@ -22,6 +22,7 @@ export class ClusterMasterAddComponent implements OnInit {
   //#region Variable Declaration
   jsonControlArray: any;
   pincodeStatus: any;
+  backPath: string;
   pincodeList: any;
   action: string;
   isUpdate = false;
@@ -31,6 +32,7 @@ export class ClusterMasterAddComponent implements OnInit {
 
   ngOnInit() {
     this.getPincodeData()
+    this.backPath = "/Masters/ClusterMaster/ClusterMasterList";
   }
   constructor(private Route: Router, private fb: UntypedFormBuilder,
     private masterService: MasterService, private filter: FilterUtils,
@@ -208,7 +210,7 @@ export class ClusterMasterAddComponent implements OnInit {
 
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
-    // function of this name may not exists, hence try..catch 
+    // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
     } catch (error) {

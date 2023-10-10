@@ -12,7 +12,7 @@ export class VehicleMasterListComponent implements OnInit {
     // Define column headers for the table
     columnHeader =
         {
-            "srNo": "Sr No",
+            // "srNo": "Sr No",
             "vehicleNo": "Vehicle No.",
             "vehicleType": "Vehicle Type",
             "vendorName": "Vendor Name",
@@ -21,13 +21,12 @@ export class VehicleMasterListComponent implements OnInit {
             "actions": "Actions",
         }
     headerForCsv = {
-        "srNo": "Sr No",
+        // "srNo": "Sr No",
         "vehicleNo": "Vehicle Number",
         "vehicleType": "Vehicle Type",
         "vendorName": "Vendor Code",
         "vendorType": "Vendor Type",
         "isActive": "Active Flag",
-        "actions": "Actions",
     }
     breadScrums = [
         {
@@ -39,7 +38,7 @@ export class VehicleMasterListComponent implements OnInit {
     dynamicControls = {
         add: true,
         edit: true,
-        csv: false
+        csv: true
     }
     toggleArray = ["isActive"]
     linkArray = []
@@ -63,7 +62,7 @@ export class VehicleMasterListComponent implements OnInit {
         const dataWithSrno = res.data.map((obj, index) => {
             return {
                 ...obj,
-                srNo: index + 1
+                // srNo: index + 1
             };
         });
         this.csv = dataWithSrno;

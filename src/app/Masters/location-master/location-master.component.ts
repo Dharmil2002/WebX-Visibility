@@ -17,11 +17,22 @@ export class LocationMasterComponent implements OnInit {
     'locCode': 'Code',
     'locName': 'Name',
     'ownership': 'Ownership',
-    'locPincode': 'Pincode',
-    'locCity': 'City',
     'reportLoc': 'Report To',
+    'locCity': 'City',
+    'locPincode': 'Pincode',
     "activeFlag": "Active",
     "actions": "Actions"
+  };
+  columnWidths = {
+    'updateDate': 'max-width: 50%',
+    'locCode': 'max-width:10%',
+    'locName': 'max-width:13%',
+    'ownership': 'max-width:12%',
+    'locPincode': 'align-self: center;max-width:10%;',
+    'locCity': 'max-width:15%',
+    'reportLoc': 'max-width:10%',
+    'activeFlag': 'max-width:8%',
+    'actions': 'max-width:8%'
   };
   headerForCsv = {
     "srNo": "Sr No",
@@ -45,9 +56,11 @@ export class LocationMasterComponent implements OnInit {
   }
   addAndEditPath: string;
   csvFileName: string;
+  centerAlignedData: string[];
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/LocationMaster/AddLocationMaster";
     this.csvFileName = "Location Details";
+    this.centerAlignedData = ["locPincode"]
   }
   ngOnInit(): void {
     this.getOwnership();

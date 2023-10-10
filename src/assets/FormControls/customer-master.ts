@@ -146,7 +146,7 @@ export class customerControl {
         name: "PANnumber",
         label: "PAN No",
         placeholder: "PAN No",
-        type: "text",
+        type: "government-id",
         value: isUpdate ? customerTable.PANnumber : "",
         generatecontrol: true,
         disable: false,

@@ -1,3 +1,5 @@
+import { financialYear } from "src/app/Utility/date/date-utils";
+
 export async function getShipment(operationService, vehicle) {
     // Define the request body with companyCode, collectionName, and an empty filter
     const reqBody = {
@@ -38,7 +40,6 @@ export async function prqDetail(operationService,dropDown) {
 }
 
 export async function thcGeneration(operationService,data){
-
      // Define the request body with companyCode, collectionName, and an empty filter
      const reqBody = {
         companyCode: localStorage.getItem("companyCode"),
@@ -46,7 +47,7 @@ export async function thcGeneration(operationService,data){
         data: data,
         docType: "TH",
         branch: "MUMB",
-        finYear: "2223"
+        finYear: financialYear
     };
     // Perform an asynchronous operation to fetch data from the operation service
     const result = await operationService.operationMongoPost("operation/thc/create", reqBody).toPromise();

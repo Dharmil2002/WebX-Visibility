@@ -5,7 +5,7 @@ export class LocationControl {
   LocationDetailControl: FormControls[];
   OtherDetailsControls: FormControls[];
 
-  constructor(LocationTable: LocationMaster, isUpdate: boolean) {
+  constructor(LocationTable: LocationMaster, isUpdate: boolean, isChecked: boolean) {
     (this.LocationDetailControl = [
       {
         name: "locCode",
@@ -356,8 +356,8 @@ export class LocationControl {
       },
       {
         name: "mappedPincode",
-        label: "Mapped Pincode",
-        placeholder: "Mapped Pincode",
+        label: "Mapped Area",
+        placeholder: "Mapped Area",
         type: "multiselect",
         value: "",
         filterOptions: "",
@@ -366,17 +366,62 @@ export class LocationControl {
         Validations: [],
         additionalData: {
           isIndeterminate: false,
-          isChecked: false,
+          isChecked: isChecked,
           support: "pincodeHandler",
           showNameAndValue: false,
 
         },
         functions: {
           onToggleAll: 'toggleSelectAll',
-          onModel: 'getMappedPincode'
+          onModel: 'getMappedPincode',
+          onSelect: "setSelectedPincodeData",
+          onClick: "resetPinCode",
         },
         generatecontrol: true,
         disable: false,
+      },
+
+      {
+        name: 'mappedPinCode',
+        label: 'Mapped Area - Pin Code',
+        placeholder: 'Mapped Area - Pin Code',
+        type: 'text',
+        value: LocationTable.mappedPinCode,
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: true,
+        disable: true
+
+      },
+      {
+        name: 'mappedCity',
+        label: 'Mapped Area - City',
+        placeholder: 'Mapped Area - City',
+        type: 'text',
+        value: LocationTable.mappedCity,
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: true,
+        disable: true
+
+      },
+      {
+        name: 'mappedState',
+        label: 'Mapped Area - State',
+        placeholder: 'Mapped Area - State',
+        type: 'text',
+        value: LocationTable.mappedState,
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: true,
+        disable: true
+
       },
       {
         name: "activeFlag",
@@ -410,10 +455,7 @@ export class LocationControl {
         placeholder: 'Pay Basis',
         type: '',
         value: '',
-        Validations: [{
-          name: "required",
-          message: " ",
-        }],
+        Validations: [],
         generatecontrol: false, disable: false
       },
       {
@@ -446,6 +488,16 @@ export class LocationControl {
       {
         name: "updateBy",
         label: "Update By",
+        placeholder: "Update By",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "EntryBy",
+        label: "",
         placeholder: "Update By",
         type: "text",
         value: localStorage.getItem("UserName"),

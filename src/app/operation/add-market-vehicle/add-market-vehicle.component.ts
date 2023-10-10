@@ -62,6 +62,12 @@ export class AddMarketVehicleComponent implements OnInit {
     this.marketVehicleTableForm = formGroupBuilder(this.fb, [this.jsonControlVehicleArray]);
   }
   save() {
+    Swal.fire({
+      icon: "success",
+      title: "Add Market Vehicle Successfully", // Update the title here
+      showConfirmButton: true,
+    });
+    
     this.dialogRef.close(this.marketVehicleTableForm.value)
 
   }

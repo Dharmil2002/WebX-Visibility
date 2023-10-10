@@ -39,11 +39,6 @@ export class InvoiceSummaryBillComponent implements OnInit {
     csv: false,
   };
   columnHeader = {
-    sr: {
-      Title: "Sr. No.",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
     checkBoxRequired: {
       Title: "Select",
       class: "matcolumncenter",
@@ -251,7 +246,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
   async getCustomerDetail() {
     const custDetail = await getApiCustomerDetail(this.masterService, this.navigateExtra);
     const tranDetail = await getApiCompanyDetail(this.masterService);
-    this.invoiceTableForm.controls['cGstin'].setValue(custDetail.data[0].gstNumber);
+    this.invoiceTableForm.controls['cGstin'].setValue(custDetail.data[0].GSTdetails.find((x)=>x.gstState===custDetail.data[0].state).gstState);
     this.invoiceTableForm.controls['cState'].setValue(custDetail.data[0].state);
     this.invoiceTableForm.controls['tState'].setValue(tranDetail.data[0].state);
     this.invoiceTableForm.controls['tGstin'].setValue(tranDetail.data[0].gstNo);

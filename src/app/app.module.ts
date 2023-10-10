@@ -18,10 +18,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { ClickOutsideModule } from "ng-click-outside";
 import { CoreModule } from "./core/core.module";
 import { DashboardLayoutComponent } from "./layout/app-layout/dashboard-layout/dashboard-layout.component";
-import { ErrorInterceptor } from "./core/interceptor/error.interceptor";
 import { HeaderComponent } from "./layout/header/header.component";
-import { JwtInterceptor } from "./core/interceptor/jwt.interceptor";
-import { JwtModule } from "@auth0/angular-jwt";
 import { MainLayoutComponent } from "./layout/app-layout/main-layout/main-layout.component";
 import { MatSelectModule } from "@angular/material/select";
 import { NgModule } from "@angular/core";
@@ -37,7 +34,8 @@ import { WINDOW_PROVIDERS } from "./core/service/window.service";
 import { environment } from "src/environments/environment";
 import { fakeBackendProvider } from "./core/interceptor/fake-backend";
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-import { CustomHttpInterceptor } from "./core/interceptor/errorhandling.interceptor";
+import { JwtInterceptor } from "./core/interceptor/jwt.interceptor";
+import { JwtModule } from "@auth0/angular-jwt";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatMenuModule } from "@angular/material/menu";
 import {
@@ -58,6 +56,8 @@ import {
 } from '@azure/msal-angular';
 import { msalConfig } from "./core/service/msal-config/msal-config";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { ErrorInterceptor } from "./core/interceptor/error.interceptor";
+import { CustomHttpInterceptor } from "./core/interceptor/errorhandling.interceptor";
 
 
 export function MSALInstanceFactory(): IPublicClientApplication {
@@ -130,13 +130,13 @@ export function createTranslateLoader(http: HttpClient): any {
       provide: PERFECT_SCROLLBAR_CONFIG,
       useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
     },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: CustomHttpInterceptor,
       multi: true
     },
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     fakeBackendProvider,
     WINDOW_PROVIDERS,
     {

@@ -31,6 +31,7 @@ export class AddVendorMasterComponent implements OnInit {
   vendorType: any;
   vendorTypeStatus: any;
   data: any;
+  backPath:string;
   vLocation: any;
   vLocationStatus: any;
   vendorCity: any;
@@ -147,6 +148,7 @@ export class AddVendorMasterComponent implements OnInit {
   ngOnInit(): void {
     this.getDropDownData();
     this.getAllMastersData();
+    this.backPath = "/Masters/VendorMaster/VendorMasterList";
   }
   // Function to handle function calls
   functionCallHandler($event) {

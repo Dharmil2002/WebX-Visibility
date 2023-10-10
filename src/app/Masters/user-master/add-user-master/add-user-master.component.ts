@@ -61,10 +61,12 @@ export class AddUserMasterComponent implements OnInit {
   newUserCode: any;
   jsonControlArray: any[];
   submit = 'Save';
+  backPath:string;
   ngOnInit(): void {
     this.bindDropdown();
     this.getDropDownData();
     this.getAllMastersData();
+    this.backPath = "/Masters/UserMaster/UserMasterView";
   }
 
   constructor(

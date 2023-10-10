@@ -222,31 +222,6 @@ export class ConsignmentControl {
         },
       },
       {
-        name: "containerSize",
-        label: "Container Size",
-        placeholder: "Container Size",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-        ],
-        additionalData: {
-          showNameAndValue: true,
-          metaData: "Basic"
-        },
-      },
-      {
-        name: 'containerNumber', label: 'Container Number', placeholder: 'Container Number', type: 'text',
-        value: docketDetail.containerNumber, Validations: [], generatecontrol: true, disable: false,
-        additionalData: {
-          metaData: "Basic"
-        }
-      },
-      {
         name: 'vendorType', label: 'Vendor Type', placeholder: 'Vendor Type', type: "Staticdropdown",
 
         value: [
@@ -300,6 +275,21 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: false,
         functions: { onChange: "onAutoBillingBased" },
+        Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic",
+        }
+      },
+      {
+        name: "cd",
+        label: "Container Detail",
+        placeholder: "",
+        type: "toggle",
+        value: docketDetail.ccbp,
+        generatecontrol: true,
+        disable: false,
+        functions: { onChange: "containerDetail" },
         Validations: [],
         additionalData: {
           showNameAndValue: true,
@@ -412,6 +402,19 @@ export class ConsignmentControl {
     ]
     this.containordetail = [
       {
+        name: "Company_file",
+        label: "Select File",
+        placeholder: "",
+        type: "file",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [".xls, .xlsx, .csv"],
+        functions: {
+            onChange: "selectedFile",
+        },
+    },
+      {
         name: "containerNumber",
         label: "Container No",
         placeholder: "Container No",
@@ -523,7 +526,7 @@ export class ConsignmentControl {
       },
       {
         name: "invoiceAmount",
-        label: "Invoice Amount",
+        label: "Invoice Amount (Rs)",
         placeholder: "Invoice Amount",
         type: "text",
         value: "",
@@ -542,8 +545,8 @@ export class ConsignmentControl {
       },
       {
         name: "noofPkts",
-        label: "No of Pkts",
-        placeholder: "No of Pkts",
+        label: "No of Package",
+        placeholder: "No of Package",
         type: "text",
         value: "",
         filterOptions: "",
@@ -551,7 +554,7 @@ export class ConsignmentControl {
         displaywith: "",
         Validations: [{
           name: "required",
-          message: "No of Pkts is required",
+          message: "No of Package is required",
         }],
         additionalData: {
           showNameAndValue: false,
@@ -580,7 +583,7 @@ export class ConsignmentControl {
       },
       {
         name: "actualWeight",
-        label: "Actual Weight",
+        label: "Actual Weight (Kg)",
         placeholder: "Actual Weight",
         type: "text",
         value: "",
@@ -599,7 +602,7 @@ export class ConsignmentControl {
       },
       {
         name: "chargedWeight",
-        label: "Charged Weight",
+        label: "Charged Weight  (Kg)",
         placeholder: "Charged Weight",
         type: "text",
         value: "",
@@ -657,7 +660,7 @@ export class FreightControl {
   constructor(docketDetail) {
     this.FreightControlArray = [
       {
-        name: 'freightAmount', label: 'Freight Amount', placeholder: 'Freight Amount', type: 'text',
+        name: 'freightAmount', label: 'Freight Amount (Rs)', placeholder: 'Freight Amount', type: 'text',
         value: docketDetail.freightAmount, Validations: [{
           name: "required",
           message: "Secret Freight Amount is required",
@@ -710,11 +713,11 @@ export class FreightControl {
         ], Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'otherAmount', label: 'Other Amount', placeholder: 'Other Amount', type: 'text',
+        name: 'otherAmount', label: 'Other Amount (Rs)', placeholder: 'Other Amount', type: 'text',
         value: docketDetail.otherAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'grossAmount', label: 'Gross Amount', placeholder: 'Gross Amount', type: 'text',
+        name: 'grossAmount', label: 'Gross Amount (Rs)', placeholder: 'Gross Amount', type: 'text',
         value: docketDetail.grossAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
@@ -722,15 +725,15 @@ export class FreightControl {
         value: docketDetail.rcm, Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'gstAmount', label: 'GST Amount', placeholder: 'GST Amount', type: 'text',
+        name: 'gstAmount', label: 'GST Amount (Rs)', placeholder: 'GST Amount', type: 'text',
         value: docketDetail.gstAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'gstChargedAmount', label: 'GST Charged Amount', placeholder: 'GST Charged Amount', type: 'text',
+        name: 'gstChargedAmount', label: 'GST Charged Amount (Rs)', placeholder: 'GST Charged Amount', type: 'text',
         value: docketDetail.gstChargedAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'totalAmount', label: 'Total Amount', placeholder: 'Total Amount', type: 'text',
+        name: 'totalAmount', label: 'Total Amount (Rs)', placeholder: 'Total Amount', type: 'text',
         value: docketDetail.totalAmount, Validations: [], generatecontrol: true, disable: false
       },
       {

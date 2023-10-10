@@ -140,7 +140,10 @@ export class thcControl {
                         showNameAndValue: true,
                         metaData:"Basic"
                     },
-                    Validations: [],
+                    Validations: [  {
+                        name: "required",
+                        message: "Closing Branch  is required",
+                    }],
                     generatecontrol: true,
                     disable: view ? view : update
                 },
@@ -325,7 +328,10 @@ export class thcControl {
                         showNameAndValue: true,
                         metaData:"vehLoad"
                     },
-                    Validations: [],
+                    Validations: [  {
+                        name: "required",
+                        message: "Advance Paid At  is required",
+                    }],
                     generatecontrol: true,
                     disable: view ? view : update
                 },
@@ -339,7 +345,10 @@ export class thcControl {
                         showNameAndValue: true,
                         metaData:"vehLoad"
                     },
-                    Validations: [],
+                    Validations: [  {
+                        name: "required",
+                        message: "Balance Paid At is required",
+                    }],
                     generatecontrol: true,
                     disable: view ? view : update
                 },

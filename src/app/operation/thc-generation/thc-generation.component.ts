@@ -105,7 +105,7 @@ export class ThcGenerationComponent implements OnInit {
       Style: "max-width:160px",
     },
     remarks: {
-      Title: "Arrival Time",
+      Title: "Remarks",
       class: "matcolumnleft",
       Style: "max-width:160px",
     },
@@ -591,10 +591,11 @@ export class ThcGenerationComponent implements OnInit {
         this.thcTableForm.value
       );
       if (resThc) {
+        debugger
         Swal.fire({
           icon: "success",
           title: "THC Generated Successfully",
-          text: `THC Number  Generated Successfully `,
+          text: `THC Number is ${resThc.data.ops[0].tripId}`,
           showConfirmButton: true,
         }).then((result) => {
           if (result.isConfirmed) {

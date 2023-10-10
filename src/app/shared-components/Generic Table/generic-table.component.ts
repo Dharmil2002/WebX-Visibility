@@ -58,12 +58,14 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Output() dialogClosed = new EventEmitter<any>();
   selectedItems: any[] = [];
   @Input() centerAligned;
+  @Input() columnWidths: { [key: string]: string };
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;
     this.maxWidth = changes.extraData?.currentValue ?? this.maxWidth;
     this.width = changes.width?.currentValue ?? this.width;
     this.height = changes.height?.currentValue ?? this.height;
+    this.centerAligned=changes.centerAligned?.currentValue??this.centerAligned;
     if (changes.tableData?.currentValue) {
       this.refresh();
     }

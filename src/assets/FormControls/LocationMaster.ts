@@ -355,16 +355,6 @@ export class LocationControl {
         },
       },
       {
-        name: "activeFlag",
-        label: "Active Flag",
-        placeholder: "",
-        type: "toggle",
-        value: LocationTable.activeFlag,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
-      {
         name: "mappedPincode",
         label: "Mapped Area",
         placeholder: "Mapped Area",
@@ -390,48 +380,7 @@ export class LocationControl {
         generatecontrol: true,
         disable: false,
       },
-      {
-        name: "Longitude",
-        label: "Latitude , Longitude",
-        placeholder: "Select Latitude , Longitude",
-        type: "text",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-        functions: {
-          onChange: "RenderMap",
-        },
-      },
-      {
-        name: 'pincodeHandler',
-        label: 'Pay Basis',
-        placeholder: 'Pay Basis',
-        type: '',
-        value: '',
-        Validations: [{
-          name: "required",
-          message: " ",
-        }],
-        generatecontrol: false, disable: false
-      },
-      {
-        name: '_id',
-        label: '',
-        placeholder: '',
-        type: 'text',
-        value: LocationTable._id,
-        filterOptions: '',
-        autocomplete: '',
-        displaywith: '',
-        Validations: [],
-        generatecontrol: false,
-        disable: false
 
-      },
       {
         name: 'mappedPinCode',
         label: 'Mapped Area - Pin Code',
@@ -473,7 +422,89 @@ export class LocationControl {
         generatecontrol: true,
         disable: true
 
-      }
+      },
+      {
+        name: "activeFlag",
+        label: "Active Flag",
+        placeholder: "",
+        type: "toggle",
+        value: LocationTable.activeFlag,
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "Longitude",
+        label: "Latitude , Longitude",
+        placeholder: "Select Latitude , Longitude",
+        type: "text",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+        functions: {
+          onChange: "RenderMap",
+        },
+      },
+      {
+        name: 'pincodeHandler',
+        label: 'Pay Basis',
+        placeholder: 'Pay Basis',
+        type: '',
+        value: '',
+        Validations: [],
+        generatecontrol: false, disable: false
+      },
+      {
+        name: '_id',
+        label: '',
+        placeholder: '',
+        type: 'text',
+        value: LocationTable._id,
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: false,
+        disable: false
+
+      },
+      {
+        name: 'updateDate',
+        label: ' ',
+        placeholder: ' ',
+        type: 'date',
+        value: new Date(), // Set the value to the current date
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: false,
+        disable: false
+      },
+      {
+        name: "updateBy",
+        label: "Update By",
+        placeholder: "Update By",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "EntryBy",
+        label: "",
+        placeholder: "Update By",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
     ])
   }
   getFormControlsLocation() {

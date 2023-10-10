@@ -52,10 +52,12 @@ export class PinCodeService {
         const pincodeResponse = await this.masterService.masterPost("generic/get", pincodeBody).toPromise();
 
         // Extract the pincodeData from the response
-        const pincodeData = pincodeResponse.data.map((element) => ({
-          name: element.PIN.toString(),
-          value: element.PIN.toString(),
-        }));
+        const pincodeData = pincodeResponse.data
+          .filter((x) => x.PIN.toString().startsWith(pincodeValue))
+          .map((element) => ({
+            name: element.PIN.toString(),
+            value: element.PIN.toString(),
+          }));
 
         // Find an exact pincode match in the pincodeData array
         const exactPincodeMatch = pincodeData.find((element) => element.name === pincodeValue.toString());

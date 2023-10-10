@@ -59,19 +59,22 @@
     <mat-table [style]="TableStyle" [dataSource]="dataSource" matSort class="col-12">
         <ng-container [matColumnDef]="tableData" *ngFor="let tableData of objectKeys(columnHeader)">
             <ng-container *ngIf="!metaData.noColumnSort.includes(tableData); else elseBlock">
-                <mat-header-cell *matHeaderCellDef mat-sort-header [ngClass]="centerAlignClass(tableData)">
+                <mat-header-cell *matHeaderCellDef mat-sort-header [ngClass]="centerAlignClass(tableData)"
+                    [style]="columnWidths?columnWidths[tableData]:''">
                     {{columnHeader[tableData]}}
                 </mat-header-cell>
             </ng-container>
             <ng-template #elseBlock>
-                <mat-header-cell *matHeaderCellDef [ngClass]="centerAlignClass(tableData)">
+                <mat-header-cell *matHeaderCellDef [ngClass]="centerAlignClass(tableData)"
+                    [style]="columnWidths?columnWidths[tableData]:''">
                     {{columnHeader[tableData]}}
                     <mat-checkbox *ngIf="tableData === 'checkBoxRequired'" class="example-margin" color="primary"
                         (change)="selectAll($event)"></mat-checkbox>
                 </mat-header-cell>
             </ng-template>
 
-            <mat-cell *matCellDef="let element" style="min-width: 100px;"
+            <mat-cell *matCellDef="let element" [style]="columnWidths?columnWidths[tableData]:''"
+            [ngClass]="centerAlignClass(tableData)"
                 [ngClass]="{'matcolumncenter': isNumeric(element[tableData]), 'matcolumnleft': !isNumeric(element[tableData])}">
                 <mat-checkbox *ngIf="tableData=='checkBoxRequired'" color="primary" [(ngModel)]="element.isSelected"
                     (change)="getCheckData($event)" class="example-margin"></mat-checkbox>

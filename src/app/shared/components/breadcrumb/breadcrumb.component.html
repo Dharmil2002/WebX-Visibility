@@ -1,12 +1,10 @@
 <div class="breadcrumb-main">
   <div class="row">
     <div class="col">
-      <div class="breadcrumb-title export-button m-l-10 breadcrumb-set-button" matTooltip="BACK">
-        <!-- <div class=" m-l-10" > -->
-          <button *ngIf="backPath" mat-mini-fab color="primary">
-            <mat-icon class="col-white" (click)="cancel()">keyboard_backspace</mat-icon>
-          </button> &nbsp;&nbsp;
-        <!-- </div> -->
+      <div class="breadcrumb-title export-button m-l-10 breadcrumb-set-button">
+        <button *ngIf="backPath" mat-mini-fab color="primary">
+          <mat-icon class="col-white" matTooltip="BACK" (click)="cancel()">keyboard_backspace</mat-icon>
+        </button> &nbsp;&nbsp;
         <h4 class="page-title">{{title}} &nbsp;&nbsp;
           <mat-slide-toggle *ngIf="generatecontrol === true" color="primary" [(ngModel)]="toggle"
             (change)="onToggleChange($event)">

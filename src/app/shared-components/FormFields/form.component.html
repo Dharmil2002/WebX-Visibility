@@ -4,7 +4,7 @@
 
       <!--textbox (input) controls---------------------------------------------------------->
       <mat-form-field class="example-full-width" appearance="outline"
-        *ngIf="(formItem.type=='text' || formItem.type=='number' || formItem.type=='password') && formItem.generatecontrol===true ">
+        *ngIf="(formItem.type=='text' || formItem.type=='number' || formItem.type=='password' ||formItem.type=='mobile-number') && formItem.generatecontrol===true ">
 
         <mat-label class="fontbold">{{formItem.label}}</mat-label>
         <!-- password block -->
@@ -21,13 +21,14 @@
 
         <ng-template #elseBlock>
           <!-- text and number type input ----------------------------------------------------------->
-          <ng-container *ngIf="(formItem.type=='text'||formItem.type=='number'); else textInput">
+          <ng-container *ngIf="(formItem.type=='text'|| formItem.type=='number'||formItem.type=='mobile-number'); else textInput">
             <input matInput type="{{formItem.type}}" formControlName={{formItem.name}} [readonly]="formItem.disable"
               placeholder={{formItem.placeholder}} suffix={{formItem.suffix}} mask="{{formItem.mask}}"
               autocomplete="off"
               (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
               (click)="functionCalled({field :formItem , functionName:formItem.functions?.onClick, eventArgs: $event })"
-              (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})">
+              (ngModelChange)="functionCalled({field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event})"
+              [maxlength]="formItem.type === 'mobile-number' ? formItem.maxlength ? formItem.maxlength: 10 : formItem?.maxlength">
           </ng-container>
           <!-- rest of the input types ... ---------------------------------------------------------->
           <ng-template #textInput>

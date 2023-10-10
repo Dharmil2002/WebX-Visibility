@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { financialYear } from "src/app/Utility/date/date-utils";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { updatePrqStatus } from "src/app/operation/prq-entry-page/prq-utitlity";
@@ -46,7 +47,6 @@ export class PrqService {
     // Ensure prqData is not undefined and set party to uppercase if it exists
     prqData = prqData || {};
     const party = prqData.billingParty ? prqData.billingParty.toUpperCase() : '';
-
     // Construct the request body
     const reqBody = {
       companyCode: companyCode,
@@ -55,7 +55,7 @@ export class PrqService {
       docType: "PRQ",
       branch: branch,
       party: party,
-      finYear: "2223", // Replace with a dynamic value if needed
+      finYear:financialYear, // Replace with a dynamic value if needed
     };
 
     try {

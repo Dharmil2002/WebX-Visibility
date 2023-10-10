@@ -24,10 +24,14 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { pendingbilling } from "../pending-billing/pending-billing-utlity";
 import { containorConsigmentDetail, updatePrq } from "./consigment-utlity";
-import { formatDate } from "src/app/Utility/date/date-utils";
+import { financialYear, formatDate } from "src/app/Utility/date/date-utils";
 import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { DocketDetail } from "src/app/core/models/operations/consignment/consgiment";
 import { VehicleStatusService } from "src/app/Utility/module/operation/vehicleStatus/vehicle.service";
+import { xlsxutilityService } from "src/app/core/service/Utility/xlsx Utils/xlsxutility.service";
+import { XlsxPreviewPageComponent } from "src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component";
+import { MatDialog } from "@angular/material/dialog";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -38,19 +42,19 @@ export class ConsignmentEntryFormComponent implements OnInit {
   containerTableForm: UntypedFormGroup;
   FreightTableForm: UntypedFormGroup;
   invoiceTableForm: UntypedFormGroup;
-  ewayBillTableForm:UntypedFormGroup;
+  ewayBillTableForm: UntypedFormGroup;
   dynamicUrl: string = 'https://www.example.com';
   tableData: any = [];
   invoiceData: any = [];
   tableLoadIn: boolean = true;
-  backPath:string;
+  backPath: string;
   tableData1: any;
   tableLoad: boolean = true;
   isTableLoad: boolean = true;
   jsonControlArray: any;
   TableStyle = "width:82%;";
   // TableStyle1 = "width:82%"
- ewayBillButton: string = 'Next'
+  ewayBillButton: string = 'Next'
   ConsignmentFormControls: ConsignmentControl;
   FreightFromControl: FreightControl;
   breadscrums = [
@@ -66,8 +70,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
   customerStatus: any;
   toCity: string;
   toCityStatus: any;
-  containerSize: string;
-  containerSizeStatus: boolean;
   consignorName: string;
   consignorNameStatus: boolean;
   consigneeName: string;
@@ -127,7 +129,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       Style: "min-width:2px",
     },
     noofPkts: {
-      Title: "No of Pkts",
+      Title: "No of Package",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -137,12 +139,12 @@ export class ConsignmentEntryFormComponent implements OnInit {
       Style: "min-width:2px",
     },
     actualWeight: {
-      Title: "Actual Weight",
+      Title: "Actual Weight (Kg)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
     chargedWeight: {
-      Title: "Charged Weight",
+      Title: "Charged Weight (Kg)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -189,7 +191,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
 
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
-  ewayBill=true;
+  ewayBill = true;
   linkArray = [];
   jsonInvoiceDetail: any;
   loadIn: boolean;
@@ -197,7 +199,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
   vendorDetail: any;
   jsonControlArrayConsignor: any;
   jsonControlArrayConsignee: any;
-  jsonEwayBill:any;
+  jsonEwayBill: any;
+  contFlag: boolean;
+  previewResult: any;
   constructor(
     private fb: UntypedFormBuilder,
     private _NavigationService: NavigationService,
@@ -205,7 +209,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private filter: FilterUtils,
     private vehicleStatusService: VehicleStatusService,
     private route: Router,
-    private operationService: OperationService
+    private operationService: OperationService,
+    public xlsxutils: xlsxutilityService,
+    private matDialog: MatDialog
   ) {
     const navigationState =
       this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -217,11 +223,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
       if (this.isUpdate) {
         this.docketDetail = navigationState;
         this.breadscrums[0].title = "Consignment Edit";
-        this.ewayBill=false
+        this.ewayBill = false
       } else {
         this.prqData = navigationState;
         this.prqFlag = true;
-        this.ewayBill=false
+        this.ewayBill = false
       }
     }
     this.initializeFormControl();
@@ -261,7 +267,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.jsonContainerDetail =
       this.ConsignmentFormControls.getContainerDetail();
     this.jsonInvoiceDetail = this.ConsignmentFormControls.getInvoiceDetail();
-    this.jsonEwayBill= this.ConsignmentFormControls.getEwayBillDetail();
+    this.jsonEwayBill = this.ConsignmentFormControls.getEwayBillDetail();
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.consignmentTableForm = formGroupBuilder(this.fb, [formControl]);
     this.FreightTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -269,7 +275,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.jsonContainerDetail,
     ]);
     this.invoiceTableForm = formGroupBuilder(this.fb, [this.jsonInvoiceDetail]);
-    this.ewayBillTableForm=formGroupBuilder(this.fb, [this.jsonEwayBill]);
+    this.ewayBillTableForm = formGroupBuilder(this.fb, [this.jsonEwayBill]);
     this.commonDropDownMapping();
     if (this.prqData) {
       this.consignmentTableForm.controls["prqNo"].setValue({
@@ -337,9 +343,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls["pAddress"].setValue(
       this.prqData?.pAddress
     );
-    this.consignmentTableForm.controls["containerSize"].setValue(
-      this.prqData?.containerSize
-    );
     this.consignmentTableForm.controls["ccbp"].setValue(true);
     this.consignmentTableForm.controls["vehicleNo"].setValue(
       this.prqData?.vehicleNo
@@ -390,13 +393,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
       cityDetail,
       this.toCity,
       this.toCityStatus
-    );
-    this.filter.Filter(
-      this.jsonControlArrayBasic,
-      this.consignmentTableForm,
-      resContainer,
-      this.containerSize,
-      this.containerSizeStatus
     );
 
     this.filter.Filter(
@@ -483,7 +479,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
       { name: "fromCity", target: "fromCity" },
       { name: "toCity", target: "toCity" },
       { name: "billingParty", target: "customer" },
-      { name: "containerSize", target: "containerSize" },
       { name: "consigneeName", target: "consigneeName" },
       { name: "vendorName", target: "vendorName" },
       { name: "prqNo", target: "prqNo" },
@@ -737,9 +732,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const consigneeName = this.billingParty.find(
       (x) => x.name == this.docketDetail.consigneeName
     );
-    const containerTypeList = this.containerTypeList.find(
-      (x) => x.name == this.docketDetail.containerSize
-    );
     const prqNo = {
       name: this.docketDetail.prqNo,
       value: this.docketDetail.prqNo,
@@ -763,9 +755,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls["consignorName"].setValue(consignorName);
     this.consignmentTableForm.controls["consigneeName"].setValue(consigneeName);
     this.consignmentTableForm.controls["billingParty"].setValue(billingParty);
-    this.consignmentTableForm.controls["containerSize"].setValue(
-      containerTypeList
-    );
     this.consignmentTableForm.controls["payType"].setValue(
       this.docketDetail.payType
     );
@@ -796,6 +785,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.loadIn = false;
     }
     if (this.docketDetail.containerDetail.length > 0) {
+      this.containerDetail();
       this.tableLoad = true;
       this.isLoad = true;
       const containerDetail = this.docketDetail.containerDetail.map(
@@ -816,9 +806,18 @@ export class ConsignmentEntryFormComponent implements OnInit {
     }
   }
   /*region Save*/
-  flagEwayBill(){
-    this.ewayBill=false;
+  flagEwayBill() {
+    this.ewayBill = false;
     this.breadscrums[0].title = "Consignment Entry";
+  }
+  containerDetail() {
+    const cd = this.consignmentTableForm.controls['cd'].value;
+    if (cd) {
+      this.contFlag = true;
+    }
+    else {
+      this.contFlag = false;
+    }
   }
   async save() {
     // Remove all form errors
@@ -829,9 +828,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     /*End*/
     const vendorType = this.consignmentTableForm.value.vendorType;
     const vendorName = this.consignmentTableForm.value.vendorName;
-    const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
     const controlNames = [
-      "containerSize",
       "transMode",
       "payType",
       "vendorType",
@@ -852,8 +849,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     };
     const controltabNames = [
       "containerCapacity",
-      "containerSize1",
-      "containerSize2",
       "containerType",
     ];
 
@@ -864,9 +859,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     });
     this.consignmentTableForm.controls["fromCity"].setValue(
       this.consignmentTableForm.value.fromCity?.name || ""
-    );
-    this.consignmentTableForm.controls["containerSize"].setValue(
-      this.consignmentTableForm.value.containerSize?.name || ""
     );
 
     this.consignmentTableForm.controls["vendorName"].setValue(
@@ -910,7 +902,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         collectionName: "docket_temp",
         docType: "CN",
         branch: localStorage.getItem("Branch"),
-        finYear: "2223",
+        finYear: financialYear,
         data: docketDetails,
       };
       if (this.prqFlag) {
@@ -929,7 +921,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
               title: "Booked Successfully",
               text:
                 "DocketNo: " +
-                this.consignmentTableForm.controls["docketNumber"].value,
+                res.data.ops[0].docketNumber,
               showConfirmButton: true,
             }).then((result) => {
               if (result.isConfirmed) {
@@ -982,4 +974,117 @@ export class ConsignmentEntryFormComponent implements OnInit {
     }
   }
   /*End Save*/
+  public selectedFile(event) {
+    let fileList: FileList = event.eventArgs;
+    if (fileList.length !== 1) {
+      throw new Error('Cannot use multiple files');
+    }
+    const file = fileList[0];
+
+    if (file) {
+      this.xlsxutils.readFile(file).then((jsonData) => {
+        const validationRules = [
+          {
+            "ItemsName": "containerNumber",
+            "Validations": [
+              { "Required": true }
+            ]
+          },
+          {
+            "ItemsName": "containerType",
+            "Validations": [
+              { "Required": true },
+              { "TakeFromList":this.containerTypeList.map((x)=>{return x.name})}
+        
+            ]
+          },
+          {
+            "ItemsName": "containerCapacity",
+            "Validations": [
+              { "Required": true }
+            ]
+          },
+        
+        ];
+        this.xlsxutils.validateDataWithApiCall(jsonData, validationRules).subscribe(
+          (response) => {
+            this.OpenPreview(response)
+          },
+          (error) => {
+            console.error('Validation error:', error);
+            // Handle errors here
+          }
+        );
+
+      });
+      // this.consignmentTableForm.controls["Company_file"].setValue(
+      //   file.name
+      // );
+    }
+  }
+  
+  OpenPreview(results) {
+
+    const dialogRef = this.matDialog.open(XlsxPreviewPageComponent, {
+      data: results,
+      width: "100%",
+      disableClose: true,
+      position: {
+        top: "20px",
+      },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+        this.previewResult=result
+        this.containorCsvDetail();
+      }
+    });
+  }
+  containorCsvDetail(){
+    if (this.previewResult.length > 0) {
+      this.tableLoad = true;
+      this.isLoad = true;
+      let containerNo=[]
+      const containerDetail = this.previewResult.map(
+        (x, index) => {
+          if (x) {
+            const detail =containerNo.includes(x.containerNumber)
+            const match = this.containerTypeList.find((y) => y.name === x.containerType && y.loadCapacity === x.containerCapacity);
+            
+            if (!match) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `Container Type '${x.containerType}' does not match Load Capacity '${x.containerCapacity}' at index ${index}`,
+              });
+              return null; // Returning null to indicate that this element should be removed
+            }
+            if(detail){
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `Container Id '${x.containerNumber}' is Already exist`,
+              });
+              return null; // Returning null to indicate that this element should be removed
+            }
+            // Modify 'x' if needed
+            // For example, you can add the index to the element
+            containerNo.push(x.containerNumber)
+            x.id = index + 1;
+            x.actions = ["Edit", "Remove"];
+            return x;
+          }
+          return x; // Return the original element if no modification is needed
+        }
+      );
+      // Filter out the null values if necessary
+      const filteredContainerDetail = containerDetail.filter((x) => x !== null);
+      this.tableData = filteredContainerDetail;
+      this.containerTableForm.controls['Company_file'].setValue("");
+      this.tableLoad = false;
+      this.isLoad = false;
+    }
+  }
 }
+
+

@@ -79,13 +79,13 @@ export class ThcGenerationComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width:160px",
     },
-    transMode: {
-      Title: "Trans Mode",
+    actualWeight: {
+      Title: "Actual Weight (Kg)",
       class: "matcolumnleft",
       Style: "max-width:160px",
     },
-    actualWeight: {
-      Title: "Actual Weight",
+    noofPkts: {
+      Title: "No of Packets ",
       class: "matcolumnleft",
       Style: "max-width:160px",
     },
@@ -118,11 +118,11 @@ export class ThcGenerationComponent implements OnInit {
   //#endregion
   staticField = [
     "billingParty",
+    "noofPkts",
     "docketNumber",
     "fromCity",
     "toCity",
-    "transMode",
-    "actualWeight",
+    "actualWeight"
   ];
   addAndEditPath: string;
   uploadedFiles: File[];
@@ -389,14 +389,24 @@ export class ThcGenerationComponent implements OnInit {
           ? calculateTotalField(item.invoiceDetails, "actualWeight")
           : 0;
       });
-
+      const noofPkts = [x].map((item) => {
+        return item
+          ? calculateTotalField(item.invoiceDetails, "noofPkts")
+          : 0;
+      });
       // Sum all the calculated actualWeights
       const totalActualWeight = actualWeights.reduce(
         (acc, weight) => acc + weight,
         0
       );
+        // Sum all the calculated actualWeights
+        const totalnoofPkts = noofPkts.reduce(
+          (acc, noofPkts) => acc + noofPkts,
+          0
+        );
 
       x.actualWeight = totalActualWeight;
+      x.noofPkts=totalnoofPkts
       x.actions = ["Update"];
       return x; // Make sure to return x to update the original object in the 'tableData' array.
     });

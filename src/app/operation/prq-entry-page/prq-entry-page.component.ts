@@ -265,7 +265,7 @@ export class PrqEntryPageComponent implements OnInit {
         Swal.fire({
           icon: "success",
           title: "Generated Successfully",
-          text: `PRQ Generated Successfully`,
+          text:  `Generated PRQ No: ${res.data.ops[0].prqNo}`,
           showConfirmButton: true,
         }).then((result) => {
           if (result.isConfirmed) {

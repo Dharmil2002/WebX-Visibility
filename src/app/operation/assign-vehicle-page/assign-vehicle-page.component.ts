@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { MatDialog } from '@angular/material/dialog';
 import { AddMarketVehicleComponent } from '../add-market-vehicle/add-market-vehicle.component';
+import { formatDate } from 'src/app/Utility/date/date-utils';
 
 @Component({
   selector: 'app-assign-vehicle-page',
@@ -57,8 +58,8 @@ export class AssignVehiclePageComponent implements OnInit {
     try {
       const vehicleStatusData = await getVehicleStatusFromApi(this.companyCode, this._operationService);
       if (vehicleStatusData.length > 0) {
-        const [fromCity, ToCity] = this.NavData.fromToCity.split('-');
-        this.tableData = vehicleStatusData.map(item => ({ ...item, action: 'Assign', fromCity: fromCity, toCity: ToCity, distance: 0,isMarket:false }));
+        const [fromCity, toCity] = this.NavData.fromToCity.split('-');
+        this.tableData = vehicleStatusData.map(item => ({ ...item, action: 'Assign', fromCity: fromCity, toCity: toCity,fromToCitySplit:`${fromCity}-${toCity}`, distance: 0,isMarket:false,eta:formatDate(new Date().toUTCString(),'dd/MM/yyyy HH:mm') }));
         this.tableLoad = false;
       }
       else {
@@ -100,7 +101,7 @@ export class AssignVehiclePageComponent implements OnInit {
     }
 
     const [fromCity, toCity] = fromToCitySplit;
-    const marketData = [tableData].map(item => ({ ...item, action: 'Assign', fromCity, toCity, distance: 0,isMarket:true }));
+    const marketData = [tableData].map(item => ({ ...item, action: 'Assign', fromCity, toCity,fromToCitySplit:`${fromCity}-${toCity}`, distance: 0,isMarket:true,eta:formatDate(item.eta,'dd/MM/yyyy HH:mm')}));
 
     this.tableData = this.tableData?this.tableData.concat(marketData):marketData;
     this.tableLoad = false;

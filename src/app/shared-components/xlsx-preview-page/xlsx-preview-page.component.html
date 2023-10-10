@@ -1,0 +1,91 @@
+<div mat-dialog-title style="display: flex;
+  justify-content: space-between;margin: 0 0 0px;
+  align-items: center;">
+    <h3>Data List</h3>
+    <button mat-icon-button (click)="CloseDialog()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+
+<div class="body">
+    <div class="materialTableHeader">
+        <div class="row">
+            <div class="col-4">
+                <ul class="header-buttons-left ml-0">
+                    <li class="dropdown m-l-20">
+                        <label for="search-input"><i class="material-icons search-icon">search</i></label>
+                        <input placeholder="Search" type="text" #filter class="browser-default search-field"
+                            aria-label="Search box">
+                    </li>
+                </ul>
+            </div>
+            <div class="col-8">
+                <ul class="header-buttons">
+                    <li>
+                        <button type="button" (click)="openDialog()"
+                            class="btn btn-warning btn-border-radius waves-effect msr-2">
+                            <i-feather style="width: 24px;height: 24px;color:white" name="filter"></i-feather>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" (click)="CloseDialog()" style="height: 38px;color: white;"
+                            class="btn btn-success btn-border-radius waves-effect ">Submit</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="responsive_table" style=" max-height: 350px;
+    overflow: auto;">
+        <mat-table #table matTableExporter [dataSource]="dataSource" matSort class="mat-cell"
+            #exporter="matTableExporter">
+
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+                <mat-header-cell *matHeaderCellDef class="matcolumnfirst" style="max-width: 100px;">
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()" color="primary"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()" [ngClass]="'tbl-checkbox'">
+                    </mat-checkbox>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row" class="matcolumnfirst" style="max-width: 100px;">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="onCheckboxChange(row)" color="primary"
+                        [checked]="selection.isSelected(row)" [ngClass]="'tbl-checkbox'" [disabled]="row.error !== null"
+                        [matTooltip]="row.error !== null ? 'Checkbox is disabled due to an Error In Data.' : ''">
+                    </mat-checkbox>
+                </mat-cell>
+
+
+
+            </ng-container>
+            <ng-container matColumnDef="status">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="matcolumncenter"
+                    style="min-width: 120px !important;">Status</mat-header-cell>
+                <mat-cell *matCellDef="let row" style="min-width: 120px !important;" class="matcolumncenter">
+                    <span class="badge" [ngClass]="{'col-green': row.error==null,'col-red': row.error!=null}">
+                        {{row.error==null ? "Valid Data" :"Invalid Data"}}
+                    </span>
+                </mat-cell>
+            </ng-container>
+
+            <ng-container *ngFor="let displayedColumn of displayedColumns" [matColumnDef]="displayedColumn.Key">
+                <mat-header-cell *matHeaderCellDef mat-sort-header 
+                    [ngStyle]="{'min-width': displayedColumn.width+ 'px'}" [ngClass]=displayedColumn.className>
+                    {{displayedColumn.title}}</mat-header-cell>
+                <mat-cell *matCellDef="let element" [ngStyle]="{'min-width': displayedColumn.width + 'px'}"
+                    [ngClass]=displayedColumn.className>
+                    <ng-container>
+                        {{ element[displayedColumn.Key] }}
+                    </ng-container>
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="columnKeys"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: columnKeys;">
+            </mat-row>
+        </mat-table>
+    </div>
+    <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]">
+    </mat-paginator>
+</div>

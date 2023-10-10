@@ -269,7 +269,7 @@ export class thcControl {
                 },
                 {
                     name: 'contAmt',
-                    label: 'Contract Amount(Rs)',
+                    label: 'Vendor Contract  Amount(Rs)',
                     placeholder: '',
                     type: 'text',
                     value: '',

@@ -45,6 +45,10 @@ import { FilterUtils } from '../Utility/Form Utilities/dropdownFilter';
 import { MatRadioModule } from '@angular/material/radio';
 import { GenericTableV2Component } from './Generic Table V2/generic-table-v2/generic-table-v2.component';
 import { ExpandableTableComponent } from './expandable-table/expandable-table/expandable-table.component';
+import { ModifyTableCollumnsComponent } from './modify-table-collumns/modify-table-collumns.component';
+import { XlsxPreviewPageComponent } from './xlsx-preview-page/xlsx-preview-page.component';
+import { MatTableExporterModule } from 'mat-table-exporter';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -61,7 +65,7 @@ const MY_DATE_FORMAT = {
   declarations: [GenericAccordionComponent, GenericTableComponent,
     FormComponent, FormWithoutAutoCompleteComponent, GenericDashBoardComponent,
     GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent, TreeViewComponent, GenericChartDashboardComponent, GenericCardComponent, DecimaRangeValidatorDirective, GenericTableV2Component
-  , ExpandableTableComponent],
+  , ExpandableTableComponent,ModifyTableCollumnsComponent,XlsxPreviewPageComponent],
   imports: [
     CommonModule,
     MatCardModule,
@@ -90,6 +94,8 @@ const MY_DATE_FORMAT = {
     MatMenuModule,
     MatTabsModule,
     MatRadioModule,
+    MatTableExporterModule,
+    DragDropModule
   ],
   providers: [
     {

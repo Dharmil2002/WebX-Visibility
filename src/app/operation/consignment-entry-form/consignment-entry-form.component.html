@@ -56,8 +56,9 @@
     <!-- ENd -->
 
     <!--  Container Detail-->
+    <div *ngIf="contFlag">
     <hr>
-    <div
+    <div 
       style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
       <h3 style="font-size: 1.5rem; padding: 5px 0px;">Container Detail</h3>
     </div>
@@ -73,6 +74,7 @@
       Add New
     </button>
     <!-- End -->
+  </div>
     <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
       <!-- Bootstrap loader -->
       <div class="spinner-border text-primary" role="status">

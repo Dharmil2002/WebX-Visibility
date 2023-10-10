@@ -32,7 +32,7 @@ export class prqDetail {
         this.containerSize = data.containerSize ?? '';
         this.typeContainer = data.typeContainer ?? '';
         this.pAddress = data.pAddress ?? '';
-        this.pickupDate = data.pickupDate ? new Date(data.pickupDate) : new Date(); // Convert to Date
+        this.pickupDate = data.pickupDate ?? new Date(data.pickupDate) ; // Convert to Date
         this.status = data.status ?? '';
         this.payType = data.payType ?? '';
         this.Action = data.Action ?? '';

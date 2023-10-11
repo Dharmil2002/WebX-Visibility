@@ -5,15 +5,33 @@ export class AddDcrSeriesControl {
     constructor() {
         this.addDcrSeriesArray = [
             {
-                name: 'documentType',
+                name: "documentType",
                 label: "Document Type",
-                placeholder: "search and select",
-                type: 'staticdropdown',
+                placeholder: 'Search And Select Document Type',
+                type: "Staticdropdown",
                 value: [
-                    { name: "CNote", value: "1" },
-                    { name: "Delivery MR", value: "2" },
-                    { name: "UBI Series", value: "3" }
+                    { value: "1", name: "CNote" },
+                    { value: "2", name: "Delivery MR", },
+                    { value: "3", name: "UBI Series", }
                 ],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Document Type is required"
+                    }
+
+                ],
+                additionalData: {
+                    showNameAndValue: false
+                },
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'businessType',
+                label: "Business Type",
+                placeholder: "search and select",
+                type: 'dropdown',
+                value: '',
                 additionalData: {
                     showNameAndValue: false
                 },
@@ -35,21 +53,22 @@ export class AddDcrSeriesControl {
                 name: 'seriesFrom',
                 label: "Series From",
                 placeholder: "Please Enter Series From",
-                type: 'number',
+                type: 'text',
                 value: '',
                 generatecontrol: true,
                 disable: false,
-                Validations: []
-            },
-            {
-                name: 'seriesTo',
-                label: "Series To",
-                placeholder: "Please Enter Series To",
-                type: 'number',
-                value: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: []
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Series From is required"
+                    },
+                    {
+                        name: "pattern",
+                        message: "Please Enter alphanumeric Series From of length 12",
+                        pattern: '^[a-zA-Z0-9]{12,30}$',
+                    }
+                ],
+
             },
             {
                 name: 'totalLeaf',
@@ -59,8 +78,84 @@ export class AddDcrSeriesControl {
                 value: '',
                 generatecontrol: true,
                 disable: false,
+                Validations: [],
+                functions: {
+                    onChange: "getSeriesTo",
+                },
+
+            },
+            {
+                name: 'seriesTo',
+                label: "Series To",
+                placeholder: "Please Enter Series To",
+                type: 'text',
+                value: '',
+                generatecontrol: true,
+                disable: true,
                 Validations: []
             },
+            {
+                name: 'allotTo',
+                label: "Allot To",
+                placeholder: "search and select",
+                type: 'dropdown',
+                value: '',
+                additionalData: {
+                    showNameAndValue: false
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: []
+            },
+            {
+                name: 'updateDate',
+                label: ' ',
+                placeholder: ' ',
+                type: 'date',
+                value: new Date(), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
+            {
+                name: "updateBy",
+                label: "",
+                placeholder: "",
+                type: "text",
+                value: localStorage.getItem("UserName"),
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
+            {
+                name: 'EntryDate',
+                label: ' ',
+                placeholder: ' ',
+                type: 'date',
+                value: new Date(), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
+            {
+                name: "EntryBy",
+                label: "",
+                placeholder: "",
+                type: "text",
+                value: localStorage.getItem("UserName"),
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
         ]
+    }
+    getAddDcrFormControls() {
+        return this.addDcrSeriesArray;
     }
 }

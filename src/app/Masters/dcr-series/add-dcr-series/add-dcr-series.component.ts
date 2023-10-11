@@ -5,6 +5,9 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import Swal from 'sweetalert2';
 import { map } from 'rxjs/operators';
+import { AddDcrSeriesControl } from 'src/assets/FormControls/add-dcr-series';
+import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-add-dcr-series',
@@ -96,11 +99,16 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     },
   };
   tableLoad: boolean;
+  addDcrFormControl: AddDcrSeriesControl;
+  jsonControlArray: any;
+  addDcrTableForm: UntypedFormGroup;
 
   constructor(
-    public objSnackBarUtility: SnackBarUtilityService, private masterService: MasterService
+    public objSnackBarUtility: SnackBarUtilityService, private masterService: MasterService,
+    private fb: UntypedFormBuilder,
   ) {
     super();
+    this.initializeFormControl();
   }
 
   ngOnInit() {
@@ -388,15 +396,15 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
 
   // Get series from input
   getSeriesFrom(): void {
-    const seriesFrom = this.tableData[0].seriesFrom;
-    let seriesTo = this.tableData[0].seriesTo;
-    let totalLeaf = this.tableData[0].totalLeaf;
+    const seriesFrom = this.addDcrTableForm.value.seriesFrom;
+    let seriesTo = this.addDcrTableForm.value.seriesTo;
+    let totalLeaf = this.addDcrTableForm.value.totalLeaf;
 
     if (seriesFrom.length !== 12) {
       Swal.fire({
         icon: "warning",
         title: "Alert",
-        text: `Series From should have a length of 12.`,
+        text: `Series From should have a length of 12 like S0000000000001.`,
         showConfirmButton: true,
       });
       return;
@@ -427,8 +435,81 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       seriesTo = '';
       totalLeaf = '';
     }
-    this.tableData[0].seriesTo = seriesTo;
-    this.tableData[0].totalLeaf = totalLeaf;
+    // this.tableData[0].seriesTo = seriesTo;
+    // this.tableData[0].totalLeaf = totalLeaf;
   }
+  //#region to initilize form control
+  initializeFormControl() {
+    this.addDcrFormControl = new AddDcrSeriesControl();
+    this.jsonControlArray = this.addDcrFormControl.getAddDcrFormControls();
+    this.addDcrTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    this.addDcrTableForm.controls["documentType"].setValue("CNote");
+
+  }
+  //#endregion
+
+  //#region to set series to.
+  getSeriesTo() {
+    // Get the 'seriesFrom' and 'totalLeaf' values from the form control
+    const { seriesFrom, totalLeaf } = this.addDcrTableForm.value;
+
+    // Calculate the result by parsing 'seriesFrom' and 'totalLeaf' to numbers
+    const resultNumber = parseInt(seriesFrom.slice(1), 10) + parseInt(totalLeaf, 10);
+
+    // Build the 'ans' string with the calculated result and leading zeros
+    const ans = seriesFrom[0] + resultNumber.toString().padStart(16, "0");
+
+    // Set the 'seriesTo' value in the form control to 'ans'
+    this.addDcrTableForm.controls.seriesTo.setValue(ans);
+  }
+  //#endregion
+  //#region to add data in table
+  async addData() {
+    this.tableLoad = true;
+    // this.isLoad = true;
+    // const tableData = this.tableData;
+    // const gstNumber = this.otherDetailForm.controls.gstNumber.value;
+    // if (tableData.length > 0) {
+    //   // Check if the gstNumber already exists in tableData
+    //   const isDuplicate = this.tableData.some((item) => item.gstNumber === gstNumber);
+
+    //   if (isDuplicate) {
+    //     this.otherDetailForm.controls['gstNumber'].setValue('');
+    //     // Show an error message using Swal (SweetAlert)
+    //     Swal.fire({
+    //       title: 'GST Number already exists! Please try with another.',
+    //       toast: true,
+    //       icon: 'error',
+    //       showCloseButton: false,
+    //       showCancelButton: false,
+    //       showConfirmButton: true,
+    //       confirmButtonText: 'OK'
+    //     });
+    //     this.tableLoad = false;
+    //     this.isLoad = false;
+    //     return false
+    //   }
+    // }
+    // const delayDuration = 1000;
+    // // Create a promise that resolves after the specified delay
+    // const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // // Use async/await to introduce the delay
+    // await delay(delayDuration);
+    // const json = {
+    //   id: tableData.length + 1,
+    //   gstNumber: this.otherDetailForm.value.gstNumber,
+    //   gstState: this.otherDetailForm.value.gstState,
+    //   gstAddress: this.otherDetailForm.value.gstAddress,
+    //   gstPincode: this.otherDetailForm.value.gstPincode.value,
+    //   gstCity: this.otherDetailForm.value.gstCity,
+    //   // invoice: false,
+    //   actions: ['Edit', 'Remove']
+    // }
+    // this.tableData.push(json);
+    // this.otherDetailForm.reset(); // Reset form values
+    // this.isLoad = false;
+    // this.tableLoad = false;
+  }
+  //#endregion
 
 }

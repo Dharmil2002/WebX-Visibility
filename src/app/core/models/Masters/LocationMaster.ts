@@ -17,9 +17,9 @@ export class LocationMaster {
   locCountry: string
   Latitude: string
   Longitude: string
-  mappedCity: string;
-  mappedState: string;
-  mappedPinCode: string;
+  mappedCity: any;
+  mappedState: any;
+  mappedPinCode: any;
   pincodeHandler: any[]
   constructor(LocationMaster) {
     {

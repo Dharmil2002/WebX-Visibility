@@ -114,6 +114,7 @@ export class LocationControl {
         },
         functions: {
           onOptionSelect: "setReportLocData",
+          onModel: "setReporting"
         },
       },
       {

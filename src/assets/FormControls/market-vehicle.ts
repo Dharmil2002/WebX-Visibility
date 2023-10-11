@@ -6,7 +6,7 @@ export class marketVehicleControls {
   ) {
     this.marketVehicle = [
       {
-        name: 'vehicelNo', label: "Vehicle Number", placeholder: "Vehicle Number", type: 'text',
+        name: 'vehicelNo', label: "Vehicle Number", placeholder: "Vehicle Number", type: 'government-id',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
@@ -55,7 +55,7 @@ export class marketVehicleControls {
         ],
       },
       {
-        name: 'vMobileNo', label: "Vendor Mobile", placeholder: "Vendor Mobile", type: 'number',
+        name: 'vMobileNo', label: "Vendor Mobile", placeholder: "Vendor Mobile", type: 'mobile-number',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
@@ -75,7 +75,7 @@ export class marketVehicleControls {
         ],
       },
       {
-        name: 'driverPan', label: "Pan No", placeholder: "Pan No", type: 'text',
+        name: 'driverPan', label: "Pan No", placeholder: "Pan No", type: 'government-id',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
@@ -85,7 +85,7 @@ export class marketVehicleControls {
         ],
       },
       {
-        name: 'lcNo', label: "Driving Licence No", placeholder: "Driving Licence No", type: 'text',
+        name: 'lcNo', label: "Driving Licence No", placeholder: "Driving Licence No", type: 'government-id',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {
@@ -106,7 +106,7 @@ export class marketVehicleControls {
       },
       
       {
-        name: 'dmobileNo', label: "Driver Mobile No", placeholder: "Driver", type: 'text',
+        name: 'dmobileNo', label: "Driver Mobile No", placeholder: "Driver", type: 'mobile-number',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
         Validations: [
           {

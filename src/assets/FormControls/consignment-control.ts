@@ -267,6 +267,110 @@ export class ConsignmentControl {
         }
       },
       {
+        name: 'pr_lr_no', label: 'PR LR No', placeholder: 'Printed LR No ', type: 'text',
+        value:docketDetail.pr_lr_no, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'edd', label: 'Transit Day Hour', placeholder: 'EDD', type: 'date',
+        value:docketDetail.edd, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'packaging_type', label: 'Packaging Type', placeholder: 'Packaging Type', type: 'Staticdropdown',
+        value: [
+          { "name": "Wooden Box", "value": "Wooden Box" },
+          { "name": "BAG", "value": "BAG" },
+          { "name": "Drum", "value": "Drum" },
+          { "name": "Cars", "value": "Cars" },
+          { "name": "Plastic drum", "value": "Plastic drum" },
+          { "name": "Metal drum", "value": "Metal drum" },
+          { "name": "Lose Cargo", "value": "Lose Cargo" },
+          { "name": "Gunny Bundel", "value": "Gunny Bundel" },
+          { "name": "Plastic crate", "value": "Plastic crate" },
+          { "name": "Metal Box", "value": "Metal Box" },
+          { "name": "Carton Box", "value": "Carton Box" }
+        ], Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'weight_in', label: 'Weight In', placeholder: 'Weight In', type: 'Staticdropdown',
+        value: [{ "name": "Tons", "value": "Tons" },
+        { "name": "Kgs", "value": "Kgs" },
+        { "name": "Fixed", "value": "Fixed" }], Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'cargo_type', label: 'Type of Cargo', placeholder: 'Type of Cargo', type: 'Staticdropdown',
+        value: [
+        { "name": "Volume Cargo", "value": "Volume Cargo" },
+        { "name": "Weight Cargo", "value": "Weight Cargo" }
+      ], Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'gp_ch_del', label: 'GP/CH/Del', placeholder: 'GP/CH/Del', type: 'text',
+        value:docketDetail.gp_ch_del, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'risk', label: 'Risk', placeholder: 'Risk', type: 'text',
+        value: docketDetail.risk, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'delivery_type', label: 'Delivery Type', placeholder: 'Delivery Type', type: 'Staticdropdown',
+        value: [
+          { "name": "Godown Pickup - Godown Delivery", "value": "Godown Pickup - Godown Delivery" },
+          { "name": "Godown Pickup - Door Delivery", "value": "Godown Pickup - Door Delivery" },
+          { "name": "Door Pickup - Godown Delivery", "value": "Door Pickup - Godown Delivery" },
+          { "name": "Door Pickup - Door Delivery", "value": "Door Pickup - Door Delivery" }
+        ]
+        , Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'rake_no', label: 'Rake', placeholder: 'Rake No', type: 'text',
+        value:docketDetail.rake_no, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'issuing_from ', label: 'Issuing From', placeholder: 'Rake No', type: 'Staticdropdown',
+        value: [
+          { "name": "None", "value": "None" },
+          { "name": "Rail Head", "value": "Rail Head" },
+          { "name": "Godown", "value": "Godown" }
+        ], Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
+        name: 'vehicleNo', label: 'Lorry No', placeholder: 'Lorry No', type: 'text',
+        value: docketDetail.vehicleNo, Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
         name: "ccbp",
         label: "consignor and consignee are same as the billing party",
         placeholder: "",
@@ -376,18 +480,6 @@ export class ConsignmentControl {
         }
       },
       {
-        name: 'vehicleNo',
-        label: 'vehicleNo',
-        placeholder: 'vehicleNo',
-        type: '',
-        value: docketDetail.vehicleNo,
-        Validations: [],
-        generatecontrol: false, disable: false,
-        additionalData: {
-          metaData: "consignee"
-        }
-      },
-      {
         name: 'status',
         label: 'status',
         placeholder: 'status',
@@ -411,9 +503,9 @@ export class ConsignmentControl {
         disable: false,
         Validations: [".xls, .xlsx, .csv"],
         functions: {
-            onChange: "selectedFile",
+          onChange: "selectedFile",
         },
-    },
+      },
       {
         name: "containerNumber",
         label: "Container No",
@@ -660,39 +752,25 @@ export class FreightControl {
   constructor(docketDetail) {
     this.FreightControlArray = [
       {
-        name: 'freightAmount', label: 'Freight Amount (Rs)', placeholder: 'Freight Amount', type: 'text',
-        value: docketDetail.freightAmount, Validations: [{
+        name: 'freight_rate', label: 'Freight Rate (Rs)', placeholder: 'Freight Rate', type: 'text',
+        value: docketDetail.freightRate, Validations: [{
           name: "required",
-          message: "Secret Freight Amount is required",
+          message: "Freight Rate is required",
         }
-        ], generatecontrol: true, disable: false
+        
+        ],
+        functions:{
+          onModel:"calculateFreight"
+        },
+         generatecontrol: true, disable: false
       },
+      
       {
         name: 'freightRatetype', label: 'Freight Rate type', placeholder: 'Freight Rate type', type: 'Staticdropdown',
         value: [
           {
-            "value": "B",
-            "name": "Per Pcs"
-          },
-          {
-            "value": "D",
-            "name": "Per KG Per KM"
-          },
-          {
             "value": "F",
             "name": "Flat(In RS)"
-          },
-          {
-            "value": "I",
-            "name": "% of Invoice Value"
-          },
-          {
-            "value": "K",
-            "name": "Per KM"
-          },
-          {
-            "value": "L",
-            "name": "Per Liter"
           },
           {
             "value": "P",
@@ -705,12 +783,25 @@ export class FreightControl {
           {
             "value": "W",
             "name": "Per KG"
-          },
-          {
-            "value": "Y",
-            "name": "Per TON Per KM"
           }
-        ], Validations: [], generatecontrol: true, disable: false
+        ], Validations: [],
+         functions:{
+          onSelection:"calculateFreight"
+        },
+         generatecontrol: true, disable: false
+      },
+      {
+        name: 'freight_amount', label: 'Frieght Rate (Rs)', placeholder: 'Freight Amount', type: 'text',
+        value: docketDetail.freightAmount, Validations: [{
+          name: "required",
+          message: " Freight Amount is required",
+        }
+        ],
+        functions:{
+          onModel:"calculateFreight"
+        }
+        , 
+        generatecontrol: true, disable: false
       },
       {
         name: 'otherAmount', label: 'Other Amount (Rs)', placeholder: 'Other Amount', type: 'text',

@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { MatDialog } from '@angular/material/dialog';
 import { AddMarketVehicleComponent } from '../add-market-vehicle/add-market-vehicle.component';
 import { formatDate } from 'src/app/Utility/date/date-utils';
+import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
 
 @Component({
   selector: 'app-assign-vehicle-page',
@@ -40,7 +41,12 @@ export class AssignVehiclePageComponent implements OnInit {
   menuItems = [{ label: 'action', componentDetails: ViewPrintComponent }];
   tableData: any;
   NavData: any;
-  constructor(private Route: Router, private _operationService: OperationService, public dialog: MatDialog, private _assignVehiclePageMethods: AssignVehiclePageMethods
+  constructor(
+    private Route: Router,
+    private _operationService: OperationService,
+    public dialog: MatDialog,
+    private _assignVehiclePageMethods: AssignVehiclePageMethods,
+    private vehicleStatusService:VehicleStatusService
   ) {
    
      this.staticField.pop();
@@ -58,9 +64,9 @@ export class AssignVehiclePageComponent implements OnInit {
     try {
       const vehicleStatusData = await getVehicleStatusFromApi(this.companyCode, this._operationService);
       if (vehicleStatusData.length > 0) {
-        const [fromCity, toCity] = this.NavData.fromToCity.split('-');
-        this.tableData = vehicleStatusData.map(item => ({ ...item, action: 'Assign', fromCity: fromCity, toCity: toCity,fromToCitySplit:`${fromCity}-${toCity}`, distance: 0,isMarket:false,eta:formatDate(new Date().toUTCString(),'dd/MM/yyyy HH:mm') }));
-        this.tableLoad = false;
+        const loadData=await this.vehicleStatusService.createTableData(this.NavData,vehicleStatusData)
+        this.tableData = loadData;
+        this.tableLoad=false;
       }
       else {
         Swal.fire({

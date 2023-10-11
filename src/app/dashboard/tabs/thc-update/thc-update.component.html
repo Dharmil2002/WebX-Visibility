@@ -8,11 +8,10 @@
                 [showSaveAndCancelButton]="false">
             </app-form-webxpress>
         </form>
-
     </div>
           <div class="example-button-row d-flex justify-content-end">
             <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad"
-              (click)="save()">Save</button>
+              (click)="save()" [disabled]="!thcTableForm.valid">Save</button>
             <button class="msr-3" mat-raised-button color="primary"   (click)="cancel()">Back</button>
           </div>
 </mat-dialog-content>

@@ -99,6 +99,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   autoFill() {
+
     if (this.isUpdate) {
       this.prqEntryTableForm.controls["transMode"].setValue(
         this.prqDetail.transMode
@@ -108,6 +109,11 @@ export class PrqEntryPageComponent implements OnInit {
       this.prqEntryTableForm.controls["vehicleSize"].setValue(
         this.prqDetail?.vehicleSize?.split("-")[0] ?? ""
       );
+      }
+      else{
+        this.prqEntryTableForm.controls["vehicleSize"].setValue(
+          this.prqDetail?.vehicleSize || ""
+        );
       }
       this.prqEntryTableForm.controls["fromCity"].setValue({
         name: this.prqDetail.fromCity,

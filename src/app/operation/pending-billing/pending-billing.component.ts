@@ -36,7 +36,7 @@ export class PendingBillingComponent implements OnInit {
     edit: false,
     csv: false,
   };
-  TableStyle = "width:60%"
+  TableStyle = "width:70%"
   /*Below is Link Array it will Used When We Want a DrillDown
  Table it's Jst for set A Hyper Link on same You jst add row Name Which You
  want hyper link and add Path which you want to redirect*/
@@ -60,9 +60,9 @@ export class PendingBillingComponent implements OnInit {
       Style: "",
     },
     sum: {
-      Title: "Unbilled Amount",
+      Title: "Unbilled Amount (Rs)",
       class: "matcolumncenter",
-      Style: "max-width: 90px",
+      Style: "max-width: 100px",
     },
     action: {
       Title: "Action",

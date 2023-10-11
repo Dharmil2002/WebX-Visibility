@@ -83,8 +83,13 @@ export class AddLocationMasterComponent implements OnInit {
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.locationTable = router.getCurrentNavigation().extras.state.data;
+      this.locationTable = {
+        ...this.locationTable,
+        mappedPinCode: this.locationTable.mappedPinCode.join(', '),
+        mappedCity: this.locationTable.mappedCity.join(', '),
+        mappedState: this.locationTable.mappedState.join(', '),
+      };
 
-      // console.log(this.locationTable);
       this.isUpdate = true;
       this.submit = 'Modify';
       this.action = "edit";
@@ -154,11 +159,16 @@ export class AddLocationMasterComponent implements OnInit {
   //#region Save function
   async save() {
     const { mappedPinCode, mappedCity, mappedState } = this.locationTableForm.value;
-    if (mappedPinCode === "" && mappedCity === "" && mappedState === "") {
+
+    if (
+      (mappedPinCode.length === 0 || mappedPinCode === "") &&
+      (mappedCity.length === 0 || mappedCity === "") &&
+      (mappedState.length === 0 || mappedState === "")
+    ) {
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
-        text: 'Please fill atleast one mapped area pincode/city/state',
+        text: 'Please fill at least one mapped area pincode/city/state',
         showConfirmButton: true,
       });
       // Add a return statement here to prevent further execution
@@ -177,8 +187,8 @@ export class AddLocationMasterComponent implements OnInit {
     ];
     const extractControlValue = (controlName) => formValue[controlName]?.value;
     const resultArraypinCodeList = this.locationTableForm.value.mappedPinCode.split(',');
-    const resultArraycityList = this.locationTableForm.value.mappedCity?.split(',');
-    const resultArraystateList = this.locationTableForm.value.mappedState?.split(',');
+    const resultArraycityList = this.locationTableForm.value.mappedCity.split(',');
+    const resultArraystateList = this.locationTableForm.value.mappedState.split(',');
 
     controlNames.forEach((controlName) => {
       const controlValue = extractControlValue(controlName);
@@ -188,7 +198,6 @@ export class AddLocationMasterComponent implements OnInit {
     const latLng = this.locationTableForm.value.Latitude.split(",");
     this.locationTableForm.controls.Latitude.setValue(latLng[0] || 0);
     this.locationTableForm.controls.Longitude.setValue(latLng[1] || 0);
-
     this.locationTableForm.controls["mappedPinCode"].setValue(resultArraypinCodeList)
     this.locationTableForm.controls["mappedCity"].setValue(resultArraycityList)
     this.locationTableForm.controls["mappedState"].setValue(resultArraystateList)
@@ -196,12 +205,12 @@ export class AddLocationMasterComponent implements OnInit {
       control.setErrors(null)
     );
 
-    // Continue with your code here...
-
     if (this.isUpdate) {
       const id = this.locationTableForm.value._id;
       this.locationTableForm.removeControl("_id");
       this.locationTableForm.removeControl("EntryBy");
+      this.locationTableForm.removeControl("mappedPincode");
+      this.locationTableForm.removeControl("pincodeHandler");
 
       const req = {
         companyCode: this.companyCode,
@@ -685,7 +694,10 @@ export class AddLocationMasterComponent implements OnInit {
     })
   }
   //#endregion
-
+  //set value empty
+  setReporting() {
+    this.locationTableForm.controls.reportLoc.setValue("");
+  }
   //#region to set flag value
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component

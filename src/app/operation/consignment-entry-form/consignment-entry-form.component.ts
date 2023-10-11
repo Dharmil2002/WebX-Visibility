@@ -351,7 +351,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       vehicleDetail?.vendorType
     );
     this.consignmentTableForm.controls["vendorName"].setValue(
-      vehicleDetail?.vendor
+      vehicleDetail?.vendorType=="Market"?vehicleDetail.vendor:{name:vehicleDetail.vendor,value:vehicleDetail.vendor}
     );
 
     this.vendorFieldChanged();
@@ -764,6 +764,21 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.FreightTableForm.controls["freightRatetype"].setValue(
       this.docketDetail.freightRatetype
     );
+    this.FreightTableForm.controls["packaging_type"].setValue(
+      this.docketDetail.packaging_type
+    );
+    this.FreightTableForm.controls["weight_in"].setValue(
+      this.docketDetail.weight_in
+    );
+    this.FreightTableForm.controls["cargo_type"].setValue(
+      this.docketDetail.cargo_type
+    );
+    this.FreightTableForm.controls["delivery_type"].setValue(
+      this.docketDetail.delivery_type
+    );
+    this.FreightTableForm.controls["issuing_from"].setValue(
+      this.docketDetail.issuing_from
+    );
     this.bindTableData();
   }
 
@@ -831,7 +846,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const controlNames = [
       "transMode",
       "payType",
-      "vendorType",
+      "vendorType"
     ];
     controlNames.forEach((controlName) => {
       if (Array.isArray(this.consignmentTableForm.value[controlName])) {
@@ -994,8 +1009,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
             "ItemsName": "containerType",
             "Validations": [
               { "Required": true },
-              { "TakeFromList":this.containerTypeList.map((x)=>{return x.name})}
-        
+              { "TakeFromList": this.containerTypeList.map((x) => { return x.name }) }
+
             ]
           },
           {
@@ -1004,7 +1019,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
               { "Required": true }
             ]
           },
-        
+
         ];
         this.xlsxutils.validateDataWithApiCall(jsonData, validationRules).subscribe(
           (response) => {
@@ -1022,7 +1037,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       // );
     }
   }
-  
+
   OpenPreview(results) {
 
     const dialogRef = this.matDialog.open(XlsxPreviewPageComponent, {
@@ -1035,22 +1050,44 @@ export class ConsignmentEntryFormComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        this.previewResult=result
+        this.previewResult = result
         this.containorCsvDetail();
       }
     });
   }
-  containorCsvDetail(){
+  calculateFreight() {
+    const freightRateType = this.FreightTableForm.controls['freightRatetype'].value;
+    const freightRate = this.FreightTableForm.controls['freight_rate']?.value || 0;
+  if(typeof(freightRateType)==="string"){
+    const rateTypeMap = {
+      "F": 'noofPkts',
+      "P": 'noofPkts',
+      "W": 'chargedWeight',
+      "T": 'chargedWeight'
+    };
+    const propertyName = rateTypeMap[freightRateType] || 'noofPkts';
+    const invoiceTotal = this.invoiceData.reduce((acc, amount) => acc + amount[propertyName], 0);
+    let total = 0;
+    if (freightRateType === "F") {
+      total = freightRate;
+    } else {
+      total = freightRateType === "T" ? (freightRate * invoiceTotal) / 1000 : freightRate * invoiceTotal;
+    }
+    this.FreightTableForm.controls['freight_amount']?.setValue(total);
+  }
+}
+
+  containorCsvDetail() {
     if (this.previewResult.length > 0) {
       this.tableLoad = true;
       this.isLoad = true;
-      let containerNo=[]
+      let containerNo = []
       const containerDetail = this.previewResult.map(
         (x, index) => {
           if (x) {
-            const detail =containerNo.includes(x.containerNumber)
+            const detail = containerNo.includes(x.containerNumber)
             const match = this.containerTypeList.find((y) => y.name === x.containerType && y.loadCapacity === x.containerCapacity);
-            
+
             if (!match) {
               Swal.fire({
                 icon: 'error',
@@ -1059,7 +1096,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
               });
               return null; // Returning null to indicate that this element should be removed
             }
-            if(detail){
+            if (detail) {
               Swal.fire({
                 icon: 'error',
                 title: 'Error',

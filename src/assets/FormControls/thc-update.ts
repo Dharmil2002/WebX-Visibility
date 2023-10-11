@@ -10,7 +10,12 @@ export class ThcUpdateControls {
                 placeholder: '',
                 type: 'time',
                 value: '',
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Vehicle No is required"
+                    }
+                ],
                 generatecontrol: true, disable: false
             },
             {
@@ -19,7 +24,12 @@ export class ThcUpdateControls {
                 placeholder: '',
                 type: 'file',
                 value: '',
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "POD  is required"
+                    }
+                ],
                 additionalData: {
                     multiple: true
                 },
@@ -35,7 +45,26 @@ export class ThcUpdateControls {
                 placeholder: '',
                 type: 'textarea',
                 value: '',
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Remarks is required"
+                    }
+                ],
+                generatecontrol: true, disable: false
+            },
+            {
+                name: 'Pod',
+                label: 'Pod',
+                placeholder: '',
+                type: 'toggle',
+                value:true,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Pod is required"
+                    }
+                ],
                 generatecontrol: true, disable: false
             },
             {

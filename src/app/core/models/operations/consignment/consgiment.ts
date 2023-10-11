@@ -25,8 +25,19 @@ export class DocketDetail {
     cnalternateContactNo: string
     companyCode: string
     vehicleNo: string
+    rake_no: string
+    delivery_type: string
+    risk: string
+    gp_ch_del: string
+    cargo_type: string
+    weight_in: string
+    packaging_type: string
+    edd: Date
+    pr_lr_no: string
+    issuing_from: string
     status: number
-    freightAmount: string
+    freight_amount: string
+    freight_rate: string
     freightRatetype: string
     otherAmount: string
     grossAmount: string
@@ -73,7 +84,8 @@ export class DocketDetail {
         this.companyCode = data.companyCode ?? '';
         this.vehicleNo = data.vehicleNo ?? '';
         this.status = data.status ?? 0;
-        this.freightAmount = data.freightAmount ?? '';
+        this.freight_amount = data.freightAmount ?? '';
+        this.freight_rate = data.freight_rate ?? '';
         this.freightRatetype = data.freightRatetype ?? '';
         this.otherAmount = data.otherAmount ?? '';
         this.grossAmount = data.grossAmount ?? '';
@@ -89,6 +101,16 @@ export class DocketDetail {
         this.actualWeight = data.actualWeight ?? 0;
         this.invoiceDetails = data.invoiceDetails ?? []
         this.containerDetail = data.containerDetail ?? []
+        this.pr_lr_no=data.pr_lr_no??""
+        this.edd=data.edd??new Date();
+        this.packaging_type=data.packaging_type??""
+        this.weight_in=data.weight_in??""
+        this.cargo_type=data.cargo_type??""
+        this.gp_ch_del=data.gp_ch_del??""
+        this.risk=data.risk??""
+        this.delivery_type=data.delivery_type??""
+        this.rake_no=data.rake_no??""
+        this.issuing_from=data.issuing_from??"" 
     }
 
 }

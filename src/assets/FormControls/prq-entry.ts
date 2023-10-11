@@ -158,7 +158,7 @@ export class PrqEntryControls {
         name: "contactNo",
         label: "Contact Number",
         placeholder: "Contact Number",
-        type: "number",
+        type: "mobile-number",
         value: prqDetail.contactNo,
         filterOptions: "",
         autocomplete: "",

@@ -1,20 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
-import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
-import { ClusterMaster } from 'src/app/core/models/Masters/cluster-master';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { ClusterControl } from 'src/assets/FormControls/cluster-master';
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import Swal from 'sweetalert2';
-import { Subject, take, takeUntil } from 'rxjs';
+import { Component, OnInit } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { Router } from "@angular/router";
+import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
+import { ClusterMaster } from "src/app/core/models/Masters/cluster-master";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import { ClusterControl } from "src/assets/FormControls/cluster-master";
+import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import Swal from "sweetalert2";
+import { Subject, take, takeUntil } from "rxjs";
 
 @Component({
-  selector: 'app-cluster-master-add',
-  templateUrl: './cluster-master-add.component.html',
+  selector: "app-cluster-master-add",
+  templateUrl: "./cluster-master-add.component.html",
 })
 export class ClusterMasterAddComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   clusterTabledata: ClusterMaster;
   clusterTableForm: UntypedFormGroup;
@@ -31,20 +31,23 @@ export class ClusterMasterAddComponent implements OnInit {
   //#endregion
 
   ngOnInit() {
-    this.getPincodeData()
+    this.getPincodeData();
     this.backPath = "/Masters/ClusterMaster/ClusterMasterList";
   }
-  constructor(private Route: Router, private fb: UntypedFormBuilder,
-    private masterService: MasterService, private filter: FilterUtils,
+  constructor(
+    private Route: Router,
+    private fb: UntypedFormBuilder,
+    private masterService: MasterService,
+    private filter: FilterUtils
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
-      this.action = 'edit'
+      this.action = "edit";
       this.isUpdate = true;
     } else {
       this.action = "Add";
     }
-    if (this.action === 'edit') {
+    if (this.action === "edit") {
       this.isUpdate = true;
       this.clusterTabledata = this.data;
       this.breadScrums = [
@@ -67,10 +70,13 @@ export class ClusterMasterAddComponent implements OnInit {
     this.initializeFormControl();
   }
   initializeFormControl() {
-    this.clusterFormControls = new ClusterControl(this.clusterTabledata, this.isUpdate);
+    this.clusterFormControls = new ClusterControl(
+      this.clusterTabledata,
+      this.isUpdate
+    );
     this.jsonControlArray = this.clusterFormControls.getClusterFormControls();
-    this.jsonControlArray.forEach(data => {
-      if (data.name === 'pincode') {
+    this.jsonControlArray.forEach((data) => {
+      if (data.name === "pincode") {
         // Set Pincode category-related variables
         this.pincodeList = data.name;
         this.pincodeStatus = data.additionalData.showNameAndValue;
@@ -79,50 +85,66 @@ export class ClusterMasterAddComponent implements OnInit {
     this.clusterTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   cancel() {
-    this.Route.navigateByUrl('/Masters/ClusterMaster/ClusterMasterList');
+    this.Route.navigateByUrl("/Masters/ClusterMaster/ClusterMasterList");
   }
   //#region Pincode Dropdown
   getPincodeData() {
-    const pincodeValue = this.clusterTableForm.controls['pincode'].value;
+    const pincodeValue = this.clusterTableForm.controls["pincode"].value;
 
     if (pincodeValue !== null && pincodeValue !== "") {
       let req = {
-        "companyCode": this.companyCode,
-        "collectionName": "pincode_detail",
-        "filter": {}
+        companyCode: this.companyCode,
+        collectionName: "pincode_detail",
+        filter: {},
       };
-      this.masterService.masterPost('generic/get', req).subscribe({
+      this.masterService.masterPost("generic/get", req).subscribe({
         next: (res: any) => {
           // Assuming the API response contains an array named 'pincodeList'
-          const pincodeList = res.data.map(element => ({
+          const pincodeList = res.data.map((element) => ({
             name: parseInt(element.pincode),
             value: parseInt(element.pincode),
           }));
           let filteredPincodeList = [];
           if (Array.isArray(pincodeValue)) {
-            filteredPincodeList = pincodeList.filter(item => pincodeValue.toString().includes(item.name.toString()));
-          } else if (typeof pincodeValue === 'string' && pincodeValue.length >= 2) {
-            filteredPincodeList = pincodeList.filter(item => item.name.toString().includes(pincodeValue));
+            filteredPincodeList = pincodeList.filter((item) =>
+              pincodeValue.toString().includes(item.name.toString())
+            );
+          } else if (
+            typeof pincodeValue === "string" &&
+            pincodeValue.length >= 2
+          ) {
+            filteredPincodeList = pincodeList.filter((item) =>
+              item.name.toString().includes(pincodeValue)
+            );
           }
+          let pincodedata = [];
+
           if (this.isUpdate) {
-            var filter = [];
-            this.clusterTabledata.pincode.forEach(item => {
-              filter.push(filteredPincodeList.find(element => element.value == item));
+            const pincode = this.clusterTabledata.pincode.split(",");
+            pincode.forEach((item) => {
+              pincodedata.push(
+                pincodeList.find((element) => element.value == item)
+              );
             });
+            this.clusterTableForm.controls["pincodeDropdown"].patchValue(
+              pincodedata
+            );
           }
-          this.clusterTableForm.controls['pincodeDropdown'].patchValue(filter);
+          const data =
+            filteredPincodeList.length > 0 ? filteredPincodeList : pincodedata;
+
           this.filter.Filter(
             this.jsonControlArray,
             this.clusterTableForm,
-            filteredPincodeList,
+            data,
             this.pincodeList,
             this.pincodeStatus
           );
-        }
+        },
       });
     } else {
       // Handle case when pincodeValue is null or blank
-      console.log('Pincode value is null or blank. API call skipped.');
+      console.log("Pincode value is null or blank. API call skipped.");
       // You might want to reset or clear some form fields or values here
     }
   }
@@ -130,11 +152,18 @@ export class ClusterMasterAddComponent implements OnInit {
 
   //#region Save Function
   save() {
-    const pincodeDropdown = this.clusterTableForm.value.pincodeDropdown == "" ? [] : this.clusterTableForm.value.pincodeDropdown.map((item: any) => item.name);
+    const pincodeDropdown =
+      this.clusterTableForm.value.pincodeDropdown == ""
+        ? []
+        : this.clusterTableForm.value.pincodeDropdown.map(
+            (item: any) => item.name
+          );
     this.clusterTableForm.controls["pincode"].setValue(pincodeDropdown);
 
     // Clear any errors in the form controls
-    Object.values(this.clusterTableForm.controls).forEach(control => control.setErrors(null));
+    Object.values(this.clusterTableForm.controls).forEach((control) =>
+      control.setErrors(null)
+    );
 
     if (this.isUpdate) {
       let id = this.clusterTableForm.value._id;
@@ -143,9 +172,9 @@ export class ClusterMasterAddComponent implements OnInit {
         companyCode: this.companyCode,
         collectionName: "cluster_detail",
         filter: { _id: id },
-        update: this.clusterTableForm.value
+        update: this.clusterTableForm.value,
       };
-      this.masterService.masterPut('generic/update', req).subscribe({
+      this.masterService.masterPut("generic/update", req).subscribe({
         next: (res: any) => {
           if (res) {
             // Display success message
@@ -155,39 +184,45 @@ export class ClusterMasterAddComponent implements OnInit {
               text: res.message,
               showConfirmButton: true,
             });
-            this.Route.navigateByUrl('/Masters/ClusterMaster/ClusterMasterList');
+            this.Route.navigateByUrl(
+              "/Masters/ClusterMaster/ClusterMasterList"
+            );
           }
-        }
+        },
       });
     } else {
       let req = {
         companyCode: parseInt(localStorage.getItem("companyCode")),
-        "collectionName": "cluster_detail",
-        "filter": {}
-      }
-      this.masterService.masterPost('generic/get', req).subscribe({
+        collectionName: "cluster_detail",
+        filter: {},
+      };
+      this.masterService.masterPost("generic/get", req).subscribe({
         next: (res: any) => {
           if (res) {
             // Generate srno for each object in the array
             const lastCode = res.data[res.data.length - 1];
-            const lastClusterCode = lastCode ? parseInt(lastCode.clusterCode.substring(1)) : 0;
+            const lastClusterCode = lastCode
+              ? parseInt(lastCode.clusterCode.substring(1))
+              : 0;
             // Function to generate a new route code
             function generateClusterCode(initialCode: number = 0) {
               const nextClusterCode = initialCode + 1;
-              const clusterNumber = nextClusterCode.toString().padStart(4, '0');
+              const clusterNumber = nextClusterCode.toString().padStart(4, "0");
               const clusterCode = `C${clusterNumber}`;
               return clusterCode;
             }
             this.newClusterCode = generateClusterCode(lastClusterCode);
             this.clusterTableForm.controls["_id"].setValue(this.newClusterCode);
-            this.clusterTableForm.controls["clusterCode"].setValue(this.newClusterCode);
+            this.clusterTableForm.controls["clusterCode"].setValue(
+              this.newClusterCode
+            );
             this.clusterTableForm.removeControl("pincodeDropdown");
             let req = {
               companyCode: this.companyCode,
               collectionName: "cluster_detail",
-              data: this.clusterTableForm.value
+              data: this.clusterTableForm.value,
             };
-            this.masterService.masterPost('generic/create', req).subscribe({
+            this.masterService.masterPost("generic/create", req).subscribe({
               next: (res: any) => {
                 if (res) {
                   // Display success message
@@ -197,19 +232,21 @@ export class ClusterMasterAddComponent implements OnInit {
                     text: res.message,
                     showConfirmButton: true,
                   });
-                  this.Route.navigateByUrl('/Masters/ClusterMaster/ClusterMasterList');
+                  this.Route.navigateByUrl(
+                    "/Masters/ClusterMaster/ClusterMasterList"
+                  );
                 }
-              }
+              },
             });
           }
-        }
-      })
+        },
+      });
     }
   }
   //#endregion
 
   functionCallHandler($event) {
-    let functionName = $event.functionName;     // name of the function , we have to call
+    let functionName = $event.functionName; // name of the function , we have to call
     // function of this name may not exists, hence try..catch
     try {
       this[functionName]($event);
@@ -238,29 +275,33 @@ export class ClusterMasterAddComponent implements OnInit {
   //#endregion
   checkClusterExists() {
     let req = {
-      "companyCode": this.companyCode,
-      "collectionName": "cluster_detail",
-      "filter": {}
-    }
-    this.masterService.masterPost('generic/get', req).subscribe({
+      companyCode: this.companyCode,
+      collectionName: "cluster_detail",
+      filter: {},
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
       next: (res: any) => {
         if (res) {
           // Generate srno for each object in the array
-          const count = res.data.filter(item => item.clusterName == this.clusterTableForm.controls.clusterName.value)
+          const count = res.data.filter(
+            (item) =>
+              item.clusterName ==
+              this.clusterTableForm.controls.clusterName.value
+          );
           if (count.length > 0) {
             Swal.fire({
-              title: 'Cluster Name already exists! Please try with another',
+              title: "Cluster Name already exists! Please try with another",
               toast: true,
               icon: "error",
               showCloseButton: false,
               showCancelButton: false,
               showConfirmButton: true,
-              confirmButtonText: "OK"
+              confirmButtonText: "OK",
             });
-            this.clusterTableForm.controls['clusterName'].reset();
+            this.clusterTableForm.controls["clusterName"].reset();
           }
         }
-      }
-    })
+      },
+    });
   }
 }

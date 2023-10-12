@@ -492,69 +492,48 @@ export class AddLocationMasterComponent implements OnInit {
     //this.locationTableForm.controls.reportLoc.setValue("");
   }
   //#region to check Existing location
-  async checkLocationCodeExist() {
-    // Extract locCode and locName form controls
-    const { locCode, locName } = this.locationTableForm.controls;
-
-    let codeExists = false;
-    let nameExists = false;
-
+  async checkValueExists(fieldName, errorMessage) {
     try {
-      // Prepare the request to fetch location data from the API
+      // Get the field value from the form controls
+      let fieldValue = this.locationTableForm.controls[fieldName].value;
+      fieldValue = fieldValue.toUpperCase();
+      // Create a request object with the filter criteria
       const req = {
         companyCode: this.companyCode,
-        filter: {},
         collectionName: "location_detail",
+        filter: { [fieldName]: fieldValue },
       };
 
-      // Make the API call to fetch location data
-      const res = await this.masterService.masterPost("generic/get", req).toPromise();
+      // Send the request to fetch user data
+      const locationlist = await this.masterService.masterPost("generic/get", req).toPromise();
 
-      // Check if the API response contains data
-      if (res && res.data) {
-        // Store the fetched location data
-        this.locationData = res.data;
+      // Check if data exists for the given filter criteria
+      if (locationlist.data.length > 0) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          icon: "error",
+          title: 'error',
+          text: `${errorMessage} already exists! Please try with another !`,
+          showConfirmButton: true,
+        });
+
+        // Reset the input field
+        this.locationTableForm.controls[fieldName].reset();
       }
-
-      // Iterate through the fetched location data
-      for (const item of this.locationData) {
-        // Check if locCode already exists
-        if (item.locCode === locCode.value) {
-          codeExists = true;
-          break;
-        }
-
-        // Check if locName already exists
-        if (item.locName === locName.value) {
-          nameExists = true;
-          break;
-        }
-      }
-
-      // If codeExists flag is true, show an error message and reset locCode
-      if (codeExists) {
-        this.showDuplicateError("Location Code");
-        locCode.reset();
-      }
-
-      // If nameExists flag is true, show an error message and reset locName
-      if (nameExists) {
-        this.showDuplicateError("Location Name");
-        locName.reset();
-      }
-    } catch (error) {
-      console.error('Error fetching location data:', error);
+    }
+    catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
     }
   }
-
-  // Helper function to display a Swal error message
-  private showDuplicateError(fieldName: string) {
-    Swal.fire({
-      icon: 'error',
-      title: 'error',
-      text: `${fieldName} already exists! Please try with another`,
-      showConfirmButton: true,
-    });
+  async checkLocCode() {
+    await this.checkValueExists("locCode", "Location Code");
+  }
+  async checkLocName() {
+    await this.checkValueExists("locName", "Location Name");
+  }
+  async checkGstNo() {
+    await this.checkValueExists("gstNumber", "Gst Number");
   }
   //#endregion
 
@@ -703,6 +682,34 @@ export class AddLocationMasterComponent implements OnInit {
     // Handle the toggle change event in the parent component
     this.locationTableForm.controls['activeFlag'].setValue(event);
     //console.log("Toggle value :", event);
+  }
+  //#endregion
+
+  //#region to validate state in gst number
+  async validateState() {
+    try {
+      const gstNumber = this.locationTableForm.value.gstNumber;
+      let filterId = gstNumber.substring(0, 2);
+      filterId = parseInt(filterId);
+      // Fetch the GST state name based on the state code
+      const stateName = await this.objState.fetchStateByFilterId(filterId, 'ST');
+      const locState = stateName[0].STNM;
+      const gstState = this.locationTableForm.value.locState;
+
+      if (locState !== gstState) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Warning',
+          text: `This GST '${gstNumber}' belongs to '${locState}' not '${gstState}' Please correct the state code`,
+          showConfirmButton: true,
+        });
+        this.locationTableForm.controls['gstNumber'].setValue("");
+        return;
+      }
+      this.checkGstNo();
+    } catch (error) {
+      console.error('An error occurred while setting the GST state:', error);
+    }
   }
   //#endregion
 }

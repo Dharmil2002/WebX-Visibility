@@ -2,6 +2,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class RouteLocationControl {
     routeLocationControlArray: FormControls[];
+    RouteDetailControlArray: FormControls[];
     constructor(routeLocationData) {
         this.routeLocationControlArray = [
             {
@@ -70,7 +71,7 @@ export class RouteLocationControl {
                 displaywith: '',
                 Validations: [],
                 generatecontrol: true,
-                disable: true
+                disable: false
             },
             {
                 name: 'departureTime',
@@ -148,7 +149,7 @@ export class RouteLocationControl {
                 type: 'toggle',
                 value: routeLocationData?.isActive,
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: false, disable: false
             },
             {
                 name: 'id',
@@ -162,12 +163,140 @@ export class RouteLocationControl {
                 Validations: [],
                 generatecontrol: false,
                 disable: false
-
-            }
+            },
+            {
+                name: "entryBy",
+                label: "Entry By",
+                placeholder: "Entry By",
+                type: "text",
+                value: localStorage.getItem("UserName"),
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
+            {
+                name: "companyCode",
+                label: "Company Code",
+                placeholder: "Company Code",
+                type: "text",
+                value: parseInt(localStorage.getItem("companyCode")),
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
         ]
+
+        this.RouteDetailControlArray = [
+            {
+                name: "loccd",
+                label: "Branch Name",
+                placeholder: "Branch Name",
+                type: "text",
+                value: routeLocationData?.loccd,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+
+            },
+            {
+                name: "distKm",
+                label: "Distance (In Km)",
+                placeholder: "",
+                type: "text",
+                value: routeLocationData?.distKm,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+                functions: {
+                    'onChange': "calRouteKm" // Function to be called on change event
+                },
+
+            },
+            {
+                name: "trtimeHr",
+                label: "Transit (Minutes)",
+                placeholder: "",
+                type: "text",
+                value: routeLocationData?.trtimeHr,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+
+            },
+            {
+                name: "sttimeHr",
+                label: "Stoppage (Minutes)",
+                placeholder: "",
+                type: "text",
+                value: routeLocationData?.sttimeHr,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+
+            },
+            {
+                name: "speedLightVeh",
+                label: "Speed-Light Veh.",
+                placeholder: "",
+                type: "text",
+                value: routeLocationData?.speedLightVeh,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+
+            },
+            {
+                name: "speedHeavyVeh",
+                label: "Speed-Heavy Veh.",
+                placeholder: "",
+                type: "text",
+                value: routeLocationData?.speedHeavyVeh,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+
+            },
+            {
+                name: "nightDrivingRestricted",
+                label: "Night Driving Restricted",
+                placeholder: "",
+                type: "text",
+                value: routeLocationData?.nightDrivingRestricted,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+
+            },
+            {
+                name: "restrictedHoursFrom",
+                label: "Restricted Hrs (From)",
+                placeholder: "",
+                type: "text",
+                value: routeLocationData?.restrictedHoursFrom,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+
+            },
+            {
+                name: "restrictedHoursTo",
+                label: "Restricted Hrs (To)",
+                placeholder: "",
+                type: "text",
+                value: routeLocationData?.restrictedHoursTo,
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+
+            },
+
+        ];
     }
     getFormControls() {
         return this.routeLocationControlArray;
+    }
+    getFormControlsR() {
+        return this.RouteDetailControlArray;
     }
 
 }

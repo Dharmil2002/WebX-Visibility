@@ -1,14 +1,26 @@
+
 import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { Subject, take, takeUntil } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
+import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import { SessionService } from "src/app/core/service/session.service";
 import { ContractServiceSelectionControl } from "src/assets/FormControls/CustomerContractControls/ServiceSelection-control";
-import Swal from "sweetalert2";
+
+interface CurrentAccessListType {
+  productAccess: string[];
+  ServicesSelectionAccess: string[];
+}
 @Component({
   selector: 'app-customer-contract-service-selection',
   templateUrl: './customer-contract-service-selection.component.html',
 })
 export class CustomerContractServiceSelectionComponent implements OnInit {
+  companyCode: number | null
 
+  //#region Form Configration Fields
   ContractServiceSelectionControls: ContractServiceSelectionControl;
 
   ProductsForm: UntypedFormGroup;
@@ -38,6 +50,19 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   FuelSurchargeForm: UntypedFormGroup;
   jsonControlArrayFuelSurchargeForm: any;
 
+  //#endregion
+
+  //#region Table Configration Fields
+  isLoad: boolean = false;
+  linkArray = [
+  ];
+  addFlag = true;
+  menuItemflag = true;
+  loadIn: boolean;
+  tableLoad: boolean = true;
+  isTableLoad: boolean = true;
+  tableData: any = [];
+
   className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   ServiceclassName = "col-xl-2 col-lg-3 col-md-12 col-sm-12";
   breadscrums = [
@@ -57,9 +82,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     { label: 'Edit' },
     { label: 'Remove' }
   ]
-  //#endregion
-  isLoad: boolean = false;
-  //#region columnHeader
+
   columnHeader = {
     InvoiceValueFrom: {
       Title: "Invoice Value From",
@@ -107,38 +130,118 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       'MinCharge',
       'MaxCharge'
     ]
-  /*End*/
-  linkArray = [
-  ];
-  addFlag = true;
-  menuItemflag = true;
-  loadIn: boolean;
-  tableLoad: boolean = true;
-  isTableLoad: boolean = true;
-  tableData: any = [];
 
+  //#endregion
 
+  //#region Section Wise Configration
   DisplayCODDODSection = false;
   DisplayVolumetricSection = false;
   DisplayDemurragericSection = false;
-  DisplayInsuranceSection = false;
+  DisplayInsuranceSection = true;
   DisplayCutOfftimeSection = false;
   DisplayYieldProtectionSection = false;
   DisplayFuelSurchargeSection = false;
+  //#endregion
 
-  constructor(private fb: UntypedFormBuilder) {
+  //#region Array List
+  CurrentAccessList: any
+  StateList: any;
+  PinCodeList: any
+  //#endregion
+
+  protected _onDestroy = new Subject<void>();
+
+  //#endregion
+  constructor(private fb: UntypedFormBuilder,
+    private masterService: MasterService,
+    public ObjcontractMethods: locationEntitySearch,
+    private filter: FilterUtils, private sessionService: SessionService) {
+    this.companyCode = this.sessionService.getCompanyCode()
+    this.CurrentAccessList = {
+      ServicesSelectionAccess: ['Volumetric', "ODA", "DACC", "fuelSurcharge", "cutofftime", "COD/DOD", "Demurrage", "DPH", "Insurance", "YieldProtection"],
+      productAccess: ['loadType', 'rateType', 'originRateOption', 'destinationRateOption', 'originRateOptionHandler', 'destinationRateOptionHandler']
+    } as CurrentAccessListType;
     this.initializeFormControl();
   }
 
+  //#endregion
   ngOnInit(): void {
+    this.getAllMastersData();
   }
+
+  /*get all Master Details*/
+  async getAllMastersData() {
+    try {
+      const stateReqBody = {
+        companyCode: this.companyCode,
+        filter: {},
+        collectionName: "state_master",
+      };
+      const pincodeReqBody = {
+        companyCode: this.companyCode,
+        filter: {},
+        collectionName: "pincode_master",
+      };
+      this.StateList = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
+      this.PinCodeList = await this.masterService.masterPost('generic/get', pincodeReqBody).toPromise();
+      this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(this.PinCodeList, this.StateList, 'ST')
+    } catch (error) {
+      // Handle any errors that occurred during the request
+      console.error("Error:", error);
+    }
+  }
+  //#region All Multi Selection Actions
+
+  //#region toggle SelectAllOriginRateOptions
+  setSelectedPincodeData(event) {
+  }
+  //#endregion
+  //#region toggle SelectAllOriginRateOptions
+  toggleSelectAllRateOptions(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+
+    const index = this.jsonControlArrayProductsForm.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlArrayProductsForm[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.ProductsForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+
+  }
+  //#endregion
+
+  //#region Set OriginRateOptions
+  SetRateOptions(event) {
+    let fieldName = event.field.name;
+
+    const search = this.ProductsForm.controls[fieldName].value;
+    let data = [];
+    if (search.length >= 2) {
+      const fieldsToSearch = ['PIN', 'CT', 'STNM', 'ZN'];
+      data = this.ObjcontractMethods.GetGenericMappedAria(this.PinCodeList.data, search, fieldsToSearch)
+      this.filter.Filter(
+        this.jsonControlArrayProductsForm,
+        this.ProductsForm,
+        data,
+        fieldName,
+        true
+      );
+    }
+  }
+  //#endregion
   initializeFormControl() {
     this.ContractServiceSelectionControls = new ContractServiceSelectionControl();
-    this.jsonControlArrayProductsForm = this.ContractServiceSelectionControls.getContractProductSelectionControlControls();
+    this.jsonControlArrayProductsForm = this.ContractServiceSelectionControls.getContractProductSelectionControlControls(this.CurrentAccessList.productAccess);
     this.ProductsForm = formGroupBuilder(this.fb, [
       this.jsonControlArrayProductsForm,
     ]);
-    this.jsonControlArrayServicesForm = this.ContractServiceSelectionControls.getContractServiceSelectionControlControls();
+    this.jsonControlArrayServicesForm = this.ContractServiceSelectionControls.getContractServiceSelectionControlControls(this.CurrentAccessList.ServicesSelectionAccess);
     this.ServicesForm = formGroupBuilder(this.fb, [
       this.jsonControlArrayServicesForm,
     ]);
@@ -223,18 +326,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     this.tableLoad = true;
     this.isLoad = true;
     const tableData = this.tableData;
-    // if (typeof (this.InsuranceCarrierRiskForm.value.tovalue) === 'string') {
-    //   this.InsuranceCarrierRiskForm.controls['tovalue'].setValue('');
-    //   Swal.fire({
-    //     icon: "info", // Use the "info" icon for informational messages
-    //     title: "Information",
-    //     text: "Please Select Proper value.",
-    //     showConfirmButton: true,
-    //   });
-    //   this.isLoad = false;
-    //   this.tableLoad = false;
-    //   return false
-    // }
+
     console.log(this.InsuranceCarrierRiskForm)
     debugger
     const delayDuration = 1000;
@@ -253,6 +345,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       actions: ['Edit', 'Remove']
     }
     this.tableData.push(json);
+    this.InsuranceCarrierRiskForm.reset();
     Object.keys(this.InsuranceCarrierRiskForm.controls).forEach(key => {
       this.InsuranceCarrierRiskForm.get(key).clearValidators();
       this.InsuranceCarrierRiskForm.get(key).updateValueAndValidity();

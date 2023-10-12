@@ -56,6 +56,7 @@ import {
 import { msalConfig } from "./core/service/msal-config/msal-config";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { ErrorInterceptor } from "./core/interceptor/error.interceptor";
+import { locationEntitySearch } from "./Utility/locationEntitySearch";
 
 
 export function MSALInstanceFactory(): IPublicClientApplication {
@@ -89,7 +90,7 @@ export function createTranslateLoader(http: HttpClient): any {
 
   ],
   imports: [
-    MatAutocompleteModule ,
+    MatAutocompleteModule,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
@@ -129,7 +130,7 @@ export function createTranslateLoader(http: HttpClient): any {
       useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
     },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },    
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     WINDOW_PROVIDERS,
     {
       provide: MSAL_INSTANCE,
@@ -142,6 +143,7 @@ export function createTranslateLoader(http: HttpClient): any {
     MsalService,
     MsalGuard,
     MsalBroadcastService,
+    locationEntitySearch
   ],
   bootstrap: [AppComponent],
 })

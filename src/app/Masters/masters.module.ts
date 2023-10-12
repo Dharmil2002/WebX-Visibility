@@ -111,7 +111,7 @@ import { VendorContractListComponent } from './Vendor Contract/vendor-contract-l
 import { ServiceSelectionComponent } from './Vendor Contract/vendor-tabs/service-selection/service-selection.component';
 import { FleetMasterListComponent } from './fleet-master/fleet-master-list/fleet-master-list.component';
 import { AddFleetMasterComponent } from './fleet-master/add-fleet-master/add-fleet-master.component';
-import { AddStandardChargesComponent} from './Vendor Contract/vendor-tabs/pop-UP/standard-charges/add-standard-charges.component';
+import { AddStandardChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/standard-charges/add-standard-charges.component';
 import { AddTripLaneBasedComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-trip-lane-based/add-trip-lane-based.component';
 import { StandardChargesComponent } from './Vendor Contract/vendor-tabs/standard-charges/standard-charges.component';
 import { AddAdditionalDeliveryChargesComponent } from './Vendor Contract/vendor-tabs/pop-UP/add-additional-delivery-charges/add-additional-delivery-charges.component';
@@ -126,6 +126,7 @@ import { CustomerContractServiceSelectionComponent } from './Customer Contract/C
 import { CustomerContractListComponent } from './Customer Contract/customer-contract-list/customer-contract-list.component';
 import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
 import { CustomerQueryPageComponent } from './Customer Contract/customer-query-page/customer-query-page.component';
+import { SessionService } from '../core/service/session.service';
 @NgModule({
   imports: [
     CommonModule,
@@ -164,7 +165,7 @@ import { CustomerQueryPageComponent } from './Customer Contract/customer-query-p
     MatExpansionModule,
     MatStepperModule,
     NgxMaterialTimepickerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
 
   declarations: [
@@ -230,7 +231,7 @@ import { CustomerQueryPageComponent } from './Customer Contract/customer-query-p
     GeneralMasterAddComponent,
     GeneralMasterCodeListComponent,
     AddVehicleStatusUpdateComponent,
-     HolidayMasterComponent,
+    HolidayMasterComponent,
     AddEditHolidayComponent,
     CityLocationMappingMaster,
     ContainerMasterListComponent,
@@ -242,26 +243,26 @@ import { CustomerQueryPageComponent } from './Customer Contract/customer-query-p
     BasicInformationComponent,
     VendorTabsIndexComponent,
     VendorContractListComponent,
-   ServiceSelectionComponent,
-   AddStandardChargesComponent,
-   FleetMasterListComponent,
-   AddFleetMasterComponent,
-   AddTripLaneBasedComponent,
-   StandardChargesComponent,
-   AddAdditionalDeliveryChargesComponent,
-   AddWaitingChargesComponent,
-   TripLaneBasedComponent,
-   SpecialChargesComponent,
-   CustomerQueryPageComponent,
-   CustomerContractListComponent,
-   CustomerContractTabsIndexComponent,
-   CustomerContractBasicInformationComponent,
-   CustomerContractServiceSelectionComponent
+    ServiceSelectionComponent,
+    AddStandardChargesComponent,
+    FleetMasterListComponent,
+    AddFleetMasterComponent,
+    AddTripLaneBasedComponent,
+    StandardChargesComponent,
+    AddAdditionalDeliveryChargesComponent,
+    AddWaitingChargesComponent,
+    TripLaneBasedComponent,
+    SpecialChargesComponent,
+    CustomerQueryPageComponent,
+    CustomerContractListComponent,
+    CustomerContractTabsIndexComponent,
+    CustomerContractBasicInformationComponent,
+    CustomerContractServiceSelectionComponent
 
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService,
-  PinCodeService,StateService]
+    PinCodeService, StateService, SessionService]
 })
 
 export class MastersModule { }

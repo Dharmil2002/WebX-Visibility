@@ -286,13 +286,28 @@ export class AddVehicleMasterComponent implements OnInit {
         name: element.vendorName.toString(),
         value: element.vendorCode.toString(),
       }));
-      const routeDet = mergedData.routeData.map(element => ({
-        name: element.loccd.join('-'),
-        value: element.routeId.toString(),
-      }));
       // const routeDet = mergedData.routeData.map(element => ({
-      //   name: Array.isArray(element.controlLoc) ? element.controlLoc.join('-') : '',
-      //   value: element.controlLoc ? element.controlLoc.toString() : '',
+      //   name: element.loccd.join('-'),
+      //   value: element.routeId.toString(),
+      // }));
+      let routeDet = [];
+      mergedData.routeData.forEach((item, index, array) => {
+        if (index < array.length) {
+          const currentLocation = item.GSTdetails[0].loccd;
+          const nextLocation = array[index].GSTdetails[1].loccd;
+
+          const name = `${currentLocation} - ${nextLocation}`;
+          const value = name;
+
+          routeDet.push({
+            name,
+            value
+          });
+        }
+      });
+      // const routeDet = mergedData.routeData.map(element => ({
+      //   name: Array.isArray(element.loccd) ? element.loccd.join('-') : '',
+      //   value: Array.isArray(element.loccd) ? element.loccd.join('-') : '',
       // }));
       const FTLtype = mergedData.fltType.filter(item => item.codeType === "FTLTYP").
         map((x) => {
@@ -462,12 +477,10 @@ export class AddVehicleMasterComponent implements OnInit {
     const controlDetail = this.vehicleTableForm.value.controllBranchDrop;
     const controllBranchDrop = controlDetail ? controlDetail.map((item: any) => item.name) : "";
     this.vehicleTableForm.controls["controllBranch"].setValue(controllBranchDrop);
-    console.log("controlDetail", controlDetail);
 
     const divisionDetail = this.vehicleTableForm.value.DivisionDrop;
     const DivisionDrop = divisionDetail ? divisionDetail.map((item: any) => item.name) : "";
     this.vehicleTableForm.controls["division"].setValue(DivisionDrop);
-    console.log("divisionDetail", divisionDetail);
 
     this.vehicleTableForm.controls["isActive"].setValue(this.vehicleTableForm.value.isActive === true ? true : false);
     this.vehicleTableForm.removeControl("DivisionDrop")
@@ -497,7 +510,6 @@ export class AddVehicleMasterComponent implements OnInit {
         this.route.navigateByUrl("/Masters/VehicleMaster/VehicleMasterList");
       }
     } else {
-      console.log("save", this.vehicleTableForm.value);
       const randomNumber = (this.vehicleTableForm.value.vehicleNo);
       this.vehicleTableForm.controls["_id"].setValue(randomNumber);
       let req = {

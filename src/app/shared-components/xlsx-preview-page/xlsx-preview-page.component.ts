@@ -54,7 +54,7 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
     });
   }
 
-  CloseDialog() {
+  saveDialog() {
     const filteredData = this.selection.selected.map(item => {
       const filteredItem = {};
       this.columnKeys.forEach(key => {
@@ -65,6 +65,9 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
       return filteredItem;
     });
     this.dialogRef.close(filteredData);
+  }
+  close(){
+    this.dialogRef.close('');
   }
   isAllSelected() {
     const numSelected = this.selection.selected.filter(x => x.error == null).length;

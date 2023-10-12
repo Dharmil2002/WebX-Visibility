@@ -76,7 +76,7 @@ export class AddVehicleMasterComponent implements OnInit {
   controllBranch: any;
   location: any;
   locationStatus: any;
-  backPath:string;
+  backPath: string;
 
   constructor(
     private masterService: MasterService,
@@ -290,6 +290,10 @@ export class AddVehicleMasterComponent implements OnInit {
         name: element.loccd.join('-'),
         value: element.routeId.toString(),
       }));
+      // const routeDet = mergedData.routeData.map(element => ({
+      //   name: Array.isArray(element.controlLoc) ? element.controlLoc.join('-') : '',
+      //   value: element.controlLoc ? element.controlLoc.toString() : '',
+      // }));
       const FTLtype = mergedData.fltType.filter(item => item.codeType === "FTLTYP").
         map((x) => {
           { return { name: x.codeDesc, value: x.codeId } }

@@ -32,7 +32,6 @@ import { SidebarComponent } from "./layout/sidebar/sidebar.component";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { WINDOW_PROVIDERS } from "./core/service/window.service";
 import { environment } from "src/environments/environment";
-import { fakeBackendProvider } from "./core/interceptor/fake-backend";
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { JwtInterceptor } from "./core/interceptor/jwt.interceptor";
 import { JwtModule } from "@auth0/angular-jwt";
@@ -57,7 +56,7 @@ import {
 import { msalConfig } from "./core/service/msal-config/msal-config";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { ErrorInterceptor } from "./core/interceptor/error.interceptor";
-import { CustomHttpInterceptor } from "./core/interceptor/errorhandling.interceptor";
+import { locationEntitySearch } from "./Utility/locationEntitySearch";
 
 
 export function MSALInstanceFactory(): IPublicClientApplication {
@@ -91,7 +90,7 @@ export function createTranslateLoader(http: HttpClient): any {
 
   ],
   imports: [
-    MatAutocompleteModule ,
+    MatAutocompleteModule,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
@@ -132,12 +131,6 @@ export function createTranslateLoader(http: HttpClient): any {
     },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: CustomHttpInterceptor,
-      multi: true
-    },
-    fakeBackendProvider,
     WINDOW_PROVIDERS,
     {
       provide: MSAL_INSTANCE,
@@ -150,6 +143,7 @@ export function createTranslateLoader(http: HttpClient): any {
     MsalService,
     MsalGuard,
     MsalBroadcastService,
+    locationEntitySearch
   ],
   bootstrap: [AppComponent],
 })

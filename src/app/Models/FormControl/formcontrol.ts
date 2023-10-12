@@ -14,8 +14,9 @@ export class FormControls {
     maxlength?: number;
     Validations: any[];
 
-    additionalData ?: any;
-    functions ?: any
+    additionalData?: any;
+    functions?: any;
+    accessallowed?: boolean = true;
 
     constructor(FormControlcc) {
         {

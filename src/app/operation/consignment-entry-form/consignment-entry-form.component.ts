@@ -351,7 +351,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       vehicleDetail?.vendorType
     );
     this.consignmentTableForm.controls["vendorName"].setValue(
-      vehicleDetail?.vendorType=="Market"?vehicleDetail.vendor:{name:vehicleDetail.vendor,value:vehicleDetail.vendor}
+      vehicleDetail?.vendorType == "Market" ? vehicleDetail.vendor : { name: vehicleDetail.vendor, value: vehicleDetail.vendor }
     );
 
     this.vendorFieldChanged();
@@ -1023,7 +1023,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
         ];
         this.xlsxutils.validateDataWithApiCall(jsonData, validationRules).subscribe(
           (response) => {
-            this.OpenPreview(response)
+            this.OpenPreview(response);
+            this.containerTableForm.controls['Company_file'].setValue("");
+
           },
           (error) => {
             console.error('Validation error:', error);
@@ -1058,24 +1060,24 @@ export class ConsignmentEntryFormComponent implements OnInit {
   calculateFreight() {
     const freightRateType = this.FreightTableForm.controls['freightRatetype'].value;
     const freightRate = this.FreightTableForm.controls['freight_rate']?.value || 0;
-  if(typeof(freightRateType)==="string"){
-    const rateTypeMap = {
-      "F": 'noofPkts',
-      "P": 'noofPkts',
-      "W": 'chargedWeight',
-      "T": 'chargedWeight'
-    };
-    const propertyName = rateTypeMap[freightRateType] || 'noofPkts';
-    const invoiceTotal = this.invoiceData.reduce((acc, amount) => acc + amount[propertyName], 0);
-    let total = 0;
-    if (freightRateType === "F") {
-      total = freightRate;
-    } else {
-      total = freightRateType === "T" ? (freightRate * invoiceTotal) / 1000 : freightRate * invoiceTotal;
+    if (typeof (freightRateType) === "string") {
+      const rateTypeMap = {
+        "F": 'noofPkts',
+        "P": 'noofPkts',
+        "W": 'chargedWeight',
+        "T": 'chargedWeight'
+      };
+      const propertyName = rateTypeMap[freightRateType] || 'noofPkts';
+      const invoiceTotal = this.invoiceData.reduce((acc, amount) => acc + amount[propertyName], 0);
+      let total = 0;
+      if (freightRateType === "F") {
+        total = freightRate;
+      } else {
+        total = freightRateType === "T" ? (freightRate * invoiceTotal) / 1000 : freightRate * invoiceTotal;
+      }
+      this.FreightTableForm.controls['freight_amount']?.setValue(total);
     }
-    this.FreightTableForm.controls['freight_amount']?.setValue(total);
   }
-}
 
   containorCsvDetail() {
     if (this.previewResult.length > 0) {
@@ -1117,7 +1119,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
       // Filter out the null values if necessary
       const filteredContainerDetail = containerDetail.filter((x) => x !== null);
       this.tableData = filteredContainerDetail;
-      this.containerTableForm.controls['Company_file'].setValue("");
       this.tableLoad = false;
       this.isLoad = false;
     }

@@ -7,121 +7,76 @@ import Swal from 'sweetalert2';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { RouteLocationControl } from 'src/assets/FormControls/routeLocationControl';
 import { DatePipe } from '@angular/common';
+import { columnHeader, generateRouteCode, staticField } from './route-location-utility';
 
 @Component({
   selector: 'app-route-master-location-add',
   templateUrl: './route-master-location-add.component.html'
 })
 export class RouteMasterLocationAddComponent implements OnInit {
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   routeMasterLocationForm: UntypedFormGroup;
+  RouteDetailTableForm: UntypedFormGroup;
   jsonControlArray: any;
+  submit = 'save';
   routeMasterLocationFormControls: RouteLocationControl;
-  // Breadcrumbs
-  breadScrums = [
-    {
-      title: "Route Location Wise Master",
-      items: ["Master"],
-      active: "Route Location Wise Master",
-    },
-  ];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
   controlLoc: any;
   controlLocStatus: any;
+  tableLoad: boolean = true;
   locationData: any[];
   action: string;
   data: any;
   isUpdate: any;
   updateState: any;
-  // Displayed columns configuration
-  displayedColumns1 = {
-    srNo: {
-      name: "Sr No",
-      key: "index",
-      style: "",
-    },
-    loccd: {
-      name: "Branch Name",
-      key: "Dropdown",
-      option: [],
-      style: "",
-    },
-    distKm: {
-      name: "Distance (In Km)",
-      key: "input",
-      style: "",
-      functions: {
-        'onChange': "calRouteKm" // Function to be called on change event
-      },
-    },
-    trtimeHr: {
-      name: "Transit (Minutes)",
-      key: "input",
-      style: "",
-    },
-    sttimeHr: {
-      name: "Stoppage (Minutes)",
-      key: "input",
-      style: "",
-    },
-    speedLightVeh: {
-      name: "Speed-Light Veh.",
-      key: "input",
-      style: "",
-    },
-    speedHeavyVeh: {
-      name: "Speed-Heavy Veh.",
-      key: "input",
-      style: "",
-    },
-    nightDrivingRestricted: {
-      name: "Night Driving Restricted",
-      key: "toggle",
-      style: "",
-    },
-    restrictedHoursFrom: {
-      name: "Restricted Hrs (From)",
-      key: "input",
-      style: "",
-    },
-    restrictedHoursTo: {
-      name: "Restricted Hrs (To)",
-      key: "input",
-      style: "",
-    },
-    action: {
-      name: "Action",
-      key: "Action",
-      style: "",
-    },
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
   };
-  // Table data
+  menuItems = [{ label: "Edit" }, { label: "Remove" }];
   tableData: any = [];
-  // Action buttons configuration
-  actionObject = {
-    addRow: true,
-    submit: false,
-    search: true
+  columnHeader = columnHeader;
+  metaData = {
+    checkBoxRequired: true,
+    noColumnSort: Object.keys(this.columnHeader),
   };
+  staticField = staticField;
   tableView: boolean;
   filteredData: any;
   newRouteCode: string;
   datePipe: DatePipe = new DatePipe("en-US");
+  jsonControlRouteDetailArray: any;
+  EditTable: any;
+  backPath: string;
+  TableEdit: boolean = false;
+  TableEditData: any;
+
   constructor(private fb: UntypedFormBuilder, private route: Router, private masterService: MasterService, private filter: FilterUtils,) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.data = route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
       this.isUpdate = true;
-      this.getRouteDet();
+      this.submit = 'Modify';
     } else {
       this.action = "Add";
-      this.loadTempData('');
     }
     if (this.action === 'edit') {
       this.isUpdate = true;
+      this.tableData = this.data.GSTdetails.map((x, index) => {
+        return {
+          ...x,
+          actions: ["Edit", "Remove"],
+          Srno: index + 1,
+        };
+      });
       this.breadScrums = [
         {
-          title: "Route Location Wise Master",
+          title: "Modify Route Location Wise Master",
           items: ["Home"],
-          active: "Edit Route Location Wise Master",
+          active: "Modify Route Location Wise Master",
+          generatecontrol: true,
+          toggle: this.data.isActive
         },
       ];
     } else {
@@ -130,289 +85,104 @@ export class RouteMasterLocationAddComponent implements OnInit {
           title: "Route Location Wise Master",
           items: ["Home"],
           active: "Add Route Location Wise Master",
+          generatecontrol: true,
+          toggle: false
         },
       ];
     }
   }
   ngOnInit(): void {
     this.intializeFormControls();
-    this.getAllMastersData();
+    this.initializeRouteFormControl();
+    this.getControlBranchDropdown();
+    this.bindDropdown();
+    this.backPath = "/Masters/RouteLocationWise/RouteList";
   }
+
   intializeFormControls() {
     this.routeMasterLocationFormControls = new RouteLocationControl(this.data);
     this.jsonControlArray = this.routeMasterLocationFormControls.getFormControls();
-    this.jsonControlArray.forEach(data => {
-      if (data.name === 'controlLoc') {
-        this.controlLoc = data.name;
-        this.controlLocStatus = data.additionalData.showNameAndValue;
-      }
-    });
-    this.routeMasterLocationForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+    this.jsonControlRouteDetailArray = this.routeMasterLocationFormControls.getFormControlsR();
+    this.routeMasterLocationForm = formGroupBuilder(
+      this.fb,
+      [
+        this.jsonControlArray
+      ]);
+    this.RouteDetailTableForm = formGroupBuilder(
+      this.fb,
+      [
+        this.jsonControlRouteDetailArray
+      ]);
     this.routeMasterLocationForm.controls["routeType"].setValue(this.data?.routeType);
     this.routeMasterLocationForm.controls["routeCat"].setValue(this.data?.routeCat);
     this.routeMasterLocationForm.controls["routeMode"].setValue(this.data?.routeMode);
     this.routeMasterLocationForm.controls["scheduleType"].setValue(this.data?.scheduleType);
   }
-  functionCallHandler($event) {
-    let functionName = $event.functionName;     // name of the function , we have to call
-    try {
-      this[functionName]($event);
-    } catch (error) {
-      console.log("failed");
-    }
+
+  initializeRouteFormControl() {
+    const customerFormControls = new RouteLocationControl(
+      this.EditTable
+    );
+    // this.jsonControlCustomerArray = customerFormControls.getFormControls();
+    this.jsonControlRouteDetailArray = customerFormControls.getFormControlsR();
+
+    // Build the form group using formGroupBuilder function and the values of accordionData
+    this.RouteDetailTableForm = formGroupBuilder(this.fb, [
+      this.jsonControlRouteDetailArray,
+    ]);
   }
-  getAllMastersData() {
+
+  //#region 
+  bindDropdown() {
+    this.jsonControlArray.forEach((data) => {
+      if (data.name === 'controlLoc') {
+        this.controlLoc = data.name;
+        this.controlLocStatus = data.additionalData.showNameAndValue;
+      }
+    });
+  }
+  //#region 
+
+  //#region 
+  getControlBranchDropdown() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.companyCode,
+      collectionName: "location_detail",
       filter: {},
-      "collectionName": "location_detail"
-    }
-    this.masterService.masterPost('generic/get', req).subscribe({
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
       next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const locData = res.data.map(element => ({
-            name: element.locName,
-            value: element.locCode,
-          }));
-          this.locationData = locData
-          this.displayedColumns1.loccd.option = this.locationData;
-          this.tableView = true;
+        if (res && res.success) {
+          const dropdownData = res.data.map((x) => {
+            return {
+              name: x.locName,
+              value: x.locCode,
+            };
+          });
           if (this.isUpdate) {
-            this.updateState = this.locationData.find((x) => x.name == this.data.controlLoc);
-            this.routeMasterLocationForm.controls.controlLoc.setValue(this.updateState);
+            res.data.forEach((x) => {
+              if (x.locName == this.data.controlLoc) {
+                this.routeMasterLocationForm.controls["controlLoc"].setValue({
+                  name: x.locName,
+                  value: x.locCode,
+                });
+              }
+            });
           }
           this.filter.Filter(
             this.jsonControlArray,
             this.routeMasterLocationForm,
-            this.locationData,
+            dropdownData,
             this.controlLoc,
-            this.controlLocStatus,
+            this.controlLocStatus
           );
         }
-      }
-    })
-  }
-  cancel() {
-    this.route.navigateByUrl('/Masters/RouteLocationWise/RouteList');
-  }
-  save() {
-    let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
-      filter: {},
-      "collectionName": "routeMasterLocWise"
-    }
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const lastRoute = res.data[res.data.length - 1];
-          const lastRouteCode = lastRoute ? parseInt(lastRoute.routeId.substring(1)) : 0;
-          // Function to generate a new route code
-          function generateRouteCode(initialCode: number = 0) {
-            const nextRouteCode = initialCode + 1;
-            const routeNumber = nextRouteCode.toString().padStart(4, '0');
-            const routeCode = `R${routeNumber}`;
-            return routeCode;
-          }
-          if (this.isUpdate) {
-            this.newRouteCode = this.data._id
-          } else {
-            this.newRouteCode = generateRouteCode(lastRouteCode);
-          }
-          const transformedData = {
-            routeId: this.newRouteCode,
-            routeMode: this.routeMasterLocationForm.value.routeMode,
-            routeCat: this.routeMasterLocationForm.value.routeCat,
-            routeKm: this.routeMasterLocationForm.value.routeKm,
-            departureClockTime: parseFloat(this.datePipe.transform(this.routeMasterLocationForm.value.departureTime, "HH:mm")),
-            controlLoc: this.routeMasterLocationForm.value.controlLoc.name,
-            routeType: this.routeMasterLocationForm.value.routeType,
-            scheduleType: this.routeMasterLocationForm.value.scheduleType,
-            isActive: this.routeMasterLocationForm.value.isActive,
-            _id: this.newRouteCode,
-            loccd: this.tableData.map((item) => item.loccd),
-            distKm: this.tableData.map((item) => parseInt(item.distKm)),
-            trtimeHr: this.tableData.map((item) => parseInt(item.trtimeHr)),
-            sttimeHr: this.tableData.map((item) => parseInt(item.sttimeHr)),
-            speedLightVeh: this.tableData.map((item) => parseInt(item.speedLightVeh)),
-            speedHeavyVeh: this.tableData.map((item) => parseInt(item.speedHeavyVeh)),
-            nightDrivingRestricted: this.tableData.map((item) => item.nightDrivingRestricted != "" ? true : false),
-            restrictedHoursFrom: this.tableData.map((item) => parseInt(item.restrictedHoursFrom)),
-            restrictedHoursTo: this.tableData.map((item) => parseInt(item.restrictedHoursTo)),
-            entryBy: localStorage.getItem('Username'),
-            entryDate: new Date().toISOString()
-          };
-
-          if (this.isUpdate) {
-            let id = transformedData._id;
-            // Remove the "id" field from the form controls
-            delete transformedData._id;
-            let req = {
-              companyCode: parseInt(localStorage.getItem("companyCode")),
-              collectionName: "routeMasterLocWise",
-              filter: { _id: id },
-              update: transformedData
-            };
-            this.masterService.masterPut('generic/update', req).subscribe({
-              next: (res: any) => {
-                if (res) {
-                  // Display success message
-                  Swal.fire({
-                    icon: "success",
-                    title: "Successful",
-                    text: res.message,
-                    showConfirmButton: true,
-                  });
-                  this.route.navigateByUrl('/Masters/RouteLocationWise/RouteList');
-                }
-              }
-            });
-          } else {
-            let req = {
-              companyCode: parseInt(localStorage.getItem("companyCode")),
-              collectionName: "routeMasterLocWise",
-              data: transformedData
-            };
-            this.masterService.masterPost('generic/create', req).subscribe({
-              next: (res: any) => {
-                if (res) {
-                  // Display success message
-                  Swal.fire({
-                    icon: "success",
-                    title: "Successful",
-                    text: res.message,
-                    showConfirmButton: true,
-                  });
-                  this.route.navigateByUrl('/Masters/RouteLocationWise/RouteList');
-                }
-              }
-            });
-          }
-        }
-      }
-    })
-  }
-  // Load temporary data
-  loadTempData(det) {
-    this.tableData = det ? det : [];
-    if (this.tableData.length === 0) {
-      this.addItem();
-    }
-  }
-
-  // Add a new item to the table
-  addItem() {
-    const AddObj = {
-      loccd: [],
-      srNo: 0,
-      distKm: "",
-      trtimeHr: "",
-      trtimeMin: "",
-      sttimeHr: "",
-      sttimeMin: "",
-      speedLightVeh: "",
-      speedHeavyVeh: "",
-      nightDrivingRestricted: "",
-      restrictedHoursFrom: "",
-      restrictedHoursTo: "",
-    };
-    this.tableData.splice(0, 0, AddObj);
-  }
-  // Delete a row from the table
-  async delete(event) {
-    const index = event.index;
-    const row = event.element;
-
-    const swalWithBootstrapButtons = await Swal.mixin({
-      customClass: {
-        confirmButton: "btn btn-success msr-2",
-        cancelButton: "btn btn-danger",
       },
-      buttonsStyling: false,
     });
-
-    swalWithBootstrapButtons
-      .fire({
-        title: `<h4><strong>Are you sure you want to delete ?</strong></h4>`,
-        showCancelButton: true,
-        cancelButtonColor: "#d33",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-        showLoaderOnConfirm: true,
-        preConfirm: (Remarks) => {
-          var request = {
-            companyCode: localStorage.getItem("CompanyCode"),
-            id: row.id,
-          };
-          if (row.id == 0) {
-            return {
-              isSuccess: true,
-              message: "City has been deleted !",
-            };
-          } else {
-            console.log("Request", request);
-          }
-        },
-        allowOutsideClick: () => !Swal.isLoading(),
-      })
-      .then((result) => {
-
-        if (result.isConfirmed) {
-          this.tableData.splice(index, 1);
-          this.tableData = this.tableData;
-          swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
-          event.callback(true);
-          this.calRouteKm();
-        } else if (result.isConfirmed) {
-          swalWithBootstrapButtons.fire("Not Deleted!", "Your Message", "info");
-          event.callback(false);
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire(
-            "Cancelled",
-            "Your item is safe :)",
-            "error"
-          );
-          event.callback(false);
-        }
-      });
-
-    return true;
   }
-  getRouteDet() {
-    // Function to transform array properties
-    function transformArrayProperties(data) {
-      const transformedData = [];
-      const len = Math.max(
-        data.loccd.length,
-        data.distKm.length,
-        data.trtimeHr.length,
-        data.sttimeHr.length,
-        data.speedLightVeh.length,
-        data.speedHeavyVeh.length,
-        data.nightDrivingRestricted.length,
-        data.restrictedHoursFrom.length,
-        data.restrictedHoursTo.length
-      );
+  //#region 
 
-      for (let i = 0; i < len; i++) {
-        transformedData.push({
-          loccd: data.loccd[i],
-          distKm: data.distKm[i] || 0,
-          trtimeHr: data.trtimeHr[i] || 0,
-          sttimeHr: data.sttimeHr[i] || 0,
-          speedLightVeh: data.speedLightVeh[i] || 0,
-          speedHeavyVeh: data.speedHeavyVeh[i] || 0,
-          nightDrivingRestricted: data.nightDrivingRestricted[i] || false,
-          restrictedHoursFrom: data.restrictedHoursFrom[i] || null,
-          restrictedHoursTo: data.restrictedHoursTo[i] || null,
-        });
-      }
-      return transformedData;
-    }
-    const transformedData = transformArrayProperties(this.data);
-    this.loadTempData(transformedData);
-  }
+  //#region 
   calRouteKm() {
     let totalDistKm = 0;
     for (let i = 0; i < this.tableData.length; i++) {
@@ -423,4 +193,225 @@ export class RouteMasterLocationAddComponent implements OnInit {
       this.routeMasterLocationForm.controls["routeKm"].setValue(totalDistKm);
     }
   }
+  //#region 
+
+  //#region 
+  async AddRowData() {
+    this.tableLoad = false;
+    const Index = this.TableEdit ? this.TableEditData.Srno :
+      this.tableData.length == 0 ? 1 : this.tableData.slice(-1)[0].Srno + 1;
+    const Body = {
+      Srno: parseInt(Index),
+      loccd: this.RouteDetailTableForm.value.loccd,
+      distKm: this.RouteDetailTableForm.value.distKm,
+      trtimeHr: this.RouteDetailTableForm.value.trtimeHr,
+      sttimeHr: this.RouteDetailTableForm.value.sttimeHr,
+      speedLightVeh: this.RouteDetailTableForm.value.speedLightVeh,
+      speedHeavyVeh: this.RouteDetailTableForm.value.speedHeavyVeh,
+      nightDrivingRestricted: this.RouteDetailTableForm.value.nightDrivingRestricted,
+      restrictedHoursFrom: this.RouteDetailTableForm.value.restrictedHoursFrom,
+      restrictedHoursTo: this.RouteDetailTableForm.value.restrictedHoursTo,
+      actions: ["Edit", "Remove"],
+    };
+    this.tableData.push(Body);
+    // Create a promise that resolves after the specified delay
+    const delayDuration = 1000;
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    await delay(delayDuration);
+    await this.addRemoveValue(null);
+    this.tableLoad = true;
+  }
+  //#endregion
+
+  //#region 
+  addRemoveValue(data) {
+    this.RouteDetailTableForm.controls["loccd"].setValue(
+      this.TableEdit ? data?.loccd : ""
+    );
+    this.RouteDetailTableForm.controls["distKm"].setValue(
+      this.TableEdit ? data?.distKm : ""
+    );
+    this.RouteDetailTableForm.controls["trtimeHr"].setValue(
+      this.TableEdit ? data?.trtimeHr : ""
+    );
+    this.RouteDetailTableForm.controls["sttimeHr"].setValue(
+      this.TableEdit ? data?.sttimeHr : ""
+    );
+    this.RouteDetailTableForm.controls["speedLightVeh"].setValue(
+      this.TableEdit ? data?.speedLightVeh : ""
+    );
+    this.RouteDetailTableForm.controls["speedHeavyVeh"].setValue(
+      this.TableEdit ? data?.speedHeavyVeh : ""
+    );
+    this.RouteDetailTableForm.controls["nightDrivingRestricted"].setValue(
+      this.TableEdit ? data?.nightDrivingRestricted : ""
+    );
+    this.RouteDetailTableForm.controls["restrictedHoursFrom"].setValue(
+      this.TableEdit ? data?.restrictedHoursFrom : ""
+    );
+    this.RouteDetailTableForm.controls["restrictedHoursTo"].setValue(
+      this.TableEdit ? data?.restrictedHoursTo : ""
+    );
+
+    if (!this.TableEdit) {
+      this.initializeRouteFormControl();
+    }
+  }
+  //#endregion
+
+  //#region 
+  async handleMenuItemClick(data) {
+    this.tableLoad = false;
+    if (data.label.label == "Edit") {
+      this.TableEdit = true;
+      this.TableEditData = data.data;
+      const index = this.tableData.indexOf(data.data);
+      if (index > -1) {
+        this.tableData.splice(index, 1); // 2nd parameter means remove one item only
+      }
+      this.addRemoveValue(data.data);
+      const delayDuration = 1000;
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      await delay(delayDuration);
+    } else {
+      const index = this.tableData.indexOf(data.data);
+      if (index > -1) {
+        this.tableData.splice(index, 1); // 2nd parameter means remove one item only
+      }
+      const delayDuration = 1000;
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      await delay(delayDuration);
+    }
+    this.tableLoad = true;
+  }
+  //#endregion
+
+  //#region 
+  async save() {
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      filter: {},
+      "collectionName": "routeMasterLocWise"
+    }
+    const res = await this.masterService.masterPost('generic/get', req).toPromise();
+    // Generate srno for each object in the array
+    const lastRoute = res.data[res.data.length - 1];
+    const lastRouteCode = lastRoute ? parseInt(lastRoute.routeId.substring(1)) : 0;
+    // Function to generate a new route code
+
+    if (this.isUpdate) {
+      this.newRouteCode = this.data._id
+    } else {
+      this.newRouteCode = generateRouteCode(lastRouteCode);
+    }
+    const Body = {
+      ...this.routeMasterLocationForm.value,
+      routeId: this.newRouteCode,
+      routeMode: this.routeMasterLocationForm.value.routeMode,
+      routeCat: this.routeMasterLocationForm.value.routeCat,
+      routeKm: this.routeMasterLocationForm.value.routeKm,
+      departureTime: parseFloat(this.datePipe.transform(this.routeMasterLocationForm.value.departureTime, "HH:mm")),
+      controlLoc: this.routeMasterLocationForm.value.controlLoc.name,
+      routeType: this.routeMasterLocationForm.value.routeType,
+      scheduleType: this.routeMasterLocationForm.value.scheduleType,
+      isActive: this.routeMasterLocationForm.value.isActive,
+      updatedBy: localStorage.getItem("UserName"),
+      _id: this.newRouteCode,
+      companyCode: localStorage.getItem("companyCode"),
+      updatedDate: new Date(),
+      GSTdetails: this.tableData.map((x) => {
+        return {
+          loccd: x.loccd,
+          distKm: x.distKm,
+          trtimeHr: x.trtimeHr,
+          sttimeHr: x.sttimeHr,
+          speedHeavyVeh: x.speedHeavyVeh,
+          speedLightVeh: x.speedLightVeh,
+          nightDrivingRestricted: x.nightDrivingRestricted,
+          restrictedHoursFrom: x.restrictedHoursFrom,
+          restrictedHoursTo: x.restrictedHoursTo,
+        };
+      }),
+    };
+
+    // this.customerTableForm.removeControl("customerLocationsDrop")
+    if (this.isUpdate) {
+      let id = this.routeMasterLocationForm.value.routeId
+      delete Body.id;
+      // delete Body.customerCode;
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "routeMasterLocWise",
+        filter: { routeId: id },
+        update: Body,
+      };
+      //API FOR UPDATE
+      this.masterService.masterPut("generic/update", req).subscribe({
+        next: (res) => {
+          this.route.navigateByUrl(
+            "/Masters/RouteLocationWise/RouteList"
+          );
+          if (res.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+          }
+          //
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
+    } else {
+      let req = {
+        companyCode: this.companyCode,
+        collectionName: "routeMasterLocWise",
+        data: Body,
+      };
+      await this.masterService.masterPost("generic/create", req).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.route.navigateByUrl(
+              "/Masters/RouteLocationWise/RouteList"
+            );
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+          }
+        },
+        error: (err) => {
+          console.log("err", err);
+        },
+      });
+    }
+  }
+  //#endregion
+
+  cancel() {
+    this.route.navigateByUrl("/Masters/RouteLocationWise/RouteList");
+  }
+
+  //#region 
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.routeMasterLocationForm.controls['isActive'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
+  //#endregion
+
+  functionCallHandler($event) {
+    let functionName = $event.functionName;     // name of the function , we have to call
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+
 }

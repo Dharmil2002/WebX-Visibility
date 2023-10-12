@@ -21,6 +21,7 @@ export class LocationMaster {
   mappedState: any;
   mappedPinCode: any;
   pincodeHandler: any[]
+  gstNumber: string;
   constructor(LocationMaster) {
     {
       this.locLevel = LocationMaster.locLevel || '';

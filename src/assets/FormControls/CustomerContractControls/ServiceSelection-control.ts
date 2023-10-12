@@ -36,6 +36,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
           {
             name: "required",
@@ -67,6 +68,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
           {
             name: "required",
@@ -78,46 +80,86 @@ export class ContractServiceSelectionControl {
         },
       },
 
+
       {
         name: "originRateOption",
         label: "Origin Rate option",
         placeholder: "Origin Rate option",
-        type: "dropdown",
+        type: "multiselect",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
+        Validations: [],
+        additionalData: {
+          isIndeterminate: false,
+          isChecked: false,
+          support: "originRateOptionHandler",
+          showNameAndValue: false,
+
+        },
+        functions: {
+          onToggleAll: 'toggleSelectAllRateOptions',
+          onModel: 'SetRateOptions',
+          onSelect: "setSelectedRateOptions"
+        },
         generatecontrol: true,
         disable: false,
-        Validations: [
-        ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
-        additionalData: {
-          showNameAndValue: false,
-        },
+        accessallowed: true,
       },
       {
         name: "destinationRateOption",
-        label: "Destination Rate",
+        label: "Destination Rate option",
         placeholder: "Destination Rate option",
-        type: "dropdown",
+        type: "multiselect",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
+        Validations: [],
+        additionalData: {
+          isIndeterminate: false,
+          isChecked: false,
+          support: "destinationRateOptionHandler",
+          showNameAndValue: false,
+
+        },
+        functions: {
+          onToggleAll: 'toggleSelectAllRateOptions',
+          onModel: 'SetRateOptions',
+          onSelect: "setSelectedRateOptions"
+        },
         generatecontrol: true,
         disable: false,
-        Validations: [
-        ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
-        additionalData: {
-          showNameAndValue: false,
-        },
-      }
+        accessallowed: true,
+      },
+
+      {
+        name: 'originRateOptionHandler',
+        label: 'Origin Rate option',
+        placeholder: 'Origin Rate option',
+        type: '',
+        value: '',
+        Validations: [{
+          name: "required",
+          message: " ",
+        }],
+        generatecontrol: false, disable: false,
+        accessallowed: true,
+      },
+      {
+        name: 'destinationRateOptionHandler',
+        label: 'Destination Rate option',
+        placeholder: 'Destination Rate option',
+        type: '',
+        value: '',
+        Validations: [{
+          name: "required",
+          message: " ",
+        }],
+        generatecontrol: false, disable: false,
+        accessallowed: true,
+      },
     ]
 
     this.ContractServiceSelectionControlArray = [
@@ -133,6 +175,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
 
       {
@@ -147,6 +190,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "DACC",
@@ -160,6 +204,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "fuelSurcharge",
@@ -173,6 +218,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "cutofftime",
@@ -186,6 +232,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "COD/DOD",
@@ -199,6 +246,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "Demurrage",
@@ -212,6 +260,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "DPH",
@@ -225,6 +274,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "Insurance",
@@ -238,6 +288,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "YieldProtection",
@@ -251,6 +302,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
 
     ]
@@ -271,6 +323,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
           {
             name: "required",
@@ -292,6 +345,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -312,6 +366,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -332,6 +387,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -354,6 +410,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -374,6 +431,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -394,6 +452,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -414,6 +473,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -437,6 +497,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -457,6 +518,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -477,6 +539,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -497,6 +560,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -517,6 +581,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -543,6 +608,7 @@ export class ContractServiceSelectionControl {
         }],
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "tovalue",
@@ -565,6 +631,7 @@ export class ContractServiceSelectionControl {
         },
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "rateType",
@@ -581,6 +648,7 @@ export class ContractServiceSelectionControl {
         }],
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "Rate",
@@ -597,6 +665,7 @@ export class ContractServiceSelectionControl {
         }],
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "MinCharge",
@@ -613,6 +682,7 @@ export class ContractServiceSelectionControl {
         }],
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
       {
         name: "MaxCharge",
@@ -629,6 +699,7 @@ export class ContractServiceSelectionControl {
         }],
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
     ];
     this.ContractCutOfftimeControlArray = [
@@ -643,6 +714,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
           {
             name: "required",
@@ -668,6 +740,7 @@ export class ContractServiceSelectionControl {
         }],
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
       },
     ];
     this.ContractYieldProtectionSelectionControlArray = [
@@ -682,6 +755,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -702,6 +776,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -723,6 +798,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -743,6 +819,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -763,6 +840,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -783,6 +861,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -805,6 +884,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -825,6 +905,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -846,6 +927,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -866,6 +948,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -886,6 +969,7 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
+        accessallowed: true,
         Validations: [
         ],
         functions: {
@@ -897,10 +981,12 @@ export class ContractServiceSelectionControl {
       },
     ]
   }
-  getContractProductSelectionControlControls() {
+  getContractProductSelectionControlControls(CurrentAccess: string[]) {
+    this.ContractProductSelectionControlArray = this.ContractProductSelectionControlArray.filter(item => CurrentAccess.includes(item.name))
     return this.ContractProductSelectionControlArray;
   }
-  getContractServiceSelectionControlControls() {
+  getContractServiceSelectionControlControls(CurrentAccess: string[]) {
+    this.ContractServiceSelectionControlArray = this.ContractServiceSelectionControlArray.filter(item => CurrentAccess.includes(item.name))
     return this.ContractServiceSelectionControlArray;
   }
   getContractCODDODSelectionControlControls() {

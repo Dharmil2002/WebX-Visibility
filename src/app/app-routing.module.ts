@@ -40,10 +40,10 @@ const routes: Routes = [
         loadChildren: () =>
           import("./operation/operation.module").then((m) => m.OperationModule),
       }
-      ,{
+      , {
         path: "Finance",
         loadChildren: () =>
-          import("./finance/finance.module").then((m)=>m.FinanceModule),
+          import("./finance/finance.module").then((m) => m.FinanceModule),
       },
     ],
   },
@@ -59,7 +59,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: "legacy" })],
+  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: "corrected", })],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

@@ -49,6 +49,9 @@ import { ModifyTableCollumnsComponent } from './modify-table-collumns/modify-tab
 import { XlsxPreviewPageComponent } from './xlsx-preview-page/xlsx-preview-page.component';
 import { MatTableExporterModule } from 'mat-table-exporter';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { GenericViewPrintComponent } from './Generic View Print/generic-view-print.component';
+import { NgxBarcode6Module } from "ngx-barcode6";
+import { NgxPrintModule } from "ngx-print";
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -65,7 +68,7 @@ const MY_DATE_FORMAT = {
   declarations: [GenericAccordionComponent, GenericTableComponent,
     FormComponent, FormWithoutAutoCompleteComponent, GenericDashBoardComponent,
     GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent, TreeViewComponent, GenericChartDashboardComponent, GenericCardComponent, DecimaRangeValidatorDirective, GenericTableV2Component
-  , ExpandableTableComponent,ModifyTableCollumnsComponent,XlsxPreviewPageComponent],
+  , ExpandableTableComponent,ModifyTableCollumnsComponent,XlsxPreviewPageComponent,GenericViewPrintComponent],
   imports: [
     CommonModule,
     MatCardModule,
@@ -95,7 +98,9 @@ const MY_DATE_FORMAT = {
     MatTabsModule,
     MatRadioModule,
     MatTableExporterModule,
-    DragDropModule
+    DragDropModule,
+    NgxBarcode6Module,
+    NgxPrintModule
   ],
   providers: [
     {
@@ -129,7 +134,8 @@ const MY_DATE_FORMAT = {
     GenericChartDashboardComponent,
     GenericCardComponent,
     DecimaRangeValidatorDirective,
-    GenericTableV2Component
+    GenericTableV2Component,
+    GenericViewPrintComponent
   ],
 
 })

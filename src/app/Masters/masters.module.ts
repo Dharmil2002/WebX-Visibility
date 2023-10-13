@@ -127,6 +127,8 @@ import { CustomerContractListComponent } from './Customer Contract/customer-cont
 import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
 import { CustomerQueryPageComponent } from './Customer Contract/customer-query-page/customer-query-page.component';
 import { SessionService } from '../core/service/session.service';
+import { BeneficiaryMasterListComponent } from './beneficiary-master/beneficiary-master-list/beneficiary-master-list.component';
+import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-beneficiary-master/add-beneficiary-master.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -257,7 +259,24 @@ import { SessionService } from '../core/service/session.service';
     CustomerContractListComponent,
     CustomerContractTabsIndexComponent,
     CustomerContractBasicInformationComponent,
-    CustomerContractServiceSelectionComponent
+    CustomerContractServiceSelectionComponent,
+    ServiceSelectionComponent,
+    AddStandardChargesComponent,
+    FleetMasterListComponent,
+    AddFleetMasterComponent,
+    AddTripLaneBasedComponent,
+    StandardChargesComponent,
+    AddAdditionalDeliveryChargesComponent,
+    AddWaitingChargesComponent,
+    TripLaneBasedComponent,
+    SpecialChargesComponent,
+    CustomerQueryPageComponent,
+    CustomerContractListComponent,
+    CustomerContractTabsIndexComponent,
+    CustomerContractBasicInformationComponent,
+    CustomerContractServiceSelectionComponent,
+    BeneficiaryMasterListComponent,
+    AddBeneficiaryMasterComponent
 
   ],
 

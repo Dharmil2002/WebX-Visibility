@@ -296,6 +296,16 @@ export const ROUTES: RouteInfo[] =
               "submenu": [
               ]
             },
+            {
+              "path": "Masters/BeneficiaryMaster/AddBeneficiaryMaster",
+              "title": "Beneficiary Master",
+              "moduleName": "Beneficiary Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
           ]
         },
         {

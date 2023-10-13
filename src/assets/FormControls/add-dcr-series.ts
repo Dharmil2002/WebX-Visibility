@@ -37,7 +37,10 @@ export class AddDcrSeriesControl {
                 },
                 generatecontrol: true,
                 disable: false,
-                Validations: []
+                Validations: [{
+                    name: "required",
+                    message: "Business Type is required"
+                }]
             },
             {
                 name: 'bookCode',
@@ -47,7 +50,12 @@ export class AddDcrSeriesControl {
                 value: '',
                 generatecontrol: true,
                 disable: false,
-                Validations: []
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Book Code is required"
+                    }
+                ]
             },
             {
                 name: 'seriesFrom',
@@ -78,7 +86,12 @@ export class AddDcrSeriesControl {
                 value: '',
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Total Leaf is required"
+                    }
+                ],
                 functions: {
                     onChange: "getSeriesTo",
                 },
@@ -92,7 +105,10 @@ export class AddDcrSeriesControl {
                 value: '',
                 generatecontrol: true,
                 disable: true,
-                Validations: []
+                Validations: [{
+                    name: "required",
+                    message: "Series To is required"
+                }]
             },
             {
                 name: 'allotTo',
@@ -105,7 +121,12 @@ export class AddDcrSeriesControl {
                 },
                 generatecontrol: true,
                 disable: false,
-                Validations: []
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Allot To is required"
+                    }
+                ]
             },
             {
                 name: 'updateDate',

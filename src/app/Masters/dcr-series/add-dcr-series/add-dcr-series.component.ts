@@ -7,8 +7,7 @@ import Swal from 'sweetalert2';
 import { map } from 'rxjs/operators';
 import { AddDcrSeriesControl } from 'src/assets/FormControls/add-dcr-series';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 @Component({
   selector: 'app-add-dcr-series',
   templateUrl: './add-dcr-series.component.html'
@@ -104,7 +103,8 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   addDcrTableForm: UntypedFormGroup;
 
   constructor(
-    public objSnackBarUtility: SnackBarUtilityService, private masterService: MasterService,
+    public objSnackBarUtility: SnackBarUtilityService,
+    private masterService: MasterService,
     private fb: UntypedFormBuilder,
   ) {
     super();

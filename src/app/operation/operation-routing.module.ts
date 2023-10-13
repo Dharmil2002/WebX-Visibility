@@ -27,6 +27,7 @@ import { UnbilledPrqComponent } from "./unbilled-prq/unbilled-prq.component";
 import { ErrorHandingComponent } from "./error-handing/error-handing.component";
 import { ConsignmentEntryFormComponent } from "./consignment-entry-form/consignment-entry-form.component";
 import { ThcGenerationComponent } from "./thc-generation/thc-generation.component";
+import { THCViewComponent } from "./ViewPrint/thc-view/thc-view.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -135,6 +136,10 @@ const routes: Routes = [
   {
     path: "thc-create",
     component: ThcGenerationComponent
+  },
+  {
+    path: "thc-view",
+    component: THCViewComponent
   }
 ]
 

@@ -44,7 +44,7 @@ export class SigninComponent
     //Redirect if user already logged in
     if (this.authService.currentUserValue) {
       this.Islogin = true;
-      this.router.navigate(["/dashboard/GlobeDashboardPage"]);
+      this.router.navigate(["/dashboard/Index"]);
     }
   }
   get f() {
@@ -72,7 +72,7 @@ export class SigninComponent
             const token = this.authService.currentUserValue.tokens.access.token;
             if (token) {
               this.Islogin = true;
-              this.router.navigate(["/dashboard/GlobeDashboardPage"]);
+              this.router.navigate(["/dashboard/Index"]);
             }
             else{
               this.Islogin = false;
@@ -101,7 +101,7 @@ export class SigninComponent
     // localStorage.setItem("Username", this.loginForm.value.Username);
     // localStorage.setItem("Branch", this.loginForm.value.Branch);
     // localStorage.setItem("Mode","Export");
-    // this.router.navigate(["/dashboard/GlobeDashboardPage"]);
+    // this.router.navigate(["/dashboard/Index"]);
     // }
   }
 

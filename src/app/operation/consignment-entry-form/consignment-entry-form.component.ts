@@ -236,7 +236,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   ngOnInit(): void {
     this.bindDataFromDropdown();
     this.isTableLoad = false;
-    this.backPath = "/dashboard/GlobeDashboardPage?tab=6";
+    this.backPath = "/dashboard/Index?tab=6";
   }
   //#region initializeFormControl
   async initializeFormControl() {
@@ -458,7 +458,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   cancel() {
     this._NavigationService.navigateTotab(
       "docket",
-      "dashboard/GlobeDashboardPage"
+      "dashboard/Index"
     );
   }
   //#endregion
@@ -943,7 +943,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
                 // Redirect to the desired page after the success message is confirmed.
                 this._NavigationService.navigateTotab(
                   "PRQ",
-                  "dashboard/GlobeDashboardPage"
+                  "dashboard/Index"
                 );
               }
             });
@@ -981,7 +981,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
             // Redirect to the desired page after the success message is confirmed.
             this._NavigationService.navigateTotab(
               "PRQ",
-              "dashboard/GlobeDashboardPage"
+              "dashboard/Index"
             );
           }
         });

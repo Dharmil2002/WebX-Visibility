@@ -53,14 +53,14 @@ export class DocketDashboardComponent implements OnInit {
   }
   docketBooking(event){
     const routeMap = {
-      'FullTruckOperations': '/dashboard/GlobeDashboardPage',
-      'EXIMTransportation':'/dashboard/GlobeDashboardPage',
-      'ExpressMovement': '/dashboard/GlobeDashboardPage',
-      'PlanningandDistribution': '/dashboard/GlobeDashboardPage',
-      'CustomerContractsandBilling': '/dashboard/GlobeDashboardPage',
-      'VendorContracts&Payments': '/dashboard/GlobeDashboardPage',
-      'FinancialAccounts': '/dashboard/GlobeDashboardPage',
-      'AdminPortal': '/dashboard/GlobeDashboardPage',
+      'FullTruckOperations': '/dashboard/Index',
+      'EXIMTransportation':'/dashboard/Index',
+      'ExpressMovement': '/dashboard/Index',
+      'PlanningandDistribution': '/dashboard/Index',
+      'CustomerContractsandBilling': '/dashboard/Index',
+      'VendorContracts&Payments': '/dashboard/Index',
+      'FinancialAccounts': '/dashboard/Index',
+      'AdminPortal': '/dashboard/Index',
       'default': '/Masters/Docket/Ewaybill-Config'
     };
 

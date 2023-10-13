@@ -277,7 +277,7 @@ export class HeaderComponent
     this.allOptions = searchDetail;
   }
   goBack(tabIndex: string): void {
-    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
 
   VirtualLogin() {

@@ -558,7 +558,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   goBack(tabIndex: string): void {
     this.navigationService.navigateTotab(
       tabIndex,
-      "/dashboard/GlobeDashboardPage"
+      "/dashboard/Index"
     );
   }
 

@@ -212,7 +212,7 @@ export class ThcGenerationComponent implements OnInit {
   ngOnInit(): void {
     this.IntializeFormControl();
     this.getDropDownDetail();
-    this.backPath = "/dashboard/GlobeDashboardPage?tab=6";
+    this.backPath = "/dashboard/Index?tab=6";
   }
 
   IntializeFormControl() {
@@ -630,7 +630,7 @@ export class ThcGenerationComponent implements OnInit {
     return blankFields.map(fieldName => fieldMap[fieldName]).join(', ');
   }
   goBack(tabIndex: string): void {
-    this.route.navigate(["/dashboard/GlobeDashboardPage"], {
+    this.route.navigate(["/dashboard/Index"], {
       queryParams: { tab: tabIndex },
       state: [],
     });

@@ -136,7 +136,7 @@ export class VoucherDetailsComponent implements OnInit {
   } 
  
   goBack(tabIndex: string): void {
-    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   save() {}
 

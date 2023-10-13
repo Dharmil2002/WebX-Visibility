@@ -375,7 +375,7 @@ export class ChaEntryPageComponent implements OnInit {
     return true;
   }
   goBack(tabIndex: string): void {
-    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+    this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   calculateTotaAmount(event) {
     let gstamount = parseFloat(event.row.clrChrg) * parseFloat(event.row.gstRate) / 100

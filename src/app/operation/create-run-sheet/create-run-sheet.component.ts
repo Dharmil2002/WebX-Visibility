@@ -151,6 +151,6 @@ export class CreateRunSheetComponent implements OnInit {
     })
   }
   goBack(tabIndex: string): void {
-    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
+    this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
 }

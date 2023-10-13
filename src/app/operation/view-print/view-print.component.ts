@@ -51,6 +51,6 @@ export class ViewPrintComponent implements OnInit {
     this.goBack('PRQ');
   }
   goBack(tabIndex: string): void {
-    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+    this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
 }

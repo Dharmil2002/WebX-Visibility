@@ -448,7 +448,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
  
   goBack(tabIndex: string): void {
-    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
+    this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
 }
 

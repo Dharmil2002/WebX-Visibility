@@ -362,7 +362,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.goBack('Departures')
   }
   goBack(tabIndex: string): void {
-    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
+    this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
   async updateTripStatus() {
     const next = getNextLocation(this.arrivalData.Route.split(":")[1].split("-"), this.currentBranch);

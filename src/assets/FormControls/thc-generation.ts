@@ -3,6 +3,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class thcControl {
     private thcControlArray: FormControls[];
     constructor(update: boolean, view: boolean) {
+
         this.thcControlArray =
             [
                 {
@@ -488,10 +489,66 @@ export class thcControl {
                     },
                     generatecontrol: false,
                     disable: true
+                },
+                {
+                    name: 'billingParty',
+                    label: 'billingParty',
+                    placeholder: 'billingParty',
+                    type: 'text',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: true
+                },
+                {
+                    name: 'docketNumber',
+                    label: 'Docket Number',
+                    placeholder:'Docket Number',
+                    type: 'text',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: true
+                },
+                {
+                    name: 'actualWeight',
+                    label: 'Actual Weight',
+                    placeholder:'Actual Weight',
+                    type: 'number',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: 'noofPkts',
+                    label: 'No Of Package',
+                    placeholder:'No Of Package',
+                    type: 'number',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData:"shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: false
                 }
 
 
-            ];
+       ];
     }
     getThcFormControls() {
         return this.thcControlArray;

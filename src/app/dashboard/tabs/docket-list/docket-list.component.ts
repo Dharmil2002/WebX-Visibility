@@ -34,13 +34,13 @@ export class DocketListComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:150px",
     },
-    transMode: {
-      Title: "Trans Mode",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
     actualWeight: {
       Title: "Actual Weight",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    totalPkg: {
+      Title: "Total Package",
       class: "matcolumncenter",
       Style: "max-width:150px",
     },
@@ -58,13 +58,17 @@ export class DocketListComponent implements OnInit {
     "vehicleNo",
     "docketNumber",
     "ftCity",
-    "transMode",
-    "actualWeight"
+    "actualWeight",
+    "totalPkg"
   ];
 
   /*.......End................*/
   /* here the varible declare for menu Item option Both is required */
-  menuItems=[{label:"Edit Docket"}]
+  menuItems=[
+    {label:"Edit Docket"},
+    {label:"Rake Update"},
+    {label:"Create THC"}
+  ]
   menuItemflag: boolean = true;
   TableStyle = "width:85%"
   /*.......End................*/
@@ -98,9 +102,15 @@ export class DocketListComponent implements OnInit {
       });
       // Sum all the calculated actualWeights
       const totalActualWeight = actualWeights.reduce((acc, weight) => acc + weight, 0);
+      const noofPkts = [x].map((item) => {
+        return item ? calculateTotalField(item.invoiceDetails, 'noofPkts') : 0;
+      });
+      // Sum all the calculated actualWeights
+      const totalnoofPkts = noofPkts.reduce((acc, pkg) => acc + pkg, 0);
       x.actualWeight = totalActualWeight,
+      x.totalPkg = totalnoofPkts,
       x.ftCity=`${x.fromCity}-${x.toCity}`,
-      x.actions=x.status=="0"?["Edit Docket"]:""
+      x.actions=x.status=="0"?["Edit Docket","Create THC"]:["Rake Update"]
       return x; // Make sure to return x to update the original object in the 'tableData' array.
     });
     //this.tableData = [];
@@ -116,5 +126,22 @@ export class DocketListComponent implements OnInit {
         },
       });
     }
+    if (data.label.label === "Create THC") {
+      this.router.navigate(['/Operation/thc-create'], {
+        state: {
+          data:{ data:data.data,addThc:true}
+
+        },
+      });
+    }
+    if (data.label.label === "Rake Update") {
+      this.goBack('Job')
+    }
+  }
+  goBack(tabIndex: string): void {
+    this.router.navigate(["/dashboard/GlobeDashboardPage"], {
+      queryParams: { tab: tabIndex },
+      state: [],
+    });
   }
 }

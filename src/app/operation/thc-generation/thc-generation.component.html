@@ -24,7 +24,21 @@
 
   <!-- End -->
 
-  <!-- Vehicle Loading Detail -->
+  <!-- Docket Detail -->
+  <div *ngIf="addThc">
+  <hr>
+  <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+    <h3 style="font-size: 1.5rem; padding: 5px 0px;"> Docket Detail</h3>
+  </div>
+  <form [formGroup]="thcTableForm">
+    <app-form-without-auto-complete-webxpress [form]="thcTableForm" [formData]="jsonControlDocketArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    </app-form-without-auto-complete-webxpress>
+  </form>
+</div>
+  <!-- End -->
+
+  
   <hr>
   <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
     <h3 style="font-size: 1.5rem; padding: 5px 0px;"> Vehicle Loading Detail</h3>
@@ -35,6 +49,7 @@
     </app-form-without-auto-complete-webxpress>
   </form>
   <!-- End -->
+
   <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
     <!-- Bootstrap loader -->
     <div class="spinner-border text-primary" role="status">
@@ -42,7 +57,7 @@
     </div>
   </div>
   <div class="paddingdiv">
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    <app-generic-table-v2 *ngIf="!tableLoad&&!addThc" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
       [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
       [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
       (menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"

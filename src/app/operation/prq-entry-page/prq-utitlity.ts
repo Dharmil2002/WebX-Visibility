@@ -1,4 +1,5 @@
 import Swal from 'sweetalert2';
+const branch=localStorage.getItem("Branch");
 export async function addPrqData(prqData, masterService) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
@@ -109,8 +110,8 @@ export async function customerFromApi(masterService) {
     }
     try {
         const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
-        const filterMap = res?.data?.map(x => ({ value: x.customerCode, name: x.customerName })) ?? null;
-        return filterMap.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
+        const result = res?.data?.filter(x => x.customerLocations.includes(branch))?.map(x => ({ value: x.customerCode, name: x.customerName })) ?? null;
+        return result.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
     } catch (error) {
         console.error("An error occurred:", error);
         return null;

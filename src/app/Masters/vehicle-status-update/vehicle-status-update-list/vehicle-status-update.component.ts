@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getVehicleDashboardDetails, getVehicleStatusFromApi } from '../vehicle-status-utility';
 import { formatDate } from 'src/app/Utility/date/date-utils';
+import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utlity';
 
 @Component({
   selector: 'app-vehicle-status-update',
@@ -31,31 +32,30 @@ export class VehicleStatusUpdateComponent implements OnInit {
       active: "Vehicle Status",
     },
   ];
+  colFilter: { filter: boolean, submit: boolean } = { filter: true, submit: false };
   columnHeader = {
-    "srNo": "Sr No",
-    "vehNo": "Vehicle No",
-    "driver": "Driver Name & Mobile",
-    "vendor": "Vendor Name  & Mobile",
-    "vendorType": "Vedor Type",
+    "updateDt": "LUDT",
+    "vehNo": "Veh-No",
+    "driver": "Driver Detail",
+    "vendor": "Vendor Detail",
+    "vendorType": "Type",
     "status": "Status",
     "tripId": "Trip Id",
     "currentLocation": "Location",
     "route": "Route",
     "eta": "ETA",
-    "updateDt": "Last Updated Date time"
   };
   columnWidths = {
-    'srNo': 'min-width: 1%',
+    'updateDt': 'min-width:12%',
     'vehNo': 'min-width:9%',
     'driver': 'min-width:9%',
     'vendor': 'min-width:9%',
     'vendorType': 'min-width:1%',
-    'status': 'align-self: center;min-width:6%;',
+    'status': 'min-width:1%;',
     'tripId': 'min-width:16%',
-    'currentLocation': 'min-width:6%',
+    'currentLocation': 'min-width:1%',
     'route': 'min-width:9%',
-    'eta': 'min-width:13%',
-    'updateDt': 'min-width:13%'
+    'eta': 'min-width:10%',
   };
   headerForCsv = {
     "srNo": "Sr No",
@@ -90,8 +90,8 @@ export class VehicleStatusUpdateComponent implements OnInit {
         return {
           ...obj,
           srNo: index + 1,
-          driver:`${obj?.driver || ""}-${obj?.dMobNo||""}`,
-          vendor:`${obj?.vendor || ""}-${obj?.vMobNo||""}`,
+          driver: `${obj?.driver || ""}-${obj?.dMobNo || ""}`,
+          vendor: `${obj?.vendor || ""}-${obj?.vMobNo || ""}`,
           route: `${obj?.fromCity || ""}-${obj?.toCity || ""}`
         };
       });
@@ -109,6 +109,7 @@ export class VehicleStatusUpdateComponent implements OnInit {
       const tableDetail = sortedTableDetail.map((x) => { if (x.updateDate) { x.updateDt = formatDate(x.updateDate, 'dd/MM/yyyy HH:mm'), x.eta = formatDate(x.updateDate, 'dd/MM/yyyy HH:mm'), x.tripId = `${x.tripId} ` } return x })
 
       this.tableData = tableDetail;
+      this.IsActiveFuntion()
       this.tableLoad = false;
       this.boxData = getVehicleDashboardDetails(this.tableData)
     } catch (error) {
@@ -117,4 +118,40 @@ export class VehicleStatusUpdateComponent implements OnInit {
       // You can also set an error state or display a relevant message to the user
     }
   }
+  /*below the code for the KPI calucation*/
+
+  IsActiveFuntion() {
+  
+    const vhAvlCount = this.tableData.filter((x) => x.status === 'Available').length;
+    const vhInTranCount = this.tableData.filter((x) => x.status === 'In Transit').length;
+    const currentTime = new Date(); // Get the current time
+
+    // Assuming tableData is an array of objects with an "updateDate" property
+    const IdleVehicle  = this.tableData.filter(item => {
+      const updateDate = new Date(item.updateDate); // Convert the updateDate to a Date object
+      const timeDifference = (currentTime.getTime() - updateDate.getTime()) / (1000 * 60); // Calculate the time difference in minutes
+      return timeDifference > 60 &&  item.status === 'Available';
+    }).length;
+  
+    // //#region fist table KPICountData
+    // this.KPICountData = [
+    //   {
+    //     count: vhAvlCount,
+    //     title: "Available Vehicle",
+    //     class: `color-Grape-light`,
+    //   },
+    //   {
+    //     count: vhInTranCount,
+    //     title: "In Transit",
+    //     class: `color-Bottle-light`,
+    //   },
+    //   {
+    //     count: IdleVehicle,
+    //     title: "Vehicle Idle Metric ",
+    //     class: `color-Daisy-light`,
+    //   }
+    //]
+  }
+  /* End */
+
 }

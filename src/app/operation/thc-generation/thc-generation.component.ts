@@ -22,7 +22,6 @@ import { MatDialog } from "@angular/material/dialog";
 import { ThcUpdateComponent } from "src/app/dashboard/tabs/thc-update/thc-update.component";
 import { VehicleStatusService } from "src/app/Utility/module/operation/vehicleStatus/vehicle.service";
 import { formatDate } from "src/app/Utility/date/date-utils";
-import { debug } from "console";
 
 @Component({
   selector: "app-thc-generation",
@@ -81,12 +80,12 @@ export class ThcGenerationComponent implements OnInit {
     },
     actualWeight: {
       Title: "Actual Weight (Kg)",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:160px",
     },
     noofPkts: {
       Title: "No of Packets ",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:160px",
     },
     pod: {
@@ -155,6 +154,8 @@ export class ThcGenerationComponent implements OnInit {
   jsonControlDriverArray: any;
   unloadName: any;
   unloadStatus: any;
+  addThc: boolean;
+  jsonControlDocketArray:any;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -165,9 +166,8 @@ export class ThcGenerationComponent implements OnInit {
     private vehicleStatusService: VehicleStatusService,
     public dialog: MatDialog
   ) {
-    const navigationState =
-      this.route.getCurrentNavigation()?.extras?.state?.data;
-
+    let navigationState =this.route.getCurrentNavigation()?.extras?.state?.data;
+    
     if (navigationState != null) {
       this.isUpdate = navigationState.hasOwnProperty("isUpdate") ? true : false;
       this.isView = navigationState.hasOwnProperty("isView") ? true : false;
@@ -182,7 +182,12 @@ export class ThcGenerationComponent implements OnInit {
         this.staticField.push(...field)
         delete this.columnHeader.actionsItems;
         this.thcDetail = navigationState.data;
-      } else {
+      }
+      else if(navigationState.hasOwnProperty('addThc')){
+        this.addThc=true;
+        this.thcDetail=navigationState.data;
+      } 
+      else {
         delete this.columnHeader.pod;
         delete this.columnHeader.receiveBy;
         delete this.columnHeader.actionsItems;
@@ -236,7 +241,15 @@ export class ThcGenerationComponent implements OnInit {
       .filter(
         (x) => x.additionalData && x.additionalData.metaData === "driver"
       );
+      if(this.addThc){
+      this.jsonControlDocketArray = loadingControlFormControls
+      .getThcFormControls()
+      .filter(
+        (x) => x.additionalData && x.additionalData.metaData === "shipment_detail"
+      );
+      }
     this.jsonControlArray = [...this.jsonControlBasicArray, ...this.jsonControlVehLoadArray, ...this.jsonControlDriverArray]
+      this.addThc?this.jsonControlArray.push(...this.jsonControlDocketArray):""
     // Loop through the jsonControlArray to find the vehicleType control and set related properties
     this.vehicleName = this.jsonControlArray.find(
       (data) => data.name === "vehicle"
@@ -325,7 +338,7 @@ export class ThcGenerationComponent implements OnInit {
     if (this.prqFlag) {
       this.bindDataPrq();
     }
-    if (this.isUpdate || this.isView) {
+    if (this.isUpdate || this.isView||this.addThc) {
       this.autoFillThc();
     }
   }
@@ -348,7 +361,7 @@ export class ThcGenerationComponent implements OnInit {
       this.prqDetail?.fromToCity || ""
     );
     this.thcTableForm.controls["capacity"].setValue(
-      this.prqDetail?.vehicleSize || ""
+      this.prqDetail?.vehicleSize ||this.prqDetail?.containerSize.split(" ")[0]||""
     );
     this.thcTableForm.controls["driverName"].setValue(
       vehicleDetail?.driver || ""
@@ -444,8 +457,9 @@ export class ThcGenerationComponent implements OnInit {
     );
     this.selectedData = event;
   }
+
   autoFillThc() {
-    const propertiesToSet = [
+    let propertiesToSet = [
       "route",
       "prqNo",
       "vehicle",
@@ -468,7 +482,9 @@ export class ThcGenerationComponent implements OnInit {
       "vendorName",
       "panNo",
     ];
-
+    if(this.addThc){
+      propertiesToSet=propertiesToSet.filter((x)=>x!=="tripId");
+    }
     propertiesToSet.forEach((property) => {
       if (property === "prqNo") {
         const prqNo = {
@@ -495,6 +511,10 @@ export class ThcGenerationComponent implements OnInit {
       (x) => x.value === this.thcDetail?.balAmtAt
     );
     this.thcTableForm.controls["closingBranch"].setValue(closingBranch);
+    if(this.addThc){
+      this.thcTableForm.controls['billingParty'].setValue(this.thcDetail?.billingParty);
+      this.thcTableForm.controls['docketNumber'].setValue(this.thcDetail?.docketNumber);
+    }
     this.getShipmentDetails();
   }
   async handleMenuItemClick(data) {
@@ -591,7 +611,6 @@ export class ThcGenerationComponent implements OnInit {
         this.thcTableForm.value
       );
       if (resThc) {
-        debugger
         Swal.fire({
           icon: "success",
           title: "THC Generated Successfully",

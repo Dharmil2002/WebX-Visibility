@@ -364,9 +364,10 @@ export class ConsignmentControl {
         },
       },
       {
-        name: 'vehicleNo', label: 'Lorry No', placeholder: 'Lorry No', type: 'text',
+        name: 'vehicleNo', label: 'Lorry No', placeholder: 'Lorry No',type: "dropdown",
         value: docketDetail.vehicleNo, Validations: [], generatecontrol: true, disable: false,
         additionalData: {
+          showNameAndValue: false,
           metaData: "Basic",
         },
       },

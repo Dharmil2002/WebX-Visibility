@@ -8,6 +8,7 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { VehicleStatusControls } from 'src/assets/FormControls/vehicle-status';
 import { addVehicleStatusData, getLocationDetail, getVehicleStatusFromApi, getvehicleDetail } from '../vehicle-status-utility';
 import Swal from 'sweetalert2';
+import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
 
 @Component({
   selector: 'app-add-vehicle-status-update',
@@ -30,11 +31,13 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
   vehicleStatus: any;
   backPath:string;
   vehicleData = [];
+  allVehDetail:any;
   constructor(
     private route: Router,
     private fb: UntypedFormBuilder,
     private _operationService: OperationService,
-    private filter: FilterUtils
+    private filter: FilterUtils,
+    private vehicleStatusService:VehicleStatusService
 
   ) {
 
@@ -120,6 +123,13 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
     this.vehicleStatusTableForm.controls['capacity'].setValue(capacity != undefined ? capacity : '');
     this.vehicleStatusTableForm.controls['_id'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
     this.vehicleStatusTableForm.controls['vehNo'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
+    this.vehicleStatusTableForm.controls['vMobNo'].setValue(this.allVehDetail?.vendorPhoneNo||"");
+    this.vehicleStatusTableForm.controls['vendor'].setValue(this.allVehDetail?.vendorName||"");
+    this.vehicleStatusTableForm.controls['vendorType'].setValue(this.allVehDetail?.vendorType||"");
+    this.vehicleStatusTableForm.controls['driver'].setValue(this.allVehDetail?.driverName||"");
+    this.vehicleStatusTableForm.controls['dMobNo'].setValue(this.allVehDetail?.telno||"");
+   const detail= this.allVehDetail;
+   console.log(detail);
     try {
 
       const vehicleData = await addVehicleStatusData(this.companyCode, this._operationService, this.vehicleStatusTableForm.value);
@@ -141,9 +151,10 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
 
   }
   async ValidationForVehno() {
+    const vehNo= this.vehicleStatusTableForm.value.vehNo.value;
     const vehList = await getVehicleStatusFromApi(this.companyCode, this._operationService);
-    const existingVehicle = vehList.find(vehicle => vehicle.vehNo === this.vehicleStatusTableForm.value.vehNo.value);
-
+    const existingVehicle = vehList.find(vehicle => vehicle.vehNo ===vehNo);
+  
     if (existingVehicle) {
       Swal.fire({
         icon: "info",
@@ -152,6 +163,9 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
         showConfirmButton: true,
     });
     this.vehicleStatusTableForm.controls['vehNo'].setValue({name:"",value:""})
+    }
+    else{
+       this.allVehDetail = await this.vehicleStatusService.vehicleListFromMaster(vehNo);
     }
 }
 

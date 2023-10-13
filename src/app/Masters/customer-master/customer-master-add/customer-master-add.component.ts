@@ -411,9 +411,10 @@ export class CustomerMasterAddComponent implements OnInit {
         "collectionName": collectionName,
         "filter": {}
       };
+     
       const response = await this.masterService.masterPost("generic/get", reqBody).toPromise()
       const dataList = response.data.map(x => ({
-        name: x[nameProperty],
+        name:nameProperty=="locName"? x[dataProperty]:x[nameProperty],
         value: x[dataProperty]
       }));
 
@@ -726,7 +727,7 @@ export class CustomerMasterAddComponent implements OnInit {
   // ******************************************************/Save Edit Remove And Set Function/**********************************************
   async save() {
     const controlDetail = this.customerTableForm.value.customerLocationsDrop;
-    const customerLocationsDrop = controlDetail ? controlDetail.map((item: any) => item.name) : "";
+    const customerLocationsDrop = controlDetail ? controlDetail.map((item: any) => item.value) : "";
     this.customerTableForm.controls["customerLocations"].setValue(customerLocationsDrop);
     this.customerTableForm.removeControl('customerLocationsDrop')
 

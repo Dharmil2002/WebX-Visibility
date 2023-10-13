@@ -95,7 +95,7 @@ export class PrqEntryPageComponent implements OnInit {
     this.bindDropDown();
     this.getCity();
     this.bindDataFromDropdown();
-    this.backPath = "dashboard/GlobeDashboardPage?tab=6";
+    this.backPath = "dashboard/Index?tab=6";
   }
 
   autoFill() {
@@ -303,7 +303,7 @@ export class PrqEntryPageComponent implements OnInit {
     // console.log(this.prqEntryTableForm.value);
   }
   goBack(tabIndex: number): void {
-    this.router.navigate(["/dashboard/GlobeDashboardPage"], {
+    this.router.navigate(["/dashboard/Index"], {
       queryParams: { tab: tabIndex },
       state: [],
     });

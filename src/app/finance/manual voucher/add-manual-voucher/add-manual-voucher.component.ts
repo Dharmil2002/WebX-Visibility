@@ -78,7 +78,7 @@ export class AddManualVoucherComponent implements OnInit {
           // Redirect to the desired page after the success message is confirmed.
           this._NavigationService.navigateTotab(
             'Voucher',
-            "dashboard/GlobeDashboardPage"
+            "dashboard/Index"
           );
         }
       });
@@ -110,7 +110,7 @@ export class AddManualVoucherComponent implements OnInit {
           // Redirect to the desired page after the success message is confirmed.
           this._NavigationService.navigateTotab(
             'Voucher',
-            "dashboard/GlobeDashboardPage"
+            "dashboard/Index"
           );
         }
       });
@@ -121,7 +121,7 @@ export class AddManualVoucherComponent implements OnInit {
     this.goBack('Management​')
   }
   goBack(tabIndex: string): void {
-    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex } });
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
   bindVoucherDetail(){
     this.manualVoucharTableForm.controls['_id'].setValue(this.voucherDetail?.voucherNo||"")

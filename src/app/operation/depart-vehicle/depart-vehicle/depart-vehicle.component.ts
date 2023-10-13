@@ -471,7 +471,7 @@ export class DepartVehicleComponent implements OnInit {
     this.departureTableForm.controls["Cewb"].setValue(randomNumber);
   }
   goBack(tabIndex: string): void {
-    this.Route.navigate(["/dashboard/GlobeDashboardPage"], {
+    this.Route.navigate(["/dashboard/Index"], {
       queryParams: { tab: tabIndex },
     });
   }

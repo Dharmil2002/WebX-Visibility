@@ -205,7 +205,7 @@ export class MarkArrivalComponent implements OnInit {
     this.dialogRef.close()
   }
   goBack(tabIndex: number): void {
-    this.Route.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: this.departature });
+    this.Route.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: this.departature });
   }
   getReasonList() {
     this.http.get(this.lateReasonURL).subscribe(res => {

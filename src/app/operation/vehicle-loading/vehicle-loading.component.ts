@@ -250,7 +250,7 @@ export class VehicleLoadingComponent implements OnInit {
     })
   }
   goBack(tabIndex: string): void {
-    this.navigationService.navigateTotab(tabIndex, '/dashboard/GlobeDashboardPage');
+    this.navigationService.navigateTotab(tabIndex, '/dashboard/Index');
   }
   
 }

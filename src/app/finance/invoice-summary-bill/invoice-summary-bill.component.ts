@@ -240,7 +240,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
 
   }
   cancel(tabIndex: string): void {
-    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
 
   async getCustomerDetail() {

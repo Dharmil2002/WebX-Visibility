@@ -9,7 +9,7 @@ export const ROUTES: RouteInfo[] =
       class: "menu-toggle",
       groupTitle: false,
       submenu: [{
-        path: "dashboard/GlobeDashboardPage",
+        path: "dashboard/Index",
         title: "Globe Dashboard Page",
         moduleName: "Dashboard",
         icon: "",

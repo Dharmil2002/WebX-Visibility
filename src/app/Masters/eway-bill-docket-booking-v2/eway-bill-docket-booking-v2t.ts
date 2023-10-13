@@ -685,7 +685,7 @@ export class EwayBillDocketBookingV2Component implements OnInit {
             // Redirect to the desired page after the success message is confirmed.
             this._NavigationService.navigateTotab(
               'DocketStock',
-              "dashboard/GlobeDashboardPage"
+              "dashboard/Index"
             );
           }
         });

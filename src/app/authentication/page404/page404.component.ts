@@ -10,6 +10,6 @@ export class Page404Component implements OnInit {
   ngOnInit() {}
 
   submit() {
-    this.router.navigate(["/dashboard/CarbonFootprint"]);
+    this.router.navigate(["/authentication/signin"]);
   }
 }

@@ -18,7 +18,7 @@ const routes: Routes = [
     component:DocketDashboardComponent
   },
   {
-    path:"GlobeDashboardPage",
+    path:"Index",
     component:DashboardPageComponent
   },
   {

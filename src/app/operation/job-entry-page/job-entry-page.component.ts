@@ -99,7 +99,7 @@ export class JobEntryPageComponent implements OnInit {
     this.bindDropdown();
     this.getDropDownDetail();
     this.loadTempData();
-    this.backPath = "/dashboard/GlobeDashboardPage?tab=6";
+    this.backPath = "/dashboard/Index?tab=6";
   }
 
   bindDropdown() {
@@ -222,7 +222,7 @@ export class JobEntryPageComponent implements OnInit {
     this.goBack('Job')
   }
   goBack(tabIndex: string): void {
-    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call

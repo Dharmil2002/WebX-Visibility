@@ -153,7 +153,7 @@ export class PrqSummaryPageComponent implements OnInit {
     });
   }
   goBack(tabIndex: number): void {
-    this.router.navigate(['/dashboard/GlobeDashboardPage'], { queryParams: { tab: tabIndex }, state: [] });
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
 
 //Kpi count 

@@ -47,7 +47,7 @@ export class ThcSummaryComponent implements OnInit {
       Title: "Loaded Kg",
       class: "matcolumncenter",
       Style: "max-width:100px",
-    }, 
+    },
     updateDate: {
       Title: "CreateAt",
       class: "matcolumnleft",
@@ -66,13 +66,15 @@ export class ThcSummaryComponent implements OnInit {
   };
   //#endregion
   staticField = [
-    "tripId",
     "route",
     "vehicle",
     "loadedKg",
     "statusAction",
     "updateDate",
   ];
+  linkArray = [
+    { Row: 'tripId', Path: 'Operation/thc-view'},
+  ]
   addAndEditPath: string;
   menuItemflag: boolean = true;
   menuItems = [{label:"Update THC"},{label:"Delivered"},{label:"View"}];
@@ -83,10 +85,10 @@ export class ThcSummaryComponent implements OnInit {
     private _operationService:OperationService,
     private router: Router,
     public dialog: MatDialog
-    ) { 
+    ) {
       this.getThcDetails();
       this.addAndEditPath = "Operation/thc-create";
-     
+
     }
 
     //here the code which is get details of Thc Which is Display in Fron-end
@@ -105,7 +107,7 @@ export class ThcSummaryComponent implements OnInit {
       return item;
     });
     this.tableData =thcDetail;
-   
+
    this.tableLoad=false;
   }
 
@@ -134,7 +136,7 @@ export class ThcSummaryComponent implements OnInit {
       // dialogref.afterClosed().subscribe((result) => {
       // });
     }
-    
+
   }
   goBack(tabIndex: number): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });

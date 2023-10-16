@@ -31,7 +31,7 @@ export class AddVendorMasterComponent implements OnInit {
   vendorType: any;
   vendorTypeStatus: any;
   data: any;
-  backPath:string;
+  backPath: string;
   vLocation: any;
   vLocationStatus: any;
   vendorCity: any;
@@ -251,7 +251,7 @@ export class AddVendorMasterComponent implements OnInit {
       // Handle the response from the server
       if (this.isUpdate) {
         this.vendorTableForm.controls["vendorLocationDropdown"].patchValue(locationBranchList.filter((element) =>
-          this.vendorTabledata.vendorLocation.includes(element.name)
+          this.vendorTabledata.vendorLocation.includes(element.value)
         ));
         const updatedData = this.pincodeData.find((x) => x.name == this.vendorTabledata.vendorPinCode);
         this.vendorTableForm.controls.vendorPinCode.setValue(updatedData);
@@ -285,7 +285,7 @@ export class AddVendorMasterComponent implements OnInit {
       const controlValue = formValue[controlName]?.name;
       this.vendorTableForm.controls[controlName].setValue(controlValue);
     });
-    const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.name);
+    const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.value);
     this.vendorTableForm.controls["vendorLocation"].setValue(vendorLocationDropdown1);
     this.vendorTableForm.removeControl('vendorLocationDropdown');
     this.vendorTableForm.removeControl('');
@@ -302,6 +302,8 @@ export class AddVendorMasterComponent implements OnInit {
     if (this.isUpdate) {
       let id = data._id;
       // Remove the "id" field from the form controls
+      this.vendorTableForm.removeControl("entryBy");
+
       delete data._id;
       let req = {
         companyCode: this.companyCode,

@@ -1,36 +1,71 @@
 <section class="content">
     <div class="container-fluid">
         <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <!-- breadcrumb -->
             <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
             </app-breadcrumb>
         </div>
-        <div class="row clearfix">
-            <div class="col-lg-12 col-md-12">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
                 <div class="card">
-                    <mat-tab-group style="font-size: 16px;">
+                    <div class="body">
+                        <div id="mail-nav">
+                            <h5 class="b-b p-10 text-strong">Contract Management</h5>
+                            <div class="card-body" style="padding-bottom: 0px;">
+                                <ul class="list-unstyled user-progress list-unstyled-border list-unstyled-noborder">
+                                    <li class="lecture-list" style="margin-bottom: -10px;">
+                                        <div class="set-flex" style="text-align: center;">
+                                            <div class="text-job text-muted-blue font-16">
+                                                {{CurrentContractDetails.customer}}
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="lecture-list" style="margin-bottom: 0px;">
+                                        <div class="set-flex">
+                                            <div class="text-job text-muted-blue mb-0" style="white-space: pre;">
+                                            </div>
 
-                        <mat-tab>
-                            <ng-template mat-tab-label>
-                                <div class="mattablable">
-                                    <mat-icon class="example-tab-icon msr-2">create</mat-icon>
-                                    Service Selection
-                                </div>
-                            </ng-template>
-                            <div>
-                                <app-customer-contract-service-selection></app-customer-contract-service-selection>
+                                            <div class="text-job text-muted-blue mb-0">Contract ID : </div>
+                                            <div class="text-job text-muted-blue mb-0">Product : </div>
+                                        </div>
+                                        <div class="ms-auto">
+                                            <div class="text-job text-muted-blue mb-0">
+                                                {{CurrentContractDetails.contractID}}
+                                            </div>
+                                            <div class="text-job text-muted-blue mb-0">
+                                                {{CurrentContractDetails.product}}
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
-                        </mat-tab>
-                    </mat-tab-group>
+                            <h5 class="b-b p-10 text-strong">Contract Tabs</h5>
+                            <ul class="" id="mail-folders">
+                                <li *ngFor="let folder of folders" [class.active]="folder === selectedFolder">
+                                    <a href="javascript:;" (click)="selectFolder(folder)" [title]="folder">{{ folder
+                                        }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+                <div class="card">
+                    <div class="boxs mail_listing" *ngIf="'Contract Summary' === selectedFolder">
+                        <app-customer-contract-basic-information
+                            [contractData]="CurrentContractDetails"></app-customer-contract-basic-information>
+                    </div>
+                    <div class="boxs mail_listing" *ngIf="'Services Selection' === selectedFolder">
+                        <app-customer-contract-service-selection
+                            [contractData]="CurrentContractDetails"></app-customer-contract-service-selection>
+                    </div>
+                    <div class="boxs mail_listing" *ngIf="'FREIGHT CHARGE MATRIX' === selectedFolder">
+                        <app-customer-contract-freight-matrix
+                            [contractData]="CurrentContractDetails"></app-customer-contract-freight-matrix>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<style>
-    .mattablable {
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-    }
-</style>

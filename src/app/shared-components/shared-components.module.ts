@@ -52,6 +52,9 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { GenericViewPrintComponent } from './Generic View Print/generic-view-print.component';
 import { NgxBarcode6Module } from "ngx-barcode6";
 import { NgxPrintModule } from "ngx-print";
+import { LazyloadingeditabletableComponent } from './lazyloadingeditabletable/lazyloadingeditabletable.component';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -68,7 +71,8 @@ const MY_DATE_FORMAT = {
   declarations: [GenericAccordionComponent, GenericTableComponent,
     FormComponent, FormWithoutAutoCompleteComponent, GenericDashBoardComponent,
     GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent, TreeViewComponent, GenericChartDashboardComponent, GenericCardComponent, DecimaRangeValidatorDirective, GenericTableV2Component
-  , ExpandableTableComponent,ModifyTableCollumnsComponent,XlsxPreviewPageComponent,GenericViewPrintComponent],
+    , ExpandableTableComponent, ModifyTableCollumnsComponent, LazyloadingeditabletableComponent, XlsxPreviewPageComponent, GenericViewPrintComponent],
+
   imports: [
     CommonModule,
     MatCardModule,
@@ -100,7 +104,9 @@ const MY_DATE_FORMAT = {
     MatTableExporterModule,
     DragDropModule,
     NgxBarcode6Module,
-    NgxPrintModule
+    NgxPrintModule,
+    TableVirtualScrollModule,
+    ScrollingModule
   ],
   providers: [
     {
@@ -135,7 +141,8 @@ const MY_DATE_FORMAT = {
     GenericCardComponent,
     DecimaRangeValidatorDirective,
     GenericTableV2Component,
-    GenericViewPrintComponent
+    GenericViewPrintComponent,
+    LazyloadingeditabletableComponent
   ],
 
 })

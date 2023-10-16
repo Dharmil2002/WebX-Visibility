@@ -1,11 +1,12 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 
 @Component({
   selector: 'app-customer-contract-tabs-index',
   templateUrl: './customer-contract-tabs-index.component.html',
 })
 export class CustomerContractTabsIndexComponent implements AfterViewInit {
-  // @ViewChild(MatTabGroup) tabGroup: MatTabGroup;
   breadscrums = [
     {
       title: "Customer Contract",
@@ -13,10 +14,30 @@ export class CustomerContractTabsIndexComponent implements AfterViewInit {
       active: "Dashboard",
     },
   ];
+  CurrentContractDetails: any;
   selectedTabIndex = 0;
-  constructor() { }
-
+  constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,) {
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)
+    });
+    this.selectFolder('FREIGHT CHARGE MATRIX')
+  }
+  folders = [
+    "Contract Summary",
+    "Services Selection",
+    "FREIGHT CHARGE MATRIX",
+    "Non Freight Charges",
+    "ODA Matrix",
+    "Fuel Price Hike Matrix"
+  ];
+  selectedFolder: string | undefined;
   ngOnInit(): void {
+  }
+  selectFolder(folder: string) {
+    this.selectedFolder = folder;
+    // Add logic to handle folder selection
   }
 
   ngAfterViewInit(): void {

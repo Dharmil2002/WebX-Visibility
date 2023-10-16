@@ -222,6 +222,18 @@
   color: #ff5200;
 }
 
+.tbl-fav-eye {
+  height: 20px !important;
+  width: 20px !important;
+  color: #ff5200;
+}
+
+.tbl-fav-download {
+  height: 20px !important;
+  width: 20px !important;
+  color: #4caf50;
+}
+
 .avatar {
   position: relative;
   width: 30px;
@@ -280,7 +292,9 @@
 
 .buttons-copy {
   background-color: #666 !important;
-  box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.2), 0 13px 24px -11px rgba(233, 30, 99, 0.6);
+  box-shadow:
+    0 5px 20px 0 rgba(0, 0, 0, 0.2),
+    0 13px 24px -11px rgba(233, 30, 99, 0.6);
   color: #fff !important;
   border-radius: 30px !important;
   border: 0px !important;
@@ -291,7 +305,9 @@
 
 .buttons-excel {
   background-color: #59bf70 !important;
-  box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.2), 0 13px 24px -11px rgba(233, 30, 99, 0.6);
+  box-shadow:
+    0 5px 20px 0 rgba(0, 0, 0, 0.2),
+    0 13px 24px -11px rgba(233, 30, 99, 0.6);
   color: #fff !important;
   border-radius: 30px !important;
   border: 0px !important;
@@ -302,7 +318,9 @@
 
 .buttons-csv {
   background-color: #2ab9d0 !important;
-  box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.2), 0 13px 24px -11px rgba(233, 30, 99, 0.6);
+  box-shadow:
+    0 5px 20px 0 rgba(0, 0, 0, 0.2),
+    0 13px 24px -11px rgba(233, 30, 99, 0.6);
   color: #fff !important;
   border-radius: 30px !important;
   border: 0px !important;
@@ -313,7 +331,9 @@
 
 .buttons-pdf {
   background-color: #e91e63 !important;
-  box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.2), 0 13px 24px -11px rgba(233, 30, 99, 0.6);
+  box-shadow:
+    0 5px 20px 0 rgba(0, 0, 0, 0.2),
+    0 13px 24px -11px rgba(233, 30, 99, 0.6);
   color: #fff !important;
   border-radius: 30px !important;
   border: 0px !important;
@@ -324,7 +344,9 @@
 
 .buttons-print {
   background-color: #6563ef !important;
-  box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.2), 0 13px 24px -11px #6563ef;
+  box-shadow:
+    0 5px 20px 0 rgba(0, 0, 0, 0.2),
+    0 13px 24px -11px #6563ef;
   color: #fff !important;
   border-radius: 30px !important;
   border: 0px !important;
@@ -459,7 +481,9 @@ tr.group:hover {
       padding: 8px 8px 8px 50px;
       width: 250px;
       background: #ffffff;
-      transition: background 0.2s, width 0.2s;
+      transition:
+        background 0.2s,
+        width 0.2s;
 
       &:hover {
         background: #fffefe;
@@ -603,7 +627,9 @@ mat-header-row {
       padding: 8px 8px 8px 50px;
       width: 250px;
       background: #ffffff;
-      transition: background 0.2s, width 0.2s;
+      transition:
+        background 0.2s,
+        width 0.2s;
 
       &:hover {
         background: #fffefe;
@@ -645,7 +671,9 @@ mat-header-row {
 
   &.active {
     background-color: #7274e2 !important;
-    box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.2), 0 4px 13px -11px #7197b5;
+    box-shadow:
+      0 5px 5px 0 rgba(0, 0, 0, 0.2),
+      0 4px 13px -11px #7197b5;
     color: #ffffff !important;
     border-radius: 30px;
   }
@@ -660,7 +688,9 @@ mat-header-row {
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #d8d7d7;
-  box-shadow: 0.25rem 0.25rem 0.6rem rgba(0, 0, 0, 0.05), 0 0.5rem 1.125rem rgba(75, 0, 0, 0.05);
+  box-shadow:
+    0.25rem 0.25rem 0.6rem rgba(0, 0, 0, 0.05),
+    0 0.5rem 1.125rem rgba(75, 0, 0, 0.05);
 
   .set-flex {
     flex: 1;
@@ -780,8 +810,11 @@ mat-header-row {
   border: 1px solid #f4f4f4;
   padding: 10px;
   margin-bottom: 20px;
-  box-shadow: 0 0.46875rem 2.1875rem rgba(90, 97, 105, 0.1), 0 0.9375rem 1.40625rem rgba(90, 97, 105, 0.1),
-    0 0.25rem 0.53125rem rgba(90, 97, 105, 0.12), 0 0.125rem 0.1875rem rgba(90, 97, 105, 0.1);
+  box-shadow:
+    0 0.46875rem 2.1875rem rgba(90, 97, 105, 0.1),
+    0 0.9375rem 1.40625rem rgba(90, 97, 105, 0.1),
+    0 0.25rem 0.53125rem rgba(90, 97, 105, 0.12),
+    0 0.125rem 0.1875rem rgba(90, 97, 105, 0.1);
   background: #ffffff;
 }
 

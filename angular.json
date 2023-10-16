@@ -35,12 +35,16 @@
               "clone-deep",
               "xlsx"
             ],
-            "assets": ["src/favicon.ico", "src/assets",
-            {
-              "glob": "**/*",
-              "input": "node_modules/leaflet/dist/images/",
-              "output": "./assets"
-            }],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/web.config",
+              {
+                "glob": "**/*",
+                "input": "node_modules/leaflet/dist/images/",
+                "output": "./assets"
+              }
+            ],
             "styles": [
               "./node_modules/leaflet/dist/leaflet.css",
               "src/assets/scss/style.scss",
@@ -117,9 +121,15 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "src/styles.scss"
+            ],
             "scripts": [],
-            "assets": ["src/favicon.ico", "src/assets"]
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/web.config"
+            ]
           }
         }
       }

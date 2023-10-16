@@ -196,10 +196,12 @@
       <mat-form-field appearance="outline" floatLabel="never" class="example-full-width"
         *ngIf="formItem.type=='select' && formItem.generatecontrol===true">
         <mat-label class="fontbold">{{formItem.label}}</mat-label>
-        <mat-select placeholder="{{formItem.label}}" formControlName={{formItem.additionalData.support}}>
+        <mat-select placeholder="{{formItem.label}}" formControlName={{formItem.additionalData.support}}
+          (selectionChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onSelect , eventArgs: $event })">
           <mat-option>
-            <ngx-mat-select-search placeholderLabel="Find bank..." noEntriesFoundLabel="'no matching bank found'"
-              formControlName={{formItem.name}}></ngx-mat-select-search>
+            <ngx-mat-select-search placeholderLabel="Find..." noEntriesFoundLabel="'no matching bank found'"
+              formControlName={{formItem.name}}
+              (ngModelChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onModel , eventArgs: $event })"></ngx-mat-select-search>
           </mat-option>
           <mat-option *ngFor="let item of formItem.filterOptions | async" [value]="item">
             <ng-container *ngIf="formItem.additionalData.showNameAndValue; else showName">
@@ -261,6 +263,12 @@
           </button>
         </a>
       </ng-container>
+      <div *ngIf="formItem.type === 'filelink' && formItem.generatecontrol" style="margin-top: 20px;">
+        <button mat-stroked-button (click)="download(formItem.value)">
+          <mat-icon>book-open</mat-icon>
+          {{formItem.label}}
+        </button>
+      </div>
       <!--textbox (input)  Timer Picker controls---------------------------------------------------------->
       <mat-form-field class="example-full-width" appearance="outline"
         *ngIf="(formItem.type=='time') && formItem.generatecontrol">

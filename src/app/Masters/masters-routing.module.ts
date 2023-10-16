@@ -68,7 +68,6 @@ import { VendorContractListComponent } from './Vendor Contract/vendor-contract-l
 import { VendorTabsIndexComponent } from './Vendor Contract/vendor-tabs-index/vendor-tabs-index.component';
 import { FleetMasterListComponent } from './fleet-master/fleet-master-list/fleet-master-list.component';
 import { AddFleetMasterComponent } from './fleet-master/add-fleet-master/add-fleet-master.component';
-import { CustomerQueryPageComponent } from './Customer Contract/customer-query-page/customer-query-page.component';
 import { CustomerContractListComponent } from './Customer Contract/customer-contract-list/customer-contract-list.component';
 import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
 import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-beneficiary-master/add-beneficiary-master.component';
@@ -150,7 +149,6 @@ const routes: Routes = [
   { path: "VendorContract/VendorIndex", component: VendorTabsIndexComponent },
 
   // Customer Contract Router
-  { path: "CustomerContract/CustomerQueryPage", component: CustomerQueryPageComponent },
   { path: "CustomerContract/CustomerContractList", component: CustomerContractListComponent },
   { path: "CustomerContract/CustomerIndex", component: CustomerContractTabsIndexComponent },
 

@@ -1,15 +1,17 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { TableData } from './StaticData';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from "@angular/core";
+import { MatPaginator } from "@angular/material/paginator";
+import { MatSort } from "@angular/material/sort";
+import { MatTableDataSource } from "@angular/material/table";
+import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
+import { fromEvent } from "rxjs";
+import { TableData } from "./StaticData";
+import { Route, Router } from "@angular/router";
+import { EncryptionService } from "src/app/core/service/encryptionService.service";
 @Component({
   selector: 'app-customer-contract-list',
   templateUrl: './customer-contract-list.component.html',
 })
-export class CustomerContractListComponent implements AfterViewInit {
+export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   breadscrums = [
     {
       title: "Customer Contract",
@@ -17,87 +19,97 @@ export class CustomerContractListComponent implements AfterViewInit {
       active: "Customer Contract",
     },
   ];
+  displayedColumns = [
+    { Key: "customer", title: "Customer", width: "250", className: "matcolumnfirst", show: true },
+    { Key: "contractID", title: "Contract Id", width: "100", className: "matcolumncenter", show: true },
+    { Key: "product", title: "Product", width: "100", className: "matcolumncenter", show: true },
+    { Key: "contractStartDate", title: "Start Date", width: "100", className: "matcolumncenter", show: true },
+    { Key: "contractEndDate", title: "End Date", width: "100", className: "matcolumncenter", show: true },
+    { Key: "expiringin", title: "Expiring In", width: "70", className: "matcolumncenter", show: true },
+  ];
+  columnKeys = this.displayedColumns.map((column) => column.Key);
+  boxData: { count: number; title: string; class: string; }[];
+  tableData = TableData;
+  public ModeldataSource = new MatTableDataSource<any>();
+  error;
+  remarks;
+  geoJsonData = '';
+  isTouchUIActivated = false;
+  isTblLoading = false;
+  constructor(private router: Router, private encryptionService: EncryptionService) {
+    super();
+    this.columnKeys.push('status')
+    this.columnKeys.push('actions')
+    this.getContractKpiCount()
+  }
 
-  tableload = true;
-  tabledata = TableData
-  ActionObject = {
-    AddRow: false,
-    Submit: false,
-    Search: false,
-  };
-  objectKeys = Object.keys;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild("filter", { static: true }) filter: ElementRef;
-  @ViewChild(MatSort) sort: MatSort;
-  columnHeader = {
-    srno: {
-      Title: "Sr.No",
-      class: "matcolumncenter",
-      Style: "max-width: 15%",
-      Key: "static",
-    },
-    ContractID: {
-      Title: "Contract ID",
-      class: "matcolumncenter",
-      Style: "max-width: 15%",
-      Key: "static",
-    },
-    contractStartDate: {
-      Title: "Contract StartDate",
-      class: "matcolumncenter",
-      Style: "max-width: 15%",
-      Key: "static",
-    },
-    contractEndDate: {
-      Title: "Contract EndDate",
-      class: "matcolumncenter",
-      Style: "max-width: 15%",
-      Key: "static",
-    },
-    ContractType: {
-      Title: "Contract Type",
-      class: "matcolumncenter",
-      Style: "max-width: 20%",
-      Key: "static",
-    },
-    IsActive: {
-      Title: "IsActive",
-      class: "matcolumncenter",
-      Style: "max-width: 10%",
-      Key: "status",
-    },
-    view: {
-      Title: "View",
-      class: "matcolumncenter",
-      Style: "max-width: 10%",
-      Key: "view",
-    },
-    edit: {
-      Title: "Edit",
-      class: "matcolumncenter",
-      Style: "max-width: 10%",
-      Key: "edit",
-    },
 
-  };
-  dataSource: any;
-
-  constructor(private router: Router) { }
-
-  ngOnInit(): void {
+  ngOnInit() {
+    this.SearchData();
   }
+  SearchData() {
+    this.tableData.forEach((item: any) => {
+      const startDate: Date = new Date(item.contractStartDate);
+      const endDate: Date = new Date(item.contractEndDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-  AddNewContract() {
-    this.router.navigateByUrl('/Masters/CustomerContract/AddContractProfile')
+      const timeDiff: number = endDate.getTime() - startDate.getTime();
+      const daysDiff: number = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      if (endDate.toDateString() === today.toDateString()) {
+        item.expiringin = `Expiring Today`;
+      }
+      else if (endDate < today) {
+        const ExpiredDiff: number = today.getTime() - endDate.getTime();
+        const ExpireddaysDiff: number = Math.floor(ExpiredDiff / (1000 * 60 * 60 * 24));
+        item.status = "Expired";
+        item.expiringin = `Expired ${ExpireddaysDiff} Days Ago`;
+      }
+      else {
+        item.expiringin = `${daysDiff} Days Left`;
+      }
+    });
+
+    this.ModeldataSource = new MatTableDataSource(
+      this.tableData
+    );
+    this.subs.sink = fromEvent(
+      this.filter.nativeElement,
+      "keyup"
+    ).subscribe(() => {
+      if (!this.ModeldataSource) {
+        return;
+      }
+      this.ModeldataSource.filter = this.filter.nativeElement.value;
+    });
   }
-
-  ngAfterViewInit() {
-    this.dataSource = new MatTableDataSource<any>(this.tabledata);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  getContractKpiCount() {
+    const createContractsDataObject = (
+      count: number,
+      title: string,
+      className: string,
+      icon: string
+    ) => ({
+      count,
+      title,
+      class: `info-box7 ${className} order-info-box7`,
+      icon
+    });
+    const ActiveContract = this.tableData.filter((x) => x.status == "Active");
+    const ExpiredContract = this.tableData.filter((x) => x.status == "Expired");
+    const shipData = [
+      createContractsDataObject(ActiveContract.length, "Active Contracts", "bg-c-Bottle-light", 'fas fa-check-circle float-start'),
+      createContractsDataObject(ExpiredContract.length, "Expired Contracts", "bg-c-Grape-light", 'fas fa-times-circle float-start'),
+    ];
+    this.boxData = shipData
   }
-
-  ActionEdit() {
-    this.router.navigateByUrl('/Masters/CustomerContract/CustomerIndex')
+  Edit(events) {
+    const EncriptedData = this.encryptionService.encrypt(JSON.stringify(events));
+    this.router.navigate(['/Masters/CustomerContract/CustomerIndex'], {
+      queryParams: { data: EncriptedData },
+    });
   }
 }

@@ -125,10 +125,13 @@ import { CustomerContractBasicInformationComponent } from './Customer Contract/C
 import { CustomerContractServiceSelectionComponent } from './Customer Contract/CustomerContractTabs/customer-contract-service-selection/customer-contract-service-selection.component';
 import { CustomerContractListComponent } from './Customer Contract/customer-contract-list/customer-contract-list.component';
 import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
-import { CustomerQueryPageComponent } from './Customer Contract/customer-query-page/customer-query-page.component';
 import { SessionService } from '../core/service/session.service';
 import { BeneficiaryMasterListComponent } from './beneficiary-master/beneficiary-master-list/beneficiary-master-list.component';
 import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-beneficiary-master/add-beneficiary-master.component';
+import { CustomerContractFreightMatrixComponent } from './Customer Contract/CustomerContractTabs/customer-contract-freight-matrix/customer-contract-freight-matrix.component';
+import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { EncryptionService } from '../core/service/encryptionService.service';
 @NgModule({
   imports: [
     CommonModule,
@@ -168,6 +171,8 @@ import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-benefici
     MatStepperModule,
     NgxMaterialTimepickerModule,
     ReactiveFormsModule,
+    TableVirtualScrollModule,
+    ScrollingModule
   ],
 
   declarations: [
@@ -255,7 +260,6 @@ import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-benefici
     AddWaitingChargesComponent,
     TripLaneBasedComponent,
     SpecialChargesComponent,
-    CustomerQueryPageComponent,
     CustomerContractListComponent,
     CustomerContractTabsIndexComponent,
     CustomerContractBasicInformationComponent,
@@ -270,18 +274,18 @@ import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-benefici
     AddWaitingChargesComponent,
     TripLaneBasedComponent,
     SpecialChargesComponent,
-    CustomerQueryPageComponent,
     CustomerContractListComponent,
     CustomerContractTabsIndexComponent,
     CustomerContractBasicInformationComponent,
     CustomerContractServiceSelectionComponent,
     BeneficiaryMasterListComponent,
-    AddBeneficiaryMasterComponent
+    AddBeneficiaryMasterComponent,
+    CustomerContractFreightMatrixComponent
 
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService,
-    PinCodeService, StateService, SessionService]
+    PinCodeService, StateService, SessionService, EncryptionService]
 })
 
 export class MastersModule { }

@@ -38,8 +38,11 @@ export class GenericTableV2Component
   @Input() menuItems: any;
   @Input() menuItemFlag;
   @Input() boxData: any;
+  @Input() AddNewButton: any = false;
+  @Output() AddNewButtonEvent = new EventEmitter<any>();
   @Output() menuItemClicked = new EventEmitter<any>();
   @Output() selectAllClicked = new EventEmitter<any>();
+  @Output() DeleteFunction = new EventEmitter<any>();
   @Input() height;
   @Input() width;
   @Input() maxWidth;
@@ -361,6 +364,13 @@ export class GenericTableV2Component
       // Handle the case where this.menuItems is undefined or not an array
       return [];
     }
+  }
+
+  AddNew(){
+    this.AddNewButtonEvent.emit()
+  }
+  Delete(element){
+    this.DeleteFunction.emit({element})
   }
   
 }

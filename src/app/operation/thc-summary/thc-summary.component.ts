@@ -30,8 +30,8 @@ export class ThcSummaryComponent implements OnInit {
   columnHeader = {
     tripId: {
       Title: "THC No",
-      class: "matcolumnleft",
-      Style: "max-width:350px",
+      class: "matcolumncenter",
+      Style: "min-width:210px",
     },
     route: {
       Title: "Route",
@@ -40,7 +40,7 @@ export class ThcSummaryComponent implements OnInit {
     },
     vehicle: {
       Title: "Vehicle No",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:130px",
     },
     loadedKg: {
@@ -50,17 +50,17 @@ export class ThcSummaryComponent implements OnInit {
     },
     updateDate: {
       Title: "CreateAt",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:250px",
     },
     statusAction:{
       Title:"Status",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:100px",
     },
     actionsItems: {
       Title: "Action",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:100px",
     }
   };

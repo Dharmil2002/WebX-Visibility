@@ -152,6 +152,16 @@ export class ContainerControl {
                 generatecontrol: false,
                 disable: false,
             },
+            {
+                name: "companyCode",
+                label: "Company Code",
+                placeholder: "Company Code",
+                type: "",
+                value: parseInt(localStorage.getItem("companyCode")),
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
         ];
     }
     getContainerFormControls() {

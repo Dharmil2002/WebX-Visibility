@@ -15,6 +15,11 @@ export class VehicleControls {
                         {
                             name: "required",
                             message: "Vehicle Number is required.."
+                        },
+                        {
+                            name: "pattern",
+                            message: "",
+                            pattern: '^[A-Z][A-Z0-9]+$'
                         }
                     ],
                     functions: {
@@ -88,24 +93,27 @@ export class VehicleControls {
                 },
                 {
                     name: 'vendorType',
-                    label: "Vendor Type",
-                    placeholder: "Select Vendor Type",
+                    label: 'Vendor Type',
+                    placeholder: 'Select Vendor Type',
                     type: 'dropdown',
-                    value: vehicleTable.vendorType,
-                    generatecontrol: true,
-                    disable: false,
+                    value: isUpdate ? vehicleTable.vendorType : "",
                     Validations: [
                         {
                             name: "required",
                             message: "Vendor Type is required"
                         },
                         {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        },
+                        {
                             name: "autocomplete",
-                        }
+                        },
                     ],
                     additionalData: {
                         showNameAndValue: false
                     },
+                    generatecontrol: true, disable: false
                 },
                 {
                     name: 'vendorName', label: "Vendor Name", placeholder: "Search and select Vendor Name", type: 'dropdown',

@@ -151,7 +151,7 @@ export class DriverControls {
         name: "telno",
         label: "Mobile Number",
         placeholder: "Enter Mobile Number",
-        type: "number",
+        type: "mobile-number",
         value: DriverTable.telno,
         generatecontrol: true,
         disable: false,
@@ -162,7 +162,7 @@ export class DriverControls {
           },
           {
             name: "pattern",
-            message: "Please enter 10 to 12 digit Mobile number",
+            message: "Please enter 10 digit Mobile number",
             pattern: "^[0-9]{10,12}$",
           },
         ],

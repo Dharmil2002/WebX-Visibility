@@ -122,7 +122,7 @@ export class customerControl {
         name: "customer_mobile",
         label: "Customer Mobile No",
         placeholder: "Customer Mobile No",
-        type: "text",
+        type: "mobile-number",
         value: isUpdate ? customerTable.customer_mobile : "",
         generatecontrol: true,
         disable: false,

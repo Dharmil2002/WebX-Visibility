@@ -223,7 +223,7 @@ export class BeneficiaryControl {
                     message: "Upload KYC is required"
                 },],
                 functions: {
-                    onChange: 'selectHandleFileSelection',
+                    onChange: 'uploadImage',
                 },
                 generatecontrol: true, disable: false
             },

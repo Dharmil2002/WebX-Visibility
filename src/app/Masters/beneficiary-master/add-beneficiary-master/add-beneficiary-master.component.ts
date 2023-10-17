@@ -120,7 +120,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     private masterService: MasterService,) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.beneficiaryTabledata = this.route.getCurrentNavigation().extras.state.data;
-      console.log(this.beneficiaryTabledata);
+      // console.log(this.beneficiaryTabledata);
 
       this.action = 'edit';
       this.isUpdate = true;
@@ -156,6 +156,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   ngOnInit(): void {
     this.backPath = "/Masters/BeneficiaryMaster/BeneficiaryMasterList";
   }
+  //#region to initialize form controls
   initializeFormControl() {
     const beneficiaryControls = new BeneficiaryControl();
     this.jsonHeaderControl = beneficiaryControls.getHeaderControl();
@@ -177,7 +178,8 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     }
 
   }
-
+  //#endregion
+  //#region to save data
   async save() {
     clearValidatorsAndValidate(this.beneficiaryHeaderForm)
     clearValidatorsAndValidate(this.beneficiaryDetailForm)
@@ -200,7 +202,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     }
     this.beneficiaryHeaderForm.controls['beneficiary'].setValue(beneficiaryData);
     this.beneficiaryHeaderForm.value.otherdetails = newData;
-    console.log(this.beneficiaryHeaderForm.value);
+    // console.log(this.beneficiaryHeaderForm.value);
     let data = convertNumericalStringsToInteger(this.beneficiaryHeaderForm.value)
     if (this.isUpdate) {
       let id = data._id;
@@ -245,7 +247,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         }
         this.newVendorCode = generateVendorCode(last_id);
         data._id = this.newVendorCode;
-        console.log(data);
+        // console.log(data);
         let req = {
           companyCode: this.companyCode,
           collectionName: "beneficiary_detail",
@@ -265,6 +267,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       }
     }
   }
+  //#endregion
   cancel() {
     this.route.navigateByUrl('/Masters/BeneficiaryMaster/BeneficiaryMasterList');
   }
@@ -336,7 +339,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       console.log("failed");
     }
   }
-
+  //#region to add data to form
   async addData() {
     this.tableLoad = true;
     this.isLoad = true;
@@ -385,7 +388,8 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     this.isLoad = false;
     this.tableLoad = false;
   }
-
+  //#endregion
+  //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
     this.fillTable(data);
   }
@@ -408,18 +412,52 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
   }
-
-  //#region to handle file selection type 
-  selectHandleFileSelection(data) {
-    // Get the field name from the data
-    const field = data.field.name;
-
-    // Set allowed extensions based on the field name
-    const extensions = field === 'uploadKYC' ? ["jpeg", "png", "jpg"] : [];
-
-    // Call the handleFileSelection function with the data and extensions
-    handleFileSelection(data, field, extensions, this.beneficiaryDetailForm);
-  }
   //#endregion
+  //#region to upload Kyc image
+  async uploadImage(event) {
+    try {
+      const field = event.field.name;
+      const extensions = ["jpeg", "png", "jpg"];
+      const fileList: FileList = event.eventArgs;
+      const fileFormat = fileList[0].type.split('/')[1];
 
+      // Check if the file format is valid
+      if (!extensions.includes(fileFormat)) {
+        Swal.fire({
+          icon: "warning",
+          title: "Alert",
+          text: `Please select a valid file format: ${extensions.join(', ')}`,
+          showConfirmButton: true,
+        });
+        return; // Exit the function if the format is not valid
+      }
+      //setting image file name in control
+      this.beneficiaryDetailForm.controls['uploadKYC'].setValue(fileList[0].name);
+
+      // Prepare the data for the HTTP request
+      const formData = new FormData();
+      formData.append('companyCode', this.companyCode);
+      formData.append('docType', "Beneficiary");
+      formData.append('docGroup', 'Master');
+      formData.append('docNo', fileList[0].name);
+      formData.append('file', fileList[0]);
+
+      // Make the HTTP request
+      const res = await this.masterService.masterPost("blob/upload", formData).toPromise();
+
+      // Check if the request was successful
+      if (res.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Image uploaded successfully",
+          showConfirmButton: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  }
+
+  //#endregion
 }

@@ -835,15 +835,23 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.loadIn = true;
       const invoiceDetail = this.docketDetail.invoiceDetails.map((x, index) => {
         if (x) {
+          if (Object.values(x).every(value => !value)) {
+            return null; // If all properties of x are empty, return null
+          }
           // You can use 'x' and 'index' here
           x.id = index + 1;
+          x.expiryDate= x.expiryDate ? formatDate(x.expiryDate, "dd-MM-yy HH:mm")
+          : formatDate(new Date().toUTCString(), "dd-MM-yy HH:mm")
           x.actions = ["Edit", "Remove"];
           return x;
         }
         return x; // Return the original element if no modification is needed
       });
+      const allEmpty = invoiceDetail.every(x => !x);
+      if(!allEmpty){
       this.invoiceData = invoiceDetail;
       this.tableLoadIn = false;
+      }
       this.loadIn = false;
     }
     if (this.docketDetail.containerDetail.length > 0) {
@@ -853,6 +861,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
       const containerDetail = this.docketDetail.containerDetail.map(
         (x, index) => {
           if (x) {
+            if (Object.values(x).every(value => !value)) {
+              return null; // If all properties of x are empty, return null
+            } 
             // Modify 'x' if needed
             // For example, you can add the index to the element
             x.id = index + 1;
@@ -862,8 +873,12 @@ export class ConsignmentEntryFormComponent implements OnInit {
           return x; // Return the original element if no modification is needed
         }
       );
+      const allNull = containerDetail.every(x => x === null);
+      if(!allNull){
       this.tableData = containerDetail;
       this.tableLoad = false;
+      }
+
       this.isLoad = false;
     }
   }
@@ -906,11 +921,13 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const fieldsToRemove = ["id", "actions", "invoice"];
     const invoiceList = removeFieldsFromArray(this.invoiceData, fieldsToRemove);
     const containerlist = removeFieldsFromArray(this.tableData, fieldsToRemove);
+    const invoiceFromData=[this.invoiceTableForm.value];
+    const containerFromData=[this.containerTableForm.value];
     let invoiceDetails = {
-      invoiceDetails: this.invoiceData.length>0?invoiceList:[this.invoiceTableForm.value],
+      invoiceDetails: this.invoiceData.length>0?invoiceList:invoiceFromData,
     };
     let containerDetail = {
-      containerDetail:this.tableData.length>0?containerlist:[this.containerTableForm],
+      containerDetail:this.tableData.length>0?containerlist:containerFromData,
     };
     const controltabNames = [
       "containerCapacity",

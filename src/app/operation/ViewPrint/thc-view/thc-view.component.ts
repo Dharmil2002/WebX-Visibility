@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, Renderer2 } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FleetMaster } from 'src/app/Models/fleet-Master/fleet';
 import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { VehicleService } from 'src/app/Utility/module/masters/vehicle-master/vehicle-master-service';
@@ -17,21 +17,37 @@ export class THCViewComponent implements OnInit {
     imageUrl: string;
     thcDetails: any;
     thcNestedData: any;
+    tripId: any;
     constructor(
-        private Route: Router,
+        
         private masterService: MasterService,
-        private vehicleService: VehicleService
+        private vehicleService: VehicleService,
+        private renderer: Renderer2,
+        private router: ActivatedRoute
     ) {
-        if (this.Route.getCurrentNavigation()?.extras?.state != null) {
-            this.thcDetails = Route.getCurrentNavigation().extras.state.data;
-        }
-        this.companylogo = localStorage.getItem("company_Logo"); // Get company logo from local storage
-        this.imageUrl = "data:image/jpeg;base64, " + this.companylogo + "";
+        this.renderer.setStyle(
+            document.querySelector("nav.navbar"),
+            "display",
+            "none"
+        ); // Hide Navbar
+        this.renderer.setStyle(
+            document.querySelector("#leftsidebar"),
+            "display",
+            "none"
+        ); //Hide Sidebars
+        this.router.queryParams.subscribe((params) => {
+            
+            
+            this.tripId = params["THC"];
+            console.log(this.tripId);
+        });
+       
     }
 
     ngOnInit(): void {
         this.getTHC()
     }
+
 
     // * retrieves detailed information about a vehicle.
     //  * Uses the vehicle service to fetch nested details based on the vehicle number.
@@ -44,12 +60,12 @@ export class THCViewComponent implements OnInit {
     // Function to retrieve THC data
     getTHC() {
         // Extract tripId from THC details column data, default to 0 if not present
-        const tripId = this.thcDetails.columnData?.tripId || 0;
+        
         // Prepare request object for THC data retrieval
         const req = {
             companyCode: this.companyCode,
             collectionName: "thc_detail",
-            filter: { tripId: tripId },
+            filter: { tripId: this.tripId },
         };
         // Subscribe to the master service to fetch THC data
         this.masterService.masterPost("generic/get", req).subscribe({
@@ -71,11 +87,11 @@ export class THCViewComponent implements OnInit {
                             dest: destination,
                             updateDate: formatDocketDate(res.data[0]?.updateDate || new Date())
                         };
+                        
                         // Determine label based on THC status for arrival information
                         this.labelArrival = this.thcNestedData.status == "1" ? "ETA" : "Arrived"
                         // Fetch additional vehicle details
                         this.getVehicleDetail()
-
                     } else {
                         console.error("Invalid route format:", res.data[0].route);
                     }

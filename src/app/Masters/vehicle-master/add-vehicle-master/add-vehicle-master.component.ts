@@ -77,13 +77,15 @@ export class AddVehicleMasterComponent implements OnInit {
   location: any;
   locationStatus: any;
   backPath: string;
+  vendorDetail: any;
+  vendorDetailList: any;
 
   constructor(
     private masterService: MasterService,
     public objSnackBarUtility: SnackBarUtilityService,
     private route: Router,
     private fb: UntypedFormBuilder,
-    private filter: FilterUtils
+    private filter: FilterUtils,
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vehicleTable = route.getCurrentNavigation().extras.state.data;
@@ -136,11 +138,6 @@ export class AddVehicleMasterComponent implements OnInit {
         // Set category-related variables
         this.vehicleType = data.name;
         this.vehicleTypeStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === 'vendorType') {
-        // Set category-related variables
-        this.vendorType = data.name;
-        this.vendorTypeStatus = data.additionalData.showNameAndValue;
       }
       if (data.name === 'vendorName') {
         // Set category-related variables
@@ -299,18 +296,15 @@ export class AddVehicleMasterComponent implements OnInit {
         name: element.vehicleTypeName.toString(),
         value: element.vehicleTypeCode.toString(),
       }));
-      // const venTypeDet = mergedData.venTypeData.map(element => ({
-      //   name: element.vendorType.toString(),
-      //   value: element.vendorCode.toString(),
-      // }));
-      const venNameDet = mergedData.venNameData.map(element => ({
-        name: element.vendorName.toString(),
-        value: element.vendorCode.toString(),
-      }));
-      // const routeDet = mergedData.routeData.map(element => ({
-      //   name: element.loccd.join('-'),
-      //   value: element.routeId.toString(),
-      // }));
+
+      const venNameDet = mergedData.venNameData
+        .map(element => ({
+          name: element.vendorName.toString(),
+          value: element.vendorCode.toString(),
+          type: element.vendorType.toString(),
+        }));
+      this.vendorDetailList = venNameDet;
+
       let routeDet = [];
       mergedData.routeData.forEach((item, index, array) => {
         if (index < array.length) {
@@ -326,10 +320,7 @@ export class AddVehicleMasterComponent implements OnInit {
           });
         }
       });
-      // const routeDet = mergedData.routeData.map(element => ({
-      //   name: Array.isArray(element.loccd) ? element.loccd.join('-') : '',
-      //   value: Array.isArray(element.loccd) ? element.loccd.join('-') : '',
-      // }));
+    
       const FTLtype = mergedData.fltType.filter(item => item.codeType === "FTLTYP").
         map((x) => {
           { return { name: x.codeDesc, value: x.codeId } }
@@ -391,6 +382,20 @@ export class AddVehicleMasterComponent implements OnInit {
     }
   }
   //#endregion
+
+  vendorFieldChanged() {
+
+    const vendorType = this.vehicleTableForm.value.vendorType;
+    const vendorDetail = this.vendorDetailList.filter((x) => x.
+      type.toLowerCase() == vendorType.toLowerCase());
+    this.filter.Filter(
+      this.jsonControlVehicleArray,
+      this.vehicleTableForm,
+      vendorDetail,
+      this.vendorName,
+      this.vendorNameStatus
+    );
+  }
 
   //#region
   autofillDropdown() {
@@ -555,7 +560,7 @@ export class AddVehicleMasterComponent implements OnInit {
   }
   //#endregion
 
-  //#endregion
+  //#region
   enableGpsProvider($event) {
     this.jsonControlVehicleArray.forEach(data => {
       if (data.name === 'gpsProvider') {

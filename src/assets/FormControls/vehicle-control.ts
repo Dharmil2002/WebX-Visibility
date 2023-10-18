@@ -92,28 +92,29 @@ export class VehicleControls {
                     generatecontrol: true, disable: false
                 },
                 {
-                    name: 'vendorType',
-                    label: 'Vendor Type',
-                    placeholder: 'Select Vendor Type',
-                    type: 'dropdown',
-                    value: isUpdate ? vehicleTable.vendorType : "",
+                    name: "vendorType",
+                    label: "Vendor Type",
+                    placeholder: "VehicleType",
+                    type:'Staticdropdown',
+                    value: [
+                        { value: "Own", name: "Own" },
+                        { value: "Attached", name: "Attached" },
+                        { value: "Service Provider", name: "Service Provider" }
+                      ],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: false,
                     Validations: [
                         {
                             name: "required",
-                            message: "Vendor Type is required"
-                        },
-                        {
-                            name: "invalidAutocompleteObject",
-                            message: "Choose proper value",
-                        },
-                        {
-                            name: "autocomplete",
-                        },
-                    ],
-                    additionalData: {
-                        showNameAndValue: false
-                    },
-                    generatecontrol: true, disable: false
+                            message: "Vendor Type  is required",
+                        }],
+                        functions: {
+                            onSelection: "vendorFieldChanged"
+                          },
+                    additionalData: { }
                 },
                 {
                     name: 'vendorName', label: "Vendor Name", placeholder: "Search and select Vendor Name", type: 'dropdown',

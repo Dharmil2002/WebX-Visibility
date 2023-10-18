@@ -72,6 +72,7 @@ import { CustomerContractListComponent } from './Customer Contract/customer-cont
 import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
 import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-beneficiary-master/add-beneficiary-master.component';
 import { BeneficiaryMasterListComponent } from './beneficiary-master/beneficiary-master-list/beneficiary-master-list.component';
+import { ListProductComponent } from './product-master/list-product/list-product.component';
 
 
 const routes: Routes = [
@@ -151,6 +152,10 @@ const routes: Routes = [
   // Customer Contract Router
   { path: "CustomerContract/CustomerContractList", component: CustomerContractListComponent },
   { path: "CustomerContract/CustomerIndex", component: CustomerContractTabsIndexComponent },
+
+  //Product Master Router
+  { path: "ProductMaster/ListProduct", component: ListProductComponent },
+
 
 ];
 

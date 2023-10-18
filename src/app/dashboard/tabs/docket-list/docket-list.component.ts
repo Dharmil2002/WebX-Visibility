@@ -28,6 +28,8 @@ export class DocketListComponent implements OnInit {
       Title: "Shipment",
       class: "matcolumnleft",
       Style: "max-width:250px",
+      type:'windowLink',
+      functionName:'OpenCnote'
     },
     ftCity: {
       Title: "From-To City",
@@ -56,7 +58,6 @@ export class DocketListComponent implements OnInit {
   staticField = [
     "billingParty",
     "vehicleNo",
-    "docketNumber",
     "ftCity",
     "actualWeight",
     "totalPkg"
@@ -143,5 +144,19 @@ export class DocketListComponent implements OnInit {
       queryParams: { tab: tabIndex },
       state: [],
     });
+  }
+  functionCallHandler(event) {
+    console.log(event);
+    try {
+      this[event.functionName](event.data);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+  OpenCnote(data){
+    const Docket = data.docketNumber
+    console.log('Docket',Docket)
+    const url = `${window.location.origin}/#/Operation/westerncarriers-view?Docket=${Docket}`;
+    window.open(url,'','width=1000,height=800');
   }
 }

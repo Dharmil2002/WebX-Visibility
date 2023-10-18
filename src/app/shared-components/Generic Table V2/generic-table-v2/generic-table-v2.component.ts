@@ -43,6 +43,7 @@ export class GenericTableV2Component
   @Output() menuItemClicked = new EventEmitter<any>();
   @Output() selectAllClicked = new EventEmitter<any>();
   @Output() DeleteFunction = new EventEmitter<any>();
+  @Output() functionCallEmitter = new EventEmitter();
   @Input() height;
   @Input() width;
   @Input() maxWidth;
@@ -372,5 +373,7 @@ export class GenericTableV2Component
   Delete(element){
     this.DeleteFunction.emit({element})
   }
-  
+  FunctionHendel(name ,element){
+    this.functionCallEmitter.emit({functionName:name , data:element})
+  }
 }

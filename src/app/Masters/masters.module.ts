@@ -125,6 +125,10 @@ import { CustomerContractBasicInformationComponent } from './Customer Contract/C
 import { CustomerContractServiceSelectionComponent } from './Customer Contract/CustomerContractTabs/customer-contract-service-selection/customer-contract-service-selection.component';
 import { CustomerContractListComponent } from './Customer Contract/customer-contract-list/customer-contract-list.component';
 import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
+import { AddProductComponent } from './product-master/add-product/add-product.component';
+import { ListProductComponent } from './product-master/list-product/list-product.component';
+import { ProductChargesComponent } from './product-master/product-charges/product-charges.component';
+import { ProductServicesComponent } from './product-master/product-services/product-services.component';
 import { SessionService } from '../core/service/session.service';
 import { BeneficiaryMasterListComponent } from './beneficiary-master/beneficiary-master-list/beneficiary-master-list.component';
 import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-beneficiary-master/add-beneficiary-master.component';
@@ -280,7 +284,11 @@ import { EncryptionService } from '../core/service/encryptionService.service';
     CustomerContractServiceSelectionComponent,
     BeneficiaryMasterListComponent,
     AddBeneficiaryMasterComponent,
-    CustomerContractFreightMatrixComponent
+    CustomerContractFreightMatrixComponent,
+   ListProductComponent,
+   AddProductComponent,
+   ProductChargesComponent,
+   ProductServicesComponent
 
   ],
 

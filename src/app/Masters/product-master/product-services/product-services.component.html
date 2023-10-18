@@ -1,0 +1,118 @@
+<div >
+    <ul class="m-0" style="padding-left: 10px; display: flex; justify-content: space-between;">
+        <li style="margin: auto 0px; font-weight: 700; font-size: 1.5rem; list-style: none;">
+            Services Selection
+        </li>
+        <li style="margin: 5px 0px; border-radius: 50px; height: 40px; width: 40px; display: flex; align-items: center; justify-content: center; margin-right: 10px; cursor: pointer; background-color: rgba(0,0,0,0.1);"
+            (click)="close()">
+            <mat-icon fontIcon="close"></mat-icon>
+        </li>
+    </ul>
+    <div class="row mx-auto"
+        style="height: 60px; background: linear-gradient(to right, rgba(0, 0, 0,0.1) , white); width: 100%; border-bottom: 1px solid rgba(0, 0, 0, 0.1);border-top: 1px solid rgba(0, 0, 0, 0.1);">
+        <div class="col-8 my-auto">
+            <div class="m-0 p-0" style="display: flex;">
+                <p class="m-0 p-0"> Product ID: </p>
+                <p class="m-0 p-0 px-1"> <b>{{ProductId}}</b></p>
+            </div>
+            <div class="m-0 p-0" style="display: flex;">
+                <p class="m-0 p-0"> Product Name: </p>
+                <p class="m-0 p-0 px-1"><b> {{ProductName}} </b></p>
+            </div>
+        </div>
+        <div class="col-4" style="padding: 10px 15px;  display: flex; justify-content: end;">
+            <button *ngIf="!tableTab" matTooltip="Add New Record" mat-stroked-button (click)="AddNew()"
+                class="filter_btn">
+                <mat-icon>add</mat-icon>
+                Add New
+            </button>
+        </div>
+    </div>
+    <div style="width: 80%; margin: 30px auto; margin-bottom: 30px;" *ngIf="!tableTab">
+        <div *ngIf="!isTable && !isTableEmt" class="d-flex justify-content-center align-items-center">
+            <!-- Bootstrap loader -->
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div *ngIf="isTable" class="gridBorder">
+            <div *ngFor="let item of tableData; index as index;" class="row Border_grid_2a"
+                [style]=" index%2 != 0?' background-color:white; ':' background-color: rgba(0, 0, 0, 0.1);'">
+                <div class="col-3 productitem Border_right_2a">
+                    {{item.ServicesName}}</div>
+                <div class="col-3 productitem Border_right_2a">
+                    {{item.ServicesType}}</div>
+                <div class="col-3 productitem Border_right_2a" style="justify-content: center;">
+                    <button mat-icon-button (click)="Delete(item)">
+                        <mat-icon style="color: rgb(59, 59, 59);">delete</mat-icon>
+                    </button>
+                </div>
+                <div class="col-3 productitem " style="justify-content: center; font-weight: 900; font-size: 18px;">
+                    {{tableData.length == index+1?'':'+' }}</div>
+            </div>
+            <div style="height: 30px; width: 100%;"></div>
+        </div>
+        <div style="text-align: center; margin-top: 10px;" *ngIf="isTableEmt">
+            <h5 style="color: rgb(180, 180, 180); font-size: 1.5rem; font-weight: 700;">Product services are note
+                found!!!</h5>
+        </div>
+    </div>
+
+    <div *ngIf="tableTab" class="row">
+        <div class="col-12">
+            <div class="title"
+                style="padding-left: 25px; font-size: 18px; font-weight: 700; margin: 10px 0px 0px 10px ;">
+                + Add Services
+            </div>
+        </div>
+        <div class="col-12">
+            <form [formGroup]="customerTableForm">
+                <app-form-webxpress [form]="customerTableForm" [formData]="jsonControlArray"
+                    [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2'" [showSaveAndCancelButton]="false"
+                    (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col-12 row">
+            <div class="col-3" style="margin-left: 30px; display: flex; justify-content: space-between;">
+                <button type="button" mat-raised-button color="primary" (click)="save()">
+                    Submit
+                </button>
+                <button type="button" mat-raised-button mat-button (click)="Cancle()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .Border_left_2a {
+        border-left: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    .Border_right_2a {
+        border-right: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    .Border_bottom_2a {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    .Border_top_2a {
+        border-top: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    .Border_grid_2a {
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-bottom: none;
+    }
+
+    .Border_grid_last_2a {
+        border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    .productitem {
+        height: 40px;
+        display: flex;
+        align-items: center;
+    }
+</style>

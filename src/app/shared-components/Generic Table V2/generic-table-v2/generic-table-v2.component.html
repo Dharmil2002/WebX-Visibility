@@ -136,8 +136,19 @@
                 <ng-container *ngIf="tableData === 'actionDelete'">
                     <button mat-icon-button (click)="Delete(element)">
                         <mat-icon style="color: rgb(59, 59, 59);">delete</mat-icon>
+                    </button>   
+                </ng-container>
+
+                <ng-container *ngIf="columnHeader[tableData]?.type === 'iconClick'">
+                    <button mat-icon-button (click)="FunctionHendel(columnHeader[tableData].functionName , element)">
+                        <mat-icon style="color: rgb(146, 0, 214);">{{columnHeader[tableData].iconName}}</mat-icon>
                     </button>
                 </ng-container>
+
+                <ng-container *ngIf="columnHeader[tableData]?.type === 'windowLink'">
+                    <p class="windowLink" (click)="FunctionHendel(columnHeader[tableData].functionName , element)" >{{element[tableData]}}</p>
+                </ng-container>
+
                 <button mat-icon-button *ngIf="tableData=='view'" (click)="$event.stopPropagation()"
                     (click)="View(element)" class="tbl-action-btn">
                     <app-feather-icons [icon]="'eye'" [class]="'tbl-fav-edit'"></app-feather-icons>
@@ -161,5 +172,14 @@
         text-decoration: none !important;
         color: #36cbe9;
         font-weight: 900;
+    }
+    .windowLink{
+        color: #36cbe9;
+        font-weight: bold;
+        cursor: pointer;
+        margin: auto 0px;
+    }
+    .windowLink:hover{
+        text-decoration: underline;
     }
 </style>

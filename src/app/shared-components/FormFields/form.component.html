@@ -234,7 +234,7 @@
         <mat-label>{{formItem.label}}</mat-label>&nbsp;
         <mat-radio-group [formControlName]="formItem.name"
           (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
-          <mat-radio-button style=" margin: 5px;" *ngFor="let option of formItem.value" [value]="option.value">
+          <mat-radio-button style=" margin: auto 5px; margin-top: 15px;" *ngFor="let option of formItem.value" [value]="option.value">
             {{ option.name }}
           </mat-radio-button>
         </mat-radio-group>

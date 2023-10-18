@@ -1,8 +1,9 @@
 <div class="paddingdiv">
-<app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-[tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
-[TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-(menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"
-[addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles">
-</app-generic-table-v2>
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
+        [menuItems]="menuItems" [staticField]="staticField" [TableStyle]="TableStyle" [Link]="linkArray"
+        [height]="height" [width]="width" [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)"
+        (onFlagChange)="selectCheckBox($event)" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+        [uploadedFiles]="uploadedFiles">
+    </app-generic-table-v2>
 </div>

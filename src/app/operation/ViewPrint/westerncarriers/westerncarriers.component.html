@@ -1,5 +1,10 @@
 <div>
-
+    <div *ngIf="!showView" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
     <div *ngIf="showView" id="print" 
         style="width: 900px; margin: 30px auto; box-sizing: border-box; border: 2px solid gainsboro; padding: 10px; font-size: 12px;">
         <div style="display: flex;">
@@ -16,17 +21,17 @@
                     <div
                         style="border-top: 1px solid gainsboro; padding: 5px; width: 30%; box-sizing: border-box; display: flex;  border-right: 1px solid gainsboro;">
                         <p class="m-0 p-0" style=" font-weight: bold;">Email: </p>
-                        <p class="m-0 p-0 px-1">Test@gmail.com</p>
+                        <p class="m-0 p-0 px-1"></p>
                     </div>
                     <div
                         style="border-top: 1px solid gainsboro; padding: 5px; width: 40%; box-sizing: border-box; display: flex;  border-right: 1px solid gainsboro;">
                         <p class="m-0 p-0" style=" font-weight: bold;">CIN: </p>
-                        <p class="m-0 p-0 px-1">U63090WB2011PLC161111</p>
+                        <p class="m-0 p-0 px-1"></p>
                     </div>
                     <div
                         style="border-top: 1px solid gainsboro; padding: 5px; width: 30%; box-sizing: border-box; display: flex;">
                         <p class="m-0 p-0" style=" font-weight: bold;">PAN NO: </p>
-                        <p class="m-0 p-0 px-1">AABCW1961A</p>
+                        <p class="m-0 p-0 px-1">{{JsonData.PANnumber}}</p>
                     </div>
                 </div>
             </div>
@@ -75,7 +80,7 @@
                     <td class="borde-1" style="width: 30%;">
                         <div style="display: flex; padding: 0px 5px;">
                             <p class="m-0 p-0" style="font-weight: bold;">Invoice No: </p>
-                            <p class="m-0 p-0 px-1"></p>
+                            <p class="m-0 p-0 px-1">{{JsonData.invoiceNo}}</p>
                         </div>
                     </td>
                 </tr>
@@ -114,7 +119,7 @@
                     <td class="borde-1" style="width: 30%;">
                         <div style="display: flex; padding: 0px 5px;">
                             <p class="m-0 p-0" style="font-weight: bold;">GST No: </p>
-                            <p class="m-0 p-0 px-1"></p>
+                            <p class="m-0 p-0 px-1">{{JsonData.gstNo}}</p>
                         </div>
                     </td>
                 </tr>
@@ -294,9 +299,8 @@
                             <tr style="width: 100%;">
                                 <td class="px-1"
                                     style="width: 50%; border-bottom: 1px solid black; border-right: 1px solid black;">
-                                    EWAY
-                                    BILL No.</td>
-                                <td class="px-1" style="width: 50%; border-bottom: 1px solid black;"></td>
+                                    EWAY BILL No.</td>
+                                <td class="px-1" style="width: 50%; border-bottom: 1px solid black;">{{JsonData.ewayBillNo}}</td>
                             </tr>
                             <tr style="width: 100%;">
                                 <td class="px-1"></td>
@@ -402,15 +406,7 @@
                 <tr style="width: 100%;">
                     <td colspan="3" class="borde-1" style="border-right: none;">
                         <div style="display: flex;" class="px-1">
-                            N.B. I/We have carefully read the conditions of the company stipulated on the consignors
-                            copy
-                            which are binding on me/us and here by declare that the particulars furnished are correct
-                            and
-                            correspond to the entries our Books of Accounts. It is further noted that the above firm is
-                            not
-                            common carriers, but carriers governed by the conditions of carriage set forth on
-                            Consignees
-                            copy.
+                            N.B.  I/We have carefully read the conditions of the company stipulated on the consignor's copy   which are binding on me/us and here by declare that the particulars furnished are correct and correspond to the entries our Books of Accounts. It is further noted that the above firm is not common carriers, but carriers governed by the conditions of carriage set forth on Consignee's copy. 
                         </div>
                     </td>
                 </tr>

@@ -48,11 +48,35 @@ export class WESTERNCARRIERSComponent implements OnInit {
     console.log("Res", Res);
     if(Res.success && Res.data.length > 0){
       this.JsonData = Res.data[0];
+      const invoiceDetails = this.JsonData.invoiceDetails[0]
       this.JsonData = {
         ...this.JsonData,
+        invoiceNo:invoiceDetails.invoiceNo,
+        ewayBillNo:invoiceDetails.ewayBillNo,
       }
-      this.showView=true
+      this.getCustomer()
     }
+  }
+
+  async getCustomer(){
+    let req = {
+      companyCode: this.companyCode,
+      filter: {customerName:this.JsonData.billingParty},
+      collectionName: "customer_detail",
+    };
+    const Res = await this.masterService
+      .masterPost("generic/get", req)
+      .toPromise();
+      if(Res.success && Res.data.length > 0){
+        const GSTdetails = Res.data[0].GSTdetails[0]
+        this.JsonData = {
+          ...this.JsonData,
+          PANnumber:Res.data[0].PANnumber,
+          gstNo:GSTdetails.gstNo
+        }
+      this.showView=true
+
+      }
   }
 
   // data = {

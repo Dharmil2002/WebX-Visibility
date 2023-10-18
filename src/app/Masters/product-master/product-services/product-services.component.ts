@@ -45,7 +45,7 @@ export class ProductServicesComponent implements OnInit {
   tableTab = false;
   ServicesNameList:any;
   ServicesTypeList:any;
-  jsonControlArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  jsonControlArray: any[];
   customerTableForm: any;
   companyCode = parseInt(localStorage.getItem("companyCode"));
   ServicesNameCode: string;

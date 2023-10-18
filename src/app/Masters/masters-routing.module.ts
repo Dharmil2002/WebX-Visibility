@@ -68,9 +68,11 @@ import { VendorContractListComponent } from './Vendor Contract/vendor-contract-l
 import { VendorTabsIndexComponent } from './Vendor Contract/vendor-tabs-index/vendor-tabs-index.component';
 import { FleetMasterListComponent } from './fleet-master/fleet-master-list/fleet-master-list.component';
 import { AddFleetMasterComponent } from './fleet-master/add-fleet-master/add-fleet-master.component';
-import { CustomerQueryPageComponent } from './Customer Contract/customer-query-page/customer-query-page.component';
 import { CustomerContractListComponent } from './Customer Contract/customer-contract-list/customer-contract-list.component';
 import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
+import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-beneficiary-master/add-beneficiary-master.component';
+import { BeneficiaryMasterListComponent } from './beneficiary-master/beneficiary-master-list/beneficiary-master-list.component';
+import { ListProductComponent } from './product-master/list-product/list-product.component';
 
 
 const routes: Routes = [
@@ -137,6 +139,8 @@ const routes: Routes = [
   { path: "ContainerMaster/AddContainerMaster", component: AddContainerMasterComponent },
   { path: 'FleetMaster/FleetMasterList', component: FleetMasterListComponent },
   { path: 'FleetMaster/AddFleetMaster', component: AddFleetMasterComponent },
+  { path: 'BeneficiaryMaster/BeneficiaryMasterList', component: BeneficiaryMasterListComponent },
+  { path: 'BeneficiaryMaster/AddBeneficiaryMaster', component: AddBeneficiaryMasterComponent },
 
   // Vendor Contract Router
   { path: "VendorContract/VendorQueryPage", component: VendorQueryPageComponent },
@@ -146,9 +150,12 @@ const routes: Routes = [
   { path: "VendorContract/VendorIndex", component: VendorTabsIndexComponent },
 
   // Customer Contract Router
-  { path: "CustomerContract/CustomerQueryPage", component: CustomerQueryPageComponent },
   { path: "CustomerContract/CustomerContractList", component: CustomerContractListComponent },
   { path: "CustomerContract/CustomerIndex", component: CustomerContractTabsIndexComponent },
+
+  //Product Master Router
+  { path: "ProductMaster/ListProduct", component: ListProductComponent },
+
 
 ];
 

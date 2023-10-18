@@ -11,7 +11,7 @@ export function autocompleteStringValidator(validOptions: Array<string>): Valida
   
  export function autocompleteObjectValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
-      if (typeof control.value === 'string') {
+      if (typeof control.value === 'string' &&  control.value !='') {
         return { invalidAutocompleteObject: { value: control.value } };
       }
       return null; /* valid option selected */

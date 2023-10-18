@@ -37,7 +37,12 @@ export class AddDcrSeriesControl {
                 },
                 generatecontrol: true,
                 disable: false,
-                Validations: []
+                Validations: [
+                    // {
+                    //     name: "required",
+                    //     message: "Business Type is required"
+                    // }
+                ]
             },
             {
                 name: 'bookCode',
@@ -47,13 +52,20 @@ export class AddDcrSeriesControl {
                 value: '',
                 generatecontrol: true,
                 disable: false,
-                Validations: []
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Book Code is required"
+                    }
+                ], functions: {
+                    onChange: "isBookCodeUnique",
+                },
             },
             {
                 name: 'seriesFrom',
                 label: "Series From",
                 placeholder: "Please Enter Series From",
-                type: 'text',
+                type: 'number',
                 value: '',
                 generatecontrol: true,
                 disable: false,
@@ -62,11 +74,11 @@ export class AddDcrSeriesControl {
                         name: "required",
                         message: "Series From is required"
                     },
-                    {
-                        name: "pattern",
-                        message: "Please Enter alphanumeric Series From of length 12",
-                        pattern: '^[a-zA-Z0-9]{12,30}$',
-                    }
+                    // {
+                    //     name: "pattern",
+                    //     message: "Please Enter alphanumeric Series From of length 12",
+                    //     pattern: '^[a-zA-Z0-9]{12,30}$',
+                    // }
                 ],
 
             },
@@ -78,7 +90,12 @@ export class AddDcrSeriesControl {
                 value: '',
                 generatecontrol: true,
                 disable: false,
-                Validations: [],
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Total Leaf is required"
+                    }
+                ],
                 functions: {
                     onChange: "getSeriesTo",
                 },
@@ -88,11 +105,14 @@ export class AddDcrSeriesControl {
                 name: 'seriesTo',
                 label: "Series To",
                 placeholder: "Please Enter Series To",
-                type: 'text',
+                type: 'number',
                 value: '',
                 generatecontrol: true,
                 disable: true,
-                Validations: []
+                Validations: [{
+                    name: "required",
+                    message: "Series To is required"
+                }]
             },
             {
                 name: 'allotTo',
@@ -101,57 +121,37 @@ export class AddDcrSeriesControl {
                 type: 'dropdown',
                 value: '',
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: true
                 },
                 generatecontrol: true,
                 disable: false,
-                Validations: []
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Allot To is required"
+                    }
+                ],
+                functions: {
+                    onOptionSelect: "getAllMastersData"
+                },
             },
             {
-                name: 'updateDate',
-                label: ' ',
-                placeholder: ' ',
-                type: 'date',
-                value: new Date(), // Set the value to the current date
-                filterOptions: '',
-                autocomplete: '',
-                displaywith: '',
-                Validations: [],
-                generatecontrol: false,
-                disable: false
-            },
-            {
-                name: "updateBy",
-                label: "",
-                placeholder: "",
-                type: "text",
-                value: localStorage.getItem("UserName"),
-                Validations: [],
-                generatecontrol: false,
+                name: 'allocateTo',
+                label: "Allocate To",
+                placeholder: "search and select",
+                type: 'dropdown',
+                value: '',
+                additionalData: {
+                    showNameAndValue: true
+                },
+                generatecontrol: true,
                 disable: false,
-            },
-            {
-                name: 'EntryDate',
-                label: ' ',
-                placeholder: ' ',
-                type: 'date',
-                value: new Date(), // Set the value to the current date
-                filterOptions: '',
-                autocomplete: '',
-                displaywith: '',
-                Validations: [],
-                generatecontrol: false,
-                disable: false
-            },
-            {
-                name: "EntryBy",
-                label: "",
-                placeholder: "",
-                type: "text",
-                value: localStorage.getItem("UserName"),
-                Validations: [],
-                generatecontrol: false,
-                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Allocate To is required"
+                    }
+                ]
             },
         ]
     }

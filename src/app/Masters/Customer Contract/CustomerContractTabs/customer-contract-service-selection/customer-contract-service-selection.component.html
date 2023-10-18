@@ -1,148 +1,144 @@
 <div>
-    <div>
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> PRODUCT
 
+    </h4>
+    <hr>
+    <form [formGroup]="ProductsForm">
+        <app-form-webxpress [form]="ProductsForm" [formData]="jsonControlArrayProductsForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+</div>
+<div>
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Services
+        Selection
+    </h4>
+    <hr>
+    <form [formGroup]="ServicesForm">
+        <app-form-webxpress [form]="ServicesForm" [formData]="jsonControlArrayServicesForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="ServiceclassName">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="DisplayVolumetricSection">
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Volumteric
+    </h4>
+    <hr>
+    <form [formGroup]="VolumtericForm">
+        <app-form-webxpress [form]="VolumtericForm" [formData]="jsonControlArrayVolumtericForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="DisplayCODDODSection">
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> COD/DOD
+    </h4>
+    <hr>
+    <form [formGroup]="CODDODForm">
+        <app-form-webxpress [form]="CODDODForm" [formData]="jsonControlArrayCODDODForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+</div>
 
-        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> PRODUCT
-            EXPRESS
-        </h4>
-        <hr>
-        <form [formGroup]="ProductsForm">
-            <app-form-webxpress [form]="ProductsForm" [formData]="jsonControlArrayProductsForm"
-                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                (callFunction)="functionCallHandler($event)" [className]="className">
-            </app-form-webxpress>
-        </form>
-    </div>
-    <div>
-        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Services
-            Selection
-        </h4>
-        <hr>
-        <form [formGroup]="ServicesForm">
-            <app-form-webxpress [form]="ServicesForm" [formData]="jsonControlArrayServicesForm"
-                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                (callFunction)="functionCallHandler($event)" [className]="ServiceclassName">
-            </app-form-webxpress>
-        </form>
-    </div>
-    <div *ngIf="DisplayVolumetricSection">
-        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Volumteric
-        </h4>
-        <hr>
-        <form [formGroup]="VolumtericForm">
-            <app-form-webxpress [form]="VolumtericForm" [formData]="jsonControlArrayVolumtericForm"
-                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                (callFunction)="functionCallHandler($event)" [className]="className">
-            </app-form-webxpress>
-        </form>
-    </div>
-    <div *ngIf="DisplayCODDODSection">
-        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> COD/DOD
-        </h4>
-        <hr>
-        <form [formGroup]="CODDODForm">
-            <app-form-webxpress [form]="CODDODForm" [formData]="jsonControlArrayCODDODForm"
-                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                (callFunction)="functionCallHandler($event)" [className]="className">
-            </app-form-webxpress>
-        </form>
-    </div>
+<div *ngIf="DisplayDemurragericSection">
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Demurrage
+    </h4>
 
-    <div *ngIf="DisplayDemurragericSection">
-        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Demurrage
-        </h4>
-
-        <hr>
-        <form [formGroup]="DemurrageForm">
-            <app-form-webxpress [form]="DemurrageForm" [formData]="jsonControlArrayDemurrageForm"
-                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                (callFunction)="functionCallHandler($event)" [className]="className">
-            </app-form-webxpress>
-        </form>
-    </div>
-    <div *ngIf="DisplayInsuranceSection">
-        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Insurance
-        </h4>
-        <hr>
-        <form [formGroup]="InsuranceCarrierRiskForm">
-            <app-form-webxpress [form]="InsuranceCarrierRiskForm" [formData]="jsonControlArrayInsuranceCarrierRiskForm"
-                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                (callFunction)="functionCallHandler($event)" [className]="className">
-            </app-form-webxpress>
-        </form>
-        <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!InsuranceCarrierRiskForm.valid"
-            style="margin-left: 88%;" (click)="addData()">
-            <mat-icon>add</mat-icon>
-            Add New
-        </button>
-        <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
-            <!-- Bootstrap loader -->
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-        <div class="paddingdiv">
-            <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-                [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-                [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-                [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-                (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-            </app-generic-table-v2>
+    <hr>
+    <form [formGroup]="DemurrageForm">
+        <app-form-webxpress [form]="DemurrageForm" [formData]="jsonControlArrayDemurrageForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="DisplayInsuranceSection">
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Insurance
+    </h4>
+    <hr>
+    <form [formGroup]="InsuranceCarrierRiskForm">
+        <app-form-webxpress [form]="InsuranceCarrierRiskForm" [formData]="jsonControlArrayInsuranceCarrierRiskForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!InsuranceCarrierRiskForm.valid"
+        style="margin-left: 85%;" (click)="addData()">
+        <mat-icon>add</mat-icon>
+        Add New
+    </button>
+    <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <div *ngIf="DisplayCutOfftimeSection">
-        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Cut-Off
-            time
-        </h4>
-        <hr>
-        <form [formGroup]="CutOfftimeForm">
-            <app-form-webxpress [form]="CutOfftimeForm" [formData]="jsonControlArrayCutOfftimeForm"
-                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                (callFunction)="functionCallHandler($event)" [className]="className">
-            </app-form-webxpress>
-        </form>
+    <div class="paddingdiv">
+        <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+            [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+            [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+            [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+            (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+        </app-generic-table-v2>
     </div>
-    <div *ngIf="DisplayYieldProtectionSection">
-        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Yield
-            Protection
-        </h4>
-        <hr>
-        <form [formGroup]="YieldProtectionForm">
-            <app-form-webxpress [form]="YieldProtectionForm" [formData]="jsonControlArrayYieldProtectionForm"
-                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                (callFunction)="functionCallHandler($event)" [className]="className">
-            </app-form-webxpress>
-        </form>
+</div>
+<div *ngIf="DisplayCutOfftimeSection">
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Cut-Off
+        time
+    </h4>
+    <hr>
+    <form [formGroup]="CutOfftimeForm">
+        <app-form-webxpress [form]="CutOfftimeForm" [formData]="jsonControlArrayCutOfftimeForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="DisplayYieldProtectionSection">
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Yield
+        Protection
+    </h4>
+    <hr>
+    <form [formGroup]="YieldProtectionForm">
+        <app-form-webxpress [form]="YieldProtectionForm" [formData]="jsonControlArrayYieldProtectionForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="DisplayFuelSurchargeSection">
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Fuel
+        Surcharge
+    </h4>
+    <hr>
+    <form [formGroup]="FuelSurchargeForm">
+        <app-form-webxpress [form]="FuelSurchargeForm" [formData]="jsonControlArrayFuelSurchargeForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!FuelSurchargeForm.valid"
+        style="margin-left: 85%;" (click)="addData()">
+        <mat-icon>add</mat-icon>
+        Add New
+    </button>
+    <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
-    <div *ngIf="DisplayFuelSurchargeSection">
-        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Fuel
-            Surcharge
-        </h4>
-        <hr>
-        <form [formGroup]="FuelSurchargeForm">
-            <app-form-webxpress [form]="FuelSurchargeForm" [formData]="jsonControlArrayFuelSurchargeForm"
-                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                (callFunction)="functionCallHandler($event)" [className]="className">
-            </app-form-webxpress>
-        </form>
-        <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!FuelSurchargeForm.valid"
-            style="margin-left: 88%;" (click)="addData()">
-            <mat-icon>add</mat-icon>
-            Add New
-        </button>
-        <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
-            <!-- Bootstrap loader -->
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-        <div class="paddingdiv">
-            <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-                [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-                [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-                [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-                (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-            </app-generic-table-v2>
-        </div>
+    <div class="paddingdiv">
+        <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+            [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+            [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+            [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+            (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+        </app-generic-table-v2>
     </div>
 </div>

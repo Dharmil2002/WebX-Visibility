@@ -91,7 +91,7 @@ export class VendorControl {
                     isIndeterminate: false,
                     isChecked: false,
                     support: "vendorLocationDropdown",
-                    showNameAndValue: false,
+                    showNameAndValue: true,
                     Validations: [{
                     }]
                 },

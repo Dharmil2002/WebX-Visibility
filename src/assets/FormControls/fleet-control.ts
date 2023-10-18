@@ -41,7 +41,7 @@ export class FleetControls {
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Vehicle Type is required"
                     },
                     {
                         name: "autocomplete",
@@ -142,6 +142,10 @@ export class FleetControls {
                         message: "Insurance Expiry Date is required"
                     },
                 ],
+                additionalData: {
+                    minDate: new Date(), // Set the minimum date to the current date
+                    maxDate: new Date(new Date().getFullYear(), 11, 31) // Set the maximum date to December 31 of the current year
+                }
             },
             {
                 name: 'insuranceScan', label: "Insurance Scan", placeholder: "Enter Insurance Scan", type: 'file',
@@ -165,6 +169,10 @@ export class FleetControls {
                         message: "Fitness Validity Date is required"
                     },
                 ],
+                additionalData: {
+                    minDate: new Date(), // Set the minimum date to the current date
+                    maxDate: new Date(new Date().getFullYear(), 11, 31) // Set the maximum date to December 31 of the current year
+                }
             },
             {
                 name: 'fitnesscertificateScan', label: "Fitness certificate Scan", placeholder: "Enter Fitness certificate Scan",
@@ -199,7 +207,7 @@ export class FleetControls {
                     },
                     {
                         // [Manufacturer Code] [Plant Code] [Production Sequence]
-                        name:"pattern",
+                        name: "pattern",
                         message: "Please enter a valid Engine No (e.g., ABC123 456789)",
                         pattern: "[A-Z]{3}[0-9]{3} [0-9]{6}"
                     }
@@ -218,6 +226,16 @@ export class FleetControls {
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
+            {
+                name: "companyCode",
+                label: "Company Code",
+                placeholder: "Company Code",
+                type: "",
+                value: parseInt(localStorage.getItem("companyCode")),
                 Validations: [],
                 generatecontrol: false,
                 disable: false,

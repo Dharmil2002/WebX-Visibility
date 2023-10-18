@@ -10,7 +10,7 @@ export class VehicleStatusControls {
             {
                 name: 'vehNo', label: "Vehicle Number", placeholder: "Search and select Vehicle Number", type: 'dropdown',
                 value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                functions:{
+                functions: {
                     onOptionSelect: 'ValidationForVehno',
                 },
                 Validations: [
@@ -65,6 +65,26 @@ export class VehicleStatusControls {
             },
             {
                 name: 'capacity', label: 'capacity', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'dMobNo', label: 'dMobNo', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'driver', label: 'driver', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'vMobNo', label: 'vMobNo', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'vendor', label: 'vendor', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
+                Validations: [],
+            },
+            {
+                name: 'vendorType', label: 'vendorType', placeholder: '', type: '', value: "", generatecontrol: false, disable: false,
                 Validations: [],
             },
             {

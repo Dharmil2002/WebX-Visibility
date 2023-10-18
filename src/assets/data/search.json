@@ -449,6 +449,16 @@
           "title": "ProductMaster/ListProduct",
           "tag": ["ProductMaster", "ListProduct"],
           "router": "Masters/ProductMaster/ListProduct"
+        },
+        {
+          "title": "BeneficiaryMaster/BeneficiaryMasterList",
+          "tag": ["BeneficiaryMaster", "BeneficiaryMasterList"],
+          "router": "Masters/BeneficiaryMaster/BeneficiaryMasterList"
+        },
+        {
+          "title": "BeneficiaryMaster/AddBeneficiaryMaster",
+          "tag": ["BeneficiaryMaster", "AddBeneficiaryMaster"],
+          "router": "Masters/BeneficiaryMaster/AddBeneficiaryMaster"
         }
 
       ]

@@ -60,7 +60,7 @@ export class DashboardPageComponent implements OnInit {
      {
       "id": "Job",
       "label": "Tab 9",
-      "permission": ["Export", "Import", "EXIM"]
+      "permission": ["Export","FTL", "Import", "EXIM"]
     }, {
       "id": "Rake",
       "label": "Tab 10",

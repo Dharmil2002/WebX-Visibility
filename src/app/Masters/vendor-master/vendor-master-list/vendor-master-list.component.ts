@@ -21,7 +21,7 @@ export class VendorMasterListComponent implements OnInit {
       "vendorType": "Vendor Type",
       "isActive": "Active",
       "actions": "Actions",
-      "view": "View"
+      //"view": "View"
     }
   //#region declaring Csv File's Header as key and value Pair
   headerForCsv = {
@@ -80,7 +80,7 @@ export class VendorMasterListComponent implements OnInit {
   }
   ngOnInit(): void {
     this.getVendorDetails();
-    this.viewComponent = VendorMasterViewComponent
+   // this.viewComponent = VendorMasterViewComponent
     this.csvFileName = "Vendor Details"  //setting csv file Name so file will be saved as per this name
   }
   async getVendorDetails() {

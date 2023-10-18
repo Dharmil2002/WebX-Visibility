@@ -3,6 +3,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class thcControl {
     private thcControlArray: FormControls[];
     constructor(update: boolean, view: boolean) {
+
         this.thcControlArray =
             [
                 {
@@ -14,7 +15,7 @@ export class thcControl {
                     Validations: [],
                     generatecontrol: true, disable: view ? view : true,
                     additionalData: {
-                     metaData:"Basic"
+                        metaData: "Basic"
                     }
                 },
                 {
@@ -24,10 +25,10 @@ export class thcControl {
                     type: 'text',
                     value: '',
                     Validations: [],
-                    generatecontrol: true, disable: view ? view : true,
+                    generatecontrol: true, disable: view ? view : false,
                     additionalData: {
-                        metaData:"Basic"
-                       }
+                        metaData: "Basic"
+                    }
 
                 },
                 {
@@ -37,14 +38,11 @@ export class thcControl {
                     type: 'dropdown',
                     value: '',
                     Validations: [
-                        {
-                            name: "required",
-                            message: "PRQ NO  is required",
-                        }],
+                    ],
                     generatecontrol: true,
                     additionalData: {
                         showNameAndValue: false,
-                        metaData:"Basic"
+                        metaData: "Basic"
 
                     },
                     functions: {
@@ -56,7 +54,7 @@ export class thcControl {
                     name: 'vehicle',
                     label: 'Vehicle',
                     placeholder: '',
-                    type: 'text',
+                    type: view ? 'text' : 'dropdown',
                     value: '',
                     Validations: [
                         {
@@ -66,37 +64,45 @@ export class thcControl {
                     generatecontrol: true,
                     additionalData: {
                         showNameAndValue: false,
-                        metaData:"Basic"
+                        metaData: "Basic"
                     },
                     functions: {
-                        onOptionSelect: ''
+                        onOptionSelect: 'getVehicleDetail'
                     },
-                    disable: view ? view : true
+                    disable: view ? view : false
                 },
                 {
-                    name: "VendorType",
+                    name: "vendorType",
                     label: "Vendor Type",
                     placeholder: "VehicleType",
-                    type: "text",
-                    value: "",
+                    type: view ? 'text' : 'Staticdropdown',
+                    value: [
+                        { value: "Own", name: "Own" },
+                        { value: "Attached", name: "Attached" },
+                        { value: "Rail", name: "Rail" },
+                        { value: "Market", name: "Market" },
+                        { value: "Service Provider", name: "Service Provider" }
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : true,
+                    disable: view ? view : false,
                     Validations: [
                         {
                             name: "required",
                             message: "Vendor Type  is required",
                         }],
-                    functions: {},
-                    additionalData: { metaData:"Basic"}
+                    functions: {
+                        onSelection: "vendorFieldChanged"
+                    },
+                    additionalData: { metaData: "Basic" }
                 },
                 {
                     name: "vendorName",
                     label: "Vendor Name",
                     placeholder: "Vendor Name",
-                    type: "text",
+                    type: view ? 'text' : 'dropdown',
                     value: "",
                     filterOptions: "",
                     autocomplete: "",
@@ -109,7 +115,10 @@ export class thcControl {
                             message: "Vendor Name  is required",
                         }],
                     functions: {},
-                    additionalData: { metaData:"Basic"}
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData: "Basic"
+                    }
                 },
                 {
                     name: "panNo",
@@ -128,7 +137,72 @@ export class thcControl {
                             message: "PAN Number  is required",
                         }],
                     functions: {},
-                    additionalData: { metaData:"Basic"}
+                    additionalData: { metaData: "Basic" }
+                },
+                {
+                    name: "fromCity",
+                    label: "From City",
+                    placeholder: "From City",
+                    type: "dropdown",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "From City is required",
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        },
+                        {
+                            name: "autocomplete",
+                        },
+                    ],
+                    functions: {
+                        onModel: "getPincodeDetail",
+                        onOptionSelect: 'getLocBasedOnCity'
+                    },
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
+                },
+                {
+                    name: "toCity",
+                    label: "To City",
+                    placeholder: "To City",
+                    type: "dropdown",
+                    value: "",
+                    filterOptions: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "To City is required",
+                        },
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        },
+                        {
+                            name: "autocomplete",
+                        },
+                    ],
+                    functions: {
+                        onModel: "getPincodeDetail",
+                        onOptionSelect: 'getLocBasedOnCity'
+                    },
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
                 },
                 {
                     name: 'closingBranch',
@@ -138,12 +212,20 @@ export class thcControl {
                     value: '',
                     additionalData: {
                         showNameAndValue: true,
-                        metaData:"Basic"
+                        metaData: "Basic"
                     },
-                    Validations: [  {
+                    Validations: [{
                         name: "required",
                         message: "Closing Branch  is required",
-                    }],
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                    ],
                     generatecontrol: true,
                     disable: view ? view : update
                 },
@@ -161,7 +243,7 @@ export class thcControl {
                     generatecontrol: true,
                     additionalData: {
                         showNameAndValue: false,
-                        metaData:"driver"
+                        metaData: "driver"
                     },
                     functions: {
                         onOptionSelect: ''
@@ -182,7 +264,7 @@ export class thcControl {
                     generatecontrol: true,
                     additionalData: {
                         showNameAndValue: false,
-                        metaData:"driver"
+                        metaData: "driver"
                     },
                     functions: {
                         onOptionSelect: ''
@@ -203,7 +285,7 @@ export class thcControl {
                     generatecontrol: true,
                     additionalData: {
                         showNameAndValue: false,
-                        metaData:"driver"
+                        metaData: "driver"
                     },
                     functions: {
                         onOptionSelect: ''
@@ -224,7 +306,7 @@ export class thcControl {
                     generatecontrol: true,
                     additionalData: {
                         showNameAndValue: false,
-                        metaData:"driver"
+                        metaData: "driver"
                     },
                     functions: {
                         onOptionSelect: ''
@@ -240,7 +322,7 @@ export class thcControl {
                     Validations: [],
                     generatecontrol: true,
                     additionalData: {
-                        metaData:"vehLoad"
+                        metaData: "vehLoad"
                     },
                     disable: true
                 },
@@ -253,7 +335,7 @@ export class thcControl {
                     Validations: [],
                     generatecontrol: true,
                     additionalData: {
-                        metaData:"vehLoad"
+                        metaData: "vehLoad"
                     },
                     disable: view ? view : true
                 },
@@ -266,7 +348,7 @@ export class thcControl {
                     Validations: [],
                     generatecontrol: true,
                     additionalData: {
-                        metaData:"vehLoad"
+                        metaData: "vehLoad"
                     },
                     disable: true
                 },
@@ -282,7 +364,7 @@ export class thcControl {
                     },
                     generatecontrol: true,
                     additionalData: {
-                        metaData:"vehLoad"
+                        metaData: "vehLoad"
                     },
                     disable: view ? view : update
                 },
@@ -298,7 +380,7 @@ export class thcControl {
                     },
                     generatecontrol: true,
                     additionalData: {
-                        metaData:"vehLoad"
+                        metaData: "vehLoad"
                     },
                     disable: view ? view : update
                 },
@@ -314,7 +396,7 @@ export class thcControl {
                     Validations: [],
                     generatecontrol: true,
                     additionalData: {
-                        metaData:"vehLoad"
+                        metaData: "vehLoad"
                     },
                     disable: view ? view : update
                 },
@@ -326,9 +408,9 @@ export class thcControl {
                     value: '',
                     additionalData: {
                         showNameAndValue: true,
-                        metaData:"vehLoad"
+                        metaData: "vehLoad"
                     },
-                    Validations: [  {
+                    Validations: [{
                         name: "required",
                         message: "Advance Paid At  is required",
                     }],
@@ -343,9 +425,9 @@ export class thcControl {
                     value: '',
                     additionalData: {
                         showNameAndValue: true,
-                        metaData:"vehLoad"
+                        metaData: "vehLoad"
                     },
-                    Validations: [  {
+                    Validations: [{
                         name: "required",
                         message: "Balance Paid At is required",
                     }],
@@ -414,7 +496,7 @@ export class thcControl {
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
-                        metaData:"Basic"
+                        metaData: "Basic"
                     },
                     generatecontrol: false,
                     disable: true
@@ -428,7 +510,7 @@ export class thcControl {
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
-                        metaData:"Basic"
+                        metaData: "Basic"
                     },
                     generatecontrol: false,
                     disable: true
@@ -442,7 +524,7 @@ export class thcControl {
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
-                        metaData:"Basic"
+                        metaData: "Basic"
                     },
                     generatecontrol: false,
                     disable: true
@@ -456,7 +538,7 @@ export class thcControl {
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
-                        metaData:"Basic"
+                        metaData: "Basic"
                     },
                     generatecontrol: false,
                     disable: true
@@ -470,7 +552,7 @@ export class thcControl {
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
-                        metaData:"Basic"
+                        metaData: "Basic"
                     },
                     generatecontrol: false,
                     disable: true
@@ -484,10 +566,94 @@ export class thcControl {
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,
-                        metaData:"Basic"
+                        metaData: "Basic"
                     },
                     generatecontrol: false,
                     disable: true
+                },
+                {
+                    name: 'billingParty',
+                    label: 'billingParty',
+                    placeholder: 'billingParty',
+                    type: 'text',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData: "shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: true
+                },
+                {
+                    name: 'docketNumber',
+                    label: 'Docket Number',
+                    placeholder: 'Docket Number',
+                    type: 'text',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData: "shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: true
+                },
+                {
+                    name: 'actualWeight',
+                    label: 'Actual Weight',
+                    placeholder: 'Actual Weight',
+                    type: 'number',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData: "shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: 'noofPkts',
+                    label: 'No Of Package',
+                    placeholder: 'No Of Package',
+                    type: 'number',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData: "shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: false
+                },
+                {
+                    name: 'pendingPackages',
+                    label: 'pending No Of Package',
+                    placeholder: 'pending No Of Package',
+                    type: 'number',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData: "shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: false
+                }
+                , {
+                    name: 'pendingActWeight',
+                    label: 'pending Actual Weight',
+                    placeholder: 'pending Actual Weight',
+                    type: 'number',
+                    value: "",
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData: "shipment_detail"
+                    },
+                    generatecontrol: true,
+                    disable: false
                 }
 
 

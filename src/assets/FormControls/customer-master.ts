@@ -89,7 +89,7 @@ export class customerControl {
           isIndeterminate: false,
           isChecked: false,
           support: "customerLocationsDrop",
-          showNameAndValue: true,
+          showNameAndValue: false,
           Validations: [{
             name: "",
             message: ""
@@ -112,6 +112,24 @@ export class customerControl {
           {
             name: "required",
             message: "Customer e-mails is required",
+          },
+        ],
+        functions: {
+          onChange: "onChangeEmail",
+        },
+      },
+      {
+        name: "customer_mobile",
+        label: "Customer Mobile No",
+        placeholder: "Customer Mobile No",
+        type: "mobile-number",
+        value: isUpdate ? customerTable.customer_mobile : "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Customer Mobile No is required",
           },
         ],
         functions: {

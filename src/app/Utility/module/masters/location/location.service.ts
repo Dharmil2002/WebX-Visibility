@@ -8,12 +8,12 @@ export class LocationService {
   constructor(private masterService: MasterService) { }
 
   // This async function retrieves location data from an API using the masterService.
-  async locationFromApi() {
+  async locationFromApi(filter={}) {
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "location_detail",
-      filter: {}, // You can specify additional filters here if needed
+      filter: filter, // You can specify additional filters here if needed
     };
 
     try {
@@ -26,7 +26,7 @@ export class LocationService {
       const filterMap =
         res?.data?.map((x) => ({
           value: x.locCode,
-          name: x.locName,
+          name: x.locCode,
           city: x.locCity,
           state: x.locState,
         })) ?? null;

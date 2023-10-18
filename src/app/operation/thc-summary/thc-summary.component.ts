@@ -30,8 +30,10 @@ export class ThcSummaryComponent implements OnInit {
   columnHeader = {
     tripId: {
       Title: "THC No",
-      class: "matcolumnleft",
-      Style: "max-width:350px",
+      class: "matcolumncenter",
+      Style: "min-width:210px",
+      functionName:'openExternalWindow',
+      type:'windowLink'
     },
     route: {
       Title: "Route",
@@ -40,7 +42,7 @@ export class ThcSummaryComponent implements OnInit {
     },
     vehicle: {
       Title: "Vehicle No",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:130px",
     },
     loadedKg: {
@@ -50,17 +52,17 @@ export class ThcSummaryComponent implements OnInit {
     },
     updateDate: {
       Title: "CreateAt",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:250px",
     },
     statusAction:{
       Title:"Status",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:100px",
     },
     actionsItems: {
       Title: "Action",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width:100px",
     }
   };
@@ -72,9 +74,9 @@ export class ThcSummaryComponent implements OnInit {
     "statusAction",
     "updateDate",
   ];
-  linkArray = [
-    { Row: 'tripId', Path: 'Operation/thc-view'},
-  ]
+  // linkArray = [
+  //   { Row: 'tripId', Path: 'Operation/thc-view'},
+  // ]
   addAndEditPath: string;
   menuItemflag: boolean = true;
   menuItems = [{label:"Update THC"},{label:"Delivered"},{label:"View"}];
@@ -88,8 +90,9 @@ export class ThcSummaryComponent implements OnInit {
     ) {
       this.getThcDetails();
       this.addAndEditPath = "Operation/thc-create";
-
     }
+
+    
 
     //here the code which is get details of Thc Which is Display in Fron-end
   async getThcDetails() {
@@ -140,5 +143,23 @@ export class ThcSummaryComponent implements OnInit {
   }
   goBack(tabIndex: number): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
+  }
+  functionCallHandler(event) {
+    try {
+      this[event.functionName](event.data);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+  // openExternalWindow() {
+  //   const url = `${window.location.origin}/#/Operation/thc-view`;
+  //   window.open(url,'','width=1000,height=800');
+  // }
+  openExternalWindow(data){
+
+    const THC = data.tripId
+    console.log("THCDta", data);
+    const url = `${window.location.origin}/#/Operation/thc-view?THC=${THC}`;
+    window.open(url,'','width=1500,height=800');
   }
 }

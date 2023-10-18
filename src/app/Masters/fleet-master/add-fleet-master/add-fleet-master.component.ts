@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
@@ -16,7 +16,8 @@ import Swal from 'sweetalert2';
 })
 export class AddFleetMasterComponent implements OnInit {
   FleetTable: fleetModel;
-  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean;}[];
+  @Input() thc: boolean;
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
   action: string;
   isUpdate = false;
   fleetTableForm: UntypedFormGroup;
@@ -28,7 +29,7 @@ export class AddFleetMasterComponent implements OnInit {
   allData: { vehicleData: any; };
   tableLoad: boolean;
   vehicleData: any;
-  backPath:string;
+  backPath: string;
   vehicleDet: any;
   vehTypeDet: any;
   SelectFile: File;
@@ -46,8 +47,6 @@ export class AddFleetMasterComponent implements OnInit {
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.FleetTable = route.getCurrentNavigation().extras.state.data;
-      console.log(this.FleetTable);
-
       this.isUpdate = true;
       this.submit = 'Modify';
       this.action = "edit";
@@ -77,7 +76,6 @@ export class AddFleetMasterComponent implements OnInit {
       ];
       this.FleetTable = new fleetModel({});
     }
-    this.initializeFormControl();
   }
 
   initializeFormControl() {
@@ -85,6 +83,7 @@ export class AddFleetMasterComponent implements OnInit {
     this.FleetFormControls = new FleetControls(this.FleetTable, this.isUpdate);
     // Get form controls for Driver Details section
     this.jsonControlFleetArray = this.FleetFormControls.getFormControls();
+
     this.jsonControlFleetArray.forEach(data => {
       if (data.name === 'vehicleNo') {
         // Set category-related variables
@@ -97,6 +96,9 @@ export class AddFleetMasterComponent implements OnInit {
         this.vehicleTypeStatus = data.additionalData.showNameAndValue;
       }
     });
+    if (this.thc) {
+      this.jsonControlFleetArray = this.jsonControlFleetArray.filter((x) => x.name != "vehicleNo" && x.name!="_id");
+    }
     // Build the form group using formGroupBuilder function
     this.fleetTableForm = formGroupBuilder(this.fb, [this.jsonControlFleetArray]);
   }
@@ -104,6 +106,8 @@ export class AddFleetMasterComponent implements OnInit {
   ngOnInit(): void {
     this.getAllMastersData();
     this.backPath = "/Masters/FleetMaster/FleetMasterList";
+    this.initializeFormControl();
+
   }
 
   //#region Function for Getting dropdown Data
@@ -111,37 +115,33 @@ export class AddFleetMasterComponent implements OnInit {
     try {
       // Prepare the requests for different collections
 
-      let vehicleReq = {
-        "companyCode": parseInt(localStorage.getItem("companyCode")),
-        "filter": {},
-        "collectionName": "vehicle_detail"
-      };
+      let vehicleRes;
       let vehTypeReq = {
         "companyCode": parseInt(localStorage.getItem("companyCode")),
         "filter": {},
         "collectionName": "vehicleType_detail"
       };
-
-      const vehicleRes = await this.masterService.masterPost('generic/get', vehicleReq).toPromise();
       const vehTypeRes = await this.masterService.masterPost('generic/get', vehTypeReq).toPromise();
-
+      if (!this.thc) {
+        let vehicleReq = {
+          "companyCode": parseInt(localStorage.getItem("companyCode")),
+          "filter": {},
+          "collectionName": "vehicle_detail"
+        };
+         vehicleRes = await this.masterService.masterPost('generic/get', vehicleReq).toPromise();
+      }
       const mergedData = {
-        vehicleData: vehicleRes?.data,
         vehTypeData: vehTypeRes?.data,
+        vehicleData: vehicleRes?.data,
       };
 
       this.allData = mergedData;
-
+      if(!this.thc){
       const vehicleDet = mergedData.vehicleData.map(element => ({
         name: element.vehicleNo,
         value: element.vehicleNo,
       }));
-      const vehTypeDet = mergedData.vehTypeData.map(element => ({
-        name: element.vehicleTypeName,
-        value: element.vehicleTypeCode,
-      }));
       this.vehicleDet = vehicleDet;
-      this.vehTypeDet = vehTypeDet;
       this.filter.Filter(
         this.jsonControlFleetArray,
         this.fleetTableForm,
@@ -149,6 +149,12 @@ export class AddFleetMasterComponent implements OnInit {
         this.vehicleNo,
         this.vehicleNoStatus
       );
+      }
+      const vehTypeDet = mergedData.vehTypeData.map(element => ({
+        name: element.vehicleTypeName,
+        value: element.vehicleTypeCode,
+      }));
+      this.vehTypeDet = vehTypeDet;
       this.filter.Filter(
         this.jsonControlFleetArray,
         this.fleetTableForm,
@@ -266,7 +272,7 @@ export class AddFleetMasterComponent implements OnInit {
   //#region Function for save data
   async save() {
     const formValue = this.fleetTableForm.value;
-    const controlNames = ["vehicleNo","vehicleType"];
+    const controlNames = ["vehicleNo", "vehicleType"];
     const controls = this.fleetTableForm;
     clearValidatorsAndValidate(controls);
     controlNames.forEach((controlName) => {

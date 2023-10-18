@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-
+const companyCode=localStorage.getItem("companyCode");
 /**
  * Handles the selection of a file and validates its format.
  *
@@ -47,7 +47,7 @@ export function handleFileSelection(data, formControlName, allowedFormats, vendo
 
 export async function  getVendorDetails(masterService) {
     let req = {
-      "companyCode": this.companyCode,
+      "companyCode": companyCode,
       "collectionName": "vendor_detail",
       "filter": {}
     }

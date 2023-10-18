@@ -45,6 +45,9 @@ export class VehicleStatusService {
     private operation: OperationService
   ) {
   }
+
+  /*below method is used for the vehicle status update*/
+
   async vehicleStatusUpdate(arrivalData: any, prqdata: any, market: boolean) {
     try {
       // Check if essential data is provided
@@ -107,16 +110,27 @@ export class VehicleStatusService {
       throw error; // Re-throw the error to be handled at a higher level or log it.
     }
   }
-  async vehiclList(prqNo: string) {
+
+  /*End*/
+
+  /* The following method is designed to retrieve data trip-wise. In this context,
+       a "trip" can refer to various types of document numbers,
+       such as PRQNO, DOCKNO, or THCNO, which are associated with a vehicle.
+   */
+
+  async vehiclList(tripId: string) {
 
     const request = {
       companyCode: localStorage.getItem("companyCode"),
       collectionName: "vehicle_status",
-      filter: { tripId: prqNo }
+      filter: { tripId: tripId }
     }
     const res = await this.operation.operationMongoPost('generic/get', request).toPromise();
     return res.data[0]
   }
+
+  /* End */
+
   /**
    * Fetch vehicle details from a MongoDB database, including vendor and driver information.
    * @param vehicleNo - The vehicle number to search for in the database.
@@ -163,10 +177,10 @@ export class VehicleStatusService {
     const mergedData = {
       vehicleNo,
       vendorName,
-      vendorType: vendorResult.data[0]?.vendorType||"",
-      vendorPhoneNo: vendorResult.data[0]?.vendorPhoneNo||"",
-      driverName: driverResult.data[0]?.driverName||"",
-      telno: driverResult.data[0]?.telno||"",
+      vendorType: vendorResult.data[0]?.vendorType || "",
+      vendorPhoneNo: vendorResult.data[0]?.vendorPhoneNo || "",
+      driverName: driverResult.data[0]?.driverName || "",
+      telno: driverResult.data[0]?.telno || "",
     };
 
     return mergedData;
@@ -175,31 +189,32 @@ export class VehicleStatusService {
 
   async createTableData(NavData, vehicleStatusData) {
     const [fromCity, toCity] = NavData.fromToCity.split('-');
-    
+
     const results = await Promise.all(vehicleStatusData.map(async item => {
-      const { vendorName, vendorPhoneNo,vendorType, driverName, telno } = await this.vehicleListFromMaster(item.vehNo);
-      
+      const { vendorName, vendorPhoneNo, vendorType, driverName, telno } = await this.vehicleListFromMaster(item.vehNo);
+
       return {
         ...item,
         action: 'Assign',
         fromCity,
         toCity,
-        capacity:`${item.capacity} MT`,
+        capacity: `${item.capacity} MT`,
         vendorType,
         driver_info: `${driverName}-${telno}`,
         vendor_info: `${vendorName}-${vendorPhoneNo}`,
         fromToCitySplit: `${fromCity}-${toCity}`,
         distance: 0,
-        vendor:vendorName,
-        vMobNo:vendorPhoneNo,
-        driver:driverName,
-        dMobNo:telno,
+        vendor: vendorName,
+        vMobNo: vendorPhoneNo,
+        driver: driverName,
+        dMobNo: telno,
         isMarket: false,
         eta: formatDate(new Date().toUTCString(), 'dd/MM/yyyy HH:mm')
       };
     }));
-  
+
     return results;
   }
-  
+
+  /*End*/
 }

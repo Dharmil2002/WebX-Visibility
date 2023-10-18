@@ -12,6 +12,7 @@ export class DocketListComponent implements OnInit {
     /*Below is for the table displaye data */
     tableData: any;
     tableLoad: boolean;
+    orgBranch: string = localStorage.getItem("Branch");
    /* column header is for the changes css or title in the table*/
   columnHeader = {
     billingParty: {
@@ -28,19 +29,21 @@ export class DocketListComponent implements OnInit {
       Title: "Shipment",
       class: "matcolumnleft",
       Style: "max-width:250px",
+      type:'windowLink',
+      functionName:'OpenCnote'
     },
     ftCity: {
       Title: "From-To City",
       class: "matcolumncenter",
       Style: "max-width:150px",
     },
-    transMode: {
-      Title: "Trans Mode",
-      class: "matcolumnleft",
+    actualWeight: {
+      Title: "Actual Weight(Kg)",
+      class: "matcolumncenter",
       Style: "max-width:150px",
     },
-    actualWeight: {
-      Title: "Actual Weight",
+    totalPkg: {
+      Title: "Total Package(Kg)",
       class: "matcolumncenter",
       Style: "max-width:150px",
     },
@@ -56,17 +59,20 @@ export class DocketListComponent implements OnInit {
   staticField = [
     "billingParty",
     "vehicleNo",
-    "docketNumber",
     "ftCity",
-    "transMode",
-    "actualWeight"
+    "actualWeight",
+    "totalPkg"
   ];
 
   /*.......End................*/
   /* here the varible declare for menu Item option Both is required */
-  menuItems=[{label:"Edit Docket"}]
+  menuItems=[
+    {label:"Edit Docket"},
+    {label:"Rake Update"},
+    {label:"Create THC"}
+  ]
   menuItemflag: boolean = true;
-  TableStyle = "width:85%"
+  TableStyle = "width:90%"
   /*.......End................*/
   /*Here the Controls which Is Hide search or add Button in table*/
   dynamicControls = {
@@ -92,15 +98,21 @@ export class DocketListComponent implements OnInit {
   async getShipmentDetail() {
 
     const shipmentList = await getShipment(this.operationService, false);
-    this.tableData = shipmentList.map((x) => {
+    this.tableData = shipmentList.filter((x)=>x.origin==this.orgBranch).map((x) => {
       const actualWeights = [x].map((item) => {
         return item ? calculateTotalField(item.invoiceDetails, 'actualWeight') : 0;
       });
       // Sum all the calculated actualWeights
       const totalActualWeight = actualWeights.reduce((acc, weight) => acc + weight, 0);
+      const noofPkts = [x].map((item) => {
+        return item ? calculateTotalField(item.invoiceDetails, 'noofPkts') : 0;
+      });
+      // Sum all the calculated actualWeights
+      const totalnoofPkts = noofPkts.reduce((acc, pkg) => acc + pkg, 0);
       x.actualWeight = totalActualWeight,
+      x.totalPkg = totalnoofPkts,
       x.ftCity=`${x.fromCity}-${x.toCity}`,
-      x.actions=x.status=="0"?["Edit Docket"]:""
+      x.actions=x.status=="0"?["Edit Docket","Create THC"]:["Rake Update"]
       return x; // Make sure to return x to update the original object in the 'tableData' array.
     });
     //this.tableData = [];
@@ -116,5 +128,36 @@ export class DocketListComponent implements OnInit {
         },
       });
     }
+    if (data.label.label === "Create THC") {
+      this.router.navigate(['/Operation/thc-create'], {
+        state: {
+          data:{ data:data.data,addThc:true}
+
+        },
+      });
+    }
+    if (data.label.label === "Rake Update") {
+      this.goBack('Job')
+    }
+  }
+  goBack(tabIndex: string): void {
+    this.router.navigate(["/dashboard/GlobeDashboardPage"], {
+      queryParams: { tab: tabIndex },
+      state: [],
+    });
+  }
+  functionCallHandler(event) {
+    console.log(event);
+    try {
+      this[event.functionName](event.data);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+  OpenCnote(data){
+    const Docket = data.docketNumber
+    console.log('Docket',Docket)
+    const url = `${window.location.origin}/#/Operation/westerncarriers-view?Docket=${Docket}`;
+    window.open(url,'','width=1000,height=800');
   }
 }

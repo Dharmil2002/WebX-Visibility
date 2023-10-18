@@ -165,7 +165,51 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   }
 
   //#endregion
-  ngOnInit(): void {
+  initializeFormControl() {
+    this.ContractServiceSelectionControls = new ContractServiceSelectionControl();
+    this.jsonControlArrayProductsForm = this.ContractServiceSelectionControls.getContractProductSelectionControlControls(this.CurrentAccessList.productAccess);
+    this.ProductsForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayProductsForm,
+    ]);
+    this.jsonControlArrayServicesForm = this.ContractServiceSelectionControls.getContractServiceSelectionControlControls(this.CurrentAccessList.ServicesSelectionAccess);
+    this.ServicesForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayServicesForm,
+    ]);
+    this.jsonControlArrayCODDODForm = this.ContractServiceSelectionControls.getContractCODDODSelectionControlControls();
+    this.CODDODForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayCODDODForm,
+    ]);
+
+    this.jsonControlArrayVolumtericForm = this.ContractServiceSelectionControls.getContractVolumtericSelectionControlControls();
+    this.VolumtericForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayVolumtericForm,
+    ]);
+
+    this.jsonControlArrayDemurrageForm = this.ContractServiceSelectionControls.getContractDemurrageSelectionControlControls();
+    this.DemurrageForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayDemurrageForm,
+    ]);
+    this.jsonControlArrayInsuranceCarrierRiskForm = this.ContractServiceSelectionControls.getContractInsuranceCarrierRiskSelectionControlControls();
+    this.InsuranceCarrierRiskForm = formGroupBuilder(this.fb, [this.jsonControlArrayInsuranceCarrierRiskForm]);
+
+    this.jsonControlArrayCutOfftimeForm = this.ContractServiceSelectionControls.getContractCutOfftimeControlControls();
+    this.CutOfftimeForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayCutOfftimeForm,
+    ]);
+
+    this.jsonControlArrayYieldProtectionForm = this.ContractServiceSelectionControls.getContractYieldProtectionSelectionControlControls();
+    this.YieldProtectionForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayYieldProtectionForm,
+    ]);
+
+    this.jsonControlArrayFuelSurchargeForm = this.ContractServiceSelectionControls.getContractFuelSurchargeSelectionControlControls();
+    this.FuelSurchargeForm = formGroupBuilder(this.fb, [
+      this.jsonControlArrayFuelSurchargeForm,
+    ]);
+
+  }
+  //#endregion
+  ngOnInit() {
     this.getAllMastersData();
   }
 
@@ -234,50 +278,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       );
     }
   }
-  //#endregion
-  initializeFormControl() {
-    this.ContractServiceSelectionControls = new ContractServiceSelectionControl();
-    this.jsonControlArrayProductsForm = this.ContractServiceSelectionControls.getContractProductSelectionControlControls(this.CurrentAccessList.productAccess);
-    this.ProductsForm = formGroupBuilder(this.fb, [
-      this.jsonControlArrayProductsForm,
-    ]);
-    this.jsonControlArrayServicesForm = this.ContractServiceSelectionControls.getContractServiceSelectionControlControls(this.CurrentAccessList.ServicesSelectionAccess);
-    this.ServicesForm = formGroupBuilder(this.fb, [
-      this.jsonControlArrayServicesForm,
-    ]);
-    this.jsonControlArrayCODDODForm = this.ContractServiceSelectionControls.getContractCODDODSelectionControlControls();
-    this.CODDODForm = formGroupBuilder(this.fb, [
-      this.jsonControlArrayCODDODForm,
-    ]);
 
-    this.jsonControlArrayVolumtericForm = this.ContractServiceSelectionControls.getContractVolumtericSelectionControlControls();
-    this.VolumtericForm = formGroupBuilder(this.fb, [
-      this.jsonControlArrayVolumtericForm,
-    ]);
-
-    this.jsonControlArrayDemurrageForm = this.ContractServiceSelectionControls.getContractDemurrageSelectionControlControls();
-    this.DemurrageForm = formGroupBuilder(this.fb, [
-      this.jsonControlArrayDemurrageForm,
-    ]);
-    this.jsonControlArrayInsuranceCarrierRiskForm = this.ContractServiceSelectionControls.getContractInsuranceCarrierRiskSelectionControlControls();
-    this.InsuranceCarrierRiskForm = formGroupBuilder(this.fb, [this.jsonControlArrayInsuranceCarrierRiskForm]);
-
-    this.jsonControlArrayCutOfftimeForm = this.ContractServiceSelectionControls.getContractCutOfftimeControlControls();
-    this.CutOfftimeForm = formGroupBuilder(this.fb, [
-      this.jsonControlArrayCutOfftimeForm,
-    ]);
-
-    this.jsonControlArrayYieldProtectionForm = this.ContractServiceSelectionControls.getContractYieldProtectionSelectionControlControls();
-    this.YieldProtectionForm = formGroupBuilder(this.fb, [
-      this.jsonControlArrayYieldProtectionForm,
-    ]);
-
-    this.jsonControlArrayFuelSurchargeForm = this.ContractServiceSelectionControls.getContractFuelSurchargeSelectionControlControls();
-    this.FuelSurchargeForm = formGroupBuilder(this.fb, [
-      this.jsonControlArrayFuelSurchargeForm,
-    ]);
-
-  }
   //#endregion
 
   OnChangeServiceSelections(event) {
@@ -318,7 +319,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       this[functionName]($event);
     } catch (error) {
       // we have to handle , if function not exists.
-      console.log("failed");
+      console.log("failed", error);
     }
   }
   async addData() {

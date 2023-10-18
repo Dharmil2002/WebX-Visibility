@@ -7,15 +7,18 @@ import Swal from 'sweetalert2';
 import { map } from 'rxjs/operators';
 import { AddDcrSeriesControl } from 'src/assets/FormControls/add-dcr-series';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { processProperties } from '../../processUtility';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-add-dcr-series',
   templateUrl: './add-dcr-series.component.html'
 })
 export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   @Input() data: any;
-
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   // Breadcrumbs
   breadScrums = [
     {
@@ -102,203 +105,217 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   addDcrFormControl: AddDcrSeriesControl;
   jsonControlArray: any;
   addDcrTableForm: UntypedFormGroup;
-
+  allotTo: string;
+  allotToStatus: boolean;
+  allocateTo: string;
+  allocateToStatus: boolean;
+  businessTypeStatus: boolean;
+  businessType: string;
+  columnHeader = {
+    documentType: {
+      Title: "DocumentType",
+      class: "matcolumncenter",
+      Style: "min-width:80px",
+    },
+    businessType: {
+      Title: 'BusinessType',
+      class: "matcolumncenter",
+      Style: "min-width:80px",
+    },
+    bookCode: {
+      Title: "BookCode",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    allotTo: {
+      Title: "AllotTo",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    allocateTo: {
+      Title: "AllocateTo",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    seriesFrom: {
+      Title: "SeriesFrom",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    totalLeaf: {
+      Title: "TotalLeaf",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    seriesTo: {
+      Title: "SeriesTo",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    }
+  };
+  isUpdate = false
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
+  menuItems = [
+    { label: 'Edit' },
+    { label: 'Remove' }
+  ]
+  menuItemflag = true;
+  staticField =
+    [
+      "documentType",
+      "businessType",
+      "bookCode",
+      "allotTo",
+      "allocateTo",
+      "seriesFrom",
+      "seriesTo",
+      "totalLeaf"
+    ]
+  linkArray = [
+  ];
+  businessTypeList: any;
+  userList: any;
+  locationList: any;
+  isLoad: boolean = false;
+  vendorList: any;
+  customerList: any;
+  dcrDetail: any;
   constructor(
-    public objSnackBarUtility: SnackBarUtilityService, private masterService: MasterService,
+    public objSnackBarUtility: SnackBarUtilityService,
+    private masterService: MasterService,
     private fb: UntypedFormBuilder,
+    private filter: FilterUtils,
+    private router: Router,
   ) {
     super();
     this.initializeFormControl();
   }
 
   ngOnInit() {
-    this.loadTempData();
+    this.bindDropdown();
     this.getAllMastersData();
   }
 
-  // Load temporary data
-  loadTempData() {
-    this.tableData = [{
-      documentType: [],
-      srNo: 0,
-      bookCode: "",
-      seriesFrom: "",
-      seriesTo: "",
-      totalLeaf: "",
-      allotTo: [],
-      allocateTo: []
-    }];
-  }
-
-  // Add a new item to the table
-  addItem() {
-    const AddObj = {
-      documentType: [],
-      srNo: 0,
-      bookCode: "",
-      seriesFrom: "",
-      seriesTo: "",
-      totalLeaf: "",
-      allotTo: [],
-      allocateTo: []
-    };
-    this.tableData.splice(0, 0, AddObj);
-  }
-  documentTypeOptions = [
-    { "name": "CNote", "value": "1" },
-    { "name": "Delivery MR", "value": "2" },
-    { "name": "UBI Series", "value": "3" }
-  ];
   // Get all dropdown data
-  getAllMastersData() {
-    // Options for documentType dropdown
-    this.displayedColumns1.documentType.option = this.documentTypeOptions;
+  async getAllMastersData() {
+    try {
+      this.addDcrTableForm.controls.allocateTo.setValue("");
+      this.dcrDetail = await this.masterService.masterPost('generic/get', {
+        companyCode: this.companyCode,
+        filter: {},
+        collectionName: "dcr"
+      }).toPromise();
 
-    // Prepare the requests for different collectionNames
-    let locationReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "filter": {},
-      "collectionName": "location_detail"
-    };
+      const fetchDataPromises = [
+        this.masterService.masterPost('generic/get', {
+          companyCode: this.companyCode,
+          filter: {},
+          collectionName: "location_detail"
+        }).toPromise(),
+        this.masterService.masterPost('generic/get', {
+          companyCode: this.companyCode,
+          filter: {},
+          collectionName: "user_master"
+        }).toPromise(),
+        this.masterService.masterPost('generic/get', {
+          companyCode: this.companyCode,
+          filter: {},
+          collectionName: "vendor_detail"
+        }).toPromise(),
+        this.masterService.masterPost('generic/get', {
+          companyCode: this.companyCode,
+          filter: {},
+          collectionName: "customer_detail"
+        }).toPromise()
+      ];
 
-    let userReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "filter": {},
-      "collectionName": "user_master"
-    };
+      const [
+        locationData,
+        userData,
+        vendorRes,
+        customerRes
+      ] = await Promise.all(fetchDataPromises);
 
-    let vendorReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "filter": {},
-      "collectionName": "vendor_detail"
-    };
+      const mergedData = {
+        locationData: locationData?.data,
+        userData: userData?.data,
+        vendorData: vendorRes?.data,
+        customerData: customerRes?.data
+      };
 
-    let customerReq = {
-      "companyCode": parseInt(localStorage.getItem("companyCode")),
-      "filter": {},
-      "collectionName": "customer_detail"
-    };
-
-    // Use forkJoin to make parallel requests and get all data at once
-    forkJoin([
-      this.masterService.masterPost('generic/get', locationReq),
-      this.masterService.masterPost('generic/get', userReq),
-      this.masterService.masterPost('generic/get', vendorReq),
-      this.masterService.masterPost('generic/get', customerReq)
-    ]).pipe(
-      map(([locationRes, userRes, vendorRes, customerRes]) => {
-        // Combine all the data into a single object
-        return {
-          locationData: locationRes?.data,
-          userData: userRes?.data,
-          vendorData: vendorRes?.data,
-          customerData: customerRes?.data
-        };
-      })
-    ).subscribe((mergedData) => {
-      // Access the merged data here
-      const locdet = mergedData.locationData.map(element => ({
+      this.locationList = mergedData.locationData.map(element => ({
         name: element.locName,
         value: element.locCode,
-        type: 'L'
       }));
 
-      const userdet = mergedData.userData.map(element => ({
-        name: element.name,
-        value: element.userId,
-        type: 'E'
-      }));
+      const allotToLocation = this.addDcrTableForm.controls['allotTo'].value;
 
-      const vendordet = mergedData.vendorData.map(element => ({
-        name: element.vendorName,
-        value: element.vendorCode,
-        type: 'B'
-      }));
+      this.vendorList = mergedData.vendorData
+        .filter(element =>
+          element.isActive &&
+          element.vendorLocation.some(location => location === allotToLocation.value)
+        )
+        .map(element => ({
+          name: element.vendorName,
+          value: element.vendorCode,
+          type: "B"
+        }));
 
-      const custdet = mergedData.customerData.map(element => ({
-        name: element.customerName,
-        value: element.customerCode,
-        type: 'C'
-      }));
-      // Options for allotTo dropdown
-      this.displayedColumns1.allotTo.option = locdet;
-      this.tableLoad = true;
+      this.userList = mergedData.userData
+        .filter(element =>
+          element.isActive &&
+          element.multiLocation.some(location => location === allotToLocation.value)
+        )
+        .map(element => ({
+          name: element.name,
+          value: element.userId,
+          type: "E"
+        }));
 
-      // Combine all arrays into one flat array with extra data indicating the sections
+      this.customerList = mergedData.customerData
+        .filter(element =>
+          element.activeFlag &&
+          element.customerLocations.some(location => location === allotToLocation.value)
+        )
+        .map(element => ({
+          name: element.customerName,
+          value: element.customerCode,
+          type: "C"
+        }));
+
+      this.businessTypeList = await this.masterService.getJsonFileDetails("businessTypeList").toPromise();
+
       const allData = [
-        { name: '---Location---', value: '', type: 'L' },
-        ...locdet,
+        // { name: '---Location---', value: '', type: 'L' },
+        // ...locdet,
         { name: '---Employee---', value: '', type: 'E' },
-        ...userdet,
+        ...this.userList,
         { name: '---BA---', value: '', type: 'B' },
-        ...vendordet,
+        ...this.vendorList,
         { name: '---Customer---', value: '', type: 'C' },
-        ...custdet,
+        ...this.customerList,
       ];
-      // Options for allocateTo dropdown
-      this.displayedColumns1.allocateTo.option = allData
-    });
 
+      this.filter.Filter(this.jsonControlArray, this.addDcrTableForm, this.businessTypeList, this.businessType, this.businessTypeStatus);
+      this.filter.Filter(this.jsonControlArray, this.addDcrTableForm, allData, this.allocateTo, this.allocateToStatus);
+      this.filter.Filter(this.jsonControlArray, this.addDcrTableForm, this.locationList, this.allotTo, this.allotToStatus);
+
+    } catch (error) {
+      // Handle errors, e.g., show an error message or log the error
+      console.error("Error in getAllMastersData:", error);
+    }
   }
-  // Delete a row from the table
-  async delete(event) {
-    const index = event.index;
-    const row = event.element;
 
-    const swalWithBootstrapButtons = await Swal.mixin({
-      customClass: {
-        confirmButton: "btn btn-success msr-2",
-        cancelButton: "btn btn-danger",
-      },
-      buttonsStyling: false,
-    });
 
-    swalWithBootstrapButtons
-      .fire({
-        title: `<h4><strong>Are you sure you want to delete ?</strong></h4>`,
-        showCancelButton: true,
-        cancelButtonColor: "#d33",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-        showLoaderOnConfirm: true,
-        preConfirm: (Remarks) => {
-          var request = {
-            companyCode: localStorage.getItem("CompanyCode"),
-            id: row.id,
-          };
-          if (row.id == 0) {
-            return {
-              isSuccess: true,
-              message: "City has been deleted !",
-            };
-          } else {
-            console.log("Request", request);
-          }
-        },
-        allowOutsideClick: () => !Swal.isLoading(),
-      })
-      .then((result) => {
-
-        if (result.isConfirmed) {
-          this.tableData.splice(index, 1);
-          this.tableData = this.tableData;
-          swalWithBootstrapButtons.fire("Deleted!", "Your Message", "success");
-          event.callback(true);
-        } else if (result.isConfirmed) {
-          swalWithBootstrapButtons.fire("Not Deleted!", "Your Message", "info");
-          event.callback(false);
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire(
-            "Cancelled",
-            "Your item is safe :)",
-            "error"
-          );
-          event.callback(false);
-        }
-      });
-
-    return true;
-  }
 
   // Handle function calls
   functionCallHandler($event) {
@@ -312,204 +329,207 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   }
 
   // Save data
-  saveData() {
-    let incompleteData = false;
+  async saveData() {
+    clearValidatorsAndValidate(this.addDcrTableForm);
+    // console.log(this.tableData);
+    this.tableData.forEach(tableItem => {
+      tableItem.status = 'Unused';
+      tableItem.action = 'Allocated';
+      tableItem.usedLeaves = 0;
+      tableItem.entryBy = localStorage.getItem("UserName");
+      tableItem.entryDate = new Date().toISOString();
 
-    this.tableData.forEach(data => {
-      if (
-        data.documentType.length === 0 ||
-        data.bookCode === "" ||
-        data.seriesFrom === "" ||
-        data.seriesTo === "" ||
-        data.totalLeaf === "" ||
-        data.allotTo.length === 0 ||
-        data.allocateTo.length === 0
-      ) {
-        incompleteData = true;
-        return;
+    });
+    // Now, add the 'id' property to each object in the 'tableData' array
+    this.tableData = this.tableData.map(item => {
+      return { ...item, _id: item.bookCode };
+    });
+    const dcrData = this.tableData.map(x => {
+      const { actions, id, ...rest } = x;
+      return rest;
+    });
+    // console.log(dcrData);
+    // Continue with the rest of the code (e.g., exporting data)
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      collectionName: "dcr",
+      data: dcrData
+    };
+    this.masterService.masterPost('generic/create', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.router.navigateByUrl('/Masters/DocumentControlRegister/TrackDCR');
+
+        }
       }
     });
-
-    if (incompleteData) {
-      Swal.fire({
-        icon: "warning",
-        title: "Incomplete Data",
-        text: "Please fill in all the required fields.",
-        showConfirmButton: true,
-      });
-      return;
-    }
-
-    if (this.isBookCodeUnique()) {
-      this.tableData.forEach(tableItem => {
-        const optionItem = this.displayedColumns1.allocateTo.option.find(optItem => optItem.value === tableItem.allocateTo);
-        if (optionItem) {
-          tableItem.type = optionItem.type;
-          tableItem.status = 'Unused';
-          tableItem.action = 'Allocated';
-          tableItem.usedLeaves = 0;
-          tableItem.entryBy = localStorage.getItem('Username');
-          tableItem.entryDate = new Date().toISOString();
-        }
-      });
-      // Now, add the 'id' property to each object in the 'tableData' array
-      this.tableData = this.tableData.map(item => {
-        return { ...item, _id: item.bookCode };
-      });
-
-      // Continue with the rest of the code (e.g., exporting data)
-      let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        collectionName: "dcr",
-        data: this.tableData
-      };
-      this.masterService.masterPost('generic/create', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            window.location.reload();
-          }
-        }
-      });
-    } else {
-      Swal.fire({
-        icon: "warning",
-        title: "Duplicate Book Code",
-        text: "Each book code should be unique.",
-        showConfirmButton: true,
-      });
-    }
   }
+  cancel() {
+    this.router.navigateByUrl('/Masters/DocumentControlRegister/TrackDCR');
+  }
+  //#region  to check unique book code
+  async isBookCodeUnique(): Promise<boolean> {
+    const bookCode = this.addDcrTableForm.value.bookCode;
 
-  isBookCodeUnique(): boolean {
-    const bookCode = this.tableData[0].bookCode;
+
+
+    const foundItem = this.dcrDetail.data.find(x => x.bookCode === bookCode);
+
     // Check if any other item in the tableData has the same bookCode
-    const isUnique = this.tableData.filter((item) => item.bookCode === bookCode).length === 1;
-    return isUnique;
+    const isUnique = this.tableData.some((item) => item.bookCode === bookCode)
+    if (isUnique || foundItem) {
+      this.addDcrTableForm.controls['bookCode'].setValue('');
+      // Show an error message using Swal (SweetAlert)
+      Swal.fire({
+        title: 'error',
+        text: 'Book Code already exists! Please try with another.',
+        icon: 'error',
+        showConfirmButton: true,
+      });
+      this.tableLoad = false;
+      this.isLoad = false;
+      return false
+    }
   }
-
-  // Get series from input
-  getSeriesFrom(): void {
-    const seriesFrom = this.addDcrTableForm.value.seriesFrom;
-    let seriesTo = this.addDcrTableForm.value.seriesTo;
-    let totalLeaf = this.addDcrTableForm.value.totalLeaf;
-
-    if (seriesFrom.length !== 12) {
-      Swal.fire({
-        icon: "warning",
-        title: "Alert",
-        text: `Series From should have a length of 12 like S0000000000001.`,
-        showConfirmButton: true,
-      });
-      return;
-    }
-    if (seriesTo !== '' && seriesTo.length !== 12) {
-      Swal.fire({
-        icon: "warning",
-        title: "Alert",
-        text: `Series To should have a length of 12.`,
-        showConfirmButton: true,
-      });
-      return;
-    }
-    if (seriesTo !== '' && seriesTo <= seriesFrom) {
-      Swal.fire({
-        icon: "warning",
-        title: "Alert",
-        text: `Series To should be greater than Series From.`,
-        showConfirmButton: true,
-      });
-      return;
-    }
-
-    if (seriesTo !== '') {
-      const difference = parseInt(seriesTo, 10) - parseInt(seriesFrom, 10);
-      totalLeaf = difference;
-    } else {
-      seriesTo = '';
-      totalLeaf = '';
-    }
-    // this.tableData[0].seriesTo = seriesTo;
-    // this.tableData[0].totalLeaf = totalLeaf;
-  }
+  //#endregion
   //#region to initilize form control
   initializeFormControl() {
     this.addDcrFormControl = new AddDcrSeriesControl();
     this.jsonControlArray = this.addDcrFormControl.getAddDcrFormControls();
     this.addDcrTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.addDcrTableForm.controls["documentType"].setValue("CNote");
-
+    this.addDcrTableForm.controls["documentType"].setValue("1");
   }
   //#endregion
-
   //#region to set series to.
   getSeriesTo() {
     // Get the 'seriesFrom' and 'totalLeaf' values from the form control
     const { seriesFrom, totalLeaf } = this.addDcrTableForm.value;
 
     // Calculate the result by parsing 'seriesFrom' and 'totalLeaf' to numbers
-    const resultNumber = parseInt(seriesFrom.slice(1), 10) + parseInt(totalLeaf, 10);
-
-    // Build the 'ans' string with the calculated result and leading zeros
-    const ans = seriesFrom[0] + resultNumber.toString().padStart(16, "0");
-
-    // Set the 'seriesTo' value in the form control to 'ans'
-    this.addDcrTableForm.controls.seriesTo.setValue(ans);
+    const seriesFromNumber = parseInt(seriesFrom);
+    const totalLeafNumber = parseInt(totalLeaf);
+    // getting seriesTo value from addition of seriesfrom and total leaf
+    const resultNumber = seriesFromNumber + totalLeafNumber;
+    // setting in seriesTo its calculated value
+    this.addDcrTableForm.controls.seriesTo.setValue(resultNumber);
   }
   //#endregion
   //#region to add data in table
   async addData() {
-    this.tableLoad = true;
-    // this.isLoad = true;
-    // const tableData = this.tableData;
-    // const gstNumber = this.otherDetailForm.controls.gstNumber.value;
-    // if (tableData.length > 0) {
-    //   // Check if the gstNumber already exists in tableData
-    //   const isDuplicate = this.tableData.some((item) => item.gstNumber === gstNumber);
+    try {
+      clearValidatorsAndValidate(this.addDcrTableForm);
+      // Set loading flags to indicate data is being processed
+      this.tableLoad = true;
+      this.isLoad = true;
+      // const foundItem = this.dcrDetail.data.find(x => x.bookCode === bookCode);
 
-    //   if (isDuplicate) {
-    //     this.otherDetailForm.controls['gstNumber'].setValue('');
-    //     // Show an error message using Swal (SweetAlert)
-    //     Swal.fire({
-    //       title: 'GST Number already exists! Please try with another.',
-    //       toast: true,
-    //       icon: 'error',
-    //       showCloseButton: false,
-    //       showCancelButton: false,
-    //       showConfirmButton: true,
-    //       confirmButtonText: 'OK'
-    //     });
-    //     this.tableLoad = false;
-    //     this.isLoad = false;
-    //     return false
-    //   }
-    // }
-    // const delayDuration = 1000;
-    // // Create a promise that resolves after the specified delay
-    // const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    // // Use async/await to introduce the delay
-    // await delay(delayDuration);
-    // const json = {
-    //   id: tableData.length + 1,
-    //   gstNumber: this.otherDetailForm.value.gstNumber,
-    //   gstState: this.otherDetailForm.value.gstState,
-    //   gstAddress: this.otherDetailForm.value.gstAddress,
-    //   gstPincode: this.otherDetailForm.value.gstPincode.value,
-    //   gstCity: this.otherDetailForm.value.gstCity,
-    //   // invoice: false,
-    //   actions: ['Edit', 'Remove']
-    // }
-    // this.tableData.push(json);
-    // this.otherDetailForm.reset(); // Reset form values
-    // this.isLoad = false;
-    // this.tableLoad = false;
+      // Get the existing table data, and the starting and ending series numbers from the form
+      const tableData = this.tableData;
+      const startingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesFrom.value);
+      const endingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesTo.value);
+
+      // Check for duplicates in the table data
+      const overlappingItem = this.tableData.find((item) => {
+        const seriesFrom = parseInt(item.seriesFrom);
+        const seriesTo = parseInt(item.seriesTo);
+
+        const isOverlap =
+          (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
+          (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
+
+        return isOverlap;
+      });
+      // If there's a duplicate, show an error message and exit
+      if (overlappingItem) {
+        const { seriesFrom, seriesTo } = overlappingItem;
+        Swal.fire({
+          icon: 'warning',
+          title: 'Warning',
+          text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
+          showConfirmButton: true,
+        });
+
+        return;
+      }
+
+      const delayDuration = 1000;
+
+      // Simulate a delay using async/await to mimic a loading state
+      await new Promise((resolve) => setTimeout(resolve, delayDuration));
+
+      // Create a new data entry using the form values
+      const json = {
+        id: tableData.length + 1,
+        documentType: this.addDcrTableForm.value.documentType,
+        businessType: this.addDcrTableForm.value.businessType?.name || '',
+        bookCode: this.addDcrTableForm.value.bookCode,
+        seriesFrom: startingSeriesNo,
+        totalLeaf: this.addDcrTableForm.value.totalLeaf,
+        seriesTo: endingSeriesNo,
+        allotTo: this.addDcrTableForm.value.allotTo?.name || '',
+        allocateTo: this.addDcrTableForm.value.allocateTo?.name || '',
+        type: this.addDcrTableForm.value.allocateTo?.type || '',
+        actions: ['Edit', 'Remove'],
+      };
+
+      // Add the new data entry to the table
+      this.tableData.push(json);
+
+      // Reset the form to clear input values
+      this.addDcrTableForm.reset();
+    } catch (error) {
+      // Handle any potential errors, e.g., log them
+      console.error(error);
+    } finally {
+      // Ensure that the loading flags are reset regardless of the outcome
+      this.tableLoad = false;
+    }
   }
   //#endregion
 
+  bindDropdown() {
+    const dcrPropertiesMapping = {
+      businessType: { variable: "businessType", status: "businessTypeStatus" },
+      allotTo: { variable: "allotTo", status: "allotToStatus" },
+      allocateTo: { variable: "allocateTo", status: "allocateToStatus" },
+    };
+    processProperties.call(
+      this,
+      this.jsonControlArray,
+      dcrPropertiesMapping
+    );
+  }
+
+
+  handleMenuItemClick(data) {
+    this.fillTable(data);
+  }
+  fillTable(data: any) {
+    if (data.label.label === 'Remove') {
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    }
+    else {
+      // console.log(data);
+
+      this.addDcrTableForm.controls['documentType'].setValue(data.data?.documentType || "");
+      const businessTypeData = this.businessTypeList.find((x) => x.name == data.data.businessType)
+      this.addDcrTableForm.controls.businessType.setValue(businessTypeData);
+      this.addDcrTableForm.controls['bookCode'].setValue(data.data?.bookCode || "");
+      this.addDcrTableForm.controls['seriesTo'].setValue(data.data?.seriesTo || "");
+      this.addDcrTableForm.controls['seriesFrom'].setValue(data.data?.seriesFrom || "");
+      this.addDcrTableForm.controls['totalLeaf'].setValue(data.data?.totalLeaf || "");
+      const updatedAllotTo = this.locationList.find((x) => x.name == data.data.allotTo);
+      this.addDcrTableForm.controls.allotTo.setValue(updatedAllotTo);
+      const updatedAllocateTo = this.userList.find((x) => x.name == data.data.allocateTo);
+      this.addDcrTableForm.controls.allocateTo.setValue(updatedAllocateTo);
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    }
+  }
 }

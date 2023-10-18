@@ -1,14 +1,3 @@
-<!-- <app-common-wrapper-webxpress [breadscrums]="breadScrums">
-    <div *ngIf="!tableLoad" class="tbl-spinner">
-        <mat-progress-spinner color="primary" [diameter]="100" mode="indeterminate">
-        </mat-progress-spinner>
-    </div>
-    <app-table-boilerplate *ngIf="tableLoad" [tableData]="tableData" [columnHeader]="displayedColumns1"
-        title="Add DCR Series" (DeleteAction)="delete($event)" (AddRow)="addItem($event)"
-        (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
-        [ActionObject]="actionObject"></app-table-boilerplate>
-</app-common-wrapper-webxpress> -->
-
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
     <form [formGroup]="addDcrTableForm">
         <app-form-webxpress [form]="addDcrTableForm" [formData]="jsonControlArray"
@@ -16,22 +5,31 @@
             [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
-    <!-- <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 91%;"
+    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 91%;"
         [disabled]="!addDcrTableForm.valid" (click)="addData()">
         <mat-icon>add</mat-icon>
         Add New
-    </button> -->
-    <!-- <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
+    </button>
+    <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-    </div> -->
-    <!-- <div class="paddingdiv">
+    </div>
+    <div class="paddingdiv">
         <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
             [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-            [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-            [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-            (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+            [staticField]="staticField" [Link]="linkArray" [addAndEditPath]="addAndEditPath"
+            [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag"
+            (addEmitter)="addPopUp($event)">
         </app-generic-table-v2>
-    </div> -->
+    </div>
+    <div style="padding-left: 35px;">
+        <button type="button" [disabled]="!isLoad" mat-raised-button color="primary" (click)="saveData()">
+            <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
+            <ng-template #saveButton>Save</ng-template>
+        </button>&nbsp;&nbsp;
+        <button type="button" mat-raised-button (click)="cancel()">
+            Cancel
+        </button>
+    </div>
 </app-common-wrapper-webxpress>

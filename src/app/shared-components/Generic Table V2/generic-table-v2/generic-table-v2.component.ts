@@ -38,8 +38,12 @@ export class GenericTableV2Component
   @Input() menuItems: any;
   @Input() menuItemFlag;
   @Input() boxData: any;
+  @Input() AddNewButton: any = false;
+  @Output() AddNewButtonEvent = new EventEmitter<any>();
   @Output() menuItemClicked = new EventEmitter<any>();
   @Output() selectAllClicked = new EventEmitter<any>();
+  @Output() DeleteFunction = new EventEmitter<any>();
+  @Output() functionCallEmitter = new EventEmitter();
   @Input() height;
   @Input() width;
   @Input() maxWidth;
@@ -362,5 +366,14 @@ export class GenericTableV2Component
       return [];
     }
   }
-  
+
+  AddNew(){
+    this.AddNewButtonEvent.emit()
+  }
+  Delete(element){
+    this.DeleteFunction.emit({element})
+  }
+  FunctionHendel(name ,element){
+    this.functionCallEmitter.emit({functionName:name , data:element})
+  }
 }

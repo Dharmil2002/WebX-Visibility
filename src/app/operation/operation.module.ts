@@ -54,6 +54,10 @@ import { FilterBillingComponent } from './pending-billing/filter-billing/filter-
 import { ThcGenerationComponent } from './thc-generation/thc-generation.component';
 import { ThcViewComponent } from './thc-summary/thc-view/thc-view.component';
 import { THCViewComponent } from './ViewPrint/thc-view/thc-view.component';
+import { WESTERNCARRIERSComponent } from './ViewPrint/westerncarriers/westerncarriers.component';
+import { NgxPrintModule } from "ngx-print";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { MastersModule } from "../Masters/masters.module";
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -89,7 +93,9 @@ import { THCViewComponent } from './ViewPrint/thc-view/thc-view.component';
     FilterBillingComponent,
     ThcGenerationComponent,
     ThcViewComponent,
-    THCViewComponent
+    THCViewComponent,
+    WESTERNCARRIERSComponent
+    
     
   ],
   imports: [
@@ -107,10 +113,12 @@ import { THCViewComponent } from './ViewPrint/thc-view/thc-view.component';
     SharedComponentsModule,
     MatDialogModule,
     MatSnackBarModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    NgxPrintModule,
+    MastersModule
     
   ],
-  providers: [SnackBarUtilityService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods,FilterUtils],
+  providers: [SnackBarUtilityService,PinCodeService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods,FilterUtils],
   exports: []
 })
 export class OperationModule { }

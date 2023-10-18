@@ -125,8 +125,17 @@ import { CustomerContractBasicInformationComponent } from './Customer Contract/C
 import { CustomerContractServiceSelectionComponent } from './Customer Contract/CustomerContractTabs/customer-contract-service-selection/customer-contract-service-selection.component';
 import { CustomerContractListComponent } from './Customer Contract/customer-contract-list/customer-contract-list.component';
 import { CustomerContractTabsIndexComponent } from './Customer Contract/customer-contract-tabs-index/customer-contract-tabs-index.component';
-import { CustomerQueryPageComponent } from './Customer Contract/customer-query-page/customer-query-page.component';
+import { AddProductComponent } from './product-master/add-product/add-product.component';
+import { ListProductComponent } from './product-master/list-product/list-product.component';
+import { ProductChargesComponent } from './product-master/product-charges/product-charges.component';
+import { ProductServicesComponent } from './product-master/product-services/product-services.component';
 import { SessionService } from '../core/service/session.service';
+import { BeneficiaryMasterListComponent } from './beneficiary-master/beneficiary-master-list/beneficiary-master-list.component';
+import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-beneficiary-master/add-beneficiary-master.component';
+import { CustomerContractFreightMatrixComponent } from './Customer Contract/CustomerContractTabs/customer-contract-freight-matrix/customer-contract-freight-matrix.component';
+import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { EncryptionService } from '../core/service/encryptionService.service';
 @NgModule({
   imports: [
     CommonModule,
@@ -166,6 +175,8 @@ import { SessionService } from '../core/service/session.service';
     MatStepperModule,
     NgxMaterialTimepickerModule,
     ReactiveFormsModule,
+    TableVirtualScrollModule,
+    ScrollingModule
   ],
 
   declarations: [
@@ -253,16 +264,36 @@ import { SessionService } from '../core/service/session.service';
     AddWaitingChargesComponent,
     TripLaneBasedComponent,
     SpecialChargesComponent,
-    CustomerQueryPageComponent,
     CustomerContractListComponent,
     CustomerContractTabsIndexComponent,
     CustomerContractBasicInformationComponent,
-    CustomerContractServiceSelectionComponent
+    CustomerContractServiceSelectionComponent,
+    ServiceSelectionComponent,
+    AddStandardChargesComponent,
+    FleetMasterListComponent,
+    AddFleetMasterComponent,
+    AddTripLaneBasedComponent,
+    StandardChargesComponent,
+    AddAdditionalDeliveryChargesComponent,
+    AddWaitingChargesComponent,
+    TripLaneBasedComponent,
+    SpecialChargesComponent,
+    CustomerContractListComponent,
+    CustomerContractTabsIndexComponent,
+    CustomerContractBasicInformationComponent,
+    CustomerContractServiceSelectionComponent,
+    BeneficiaryMasterListComponent,
+    AddBeneficiaryMasterComponent,
+    CustomerContractFreightMatrixComponent,
+   ListProductComponent,
+   AddProductComponent,
+   ProductChargesComponent,
+   ProductServicesComponent
 
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService,
-    PinCodeService, StateService, SessionService]
+    PinCodeService, StateService, SessionService, EncryptionService]
 })
 
 export class MastersModule { }

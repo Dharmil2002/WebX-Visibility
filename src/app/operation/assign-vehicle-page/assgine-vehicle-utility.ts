@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { updatePrqStatus, vehicleStatusUpdate } from "../prq-entry-page/prq-utitlity";
-
+const branch=localStorage.getItem("Branch");
 export async function showVehicleConfirmationDialog(prqDetail, masterService, goBack, tabIndex, dialogRef, item) {
     const confirmationResult = await Swal.fire({
         icon: "success",
@@ -55,7 +55,8 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
         companyCode: companyCode,
         collectionName: "vehicle_status",
         filter: {
-            status: 'Available'
+            status: 'Available',
+            currentLocation:branch
         }
     };
 

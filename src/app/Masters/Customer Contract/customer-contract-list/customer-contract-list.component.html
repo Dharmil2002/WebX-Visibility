@@ -1,110 +1,164 @@
-<style>
-    mat-divider {
-        background-color: black;
-        opacity: 0.8;
-    }
-
-    ::ng-deep .mat-header-cell {
-        background-color: white;
-        text-align: center;
-    }
-
-    ::ng-deep .mat-cell {
-        text-align: center;
-    }
-
-    .mat-table {
-        border: 1px solid #e4e7ed;
-    }
-
-    ::ng-deep .app-Customer-contract-header {
-        margin-right: 100px;
-        padding-right: 70px;
-    }
-
-    table,
-    td,
-    tr {
-        border: 1px solid #e4e7ed;
-        ;
-    }
-
-    td {
-        padding: 5px;
-    }
-
-    .bg-light-gray {
-        background-color: rgba(65, 65, 65, 0.005);
-    }
-</style>
 <section class="content">
     <div class="container-fluid">
         <div class="block-header" *ngFor="let breadcrumb of breadscrums">
             <app-breadcrumb [title]="breadcrumb.title" [items]="breadcrumb.items"
                 [active_item]="breadcrumb.active"></app-breadcrumb>
         </div>
+        <div class="row">
+            <div class="col-lg-8 col-sm-8" style="margin-bottom: 0px;">
+                <div class="row">
+                    <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
+                </div>
+            </div>
+        </div>
+
         <div class="row clearfix">
             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="card">
                     <div class="body">
-                        <section align="end">
-                            <div class="example-button-row">
-                                <button mat-raised-button color="success" type="button" (click)="AddNewContract()">Add
-                                    New Contract</button>
-                            </div>
-                            <table>
-                                <tr>
-                                    <td><b>Customer Code :</b> 1234567</td>
-                                    <td><b>Customer Name :</b> 1234567</td>
-                                </tr>
-                            </table><br />
-                        </section>
+                        <div class="materialTableHeader">
+                            <div class="row">
+                                <div class="col-8">
+                                    <ul class="header-buttons-left ml-0">
 
-                        <div class="row">
-                            <h4><mat-icon style="padding-top:4px;">view_list</mat-icon> Customer Contract List</h4>
-                            <hr><br>
-                            <div style="max-height: 390px;" class="responsive_table">
-                                <mat-table #table matTableExporter [dataSource]="dataSource" matSort class="mat-cell">
-                                    <ng-container *ngFor="let displayedColumn of objectKeys(columnHeader)"
-                                        [matColumnDef]="displayedColumn">
-                                        <mat-header-cell *matHeaderCellDef mat-sort-header
-                                            class="matcolumncenter bg-light-gray"
-                                            [style]="columnHeader[displayedColumn].Style">
-                                            <div style="font-weight: 600; font-size: 1.1rem;">
-                                                {{columnHeader[displayedColumn].Title}}
+                                        <li class="dropdown ">
+                                            <label for="search-input"><i
+                                                    class="material-icons search-icon">search</i></label>
+                                            <input placeholder="Search" type="text" #filter
+                                                class="browser-default search-field" aria-label="Search box">
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-4">
+                                    <ul class="header-buttons" style="padding: 16px 8px 8px 8px !important;">
+                                        <li>
+                                            <div matTooltip="Actions" class="msl-3">
+                                                <a href="javascript:void(0)" [matMenuTriggerFor]="action"
+                                                    class="settingPanelToggle">
+                                                    <app-feather-icons [icon]="'settings'"
+                                                        [class]="'setting-sidebar-icon'"></app-feather-icons>
+                                                </a>
+                                                <mat-menu #action="matMenu">
+                                                    <button mat-menu-item>
+                                                        <mat-icon color="primary">add_circle</mat-icon>
+                                                        <span>Add New Contract</span>
+                                                    </button>
+                                                    <button mat-menu-item>
+                                                        <mat-icon color="accent">swap_horiz</mat-icon>
+                                                        <span>Copy a contract</span>
+                                                    </button>
+
+                                                    <button mat-menu-item>
+                                                        <mat-icon color="primary">save_alt</mat-icon>
+                                                        <span>Export Data</span>
+                                                    </button>
+                                                </mat-menu>
                                             </div>
-                                        </mat-header-cell>
-                                        <mat-cell *matCellDef="let element"
-                                            [style]="columnHeader[displayedColumn].Style" class="matcolumncenter">
-                                            <ng-container *ngIf="columnHeader[displayedColumn].Key === 'static'">
-                                                {{element[displayedColumn]}}
-                                            </ng-container>
-                                            <ng-container *ngIf="columnHeader[displayedColumn].Key === 'date'">
-                                                {{element[displayedColumn] | date: 'dd/MM/yyyy'}}
-                                            </ng-container>
-                                            <ng-container *ngIf="columnHeader[displayedColumn].Key === 'edit'">
-                                                <button (click)="ActionEdit()" mat-icon-button class="tbl-action-btn">
-                                                    <app-feather-icons [icon]="'edit'"
-                                                        [class]="'tbl-fav-edit'"></app-feather-icons>
-                                                </button>
-                                            </ng-container>
-                                            <ng-container *ngIf="columnHeader[displayedColumn].Key === 'status'">
-                                                <mat-checkbox [checked]="element[displayedColumn]"></mat-checkbox>
-                                            </ng-container>
-                                        </mat-cell>
-                                    </ng-container>
-                                    <mat-header-row *matHeaderRowDef="objectKeys(columnHeader);"></mat-header-row>
-                                    <mat-row *matRowDef="let row; columns: objectKeys(columnHeader);"
-                                        [style.cursor]="'pointer'" matRipple>
-                                    </mat-row>
-                                </mat-table>
-                                <div style="height: 70px;">
-                                    <mat-paginator #paginator [pageIndex]="0" [pageSize]="5"
-                                        [pageSizeOptions]="[5, 10, 25, 100]">
-                                    </mat-paginator>
+                                        </li>
+                                        <li>
+                                            <div matTooltip="Filters" class="msl-3">
+                                                <a href="javascript:void(0)" [matMenuTriggerFor]="menu"
+                                                    class="settingPanelToggle">
+                                                    <app-feather-icons [icon]="'more-vertical'"
+                                                        [class]="'setting-sidebar-icon'"></app-feather-icons>
+                                                </a>
+
+                                                <mat-menu #menu="matMenu">
+                                                    <button mat-menu-item>
+                                                        <mat-icon color="primary">list</mat-icon>
+                                                        <span>Active contracts</span>
+                                                    </button>
+                                                    <button mat-menu-item>
+                                                        <mat-icon color="accent">group</mat-icon>
+                                                        <span>Customer Group</span>
+                                                    </button>
+
+                                                    <button mat-menu-item>
+                                                        <mat-icon color="primary">supervisor_account</mat-icon>
+                                                        <span>Customer</span>
+                                                    </button>
+                                                </mat-menu>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+                        <div class="body overflow-auto">
+                            <div class="responsive_table" style="overflow-x: unset !important;">
+                                <mat-table [dataSource]="ModeldataSource" matSort class="table-hover" class="mat-cell">
+
+                                    <!-- Order Column -->
+                                    <ng-container *ngFor="let displayedColumn of displayedColumns"
+                                        [matColumnDef]="displayedColumn.Key">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header
+                                            [ngStyle]="{'min-width': displayedColumn.width+ 'px'}"
+                                            [ngClass]=displayedColumn.className>
+                                            {{displayedColumn.title}}</mat-header-cell>
+                                        <mat-cell *matCellDef="let element"
+                                            [ngStyle]="{'min-width': displayedColumn.width+ 'px'}"
+                                            [ngClass]=displayedColumn.className>
+                                            <ng-container>
+                                                {{element[displayedColumn.Key]}}
+                                            </ng-container>
+                                        </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="status">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header class="matcolumncenter"
+                                            style="min-width: 100px !important;">Status</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" style="min-width: 100px !important;"
+                                            class="matcolumncenter">
+                                            <span class="badge"
+                                                [ngClass]="{'col-green': row.status=='Active','col-red': row.status=='Expired'}">
+                                                {{row.status}}
+                                            </span>
+                                        </mat-cell>
+                                    </ng-container>
+                                    <ng-container matColumnDef="actions">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header class="matcolumncenter"
+                                            style="min-width: 150px !important;">Actions</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" style="min-width: 150px !important;"
+                                            class="matcolumncenter">
+                                            <span>
+                                                <button mat-icon-button matTooltip="Edit" (click)="Edit(row)"
+                                                    class="tbl-action-btn">
+                                                    <app-feather-icons [icon]="'edit'"
+                                                        [class]="'tbl-fav-edit'"></app-feather-icons>
+                                                </button>
+                                                <button mat-icon-button matTooltip="View" class="tbl-action-btn">
+                                                    <app-feather-icons [icon]="'eye'"
+                                                        [class]="'tbl-fav-eye'"></app-feather-icons>
+                                                </button>
+                                                <button mat-icon-button matTooltip="Download" class="tbl-action-btn">
+                                                    <app-feather-icons [icon]="'download-cloud'"
+                                                        [class]="'tbl-fav-download'"></app-feather-icons>
+                                                </button>
+
+
+                                            </span>
+                                        </mat-cell>
+                                    </ng-container>
+                                    <mat-header-row *matHeaderRowDef="columnKeys"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: columnKeys;" matRipple>
+                                    </mat-row>
+                                </mat-table>
+                                <div *ngIf="isTblLoading" class="tbl-spinner">
+                                    <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                                    </mat-progress-spinner>
+                                </div>
+
+                                <div *ngIf="isTblLoading" class="no-results"
+                                    [style.display]="ModeldataSource.data.length == 0 ? '' : 'none'">
+                                    No results
+                                </div>
+                                <mat-paginator #paginator [pageIndex]="0" [pageSize]="10"
+                                    [pageSizeOptions]="[5, 10, 25, 100]">
+                                </mat-paginator>
+                            </div>
+                        </div>
+                        <!-- Loading spinner -->
+
                     </div>
                 </div>
             </div>

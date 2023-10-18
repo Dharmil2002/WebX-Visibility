@@ -40,7 +40,7 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
  * @returns vehicle data object.
  */
 export function getVehicleDashboardDetails(tableData: VehicleData[]) {
-    const availableVehicles = tableData.filter(vehicle => vehicle.status === "available");
+    const availableVehicles = tableData.filter(vehicle => vehicle.status === "Available");
     const totalTrips = tableData.filter(vehicle => vehicle.tripId !== "");
 
     const createShipDataObject = (count: number, title: string, className: string) => ({

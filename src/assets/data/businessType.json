@@ -1,0 +1,42 @@
+[
+    {
+        "name": "Express-Cargo",
+        "value": "1"
+    },
+    {
+        "name": "Own vehicle",
+        "value": "2"
+    },
+    {
+        "name": "AIR CARGO",
+        "value": "3"
+    },
+    {
+        "name": "Cold chain- Reefer movement",
+        "value": "4"
+    },
+    {
+        "name": "Carrier management- 3PL",
+        "value": "5"
+    },
+    {
+        "name": "Parcel- Bisuness",
+        "value": "6"
+    },
+    {
+        "name": "Standard - FTL & Break Bulk",
+        "value": "7"
+    },
+    {
+        "name": "Container cargo ",
+        "value": "8"
+    },
+    {
+        "name": "Vertical ",
+        "value": "9"
+    },
+    {
+        "name": "FTL",
+        "value": "10"
+    }
+]

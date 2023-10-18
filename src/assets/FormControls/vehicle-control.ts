@@ -15,6 +15,11 @@ export class VehicleControls {
                         {
                             name: "required",
                             message: "Vehicle Number is required.."
+                        },
+                        {
+                            name: "pattern",
+                            message: "",
+                            pattern: '^[A-Z][A-Z0-9]+$'
                         }
                     ],
                     functions: {
@@ -87,25 +92,29 @@ export class VehicleControls {
                     generatecontrol: true, disable: false
                 },
                 {
-                    name: 'vendorType',
+                    name: "vendorType",
                     label: "Vendor Type",
-                    placeholder: "Select Vendor Type",
-                    type: 'dropdown',
-                    value: vehicleTable.vendorType,
+                    placeholder: "VehicleType",
+                    type:'Staticdropdown',
+                    value: [
+                        { value: "Own", name: "Own" },
+                        { value: "Attached", name: "Attached" },
+                        { value: "Service Provider", name: "Service Provider" }
+                      ],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
                     generatecontrol: true,
                     disable: false,
                     Validations: [
                         {
                             name: "required",
-                            message: "Vendor Type is required"
-                        },
-                        {
-                            name: "autocomplete",
-                        }
-                    ],
-                    additionalData: {
-                        showNameAndValue: false
-                    },
+                            message: "Vendor Type  is required",
+                        }],
+                        functions: {
+                            onSelection: "vendorFieldChanged"
+                          },
+                    additionalData: { }
                 },
                 {
                     name: 'vendorName', label: "Vendor Name", placeholder: "Search and select Vendor Name", type: 'dropdown',

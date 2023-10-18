@@ -22,12 +22,12 @@ export class CustomerContractTabsIndexComponent implements AfterViewInit {
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
     });
-    this.selectFolder('FREIGHT CHARGE MATRIX')
+    this.selectFolder('Non Freight Charges')
   }
   folders = [
     "Contract Summary",
     "Services Selection",
-    "FREIGHT CHARGE MATRIX",
+    "Freight Charge Matrix",
     "Non Freight Charges",
     "ODA Matrix",
     "Fuel Price Hike Matrix"

@@ -40,7 +40,7 @@
                                 </ul>
                             </div>
                             <h5 class="b-b p-10 text-strong">Contract Tabs</h5>
-                            <ul class="" id="mail-folders">
+                            <ul id="mail-folders">
                                 <li *ngFor="let folder of folders" [class.active]="folder === selectedFolder">
                                     <a href="javascript:;" (click)="selectFolder(folder)" [title]="folder">{{ folder
                                         }}</a>
@@ -60,9 +60,13 @@
                         <app-customer-contract-service-selection
                             [contractData]="CurrentContractDetails"></app-customer-contract-service-selection>
                     </div>
-                    <div class="boxs mail_listing" *ngIf="'FREIGHT CHARGE MATRIX' === selectedFolder">
+                    <div class="boxs mail_listing" *ngIf="'Freight Charge Matrix' === selectedFolder">
                         <app-customer-contract-freight-matrix
                             [contractData]="CurrentContractDetails"></app-customer-contract-freight-matrix>
+                    </div>
+                    <div class="boxs mail_listing" *ngIf="'Non Freight Charges' === selectedFolder">
+                        <app-customer-contract-non-freight-charges
+                            [contractData]="CurrentContractDetails"></app-customer-contract-non-freight-charges>
                     </div>
                 </div>
             </div>

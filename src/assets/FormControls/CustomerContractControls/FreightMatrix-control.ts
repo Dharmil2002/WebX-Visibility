@@ -9,17 +9,7 @@ export class ContractFreightMatrixControl {
         label: "From",
         placeholder: "From",
         type: "select",
-        value: [
-          {
-            value: "20",
-            name: "20 Ton",
-          },
-          {
-            value: "10",
-            name: "10 Ton",
-          },
-
-        ],
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -137,8 +127,19 @@ export class ContractFreightMatrixControl {
         type: "text",
         value: "",
         generatecontrol: true,
-        disable: true,
-        Validations: [],
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Rate is required",
+          },
+          {
+            name: "pattern",
+            pattern:
+              "^[0-9]{1,8}(?:\.[0-9]{1,2})?$",
+            message: "Please enter a valid Rate EX. (100000.00)",
+          },
+        ],
       },
       {
         name: 'FromHandler',
@@ -146,7 +147,11 @@ export class ContractFreightMatrixControl {
         placeholder: 'Origin Rate option',
         type: '',
         value: '',
-        Validations: [],
+        filterOptions: "",
+        Validations: [{
+          name: "required",
+          message: " ",
+        }],
         generatecontrol: false, disable: false,
         accessallowed: true,
       },
@@ -156,7 +161,11 @@ export class ContractFreightMatrixControl {
         placeholder: 'Destination Rate option',
         type: '',
         value: '',
-        Validations: [],
+        filterOptions: "",
+        Validations: [{
+          name: "required",
+          message: " ",
+        }],
         generatecontrol: false, disable: false,
         accessallowed: true,
       },

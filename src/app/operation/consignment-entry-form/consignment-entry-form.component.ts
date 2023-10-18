@@ -840,8 +840,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
           }
           // You can use 'x' and 'index' here
           x.id = index + 1;
-          x.expiryDate= x.expiryDate ? formatDate(x.expiryDate, "dd-MM-yy HH:mm")
-          : formatDate(new Date().toUTCString(), "dd-MM-yy HH:mm")
           x.actions = ["Edit", "Remove"];
           return x;
         }

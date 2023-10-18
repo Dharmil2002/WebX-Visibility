@@ -6,7 +6,6 @@ import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 
 @Component({
   selector: "app-product-charges",
@@ -73,7 +72,7 @@ export class ProductChargesComponent implements OnInit {
   tableData = [];
   ProductId: any;
   ProductName: any;
-  jsonControlArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  jsonControlArray: any[];
   customerTableForm: any;
   SelectChargesCode: string;
   SelectChargesStatus: any;

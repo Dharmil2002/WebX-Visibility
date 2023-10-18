@@ -12,7 +12,7 @@ export class PinCodeService {
     private filter: FilterUtils) {
 
   }
-  async pinCodeDetail(filter) {
+  async pinCodeDetail() {
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
@@ -94,4 +94,52 @@ export class PinCodeService {
     }
   }
   //#endregion 
+  /*get city on pinCode based*/
+  async getCity(form, jsondata, cityControlName, citycodeStatus) {
+    try {
+      const cityValue = form.controls[cityControlName].value;
+
+      // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+      if (cityValue.length >= 3) {
+        const filter = {}
+
+        // Prepare the pincodeBody with the companyCode and the determined filter
+        const cityBody = {
+          companyCode: this.companyCode,
+          collectionName: "pincode_master",
+          filter,
+        };
+
+        // Fetch pincode data from the masterService asynchronously
+        const cityResponse = await this.masterService.masterPost("generic/get", cityBody).toPromise();
+        // Extract the cityCodeData from the response
+        const cityCodeData = [...new Set(cityResponse.data.map((element: { CT: string }) => element.CT))]
+        .filter((ct: string) => ct.toLowerCase().includes((cityValue as string).toLowerCase()))
+        .map((ct: string) => ({ name: ct, value: ct }));
+        // Filter cityCodeData for partial matches
+        if (cityCodeData.length === 0) {
+          // Show a popup indicating no data found for the given pincode
+          Swal.fire({
+            icon: "info",
+            title: "No Data Found",
+            text: `No data found for City ${cityValue}`,
+            showConfirmButton: true,
+          });
+        } else {
+          // Call the filter function with the filtered data
+          this.filter.Filter(
+            jsondata,
+            form,
+            cityCodeData,
+            cityControlName,
+            citycodeStatus
+          );
+        }
+      }
+     
+    } catch (error) {
+      // Handle any errors that may occur during the asynchronous operation
+      console.error("Error fetching city data:", error);
+    }
+  }
 }

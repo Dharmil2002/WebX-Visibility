@@ -1,5 +1,12 @@
 <app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="backPath">
   <!-- Basic Detail -->
+  <div *ngIf="thcLoad" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<div *ngIf="!thcLoad">
   <hr>
   <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
     <h3 style="font-size: 1.5rem; padding: 5px 0px;">Basic Detail</h3>
@@ -10,7 +17,15 @@
     </app-form-without-auto-complete-webxpress>
   </form>
   <!-- End -->
-
+    <!-- fleet Detail -->
+    <div *ngIf="marketVendor">
+      <hr>
+      <div
+        style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
+        <h3 style="font-size: 1.5rem; padding: 5px 0px;">Vehicle Basic Detail</h3>
+      </div>
+     <app-add-fleet-master [thc]="true"></app-add-fleet-master>
+    </div>
   <!-- Driver Detail -->
   <hr>
   <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
@@ -23,7 +38,6 @@
   </form>
 
   <!-- End -->
-
   <!-- Docket Detail -->
   <div *ngIf="addThc">
   <hr>
@@ -37,8 +51,6 @@
   </form>
 </div>
   <!-- End -->
-
-  
   <hr>
   <div style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
     <h3 style="font-size: 1.5rem; padding: 5px 0px;"> Vehicle Loading Detail</h3>
@@ -73,4 +85,5 @@
       </div>
     </div>
   </div>
+</div>
 </app-common-wrapper-webxpress>

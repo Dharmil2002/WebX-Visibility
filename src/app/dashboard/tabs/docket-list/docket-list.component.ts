@@ -12,6 +12,7 @@ export class DocketListComponent implements OnInit {
     /*Below is for the table displaye data */
     tableData: any;
     tableLoad: boolean;
+    orgBranch: string = localStorage.getItem("Branch");
    /* column header is for the changes css or title in the table*/
   columnHeader = {
     billingParty: {
@@ -37,12 +38,12 @@ export class DocketListComponent implements OnInit {
       Style: "max-width:150px",
     },
     actualWeight: {
-      Title: "Actual Weight",
+      Title: "Actual Weight(Kg)",
       class: "matcolumncenter",
       Style: "max-width:150px",
     },
     totalPkg: {
-      Title: "Total Package",
+      Title: "Total Package(Kg)",
       class: "matcolumncenter",
       Style: "max-width:150px",
     },
@@ -71,7 +72,7 @@ export class DocketListComponent implements OnInit {
     {label:"Create THC"}
   ]
   menuItemflag: boolean = true;
-  TableStyle = "width:85%"
+  TableStyle = "width:90%"
   /*.......End................*/
   /*Here the Controls which Is Hide search or add Button in table*/
   dynamicControls = {
@@ -97,7 +98,7 @@ export class DocketListComponent implements OnInit {
   async getShipmentDetail() {
 
     const shipmentList = await getShipment(this.operationService, false);
-    this.tableData = shipmentList.map((x) => {
+    this.tableData = shipmentList.filter((x)=>x.origin==this.orgBranch).map((x) => {
       const actualWeights = [x].map((item) => {
         return item ? calculateTotalField(item.invoiceDetails, 'actualWeight') : 0;
       });

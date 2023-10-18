@@ -41,7 +41,7 @@ export class FleetControls {
                 Validations: [
                     {
                         name: "required",
-                        message: "Vehicle Number is required"
+                        message: "Vehicle Type is required"
                     },
                     {
                         name: "autocomplete",

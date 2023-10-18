@@ -56,6 +56,8 @@ import { ThcViewComponent } from './thc-summary/thc-view/thc-view.component';
 import { THCViewComponent } from './ViewPrint/thc-view/thc-view.component';
 import { WESTERNCARRIERSComponent } from './ViewPrint/westerncarriers/westerncarriers.component';
 import { NgxPrintModule } from "ngx-print";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { MastersModule } from "../Masters/masters.module";
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -94,6 +96,7 @@ import { NgxPrintModule } from "ngx-print";
     THCViewComponent,
     WESTERNCARRIERSComponent
     
+    
   ],
   imports: [
     CommonModule,
@@ -112,9 +115,10 @@ import { NgxPrintModule } from "ngx-print";
     MatSnackBarModule,
     MatSlideToggleModule,
     NgxPrintModule,
+    MastersModule
     
   ],
-  providers: [SnackBarUtilityService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods,FilterUtils],
+  providers: [SnackBarUtilityService,PinCodeService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods,FilterUtils],
   exports: []
 })
 export class OperationModule { }

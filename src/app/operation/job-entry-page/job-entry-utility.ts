@@ -1,5 +1,4 @@
-import { geoDataServices } from "../error-handing/outbox-utility";
-
+const branch=localStorage.getItem("Branch");
 // This function adds a job detail to a MongoDB collection using a master service.
 export async function addJobDetail(jobDetail, masterService) {
   // Prepare the request body with company code, collection name, and job detail data.
@@ -22,23 +21,23 @@ export async function getVendorDetails(masterService) {
     let req = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
       "collectionName": "vendor_detail",
-      "filter": {}
+      "filter": {isActive:true}
     }
-    
     // Send a POST request to retrieve vendor details from the MongoDB collection.
     const res = await masterService.masterPost("generic/get", req).toPromise()
-    
     if (res) {
-      // Generate srno for each object in the array and return a modified array.
-      const jobDetail = res.data.map((obj, index) => {
-        return {
+      // Filter and map the array to generate 'vendorDetail'
+      const vendorDetail = res.data
+        .filter((x) => x.vendorLocation.includes(branch))
+        .map((obj) => ({
           name: obj?.vendorName || "",
-          value: obj.vendorCode || ""
-        };
-      });
-      
-      return jobDetail;
+          value: obj?.vendorCode || "",
+          type:obj?.vendorType||"",
+        }));
+    
+      return vendorDetail;
     }
+    
 }
 
 // This function gets the next sequential number, formats it, and updates it in localStorage.

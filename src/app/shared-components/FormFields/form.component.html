@@ -92,7 +92,6 @@
           [min]="formItem.additionalData?.minDate" placeholder={{formItem.placeholder}}
           [max]="formItem.additionalData?.maxDate" (dateChange)="functionCalled( {field :formItem , functionName:formItem.functions?.onDate
                 , eventArgs: $event})">
-        <mat-hint>DD/MM/YYYY</mat-hint>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
 

@@ -1,0 +1,21 @@
+export class DriverMaster {
+    manualDriverCode: string = '';
+    driverName: string = '';
+    driverPhoto: string = '';
+    licenseNo: string = '';
+    valdityDt: string = '';
+    licenseScan: string = '';
+    country: string = '';
+    telno: string = '';
+    address: string = '';
+    pincode: string = '';
+    city: string = '';
+    addressProofDocNo: string = '';
+    addressProofScan: string = '';
+    vehicleNo: string = '';
+    dDob: string = '';
+    DOBProofDocNo: string = '';
+    DOBProofScan: string = '';
+    activeFlag: boolean = false;
+    entryBy: string = '';
+}

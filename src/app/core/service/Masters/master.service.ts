@@ -29,6 +29,7 @@ export class MasterService {
   customerGst: any;
   companyGst: any;
   businessTypeList = '../../../assets/data/businessType.json'
+  regexPattern = '../../../assets/data/regexPattern.json'
   constructor(private http: HttpClient) { }
   /**
    * Retrieves JSON file details from the specified API URL.

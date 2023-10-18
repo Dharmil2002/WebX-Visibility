@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 import { map } from 'rxjs/operators';
 import { AddDcrSeriesControl } from 'src/assets/FormControls/add-dcr-series';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { processProperties } from '../../processUtility';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
@@ -203,6 +203,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   ngOnInit() {
     this.bindDropdown();
     this.getAllMastersData();
+
   }
 
   // Get all dropdown data
@@ -315,8 +316,6 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     }
   }
 
-
-
   // Handle function calls
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -377,9 +376,6 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   //#region  to check unique book code
   async isBookCodeUnique(): Promise<boolean> {
     const bookCode = this.addDcrTableForm.value.bookCode;
-
-
-
     const foundItem = this.dcrDetail.data.find(x => x.bookCode === bookCode);
 
     // Check if any other item in the tableData has the same bookCode
@@ -399,12 +395,12 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     }
   }
   //#endregion
-  //#region to initilize form control
+  //#region to Initialize form control
   initializeFormControl() {
     this.addDcrFormControl = new AddDcrSeriesControl();
     this.jsonControlArray = this.addDcrFormControl.getAddDcrFormControls();
     this.addDcrTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.addDcrTableForm.controls["documentType"].setValue("1");
+    this.addDcrTableForm.controls["documentType"].setValue("dkt");
   }
   //#endregion
   //#region to set series to.
@@ -424,13 +420,11 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   //#region to add data in table
   async addData() {
     try {
-      clearValidatorsAndValidate(this.addDcrTableForm);
       // Set loading flags to indicate data is being processed
       this.tableLoad = true;
       this.isLoad = true;
-      // const foundItem = this.dcrDetail.data.find(x => x.bookCode === bookCode);
 
-      // Get the existing table data, and the starting and ending series numbers from the form
+      // Get the existing table data and the starting and ending series numbers from the form
       const tableData = this.tableData;
       const startingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesFrom.value);
       const endingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesTo.value);
@@ -446,6 +440,19 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
 
         return isOverlap;
       });
+
+      // Check for duplicates in the existing data
+      const foundItem = this.dcrDetail.data.find((x) => {
+        const seriesFrom = parseInt(x.seriesFrom);
+        const seriesTo = parseInt(x.seriesTo);
+
+        const isOverlap =
+          (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
+          (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
+
+        return isOverlap;
+      });
+
       // If there's a duplicate, show an error message and exit
       if (overlappingItem) {
         const { seriesFrom, seriesTo } = overlappingItem;
@@ -455,10 +462,19 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
           text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
           showConfirmButton: true,
         });
-
         return;
       }
 
+      if (foundItem) {
+        const { seriesFrom, seriesTo } = foundItem;
+        Swal.fire({
+          icon: 'warning',
+          title: 'Warning',
+          text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
+          showConfirmButton: true,
+        });
+        return;
+      }
       const delayDuration = 1000;
 
       // Simulate a delay using async/await to mimic a loading state
@@ -532,4 +548,46 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
   }
+  async getPattern() {
+    try {
+      const documentType = this.addDcrTableForm.value.documentType;
+      const regexPattern = await this.masterService.getJsonFileDetails("regexPattern").toPromise();
+      const matchingPattern = regexPattern.find(pattern => pattern.companyCode === this.companyCode && pattern.documentId === documentType);
+  
+      if (!matchingPattern || !matchingPattern.required) {
+        console.log("No matching patterns found.");
+        return;
+      }
+  
+      const controlName = "seriesFrom"; // Change this to match your control's name
+      const control = this.addDcrTableForm.get(controlName); // Use `get` to access the FormControl
+  
+      if (control) {
+        const customValidations = [
+          Validators.required, // Add the required validator
+          Validators.pattern(matchingPattern.regexPattern), // Add the pattern validator
+        ];
+  
+        // Set custom error messages
+        control.setErrors({
+          required: "Series From is required",
+          pattern: matchingPattern.message, // Custom message for the pattern validator
+        });
+  
+        control.setValidators(customValidations);
+  
+        // Call updateValueAndValidity to re-validate the control with the new validators and error messages
+      //  control.updateValueAndValidity();
+      console.log(control);
+      
+      } else {
+        console.log("Control not found.");
+      }
+    } catch (error) {
+      console.error("Error while fetching regex patterns:", error);
+      // Handle the error, e.g., display an error message to the user.
+    }
+  }
+  
+
 }

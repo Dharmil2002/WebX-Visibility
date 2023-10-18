@@ -431,8 +431,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         });
         return; // Exit the function if the format is not valid
       }
-      //setting image file name in control
-      this.beneficiaryDetailForm.controls['uploadKYC'].setValue(fileList[0].name);
+
 
       // Prepare the data for the HTTP request
       const formData = new FormData();
@@ -454,6 +453,8 @@ export class AddBeneficiaryMasterComponent implements OnInit {
           showConfirmButton: true,
         });
       }
+      //setting image file name in control
+      this.beneficiaryDetailForm.controls['uploadKYC'].setValue(fileList[0].name);
     } catch (error) {
       console.error("Error uploading image:", error);
     }

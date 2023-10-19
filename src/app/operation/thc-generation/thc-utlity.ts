@@ -41,12 +41,14 @@ export async function prqDetail(operationService,dropDown) {
 
 export async function thcGeneration(operationService,data){
      // Define the request body with companyCode, collectionName, and an empty filter
+     const party = data.billingParty ? data.billingParty.toUpperCase() : '';
      const reqBody = {
         companyCode: localStorage.getItem("companyCode"),
         collectionName: "thc_detail",
         data: data,
         docType: "TH",
         branch: "MUMB",
+        party: party,
         finYear: financialYear
     };
     // Perform an asynchronous operation to fetch data from the operation service

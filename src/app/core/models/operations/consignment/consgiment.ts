@@ -52,6 +52,8 @@ export class DocketDetail {
     entryBy: any
     entryDate: string
     unloadloc: string
+    tran_day: string
+    tran_hour: string
     actualWeight: number
     invoiceDetails: InvoiceDetail[]
     containerDetail: ContainerDetail[]
@@ -111,6 +113,8 @@ export class DocketDetail {
         this.delivery_type=data.delivery_type??""
         this.rake_no=data.rake_no??""
         this.issuing_from=data.issuing_from??"" 
+        this.tran_day= data.tran_day??"" 
+        this.tran_hour= data.tran_hour??"" 
     }
 
 }

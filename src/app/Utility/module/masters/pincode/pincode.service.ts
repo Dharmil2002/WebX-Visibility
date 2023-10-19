@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { filterAndUnique } from "src/app/Utility/Form Utilities/filter-utils";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
@@ -113,9 +114,11 @@ export class PinCodeService {
         // Fetch pincode data from the masterService asynchronously
         const cityResponse = await this.masterService.masterPost("generic/get", cityBody).toPromise();
         // Extract the cityCodeData from the response
-        const cityCodeData = [...new Set(cityResponse.data.map((element: { CT: string }) => element.CT))]
-        .filter((ct: string) => ct.toLowerCase().includes((cityValue as string).toLowerCase()))
-        .map((ct: string) => ({ name: ct, value: ct }));
+       const cityCodeData = filterAndUnique(
+          cityResponse.data,
+          (element: { CT: string }) => element.CT.toLowerCase().includes(cityValue.toLowerCase()),
+          (ct: { CT: string }) => ({ name: ct.CT, value: ct.CT })
+        );
         // Filter cityCodeData for partial matches
         if (cityCodeData.length === 0) {
           // Show a popup indicating no data found for the given pincode

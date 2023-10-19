@@ -17,6 +17,8 @@ import { CustomerService } from "src/app/Utility/module/masters/customer/custome
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { PrqService } from "src/app/Utility/module/operation/prq/prq.service";
 import { CityService } from "src/app/Utility/module/masters/city/city.service";
+import { customerFromApi } from "./prq-utitlity";
+import { MasterService } from "src/app/core/service/Masters/master.service";
 
 @Component({
   selector: "app-prq-entry-page",
@@ -66,15 +68,15 @@ export class PrqEntryPageComponent implements OnInit {
   customerList: any;
   allFormGrop: FormControls[];
   resContainer: any;
-
+  branchCode = localStorage.getItem("Branch");
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private router: Router,
     public dialog: MatDialog,
     private containerService: ContainerService,
-    private customerService: CustomerService,
     private locationService: LocationService,
+    private masterService:MasterService,
     private cityService: CityService,
     private prqService: PrqService
   ) {
@@ -190,16 +192,22 @@ export class PrqEntryPageComponent implements OnInit {
 
   async getCity() {
     try {
+      const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode })
+      const city={
+        name:destinationMapping[0].city,
+        value:destinationMapping[0].city
+      }
+      this.prqEntryTableForm.controls['fromCity'].setValue(city);
       const cityDetail = await this.cityService.getCity();
 
       if (cityDetail) {
-        this.filter.Filter(
-          this.jsonControlPrqArray,
-          this.prqEntryTableForm,
-          cityDetail,
-          this.fromCity,
-          this.fromCityStatus
-        ); // Filter the docket control array based on fromCity details
+        // this.filter.Filter(
+        //   this.jsonControlPrqArray,
+        //   this.prqEntryTableForm,
+        //   cityDetail,
+        //   this.fromCity,
+        //   this.fromCityStatus
+        // ); // Filter the docket control array based on fromCity details
 
         this.filter.Filter(
           this.jsonControlPrqArray,
@@ -310,7 +318,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
   async bindDataFromDropdown() {
     const resLoc = await this.locationService.locationFromApi();
-    const resCust = await this.customerService.customerFromApi();
+    const resCust =  await customerFromApi(this.masterService);
     this.customerList = resCust;
     this.resContainer = await this.containerService.containerFromApi();
     this.locationDetail = resLoc;

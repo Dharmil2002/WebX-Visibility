@@ -1,5 +1,5 @@
-<h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>FREIGHT CHARGE
-    MATRIX</h4>
+<h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>
+    Freight Charge Matrix</h4>
 <hr>
 <form [formGroup]="FreightMatrixForm">
     <app-form-webxpress [form]="FreightMatrixForm" [formData]="jsonControlArrayFreightMatrix"
@@ -7,19 +7,16 @@
         (callFunction)="functionCallHandler($event)" [className]="className">
     </app-form-webxpress>
 </form>
-<button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!FreightMatrixForm.valid"
-    style="margin-left: 85%;" (click)="addData()">
-    <mat-icon>add</mat-icon>
-    Add New
-</button>
+
 <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
     <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
 </div>
 <div class="paddingdiv">
-    <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="tableData"
-        [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag"
-        [addFlag]="addFlag">
+    <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
+        [menuItemFlag]="menuItemflag" [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)"
+        [AddNewButton]=true [btndisabled]="!FreightMatrixForm.valid" (AddNewButtonEvent)="AddNewButtonEvent()">
     </app-generic-table-v2>
 </div>

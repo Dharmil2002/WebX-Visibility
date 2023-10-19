@@ -22,10 +22,10 @@ export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter i
   displayedColumns = [
     { Key: "customer", title: "Customer", width: "250", className: "matcolumnfirst", show: true },
     { Key: "contractID", title: "Contract Id", width: "100", className: "matcolumncenter", show: true },
-    { Key: "product", title: "Product", width: "100", className: "matcolumncenter", show: true },
+    { Key: "product", title: "Product", width: "70", className: "matcolumncenter", show: true },
     { Key: "contractStartDate", title: "Start Date", width: "100", className: "matcolumncenter", show: true },
     { Key: "contractEndDate", title: "End Date", width: "100", className: "matcolumncenter", show: true },
-    { Key: "expiringin", title: "Expiring In", width: "70", className: "matcolumncenter", show: true },
+    { Key: "expiringin", title: "Expiring In", width: "170", className: "matcolumncenter", show: true },
   ];
   columnKeys = this.displayedColumns.map((column) => column.Key);
   boxData: { count: number; title: string; class: string; }[];

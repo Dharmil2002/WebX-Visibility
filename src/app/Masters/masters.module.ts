@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { MastersRoutingModule } from './masters-routing.module';
 import { MatIconModule } from '@angular/material/icon';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -136,6 +136,8 @@ import { CustomerContractFreightMatrixComponent } from './Customer Contract/Cust
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { EncryptionService } from '../core/service/encryptionService.service';
+import { CustomerContractNonFreightChargesComponent } from './Customer Contract/CustomerContractTabs/customer-contract-non-freight-charges/customer-contract-non-freight-charges.component';
+import { MatSidenavModule } from '@angular/material/sidenav';
 @NgModule({
   imports: [
     CommonModule,
@@ -176,7 +178,9 @@ import { EncryptionService } from '../core/service/encryptionService.service';
     NgxMaterialTimepickerModule,
     ReactiveFormsModule,
     TableVirtualScrollModule,
-    ScrollingModule
+    ScrollingModule,
+    MatSidenavModule,
+    NgIf
   ],
 
   declarations: [
@@ -285,11 +289,11 @@ import { EncryptionService } from '../core/service/encryptionService.service';
     BeneficiaryMasterListComponent,
     AddBeneficiaryMasterComponent,
     CustomerContractFreightMatrixComponent,
-   ListProductComponent,
-   AddProductComponent,
-   ProductChargesComponent,
-   ProductServicesComponent
-
+    ListProductComponent,
+    AddProductComponent,
+    ProductChargesComponent,
+    ProductServicesComponent,
+    CustomerContractNonFreightChargesComponent,
   ],
 
   providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService,

@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Subject, take, takeUntil } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
@@ -137,7 +137,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   DisplayCODDODSection = false;
   DisplayVolumetricSection = false;
   DisplayDemurragericSection = false;
-  DisplayInsuranceSection = true;
+  DisplayInsuranceSection = false;
   DisplayCutOfftimeSection = false;
   DisplayYieldProtectionSection = false;
   DisplayFuelSurchargeSection = false;
@@ -154,6 +154,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   //#endregion
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
+    private changeDetectorRef: ChangeDetectorRef,
     public ObjcontractMethods: locationEntitySearch,
     private filter: FilterUtils, private sessionService: SessionService) {
     this.companyCode = this.sessionService.getCompanyCode()
@@ -289,7 +290,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       case "Volumetric":
         this.DisplayVolumetricSection = checked;
         break;
-      case "ODA":
+      case "COD/DOD":
         this.DisplayCODDODSection = checked;
         break;
       case "Demurrage":

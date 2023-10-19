@@ -87,30 +87,6 @@
         </app-generic-table-v2>
     </div>
 </div>
-<div *ngIf="DisplayCutOfftimeSection">
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Cut-Off
-        time
-    </h4>
-    <hr>
-    <form [formGroup]="CutOfftimeForm">
-        <app-form-webxpress [form]="CutOfftimeForm" [formData]="jsonControlArrayCutOfftimeForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="className">
-        </app-form-webxpress>
-    </form>
-</div>
-<div *ngIf="DisplayYieldProtectionSection">
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Yield
-        Protection
-    </h4>
-    <hr>
-    <form [formGroup]="YieldProtectionForm">
-        <app-form-webxpress [form]="YieldProtectionForm" [formData]="jsonControlArrayYieldProtectionForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="className">
-        </app-form-webxpress>
-    </form>
-</div>
 <div *ngIf="DisplayFuelSurchargeSection">
     <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Fuel
         Surcharge
@@ -141,4 +117,28 @@
             (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
         </app-generic-table-v2>
     </div>
+</div>
+<div *ngIf="DisplayCutOfftimeSection">
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Cut-Off
+        time
+    </h4>
+    <hr>
+    <form [formGroup]="CutOfftimeForm">
+        <app-form-webxpress [form]="CutOfftimeForm" [formData]="jsonControlArrayCutOfftimeForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="DisplayYieldProtectionSection">
+    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Yield
+        Protection
+    </h4>
+    <hr>
+    <form [formGroup]="YieldProtectionForm">
+        <app-form-webxpress [form]="YieldProtectionForm" [formData]="jsonControlArrayYieldProtectionForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
 </div>

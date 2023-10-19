@@ -137,7 +137,7 @@ export class SplitDcrComponent implements OnInit {
     this.dcrSplitForm.controls["allotTo"].setValue(this.dcrSplitForm.value.allotTo.value);
     this.dcrSplitForm.controls["type"].setValue(this.dcrSplitForm.value.type.value);
     this.dcrSplitForm.controls["allocateTo"].setValue(this.dcrSplitForm.value.allocateTo.value);
-    this.dcrSplitForm.controls["id"].setValue(this.dcrSplitForm.value.bookCode);
+    this.dcrSplitForm.controls["_id"].setValue(this.dcrSplitForm.value.bookCode);
     this.dcrSplitForm.controls["action"].setValue('Split');
     let getReq = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),

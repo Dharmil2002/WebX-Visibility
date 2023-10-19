@@ -223,11 +223,10 @@ export class DcrDetailPageComponent implements OnInit {
               srNo: index + 1
             };
           });
-          this.historyDet = dataWithSrno.filter(item => item.bookCode === this.data?.bookCode).map((item) => {
+          this.historyDet = dataWithSrno.filter(item => item.seriesFrom === this.data?.seriesFrom).map((item) => {
             const loc = this.locdet.find(optItem => optItem.value === item.allotTo);
             const allocateTo = this.allData.find(optItem => optItem.value === item.allocateTo);
             item['location'] = loc ? `${loc.value} - ${loc.name}` : '';
-            item["entryDate"] = this.datePipe.transform(item.entryDate, "dd-MM-yyyy HH:mm:ss");
             item['fromTo'] = item.seriesFrom + ' - ' + item.seriesTo;
             item['type'] = item.type === 'E' ? 'Employee' : item.type === 'C' ? 'Customer' : item.type === 'L' ? 'Location' : 'BA'
             item['person'] = allocateTo ? `${allocateTo.value} - ${allocateTo.name}` : '';

@@ -1,13 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { forkJoin } from 'rxjs';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import Swal from 'sweetalert2';
-import { map } from 'rxjs/operators';
 import { AddDcrSeriesControl } from 'src/assets/FormControls/add-dcr-series';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { processProperties } from '../../processUtility';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
@@ -205,7 +203,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     this.getAllMastersData();
   }
 
-  // Get all dropdown data
+  //#region to get all dropdown data
   async getAllMastersData() {
     try {
       this.addDcrTableForm.controls.allocateTo.setValue("");
@@ -314,9 +312,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       console.error("Error in getAllMastersData:", error);
     }
   }
-
-
-
+  //#endregion
   // Handle function calls
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -328,7 +324,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     }
   }
 
-  // Save data
+  //#region to Save data
   async saveData() {
     clearValidatorsAndValidate(this.addDcrTableForm);
     // console.log(this.tableData);
@@ -371,15 +367,13 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       }
     });
   }
+  //#endregion
   cancel() {
     this.router.navigateByUrl('/Masters/DocumentControlRegister/TrackDCR');
   }
   //#region  to check unique book code
   async isBookCodeUnique(): Promise<boolean> {
     const bookCode = this.addDcrTableForm.value.bookCode;
-
-
-
     const foundItem = this.dcrDetail.data.find(x => x.bookCode === bookCode);
 
     // Check if any other item in the tableData has the same bookCode
@@ -399,24 +393,28 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     }
   }
   //#endregion
-  //#region to initilize form control
+  //#region to Initialize form control
   initializeFormControl() {
     this.addDcrFormControl = new AddDcrSeriesControl();
     this.jsonControlArray = this.addDcrFormControl.getAddDcrFormControls();
     this.addDcrTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.addDcrTableForm.controls["documentType"].setValue("1");
+    // this.addDcrTableForm.controls["documentType"].setValue("dkt");
   }
   //#endregion
   //#region to set series to.
   getSeriesTo() {
     // Get the 'seriesFrom' and 'totalLeaf' values from the form control
     const { seriesFrom, totalLeaf } = this.addDcrTableForm.value;
+    const match = seriesFrom.match(/([a-zA-Z]+)(\d+)/);
 
+    const extractedLetters = match[1];  // Will store "zzz"
+    const extractedNumber = match[2];   // Will store "9999"
     // Calculate the result by parsing 'seriesFrom' and 'totalLeaf' to numbers
-    const seriesFromNumber = parseInt(seriesFrom);
+    const seriesFromNumber = parseInt(extractedNumber);
+
     const totalLeafNumber = parseInt(totalLeaf);
     // getting seriesTo value from addition of seriesfrom and total leaf
-    const resultNumber = seriesFromNumber + totalLeafNumber;
+    const resultNumber = extractedLetters + (seriesFromNumber + totalLeafNumber);
     // setting in seriesTo its calculated value
     this.addDcrTableForm.controls.seriesTo.setValue(resultNumber);
   }
@@ -424,41 +422,61 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   //#region to add data in table
   async addData() {
     try {
-      clearValidatorsAndValidate(this.addDcrTableForm);
       // Set loading flags to indicate data is being processed
       this.tableLoad = true;
       this.isLoad = true;
-      // const foundItem = this.dcrDetail.data.find(x => x.bookCode === bookCode);
 
-      // Get the existing table data, and the starting and ending series numbers from the form
+      // Get the existing table data and the starting and ending series numbers from the form
       const tableData = this.tableData;
-      const startingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesFrom.value);
-      const endingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesTo.value);
+      // const startingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesFrom.value);
+      // const endingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesTo.value);
 
-      // Check for duplicates in the table data
-      const overlappingItem = this.tableData.find((item) => {
-        const seriesFrom = parseInt(item.seriesFrom);
-        const seriesTo = parseInt(item.seriesTo);
+      // // Check for duplicates in the table data
+      // const overlappingItem = this.tableData.find((item) => {
+      //   const seriesFrom = parseInt(item.seriesFrom);
+      //   const seriesTo = parseInt(item.seriesTo);
 
-        const isOverlap =
-          (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
-          (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
+      //   const isOverlap =
+      //     (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
+      //     (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
 
-        return isOverlap;
-      });
-      // If there's a duplicate, show an error message and exit
-      if (overlappingItem) {
-        const { seriesFrom, seriesTo } = overlappingItem;
-        Swal.fire({
-          icon: 'warning',
-          title: 'Warning',
-          text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
-          showConfirmButton: true,
-        });
+      //   return isOverlap;
+      // });
 
-        return;
-      }
+      // // Check for duplicates in the existing data
+      // const foundItem = this.dcrDetail.data.find((x) => {
+      //   const seriesFrom = parseInt(x.seriesFrom);
+      //   const seriesTo = parseInt(x.seriesTo);
 
+      //   const isOverlap =
+      //     (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
+      //     (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
+
+      //   return isOverlap;
+      // });
+
+      // // If there's a duplicate, show an error message and exit
+      // if (overlappingItem) {
+      //   const { seriesFrom, seriesTo } = overlappingItem;
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     title: 'Warning',
+      //     text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
+      //     showConfirmButton: true,
+      //   });
+      //   return;
+      // }
+
+      // if (foundItem) {
+      //   const { seriesFrom, seriesTo } = foundItem;
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     title: 'Warning',
+      //     text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
+      //     showConfirmButton: true,
+      //   });
+      //   return;
+      // }
       const delayDuration = 1000;
 
       // Simulate a delay using async/await to mimic a loading state
@@ -468,13 +486,15 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       const json = {
         id: tableData.length + 1,
         documentType: this.addDcrTableForm.value.documentType,
-        businessType: this.addDcrTableForm.value.businessType?.name || '',
+        businessType: this.addDcrTableForm.value.businessType?.value || '',
         bookCode: this.addDcrTableForm.value.bookCode,
-        seriesFrom: startingSeriesNo,
+        seriesFrom: this.addDcrTableForm.value.seriesFrom,
+        // : startingSeriesNo,
         totalLeaf: this.addDcrTableForm.value.totalLeaf,
-        seriesTo: endingSeriesNo,
-        allotTo: this.addDcrTableForm.value.allotTo?.name || '',
-        allocateTo: this.addDcrTableForm.value.allocateTo?.name || '',
+        seriesTo: this.addDcrTableForm.value.seriesTo,
+        //seriesTo: endingSeriesNo,
+        allotTo: this.addDcrTableForm.value.allotTo?.value || '',
+        allocateTo: this.addDcrTableForm.value.allocateTo?.value || '',
         type: this.addDcrTableForm.value.allocateTo?.type || '',
         actions: ['Edit', 'Remove'],
       };
@@ -493,7 +513,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     }
   }
   //#endregion
-
+  //#region to bind dropdown
   bindDropdown() {
     const dcrPropertiesMapping = {
       businessType: { variable: "businessType", status: "businessTypeStatus" },
@@ -506,8 +526,8 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       dcrPropertiesMapping
     );
   }
-
-
+  //#endregion
+  //#region to set or remove data in table
   handleMenuItemClick(data) {
     this.fillTable(data);
   }
@@ -519,17 +539,53 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       // console.log(data);
 
       this.addDcrTableForm.controls['documentType'].setValue(data.data?.documentType || "");
-      const businessTypeData = this.businessTypeList.find((x) => x.name == data.data.businessType)
+      const businessTypeData = this.businessTypeList.find((x) => x.value == data.data.businessType)
       this.addDcrTableForm.controls.businessType.setValue(businessTypeData);
       this.addDcrTableForm.controls['bookCode'].setValue(data.data?.bookCode || "");
       this.addDcrTableForm.controls['seriesTo'].setValue(data.data?.seriesTo || "");
       this.addDcrTableForm.controls['seriesFrom'].setValue(data.data?.seriesFrom || "");
       this.addDcrTableForm.controls['totalLeaf'].setValue(data.data?.totalLeaf || "");
-      const updatedAllotTo = this.locationList.find((x) => x.name == data.data.allotTo);
+      const updatedAllotTo = this.locationList.find((x) => x.value == data.data.allotTo);
       this.addDcrTableForm.controls.allotTo.setValue(updatedAllotTo);
-      const updatedAllocateTo = this.userList.find((x) => x.name == data.data.allocateTo);
+      const updatedAllocateTo = this.userList.find((x) => x.value == data.data.allocateTo);
       this.addDcrTableForm.controls.allocateTo.setValue(updatedAllocateTo);
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
   }
+  //#endregion
+  //#region to set pattern from json
+  async getPattern() {
+    try {
+      const documentType = this.addDcrTableForm.value.documentType;
+      const regexPattern = await this.masterService.getJsonFileDetails("regexPattern").toPromise();
+      const matchingPattern = regexPattern.find(pattern => pattern.companyCode === this.companyCode && pattern.documentId === documentType);
+
+      if (!matchingPattern || !matchingPattern.required) {
+        console.log("No matching patterns found.");
+        return;
+      }
+      const controlName = "seriesFrom"; // Change this to match your control's name
+      const control = this.addDcrTableForm.get(controlName);
+
+      if (control) {
+        const customValidations = [
+          Validators.required, // Add the required validator with its default error message
+          Validators.pattern(matchingPattern.regexPattern), // Add the pattern validator with its default error message
+        ];
+
+        // Set custom error messages for required and pattern validations
+        control.setValidators(customValidations);
+
+        control.updateValueAndValidity(); // Update the control's validity
+
+        // console.log(control);
+      } else {
+        console.log("Control not found.");
+      }
+    } catch (error) {
+      console.error("Error while fetching regex patterns:", error);
+      // Handle the error, e.g., display an error message to the user.
+    }
+  }
+  //#endregion
 }

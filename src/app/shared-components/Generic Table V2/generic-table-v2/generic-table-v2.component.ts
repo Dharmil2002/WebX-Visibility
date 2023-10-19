@@ -1,4 +1,4 @@
-import {AfterViewInit,Component,ElementRef,EventEmitter,Input,Output,SimpleChanges,ViewChild,} from "@angular/core";
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, SimpleChanges, ViewChild, } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortable } from "@angular/material/sort";
@@ -17,8 +17,7 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 })
 export class GenericTableV2Component
   extends UnsubscribeOnDestroyAdapter
-  implements AfterViewInit
-{
+  implements AfterViewInit {
   // properties declaration to receive data from parent component
   @Input() dataSource: MatTableDataSource<any>;
   @Input() tableData;
@@ -48,6 +47,8 @@ export class GenericTableV2Component
   @Input() width;
   @Input() maxWidth;
   @Input() extraData;
+  @Input() btndisabled: boolean = false;
+  @Input() refreshbtn: boolean = false;
   @Input() staticField = [];
   triggered: boolean = false;
   objectKeys = Object.keys;
@@ -64,7 +65,7 @@ export class GenericTableV2Component
   tableLoad: boolean = true;
   @Output() onFlagChange: EventEmitter<any> = new EventEmitter();
   @Output() dialogClosed = new EventEmitter<any>();
-  @Output() addEmitter=new EventEmitter<any>();
+  @Output() addEmitter = new EventEmitter<any>();
   selectedItems: any[] = [];
   AllChack = false
   @Input() centerAligned;
@@ -156,10 +157,10 @@ export class GenericTableV2Component
   // this function is called, when add button is clicked.
   // it navigates to the Add page using the url provided, from parent
   addNew() {
-    if(this.addAndEditPath){
-    this.router.navigateByUrl(this.addAndEditPath);
+    if (this.addAndEditPath) {
+      this.router.navigateByUrl(this.addAndEditPath);
     }
-    if(this.addFlag){
+    if (this.addFlag) {
       this.addEmitter.emit();
     }
   }
@@ -278,8 +279,8 @@ export class GenericTableV2Component
         return Object.keys(this.csvHeaders).map((col) => {
           let value =
             col.toLowerCase().includes("date") ||
-            col.toLowerCase().includes("dob") ||
-            col.toLowerCase().includes("dt")
+              col.toLowerCase().includes("dob") ||
+              col.toLowerCase().includes("dt")
               ? moment(new Date(row[col])).format("DD-MM-YYYY") ===
                 "Invalid date"
                 ? row[col]
@@ -348,7 +349,7 @@ export class GenericTableV2Component
     return "matcolumnleft";
   }
 
-  someComplete(){
+  someComplete() {
     if (this.dataSource == null) {
       return false;
     }
@@ -367,13 +368,14 @@ export class GenericTableV2Component
     }
   }
 
-  AddNew(){
+  AddNew() {
     this.AddNewButtonEvent.emit()
   }
-  Delete(element){
-    this.DeleteFunction.emit({element})
+  Delete(element) {
+    this.DeleteFunction.emit({ element })
   }
-  FunctionHendel(name ,element){
-    this.functionCallEmitter.emit({functionName:name , data:element})
+  FunctionHendel(name, element) {
+    this.functionCallEmitter.emit({ functionName: name, data: element })
   }
+
 }

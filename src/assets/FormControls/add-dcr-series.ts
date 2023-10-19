@@ -10,9 +10,9 @@ export class AddDcrSeriesControl {
                 placeholder: 'Search And Select Document Type',
                 type: "Staticdropdown",
                 value: [
-                    { value: "1", name: "CNote" },
-                    { value: "2", name: "Delivery MR", },
-                    { value: "3", name: "UBI Series", }
+                    { value: "dkt", name: "CNote" },
+                    { value: "dmr", name: "Delivery MR", },
+                    { value: "ubis", name: "UBI Series", }
                 ],
                 Validations: [
                     {
@@ -21,6 +21,9 @@ export class AddDcrSeriesControl {
                     }
 
                 ],
+                functions: {
+                    onSelection: "getPattern",
+                },
                 additionalData: {
                     showNameAndValue: false
                 },
@@ -65,7 +68,7 @@ export class AddDcrSeriesControl {
                 name: 'seriesFrom',
                 label: "Series From",
                 placeholder: "Please Enter Series From",
-                type: 'number',
+                type: 'text',
                 value: '',
                 generatecontrol: true,
                 disable: false,
@@ -74,11 +77,11 @@ export class AddDcrSeriesControl {
                         name: "required",
                         message: "Series From is required"
                     },
-                    // {
-                    //     name: "pattern",
-                    //     message: "Please Enter alphanumeric Series From of length 12",
-                    //     pattern: '^[a-zA-Z0-9]{12,30}$',
-                    // }
+                    {
+                        name: "pattern",
+                        message: 'Length should be 7 and pattern should be: ZZZ9999',
+                        pattern: ''
+                    }
                 ],
 
             },
@@ -105,7 +108,7 @@ export class AddDcrSeriesControl {
                 name: 'seriesTo',
                 label: "Series To",
                 placeholder: "Please Enter Series To",
-                type: 'number',
+                type: 'text',
                 value: '',
                 generatecontrol: true,
                 disable: true,

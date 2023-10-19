@@ -1,7 +1,6 @@
 import { Component, OnInit, Renderer2 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FleetMaster } from 'src/app/Models/fleet-Master/fleet';
-import { formatDocketDate } from 'src/app/Utility/commonFunction/arrayCommonFunction/uniqArray';
 import { VehicleService } from 'src/app/Utility/module/masters/vehicle-master/vehicle-master-service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
@@ -18,10 +17,17 @@ export class THCViewComponent implements OnInit {
     thcDetails: any;
     thcNestedData: any;
     tripId: any;
+    totalAmt: number;
+    contractAmt: number;
+    otherAmt: number;
+    deductionAmt: number;
+    ETA: number;
+    Departed: number;
     constructor(
-        
+
         private masterService: MasterService,
         private vehicleService: VehicleService,
+        private movementService: VehicleService,
         private renderer: Renderer2,
         private router: ActivatedRoute
     ) {
@@ -36,12 +42,11 @@ export class THCViewComponent implements OnInit {
             "none"
         ); //Hide Sidebars
         this.router.queryParams.subscribe((params) => {
-            
-            
+
+
             this.tripId = params["THC"];
-            console.log(this.tripId);
         });
-       
+
     }
 
     ngOnInit(): void {
@@ -59,8 +64,6 @@ export class THCViewComponent implements OnInit {
 
     // Function to retrieve THC data
     getTHC() {
-        // Extract tripId from THC details column data, default to 0 if not present
-        
         // Prepare request object for THC data retrieval
         const req = {
             companyCode: this.companyCode,
@@ -85,13 +88,20 @@ export class THCViewComponent implements OnInit {
                             ...res.data[0],
                             origin: origin,
                             dest: destination,
-                            updateDate: formatDocketDate(res.data[0]?.updateDate || new Date())
+                            updateDate: res.data[0]?.updateDate || new Date()
                         };
-                        
+                        const originalDate = new Date(this.thcNestedData.updateDate);
+                        this.ETA = originalDate.setDate(originalDate.getDate() + 2);
+                        this.Departed = this.thcNestedData.updateDate
+
                         // Determine label based on THC status for arrival information
-                        this.labelArrival = this.thcNestedData.status == "1" ? "ETA" : "Arrived"
+                        // this.labelArrival = this.thcNestedData.status == "1" ? "ETA" : "Arrived"
                         // Fetch additional vehicle details
                         this.getVehicleDetail()
+                        this.getDocketDetail()
+                        this.getvendorName()
+
+                        // this.getMovementDetail()
                     } else {
                         console.error("Invalid route format:", res.data[0].route);
                     }
@@ -104,5 +114,35 @@ export class THCViewComponent implements OnInit {
             },
         });
     }
+    async getDocketDetail() {
+        const req = {
+            companyCode: this.companyCode,
+            collectionName: "docket_temp",
+            filter: { docketNumber: this.thcNestedData.docket[0] },
+        };
+        // Subscribe to the master service to fetch THC data
+        const Res = await this.masterService.masterPost("generic/get", req).toPromise()
+        if (Res.success && Res.data.length > 0) {
+            this.thcNestedData = {
+                ...this.thcNestedData,
+                invoiceDetails: Res.data[0].invoiceDetails[0]
+            }
+        }
+    }
 
+    async getvendorName() {
+        const req = {
+            companyCode: this.companyCode,
+            collectionName: "vendor_detail",
+            filter: { vendorCode: this.thcNestedData.vendorName },
+        };
+        // Subscribe to the master service to fetch THC data
+        const Res = await this.masterService.masterPost("generic/get", req).toPromise()
+        if (Res.success && Res.data.length > 0) {
+            this.thcNestedData = {
+                ...this.thcNestedData,
+                vendorName_code: Res.data[0].vendorCode + ' - ' + Res.data[0].vendorName
+            }
+        }
+    }
 }

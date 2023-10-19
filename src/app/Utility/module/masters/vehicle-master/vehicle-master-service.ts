@@ -20,10 +20,8 @@ export class VehicleService {
             collectionName: "fleet_master",
             filter: filter,
         };
-
         // Making an asynchronous request to fetch vehicle data using the master service
         const vehicleData = await this.masterService.masterPost("generic/get", req).toPromise();
-
         // Returning the vehicle data
         return vehicleData.data;
     }

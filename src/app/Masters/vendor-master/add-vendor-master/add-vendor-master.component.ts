@@ -498,7 +498,7 @@ export class AddVendorMasterComponent implements OnInit {
     this.isLoad = true;
     const tableData = this.tableData;
     const gstNumber = this.otherDetailForm.controls.gstNumber.value;
-    if (tableData.length > 0) {debugger
+    if (tableData.length > 0) {
       // Check if the gstNumber already exists in tableData
       const isDuplicate = this.tableData.some((item) => item.gstNumber === gstNumber);
 

@@ -1,0 +1,42 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - beta
+  workflow_dispatch:
+
+env:
+  DOCKER_REGISTRY: webxdmsregistry.azurecr.io
+  IMAGE_NAME: dms-web-beta
+  TAG: ${{ github.sha }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Build Docker image
+      run: docker build . -f Dockerfiles/Dockerfile.beta -t ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
+    #- name: Push Docker image to Azure Container Registry
+    #  run: docker push ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
+    - name: Tag Docker image with latest
+      run: |
+        docker tag ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }} ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        echo "${GITHUB_OUTPUT}latest_tag=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+
+    - name: Push Docker image to Azure Container Registry
+      run: |
+        docker push ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+        docker push ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest

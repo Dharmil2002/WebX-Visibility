@@ -132,7 +132,7 @@ export class ReAllocateDcrComponent implements OnInit {
               "allotTo": this.dcrReallocateForm.value.newLocation.value,
               "type": this.dcrReallocateForm.value.newCategory.value,
               "allocateTo": this.dcrReallocateForm.value.newPerson.value,
-              "entryBy": localStorage.getItem('Username'),
+              "entryBy": localStorage.getItem("UserName"),
               "entryDate": new Date().toISOString(),
               "_id": this.id,
               "action": "Re-Allocate"

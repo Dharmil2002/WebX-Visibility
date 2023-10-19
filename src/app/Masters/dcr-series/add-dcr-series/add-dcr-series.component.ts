@@ -486,15 +486,15 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       const json = {
         id: tableData.length + 1,
         documentType: this.addDcrTableForm.value.documentType,
-        businessType: this.addDcrTableForm.value.businessType?.name || '',
+        businessType: this.addDcrTableForm.value.businessType?.value || '',
         bookCode: this.addDcrTableForm.value.bookCode,
         seriesFrom: this.addDcrTableForm.value.seriesFrom,
         // : startingSeriesNo,
         totalLeaf: this.addDcrTableForm.value.totalLeaf,
         seriesTo: this.addDcrTableForm.value.seriesTo,
         //seriesTo: endingSeriesNo,
-        allotTo: this.addDcrTableForm.value.allotTo?.name || '',
-        allocateTo: this.addDcrTableForm.value.allocateTo?.name || '',
+        allotTo: this.addDcrTableForm.value.allotTo?.value || '',
+        allocateTo: this.addDcrTableForm.value.allocateTo?.value || '',
         type: this.addDcrTableForm.value.allocateTo?.type || '',
         actions: ['Edit', 'Remove'],
       };
@@ -539,15 +539,15 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       // console.log(data);
 
       this.addDcrTableForm.controls['documentType'].setValue(data.data?.documentType || "");
-      const businessTypeData = this.businessTypeList.find((x) => x.name == data.data.businessType)
+      const businessTypeData = this.businessTypeList.find((x) => x.value == data.data.businessType)
       this.addDcrTableForm.controls.businessType.setValue(businessTypeData);
       this.addDcrTableForm.controls['bookCode'].setValue(data.data?.bookCode || "");
       this.addDcrTableForm.controls['seriesTo'].setValue(data.data?.seriesTo || "");
       this.addDcrTableForm.controls['seriesFrom'].setValue(data.data?.seriesFrom || "");
       this.addDcrTableForm.controls['totalLeaf'].setValue(data.data?.totalLeaf || "");
-      const updatedAllotTo = this.locationList.find((x) => x.name == data.data.allotTo);
+      const updatedAllotTo = this.locationList.find((x) => x.value == data.data.allotTo);
       this.addDcrTableForm.controls.allotTo.setValue(updatedAllotTo);
-      const updatedAllocateTo = this.userList.find((x) => x.name == data.data.allocateTo);
+      const updatedAllocateTo = this.userList.find((x) => x.value == data.data.allocateTo);
       this.addDcrTableForm.controls.allocateTo.setValue(updatedAllocateTo);
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }

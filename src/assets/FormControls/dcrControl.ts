@@ -394,7 +394,7 @@ export class DCRControl {
                     label: 'Entry By',
                     placeholder: 'Entry By',
                     type: 'text',
-                    value: localStorage.getItem("Username"),
+                    value: localStorage.getItem("UserName"),
                     Validations: [],
                     generatecontrol: false, disable: false
                 },

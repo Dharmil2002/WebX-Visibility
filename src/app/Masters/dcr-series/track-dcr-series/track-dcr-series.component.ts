@@ -96,8 +96,8 @@ export class TrackDcrSeriesComponent implements OnInit {
               srNo: index + 1
             };
           });
-          // Step 1: Filter records with bookCode = 'CN1234'
-          const filteredDataArray = dataWithSrno.filter((item) => item.bookCode === this.trackDcrForm.value.documentNumber && item.documentType === this.trackDcrForm.value.documentType.value);
+          // Step 1: Filter records with seriesFrom = 'CN1234'
+          const filteredDataArray = dataWithSrno.filter((item) => item.seriesFrom === this.trackDcrForm.value.documentNumber && item.documentType === this.trackDcrForm.value.documentType.value);
           if (filteredDataArray.length === 0) {
             Swal.fire({
               icon: "warning",

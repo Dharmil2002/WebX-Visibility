@@ -72,7 +72,17 @@ export class AddDcrSeriesControl {
                 value: '',
                 generatecontrol: true,
                 disable: false,
-                Validations: [],              
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Series From is required"
+                    },
+                    {
+                        name: "pattern",
+                        message: 'Length should be 7 and pattern should be: ZZZ9999',
+                        pattern: ''
+                    }
+                ],
 
             },
             {

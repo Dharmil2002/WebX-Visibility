@@ -1,10 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { forkJoin } from 'rxjs';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import Swal from 'sweetalert2';
-import { map } from 'rxjs/operators';
 import { AddDcrSeriesControl } from 'src/assets/FormControls/add-dcr-series';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
@@ -203,10 +201,9 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
   ngOnInit() {
     this.bindDropdown();
     this.getAllMastersData();
-
   }
 
-  // Get all dropdown data
+  //#region to get all dropdown data
   async getAllMastersData() {
     try {
       this.addDcrTableForm.controls.allocateTo.setValue("");
@@ -315,7 +312,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       console.error("Error in getAllMastersData:", error);
     }
   }
-
+  //#endregion
   // Handle function calls
   functionCallHandler($event) {
     let functionName = $event.functionName;     // name of the function , we have to call
@@ -327,7 +324,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     }
   }
 
-  // Save data
+  //#region to Save data
   async saveData() {
     clearValidatorsAndValidate(this.addDcrTableForm);
     // console.log(this.tableData);
@@ -370,6 +367,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       }
     });
   }
+  //#endregion
   cancel() {
     this.router.navigateByUrl('/Masters/DocumentControlRegister/TrackDCR');
   }
@@ -400,19 +398,23 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     this.addDcrFormControl = new AddDcrSeriesControl();
     this.jsonControlArray = this.addDcrFormControl.getAddDcrFormControls();
     this.addDcrTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.addDcrTableForm.controls["documentType"].setValue("dkt");
+    // this.addDcrTableForm.controls["documentType"].setValue("dkt");
   }
   //#endregion
   //#region to set series to.
   getSeriesTo() {
     // Get the 'seriesFrom' and 'totalLeaf' values from the form control
     const { seriesFrom, totalLeaf } = this.addDcrTableForm.value;
+    const match = seriesFrom.match(/([a-zA-Z]+)(\d+)/);
 
+    const extractedLetters = match[1];  // Will store "zzz"
+    const extractedNumber = match[2];   // Will store "9999"
     // Calculate the result by parsing 'seriesFrom' and 'totalLeaf' to numbers
-    const seriesFromNumber = parseInt(seriesFrom);
+    const seriesFromNumber = parseInt(extractedNumber);
+
     const totalLeafNumber = parseInt(totalLeaf);
     // getting seriesTo value from addition of seriesfrom and total leaf
-    const resultNumber = seriesFromNumber + totalLeafNumber;
+    const resultNumber = extractedLetters + (seriesFromNumber + totalLeafNumber);
     // setting in seriesTo its calculated value
     this.addDcrTableForm.controls.seriesTo.setValue(resultNumber);
   }
@@ -426,55 +428,55 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
 
       // Get the existing table data and the starting and ending series numbers from the form
       const tableData = this.tableData;
-      const startingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesFrom.value);
-      const endingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesTo.value);
+      // const startingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesFrom.value);
+      // const endingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesTo.value);
 
-      // Check for duplicates in the table data
-      const overlappingItem = this.tableData.find((item) => {
-        const seriesFrom = parseInt(item.seriesFrom);
-        const seriesTo = parseInt(item.seriesTo);
+      // // Check for duplicates in the table data
+      // const overlappingItem = this.tableData.find((item) => {
+      //   const seriesFrom = parseInt(item.seriesFrom);
+      //   const seriesTo = parseInt(item.seriesTo);
 
-        const isOverlap =
-          (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
-          (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
+      //   const isOverlap =
+      //     (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
+      //     (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
 
-        return isOverlap;
-      });
+      //   return isOverlap;
+      // });
 
-      // Check for duplicates in the existing data
-      const foundItem = this.dcrDetail.data.find((x) => {
-        const seriesFrom = parseInt(x.seriesFrom);
-        const seriesTo = parseInt(x.seriesTo);
+      // // Check for duplicates in the existing data
+      // const foundItem = this.dcrDetail.data.find((x) => {
+      //   const seriesFrom = parseInt(x.seriesFrom);
+      //   const seriesTo = parseInt(x.seriesTo);
 
-        const isOverlap =
-          (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
-          (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
+      //   const isOverlap =
+      //     (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
+      //     (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
 
-        return isOverlap;
-      });
+      //   return isOverlap;
+      // });
 
-      // If there's a duplicate, show an error message and exit
-      if (overlappingItem) {
-        const { seriesFrom, seriesTo } = overlappingItem;
-        Swal.fire({
-          icon: 'warning',
-          title: 'Warning',
-          text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
-          showConfirmButton: true,
-        });
-        return;
-      }
+      // // If there's a duplicate, show an error message and exit
+      // if (overlappingItem) {
+      //   const { seriesFrom, seriesTo } = overlappingItem;
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     title: 'Warning',
+      //     text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
+      //     showConfirmButton: true,
+      //   });
+      //   return;
+      // }
 
-      if (foundItem) {
-        const { seriesFrom, seriesTo } = foundItem;
-        Swal.fire({
-          icon: 'warning',
-          title: 'Warning',
-          text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
-          showConfirmButton: true,
-        });
-        return;
-      }
+      // if (foundItem) {
+      //   const { seriesFrom, seriesTo } = foundItem;
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     title: 'Warning',
+      //     text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
+      //     showConfirmButton: true,
+      //   });
+      //   return;
+      // }
       const delayDuration = 1000;
 
       // Simulate a delay using async/await to mimic a loading state
@@ -486,9 +488,11 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
         documentType: this.addDcrTableForm.value.documentType,
         businessType: this.addDcrTableForm.value.businessType?.name || '',
         bookCode: this.addDcrTableForm.value.bookCode,
-        seriesFrom: startingSeriesNo,
+        seriesFrom: this.addDcrTableForm.value.seriesFrom,
+        // : startingSeriesNo,
         totalLeaf: this.addDcrTableForm.value.totalLeaf,
-        seriesTo: endingSeriesNo,
+        seriesTo: this.addDcrTableForm.value.seriesTo,
+        //seriesTo: endingSeriesNo,
         allotTo: this.addDcrTableForm.value.allotTo?.name || '',
         allocateTo: this.addDcrTableForm.value.allocateTo?.name || '',
         type: this.addDcrTableForm.value.allocateTo?.type || '',
@@ -509,7 +513,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     }
   }
   //#endregion
-
+  //#region to bind dropdown
   bindDropdown() {
     const dcrPropertiesMapping = {
       businessType: { variable: "businessType", status: "businessTypeStatus" },
@@ -522,8 +526,8 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       dcrPropertiesMapping
     );
   }
-
-
+  //#endregion
+  //#region to set or remove data in table
   handleMenuItemClick(data) {
     this.fillTable(data);
   }
@@ -548,38 +552,33 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
   }
+  //#endregion
+  //#region to set pattern from json
   async getPattern() {
     try {
       const documentType = this.addDcrTableForm.value.documentType;
       const regexPattern = await this.masterService.getJsonFileDetails("regexPattern").toPromise();
       const matchingPattern = regexPattern.find(pattern => pattern.companyCode === this.companyCode && pattern.documentId === documentType);
-  
+
       if (!matchingPattern || !matchingPattern.required) {
         console.log("No matching patterns found.");
         return;
       }
-  
       const controlName = "seriesFrom"; // Change this to match your control's name
-      const control = this.addDcrTableForm.get(controlName); // Use `get` to access the FormControl
-  
+      const control = this.addDcrTableForm.get(controlName);
+
       if (control) {
         const customValidations = [
-          Validators.required, // Add the required validator
-          Validators.pattern(matchingPattern.regexPattern), // Add the pattern validator
+          Validators.required, // Add the required validator with its default error message
+          Validators.pattern(matchingPattern.regexPattern), // Add the pattern validator with its default error message
         ];
-  
-        // Set custom error messages
-        control.setErrors({
-          required: "Series From is required",
-          pattern: matchingPattern.message, // Custom message for the pattern validator
-        });
-  
+
+        // Set custom error messages for required and pattern validations
         control.setValidators(customValidations);
-  
-        // Call updateValueAndValidity to re-validate the control with the new validators and error messages
-      //  control.updateValueAndValidity();
-      console.log(control);
-      
+
+        control.updateValueAndValidity(); // Update the control's validity
+
+        // console.log(control);
       } else {
         console.log("Control not found.");
       }
@@ -588,6 +587,5 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       // Handle the error, e.g., display an error message to the user.
     }
   }
-  
-
+  //#endregion
 }

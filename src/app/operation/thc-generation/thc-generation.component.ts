@@ -462,14 +462,35 @@ export class ThcGenerationComponent implements OnInit {
     this.getShipmentDetails();
   }
 
-  async bindPrqData() {
+  async bindPrqData
+  () {
+    const prqDetail=this.prqDetail
+    console.log(prqDetail);
     const vehicleDetail = await this.vehicleStatusService.vehiclList(
       this.prqDetail?.prqNo
     );
-    this.thcTableForm.controls["vehicle"].setValue(this.prqDetail?.vehicleNo);
-    this.thcTableForm.controls["vendorType"].setValue("Market");
+    const vehno={
+      name:this.prqDetail?.vehicleNo,
+      value:this.prqDetail?.vehicleNo
+    }
+    const vendor={
+      name:vehicleDetail?.vendor||"",
+      value:vehicleDetail?.vendor||"",
+    }
+    this.thcTableForm.controls["vehicle"].setValue(vehno);
+    this.thcTableForm.controls["vendorType"].setValue(vehicleDetail?.vendorType||"");
+    this.thcTableForm.controls["vendorName"].setValue(vendor);
     this.thcTableForm.controls["route"].setValue(
       this.prqDetail?.fromToCity || ""
+    );
+    const fcity = this.prqDetail?.fromToCity.split('-')[0] || "";
+    console.log(fcity)
+    const tcity = this.prqDetail?.fromToCity.split('-')[1] || "";
+    this.thcTableForm.controls["fromCity"].setValue(
+      fcity
+    );
+    this.thcTableForm.controls["toCity"].setValue(
+      tcity
     );
     this.thcTableForm.controls["capacity"].setValue(
       this.prqDetail?.vehicleSize || this.prqDetail?.containerSize.split(" ")[0] || ""
@@ -547,9 +568,9 @@ export class ThcGenerationComponent implements OnInit {
       });
       this.tableData = includedDocketNumbers;
     }
-    this.thcTableForm.controls["vendorName"].setValue(
-      shipment ? shipment[0].vendorName : ""
-    );
+    // this.thcTableForm.controls["vendorName"].setValue(
+    //   shipment ? shipment[0].vendorName : ""
+    // );
     // Sum all the calculated actualWeights
   }
 
@@ -641,7 +662,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['toCity'].setValue(toCity);
     const vehicle = this.thcTableForm.controls['vehicle'].value?.value || this.thcTableForm.controls['vehicle'].value
     this.thcTableForm.controls['vehicle'].setValue(vehicle);
-    const vendorName = this.thcTableForm.controls['vendorName'].value?.value || this.thcTableForm.controls['vendorName'].value;
+    const vendorName = this.thcTableForm.controls['vendorName'].value?.name || this.thcTableForm.controls['vendorName'].value;
     this.thcTableForm.controls['vendorName'].setValue(vendorName);
     this.thcTableForm.controls['fromCity'].setValue(fromCity);
     this.thcTableForm.controls['toCity'].setValue(toCity);

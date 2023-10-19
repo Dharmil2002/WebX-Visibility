@@ -55,7 +55,6 @@ import { ThcGenerationComponent } from './thc-generation/thc-generation.componen
 import { ThcViewComponent } from './thc-summary/thc-view/thc-view.component';
 import { THCViewComponent } from './ViewPrint/thc-view/thc-view.component';
 import { WESTERNCARRIERSComponent } from './ViewPrint/westerncarriers/westerncarriers.component';
-import { NgxPrintModule } from "ngx-print";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { MastersModule } from "../Masters/masters.module";
 @NgModule({
@@ -114,7 +113,6 @@ import { MastersModule } from "../Masters/masters.module";
     MatDialogModule,
     MatSnackBarModule,
     MatSlideToggleModule,
-    NgxPrintModule,
     MastersModule
     
   ],

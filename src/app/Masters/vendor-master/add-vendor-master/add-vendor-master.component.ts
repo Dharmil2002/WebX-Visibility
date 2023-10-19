@@ -463,13 +463,10 @@ export class AddVendorMasterComponent implements OnInit {
       if (userlist.data.length > 0) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
-          title: `${errorMessage} already exists! Please try with another !`,
-          toast: true,
+          text: `${errorMessage} already exists! Please try with another !`,
           icon: "error",
-          showCloseButton: false,
-          showCancelButton: false,
+          title: 'error',
           showConfirmButton: true,
-          confirmButtonText: "OK"
         });
 
         // Reset the input field
@@ -501,7 +498,7 @@ export class AddVendorMasterComponent implements OnInit {
     this.isLoad = true;
     const tableData = this.tableData;
     const gstNumber = this.otherDetailForm.controls.gstNumber.value;
-    if (tableData.length > 0) {
+    if (tableData.length > 0) {debugger
       // Check if the gstNumber already exists in tableData
       const isDuplicate = this.tableData.some((item) => item.gstNumber === gstNumber);
 
@@ -509,13 +506,10 @@ export class AddVendorMasterComponent implements OnInit {
         this.otherDetailForm.controls['gstNumber'].setValue('');
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
-          title: 'GST Number already exists! Please try with another.',
-          toast: true,
-          icon: 'error',
-          showCloseButton: false,
-          showCancelButton: false,
+          text: 'GST Number already exists! Please try with another.',
+          icon: "error",
+          title: 'error',
           showConfirmButton: true,
-          confirmButtonText: 'OK'
         });
         this.tableLoad = false;
         this.isLoad = false;
@@ -586,13 +580,10 @@ export class AddVendorMasterComponent implements OnInit {
           }`;
       });
       Swal.fire({
-        title: 'This Email is not valid. Please try with another!',
-        toast: true,
-        icon: 'error',
-        showCloseButton: false,
-        showCancelButton: false,
+        text: 'This Email is not valid. Please try with another!',
+        icon: "error",
+        title: 'error',
         showConfirmButton: true,
-        confirmButtonText: 'OK'
       });
       this.vendorTableForm.controls['emailId'].setValue(validEmails.join(','))
     }

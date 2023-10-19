@@ -19,14 +19,14 @@
                 </div>
                 <div style="display: flex;">
                     <div
-                        style="border-top: 1px solid gainsboro; padding: 5px; width: 30%; box-sizing: border-box; display: flex;  border-right: 1px solid gainsboro;">
+                        style="border-top: 1px solid gainsboro; padding: 5px; width: 45%; box-sizing: border-box; display: flex;  border-right: 1px solid gainsboro;">
                         <p class="m-0 p-0" style=" font-weight: bold;">Email: </p>
-                        <p class="m-0 p-0 px-1"></p>
+                        <p class="m-0 p-0 px-1">{{JsonData.Customer_Emails}}</p>
                     </div>
                     <div
-                        style="border-top: 1px solid gainsboro; padding: 5px; width: 40%; box-sizing: border-box; display: flex;  border-right: 1px solid gainsboro;">
+                        style="border-top: 1px solid gainsboro; padding: 5px; width: 25%; box-sizing: border-box; display: flex;  border-right: 1px solid gainsboro;">
                         <p class="m-0 p-0" style=" font-weight: bold;">CIN: </p>
-                        <p class="m-0 p-0 px-1"></p>
+                        <p class="m-0 p-0 px-1">{{JsonData.CINnumber}}</p>
                     </div>
                     <div
                         style="border-top: 1px solid gainsboro; padding: 5px; width: 30%; box-sizing: border-box; display: flex;">
@@ -124,7 +124,7 @@
                     </td>
                 </tr>
                 <tr style="width: 100%;">
-                    <td class="borde-1" style="font-weight: bold; width: 30%;"></td>
+                    <td class="borde-1 px-1" style="font-weight: bold; width: 30%;">{{JsonData.deliveryAddress}}</td>
                     <td class="borde-1" style="width: 30%;">
                         <p class="m-0 p-0 px-2" style="font-weight: bold; text-align: right;">GST PAYABLE</p>
                     </td>
@@ -226,7 +226,7 @@
                             <tr style="width: 100%;">
                                 <td class="px-1" style="width: 40%; border-right: 1px solid black; text-align: left;">
                                     CONTAINER No.</td>
-                                <td class="px-1" style="width: 60%;" rowspan="2"></td>
+                                <td class="px-1" style="width: 60%;" rowspan="2">{{JsonData.containerDetail?.containerNumber}}</td>
                             </tr>
                         </table>
                     </td>
@@ -282,14 +282,14 @@
                             </tr>
                             <tr style="width: 100%;">
                                 <td class="px-1"
-                                    style=" border-right: 1px solid black; width: 20%; text-align: center;">Net
+                                    style=" border-right: 1px solid black; width: 20%; text-align: center;">Net (KG)
                                 </td>
                                 <td class="px-1"
                                     style=" border-right: 1px solid black; width: 20%; text-align: center;">
-                                    Gross</td>
+                                    Gross (KG)</td>
                                 <td class="px-1"
                                     style=" border-right: 1px solid black; width: 20%; text-align: center;">
-                                    Charged</td>
+                                    Charged (KG)</td>
                                 <td class="px-1" style=" width: 20%;"></td>
                             </tr>
                         </table>
@@ -313,19 +313,19 @@
                     <td class="borde-1 width-100">
                         <table style="width: 100%;">
                             <tr style="width: 100%;">
-                                <td class="px-1" style=" border-right: 1px solid black; width: 35%;"></td>
-                                <td class="px-1" style="width: 65%;"></td>
+                                <td class="px-1" style=" border-right: 1px solid rgb(20, 20, 20); width: 35%;">{{JsonData.invoiceDetails.noofPkts}}</td>
+                                <td class="px-1" style="width: 65%;">{{JsonData.invoiceDetails.materialName}}</td>
                             </tr>
                         </table>
                     </td>
                     <td colspan="2" class="borde-1 width-100">
                         <table style="width: 100%;">
                             <tr style="width: 100%;">
-                                <td class="px-1" style=" border-right: 1px solid black; width: 20%;"></td>
-                                <td class="px-1" style=" border-right: 1px solid black; width: 20%;"></td>
-                                <td class="px-1" style=" border-right: 1px solid black; width: 20%;"></td>
-                                <td class="px-1" style=" border-right: 1px solid black; width: 20%;"></td>
-                                <td class="px-1" style=" width: 20%;"></td>
+                                <td class="px-1" style=" border-right: 1px solid black; width: 20%;">{{JsonData.invoiceDetails.actualWeight}}</td>
+                                <td class="px-1" style=" border-right: 1px solid black; width: 20%;">{{JsonData.grossAmount}}</td>
+                                <td class="px-1" style=" border-right: 1px solid black; width: 20%;">{{JsonData.invoiceDetails.chargedWeight}}</td>
+                                <td class="px-1" style=" border-right: 1px solid black; width: 20%;">{{JsonData.freight_rate + ' ₹'}}</td>
+                                <td class="px-1" style=" width: 20%;">{{JsonData.totalAmount + ' ₹'}}</td>
                             </tr>
                         </table>
                     </td>
@@ -335,7 +335,7 @@
                                 <td class="px-1" style="border-bottom: 1px solid black; height: 30px; width: 100%;">
                                     <div style="display: flex;">
                                         <p class="px-1">MR No. Date:</p>
-                                        <p></p>
+                                        <p>{{JsonData.docketDate | date: 'dd/MM/yyyy'}}</p>
                                     </div>
                                 </td>
                             </tr>
@@ -343,7 +343,7 @@
                                 <td class="px-1" style="border-bottom: 1px solid black; height: 30px; width: 100%;">
                                     <div style="display: flex;">
                                         <p class="px-1">Bill No. & Date:</p>
-                                        <p></p>
+                                        <p>{{JsonData.docketDate | date: 'dd/MM/yyyy'}}</p>
                                     </div>
                                 </td>
                             </tr>
@@ -376,7 +376,7 @@
                                 <td class="px-1" style=" border-right: 1px solid black; width: 20%;"></td>
                                 <td class="px-1" style=" border-right: 1px solid black; width: 20%; font-weight: bold;">
                                     Total</td>
-                                <td class="px-1" style=" width: 20%;"></td>
+                                <td class="px-1" style=" width: 20%;">{{JsonData.totalAmount + ' ₹'}}</td>
                             </tr>
                         </table>
                     </td>
@@ -399,7 +399,7 @@
                     <td colspan="3" class="borde-1" style="border-right: none;">
                         <div style="display: flex;">
                             <p class="px-1">TRUCK/TRAILER No.</p>
-                            <p class="px-1"></p>
+                            <p class="px-1">{{JsonData.vehicleNo}}</p>
                         </div>
                     </td>
                 </tr>

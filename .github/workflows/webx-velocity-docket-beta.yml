@@ -8,7 +8,7 @@ on:
 
 env:
   DOCKER_REGISTRY: velocitycontainers.azurecr.io
-  IMAGE_NAME: dms-web-beta
+  IMAGE_NAME: webx-tms-web
   TAG: ${{ github.sha }}
 
 jobs:

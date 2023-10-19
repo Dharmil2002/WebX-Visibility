@@ -141,7 +141,7 @@ export class DocketListComponent implements OnInit {
     }
   }
   goBack(tabIndex: string): void {
-    this.router.navigate(["/dashboard/GlobeDashboardPage"], {
+    this.router.navigate(["/dashboard/Index"], {
       queryParams: { tab: tabIndex },
       state: [],
     });

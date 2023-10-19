@@ -115,6 +115,25 @@
         </mat-select>
       </mat-form-field>
 
+      <!-- Days time Field -->
+      <div class="row" *ngIf="(formItem.type == 'dayhour') && formItem.generatecontrol === true">
+        <div class="col-6">
+          <mat-form-field appearance="outline">
+            <mat-label class="fontbold">{{formItem.label}}</mat-label>
+            <input matInput type="number" formControlName="{{formItem.name}}" placeholder="{{formItem.label}}"
+            [disabled]="formItem.disable">
+          </mat-form-field>
+        </div>
+        <div class="col-6">
+          <mat-form-field appearance="outline">
+            <mat-label class="fontbold">{{formItem.additionalData.label}}</mat-label>
+            <input matInput type="number" formControlName="{{formItem.additionalData.fieldName}}" placeholder="{{formItem.additionalData.label}}"
+            [disabled]="formItem.disable">
+          </mat-form-field>
+        </div>
+      </div>
+
+
       <!-- Download Icon -->
       <div style="margin-top: 28px!important;" class="example-full-width" appearance="outline"
         *ngIf="formItem.type=='Icon' && formItem.generatecontrol===true">
@@ -233,7 +252,8 @@
         <mat-label>{{formItem.label}}</mat-label>&nbsp;
         <mat-radio-group [formControlName]="formItem.name"
           (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
-          <mat-radio-button style=" margin: auto 5px; margin-top: 15px;" *ngFor="let option of formItem.value" [value]="option.value">
+          <mat-radio-button style=" margin: auto 5px; margin-top: 15px;" *ngFor="let option of formItem.value"
+            [value]="option.value">
             {{ option.name }}
           </mat-radio-button>
         </mat-radio-group>

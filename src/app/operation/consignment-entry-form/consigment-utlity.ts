@@ -37,3 +37,14 @@ export async function containorConsigmentDetail(operationService) {
 
   return dropdown;
 }
+export const validationAutocomplete=
+  [
+    {
+        name: "invalidAutocompleteObject",
+        message: "Choose proper value",
+    },
+    {
+        name: "autocomplete",
+    },
+    ]
+

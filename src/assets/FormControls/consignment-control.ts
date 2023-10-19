@@ -35,6 +35,7 @@ export class ConsignmentControl {
         ],
         additionalData: {
           minDate: new Date("01 Jan 2023"),
+          maxDate: new Date(),
           metaData: "Basic"
         },
       },
@@ -148,7 +149,7 @@ export class ConsignmentControl {
           },
         ],
         functions: {
-          onModel: "getPincodeDetail",
+          onModel: "",
         },
         additionalData: {
           showNameAndValue: false,
@@ -269,7 +270,8 @@ export class ConsignmentControl {
           { value: "Own", name: "Own" },
           { value: "Attached", name: "Attached" },
           { value: "Rail", name: "Rail" },
-          { value: "Market", name: "Market" }
+          { value: "Market", name: "Market" },
+          { value: "Service Provider", name: "Service Provider" }
         ], Validations: [], functions: {
           onSelection: "vendorFieldChanged"
         },
@@ -286,8 +288,10 @@ export class ConsignmentControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [
-        ],
+          Validations: [  {
+            name: "required",
+            message: "Vendor Name is required",
+          }],
         additionalData: {
           showNameAndValue: true,
           metaData: "Basic",
@@ -315,10 +319,13 @@ export class ConsignmentControl {
         },
       },
       {
-        name: 'edd', label: 'Transit Day Hour', placeholder: 'EDD', type: 'time',
-        value: docketDetail.edd, Validations: [], generatecontrol: true, disable: false,
+        name: 'tran_day', label: 'Transit Day', placeholder: 'Transit Day Hour', type: 'dayhour',
+        value: docketDetail.tran_day,
+        Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
+          label: 'Transit hour',
+          fieldName:"tran_hour"
         },
       },
       {
@@ -529,22 +536,21 @@ export class ConsignmentControl {
         additionalData: {
           metaData: "consignee"
         }
+      },
+      {
+        name: 'tran_hour',
+        label: '',
+        placeholder: '',
+        type: '',
+        value: docketDetail.tran_hour,
+        Validations: [],
+        generatecontrol: false, disable: false,
+        additionalData: {
+          metaData: "consignee"
+        }
       }
     ]
     this.containordetail = [
-      {
-        name: "Company_file",
-        label: "Select File",
-        placeholder: "",
-        type: "file",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [".xls, .xlsx, .csv"],
-        functions: {
-          onChange: "selectedFile",
-        },
-      },
       {
         name: "containerNumber",
         label: "Container No",
@@ -599,6 +605,31 @@ export class ConsignmentControl {
         generatecontrol: true,
         disable: true,
       },
+      {
+        name: "Company_file",
+        label: "Select File",
+        placeholder: "",
+        type: "file",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [".xls, .xlsx, .csv"],
+        functions: {
+          onChange: "selectedFile",
+        },
+      },
+     {
+          name: "Download_Icon",
+          label: "Dowload Containor Template",
+          placeholder: "",
+          type: "filelink",
+          value: "assets/Download/temp-container.xlsx",
+          generatecontrol: true,
+          disable: false,
+          Validations: [],
+          functions: {
+          },
+        },
     ]
     this.invoiceDetail = [
       {
@@ -769,7 +800,7 @@ export class ConsignmentControl {
         }],
         generatecontrol: true,
         disable: false,
-      },
+      }
     ]
   }
   getConsignmentControlControls() {
@@ -838,18 +869,20 @@ export class FreightControl {
         }
         ],
         functions: {
-          onModel: "calculateFreight"
+          onModel: "calculateGross"
         }
         ,
         generatecontrol: true, disable: false
       },
       {
         name: 'otherAmount', label: 'Other Amount (Rs)', placeholder: 'Other Amount', type: 'mobile-number',
-        value: docketDetail.otherAmount, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.otherAmount, Validations: [], generatecontrol: true, functions: {
+          onModel: "calculateGross"
+        }, disable: false
       },
       {
         name: 'grossAmount', label: 'Gross Amount (Rs)', placeholder: 'Gross Amount', type: 'mobile-number',
-        value: docketDetail.grossAmount, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.grossAmount, Validations: [], generatecontrol: true, disable: true
       },
       {
         name: 'rcm', label: 'RCM', placeholder: 'RCM', type: 'text',

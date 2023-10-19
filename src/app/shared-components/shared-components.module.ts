@@ -50,8 +50,6 @@ import { XlsxPreviewPageComponent } from './xlsx-preview-page/xlsx-preview-page.
 import { MatTableExporterModule } from 'mat-table-exporter';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { GenericViewPrintComponent } from './Generic View Print/generic-view-print.component';
-import { NgxBarcode6Module } from "ngx-barcode6";
-import { NgxPrintModule } from "ngx-print";
 import { LazyloadingeditabletableComponent } from './lazyloadingeditabletable/lazyloadingeditabletable.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
@@ -103,8 +101,6 @@ const MY_DATE_FORMAT = {
     MatRadioModule,
     MatTableExporterModule,
     DragDropModule,
-    NgxBarcode6Module,
-    NgxPrintModule,
     TableVirtualScrollModule,
     ScrollingModule
   ],

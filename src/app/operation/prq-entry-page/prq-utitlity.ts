@@ -106,11 +106,11 @@ export async function customerFromApi(masterService) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "customer_detail",
-        filter:{}
+        filter:{customerLocations:branch}
     }
     try {
         const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
-        const result = res?.data?.filter(x => x.customerLocations.includes(branch))?.map(x => ({ value: x.customerCode, name: x.customerName ,pinCode:x.PinCode,mobile:x.customer_mobile})) ?? null;
+        const result = res?.data.map(x => ({ value: x.customerCode, name: x.customerName ,pinCode:x.PinCode,mobile:x.customer_mobile})) ?? null;
         return result.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
     } catch (error) {
         console.error("An error occurred:", error);

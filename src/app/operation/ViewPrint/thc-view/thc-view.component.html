@@ -35,14 +35,14 @@
                                         <td style="font-size: 16px; text-align: right;">
                                             <span style="margin-right: 40px;">Created On</span>
                                             <span
-                                                style="margin-right: 43px;font-weight:bold;">{{thcNestedData.updateDate}}</span>
+                                                style="margin-right: 43px;font-weight:bold;">{{thcNestedData.updateDate | date:'dd/MM/yyyy' }}</span>
                                             <span style="margin-right: 45px;">Origin</span>
                                             <span
                                                 style="font-weight: bold; text-transform: uppercase;">{{thcNestedData.origin}}</span>
                                             <br />
 
-                                            <span style="margin-right: 229px;">Mode</span>
-                                            <span style="margin-right: 43px;font-weight:bold;"> </span>
+                                            <span style="margin-right: 204px;">Mode</span>
+                                            <span style="margin-right: 43px;font-weight:bold;">  </span>
                                             <span style="margin-right: 78px;">Dest.</span>
                                             <span
                                                 style="font-weight: bold; text-transform: uppercase;">{{thcNestedData.dest}}</span>
@@ -128,7 +128,7 @@
                                                         Fulfillment
                                                     </span><br />
                                                     <span style="color: #8C001A;font-size: 20px;font-weight: bold;">By
-                                                        Vendor : {{thcNestedData.vendorName}}</span>
+                                                        Vendor : {{thcNestedData.vendorName_code}}</span>
                                                 </div>
                                                 <tbody>
                                                     <tr>
@@ -232,13 +232,13 @@
                             </div>
                             <br />
                             <span style="font-size: 18px;color:#464855;font-weight: bold;">Movement Summary</span><br />
-                            <span style="font-size: 20px;color:#8C001A;font-weight: bold;"></span>
+                            <span style="font-size: 20px;color:#8C001A;font-weight: bold;">{{thcNestedData.route}}</span>
                             <br /><br />
 
                             <table style="width: 100%;" border="0" cellpadding="0" cellspacing="0">
                                 <tr style="color:#6b6f82;">
                                     <th>Location</th>
-                                    <th>{{labelArrival}}</th>
+                                    <th>ETA</th>
                                     <th>Departed</th>
                                     <th>Manifest</th>
                                     <th>CEWB</th>
@@ -250,22 +250,20 @@
                                 <tr style="font-size:16px;">
                                     <td style="font-weight:bold;">{{thcNestedData.origin}}</td>
                                     <td>
-                                        <div></div>
-                                        <div style="color: red;"></div>
+                                        <div>{{ETA | date:'dd/MM/yyyy HH:mm'}}</div>
+                                        <div style="color: red;"> </div>
                                     </td>
                                     <td>
-                                        <div> </div>
-                                        <div style="color: Green;"></div>
+                                        <div>{{Departed | date:'dd/MM/yyyy HH:mm'}}</div>
                                     </td>
                                     <td>
-                                        <div> </div>
-                                        <div style="color: darkgray;"> </div>
+                                        <div>  </div>
                                     </td>
                                     <td></td>
                                     <td></td>
-                                    <td>0</td>
-                                    <td>0</td>
-                                    <td>0</td>
+                                    <td>{{thcNestedData.docket.length}}</td>
+                                    <td>{{thcNestedData.invoiceDetails.noofPkts}}</td>
+                                    <td>{{thcNestedData.invoiceDetails.chargedWeight}}</td>
                                 </tr>
                                 <tr style="font-size:16px;">
                                     <td style="font-weight:bold;">{{thcNestedData.dest}}</td>
@@ -273,10 +271,7 @@
                                         <div></div>
                                         <div></div>
                                     </td>
-                                    <td>
-                                        <div></div>
-                                        <div style="color: Green;"></div>
-                                    </td>
+                                    <td> </td>
                                     <td>
                                         <div></div>
                                         <div style="color: darkgray;"></div>
@@ -294,9 +289,9 @@
                                         Load Summary
                                     </td>
                                     <td style="background-color: #dcdada;font-weight: bold;"></td>
-                                    <td style="background-color: #dcdada;font-weight: bold;">0</td>
-                                    <td style="background-color:#dcdada;font-weight:bold;">0</td>
-                                    <td style="background-color:#dcdada;font-weight:bold;">0</td>
+                                    <td style="background-color: #dcdada;font-weight: bold;">{{thcNestedData.docket.length}}</td>
+                                    <td style="background-color:#dcdada;font-weight:bold;">{{thcNestedData.invoiceDetails.noofPkts}}</td>
+                                    <td style="background-color:#dcdada;font-weight:bold;">{{thcNestedData.invoiceDetails.chargedWeight}}</td>
                                 </tr>
                             </table>
                             <br />
@@ -313,12 +308,12 @@
                                                 <td><span>Updated by</span><br /></td>
                                             </tr>
                                             <tr style="font-size:16px;">
-                                                <td><span>{{thcNestedData.updateDate}}</span></td>
+                                                <td><span>{{thcNestedData.updateDate | date:'dd/MM/yyyy HH:mm'}}</span></td>
                                                 <td><span>{{thcNestedData.closingBranch}}</span></td>
                                                 <td><span>{{thcNestedData.updateBy}}</span></td>
                                             </tr>
                                             <tr style="font-size:16px;">
-                                                <td><span>00:00</span></td>
+                                                <td><span> </span></td>
                                                 <td><span> </span></td>
                                                 <td><span> </span></td>
                                             </tr>

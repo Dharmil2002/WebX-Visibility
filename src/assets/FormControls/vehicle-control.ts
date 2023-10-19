@@ -138,7 +138,7 @@ export class VehicleControls {
                 },
                 {
                     name: 'route', label: "Routes", placeholder: "Search and select route", type: 'dropdown',
-                    value: 'vehicleTable.route', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                    value: vehicleTable.route, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
                         {
                             name: "required",

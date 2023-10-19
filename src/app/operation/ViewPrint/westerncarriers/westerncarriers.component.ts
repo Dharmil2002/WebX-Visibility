@@ -49,10 +49,14 @@ export class WESTERNCARRIERSComponent implements OnInit {
     if(Res.success && Res.data.length > 0){
       this.JsonData = Res.data[0];
       const invoiceDetails = this.JsonData.invoiceDetails[0]
+      const containerDetail = this.JsonData.containerDetail[0]
+
       this.JsonData = {
         ...this.JsonData,
         invoiceNo:invoiceDetails.invoiceNo,
         ewayBillNo:invoiceDetails.ewayBillNo,
+        invoiceDetails:invoiceDetails,
+        containerDetail:containerDetail
       }
       this.getCustomer()
     }
@@ -67,12 +71,15 @@ export class WESTERNCARRIERSComponent implements OnInit {
     const Res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
+      console.log('Res' ,Res)
       if(Res.success && Res.data.length > 0){
         const GSTdetails = Res.data[0].GSTdetails[0]
         this.JsonData = {
           ...this.JsonData,
           PANnumber:Res.data[0].PANnumber,
-          gstNo:GSTdetails.gstNo
+          gstNo:GSTdetails.gstNo,
+          CINnumber:Res.data[0].CINnumber,
+          Customer_Emails:typeof(Res.data[0].Customer_Emails)=='string'?Res.data[0].Customer_Emails:Res.data[0].Customer_Emails[0],
         }
       this.showView=true
 

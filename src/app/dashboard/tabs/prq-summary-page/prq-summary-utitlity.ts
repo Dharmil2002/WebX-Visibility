@@ -1,5 +1,4 @@
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
-
 export async function getPrqDetailFromApi(masterServices) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),

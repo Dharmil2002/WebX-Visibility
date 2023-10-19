@@ -158,7 +158,6 @@ export class ThcSummaryComponent implements OnInit {
   openExternalWindow(data){
 
     const THC = data.tripId
-    console.log("THCDta", data);
     const url = `${window.location.origin}/#/Operation/thc-view?THC=${THC}`;
     window.open(url,'','width=1500,height=800');
   }

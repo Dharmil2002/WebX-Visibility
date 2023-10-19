@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
   providedIn: "root",
 })
 export class PrqService {
+  branchCode = localStorage.getItem("Branch");
   vehicleDetail: any;
   statusActions = {
     "0": ["Confirm", "Reject", "Modify"],
@@ -171,7 +172,7 @@ export class PrqService {
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "prq_detail",
-      filter: {},
+      filter: {prqBranch:this.branchCode},
     };
 
     // Make an asynchronous request to the API using masterMongoPost method

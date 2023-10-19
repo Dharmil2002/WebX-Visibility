@@ -117,11 +117,12 @@ export class AddVehicleMasterComponent implements OnInit {
       this.vehicleTable = new vehicleModel({})
     }
     this.initializeFormControl()
+    this.vehicleTableForm.controls["vendorType"].setValue(this.vehicleTable.vendorType);
   }
 
 
   ngOnInit(): void {
-    this.getDropDownDataVendor();
+    // this.getDropDownDataVendor();
     this.getDropDownData();
     this.getDataAndPopulateForm();
     this.getAllMastersData();
@@ -169,25 +170,25 @@ export class AddVehicleMasterComponent implements OnInit {
     this.vehicleTableForm = formGroupBuilder(this.fb, [this.jsonControlVehicleArray]);
   }
 
-  getDropDownDataVendor() {
-    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-      const {
-        vendorTypeDropdown,
-      } = res;
-      this.vendorTypeData = vendorTypeDropdown;
-      if (this.isUpdate) {
-        this.vendorTypDetail = this.findDropdownItemByName(this.vendorTypeData, this.vehicleTable.vendorType);
-        this.vehicleTableForm.controls.vendorType.setValue(this.vendorTypDetail);
-      }
-      const filterParams = [
-        [this.jsonControlVehicleArray, this.vendorTypeData, this.vendorType, this.vendorTypeStatus],
-      ];
+  // getDropDownDataVendor() {
+  //   this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
+  //     const {
+  //       vendorTypeDropdown,
+  //     } = res;
+  //     this.vendorTypeData = vendorTypeDropdown;
+  //     if (this.isUpdate) {
+  //       this.vendorTypDetail = this.findDropdownItemByName(this.vendorTypeData, this.vehicleTable.vendorType);
+  //       this.vehicleTableForm.controls.vendorType.setValue(this.vendorTypDetail);
+  //     }
+  //     const filterParams = [
+  //       [this.jsonControlVehicleArray, this.vendorTypeData, this.vendorType, this.vendorTypeStatus],
+  //     ];
 
-      filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
-        this.filter.Filter(jsonControlArray, this.vehicleTableForm, dropdownData, formControl, statusControl);
-      });
-    });
-  }
+  //     filterParams.forEach(([jsonControlArray, dropdownData, formControl, statusControl]) => {
+  //       this.filter.Filter(jsonControlArray, this.vehicleTableForm, dropdownData, formControl, statusControl);
+  //     });
+  //   });
+  // }
 
   //#region
   getDropDownData() {
@@ -383,19 +384,19 @@ export class AddVehicleMasterComponent implements OnInit {
   }
   //#endregion
 
-  vendorFieldChanged() {
+  // vendorFieldChanged() {
 
-    const vendorType = this.vehicleTableForm.value.vendorType;
-    const vendorDetail = this.vendorDetailList.filter((x) => x.
-      type.toLowerCase() == vendorType.toLowerCase());
-    this.filter.Filter(
-      this.jsonControlVehicleArray,
-      this.vehicleTableForm,
-      vendorDetail,
-      this.vendorName,
-      this.vendorNameStatus
-    );
-  }
+  //   const vendorType = this.vehicleTableForm.value.vendorType;
+  //   const vendorDetail = this.vendorDetailList.filter((x) => x.
+  //     type.toLowerCase() == vendorType.toLowerCase());
+  //   this.filter.Filter(
+  //     this.jsonControlVehicleArray,
+  //     this.vehicleTableForm,
+  //     vendorDetail,
+  //     this.vendorName,
+  //     this.vendorNameStatus
+  //   );
+  // }
 
   //#region
   autofillDropdown() {
@@ -407,8 +408,8 @@ export class AddVehicleMasterComponent implements OnInit {
       this.vendorData = this.venNameDet.find((x) => x.name == this.vehicleTable.vendorName);
       this.vehicleTableForm.controls.vendorName.setValue(this.vendorData);
 
-      this.venTypeData = this.venTypeDet.find((x) => x.name == this.vehicleTable.vendorType);
-      this.vehicleTableForm.controls.vendorType.setValue(this.venTypeData);
+      // this.venTypeData = this.venTypeDet.find((x) => x.name == this.vehicleTable.vendorType);
+      // this.vehicleTableForm.controls.vendorType.setValue(this.venTypeData);
 
       this.RouteData = this.routeDet.find((x) => x.name == this.vehicleTable.route);
       this.vehicleTableForm.controls.route.setValue(this.RouteData);
@@ -491,7 +492,7 @@ export class AddVehicleMasterComponent implements OnInit {
     const formValue = this.vehicleTableForm.value;
     const controlNames = [
       "vehicleType",
-      "vendorType",
+      // "vendorType",
       "vendorName",
       "route",
       "ftlTypeDesc"];

@@ -116,7 +116,7 @@ export class thcControl {
                         }],
                     functions: {},
                     additionalData: {
-                        showNameAndValue: true,
+                        showNameAndValue: false,
                         metaData: "Basic"
                     }
                 },

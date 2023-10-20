@@ -2,7 +2,7 @@
   <!-- Eway Bill Verfication -->
   <div *ngIf="ewayBill">
     <form [formGroup]="invoiceTableForm">
-      <app-form-webxpress [form]="invoiceTableForm" [formData]="jsonEwayBill"
+      <app-form-webxpress [form]="invoiceTableForm"  [formData]="jsonEwayBill"
         (functionCallEmitter)="functionCallHandler($event)" [submit]="ewayBillButton" [showSaveAndCancelButton]="true"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
@@ -14,41 +14,28 @@
   <!-- End -->
   <!--  Basic Detail-->
   <div *ngIf="!ewayBill">
-    <hr>
-    <div
-      style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
-      <h3 style="font-size: 1.5rem; padding: 5px 0px;">Basic Detail</h3>
-    </div>
     <form [formGroup]="consignmentTableForm">
-      <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayBasic"
+      <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Basic Detail'" [formData]="jsonControlArrayBasic"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
     </form>
     <!-- End -->
-
+  <!-- fleet Detail -->
+  <div *ngIf="marketVendor">
+   <app-add-fleet-master [thc]="true"></app-add-fleet-master>
+  </div>
     <!-- Consignor Detail -->
-    <hr>
-    <div
-      style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
-      <h3 style="font-size: 1.5rem; padding: 5px 0px;">Consignor Detail</h3>
-    </div>
     <form [formGroup]="consignmentTableForm">
-      <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayConsignor"
+      <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignor Detail'" [formData]="jsonControlArrayConsignor"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
     </form>
     <!-- End -->
-
     <!-- Consignee Detail -->
-    <hr>
-    <div
-      style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
-      <h3 style="font-size: 1.5rem; padding: 5px 0px;">Consignee Detail</h3>
-    </div>
     <form [formGroup]="consignmentTableForm">
-      <app-form-webxpress [form]="consignmentTableForm" [formData]="jsonControlArrayConsignee"
+      <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignee Detail'" [formData]="jsonControlArrayConsignee"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
@@ -57,13 +44,8 @@
 
     <!--  Container Detail-->
     <div *ngIf="contFlag">
-    <hr>
-    <div 
-      style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
-      <h3 style="font-size: 1.5rem; padding: 5px 0px;">Container Detail</h3>
-    </div>
     <form [formGroup]="containerTableForm">
-      <app-form-webxpress [form]="containerTableForm" [formData]="jsonContainerDetail"
+      <app-form-webxpress [form]="containerTableForm" [FormTitle]="'Container Detail'" [formData]="jsonContainerDetail"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
@@ -95,7 +77,7 @@
       <h3 style="font-size: 1.5rem; padding: 5px 0px;">Invoice Details</h3>
     </div>
     <form [formGroup]="invoiceTableForm">
-      <app-form-webxpress [form]="invoiceTableForm" [formData]="jsonInvoiceDetail"
+      <app-form-webxpress [form]="invoiceTableForm" [FormTitle]="'Invoice Details'" [formData]="jsonInvoiceDetail"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
@@ -127,7 +109,7 @@
       <h3 style="font-size: 1.5rem; padding: 5px 0px;">Freight Detail</h3>
     </div>
     <form [formGroup]="FreightTableForm">
-      <app-form-webxpress [form]="FreightTableForm" [formData]="jsonControlArray"
+      <app-form-webxpress [form]="FreightTableForm"  [FormTitle]="'Freight Details'" [formData]="jsonControlArray"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>

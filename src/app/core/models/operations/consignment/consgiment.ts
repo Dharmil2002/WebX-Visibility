@@ -55,6 +55,7 @@ export class DocketDetail {
     tran_day: string
     tran_hour: string
     actualWeight: number
+    vehicleDetail:any
     invoiceDetails: InvoiceDetail[]
     containerDetail: ContainerDetail[]
 
@@ -142,3 +143,4 @@ export class ContainerDetail {
     invoice: boolean
     actions: ['Edit', 'Remove']
 }
+

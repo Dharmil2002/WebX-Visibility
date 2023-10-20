@@ -74,7 +74,7 @@ export class thcControl {
                 {
                     name: "vendorType",
                     label: "Vendor Type",
-                    placeholder: "VehicleType",
+                    placeholder: "Vendor Type",
                     type: view ? 'text' : 'Staticdropdown',
                     value: [
                         { value: "Own", name: "Own" },

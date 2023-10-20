@@ -27,7 +27,6 @@ export class THCViewComponent implements OnInit {
 
         private masterService: MasterService,
         private vehicleService: VehicleService,
-        private movementService: VehicleService,
         private renderer: Renderer2,
         private router: ActivatedRoute
     ) {

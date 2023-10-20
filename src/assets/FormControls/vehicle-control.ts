@@ -10,7 +10,7 @@ export class VehicleControls {
         this.vehicleDetailsControl =
             [
                 {
-                    name: 'vehicleNo', label: "Vehicle Number", placeholder: "Enter Vehicle Number", type: 'text', value: vehicleTable.vehicleNo, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: isUpdate ? true : false,
+                    name: 'vehicleNo', label: "Vehicle Number", placeholder: "Enter Vehicle Number", type: 'government-id', value: vehicleTable.vehicleNo, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: isUpdate ? true : false,
                     Validations: [
                         {
                             name: "required",
@@ -18,7 +18,7 @@ export class VehicleControls {
                         },
                         {
                             name: "pattern",
-                            message: "",
+                            message: "Please enter ",
                             pattern: '^[A-Z][A-Z0-9]+$'
                         }
                     ],

@@ -175,7 +175,20 @@ export class VehicleTypeControl {
                 generatecontrol: false,
                 disable: false
 
-            }
+            },
+            {
+                name: 'updatedDate',
+                label: ' ',
+                placeholder: ' ',
+                type: 'date',
+                value: new Date(), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
         ],
             this.capacityInfoArray = [
                 // {

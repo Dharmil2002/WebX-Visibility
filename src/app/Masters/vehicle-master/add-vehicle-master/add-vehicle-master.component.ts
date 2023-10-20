@@ -299,6 +299,7 @@ export class AddVehicleMasterComponent implements OnInit {
       }));
 
       const venNameDet = mergedData.venNameData
+        .filter(element => element.isActive === true) // Filter only active elements
         .map(element => ({
           name: element.vendorName.toString(),
           value: element.vendorCode.toString(),
@@ -321,7 +322,7 @@ export class AddVehicleMasterComponent implements OnInit {
           });
         }
       });
-    
+
       const FTLtype = mergedData.fltType.filter(item => item.codeType === "FTLTYP").
         map((x) => {
           { return { name: x.codeDesc, value: x.codeId } }
@@ -384,19 +385,20 @@ export class AddVehicleMasterComponent implements OnInit {
   }
   //#endregion
 
-  // vendorFieldChanged() {
-
-  //   const vendorType = this.vehicleTableForm.value.vendorType;
-  //   const vendorDetail = this.vendorDetailList.filter((x) => x.
-  //     type.toLowerCase() == vendorType.toLowerCase());
-  //   this.filter.Filter(
-  //     this.jsonControlVehicleArray,
-  //     this.vehicleTableForm,
-  //     vendorDetail,
-  //     this.vendorName,
-  //     this.vendorNameStatus
-  //   );
-  // }
+  vendorFieldChanged() {
+    const vendorType = this.vehicleTableForm.value.vendorType;
+    const vendorDetail = this.vendorDetailList.filter((x) =>
+      x.type.toLowerCase() == vendorType.toLowerCase()
+    );
+    this.filter.Filter(
+      this.jsonControlVehicleArray,
+      this.vehicleTableForm,
+      vendorDetail,
+      this.vendorName,
+      this.vendorNameStatus
+    );
+    console.log("vendorDetail vendorFieldChanged", vendorDetail);
+  }
 
   //#region
   autofillDropdown() {

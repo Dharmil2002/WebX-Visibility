@@ -13,6 +13,7 @@ export class DriverMasterComponent implements OnInit {
   linkArray = []
   columnHeader = {
     // "srNo": "Sr No",
+    "updatedDate": "Created Date",
     'manualDriverCode': 'Driver Code',
     'driverName': 'Driver Name',
     'licenseNo': 'License No',
@@ -41,36 +42,42 @@ export class DriverMasterComponent implements OnInit {
   }
   addAndEditPath: string;
   csvFileName: string;
+  tableData: any;
   constructor(private masterService: MasterService) {
     this.addAndEditPath = "/Masters/DriverMaster/AddDriverMaster";
   }
+
   ngOnInit(): void {
     this.csvFileName = "Driver Details";
     this.getDriverDetails();
   }
+
   getDriverDetails() {
-    let req = {
+    const req = {
       "companyCode": this.companyCode,
       "filter": {},
       "collectionName": "driver_detail"
-    }
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) => {
-            return {
-              ...obj,
-              // srNo: index + 1
-            };
-          });
-          this.csv = dataWithSrno
-          this.tableLoad = false;
-        }
-      }
-    })
-  }
+    };
   
+    this.masterService.masterPost('generic/get', req).subscribe((res: any) => {
+      if (res && res.data) {
+        const data = res.data;
+  
+        // Sort the data based on updatedDate in descending order
+        const dataWithDate = data.sort((a, b) => new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime());
+  
+        // Extract the updatedDate from the first element (latest record)
+        const latestUpdatedDate = dataWithDate.length > 0 ? dataWithDate[0].updatedDate : null;
+  
+        // Use latestUpdatedDate as needed
+  
+        this.csv = dataWithDate;
+        this.tableData = dataWithDate;
+      }
+  
+      this.tableLoad = false;
+    });
+  }
 
   IsActiveFuntion(det) {
     let id = det._id;

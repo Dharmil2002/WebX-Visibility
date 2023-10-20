@@ -53,13 +53,13 @@ export const columnHeader = {
         Title: "Action",
         class: "matcolumncenter",
         Style: "min-width:10%",
-      },
+    },
 };
 
-export const staticField = ["Srno", "loccd", "distKm", "trtimeHr", "sttimeHr", "speedLightVeh", "speedHeavyVeh", "nightDrivingRestricted", "restrictedHoursFrom", "restrictedHoursTo"];  
+export const staticField = ["Srno", "loccd", "distKm", "trtimeHr", "sttimeHr", "speedLightVeh", "speedHeavyVeh", "nightDrivingRestricted", "restrictedHoursFrom", "restrictedHoursTo"];
 export function generateRouteCode(initialCode: number = 0) {
     const nextRouteCode = initialCode + 1;
     const routeNumber = nextRouteCode.toString().padStart(4, '0');
     const routeCode = `R${routeNumber}`;
     return routeCode;
-  }
+}

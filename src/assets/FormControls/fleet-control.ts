@@ -56,7 +56,7 @@ export class FleetControls {
                 },
             },
             {
-                name: 'RCBookNo', label: "RC Book No", placeholder: "Enter RC Book No", type: 'text', value: FleetTable?.RCBookNo,
+                name: 'RCBookNo', label: "RC Book No", placeholder: "Enter RC Book No", type: 'government-id', value: FleetTable?.RCBookNo,
                 filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     {

@@ -1,70 +1,47 @@
-<div>
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> PRODUCT
+<form [formGroup]="ProductsForm">
+    <app-form-webxpress [form]="ProductsForm" [FormTitle]="'PRODUCT'" [formData]="jsonControlArrayProductsForm"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)" [className]="className">
+    </app-form-webxpress>
+</form>
 
-    </h4>
-    <hr>
-    <form [formGroup]="ProductsForm">
-        <app-form-webxpress [form]="ProductsForm" [formData]="jsonControlArrayProductsForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="className">
-        </app-form-webxpress>
-    </form>
-</div>
-<div>
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Services
-        Selection
-    </h4>
-    <hr>
-    <form [formGroup]="ServicesForm">
-        <app-form-webxpress [form]="ServicesForm" [formData]="jsonControlArrayServicesForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="ServiceclassName">
-        </app-form-webxpress>
-    </form>
-</div>
+<form [formGroup]="ServicesForm">
+    <app-form-webxpress [form]="ServicesForm" [FormTitle]="'Services Selection'"
+        [formData]="jsonControlArrayServicesForm" (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="ServiceclassName">
+    </app-form-webxpress>
+</form>
 <div *ngIf="DisplayVolumetricSection">
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Volumteric
-    </h4>
-    <hr>
     <form [formGroup]="VolumtericForm">
-        <app-form-webxpress [form]="VolumtericForm" [formData]="jsonControlArrayVolumtericForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="className">
+        <app-form-webxpress [form]="VolumtericForm" [FormTitle]="'Volumteric'"
+            [formData]="jsonControlArrayVolumtericForm" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
 </div>
 <div *ngIf="DisplayCODDODSection">
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> COD/DOD
-    </h4>
-    <hr>
+
     <form [formGroup]="CODDODForm">
-        <app-form-webxpress [form]="CODDODForm" [formData]="jsonControlArrayCODDODForm"
+        <app-form-webxpress [form]="CODDODForm" [FormTitle]="'COD/DOD'" [formData]="jsonControlArrayCODDODForm"
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
             (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
 </div>
-
 <div *ngIf="DisplayDemurragericSection">
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Demurrage
-    </h4>
-
-    <hr>
     <form [formGroup]="DemurrageForm">
-        <app-form-webxpress [form]="DemurrageForm" [formData]="jsonControlArrayDemurrageForm"
+        <app-form-webxpress [form]="DemurrageForm" [FormTitle]="'Demurrage'" [formData]="jsonControlArrayDemurrageForm"
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
             (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
 </div>
 <div *ngIf="DisplayInsuranceSection">
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Insurance
-    </h4>
-    <hr>
+
     <form [formGroup]="InsuranceCarrierRiskForm">
-        <app-form-webxpress [form]="InsuranceCarrierRiskForm" [formData]="jsonControlArrayInsuranceCarrierRiskForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="className">
+        <app-form-webxpress [form]="InsuranceCarrierRiskForm" [FormTitle]="'Insurance'"
+            [formData]="jsonControlArrayInsuranceCarrierRiskForm" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
     <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!InsuranceCarrierRiskForm.valid"
@@ -88,14 +65,10 @@
     </div>
 </div>
 <div *ngIf="DisplayFuelSurchargeSection">
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> Fuel
-        Surcharge
-    </h4>
-    <hr>
     <form [formGroup]="FuelSurchargeForm">
-        <app-form-webxpress [form]="FuelSurchargeForm" [formData]="jsonControlArrayFuelSurchargeForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="className">
+        <app-form-webxpress [form]="FuelSurchargeForm" [FormTitle]="'Fuel Surcharge'"
+            [formData]="jsonControlArrayFuelSurchargeForm" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
     <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!FuelSurchargeForm.valid"
@@ -119,26 +92,18 @@
     </div>
 </div>
 <div *ngIf="DisplayCutOfftimeSection">
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Cut-Off
-        time
-    </h4>
-    <hr>
     <form [formGroup]="CutOfftimeForm">
-        <app-form-webxpress [form]="CutOfftimeForm" [formData]="jsonControlArrayCutOfftimeForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="className">
+        <app-form-webxpress [form]="CutOfftimeForm" [FormTitle]="'Cut-Off time'"
+            [formData]="jsonControlArrayCutOfftimeForm" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
 </div>
 <div *ngIf="DisplayYieldProtectionSection">
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>Yield
-        Protection
-    </h4>
-    <hr>
     <form [formGroup]="YieldProtectionForm">
-        <app-form-webxpress [form]="YieldProtectionForm" [formData]="jsonControlArrayYieldProtectionForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="className">
+        <app-form-webxpress [form]="YieldProtectionForm" [FormTitle]="'Yield Protection'"
+            [formData]="jsonControlArrayYieldProtectionForm" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
 </div>

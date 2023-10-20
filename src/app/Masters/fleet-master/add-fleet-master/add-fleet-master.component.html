@@ -10,7 +10,7 @@
 </ng-container>
 <ng-template #elseBlock>
   <form [formGroup]="fleetTableForm">
-    <app-form-webxpress [form]="fleetTableForm" [formData]="jsonControlFleetArray"
+    <app-form-webxpress [form]="fleetTableForm"[FormTitle]="'Vehicle Details'" [formData]="jsonControlFleetArray"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
       (callFunction)="functionCallHandler($event)" [submit]="submit">
     </app-form-webxpress>

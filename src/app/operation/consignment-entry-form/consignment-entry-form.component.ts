@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
@@ -32,6 +32,7 @@ import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { getPrqDetailFromApi } from "src/app/dashboard/tabs/prq-summary-page/prq-summary-utitlity";
+import { AddFleetMasterComponent } from "src/app/Masters/fleet-master/add-fleet-master/add-fleet-master.component";
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -210,6 +211,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
   packagingType: any;
   allformControl: any[];
   vehileList: any;
+  marketVendor:boolean;
+  /*Below Compotent is used for market vehicle*/
+  @ViewChild(AddFleetMasterComponent) addFleetMaster: AddFleetMasterComponent;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -233,6 +237,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
       if (this.isUpdate) {
+        debugger
         this.docketDetail = navigationState;
         this.breadscrums[0].title = "Consignment Edit";
         this.ewayBill = false
@@ -342,8 +347,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     }
   }
   //#endregion
-
-
   async prqDetail() {
     const fromCity = {
       name: this.prqData?.fromCity || "",
@@ -439,7 +442,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.prqNo,
       this.prqNoStatus
     );
-
     this.filter.Filter(
       this.jsonControlArrayBasic,
       this.consignmentTableForm,
@@ -447,12 +449,10 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.vehicleNo,
       this.vehicleNoStatus
     );
-
-
     this.prqFlag && this.prqDetail();
     this.isUpdate && this.autofillDropDown();
+  
   }
-
   /* below function was the call when */
   async getLocBasedOnCity() {
     const destinationMapping = await this.locationService.locationFromApi({ locCity: this.consignmentTableForm.get("toCity")?.value?.value })
@@ -470,10 +470,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.consignmentTableForm.controls['destination'].setValue(destinationMapping[0])
     }
   }
-
-  //here the function is calling for add docket Data in docket Tracking.
-
-  //#region cancel Function
+  
   cancel() {
     this._NavigationService.navigateTotab(
       "docket",
@@ -736,6 +733,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
 
   vendorFieldChanged() {
+
     const vendorType = this.consignmentTableForm.value.vendorType;
 
     this.jsonControlArrayBasic.forEach((x) => {
@@ -765,16 +763,22 @@ export class ConsignmentEntryFormComponent implements OnInit {
       );
     }
     else {
+      this.marketVendor=true
     }
 
 
   }
-
+  /*Below function is only call those time when user can come to only edit a
+   docket not for prq or etc etc*/
   autofillDropDown() {
+
     const { vendorType, vendorName } = this.docketDetail;
     const vendor = vendorType !== "Market" ? this.vendorDetail.find(x => x.name === vendorName) : vendorName;
     this.consignmentTableForm.controls["vendorName"].setValue(vendor);
-
+    this.consignmentTableForm.controls["vendorType"].setValue(vendorType);
+    this.vendorFieldChanged();
+    
+    this.addFleetMaster.fleetTableForm.controls['RCBookNo'].setValue(this.docketDetail?.vehicleDetail.RCBookNo||"")
     const fromCity = {
       name: this.docketDetail.fromCity,
       value: this.docketDetail.fromCity,
@@ -1007,10 +1011,12 @@ export class ConsignmentEntryFormComponent implements OnInit {
         unloading: 0,
         lsNo: "",
         mfNo: "",
+        vehicleDetail:this.marketVendor?this.addFleetMaster.fleetTableForm.value:"",
         entryBy: this.userName,
         entryDate: new Date().toISOString(),
         unloadloc: "",
       };
+      
       let docketDetails = {
         ...this.consignmentTableForm.value,
         ...this.FreightTableForm.value,
@@ -1282,6 +1288,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     );
   }
   /*End*/
+
 
 }
 

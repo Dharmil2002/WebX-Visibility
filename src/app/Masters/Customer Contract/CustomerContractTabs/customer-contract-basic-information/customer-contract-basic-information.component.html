@@ -1,11 +1,6 @@
-<div>
-    <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon> SUMMARY
-    </h4>
-    <hr>
-    <form [formGroup]="ProductsForm">
-        <app-form-webxpress [form]="ProductsForm" [formData]="jsonControlArrayProductsForm"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-            (callFunction)="functionCallHandler($event)" [className]="className">
-        </app-form-webxpress>
-    </form>
-</div>
+<form [formGroup]="ProductsForm">
+    <app-form-webxpress [form]="ProductsForm" [FormTitle]="'SUMMARY'" [formData]="jsonControlArrayProductsForm"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)" [className]="className">
+    </app-form-webxpress>
+</form>

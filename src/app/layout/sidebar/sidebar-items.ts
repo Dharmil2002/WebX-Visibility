@@ -17,52 +17,53 @@ export const ROUTES: RouteInfo[] =
         groupTitle: false,
         submenu: []
       }
-      // {
-      //   path: "Masters/Docket/Ewaybill",
-      //   title: "Eway Bill",
-      //   moduleName: "Masters",
-      //   icon: "",
-      //   class: "",
-      //   groupTitle: false,
-      //   submenu: []
-      // },
-      // {
-      //   path: "Masters/Docket/Create",
-      //   title: "Manual docket",
-      //   moduleName: "Masters",
-      //   icon: "",
-      //   class: "",
-      //   groupTitle: false,
-      //   submenu: []
-      // },
-      // {
-      //   path: "Masters/Docket/Ewaybill-Config",
-      //   title: "Eway-Bill Config",
-      //   moduleName: "Masters",
-      //   icon: "",
-      //   class: "",
-      //   groupTitle: false,
-      //   submenu: []
-      // },
-      // {
-      //   path: "Masters/Docket/LoadingSheet",
-      //   title: "Loading Sheet",
-      //   moduleName: "Masters",
-      //   icon: "",
-      //   class: "",
-      //   groupTitle: false,
-      //   submenu: []
-      // },
-      // {
-      //   path: "Masters/Docket/ManifestGeneration",
-      //   title: "Manifest Generation ",
-      //   moduleName: "Masters",
-      //   icon: "",
-      //   class: "",
-      //   groupTitle: false,
-      //   submenu: []
-      // }],
-  ]},
+        // {
+        //   path: "Masters/Docket/Ewaybill",
+        //   title: "Eway Bill",
+        //   moduleName: "Masters",
+        //   icon: "",
+        //   class: "",
+        //   groupTitle: false,
+        //   submenu: []
+        // },
+        // {
+        //   path: "Masters/Docket/Create",
+        //   title: "Manual docket",
+        //   moduleName: "Masters",
+        //   icon: "",
+        //   class: "",
+        //   groupTitle: false,
+        //   submenu: []
+        // },
+        // {
+        //   path: "Masters/Docket/Ewaybill-Config",
+        //   title: "Eway-Bill Config",
+        //   moduleName: "Masters",
+        //   icon: "",
+        //   class: "",
+        //   groupTitle: false,
+        //   submenu: []
+        // },
+        // {
+        //   path: "Masters/Docket/LoadingSheet",
+        //   title: "Loading Sheet",
+        //   moduleName: "Masters",
+        //   icon: "",
+        //   class: "",
+        //   groupTitle: false,
+        //   submenu: []
+        // },
+        // {
+        //   path: "Masters/Docket/ManifestGeneration",
+        //   title: "Manifest Generation ",
+        //   moduleName: "Masters",
+        //   icon: "",
+        //   class: "",
+        //   groupTitle: false,
+        //   submenu: []
+        // }],
+      ]
+    },
     {
       "path": "Masters/DriverMaster/DriverMasterList",
       "title": "Master & Utilities",
@@ -465,6 +466,25 @@ export const ROUTES: RouteInfo[] =
         path: "Operation/IssueTracker",
         title: "Request Outbox",
         moduleName: "Request Outbox",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
+      }
+      ],
+    },
+
+    {
+      path: "",
+      title: "Finance",
+      moduleName: "Finance",
+      icon: "book",
+      class: "menu-toggle",
+      groupTitle: false,
+      submenu: [{
+        path: "Finance/CreditDebitVoucher",
+        title: "Credit Debit Voucher",
+        moduleName: "Credit Debit Voucher",
         icon: "star",
         class: "",
         groupTitle: false,

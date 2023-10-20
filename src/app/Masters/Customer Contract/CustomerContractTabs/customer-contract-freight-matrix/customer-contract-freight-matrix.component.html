@@ -1,10 +1,7 @@
-<h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>
-    Freight Charge Matrix</h4>
-<hr>
 <form [formGroup]="FreightMatrixForm">
-    <app-form-webxpress [form]="FreightMatrixForm" [formData]="jsonControlArrayFreightMatrix"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)" [className]="className">
+    <app-form-webxpress [form]="FreightMatrixForm" [FormTitle]="'Freight Charge Matrix'"
+        [formData]="jsonControlArrayFreightMatrix" (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
     </app-form-webxpress>
 </form>
 

@@ -13,6 +13,11 @@ export class marketVehicleControls {
             name: "required",
             message: "Vehicle Number is required",
           },
+          {
+            name: "pattern",
+            message: "Please enter a valid Vehicle Number (e.g., GJ05AK4741)",
+            pattern: '^[A-Z][A-Z0-9]+$'
+        }
         ],
       },
       {
@@ -82,6 +87,11 @@ export class marketVehicleControls {
             name: "required",
             message: "Pan No is required",
           },
+          {
+            name: "pattern",
+            pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$",
+            message: "Please enter a valid PAN NO (e.g., ABCDE1234F)",
+          },
         ],
       },
       {
@@ -90,8 +100,14 @@ export class marketVehicleControls {
         Validations: [
           {
             name: "required",
-            message: "Driving Licence Expiry Date  is required",
+            message: "Driving Licence   is required",
           },
+          {
+            name: "pattern",
+            message:
+              "Please Enter alphanumeric License No of length 8 (eg. AZ-125487)",
+            pattern: "^[A-Z]{2}-[0-9]{6}$",
+          }
         ],
       },
       {
@@ -103,6 +119,9 @@ export class marketVehicleControls {
             message: "Driving Licence Expiry Date  is required",
           },
         ],
+        additionalData: {
+          minDate: new Date()
+        },
       },
       
       {
@@ -124,6 +143,9 @@ export class marketVehicleControls {
             message: "ETA   is required",
           },
         ],
+        additionalData: {
+          minDate: new Date()
+        },
       },
       
       {

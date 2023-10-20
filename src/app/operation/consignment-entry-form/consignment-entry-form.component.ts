@@ -237,7 +237,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
       if (this.isUpdate) {
-        debugger
+        
         this.docketDetail = navigationState;
         this.breadscrums[0].title = "Consignment Edit";
         this.ewayBill = false
@@ -455,7 +455,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   /* below function was the call when */
   async getLocBasedOnCity() {
-    const destinationMapping = await this.locationService.locationFromApi({ locCity: this.consignmentTableForm.get("toCity")?.value?.value })
+    const destinationMapping = await this.locationService.locationFromApi({ locCity: this.consignmentTableForm.get("toCity")?.value?.value.toUpperCase()})
     // this.consignmentTableForm.controls["destination"].setValue(toCity[0].value);
     if (destinationMapping.length > 1) {
       this.filter.Filter(
@@ -771,18 +771,17 @@ export class ConsignmentEntryFormComponent implements OnInit {
   /*Below function is only call those time when user can come to only edit a
    docket not for prq or etc etc*/
   autofillDropDown() {
-
+    
     const { vendorType, vendorName } = this.docketDetail;
     const vendor = vendorType !== "Market" ? this.vendorDetail.find(x => x.name === vendorName) : vendorName;
     this.consignmentTableForm.controls["vendorName"].setValue(vendor);
     this.consignmentTableForm.controls["vendorType"].setValue(vendorType);
     this.vendorFieldChanged();
-    
-    this.addFleetMaster.fleetTableForm.controls['RCBookNo'].setValue(this.docketDetail?.vehicleDetail.RCBookNo||"")
-    const fromCity = {
+     const fromCity = {
       name: this.docketDetail.fromCity,
       value: this.docketDetail.fromCity,
     };
+
     this.consignmentTableForm.controls["fromCity"].setValue(fromCity);
     const vehicleNo = {
       name: this.docketDetail?.vehicleNo || "",

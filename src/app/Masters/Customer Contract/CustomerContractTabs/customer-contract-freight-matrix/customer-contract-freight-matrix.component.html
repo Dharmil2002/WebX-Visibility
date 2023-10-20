@@ -1,22 +1,27 @@
-<h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>
-    Freight Charge Matrix</h4>
-<hr>
-<form [formGroup]="FreightMatrixForm">
-    <app-form-webxpress [form]="FreightMatrixForm" [formData]="jsonControlArrayFreightMatrix"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)" [className]="className">
-    </app-form-webxpress>
-</form>
+<div class="body">
+    <div class="task-list">
+        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>
+            Freight Charge Matrix</h4>
+        <hr>
 
-<div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <form [formGroup]="FreightMatrixForm">
+            <app-form-webxpress [form]="FreightMatrixForm" [formData]="jsonControlArrayFreightMatrix"
+                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+                (callFunction)="functionCallHandler($event)" [className]="className">
+            </app-form-webxpress>
+        </form>
+
+        <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div class="paddingdiv">
+            <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+                [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
+                [menuItemFlag]="menuItemflag" [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)"
+                [AddNewButton]=true [btndisabled]="!FreightMatrixForm.valid" (AddNewButtonEvent)="AddNewButtonEvent()">
+            </app-generic-table-v2>
+        </div>
     </div>
-</div>
-<div class="paddingdiv">
-    <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-        [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
-        [menuItemFlag]="menuItemflag" [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)"
-        [AddNewButton]=true [btndisabled]="!FreightMatrixForm.valid" (AddNewButtonEvent)="AddNewButtonEvent()">
-    </app-generic-table-v2>
 </div>

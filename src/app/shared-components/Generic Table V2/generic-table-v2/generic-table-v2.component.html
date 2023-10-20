@@ -137,9 +137,20 @@
                 <ng-container *ngIf="tableData === 'actionDelete'">
                     <button mat-icon-button (click)="Delete(element)">
                         <mat-icon style="color: rgb(59, 59, 59);">delete</mat-icon>
-                    </button>   
+                    </button>
                 </ng-container>
+                <ng-container *ngIf="columnHeader[tableData]?.type === 'iconorvalue'">
+                    <div *ngIf="element[columnHeader[tableData]?.Title]=='Add'">
+                        <button mat-icon-button
+                            (click)="FunctionHendel(columnHeader[tableData].functionName , element)">
+                            <mat-icon>{{columnHeader[tableData].iconName}}</mat-icon>
+                        </button>
+                    </div>
+                    <div *ngIf="element[columnHeader[tableData]?.Title]!='Add'">
+                        {{element[columnHeader[tableData]?.Title]}}
+                    </div>
 
+                </ng-container>
                 <ng-container *ngIf="columnHeader[tableData]?.type === 'iconClick'">
                     <button mat-icon-button (click)="FunctionHendel(columnHeader[tableData].functionName , element)">
                         <mat-icon style="color: #005bb1">{{columnHeader[tableData].iconName}}</mat-icon>
@@ -147,7 +158,8 @@
                 </ng-container>
 
                 <ng-container *ngIf="columnHeader[tableData]?.type === 'windowLink'">
-                    <p class="windowLink" (click)="FunctionHendel(columnHeader[tableData].functionName , element)" >{{element[tableData]}}</p>
+                    <p class="windowLink" (click)="FunctionHendel(columnHeader[tableData].functionName , element)">
+                        {{element[tableData]}}</p>
                 </ng-container>
 
                 <button mat-icon-button *ngIf="tableData=='view'" (click)="$event.stopPropagation()"
@@ -174,13 +186,15 @@
         color: #36cbe9;
         font-weight: 900;
     }
-    .windowLink{
+
+    .windowLink {
         color: #36cbe9;
         font-weight: bold;
         cursor: pointer;
         margin: auto 0px;
     }
-    .windowLink:hover{
+
+    .windowLink:hover {
         text-decoration: underline;
     }
 </style>

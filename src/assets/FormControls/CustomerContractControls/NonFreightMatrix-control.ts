@@ -55,6 +55,9 @@ export class ContractNonFreightMatrixControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
+        functions: {
+          onSelection: "ChargesBehaviour"
+        },
         generatecontrol: true,
         disable: false,
         accessallowed: true,

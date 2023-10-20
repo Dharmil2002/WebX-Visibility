@@ -1,14 +1,14 @@
 export class fleetModel {
 
-  activeFlag: any;
+  activeFlag: boolean;
   id: number; //user
   vehicleNo: string;
   vehicleType: string;
   RCBookNo: string;
   registrationNo: string;
-  RegistrationDate: any;
-  insuranceExpiryDate:any;
-  fitnessValidityDate: any;
+  RegistrationDate: Date;
+  insuranceExpiryDate: Date;
+  fitnessValidityDate: Date;
   vehicleInsurancePolicy: string;
   insuranceProvider: string;
   chassisNo: string;
@@ -28,7 +28,9 @@ export class fleetModel {
       this.insuranceProvider = FleetMaster.insuranceProvider || '';
       this.chassisNo = FleetMaster.chassisNo || '';
       this.engineNo = FleetMaster.engineNo || '';
-      this.insuranceExpiryDate = FleetMaster.insuranceExpiryDate ||'';
+      this.insuranceExpiryDate = FleetMaster.insuranceExpiryDate || this.date;
+      this.RegistrationDate = FleetMaster.RegistrationDate || this.date;
+      this.fitnessValidityDate = FleetMaster.fitnessValidityDate || this.date;
       this.activeFlag = FleetMaster.activeFlag || false;
 
     }

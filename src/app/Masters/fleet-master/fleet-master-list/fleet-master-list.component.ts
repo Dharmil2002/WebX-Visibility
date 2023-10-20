@@ -31,7 +31,7 @@ export class FleetMasterListComponent implements OnInit {
   };
 
   columnHeader = {
-    srNo: "Sr No",
+    updateDate: "Created Date",
     vehicleNo: "Vehicle No",
     vehicleType: "Vehicle Type",
     insuranceExpiryDate: "Insurance Expiry Date",
@@ -48,7 +48,7 @@ export class FleetMasterListComponent implements OnInit {
     activeFlag: "Active Status",
   };
 
-  constructor(private masterService: MasterService) {}
+  constructor(private masterService: MasterService) { }
 
   ngOnInit(): void {
     this.csvFileName = "Fleet Details";

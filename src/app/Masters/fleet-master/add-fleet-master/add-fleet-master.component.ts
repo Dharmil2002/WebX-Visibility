@@ -1,11 +1,13 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { fleetModel } from 'src/app/core/models/Masters/fleetMaster';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { FleetControls } from 'src/assets/FormControls/fleet-control';
 import Swal from 'sweetalert2';
 
@@ -38,12 +40,13 @@ export class AddFleetMasterComponent implements OnInit {
   vehicleType: any;
   vehicleTypeStatus: any;
   submit = 'Save';
-
+  url: any;
   constructor(
     private filter: FilterUtils,
     private route: Router,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
+    private dialog: MatDialog
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.FleetTable = route.getCurrentNavigation().extras.state.data;
@@ -97,7 +100,7 @@ export class AddFleetMasterComponent implements OnInit {
       }
     });
     if (this.thc) {
-      this.jsonControlFleetArray = this.jsonControlFleetArray.filter((x) => x.name != "vehicleNo" && x.name!="_id");
+      this.jsonControlFleetArray = this.jsonControlFleetArray.filter((x) => x.name != "vehicleNo" && x.name != "_id");
     }
     // Build the form group using formGroupBuilder function
     this.fleetTableForm = formGroupBuilder(this.fb, [this.jsonControlFleetArray]);
@@ -128,7 +131,7 @@ export class AddFleetMasterComponent implements OnInit {
           "filter": {},
           "collectionName": "vehicle_detail"
         };
-         vehicleRes = await this.masterService.masterPost('generic/get', vehicleReq).toPromise();
+        vehicleRes = await this.masterService.masterPost('generic/get', vehicleReq).toPromise();
       }
       const mergedData = {
         vehTypeData: vehTypeRes?.data,
@@ -136,19 +139,19 @@ export class AddFleetMasterComponent implements OnInit {
       };
 
       this.allData = mergedData;
-      if(!this.thc){
-      const vehicleDet = mergedData.vehicleData.map(element => ({
-        name: element.vehicleNo,
-        value: element.vehicleNo,
-      }));
-      this.vehicleDet = vehicleDet;
-      this.filter.Filter(
-        this.jsonControlFleetArray,
-        this.fleetTableForm,
-        vehicleDet,
-        this.vehicleNo,
-        this.vehicleNoStatus
-      );
+      if (!this.thc) {
+        const vehicleDet = mergedData.vehicleData.map(element => ({
+          name: element.vehicleNo,
+          value: element.vehicleNo,
+        }));
+        this.vehicleDet = vehicleDet;
+        this.filter.Filter(
+          this.jsonControlFleetArray,
+          this.fleetTableForm,
+          vehicleDet,
+          this.vehicleNo,
+          this.vehicleNoStatus
+        );
       }
       const vehTypeDet = mergedData.vehTypeData.map(element => ({
         name: element.vehicleTypeName,
@@ -240,17 +243,21 @@ export class AddFleetMasterComponent implements OnInit {
   //#endregion
 
   //#region Registration Scan
-  selectedFileregistrationScan(data) {
-    let fileList: FileList = data.eventArgs;
+  selectedFileregistrationScan(event) {
+    //this.openImageDialog(event)
+    let fileList: FileList = event.eventArgs;
     if (fileList.length > 0) {
       const file: File = fileList[0];
       const allowedFormats = ["jpeg", "png", "jpg"];
       const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
 
       if (allowedFormats.includes(fileFormat)) {
+        this.url = fileList[0];
         this.SelectFile = file;
         this.imageName = file.name;
         this.selectedFiles = true;
+        //        this.fleetTableForm.controls["registrationScan"].setValue(selectedFiles[0].name);
+
         this.fleetTableForm.controls["registrationScan"].setValue(this.SelectFile.name);
 
       } else {
@@ -279,7 +286,6 @@ export class AddFleetMasterComponent implements OnInit {
       const controlValue = formValue[controlName]?.name;
       this.fleetTableForm.controls[controlName].setValue(controlValue);
     });
-    this.fleetTableForm.controls["activeFlag"].setValue(this.fleetTableForm.value.activeFlag === true ? true : false);
     if (this.isUpdate) {
       let id = this.fleetTableForm.value.vehicleNo;
       // Remove the "id" field from the form controls
@@ -305,14 +311,16 @@ export class AddFleetMasterComponent implements OnInit {
         this.route.navigateByUrl("/Masters/FleetMaster/FleetMasterList");
       }
     } else {
-      const randomNumber = (this.fleetTableForm.value.vehicleNo);
+      const randomNumber = this.fleetTableForm.value.vehicleNo;
       this.fleetTableForm.controls["_id"].setValue(randomNumber);
+      //API FOR ADD
       let req = {
         companyCode: this.companyCode,
         collectionName: "fleet_master",
         data: this.fleetTableForm.value,
       };
-      //API FOR ADD
+      console.log(req);
+
       const res = await this.masterService
         .masterPost("generic/create", req)
         .toPromise();
@@ -353,7 +361,60 @@ export class AddFleetMasterComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.fleetTableForm.controls['activeFlag'].setValue(event);
-    console.log("Toggle value :", event);
+    //console.log("Toggle value :", event);
   }
+  //#region to check vehicle number
+  async checkUniqueVehicle() {
+    // Get the vehicle number from the form
+    const vehicleNumber = this.fleetTableForm.value.vehicleNo.name;
 
+    try {
+      // Prepare the request to fetch the fleet collection
+      const request = {
+        companyCode: this.companyCode,
+        collectionName: 'fleet_master',
+        filter: { "vehicleNo": vehicleNumber },
+      };
+
+      // Fetch the fleet collection from the server
+      const fleetCollection = await this.masterService.masterPost('generic/get', request).toPromise();
+
+      // Check if the vehicle number already exists in the fleet collection
+      if (fleetCollection.data.length > 0) {
+        // Display an error message
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `This ${vehicleNumber} Number already added! Please try with another!`,
+          showConfirmButton: true,
+        });
+        // Reset the vehicle number field
+        this.fleetTableForm.controls['vehicleNo'].setValue('');
+        return;
+      }
+    } catch (error) {
+      // Handle errors appropriately, e.g., log the error or show an error message
+      console.error('An error occurred while checking for unique vehicles:', error);
+    }
+  }
+  //#endregion
+
+  openImageDialog() {
+    
+    const reader = new FileReader();
+let base64String
+    reader.onload = (event) => {
+      let base64String = event.target.result; // This contains the Base64-encoded string
+      console.log(base64String);
+    };
+  
+    reader.readAsDataURL(this.url); // Read the file as a data URL (Base64)
+
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: base64String },
+      width: '30%',
+      height: '50%',
+    });
+    //}
+  }  
 }

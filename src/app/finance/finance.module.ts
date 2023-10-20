@@ -37,12 +37,14 @@ import { utilityService } from '../Utility/utility.service';
 import { OperationService } from '../core/service/operations/operation.service';
 import { AssignVehiclePageMethods } from '../operation/assign-vehicle-page/assgine-vehicle-utility';
 import { AddManualVoucherComponent } from './manual voucher/add-manual-voucher/add-manual-voucher.component';
+import { CreditDebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
 
 
 @NgModule({
     declarations: [
         InvoiceSummaryBillComponent,
-        AddManualVoucherComponent
+        AddManualVoucherComponent,
+        CreditDebitVoucherComponent
     ],
     imports: [
         CommonModule,

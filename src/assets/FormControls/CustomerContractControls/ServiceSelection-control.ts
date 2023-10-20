@@ -987,7 +987,12 @@ export class ContractServiceSelectionControl {
   }
   getContractServiceSelectionControlControls(CurrentAccess: string[]) {
     this.ContractServiceSelectionControlArray = this.ContractServiceSelectionControlArray.filter(item => CurrentAccess.includes(item.name))
-    return this.ContractServiceSelectionControlArray;
+    const sortedArray = this.ContractServiceSelectionControlArray.sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+    return sortedArray;
   }
   getContractCODDODSelectionControlControls() {
     return this.ContractCODDODSelectionControlArray;

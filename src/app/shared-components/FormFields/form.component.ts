@@ -22,6 +22,7 @@ export class FormComponent {
   @Output() functionCallEmitter = new EventEmitter();
   @Input() uploadedFiles;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
+  @Input() FormTitle: string = "";
   selectedValue: any;
   isTouchUIActivated = false;
   // field required for password input.

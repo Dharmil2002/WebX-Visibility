@@ -30,7 +30,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() csvFileName;
   @Input() headercode;
   @Input() backPath;
-  @Input()TableStyle;
+  @Input() TableStyle;
   @Input() IscheckBoxRequired;
   @Input() Link;
   @Input() toggleArray;
@@ -41,6 +41,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
   @Input() height;
   @Input() width;
   @Input() maxWidth;
+  @Input() FormTitle: string = "";
   @Input() extraData;
   triggered: boolean = false;
   objectKeys = Object.keys;
@@ -65,7 +66,7 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     this.maxWidth = changes.extraData?.currentValue ?? this.maxWidth;
     this.width = changes.width?.currentValue ?? this.width;
     this.height = changes.height?.currentValue ?? this.height;
-    this.centerAligned=changes.centerAligned?.currentValue??this.centerAligned;
+    this.centerAligned = changes.centerAligned?.currentValue ?? this.centerAligned;
     if (changes.tableData?.currentValue) {
       this.refresh();
     }
@@ -203,8 +204,8 @@ export class GenericTableComponent extends UnsubscribeOnDestroyAdapter implement
     this.dialog.open(
       this.viewComponent,
       {
-        width: this.width?this.width:'800px',
-        height: this.height?this.height:'500px', 
+        width: this.width ? this.width : '800px',
+        height: this.height ? this.height : '500px',
         data: item
       });
   }

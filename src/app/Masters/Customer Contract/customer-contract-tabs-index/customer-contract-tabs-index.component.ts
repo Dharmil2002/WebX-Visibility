@@ -22,7 +22,7 @@ export class CustomerContractTabsIndexComponent implements AfterViewInit {
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
     });
-    this.selectFolder('Non Freight Charges')
+    this.selectFolder('Contract Summary')
   }
   folders = [
     "Contract Summary",

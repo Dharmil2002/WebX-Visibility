@@ -1,4 +1,4 @@
-<div class="body">
+<!-- <div class="body">
     <div class="task-list">
         <div class="row">
             <div class="col">
@@ -13,67 +13,78 @@
                 </button>
             </div>
         </div>
-        <hr>
+        <hr> -->
 
-        <div class="row">
-            <mat-drawer-container c style=" height: 450px;background: white;" autosize>
-                <mat-drawer [opened]="isDrawerOpen" style="width: 30%;padding-right: 15px;background: white;"
-                    mode="side" position="end">
-                    <form [formGroup]="NonFreightChargesForm">
-                        <app-form-webxpress [form]="NonFreightChargesForm"
-                            [formData]="jsonControlArrayNonFreightCharges"
-                            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
-                            (callFunction)="functionCallHandler($event)" [className]="productsclassName">
-                        </app-form-webxpress>
-                    </form>
-                </mat-drawer>
+<div class="row">
+    <div class="col">
+        <h4 style="margin-top:10px;margin-left:10px; "><mat-icon style="padding-top:4px;">view_list</mat-icon>
+            Non-Freight Charges</h4>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <button *ngIf="IsChargeMatrix" matTooltip="Add Data" mat-stroked-button class="filter_btn"
+            style="margin-top:10px;margin-right:10px; " (click)="toggleDrawer()">
+            <mat-icon>add</mat-icon>
+            Add New
+        </button>
+    </div>
+    <div class="row">
+        <mat-drawer-container c style=" height: 450px;background: white;" autosize>
+            <mat-drawer [opened]="isDrawerOpen" style="width: 30%;padding-right: 15px;background: white;" mode="side"
+                position="end">
+                <form [formGroup]="NonFreightChargesForm">
+                    <app-form-webxpress [form]="NonFreightChargesForm" [formData]="jsonControlArrayNonFreightCharges"
+                        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+                        (callFunction)="functionCallHandler($event)" [className]="productsclassName">
+                    </app-form-webxpress>
+                </form>
+            </mat-drawer>
 
-                <div *ngIf="IsChargeMatrix">
+            <div *ngIf="IsChargeMatrix">
 
-                    <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls"
-                        [columnHeader]="ChargescolumnHeader" [tableData]="chargestableData" [menuItems]="menuItems"
-                        [staticField]="ChargesstaticField" [Link]="linkArray" [menuItemFlag]="menuItemflag"
-                        [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)"
-                        (functionCallEmitter)="addCharges($event)" [btndisabled]="!NonFreightMatrixForm.valid">
-                    </app-generic-table-v2>
-                    <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
+                <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls"
+                    [columnHeader]="ChargescolumnHeader" [tableData]="chargestableData" [menuItems]="menuItems"
+                    [staticField]="ChargesstaticField" [Link]="linkArray" [menuItemFlag]="menuItemflag"
+                    [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)"
+                    (functionCallEmitter)="addCharges($event)" [btndisabled]="!NonFreightMatrixForm.valid">
+                </app-generic-table-v2>
+                <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-                <div *ngIf="!IsChargeMatrix">
-                    <div style="display: flex;
+            </div>
+            <div *ngIf="!IsChargeMatrix">
+                <div style="display: flex;
                       justify-content: space-between;margin: 0 0 0px;padding:10px 10px 0px 10px;
                       align-items: center;">
-                        <h4>Charges List</h4>
-                        <button mat-icon-button (click)="close()">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </div>
-                    <hr>
-                    <form [formGroup]="NonFreightMatrixForm">
-                        <app-form-webxpress [form]="NonFreightMatrixForm" [formData]="jsonControlArrayNonFreightMatrix"
-                            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-                            (callFunction)="functionCallHandler($event)" [className]="className">
-                        </app-form-webxpress>
-                    </form>
+                    <h4>Charges List</h4>
+                    <button mat-icon-button (click)="close()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div>
+                <hr>
+                <form [formGroup]="NonFreightMatrixForm">
+                    <app-form-webxpress [form]="NonFreightMatrixForm" [formData]="jsonControlArrayNonFreightMatrix"
+                        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+                        (callFunction)="functionCallHandler($event)" [className]="className">
+                    </app-form-webxpress>
+                </form>
 
-                    <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="paddingdiv">
-                        <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls"
-                            [columnHeader]="columnHeader" [tableData]="tableData" [menuItems]="menuItems"
-                            [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag"
-                            [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)" [AddNewButton]=true
-                            [btndisabled]="!NonFreightMatrixForm.valid" (AddNewButtonEvent)="AddNewButtonEvent()">
-                        </app-generic-table-v2>
+                <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-            </mat-drawer-container>
-        </div>
+                <div class="paddingdiv">
+                    <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls"
+                        [columnHeader]="columnHeader" [tableData]="tableData" [menuItems]="menuItems"
+                        [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag" [addFlag]="addFlag"
+                        (menuItemClicked)="handleMenuItemClick($event)" [AddNewButton]=true
+                        [btndisabled]="!NonFreightMatrixForm.valid" (AddNewButtonEvent)="AddNewButtonEvent()">
+                    </app-generic-table-v2>
+                </div>
+            </div>
+        </mat-drawer-container>
     </div>
-</div>
+    <!-- </div>
+</div> -->

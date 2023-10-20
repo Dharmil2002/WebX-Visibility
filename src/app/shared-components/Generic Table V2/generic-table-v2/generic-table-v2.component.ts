@@ -47,6 +47,7 @@ export class GenericTableV2Component
   @Input() width;
   @Input() maxWidth;
   @Input() extraData;
+  @Input() FormTitle: string = "";
   @Input() btndisabled: boolean = false;
   @Input() refreshbtn: boolean = false;
   @Input() staticField = [];

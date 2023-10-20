@@ -53,23 +53,21 @@
                 </div>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
-                <div class="card">
-                    <div class="boxs mail_listing" *ngIf="'Contract Summary' === selectedFolder">
-                        <app-customer-contract-basic-information
-                            [contractData]="CurrentContractDetails"></app-customer-contract-basic-information>
-                    </div>
-                    <div class="boxs mail_listing" *ngIf="'Services Selection' === selectedFolder">
-                        <app-customer-contract-service-selection
-                            [contractData]="CurrentContractDetails"></app-customer-contract-service-selection>
-                    </div>
-                    <div class="boxs mail_listing" *ngIf="'Freight Charge Matrix' === selectedFolder">
-                        <app-customer-contract-freight-matrix
-                            [contractData]="CurrentContractDetails"></app-customer-contract-freight-matrix>
-                    </div>
-                    <div class="boxs mail_listing" *ngIf="'Non Freight Charges' === selectedFolder">
-                        <app-customer-contract-non-freight-charges
-                            [contractData]="CurrentContractDetails"></app-customer-contract-non-freight-charges>
-                    </div>
+                <div class="boxs mail_listing" *ngIf="'Contract Summary' === selectedFolder">
+                    <app-customer-contract-basic-information
+                        [contractData]="CurrentContractDetails"></app-customer-contract-basic-information>
+                </div>
+                <div class="boxs mail_listing" *ngIf="'Services Selection' === selectedFolder">
+                    <app-customer-contract-service-selection
+                        [contractData]="CurrentContractDetails"></app-customer-contract-service-selection>
+                </div>
+                <div class="boxs mail_listing" *ngIf="'Freight Charge Matrix' === selectedFolder">
+                    <app-customer-contract-freight-matrix
+                        [contractData]="CurrentContractDetails"></app-customer-contract-freight-matrix>
+                </div>
+                <div class="boxs mail_listing" *ngIf="'Non Freight Charges' === selectedFolder">
+                    <app-customer-contract-non-freight-charges
+                        [contractData]="CurrentContractDetails"></app-customer-contract-non-freight-charges>
                 </div>
             </div>
         </div>

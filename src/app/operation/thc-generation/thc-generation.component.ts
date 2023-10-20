@@ -91,7 +91,7 @@ export class ThcGenerationComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width:160px",
     },
-    chargedWeight: {
+    actualWeight: {
       Title: "Actual Weight (Kg)",
       class: "matcolumncenter",
       Style: "max-width:160px",
@@ -192,18 +192,25 @@ export class ThcGenerationComponent implements OnInit {
     private vendorService: VendorService,
     private driverService: DriverService,
     private pinCodeService: PinCodeService
-  ) {
-    let navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
+  ) 
+  {
+    /* here the code which is used to bind data for add thc edit thc add thc based on
+     docket or prq based on that we can declare condition*/
 
+    let navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
     if (navigationState != null) {
       this.isUpdate = navigationState.hasOwnProperty("isUpdate") ? true : false;
       this.isView = navigationState.hasOwnProperty("isView") ? true : false;
+       /* if user going  to update Thc below condition is true */
       if (this.isUpdate) {
+        /*Bind the Thc detail and in Update thc time below some field was added in table for docket and upload Pod*/
         this.thcDetail = navigationState.data;
         const field =
           ["pod", "receiveBy", "arrivalTime", "remarks"]
         this.staticField.push(...field)
       } else if (this.isView) {
+        
+        /*Bind the Thc detail and in View thc time below some field was added in table for docket and upload Pod*/
         const field =
           ["pod", "receiveBy", "arrivalTime", "remarks"]
         this.staticField.push(...field)
@@ -211,6 +218,11 @@ export class ThcGenerationComponent implements OnInit {
         this.thcDetail = navigationState.data;
       }
       else if (navigationState.hasOwnProperty('addThc')) {
+        
+       /*when user try to create multiple Thc based one docket  that time below code is use
+       @addThc boolean which is use to help to verfied that the sholud be a create thc based on docket
+       @docketDetail object which is used to help to bind the data from docket to thc
+       */
         this.addThc = true;
         this.docketDetail = navigationState.data;
       }
@@ -431,6 +443,7 @@ export class ThcGenerationComponent implements OnInit {
       }));
       this.vehicleList=vehicleList;
       const vendorDetail = await getVendorDetails(this.masterService)
+      
       this.vendorDetail = vendorDetail;
       this.filter.Filter(
         this.jsonControlArray,
@@ -621,7 +634,6 @@ export class ThcGenerationComponent implements OnInit {
 
   async createThc() {
     let extractedData = {};
-    this.selectedData = this.tableData;
     if (!this.selectedData || (this.isUpdate && this.hasBlankFields())) {
       if (!this.selectedData) {
         Swal.fire({

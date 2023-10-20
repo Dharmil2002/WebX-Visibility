@@ -1,5 +1,5 @@
 import { financialYear } from "src/app/Utility/date/date-utils";
-
+const branch=localStorage.getItem("Branch");
 export async function getShipment(operationService, vehicle) {
     // Define the request body with companyCode, collectionName, and an empty filter
     const reqBody = {
@@ -40,14 +40,14 @@ export async function prqDetail(operationService,dropDown) {
 }
 
 export async function thcGeneration(operationService,data){
-    
+     
      // Define the request body with companyCode, collectionName, and an empty filter
      const reqBody = {
         companyCode: localStorage.getItem("companyCode"),
         collectionName: "thc_detail",
         data: data,
         docType: "TH",
-        branch: "MUMB",
+        branch: branch,
         finYear: financialYear
     };
     // Perform an asynchronous operation to fetch data from the operation service

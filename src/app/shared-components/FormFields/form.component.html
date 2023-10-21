@@ -144,23 +144,6 @@
                     </mat-form-field>
                   </div>
                 </div>
-                <!-- Days time Field -->
-                <div class="row" *ngIf="(formItem.type == 'dayhour') && formItem.generatecontrol === true">
-                  <div class="col-6">
-                    <mat-form-field appearance="outline">
-                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
-                      <input matInput type="number" formControlName="{{formItem.name}}" placeholder="{{formItem.label}}"
-                        [disabled]="formItem.disable">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-6">
-                    <mat-form-field appearance="outline">
-                      <mat-label class="fontbold">{{formItem.additionalData.label}}</mat-label>
-                      <input matInput type="number" formControlName="{{formItem.additionalData.fieldName}}"
-                        placeholder="{{formItem.additionalData.label}}" [disabled]="formItem.disable">
-                    </mat-form-field>
-                  </div>
-                </div>
 
                 <!-- Download Icon -->
                 <div style="margin-top: 28px!important;" class="example-full-width" appearance="outline"
@@ -286,20 +269,6 @@
                     </mat-radio-button>
                   </mat-radio-group>
                 </ng-container>
-                <!--file-->
-                <mat-form-field appearance="outline" class="example-full-width"
-                  *ngIf="formItem.type === 'file' && formItem.generatecontrol">
-                  <mat-label>{{formItem.label}}</mat-label>
-                  <input matInput style="cursor:pointer" [formControlName]="formItem.name" readonly="true"
-                    (click)="fileInput.click()" class="example-full-width"
-                    [multiple]="(formItem.additionalData?.multiple||false)">
-                  <button mat-icon-button matSuffix (click)="fileInput.click()" class="example-full-width">
-                    <mat-icon>attach_file</mat-icon>
-                  </button>
-                  <input hidden class="example-full-width" style="cursor:pointer" [formControlName]='formItem.name'
-                    (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event.target.files })"
-                    #fileInput type="file" [multiple]="(formItem.additionalData?.multiple||false)">
-                </mat-form-field>
                 <!--Checkbox-->
                 <ng-container *ngIf="formItem.type === 'checkbox'">
                   <ng-container *ngIf="formItem.generatecontrol">

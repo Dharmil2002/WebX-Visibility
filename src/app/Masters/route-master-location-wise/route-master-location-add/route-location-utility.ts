@@ -7,52 +7,52 @@ export const columnHeader = {
     loccd: {
         Title: "Branch Name",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:9%",
     },
     distKm: {
         Title: "Distance(KM)",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:8%",
     },
     trtimeHr: {
         Title: "Transit(Minutes)",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:8%",
     },
     sttimeHr: {
         Title: "Stoppage(Minutes)",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:8%",
     },
     speedLightVeh: {
         Title: "Speed-Light Vehicle",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:8%",
     },
     speedHeavyVeh: {
         Title: "Speed-Heavy Vehicle",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:8%",
     },
     nightDrivingRestricted: {
         Title: "Night Driving Restricted",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:8%",
     },
     restrictedHoursFrom: {
         Title: "Restricted Hrs (From)",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:8%",
     },
     restrictedHoursTo: {
         Title: "Restricted Hrs (To)",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:8%",
     },
     actionsItems: {
         Title: "Action",
         class: "matcolumncenter",
-        Style: "min-width:10%",
+        Style: "min-width:8%",
     },
 };
 

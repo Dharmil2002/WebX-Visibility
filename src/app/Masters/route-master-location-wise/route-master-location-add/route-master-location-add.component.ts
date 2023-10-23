@@ -26,9 +26,11 @@ export class RouteMasterLocationAddComponent implements OnInit {
   tableLoad: boolean = true;
   locationData: any[];
   action: string;
+  addFlag = true;
   data: any;
   isUpdate: any;
   updateState: any;
+  menuItemflag = true;
   dynamicControls = {
     add: false,
     edit: false,

@@ -298,13 +298,19 @@ export class AddVehicleMasterComponent implements OnInit {
         value: element.vehicleTypeCode.toString(),
       }));
 
+      // Define the user's location (change this to the actual user's location)
+      const userLocation = localStorage.Branch;
+
+      // Filter the vendor names based on the user's location
       const venNameDet = mergedData.venNameData
-        .filter(element => element.isActive === true) // Filter only active elements
+        .filter(element => element.isActive && element.vendorLocation.includes(userLocation))
         .map(element => ({
           name: element.vendorName.toString(),
           value: element.vendorCode.toString(),
           type: element.vendorType.toString(),
         }));
+
+      // Assign the filtered vendor names to the vendorDetailList variable
       this.vendorDetailList = venNameDet;
 
       let routeDet = [];
@@ -397,9 +403,7 @@ export class AddVehicleMasterComponent implements OnInit {
       this.vendorName,
       this.vendorNameStatus
     );
-    console.log("vendorDetail vendorFieldChanged", vendorDetail);
   }
-
   //#region
   autofillDropdown() {
     if (this.isUpdate) {

@@ -147,7 +147,7 @@ export class FleetControls {
                 ],
                 additionalData: {
                     minDate: new Date(), // Set the minimum date to the current date
-                    maxDate: new Date(new Date().getFullYear(), 11, 31) // Set the maximum date to December 31 of the current year
+                    maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
                 }
             },
             {
@@ -174,7 +174,7 @@ export class FleetControls {
                 ],
                 additionalData: {
                     minDate: new Date(), // Set the minimum date to the current date
-                    maxDate: new Date(new Date().getFullYear(), 11, 31) // Set the maximum date to December 31 of the current year
+                    maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
                 }
             },
             {

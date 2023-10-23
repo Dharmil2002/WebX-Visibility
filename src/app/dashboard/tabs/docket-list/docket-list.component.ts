@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
-import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utlity';
 
 @Component({
   selector: 'app-docket-list',
@@ -20,15 +20,10 @@ export class DocketListComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width:300px",
     },
-    vehicleNo: {
-      Title: "Vehicle No",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
     docketNumber: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "max-width:250px",
+      Style: "max-width:280px",
       type:'windowLink',
       functionName:'OpenCnote'
     },
@@ -38,14 +33,29 @@ export class DocketListComponent implements OnInit {
       Style: "max-width:150px",
     },
     actualWeight: {
-      Title: "Actual Weight(Kg)",
+      Title: "Act Wt(Kg)",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "max-width:90px",
     },
     totalPkg: {
-      Title: "Total Package(Kg)",
+      Title: "Pkg Count",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "max-width:90px",
+    },
+    totalAmount: {
+      Title: "Freight Value(+)₹",
+      class: "matcolumncenter",
+      Style: "max-width:90px",
+    },
+     invoiceCount: {
+      Title: "Inv Count",
+      class: "matcolumncenter",
+      Style: "max-width:90px",
+    },
+    status:{
+      Title: "Status",
+      class: "matcolumncenter",
+      Style: "max-width:130px",
     },
     actionsItems: {
       Title: "Action",
@@ -58,10 +68,12 @@ export class DocketListComponent implements OnInit {
   /*which field you displayed in a table Must Declare here*/
   staticField = [
     "billingParty",
-    "vehicleNo",
     "ftCity",
     "actualWeight",
-    "totalPkg"
+    "totalPkg",
+    "totalAmount",
+    "invoiceCount",
+    "status"
   ];
 
   /*.......End................*/
@@ -72,7 +84,7 @@ export class DocketListComponent implements OnInit {
     {label:"Create THC"}
   ]
   menuItemflag: boolean = true;
-  TableStyle = "width:90%"
+//  TableStyle = "width:90%"
   /*.......End................*/
   /*Here the Controls which Is Hide search or add Button in table*/
   dynamicControls = {
@@ -87,7 +99,8 @@ export class DocketListComponent implements OnInit {
 
   constructor(
     private operationService: OperationService,
-    private router: Router
+    private router: Router,
+    private docketService:DocketService
     ) {
     this.getShipmentDetail();
   }
@@ -96,27 +109,11 @@ export class DocketListComponent implements OnInit {
   }
 
   async getShipmentDetail() {
-
+   /*below the method to get docket Detail using service*/
     const shipmentList = await getShipment(this.operationService, false);
-    this.tableData = shipmentList.filter((x)=>x.origin==this.orgBranch).map((x) => {
-      const actualWeights = [x].map((item) => {
-        return item ? calculateTotalField(item.invoiceDetails, 'actualWeight') : 0;
-      });
-      // Sum all the calculated actualWeights
-      const totalActualWeight = actualWeights.reduce((acc, weight) => acc + weight, 0);
-      const noofPkts = [x].map((item) => {
-        return item ? calculateTotalField(item.invoiceDetails, 'noofPkts') : 0;
-      });
-      // Sum all the calculated actualWeights
-      const totalnoofPkts = noofPkts.reduce((acc, pkg) => acc + pkg, 0);
-      x.actualWeight = totalActualWeight,
-      x.totalPkg = totalnoofPkts,
-      x.ftCity=`${x.fromCity}-${x.toCity}`,
-      x.actions=x.status=="0"?["Edit Docket","Create THC"]:["Rake Update"]
-      return x; // Make sure to return x to update the original object in the 'tableData' array.
-    });
-    //this.tableData = [];
+    this.tableData = await this.docketService.processShipmentList(shipmentList,this.orgBranch)
     this.tableLoad = false;
+    /*end*/
   }
 
   async handleMenuItemClick(data) {

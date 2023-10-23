@@ -269,25 +269,6 @@
                     </mat-radio-button>
                   </mat-radio-group>
                 </ng-container>
-                <!--Checkbox-->
-                <ng-container *ngIf="formItem.type === 'checkbox'">
-                  <ng-container *ngIf="formItem.generatecontrol">
-                    <mat-checkbox class="example-full-width" [formControlName]="formItem.name">
-                      {{formItem.label}}
-                    </mat-checkbox>
-                  </ng-container>
-                </ng-container>
-                <!--Radio Button-->
-                <ng-container *ngIf="formItem.type==='radiobutton' && formItem.generatecontrol">
-                  <mat-label>{{formItem.label}}</mat-label>&nbsp;
-                  <mat-radio-group [formControlName]="formItem.name"
-                    (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })">
-                    <mat-radio-button style=" margin: auto 5px; margin-top: 15px;" *ngFor="let option of formItem.value"
-                      [value]="option.value">
-                      {{ option.name }}
-                    </mat-radio-button>
-                  </mat-radio-group>
-                </ng-container>
                 <!--file-->
                 <mat-form-field appearance="outline" class="example-full-width"
                   *ngIf="formItem.type === 'file' && formItem.generatecontrol">

@@ -94,15 +94,15 @@ export class ClusterMasterAddComponent implements OnInit {
     if (pincodeValue !== null && pincodeValue !== "") {
       let req = {
         companyCode: this.companyCode,
-        collectionName: "pincode_detail",
+        collectionName: "pincode_master",
         filter: {},
       };
       this.masterService.masterPost("generic/get", req).subscribe({
         next: (res: any) => {
           // Assuming the API response contains an array named 'pincodeList'
           const pincodeList = res.data.map((element) => ({
-            name: parseInt(element.pincode),
-            value: parseInt(element.pincode),
+            name: element.PIN.toString(),
+            value:element.PIN.toString()
           }));
           let filteredPincodeList = [];
           if (Array.isArray(pincodeValue)) {
@@ -123,12 +123,13 @@ export class ClusterMasterAddComponent implements OnInit {
             const pincode = this.clusterTabledata.pincode.split(",");
             pincode.forEach((item) => {
               pincodedata.push(
-                pincodeList.find((element) => element.value == item)
+                pincodeList.find((element) => element.name.trim() == item.trim())
               );
             });
             this.clusterTableForm.controls["pincodeDropdown"].patchValue(
               pincodedata
             );
+            console.log(pincodedata)
           }
           const data =
             filteredPincodeList.length > 0 ? filteredPincodeList : pincodedata;
@@ -159,6 +160,7 @@ export class ClusterMasterAddComponent implements OnInit {
             (item: any) => item.name
           );
     this.clusterTableForm.controls["pincode"].setValue(pincodeDropdown);
+    this.clusterTableForm.removeControl("pincodeDropdown")
 
     // Clear any errors in the form controls
     Object.values(this.clusterTableForm.controls).forEach((control) =>

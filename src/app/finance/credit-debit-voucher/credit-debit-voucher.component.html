@@ -1,30 +1,70 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
 
-    <div class="body">
-        <div class="task-list">
-            <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>
-                Voucher Summary</h4>
-            <hr>
-            <form [formGroup]="invoiceTableForm">
-                <app-form-webxpress [form]="invoiceTableForm" [formData]="jsonControlArray"
-                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-                </app-form-webxpress>
-            </form>
-        </div>
-    </div>
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-        [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-        [menuItems]="menuItems" [staticField]="staticField" (onFlagChange)="IsActiveFuntion($event)" [Link]="linkArray"
-        [height]="height" [width]="width" [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath"
-        [boxData]="this.KPICountData">
-    </app-generic-table-v2>
-
-    <form [formGroup]="invoiceSummaryTableForm">
-        <app-form-webxpress [form]="invoiceSummaryTableForm" [formData]="invoiceSummaryJsonArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    <form [formGroup]="CreditDebitVoucherSummaryForm">
+        <app-form-webxpress [form]="CreditDebitVoucherSummaryForm" [FormTitle]="'Voucher Summary'"
+            [formData]="jsonControlCreditDebitVoucherSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
     <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="body">
+                    <div class="task-list">
+                        <h4 style="margin-top:10px;margin-left:10px;"><mat-icon
+                                style="padding-top:4px;">view_list</mat-icon>
+                            Voucher Details </h4>
+                        <hr>
+                        <div class="responsive_table" style="overflow-x: unset !important;">
+                            <mat-table [dataSource]="ModeldataSource" matSort class="table-hover" class="mat-cell">
+
+                                <!-- Order Column -->
+                                <ng-container *ngFor="let displayedColumn of displayedColumns"
+                                    [matColumnDef]="displayedColumn.Key">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                                        [ngStyle]="{'min-width': displayedColumn.width+ 'px'}"
+                                        [ngClass]=displayedColumn.className>
+                                        {{displayedColumn.title}}</mat-header-cell>
+                                    <mat-cell *matCellDef="let element"
+                                        [ngStyle]="{'min-width': displayedColumn.width+ 'px'}"
+                                        [ngClass]=displayedColumn.className>
+                                        <ng-container>
+                                            {{element[displayedColumn.Key]}}
+                                        </ng-container>
+                                    </mat-cell>
+                                </ng-container>
+
+                                <mat-header-row *matHeaderRowDef="columnKeys"></mat-header-row>
+                                <mat-row *matRowDef="let row; columns: columnKeys;" matRipple>
+                                </mat-row>
+                            </mat-table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form [formGroup]="CreditDebitVoucherTaxationTDSForm">
+        <app-form-webxpress [form]="CreditDebitVoucherTaxationTDSForm" [FormTitle]="'Voucher Taxation TDS'"
+            [formData]="jsonControlCreditDebitVoucherTaxationTDSArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+    <form [formGroup]="CreditDebitVoucherTaxationTCSForm">
+        <app-form-webxpress [form]="CreditDebitVoucherTaxationTCSForm" [FormTitle]="'Voucher Taxation TCS'"
+            [formData]="jsonControlCreditDebitVoucherTaxationTCSArray"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+    <form [formGroup]="CreditDebitVoucherTaxationGSTForm">
+        <app-form-webxpress [form]="CreditDebitVoucherTaxationGSTForm" [FormTitle]="'Voucher Taxation GST'"
+            [formData]="jsonControlCreditDebitVoucherTaxationGSTArray" [className]="className"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+
+    <!-- <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
             <div class="example-button-row  d-flex justify-content-end">
                 <button class="msr-3" mat-raised-button color="primary" (click)="save()">Save</button>
@@ -32,5 +72,6 @@
             </div>
 
         </div>
-    </div>
+    </div> -->
+
 </app-common-wrapper-webxpress>

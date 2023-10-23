@@ -57,10 +57,10 @@ export class DashboardPageComponent implements OnInit {
       "label": "Tab 8",
       "permission": ["Export", "FTL", "EXIM"]
     },
-     {
+    {
       "id": "Job",
       "label": "Tab 9",
-      "permission": ["Export","FTL", "Import", "EXIM"]
+      "permission": ["Export", "FTL", "Import", "EXIM"]
     }, {
       "id": "Rake",
       "label": "Tab 10",
@@ -94,7 +94,12 @@ export class DashboardPageComponent implements OnInit {
       "id": "THCUpdate",
       "label": "Tab 16",
       "permission": ["Export", "FTL", "EXIM"]
-    }
+    },
+    {
+      "id": "Accounts",
+      "label": "Tab 17",
+      "permission": ['Accounts']
+    },
   ];
   tabName: any;
   constructor(private changeDetectorRef: ChangeDetectorRef,
@@ -125,8 +130,8 @@ export class DashboardPageComponent implements OnInit {
     // }
     // this.myTabGroup.selectedIndex = Index;
   }
-  onTabChange(event){
-     this.tabName=event.tab.textLabel;
+  onTabChange(event) {
+    this.tabName = event.tab.textLabel;
   }
   ngAfterViewInit(): void {
 
@@ -141,11 +146,11 @@ export class DashboardPageComponent implements OnInit {
           // Set the selectedIndex of the TabGroup
           this.tabGroup.selectedIndex = index;
         }
-        if(selectedTabName=="0"){
+        if (selectedTabName == "0") {
           this.tabGroup.selectedIndex = 0;
         }
       }
     });
   }
-  
+
 }

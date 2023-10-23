@@ -46,7 +46,7 @@ export class HeaderComponent
   searchQuery: string = '';
   autocompleteOptions: any;
   showAutocomplete: boolean = false;
-  menuItems = ['LTL', 'FTL', 'Import', 'Export', 'Billing​'];
+  menuItems = ['LTL', 'FTL', 'Import', 'Export', 'Billing​', 'Accounts'];
   // Replace this with your actual data source or API call
   allOptions: any;
   searchData: any;
@@ -239,7 +239,7 @@ export class HeaderComponent
   menuModeDetail(option: string) {
     localStorage.setItem("Mode", option);
     //location.reload();
-    this.router.navigate(['/']); 
+    this.router.navigate(['/']);
     this.isDropdownOpen = false; // Close the dropdown when an option is selected
     // Add any other logic you need here when a menu item is selected
   }
@@ -258,7 +258,7 @@ export class HeaderComponent
   selectOption(option: any) {
     this.searchQuery = option.name;
     this.router.navigateByUrl(option.value);
-    this.searchQuery="";
+    this.searchQuery = "";
     this.showAutocomplete = false;
   }
   @HostListener('document:click', ['$event'])

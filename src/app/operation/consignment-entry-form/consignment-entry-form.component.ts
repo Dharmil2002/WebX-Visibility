@@ -1277,6 +1277,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const cityMapping = event.field.name == 'fromCity' ? this.fromCityStatus : this.toCityStatus;
     this.pinCodeService.getCity(this.consignmentTableForm, this.jsonControlArrayBasic, event.field.name, cityMapping);
   }
+  /*end*/
 
   /*here the function which is declare for the gross calucation Which is called when the freight and
    otherAmount is enter*/
@@ -1287,7 +1288,14 @@ export class ConsignmentEntryFormComponent implements OnInit {
     );
   }
   /*End*/
-
+ /*here the calucation */
+ calculateTotalamt(){
+  this.FreightTableForm.get('totalAmount')?.setValue(
+    (parseFloat(this.FreightTableForm.get('grossAmount')?.value) || 0) +
+    (parseFloat(this.FreightTableForm.get('gstChargedAmount')?.value) || 0)
+  );
+ }
+ /*end*/
 
 }
 

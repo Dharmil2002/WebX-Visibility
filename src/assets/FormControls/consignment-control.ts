@@ -882,7 +882,10 @@ export class FreightControl {
       },
       {
         name: 'grossAmount', label: 'Gross Amount (Rs)', placeholder: 'Gross Amount', type: 'mobile-number',
-        value: docketDetail.grossAmount, Validations: [], generatecontrol: true, disable: true
+        value: docketDetail.grossAmount, Validations: [], generatecontrol: true, disable: true,
+        functions: {
+          onModel: "calculateTotalamt"
+        },
       },
       {
         name: 'rcm', label: 'RCM', placeholder: 'RCM', type: 'text',
@@ -890,11 +893,15 @@ export class FreightControl {
       },
       {
         name: 'gstAmount', label: 'GST Amount (Rs)', placeholder: 'GST Amount', type: 'mobile-number',
-        value: docketDetail.gstAmount, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.gstAmount, Validations: [], generatecontrol: true, disable: false,
+        
       },
       {
         name: 'gstChargedAmount', label: 'GST Charged Amount (Rs)', placeholder: 'GST Charged Amount', type: 'mobile-number',
-        value: docketDetail.gstChargedAmount, Validations: [], generatecontrol: true, disable: false
+        value: docketDetail.gstChargedAmount, Validations: [], generatecontrol: true, disable: false,
+        functions: {
+          onModel: "calculateTotalamt"
+        }
       },
       {
         name: 'totalAmount', label: 'Total Amount (Rs)', placeholder: 'Total Amount', type: 'mobile-number',

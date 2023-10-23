@@ -124,7 +124,8 @@ export class THCViewComponent implements OnInit {
         if (Res.success && Res.data.length > 0) {
             this.thcNestedData = {
                 ...this.thcNestedData,
-                invoiceDetails: Res.data[0].invoiceDetails[0]
+                transMode: Res.data[0].transMode,
+                invoiceDetails: Res.data[0].invoiceDetails[0] 
             }
         }
     }

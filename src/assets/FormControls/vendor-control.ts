@@ -359,6 +359,16 @@ export class VendorControl {
                 generatecontrol: false, disable: false
             },
             {
+              name: "companyCode",
+              label: "Company Code",
+              placeholder: "Company Code",
+              type: "text",
+              value: parseInt(localStorage.getItem("companyCode")),
+              Validations: [],
+              generatecontrol: false,
+              disable: false,
+            },
+            {
                 name: '_id',
                 label: '',
                 placeholder: '',

@@ -65,13 +65,19 @@ export class ClusterControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'activeFlag',
-                label: 'Active Flag',
-                placeholder: 'Active Flag',
-                type: 'toggle',
-                value: clusterMasterTable.activeFlag,
-                Validations: [],
-                generatecontrol: true, disable: false
+              name: "activeFlag",
+              label: "Active Flag",
+              placeholder: "",
+              type: "toggle",
+              value: isUpdate ? clusterMasterTable.activeFlag : false,
+              generatecontrol: false,
+              disable: false,
+              Validations: [
+                {
+                  name: "required",
+                  message: "Active Flag is required",
+                },
+              ],
             },
             {
                 name: 'pincodeDropdown',

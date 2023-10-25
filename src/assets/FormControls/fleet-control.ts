@@ -29,6 +29,9 @@ export class FleetControls {
                 additionalData: {
                     showNameAndValue: false
                 },
+                functions: {
+                    onOptionSelect: "checkUniqueVehicle",
+                },
             },
             {
                 name: 'vehicleType',
@@ -56,7 +59,7 @@ export class FleetControls {
                 },
             },
             {
-                name: 'RCBookNo', label: "RC Book No", placeholder: "Enter RC Book No", type: 'text', value: FleetTable?.RCBookNo,
+                name: 'RCBookNo', label: "RC Book No", placeholder: "Enter RC Book No", type: 'government-id', value: FleetTable?.RCBookNo,
                 filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [
                     {
@@ -144,7 +147,7 @@ export class FleetControls {
                 ],
                 additionalData: {
                     minDate: new Date(), // Set the minimum date to the current date
-                    maxDate: new Date(new Date().getFullYear(), 11, 31) // Set the maximum date to December 31 of the current year
+                    maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
                 }
             },
             {
@@ -171,7 +174,7 @@ export class FleetControls {
                 ],
                 additionalData: {
                     minDate: new Date(), // Set the minimum date to the current date
-                    maxDate: new Date(new Date().getFullYear(), 11, 31) // Set the maximum date to December 31 of the current year
+                    maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
                 }
             },
             {
@@ -222,7 +225,7 @@ export class FleetControls {
                 label: "",
                 placeholder: "",
                 type: "text",
-                value: FleetTable.id,
+                value: FleetTable._id,
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",
@@ -236,6 +239,39 @@ export class FleetControls {
                 placeholder: "Company Code",
                 type: "",
                 value: parseInt(localStorage.getItem("companyCode")),
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
+            {
+                name: 'updateDate',
+                label: ' ',
+                placeholder: ' ',
+                type: 'date',
+                value: new Date(), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
+            {
+                name: "updateBy",
+                label: "Update By",
+                placeholder: "Update By",
+                type: "text",
+                value: localStorage.getItem("UserName"),
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
+            {
+                name: "EntryBy",
+                label: "",
+                placeholder: "Update By",
+                type: "text",
+                value: localStorage.getItem("UserName"),
                 Validations: [],
                 generatecontrol: false,
                 disable: false,

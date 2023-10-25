@@ -1,12 +1,13 @@
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 export async function getPrqDetailFromApi(masterServices) {
+    const branch = localStorage.getItem("Branch");
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "prq_detail",
         filter: {}
     }
     const res = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
-    const prqData = res.data.filter((x) => x.status.trim() !== "4" && x.status.trim() !== "5")
+    const prqData = res.data.filter((x) => x.status.trim() !== "4" && x.status.trim() !== "5" && x.prqBranch==branch)
     let prqList = [];
 
     prqData.map((element, index) => {

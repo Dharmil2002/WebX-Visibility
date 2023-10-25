@@ -211,7 +211,7 @@ export class VendorControl {
                 name: 'panNo',
                 label: 'PAN NO',
                 placeholder: 'PAN NO',
-                type: 'text',
+                type: 'government-id',
                 value: vendorMasterTable.panNo,
                 Validations: [
                     {
@@ -359,6 +359,16 @@ export class VendorControl {
                 generatecontrol: false, disable: false
             },
             {
+              name: "companyCode",
+              label: "Company Code",
+              placeholder: "Company Code",
+              type: "text",
+              value: parseInt(localStorage.getItem("companyCode")),
+              Validations: [],
+              generatecontrol: false,
+              disable: false,
+            },
+            {
                 name: '_id',
                 label: '',
                 placeholder: '',
@@ -404,7 +414,7 @@ export class VendorControl {
                 name: 'gstNumber',
                 label: 'GST Number',
                 placeholder: 'Enter GST Number',
-                type: 'text',
+                type: 'government-id',
                 value: vendorMasterTable.gstNumber,
                 Validations: [{
                     name: "required",
@@ -413,7 +423,7 @@ export class VendorControl {
                 {
                     name: "pattern",
                     pattern: '^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$',
-                    message: "Please enter a valid GST Number alphanumeric characters like 01BZAHM6385P6Z2"
+                    message: "Enter a valid alphanumeric GST number EX: 01BZAHM6385P6Z2"
                 }
                 ],
                 functions: {

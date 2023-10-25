@@ -1,6 +1,6 @@
 import { financialYear } from "src/app/Utility/date/date-utils";
 const branch=localStorage.getItem("Branch");
-export async function getShipment(operationService, vehicle) {
+export async function getShipment(operationService, vehicle=false) {
     // Define the request body with companyCode, collectionName, and an empty filter
     const reqBody = {
         companyCode: localStorage.getItem("companyCode"),
@@ -73,3 +73,10 @@ export function calculateTotal(form, controlName1, controlName2, resultControlNa
     const total = value1 - value2;
     form.controls[resultControlName].setValue(total);
   }
+export const vendorTypeList=[
+    { value: "Own", name: "Own" },
+    { value: "Attached", name: "Attached" },
+    { value: "Rail", name: "Rail" },
+    { value: "Market", name: "Market" },
+    { value: "Service Provider", name: "Service Provider" }
+]

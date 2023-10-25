@@ -12,7 +12,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
   templateUrl: './customer-group-add.component.html',
 })
 export class CustomerGroupAddComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string;  generatecontrol: boolean; toggle: any;}[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   action: string;
   isUpdate = false;
@@ -21,6 +21,7 @@ export class CustomerGroupAddComponent implements OnInit {
   customerGroupFormControls: CustomerGroupControl;
   jsonControlGroupArray: any;
   backPath:string;
+  submit = 'Save';
   ngOnInit() {
     this.backPath = "/Masters/CustomerGroupMaster/CustomerGroupMasterList";
   }
@@ -31,6 +32,7 @@ export class CustomerGroupAddComponent implements OnInit {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.groupTabledata = Route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
+      this.submit = 'Modify';
       this.isUpdate = true;
     } else {
       this.action = "Add";
@@ -38,17 +40,21 @@ export class CustomerGroupAddComponent implements OnInit {
     if (this.action === 'edit') {
       this.breadScrums = [
         {
-          title: "Customer Group Master",
+          title: "Modify Customer Group",
           items: ["Home"],
-          active: "Edit Customer Group Master",
+          active: "Modify Customer Group",
+          generatecontrol: true,
+          toggle: this.groupTabledata.activeFlag
         },
       ];
     } else {
       this.breadScrums = [
         {
-          title: "Customer Group Master",
+          title: "Add Customer Group",
           items: ["Home"],
-          active: "Add Customer Group Master",
+          active: "Add Customer Group",
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.groupTabledata = new CustomerGroupMaster({});
@@ -128,6 +134,11 @@ export class CustomerGroupAddComponent implements OnInit {
     }
   }
   //#endregion
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.groupTableForm.controls['activeFlag'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
   checkGroupCodeExists() {
     let req = {
       "companyCode": this.companyCode,

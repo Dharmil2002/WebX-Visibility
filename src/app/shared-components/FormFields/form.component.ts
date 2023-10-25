@@ -23,16 +23,20 @@ export class FormComponent {
   @Input() uploadedFiles;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
+  hide: boolean = true;
   selectedValue: any;
   isTouchUIActivated = false;
   // field required for password input.
   showPassword: boolean = false;
   ConfirmshowPassword: boolean = false;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
+  @Input() url: string;
   // ngOnChanges(changes: SimpleChanges) {
   //   this.formData=changes.formData.currentValue
   //   }
-  constructor(private rootFormGroup: FormGroupDirective) {
+  constructor(private rootFormGroup: FormGroupDirective,
+    
+  ) {
     this.form = this.rootFormGroup.control  // get parent form control
 
     // some data we want , for date fiels, that are required most of the time.
@@ -82,4 +86,19 @@ export class FormComponent {
     link.download = url.substring(url.lastIndexOf('/') + 1);
     link.click();
   }
+  showhidebuttonclick() {
+    let context = {};
+    context['functionName'] = 'showhidebuttonclick';
+    this.functionCallEmitter.emit(context)
+  }
+  //#region to emit function to preview image
+  openImageDialog(functionName: string, imageName: string) {
+    this.hide = false;
+    let context = {
+      functionName: functionName,
+      imageName: imageName
+    };
+    this.functionCallEmitter.emit(context);
+  }
+  //#endregion
 }

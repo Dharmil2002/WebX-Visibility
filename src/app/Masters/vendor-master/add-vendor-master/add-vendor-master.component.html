@@ -1,19 +1,19 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath"
 (toggleChange)="onToggleChange($event)">
     <form [formGroup]="vendorTableForm">
-        <app-form-webxpress [form]="vendorTableForm" [formData]="jsonControlVendorArray"
+        <app-form-webxpress [form]="vendorTableForm" [FormTitle]="'Vendor Details'" [formData]="jsonControlVendorArray"
             (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
-    <div
+    <!-- <div
     style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
     <h3 style="font-size: 1.5rem; padding: 5px 0px;">Vendor Other Details</h3>
-  </div>
+  </div> -->
 
     <hr>
     <form [formGroup]="otherDetailForm">
-        <app-form-webxpress [form]="otherDetailForm" [formData]="jsonControlOtherArray"
+        <app-form-webxpress [form]="otherDetailForm" [FormTitle]="'Vendor Other Details'" [formData]="jsonControlOtherArray"
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
             (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>

@@ -86,7 +86,7 @@ export class AddressControl {
                     {
                         name: "required",
                         message: " ",
-                      },
+                    },
                     {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
@@ -115,7 +115,7 @@ export class AddressControl {
                 Validations: []
             },
             {
-                name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: addressGroupTable.activeFlag, generatecontrol: true, disable: false,
+                name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: addressGroupTable.activeFlag, generatecontrol: false, disable: false,
                 Validations: []
             },
             {
@@ -140,7 +140,20 @@ export class AddressControl {
                 Validations: [],
                 generatecontrol: false,
                 disable: false,
-              },
+            },
+            {
+                name: 'updatedDate',
+                label: ' ',
+                placeholder: ' ',
+                type: 'date',
+                value: new Date(), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
         ]
     }
     getFormControls() {

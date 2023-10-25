@@ -10,7 +10,7 @@ export class VehicleControls {
         this.vehicleDetailsControl =
             [
                 {
-                    name: 'vehicleNo', label: "Vehicle Number", placeholder: "Enter Vehicle Number", type: 'text', value: vehicleTable.vehicleNo, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: isUpdate ? true : false,
+                    name: 'vehicleNo', label: "Vehicle Number", placeholder: "Enter Vehicle Number", type: 'government-id', value: vehicleTable.vehicleNo, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: isUpdate ? true : false,
                     Validations: [
                         {
                             name: "required",
@@ -18,7 +18,7 @@ export class VehicleControls {
                         },
                         {
                             name: "pattern",
-                            message: "",
+                            message: "Please enter ",
                             pattern: '^[A-Z][A-Z0-9]+$'
                         }
                     ],
@@ -95,12 +95,12 @@ export class VehicleControls {
                     name: "vendorType",
                     label: "Vendor Type",
                     placeholder: "VehicleType",
-                    type:'Staticdropdown',
+                    type: 'Staticdropdown',
                     value: [
                         { value: "Own", name: "Own" },
                         { value: "Attached", name: "Attached" },
                         { value: "Service Provider", name: "Service Provider" }
-                      ],
+                    ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -111,10 +111,10 @@ export class VehicleControls {
                             name: "required",
                             message: "Vendor Type  is required",
                         }],
-                        functions: {
-                            onSelection: "vendorFieldChanged"
-                          },
-                    additionalData: { }
+                    functions: {
+                        onSelection: "vendorFieldChanged"
+                    },
+                    additionalData: {}
                 },
                 {
                     name: 'vendorName', label: "Vendor Name", placeholder: "Search and select Vendor Name", type: 'dropdown',
@@ -283,7 +283,13 @@ export class VehicleControls {
                     ]
                 },
                 {
-                    name: 'isActive', label: 'Active Flag', placeholder: '', type: 'toggle', value: vehicleTable.isActive, generatecontrol: true, disable: false,
+                    name: 'isActive',
+                    label: 'Active Flag',
+                    placeholder: '',
+                    type: 'toggle',
+                    value: vehicleTable.isActive,
+                    generatecontrol: false,
+                    disable: false,
                     Validations: []
                 },
                 {
@@ -325,6 +331,19 @@ export class VehicleControls {
                 {
                     name: 'companyCode', label: 'companyCode', placeholder: '', type: 'text', value: localStorage.getItem("companyCode"), generatecontrol: false, disable: false,
                     Validations: []
+                },
+                {
+                    name: 'updatedDate',
+                    label: 'Entry Date',
+                    placeholder: 'Select Entry Date',
+                    type: 'date',
+                    value: new Date(), // Set the value to the current date
+                    filterOptions: '',
+                    autocomplete: '',
+                    displaywith: '',
+                    Validations: [],
+                    generatecontrol: false,
+                    disable: false
                 },
             ]
     }

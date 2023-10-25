@@ -26,7 +26,7 @@ export class JobSummaryPageComponent implements OnInit {
     jobNo: {
       Title: "Job No",
       class: "matcolumnleft",
-      Style: "min-width:180px",
+      Style: "min-width:250px",
     },
     jobDate: {
       Title: "Job Date",
@@ -51,7 +51,7 @@ export class JobSummaryPageComponent implements OnInit {
     jobLocation: {
       Title: "Job Location",
       class: "matcolumnleft",
-      Style: "min-width:110px",
+      Style: "max-width:90px",
     },
     pkgs: {
       Title: "Pkgs",
@@ -61,7 +61,7 @@ export class JobSummaryPageComponent implements OnInit {
     vehicleSize: {
       Title: "Vehicle Size",
       class: "matcolumncenter",
-      Style:  "max-width:150px",
+      Style:  "max-width:90px",
     },
     status: {
       Title: "Status",

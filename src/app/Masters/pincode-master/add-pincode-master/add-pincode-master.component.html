@@ -1,7 +1,7 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
     <form [formGroup]="pincodeTableForm">
         <app-form-webxpress [form]="pincodeTableForm" [formData]="jsonControlArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true" [submit]="submit" [FormTitle]="'Pincode Details'">
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

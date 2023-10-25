@@ -90,7 +90,7 @@ export class CustomerMasterListComponent implements OnInit {
           });
 
           // Generate srno for each object in the array
-          const dataWithSrno = sortedData.map((obj, index) => {
+          const dataWithDate = sortedData.map((obj, index) => {
             return {
               ...obj,
               customerGroup: obj.customerGroup,
@@ -104,8 +104,8 @@ export class CustomerMasterListComponent implements OnInit {
 
           // Use latestUpdatedDate as needed
 
-          this.csv = dataWithSrno;
-          this.tableData = dataWithSrno;
+          this.csv = dataWithDate;
+          this.tableData = dataWithDate;
           this.tableLoad = false;
         }
       }

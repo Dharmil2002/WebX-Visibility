@@ -1,8 +1,8 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
     <form [formGroup]="addressTableForm">
         <app-form-webxpress [form]="addressTableForm" [formData]="jsonControlGroupArray"
             [showSaveAndCancelButton]="true" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)">
+            (callFunction)="functionCallHandler($event)" [submit]="submit" [FormTitle]="'Address Details'">
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

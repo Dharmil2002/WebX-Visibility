@@ -1,20 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Route, Router } from '@angular/router';
+import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
+import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
+import { financialYear } from 'src/app/Utility/date/date-utils';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { pendingbilling } from 'src/app/operation/pending-billing/pending-billing-utlity';
-import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utlity';
-import { StateWiseSummaryControl } from 'src/assets/FormControls/state-wise-summary-control';
+import { SessionService } from 'src/app/core/service/session.service';
+import { customerFromApi } from 'src/app/operation/prq-entry-page/prq-utitlity';
+import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/creditdebitvouchercontrol';
 import Swal from 'sweetalert2';
-import { UpdateDetail, addInvoiceDetail, getApiCompanyDetail, getApiCustomerDetail, getInvoiceDetail, getLocationApiDetail, getPrqApiDetail, shipmentDetail } from '../invoice-summary-bill/invoice-utility';
-
 @Component({
   selector: 'app-credit-debit-voucher',
   templateUrl: './credit-debit-voucher.component.html',
 })
 export class CreditDebitVoucherComponent implements OnInit {
-
+  companyCode: number | null
   breadScrums = [
     {
       title: "Credit Debit Voucher",
@@ -22,283 +25,406 @@ export class CreditDebitVoucherComponent implements OnInit {
       active: "Credit Debit Voucher",
     },
   ];
-  METADATA = {
-    checkBoxRequired: true,
-    noColumnSort: ["checkBoxRequired"],
-  };
-  tableLoad: boolean = true;
-  invoiceTableForm: UntypedFormGroup;
-  invoiceSummaryTableForm: UntypedFormGroup;
-  invoiceFormControls: StateWiseSummaryControl;
-  jsonControlArray: any;
-  KPICountData: { count: any; title: string; class: string }[];
+  className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
+  creditDebitVoucherControl: CreditDebitVoucherControl;
 
-  dynamicControls = {
-    add: false,
-    edit: false,
-    csv: false,
-  };
-  columnHeader = {
-    checkBoxRequired: {
-      Title: "Select",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    stateName: {
-      Title: "State Name",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    cnoteCount: {
-      Title: "Shipment Count",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    countSelected: {
-      Title: "Shipment Selected",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    subTotalAmount: {
-      Title: "Sub-total",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    gstCharged: {
-      Title: "GST",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    totalBillingAmount: {
-      Title: "Shipment Total",
-      class: "matcolumncenter",
-      Style: "",
-    }
-  };
-  columnHeader1 = {
-    count: {
-      Title: "Count",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    subTotal: {
-      Title: "Sub Total",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    billTimeCharges: {
-      Title: "Bill Time Charges",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    totalAmount: {
-      Title: "Total Amount",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    gstRate: {
-      Title: "GST Rate",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    sgst: {
-      Title: "SGST",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    utgst: {
-      Title: "UTGST",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    cgst: {
-      Title: "CGST",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    igst: {
-      Title: "IGST",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    gstTotal: {
-      Title: "GST Total",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    total: {
-      Title: "Total",
-      class: "matcolumncenter",
-      Style: "",
-    },
-  };
-  tableData = []
-  tableData1 = [
+  CreditDebitVoucherSummaryForm: UntypedFormGroup;
+  jsonControlCreditDebitVoucherSummaryArray: any;
+
+  //Taxation Form Config
+  CreditDebitVoucherTaxationTDSForm: UntypedFormGroup;
+  jsonControlCreditDebitVoucherTaxationTDSArray: any;
+
+  CreditDebitVoucherTaxationTCSForm: UntypedFormGroup;
+  jsonControlCreditDebitVoucherTaxationTCSArray: any;
+
+  CreditDebitVoucherTaxationGSTForm: UntypedFormGroup;
+  jsonControlCreditDebitVoucherTaxationGSTArray: any;
+
+  CreditDebitVoucherTaxationPaymentSummaryForm: UntypedFormGroup;
+  jsonControlCreditDebitVoucherTaxationPaymentSummaryArray: any;
+
+  CreditDebitVoucherTaxationPaymentDetailsForm: UntypedFormGroup;
+  jsonControlCreditDebitVoucherTaxationPaymentDetailsArray: any;
+
+
+  CreditDebitVoucherDocumentDebitsForm: UntypedFormGroup;
+  jsonControlCreditDebitVoucherDocumentDebitsArray: any;
+
+  displayedColumns = [
     {
-      count: 0,
-      subTotal: 0.00,
-      billTimeCharges: 0.00,
-      totalAmount: 0,
-      gstRate: 12,
-      sgst: 0.00,
-      utgst: 0.00,
-      cgst: 0.00,
-      igst: 0.00,
-      gstTotal: 0,
-      total: 0.00,
-    }
+      Key: "Ledger", title: "Ledger", width: "200", className: "matcolumnleft", show: true
+    },
+    { Key: "SACCode", title: "SAC Code", width: "200", className: "matcolumnleft", show: true },
+    {
+      Key: "DebitAmount", title: "Debit Amount ₹", width: "70", className: "matcolumncenter", show: true
+    },
+    {
+      Key: "GSTRate", title: "GST Rate", width: "70", className: "matcolumncenter", show: true
+    },
+    {
+      Key: "GSTAmount", title: "GST Amount ₹", width: "70", className: "matcolumncenter", show: true
+    },
+    {
+      Key: "Total", title: "Total ₹", width: "70", className: "matcolumncenter", show: true
+    },
+    {
+      Key: "TDSApplicable", title: "TDS Applicable", width: "100", className: "matcolumncenter", show: true
+    },
+    {
+      Key: "Narration", title: "Narration", width: "200", className: "matcolumnleft", show: true
+    },
   ];
-  staticField = ["sr", "select", "stateName", "cnoteCount", "countSelected", "subTotalAmount", "gstCharged", "totalBillingAmount"];
-  staticField1 = ["count", "subTotal", "billTimeCharges", "totalAmount", "gstRate", "sgst", "utgst", "cgst", "igst", "gstTotal", "total"];
-  navigateExtra: any;
-  prqNo: any;
-  invoiceSummaryJsonArray: any;
+  columnKeys = this.displayedColumns.map((column) => column.Key);
+  // EditAble Table 
+  tableData: any = [];
+  DocumentDebits: any = [];
+  //Displayed columns City location configuration
+  VoucherDetailsDisplayedColumns = {
+
+    Ledger: {
+      name: "Ledger",
+      key: "Dropdown",
+      option: [],
+      style: "",
+      class: 'matcolumnfirst'
+    },
+    SACCode: {
+      name: "SAC Code",
+      key: "Dropdown",
+      option: [],
+      style: "",
+      class: 'matcolumncenter'
+    },
+    DebitAmount: {
+      name: "Debit Amount ₹",
+      key: "inputnumber",
+      style: "",
+      class: 'matcolumncenter'
+    },
+    GSTRate: {
+      name: "GST Rate %",
+      key: "inputnumber",
+      style: "",
+      class: 'matcolumncenter'
+    },
+    GSTAmount: {
+      name: "GST Amount ₹",
+      key: "inputnumber",
+      style: "",
+      class: 'matcolumncenter'
+    },
+    Total: {
+      name: "Total ₹",
+      key: "inputnumber",
+      style: "",
+      class: 'matcolumncenter'
+    },
+    TDSApplicable: {
+      name: "TDS Applicable",
+      key: "togleCheckBox",
+      style: "max-width: 80px;",
+      class: 'matcolumncenter'
+    },
+    Narration: {
+      name: "Narration",
+      key: "inputString",
+      style: "",
+      class: 'matcolumncenter'
+    },
+    action: {
+      name: "Action",
+      key: "Action",
+      style: "",
+      class: 'matcolumncenter'
+    }
+  };
+  DocumentDebitsDisplayedColumns = {
+
+    Document: {
+      name: "Document ",
+      key: "Dropdown",
+      option: [],
+      style: "",
+      class: 'matcolumnfirst'
+    },
+    DebitAmount: {
+      name: "Debit Amount ₹",
+      key: "inputnumber",
+      style: "",
+      class: 'matcolumncenter'
+    },
+
+    action: {
+      name: "Action",
+      key: "Action",
+      style: "",
+      class: 'matcolumncenter'
+    }
+  };
+  actionObject = {
+    addRow: true,
+    submit: true,
+    search: true
+  };
+
+  PartyNameList: any;
+  StateList: any;
+  AccountGroupList: any;
+  DisplayCreditDebitVoucherDocument: boolean = false;
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
-    private masterService: MasterService
+    private filter: FilterUtils,
+    private sessionService: SessionService,
+    private masterService: MasterService,
+    private navigationService: NavigationService,
+    private voucherServicesService: VoucherServicesService,
   ) {
-    if (this.router.getCurrentNavigation()?.extras?.state != null) {
-      this.navigateExtra = this.router.getCurrentNavigation()?.extras?.state.data || "";
+    this.companyCode = this.sessionService.getCompanyCode()
+    // this.VoucherDetailsDisplayedColumns.Ledger.option = [
+    //   { "name": "EXP001: Conveyance", "value": "EXP001" },
+    //   { "name": "EXP002: Communication", "value": "EXP002" },
+    //   { "name": "EXP003: Communication", "value": "EXP003" }
+    // ];
+    this.VoucherDetailsDisplayedColumns.SACCode.option = [
+      { "name": "12022: Local conveyance", "value": "12022" },
+      { "name": "12088: Telecom services", "value": "12088" },
+      { "name": "12089: Telecom services", "value": "12089" }
+    ];
 
-    }
-
-    this.tableLoad = false;
-    //#region fist table count
-
-    //#endregion
   }
-
   ngOnInit(): void {
+    this.BindDataFromApi();
     this.initializeFormControl();
-    this.getPrqDetail();
+    this.addVoucherDetails('')
+    this.AddDocumentDebits('');
   }
-
   initializeFormControl() {
-    this.invoiceFormControls = new StateWiseSummaryControl();
-    // Get form controls for job Entry form section
-    this.jsonControlArray = this.invoiceFormControls.getstateWiseSummaryArrayControls();
-    this.invoiceSummaryJsonArray = this.invoiceFormControls.getInvoiceSummaryArrayControls();
-    // Build the form group using formGroupBuilder function
-    this.invoiceTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.invoiceSummaryTableForm = formGroupBuilder(this.fb, [this.invoiceSummaryJsonArray])
-    this.invoiceTableForm.controls['customerName'].setValue(this.navigateExtra.columnData.billingparty || "")
-    this.invoiceTableForm.controls['unbilledAmount'].setValue(this.navigateExtra.columnData.sum || 0)
-    this.getCustomerDetail();
+    this.creditDebitVoucherControl = new CreditDebitVoucherControl();
+    this.jsonControlCreditDebitVoucherSummaryArray = this.creditDebitVoucherControl.getCreditDebitVoucherSummaryArrayControls();
+    this.CreditDebitVoucherSummaryForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherSummaryArray]);
+
+    this.jsonControlCreditDebitVoucherTaxationTDSArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationTDSArrayControls();
+    this.CreditDebitVoucherTaxationTDSForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationTDSArray]);
+
+    this.jsonControlCreditDebitVoucherTaxationTCSArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationTCSArrayControls();
+    this.CreditDebitVoucherTaxationTCSForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationTCSArray]);
+
+    this.jsonControlCreditDebitVoucherTaxationGSTArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationGSTArrayControls();
+    this.CreditDebitVoucherTaxationGSTForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationGSTArray]);
+
+    this.jsonControlCreditDebitVoucherTaxationPaymentSummaryArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationPaymentSummaryArrayControls();
+    this.CreditDebitVoucherTaxationPaymentSummaryForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationPaymentSummaryArray]);
+
+    this.jsonControlCreditDebitVoucherTaxationPaymentDetailsArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationPaymentDetailsArrayControls();
+    this.CreditDebitVoucherTaxationPaymentDetailsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationPaymentDetailsArray]);
+
+    this.jsonControlCreditDebitVoucherDocumentDebitsArray = this.creditDebitVoucherControl.getCreditDebitVoucherDocumentDebitsArrayControls();
+    this.CreditDebitVoucherDocumentDebitsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherDocumentDebitsArray]);
+
   }
+  async BindDataFromApi() {
+    const stateReqBody = {
+      companyCode: this.companyCode,
+      filter: {},
+      collectionName: "state_master",
+    };
+    const account_groupReqBody = {
+      companyCode: this.companyCode,
+      collectionName: "account_group_detail",
+      filter: {},
+    };
+
+    const resCust = await customerFromApi(this.masterService);
+    this.PartyNameList = resCust;
+    const resState = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
+    this.StateList = resState?.data
+      .map(x => ({ value: x.STNM, name: x.ST }))
+      .filter(x => x != null)
+      .sort((a, b) => a.value.localeCompare(b.value));
+
+    const resaccount_group = await this.masterService.masterPost('generic/get', account_groupReqBody).toPromise();
+    this.AccountGroupList = resaccount_group?.data
+      .map(x => ({ value: x.GroupCode + ":" + x.GroupName, name: x.GroupCode + ":" + x.GroupName }))
+      .filter(x => x != null)
+      .sort((a, b) => a.value.localeCompare(b.value));
+    this.VoucherDetailsDisplayedColumns.Ledger.option = this.AccountGroupList
+    this.filter.Filter(
+      this.jsonControlCreditDebitVoucherSummaryArray,
+      this.CreditDebitVoucherSummaryForm,
+      resCust,
+      "PartyName",
+      false
+    );
+    this.filter.Filter(
+      this.jsonControlCreditDebitVoucherSummaryArray,
+      this.CreditDebitVoucherSummaryForm,
+      this.StateList,
+      "Partystate",
+      null
+    );
+    this.filter.Filter(
+      this.jsonControlCreditDebitVoucherSummaryArray,
+      this.CreditDebitVoucherSummaryForm,
+      this.StateList,
+      "Paymentstate",
+      false
+    );
 
 
+  }
   functionCallHandler($event) {
-    let functionName = $event.functionName; // name of the function , we have to call
-
-    // function of this name may not exists, hence try..catch
+    let functionName = $event.functionName;
     try {
       this[functionName]($event);
     } catch (error) {
-      // we have to handle , if function not exists.
       console.log("failed");
     }
   }
-  async getPrqDetail() {
-    const prqDetail = await pendingbilling(this.masterService);
-    this.prqNo = prqDetail
-      .filter((x) => x.billingParty === this.navigateExtra.columnData.billingparty)
-      .map((x) => x.prqNo)
-      .join(', ');
+  async save1() {
+    console.log(this.tableData)
+    console.log(this.CreditDebitVoucherSummaryForm.value)
+    // CreditDebitVoucherSummaryForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationTDSForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationTCSForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationGSTForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationPaymentSummaryForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationPaymentDetailsForm: UntypedFormGroup;
+    // CreditDebitVoucherDocumentDebitsForm: UntypedFormGroup;
 
   }
-
   async save() {
-    if (this.invoiceTableForm.value?.MIN) {
-      this.invoiceTableForm.controls['invoiceNo'].setValue(this.invoiceTableForm.value?.MIN || "");
-    }
-    else {
-      const thisYear = new Date().getFullYear();
-      const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
-      const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
-      const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-      const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-      let invoice = `BL/${dynamicValue}/${financialYear}/${paddedNumber}`;
-      this.invoiceTableForm.controls['invoiceNo'].setValue(invoice);
-    }
-    this.invoiceTableForm.controls['_id'].setValue(this.invoiceTableForm.controls['invoiceNo'].value);
-    this.invoiceTableForm.controls['prqNo'].setValue(this.prqNo);
-    this.invoiceTableForm.controls['billingAmount'].setValue(this.invoiceTableForm.controls['unbilledAmount'].value);
-    const addRes = await addInvoiceDetail(this.masterService, this.invoiceTableForm.value);
-    if (addRes) {
-      const update = await UpdateDetail(this.masterService, this.invoiceTableForm.value);
-      if (update) {
-        Swal.fire({
-          icon: "success",
-          title: "Successfully Generated",
-          text: `Invoice Successfully Generated Invoice number is ${this.invoiceTableForm.controls['invoiceNo'].value}`,
-          showConfirmButton: true,
-        });
-        this.cancel('Billing​');
-      }
-    }
+    // Create a new array to store the transformed data
+    var transformedData = this.tableData.map(function (item) {
+      // Split the "Ledger" value into "accCode" and "accName"
+      var ledgerParts = item.Ledger.split(":");
+      // Create a new object with the desired structure
+      return {
+        "accCode": ledgerParts[0],
+        "accName": ledgerParts[1],
+        "amount": item.Total,
+        "narration": item.Narration
+      };
+    });
+    console.log(this.CreditDebitVoucherSummaryForm.value)
+    let reqBody = {
+      companyCode: this.companyCode,
+      voucherNo: "VR0002",
+      transDate: Date(),
+      finYear: financialYear,
+      branch: localStorage.getItem("Branch"),
+      transType: "DebitVoucher",
+      docType: "Voucher",
+      docNo: "VR0002",
+      partyCode: this.CreditDebitVoucherSummaryForm.value?.PartyName?.value,
+      partyName: this.CreditDebitVoucherSummaryForm.value?.PartyName?.name,
+      entryBy: localStorage.getItem("UserName"),
+      entryDate: Date(),
+      debit: transformedData,
+      credit: transformedData,
 
+    };
+    this.voucherServicesService
+      .FinancePost("fin/account/posting", reqBody)
+      .subscribe({
+        next: (res: any) => {
+          Swal.fire({
+            icon: "success",
+            title: "Voucher Created Successfully",
+            text:
+              "",
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirect to the desired page after the success message is confirmed.
+              this.navigationService.navigateTotab(
+                "docket",
+                "dashboard/Index"
+              );
+            }
+          });
+        },
+      });
   }
   cancel(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
-
-  async getCustomerDetail() {
-    const custDetail = await getApiCustomerDetail(this.masterService, this.navigateExtra);
-    const tranDetail = await getApiCompanyDetail(this.masterService);
-    this.invoiceTableForm.controls['cGstin'].setValue(custDetail.data[0].GSTdetails.find((x) => x.gstState === custDetail.data[0].state).gstState);
-    this.invoiceTableForm.controls['cState'].setValue(custDetail.data[0].state);
-    this.invoiceTableForm.controls['tState'].setValue(tranDetail.data[0].state);
-    this.invoiceTableForm.controls['tGstin'].setValue(tranDetail.data[0].gstNo);
-    const prqDetail = await getPrqApiDetail(this.masterService, this.navigateExtra.columnData.billingparty);
-    if (prqDetail) {
-      const locDetail = await getLocationApiDetail(this.masterService);
-      const shipment = await shipmentDetail(this.masterService);
-      const invoiceDetail = await getInvoiceDetail(prqDetail, locDetail, shipment);
-      this.tableData = invoiceDetail;
-      this.IsActiveFuntion("")
-    }
-
+  showhidebuttonclick(event) {
+    this.DisplayCreditDebitVoucherDocument = !this.DisplayCreditDebitVoucherDocument
+  }
+  // Add a new item to the table
+  addVoucherDetails(event) {
+    const addObj = {
+      Ledger: "EXP001",
+      SACCode: "12088",
+      action: ""
+    };
+    this.tableData.splice(0, 0, addObj);
 
   }
+  // Add a new item to the table
+  AddDocumentDebits(event) {
+    const addObj = {
+      Ledger: "EXP001",
+      SACCode: "12088",
+      action: ""
+    };
+    this.DocumentDebits.splice(0, 0, addObj);
 
-  IsActiveFuntion($event) {
+  }
+  async delete(event, tableData) {
+    const index = event.index;
+    const row = event.element;
 
-    const invoice = $event ? $event : "";
-    const cnoteCount = this.tableData.length;
-    const countSelected = invoice ? invoice.length : 0;
-    const subTotalAmount = invoice ? calculateTotalField(invoice, 'subTotalAmount') : 0;
-    const gstCharged = invoice ? calculateTotalField(invoice, 'gstCharged') : 0;
-    const totalBillingAmount = invoice ? calculateTotalField(invoice, 'totalBillingAmount') : 0;
-    //#endregion
+    const swalWithBootstrapButtons = await Swal.mixin({
+      customClass: {
+        confirmButton: "btn btn-success msr-2",
+        cancelButton: "btn btn-danger",
+      },
+      buttonsStyling: false,
+    });
+    swalWithBootstrapButtons
+      .fire({
+        title: `<h4><strong>Are you sure you want to delete ?</strong></h4>`,
+        showCancelButton: true,
+        cancelButtonColor: "#d33",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        showLoaderOnConfirm: true,
+        preConfirm: (Remarks) => {
+          var request = {
+            companyCode: localStorage.getItem("CompanyCode"),
+            id: row.id,
+          };
+          if (row.id == 0) {
+            return {
+              isSuccess: true,
+              message: "Data has been deleted !",
+            };
+          } else {
+            console.log("Request", request);
+          }
+        },
+        allowOutsideClick: () => !Swal.isLoading(),
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          this[tableData].splice(index, 1);
+          swalWithBootstrapButtons.fire("Deleted!", "Your data has been deleted successfully", "success");
+          event.callback(true);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithBootstrapButtons.fire("Cancelled", "Your item is safe :)", "error");
+          event.callback(false);
+        } else {
+          swalWithBootstrapButtons.fire("Not Deleted!", "Your data remains safe", "info");
+          event.callback(false);
+        }
+      });
 
-    //#region fist table KPICountData
-    this.KPICountData = [
-      {
-        count: cnoteCount,
-        title: "Total Cnote Count",
-        class: `color-Grape-light`,
-      },
-      {
-        count: countSelected,
-        title: "Total Count Selected",
-        class: `color-Bottle-light`,
-      },
-      {
-        count: subTotalAmount,
-        title: "Sub Total Amount",
-        class: `color-Daisy-light`,
-      },
-      {
-        count: gstCharged,
-        title: "Total GST Charged",
-        class: `color-Success-light`,
-      },
-      {
-        count: totalBillingAmount,
-        title: "Total Billing Amount",
-        class: `color-Grape-light`,
-      },
-    ]
+    return true;
+  }
+  saveData(event) {
+
   }
 }

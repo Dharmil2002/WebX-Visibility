@@ -43,7 +43,7 @@ export class AddManualVoucherControl {
       },
       {
         name: "amount",
-        label: "Amount (Rs)",
+        label: "Amount (₹)",
         placeholder: "Amount",
         type: "number",
         value:"",

@@ -12,6 +12,9 @@ export class JobControl {
                 value: "System Generated",
                 generatecontrol: true,
                 disable: true,
+                additionalData: {
+                    metaData: "jobControls"
+                },
                 Validations: [
                 ]
             }, {
@@ -24,8 +27,9 @@ export class JobControl {
                 disable: false,
                 Validations: [],
                 additionalData: {
-                    minDate: new Date(),
-                },
+                    metaData: "jobControls",
+                    minDate: new Date()
+                }
             },
             {
                 name: "weight",
@@ -35,6 +39,9 @@ export class JobControl {
                 value: "",
                 generatecontrol: true,
                 disable: false,
+                additionalData: {
+                    metaData: "jobControls"
+                },
                 Validations: []
             }, {
                 name: 'billingParty', label: "Billing Party", placeholder: "Select Billing Party", type: 'dropdown',
@@ -43,9 +50,17 @@ export class JobControl {
                     {
                         name: "required",
                         message: "Billing Party is required"
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
                     }
                 ],
                 additionalData: {
+                    metaData: "jobControls",
                     showNameAndValue: false
                 }
             }, {
@@ -57,11 +72,13 @@ export class JobControl {
                     { value: '32', name: '32-MT' }
                 ],
                 filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "jobControls"
+                },
                 Validations: [
                 ],
-                additionalData: {
-                    showNameAndValue: false
-                }
+
             }, {
                 name: "mobileNo",
                 label: "Mobile No",
@@ -77,10 +94,13 @@ export class JobControl {
                         pattern: "^[0-9]{10}$",
                     },
                 ],
+                additionalData: {
+                    metaData: "jobControls"
+                },
             }, {
                 name: 'fromCity', label: "From City", placeholder: "Enter From City", type: 'dropdown', value: '',
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: [
                     {
                         name: "autocomplete",
@@ -88,11 +108,16 @@ export class JobControl {
                     {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
-                    }
+                    },
+                    {
+                        name: "required",
+                        message: "From City is required"
+                    },
                 ],
                 additionalData: {
-                    showNameAndValue: false
-                }
+                    showNameAndValue: false,
+                    metaData: "jobControls"
+                },
             }, {
                 name: 'toCity', label: "To City", placeholder: "Enter To City", type: 'dropdown', value: '',
                 generatecontrol: true,
@@ -104,10 +129,19 @@ export class JobControl {
                     {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
-                    }
+                    },
+                    {
+                        name: "required",
+                        message: "To City is required"
+                    },
                 ],
+                functions: {
+                    onModel: "getPincodeDetail",
+                    onOptionSelect:"getDocketBasedOnCity"
+                },
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: false,
+                    metaData: "jobControls"
                 }
             },
             {
@@ -125,6 +159,9 @@ export class JobControl {
                         message: "Job Type is required"
                     }
                 ],
+                additionalData: {
+                    metaData: "jobControls"
+                },
                 generatecontrol: true,
                 disable: false
             },
@@ -141,7 +178,10 @@ export class JobControl {
                     message: "Please Enter Proper Packages(1-6 Digit)",
                     pattern: '[0-9]{1,6}'
                 }
-                ]
+                ],
+                additionalData: {
+                    metaData: "jobControls"
+                }
             },
             {
                 name: "transportedBy",
@@ -154,6 +194,12 @@ export class JobControl {
                 ],
                 Validations: [
                 ],
+                functions: {
+                    onSelection: "tranPortChanged"
+                  },
+                additionalData: {
+                    metaData: "jobControls"
+                },
                 generatecontrol: true,
                 disable: false
             },
@@ -172,7 +218,8 @@ export class JobControl {
                     }
                 ],
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: false,
+                    metaData: "jobControls"
                 }
             },
             {
@@ -180,7 +227,8 @@ export class JobControl {
                 value: localStorage.getItem('Branch'), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: true,
                 Validations: [],
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: false,
+                    metaData: "jobControls"
                 }
             },
             {
@@ -192,8 +240,12 @@ export class JobControl {
 
                 ], filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                 Validations: [],
+                functions: {
+                    onSelection: "tranPortChanged"
+                  },
                 additionalData: {
-                    showNameAndValue: false
+                    showNameAndValue: false,
+                    metaData: "jobControls"
                 }
             },
             {
@@ -202,6 +254,121 @@ export class JobControl {
                 placeholder: "Enter PO Number",
                 type: "text",
                 value: "",
+                additionalData: {
+                    metaData: "jobControls"
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "contNo",
+                label: "Containor Number",
+                placeholder: "Containor Number",
+                type: "text",
+                value: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "containerType",
+                label: "Container Type",
+                placeholder: "Container Type",
+                type: "dropdown",
+                value: "",
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                Validations: [
+                {
+                    name: "autocomplete",
+                },
+                {
+                    name: "invalidAutocompleteObject",
+                    message: "Choose proper value",
+                }
+            ],
+                additionalData: {
+                  showNameAndValue: false,
+                  metaData: "jobTableControls"
+                },
+                functions: {
+                  onOptionSelect: 'getContainerType'
+                },
+                generatecontrol: true,
+                disable: false,
+              },
+            {
+                name: "cnoteNo",
+                label: "Cnote Number",
+                placeholder: "Cnote Number",
+                type: "dropdown",
+                value: "",
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "jobTableControls"
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
+
+                ]
+                ,
+                functions: {
+                  onChange: "getDocketDetail",
+                  onOptionSelect: 'fillDocketDetail'
+                  }
+            },
+            {
+                name: "cnoteDate",
+                label: "Cnote Date",
+                placeholder: "Cnote Date",
+                type: "date",
+                value: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "noOfpkg",
+                label: "No of Package",
+                placeholder: "No of Package",
+                type: "mobile-number",
+                value: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "loadedWeight",
+                label: "Loaded Weight",
+                placeholder: "Loaded Weight",
+                type: "text",
+                value: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -211,9 +378,12 @@ export class JobControl {
                 name: 'isUpdate',
                 label: 'IsUpdate',
                 placeholder: 'IsUpdate',
-                type: 'text',
+                type: '',
                 value: false,
                 Validations: [],
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
                 generatecontrol: false, disable: false
             },
             {
@@ -222,6 +392,9 @@ export class JobControl {
                 placeholder: "",
                 type: "",
                 value: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
                 generatecontrol: false,
                 disable: false,
                 Validations: [
@@ -232,6 +405,9 @@ export class JobControl {
                 label: "Entry by",
                 placeholder: "",
                 type: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
                 value: localStorage.getItem("Username"),
                 generatecontrol: false,
                 disable: false,
@@ -243,6 +419,9 @@ export class JobControl {
                 label: "Entry Date",
                 placeholder: "",
                 type: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
                 value: new Date().toUTCString(),
                 generatecontrol: false,
                 disable: false,
@@ -255,8 +434,25 @@ export class JobControl {
                 placeholder: "",
                 type: "",
                 value: "0",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
                 generatecontrol: false,
                 disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "companyCode",
+                label: "companyCode",
+                placeholder: "company Code",
+                type: "",
+                value: localStorage.getItem("companyCode"),
+                generatecontrol: false,
+                disable: false,
+                additionalData: {
+                    metaData: "jobControls"
+                },
                 Validations: [
                 ]
             },

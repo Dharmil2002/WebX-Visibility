@@ -89,7 +89,7 @@ export class ChaEntryPageComponent implements OnInit {
       HeaderStyle: { 'text-align': 'center' },
     },
     clrChrg: {
-      name: "Clearance Charge (Rs)",
+      name: "Clearance Charge (₹)",
       key: "inputnumber",
       Style: "",
       HeaderStyle: { 'text-align': 'center' },
@@ -107,14 +107,14 @@ export class ChaEntryPageComponent implements OnInit {
       },
     },
     gstAmt: {
-      name: "GST Amount (Rs)",
+      name: "GST Amount (₹)",
       key: "inputnumber",
       Style: "",
       HeaderStyle: { 'text-align': 'center' },
       readonly: true
     },
     totalAmt: {
-      name: "Total Amount (Rs)",
+      name: "Total Amount (₹)",
       key: "inputnumber",
       Style: "",
       HeaderStyle: { 'text-align': 'center' },

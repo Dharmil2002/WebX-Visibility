@@ -375,7 +375,7 @@ export class customerControl {
         Validations: [
           {
             name: "required",
-            message: "MSME Number is required",
+            message: "Black Listed is required",
           },
         ],
       },
@@ -390,7 +390,7 @@ export class customerControl {
         Validations: [
           {
             name: "required",
-            message: "MSME Number is required",
+            message: "Active Flag is required",
           },
         ],
       },
@@ -410,7 +410,7 @@ export class customerControl {
         name: "gstNo",
         label: "GST Number",
         placeholder: "GST Number",
-        type: "text",
+        type: "government-id",
         value: isUpdate ? customerTable.GSTNumber : "",
         generatecontrol: true,
         disable: false,

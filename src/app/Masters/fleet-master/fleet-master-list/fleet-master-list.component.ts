@@ -31,7 +31,7 @@ export class FleetMasterListComponent implements OnInit {
   };
 
   columnHeader = {
-    srNo: "Sr No",
+    updateDate: "Created Date",
     vehicleNo: "Vehicle No",
     vehicleType: "Vehicle Type",
     insuranceExpiryDate: "Insurance Expiry Date",
@@ -48,40 +48,77 @@ export class FleetMasterListComponent implements OnInit {
     activeFlag: "Active Status",
   };
 
-  constructor(private masterService: MasterService) {}
+  constructor(private masterService: MasterService) { }
 
   ngOnInit(): void {
     this.csvFileName = "Fleet Details";
     this.addAndEditPath = "/Masters/FleetMaster/AddFleetMaster";
+    this.getVehicleTypeName();
     this.getFleetDetails();
   }
 
-  //#region Get Data of Fleet
-  getFleetDetails() {
-    let req = {
+  // #region Get Data of Fleet
+  async getFleetDetails() {
+    try {
+      const fleetData = await this.fetchFleetData();
+      if (fleetData) {
+        const vehicleTypeData = await this.getVehicleTypeName();
+        const modifiedData = this.processFleetData(fleetData, vehicleTypeData);
+        this.updateTableData(modifiedData);
+      }
+    } catch (error) {
+      // Handle errors
+    }
+  }
+  // #endregion
+
+  // #region Fetch Fleet Data
+  fetchFleetData() {
+    const req = {
       companyCode: this.companyCode,
       filter: {},
       collectionName: "fleet_master",
     };
-    this.masterService.masterPost("generic/get", req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) => {
-            return {
-              ...obj,
-              srNo: index + 1,
-            };
-          });
-          this.csv = dataWithSrno;
-          this.tableData = dataWithSrno;
-          this.tableLoad = false;
-        }
-      },
+    return this.masterService.masterPost("generic/get", req).toPromise();
+  }
+  // #endregion
+
+  // #region Process Fleet Data
+  processFleetData(fleetData, vehicleTypeData) {
+    return fleetData.data.map(obj => {
+      const vehicleType = vehicleTypeData.find(x => x.vehicleTypeCode === obj.vehicleType);
+      obj.vehicleType = vehicleType ? vehicleType.vehicleTypeName : '';
+      return obj;
+    }).sort((a, b) => {
+      const dateA = new Date(a.updateDate).getTime(); // Convert to a number
+      const dateB = new Date(b.updateDate).getTime(); // Convert to a number
+      if (!isNaN(dateA) && !isNaN(dateB)) {
+        return dateB - dateA;
+      }
+      return 0; // Handle invalid dates or NaN values
     });
   }
-  //#endregion
+  // #endregion
 
+  // #region Update Table Data
+  updateTableData(sortedData) {
+    this.csv = sortedData;
+    this.tableData = sortedData;
+    this.tableLoad = false;
+  }
+  // #endregion
+
+  // #region Get Vehicle Type Name
+  async getVehicleTypeName() {
+    const req = {
+      companyCode: this.companyCode,
+      filter: {},
+      collectionName: 'vehicleType_detail',
+    };
+    const response = await this.masterService.masterPost('generic/get', req).toPromise();
+    return response.data;
+  }
+  //#endregion
   async IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls

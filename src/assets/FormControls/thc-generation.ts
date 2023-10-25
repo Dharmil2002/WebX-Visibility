@@ -74,7 +74,7 @@ export class thcControl {
                 {
                     name: "vendorType",
                     label: "Vendor Type",
-                    placeholder: "VehicleType",
+                    placeholder: "Vendor Type",
                     type: view ? 'text' : 'Staticdropdown',
                     value: [
                         { value: "Own", name: "Own" },
@@ -354,7 +354,7 @@ export class thcControl {
                 },
                 {
                     name: 'contAmt',
-                    label: 'Vendor Contract  Amount(Rs)',
+                    label: 'Vendor Contract  Amount(₹)',
                     placeholder: '',
                     type: 'text',
                     value: '',
@@ -370,7 +370,7 @@ export class thcControl {
                 },
                 {
                     name: 'advAmt',
-                    label: 'Advance Amount(Rs)',
+                    label: 'Advance Amount(₹)',
                     placeholder: '',
                     type: 'text',
                     value: '',
@@ -386,7 +386,7 @@ export class thcControl {
                 },
                 {
                     name: 'balAmt',
-                    label: 'Balance Amount(Rs)',
+                    label: 'Balance Amount(₹)',
                     placeholder: '',
                     type: 'text',
                     value: '',

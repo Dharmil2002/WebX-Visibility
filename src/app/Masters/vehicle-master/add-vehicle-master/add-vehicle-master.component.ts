@@ -16,7 +16,7 @@ import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remov
   templateUrl: './add-vehicle-master.component.html',
 })
 export class AddVehicleMasterComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
   action: string;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   isUpdate = false;
@@ -45,6 +45,7 @@ export class AddVehicleMasterComponent implements OnInit {
   permitStateDetail: any;
   routeLoc: any;
   routeStatus: any;
+  submit = 'Save';
   protected _onDestroy = new Subject<void>();
   vehicleFormControls: VehicleControls
   vehicleType: any;
@@ -91,6 +92,7 @@ export class AddVehicleMasterComponent implements OnInit {
       this.vehicleTable = route.getCurrentNavigation().extras.state.data;
 
       this.isUpdate = true;
+      this.submit = 'Modify';
       this.action = 'edit'
 
     } else {
@@ -100,18 +102,22 @@ export class AddVehicleMasterComponent implements OnInit {
       this.isUpdate = true;
       this.breadScrums = [
         {
-          title: "Vehicle Master",
+          title: "Modify Vehicle",
           items: ["Masters"],
-          active: "Edit Vehicle",
+          active: "Modify Vehicle",
+          generatecontrol: true,
+          toggle: this.vehicleTable.isActive
         },
       ];
 
     } else {
       this.breadScrums = [
         {
-          title: "Vehicle Master",
+          title: "Add Vehicle",
           items: ["Masters"],
           active: "Add Vehicle",
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.vehicleTable = new vehicleModel({})
@@ -298,12 +304,19 @@ export class AddVehicleMasterComponent implements OnInit {
         value: element.vehicleTypeCode.toString(),
       }));
 
+      // Define the user's location (change this to the actual user's location)
+      const userLocation = localStorage.Branch;
+
+      // Filter the vendor names based on the user's location
       const venNameDet = mergedData.venNameData
+        .filter(element => element.isActive && element.vendorLocation.includes(userLocation))
         .map(element => ({
           name: element.vendorName.toString(),
           value: element.vendorCode.toString(),
           type: element.vendorType.toString(),
         }));
+
+      // Assign the filtered vendor names to the vendorDetailList variable
       this.vendorDetailList = venNameDet;
 
       let routeDet = [];
@@ -321,7 +334,7 @@ export class AddVehicleMasterComponent implements OnInit {
           });
         }
       });
-    
+
       const FTLtype = mergedData.fltType.filter(item => item.codeType === "FTLTYP").
         map((x) => {
           { return { name: x.codeDesc, value: x.codeId } }
@@ -384,20 +397,20 @@ export class AddVehicleMasterComponent implements OnInit {
   }
   //#endregion
 
-  // vendorFieldChanged() {
-
-  //   const vendorType = this.vehicleTableForm.value.vendorType;
-  //   const vendorDetail = this.vendorDetailList.filter((x) => x.
-  //     type.toLowerCase() == vendorType.toLowerCase());
-  //   this.filter.Filter(
-  //     this.jsonControlVehicleArray,
-  //     this.vehicleTableForm,
-  //     vendorDetail,
-  //     this.vendorName,
-  //     this.vendorNameStatus
-  //   );
-  // }
-
+  vendorFieldChanged() {
+    const vendorType = this.vehicleTableForm.value.vendorType;
+    this.vehicleTableForm.controls.vendorName.setValue("");
+    const vendorDetail = this.vendorDetailList.filter((x) =>
+      x.type.toLowerCase() == vendorType.toLowerCase()
+    );
+    this.filter.Filter(
+      this.jsonControlVehicleArray,
+      this.vehicleTableForm,
+      vendorDetail,
+      this.vendorName,
+      this.vendorNameStatus
+    );
+  }
   //#region
   autofillDropdown() {
     if (this.isUpdate) {
@@ -622,5 +635,11 @@ export class AddVehicleMasterComponent implements OnInit {
     }
   }
   //#endregion
+
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.vehicleTableForm.controls['isActive'].setValue(event);
+    console.log("Toggle value :", event);
+  }
 
 }

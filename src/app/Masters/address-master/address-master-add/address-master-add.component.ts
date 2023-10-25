@@ -12,7 +12,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
   templateUrl: './address-master-add.component.html',
 })
 export class AddressMasterAddComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean;}[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   addressTabledata: AddressMaster;
   addressTableForm: UntypedFormGroup;
@@ -30,6 +30,7 @@ export class AddressMasterAddComponent implements OnInit {
   backPath: string;
   data: any;
   pincodeDataFetched = false;
+  submit = 'Save';
   //#endregion
 
   ngOnInit() {
@@ -53,6 +54,7 @@ export class AddressMasterAddComponent implements OnInit {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
+      this.submit = 'Modify';
       this.isUpdate = true;
     } else {
       this.action = "Add";
@@ -65,10 +67,11 @@ export class AddressMasterAddComponent implements OnInit {
       this.addressTabledata = new AddressMaster({});
     }
     this.breadScrums = [
-      {
-        title: "Address Master",
+      {generatecontrol: true,
+        toggle: this.data && this.data.activeFlag ? this.data.activeFlag : "",
+        title: this.action === 'edit' ? "Modify Address" : "Add Address",
         items: ["Home"],
-        active: this.action === 'edit' ? "Edit Address Master" : "Add Address Master",
+        active: this.action === 'edit' ? "Modify Address" : "Add Address",
       },
     ];
     this.initializeFormControl();
@@ -265,5 +268,9 @@ export class AddressMasterAddComponent implements OnInit {
         }
       }
     })
+  }
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.addressTableForm.controls['activeFlag'].setValue(event);
   }
 }

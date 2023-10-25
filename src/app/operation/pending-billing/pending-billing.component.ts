@@ -60,7 +60,7 @@ export class PendingBillingComponent implements OnInit {
       Style: "",
     },
     sum: {
-      Title: "Unbilled Amount (Rs)",
+      Title: "Unbilled Amount (₹)",
       class: "matcolumncenter",
       Style: "max-width: 100px",
     },

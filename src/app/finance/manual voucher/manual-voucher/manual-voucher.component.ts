@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   templateUrl: './manual-voucher.component.html'
 })
 export class ManualVoucherComponent implements OnInit {
-  tableLoad:boolean=true;
+  tableLoad: boolean = true;
   tableData: any;
   addAndEditPath: string;
   dynamicControls = {
@@ -17,7 +17,7 @@ export class ManualVoucherComponent implements OnInit {
     edit: true,
     csv: false,
   };
-  TableStyle = "width:80%"
+  TableStyle = "width:100%"
   columnHeader = {
     voucherNo: {
       Title: "Voucher No",
@@ -35,7 +35,7 @@ export class ManualVoucherComponent implements OnInit {
       Style: "max-width: 200px",
     },
     amount: {
-      Title: "Amount (Rs)",
+      Title: "Amount (₹)",
       class: "matcolumncenter",
       Style: "max-width: 120px",
     },
@@ -80,40 +80,41 @@ export class ManualVoucherComponent implements OnInit {
     // { Row: 'VendorBillAmount', Path: 'Operation/VendorBillDetails',componentDetails: ""},
     // { Row: 'CustomerBillAmount', Path: 'Operation/CustomerBillDetails',componentDetails: ""}
   ]
-    constructor(
-      private masterService: MasterService,
-      private datePipe: DatePipe,
-      private router:Router
-      ) {
-    this.addAndEditPath = "Finance/AddManualVouchar";
+  constructor(
+    private masterService: MasterService,
+    private datePipe: DatePipe,
+    private router: Router
+  ) {
+    this.addAndEditPath = "Finance/CreditDebitVoucher";
   }
 
   ngOnInit(): void {
     this.getRakeDetail();
   }
-  async getRakeDetail(){
-    const detail= await manualvoucharDetail(this.masterService) ;
-    const result= detail.map((x) => {
+  async getRakeDetail() {
+    const detail = await manualvoucharDetail(this.masterService);
+    const result = detail.map((x) => {
       if (x.status === "0") {
         // Modify the status property to "Generated"
-        const formattedDate = this.datePipe.transform(x.voucherDate,'dd-MMM-yy HH-mm');
-        const createdDate = this.datePipe.transform(x.createdDate,'dd-MMM-yy HH-mm');
-        return { ...x, status: "Generated", voucherDate: formattedDate,createdOn:createdDate,
-        actions :["Modify","Delete"]
-      };
+        const formattedDate = this.datePipe.transform(x.voucherDate, 'dd-MMM-yy HH:mm a');
+        const createdDate = this.datePipe.transform(x.createdDate, 'dd-MMM-yy HH:mm a');
+        return {
+          ...x, status: "Generated", voucherDate: formattedDate, createdOn: createdDate,
+          actions: ["Modify", "Delete"]
+        };
       } else {
         // Keep the object unchanged
         return x;
       }
     });
-    
-    this.tableData= result;
-    this.tableLoad=false;
+
+    this.tableData = result;
+    this.tableLoad = false;
   }
 
   async handleMenuItemClick(data) {
-    if (data.label.label==="Modify") {
-      this.router.navigate(['Finance/AddManualVouchar'], {
+    if (data.label.label === "Modify") {
+      this.router.navigate(['Finance/CreditDebitVoucher'], {
         state: {
           data: data.data
         },

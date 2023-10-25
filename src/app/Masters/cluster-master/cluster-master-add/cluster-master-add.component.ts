@@ -14,7 +14,7 @@ import { Subject, take, takeUntil } from "rxjs";
   templateUrl: "./cluster-master-add.component.html",
 })
 export class ClusterMasterAddComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string }[];
+  breadScrums: { title: string; items: string[]; active: string;  generatecontrol: boolean; toggle: any; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   clusterTabledata: ClusterMaster;
   clusterTableForm: UntypedFormGroup;
@@ -28,6 +28,7 @@ export class ClusterMasterAddComponent implements OnInit {
   isUpdate = false;
   newClusterCode: string;
   data: any;
+  submit = 'Save';
   //#endregion
 
   ngOnInit() {
@@ -43,6 +44,7 @@ export class ClusterMasterAddComponent implements OnInit {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
       this.action = "edit";
+      this.submit = 'Modify';
       this.isUpdate = true;
     } else {
       this.action = "Add";
@@ -52,17 +54,21 @@ export class ClusterMasterAddComponent implements OnInit {
       this.clusterTabledata = this.data;
       this.breadScrums = [
         {
-          title: "Cluster Master",
+          title: "Modify Cluster",
           items: ["Home"],
-          active: "Edit Cluster Master",
+          active: "Modify Cluster",
+          generatecontrol: true,
+          toggle: this.data.activeFlag
         },
       ];
     } else {
       this.breadScrums = [
         {
-          title: "Cluster Master",
+          title: "Add Cluster",
           items: ["Home"],
-          active: "Add Cluster Master",
+          active: "Add Cluster",
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.clusterTabledata = new ClusterMaster({});
@@ -94,15 +100,15 @@ export class ClusterMasterAddComponent implements OnInit {
     if (pincodeValue !== null && pincodeValue !== "") {
       let req = {
         companyCode: this.companyCode,
-        collectionName: "pincode_detail",
+        collectionName: "pincode_master",
         filter: {},
       };
       this.masterService.masterPost("generic/get", req).subscribe({
         next: (res: any) => {
           // Assuming the API response contains an array named 'pincodeList'
           const pincodeList = res.data.map((element) => ({
-            name: parseInt(element.pincode),
-            value: parseInt(element.pincode),
+            name: element.PIN.toString(),
+            value:element.PIN.toString()
           }));
           let filteredPincodeList = [];
           if (Array.isArray(pincodeValue)) {
@@ -123,12 +129,13 @@ export class ClusterMasterAddComponent implements OnInit {
             const pincode = this.clusterTabledata.pincode.split(",");
             pincode.forEach((item) => {
               pincodedata.push(
-                pincodeList.find((element) => element.value == item)
+                pincodeList.find((element) => element.name.trim() == item.trim())
               );
             });
             this.clusterTableForm.controls["pincodeDropdown"].patchValue(
               pincodedata
             );
+            console.log(pincodedata)
           }
           const data =
             filteredPincodeList.length > 0 ? filteredPincodeList : pincodedata;
@@ -149,7 +156,11 @@ export class ClusterMasterAddComponent implements OnInit {
     }
   }
   //#endregion
-
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.clusterTableForm.controls['activeFlag'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
   //#region Save Function
   save() {
     const pincodeDropdown =
@@ -159,6 +170,7 @@ export class ClusterMasterAddComponent implements OnInit {
             (item: any) => item.name
           );
     this.clusterTableForm.controls["pincode"].setValue(pincodeDropdown);
+    this.clusterTableForm.removeControl("pincodeDropdown")
 
     // Clear any errors in the form controls
     Object.values(this.clusterTableForm.controls).forEach((control) =>

@@ -41,9 +41,9 @@
                                                 style="font-weight: bold; text-transform: uppercase;">{{thcNestedData.origin}}</span>
                                             <br />
 
-                                            <span style="margin-right: 204px;">Mode</span>
-                                            <span style="margin-right: 43px;font-weight:bold;">  </span>
-                                            <span style="margin-right: 78px;">Dest.</span>
+                                            <span style="margin-right: 149px;">Mode</span>
+                                            <span style="margin-right: 40px;font-weight:bold;"> {{thcNestedData.transMode}} </span>
+                                            <span style="margin-right: 116px;">Dest.</span>
                                             <span
                                                 style="font-weight: bold; text-transform: uppercase;">{{thcNestedData.dest}}</span>
                                             <br />
@@ -177,8 +177,7 @@
                                                     <tr>
                                                         <td style="background-color: gainsboro;">
                                                             <span> Total Amount</span>
-                                                            <span style="font-weight:bold;float:right">1000.00
-                                                                ₹</span><br />
+                                                            <span style="font-weight:bold;float:right">{{thcNestedData.contAmt}} ₹</span><br />
                                                         </td>
                                                         <td
                                                             style="border: 1px solid #fff; border-top: 1px solid gainsboro;">
@@ -238,8 +237,8 @@
                             <table style="width: 100%;" border="0" cellpadding="0" cellspacing="0">
                                 <tr style="color:#6b6f82;">
                                     <th>Location</th>
-                                    <th>ETA</th>
                                     <th>Departed</th>
+                                    <th>ETA</th>
                                     <th>Manifest</th>
                                     <th>CEWB</th>
                                     <th>Utility</th>
@@ -250,11 +249,11 @@
                                 <tr style="font-size:16px;">
                                     <td style="font-weight:bold;">{{thcNestedData.origin}}</td>
                                     <td>
-                                        <div>{{ETA | date:'dd/MM/yyyy HH:mm'}}</div>
+                                        <div>{{Departed | date:'dd/MM/yyyy HH:mm'}}</div>
                                         <div style="color: red;"> </div>
                                     </td>
                                     <td>
-                                        <div>{{Departed | date:'dd/MM/yyyy HH:mm'}}</div>
+                                        <div></div>
                                     </td>
                                     <td>
                                         <div>  </div>
@@ -269,9 +268,8 @@
                                     <td style="font-weight:bold;">{{thcNestedData.dest}}</td>
                                     <td>
                                         <div></div>
-                                        <div></div>
                                     </td>
-                                    <td> </td>
+                                    <td>{{ETA | date:'dd/MM/yyyy HH:mm'}}</td>
                                     <td>
                                         <div></div>
                                         <div style="color: darkgray;"></div>

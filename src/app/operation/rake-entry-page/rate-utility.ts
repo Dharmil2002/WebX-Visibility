@@ -1,6 +1,5 @@
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
-import { geoDataServices } from "../error-handing/outbox-utility";
-
+const branch=localStorage.getItem("Branch") 
 export function renameKeys(originalObject, keyNameMapping) {
     const modifiedObject = {};
 
@@ -21,7 +20,8 @@ export async function vendorDetailFromApi(masterService) {
         filter: {}
     }
     const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
-    return res.data
+    const filteredData = res.data.filter(x => x.vendorLocation.includes(branch));
+    return filteredData;
 
 }
 export async function addRakeEntry(data, masterService) {

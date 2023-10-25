@@ -85,7 +85,7 @@ export class AddDriverMasterComponent implements OnInit {
     } else {
       this.breadScrums = [
         {
-          title: "Driver Master",
+          title: "Add Driver",
           items: ["Masters"],
           active: "Add Driver",
           generatecontrol: true,

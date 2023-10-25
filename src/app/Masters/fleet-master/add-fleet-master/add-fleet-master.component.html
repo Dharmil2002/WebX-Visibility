@@ -1,7 +1,8 @@
 <ng-container *ngIf="!thc; else elseBlock">
-  <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
+  <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath"
+    (toggleChange)="onToggleChange($event)">
     <form [formGroup]="fleetTableForm">
-      <app-form-webxpress [form]="fleetTableForm" [formData]="jsonControlFleetArray"
+      <app-form-webxpress [form]="fleetTableForm" [formData]="jsonControlFleetArray" [FormTitle]="'Fleet Master'"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
         (callFunction)="functionCallHandler($event)" [submit]="submit">
       </app-form-webxpress>
@@ -10,7 +11,7 @@
 </ng-container>
 <ng-template #elseBlock>
   <form [formGroup]="fleetTableForm">
-    <app-form-webxpress [form]="fleetTableForm"[FormTitle]="'Vehicle Details'" [formData]="jsonControlFleetArray"
+    <app-form-webxpress [form]="fleetTableForm" [formData]="jsonControlFleetArray" [FormTitle]="'Fleet Master'"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
       (callFunction)="functionCallHandler($event)" [submit]="submit">
     </app-form-webxpress>

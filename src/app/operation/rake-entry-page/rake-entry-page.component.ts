@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from "@angular/core";
-import { UntypedFormBuilder } from "@angular/forms";
+import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { processProperties } from "src/app/Masters/processUtility";
 import { RakeEntryControl } from "src/assets/FormControls/rake-entry";
@@ -9,6 +9,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { Router } from "@angular/router";
 import { addRakeEntry, filterDocketDetail, genericGet, vendorDetailFromApi } from "./rate-utility";
 import Swal from "sweetalert2";
+import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -56,6 +57,7 @@ export class RakeEntryPageComponent implements OnInit {
     ];
     jobDetail: any;
     allCn: any[];
+    vendorData: any;
 
     ngOnInit(): void {
         this.initializeFormControl();
@@ -302,7 +304,8 @@ export class RakeEntryPageComponent implements OnInit {
 
     async vendorDetail() {
         const resDetail = await vendorDetailFromApi(this.masterService);
-        const vendorData = resDetail.map((x) => { return { value: x.vendorCode, name: x.vendorName } });
+        const vendorData = resDetail.map((x) => { return { value: x.vendorCode, name: x.vendorName, type: x.vendorType } });
+        this.vendorData = vendorData;
         this.filter.Filter(
             this.jsonControlArray,
             this.rakeEntryTableForm,
@@ -392,13 +395,39 @@ export class RakeEntryPageComponent implements OnInit {
                 this.cnDetail = this.allCn.filter(x => x.fromToCity === city);
                 this.display('CN');
             }
-            else{
+            else {
                 this.display('CN');
             }
         }
-        else{
+        else {
             this.display('JOB');
         }
     }
-    
+    vendorFieldChanged() {
+        const rakeControl = this.rakeEntryTableForm.get('vendorName');
+        const vendorType = this.rakeEntryTableForm.value.vendorType;
+        this.jsonControlArray.forEach((x) => {
+            if (x.name === "vendorName") {
+                x.type = vendorType === "Market" ? "text" : "dropdown";
+            }
+        });
+        if (vendorType !== 'Market') {
+            const vendorDetail = this.vendorData.filter((x) => x.type.toLowerCase() == vendorType.toLowerCase());
+            this.filter.Filter(
+                this.jsonControlArray,
+                this.rakeEntryTableForm,
+                vendorDetail,
+                this.vendor,
+                this.vendorStatus
+            );
+            rakeControl.setValidators([Validators.required,autocompleteObjectValidator()]);
+            rakeControl.updateValueAndValidity();
+        }
+        else{
+            const rakeControl = this.rakeEntryTableForm.get('vendorName');
+            rakeControl.setValidators(Validators.required);
+            rakeControl.updateValueAndValidity();
+        }
+
+    }
 }

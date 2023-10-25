@@ -15,10 +15,10 @@ export class AddressMasterListComponent implements OnInit {
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = []
   columnHeader = {
-    srNo: {
-      Title: "Sr No",
+    updatedDate: {
+      Title: "Created Date",
       class: "matcolumnleft",
-      Style: "max-width:90px",
+      Style: "max-width:150px",
     },
     addressCode: {
       Title: "Address Code",
@@ -52,7 +52,7 @@ export class AddressMasterListComponent implements OnInit {
     },
   };
   staticField = [
-    "srNo",
+    "updatedDate",
     "addressCode",
     "manualCode",
     "cityName",
@@ -78,34 +78,47 @@ export class AddressMasterListComponent implements OnInit {
     this.getAddressDetails();
   }
   getAddressDetails() {
-    let req = {
-      "companyCode": this.companyCode,
-      "collectionName": "address_detail",
-      "filter": {}
-    }
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) => {
-            return {
-              ...obj,
-              srNo: index + 1
-            };
-
+    const request = {
+      companyCode: this.companyCode,
+      collectionName: "address_detail",
+      filter: {}
+    };
+    this.masterService.masterPost('generic/get', request).subscribe({
+      next: (response: any) => {
+        if (response) {
+          // Sort the data by updatedDate in descending order (most recent first)
+          const sortedData = response.data.sort((a, b) => {
+            return new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime();
           });
-          this.csv = dataWithSrno
+          // Generate srno for each object in the array and format the updatedDate
+          const dataWithFormattedDate = sortedData.map((item, index) => {
+            const formattedDate = formatDate(item.updatedDate);
+            return {
+              ...item,
+              updatedDate: formattedDate,
+            };
+          });
+          // Extract the updatedDate from the first element (latest record)
+          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].updatedDate : null;
+          this.csv = dataWithFormattedDate;
           this.tableLoad = false;
         }
       }
-    })
+    });
+    function formatDate(dateString) {
+      const formattedDate = new Date(dateString);
+      const formatDatePart = (value) => (value < 10 ? '0' : '') + value;
+      const formattedDateStr = `${formatDatePart(formattedDate.getDate())}-${formatDatePart(formattedDate.getMonth() + 1)}-${formattedDate.getFullYear()}`;
+      const formattedTimeStr = `${formatDatePart(formattedDate.getHours())}:${formatDatePart(formattedDate.getMinutes())}`;
+      return `${formattedDateStr} ${formattedTimeStr}`;
+    }
   }
 
   IsActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls
     delete det._id;
-    delete det.srNo;
+    // delete det.srNo;
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "address_detail",

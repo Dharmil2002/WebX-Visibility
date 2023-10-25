@@ -1,17 +1,13 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
     <form [formGroup]="beneficiaryHeaderForm">
         <app-form-webxpress [form]="beneficiaryHeaderForm" [formData]="jsonHeaderControl"
-            (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false">
+            [FormTitle]="'Beneficiary Master'" (functionCallEmitter)="functionCallHandler($event)"
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
-    <div
-        style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
-        <h3 style="font-size: 1.5rem; padding: 5px 0px;">Other Details</h3>
-    </div>
 
     <form [formGroup]="beneficiaryDetailForm">
-        <app-form-webxpress [form]="beneficiaryDetailForm" [formData]="jsonDetailControl"
+        <app-form-webxpress [form]="beneficiaryDetailForm" [formData]="jsonDetailControl" [FormTitle]="'Other Details'"
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
             (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
@@ -27,22 +23,19 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <div class="paddingdiv">
-        <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-            [tableData]="tableData" [menuItems]="menuItems"
-            [staticField]="staticField" [Link]="linkArray" 
-            [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-            (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-        </app-generic-table-v2>
-    </div>
-    <div style="padding-left: 35px;">
-        <button type="button" [disabled]="!beneficiaryHeaderForm.valid" mat-raised-button color="primary" (click)="save()">
-            <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
-            <ng-template #saveButton>Save</ng-template>
-        </button>&nbsp;&nbsp;
-        <button type="button" mat-raised-button (click)="cancel()">
-            Cancel
-        </button>
-    </div>
+
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [FormTitle]="'List'" [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField"
+        [Link]="linkArray" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+        (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+    </app-generic-table-v2>
+
+    <button type="button" [disabled]="!beneficiaryHeaderForm.valid" mat-raised-button color="primary" (click)="save()">
+        <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
+        <ng-template #saveButton>Save</ng-template>
+    </button>&nbsp;&nbsp;
+    <button type="button" mat-raised-button (click)="cancel()">
+        Cancel
+    </button>
 
 </app-common-wrapper-webxpress>

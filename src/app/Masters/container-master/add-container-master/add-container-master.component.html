@@ -1,7 +1,8 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath"  (toggleChange)="onToggleChange($event)">
     <form [formGroup]="containerTableForm">
         <app-form-webxpress [form]="containerTableForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
-            (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)">
+            [FormTitle]="'Container Details'" (callFunction)="functionCallHandler($event)"
+            (functionCallEmitter)="functionCallHandler($event)" [submit]="submit">
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

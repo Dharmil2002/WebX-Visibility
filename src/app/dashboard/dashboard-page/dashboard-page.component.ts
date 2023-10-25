@@ -57,10 +57,10 @@ export class DashboardPageComponent implements OnInit {
       "label": "Tab 8",
       "permission": ["Export", "FTL", "EXIM"]
     },
-     {
+    {
       "id": "Job",
       "label": "Tab 9",
-      "permission": ["Export","FTL", "Import", "EXIM"]
+      "permission": ["Export", "Import", "EXIM"]
     }, {
       "id": "Rake",
       "label": "Tab 10",
@@ -94,7 +94,27 @@ export class DashboardPageComponent implements OnInit {
       "id": "THCUpdate",
       "label": "Tab 16",
       "permission": ["Export", "FTL", "EXIM"]
-    }
+    },
+    {
+      "id": "Voucher",
+      "label": "Tab 17",
+      "permission": ['Accounts']
+    },
+    {
+      "id": "BankReconciliation",
+      "label": "Tab 18",
+      "permission": ['Accounts']
+    },
+     {
+      "id": "TDSReconciliation",
+      "label": "Tab 18",
+      "permission": ['Accounts']
+    },
+    {
+      "id": "Analytics",
+      "label": "Tab 19",
+      "permission": ['Accounts']
+    },
   ];
   tabName: any;
   constructor(private changeDetectorRef: ChangeDetectorRef,
@@ -125,8 +145,8 @@ export class DashboardPageComponent implements OnInit {
     // }
     // this.myTabGroup.selectedIndex = Index;
   }
-  onTabChange(event){
-     this.tabName=event.tab.textLabel;
+  onTabChange(event) {
+    this.tabName = event.tab.textLabel;
   }
   ngAfterViewInit(): void {
 
@@ -141,11 +161,11 @@ export class DashboardPageComponent implements OnInit {
           // Set the selectedIndex of the TabGroup
           this.tabGroup.selectedIndex = index;
         }
-        if(selectedTabName=="0"){
+        if (selectedTabName == "0") {
           this.tabGroup.selectedIndex = 0;
         }
       }
     });
   }
-  
+
 }

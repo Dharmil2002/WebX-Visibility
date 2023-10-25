@@ -11,7 +11,7 @@ export class CustomerContractTabsIndexComponent implements AfterViewInit {
     {
       title: "Customer Contract",
       items: ["Home"],
-      active: "Dashboard",
+      active: "Customer Contract",
     },
   ];
   CurrentContractDetails: any;

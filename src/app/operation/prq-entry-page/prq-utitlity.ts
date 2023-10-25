@@ -1,5 +1,5 @@
 import Swal from 'sweetalert2';
-const branch=localStorage.getItem("Branch");
+
 export async function addPrqData(prqData, masterService) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
@@ -103,6 +103,7 @@ export async function locationFromApi(masterService) {
 
 
 export async function customerFromApi(masterService) {
+    const branch=localStorage.getItem("Branch");
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "customer_detail",

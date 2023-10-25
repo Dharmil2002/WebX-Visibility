@@ -53,6 +53,7 @@ import { GenericViewPrintComponent } from './Generic View Print/generic-view-pri
 import { LazyloadingeditabletableComponent } from './lazyloadingeditabletable/lazyloadingeditabletable.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
+import { ImagePreviewComponent } from './image-preview/image-preview.component';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -69,7 +70,8 @@ const MY_DATE_FORMAT = {
   declarations: [GenericAccordionComponent, GenericTableComponent,
     FormComponent, FormWithoutAutoCompleteComponent, GenericDashBoardComponent,
     GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent, TreeViewComponent, GenericChartDashboardComponent, GenericCardComponent, DecimaRangeValidatorDirective, GenericTableV2Component
-    , ExpandableTableComponent, ModifyTableCollumnsComponent, LazyloadingeditabletableComponent, XlsxPreviewPageComponent, GenericViewPrintComponent],
+    , ExpandableTableComponent, ModifyTableCollumnsComponent, LazyloadingeditabletableComponent, XlsxPreviewPageComponent, GenericViewPrintComponent,
+  ImagePreviewComponent],
 
   imports: [
     CommonModule,
@@ -138,7 +140,8 @@ const MY_DATE_FORMAT = {
     DecimaRangeValidatorDirective,
     GenericTableV2Component,
     GenericViewPrintComponent,
-    LazyloadingeditabletableComponent
+    LazyloadingeditabletableComponent,
+    ImagePreviewComponent
   ],
 
 })

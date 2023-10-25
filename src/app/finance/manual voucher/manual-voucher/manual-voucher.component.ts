@@ -35,7 +35,7 @@ export class ManualVoucherComponent implements OnInit {
       Style: "max-width: 200px",
     },
     amount: {
-      Title: "Amount (Rs)",
+      Title: "Amount (₹)",
       class: "matcolumncenter",
       Style: "max-width: 120px",
     },

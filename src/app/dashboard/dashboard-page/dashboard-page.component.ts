@@ -60,7 +60,7 @@ export class DashboardPageComponent implements OnInit {
     {
       "id": "Job",
       "label": "Tab 9",
-      "permission": ["Export", "FTL", "Import", "EXIM"]
+      "permission": ["Export", "Import", "EXIM"]
     }, {
       "id": "Rake",
       "label": "Tab 10",
@@ -96,8 +96,23 @@ export class DashboardPageComponent implements OnInit {
       "permission": ["Export", "FTL", "EXIM"]
     },
     {
-      "id": "Accounts",
+      "id": "Voucher",
       "label": "Tab 17",
+      "permission": ['Accounts']
+    },
+    {
+      "id": "BankReconciliation",
+      "label": "Tab 18",
+      "permission": ['Accounts']
+    },
+     {
+      "id": "TDSReconciliation",
+      "label": "Tab 18",
+      "permission": ['Accounts']
+    },
+    {
+      "id": "Analytics",
+      "label": "Tab 19",
       "permission": ['Accounts']
     },
   ];

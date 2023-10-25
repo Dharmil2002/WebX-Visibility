@@ -318,7 +318,7 @@ export class PrqEntryControls {
       },
       {
         name: "contractAmt",
-        label: "Contract Amount(Rs)",
+        label: "Contract Amount(₹)",
         placeholder: "Contract Amount",
         type: "number",
         value: prqDetail.contractAmt,

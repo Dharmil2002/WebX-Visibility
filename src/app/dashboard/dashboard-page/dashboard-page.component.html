@@ -126,28 +126,28 @@
                     <app-invoice-management (CurrentIndex)="GetSelectedIndex($event)" *ngIf="tabName === 'Masters'"
                         [selectedIndex]="15"></app-invoice-management>
                 </mat-tab>
-                <mat-tab *ngIf="hasPermission('Accounts')" label="Voucher">
+                <mat-tab *ngIf="hasPermission('Voucher')" label="Voucher">
                     <ng-template mat-tab-label>
                         Manual Voucher
                     </ng-template>
-                    <app-manual-voucher (CurrentIndex)="GetSelectedIndex($event)" *ngIf="tabName === 'Voucher'"
+                    <app-manual-voucher (CurrentIndex)="GetSelectedIndex($event)" 
                         [selectedIndex]="16"></app-manual-voucher>
                 </mat-tab>
-                <mat-tab *ngIf=" hasPermission('Accounts')" label="BankReconciliation">
+                <mat-tab *ngIf=" hasPermission('BankReconciliation')" label="BankReconciliation">
                     <ng-template mat-tab-label>
                         Bank Reconciliation
                     </ng-template>
                     <app-bank-reconciliation (CurrentIndex)="GetSelectedIndex($event)"
                         *ngIf="tabName === 'BankReconciliation'" [selectedIndex]="17"></app-bank-reconciliation>
                 </mat-tab>
-                <mat-tab *ngIf=" hasPermission('Accounts')" label="TDSReconciliation">
+                <mat-tab *ngIf=" hasPermission('TDSReconciliation')" label="TDSReconciliation">
                     <ng-template mat-tab-label>
                         TDS Reconciliation
                     </ng-template>
                     <app-tds-reconciliation (CurrentIndex)="GetSelectedIndex($event)"
                         *ngIf="tabName === 'TDSReconciliation'" [selectedIndex]="18"></app-tds-reconciliation>
                 </mat-tab>
-                <mat-tab *ngIf=" hasPermission('Accounts')" label="Analytics">
+                <mat-tab *ngIf=" hasPermission('Analytics')" label="Analytics">
                     <ng-template mat-tab-label>
                         Analytics
                     </ng-template>

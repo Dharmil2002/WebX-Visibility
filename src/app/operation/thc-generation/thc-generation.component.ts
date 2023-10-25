@@ -8,6 +8,7 @@ import {
   getShipment,
   prqDetail,
   thcGeneration,
+  vendorTypeList,
 } from "./thc-utlity";
 import { Router } from "@angular/router";
 import { calculateTotalField } from "../unbilled-prq/unbilled-utlity";
@@ -249,7 +250,7 @@ export class ThcGenerationComponent implements OnInit {
 
   async getShipmentDetail() {
     const shipmentList = await getShipment(this.operationService, false);
-    const branchWise = shipmentList.filter((x) => x.origin === this.orgBranch);
+    const branchWise = shipmentList.filter((x) => x.origin === this.orgBranch && x.status=='0');
     this.allShipment = shipmentList;
     if (this.addThc) {
       this.tableData = branchWise.map((x) => {
@@ -465,6 +466,7 @@ export class ThcGenerationComponent implements OnInit {
     }
     this.thcLoad = false;
   }
+
   bindDataPrq() {
     const prq = {
       name: this.prqDetail?.prqNo || "",
@@ -608,8 +610,6 @@ export class ThcGenerationComponent implements OnInit {
     );
     this.selectedData = event;
   }
-
-
   async handleMenuItemClick(data) {
     if (data.label.label === "Update") {
       const dialogref = this.dialog.open(ThcUpdateComponent, {
@@ -772,12 +772,13 @@ export class ThcGenerationComponent implements OnInit {
   async getVehicleDetail() {
     const vehDetail: Vehicle = this.thcTableForm.controls['vehicle'].value
     const vendorName = this.vendorDetail.find((x) => x.name === vehDetail.vendor)
-    this.thcTableForm.controls['vendorType'].setValue(vehDetail.vendorType);
     this.thcTableForm.controls['vendorName'].setValue(vendorName);
     this.thcTableForm.controls['driverName'].setValue(vehDetail.driver);
     this.thcTableForm.controls['driverMno'].setValue(vehDetail.dMobNo);
     const vendorDetail: VendorDetail[] = await this.vendorService.getVendorDetail({ vendorName: vendorName.name });
     const driverDetail: DriverMaster[] = await this.driverService.getDriverDetail({ vehicleNo: vehDetail.value });
+    const vendorType=vendorTypeList.find((x)=>x.value.toLowerCase()==vehDetail.vendorType.toLowerCase());
+    this.thcTableForm.controls['vendorType'].setValue(vendorType?.value);
     this.thcTableForm.controls['panNo'].setValue(vendorDetail[0].panNo);
     this.thcTableForm.controls['driverLexd'].setValue(driverDetail[0].valdityDt);
     this.thcTableForm.controls['driverLno'].setValue(driverDetail[0].licenseNo);
@@ -828,7 +829,7 @@ export class ThcGenerationComponent implements OnInit {
     if (toCity) {
       const filteredShipments = this.allShipment.filter((x) =>
         x.fromCity.toLowerCase() === formCity.toLowerCase() &&
-        x.toCity.toLowerCase() === toCity.toLowerCase()
+        x.toCity.toLowerCase() === toCity.toLowerCase()&& x.status=="0"
       );
 
       this.tableData = filteredShipments.map((x) => {

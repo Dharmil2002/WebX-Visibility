@@ -134,7 +134,7 @@ export class ConsignmentControl {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -288,9 +288,16 @@ export class ConsignmentControl {
         displaywith: "",
         generatecontrol: true,
         disable: false,
-          Validations: [  {
+          Validations: [     {
             name: "required",
             message: "Vendor Name is required",
+        },
+        {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
           }],
         additionalData: {
           showNameAndValue: true,
@@ -404,7 +411,18 @@ export class ConsignmentControl {
       },
       {
         name: 'vehicleNo', label: 'Lorry No', placeholder: 'Lorry No', type: "dropdown",
-        value: docketDetail.vehicleNo, Validations: [], generatecontrol: true, disable: false,
+        value: docketDetail.vehicleNo,
+        Validations: [     {
+          name: "required",
+          message: "'Lorry No is required",
+      },
+      {
+          name: "invalidAutocompleteObject",
+          message: "Choose proper value",
+        },
+        {
+          name: "autocomplete",
+        }], generatecontrol: true, disable: false,
         additionalData: {
           showNameAndValue: false,
           metaData: "Basic",
@@ -620,7 +638,7 @@ export class ConsignmentControl {
       },
      {
           name: "Download_Icon",
-          label: "Dowload Containor Template",
+          label: "Dowload Container Template",
           placeholder: "",
           type: "filelink",
           value: "assets/Download/temp-container.xlsx",
@@ -689,7 +707,7 @@ export class ConsignmentControl {
       },
       {
         name: "invoiceAmount",
-        label: "Invoice Amount (Rs)",
+        label: "Invoice Amount (₹)",
         placeholder: "Invoice Amount",
         type: "text",
         value: "",
@@ -783,7 +801,6 @@ export class ConsignmentControl {
         disable: false,
       }
     ]
-
     this.ewayBillDetail = [
       {
         name: "ewayBillNo",
@@ -823,7 +840,7 @@ export class FreightControl {
   constructor(docketDetail: DocketDetail) {
     this.FreightControlArray = [
       {
-        name: 'freight_rate', label: 'Freight Rate (Rs)', placeholder: 'Freight Rate', type: 'mobile-number',
+        name: 'freight_rate', label: 'Freight Rate (₹)', placeholder: 'Freight Rate', type: 'mobile-number',
         value: docketDetail.freight_rate, Validations: [{
           name: "required",
           message: "Freight Rate is required",
@@ -862,7 +879,7 @@ export class FreightControl {
         generatecontrol: true, disable: false
       },
       {
-        name: 'freight_amount', label: 'Frieght Amount (Rs)', placeholder: 'Freight Amount', type: 'mobile-number',
+        name: 'freight_amount', label: 'Frieght Amount (₹)', placeholder: 'Freight Amount', type: 'mobile-number',
         value: docketDetail.freight_amount, Validations: [{
           name: "required",
           message: " Freight Amount is required",
@@ -875,13 +892,13 @@ export class FreightControl {
         generatecontrol: true, disable: false
       },
       {
-        name: 'otherAmount', label: 'Other Amount (Rs)', placeholder: 'Other Amount', type: 'mobile-number',
+        name: 'otherAmount', label: 'Other Amount (₹)', placeholder: 'Other Amount', type: 'mobile-number',
         value: docketDetail.otherAmount, Validations: [], generatecontrol: true, functions: {
           onModel: "calculateGross"
         }, disable: false
       },
       {
-        name: 'grossAmount', label: 'Gross Amount (Rs)', placeholder: 'Gross Amount', type: 'mobile-number',
+        name: 'grossAmount', label: 'Gross Amount (₹)', placeholder: 'Gross Amount', type: 'mobile-number',
         value: docketDetail.grossAmount, Validations: [], generatecontrol: true, disable: true,
         functions: {
           onModel: "calculateTotalamt"
@@ -892,19 +909,19 @@ export class FreightControl {
         value: docketDetail.rcm, Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'gstAmount', label: 'GST Amount (Rs)', placeholder: 'GST Amount', type: 'mobile-number',
+        name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',
         value: docketDetail.gstAmount, Validations: [], generatecontrol: true, disable: false,
         
       },
       {
-        name: 'gstChargedAmount', label: 'GST Charged Amount (Rs)', placeholder: 'GST Charged Amount', type: 'mobile-number',
+        name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'mobile-number',
         value: docketDetail.gstChargedAmount, Validations: [], generatecontrol: true, disable: false,
         functions: {
           onModel: "calculateTotalamt"
         }
       },
       {
-        name: 'totalAmount', label: 'Total Amount (Rs)', placeholder: 'Total Amount', type: 'mobile-number',
+        name: 'totalAmount', label: 'Total Amount (₹)', placeholder: 'Total Amount', type: 'mobile-number',
         value: docketDetail.totalAmount, Validations: [], generatecontrol: true, disable: false
       },
       {

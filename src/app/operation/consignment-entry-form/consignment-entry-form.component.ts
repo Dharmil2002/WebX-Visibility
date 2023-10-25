@@ -33,6 +33,7 @@ import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.s
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { getPrqDetailFromApi } from "src/app/dashboard/tabs/prq-summary-page/prq-summary-utitlity";
 import { AddFleetMasterComponent } from "src/app/Masters/fleet-master/add-fleet-master/add-fleet-master.component";
+import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -171,7 +172,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
   menuItems = [{ label: "Edit" }, { label: "Remove" }];
   menuItemflag = true;
   //#endregion
-
   //#endregion
   jsonControlArrayBasic: any;
   jsonContainerDetail: any;
@@ -190,7 +190,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     edit: false,
     csv: false,
   };
-
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   ewayBill = true;
@@ -211,7 +210,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   packagingType: any;
   allformControl: any[];
   vehileList: any;
-  marketVendor:boolean;
+  marketVendor: boolean;
   /*Below Compotent is used for market vehicle*/
   @ViewChild(AddFleetMasterComponent) addFleetMaster: AddFleetMasterComponent;
   /*in constructor inilization of all the services which required in this type script*/
@@ -237,7 +236,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
       if (this.isUpdate) {
-        
+
         this.docketDetail = navigationState;
         this.breadscrums[0].title = "Consignment Edit";
         this.ewayBill = false
@@ -451,11 +450,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
     );
     this.prqFlag && this.prqDetail();
     this.isUpdate && this.autofillDropDown();
-  
+
   }
   /* below function was the call when */
   async getLocBasedOnCity() {
-    const destinationMapping = await this.locationService.locationFromApi({ locCity: this.consignmentTableForm.get("toCity")?.value?.value.toUpperCase()})
+    const destinationMapping = await this.locationService.locationFromApi({ locCity: this.consignmentTableForm.get("toCity")?.value?.value.toUpperCase() })
     // this.consignmentTableForm.controls["destination"].setValue(toCity[0].value);
     if (destinationMapping.length > 1) {
       this.filter.Filter(
@@ -470,7 +469,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.consignmentTableForm.controls['destination'].setValue(destinationMapping[0])
     }
   }
-  
+
   cancel() {
     this._NavigationService.navigateTotab(
       "docket",
@@ -515,9 +514,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     mapControlArray(this.jsonControlArrayConsignee, consignee);
     mapControlArray(this.jsonContainerDetail, containerMapping);// Map docket control array
     const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode })
-    const city={
-      name:destinationMapping[0].city,
-      value:destinationMapping[0].city
+    const city = {
+      name: destinationMapping[0].city,
+      value: destinationMapping[0].city
     }
     this.consignmentTableForm.controls['fromCity'].setValue(city);
     // mapControlArray(this.consignorControlArray, consignorMappings); // Map consignor control array
@@ -735,7 +734,10 @@ export class ConsignmentEntryFormComponent implements OnInit {
   vendorFieldChanged() {
 
     const vendorType = this.consignmentTableForm.value.vendorType;
-
+    const vendorName = this.consignmentTableForm.get('vendorName');
+    const vehicleNo = this.consignmentTableForm.get('vehicleNo');
+    vendorName.setValue("");
+    vehicleNo.setValue("");
     this.jsonControlArrayBasic.forEach((x) => {
       if (x.name === "vendorName") {
         x.type = vendorType === "Market" ? "text" : "dropdown";
@@ -761,9 +763,17 @@ export class ConsignmentEntryFormComponent implements OnInit {
         this.vehicleNo,
         this.vehicleNoStatus
       );
+      vendorName.setValidators([Validators.required, autocompleteObjectValidator()]);
+      vendorName.updateValueAndValidity();
+      vehicleNo.setValidators([Validators.required, autocompleteObjectValidator()]);
+      vehicleNo.updateValueAndValidity();
     }
     else {
-      this.marketVendor=true
+      vendorName.setValidators(Validators.required);
+      vendorName.updateValueAndValidity();
+      vehicleNo.setValidators(Validators.required);
+      vehicleNo.updateValueAndValidity();
+      this.marketVendor = true
     }
 
 
@@ -771,13 +781,13 @@ export class ConsignmentEntryFormComponent implements OnInit {
   /*Below function is only call those time when user can come to only edit a
    docket not for prq or etc etc*/
   autofillDropDown() {
-    
+
     const { vendorType, vendorName } = this.docketDetail;
     const vendor = vendorType !== "Market" ? this.vendorDetail.find(x => x.name === vendorName) : vendorName;
     this.consignmentTableForm.controls["vendorName"].setValue(vendor);
     this.consignmentTableForm.controls["vendorType"].setValue(vendorType);
     this.vendorFieldChanged();
-     const fromCity = {
+    const fromCity = {
       name: this.docketDetail.fromCity,
       value: this.docketDetail.fromCity,
     };
@@ -1010,12 +1020,12 @@ export class ConsignmentEntryFormComponent implements OnInit {
         unloading: 0,
         lsNo: "",
         mfNo: "",
-        vehicleDetail:this.marketVendor?this.addFleetMaster.fleetTableForm.value:"",
+        vehicleDetail: this.marketVendor ? this.addFleetMaster.fleetTableForm.value : "",
         entryBy: this.userName,
         entryDate: new Date().toISOString(),
         unloadloc: "",
       };
-      
+
       let docketDetails = {
         ...this.consignmentTableForm.value,
         ...this.FreightTableForm.value,
@@ -1288,14 +1298,14 @@ export class ConsignmentEntryFormComponent implements OnInit {
     );
   }
   /*End*/
- /*here the calucation */
- calculateTotalamt(){
-  this.FreightTableForm.get('totalAmount')?.setValue(
-    (parseFloat(this.FreightTableForm.get('grossAmount')?.value) || 0) +
-    (parseFloat(this.FreightTableForm.get('gstChargedAmount')?.value) || 0)
-  );
- }
- /*end*/
+  /*here the calucation */
+  calculateTotalamt() {
+    this.FreightTableForm.get('totalAmount')?.setValue(
+      (parseFloat(this.FreightTableForm.get('grossAmount')?.value) || 0) +
+      (parseFloat(this.FreightTableForm.get('gstChargedAmount')?.value) || 0)
+    );
+  }
+  /*end*/
 
 }
 

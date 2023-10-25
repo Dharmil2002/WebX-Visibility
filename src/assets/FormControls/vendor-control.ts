@@ -211,7 +211,7 @@ export class VendorControl {
                 name: 'panNo',
                 label: 'PAN NO',
                 placeholder: 'PAN NO',
-                type: 'text',
+                type: 'government-id',
                 value: vendorMasterTable.panNo,
                 Validations: [
                     {
@@ -414,7 +414,7 @@ export class VendorControl {
                 name: 'gstNumber',
                 label: 'GST Number',
                 placeholder: 'Enter GST Number',
-                type: 'text',
+                type: 'government-id',
                 value: vendorMasterTable.gstNumber,
                 Validations: [{
                     name: "required",

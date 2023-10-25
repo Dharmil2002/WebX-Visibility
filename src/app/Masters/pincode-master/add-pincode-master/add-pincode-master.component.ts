@@ -15,7 +15,7 @@ import Swal from "sweetalert2";
 })
 
 export class AddPinCodeMasterComponent implements OnInit {
-    breadScrums: { title: string; items: string[]; active: string; }[];
+    breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any;}[];
     action: string;
     isUpdate = false;
     pincodeTable: PincodeMaster;
@@ -55,9 +55,11 @@ export class AddPinCodeMasterComponent implements OnInit {
             this.pincodeTable = this.data;
             this.breadScrums = [
                 {
-                    title: "Pincode Master",
+                    title: "Modify Pincode",
                     items: ["Home"],
-                    active: "Edit Pincode",
+                    active: "Modify Pincode",
+                    generatecontrol: true,
+                    toggle: this.data.isActive
                 },
             ];
         } else {
@@ -66,9 +68,11 @@ export class AddPinCodeMasterComponent implements OnInit {
             this.pincodeTable = new PincodeMaster({});
             this.breadScrums = [
                 {
-                    title: "Pincode Master",
+                    title: "Add Pincode",
                     items: ["Home"],
                     active: "Add Pincode",
+                    generatecontrol: true,
+                    toggle: false
                 },
             ];
         }
@@ -131,7 +135,11 @@ export class AddPinCodeMasterComponent implements OnInit {
             }
         });
     }
-
+    onToggleChange(event: boolean) {
+      // Handle the toggle change event in the parent component
+      this.pincodeTableForm.controls['isActive'].setValue(event);
+      // console.log("Toggle value :", event);
+    }
     async getStateData() {
         let req = {
             companyCode: this.companyCode,

@@ -61,8 +61,19 @@ export class CustomerGroupControl {
         },
       },
       {
-        name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: customerGroupTable.activeFlag, generatecontrol: true, disable: false,
-        Validations: []
+        name: "activeFlag",
+        label: "Active Flag",
+        placeholder: "",
+        type: "toggle",
+        value: isUpdate ? customerGroupTable.activeFlag : false,
+        generatecontrol: false,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Active Flag is required",
+          },
+        ],
       },
       {
         name: '_id',

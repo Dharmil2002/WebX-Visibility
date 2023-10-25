@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
     <form [formGroup]="pincodeTableForm">
         <app-form-webxpress [form]="pincodeTableForm" [formData]="jsonControlArray"
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true">

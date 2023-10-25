@@ -12,7 +12,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
   templateUrl: './customer-group-add.component.html',
 })
 export class CustomerGroupAddComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string;  generatecontrol: boolean; toggle: any;}[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   action: string;
   isUpdate = false;
@@ -40,7 +40,9 @@ export class CustomerGroupAddComponent implements OnInit {
         {
           title: "Customer Group Master",
           items: ["Home"],
-          active: "Edit Customer Group Master",
+          active: "Modify Customer Group Master",
+          generatecontrol: true,
+          toggle: this.groupTabledata.activeFlag
         },
       ];
     } else {
@@ -49,6 +51,8 @@ export class CustomerGroupAddComponent implements OnInit {
           title: "Customer Group Master",
           items: ["Home"],
           active: "Add Customer Group Master",
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.groupTabledata = new CustomerGroupMaster({});
@@ -128,6 +132,11 @@ export class CustomerGroupAddComponent implements OnInit {
     }
   }
   //#endregion
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.groupTableForm.controls['activeFlag'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
   checkGroupCodeExists() {
     let req = {
       "companyCode": this.companyCode,

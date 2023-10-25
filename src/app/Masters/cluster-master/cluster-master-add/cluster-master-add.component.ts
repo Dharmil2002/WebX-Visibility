@@ -14,7 +14,7 @@ import { Subject, take, takeUntil } from "rxjs";
   templateUrl: "./cluster-master-add.component.html",
 })
 export class ClusterMasterAddComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string }[];
+  breadScrums: { title: string; items: string[]; active: string;  generatecontrol: boolean; toggle: any; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   clusterTabledata: ClusterMaster;
   clusterTableForm: UntypedFormGroup;
@@ -55,6 +55,8 @@ export class ClusterMasterAddComponent implements OnInit {
           title: "Cluster Master",
           items: ["Home"],
           active: "Edit Cluster Master",
+          generatecontrol: true,
+          toggle: this.data.activeFlag
         },
       ];
     } else {
@@ -63,6 +65,8 @@ export class ClusterMasterAddComponent implements OnInit {
           title: "Cluster Master",
           items: ["Home"],
           active: "Add Cluster Master",
+          generatecontrol: true,
+          toggle: false
         },
       ];
       this.clusterTabledata = new ClusterMaster({});
@@ -150,7 +154,11 @@ export class ClusterMasterAddComponent implements OnInit {
     }
   }
   //#endregion
-
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.clusterTableForm.controls['activeFlag'].setValue(event);
+    // console.log("Toggle value :", event);
+  }
   //#region Save Function
   save() {
     const pincodeDropdown =

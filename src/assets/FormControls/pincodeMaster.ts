@@ -106,13 +106,19 @@ export class PincodeControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'isActive',
-                label: 'Active Flag',
-                placeholder: 'Active Flag',
-                type: 'toggle',
-                value: PincodeTable.isActive,
-                Validations: [],
-                generatecontrol: true, disable: false
+              name: "isActive",
+              label: "Active Flag",
+              placeholder: "",
+              type: "toggle",
+              value: isUpdate ? PincodeTable.isActive : false,
+              generatecontrol: false,
+              disable: false,
+              Validations: [
+                {
+                  name: "required",
+                  message: "Active Flag is required",
+                },
+              ],
             },
             {
                 name: 'serviceable',

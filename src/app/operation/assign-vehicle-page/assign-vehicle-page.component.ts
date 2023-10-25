@@ -63,7 +63,7 @@ export class AssignVehiclePageComponent implements OnInit {
     try {
       const vehicleStatusData = await getVehicleStatusFromApi(this.companyCode, this._operationService);
        const sizeContainer=this.NavData.size.split(' ')[0];
-      const checkCap=vehicleStatusData.filter((x)=>parseInt(x.capacity)>=parseInt(sizeContainer));
+      const checkCap=vehicleStatusData.filter((x)=>parseInt(x.capacity)==parseInt(sizeContainer));
       if (checkCap.length > 0) {
         const loadData=await this.vehicleStatusService.createTableData(this.NavData,checkCap)
         this.tableData = loadData;
@@ -85,6 +85,7 @@ export class AssignVehiclePageComponent implements OnInit {
       // You can also set an error state or display a relevant message to the user
     }
   }
+
   toggleMarketVehicle() {
     // Add your event code for "OK" here
     // This code will run when the user clicks "OK"
@@ -106,10 +107,8 @@ export class AssignVehiclePageComponent implements OnInit {
       console.error('Invalid fromToCity format');
       return;
     }
-
     const [fromCity, toCity] = fromToCitySplit;
     const marketData = [tableData].map(item => ({ ...item, action: 'Assign', fromCity, toCity,fromToCitySplit:`${fromCity}-${toCity}`, distance: 0,isMarket:true,eta:formatDate(item.eta,'dd/MM/yyyy HH:mm')}));
-
     this.tableData = this.tableData?this.tableData.concat(marketData):marketData;
     this.tableLoad = false;
   }

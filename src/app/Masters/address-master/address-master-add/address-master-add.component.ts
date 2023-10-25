@@ -69,7 +69,7 @@ export class AddressMasterAddComponent implements OnInit {
     this.breadScrums = [
       {generatecontrol: true,
         toggle: this.data && this.data.activeFlag ? this.data.activeFlag : "",
-        title: "Address Master",
+        title: this.action === 'edit' ? "Modify Address" : "Add Address",
         items: ["Home"],
         active: this.action === 'edit' ? "Modify Address" : "Add Address",
       },

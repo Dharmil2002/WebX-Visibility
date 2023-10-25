@@ -21,6 +21,7 @@ export class CustomerGroupAddComponent implements OnInit {
   customerGroupFormControls: CustomerGroupControl;
   jsonControlGroupArray: any;
   backPath:string;
+  submit = 'Save';
   ngOnInit() {
     this.backPath = "/Masters/CustomerGroupMaster/CustomerGroupMasterList";
   }
@@ -31,6 +32,7 @@ export class CustomerGroupAddComponent implements OnInit {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.groupTabledata = Route.getCurrentNavigation().extras.state.data;
       this.action = 'edit'
+      this.submit = 'Modify';
       this.isUpdate = true;
     } else {
       this.action = "Add";
@@ -38,9 +40,9 @@ export class CustomerGroupAddComponent implements OnInit {
     if (this.action === 'edit') {
       this.breadScrums = [
         {
-          title: "Customer Group Master",
+          title: "Modify Customer Group",
           items: ["Home"],
-          active: "Modify Customer Group Master",
+          active: "Modify Customer Group",
           generatecontrol: true,
           toggle: this.groupTabledata.activeFlag
         },
@@ -48,9 +50,9 @@ export class CustomerGroupAddComponent implements OnInit {
     } else {
       this.breadScrums = [
         {
-          title: "Customer Group Master",
+          title: "Add Customer Group",
           items: ["Home"],
-          active: "Add Customer Group Master",
+          active: "Add Customer Group",
           generatecontrol: true,
           toggle: false
         },

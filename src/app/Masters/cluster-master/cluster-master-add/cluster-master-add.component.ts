@@ -28,6 +28,7 @@ export class ClusterMasterAddComponent implements OnInit {
   isUpdate = false;
   newClusterCode: string;
   data: any;
+  submit = 'Save';
   //#endregion
 
   ngOnInit() {
@@ -43,6 +44,7 @@ export class ClusterMasterAddComponent implements OnInit {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
       this.action = "edit";
+      this.submit = 'Modify';
       this.isUpdate = true;
     } else {
       this.action = "Add";
@@ -52,9 +54,9 @@ export class ClusterMasterAddComponent implements OnInit {
       this.clusterTabledata = this.data;
       this.breadScrums = [
         {
-          title: "Cluster Master",
+          title: "Modify Cluster",
           items: ["Home"],
-          active: "Edit Cluster Master",
+          active: "Modify Cluster",
           generatecontrol: true,
           toggle: this.data.activeFlag
         },
@@ -62,9 +64,9 @@ export class ClusterMasterAddComponent implements OnInit {
     } else {
       this.breadScrums = [
         {
-          title: "Cluster Master",
+          title: "Add Cluster",
           items: ["Home"],
-          active: "Add Cluster Master",
+          active: "Add Cluster",
           generatecontrol: true,
           toggle: false
         },

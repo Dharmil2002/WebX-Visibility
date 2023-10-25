@@ -39,6 +39,7 @@ export class AddPinCodeMasterComponent implements OnInit {
     stateRes: any;
     stateData: any;
     backPath:string;
+    submit = 'Save';
 
     ngOnInit(): void {
         this.getStateData();
@@ -51,6 +52,7 @@ export class AddPinCodeMasterComponent implements OnInit {
         if (this.route.getCurrentNavigation()?.extras?.state?.data != null) {
             this.data = this.route.getCurrentNavigation().extras.state.data;
             this.action = 'edit';
+            this.submit = 'Modify';
             this.isUpdate = true;
             this.pincodeTable = this.data;
             this.breadScrums = [

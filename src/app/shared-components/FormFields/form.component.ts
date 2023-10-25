@@ -23,7 +23,7 @@ export class FormComponent {
   @Input() uploadedFiles;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
-  hide: false;
+  hide: boolean = true;
   selectedValue: any;
   isTouchUIActivated = false;
   // field required for password input.
@@ -35,7 +35,7 @@ export class FormComponent {
   //   this.formData=changes.formData.currentValue
   //   }
   constructor(private rootFormGroup: FormGroupDirective,
-
+    
   ) {
     this.form = this.rootFormGroup.control  // get parent form control
 
@@ -91,9 +91,14 @@ export class FormComponent {
     context['functionName'] = 'showhidebuttonclick';
     this.functionCallEmitter.emit(context)
   }
-  openImageDialog() {
-    let context = {};
-    context['functionName'] = 'openImageDialog';
-    this.functionCallEmitter.emit(context)
+  //#region to emit function to preview image
+  openImageDialog(functionName: string, imageName: string) {
+    this.hide = false;
+    let context = {
+      functionName: functionName,
+      imageName: imageName
+    };
+    this.functionCallEmitter.emit(context);
   }
+  //#endregion
 }

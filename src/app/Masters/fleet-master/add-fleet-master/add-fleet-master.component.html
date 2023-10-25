@@ -2,16 +2,16 @@
   <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath"
     (toggleChange)="onToggleChange($event)">
     <form [formGroup]="fleetTableForm">
-      <app-form-webxpress [form]="fleetTableForm" [formData]="jsonControlFleetArray"
-       (functionCallEmitter)="functionCallHandler($event)"
-        [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)" [submit]="submit">
+      <app-form-webxpress [form]="fleetTableForm" [formData]="jsonControlFleetArray" [FormTitle]="'Fleet Master'"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+        (callFunction)="functionCallHandler($event)" [submit]="submit">
       </app-form-webxpress>
     </form>
   </app-common-wrapper-webxpress>
 </ng-container>
 <ng-template #elseBlock>
   <form [formGroup]="fleetTableForm">
-    <app-form-webxpress [form]="fleetTableForm"[FormTitle]="'Vehicle Details'" [formData]="jsonControlFleetArray"
+    <app-form-webxpress [form]="fleetTableForm" [formData]="jsonControlFleetArray" [FormTitle]="'Fleet Master'"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
       (callFunction)="functionCallHandler($event)" [submit]="submit">
     </app-form-webxpress>

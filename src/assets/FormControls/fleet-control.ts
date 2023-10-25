@@ -225,7 +225,7 @@ export class FleetControls {
                 label: "",
                 placeholder: "",
                 type: "text",
-                value: FleetTable.id,
+                value: FleetTable._id,
                 filterOptions: "",
                 autocomplete: "",
                 displaywith: "",

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { fleetModel } from 'src/app/core/models/Masters/fleetMaster';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { FormComponent } from 'src/app/shared-components/FormFields/form.component';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { FleetControls } from 'src/assets/FormControls/fleet-control';
 import Swal from 'sweetalert2';
@@ -17,7 +18,7 @@ import Swal from 'sweetalert2';
 
 })
 export class AddFleetMasterComponent implements OnInit {
-  FleetTable: fleetModel;
+  fleetTableData: fleetModel;
   @Input() thc: boolean;
   breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
   action: string;
@@ -34,23 +35,31 @@ export class AddFleetMasterComponent implements OnInit {
   backPath: string;
   vehicleDet: any;
   vehTypeDet: any;
-  SelectFile: File;
   imageName: string;
   selectedFiles: boolean;
   vehicleType: any;
   vehicleTypeStatus: any;
   submit = 'Save';
-  url: any;
+  imageData: any = {};
+  @ViewChild(FormComponent) childComponent: FormComponent;
+
   constructor(
     private filter: FilterUtils,
     private route: Router,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.FleetTable = route.getCurrentNavigation().extras.state.data;
+      this.fleetTableData = route.getCurrentNavigation().extras.state.data;
+      // console.log(this.fleetTableData);
       this.isUpdate = true;
+      this.imageData = {
+        'fitnesscertificateScan': this.fleetTableData.fitnesscertificateScan,
+        'registrationScan': this.fleetTableData.registrationScan,
+        'insuranceScan': this.fleetTableData.insuranceScan
+      };
       this.submit = 'Modify';
       this.action = "edit";
     } else {
@@ -64,7 +73,7 @@ export class AddFleetMasterComponent implements OnInit {
           items: ["Masters"],
           active: "Modify Fleet",
           generatecontrol: true,
-          toggle: this.FleetTable.activeFlag
+          toggle: this.fleetTableData.activeFlag
         },
       ];
     } else {
@@ -77,13 +86,18 @@ export class AddFleetMasterComponent implements OnInit {
           toggle: false
         },
       ];
-      this.FleetTable = new fleetModel({});
+      this.fleetTableData = new fleetModel({});
     }
   }
 
+  ngOnInit(): void {
+    this.getAllMastersData();
+    this.backPath = "/Masters/FleetMaster/FleetMasterList";
+    this.initializeFormControl();
+  }
+  //#region to initialize form Controls
   initializeFormControl() {
-    //throw new Error("Method not implemented.");
-    this.FleetFormControls = new FleetControls(this.FleetTable, this.isUpdate);
+    this.FleetFormControls = new FleetControls(this.fleetTableData, this.isUpdate);
     // Get form controls for Driver Details section
     this.jsonControlFleetArray = this.FleetFormControls.getFormControls();
 
@@ -105,66 +119,48 @@ export class AddFleetMasterComponent implements OnInit {
     // Build the form group using formGroupBuilder function
     this.fleetTableForm = formGroupBuilder(this.fb, [this.jsonControlFleetArray]);
   }
-
-  ngOnInit(): void {
-    this.getAllMastersData();
-    this.backPath = "/Masters/FleetMaster/FleetMasterList";
-    this.initializeFormControl();
-
-  }
-
+  //#endregion
   //#region Function for Getting dropdown Data
   async getAllMastersData() {
     try {
-      // Prepare the requests for different collections
+      // Fetch vehicle type data
+      const vehTypeData = await this.fetchMasterData("vehicleType_detail");
 
-      let vehicleRes;
-      let vehTypeReq = {
-        "companyCode": parseInt(localStorage.getItem("companyCode")),
-        "filter": {},
-        "collectionName": "vehicleType_detail"
-      };
-      const vehTypeRes = await this.masterService.masterPost('generic/get', vehTypeReq).toPromise();
+      // Fetch vehicle data if not in TH Component
+      let vehicleData = [];
       if (!this.thc) {
-        let vehicleReq = {
-          "companyCode": parseInt(localStorage.getItem("companyCode")),
-          "filter": {},
-          "collectionName": "vehicle_detail"
-        };
-        vehicleRes = await this.masterService.masterPost('generic/get', vehicleReq).toPromise();
+        vehicleData = await this.fetchMasterData("vehicle_detail");
       }
+
+      // Merge the data into a single object
       const mergedData = {
-        vehTypeData: vehTypeRes?.data,
-        vehicleData: vehicleRes?.data,
+        vehTypeData: vehTypeData,
+        vehicleData: vehicleData,
       };
 
       this.allData = mergedData;
+
+      // Populate vehicle details and vehicle type details
       if (!this.thc) {
-        const vehicleDet = mergedData.vehicleData.map(element => ({
-          name: element.vehicleNo,
-          value: element.vehicleNo,
-        }));
-        this.vehicleDet = vehicleDet;
+        this.vehicleDet = this.getFilteredVehicleDetails(mergedData.vehicleData);
         this.filter.Filter(
           this.jsonControlFleetArray,
           this.fleetTableForm,
-          vehicleDet,
+          this.vehicleDet,
           this.vehicleNo,
           this.vehicleNoStatus
         );
       }
-      const vehTypeDet = mergedData.vehTypeData.map(element => ({
-        name: element.vehicleTypeName,
-        value: element.vehicleTypeCode,
-      }));
-      this.vehTypeDet = vehTypeDet;
+
+      this.vehTypeDet = this.getFilteredVehicleTypeDetails(mergedData.vehTypeData);
       this.filter.Filter(
         this.jsonControlFleetArray,
         this.fleetTableForm,
-        vehTypeDet,
+        this.vehTypeDet,
         this.vehicleType,
         this.vehicleTypeStatus
       );
+
       this.tableLoad = true;
       this.autofillDropdown();
     } catch (error) {
@@ -172,130 +168,93 @@ export class AddFleetMasterComponent implements OnInit {
       // Handle the error as needed
     }
   }
+
+  async fetchMasterData(collectionName: string) {
+    const req = {
+      "companyCode": this.companyCode,
+      "filter": {},
+      "collectionName": collectionName,
+    };
+    const res = await this.masterService.masterPost('generic/get', req).toPromise();
+    return res?.data || [];
+  }
+
+  getFilteredVehicleDetails(data: any) {
+    return data
+      .filter(element => element.isActive)
+      .map(element => ({
+        name: element.vehicleNo,
+        value: element.vehicleNo,
+      }));
+  }
+
+  getFilteredVehicleTypeDetails(data: any) {
+    return data
+      .filter(element => element.isActive)
+      .map(element => ({
+        name: element.vehicleTypeName,
+        value: element.vehicleTypeCode,
+      }));
+  }
   //#endregion
 
   autofillDropdown() {
     if (this.isUpdate) {
-      this.vehicleData = this.vehicleDet.find((x) => x.name == this.FleetTable.vehicleNo);
+      this.vehicleData = this.vehicleDet.find((x) => x.value == this.fleetTableData.vehicleNo);
       this.fleetTableForm.controls.vehicleNo.setValue(this.vehicleData);
-      this.vehicleData = this.vehTypeDet.find((x) => x.name == this.FleetTable.vehicleType);
+      this.vehicleData = this.vehTypeDet.find((x) => x.name == this.fleetTableData.vehicleType);
       this.fleetTableForm.controls.vehicleType.setValue(this.vehicleData);
-    }
-  }
-
-  //#region  Fitness certificate Scan
-  selectedFilefitnesscertificateScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.fleetTableForm.controls["fitnesscertificateScan"].setValue(this.SelectFile.name);
-
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
+      this.childComponent.hide = false;
+      // For setting image data, assuming you have imageData defined
+      for (const controlName in this.imageData) {
+        if (this.imageData.hasOwnProperty(controlName)) {
+          const url = this.imageData[controlName];
+          const fileName = this.extractFileName(url);
+          // Set the form control value using the control name
+          this.fleetTableForm.controls[controlName].setValue(fileName);
+        }
       }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
     }
   }
 
-  //#region Insurance Scan
-  selectedFileinsuranceScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.fleetTableForm.controls["insuranceScan"].setValue(this.SelectFile.name);
-
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  // Define a function to extract the filename from a URL
+  extractFileName(url: string): string {
+    const parts = url.split('/');
+    const filenameWithTimestamp = parts[parts.length - 1];
+    const filenameParts = filenameWithTimestamp.split('_');
+    const fileName = filenameParts[0];
+    return fileName;
   }
-  //#endregion
-
-  //#region Registration Scan
-  selectedFileregistrationScan(event) {
-    //this.openImageDialog(event)
-    let fileList: FileList = event.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.url = fileList[0];
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        //        this.fleetTableForm.controls["registrationScan"].setValue(selectedFiles[0].name);
-
-        this.fleetTableForm.controls["registrationScan"].setValue(this.SelectFile.name);
-
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
-  }
-  //#endregion
-
   //#region Function for save data
   async save() {
-    const formValue = this.fleetTableForm.value;
-    const controlNames = ["vehicleNo", "vehicleType"];
     const controls = this.fleetTableForm;
     clearValidatorsAndValidate(controls);
-    controlNames.forEach((controlName) => {
-      const controlValue = formValue[controlName]?.name;
-      this.fleetTableForm.controls[controlName].setValue(controlValue);
+    // Correct way to set values in form controls
+    this.fleetTableForm.get('vehicleNo').setValue(this.fleetTableForm.value.vehicleNo.value);
+    this.fleetTableForm.get('vehicleType').setValue(this.fleetTableForm.value.vehicleType.value);
+
+    // Define an array of control names
+    const imageControlNames = ['fitnesscertificateScan', 'insuranceScan', 'registrationScan'];
+    let data = { ...this.fleetTableForm.value };
+
+    imageControlNames.forEach(controlName => {
+      const file = this.getFileByKey(controlName);
+
+      // Set the URL in the corresponding control name
+      data[controlName] = file;
     });
+
     if (this.isUpdate) {
-      let id = this.fleetTableForm.value.vehicleNo;
+      let id = this.fleetTableData._id;
       // Remove the "id" field from the form controls
-      this.fleetTableForm.removeControl("_id");
+      delete data._id;
       let req = {
         companyCode: this.companyCode,
         collectionName: "fleet_master",
-        filter: { vehicleNo: id },
-        update: this.fleetTableForm.value,
+        filter: { _id: id },
+        update: data,
       };
+
       //API FOR UPDATE
       const res = await this.masterService
         .masterPut("generic/update", req)
@@ -317,10 +276,8 @@ export class AddFleetMasterComponent implements OnInit {
       let req = {
         companyCode: this.companyCode,
         collectionName: "fleet_master",
-        data: this.fleetTableForm.value,
+        data: data,
       };
-      console.log(req);
-
       const res = await this.masterService
         .masterPost("generic/create", req)
         .toPromise();
@@ -398,23 +355,88 @@ export class AddFleetMasterComponent implements OnInit {
     }
   }
   //#endregion
-
-  openImageDialog() {
-    
-    const reader = new FileReader();
-let base64String
-    reader.onload = (event) => {
-      let base64String = event.target.result; // This contains the Base64-encoded string
-      console.log(base64String);
-    };
-  
-    reader.readAsDataURL(this.url); // Read the file as a data URL (Base64)
-
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.getFileByKey(control.imageName);
     this.dialog.open(ImagePreviewComponent, {
-      data: { imageUrl: base64String },
+      data: { imageUrl: file },
       width: '30%',
       height: '50%',
     });
-    //}
-  }  
+  }
+  //#endregion
+  //#region to handle file selection
+  async selectedFile(event, controlName) {
+    // Get the selected files from the input element
+    const files: FileList = event;
+
+    if (files.length > 0) {
+      const file: File = files[0];
+
+      // Extract the file format from the MIME type
+      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
+
+      // Allowed file formats
+      const allowedFormats = ["jpeg", "png", "jpg"];
+
+      if (allowedFormats.includes(fileFormat)) {
+
+        // Create a FormData object to prepare the file for upload
+        const formData = new FormData();
+        formData.append('companyCode', this.companyCode);
+        formData.append('docType', "Fleet");
+        formData.append('docGroup', 'Master');
+        formData.append('docNo', file.name);
+        formData.append('file', file);
+
+        try {
+          // Make the HTTP request to upload the file and await its response
+          const res = await this.masterService.masterPost("blob/upload", formData).toPromise();
+          const url = res.url
+          // Store the file data and URL in the imageData variable
+          this.imageData = {
+            ...this.imageData,
+            [controlName]: url
+          };
+          this.childComponent.hide = false;
+          // Set the form control value to the file name
+          this.fleetTableForm.controls[controlName].setValue(file.name);
+        } catch (error) {
+          // Handle HTTP request errors
+          console.error("HTTP request error:", error);
+        }
+      } else {
+        // Show a warning if the selected format is not allowed
+        Swal.fire({
+          icon: "warning",
+          title: "Alert",
+          text: `Please select a valid file format: ${allowedFormats.join(', ')}`,
+          showConfirmButton: true,
+        });
+      }
+    }
+  }
+
+  // Fitness Certificate Scan
+  selectedFilefitnesscertificateScan(data) {
+    this.selectedFile(data.eventArgs, "fitnesscertificateScan");
+  }
+  // Insurance Scan
+  selectedFileinsuranceScan(data) {
+    this.selectedFile(data.eventArgs, "insuranceScan");
+  }
+  // Registration Scan
+  selectedFileregistrationScan(data) {
+    this.selectedFile(data.eventArgs, "registrationScan");
+  }
+
+  // Function to get a file by key
+  getFileByKey(key: string) {
+    if (this.imageData.hasOwnProperty(key)) {
+      return this.imageData[key];
+    } else {
+      return null; // Key not found in imageData
+    }
+  }
+  //#endregion
 }

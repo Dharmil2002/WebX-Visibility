@@ -282,7 +282,7 @@
                     </ng-container>
                     <ng-template #eyeIcon>
                       <app-feather-icons [icon]="'eye'" style="cursor: pointer" [class]="'tbl-fav-edit'"
-                        (click)="openImageDialog()"></app-feather-icons>
+                        (click)="openImageDialog('openImageDialog', formItem.name)"></app-feather-icons>
                     </ng-template>
                   </button>
                   <input hidden class="example-full-width" style="cursor:pointer" [formControlName]='formItem.name'

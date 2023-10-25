@@ -10,9 +10,10 @@
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
     <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="tableData"
-        [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
-        [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
-        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)">
+        [FormTitle]="'Beneficiary List'" [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath"
+        [metaData]="METADATA" [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems"
+        (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag"
+        [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)">
     </generic-table-webxpress>
 
 </app-common-wrapper-webxpress>

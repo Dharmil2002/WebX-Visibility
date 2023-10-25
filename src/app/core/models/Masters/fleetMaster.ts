@@ -1,7 +1,7 @@
 export class fleetModel {
 
   activeFlag: boolean;
-  id: number; //user
+  _id: string; //user
   vehicleNo: string;
   vehicleType: string;
   RCBookNo: string;
@@ -16,10 +16,9 @@ export class fleetModel {
   registrationScan: string;
   insuranceScan: string;
   fitnesscertificateScan: string;
-  date = new Date()
   constructor(FleetMaster) {
     {
-      this.id = FleetMaster._id || this.getRandomID();
+      //this._id = FleetMaster._id || this.getRandomID();
       this.vehicleNo = FleetMaster.vehicleNo || '';
       this.vehicleType = FleetMaster.vehicleType || '';
       this.RCBookNo = FleetMaster.RCBookNo || '';
@@ -28,18 +27,11 @@ export class fleetModel {
       this.insuranceProvider = FleetMaster.insuranceProvider || '';
       this.chassisNo = FleetMaster.chassisNo || '';
       this.engineNo = FleetMaster.engineNo || '';
-      this.insuranceExpiryDate = FleetMaster.insuranceExpiryDate || this.date;
-      this.RegistrationDate = FleetMaster.RegistrationDate || this.date;
-      this.fitnessValidityDate = FleetMaster.fitnessValidityDate || this.date;
+      this.insuranceExpiryDate = FleetMaster.insuranceExpiryDate || new Date();
+      this.RegistrationDate = FleetMaster.RegistrationDate || new Date();
+      this.fitnessValidityDate = FleetMaster.fitnessValidityDate || new Date();
       this.activeFlag = FleetMaster.activeFlag || false;
 
     }
-  }
-
-  public getRandomID(): string {
-    const S4 = () => {
-      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    };
-    return S4() + S4();
   }
 }

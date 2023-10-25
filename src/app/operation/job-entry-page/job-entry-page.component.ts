@@ -606,20 +606,19 @@ export class JobEntryPageComponent implements OnInit {
     this.jobEntryTableForm.controls['vendorName'].setValue(this.jobEntryTableForm.controls['vendorName'].value.name);
     this.jobEntryTableForm.controls['fromCity'].setValue(this.jobEntryTableForm.controls['fromCity'].value.value);
     this.jobEntryTableForm.controls['toCity'].setValue(this.jobEntryTableForm.controls['toCity'].value.value);
-    console.log(fieldsToFromRemove + "test")
     const containorList = fieldsToFromRemove.length > 0 ? removeFieldsFromArray(containorDetail, fieldsToFromRemove) : [];
     let jobDetail = {
       ...this.jobEntryTableForm.value,
       ...containorList,
     };
-
-    const res = await addJobDetail(jobDetail, this.masterService);
+ 
+    const res = await addJobDetail(jobDetail, this.masterService,financialYear);
     if (res) {
       if (docket.length <= 0) {
         Swal.fire({
           icon: "success",
           title: "Generated Successfuly",
-          text: "Job Entry No: " + jeNo.toUpperCase(),
+          text: "Job Entry No: " + res.toUpperCase(),
           showConfirmButton: true,
         }).then((result) => {
           if (result.isConfirmed) {
@@ -630,12 +629,12 @@ export class JobEntryPageComponent implements OnInit {
       }
       else {
         for (const element of docket) {
-          await this.docketService.updateDocket(element, { "jobNo": jeNo.toUpperCase() });
+          await this.docketService.updateDocket(element, { "jobNo": res.toUpperCase() });
         }
         Swal.fire({
           icon: "success",
           title: "Generated Successfuly",
-          text: "Job Entry No: " + jeNo.toUpperCase(),
+          text: "Job Entry No: " +  res.toUpperCase(),
           showConfirmButton: true,
         }).then((result) => {
           if (result.isConfirmed) {

@@ -108,7 +108,11 @@ export class JobControl {
                     {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
-                    }
+                    },
+                    {
+                        name: "required",
+                        message: "From City is required"
+                    },
                 ],
                 additionalData: {
                     showNameAndValue: false,
@@ -125,7 +129,11 @@ export class JobControl {
                     {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
-                    }
+                    },
+                    {
+                        name: "required",
+                        message: "To City is required"
+                    },
                 ],
                 functions: {
                     onModel: "getPincodeDetail",
@@ -431,6 +439,20 @@ export class JobControl {
                 },
                 generatecontrol: false,
                 disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "companyCode",
+                label: "companyCode",
+                placeholder: "company Code",
+                type: "",
+                value: localStorage.getItem("companyCode"),
+                generatecontrol: false,
+                disable: false,
+                additionalData: {
+                    metaData: "jobControls"
+                },
                 Validations: [
                 ]
             },

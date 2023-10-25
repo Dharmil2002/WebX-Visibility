@@ -1,18 +1,22 @@
 const branch=localStorage.getItem("Branch");
 // This function adds a job detail to a MongoDB collection using a master service.
-export async function addJobDetail(jobDetail, masterService) {
-  // Prepare the request body with company code, collection name, and job detail data.
-  const reqBody = {
-      companyCode: localStorage.getItem('companyCode'),
-      collectionName: "job_detail",
-      data: jobDetail
-  }
+export async function addJobDetail(jobDetail, masterService,financialYear) {
   
+  // Prepare the request body with company code, collection name, and job detail data.
+  let reqBody = {
+    companyCode:localStorage.getItem("companyCode"),
+    collectionName: "job_detail",
+    docType: "JOB",
+    branch: localStorage.getItem("Branch"),
+    finYear: financialYear,
+    data: jobDetail,
+    party: jobDetail.billingParty.toUpperCase()
+  };
   // Send a POST request to create the job detail in the MongoDB collection.
-  const res = await masterService.masterMongoPost("generic/create", reqBody).toPromise();
+  const res = await masterService.masterMongoPost("operation/Job/create", reqBody).toPromise();
   
   // Return the response from the server.
-  return res;
+  return res.data.ops[0].jobId;
 }
 
 // This function retrieves vendor details from a MongoDB collection using a master service.

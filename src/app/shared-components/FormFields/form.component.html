@@ -130,14 +130,14 @@
                 <!-- Days time Field -->
                 <div class="row" *ngIf="(formItem.type == 'dayhour') && formItem.generatecontrol === true">
                   <div class="col-6">
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" style="width: 100%;">
                       <mat-label class="fontbold">{{formItem.label}}</mat-label>
                       <input matInput type="number" formControlName="{{formItem.name}}" placeholder="{{formItem.label}}"
                         [disabled]="formItem.disable">
                     </mat-form-field>
                   </div>
                   <div class="col-6">
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" style="width: 100%;">
                       <mat-label class="fontbold">{{formItem.additionalData.label}}</mat-label>
                       <input matInput type="number" formControlName="{{formItem.additionalData.fieldName}}"
                         placeholder="{{formItem.additionalData.label}}" [disabled]="formItem.disable">
@@ -299,7 +299,8 @@
                     </button>
                   </a>
                 </ng-container>
-                <div *ngIf="formItem.type === 'filelink' && formItem.generatecontrol" style="margin-top: 20px;">
+                <div *ngIf="formItem.type === 'filelink' && formItem.generatecontrol"
+                  style="margin-top: 20px;padding-left: 3%;">
                   <button mat-stroked-button (click)="download(formItem.value)">
                     <mat-icon>book-open</mat-icon>
                     {{formItem.label}}

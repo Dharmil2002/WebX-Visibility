@@ -25,6 +25,9 @@ export class EditAbleTableComponent implements OnInit {
   @Input() columnHeader;
   @Input() ActionObject: any;
   @Input() showsubmit: boolean
+  @Input() FormTitle: string = "";
+  @Input() showHeader: boolean = true;
+  @Input() centerAligned;
   @Output() DeleteAction: EventEmitter<any> = new EventEmitter();
   @Output() Submit: EventEmitter<any> = new EventEmitter();
   @Output() AddRow: EventEmitter<any> = new EventEmitter();
@@ -44,6 +47,7 @@ export class EditAbleTableComponent implements OnInit {
   }
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
+    this.centerAligned = changes.centerAligned?.currentValue ?? this.centerAligned;
     if (changes.tableData?.currentValue) {
       this.ngOnInit();
     }
@@ -96,15 +100,15 @@ export class EditAbleTableComponent implements OnInit {
       }
     });
 
-    fromEvent(
-      this.filter.nativeElement,
-      "keyup"
-    ).subscribe(() => {
-      if (!this.dataSource) {
-        return;
-      }
-      this.dataSource.filter = this.filter.nativeElement.value;
-    });
+    // fromEvent(
+    //   this.filter.nativeElement,
+    //   "keyup"
+    // ).subscribe(() => {
+    //   if (!this.dataSource) {
+    //     return;
+    //   }
+    //   this.dataSource.filter = this.filter.nativeElement.value;
+    // });
   }
 
 
@@ -160,6 +164,7 @@ export class EditAbleTableComponent implements OnInit {
     this.AddRow.emit();
     this.dataSource._updateChangeSubscription();
   }
+
   functionCalled(context) {
     // console.log(context, "from form components");
     if ((context.functionName !== undefined || context.functionName != null) && context.functionName?.length > 0) {

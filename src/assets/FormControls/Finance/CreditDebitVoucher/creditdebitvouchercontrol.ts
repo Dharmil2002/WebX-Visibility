@@ -5,6 +5,8 @@ export class CreditDebitVoucherControl {
   CreditDebitVoucherTaxationTDSArray: FormControls[];
   CreditDebitVoucherTaxationTCSArray: FormControls[];
   CreditDebitVoucherTaxationGSTArray: FormControls[];
+  CreditDebitVoucherTaxationPaymentSummaryArray: FormControls[];
+  CreditDebitVoucherTaxationPaymentDetailsArray: FormControls[];
   constructor() {
     this.CreditDebitVoucherSummaryArray = [
       {
@@ -103,9 +105,9 @@ export class CreditDebitVoucherControl {
         label: "Prepared by",
         placeholder: "Prepared by",
         type: "text",
-        value: "",
+        value: localStorage.getItem('UserName'),
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [],
       },
       {
@@ -113,9 +115,9 @@ export class CreditDebitVoucherControl {
         label: "Accounting location",
         placeholder: "Accounting location",
         type: "text",
-        value: "",
+        value: localStorage.getItem('Branch'),
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [],
       },
 
@@ -124,7 +126,7 @@ export class CreditDebitVoucherControl {
         label: "Entry Location",
         placeholder: "Entry Location",
         type: "text",
-        value: "",
+        value: localStorage.getItem('Branch'),
         generatecontrol: true,
         disable: false,
         Validations: [],
@@ -199,26 +201,16 @@ export class CreditDebitVoucherControl {
         },
       },
       {
-        name: "TDSRate",
-        label: "TDS Rate",
-        placeholder: "TDS Rate",
-        type: "text",
+        name: 'TDSRate', label: 'TDS Rate', placeholder: 'TDS Rate', type: 'dayhour',
         value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
+        Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+          label: 'TDS Deduction',
+          fieldName: "TDSDeduction"
+        },
       },
 
-      {
-        name: "TDSDeduction",
-        label: "TDS Deduction",
-        placeholder: "TDS Deduction",
-        type: "text",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
 
     ];
     this.CreditDebitVoucherTaxationTCSArray = [
@@ -255,9 +247,69 @@ export class CreditDebitVoucherControl {
         },
       },
       {
-        name: "TCSRate",
-        label: "TCS Rate",
-        placeholder: "TCS Rate",
+        name: 'TCSRate', label: 'TCS Rate', placeholder: 'TCS Rate', type: 'dayhour',
+        value: "",
+        Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+          label: 'TCS Deduction',
+          fieldName: "TCSDeduction"
+        },
+      },
+
+      // {
+      //   name: "TCSRate",
+      //   label: "TCS Rate",
+      //   placeholder: "TCS Rate",
+      //   type: "text",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
+
+      // {
+      //   name: "TCSDeduction",
+      //   label: "TCS Deduction",
+      //   placeholder: "TCS Deduction",
+      //   type: "text",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
+
+    ];
+    this.CreditDebitVoucherTaxationGSTArray = [
+
+      {
+        name: 'IGST', label: 'IGST', placeholder: 'IGST', type: 'dayhour',
+        value: "",
+        Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+          label: 'UGST',
+          fieldName: "UGST"
+        },
+      },
+      {
+        name: 'SGST', label: 'SGST', placeholder: 'SGST', type: 'dayhour',
+        value: "",
+        Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+          label: 'UGST',
+          fieldName: "UGST"
+        },
+      },
+
+    ];
+    this.CreditDebitVoucherTaxationPaymentSummaryArray = [
+
+      {
+        name: "PaymentAmount",
+        label: "Payment Amount",
+        placeholder: "Payment Amount",
         type: "text",
         value: "",
         generatecontrol: true,
@@ -266,23 +318,43 @@ export class CreditDebitVoucherControl {
       },
 
       {
-        name: "TCSDeduction",
-        label: "TCS Deduction",
-        placeholder: "TCS Deduction",
+        name: "Roundoff",
+        label: "Round off",
+        placeholder: "Round off",
         type: "text",
         value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "NetPayable",
+        label: "Net Payable",
+        placeholder: "Net Payable",
+        type: "text",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "Debitagainstdocument",
+        label: "Debit against document",
+        placeholder: "Debit against document",
+        type: "filelink",
+        value: "Click",
         generatecontrol: true,
         disable: false,
         Validations: [],
       },
 
     ];
-    this.CreditDebitVoucherTaxationGSTArray = [
+    this.CreditDebitVoucherTaxationPaymentDetailsArray = [
 
       {
-        name: "IGST",
-        label: "IGST",
-        placeholder: "IGST",
+        name: "PaymentMode",
+        label: "Payment Mode",
+        placeholder: "Payment Mode",
         type: "text",
         value: "",
         generatecontrol: true,
@@ -291,9 +363,9 @@ export class CreditDebitVoucherControl {
       },
 
       {
-        name: "UGST",
-        label: "UGST",
-        placeholder: "UGST",
+        name: "Cheque/RefNo",
+        label: "Cheque/Ref No.",
+        placeholder: "Cheque/Ref No.",
         type: "text",
         value: "",
         generatecontrol: true,
@@ -301,9 +373,9 @@ export class CreditDebitVoucherControl {
         Validations: [],
       },
       {
-        name: "SGST",
-        label: "SGST",
-        placeholder: "SGST",
+        name: "Bank",
+        label: "Bank",
+        placeholder: "Bank",
         type: "text",
         value: "",
         generatecontrol: true,
@@ -311,17 +383,31 @@ export class CreditDebitVoucherControl {
         Validations: [],
       },
       {
-        name: "UGST",
-        label: "CGST",
-        placeholder: "CGST",
-        type: "text",
+        name: "Date",
+        label: "Date",
+        placeholder: "Date",
+        type: "date",
+        value: new Date(),
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          minDate: new Date(),
+        },
+      },
+      {
+        name: "ScanSupportingdocument",
+        label: "Scan Supporting document",
+        placeholder: "Scan Supporting document",
+        type: "file",
         value: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
+        functions: {
+          onChange: "onFileSelected",
+        },
       },
-
-
 
     ];
   }
@@ -337,6 +423,12 @@ export class CreditDebitVoucherControl {
   }
   getCreditDebitVoucherTaxationGSTArrayControls() {
     return this.CreditDebitVoucherTaxationGSTArray;
+  }
+  getCreditDebitVoucherTaxationPaymentSummaryArrayControls() {
+    return this.CreditDebitVoucherTaxationPaymentSummaryArray;
+  }
+  getCreditDebitVoucherTaxationPaymentDetailsArrayControls() {
+    return this.CreditDebitVoucherTaxationPaymentDetailsArray;
   }
 
 }

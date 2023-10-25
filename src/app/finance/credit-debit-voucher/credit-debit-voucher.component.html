@@ -6,6 +6,13 @@
             [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
+    <app-table-boilerplate [tableData]="tableData" [columnHeader]="VoucherDetailsDisplayedColumns"
+        [FormTitle]="'Voucher Details'" (DeleteAction)="delete($event,'tableData')" (AddRow)="addVoucherDetails($event)"
+        (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="true"
+        [ActionObject]="actionObject" [showHeader]="false"
+        (callFunction)="functionCallHandler($event)"></app-table-boilerplate>
+
+    <!-- 
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="card">
@@ -17,8 +24,6 @@
                         <hr>
                         <div class="responsive_table" style="overflow-x: unset !important;">
                             <mat-table [dataSource]="ModeldataSource" matSort class="table-hover" class="mat-cell">
-
-                                <!-- Order Column -->
                                 <ng-container *ngFor="let displayedColumn of displayedColumns"
                                     [matColumnDef]="displayedColumn.Key">
                                     <mat-header-cell *matHeaderCellDef mat-sort-header
@@ -44,25 +49,61 @@
                 </div>
             </div>
         </div>
+    </div> -->
+    <div class="row">
+        <div class="col-4">
+            <form [formGroup]="CreditDebitVoucherTaxationTDSForm">
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationTDSForm" [FormTitle]="'Voucher Taxation TDS'"
+                    [formData]="jsonControlCreditDebitVoucherTaxationTDSArray"
+                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col-4">
+
+            <form [formGroup]="CreditDebitVoucherTaxationTCSForm">
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationTCSForm" [FormTitle]="'Voucher Taxation TCS'"
+                    [formData]="jsonControlCreditDebitVoucherTaxationTCSArray"
+                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col-4">
+            <form [formGroup]="CreditDebitVoucherTaxationGSTForm">
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationGSTForm" [FormTitle]="'Voucher Taxation GST'"
+                    [formData]="jsonControlCreditDebitVoucherTaxationGSTArray"
+                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
     </div>
-    <form [formGroup]="CreditDebitVoucherTaxationTDSForm">
-        <app-form-webxpress [form]="CreditDebitVoucherTaxationTDSForm" [FormTitle]="'Voucher Taxation TDS'"
-            [formData]="jsonControlCreditDebitVoucherTaxationTDSArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
-    <form [formGroup]="CreditDebitVoucherTaxationTCSForm">
-        <app-form-webxpress [form]="CreditDebitVoucherTaxationTCSForm" [FormTitle]="'Voucher Taxation TCS'"
-            [formData]="jsonControlCreditDebitVoucherTaxationTCSArray"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
-    <form [formGroup]="CreditDebitVoucherTaxationGSTForm">
-        <app-form-webxpress [form]="CreditDebitVoucherTaxationGSTForm" [FormTitle]="'Voucher Taxation GST'"
-            [formData]="jsonControlCreditDebitVoucherTaxationGSTArray" [className]="className"
-            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
+    <div class="row">
+        <div class="col-4">
+            <form [formGroup]="CreditDebitVoucherTaxationPaymentSummaryForm">
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationPaymentSummaryForm"
+                    [FormTitle]="'Payment Summary'"
+                    [formData]="jsonControlCreditDebitVoucherTaxationPaymentSummaryArray"
+                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col">
+            <form [formGroup]="CreditDebitVoucherTaxationPaymentDetailsForm">
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationPaymentDetailsForm"
+                    [FormTitle]="'Payment Details'"
+                    [formData]="jsonControlCreditDebitVoucherTaxationPaymentDetailsArray"
+                    [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+    </div>
+
+
 
     <!-- <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">

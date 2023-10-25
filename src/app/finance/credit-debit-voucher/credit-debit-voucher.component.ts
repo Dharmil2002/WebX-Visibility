@@ -2,8 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
+import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
+import { financialYear } from 'src/app/Utility/date/date-utils';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { SessionService } from 'src/app/core/service/session.service';
+import { customerFromApi } from 'src/app/operation/prq-entry-page/prq-utitlity';
 import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/creditdebitvouchercontrol';
 import Swal from 'sweetalert2';
 @Component({
@@ -11,6 +17,7 @@ import Swal from 'sweetalert2';
   templateUrl: './credit-debit-voucher.component.html',
 })
 export class CreditDebitVoucherComponent implements OnInit {
+  companyCode: number | null
   breadScrums = [
     {
       title: "Credit Debit Voucher",
@@ -40,6 +47,10 @@ export class CreditDebitVoucherComponent implements OnInit {
   CreditDebitVoucherTaxationPaymentDetailsForm: UntypedFormGroup;
   jsonControlCreditDebitVoucherTaxationPaymentDetailsArray: any;
 
+
+  CreditDebitVoucherDocumentDebitsForm: UntypedFormGroup;
+  jsonControlCreditDebitVoucherDocumentDebitsArray: any;
+
   displayedColumns = [
     {
       Key: "Ledger", title: "Ledger", width: "200", className: "matcolumnleft", show: true
@@ -65,10 +76,9 @@ export class CreditDebitVoucherComponent implements OnInit {
     },
   ];
   columnKeys = this.displayedColumns.map((column) => column.Key);
-  public ModeldataSource = new MatTableDataSource<any>();
-
   // EditAble Table 
   tableData: any = [];
+  DocumentDebits: any = [];
   //Displayed columns City location configuration
   VoucherDetailsDisplayedColumns = {
 
@@ -129,52 +139,66 @@ export class CreditDebitVoucherComponent implements OnInit {
       class: 'matcolumncenter'
     }
   };
+  DocumentDebitsDisplayedColumns = {
+
+    Document: {
+      name: "Document ",
+      key: "Dropdown",
+      option: [],
+      style: "",
+      class: 'matcolumnfirst'
+    },
+    DebitAmount: {
+      name: "Debit Amount ₹",
+      key: "inputnumber",
+      style: "",
+      class: 'matcolumncenter'
+    },
+
+    action: {
+      name: "Action",
+      key: "Action",
+      style: "",
+      class: 'matcolumncenter'
+    }
+  };
   actionObject = {
     addRow: true,
     submit: true,
     search: true
   };
+
+  PartyNameList: any;
+  StateList: any;
+  AccountGroupList: any;
+  DisplayCreditDebitVoucherDocument: boolean = false;
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
-    private masterService: MasterService
+    private filter: FilterUtils,
+    private sessionService: SessionService,
+    private masterService: MasterService,
+    private navigationService: NavigationService,
+    private voucherServicesService: VoucherServicesService,
   ) {
-    this.VoucherDetailsDisplayedColumns.Ledger.option = [
-      { "name": "EXP001: Conveyance", "value": "EXP001" },
-      { "name": "EXP002: Communication", "value": "EXP002" },
-      { "name": "EXP003: Communication", "value": "EXP003" }
-    ];
+    this.companyCode = this.sessionService.getCompanyCode()
+    // this.VoucherDetailsDisplayedColumns.Ledger.option = [
+    //   { "name": "EXP001: Conveyance", "value": "EXP001" },
+    //   { "name": "EXP002: Communication", "value": "EXP002" },
+    //   { "name": "EXP003: Communication", "value": "EXP003" }
+    // ];
     this.VoucherDetailsDisplayedColumns.SACCode.option = [
       { "name": "12022: Local conveyance", "value": "12022" },
       { "name": "12088: Telecom services", "value": "12088" },
       { "name": "12089: Telecom services", "value": "12089" }
     ];
-    this.ModeldataSource.data = [
-      {
-        Ledger: "EXP001: Conveyance",
-        SACCode: "12022: Local conveyance",
-        DebitAmount: "3450.50",
-        GSTRate: "0",
-        GSTAmount: "",
-        Total: "3450.50",
-        TDSApplicable: "No",
-        Narration: "For local conveyance at Andheri"
-      },
-      {
-        Ledger: "EXP003: Communication",
-        SACCode: "12088: Telecom services",
-        DebitAmount: "2340.00",
-        GSTRate: "12%",
-        GSTAmount: "280.8",
-        Total: "2620.80",
-        TDSApplicable: "Yes",
-        Narration: "For phone expense"
-      },
-    ]
+
   }
   ngOnInit(): void {
+    this.BindDataFromApi();
     this.initializeFormControl();
     this.addVoucherDetails('')
+    this.AddDocumentDebits('');
   }
   initializeFormControl() {
     this.creditDebitVoucherControl = new CreditDebitVoucherControl();
@@ -196,6 +220,59 @@ export class CreditDebitVoucherComponent implements OnInit {
     this.jsonControlCreditDebitVoucherTaxationPaymentDetailsArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationPaymentDetailsArrayControls();
     this.CreditDebitVoucherTaxationPaymentDetailsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationPaymentDetailsArray]);
 
+    this.jsonControlCreditDebitVoucherDocumentDebitsArray = this.creditDebitVoucherControl.getCreditDebitVoucherDocumentDebitsArrayControls();
+    this.CreditDebitVoucherDocumentDebitsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherDocumentDebitsArray]);
+
+  }
+  async BindDataFromApi() {
+    const stateReqBody = {
+      companyCode: this.companyCode,
+      filter: {},
+      collectionName: "state_master",
+    };
+    const account_groupReqBody = {
+      companyCode: this.companyCode,
+      collectionName: "account_group_detail",
+      filter: {},
+    };
+
+    const resCust = await customerFromApi(this.masterService);
+    this.PartyNameList = resCust;
+    const resState = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
+    this.StateList = resState?.data
+      .map(x => ({ value: x.STNM, name: x.ST }))
+      .filter(x => x != null)
+      .sort((a, b) => a.value.localeCompare(b.value));
+
+    const resaccount_group = await this.masterService.masterPost('generic/get', account_groupReqBody).toPromise();
+    this.AccountGroupList = resaccount_group?.data
+      .map(x => ({ value: x.GroupCode + ":" + x.GroupName, name: x.GroupCode + ":" + x.GroupName }))
+      .filter(x => x != null)
+      .sort((a, b) => a.value.localeCompare(b.value));
+    this.VoucherDetailsDisplayedColumns.Ledger.option = this.AccountGroupList
+    this.filter.Filter(
+      this.jsonControlCreditDebitVoucherSummaryArray,
+      this.CreditDebitVoucherSummaryForm,
+      resCust,
+      "PartyName",
+      false
+    );
+    this.filter.Filter(
+      this.jsonControlCreditDebitVoucherSummaryArray,
+      this.CreditDebitVoucherSummaryForm,
+      this.StateList,
+      "Partystate",
+      null
+    );
+    this.filter.Filter(
+      this.jsonControlCreditDebitVoucherSummaryArray,
+      this.CreditDebitVoucherSummaryForm,
+      this.StateList,
+      "Paymentstate",
+      false
+    );
+
+
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;
@@ -205,20 +282,96 @@ export class CreditDebitVoucherComponent implements OnInit {
       console.log("failed");
     }
   }
+  async save1() {
+    console.log(this.tableData)
+    console.log(this.CreditDebitVoucherSummaryForm.value)
+    // CreditDebitVoucherSummaryForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationTDSForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationTCSForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationGSTForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationPaymentSummaryForm: UntypedFormGroup;
+    // CreditDebitVoucherTaxationPaymentDetailsForm: UntypedFormGroup;
+    // CreditDebitVoucherDocumentDebitsForm: UntypedFormGroup;
+
+  }
   async save() {
+    // Create a new array to store the transformed data
+    var transformedData = this.tableData.map(function (item) {
+      // Split the "Ledger" value into "accCode" and "accName"
+      var ledgerParts = item.Ledger.split(":");
+      // Create a new object with the desired structure
+      return {
+        "accCode": ledgerParts[0],
+        "accName": ledgerParts[1],
+        "amount": item.Total,
+        "narration": item.Narration
+      };
+    });
+    console.log(this.CreditDebitVoucherSummaryForm.value)
+    let reqBody = {
+      companyCode: this.companyCode,
+      voucherNo: "VR0002",
+      transDate: Date(),
+      finYear: financialYear,
+      branch: localStorage.getItem("Branch"),
+      transType: "DebitVoucher",
+      docType: "Voucher",
+      docNo: "VR0002",
+      partyCode: this.CreditDebitVoucherSummaryForm.value?.PartyName?.value,
+      partyName: this.CreditDebitVoucherSummaryForm.value?.PartyName?.name,
+      entryBy: localStorage.getItem("UserName"),
+      entryDate: Date(),
+      debit: transformedData,
+      credit: transformedData,
+
+    };
+    this.voucherServicesService
+      .FinancePost("fin/account/posting", reqBody)
+      .subscribe({
+        next: (res: any) => {
+          Swal.fire({
+            icon: "success",
+            title: "Voucher Created Successfully",
+            text:
+              "",
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirect to the desired page after the success message is confirmed.
+              this.navigationService.navigateTotab(
+                "docket",
+                "dashboard/Index"
+              );
+            }
+          });
+        },
+      });
   }
   cancel(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
+  showhidebuttonclick(event) {
+    this.DisplayCreditDebitVoucherDocument = !this.DisplayCreditDebitVoucherDocument
+  }
   // Add a new item to the table
   addVoucherDetails(event) {
-    // const city = this.cityLocationTableForm.value?.city.name || ""
     const addObj = {
       Ledger: "EXP001",
       SACCode: "12088",
       action: ""
     };
     this.tableData.splice(0, 0, addObj);
+
+  }
+  // Add a new item to the table
+  AddDocumentDebits(event) {
+    const addObj = {
+      Ledger: "EXP001",
+      SACCode: "12088",
+      action: ""
+    };
+    this.DocumentDebits.splice(0, 0, addObj);
+
   }
   async delete(event, tableData) {
     const index = event.index;

@@ -38,7 +38,8 @@ import { OperationService } from '../core/service/operations/operation.service';
 import { AssignVehiclePageMethods } from '../operation/assign-vehicle-page/assgine-vehicle-utility';
 import { AddManualVoucherComponent } from './manual voucher/add-manual-voucher/add-manual-voucher.component';
 import { CreditDebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
-
+import { FilterUtils } from "../Utility/dropdownFilter";
+import { VoucherServicesService } from '../core/service/Finance/voucher-services.service';
 
 @NgModule({
     declarations: [
@@ -87,6 +88,8 @@ import { CreditDebitVoucherComponent } from './credit-debit-voucher/credit-debit
         NgxMaterialTimepickerModule,
         ReactiveFormsModule
     ],
-    providers: [SnackBarUtilityService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods],
+    providers: [SnackBarUtilityService, utilityService, OperationService,
+        NavigationService, DatePipe, MatDialogModule,
+        AssignVehiclePageMethods, FilterUtils, VoucherServicesService],
 })
 export class FinanceModule { }

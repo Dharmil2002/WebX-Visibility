@@ -35,7 +35,7 @@ export class FormComponent {
   //   this.formData=changes.formData.currentValue
   //   }
   constructor(private rootFormGroup: FormGroupDirective,
-    
+
   ) {
     this.form = this.rootFormGroup.control  // get parent form control
 
@@ -86,8 +86,12 @@ export class FormComponent {
     link.download = url.substring(url.lastIndexOf('/') + 1);
     link.click();
   }
-
-  openImageDialog( ) {
+  showhidebuttonclick() {
+    let context = {};
+    context['functionName'] = 'showhidebuttonclick';
+    this.functionCallEmitter.emit(context)
+  }
+  openImageDialog() {
     let context = {};
     context['functionName'] = 'openImageDialog';
     this.functionCallEmitter.emit(context)

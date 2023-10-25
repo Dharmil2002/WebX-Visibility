@@ -96,7 +96,7 @@ export class AddUserMasterComponent implements OnInit {
     } else {
       this.breadScrums = [
         {
-          title: "Add Master",
+          title: "Add User",
           items: ["Master"],
           active: "Add User",
           generatecontrol: true,

@@ -2,7 +2,7 @@
     <form [formGroup]="addressTableForm">
         <app-form-webxpress [form]="addressTableForm" [formData]="jsonControlGroupArray"
             [showSaveAndCancelButton]="true" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [submit]="submit">
+            (callFunction)="functionCallHandler($event)" [submit]="submit" [FormTitle]="'Address Details'">
         </app-form-webxpress>
     </form>
 </app-common-wrapper-webxpress>

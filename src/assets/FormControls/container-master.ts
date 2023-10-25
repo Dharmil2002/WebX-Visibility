@@ -127,7 +127,7 @@ export class ContainerControl {
                 type: 'toggle',
                 value: containerMasterTable?.activeFlag,
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: false, disable: false
             },
             {
                 name: '_id',

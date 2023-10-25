@@ -13,6 +13,7 @@ export class VehicleMasterListComponent implements OnInit {
     columnHeader =
         {
             // "srNo": "Sr No",
+            "updatedDate": "Created Date",
             "vehicleNo": "Vehicle No.",
             "vehicleType": "Vehicle Type",
             "vendorName": "Vendor Name",
@@ -44,6 +45,7 @@ export class VehicleMasterListComponent implements OnInit {
     linkArray = []
     addAndEditPath: string;
     csvFileName: string;
+    tableData: any;
     constructor(private masterService: MasterService,) {
         this.addAndEditPath = "/Masters/VehicleMaster/AddVehicle";
     }
@@ -57,16 +59,24 @@ export class VehicleMasterListComponent implements OnInit {
             "collectionName": "vehicle_detail",
             "filter": {}
         }
-        const res = await this.masterService.masterPost("generic/get", req).toPromise()
-        // Generate srno for each object in the array
-        const dataWithSrno = res.data.map((obj, index) => {
-            return {
-                ...obj,
-                // srNo: index + 1
-            };
-        });
-        this.csv = dataWithSrno;
-        this.tableLoad = false;
+        this.masterService.masterPost('generic/get', req).subscribe((res: any) => {
+            if (res && res.data) {
+              const data = res.data;
+        
+              // Sort the data based on updatedDate in descending order
+              const dataWithDate = data.sort((a, b) => new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime());
+        
+              // Extract the updatedDate from the first element (latest record)
+              const latestUpdatedDate = dataWithDate.length > 0 ? dataWithDate[0].updatedDate : null;
+        
+              // Use latestUpdatedDate as needed
+        
+              this.csv = dataWithDate;
+              this.tableData = dataWithDate;
+            }
+        
+            this.tableLoad = false;
+          });
     }
     async isActiveFuntion(det) {
         let id = det._id;

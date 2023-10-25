@@ -16,7 +16,7 @@ import { HttpErrorResponse } from "@angular/common/http";
   templateUrl: './add-vehicletype-master.component.html',
 })
 export class AddVehicletypeMasterComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean;}[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   action: string;
   isUpdate = false;
@@ -30,6 +30,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
   data: any;
   updateVehicleTypeCategory: any;
   vehicleTypeCategory: any;
+  submit = 'Save';
   newVehicleTypeCode: any;
   ngOnInit(): void {
     //this.getVehicleTypeCategoryList();
@@ -55,6 +56,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state;
     if (navigationState != null) {
       this.action = 'edit';
+      this.submit = 'Modify';
       this.data = navigationState.data;
       console.log(this.data);
 
@@ -68,9 +70,11 @@ export class AddVehicletypeMasterComponent implements OnInit {
     this.isUpdate = this.action === 'edit';
     this.breadScrums = [
       {
-        title: 'Vehicle Type Master',
+        generatecontrol: true,
+        toggle: this.data && this.data.isActive ? this.data.isActive : "",
+        title: this.isUpdate ? 'Modify Vehicle Type' : 'Add Vehicle Type',
         items: ['Home'],
-        active: this.isUpdate ? 'Edit Vehicle Type' : 'Add Vehicle Type',
+        active: this.isUpdate ? 'Modify Vehicle Type' : 'Add Vehicle Type',
       },
     ];
     this.initializeFormControl();
@@ -194,5 +198,10 @@ export class AddVehicletypeMasterComponent implements OnInit {
         }
       }
     }
+  }
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.vehicleTypeTableForm.controls['isActive'].setValue(event);
+    console.log("Toggle value :", event);
   }
 }

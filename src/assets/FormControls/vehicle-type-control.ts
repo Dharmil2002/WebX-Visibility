@@ -129,7 +129,7 @@ export class VehicleTypeControl {
                 type: 'toggle',
                 value: vehicleTypeTable.isActive,
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: false, disable: false
             },
             {
                 name: 'entryBy',

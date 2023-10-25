@@ -8,7 +8,7 @@
 
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
   <form [formGroup]="DriverTableForm">
-    <app-form-webxpress [form]="DriverTableForm" [formData]="jsonControlDriverArray"
+    <app-form-webxpress [form]="DriverTableForm" [FormTitle]="'Driver Details'" [formData]="jsonControlDriverArray"
       (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
       (callFunction)="functionCallHandler($event)" [submit]="submit">
     </app-form-webxpress>

@@ -13,7 +13,7 @@ import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remov
   templateUrl: './add-container-master.component.html',
 })
 export class AddContainerMasterComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; }[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   containerTabledata: any;
   containerTableForm: UntypedFormGroup;
@@ -31,6 +31,7 @@ export class AddContainerMasterComponent implements OnInit {
   containerType: any;
   containerTypeStatus: any;
   containerTypeId: any;
+  submit = 'Save';
   //#endregion
 
   ngOnInit() {
@@ -45,6 +46,7 @@ export class AddContainerMasterComponent implements OnInit {
       console.log(this.data);
 
       this.action = 'edit'
+      this.submit = 'Modify';
       this.isUpdate = true;
     } else {
       this.action = "Add";
@@ -55,17 +57,21 @@ export class AddContainerMasterComponent implements OnInit {
       this.containerTypeId = this.data.containerType;
       this.breadScrums = [
         {
-          title: "Container Master",
+          title: "Modify Container",
           items: ["Home"],
-          active: "Edit Container Master",
+          active: "Modify Container",
+          generatecontrol: true,
+          toggle: this.data.activeFlag
         },
       ];
     } else {
       this.breadScrums = [
         {
-          title: "Container Master",
+          title: "Add Container",
           items: ["Home"],
-          active: "Add Container Master",
+          active: "Add Container",
+          generatecontrol: true,
+          toggle: false
         },
       ];
     }
@@ -246,4 +252,8 @@ export class AddContainerMasterComponent implements OnInit {
     });
   }
   //#endregion
+  onToggleChange(event: boolean) {
+    // Handle the toggle change event in the parent component
+    this.containerTableForm.controls['activeFlag'].setValue(event);
+  }
 }

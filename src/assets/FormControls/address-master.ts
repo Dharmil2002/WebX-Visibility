@@ -115,7 +115,7 @@ export class AddressControl {
                 Validations: []
             },
             {
-                name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: addressGroupTable.activeFlag, generatecontrol: true, disable: false,
+                name: 'activeFlag', label: 'Active Flag', placeholder: 'Active', type: 'toggle', value: addressGroupTable.activeFlag, generatecontrol: false, disable: false,
                 Validations: []
             },
             {

@@ -3,19 +3,19 @@
   <div>
     <form [formGroup]="customerTableForm">
       <app-form-webxpress [form]="customerTableForm" [formData]="jsonControlCustomerArray"
-        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [FormTitle]="'Customer Details'"
         (functionCallEmitter)="functionCallHandler($event)">
       </app-form-webxpress>
     </form>
     <div style="margin-top: 50px;">
-      <div
+      <!-- <div
         style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
         <h3 style="font-size: 1.5rem; padding: 5px 0px;">GST Details</h3>
-      </div>
+      </div> -->
       <div>
         <div>
           <form [formGroup]="GSTcustomerTableForm">
-            <app-form-webxpress [form]="GSTcustomerTableForm" [formData]="jsonControlGSTArray"
+            <app-form-webxpress [form]="GSTcustomerTableForm" [FormTitle]="'GST Details'" [formData]="jsonControlGSTArray"
               [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
               (functionCallEmitter)="functionCallHandler($event)">
             </app-form-webxpress>

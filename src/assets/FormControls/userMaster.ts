@@ -147,26 +147,6 @@ export class UserControl {
           minDate: new Date("01 Jan 1900"),
         },
       },
-      // {
-      //   name: 'branchCode', label: "Location", placeholder: "Select Location", type: 'dropdown',
-      //   value: UserTable.branchCode, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-      //   Validations: [
-      //     {
-      //       name: "required",
-      //       message: "Location is required.."
-      //     },
-      //     {
-      //       name: "autocomplete",
-      //     },
-      //     {
-      //       name: "invalidAutocomplete",
-      //       message: "Choose proper value",
-      //     }
-      //   ],
-      //   additionalData: {
-      //     showNameAndValue: false
-      //   }
-      // },
       {
         name: "branchCode",
         label: "Location",

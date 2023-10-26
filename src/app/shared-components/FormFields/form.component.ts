@@ -21,6 +21,7 @@ export class FormComponent {
   @Input() showSaveButton: boolean
   @Output() functionCallEmitter = new EventEmitter();
   @Input() uploadedFiles;
+  @Input() AddNewButton;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
   hide: boolean = true;
@@ -53,6 +54,13 @@ export class FormComponent {
     if ((context.functionName !== undefined || context.functionName != null) && context.functionName?.length > 0) {
       this.callFunction.emit(context)
     }
+  }
+
+  AddNew(FunctionName){
+    const context = {
+      functionName : FunctionName
+    }
+    this.functionCallEmitter.emit(context)
   }
   togglePasswordInputType(field: any) {
     field.additionalData.showPassword = !field.additionalData.showPassword;

@@ -19,19 +19,18 @@
             </app-form-webxpress>
         </form>
         <button matTooltip="Add Data" mat-stroked-button class="filter_btn"
-        style="margin-left: 85%;" (click)="addDetail()" [disabled]="!this.jobEntryTableForm.controls['cnoteNo'].value && !this.jobEntryTableForm.value.contNo">
+        style="margin-left: 85%;
+        top: -214px;
+        position: relative;" (click)="addDetail()" [disabled]="!this.jobEntryTableForm.controls['cnoteNo'].value && !this.jobEntryTableForm.value.contNo">
         <mat-icon>add</mat-icon>
         Add New 
       </button>
-    <div class="paddingdiv">
         <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnJobDetail"
             [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
             [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
             [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
             (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
         </app-generic-table-v2>
-    </div>
-
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
             <div class="example-button-row  d-flex justify-content-end">

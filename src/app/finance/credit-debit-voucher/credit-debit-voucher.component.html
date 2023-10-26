@@ -1,23 +1,29 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
 
     <form [formGroup]="CreditDebitVoucherSummaryForm">
-        <app-form-webxpress [form]="CreditDebitVoucherSummaryForm" [FormTitle]="'Debit Voucher Summary'"
+        <app-form-webxpress [form]="CreditDebitVoucherSummaryForm" [FormTitle]="'Summary'"
             [formData]="jsonControlCreditDebitVoucherSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" [className]="className">
+            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false" [className]="className">
         </app-form-webxpress>
     </form>
-    <app-table-boilerplate [tableData]="tableData" [columnHeader]="VoucherDetailsDisplayedColumns"
-        [FormTitle]="'Debit Voucher Details'" (DeleteAction)="delete($event,'tableData')"
-        (AddRow)="addVoucherDetails($event)" (functionCallEmitter)="functionCallHandler($event)"
-        (Submit)="saveData($event)" [showsubmit]="false" [ActionObject]="actionObject" [showHeader]="false"
-        (callFunction)="functionCallHandler($event)"></app-table-boilerplate>
+    <app-generic-table-v2 *ngIf="LoadVoucherDetails" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
+        [FormTitle]="'Details'" [menuItemFlag]="menuItemflag" [addFlag]="addFlag"
+        (menuItemClicked)="handleMenuItemClick($event)" [AddNewButton]=true (AddNewButtonEvent)="AddNewButtonEvent()">
+    </app-generic-table-v2>
+
+    <!-- <app-table-boilerplate *ngIf="LoadVoucherDetails" [tableData]="tableData"
+        [columnHeader]="VoucherDetailsDisplayedColumns" [FormTitle]="'Voucher Details'"
+        (DeleteAction)="delete($event,'tableData')" (AddRow)="addVoucherDetails($event)"
+        (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="false"
+        [ActionObject]="actionObject" [showHeader]="false"
+        (callFunction)="functionCallHandler($event)"></app-table-boilerplate> -->
 
 
     <div class="row">
         <div class="col-4">
             <form [formGroup]="CreditDebitVoucherTaxationTDSForm">
-                <app-form-webxpress [form]="CreditDebitVoucherTaxationTDSForm"
-                    [FormTitle]="'Debit Voucher Taxation TDS'"
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationTDSForm" [FormTitle]="'Taxation TDS'"
                     [formData]="jsonControlCreditDebitVoucherTaxationTDSArray"
                     [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
                     (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
@@ -27,8 +33,7 @@
         <div class="col-4">
 
             <form [formGroup]="CreditDebitVoucherTaxationTCSForm">
-                <app-form-webxpress [form]="CreditDebitVoucherTaxationTCSForm"
-                    [FormTitle]="'Debit Voucher Taxation TCS'"
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationTCSForm" [FormTitle]="'Taxation TCS'"
                     [formData]="jsonControlCreditDebitVoucherTaxationTCSArray"
                     [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
                     (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
@@ -37,8 +42,7 @@
         </div>
         <div class="col-4">
             <form [formGroup]="CreditDebitVoucherTaxationGSTForm">
-                <app-form-webxpress [form]="CreditDebitVoucherTaxationGSTForm"
-                    [FormTitle]="'Debit Voucher Taxation GST'"
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationGSTForm" [FormTitle]="'Taxation GST'"
                     [formData]="jsonControlCreditDebitVoucherTaxationGSTArray"
                     [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
                     (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">

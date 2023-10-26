@@ -38,7 +38,7 @@ export class JobControl {
                 type: "number",
                 value: "",
                 generatecontrol: true,
-                disable: false,
+                disable: false, 
                 additionalData: {
                     metaData: "jobControls"
                 },
@@ -59,6 +59,9 @@ export class JobControl {
                         message: "Choose proper value",
                     }
                 ],
+                functions: {
+                    onOptionSelect:"getDocketBasedOnCity"
+                },
                 additionalData: {
                     metaData: "jobControls",
                     showNameAndValue: false
@@ -77,6 +80,10 @@ export class JobControl {
                     metaData: "jobControls"
                 },
                 Validations: [
+                    {
+                        name: "required",
+                        message: "Vehicle Size  is required"
+                    }
                 ],
 
             }, {
@@ -408,7 +415,7 @@ export class JobControl {
                 additionalData: {
                     metaData: "jobTableControls"
                 },
-                value: localStorage.getItem("Username"),
+                value: localStorage.getItem("UserName"),
                 generatecontrol: false,
                 disable: false,
                 Validations: [
@@ -422,7 +429,7 @@ export class JobControl {
                 additionalData: {
                     metaData: "jobTableControls"
                 },
-                value: new Date().toUTCString(),
+                value: new Date(),
                 generatecontrol: false,
                 disable: false,
                 Validations: [

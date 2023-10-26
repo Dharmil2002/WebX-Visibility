@@ -52,6 +52,7 @@ export class UserMaster {
   userStatusData: any;
   userpassword: any;
   erpId:any;
+  branchCode: any;
 
   constructor(UserMaster) {
     {

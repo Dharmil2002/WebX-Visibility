@@ -73,6 +73,9 @@ import { CustomerContractTabsIndexComponent } from './Customer Contract/customer
 import { AddBeneficiaryMasterComponent } from './beneficiary-master/add-beneficiary-master/add-beneficiary-master.component';
 import { BeneficiaryMasterListComponent } from './beneficiary-master/beneficiary-master-list/beneficiary-master-list.component';
 import { ListProductComponent } from './product-master/list-product/list-product.component';
+import { ShardProductComponent } from './product-master/shard-product/shard-product.component';
+import { AccountMasterComponent } from './Account/Account Master/account-master/account-master.component';
+import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
 
 
 const routes: Routes = [
@@ -155,6 +158,12 @@ const routes: Routes = [
 
   //Product Master Router
   { path: "ProductMaster/ListProduct", component: ListProductComponent },
+  { path: "ProductMaster/shardProductList", component: ShardProductComponent },
+
+  //Account Master Router
+  { path: "Account/AccountMasterList", component: AccountMasterComponent },
+  { path: "Account/AddAccountMaster", component: AddAccountComponent },
+
 
 
 ];

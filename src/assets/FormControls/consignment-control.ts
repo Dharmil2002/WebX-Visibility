@@ -1,7 +1,8 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { DocketDetail } from "src/app/core/models/operations/consignment/consgiment";
-
-
+const today = new Date();
+today.setHours(23, 59, 59, 999); // Set the time to the end of the day
+let maxDate = today;
 export class ConsignmentControl {
   private ConsignmentControlArray: FormControls[];
   private containordetail: FormControls[];
@@ -34,8 +35,7 @@ export class ConsignmentControl {
           },
         ],
         additionalData: {
-          minDate: new Date("01 Jan 2023"),
-          maxDate: new Date(),
+          maxDate:maxDate,
           metaData: "Basic"
         },
       },
@@ -412,10 +412,7 @@ export class ConsignmentControl {
       {
         name: 'vehicleNo', label: 'Lorry No', placeholder: 'Lorry No', type: "dropdown",
         value: docketDetail.vehicleNo,
-        Validations: [     {
-          name: "required",
-          message: "'Lorry No is required",
-      },
+        Validations: [ 
       {
           name: "invalidAutocompleteObject",
           message: "Choose proper value",
@@ -597,7 +594,15 @@ export class ConsignmentControl {
         Validations: [{
           name: "required",
           message: "Container Type is required",
-        }],
+        },
+        {
+          name: "autocomplete",
+        },
+        {
+          name: "invalidAutocompleteObject",
+          message: "Choose proper value",
+        },
+      ],
         additionalData: {
           showNameAndValue: false,
         },
@@ -858,7 +863,7 @@ export class FreightControl {
         value: [
           {
             "value": "F",
-            "name": "Flat(In RS)"
+            "name": "Flat"
           },
           {
             "value": "P",

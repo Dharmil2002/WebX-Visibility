@@ -55,7 +55,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
   tableLoad: boolean = true;
   isTableLoad: boolean = true;
   jsonControlArray: any;
-  TableStyle = "width:82%;";
   // TableStyle1 = "width:82%"
   ewayBillButton: string = 'Next'
   ConsignmentFormControls: ConsignmentControl;
@@ -83,7 +82,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   prqNoStatus: boolean;
   containerType: string;
   containerTypeStatus: boolean;
-  userName = localStorage.getItem("Username");
+  userName = localStorage.getItem("UserName");
   docketDetail: DocketDetail;
   //#region columnHeader
   columnHeader = {
@@ -375,17 +374,19 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.prqData?.pAddress
     );
     this.consignmentTableForm.controls["ccbp"].setValue(true);
-    this.consignmentTableForm.controls["vehicleNo"].setValue(
-      this.prqData?.vehicleNo
-    );
+ 
     this.consignmentTableForm.controls["vendorType"].setValue(
       vehicleDetail?.vendorType
     );
+    await this.vendorFieldChanged();
     this.consignmentTableForm.controls["vendorName"].setValue(
       vehicleDetail?.vendorType == "Market" ? vehicleDetail.vendor : { name: vehicleDetail.vendor, value: vehicleDetail.vendor }
     );
+    this.consignmentTableForm.controls["vehicleNo"].setValue(
+      this.prqData?.vehicleNo
+    );
+   
 
-    this.vendorFieldChanged();
     this.getLocBasedOnCity();
     this.onAutoBillingBased("true");
   }
@@ -765,17 +766,17 @@ export class ConsignmentEntryFormComponent implements OnInit {
       );
       vendorName.setValidators([Validators.required, autocompleteObjectValidator()]);
       vendorName.updateValueAndValidity();
-      vehicleNo.setValidators([Validators.required, autocompleteObjectValidator()]);
+      vehicleNo.setValidators(autocompleteObjectValidator());
       vehicleNo.updateValueAndValidity();
     }
     else {
+      vehicleNo.clearValidators();
       vendorName.setValidators(Validators.required);
       vendorName.updateValueAndValidity();
-      vehicleNo.setValidators(Validators.required);
       vehicleNo.updateValueAndValidity();
       this.marketVendor = true
     }
-
+    
 
   }
   /*Below function is only call those time when user can come to only edit a
@@ -923,6 +924,16 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const cd = this.consignmentTableForm.controls['cd'].value;
     if (cd) {
       this.contFlag = true;
+      this.jsonControlArray = this.jsonControlArray.map((x) => {
+        if (x.name === "freightRatetype") {
+          x.value.push({
+            value: "C",
+            name: "Per Container"
+          });
+        }
+        return x;
+      });
+      
       this.filter.Filter(
         this.jsonContainerDetail,
         this.containerTableForm,
@@ -932,12 +943,19 @@ export class ConsignmentEntryFormComponent implements OnInit {
       );
     }
     else {
+      this.jsonControlArray = this.jsonControlArray.map((x) => {
+        if (x.name === "freightRatetype") {
+          // Use filter to remove the object with value: "C" and name: "Per Container"
+          x.value = x.value.filter(item => !(item.value === "C" && item.name === "Per Container"));
+        }
+        return x;
+      });
+      
       this.contFlag = false;
     }
   }
 
   async save() {
-    console.log(this.consignmentTableForm.value);
     // Remove all form errors
     const tabcontrols = this.consignmentTableForm;
     clearValidatorsAndValidate(tabcontrols);
@@ -945,6 +963,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     clearValidatorsAndValidate(contractcontrols);
     /*End*/
     const vendorType = this.consignmentTableForm.value.vendorType;
+
     const vendorName = this.consignmentTableForm.value.vendorName;
     const vehNo = this.consignmentTableForm.value.vehicleNo?.value || this.consignmentTableForm.value.vehicleNo;
     const controlNames = [
@@ -1020,7 +1039,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
         unloading: 0,
         lsNo: "",
         mfNo: "",
-        vehicleDetail: this.marketVendor ? this.addFleetMaster.fleetTableForm.value : "",
         entryBy: this.userName,
         entryDate: new Date().toISOString(),
         unloadloc: "",
@@ -1183,7 +1201,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
           "F": 'noofPkts',
           "P": 'noofPkts',
           "W": 'chargedWeight',
-          "T": 'chargedWeight'
+          "T": 'chargedWeight',
         };
         const propertyName = rateTypeMap[freightRateType] || 'noofPkts';
         const invoiceTotal = this.invoiceData.reduce((acc, amount) => parseFloat(acc) + parseFloat(amount[propertyName]), 0);
@@ -1193,10 +1211,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
         } else {
           total = freightRateType === "T" ? (parseFloat(freightRate) * parseFloat(invoiceTotal)) / 1000 : parseFloat(freightRate) * parseFloat(invoiceTotal);
         }
+       
         this.FreightTableForm.controls['freight_amount']?.setValue(total);
       }
     }
-    else if (this.invoiceTableForm.value) {
+    else if (this.invoiceTableForm.value.invoiceNo) {
       if (typeof (freightRateType) === "string") {
         const rateTypeMap = {
           "F": 'noofPkts',
@@ -1214,6 +1233,16 @@ export class ConsignmentEntryFormComponent implements OnInit {
         }
         this.FreightTableForm.controls['freight_amount']?.setValue(total);
 
+      }
+    }
+     if(freightRateType==="C"){
+      if(this.tableData.length>0){
+      const total=parseFloat(freightRate)*this.tableData.length;
+      this.FreightTableForm.controls['freight_amount']?.setValue(total);
+      }
+       if(this.containerTableForm.value.containerNumber){
+        const total=parseFloat(freightRate)*1;
+        this.FreightTableForm.controls['freight_amount']?.setValue(total);
       }
     }
   }

@@ -40,12 +40,14 @@ import { AddManualVoucherComponent } from './manual voucher/add-manual-voucher/a
 import { CreditDebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
 import { FilterUtils } from "../Utility/dropdownFilter";
 import { VoucherServicesService } from '../core/service/Finance/voucher-services.service';
+import { AddVoucherDetailsModalComponent } from './Modals/add-voucher-details-modal/add-voucher-details-modal.component';
 
 @NgModule({
     declarations: [
         InvoiceSummaryBillComponent,
         AddManualVoucherComponent,
-        CreditDebitVoucherComponent
+        CreditDebitVoucherComponent,
+        AddVoucherDetailsModalComponent
     ],
     imports: [
         CommonModule,

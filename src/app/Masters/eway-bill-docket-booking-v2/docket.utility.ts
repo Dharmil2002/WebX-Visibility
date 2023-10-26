@@ -79,7 +79,7 @@ export async function addTracking(companyCode, operationService, data) {
     dlSt:"",
 	  dlTm:"",
     evnCd:"",
-    upBy:localStorage.getItem("Username"),
+    upBy:localStorage.getItem("UserName"),
     upDt:new Date().toUTCString()
   }
 

@@ -148,6 +148,31 @@ export class UserControl {
         },
       },
       {
+        name: "branchCode",
+        label: "Location",
+        placeholder: "Select Location",
+        type: "dropdown",
+        value: UserTable.branchCode,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Location is required..",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
         name: "multiLocation",
         label: "Multi Locations Access",
         placeholder: "Multi Locations Access",
@@ -161,7 +186,7 @@ export class UserControl {
           isIndeterminate: false,
           isChecked: false,
           support: "userLocationscontrolHandler",
-          showNameAndValue: true,
+          showNameAndValue: false,
           Validations: [
             {
               name: "",

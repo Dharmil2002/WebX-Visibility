@@ -70,7 +70,7 @@ export class AuthService {
             let userdetails = this._jwt.decodeToken(user.tokens.access.token);
             this.storageService.setItem("currentUser", JSON.stringify(user));
             this.storageService.setItem("UserName", user.usr.name);
-            this.storageService.setItem("Branch", user.usr.multiLocation[0]);
+            this.storageService.setItem("Branch", user.usr.branchCode);
             this.storageService.setItem("companyCode", user.usr.companyCode);
             this.storageService.setItem("Mode", "Export");
             //localStorage.setItem("company_Name", "Velocity");
@@ -89,8 +89,8 @@ export class AuthService {
   }
 
   refreshtoken() {
-    
-    let request = {     
+
+    let request = {
       "refreshToken": this.storageService.getItem('refreshToken')
     }
     return this.http

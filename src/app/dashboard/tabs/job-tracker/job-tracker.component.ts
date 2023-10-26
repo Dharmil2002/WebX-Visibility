@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { getJobDetailFromApi } from '../job-summary-page/job-summary-utlity';
 import { jobtrackingDetail } from './job-tracker-utility';
 @Component({
   selector: 'app-job-tracker',
@@ -16,107 +17,81 @@ export class JobTrackerComponent implements OnInit {
     csv: false,
   };
   columnHeader = {
-    SLNo: {
-      Title: "Sl No",
+    createdOn:{
+      Title: "Created On",
       class: "matcolumncenter",
-      Style: "max-width: 60px",
+      Style: "max-width: 160px",
     },
-    JobNo: {
+    jobNo: {
       Title: "Job No",
       class: "matcolumncenter",
-      Style: "max-width: 60px",
+      Style: "min-width: 250px",
     },
-    JobDate: {
+    jobDate: {
       Title: "Job Date",
       class: "matcolumncenter",
       Style: "",
     },
-    Jobtype: {
+    jobType: {
       Title: "Job type",
       class: "matcolumncenter",
       Style: "max-width: 90px",
     },
-    BillingParty: {
+    billingParty: {
       Title: "Billing Party",
       class: "matcolumncenter",
       Style: "",
     },
-    FromToCity: {
+    fromToCity: {
       Title: "From & To City",
       class: "matcolumncenter",
       Style: "",
     },
-    JobLocation: {
+    jobLocation: {
       Title: "Loc",
       class: "matcolumncenter",
       Style: "max-width: 60px",
     },
-    NoofPkgs: {
+    pkgs: {
       Title: "Pkgs",
       class: "matcolumncenter",
       Style: "max-width: 60px",
     },
-    VehicleSize: {
+    vehicleSize: {
       Title: "Size",
       class: "matcolumncenter",
       Style: "max-width: 70px",
     },
-    CHAAmount: {
+    totalChaAmt: {
       Title: "CHA Amount Rs.",
       class: "matcolumncenter",
       Style: "",
     },
-    CHADate: {
+    chaDate: {
       Title: "CHA Date",
       class: "matcolumncenter",
       Style: "",
-    },
-    NoofVoucher: {
-      Title: "No of Voucher",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    VoucherAmount: {
-      Title: "Voucher Amount Rs.",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    VendorBillAmount: {
-      Title: "Vendor Bill Amount Rs.",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    CustomerBillAmount: {
-      Title: "Customer Bill Amount Rs.",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    CurrentStatus: {
-      Title: "Current Status",
-      class: "matcolumncenter",
-      Style: "",
-    },
+    }
   };
   //#endregion
   staticField = [
-    "SLNo",
-    "JobNo",
-    "JobDate",
-    "Jobtype",
-    "BillingParty",
-    "FromToCity",
-    "JobLocation",
-    "NoofPkgs",
-    "VehicleSize",
-    "CHADate",
-    "VoucherAmount",
-    "CurrentStatus"
+    "createdOn",
+    "jobNo",
+    "jobDate",
+    "jobType",
+    "billingParty",
+    "fromToCity",
+    "jobLocation",
+    "pkgs",
+    "vehicleSize",
+    "totalChaAmt",
+    "chaDate"
   ];
   linkArray = [
-    { Row: 'CHAAmount', Path: 'Operation/ChaDetail',componentDetails: ""},
-    { Row: 'NoofVoucher', Path: 'Operation/VoucherDetails',componentDetails: ""},
-    { Row: 'VendorBillAmount', Path: 'Operation/VendorBillDetails',componentDetails: ""},
-    { Row: 'CustomerBillAmount', Path: 'Operation/CustomerBillDetails',componentDetails: ""}
+    // { Row: 'CHAAmount', Path: 'Operation/ChaDetail',componentDetails: ""},
+    // { Row: 'NoofVoucher', Path: 'Operation/VoucherDetails',componentDetails: ""},
+    // { Row: 'VendorBillAmount', Path: 'Operation/VendorBillDetails',componentDetails: ""},
+    // { Row: 'CustomerBillAmount', Path: 'Operation/CustomerBillDetails',componentDetails: ""}
   ]
   constructor(private masterService: MasterService) {  }
 
@@ -125,27 +100,37 @@ export class JobTrackerComponent implements OnInit {
     this.getDashboadData();
   }
   getDashboadData() {
-    this.boxData = [
-      {
-        "count": 130,
-        "title": "Awaiting for CHA Entry",
-        "class": "info-box7 bg-c-Bottle-light order-info-box7"
-      },
-      {
-        "count": 87,
-        "title": "Awaiting for Rake Entry",
-        "class": "info-box7 bg-c-Grape-light order-info-box7"
-      },
-      {
-        "count": 160,
-        "title": "Awaiting for Rake Updation",
-        "class": "info-box7 bg-c-Daisy-light order-info-box7"
-      },
-    ];
+   
   }
   async getRakeDetail(){
-    const detail= await jobtrackingDetail(this.masterService) ;
-    this.tableData=detail;
+    let data = await getJobDetailFromApi(this.masterService);
+    this.tableData = data;
     this.tableLoad=false;
+    const boxData = [
+      {
+        title: "Awaiting for CHA Entry",
+        class: "info-box7 bg-c-Bottle-light order-info-box7",
+        filterCondition: (x) => x.statusCode === "0",
+      },
+      {
+        title: "Awaiting for Rake Entry",
+        class: "info-box7 bg-c-Grape-light order-info-box7",
+        filterCondition: (x) => x.statusCode === "1",
+      },
+      {
+        title: "Awaiting for Rake Updation",
+        class: "info-box7 bg-c-Daisy-light order-info-box7",
+        filterCondition: (x) => x.statusCode !== "1" && x.statusCode !== "0",
+      },
+    ];
+    
+    const result = boxData.map((box) => ({
+      count: data.filter(box.filterCondition).length,
+      title: box.title,
+      class: box.class,
+    }));
+    this.boxData=result;
+    // Use the 'result' array for further processing
+    
   }
 }

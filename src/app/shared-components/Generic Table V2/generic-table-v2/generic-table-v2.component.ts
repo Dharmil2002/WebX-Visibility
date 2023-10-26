@@ -44,6 +44,7 @@ export class GenericTableV2Component
   @Output() DeleteFunction = new EventEmitter<any>();
   @Output() functionCallEmitter = new EventEmitter();
   @Input() height;
+  @Input() FilterButton;
   @Input() width;
   @Input() maxWidth;
   @Input() extraData;
@@ -370,7 +371,11 @@ export class GenericTableV2Component
   }
 
   AddNew() {
-    this.AddNewButtonEvent.emit()
+    if (this.addAndEditPath) {
+      this.router.navigateByUrl(this.addAndEditPath);
+    }else{
+      this.AddNewButtonEvent.emit()
+    }
   }
   Delete(element) {
     this.DeleteFunction.emit({ element })

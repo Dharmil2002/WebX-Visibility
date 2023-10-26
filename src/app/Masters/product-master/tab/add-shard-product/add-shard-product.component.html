@@ -1,0 +1,52 @@
+<div
+    style="border-bottom-left-radius: 10px; padding: 7px; border-bottom-right-radius: 10px; width: 100%; display: flex; background-color: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.06);">
+    <div
+        style="width: 70%; border-radius: 10px; margin: 7px; border: 1px solid rgba(0, 0, 0, 0.2); background-color: white;">
+        <div style="width: 95%; margin: 15px auto;">
+            <div *ngIf="!isTableLode" class="d-flex my-5 justify-content-center align-items-center">
+                <!-- Bootstrap loader -->
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div *ngIf="isTableLode">
+                <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+                    [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
+                    [menuItems]="menuItems" [Link]="linkArray" [staticField]="staticField">
+                </app-generic-table-v2>
+            </div>
+        </div>
+    </div>
+    <div style="width: 30%; margin: 7px; ">
+        <div style="background-color: white; border: 1px solid rgba(0, 0, 0, 0.2);border-radius: 10px; ">
+            <div style="width: 95%; margin: 15px auto; box-sizing: border-box; padding: 5px">
+                <div style="width: 100%;">
+                    <ul class="m-0" style="display: flex; justify-content: space-between;">
+                        <li style=" font-weight: 700; font-size: 1.5rem; list-style: none;">
+                            + Add Product
+                        </li>
+                    </ul>
+                    <div>
+                        <div>
+                            <form [formGroup]="customerTableForm">
+                                <app-form-webxpress [form]="customerTableForm" [formData]="jsonControlArray"
+                                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                                    [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+                                    (functionCallEmitter)="functionCallHandler($event)">
+                                </app-form-webxpress>
+                            </form>
+                        </div>
+                        <div class="row" style="margin-top: 10px; margin-left: 20px;">
+                            <div class="col-3">
+                                <button type="button" [disabled]="!customerTableForm.valid" (click)="save()"
+                                    mat-raised-button color="primary">
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

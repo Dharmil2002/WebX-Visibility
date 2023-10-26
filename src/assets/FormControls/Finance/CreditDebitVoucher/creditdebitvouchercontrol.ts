@@ -8,30 +8,26 @@ export class CreditDebitVoucherControl {
   CreditDebitVoucherTaxationPaymentSummaryArray: FormControls[];
   CreditDebitVoucherTaxationPaymentDetailsArray: FormControls[];
   CreditDebitVoucherDocumentDebitsArray: FormControls[];
-  constructor() {
+  CreditDebitVoucherDetailsArray: FormControls[];
+  constructor(FormValues) {
     this.CreditDebitVoucherSummaryArray = [
-      // {
-      //   name: "VoucherType",
-      //   label: "               Voucher Type",
-      //   placeholder: "Voucher Type",
-      //   type: "radiobutton",
-      //   value: [
-      //     { value: "Y", name: "Debit Voucher", checked: true },
-      //     { value: "N", name: "Credit Voucher" },
-      //   ],
-      //   Validations: [],
-      //   functions: {
-      //     onChange: "displayAppointment",
-      //   },
-      //   generatecontrol: true,
-      //   disable: false,
-      // },
+
       {
         name: "VoucherNumber",
         label: "Voucher Number",
         placeholder: "Voucher Number",
         type: "text",
         value: "System Generated",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "Accountinglocation",
+        label: "Accounting location",
+        placeholder: "Accounting location",
+        type: "text",
+        value: localStorage.getItem('Branch'),
         generatecontrol: true,
         disable: true,
         Validations: [],
@@ -48,6 +44,16 @@ export class CreditDebitVoucherControl {
         additionalData: {
           minDate: new Date(),
         },
+      },
+      {
+        name: "EntryLocation",
+        label: "Entry Location",
+        placeholder: "Entry Location",
+        type: "text",
+        value: localStorage.getItem('Branch'),
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
       },
       {
         name: "Preparedfor",
@@ -90,67 +96,9 @@ export class CreditDebitVoucherControl {
         additionalData: {
           showNameAndValue: true,
         },
-      },
-      {
-        name: "Paymentstate",
-        label: "Payment state",
-        placeholder: "Payment state",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Payment state is required"
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-          {
-            name: "autocomplete",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-          metaData: "Basic"
+        functions: {
+          onSelection: "PreparedforFieldChanged"
         },
-      },
-
-
-      {
-        name: "Preparedby",
-        label: "Prepared by",
-        placeholder: "Prepared by",
-        type: "text",
-        value: localStorage.getItem('UserName'),
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
-      {
-        name: "Accountinglocation",
-        label: "Accounting location",
-        placeholder: "Accounting location",
-        type: "text",
-        value: localStorage.getItem('Branch'),
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
-
-      {
-        name: "EntryLocation",
-        label: "Entry Location",
-        placeholder: "Entry Location",
-        type: "text",
-        value: localStorage.getItem('Branch'),
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
       },
       {
         name: "PartyName",
@@ -182,6 +130,34 @@ export class CreditDebitVoucherControl {
       },
 
       {
+        name: "Paymentstate",
+        label: "Payment state",
+        placeholder: "Payment state",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Payment state is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      {
         name: "Partystate",
         label: "Party state",
         placeholder: "Party state",
@@ -210,6 +186,18 @@ export class CreditDebitVoucherControl {
         },
       },
 
+
+      {
+        name: "Preparedby",
+        label: "Prepared by",
+        placeholder: "Prepared by",
+        type: "text",
+        value: localStorage.getItem('UserName'),
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+
       {
         name: "EntryDateandtime",
         label: "Entry Date and time",
@@ -217,7 +205,7 @@ export class CreditDebitVoucherControl {
         type: "date",
         value: new Date(),
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [],
         additionalData: {
           minDate: new Date(),
@@ -515,6 +503,152 @@ export class CreditDebitVoucherControl {
       },
 
     ]
+    this.CreditDebitVoucherDetailsArray = [
+      {
+        name: "Ledger",
+        label: "Ledger",
+        placeholder: "Ledger",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Ledger is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      {
+        name: "SACCode",
+        label: "SAC Code",
+        placeholder: "SAC Code",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "SAC Code is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      {
+        name: "DebitAmount",
+        label: "Debit Amount",
+        placeholder: "Debit Amount",
+        type: "number",
+        value: FormValues?.DebitAmount,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Debit Amount is required!",
+          },
+          // {
+          //   name: "pattern",
+          //   message: "Please Enter Valid Debit Amount",
+          //   pattern: '^\d+(\.\d{1,2})?$'
+          // },
+        ],
+        functions: {
+          onChange: "calculateGSTAndTotal"
+        },
+      },
+      {
+        name: "GSTRate",
+        label: "GST Rate",
+        placeholder: "GST Rate",
+        type: "number",
+        value: FormValues?.GSTRate,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "GST Rate is required!",
+          },
+          {
+            name: "pattern",
+            message: "Please Enter Valid GST Rate",
+            pattern: '^(100|[0-9]{1,2})$'
+          },
+        ],
+        functions: {
+          onChange: "calculateGSTAndTotal"
+        },
+      },
+      {
+        name: "GSTAmount",
+        label: "GST Amount",
+        placeholder: "GST Amount",
+        type: "number",
+        value: FormValues?.GSTAmount,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "Total",
+        label: "Total",
+        placeholder: "Total",
+        type: "number",
+        value: FormValues?.Total,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "TDSApplicable",
+        label: "TDS Applicable",
+        placeholder: "TDS Applicable",
+        type: "toggle",
+        value: FormValues?.TDSApplicable == "Yes" ? true : false,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "Narration",
+        label: "Narration",
+        placeholder: "Narration",
+        type: "text",
+        value: FormValues?.Narration,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+
+
+    ]
   }
 
   getCreditDebitVoucherSummaryArrayControls() {
@@ -538,5 +672,7 @@ export class CreditDebitVoucherControl {
   getCreditDebitVoucherDocumentDebitsArrayControls() {
     return this.CreditDebitVoucherDocumentDebitsArray;
   }
-
+  getCreditDebitVoucherDetailsArrayControls() {
+    return this.CreditDebitVoucherDetailsArray;
+  }
 }

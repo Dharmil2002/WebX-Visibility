@@ -1,2 +1,7 @@
-<h2>Selected Image</h2>
-<img [src]="data.imageUrl">
+<div mat-dialog-title style="display: flex; justify-content: space-between;margin: 0 0 0px;align-items: center;">
+    <h2>Selected Image</h2>
+    <button mat-icon-button aria-label="close dialog" (click)="onCloseClick()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+<img [src]="data.imageUrl" style="width: 100%; height: 80%; object-fit: cover;margin-top: 5px;">

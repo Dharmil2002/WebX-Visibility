@@ -3,11 +3,26 @@
         <div class="card" style="margin-bottom: 5px;">
             <div class="body">
                 <div class="task-list">
-                    <div *ngIf="FormTitle">
+                    <!-- <div *ngIf="FormTitle">
                         <h4 style="margin-top:10px;margin-left:10px;"><mat-icon
                                 style="padding-top:4px;">view_list</mat-icon>
-                            {{FormTitle}}</h4>
+                            </h4>
                         <hr>
+                    </div> -->
+                    <div class="row" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
+                        <div class="col d-flex align-items-center">
+                            <h4 style="margin-top: 5px; margin-bottom: 10px; margin-left:10px; "><mat-icon
+                                    style="padding-top:4px;">view_list</mat-icon>
+                                {{FormTitle}}
+                            </h4>
+                        </div>
+                        <div *ngIf="AddNewButton" class="col d-flex justify-content-end align-items-center">
+                            <button (click)="AddNew()" matTooltip="Add Data" mat-stroked-button class="filter_btn"
+                                style="margin:10px;margin-right:10px; ">
+                                <mat-icon>add</mat-icon>
+                                Add New
+                            </button>
+                        </div>
                     </div>
                     <div class="materialTableHeader" style="min-width:auto !important;">
                         <div class="row">
@@ -55,14 +70,10 @@
                                         <div *ngIf="csvHeaders" class="export-button m-l-10" matTooltip="CSV">
                                             <img src="assets/images/icons/csv.png" alt="" (click)="ExportToCsv()" />
                                         </div>
-
-                                        <div *ngIf="AddNewButton"
-                                            style="width: 100%; display: flex; justify-content: start;">
-                                            <button [disabled]="btndisabled" matTooltip="Add New Record"
-                                                mat-stroked-button (click)="AddNew()" class="filter_btn">
-                                                <mat-icon>add</mat-icon>
-                                                Add New
-                                            </button>
+                                    </li>
+                                    <li *ngIf="FilterButton">
+                                        <div>
+                                            <button mat-raised-button (click)="FunctionHendel(FilterButton.functionName , {})" color="primary">{{FilterButton.name}}</button>
                                         </div>
                                     </li>
                                     <li *ngFor="let box of boxData" style="text-align: center;">
@@ -76,15 +87,6 @@
                                     </li>
                                 </ul>
                             </div>
-                        </div>
-                        <div class="col-4" *ngIf="dynamicControls.csv">
-                            <ul class="header-buttons">
-                                <li>
-                                    <div class="export-button m-l-10" matTooltip="CSV">
-                                        <img src="assets/images/icons/csv.png" alt="" (click)="ExportToCsv()" />
-                                    </div>
-                                </li>
-                            </ul>
                         </div>
                     </div>
                     <!-- Generic Table -->
@@ -175,7 +177,7 @@
                                         <button mat-icon-button
                                             (click)="FunctionHendel(columnHeader[tableData].functionName , element)">
                                             <mat-icon
-                                                style="color: #005bb1">{{columnHeader[tableData].iconName}}</mat-icon>
+                                                style="color: #0038a0">{{columnHeader[tableData].iconName}}</mat-icon>
                                         </button>
                                     </ng-container>
 

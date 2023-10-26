@@ -1,0 +1,13 @@
+<div>
+   <form [formGroup]="AccountQueryForm">
+      <app-form-webxpress [form]="AccountQueryForm" [formData]="jsonControlAccountQueryArray"
+         [showSaveAndCancelButton]="false" [FormTitle]="'List Filter'"
+         [className]="'col-xl-8 col-lg-8 col-md-12 col-sm-12 mb-2'" (callFunction)="functionCallHandler($event)"
+         (functionCallEmitter)="functionCallHandler($event)">
+      </app-form-webxpress>
+   </form>
+   <div>
+      <button mat-raised-button (click)="Save()" color="primary" class="mx-3">Save</button>
+      <button mat-raised-button (click)="Cancle()">Cancle</button>
+   </div>
+</div>

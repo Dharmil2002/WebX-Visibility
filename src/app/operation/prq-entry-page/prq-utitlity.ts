@@ -65,7 +65,7 @@ export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqd
                     ToCity: arrivalData.toCity,
                     distance: arrivalData.distance,
                     currentLocation: localStorage.getItem("Branch"),
-                    updateBy: localStorage.getItem("Username"),
+                    updateBy: localStorage.getItem("UserName"),
                     updateDate: new Date()
                 }
                 : {})

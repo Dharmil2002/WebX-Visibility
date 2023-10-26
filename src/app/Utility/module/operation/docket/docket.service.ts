@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { calculateTotalField } from "src/app/operation/unbilled-prq/unbilled-utlity";
@@ -27,13 +28,13 @@ export class DocketService {
         private operation: OperationService
     ) { }
 
-    async updateDocket(data,filter={}) {
+    async updateDocket(data,filter) {
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
             collectionName: "docket_temp",
             filter: { "docketNumber": data },
-            update: filter?filter:{ "status": "1" }
+            update: filter
         };
         // Perform an asynchronous operation to fetch data from the operation service
         const result = await this.operation.operationMongoPut("generic/update", reqBody).toPromise();
@@ -69,6 +70,7 @@ export class DocketService {
                 x.invoiceCount = x.invoiceDetails.length || 0;
                 x.status = statusInfo.status || "";
                 x.actions = statusInfo.actions || ["Rake Update"];
+                x.createOn= formatDocketDate(x?.entryDate || new Date())
                 return x;
             }
             return null;

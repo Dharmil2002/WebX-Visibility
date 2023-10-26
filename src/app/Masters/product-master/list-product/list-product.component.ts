@@ -70,33 +70,30 @@ export class ListProductComponent implements OnInit {
   productNameList: any = [];
   tableData: any;
   isTableLode = false;
-  isCompany: any;
+  isCompany: any = true;
   constructor(
     public dialog: MatDialog,
     private route: ActivatedRoute,
     private masterService: MasterService
   ) {
-    this.route.queryParams.subscribe((params) => {
-      const encryptedData = params["isCompany"]; // Retrieve the encrypted data from the URL
-      if (this.isCompany == undefined || this.isCompany == null) {
-        console.log("encryptedData", encryptedData);
-        if (encryptedData != undefined) {
-          this.isCompany = encryptedData == "true" ? true : false;
-          if (!this.isCompany) {
-            delete this.columnHeader.Charges;
-            delete this.columnHeader.Services;
-          }
-        } else {
-          window.history.back();
-        }
-      } else {
-        window.location.reload();
-      }
-    });
+    // this.route.queryParams.subscribe((params) => {
+      // const encryptedData = params["isCompany"]; // Retrieve the encrypted data from the URL
+      // if (this.isCompany == undefined || this.isCompany == null) {
+      //   console.log("encryptedData", encryptedData);
+      //   if (encryptedData != undefined) {
+      //     this.isCompany = encryptedData == "true" ? true : false;
+      //     if (!this.isCompany) {
+      //       delete this.columnHeader.Charges;
+      //       delete this.columnHeader.Services;
+      //     }
+      //   } else {
+      //     window.history.back();
+      //   }
+      // } else {
+      //   window.location.reload();
+      // }
+    // });
   }
-  // <span class="material-symbols-outlined">
-  // library_add
-  // </span>
   ngOnInit() {
     this.getProductDetails();
     if (this.isCompany) {

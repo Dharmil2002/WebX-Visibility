@@ -143,7 +143,7 @@ export class PrqService {
             ToCity: arrivalData.toCity,
             distance: arrivalData.distance,
             currentLocation: localStorage.getItem("Branch"),
-            updateBy: localStorage.getItem("Username"),
+            updateBy: localStorage.getItem("UserName"),
             updateDate: new Date().toISOString(),
           }
           : {}),
@@ -194,9 +194,9 @@ export class PrqService {
         prqNo: element?.prqNo || "",
         vehicleSize: element?.vehicleSize || "",
         size: element.vehicleSize
-          ? element.vehicleSize + " " + "MT"
+          ? element.vehicleSize 
           : element.containerSize
-            ? element.containerSize + " " + "MT"
+            ? element.containerSize
             : "",
         billingParty: element?.billingParty || "",
         fromToCity: element?.fromCity + "-" + element?.toCity,

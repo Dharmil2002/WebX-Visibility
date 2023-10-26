@@ -48,7 +48,6 @@ export class ThcGenerationComponent implements OnInit {
   tableLoad: boolean;
   backPath: string;
   thcLoad: boolean = true;
-  TableStyle = "width:90%"
   // Declaring breadcrumbs
   breadscrums = [
     {
@@ -76,32 +75,32 @@ export class ThcGenerationComponent implements OnInit {
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
-      Style: "max-width:260px",
+      Style: "min-width:150px",
     },
     docketNumber: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "max-width:250px",
+      Style: "min-width:150px",
     },
     fromCity: {
       Title: "From City",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "min-width:150px",
     },
     toCity: {
       Title: "To City",
       class: "matcolumnleft",
-      Style: "max-width:160px",
+      Style: "min-width:160px",
     },
     actualWeight: {
       Title: "Actual Weight (Kg)",
       class: "matcolumncenter",
-      Style: "min-width:160px",
+      Style: "max-width:100px",
     },
     noofPkts: {
       Title: "No of Packets ",
       class: "matcolumncenter",
-      Style: "min-width:160px",
+      Style: "max-width:100px",
     },
     pod: {
       Title: "Pod",
@@ -709,7 +708,7 @@ export class ThcGenerationComponent implements OnInit {
         await updatePrq(this.operationService, prqData, "7");
       }
       for (const element of docket) {
-        await this.docketService.updateDocket(element);
+        await this.docketService.updateDocket(element,{ "status": "1" });
       }
       const vendorType = this.thcTableForm.value.vendorType;
       const thcTableFormValue = this.thcTableForm.value;
@@ -790,6 +789,35 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['driverLexd'].setValue(driverDetail[0].valdityDt);
     this.thcTableForm.controls['driverLno'].setValue(driverDetail[0].licenseNo);
     this.thcTableForm.controls['capacity'].setValue(vehDetail.capacity);
+    if (vehDetail.value) {
+      const filteredShipments = this.allShipment.filter((x) =>x.vehicleNo==vehDetail.value &&  x.status=="0");
+      this.tableData = filteredShipments.map((x) => {
+        const actualWeights = [x].map((item) => {
+          return item
+            ? calculateTotalField(item.invoiceDetails, "actualWeight")
+            : 0;
+        });
+        const noofPkts = [x].map((item) => {
+          return item
+            ? calculateTotalField(item.invoiceDetails, "noofPkts")
+            : 0;
+        });
+        // Sum all the calculated actualWeights
+        const totalActualWeight = actualWeights.reduce(
+          (acc, weight) => acc + weight,
+          0
+        );
+        // Sum all the calculated actualWeights
+        const totalnoofPkts = noofPkts.reduce(
+          (acc, noofPkts) => acc + noofPkts,
+          0
+        );
+
+        x.actualWeight = totalActualWeight;
+        x.noofPkts = totalnoofPkts
+        return x; // Make sure to return x to update the original object in the 'tableData' array.
+      });
+    }
     // this.thcTableForm.controls['vehicle'].setValue();
 
   }
@@ -834,9 +862,10 @@ export class ThcGenerationComponent implements OnInit {
     const fromTo = `${formCity}-${toCity}`
     this.thcTableForm.controls['route'].setValue(fromTo)
     if (toCity) {
+      
       const filteredShipments = this.allShipment.filter((x) =>
         x.fromCity.toLowerCase() === formCity.toLowerCase() &&
-        x.toCity.toLowerCase() === toCity.toLowerCase()&& x.status=="0"
+        x.toCity.toLowerCase() === toCity.toLowerCase()&& x.status=="0" && x.vehicleNo==this.thcTableForm.controls['vehicle'].value.value
       );
 
       this.tableData = filteredShipments.map((x) => {
@@ -874,7 +903,6 @@ export class ThcGenerationComponent implements OnInit {
     let propertiesToSet = [
       "route",
       "prqNo",
-      "vehicle",
       "vendorType",
       "tripId",
       "capacity",
@@ -891,7 +919,6 @@ export class ThcGenerationComponent implements OnInit {
       "balAmtAt",
       "status",
       "vendorType",
-      "vendorName",
       "panNo",
     ];
     if (this.prqFlag) {
@@ -927,6 +954,9 @@ export class ThcGenerationComponent implements OnInit {
     const toCity = { name: this.thcDetail?.route.split('-')[1] || "", value: this.thcDetail?.route.split('-')[0] || "" }
     this.thcTableForm.controls["fromCity"].setValue(fromCity);
     this.thcTableForm.controls["toCity"].setValue(toCity);
+    this.thcTableForm.controls["toCity"].setValue(toCity);
+    this.thcTableForm.controls["vehicle"].setValue({name:this.thcDetail?.vehicle,value:this.thcDetail?.vehicle});
+    this.thcTableForm.controls["vendorName"].setValue({name:this.thcDetail?.vendorName,value:this.thcDetail?.vendorName});
     if (this.addThc) {
       this.thcTableForm.controls['billingParty'].setValue(this.thcDetail?.billingParty);
       this.thcTableForm.controls['docketNumber'].setValue(this.thcDetail?.docketNumber);

@@ -876,10 +876,6 @@ export class FreightControl {
           {
             "value": "W",
             "name": "Per KG"
-          },
-            {
-            "value": "C",
-            "name": "Per Container"
           }
         ], Validations: [],
         functions: {

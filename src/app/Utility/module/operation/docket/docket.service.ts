@@ -28,13 +28,13 @@ export class DocketService {
         private operation: OperationService
     ) { }
 
-    async updateDocket(data,filter={}) {
+    async updateDocket(data,filter) {
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
             collectionName: "docket_temp",
             filter: { "docketNumber": data },
-            update: filter?filter:{ "status": "1" }
+            update: filter
         };
         // Perform an asynchronous operation to fetch data from the operation service
         const result = await this.operation.operationMongoPut("generic/update", reqBody).toPromise();

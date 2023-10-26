@@ -924,6 +924,16 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const cd = this.consignmentTableForm.controls['cd'].value;
     if (cd) {
       this.contFlag = true;
+      this.jsonControlArray = this.jsonControlArray.map((x) => {
+        if (x.name === "freightRatetype") {
+          x.value.push({
+            value: "C",
+            name: "Per Container"
+          });
+        }
+        return x;
+      });
+      
       this.filter.Filter(
         this.jsonContainerDetail,
         this.containerTableForm,
@@ -933,6 +943,14 @@ export class ConsignmentEntryFormComponent implements OnInit {
       );
     }
     else {
+      this.jsonControlArray = this.jsonControlArray.map((x) => {
+        if (x.name === "freightRatetype") {
+          // Use filter to remove the object with value: "C" and name: "Per Container"
+          x.value = x.value.filter(item => !(item.value === "C" && item.name === "Per Container"));
+        }
+        return x;
+      });
+      
       this.contFlag = false;
     }
   }

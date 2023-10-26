@@ -7,6 +7,7 @@ import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { AccountMasterControls } from "src/assets/FormControls/AccountMasterControls";
 import Swal from "sweetalert2";
+import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 @Component({
   selector: "app-account-group",
@@ -62,7 +63,7 @@ export class AccountGroupComponent implements OnInit {
     "GroupCode",
   ];
   TableData: any = [];
-  jsonControlAccountGroupArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  jsonControlAccountGroupArray:FormControls[];
   AccountGroupForm: any;
   CategoryCodeCode: string;
   CategoryCodeStatus: any;

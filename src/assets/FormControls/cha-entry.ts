@@ -102,7 +102,7 @@ export class ChaEntryControl {
                 label: 'entryDate',
                 placeholder: 'entryDate',
                 type: '',
-                value: new Date().toUTCString(),
+                value: new Date(),
                 Validations: [],
                 generatecontrol: false, disable: false
             },

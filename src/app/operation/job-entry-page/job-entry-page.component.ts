@@ -652,10 +652,25 @@ export class JobEntryPageComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   getDocketBasedOnCity() {
+    debugger
       if(this.jobEntryTableForm.value.transportedBy=="E"&& this.jobEntryTableForm.value.transportMode=="Road"){
-    const docketDetail = this.docketData.filter((x) => x.toCity.trim() === this.jobEntryTableForm.value.toCity.value.trim());
-    if (docketDetail.length > 0) {
-      const transformedData = docketDetail.map(({ docketNumber, docketDate, loadedWeight, noOfpkg, fromCity, toCity }) => ({
+        const toCity = this.jobEntryTableForm.value.toCity?this.jobEntryTableForm.value.toCity.value.trim():"";
+        const billingPartyName = this.jobEntryTableForm.value.billingParty.name.toLowerCase();
+        
+        const filteredDocketData = this.docketData.filter((docket) => {
+          // Check if billingParty has a value and toCity matches
+          if (toCity) {
+            const toCityMatch = docket.toCity.trim().toLowerCase() === toCity.toLowerCase();
+            const billingPartyMatch = docket.billingParty.toLowerCase() === billingPartyName;
+            return toCityMatch && billingPartyMatch;
+          } else {
+            // If billingParty is empty, only check for a matching toCity
+            return docket.billingParty.toLowerCase() === billingPartyName;
+          }
+        });
+        
+    if (filteredDocketData.length > 0) {
+      const transformedData = filteredDocketData.map(({ docketNumber, docketDate, loadedWeight, noOfpkg, fromCity, toCity }) => ({
         name: docketNumber,
         value: docketNumber,
         cnoteDate: docketDate,

@@ -385,7 +385,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls["vehicleNo"].setValue(
       this.prqData?.vehicleNo
     );
-    this.consignmentTableForm.controls["vehicleNo"].clearValidators();
+   
 
     this.getLocBasedOnCity();
     this.onAutoBillingBased("true");
@@ -770,9 +770,10 @@ export class ConsignmentEntryFormComponent implements OnInit {
       vehicleNo.updateValueAndValidity();
     }
     else {
+      vehicleNo.clearValidators();
       vendorName.setValidators(Validators.required);
       vendorName.updateValueAndValidity();
-      
+      vehicleNo.updateValueAndValidity();
       this.marketVendor = true
     }
     
@@ -937,7 +938,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
 
   async save() {
-    console.log(this.consignmentTableForm.value);
     // Remove all form errors
     const tabcontrols = this.consignmentTableForm;
     clearValidatorsAndValidate(tabcontrols);
@@ -945,6 +945,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     clearValidatorsAndValidate(contractcontrols);
     /*End*/
     const vendorType = this.consignmentTableForm.value.vendorType;
+
     const vendorName = this.consignmentTableForm.value.vendorName;
     const vehNo = this.consignmentTableForm.value.vehicleNo?.value || this.consignmentTableForm.value.vehicleNo;
     const controlNames = [
@@ -1216,12 +1217,12 @@ export class ConsignmentEntryFormComponent implements OnInit {
 
       }
     }
-    else if(freightRateType==="C"){
+     if(freightRateType==="C"){
       if(this.tableData.length>0){
       const total=parseFloat(freightRate)*this.tableData.length;
       this.FreightTableForm.controls['freight_amount']?.setValue(total);
       }
-      else if(this.containerTableForm.value.containerNumber){
+       if(this.containerTableForm.value.containerNumber){
         const total=parseFloat(freightRate)*1;
         this.FreightTableForm.controls['freight_amount']?.setValue(total);
       }

@@ -407,16 +407,20 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
     const { seriesFrom, totalLeaf } = this.addDcrTableForm.value;
     const match = seriesFrom.match(/([a-zA-Z]+)(\d+)/);
 
-    const extractedLetters = match[1];  // Will store "zzz"
-    const extractedNumber = match[2];   // Will store "9999"
-    // Calculate the result by parsing 'seriesFrom' and 'totalLeaf' to numbers
-    const seriesFromNumber = parseInt(extractedNumber);
+    const extractedLetters = match[1];  // Will store the letters part, e.g., "AAA"
+    const extractedNumber = match[2];   // Will store the number part as a string, e.g., "0001"
 
-    const totalLeafNumber = parseInt(totalLeaf);
-    // getting seriesTo value from addition of seriesfrom and total leaf
-    const resultNumber = extractedLetters + (seriesFromNumber + totalLeafNumber);
-    // setting in seriesTo its calculated value
-    this.addDcrTableForm.controls.seriesTo.setValue(resultNumber);
+    // Calculate the result by parsing 'seriesFrom' and 'totalLeaf' to numbers
+    const seriesFromNumber = parseInt(extractedNumber, 10);
+    const totalLeafNumber = parseInt(totalLeaf, 10);
+
+    const resultNumber = seriesFromNumber + totalLeafNumber;
+
+    // Format the result with leading zeros to match the length of 'extractedNumber'
+    const formattedResult = extractedLetters + resultNumber.toString().padStart(extractedNumber.length, '0');
+
+    // Set the formatted value in the 'seriesTo' form control
+    this.addDcrTableForm.controls.seriesTo.setValue(formattedResult);
   }
   //#endregion
   //#region to add data in table
@@ -425,58 +429,7 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       // Set loading flags to indicate data is being processed
       this.tableLoad = true;
       this.isLoad = true;
-
-      // Get the existing table data and the starting and ending series numbers from the form
       const tableData = this.tableData;
-      // const startingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesFrom.value);
-      // const endingSeriesNo = parseInt(this.addDcrTableForm.controls.seriesTo.value);
-
-      // // Check for duplicates in the table data
-      // const overlappingItem = this.tableData.find((item) => {
-      //   const seriesFrom = parseInt(item.seriesFrom);
-      //   const seriesTo = parseInt(item.seriesTo);
-
-      //   const isOverlap =
-      //     (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
-      //     (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
-
-      //   return isOverlap;
-      // });
-
-      // // Check for duplicates in the existing data
-      // const foundItem = this.dcrDetail.data.find((x) => {
-      //   const seriesFrom = parseInt(x.seriesFrom);
-      //   const seriesTo = parseInt(x.seriesTo);
-
-      //   const isOverlap =
-      //     (startingSeriesNo >= seriesFrom && startingSeriesNo <= seriesTo) ||
-      //     (endingSeriesNo >= seriesFrom && endingSeriesNo <= seriesTo);
-
-      //   return isOverlap;
-      // });
-
-      // // If there's a duplicate, show an error message and exit
-      // if (overlappingItem) {
-      //   const { seriesFrom, seriesTo } = overlappingItem;
-      //   Swal.fire({
-      //     icon: 'warning',
-      //     title: 'Warning',
-      //     text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
-      //     showConfirmButton: true,
-      //   });
-      //   return;
-      // }
-
-      // if (foundItem) {
-      //   const { seriesFrom, seriesTo } = foundItem;
-      //   Swal.fire({
-      //     icon: 'warning',
-      //     title: 'Warning',
-      //     text: `The series overlaps with an existing entry. It cannot be between ${seriesFrom} and ${seriesTo}.`,
-      //     showConfirmButton: true,
-      //   });
-      //   return;
-      // }
       const delayDuration = 1000;
 
       // Simulate a delay using async/await to mimic a loading state
@@ -586,6 +539,107 @@ export class AddDcrSeriesComponent extends UnsubscribeOnDestroyAdapter implement
       console.error("Error while fetching regex patterns:", error);
       // Handle the error, e.g., display an error message to the user.
     }
+  }
+  //#endregion
+  //#region of logic To check series number from  table
+  getCodesBetween = (
+    startCode: string,
+    endCode: string,
+    maxIterations: number = 10000
+  ): { count: number; list: string[] } => {
+    const codeList: string[] = [];
+    let currentCode = startCode;
+    let iterations = 0;
+
+    while (currentCode !== endCode && iterations < maxIterations) {
+      codeList.push(currentCode);
+      currentCode = this.nextKeyCode(currentCode);
+      iterations++;
+    }
+
+    if (iterations === maxIterations) {
+      console.log("Max iterations reached. Consider adjusting the increment logic.");
+    }
+
+    // Include the endCode in the list
+    codeList.push(endCode);
+
+    return {
+      count: codeList.length,
+      list: codeList,
+    };
+  }
+  nextKeyCode = (keyCode: string): string => {
+    const ASCIIValues = [...keyCode].map(char => char.charCodeAt(0));
+
+    const isAllZed = ASCIIValues.every(value => value === 90);
+    const isAllNine = ASCIIValues.every(value => value === 57);
+    const stringLength = ASCIIValues.length;
+
+    if (isAllZed) {
+      return keyCode;
+    }
+
+    if (isAllNine) {
+      ASCIIValues[stringLength - 1] = 47;
+      ASCIIValues[0] = 65;
+
+      for (let i = 1; i < stringLength - 1; i++) {
+        ASCIIValues[i] = 48;
+      }
+    }
+
+    for (let i = stringLength; i > 0; i--) {
+      if (i - stringLength === 0) {
+        ASCIIValues[i - 1] += 1;
+      }
+
+      if (ASCIIValues[i - 1] === 58) {
+        ASCIIValues[i - 1] = 48;
+
+        if (i - 2 === -1) {
+          break;
+        }
+
+        ASCIIValues[i - 2] += 1;
+      } else if (ASCIIValues[i - 1] === 91) {
+        ASCIIValues[i - 1] = 65;
+
+        if (i - 2 === -1) {
+          break;
+        }
+
+        ASCIIValues[i - 2] += 1;
+      } else {
+        break;
+      }
+    }
+    keyCode = String.fromCharCode(...ASCIIValues);
+    return keyCode;
+  }
+  //#endregion
+  //#region to validate Series From number
+  checkValidation() {
+    const startingSeriesNo = this.addDcrTableForm.controls.seriesFrom.value;
+
+    // Use some() to check if the startingSeriesNo exists in any range
+    const exists = this.dcrDetail.data.some(element => {
+      const result = this.getCodesBetween(element.seriesFrom, element.seriesTo);
+      return result.list.includes(startingSeriesNo);
+    });
+
+    if (exists) {
+      Swal.fire({
+        icon: "warning",
+        title: "Alert",
+        text: `This Series No: ${startingSeriesNo} already exists. Please enter another SeriesFrom number.`,
+        showConfirmButton: true,
+      });
+
+      this.addDcrTableForm.controls.seriesFrom.setValue("");
+    }
+
+    return !exists; // Return whether the series number is valid
   }
   //#endregion
 }

@@ -83,7 +83,9 @@ export class AddDcrSeriesControl {
                         pattern: ''
                     }
                 ],
-
+                functions: {
+                    onChange: "checkValidation",
+                },
             },
             {
                 name: 'totalLeaf',

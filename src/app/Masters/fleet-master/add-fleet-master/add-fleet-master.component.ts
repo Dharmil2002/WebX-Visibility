@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -15,7 +16,6 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-add-fleet-master',
   templateUrl: './add-fleet-master.component.html',
-
 })
 export class AddFleetMasterComponent implements OnInit {
   fleetTableData: fleetModel;
@@ -49,6 +49,7 @@ export class AddFleetMasterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private dialog: MatDialog,
+    private objImageHandling: ImageHandling
 
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
@@ -209,7 +210,7 @@ export class AddFleetMasterComponent implements OnInit {
       for (const controlName in this.imageData) {
         if (this.imageData.hasOwnProperty(controlName)) {
           const url = this.imageData[controlName];
-          const fileName = this.extractFileName(url);
+          const fileName = this.objImageHandling.extractFileName(url);
           // Set the form control value using the control name
           this.fleetTableForm.controls[controlName].setValue(fileName);
         }
@@ -217,14 +218,6 @@ export class AddFleetMasterComponent implements OnInit {
     }
   }
 
-  // Define a function to extract the filename from a URL
-  extractFileName(url: string): string {
-    const parts = url.split('/');
-    const filenameWithTimestamp = parts[parts.length - 1];
-    const filenameParts = filenameWithTimestamp.split('_');
-    const fileName = filenameParts[0];
-    return fileName;
-  }
   //#region Function for save data
   async save() {
     const controls = this.fleetTableForm;
@@ -238,7 +231,7 @@ export class AddFleetMasterComponent implements OnInit {
     let data = { ...this.fleetTableForm.value };
 
     imageControlNames.forEach(controlName => {
-      const file = this.getFileByKey(controlName);
+      const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
 
       // Set the URL in the corresponding control name
       data[controlName] = file;
@@ -357,7 +350,7 @@ export class AddFleetMasterComponent implements OnInit {
   //#endregion
   //#region to preview image
   openImageDialog(control) {
-    const file = this.getFileByKey(control.imageName);
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
     this.dialog.open(ImagePreviewComponent, {
       data: { imageUrl: file },
       width: '30%',
@@ -413,6 +406,7 @@ export class AddFleetMasterComponent implements OnInit {
           text: `Please select a valid file format: ${allowedFormats.join(', ')}`,
           showConfirmButton: true,
         });
+        return false;
       }
     }
   }
@@ -428,15 +422,6 @@ export class AddFleetMasterComponent implements OnInit {
   // Registration Scan
   selectedFileregistrationScan(data) {
     this.selectedFile(data.eventArgs, "registrationScan");
-  }
-
-  // Function to get a file by key
-  getFileByKey(key: string) {
-    if (this.imageData.hasOwnProperty(key)) {
-      return this.imageData[key];
-    } else {
-      return null; // Key not found in imageData
-    }
   }
   //#endregion
 }

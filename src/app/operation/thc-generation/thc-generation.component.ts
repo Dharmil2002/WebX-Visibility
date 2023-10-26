@@ -33,6 +33,7 @@ import { getVendorDetails } from "../job-entry-page/job-entry-utility";
 import { AddFleetMasterComponent } from "src/app/Masters/fleet-master/add-fleet-master/add-fleet-master.component";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
+import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 
 @Component({
   selector: "app-thc-generation",
@@ -95,12 +96,12 @@ export class ThcGenerationComponent implements OnInit {
     actualWeight: {
       Title: "Actual Weight (Kg)",
       class: "matcolumncenter",
-      Style: "max-width:160px",
+      Style: "min-width:160px",
     },
     noofPkts: {
       Title: "No of Packets ",
       class: "matcolumncenter",
-      Style: "max-width:160px",
+      Style: "min-width:160px",
     },
     pod: {
       Title: "Pod",
@@ -161,6 +162,7 @@ export class ThcGenerationComponent implements OnInit {
   locationData: any;
   prqlist: any;
   isView: any;
+  branchCode = localStorage.getItem("Branch");
   selectedData: any;
   menuItems = [{ label: "Update" }];
   menuItemflag: boolean = true;
@@ -192,7 +194,8 @@ export class ThcGenerationComponent implements OnInit {
     public dialog: MatDialog,
     private vendorService: VendorService,
     private driverService: DriverService,
-    private pinCodeService: PinCodeService
+    private pinCodeService: PinCodeService,
+    private locationService: LocationService
   ) 
   {
     /* here the code which is used to bind data for add thc edit thc add thc based on
@@ -293,7 +296,8 @@ export class ThcGenerationComponent implements OnInit {
     // Create an instance of loadingControl class
     const loadingControlFormControls = new thcControl(
       this.isUpdate || false,
-      this.isView || false
+      this.isView || false,
+      this.prqFlag||false
     );
 
     // Get the form controls from the loadingControlFormControls instance
@@ -444,7 +448,12 @@ export class ThcGenerationComponent implements OnInit {
       }));
       this.vehicleList=vehicleList;
       const vendorDetail = await getVendorDetails(this.masterService)
-      
+      const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode })
+      const city = {
+        name: destinationMapping[0].city,
+        value: destinationMapping[0].city
+      }
+      this.thcTableForm.controls['fromCity'].setValue(city);
       this.vendorDetail = vendorDetail;
       this.filter.Filter(
         this.jsonControlArray,
@@ -479,8 +488,6 @@ export class ThcGenerationComponent implements OnInit {
 
   async bindPrqData
   () {
-    const prqDetail=this.prqDetail
-    console.log(prqDetail);
     const vehicleDetail = await this.vehicleStatusService.vehiclList(
       this.prqDetail?.prqNo
     );
@@ -502,10 +509,10 @@ export class ThcGenerationComponent implements OnInit {
     console.log(fcity)
     const tcity = this.prqDetail?.fromToCity.split('-')[1] || "";
     this.thcTableForm.controls["fromCity"].setValue(
-      fcity
+      {name:fcity,value:fcity}
     );
     this.thcTableForm.controls["toCity"].setValue(
-      tcity
+      {name:tcity,value:tcity}
     );
     this.thcTableForm.controls["capacity"].setValue(
       this.prqDetail?.vehicleSize || this.prqDetail?.containerSize.split(" ")[0] || ""

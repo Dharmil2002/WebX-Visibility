@@ -353,7 +353,7 @@ export class PrqEntryControls {
         label: "",
         placeholder: "",
         type: "",
-        value: localStorage.getItem("Username"),
+        value: localStorage.getItem("UserName"),
         Validations: [],
         generatecontrol: true,
         disable: false,

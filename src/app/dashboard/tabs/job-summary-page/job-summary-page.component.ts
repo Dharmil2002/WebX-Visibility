@@ -23,6 +23,11 @@ export class JobSummaryPageComponent implements OnInit {
   // < column name : Column name you want to display on table >
 
   columnHeader = {
+    createdOn: {
+      Title: "Created On",
+      class: "matcolumnleft",
+      Style: "max-width:200px",
+    },
     jobNo: {
       Title: "Job No",
       class: "matcolumnleft",
@@ -59,7 +64,7 @@ export class JobSummaryPageComponent implements OnInit {
       Style: "max-width:70px",
     },
     vehicleSize: {
-      Title: "Vehicle Size",
+      Title: "Size(MT)",
       class: "matcolumncenter",
       Style:  "max-width:90px",
     },
@@ -76,6 +81,7 @@ export class JobSummaryPageComponent implements OnInit {
   };
   //#endregion
   staticField = [
+    "createdOn",
     "jobNo",
     "jobDate",
     "jobType",

@@ -15,6 +15,11 @@ export class DocketListComponent implements OnInit {
     orgBranch: string = localStorage.getItem("Branch");
    /* column header is for the changes css or title in the table*/
   columnHeader = {
+    createOn: {
+      Title: "Created On",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    },
     billingParty: {
       Title: "Billing Party",
       class: "matcolumnleft",
@@ -23,44 +28,44 @@ export class DocketListComponent implements OnInit {
     docketNumber: {
       Title: "Shipment",
       class: "matcolumnleft",
-      Style: "max-width:280px",
+      Style: "min-width:300px",
       type:'windowLink',
       functionName:'OpenCnote'
     },
     ftCity: {
       Title: "From-To City",
       class: "matcolumncenter",
-      Style: "max-width:150px",
+      Style: "max-width:200px",
     },
     actualWeight: {
       Title: "Act Wt(Kg)",
       class: "matcolumncenter",
-      Style: "max-width:90px",
+      Style: "max-width:70px",
     },
     totalPkg: {
       Title: "Pkg Count",
       class: "matcolumncenter",
-      Style: "max-width:90px",
+      Style: "max-width:70px",
     },
     totalAmount: {
-      Title: "Freight Value(+)₹",
+      Title: "FV(₹)",
       class: "matcolumncenter",
-      Style: "max-width:90px",
+      Style: "max-width:70px",
     },
      invoiceCount: {
       Title: "Inv Count",
       class: "matcolumncenter",
-      Style: "max-width:90px",
+      Style: "max-width:70px",
     },
     status:{
       Title: "Status",
       class: "matcolumncenter",
-      Style: "max-width:130px",
+      Style: "min-width:140px",
     },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "max-width:80px",
+      Style: "max-width:100px",
     }
   };
   //#endregion
@@ -73,7 +78,8 @@ export class DocketListComponent implements OnInit {
     "totalPkg",
     "totalAmount",
     "invoiceCount",
-    "status"
+    "status",
+    "createOn"
   ];
 
   /*.......End................*/

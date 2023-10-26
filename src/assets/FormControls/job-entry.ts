@@ -408,7 +408,7 @@ export class JobControl {
                 additionalData: {
                     metaData: "jobTableControls"
                 },
-                value: localStorage.getItem("Username"),
+                value: localStorage.getItem("UserName"),
                 generatecontrol: false,
                 disable: false,
                 Validations: [
@@ -422,7 +422,7 @@ export class JobControl {
                 additionalData: {
                     metaData: "jobTableControls"
                 },
-                value: new Date().toUTCString(),
+                value: new Date(),
                 generatecontrol: false,
                 disable: false,
                 Validations: [

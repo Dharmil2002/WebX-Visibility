@@ -2,7 +2,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class thcControl {
     private thcControlArray: FormControls[];
-    constructor(update: boolean, view: boolean) {
+    constructor(update: boolean, view: boolean,prq:boolean) {
 
         this.thcControlArray =
             [
@@ -25,7 +25,7 @@ export class thcControl {
                     type: 'text',
                     value: '',
                     Validations: [],
-                    generatecontrol: true, disable: view ? view : false,
+                    generatecontrol: true, disable: view ? view :  prq?prq:false,
                     additionalData: {
                         metaData: "Basic"
                     }
@@ -48,7 +48,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: 'getShipmentDetails'
                     },
-                    disable: view ? view : update
+                    disable: view ? view :  prq?prq:update
                 },
                 {
                     name: 'vehicle',
@@ -69,7 +69,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: 'getVehicleDetail'
                     },
-                    disable: view ? view : false
+                    disable: view ? view : prq?prq:false
                 },
                 {
                     name: "vendorType",
@@ -87,7 +87,7 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : false,
+                    disable: view ? view :  prq?prq:false,
                     Validations: [
                         {
                             name: "required",
@@ -108,7 +108,7 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : update,
+                    disable: view ? view :  prq?prq:update,
                     Validations: [
                         {
                             name: "required",
@@ -130,7 +130,7 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : update,
+                    disable: view ? view :  prq?prq:update,
                     Validations: [
                         {
                             name: "required",
@@ -149,7 +149,7 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: false,
+                    disable: true,
                     Validations: [
                         {
                             name: "required",
@@ -164,7 +164,6 @@ export class thcControl {
                         },
                     ],
                     functions: {
-                        onModel: "getPincodeDetail",
                         onOptionSelect: 'getLocBasedOnCity'
                     },
                     additionalData: {
@@ -181,7 +180,7 @@ export class thcControl {
                     filterOptions: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: false,
+                    disable: prq?prq:false,
                     Validations: [
                         {
                             name: "required",
@@ -248,7 +247,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: view ? view : update
+                    disable: view ? view :  prq?prq:update
                 },
                 {
                     name: 'driverMno',
@@ -269,7 +268,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: view ? view : update
+                    disable: view ? view :  prq?prq:update
                 },
                 {
                     name: 'driverLno',
@@ -290,7 +289,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: view ? view : update
+                    disable: view ? view :  prq?prq:update
                 },
                 {
                     name: 'driverLexd',
@@ -311,7 +310,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: view ? view : update
+                    disable: view ? view :  prq?prq:update
                 },
                 {
                     name: 'capacity',

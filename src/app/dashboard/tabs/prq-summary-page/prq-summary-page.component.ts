@@ -24,15 +24,20 @@ export class PrqSummaryPageComponent implements OnInit {
   // < column name : Column name you want to display on table >
 
   columnHeader = {
+    createdDate: {
+      Title: "Created On",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    },
     prqNo: {
       Title: "PRQ No",
       class: "matcolumnleft",
       Style: "min-width:200px",
     },
     size: {
-      Title: "Veh/Cont-Size",
+      Title: "Size(MT)",
       class: "matcolumncenter",
-      Style: "min-width:150px",
+      Style: "max-width:80px",
     },
     billingParty: {
       Title: "Billing Party",
@@ -45,17 +50,12 @@ export class PrqSummaryPageComponent implements OnInit {
       Style: "max-width:150px",
     },
     pickUpDate: {
-      Title: "Pk-Up Dt-Time",
+      Title: "Pickup Time",
       class: "matcolumnleft",
-      Style: "min-width:100px",
+      Style: "max-width:150px",
     },
     status: {
       Title: "Status",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
-    createdDate: {
-      Title: "Created Date",
       class: "matcolumnleft",
       Style: "min-width:100px",
     },

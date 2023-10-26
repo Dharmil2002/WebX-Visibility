@@ -25,6 +25,8 @@ export async function getJobDetailFromApi(masterServices) {
             "vehicleSize":element?.vehicleSize||"",
             "transportedBy":element?.transportedBy||"",
             "status": element?.status === "0" ? "Awaiting CHA Entry" : element.status === "1" ? "Awaiting Rake Entry" : "Awaiting Advance Payment",
+            "createdOn":formatDocketDate(element?.entryDate || new Date()),
+            "entryDate":element?.entryDate || new Date(),
             "Action": element?.status === "0" ? "CHA Entry" : element.status === "1" ? "Rake Entry" : "Advance Payment"
         }
         jobList.push(jobData)

@@ -22,7 +22,7 @@
     </form>
     <!-- End -->
   <!-- fleet Detail -->
-  <div *ngIf="marketVendor">
+  <div *ngIf="marketVendor && !this.prqFlag">
    <app-add-fleet-master [thc]="true"></app-add-fleet-master>
   </div>
     <!-- Consignor Detail -->
@@ -51,7 +51,9 @@
       </app-form-webxpress>
     </form>
     <button matTooltip="Add Data Container" mat-stroked-button class="filter_btn" [disabled]="!containerTableForm.valid"
-      style="margin-left: 85%;" (click)="addData()">
+      style="margin-left: 80%;
+      position: relative;
+      top: -224px" (click)="addData()">
       <mat-icon>add</mat-icon>
       Add New Container
     </button>
@@ -63,14 +65,12 @@
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
-    <div class="paddingdiv">
       <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
         [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
         [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
         [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
       </app-generic-table-v2>
-    </div>
     <!--  Invoice Details-->
     <form [formGroup]="invoiceTableForm">
       <app-form-webxpress [form]="invoiceTableForm" [FormTitle]="'Invoice Details'" [formData]="jsonInvoiceDetail"
@@ -79,7 +79,9 @@
       </app-form-webxpress>
     </form>
     <button matTooltip="Add Data Invoice Detail" mat-stroked-button class="filter_btn" [disabled]="!invoiceTableForm.valid"
-      style="margin-left: 85%;" (click)="addInvoiceData()">
+      style="margin-left: 81%;margin-left: 80%;
+      position: relative;
+      top: -297px" (click)="addInvoiceData()">
       <mat-icon>add</mat-icon>
       Add Invoice
     </button>
@@ -90,14 +92,12 @@
       </div>
     </div>
     <!-- End -->
-    <div class="paddingdiv">
       <app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="dynamicControls" [columnHeader]="columnInvoice"
         [tableData]="invoiceData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
         [staticField]="staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
         [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
         [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
       </app-generic-table-v2>
-    </div>
     <!--Freight Detail  -->
     <form [formGroup]="FreightTableForm">
       <app-form-webxpress [form]="FreightTableForm"  [FormTitle]="'Freight Details'" [formData]="jsonControlArray"

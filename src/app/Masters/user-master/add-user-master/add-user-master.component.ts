@@ -29,6 +29,7 @@ export class AddUserMasterComponent implements OnInit {
   location: any;
   divisionStatus: any;
   locationName: any;
+  branchCode: any;
   userLocationStatus: any;
   userRoleStatus: any;
   userRole: any;
@@ -118,7 +119,7 @@ export class AddUserMasterComponent implements OnInit {
 
   bindDropdown() {
     const propertyMappings = {
-      // branchCode: { property: "location", statusProperty: "locationStatus" },
+      branchCode: { property: "location", statusProperty: "locationStatus" },
       userType: { property: "userType", statusProperty: "userTypeStatus" },
       country: { property: "countryCode", statusProperty: "countryCodeStatus" },
       // userStatus: { property: "userName", statusProperty: "userStatus" },
@@ -249,7 +250,7 @@ export class AddUserMasterComponent implements OnInit {
         .masterPost("generic/get", userReqBody)
         .toPromise();
       const locations = locationsResponse.data.map((element) => ({
-        name: String(element.locName),
+        name: String(element.locCode),
         value: String(element.locCode),
       }));
 
@@ -286,10 +287,10 @@ export class AddUserMasterComponent implements OnInit {
         });
 
       if (this.isUpdate) {
-        // const userLocation = locations.find(
-        //   (x) => x.name === this.userTable.branchCode
-        // );
-        // this.userTableForm.controls["branchCode"].setValue(userLocation);
+        const userLocation = locations.find(
+          (x) => x.value === this.userTable.branchCode
+        );
+        this.userTableForm.controls["branchCode"].setValue(userLocation);
 
         // const userStatus = userStatusList.find(
         //   (x) => x.name === this.userTable.userStatus
@@ -326,6 +327,13 @@ export class AddUserMasterComponent implements OnInit {
       this.filter.Filter(
         this.jsonControlUserArray,
         this.userTableForm,
+        locations,
+        this.location,
+        this.locationStatus
+      );
+      this.filter.Filter(
+        this.jsonControlUserArray,
+        this.userTableForm,
         userTypeList,
         this.userType,
         this.userTypeStatus
@@ -343,6 +351,7 @@ export class AddUserMasterComponent implements OnInit {
   }
 
   async save() {
+    this.userTableForm.controls["branchCode"].setValue(this.userTableForm.value.branchCode.value);
     this.userTableForm.controls["userType"].setValue(
       this.userTableForm.value.userType.name
     );

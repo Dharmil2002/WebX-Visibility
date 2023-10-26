@@ -1,5 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
-
+const today = new Date();
+today.setHours(23, 59, 59, 999); // Set the time to the end of the day
+let maxDate = today;
 export class marketVehicleControls {
   private marketVehicle: FormControls[];
   constructor(
@@ -105,8 +107,8 @@ export class marketVehicleControls {
           {
             name: "pattern",
             message:
-              "Please Enter alphanumeric License No of length 8 (eg. AZ-125487)",
-            pattern: "^[A-Z]{2}-[0-9]{6}$",
+              "Please Enter alphanumeric License No of length 8 (eg. AZ1254871111111)",
+            pattern: "^[A-Z]{2}[0-9]{13}$",
           }
         ],
       },
@@ -144,7 +146,7 @@ export class marketVehicleControls {
           },
         ],
         additionalData: {
-          minDate: new Date()
+          maxDate:maxDate
         },
       },
       
@@ -153,7 +155,7 @@ export class marketVehicleControls {
         label: 'Entry By',
         placeholder: 'Entry By',
         type: 'text',
-        value: localStorage.getItem("Username"),
+        value: localStorage.getItem("UserName"),
         Validations: [],
         generatecontrol: false, disable: false
       },

@@ -93,6 +93,7 @@ export class ProductChargesComponent implements OnInit {
 
   ngOnInit(): void {
     this.GetTableData();
+    // this.HendelFormFunction()
   }
   HendelFormFunction() {
     this.initializeFormControl();
@@ -114,6 +115,7 @@ export class ProductChargesComponent implements OnInit {
   initializeFormControl() {
     const customerFormControls = new ProductControls();
     this.jsonControlArray = customerFormControls.getChargesControlsArray();
+    console.log('this.jsonControlArray' ,this.jsonControlArray)
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
@@ -140,6 +142,7 @@ export class ProductChargesComponent implements OnInit {
     const Res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
+    console.log('Res' ,Res)
     if (Res.success && Res.data.length > 0) {
       this.ChargesList = Res.data.map((x) => {
         return {

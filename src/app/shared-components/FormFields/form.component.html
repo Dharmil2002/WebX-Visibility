@@ -3,10 +3,20 @@
     <div class="card" style="margin-bottom: 6px;margin-right: 3px;margin-left: 3px;">
       <div class="body">
         <div class="task-list">
-          <div *ngIf="FormTitle">
-            <h4 style="margin-top:10px;margin-left:10px;"><mat-icon style="padding-top:4px;">view_list</mat-icon>
-              {{FormTitle}}</h4>
-            <hr>
+          <div class="row" style="border-bottom: 1px solid rgba(0,0,0,0.2);">
+            <div class="col d-flex align-items-center">
+              <h4 style="margin-top: 5px; margin-bottom: 10px; margin-left:10px; "><mat-icon
+                  style="padding-top:4px;">view_list</mat-icon>
+                {{FormTitle}}
+              </h4>
+            </div>
+            <div *ngIf="AddNewButton" class="col d-flex justify-content-end align-items-center">
+              <button (click)="AddNew(AddNewButton.functionName)" matTooltip="Add Data" mat-stroked-button class="filter_btn"
+                style="margin:10px;margin-right:10px; ">
+                <mat-icon>{{AddNewButton.iconName}}</mat-icon>
+                {{AddNewButton.name}}
+              </button>
+            </div>
           </div>
           <form class="register-form " style="margin-right: 20px;" *ngIf="formData" [formGroup]="form">
             <div class="row">

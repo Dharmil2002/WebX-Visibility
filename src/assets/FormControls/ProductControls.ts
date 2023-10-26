@@ -2,9 +2,12 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class ProductControls {
   private isCompanyProductControlsArray: FormControls[];
-  private ProductControlsArray: FormControls[];
   private ChargesControlsArray: FormControls[];
   private ServicesControlsArray: FormControls[];
+  private ProductControlsArray: FormControls[];
+  private ShardChargesControlsArray: FormControls[];
+  private ShardServicesControlsArray: FormControls[];
+
 
   constructor() {
     this.isCompanyProductControlsArray = [
@@ -65,8 +68,8 @@ export class ProductControls {
           {
             name: "pattern",
             message: "Please Enter only text of length 3 to 20 characters",
-            pattern: '^[a-zA-Z ]{3,20}$',
-          }
+            pattern: "^[a-zA-Z ]{3,20}$",
+          },
         ],
         functions: {
           onChange: "handleProductName",
@@ -78,7 +81,10 @@ export class ProductControls {
         placeholder: "System Genreted",
         type: "text",
         value: "",
-        Validations: [],
+        Validations: [{
+          name: "required",
+          message: "Required",
+        },],
         generatecontrol: true,
         disable: true,
       },
@@ -89,7 +95,7 @@ export class ProductControls {
         name: "SelectCharges",
         label: "Select Charges",
         placeholder: "Select Charges",
-        type: "text",
+        type: "dropdown",
         value: "",
         generatecontrol: true,
         disable: false,
@@ -139,7 +145,7 @@ export class ProductControls {
         functions: {},
       },
       {
-        name: "Variability",
+        name: "Variability", 
         label: "Variability:",
         placeholder: "Variability:",
         type: "radiobutton",
@@ -163,6 +169,40 @@ export class ProductControls {
         Validations: [],
         generatecontrol: true,
         disable: false,
+      },
+    ];
+
+    this.ShardChargesControlsArray = [
+      {
+        name: "ChargeName",
+        label: "Charges Name",
+        placeholder: "Charges Name",
+        type: "text",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Select Charges is required",
+          },
+        ],
+        functions: {
+          onChange: "handleChargesName",
+        },
+      },
+      {
+        name: "ChargeID",
+        label: "Charges ID",
+        placeholder: "System Genreted",
+        type: "text",
+        value: "",
+        Validations: [{
+          name: "required",
+          message: "Required",
+        },],
+        generatecontrol: true,
+        disable: true,
       },
     ];
 
@@ -243,15 +283,49 @@ export class ProductControls {
         generatecontrol: false,
         disable: false,
       },
-      
+    ];
+    this.ShardServicesControlsArray = [
+      {
+        name: "ServicesName",
+        label: "Services Name",
+        placeholder: "Services Name",
+        type: "text",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Select Services is required",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {
+          onChange: "handleServicesName",
+        },
+      },
+      {
+        name: "ServicesID",
+        label: "Services ID",
+        placeholder: "System Genreted",
+        type: "text",
+        value: "",
+        Validations: [{
+          name: "required",
+          message: "Required",
+        },],
+        generatecontrol: true,
+        disable: true,
+      },
     ];
   }
   getProductControlsArray(event) {
-    if(event){
+    if (event) {
       return this.isCompanyProductControlsArray;
-    }else{
+    } else {
       return this.ProductControlsArray;
-
     }
   }
 
@@ -260,5 +334,11 @@ export class ProductControls {
   }
   getServicesControlsArray() {
     return this.ServicesControlsArray;
+  }
+  getShardChargesControlsArray() {
+    return this.ShardChargesControlsArray;
+  }
+  getShardServicesControlsArray() {
+    return this.ShardServicesControlsArray;
   }
 }

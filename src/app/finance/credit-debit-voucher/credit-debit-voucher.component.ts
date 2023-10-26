@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
@@ -9,9 +9,12 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { SessionService } from 'src/app/core/service/session.service';
-import { customerFromApi } from 'src/app/operation/prq-entry-page/prq-utitlity';
 import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/creditdebitvouchercontrol';
 import Swal from 'sweetalert2';
+import { AddVoucherDetailsModalComponent } from '../Modals/add-voucher-details-modal/add-voucher-details-modal.component';
+import { MatDialog } from '@angular/material/dialog';
+import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
+import { DriversFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
 @Component({
   selector: 'app-credit-debit-voucher',
   templateUrl: './credit-debit-voucher.component.html',
@@ -51,96 +54,74 @@ export class CreditDebitVoucherComponent implements OnInit {
   CreditDebitVoucherDocumentDebitsForm: UntypedFormGroup;
   jsonControlCreditDebitVoucherDocumentDebitsArray: any;
 
-  displayedColumns = [
-    {
-      Key: "Ledger", title: "Ledger", width: "200", className: "matcolumnleft", show: true
-    },
-    { Key: "SACCode", title: "SAC Code", width: "200", className: "matcolumnleft", show: true },
-    {
-      Key: "DebitAmount", title: "Debit Amount ₹", width: "70", className: "matcolumncenter", show: true
-    },
-    {
-      Key: "GSTRate", title: "GST Rate", width: "70", className: "matcolumncenter", show: true
-    },
-    {
-      Key: "GSTAmount", title: "GST Amount ₹", width: "70", className: "matcolumncenter", show: true
-    },
-    {
-      Key: "Total", title: "Total ₹", width: "70", className: "matcolumncenter", show: true
-    },
-    {
-      Key: "TDSApplicable", title: "TDS Applicable", width: "100", className: "matcolumncenter", show: true
-    },
-    {
-      Key: "Narration", title: "Narration", width: "200", className: "matcolumnleft", show: true
-    },
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
+  menuItems = [
+    { label: 'Edit' },
+    { label: 'Remove' }
+  ]
+  linkArray = [
   ];
-  columnKeys = this.displayedColumns.map((column) => column.Key);
-  // EditAble Table 
-  tableData: any = [];
-  DocumentDebits: any = [];
-  //Displayed columns City location configuration
-  VoucherDetailsDisplayedColumns = {
+  addFlag = true;
+  menuItemflag = true;
+  staticField = ['Ledger', 'SACCode', 'DebitAmount', 'GSTRate', 'GSTAmount', 'Total', 'TDSApplicable', 'Narration']
 
+  columnHeader = {
     Ledger: {
-      name: "Ledger",
-      key: "Dropdown",
-      option: [],
-      style: "",
-      class: 'matcolumnfirst'
+      Title: "Ledger",
+      class: "matcolumnfirst",
+      Style: "min-width:200px",
     },
     SACCode: {
-      name: "SAC Code",
-      key: "Dropdown",
-      option: [],
-      style: "",
-      class: 'matcolumncenter'
+      Title: "SACCode",
+      class: "matcolumncenter",
+      Style: "min-width:200px",
     },
     DebitAmount: {
-      name: "Debit Amount ₹",
-      key: "inputnumber",
-      style: "",
-      class: 'matcolumncenter'
+      Title: "Debit Amount ₹",
+      class: "matcolumncenter",
+      Style: "max-width:120px",
     },
     GSTRate: {
-      name: "GST Rate %",
-      key: "inputnumber",
-      style: "",
-      class: 'matcolumncenter'
+      Title: "GST Rate %",
+      class: "matcolumncenter",
+      Style: "max-width:100px",
     },
     GSTAmount: {
-      name: "GST Amount ₹",
-      key: "inputnumber",
-      style: "",
-      class: 'matcolumncenter'
+      Title: "GST Amount ₹",
+      class: "matcolumncenter",
+      Style: "max-width:120px",
     },
     Total: {
-      name: "Total ₹",
-      key: "inputnumber",
-      style: "",
-      class: 'matcolumncenter'
+      Title: "Total ₹",
+      class: "matcolumncenter",
+      Style: "max-width:100px",
     },
     TDSApplicable: {
-      name: "TDS Applicable",
-      key: "togleCheckBox",
-      style: "max-width: 80px;",
-      class: 'matcolumncenter'
+      Title: "TDS Applicable",
+      class: "matcolumncenter",
+      Style: "max-width:100px",
     },
     Narration: {
-      name: "Narration",
-      key: "inputString",
-      style: "",
-      class: 'matcolumncenter'
+      Title: "Narration",
+      class: "matcolumncenter",
+      Style: "min-width:170px",
     },
-    action: {
-      name: "Action",
-      key: "Action",
-      style: "",
-      class: 'matcolumncenter'
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:100px",
     }
   };
-  DocumentDebitsDisplayedColumns = {
 
+  tableData: any = [];
+  LoadVoucherDetails = true;
+  DocumentDebits: any = [];
+
+  DocumentDebitsDisplayedColumns = {
     Document: {
       name: "Document ",
       key: "Dropdown",
@@ -180,28 +161,17 @@ export class CreditDebitVoucherComponent implements OnInit {
     private masterService: MasterService,
     private navigationService: NavigationService,
     private voucherServicesService: VoucherServicesService,
+    private matDialog: MatDialog,
   ) {
     this.companyCode = this.sessionService.getCompanyCode()
-    // this.VoucherDetailsDisplayedColumns.Ledger.option = [
-    //   { "name": "EXP001: Conveyance", "value": "EXP001" },
-    //   { "name": "EXP002: Communication", "value": "EXP002" },
-    //   { "name": "EXP003: Communication", "value": "EXP003" }
-    // ];
-    this.VoucherDetailsDisplayedColumns.SACCode.option = [
-      { "name": "12022: Local conveyance", "value": "12022" },
-      { "name": "12088: Telecom services", "value": "12088" },
-      { "name": "12089: Telecom services", "value": "12089" }
-    ];
-
   }
   ngOnInit(): void {
     this.BindDataFromApi();
     this.initializeFormControl();
-    this.addVoucherDetails('')
     this.AddDocumentDebits('');
   }
   initializeFormControl() {
-    this.creditDebitVoucherControl = new CreditDebitVoucherControl();
+    this.creditDebitVoucherControl = new CreditDebitVoucherControl("");
     this.jsonControlCreditDebitVoucherSummaryArray = this.creditDebitVoucherControl.getCreditDebitVoucherSummaryArrayControls();
     this.CreditDebitVoucherSummaryForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherSummaryArray]);
 
@@ -236,8 +206,6 @@ export class CreditDebitVoucherComponent implements OnInit {
       filter: {},
     };
 
-    const resCust = await customerFromApi(this.masterService);
-    this.PartyNameList = resCust;
     const resState = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
     this.StateList = resState?.data
       .map(x => ({ value: x.STNM, name: x.ST }))
@@ -246,17 +214,10 @@ export class CreditDebitVoucherComponent implements OnInit {
 
     const resaccount_group = await this.masterService.masterPost('generic/get', account_groupReqBody).toPromise();
     this.AccountGroupList = resaccount_group?.data
-      .map(x => ({ value: x.GroupCode + ":" + x.GroupName, name: x.GroupCode + ":" + x.GroupName }))
+      .map(x => ({ value: x.GroupCode, name: x.GroupName }))
       .filter(x => x != null)
       .sort((a, b) => a.value.localeCompare(b.value));
-    this.VoucherDetailsDisplayedColumns.Ledger.option = this.AccountGroupList
-    this.filter.Filter(
-      this.jsonControlCreditDebitVoucherSummaryArray,
-      this.CreditDebitVoucherSummaryForm,
-      resCust,
-      "PartyName",
-      false
-    );
+
     this.filter.Filter(
       this.jsonControlCreditDebitVoucherSummaryArray,
       this.CreditDebitVoucherSummaryForm,
@@ -282,17 +243,77 @@ export class CreditDebitVoucherComponent implements OnInit {
       console.log("failed");
     }
   }
-  async save1() {
-    console.log(this.tableData)
-    console.log(this.CreditDebitVoucherSummaryForm.value)
-    // CreditDebitVoucherSummaryForm: UntypedFormGroup;
-    // CreditDebitVoucherTaxationTDSForm: UntypedFormGroup;
-    // CreditDebitVoucherTaxationTCSForm: UntypedFormGroup;
-    // CreditDebitVoucherTaxationGSTForm: UntypedFormGroup;
-    // CreditDebitVoucherTaxationPaymentSummaryForm: UntypedFormGroup;
-    // CreditDebitVoucherTaxationPaymentDetailsForm: UntypedFormGroup;
-    // CreditDebitVoucherDocumentDebitsForm: UntypedFormGroup;
+  handleMenuItemClick(data) {
+    if (data.label.label === 'Remove') {
+      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+    }
+    else {
 
+      const LedgerDetails = this.tableData.find(x => x.id == data.data.id);
+      this.addVoucherDetails(LedgerDetails)
+    }
+  }
+
+  async PreparedforFieldChanged(event) {
+    const Preparedfor = this.CreditDebitVoucherSummaryForm.value.Preparedfor;
+    const PartyName = this.CreditDebitVoucherSummaryForm.get('PartyName');
+    PartyName.setValue("");
+    const partyNameControl = this.jsonControlCreditDebitVoucherSummaryArray.find(x => x.name === "PartyName");
+    partyNameControl.type = "dropdown";
+    PartyName.setValidators([Validators.required, autocompleteObjectValidator()]);
+    PartyName.updateValueAndValidity();
+    let responseFromAPI = [];
+    switch (Preparedfor) {
+      case 'Vendor':
+        responseFromAPI = await vendorFromApi(this.masterService)
+        this.filter.Filter(
+          this.jsonControlCreditDebitVoucherSummaryArray,
+          this.CreditDebitVoucherSummaryForm,
+          responseFromAPI,
+          "PartyName",
+          false
+        );
+        break;
+      case 'Customer':
+        responseFromAPI = await customerFromApi(this.masterService)
+        this.filter.Filter(
+          this.jsonControlCreditDebitVoucherSummaryArray,
+          this.CreditDebitVoucherSummaryForm,
+          responseFromAPI,
+          "PartyName",
+          false
+        );
+        break;
+      case 'Employee':
+        responseFromAPI = await UsersFromApi(this.masterService)
+        this.filter.Filter(
+          this.jsonControlCreditDebitVoucherSummaryArray,
+          this.CreditDebitVoucherSummaryForm,
+          responseFromAPI,
+          "PartyName",
+          false
+        );
+        break;
+      case 'Driver':
+        responseFromAPI = await DriversFromApi(this.masterService)
+        this.filter.Filter(
+          this.jsonControlCreditDebitVoucherSummaryArray,
+          this.CreditDebitVoucherSummaryForm,
+          responseFromAPI,
+          "PartyName",
+          false
+        );
+        break;
+      default:
+        partyNameControl.type = "text";
+        PartyName.setValidators(Validators.required);
+        PartyName.updateValueAndValidity();
+
+    }
+
+  }
+  async AddNewButtonEvent() {
+    this.addVoucherDetails('')
   }
   async save() {
     // Create a new array to store the transformed data
@@ -355,12 +376,49 @@ export class CreditDebitVoucherComponent implements OnInit {
   }
   // Add a new item to the table
   addVoucherDetails(event) {
-    const addObj = {
-      Ledger: "EXP001",
-      SACCode: "12088",
-      action: ""
-    };
-    this.tableData.splice(0, 0, addObj);
+    const SACCode = [
+      { "name": "12022: Local conveyance", "value": "12022" },
+      { "name": "12088: Telecom services", "value": "12088" },
+      { "name": "12089: Telecom services", "value": "12089" }
+    ];
+    const EditableId = event?.id
+    const request = {
+      LedgerList: this.AccountGroupList,
+      SACCode: SACCode,
+      Details: event,
+    }
+    this.LoadVoucherDetails = false;
+    const dialogRef = this.matDialog.open(AddVoucherDetailsModalComponent, {
+      data: request,
+      width: "100%",
+      disableClose: true,
+      position: {
+        top: "20px",
+      },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+        if (EditableId) {
+          this.tableData = this.tableData.filter((x) => x.id !== EditableId);
+        }
+        const json = {
+          id: this.tableData.length + 1,
+          Ledger: result?.Ledger,
+          SACCode: result?.Ledger,
+          DebitAmount: result?.DebitAmount,
+          GSTRate: result?.GSTRate,
+          GSTAmount: result?.GSTAmount,
+          Total: result?.Total,
+          TDSApplicable: result?.TDSApplicable == true ? "Yes" : "No",
+          Narration: result?.Narration,
+          actions: ['Edit', 'Remove']
+        }
+        this.tableData.push(json);
+        this.LoadVoucherDetails = true;
+      }
+      this.LoadVoucherDetails = true;
+    });
+
 
   }
   // Add a new item to the table
@@ -373,57 +431,7 @@ export class CreditDebitVoucherComponent implements OnInit {
     this.DocumentDebits.splice(0, 0, addObj);
 
   }
-  async delete(event, tableData) {
-    const index = event.index;
-    const row = event.element;
 
-    const swalWithBootstrapButtons = await Swal.mixin({
-      customClass: {
-        confirmButton: "btn btn-success msr-2",
-        cancelButton: "btn btn-danger",
-      },
-      buttonsStyling: false,
-    });
-    swalWithBootstrapButtons
-      .fire({
-        title: `<h4><strong>Are you sure you want to delete ?</strong></h4>`,
-        showCancelButton: true,
-        cancelButtonColor: "#d33",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-        showLoaderOnConfirm: true,
-        preConfirm: (Remarks) => {
-          var request = {
-            companyCode: localStorage.getItem("CompanyCode"),
-            id: row.id,
-          };
-          if (row.id == 0) {
-            return {
-              isSuccess: true,
-              message: "Data has been deleted !",
-            };
-          } else {
-            console.log("Request", request);
-          }
-        },
-        allowOutsideClick: () => !Swal.isLoading(),
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          this[tableData].splice(index, 1);
-          swalWithBootstrapButtons.fire("Deleted!", "Your data has been deleted successfully", "success");
-          event.callback(true);
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire("Cancelled", "Your item is safe :)", "error");
-          event.callback(false);
-        } else {
-          swalWithBootstrapButtons.fire("Not Deleted!", "Your data remains safe", "info");
-          event.callback(false);
-        }
-      });
-
-    return true;
-  }
   saveData(event) {
 
   }

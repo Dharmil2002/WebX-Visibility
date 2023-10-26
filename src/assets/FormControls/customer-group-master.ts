@@ -97,7 +97,7 @@ export class CustomerGroupControl {
         Validations: [],
         generatecontrol: false,
         disable: false,
-    },
+      },
     ]
   }
   getFormControls() {

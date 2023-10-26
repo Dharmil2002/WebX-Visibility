@@ -10,10 +10,9 @@
         <span class="visually-hidden">Loading...</span>
     </div>
 </div>
-<div class="paddingdiv">
-    <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-        [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
-        [menuItemFlag]="menuItemflag" [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)"
-        [AddNewButton]=true [btndisabled]="!FreightMatrixForm.valid" (AddNewButtonEvent)="AddNewButtonEvent()">
-    </app-generic-table-v2>
-</div>
+
+<app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
+    [menuItemFlag]="menuItemflag" [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)"
+    [AddNewButton]=true [btndisabled]="!FreightMatrixForm.valid" (AddNewButtonEvent)="AddNewButtonEvent()">
+</app-generic-table-v2>

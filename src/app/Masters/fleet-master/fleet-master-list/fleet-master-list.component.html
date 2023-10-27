@@ -10,7 +10,7 @@
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
     <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
-        [FormTitle]="'Fleet List'" [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent"
+        [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent"
         [csvHeaders]="headerForCsv" [csvFileName]="csvFileName" [dynamicControls]="dynamicControls"
         (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [toggleArray]="toggleArray" [Link]="linkArray">
     </generic-table-webxpress>

@@ -168,7 +168,7 @@ export class VendorControl {
                 name: 'vendorPhoneNo',
                 label: 'Vendor Phone No',
                 placeholder: 'Vendor Phone No',
-                type: 'number', value: vendorMasterTable.vendorPhoneNo,
+                type: 'mobile-number', value: vendorMasterTable.vendorPhoneNo,
                 Validations: [
                     {
                         name: "required",
@@ -248,7 +248,7 @@ export class VendorControl {
                     },
                 ],
                 functions: {
-                    onChange: 'selectHandleFileSelection',
+                    onChange: 'selectPanCardScan',
                 }
             },
             {
@@ -311,7 +311,7 @@ export class VendorControl {
                     },
                 ],
                 functions: {
-                    onChange: 'selectHandleFileSelection',
+                    onChange: 'selectMsmeScan',
                 }
             },
             {

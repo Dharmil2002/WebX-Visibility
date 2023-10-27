@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
@@ -9,10 +9,13 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { Subject, take, takeUntil } from "rxjs";
-import { handleFileSelection } from "../vendor-utility";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
+import { FormComponent } from "src/app/shared-components/FormFields/form.component";
+import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
+import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: 'app-add-vendor-master',
@@ -102,18 +105,27 @@ export class AddVendorMasterComponent implements OnInit {
   linkArray = [
   ];
   breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
+  imageData: any = {};
+  @ViewChild(FormComponent) childComponent: FormComponent;
   constructor(
     private route: Router, private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
     private objPinCodeService: PinCodeService,
-    private objState: StateService
+    private objState: StateService,
+    private objImageHandling: ImageHandling,
+    private dialog: MatDialog,
+
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vendorTabledata = this.route.getCurrentNavigation().extras.state.data;
 
       this.action = 'edit';
       this.isUpdate = true;
+      this.imageData = {
+        'msmeScan': this.vendorTabledata.msmeScan,
+        'panCardScan': this.vendorTabledata.panCardScan,
+      };
       this.isLoad = true;
       this.tableLoad = true;
       // setting data in table at update time
@@ -200,6 +212,16 @@ export class AddVendorMasterComponent implements OnInit {
       if (this.isUpdate) {
         this.vendorTypDetail = this.findDropdownItemByName(this.vendorTypeData, this.vendorTabledata.vendorType);
         this.vendorTableForm.controls.vendorType.setValue(this.vendorTypDetail);
+        // For setting image data, assuming you have imageData defined
+        this.childComponent.hide = false;
+        for (const controlName in this.imageData) {
+          if (this.imageData.hasOwnProperty(controlName)) {
+            const url = this.imageData[controlName];
+            const fileName = this.objImageHandling.extractFileName(url);
+            // Set the form control value using the control name
+            this.vendorTableForm.controls[controlName].setValue(fileName);
+          }
+        }
       }
       const filterParams = [
         [this.jsonControlVendorArray, this.vendorTypeData, this.vendorType, this.vendorTypeStatus],
@@ -212,20 +234,6 @@ export class AddVendorMasterComponent implements OnInit {
   }
   findDropdownItemByName(dropdownData, name) {
     return dropdownData.find(item => item.name.toUpperCase() === name);
-  }
-  selectHandleFileSelection(data, allowedExtensions) {
-    switch (data.field.name) {
-      case 'panCardScan':
-        allowedExtensions = ["jpeg", "png", "jpg"];
-        break;
-      case 'msmeScan':
-        allowedExtensions = ["jpeg", "png", "jpg"];
-        break;
-      default:
-        allowedExtensions = [];
-        break;
-    }
-    handleFileSelection(data, data.field.name, allowedExtensions, this.vendorTableForm);
   }
   /*get All Master Data*/
   async getAllMastersData() {
@@ -290,26 +298,30 @@ export class AddVendorMasterComponent implements OnInit {
     this.vendorTableForm.removeControl('vendorLocationDropdown');
     this.vendorTableForm.removeControl('');
     Object.values(this.vendorTableForm.controls).forEach(control => control.setErrors(null));
-    // Remove  field from the form controls
-    let data = convertNumericalStringsToInteger(this.vendorTableForm.value)
 
     const newData = this.tableData.map(x => {
       const { actions, id, ...rest } = x;
       return rest;
     });
     this.vendorTableForm.value.otherdetails = newData;
+    let data = convertNumericalStringsToInteger(this.vendorTableForm.value)
+    // Define an array of control names
+    const imageControlNames = ['msmeScan', 'panCardScan'];
+    imageControlNames.forEach(controlName => {
+      const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
+      // Set the URL in the corresponding control name
+      data[controlName] = file;
+    });
 
     if (this.isUpdate) {
       let id = data._id;
-      // Remove the "id" field from the form controls
-      this.vendorTableForm.removeControl("entryBy");
-
+      delete data.entryBy;
       delete data._id;
       let req = {
         companyCode: this.companyCode,
         collectionName: "vendor_detail",
         filter: { _id: id },
-        update: this.vendorTableForm.value
+        update: data
       };
       const res = await this.masterService.masterPut("generic/update", req).toPromise()
       if (res) {
@@ -594,4 +606,26 @@ export class AddVendorMasterComponent implements OnInit {
     this.vendorTableForm.controls['isActive'].setValue(event);
     // console.log("Toggle value :", event);
   }
+  //#region to handle image selection
+  async selectPanCardScan(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "panCardScan", this.
+      vendorTableForm, this.childComponent, this.imageData);
+  }
+  async selectMsmeScan(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "msmeScan", this.
+      vendorTableForm, this.childComponent, this.imageData);
+  }
+  //#endregion
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
+  //#endregion
 }

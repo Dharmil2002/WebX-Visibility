@@ -107,7 +107,7 @@ export class marketVehicleControls {
           {
             name: "pattern",
             message:
-              "Please Enter alphanumeric License No of length 8 (eg. AZ1254871111111)",
+              "Please Enter alphanumeric License No",
             pattern: "^[A-Z]{2}[0-9]{13}$",
           }
         ],

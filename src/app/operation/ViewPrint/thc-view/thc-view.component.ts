@@ -23,6 +23,7 @@ export class THCViewComponent implements OnInit {
     deductionAmt: number;
     ETA: number;
     Departed: number;
+    vehicleData: any;
     constructor(
 
         private masterService: MasterService,
@@ -42,16 +43,13 @@ export class THCViewComponent implements OnInit {
         ); //Hide Sidebars
         this.router.queryParams.subscribe((params) => {
 
-
             this.tripId = params["THC"];
         });
-
     }
 
     ngOnInit(): void {
         this.getTHC()
     }
-
 
     // * retrieves detailed information about a vehicle.
     //  * Uses the vehicle service to fetch nested details based on the vehicle number.
@@ -81,7 +79,6 @@ export class THCViewComponent implements OnInit {
                         // Extract origin and destination from routeParts
                         const origin = routeParts[0].trim();
                         const destination = routeParts[1].trim();
-
                         // Update thcNestedData with additional properties
                         this.thcNestedData = {
                             ...res.data[0],
@@ -92,15 +89,10 @@ export class THCViewComponent implements OnInit {
                         const originalDate = new Date(this.thcNestedData.updateDate);
                         this.ETA = originalDate.setDate(originalDate.getDate() + 2);
                         this.Departed = this.thcNestedData.updateDate
-
-                        // Determine label based on THC status for arrival information
-                        // this.labelArrival = this.thcNestedData.status == "1" ? "ETA" : "Arrived"
                         // Fetch additional vehicle details
                         this.getVehicleDetail()
                         this.getDocketDetail()
                         this.getvendorName()
-
-                        // this.getMovementDetail()
                     } else {
                         console.error("Invalid route format:", res.data[0].route);
                     }
@@ -113,6 +105,7 @@ export class THCViewComponent implements OnInit {
             },
         });
     }
+
     async getDocketDetail() {
         const req = {
             companyCode: this.companyCode,
@@ -124,8 +117,10 @@ export class THCViewComponent implements OnInit {
         if (Res.success && Res.data.length > 0) {
             this.thcNestedData = {
                 ...this.thcNestedData,
+                otherAmount: Res.data[0].otherAmount,
                 transMode: Res.data[0].transMode,
-                invoiceDetails: Res.data[0].invoiceDetails[0] 
+                invoiceDetails: Res.data[0].invoiceDetails[0],
+                totalAmt: parseFloat(this.thcNestedData.contAmt) + parseFloat(Res.data[0].otherAmount)
             }
         }
     }

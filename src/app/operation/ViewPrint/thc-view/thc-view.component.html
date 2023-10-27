@@ -35,14 +35,16 @@
                                         <td style="font-size: 16px; text-align: right;">
                                             <span style="margin-right: 40px;">Created On</span>
                                             <span
-                                                style="margin-right: 43px;font-weight:bold;">{{thcNestedData.updateDate | date:'dd/MM/yyyy' }}</span>
+                                                style="margin-right: 43px;font-weight:bold;">{{thcNestedData.updateDate
+                                                | date:'dd/MM/yyyy' }}</span>
                                             <span style="margin-right: 45px;">Origin</span>
                                             <span
                                                 style="font-weight: bold; text-transform: uppercase;">{{thcNestedData.origin}}</span>
                                             <br />
 
                                             <span style="margin-right: 149px;">Mode</span>
-                                            <span style="margin-right: 40px;font-weight:bold;"> {{thcNestedData.transMode}} </span>
+                                            <span style="margin-right: 40px;font-weight:bold;">
+                                                {{thcNestedData.transMode}} </span>
                                             <span style="margin-right: 116px;">Dest.</span>
                                             <span
                                                 style="font-weight: bold; text-transform: uppercase;">{{thcNestedData.dest}}</span>
@@ -152,7 +154,8 @@
                                                         <td
                                                             style="border-bottom: 1px solid #fff; border-right: 1px solid gainsboro;">
                                                             <span>Other Amt (+) </span>
-                                                            <span style="float:right">00 ₹</span>
+                                                            <span style="float:right">{{thcNestedData.otherAmount}}
+                                                                ₹</span>
                                                         </td>
                                                         <td
                                                             style="border: 1px solid #fff; border-top: 1px solid gainsboro;">
@@ -177,7 +180,9 @@
                                                     <tr>
                                                         <td style="background-color: gainsboro;">
                                                             <span> Total Amount</span>
-                                                            <span style="font-weight:bold;float:right">{{thcNestedData.contAmt}} ₹</span><br />
+                                                            <span
+                                                                style="font-weight:bold;float:right">{{thcNestedData.totalAmt}}
+                                                                ₹</span><br />
                                                         </td>
                                                         <td
                                                             style="border: 1px solid #fff; border-top: 1px solid gainsboro;">
@@ -231,7 +236,8 @@
                             </div>
                             <br />
                             <span style="font-size: 18px;color:#464855;font-weight: bold;">Movement Summary</span><br />
-                            <span style="font-size: 20px;color:#8C001A;font-weight: bold;">{{thcNestedData.route}}</span>
+                            <span
+                                style="font-size: 20px;color:#8C001A;font-weight: bold;">{{thcNestedData.route}}</span>
                             <br /><br />
 
                             <table style="width: 100%;" border="0" cellpadding="0" cellspacing="0">
@@ -256,7 +262,7 @@
                                         <div></div>
                                     </td>
                                     <td>
-                                        <div>  </div>
+                                        <div> </div>
                                     </td>
                                     <td></td>
                                     <td></td>
@@ -287,9 +293,12 @@
                                         Load Summary
                                     </td>
                                     <td style="background-color: #dcdada;font-weight: bold;"></td>
-                                    <td style="background-color: #dcdada;font-weight: bold;">{{thcNestedData.docket.length}}</td>
-                                    <td style="background-color:#dcdada;font-weight:bold;">{{thcNestedData.invoiceDetails.noofPkts}}</td>
-                                    <td style="background-color:#dcdada;font-weight:bold;">{{thcNestedData.invoiceDetails.chargedWeight}}</td>
+                                    <td style="background-color: #dcdada;font-weight: bold;">
+                                        {{thcNestedData.docket.length}}</td>
+                                    <td style="background-color:#dcdada;font-weight:bold;">
+                                        {{thcNestedData.invoiceDetails.noofPkts}}</td>
+                                    <td style="background-color:#dcdada;font-weight:bold;">
+                                        {{thcNestedData.invoiceDetails.chargedWeight}}</td>
                                 </tr>
                             </table>
                             <br />
@@ -306,7 +315,8 @@
                                                 <td><span>Updated by</span><br /></td>
                                             </tr>
                                             <tr style="font-size:16px;">
-                                                <td><span>{{thcNestedData.updateDate | date:'dd/MM/yyyy HH:mm'}}</span></td>
+                                                <td><span>{{thcNestedData.updateDate | date:'dd/MM/yyyy HH:mm'}}</span>
+                                                </td>
                                                 <td><span>{{thcNestedData.closingBranch}}</span></td>
                                                 <td><span>{{thcNestedData.updateBy}}</span></td>
                                             </tr>

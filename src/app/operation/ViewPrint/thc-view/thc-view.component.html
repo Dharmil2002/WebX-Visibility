@@ -1,403 +1,418 @@
 <div class="form-horizontal mr-5 ml-5">
-    <div class="form" id="print" style="width: 80%; margin: 0px auto; border: 1px solid #D8DAD9;">
-        <div class="form-body">
-            <div class="row mt-5">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <img src='/assets/images/globe.png' height="75" />
-                    </div>
-                </div>
-                <div class="col-md-4" style="border-left:4px solid #D8DAD9;">
-                    <div class="form-group">
-                        <div style="font-size: 25px;font-weight:bold;">Trip Hire Chalan </div>
-                        <div style="color: #464855;font-size: 15px;">Original Copy</div>
-                    </div>
-                </div>
-                <!-- <div class="col-md-4">
-                        <div class="barcode">
-                            <img src='/assets/images/barcode.png' height="75" />
-                        </div>
-                    </div> -->
-            </div>
-            <div id="PrintDiv" class="mr-4 ml-4 CommonViewPrint_table">
-                <table id='tblPDF' style="width: 100%;">
-                    <tr>
-                        <td>
-                            <div>
-                                <table style="width: 100%;">
-                                    <tr>
-                                        <td colspan="2">
-                                            <div style="color:#8C001A;font-size: 22px;font-weight: bold;" class="mb-2">
-                                                {{thcNestedData.tripId}}</div>
-                                            <div style="font-weight: bold;color: #464855;font-size: 18px;">
-                                                Manual ID : </div>
-                                        </td>
-                                        <td style="font-size: 16px; text-align: right;">
-                                            <span style="margin-right: 40px;">Created On</span>
-                                            <span
-                                                style="margin-right: 43px;font-weight:bold;">{{thcNestedData.updateDate
-                                                | date:'dd/MM/yyyy' }}</span>
-                                            <span style="margin-right: 45px;">Origin</span>
-                                            <span
-                                                style="font-weight: bold; text-transform: uppercase;">{{thcNestedData.origin}}</span>
-                                            <br />
+  <div class="form" id="print" style="width: 100%; margin: 0px auto; border: 1px solid #D8DAD9;">
+      <div class="form-body">
+          <div class="row mt-5">
+              <div class="col-md-4">
+                  <div class="form-group">
+                      <img src='/assets/images/globe.png' height="75" />
+                  </div>
+              </div>
+              <div class="col-md-4" style="border-left:4px solid #D8DAD9;">
+                  <div class="form-group">
+                      <div style="font-size: 20px;font-weight:bold;">Trip Hire Chalan </div>
+                      <div style="color: #464855;font-size: 12px;">Original Copy</div>
+                  </div>
+              </div>
+              <!-- <div class="col-md-4">
+                      <div class="barcode">
+                          <img src='/assets/images/barcode.png' height="75" />
+                      </div>
+                  </div> -->
+          </div>
+          <div id="PrintDiv" class="mr-4 ml-4 CommonViewPrint_table">
+              <table id='tblPDF' style="width: 100%;">
+                  <tr>
+                      <td>
+                          <div>
+                              <table style="width: 100%; border: none;">
+                                  <tr>
+                                      <td style="width: 33%;">
+                                          <div style="color:#8C001A;font-size: 16px;font-weight: bold;" class="mb-2">
+                                              {{thcNestedData.tripId}}</div>
+                                      </td>
+                                      <td style="font-size: 15px; text-align: right; width: 33%;">
+                                          <div>Created On</div>
+                                      </td>
+                                      <td>
+                                          <div style="font-weight:bold;">{{thcNestedData.updateDate |
+                                              date:'dd/MM/yyyy' }}</div>
+                                      </td>
+                                      <br />
+                                      <td style="font-size: 14px; text-align: right; width: 33%;">
+                                          <div>Origin</div>
+                                      </td>
+                                      <td>
+                                          <div
+                                              style="font-weight:bold; text-transform: uppercase;  clear: both;display: inline-block;overflow: hidden;white-space: nowrap;">
+                                              {{thcNestedData.origin}}</div>
+                                      </td>
+                                  </tr>
+                                  <tr>
+                                      <td style="width: 33%;">
+                                          <div style="font-weight: bold;color: #464855;font-size: 15px;">
+                                              Manual ID : </div>
+                                      </td>
+                                      <td style="font-size: 13px; text-align: right; width: 33%;">
+                                          <div style="margin-right: 43px;">Mode</div>
+                                      </td>
+                                      <td>
+                                          <div style="font-weight:bold;  text-transform: uppercase;">
+                                              {{thcNestedData.transMode}}</div>
+                                      </td>
+                                      <br />
+                                      <td style="font-size: 13px; text-align: right; width: 33%;">
+                                          <div>Dest.</div>
+                                      </td>
+                                      <td>
+                                          <div style="font-weight:bold;  text-transform: uppercase;  clear: both;
+                                          display: inline-block;
+                                          overflow: hidden;
+                                          white-space: nowrap;">
+                                              {{thcNestedData.dest}}</div>
+                                      </td>
+                                  </tr>
+                              </table>
+                          </div>
+                          <br />
+                          <div>
+                              <table style="width: 100%;">
+                                  <tr>
+                                      <td style="background-color: gainsboro" width="29%">
+                                          <table style="font-size:13px; width: 100%;">
+                                              <tr>
+                                                  <td>
+                                                      <span style="color: #464855;font-size: 13px;font-weight: bold;">
+                                                          <span>Vehicle No.</span>
+                                                      </span>
+                                                      <br />
+                                                      <span style="color: #8C001A;font-size: 18px;font-weight: bold;">
+                                                          <span>{{thcNestedData.vehicle}}</span>
+                                                      </span>
+                                                  </td>
+                                              </tr>
+                                              <tr>
+                                                  <td>
+                                                      <span>Type</span>
+                                                      <span style="float:right">Attached</span>
+                                                  </td>
+                                              </tr>
+                                              <tr>
+                                                  <td>
+                                                      <span> Capacity</span>
+                                                      <span style="float:right">{{thcNestedData.capacity}}
+                                                          MT</span>
+                                                  </td>
+                                              </tr>
+                                              <tr>
+                                                  <td>
+                                                      <span>Engine No.</span>
+                                                      <span
+                                                          style="float:right">{{vehicleNestedDetail[0].engineNo}}</span>
+                                                  </td>
+                                              </tr>
+                                              <tr>
+                                                  <td>
+                                                      <span>Chassis No.</span>
+                                                      <span
+                                                          style="float:right">{{vehicleNestedDetail[0].chassisNo}}</span>
+                                                  </td>
+                                              </tr>
+                                              <tr>
+                                                  <td>
+                                                      <span>Insurance</span>
+                                                      <span style="float:right">Valid:
+                                                          {{ vehicleNestedDetail[0].insuranceExpiryDate |
+                                                          date:'dd/MM/yyyy HH:mm' }}</span>
+                                                  </td>
+                                              </tr>
+                                              <tr>
+                                                  <td>
+                                                      <span>Fitness Insp.</span>
+                                                      <span style="float:right">Valid:
+                                                          {{ vehicleNestedDetail[0].fitnessValidityDate |
+                                                          date:'dd/MM/yyyy HH:mm' }}</span>
+                                                  </td>
+                                              </tr>
+                                              <tr style="background-color: #f2f2f2;">
+                                                  <td>
+                                                      <span> Utilization</span>
+                                                      <span style="float:right;">
+                                                          {{thcNestedData.weightUtilization}} %</span>
+                                                  </td>
+                                              </tr>
+                                          </table>
+                                      </td>
+                                      <td style="border: none;" width="2%"></td>
+                                      <td style="border: none;" width="59%">
+                                          <table style="width: 100%; font-size: 13px;border: 2px solid gainsboro;"
+                                              border="1">
+                                              <div style="font-weight: bold; width: 150%; padding: 5px 10px;">
+                                                  <span style="color: #464855;font-size: 13px;font-weight: bold;">
+                                                      Fulfillment
+                                                  </span><br />
+                                                  <span style="color: #8C001A;font-size: 18px;font-weight: bold;">By
+                                                      Vendor : {{thcNestedData.vendorName_code}}</span>
+                                              </div>
+                                              <tbody>
+                                                  <tr>
+                                                      <td
+                                                          style="border: 1px solid gainsboro; border-bottom: 1px solid #fff;">
+                                                          <span>Contract Amount</span>
+                                                          <span style="float:right">{{thcNestedData.contAmt}}
+                                                              ₹</span>
+                                                          <br>
+                                                      </td>
+                                                      <td
+                                                          style="border: 1px solid #fff; border-top: 1px solid gainsboro;">
+                                                          <span>Advance Pay </span>
+                                                          <span style="float:right">
+                                                              {{thcNestedData.advAmt}} ₹
+                                                          </span>
+                                                          <br />
+                                                      </td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td
+                                                          style="border-bottom: 1px solid #fff; border-right: 1px solid gainsboro;">
+                                                          <span>Other Amt (+) </span>
+                                                          <span style="float:right">00 ₹</span>
+                                                      </td>
+                                                      <td
+                                                          style="border: 1px solid #fff; border-top: 1px solid gainsboro;">
+                                                          <span>at </span>
+                                                          <span style="float:right">
+                                                              {{thcNestedData.origin}}
+                                                          </span>
+                                                          <br />
+                                                      </td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td style="border-right: 1px solid gainsboro;">
+                                                          <span>Deductions (-) </span>
+                                                          <span style="float:right">00 ₹</span><br />
+                                                      </td>
+                                                      <td style="border: 1px solid white;">
+                                                          <span> Balance Pay </span>
+                                                          <span style="float:right">{{thcNestedData.balAmt}}
+                                                              ₹</span><br />
+                                                      </td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td style="background-color: gainsboro;">
+                                                          <span> Total Amount</span>
+                                                          <span
+                                                              style="font-weight:bold;float:right">{{thcNestedData.contAmt}}
+                                                              ₹</span><br />
+                                                      </td>
+                                                      <td
+                                                          style="border: 1px solid #fff; border-top: 1px solid gainsboro;">
+                                                          <span>at </span>
+                                                          <span style="float:right">
+                                                              {{thcNestedData.origin}}
+                                                          </span>
+                                                          <br />
+                                                      </td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                          <table style="width: 100%;" border="0">
+                                              <tbody>
+                                                  <tr>
+                                                      <td>
+                                                          <span style="font-size: 13px;">Driver 1</span><br />
+                                                          <span
+                                                              style="font-size: 13px;font-weight: bold;">{{thcNestedData.driverName}}</span>
+                                                      </td>
+                                                      <td>
+                                                          <span
+                                                              style="font-size: 13px;margin-right: 25px;">Phone</span><span
+                                                              style="font-size: 13px;">{{thcNestedData.driverMno}}</span><br />
+                                                          <span
+                                                              style="font-size: 13px;margin-right: 12px;">Licence</span>
+                                                          <span
+                                                              style="font-size: 13px;">{{thcNestedData.driverLno}}</span>
+                                                      </td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td>
+                                                          <span style="font-size: 13px;">Driver 2</span><br />
+                                                          <span style="font-size: 13px;font-weight: bold;">
+                                                          </span>
+                                                      </td>
+                                                      <td>
+                                                          <span
+                                                              style="font-size: 13px;margin-right: 25px;">Phone</span><span
+                                                              style="font-size: 13px;"> </span><br />
+                                                          <span
+                                                              style="font-size: 13px;margin-right: 12px;">Licence</span>
+                                                          <span style="font-size: 13px;"> </span>
+                                                      </td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                      </td>
+                                  </tr>
+                              </table>
+                          </div>
+                          <br />
+                          <span style="font-size: 15px;color:#464855;font-weight: bold;">Movement Summary</span><br />
+                          <span
+                              style="font-size: 18px;color:#8C001A;font-weight: bold;">{{thcNestedData.route}}</span>
+                          <br /><br />
 
-                                            <span style="margin-right: 149px;">Mode</span>
-                                            <span style="margin-right: 40px;font-weight:bold;">
-                                                {{thcNestedData.transMode}} </span>
-                                            <span style="margin-right: 116px;">Dest.</span>
-                                            <span
-                                                style="font-weight: bold; text-transform: uppercase;">{{thcNestedData.dest}}</span>
-                                            <br />
-                                        </td>
-                                </table>
-                            </div>
-                            <br />
-                            <div>
-                                <table style="width: 100%;">
-                                    <tr>
-                                        <td style="background-color: gainsboro" width="29%">
-                                            <table style="font-size:16px; width: 100%;">
-                                                <tr>
-                                                    <td>
-                                                        <span style="color: #464855;font-size: 16px;font-weight: bold;">
-                                                            <span>Vehicle No.</span>
-                                                        </span>
-                                                        <br />
-                                                        <span style="color: #8C001A;font-size: 20px;font-weight: bold;">
-                                                            <span>{{thcNestedData.vehicle}}</span>
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span>Type</span>
-                                                        <span style="float:right">Attached</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span> Capacity</span>
-                                                        <span style="float:right">{{thcNestedData.capacity}}
-                                                            MT</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span>Engine No.</span>
-                                                        <span
-                                                            style="float:right">{{vehicleNestedDetail[0].engineNo}}</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span>Chassis No.</span>
-                                                        <span
-                                                            style="float:right">{{vehicleNestedDetail[0].chassisNo}}</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span>Insurance</span>
-                                                        <span style="float:right">Valid:
-                                                            {{ vehicleNestedDetail[0].insuranceExpiryDate |
-                                                            date:'dd/MM/yyyy HH:mm' }}</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span>Fitness Insp.</span>
-                                                        <span style="float:right">Valid:
-                                                            {{ vehicleNestedDetail[0].fitnessValidityDate |
-                                                            date:'dd/MM/yyyy HH:mm' }}</span>
-                                                    </td>
-                                                </tr>
-                                                <tr style="background-color: #f2f2f2;">
-                                                    <td>
-                                                        <span> Utilization</span>
-                                                        <span style="float:right;">
-                                                            {{thcNestedData.weightUtilization}} %</span>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                        <td style="border: none;" width="2%"></td>
-                                        <td style="border: none;" width="59%">
-                                            <table style="width: 100%; font-size: 16px;border: 2px solid gainsboro;"
-                                                border="1">
-                                                <div style="font-weight: bold; width: 150%; padding: 5px 10px;">
-                                                    <span style="color: #464855;font-size: 16px;font-weight: bold;">
-                                                        Fulfillment
-                                                    </span><br />
-                                                    <span style="color: #8C001A;font-size: 20px;font-weight: bold;">By
-                                                        Vendor : {{thcNestedData.vendorName_code}}</span>
-                                                </div>
-                                                <tbody>
-                                                    <tr>
-                                                        <td
-                                                            style="border: 1px solid gainsboro; border-bottom: 1px solid #fff;">
-                                                            <span>Contract Amount</span>
-                                                            <span style="float:right">{{thcNestedData.contAmt}}
-                                                                ₹</span>
-                                                            <br>
-                                                        </td>
-                                                        <td
-                                                            style="border: 1px solid #fff; border-top: 1px solid gainsboro;">
-                                                            <span>Advance Pay </span>
-                                                            <span style="float:right">
-                                                                {{thcNestedData.advAmt}} ₹
-                                                            </span>
-                                                            <br />
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td
-                                                            style="border-bottom: 1px solid #fff; border-right: 1px solid gainsboro;">
-                                                            <span>Other Amt (+) </span>
-                                                            <span style="float:right">{{thcNestedData.otherAmount}}
-                                                                ₹</span>
-                                                        </td>
-                                                        <td
-                                                            style="border: 1px solid #fff; border-top: 1px solid gainsboro;">
-                                                            <span>at </span>
-                                                            <span style="float:right">
-                                                                {{thcNestedData.origin}}
-                                                            </span>
-                                                            <br />
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="border-right: 1px solid gainsboro;">
-                                                            <span>Deductions (-) </span>
-                                                            <span style="float:right">00 ₹</span><br />
-                                                        </td>
-                                                        <td style="border: 1px solid white;">
-                                                            <span> Balance Pay </span>
-                                                            <span style="float:right">{{thcNestedData.balAmt}}
-                                                                ₹</span><br />
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="background-color: gainsboro;">
-                                                            <span> Total Amount</span>
-                                                            <span
-                                                                style="font-weight:bold;float:right">{{thcNestedData.totalAmt}}
-                                                                ₹</span><br />
-                                                        </td>
-                                                        <td
-                                                            style="border: 1px solid #fff; border-top: 1px solid gainsboro;">
-                                                            <span>at </span>
-                                                            <span style="float:right">
-                                                                {{thcNestedData.origin}}
-                                                            </span>
-                                                            <br />
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <table style="width: 100%;" border="0">
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <span style="font-size: 16px;">Driver 1</span><br />
-                                                            <span
-                                                                style="font-size: 16px;font-weight: bold;">{{thcNestedData.driverName}}</span>
-                                                        </td>
-                                                        <td>
-                                                            <span
-                                                                style="font-size: 16px;margin-right: 25px;">Phone</span><span
-                                                                style="font-size: 16px;">{{thcNestedData.driverMno}}</span><br />
-                                                            <span
-                                                                style="font-size: 16px;margin-right: 12px;">Licence</span>
-                                                            <span
-                                                                style="font-size: 16px;">{{thcNestedData.driverLno}}</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <span style="font-size: 16px;">Driver 2</span><br />
-                                                            <span style="font-size: 16px;font-weight: bold;">
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <span
-                                                                style="font-size: 16px;margin-right: 25px;">Phone</span><span
-                                                                style="font-size: 16px;"> </span><br />
-                                                            <span
-                                                                style="font-size: 16px;margin-right: 12px;">Licence</span>
-                                                            <span style="font-size: 16px;"> </span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <br />
-                            <span style="font-size: 18px;color:#464855;font-weight: bold;">Movement Summary</span><br />
-                            <span
-                                style="font-size: 20px;color:#8C001A;font-weight: bold;">{{thcNestedData.route}}</span>
-                            <br /><br />
+                          <table style="width: 100%;" border="0" cellpadding="0" cellspacing="0">
+                              <tr style="color:#6b6f82;">
+                                  <th>Location</th>
+                                  <th>Departed</th>
+                                  <th>ETA</th>
+                                  <th>Manifest</th>
+                                  <th>CEWB</th>
+                                  <th>Utility</th>
+                                  <th>CNs</th>
+                                  <th>Pcs</th>
+                                  <th>Wt-KG</th>
+                              </tr>
+                              <tr style="font-size:13px;">
+                                  <td style="font-weight:bold;">{{thcNestedData.origin}}</td>
+                                  <td>
+                                      <div>{{Departed | date:'dd/MM/yyyy HH:mm'}}</div>
+                                      <div style="color: red;"> </div>
+                                  </td>
+                                  <td>
+                                      <div></div>
+                                  </td>
+                                  <td>
+                                      <div> </div>
+                                  </td>
+                                  <td></td>
+                                  <td></td>
+                                  <td>{{thcNestedData.docket.length}}</td>
+                                  <td>{{thcNestedData.invoiceDetails.noofPkts}}</td>
+                                  <td>{{thcNestedData.invoiceDetails.chargedWeight}}</td>
+                              </tr>
+                              <tr style="font-size:13px;">
+                                  <td style="font-weight:bold;">{{thcNestedData.dest}}</td>
+                                  <td>
+                                      <div></div>
+                                  </td>
+                                  <td>{{ETA | date:'dd/MM/yyyy HH:mm'}}</td>
+                                  <td>
+                                      <div></div>
+                                      <div style="color: darkgray;"></div>
+                                  </td>
+                                  <td></td>
+                                  <td> </td>
+                                  <td>0</td>
+                                  <td>0</td>
+                                  <td>0</td>
+                              </tr>
+                              <tr>
+                                  <td colspan="4" style="border: none;">
+                                  </td>
+                                  <td style="background-color:#dcdada;">
+                                      Load Summary
+                                  </td>
+                                  <td style="background-color: #dcdada;font-weight: bold;"></td>
+                                  <td style="background-color: #dcdada;font-weight: bold;">
+                                      {{thcNestedData.docket.length}}</td>
+                                  <td style="background-color:#dcdada;font-weight:bold;">
+                                      {{thcNestedData.invoiceDetails.noofPkts}}</td>
+                                  <td style="background-color:#dcdada;font-weight:bold;">
+                                      {{thcNestedData.invoiceDetails.chargedWeight}}</td>
+                              </tr>
+                          </table>
+                          <br />
+                          <br />
 
-                            <table style="width: 100%;" border="0" cellpadding="0" cellspacing="0">
-                                <tr style="color:#6b6f82;">
-                                    <th>Location</th>
-                                    <th>Departed</th>
-                                    <th>ETA</th>
-                                    <th>Manifest</th>
-                                    <th>CEWB</th>
-                                    <th>Utility</th>
-                                    <th>CNs</th>
-                                    <th>Pcs</th>
-                                    <th>Wt-KG</th>
-                                </tr>
-                                <tr style="font-size:16px;">
-                                    <td style="font-weight:bold;">{{thcNestedData.origin}}</td>
-                                    <td>
-                                        <div>{{Departed | date:'dd/MM/yyyy HH:mm'}}</div>
-                                        <div style="color: red;"> </div>
-                                    </td>
-                                    <td>
-                                        <div></div>
-                                    </td>
-                                    <td>
-                                        <div> </div>
-                                    </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>{{thcNestedData.docket.length}}</td>
-                                    <td>{{thcNestedData.invoiceDetails.noofPkts}}</td>
-                                    <td>{{thcNestedData.invoiceDetails.chargedWeight}}</td>
-                                </tr>
-                                <tr style="font-size:16px;">
-                                    <td style="font-weight:bold;">{{thcNestedData.dest}}</td>
-                                    <td>
-                                        <div></div>
-                                    </td>
-                                    <td>{{ETA | date:'dd/MM/yyyy HH:mm'}}</td>
-                                    <td>
-                                        <div></div>
-                                        <div style="color: darkgray;"></div>
-                                    </td>
-                                    <td></td>
-                                    <td> </td>
-                                    <td>0</td>
-                                    <td>0</td>
-                                    <td>0</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="4" style="border: none;">
-                                    </td>
-                                    <td style="background-color:#dcdada;">
-                                        Load Summary
-                                    </td>
-                                    <td style="background-color: #dcdada;font-weight: bold;"></td>
-                                    <td style="background-color: #dcdada;font-weight: bold;">
-                                        {{thcNestedData.docket.length}}</td>
-                                    <td style="background-color:#dcdada;font-weight:bold;">
-                                        {{thcNestedData.invoiceDetails.noofPkts}}</td>
-                                    <td style="background-color:#dcdada;font-weight:bold;">
-                                        {{thcNestedData.invoiceDetails.chargedWeight}}</td>
-                                </tr>
-                            </table>
-                            <br />
-                            <br />
-
-                            <table style="width: 100%;">
-                                <tr>
-                                    <td style="border: none;" width="50%">
-                                        <table style="text-align: right; width: 100%;">
-                                            <tr style="font-size:16px;">
-                                                <td><span style="color:#8C001A;font-weight:bold">Document
-                                                        History</span><br /></td>
-                                                <td><span>Location</span><br /></td>
-                                                <td><span>Updated by</span><br /></td>
-                                            </tr>
-                                            <tr style="font-size:16px;">
-                                                <td><span>{{thcNestedData.updateDate | date:'dd/MM/yyyy HH:mm'}}</span>
-                                                </td>
-                                                <td><span>{{thcNestedData.closingBranch}}</span></td>
-                                                <td><span>{{thcNestedData.updateBy}}</span></td>
-                                            </tr>
-                                            <tr style="font-size:16px;">
-                                                <td><span> </span></td>
-                                                <td><span> </span></td>
-                                                <td><span> </span></td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                    <td style="background-color:gainsboro" width="50%">
-                                        <table style="width: 100%;">
-                                            <tr style="font-weight: bold;">
-                                                <td style="padding-bottom: 65px;">
-                                                    <span>Remarks</span><br />
-                                                    <span></span>
-                                                </td>
-                                                <td style="padding-bottom: 65px;">
-                                                    <span>Authorizer's Sign</span><br /><span></span>
-                                                </td>
-                                                <td style="padding-bottom: 65px;">
-                                                    <span>Loader's Sign</span><br /><span></span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3"></td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
-    <!-- <div style="display: flex; justify-content: center; padding-bottom: 20px;">
-        <button mat-raised-button color="primary" printSectionId="print" [useExistingCss]="true" ngxPrint>
-            <i class="fas fa-print msr-2"></i>Print</button>
-    </div> -->
+                          <table style="width: 100%;">
+                              <tr>
+                                  <td style="border: none;" width="50%">
+                                      <table style="text-align: right; width: 100%;">
+                                          <tr style="font: size 13px;">
+                                              <td><span style="color:#8C001A;font-weight:bold">Document
+                                                      History</span><br /></td>
+                                              <td><span>Location</span><br /></td>
+                                              <td><span>Updated by</span><br /></td>
+                                          </tr>
+                                          <tr style="font: size 13px;">
+                                              <td><span>{{thcNestedData.updateDate | date:'dd/MM/yyyy HH:mm'}}</span>
+                                              </td>
+                                              <td><span>{{thcNestedData.closingBranch}}</span></td>
+                                              <td><span>{{thcNestedData.updateBy}}</span></td>
+                                          </tr>
+                                          <tr style="font: size 13px;">
+                                              <td><span> </span></td>
+                                              <td><span> </span></td>
+                                              <td><span> </span></td>
+                                          </tr>
+                                      </table>
+                                  </td>
+                                  <td style="background-color:gainsboro" width="50%">
+                                      <table style="width: 100%;">
+                                          <tr style="font-weight: bold;">
+                                              <td style="padding-bottom: 65px;">
+                                                  <span>Remarks</span><br />
+                                                  <span></span>
+                                              </td>
+                                              <td style="padding-bottom: 65px;">
+                                                  <span>Authorizer's Sign</span><br /><span></span>
+                                              </td>
+                                              <td style="padding-bottom: 65px;">
+                                                  <span>Loader's Sign</span><br /><span></span>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td colspan="3"></td>
+                                          </tr>
+                                      </table>
+                                  </td>
+                              </tr>
+                          </table>
+                      </td>
+                  </tr>
+              </table>
+          </div>
+      </div>
+  </div>
+  <!-- <div style="display: flex; justify-content: center; padding-bottom: 20px;">
+      <button mat-raised-button color="primary" printSectionId="print" [useExistingCss]="true" ngxPrint>
+          <i class="fas fa-print msr-2"></i>Print</button>
+  </div> -->
 </div>
 
-<!-- <app-generic-view-print-webxpress *ngIf="LodeViewPrint" 
-  [HtmlTemplate]="HtmlTemplate" [JsonData]="JsonData" [FieldMapping]="FieldMapping">
-</app-generic-view-print-webxpress> -->
-
-
 <style>
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        font-family: "verdana";
-        font-size: 16px;
-        color: #000000;
-    }
+  table {
+      border-collapse: collapse;
+      width: 100%;
+      font-family: "verdana";
+      font-size: 13px;
+      color: #000000;
+  }
 
-    div {
-        margin: 0;
-    }
+  div {
+      margin: 0;
+  }
 
 
-    th {
-        padding: 8px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-        background-color: #f2f2f2;
-        height: 42px;
-    }
+  th {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      background-color: #f2f2f2;
+      height: 42px;
+  }
 
-    td {
-        padding: 8px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
+  td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+  }
 
-    .barcode {
-        position: absolute;
-        right: 150px;
-        top: 60px;
-        height: 300px;
-        width: 300px;
-    }
+  .barcode {
+      position: absolute;
+      right: 150px;
+      top: 60px;
+      height: 300px;
+      width: 300px;
+  }
 </style>

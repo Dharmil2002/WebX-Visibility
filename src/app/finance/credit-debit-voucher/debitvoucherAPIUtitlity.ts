@@ -24,7 +24,7 @@ export async function vendorFromApi(masterService) {
     const res = await masterService.masterPost("generic/get", req).toPromise()
     if (res) {
         const data = res?.data
-            .map(x => ({ value: x.vendorName, name: x.vendorCode }))
+            .map(x => ({ value: x.vendorCode, name: x.vendorName }))
             .filter(x => x != null)
             .sort((a, b) => a.value.localeCompare(b.value));
 
@@ -62,3 +62,37 @@ export async function DriversFromApi(masterService) {
         return null;
     }
 }
+export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = { vendorCode };
+        const req = { companyCode, collectionName: 'vendor_detail', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+
+        if (res && res.data && res.data[0].otherdetails) {
+            return res.data[0].otherdetails.map(x => ({ name: x.gstState, value: x.gstNumber, ...x }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}
+export async function GetSingleCustomerDetailsFromApi(masterService, customerCode) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = { customerCode };
+        const req = { companyCode, collectionName: 'customer_detail', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+
+        if (res && res.data && res.data[0].GSTdetails) {
+            return res.data[0].GSTdetails.map(x => ({
+                name: x.gstState, value: x.gstNo, ...x
+            }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}
+
+

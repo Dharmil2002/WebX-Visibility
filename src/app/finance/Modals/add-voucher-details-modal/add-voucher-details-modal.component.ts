@@ -76,8 +76,8 @@ export class AddVoucherDetailsModalComponent implements OnInit {
       const GSTAmount = (DebitAmount * GSTRate) / 100;
       const Total = GSTAmount + DebitAmount;
 
-      this.CreditDebitVoucherDetailsForm.controls.GSTAmount.setValue(GSTAmount);
-      this.CreditDebitVoucherDetailsForm.controls.Total.setValue(Total);
+      this.CreditDebitVoucherDetailsForm.controls.GSTAmount.setValue(GSTAmount.toFixed(2));
+      this.CreditDebitVoucherDetailsForm.controls.Total.setValue(Total.toFixed(2));
     } else {
       console.error('Invalid input values for DebitAmount or GSTRate');
     }

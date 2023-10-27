@@ -1,27 +1,51 @@
+<style>
+  /* .content {
+    position: relative;
+    overflow: hidden;
+  } */
+
+  .breadcrumbs {
+    background-color: #fff;
+    /* Set the background color as needed */
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-radius: 10px;
+  }
+
+  .scrollable-content {
+    max-height: 78vh;
+    /* Set the maximum height to the viewport height */
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 10px;
+    /* Add any other desired styles for this section */
+  }
+</style>
+
 <section class="content">
   <div class="container-fluid">
-    <!-- <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <div class="card"> -->
-    <!-- <div class="body"> -->
-    <div *ngIf="breadscrums !== undefined">
-      <div class="block-header" *ngFor="let breadscrum of breadscrums">
-        <app-breadcrumb [backPath]="backPath" [title]="breadscrum.title" [items]="breadscrum.items"
-          [active_item]="breadscrum.active" [generatecontrol]="breadscrum.generatecontrol"
-          (toggleChange)="onToggleChange($event)" [toggle]="breadscrum.toggle">
-        </app-breadcrumb>
+    <div class="card" style="margin-bottom: 5px !important;">
+      <div class="breadcrumbs">
+        <div *ngIf="breadscrums !== undefined">
+          <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <app-breadcrumb [backPath]="backPath" [title]="breadscrum.title" [items]="breadscrum.items"
+              [active_item]="breadscrum.active" [generatecontrol]="breadscrum.generatecontrol"
+              (toggleChange)="onToggleChange($event)" [toggle]="breadscrum.toggle">
+            </app-breadcrumb>
+          </div>
+        </div>
       </div>
     </div>
     <ng-container *ngIf="loadTable !== undefined">
-      <div *ngIf="loadTable==true" class="tbl-spinner">
+      <div *ngIf="loadTable == true" class="tbl-spinner">
         <mat-progress-spinner color="primary" [diameter]="100" mode="indeterminate">
         </mat-progress-spinner>
       </div>
     </ng-container>
-    <ng-content></ng-content>
-  </div>
-  <!-- </div> -->
-  <!-- </div>
+    <div class="scrollable-content">
+      <ng-content></ng-content>
     </div>
-  </div> -->
+  </div>
 </section>

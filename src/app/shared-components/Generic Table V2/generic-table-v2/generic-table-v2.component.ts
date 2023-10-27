@@ -51,6 +51,9 @@ export class GenericTableV2Component
   @Input() FormTitle: string = "";
   @Input() btndisabled: boolean = false;
   @Input() refreshbtn: boolean = false;
+  @Input() showHeader: boolean = true;
+  @Input() DisplayAddNewButton: boolean = false;
+  @Input() DisplayCheckbox: boolean = false;
   @Input() staticField = [];
   triggered: boolean = false;
   objectKeys = Object.keys;

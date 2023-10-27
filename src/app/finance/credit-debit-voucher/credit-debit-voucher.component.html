@@ -8,8 +8,9 @@
     </form>
     <app-generic-table-v2 *ngIf="LoadVoucherDetails" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
-        [FormTitle]="'Details'" [menuItemFlag]="menuItemflag" [addFlag]="addFlag"
-        (menuItemClicked)="handleMenuItemClick($event)" [AddNewButton]=true (AddNewButtonEvent)="AddNewButtonEvent()">
+        [FormTitle]="'Details'" [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="false"
+        (menuItemClicked)="handleMenuItemClick($event)" [DisplayAddNewButton]=true [DisplayCheckbox]="true"
+        (AddNewButtonEvent)="AddNewButtonEvent()">
     </app-generic-table-v2>
 
     <!-- <app-table-boilerplate *ngIf="LoadVoucherDetails" [tableData]="tableData"
@@ -23,29 +24,32 @@
     <div class="row">
         <div class="col-4">
             <form [formGroup]="CreditDebitVoucherTaxationTDSForm">
-                <app-form-webxpress [form]="CreditDebitVoucherTaxationTDSForm" [FormTitle]="'Taxation TDS'"
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationTDSForm" [FormTitle]="'TDS'"
                     [formData]="jsonControlCreditDebitVoucherTaxationTDSArray"
                     [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
-                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
         </div>
         <div class="col-4">
 
             <form [formGroup]="CreditDebitVoucherTaxationTCSForm">
-                <app-form-webxpress [form]="CreditDebitVoucherTaxationTCSForm" [FormTitle]="'Taxation TCS'"
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationTCSForm" [FormTitle]="'TCS'"
                     [formData]="jsonControlCreditDebitVoucherTaxationTCSArray"
                     [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
-                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
         </div>
         <div class="col-4">
             <form [formGroup]="CreditDebitVoucherTaxationGSTForm">
-                <app-form-webxpress [form]="CreditDebitVoucherTaxationGSTForm" [FormTitle]="'Taxation GST'"
+                <app-form-webxpress [form]="CreditDebitVoucherTaxationGSTForm" [FormTitle]="'GST'"
                     [formData]="jsonControlCreditDebitVoucherTaxationGSTArray"
                     [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
-                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
         </div>
@@ -54,10 +58,11 @@
         <div class="col-4">
             <form [formGroup]="CreditDebitVoucherTaxationPaymentSummaryForm">
                 <app-form-webxpress [form]="CreditDebitVoucherTaxationPaymentSummaryForm"
-                    [FormTitle]="'Payment Summary'"
+                    [FormTitle]="'Payment Summary'" [DisplayCheckbox]="true" [CheckBoxMessage]="'Round Off'"
                     [formData]="jsonControlCreditDebitVoucherTaxationPaymentSummaryArray"
                     [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
-                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
         </div>
@@ -66,8 +71,8 @@
                 <app-form-webxpress [form]="CreditDebitVoucherTaxationPaymentDetailsForm"
                     [FormTitle]="'Payment Details'"
                     [formData]="jsonControlCreditDebitVoucherTaxationPaymentDetailsArray"
-                    [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2'"
-                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
         </div>
@@ -78,7 +83,8 @@
                 <app-form-webxpress [form]="CreditDebitVoucherDocumentDebitsForm" [FormTitle]="'Document Debits'"
                     [formData]="jsonControlCreditDebitVoucherDocumentDebitsArray"
                     [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
-                    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
                 </app-form-webxpress>
             </form>
         </div>

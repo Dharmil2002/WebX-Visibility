@@ -24,6 +24,8 @@ export class FormComponent {
   @Input() AddNewButton;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
+  @Input() DisplayCheckbox: boolean = false;
+  @Input() CheckBoxMessage: string = "";
   hide: boolean = true;
   selectedValue: any;
   isTouchUIActivated = false;
@@ -36,7 +38,7 @@ export class FormComponent {
   //   this.formData=changes.formData.currentValue
   //   }
   constructor(private rootFormGroup: FormGroupDirective,
-    
+
   ) {
     this.form = this.rootFormGroup.control  // get parent form control
 
@@ -86,6 +88,11 @@ export class FormComponent {
   cancel() {
     let context = {};
     context['functionName'] = 'cancel';
+    this.functionCallEmitter.emit(context)
+  }
+  OnChangeCheckBox(event) {
+    let context = { event };
+    context['functionName'] = 'OnChangeCheckBox';
     this.functionCallEmitter.emit(context)
   }
   download(url) {

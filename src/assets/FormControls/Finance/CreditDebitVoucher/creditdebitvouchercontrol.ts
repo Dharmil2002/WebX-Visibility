@@ -22,16 +22,7 @@ export class CreditDebitVoucherControl {
         disable: true,
         Validations: [],
       },
-      {
-        name: "Accountinglocation",
-        label: "Accounting location",
-        placeholder: "Accounting location",
-        type: "text",
-        value: localStorage.getItem('Branch'),
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
+
       {
         name: "TransactionDate",
         label: "Transaction Date",
@@ -53,6 +44,16 @@ export class CreditDebitVoucherControl {
         value: localStorage.getItem('Branch'),
         generatecontrol: true,
         disable: false,
+        Validations: [],
+      },
+      {
+        name: "Accountinglocation",
+        label: "Accounting location",
+        placeholder: "Accounting location",
+        type: "text",
+        value: localStorage.getItem('Branch'),
+        generatecontrol: true,
+        disable: true,
         Validations: [],
       },
       {
@@ -127,34 +128,8 @@ export class CreditDebitVoucherControl {
           showNameAndValue: true,
           metaData: "Basic"
         },
-      },
-
-      {
-        name: "Paymentstate",
-        label: "Payment state",
-        placeholder: "Payment state",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Payment state is required"
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-          {
-            name: "autocomplete",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-          metaData: "Basic"
+        functions: {
+          onOptionSelect: "PartyNameFieldChanged"
         },
       },
       {
@@ -181,10 +156,45 @@ export class CreditDebitVoucherControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
           metaData: "Basic"
         },
+        functions: {
+          onOptionSelect: "StateChange"
+        },
       },
+      {
+        name: "Paymentstate",
+        label: "Payment state",
+        placeholder: "Payment state",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Payment state is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "StateChange"
+        },
+      },
+
 
 
       {
@@ -247,15 +257,59 @@ export class CreditDebitVoucherControl {
         },
       },
       {
-        name: 'TDSRate', label: 'TDS Rate', placeholder: 'TDS Rate', type: 'dayhour',
+        name: 'TDSRate', label: 'TDS Rate %', placeholder: 'TDS Rate', type: 'dayhour',
         value: "",
-        Validations: [], generatecontrol: true, disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter Valid TDS Rate",
+            pattern: '^(100|[0-9]{1,2})$'
+          },
+        ],
+        functions: {
+          onChange: "calculateTDSAndTotal"
+        },
+        generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
           label: 'TDS Deduction',
-          fieldName: "TDSDeduction"
+          fieldName: "TDSDeduction",
+          disable: true,
         },
       },
+
+      // {
+      //   name: "TDSRate",
+      //   label: "TDS Rate %",
+      //   placeholder: "TDS Rate",
+      //   type: "number",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [
+      //     {
+      //       name: "pattern",
+      //       message: "Please Enter Valid TDS Rate",
+      //       pattern: '^(100|[0-9]{1,2})$'
+      //     },
+      //   ],
+      //   functions: {
+      //     onChange: "calculateTDSAndTotal"
+      //   },
+      // },
+
+      {
+        name: "TDSDeduction",
+        label: "TDS Deduction",
+        placeholder: "TDS Deduction",
+        type: "number",
+        value: "",
+        generatecontrol: false,
+        disable: true,
+        Validations: [],
+      },
+
+
 
 
     ];
@@ -299,7 +353,8 @@ export class CreditDebitVoucherControl {
         additionalData: {
           metaData: "Basic",
           label: 'TCS Deduction',
-          fieldName: "TCSDeduction"
+          fieldName: "TCSDeduction",
+          disable: true,
         },
       },
 
@@ -314,29 +369,39 @@ export class CreditDebitVoucherControl {
       //   Validations: [],
       // },
 
-      // {
-      //   name: "TCSDeduction",
-      //   label: "TCS Deduction",
-      //   placeholder: "TCS Deduction",
-      //   type: "text",
-      //   value: "",
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [],
-      // },
+      {
+        name: "TCSDeduction",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
 
     ];
     this.CreditDebitVoucherTaxationGSTArray = [
 
       {
-        name: 'IGST', label: 'IGST', placeholder: 'IGST', type: 'dayhour',
+        name: "IGST",
+        label: "IGST",
+        placeholder: "IGST",
+        type: "number",
         value: "",
-        Validations: [], generatecontrol: true, disable: false,
-        additionalData: {
-          metaData: "Basic",
-          label: 'UGST',
-          fieldName: "UGST"
-        },
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "UGST",
+        label: "UGST",
+        placeholder: "UGST",
+        type: "number",
+        value: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
       },
       {
         name: 'SGST', label: 'SGST', placeholder: 'SGST', type: 'dayhour',
@@ -344,32 +409,36 @@ export class CreditDebitVoucherControl {
         Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
-          label: 'UGST',
-          fieldName: "UGST"
+          label: 'CGST',
+          fieldName: "CGST",
+          disable: true,
         },
       },
-
+      {
+        name: 'CGST',
+        label: '',
+        placeholder: '',
+        type: '',
+        value: "",
+        Validations: [],
+        generatecontrol: false, disable: false,
+        additionalData: {
+          metaData: "CGST"
+        }
+      }
     ];
     this.CreditDebitVoucherTaxationPaymentSummaryArray = [
 
+
       {
-        name: "PaymentAmount",
-        label: "Payment Amount",
-        placeholder: "Payment Amount",
-        type: "text",
+        name: 'PaymentAmount', label: 'Payment Amount', placeholder: 'Payment Amount', type: 'dayhour',
         value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
-      {
-        name: 'Roundoff', label: 'Round off', placeholder: 'Round off', type: 'dayhour',
-        value: "",
-        Validations: [], generatecontrol: true, disable: false,
+        Validations: [], generatecontrol: true, disable: true,
         additionalData: {
           metaData: "Basic",
           label: 'Net Payable',
-          fieldName: "NetPayable"
+          fieldName: "NetPayable",
+          disable: false,
         },
       },
 
@@ -387,10 +456,10 @@ export class CreditDebitVoucherControl {
         name: 'NetPayable',
         label: '',
         placeholder: '',
-        type: '',
+        type: 'number',
         value: "",
         Validations: [],
-        generatecontrol: false, disable: false,
+        generatecontrol: false, disable: true,
         additionalData: {
           metaData: "NetPayable"
         }
@@ -398,16 +467,43 @@ export class CreditDebitVoucherControl {
 
     ];
     this.CreditDebitVoucherTaxationPaymentDetailsArray = [
-
       {
         name: "PaymentMode",
         label: "Payment Mode",
         placeholder: "Payment Mode",
-        type: "text",
-        value: "",
+        type: "Staticdropdown",
+        value: [
+          {
+            value: "Bank",
+            name: "Bank",
+          },
+          {
+            value: "Cash",
+            name: "Cash",
+          },
+          {
+            value: "RTGS/UTR",
+            name: "RTGS/UTR",
+          },
+
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Payment Mode is required",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        functions: {
+          onSelection: "OnPaymentModeChange"
+        },
       },
 
       {
@@ -626,16 +722,16 @@ export class CreditDebitVoucherControl {
         disable: true,
         Validations: [],
       },
-      {
-        name: "TDSApplicable",
-        label: "TDS Applicable",
-        placeholder: "TDS Applicable",
-        type: "toggle",
-        value: FormValues?.TDSApplicable == "Yes" ? true : false,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
+      // {
+      //   name: "TDSApplicable",
+      //   label: "TDS Applicable",
+      //   placeholder: "TDS Applicable",
+      //   type: "toggle",
+      //   value: FormValues?.TDSApplicable == "Yes" ? true : false,
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
       {
         name: "Narration",
         label: "Narration",

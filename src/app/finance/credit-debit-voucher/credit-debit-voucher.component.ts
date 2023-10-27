@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 import { AddVoucherDetailsModalComponent } from '../Modals/add-voucher-details-modal/add-voucher-details-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
-import { DriversFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
+import { DriversFromApi, GetSingleCustomerDetailsFromApi, GetSingleVendorDetailsFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
 @Component({
   selector: 'app-credit-debit-voucher',
   templateUrl: './credit-debit-voucher.component.html',
@@ -23,9 +23,9 @@ export class CreditDebitVoucherComponent implements OnInit {
   companyCode: number | null
   breadScrums = [
     {
-      title: "Credit Debit Voucher",
+      title: "Debit Voucher",
       items: ["Finance"],
-      active: "Credit Debit Voucher",
+      active: "Debit Voucher",
     },
   ];
   className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
@@ -43,6 +43,7 @@ export class CreditDebitVoucherComponent implements OnInit {
 
   CreditDebitVoucherTaxationGSTForm: UntypedFormGroup;
   jsonControlCreditDebitVoucherTaxationGSTArray: any;
+  AlljsonControlCreditDebitVoucherTaxationGSTArray: any;
 
   CreditDebitVoucherTaxationPaymentSummaryForm: UntypedFormGroup;
   jsonControlCreditDebitVoucherTaxationPaymentSummaryArray: any;
@@ -150,6 +151,7 @@ export class CreditDebitVoucherComponent implements OnInit {
   };
 
   PartyNameList: any;
+  AllStateList: any;
   StateList: any;
   AccountGroupList: any;
   DisplayCreditDebitVoucherDocument: boolean = false;
@@ -182,6 +184,7 @@ export class CreditDebitVoucherComponent implements OnInit {
     this.CreditDebitVoucherTaxationTCSForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationTCSArray]);
 
     this.jsonControlCreditDebitVoucherTaxationGSTArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationGSTArrayControls();
+    this.AlljsonControlCreditDebitVoucherTaxationGSTArray = this.jsonControlCreditDebitVoucherTaxationGSTArray;
     this.CreditDebitVoucherTaxationGSTForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationGSTArray]);
 
     this.jsonControlCreditDebitVoucherTaxationPaymentSummaryArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationPaymentSummaryArrayControls();
@@ -198,7 +201,7 @@ export class CreditDebitVoucherComponent implements OnInit {
     const stateReqBody = {
       companyCode: this.companyCode,
       filter: {},
-      collectionName: "state_master",
+      collectionName: "state_detail",
     };
     const account_groupReqBody = {
       companyCode: this.companyCode,
@@ -207,10 +210,13 @@ export class CreditDebitVoucherComponent implements OnInit {
     };
 
     const resState = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
+    this.AllStateList = resState?.data;
     this.StateList = resState?.data
-      .map(x => ({ value: x.STNM, name: x.ST }))
+      .map(x => ({
+        value: x.stateCode, name: x.stateName
+      }))
       .filter(x => x != null)
-      .sort((a, b) => a.value.localeCompare(b.value));
+      .sort((a, b) => a.name.localeCompare(b.name));
 
     const resaccount_group = await this.masterService.masterPost('generic/get', account_groupReqBody).toPromise();
     this.AccountGroupList = resaccount_group?.data
@@ -223,14 +229,14 @@ export class CreditDebitVoucherComponent implements OnInit {
       this.CreditDebitVoucherSummaryForm,
       this.StateList,
       "Partystate",
-      null
+      true
     );
     this.filter.Filter(
       this.jsonControlCreditDebitVoucherSummaryArray,
       this.CreditDebitVoucherSummaryForm,
       this.StateList,
       "Paymentstate",
-      false
+      true
     );
 
 
@@ -241,6 +247,57 @@ export class CreditDebitVoucherComponent implements OnInit {
       this[functionName]($event);
     } catch (error) {
       console.log("failed");
+    }
+  }
+  StateChange(event) {
+    const Partystate = this.CreditDebitVoucherSummaryForm.value.Partystate;
+    const Paymentstate = this.CreditDebitVoucherSummaryForm.value.Paymentstate;
+    if (Partystate && Paymentstate) {
+      const IsStateTypeUT = this.AllStateList.find(item => item.stateName == Paymentstate.name).stateType == "UT";
+      const GSTAmount = this.tableData.reduce((accumulator, currentValue) => {
+        return accumulator + parseFloat(currentValue['GSTAmount']);
+      }, 0);
+      if (IsStateTypeUT) {
+        this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTAmount)
+      }
+      else if (!IsStateTypeUT && Partystate.name == Paymentstate.name) {
+        this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTAmount)
+      }
+      else if (!IsStateTypeUT && Partystate.name != Paymentstate.name) {
+        this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTAmount)
+      }
+    }
+  }
+  ShowOrHideBasedOnSameOrDifferentState(Check, GSTAmount) {
+    let filterFunction;
+    switch (Check) {
+      case 'UT':
+        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'SGST' && x.name !== 'CGST';
+        break;
+      case 'SAME':
+        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'UGST';
+        break;
+      case 'DIFF':
+        filterFunction = (x) => x.name !== 'SGST' && x.name !== 'UGST' && x.name !== 'CGST';
+        break;
+    }
+    this.jsonControlCreditDebitVoucherTaxationGSTArray = this.AlljsonControlCreditDebitVoucherTaxationGSTArray.filter(filterFunction);
+    this.jsonControlCreditDebitVoucherTaxationGSTArray.forEach(item => {
+      this.CreditDebitVoucherTaxationGSTForm.get(item.name).setValue((GSTAmount / this.jsonControlCreditDebitVoucherTaxationGSTArray.length).toFixed(2));
+    });
+    this.CalculatePaymentAmount();
+  }
+  calculateTDSAndTotal(event) {
+    const TDSRate = Number(this.CreditDebitVoucherTaxationTDSForm.value['TDSRate']);
+    const Total = this.tableData.reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue['Total']);
+    }, 0);
+    if (!isNaN(Total) && !isNaN(TDSRate)) {
+      const TDSAmount = (Total * TDSRate) / 100;
+      this.CreditDebitVoucherTaxationTDSForm.controls.TDSDeduction.setValue(TDSAmount.toFixed(2));
+      this.CalculatePaymentAmount();
+    } else {
+      console.error('Invalid input values for DebitAmount or GSTRate');
     }
   }
   handleMenuItemClick(data) {
@@ -310,8 +367,68 @@ export class CreditDebitVoucherComponent implements OnInit {
         PartyName.updateValueAndValidity();
 
     }
-
   }
+  async PartyNameFieldChanged(event) {
+    const Preparedfor = this.CreditDebitVoucherSummaryForm.value.Preparedfor;
+    const PartyName = this.CreditDebitVoucherSummaryForm.value.PartyName
+    const Partystate = this.CreditDebitVoucherSummaryForm.get('Partystate');
+    Partystate.setValue("");
+    let responseFromAPI = [];
+    switch (Preparedfor) {
+      case 'Vendor':
+        responseFromAPI = await GetSingleVendorDetailsFromApi(this.masterService, PartyName.value)
+        this.filter.Filter(
+          this.jsonControlCreditDebitVoucherSummaryArray,
+          this.CreditDebitVoucherSummaryForm,
+          responseFromAPI,
+          "Partystate",
+          false
+        );
+        break;
+      case 'Customer':
+        responseFromAPI = await GetSingleCustomerDetailsFromApi(this.masterService, PartyName.value)
+        this.filter.Filter(
+          this.jsonControlCreditDebitVoucherSummaryArray,
+          this.CreditDebitVoucherSummaryForm,
+          responseFromAPI,
+          "Partystate",
+          false
+        );
+        break;
+      default:
+        this.filter.Filter(
+          this.jsonControlCreditDebitVoucherSummaryArray,
+          this.CreditDebitVoucherSummaryForm,
+          this.StateList,
+          "Partystate",
+          false
+        );
+
+
+    }
+  }
+  OnChangeCheckBox(event) {
+    const TotalPaymentAmount = this.CreditDebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value;
+    const netPayable = event?.event?.checked ? Math.ceil(TotalPaymentAmount) : TotalPaymentAmount;
+    this.CreditDebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(netPayable);
+  }
+  CalculatePaymentAmount() {
+    const totalSum = this.tableData.reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue['Total']);
+    }, 0);
+    debugger
+    const TDSAmount = this.CreditDebitVoucherTaxationTDSForm.controls.TDSDeduction.value || 0;
+    let GSTAmount = 0;
+    this.jsonControlCreditDebitVoucherTaxationGSTArray.forEach(item => {
+      const value = parseFloat(this.CreditDebitVoucherTaxationGSTForm.get(item.name).value);
+      GSTAmount += isNaN(value) ? 0 : value; // Check for NaN and handle it as 0
+    });
+
+    const CalculatedSum = totalSum + GSTAmount - TDSAmount
+    this.CreditDebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").setValue(CalculatedSum.toFixed(2));
+    this.CreditDebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(CalculatedSum.toFixed(2));
+  }
+
   async AddNewButtonEvent() {
     this.addVoucherDetails('')
   }
@@ -415,6 +532,7 @@ export class CreditDebitVoucherComponent implements OnInit {
         }
         this.tableData.push(json);
         this.LoadVoucherDetails = true;
+        this.StateChange("");
       }
       this.LoadVoucherDetails = true;
     });

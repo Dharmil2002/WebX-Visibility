@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { financialYear } from 'src/app/Utility/date/date-utils';
@@ -15,6 +14,7 @@ import { AddVoucherDetailsModalComponent } from '../Modals/add-voucher-details-m
 import { MatDialog } from '@angular/material/dialog';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
 import { DriversFromApi, GetSingleCustomerDetailsFromApi, GetSingleVendorDetailsFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
+import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUtitlity';
 @Component({
   selector: 'app-credit-debit-voucher',
   templateUrl: './credit-debit-voucher.component.html',
@@ -70,80 +70,13 @@ export class CreditDebitVoucherComponent implements OnInit {
   menuItemflag = true;
   staticField = ['Ledger', 'SACCode', 'DebitAmount', 'GSTRate', 'GSTAmount', 'Total', 'TDSApplicable', 'Narration']
 
-  columnHeader = {
-    Ledger: {
-      Title: "Ledger",
-      class: "matcolumnfirst",
-      Style: "min-width:200px",
-    },
-    SACCode: {
-      Title: "SACCode",
-      class: "matcolumncenter",
-      Style: "min-width:200px",
-    },
-    DebitAmount: {
-      Title: "Debit Amount ₹",
-      class: "matcolumncenter",
-      Style: "max-width:120px",
-    },
-    GSTRate: {
-      Title: "GST Rate %",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    GSTAmount: {
-      Title: "GST Amount ₹",
-      class: "matcolumncenter",
-      Style: "max-width:120px",
-    },
-    Total: {
-      Title: "Total ₹",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    TDSApplicable: {
-      Title: "TDS Applicable",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    Narration: {
-      Title: "Narration",
-      class: "matcolumncenter",
-      Style: "min-width:170px",
-    },
-    actionsItems: {
-      Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:100px",
-    }
-  };
+  columnHeader = GetLedgercolumnHeader()
 
   tableData: any = [];
   LoadVoucherDetails = true;
   DocumentDebits: any = [];
 
-  DocumentDebitsDisplayedColumns = {
-    Document: {
-      name: "Document ",
-      key: "Dropdown",
-      option: [],
-      style: "",
-      class: 'matcolumnfirst'
-    },
-    DebitAmount: {
-      name: "Debit Amount ₹",
-      key: "inputnumber",
-      style: "",
-      class: 'matcolumncenter'
-    },
-
-    action: {
-      name: "Action",
-      key: "Action",
-      style: "",
-      class: 'matcolumncenter'
-    }
-  };
+  DocumentDebitsDisplayedColumns = GetLedgerDocument()
   actionObject = {
     addRow: true,
     submit: true,

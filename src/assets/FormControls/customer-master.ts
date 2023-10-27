@@ -365,11 +365,8 @@ export class customerControl {
         label: "Black Listed",
         placeholder: "",
         type: "toggle",
-        value: isUpdate
-          ? customerTable.BlackListed == "Y"
-            ? true
-            : false
-          : false,
+        // value: isUpdate ? customerTable.BlackListed == "Y" ? true : false : false,
+        value: isUpdate ? customerTable.BlackListed : false,
         generatecontrol: true,
         disable: false,
         Validations: [

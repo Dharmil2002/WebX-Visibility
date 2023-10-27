@@ -189,41 +189,38 @@ export class PrqService {
 
     // Map and transform the PRQ data
     prqData.map((element, index) => {
-      let prqDataItem = {
-        srNo: (element.srNo = index + 1),
-        prqNo: element?.prqNo || "",
-        vehicleSize: element?.vehicleSize || "",
-        size: element.vehicleSize
-          ? element.vehicleSize 
-          : element.containerSize
-            ? element.containerSize
-            : "",
-        billingParty: element?.billingParty || "",
-        fromToCity: element?.fromCity + "-" + element?.toCity,
-        fromCity: element?.fromCity || "",
-        contactNo: element?.contactNo || "",
-        toCity: element?.toCity || "",
-        transMode: element?.transMode || "",
-        vehicleNo: element?.vehicleNo || "",
-        prqBranch: element?.prqBranch || "",
-        pickUpDate: formatDocketDate(element?.pickUpTime || new Date()),
-        pickupDate: element?.pickUpTime || new Date(),
-        status: this.status[element.status] || this.status.default,
-        actions: this.statusActions[element.status] || this.statusActions.default,
-        containerSize: element?.containerSize || "",
-        typeContainer: element?.typeContainer || "",
-        pAddress: element?.pAddress || "",
-        payType: element?.payType || "",
-        contractAmt: element?.contractAmt || "",
-        createdDate: formatDocketDate(element?.entryDate || new Date()),
-      };
-      prqList.push(prqDataItem);
-    });
-
+      let pqrData = {
+          "srNo": element.srNo = index + 1,
+          "prqNo": element?.prqNo || '',
+          "vehicleSize": element?.vehicleSize||"",
+          "size":element.vehicleSize?element.vehicleSize : element.containerSize?element.containerSize:"",
+          "billingParty": element?.billingParty || '',
+          "fromToCity": element?.fromCity + "-" + element?.toCity,
+          "fromCity": element?.fromCity || "",
+          "contactNo": element?.contactNo || '',
+          "toCity": element?.toCity || "",
+          "transMode": element?.transMode || "",
+          "vehicleNo": element?.vehicleNo || "",
+          "prqBranch": element?.prqBranch || "",
+          "pickUpDate": formatDocketDate(element?.pickUpTime || new Date()),
+          "pickupDate": element?.pickUpTime || new Date(),
+          "status": element?.status === "0" ? "Awaiting Confirmation" : element.status === "1" ? "Awaiting Assign Vehicle" :element.status=="2"?"Awaiting For Docket":element.status=="3"?"Ready For THC":"THC Generated",
+          "actions": element?.status === "0" ? ["Confirm", "Reject", "Modify"] : element.status === "1" ? ["Assign Vehicle"] :element.status=="2"?["Add Docket"]:element.status=="3"?["Add Docket","Create THC"]:[""],
+          "containerSize":element?.containerSize||"",
+          "typeContainer":element?.typeContainer||"",
+          "pAddress":element?.pAddress||"",
+          "payType":element?.payType||"",
+          "contractAmt":element?.contractAmt||"",
+          "createdDate": formatDocketDate(element?.entryDate || new Date()),
+          "entryDate":element?.entryDate
+      }
+      prqList.push(pqrData)
+      // You need to return the modified element
+  });
     // Sort the PRQ list by pickupDate in descending order
     const sortedData = prqList.sort((a, b) => {
-      const dateA: Date | any = new Date(a.pickupDate);
-      const dateB: Date | any = new Date(b.pickupDate);
+      const dateA: Date | any = new Date(a.entryDate);
+      const dateB: Date | any = new Date(b.entryDate);
 
       // Compare the date objects
       return dateB - dateA; // Sort in descending order
@@ -280,14 +277,15 @@ export class PrqService {
         payType: element?.payType || "",
         contractAmt: element?.contractAmt || "",
         createdDate: formatDocketDate(element?.entryDate || new Date()),
+        createDateOrg:element?.entryDate 
       };
       prqList.push(prqDataItem);
     });
 
     // Sort the PRQ list by pickupDate in descending order
     const sortedData = prqList.sort((a, b) => {
-      const dateA: Date | any = new Date(a.pickupDate);
-      const dateB: Date | any = new Date(b.pickupDate);
+      const dateA: Date | any = new Date(a.createDateOrg);
+      const dateB: Date | any = new Date(b.createDateOrg);
 
       // Compare the date objects
       return dateB - dateA; // Sort in descending order

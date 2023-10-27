@@ -487,6 +487,7 @@ export class ThcGenerationComponent implements OnInit {
 
   async bindPrqData
   () {
+    
     const vehicleDetail = await this.vehicleStatusService.vehiclList(
       this.prqDetail?.prqNo
     );
@@ -505,7 +506,6 @@ export class ThcGenerationComponent implements OnInit {
       this.prqDetail?.fromToCity || ""
     );
     const fcity = this.prqDetail?.fromToCity.split('-')[0] || "";
-    console.log(fcity)
     const tcity = this.prqDetail?.fromToCity.split('-')[1] || "";
     this.thcTableForm.controls["fromCity"].setValue(
       {name:fcity,value:fcity}
@@ -514,7 +514,7 @@ export class ThcGenerationComponent implements OnInit {
       {name:tcity,value:tcity}
     );
     this.thcTableForm.controls["capacity"].setValue(
-      this.prqDetail?.vehicleSize || this.prqDetail?.containerSize.split(" ")[0] || ""
+      this.prqDetail?.vehicleSize || this.prqDetail?.containerSize|| ""
     );
     this.thcTableForm.controls["driverName"].setValue(
       vehicleDetail?.driver || ""

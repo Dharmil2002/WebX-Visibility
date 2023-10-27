@@ -18,7 +18,7 @@ import { getVendorDetails } from "../job-entry-page/job-entry-utility";
 import { Router } from "@angular/router";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { OperationService } from "src/app/core/service/operations/operation.service";
-import { containorConsigmentDetail, updatePrq, validationAutocomplete } from "./consigment-utlity";
+import { containorConsigmentDetail, updatePrq } from "./consigment-utlity";
 import { financialYear, formatDate } from "src/app/Utility/date/date-utils";
 import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { DocketDetail } from "src/app/core/models/operations/consignment/consgiment";
@@ -34,7 +34,7 @@ import { LocationService } from "src/app/Utility/module/masters/location/locatio
 import { getPrqDetailFromApi } from "src/app/dashboard/tabs/prq-summary-page/prq-summary-utitlity";
 import { AddFleetMasterComponent } from "src/app/Masters/fleet-master/add-fleet-master/add-fleet-master.component";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
-
+import { PrqService } from "../../Utility/module/operation/prq/prq.service";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -225,7 +225,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private matDialog: MatDialog,
     private generalService: GeneralService,
     private pinCodeService: PinCodeService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private prqService:PrqService
   ) {
     const navigationState =
       this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -314,6 +315,10 @@ export class ConsignmentEntryFormComponent implements OnInit {
         value: this.prqData?.prqNo,
       });
     }
+    if(this.prqData.transMode == 'trailer'){
+      this.consignmentTableForm.controls['cd'].setValue(true);
+      this.contFlag = true;
+    }
 
   }
   //#endregion
@@ -374,7 +379,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       this.prqData?.pAddress
     );
     this.consignmentTableForm.controls["ccbp"].setValue(true);
- 
+
     this.consignmentTableForm.controls["vendorType"].setValue(
       vehicleDetail?.vendorType
     );
@@ -385,7 +390,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls["vehicleNo"].setValue(
       this.prqData?.vehicleNo
     );
-   
+
 
     this.getLocBasedOnCity();
     this.onAutoBillingBased("true");
@@ -403,7 +408,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.containerTypeList = resContainerType;
     const vendorDetail = await getVendorDetails(this.masterService);
     this.vendorDetail = vendorDetail;
-    const prqNo = await getPrqDetailFromApi(this.masterService);
+    const prqNo =  await this.prqService.getPrqDetailFromApi();;
     this.prqNoDetail = prqNo.allPrqDetail;
     const prqDetail = prqNo.allPrqDetail.map((x) => ({ name: x.prqNo, value: x.prqNo }));
 
@@ -776,7 +781,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       vehicleNo.updateValueAndValidity();
       this.marketVendor = true
     }
-    
+
 
   }
   /*Below function is only call those time when user can come to only edit a
@@ -933,7 +938,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         }
         return x;
       });
-      
+
       this.filter.Filter(
         this.jsonContainerDetail,
         this.containerTableForm,
@@ -950,7 +955,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         }
         return x;
       });
-      
+
       this.contFlag = false;
     }
   }
@@ -1040,7 +1045,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         lsNo: "",
         mfNo: "",
         entryBy: this.userName,
-        entryDate: new Date().toISOString(),
+        entryDate: new Date(),
         unloadloc: "",
       };
 
@@ -1195,56 +1200,19 @@ export class ConsignmentEntryFormComponent implements OnInit {
   calculateFreight() {
     const freightRateType = this.FreightTableForm.controls['freightRatetype'].value;
     const freightRate = this.FreightTableForm.controls['freight_rate']?.value || 0;
-    if (this.invoiceData.length > 0) {
-      if (typeof (freightRateType) === "string") {
-        const rateTypeMap = {
-          "F": 'noofPkts',
-          "P": 'noofPkts',
-          "W": 'chargedWeight',
-          "T": 'chargedWeight',
-        };
-        const propertyName = rateTypeMap[freightRateType] || 'noofPkts';
-        const invoiceTotal = this.invoiceData.reduce((acc, amount) => parseFloat(acc) + parseFloat(amount[propertyName]), 0);
-        let total = 0;
-        if (freightRateType === "F") {
-          total = freightRate;
-        } else {
-          total = freightRateType === "T" ? (parseFloat(freightRate) * parseFloat(invoiceTotal)) / 1000 : parseFloat(freightRate) * parseFloat(invoiceTotal);
-        }
-       
-        this.FreightTableForm.controls['freight_amount']?.setValue(total);
-      }
+    let rateTypeMap = {};
+    if (typeof (freightRateType) === "string") {
+      rateTypeMap = {
+        "F": 1.00,
+        "P": this.getInvoiceAggValue('noofPkts'),
+        "W": this.getInvoiceAggValue('chargedWeight'),
+        "T": this.getInvoiceAggValue('chargedWeight') / 1000,
+        "C": this.tableData.length > 0 ? this.tableData.length : 1
+      };
     }
-    else if (this.invoiceTableForm.value.invoiceNo) {
-      if (typeof (freightRateType) === "string") {
-        const rateTypeMap = {
-          "F": 'noofPkts',
-          "P": 'noofPkts',
-          "W": 'chargedWeight',
-          "T": 'chargedWeight'
-        };
-        const propertyName = rateTypeMap[freightRateType] || 'noofPkts';
-        const invoiceTotal = this.invoiceTableForm.controls[propertyName].value;
-        let total = 0;
-        if (freightRateType === "F") {
-          total = freightRate;
-        } else {
-          total = freightRateType === "T" ? (parseFloat(freightRate) * parseFloat(invoiceTotal)) / 1000 : parseFloat(freightRate) * parseFloat(invoiceTotal);
-        }
-        this.FreightTableForm.controls['freight_amount']?.setValue(total);
-
-      }
-    }
-     if(freightRateType==="C"){
-      if(this.tableData.length>0){
-      const total=parseFloat(freightRate)*this.tableData.length;
-      this.FreightTableForm.controls['freight_amount']?.setValue(total);
-      }
-       if(this.containerTableForm.value.containerNumber){
-        const total=parseFloat(freightRate)*1;
-        this.FreightTableForm.controls['freight_amount']?.setValue(total);
-      }
-    }
+    const mfactor = rateTypeMap[freightRateType] || 1;
+    let total = parseFloat(freightRate) * parseFloat(mfactor)
+    this.FreightTableForm.controls['freight_amount']?.setValue(total);
   }
 
   containorCsvDetail() {
@@ -1335,7 +1303,15 @@ export class ConsignmentEntryFormComponent implements OnInit {
     );
   }
   /*end*/
-
+  getInvoiceAggValue(fielName) {
+    if (this.invoiceData.length > 0) {
+      return this.invoiceData.reduce((acc, amount) => parseFloat(acc) + parseFloat(amount[fielName]), 0);
+    }
+    else if (this.invoiceTableForm.value) {
+      return parseFloat(this.invoiceTableForm.controls[fielName].value)
+    }
+    return 0;
+  }
 }
 
 

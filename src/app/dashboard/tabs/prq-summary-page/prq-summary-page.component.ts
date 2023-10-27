@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { showConfirmationDialog } from 'src/app/operation/prq-entry-page/prq-utitlity';
-import { PrqService } from 'src/app/Utility/module/operation/prq/prq.service';
+import { PrqService } from '../../../Utility/module/operation/prq/prq.service';
+import { PrqSummaryModel } from 'src/app/Models/prq-model/prqsummary.model';
 
 @Component({
   selector: 'app-prq-summary-page',
@@ -19,70 +19,7 @@ export class PrqSummaryPageComponent implements OnInit {
     edit: true,
     csv: false,
   };
-  isLoad:boolean=false;
-  //#region create columnHeader object,as data of only those columns will be shown in table.
-  // < column name : Column name you want to display on table >
-
-  columnHeader = {
-    createdDate: {
-      Title: "Created On",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    prqNo: {
-      Title: "PRQ No",
-      class: "matcolumnleft",
-      Style: "min-width:200px",
-    },
-    size: {
-      Title: "Size(MT)",
-      class: "matcolumncenter",
-      Style: "max-width:80px",
-    },
-    billingParty: {
-      Title: "Billing Party",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
-    fromToCity: {
-      Title: "From-To City",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    pickUpDate: {
-      Title: "Pickup Time",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    status: {
-      Title: "Status",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
-    actionsItems: {
-      Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:80px",
-    }
-  };
-  //#endregion
-  staticField = [
-    "prqNo",
-    "pickUpDate",
-    "billingParty",
-    "fromToCity",
-    "status",
-    "createdDate",
-    "size"
-  ];
-  menuItems = [
-    { label: 'Confirm' },
-    { label: 'Reject' },
-    { label: 'Assign Vehicle' },
-    { label: 'Add Docket' },
-    { label: 'Modify' },
-    { label: 'Create THC' },
-  ];
+  isLoad:boolean=false;      
   menuItemflag: boolean = true;
   addAndEditPath: string;
   tableData: any[];
@@ -91,7 +28,8 @@ export class PrqSummaryPageComponent implements OnInit {
   allPrq: any;
   constructor(
     private router: Router,
-    private prqService:PrqService
+    private prqService:PrqService,
+    private definition: PrqSummaryModel
     ) {
     this.addAndEditPath = "Operation/PRQEntry";
   }
@@ -102,56 +40,32 @@ export class PrqSummaryPageComponent implements OnInit {
   async getPrqDetails() {
   
     let data= await this.prqService.getPrqDetailFromApi();
+    
     this.tableData=data.tableData;
     this.allPrq=data.allPrqDetail;
     this.getPrqKpiCount();
     this.tableLoad = false;
   }
-   async handleMenuItemClick(data) {
+   async handleMenuItemClick(data) {    
     if (data.label.label === "Assign Vehicle") {
       this.prqService.setassignVehicleDetail(data.data);
-      this.router.navigate(['/Operation/AssignVehicle'], {
-        state: {
-          data: data.data
-
-        },
-      });
     }
-    else if (data.label.label === "Add Docket") {
-      this.router.navigate(['Operation/ConsignmentEntry'], {
-        state: {
-          data: data.data
-        },
-      });
+    if (data.label) {
+      if (data.label.route) {
+        this.router.navigate([data.label.route], {
+          state: {
+            data: data.data
+          },
+        });
+      } else {
+        const { tabIndex, status } = data.label;
+        await this.prqService.showConfirmationDialog(data.data, this.goBack.bind(this), tabIndex, status);
+        this.tableLoad = true;
+        this.getPrqDetails();
+      }
     }
-    else if (data.label.label === "Confirm") {
-      const tabIndex = 6; // Adjust the tab index as needed
-      const status="1";
-      await this.prqService.showConfirmationDialog(data.data, this.goBack.bind(this),tabIndex,status);
-      this.tableLoad=true;
-      this.getPrqDetails();
-    }
-    else if(data.label.label==="Modify"){
-      this.router.navigate(['/Operation/PRQEntry'], {
-        state: {
-          data: data.data
-        },
-      });
-    }
-    else if(data.label.label==="Reject"){
-      const tabIndex = "PRQ"; 
-      const status="5";
-      this.tableLoad=true;
-      await this.prqService.showConfirmationDialog(data.data, this.goBack.bind(this),tabIndex,status);
-      this.getPrqDetails();
-    }
-    else if(data.label.label==="Create THC")
-    this.router.navigate(['/Operation/thc-create'], {
-      state: {
-        data: data.data
-      },
-    });
   }
+
   goBack(tabIndex: number): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }

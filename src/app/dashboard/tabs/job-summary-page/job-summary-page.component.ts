@@ -26,7 +26,7 @@ export class JobSummaryPageComponent implements OnInit {
     createdOn: {
       Title: "Created On",
       class: "matcolumnleft",
-      Style: "max-width:200px",
+      Style: "min-width:200px",
     },
     jobNo: {
       Title: "Job No",
@@ -36,7 +36,7 @@ export class JobSummaryPageComponent implements OnInit {
     jobDate: {
       Title: "Job Date",
       class: "matcolumnleft",
-      Style: "max-width:150px",
+      Style: "min-width:200px",
     },
     jobType: {
       Title: "Job Type",

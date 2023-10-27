@@ -13,22 +13,23 @@ export class DocketService {
     // Define a mapping object
     statusMapping = {
         default: {
-          status: "Thc Generated",
-          actions: [""],
+            status: "Thc Generated",
+            actions: [""],
         },
         "0": {
-          status: "Booked",
-          actions: ["Edit Docket", "Create THC"],
+            status: "Booked",
+            actions: ["Edit Docket", "Create THC"],
         },
         // Add more status mappings as needed
-      };
+    };
 
     constructor(
         private masterService: MasterService,
         private operation: OperationService
     ) { }
 
-    async updateDocket(data,filter) {
+    async updateDocket(data, filter) {
+        debugger
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
@@ -57,7 +58,7 @@ export class DocketService {
     /* below the function  was generated for the mapping of data */
     // Define a common service function
     async processShipmentList(shipmentList, orgBranch) {
-        return shipmentList.map((x) => {
+        const res = shipmentList.map((x) => {
             if (x.origin === orgBranch) {
 
                 // Assuming x.status is a string (e.g., "0", "1", "2", etc.)
@@ -70,11 +71,20 @@ export class DocketService {
                 x.invoiceCount = x.invoiceDetails.length || 0;
                 x.status = statusInfo.status || "";
                 x.actions = statusInfo.actions || ["Rake Update"];
-                x.createOn= formatDocketDate(x?.entryDate || new Date())
+                x.createOn = formatDocketDate(x?.entryDate || new Date())
                 return x;
             }
             return null;
         }).filter((x) => x !== null);
+        // Sort the PRQ list by pickupDate in descending order
+        const sortedData = res.sort((a, b) => {
+            const dateA: Date | any = new Date(a.entryDate);
+            const dateB: Date | any = new Date(b.entryDate);
+
+            // Compare the date objects
+            return dateB - dateA; // Sort in descending order
+        });
+        return sortedData
     }
     /*End*/
 }

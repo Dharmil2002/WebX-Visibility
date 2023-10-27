@@ -652,7 +652,7 @@ export class JobEntryPageComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   getDocketBasedOnCity() {
-    debugger
+    
       if(this.jobEntryTableForm.value.transportedBy=="E"&& this.jobEntryTableForm.value.transportMode=="Road"){
         const toCity = this.jobEntryTableForm.value.toCity?this.jobEntryTableForm.value.toCity.value.trim():"";
         const billingPartyName = this.jobEntryTableForm.value.billingParty.name.toLowerCase();

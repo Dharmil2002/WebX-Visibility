@@ -131,6 +131,7 @@ export class AccountMasterComponent implements OnInit {
   }
 
   EditFunction(event){
-    this.Route.navigate(["/Masters/Account/AddAccountMaster"], { state: { data: event?.data } });
+    this.Route.navigate(["/Masters/AccountMaster/AddAccountMaster"], { state: { data: event?.data } });
   }
+  
 }

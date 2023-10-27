@@ -9,7 +9,7 @@
        <div *ngIf="isTableLode">
          <app-generic-table-v2  [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
            [tableData]="TableData" (addEmitter)="AddNew()" [AddNewButton]="true" [FilterButton]="FilterButton" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData" 
-           [Link]="linkArray" [addAndEditPath]="'Masters/Account/AddAccountMaster'" [FormTitle]="'Accounts List'" [staticField]="staticField" >
+           [Link]="linkArray" [addAndEditPath]="'Masters/AccountMaster/AddAccountMaster'" [FormTitle]="'Accounts List'" [staticField]="staticField" >
          </app-generic-table-v2>
        </div>
    </div>

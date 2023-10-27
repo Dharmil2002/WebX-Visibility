@@ -359,7 +359,7 @@ export class AddAccountComponent implements OnInit {
         .masterPut("generic/update", req)
         .toPromise();
       if (res.success) {
-        this.Route.navigateByUrl("/Masters/Account/AccountMasterList");
+        this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
         Swal.fire({
           icon: "success",
           title: "Successful",
@@ -398,7 +398,7 @@ export class AddAccountComponent implements OnInit {
         .masterPost("generic/create", req)
         .toPromise();
       if (res.success) {
-        this.Route.navigateByUrl("/Masters/Account/AccountMasterList");
+        this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
         Swal.fire({
           icon: "success",
           title: "Successful",
@@ -432,7 +432,7 @@ export class AddAccountComponent implements OnInit {
   }
 
   Cancle() {
-    this.Route.navigateByUrl("/Masters/Account/AccountMasterList");
+    this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
   }
 
   toggleSelectAll(argData: any) {

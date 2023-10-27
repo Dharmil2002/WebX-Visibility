@@ -278,6 +278,16 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": [
             {
+              "path": "Masters/AccountMaster/AccountMasterList",
+              "title": "Account Master",
+              "moduleName": "Account Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
               "path": "Masters/CustomerGroupMaster/CustomerGroupMasterList",
               "title": "Customer Group Master",
               "moduleName": "Customer Group Master",

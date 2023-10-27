@@ -652,7 +652,7 @@ export class ConsignmentControl {
           Validations: [],
           functions: {
           },
-        },
+        }
     ]
     this.invoiceDetail = [
       {
@@ -937,7 +937,20 @@ export class FreightControl {
         value: localStorage.getItem("companyCode"),
         Validations: [],
         generatecontrol: false, disable: false
-      }
+      },
+      {
+        name: "jobNo",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+        functions: {
+          
+        }
+      },
     ]
   }
   getFreightControlControls() {

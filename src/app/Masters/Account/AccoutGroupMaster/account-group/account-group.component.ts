@@ -306,8 +306,7 @@ export class AccountGroupComponent implements OnInit {
         ].GroupCode.substring(3)
       );
       const Body = {
-        GroupCode:
-        this.AccountGroupForm.value.CategoryCode.name.substring(3) +
+        GroupCode:this.AccountGroupForm.value.CategoryCode.name.substr(0, 3)+
           (index < 9 ? "00" : index > 9 && index < 99 ? "0" : "") +
           (index + 1),
         GroupName: this.AccountGroupForm.value.GroupName,

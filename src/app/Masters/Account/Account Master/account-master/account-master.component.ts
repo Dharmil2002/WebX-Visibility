@@ -93,7 +93,6 @@ export class AccountMasterComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result.data) {
         this.FilterData = result.data;
-        console.log('this.FilterData' ,this.FilterData)
         this.GetTableData(this.FilterData);
       }
     });

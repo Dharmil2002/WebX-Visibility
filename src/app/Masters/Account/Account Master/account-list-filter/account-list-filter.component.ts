@@ -146,7 +146,6 @@ export class AccountListFilterComponent implements OnInit {
   }
 
   Save() {
-    console.log('this.AccountQueryForm.value.RadioAccountCode',this.AccountQueryForm.value.RadioAccountCode)
     let Body;
     if (this.AccountQueryForm.value.AccountCode) {
       if(this.AccountQueryForm.value.RadioAccountCode == 'SystemAccount'){

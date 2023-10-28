@@ -116,7 +116,7 @@ export class BeneficiaryControl {
                 name: 'accountCode',
                 label: 'Account code',
                 placeholder: 'Enter Account code',
-                type: 'text',
+                type: 'number', 
                 value: '',
                 Validations: [{
                     name: "required",
@@ -124,8 +124,8 @@ export class BeneficiaryControl {
                 },
                 {
                     name: "pattern",
-                    message: "Please enter upto 100 Alpha numeric Account code.",
-                    pattern: "^[a-zA-Z 0-9]{1,100}$",
+                    message: "Please enter valid Account code of length upto 12.",
+                    pattern: "^[0-9]{12}$",
                 },
                 ],
                 generatecontrol: true, disable: false
@@ -142,8 +142,8 @@ export class BeneficiaryControl {
                 },
                 {
                     name: "pattern",
-                    message: "Please enter upto 100 Alpha numeric IFSC code.",
-                    pattern: "^[a-zA-Z 0-9]{1,100}$",
+                    message: "Please enter IFSC code Ex: SBIN0123456",
+                    pattern: "^[A-Z]{4}0[A-Z0-9]{6}$",
                 },
                 ],
                 generatecontrol: true, disable: false
@@ -223,7 +223,10 @@ export class BeneficiaryControl {
                     message: "Upload KYC is required"
                 },],
                 functions: {
-                    onChange: 'uploadImage',
+                    onChange: 'uploadKYC',
+                },
+                additionalData: {
+                    isFileSelected: true
                 },
                 generatecontrol: true, disable: false
             },

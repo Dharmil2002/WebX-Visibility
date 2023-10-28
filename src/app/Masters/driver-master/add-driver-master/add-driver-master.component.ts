@@ -8,7 +8,9 @@ import { DriverMaster } from "src/app/core/models/Masters/Driver";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
-import { HttpErrorResponse } from "@angular/common/http";
+import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
+import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
+import { MatDialog } from "@angular/material/dialog";
 @Component({
   selector: "app-add-driver-master",
   templateUrl: "./add-driver-master.component.html",
@@ -25,13 +27,11 @@ export class AddDriverMasterComponent implements OnInit {
   jsonControlDriverArray: any;
   accordionData: any;
   location: any;
-  backPath:string;
+  backPath: string;
   locationStatus: any;
   category: any;
   categoryStatus: any;
   breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
-  selectedFiles: boolean;
-  SelectFile: File;
   vehicleDet: any;
   imageName: string;
   routeLocation: any;
@@ -54,18 +54,29 @@ export class AddDriverMasterComponent implements OnInit {
   countryCodeStatus: any;
   newDriverCode: any;
   submit = 'Save';
+  imageData: any = {};
+
   //#endregion
 
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private objImageHandling: ImageHandling,
+    private dialog: MatDialog,
+
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.DriverTable = Route.getCurrentNavigation().extras.state.data;
 
       this.isUpdate = true;
+      this.imageData = {
+        'DOBProofScan': this.DriverTable.DOBProofScan,
+        'addressProofScan': this.DriverTable.addressProofScan,
+        'licenseScan': this.DriverTable.licenseScan,
+        'driverPhoto': this.DriverTable.driverPhoto
+      }
       this.submit = 'Modify';
       this.action = "edit";
     } else {
@@ -233,6 +244,18 @@ export class AddDriverMasterComponent implements OnInit {
       );
       this.DriverTableForm.controls.vehicleNo.setValue(this.vehicleData);
     }
+    // For setting image data, assuming you have imageData defined
+    for (const controlName in this.imageData) {
+      if (this.imageData.hasOwnProperty(controlName)) {
+        const url = this.imageData[controlName];
+        const fileName = this.objImageHandling.extractFileName(url);
+        // Set the form control value using the control name
+        this.DriverTableForm.controls[controlName].setValue(fileName);
+      }
+      //setting isFileSelected to true
+      const control = this.jsonControlDriverArray.find(x => x.name === controlName);
+      control.additionalData.isFileSelected = false
+    }
   }
   //#endregion
 
@@ -278,184 +301,34 @@ export class AddDriverMasterComponent implements OnInit {
   //#endregion
 
   //#region Driver Photo
-  selectedFileDriverPhoto(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["driverPhoto"].setValue(
-          this.SelectFile.name
-        );
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  async selectFileDriverPhoto(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "driverPhoto", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
   }
   //#endregion
 
   //#region License Scan
-  selectedFileLicenseScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["licenseScan"].setValue(
-          this.SelectFile.name
-        );
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  async selectedFileLicenseScan(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "licenseScan", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
   }
   //#endregion
 
   //#region DOB proof scan
-  selectedFileDOBProofScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["DOBProofScan"].setValue(
-          this.SelectFile.name
-        );
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  async selectedFileDOBProofScan(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "DOBProofScan", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
   }
   //#endregion
 
   //#region Address Proof Scan
-  selectedFileAddressProofScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["addressProofScan"].setValue(
-          this.SelectFile.name
-        );
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
-  }
-  //#endregion
-
-  //#region License No
-  selectedFile(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["license"].setValue(this.SelectFile.name);
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
-  }
-  //#endregion
-
-  //#region Pan Card
-  selectedPngFile(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["panCard"].setValue(this.SelectFile.name);
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  async selectedFileAddressProofScan(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "addressProofScan", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
   }
   //#endregion
 
@@ -464,20 +337,12 @@ export class AddDriverMasterComponent implements OnInit {
     const controls = this.DriverTableForm;
     clearValidatorsAndValidate(controls);
     const formValue = this.DriverTableForm.value;
-    const controlNames = ["country","pincode","vehicleNo"];
+    const controlNames = ["country", "pincode", "vehicleNo"];
     controlNames.forEach((controlName) => {
       const controlValue = formValue[controlName]?.name;
       this.DriverTableForm.controls[controlName].setValue(controlValue);
     });
-    // this.DriverTableForm.controls["country"].setValue(
-    //   this.DriverTableForm.value.country.name
-    // );
-    // this.DriverTableForm.controls["pincode"].setValue(
-    //   this.DriverTableForm.value.pincode.name
-    // );
-    // this.DriverTableForm.controls["vehicleNo"].setValue(
-    //   this.DriverTableForm.value.vehicleNo.name
-    // );
+    
     // Remove field from the form controls
     this.DriverTableForm.removeControl("companyCode");
     this.DriverTableForm.removeControl("updateBy");
@@ -486,6 +351,16 @@ export class AddDriverMasterComponent implements OnInit {
     this.DriverTableForm.controls["activeFlag"].setValue(
       this.DriverTableForm.value.activeFlag === true ? true : false
     );
+    // Define an array of control names
+    const imageControlNames = ['driverPhoto', 'licenseScan', 'addressProofScan', 'DOBProofScan'];
+    let data = { ...this.DriverTableForm.value };
+
+    imageControlNames.forEach(controlName => {
+      const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
+
+      // Set the URL in the corresponding control name
+      data[controlName] = file;
+    });
 
     let req = {
       companyCode: this.companyCode,
@@ -514,9 +389,8 @@ export class AddDriverMasterComponent implements OnInit {
         this.newDriverCode = generateDriverCode(lastDriverCode);
       }
       //generate unique manualDriverCode
-      this.DriverTableForm.controls["manualDriverCode"].setValue(
-        this.newDriverCode
-      );
+      data.manualDriverCode = this.newDriverCode
+
       if (this.isUpdate) {
         let id = this.DriverTableForm.value._id;
         // Remove the "_id" field from the form controls
@@ -525,7 +399,7 @@ export class AddDriverMasterComponent implements OnInit {
           companyCode: this.companyCode,
           collectionName: "driver_detail",
           filter: { _id: id },
-          update: this.DriverTableForm.value,
+          update: data,
         };
         const res = await this.masterService
           .masterPut("generic/update", req)
@@ -541,7 +415,7 @@ export class AddDriverMasterComponent implements OnInit {
           this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList");
         }
       } else {
-        const data = this.DriverTableForm.value;
+        //const data = this.DriverTableForm.value;
         this.DriverTableForm.removeControl("_id");
         // Assign the generated _id directly
         const id = { _id: this.newDriverCode };
@@ -743,6 +617,16 @@ export class AddDriverMasterComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.DriverTableForm.controls['activeFlag'].setValue(event);
-    console.log("Toggle value :", event);
+    // console.log("Toggle value :", event);
   }
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
+  //#endregion
 }

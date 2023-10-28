@@ -52,9 +52,10 @@ export class DriverControls {
         ],
         additionalData: {
           multiple: true,
+          isFileSelected: true
         },
         functions: {
-          onChange: "selectedFileDriverPhoto",
+          onChange: "selectFileDriverPhoto",
         },
         generatecontrol: true,
         disable: false,
@@ -112,6 +113,7 @@ export class DriverControls {
         ],
         additionalData: {
           multiple: true,
+          isFileSelected: true
         },
         functions: {
           onChange: "selectedFileLicenseScan",
@@ -266,6 +268,7 @@ export class DriverControls {
         ],
         additionalData: {
           multiple: true,
+          isFileSelected: true
         },
         functions: {
           onChange: "selectedFileAddressProofScan",
@@ -352,6 +355,7 @@ export class DriverControls {
         ],
         additionalData: {
           multiple: true,
+          isFileSelected: true
         },
         functions: {
           onChange: "selectedFileDOBProofScan",

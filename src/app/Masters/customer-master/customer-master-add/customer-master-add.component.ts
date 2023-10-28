@@ -1,10 +1,8 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
-  ValidationErrors,
 } from "@angular/forms";
-// import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { customerControl } from "src/assets/FormControls/customer-master";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { Router } from "@angular/router";
@@ -16,7 +14,6 @@ import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.s
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 import { columnHeader, staticField } from "../customer-master-list/customer-utlity";
-import { FormComponent } from "src/app/shared-components/FormFields/form.component";
 import { MatDialog } from "@angular/material/dialog";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
@@ -28,8 +25,6 @@ import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 export class CustomerMasterAddComponent implements OnInit {
   customerTableForm: UntypedFormGroup;
   GSTcustomerTableForm: UntypedFormGroup;
-
-  @ViewChild(FormComponent) childComponent: FormComponent;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   //#region Variable declaration
   error: string;
@@ -322,7 +317,6 @@ export class CustomerMasterAddComponent implements OnInit {
               }
             });
 
-            this.childComponent.hide = false;
             // For setting image data, assuming you have imageData defined
             for (const controlName in this.imageData) {
               if (this.imageData.hasOwnProperty(controlName)) {
@@ -331,6 +325,9 @@ export class CustomerMasterAddComponent implements OnInit {
                 // Set the form control value using the control name
                 this.customerTableForm.controls[controlName].setValue(fileName);
               }
+              //setting isFileSelected to true
+              const control = this.jsonControlCustomerArray.find(x => x.name === controlName);
+              control.additionalData.isFileSelected = false
             }
           }
           this.filter.Filter(
@@ -952,22 +949,22 @@ export class CustomerMasterAddComponent implements OnInit {
 
   // Uplod PAN card
   async selectedFilePanCardScan(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uplodPANcard", this.customerTableForm, this.childComponent, this.imageData);
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uplodPANcard", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray);
   }
 
   // MSME Scan
   async selectedFileMSMEScan(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "MSMEscan", this.customerTableForm, this.childComponent, this.imageData);
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "MSMEscan", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray);
   }
 
- //#region to preview image
- openImageDialog(control) {
-  const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
-  this.dialog.open(ImagePreviewComponent, {
-    data: { imageUrl: file },
-    width: '30%',
-    height: '50%',
-  });
-}
-//#endregion
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
+  //#endregion
 }

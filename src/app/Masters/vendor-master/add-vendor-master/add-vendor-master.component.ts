@@ -12,7 +12,6 @@ import { Subject, take, takeUntil } from "rxjs";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
-import { FormComponent } from "src/app/shared-components/FormFields/form.component";
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { MatDialog } from "@angular/material/dialog";
@@ -106,7 +105,6 @@ export class AddVendorMasterComponent implements OnInit {
   ];
   breadScrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
   imageData: any = {};
-  @ViewChild(FormComponent) childComponent: FormComponent;
   constructor(
     private route: Router, private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -212,8 +210,8 @@ export class AddVendorMasterComponent implements OnInit {
       if (this.isUpdate) {
         this.vendorTypDetail = this.findDropdownItemByName(this.vendorTypeData, this.vendorTabledata.vendorType);
         this.vendorTableForm.controls.vendorType.setValue(this.vendorTypDetail);
+
         // For setting image data, assuming you have imageData defined
-        this.childComponent.hide = false;
         for (const controlName in this.imageData) {
           if (this.imageData.hasOwnProperty(controlName)) {
             const url = this.imageData[controlName];
@@ -221,6 +219,9 @@ export class AddVendorMasterComponent implements OnInit {
             // Set the form control value using the control name
             this.vendorTableForm.controls[controlName].setValue(fileName);
           }
+          //setting isFileSelected to true
+          const control = this.jsonControlVendorArray.find(x => x.name === controlName);
+          control.additionalData.isFileSelected = false
         }
       }
       const filterParams = [
@@ -610,12 +611,12 @@ export class AddVendorMasterComponent implements OnInit {
   async selectPanCardScan(data) {
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "panCardScan", this.
-      vendorTableForm, this.childComponent, this.imageData);
+      vendorTableForm, this.imageData, "Vendor", 'Master', this.jsonControlVendorArray);
   }
   async selectMsmeScan(data) {
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "msmeScan", this.
-      vendorTableForm, this.childComponent, this.imageData);
+      vendorTableForm, this.imageData, "Vendor", 'Master', this.jsonControlVendorArray);
   }
   //#endregion
   //#region to preview image

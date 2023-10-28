@@ -193,6 +193,7 @@ export class customerControl {
         Validations: [],
         additionalData: {
           multiple: true,
+          isFileSelected: true
         },
         functions: {
           onChange: "selectedFilePanCardScan",
@@ -351,8 +352,8 @@ export class customerControl {
         value: isUpdate ? customerTable.MSMEscan : "",
         Validations: [],
         additionalData: {
-          // multiple: true,
-        },
+          isFileSelected: true
+      },
         functions: {
           onChange: "selectedFileMSMEScan",
         },

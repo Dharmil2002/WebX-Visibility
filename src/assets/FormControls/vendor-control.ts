@@ -249,7 +249,10 @@ export class VendorControl {
                 ],
                 functions: {
                     onChange: 'selectPanCardScan',
-                }
+                },
+                additionalData: {
+                    isFileSelected: true
+                },
             },
             {
                 name: 'cinNumber',
@@ -312,7 +315,10 @@ export class VendorControl {
                 ],
                 functions: {
                     onChange: 'selectMsmeScan',
-                }
+                },
+                additionalData: {
+                    isFileSelected: true
+                },
             },
             {
                 name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isActive, Validations: [],
@@ -359,14 +365,14 @@ export class VendorControl {
                 generatecontrol: false, disable: false
             },
             {
-              name: "companyCode",
-              label: "Company Code",
-              placeholder: "Company Code",
-              type: "text",
-              value: parseInt(localStorage.getItem("companyCode")),
-              Validations: [],
-              generatecontrol: false,
-              disable: false,
+                name: "companyCode",
+                label: "Company Code",
+                placeholder: "Company Code",
+                type: "text",
+                value: parseInt(localStorage.getItem("companyCode")),
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
             },
             {
                 name: '_id',

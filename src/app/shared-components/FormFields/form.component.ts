@@ -26,7 +26,6 @@ export class FormComponent {
   @Input() FormTitle: string = "";
   @Input() DisplayCheckbox: boolean = false;
   @Input() CheckBoxMessage: string = "";
-  hide: boolean = true;
   selectedValue: any;
   isTouchUIActivated = false;
   // field required for password input.
@@ -108,7 +107,6 @@ export class FormComponent {
   }
   //#region to emit function to preview image
   openImageDialog(functionName: string, imageName: string) {
-    this.hide = false;
     let context = {
       functionName: functionName,
       imageName: imageName

@@ -12,10 +12,9 @@ export class ImageHandling {
     constructor(private masterService: MasterService,) { }
 
     //#region to handle file selection
-    async uploadFile(event, controlName, formControl, childComponent, imageData) {
+    async uploadFile(event, controlName, formControl, imageData, masterName, documentGroup, jsonControl) {
         // Get the selected files from the input element
         const files: FileList = event;
-
         if (files.length > 0) {
             const file: File = files[0];
 
@@ -30,8 +29,8 @@ export class ImageHandling {
                 // Create a FormData object to prepare the file for upload
                 const formData = new FormData();
                 formData.append('companyCode', this.companyCode);
-                formData.append('docType', "Fleet");
-                formData.append('docGroup', 'Master');
+                formData.append('docType', masterName);
+                formData.append('docGroup', documentGroup);
                 formData.append('docNo', file.name);
                 formData.append('file', file);
 
@@ -44,7 +43,9 @@ export class ImageHandling {
                         ...imageData,
                         [controlName]: url
                     };
-                    childComponent.hide = false;
+                    //setting isFileSelected to true
+                    const control = jsonControl.find(x => x.name === controlName);
+                    control.additionalData.isFileSelected = false
                     // Set the form control value to the file name
                     formControl.controls[controlName].setValue(file.name);
                 } catch (error) {

@@ -58,6 +58,7 @@ import { WESTERNCARRIERSComponent } from './ViewPrint/westerncarriers/westerncar
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { MastersModule } from "../Masters/masters.module";
 import { PrqViewComponent } from './ViewPrint/prq-view/prq-view.component';
+import { NgxPrintModule } from "ngx-print";
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -115,8 +116,8 @@ import { PrqViewComponent } from './ViewPrint/prq-view/prq-view.component';
     MatDialogModule,
     MatSnackBarModule,
     MatSlideToggleModule,
-    MastersModule
-    
+    MastersModule,
+    NgxPrintModule
   ],
   providers: [SnackBarUtilityService,PinCodeService,utilityService, OperationService, NavigationService, DatePipe, MatDialogModule, AssignVehiclePageMethods,FilterUtils],
   exports: []

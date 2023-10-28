@@ -163,9 +163,6 @@ const routes: Routes = [
   //Account Master Router
   { path: "AccountMaster/AccountMasterList", component: AccountMasterComponent },
   { path: "AccountMaster/AddAccountMaster", component: AddAccountComponent },
-
-
-
 ];
 
 @NgModule({

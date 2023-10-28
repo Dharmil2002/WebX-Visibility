@@ -15,7 +15,7 @@
     </div>
     <div>
       <app-generic-table-v2 *ngIf="isTableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="TableData"
-        (AddNewButtonEvent)="AddNew()" [AddNewButton]="true" (functionCallEmitter)="functionCallHandler($event)"
+        (AddNewButtonEvent)="AddNew()" [DisplayAddNewButton]="true" (functionCallEmitter)="functionCallHandler($event)"
         [metaData]="metaData" [Link]="linkArray" [FormTitle]="'Accounts Group List'" [staticField]="staticField">
       </app-generic-table-v2>
     </div>
@@ -34,7 +34,7 @@
     </div>
     <form [formGroup]="AccountGroupForm">
       <app-form-webxpress [form]="AccountGroupForm" [formData]="jsonControlAccountGroupArray"
-        [showSaveAndCancelButton]="false" [FormTitle]="FormTitle" [AddNewButton]="AddNewButton"
+        [showSaveAndCancelButton]="false" [FormTitle]="FormTitle"
         [className]="'col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2'" (callFunction)="functionCallHandler($event)"
         (functionCallEmitter)="functionCallHandler($event)">
       </app-form-webxpress>

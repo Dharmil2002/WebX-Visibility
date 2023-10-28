@@ -314,7 +314,7 @@ export class AddAccountComponent implements OnInit {
     }
   }
 
-  addNewAccountGroup(event) {
+  addNewAccountGroup() {
     const dialogRef = this.dialog.open(AccountGroupComponent, {
       data: {},
       width: "1000px",

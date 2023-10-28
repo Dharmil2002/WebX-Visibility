@@ -20,11 +20,13 @@ export class FormComponent {
   @Input() showSaveAndCancelButton: boolean
   @Input() showSaveButton: boolean
   @Output() functionCallEmitter = new EventEmitter();
+  @Output() AddNewButtonEvent = new EventEmitter();
   @Input() uploadedFiles;
   @Input() AddNewButton;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
   @Input() DisplayCheckbox: boolean = false;
+  @Input() DisplayAddNewButton: boolean = false;
   @Input() CheckBoxMessage: string = "";
   selectedValue: any;
   isTouchUIActivated = false;
@@ -57,11 +59,8 @@ export class FormComponent {
     }
   }
 
-  AddNew(FunctionName){
-    const context = {
-      functionName : FunctionName
-    }
-    this.functionCallEmitter.emit(context)
+  AddNew(){
+    this.AddNewButtonEvent.emit()
   }
   togglePasswordInputType(field: any) {
     field.additionalData.showPassword = !field.additionalData.showPassword;

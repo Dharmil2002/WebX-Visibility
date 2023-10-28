@@ -10,15 +10,23 @@
                 {{FormTitle}}
               </h4>
             </div>
-            <div *ngIf="DisplayCheckbox" class="col d-flex justify-content-end">
-              <section class="example-section">
-                <mat-checkbox (change)="OnChangeCheckBox($event)">
-                  {{CheckBoxMessage}} &nbsp;
-                </mat-checkbox>
-              </section>
+            <div class="col d-flex justify-content-end">
+              <div *ngIf="DisplayCheckbox">
+                <section class="example-section">
+                  <mat-checkbox (change)="OnChangeCheckBox($event)">
+                    {{CheckBoxMessage}} &nbsp;
+                  </mat-checkbox>
+                </section>
+              </div>
+              <button *ngIf="DisplayAddNewButton" matTooltip="Add New Record" mat-stroked-button
+                style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " (click)="AddNew()" class="filter_btn">
+                <mat-icon>add</mat-icon>
+                Add New
+              </button>
+              <hr>
             </div>
-            <hr>
           </div>
+
           <form class="register-form " style="margin-right: 20px;" *ngIf="formData" [formGroup]="form">
             <div class="row">
               <div *ngFor="let formItem of formData" [style]="FieldStyle" [ngClass]=className>

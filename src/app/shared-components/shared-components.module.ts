@@ -55,6 +55,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { ImagePreviewComponent } from './image-preview/image-preview.component';
 import { ImageHandling } from '../Utility/Form Utilities/imageHandling';
+import { NgxPrintModule } from "ngx-print";
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -105,7 +106,8 @@ const MY_DATE_FORMAT = {
     MatTableExporterModule,
     DragDropModule,
     TableVirtualScrollModule,
-    ScrollingModule
+    ScrollingModule,
+    NgxPrintModule
   ],
   providers: [
     {

@@ -8,8 +8,8 @@
         <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
         <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="definition.columnHeader"
             [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-            [menuItems]="definition.menuItems" [staticField]="definition.staticField" [Link]="linkArray" [height]="height" [width]="width"
-            [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
+            [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width"
+            [maxWidth]="maxWidth" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
             [menuItemFlag]="menuItemflag">
         </app-generic-table-v2>
 </div>

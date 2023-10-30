@@ -8,13 +8,13 @@ import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/Credi
 @Component({
   selector: 'app-add-voucher-details-modal',
   templateUrl: './add-voucher-details-modal.component.html',
-  encapsulation: ViewEncapsulation.None,
-  styles: [
-    `.mat-dialog-container {
-  padding: 3px 11px 0 11px !important;
-}
-    `,
-  ]
+  //   encapsulation: ViewEncapsulation.None,
+  //   styles: [
+  //     `.mat-dialog-container {
+  //   padding: 3px 11px 0 11px !important;
+  // }
+  //     `,
+  //   ]
 })
 
 export class AddVoucherDetailsModalComponent implements OnInit {

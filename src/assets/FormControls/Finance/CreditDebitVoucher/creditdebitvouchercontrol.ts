@@ -9,6 +9,7 @@ export class CreditDebitVoucherControl {
   CreditDebitVoucherTaxationPaymentDetailsArray: FormControls[];
   CreditDebitVoucherDocumentDebitsArray: FormControls[];
   CreditDebitVoucherDetailsArray: FormControls[];
+  CreditDebitAgainstDocumentArray: FormControls[];
   constructor(FormValues) {
     this.CreditDebitVoucherSummaryArray = [
 
@@ -796,6 +797,57 @@ export class CreditDebitVoucherControl {
         Validations: [],
       },
     ]
+
+    this.CreditDebitAgainstDocumentArray = [
+      {
+        name: "Document",
+        label: "Document",
+        placeholder: "Document",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Document is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      {
+        name: "DebitAmountAgaintsDocument",
+        label: "DebitAmount",
+        placeholder: "DebitAmount",
+        type: "number",
+        value: FormValues?.DebitAmountAgaintsDocument,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "DocumentHdn",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
+    ]
   }
 
   getCreditDebitVoucherSummaryArrayControls() {
@@ -821,5 +873,8 @@ export class CreditDebitVoucherControl {
   }
   getCreditDebitVoucherDetailsArrayControls() {
     return this.CreditDebitVoucherDetailsArray;
+  }
+  getCreditDebitAgainstDocumentArrayControls() {
+    return this.CreditDebitAgainstDocumentArray;
   }
 }

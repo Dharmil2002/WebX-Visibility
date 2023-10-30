@@ -50,28 +50,25 @@ export function GetLedgercolumnHeader() {
 
 
 export function GetLedgerDocument() {
+
     return {
         Document: {
-            name: "Document ",
-            key: "Dropdown",
-            option: [],
-            style: "",
-            class: 'matcolumnfirst'
-        },
-        DebitAmount: {
-            name: "Debit Amount ₹",
-            key: "inputnumber",
-            style: "",
-            class: 'matcolumncenter'
+            Title: "Document",
+            class: "matcolumnfirst",
+            Style: "min-width:200px",
         },
 
-        action: {
-            name: "Action",
-            key: "Action",
-            style: "",
-            class: 'matcolumncenter'
+        DebitAmountAgaintsDocument: {
+            Title: "DebitAmount",
+            class: "matcolumncenter",
+            Style: "min-width:170px",
+        },
+        actionsItems: {
+            Title: "Action",
+            class: "matcolumnleft",
+            Style: "max-width:100px",
         }
-    };
+    }
 }
 
 

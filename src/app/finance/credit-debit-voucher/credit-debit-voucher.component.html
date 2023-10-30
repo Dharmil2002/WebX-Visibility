@@ -10,16 +10,8 @@
         [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
         [FormTitle]="'Details'" [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="false"
         (menuItemClicked)="handleMenuItemClick($event)" [DisplayAddNewButton]=true [DisplayCheckbox]="true"
-        (AddNewButtonEvent)="AddNewButtonEvent()">
+        (AddNewButtonEvent)="AddNewDebits()">
     </app-generic-table-v2>
-
-    <!-- <app-table-boilerplate *ngIf="LoadVoucherDetails" [tableData]="tableData"
-        [columnHeader]="VoucherDetailsDisplayedColumns" [FormTitle]="'Voucher Details'"
-        (DeleteAction)="delete($event,'tableData')" (AddRow)="addVoucherDetails($event)"
-        (functionCallEmitter)="functionCallHandler($event)" (Submit)="saveData($event)" [showsubmit]="false"
-        [ActionObject]="actionObject" [showHeader]="false"
-        (callFunction)="functionCallHandler($event)"></app-table-boilerplate> -->
-
 
     <div class="row">
         <div class="col-4">
@@ -77,26 +69,7 @@
             </form>
         </div>
     </div>
-    <div *ngIf="DisplayCreditDebitVoucherDocument" class="row">
-        <div class="col-4">
-            <form [formGroup]="CreditDebitVoucherDocumentDebitsForm">
-                <app-form-webxpress [form]="CreditDebitVoucherDocumentDebitsForm" [FormTitle]="'Document Debits'"
-                    [formData]="jsonControlCreditDebitVoucherDocumentDebitsArray"
-                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
-                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-                    [showSaveAndCancelButton]="false">
-                </app-form-webxpress>
-            </form>
-        </div>
-        <div class="col-8">
-            <app-table-boilerplate [tableData]="DocumentDebits" [columnHeader]="DocumentDebitsDisplayedColumns"
-                [FormTitle]="'Document Debits'" (DeleteAction)="delete($event,'DocumentDebits')"
-                (AddRow)="AddDocumentDebits($event)" (functionCallEmitter)="functionCallHandler($event)"
-                (Submit)="saveData($event)" [showsubmit]="true" [ActionObject]="actionObject" [showHeader]="false"
-                (callFunction)="functionCallHandler($event)"></app-table-boilerplate>
 
-        </div>
-    </div>
 
     <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">

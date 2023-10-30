@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
 import { DriversFromApi, GetLocationDetailFromApi, GetSingleCustomerDetailsFromApi, GetSingleVendorDetailsFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
 import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUtitlity';
+import { AddDebitAgainstDocumentModalComponent } from '../Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
 @Component({
   selector: 'app-credit-debit-voucher',
   templateUrl: './credit-debit-voucher.component.html',
@@ -52,8 +53,6 @@ export class CreditDebitVoucherComponent implements OnInit {
   jsonControlCreditDebitVoucherTaxationPaymentDetailsArray: any;
 
 
-  CreditDebitVoucherDocumentDebitsForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherDocumentDebitsArray: any;
 
   dynamicControls = {
     add: false,
@@ -74,9 +73,8 @@ export class CreditDebitVoucherComponent implements OnInit {
 
   tableData: any = [];
   LoadVoucherDetails = true;
-  DocumentDebits: any = [];
 
-  DocumentDebitsDisplayedColumns = GetLedgerDocument()
+
   actionObject = {
     addRow: true,
     submit: true,
@@ -88,7 +86,6 @@ export class CreditDebitVoucherComponent implements OnInit {
   StateList: any;
   AccountGroupList: any;
   AllLocationsList: any;
-  DisplayCreditDebitVoucherDocument: boolean = false;
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -104,7 +101,6 @@ export class CreditDebitVoucherComponent implements OnInit {
   ngOnInit(): void {
     this.BindDataFromApi();
     this.initializeFormControl();
-    this.AddDocumentDebits('');
   }
   initializeFormControl() {
     this.creditDebitVoucherControl = new CreditDebitVoucherControl("");
@@ -126,9 +122,6 @@ export class CreditDebitVoucherComponent implements OnInit {
 
     this.jsonControlCreditDebitVoucherTaxationPaymentDetailsArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationPaymentDetailsArrayControls();
     this.CreditDebitVoucherTaxationPaymentDetailsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationPaymentDetailsArray]);
-
-    this.jsonControlCreditDebitVoucherDocumentDebitsArray = this.creditDebitVoucherControl.getCreditDebitVoucherDocumentDebitsArrayControls();
-    this.CreditDebitVoucherDocumentDebitsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherDocumentDebitsArray]);
 
   }
   async BindDataFromApi() {
@@ -366,9 +359,10 @@ export class CreditDebitVoucherComponent implements OnInit {
     this.CreditDebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(CalculatedSum.toFixed(2));
   }
 
-  async AddNewButtonEvent() {
+  async AddNewDebits() {
     this.addVoucherDetails('')
   }
+
   async save() {
     // Create a new array to store the transformed data
     var transformedData = this.tableData.map(function (item) {
@@ -426,7 +420,20 @@ export class CreditDebitVoucherComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   showhidebuttonclick(event) {
-    this.DisplayCreditDebitVoucherDocument = !this.DisplayCreditDebitVoucherDocument
+    const dialogRef = this.matDialog.open(AddDebitAgainstDocumentModalComponent, {
+      data: "request",
+      width: "100%",
+      disableClose: true,
+      position: {
+        top: "20px",
+      },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+
+      }
+    });
+
   }
   toggleUpDown(event) {
     const totalPaymentAmount = this.CreditDebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value;
@@ -482,20 +489,6 @@ export class CreditDebitVoucherComponent implements OnInit {
       this.LoadVoucherDetails = true;
     });
 
-
-  }
-  // Add a new item to the table
-  AddDocumentDebits(event) {
-    const addObj = {
-      Ledger: "EXP001",
-      SACCode: "12088",
-      action: ""
-    };
-    this.DocumentDebits.splice(0, 0, addObj);
-
-  }
-
-  saveData(event) {
 
   }
 }

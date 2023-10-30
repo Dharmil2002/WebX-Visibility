@@ -41,13 +41,17 @@ import { CreditDebitVoucherComponent } from './credit-debit-voucher/credit-debit
 import { FilterUtils } from "../Utility/dropdownFilter";
 import { VoucherServicesService } from '../core/service/Finance/voucher-services.service';
 import { AddVoucherDetailsModalComponent } from './Modals/add-voucher-details-modal/add-voucher-details-modal.component';
+import { AddDebitAgainstDocumentModalComponent } from './Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
+import { AddDetailsDebitAgainstDocumentModalComponent } from './Modals/add-details-debit-against-document-modal/add-details-debit-against-document-modal.component';
 
 @NgModule({
     declarations: [
         InvoiceSummaryBillComponent,
         AddManualVoucherComponent,
         CreditDebitVoucherComponent,
-        AddVoucherDetailsModalComponent
+        AddVoucherDetailsModalComponent,
+        AddDebitAgainstDocumentModalComponent,
+        AddDetailsDebitAgainstDocumentModalComponent
     ],
     imports: [
         CommonModule,

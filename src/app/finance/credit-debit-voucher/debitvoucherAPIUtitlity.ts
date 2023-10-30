@@ -95,4 +95,22 @@ export async function GetSingleCustomerDetailsFromApi(masterService, customerCod
     return []; // Return an empty array in case of an error or missing data
 }
 
+export async function GetLocationDetailFromApi(masterService) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = {};
+        const req = { companyCode, collectionName: 'location_detail', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+
+        if (res && res.data) {
+            return res.data.map(x => ({
+                name: x.locCode, value: x.locState
+            }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}
+
 

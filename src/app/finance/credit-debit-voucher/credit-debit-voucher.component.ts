@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 import { AddVoucherDetailsModalComponent } from '../Modals/add-voucher-details-modal/add-voucher-details-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
-import { DriversFromApi, GetSingleCustomerDetailsFromApi, GetSingleVendorDetailsFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
+import { DriversFromApi, GetLocationDetailFromApi, GetSingleCustomerDetailsFromApi, GetSingleVendorDetailsFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
 import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUtitlity';
 @Component({
   selector: 'app-credit-debit-voucher',
@@ -87,6 +87,7 @@ export class CreditDebitVoucherComponent implements OnInit {
   AllStateList: any;
   StateList: any;
   AccountGroupList: any;
+  AllLocationsList: any;
   DisplayCreditDebitVoucherDocument: boolean = false;
   constructor(
     private fb: UntypedFormBuilder,
@@ -164,14 +165,17 @@ export class CreditDebitVoucherComponent implements OnInit {
       "Partystate",
       true
     );
+
+    this.AllLocationsList = await GetLocationDetailFromApi(this.masterService)
     this.filter.Filter(
       this.jsonControlCreditDebitVoucherSummaryArray,
       this.CreditDebitVoucherSummaryForm,
-      this.StateList,
-      "Paymentstate",
-      true
+      this.AllLocationsList,
+      "Accountinglocation",
+      false
     );
-
+    const paymentstate = this.AllLocationsList.find(item => item.name == localStorage.getItem("Branch"))?.value
+    this.CreditDebitVoucherSummaryForm.get('Paymentstate').setValue(paymentstate);
 
   }
   functionCallHandler($event) {
@@ -186,17 +190,17 @@ export class CreditDebitVoucherComponent implements OnInit {
     const Partystate = this.CreditDebitVoucherSummaryForm.value.Partystate;
     const Paymentstate = this.CreditDebitVoucherSummaryForm.value.Paymentstate;
     if (Partystate && Paymentstate) {
-      const IsStateTypeUT = this.AllStateList.find(item => item.stateName == Paymentstate.name).stateType == "UT";
+      const IsStateTypeUT = this.AllStateList.find(item => item.stateName == Paymentstate).stateType == "UT";
       const GSTAmount = this.tableData.reduce((accumulator, currentValue) => {
         return accumulator + parseFloat(currentValue['GSTAmount']);
       }, 0);
       if (IsStateTypeUT) {
         this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTAmount)
       }
-      else if (!IsStateTypeUT && Partystate.name == Paymentstate.name) {
+      else if (!IsStateTypeUT && Partystate.name == Paymentstate) {
         this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTAmount)
       }
-      else if (!IsStateTypeUT && Partystate.name != Paymentstate.name) {
+      else if (!IsStateTypeUT && Partystate.name != Paymentstate) {
         this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTAmount)
       }
     }
@@ -424,12 +428,18 @@ export class CreditDebitVoucherComponent implements OnInit {
   showhidebuttonclick(event) {
     this.DisplayCreditDebitVoucherDocument = !this.DisplayCreditDebitVoucherDocument
   }
+  toggleUpDown(event) {
+    const totalPaymentAmount = this.CreditDebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value;
+    const roundedValue = event.isUpDown ? Math.ceil(totalPaymentAmount) : Math.floor(totalPaymentAmount);
+    this.CreditDebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(roundedValue);
+
+  }
   // Add a new item to the table
   addVoucherDetails(event) {
     const SACCode = [
-      { "name": "12022: Local conveyance", "value": "12022" },
-      { "name": "12088: Telecom services", "value": "12088" },
-      { "name": "12089: Telecom services", "value": "12089" }
+      { "name": "Local conveyance", "value": "12022" },
+      { "name": "Telecom services", "value": "12088" },
+      { "name": "Telecom services", "value": "12089" }
     ];
     const EditableId = event?.id
     const request = {
@@ -454,7 +464,9 @@ export class CreditDebitVoucherComponent implements OnInit {
         const json = {
           id: this.tableData.length + 1,
           Ledger: result?.Ledger,
-          SACCode: result?.Ledger,
+          LedgerHdn: result?.LedgerHdn,
+          SACCode: result?.SACCode,
+          SACCodeHdn: result?.SACCodeHdn,
           DebitAmount: result?.DebitAmount,
           GSTRate: result?.GSTRate,
           GSTAmount: result?.GSTAmount,

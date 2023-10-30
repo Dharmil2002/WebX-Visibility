@@ -42,9 +42,11 @@ export class FormComponent {
   // field required for password input.
   showPassword: boolean = false;
   ConfirmshowPassword: boolean = false;
+  checkboxChecked: boolean = false;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   @Input() url: string;
   isExpanded = true;
+  isUpDown = true;
   // ngOnChanges(changes: SimpleChanges) {
   //   this.formData=changes.formData.currentValue
   //   }
@@ -63,6 +65,13 @@ export class FormComponent {
   }
   toggleSection() {
     this.isExpanded = !this.isExpanded;
+  }
+  toggleUpDown() {
+    this.isUpDown = !this.isUpDown;
+    let isUpDown = this.isUpDown;
+    let context = { isUpDown };
+    context['functionName'] = 'toggleUpDown';
+    this.functionCallEmitter.emit(context)
   }
   functionCalled(context) {
     // console.log(context , "from form components");
@@ -101,6 +110,8 @@ export class FormComponent {
     this.functionCallEmitter.emit(context)
   }
   OnChangeCheckBox(event) {
+    this.checkboxChecked = event.checked;
+
     let context = { event };
     context['functionName'] = 'OnChangeCheckBox';
     this.functionCallEmitter.emit(context)

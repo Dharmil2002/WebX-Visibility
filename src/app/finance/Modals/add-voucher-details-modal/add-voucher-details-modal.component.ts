@@ -55,8 +55,8 @@ export class AddVoucherDetailsModalComponent implements OnInit {
       false
     );
     if (this.objResult.Details) {
-      this.CreditDebitVoucherDetailsForm.controls.Ledger.setValue(this.objResult.LedgerList.find(x => x.value == this.objResult.Details.Ledger))
-      this.CreditDebitVoucherDetailsForm.controls.SACCode.setValue(this.objResult.SACCode.find(x => x.value == this.objResult.Details.SACCode))
+      this.CreditDebitVoucherDetailsForm.controls.Ledger.setValue(this.objResult.LedgerList.find(x => x.value == this.objResult.Details.LedgerHdn))
+      this.CreditDebitVoucherDetailsForm.controls.SACCode.setValue(this.objResult.SACCode.find(x => x.value == this.objResult.Details.SACCodeHdn))
     }
 
   }
@@ -69,8 +69,12 @@ export class AddVoucherDetailsModalComponent implements OnInit {
     }
   }
   save(event) {
-    this.CreditDebitVoucherDetailsForm.controls.Ledger.patchValue(this.CreditDebitVoucherDetailsForm.value['Ledger'].value)
-    this.CreditDebitVoucherDetailsForm.controls.SACCode.patchValue(this.CreditDebitVoucherDetailsForm.value['SACCode'].value)
+    const Ledger = this.CreditDebitVoucherDetailsForm.value['Ledger'];
+    const SACCode = this.CreditDebitVoucherDetailsForm.value['SACCode'];
+    this.CreditDebitVoucherDetailsForm.controls.Ledger.patchValue(Ledger.name)
+    this.CreditDebitVoucherDetailsForm.controls.SACCode.patchValue(SACCode.name)
+    this.CreditDebitVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value)
+    this.CreditDebitVoucherDetailsForm.controls.SACCodeHdn.patchValue(SACCode.value)
     this.dialogRef.close(this.CreditDebitVoucherDetailsForm.value)
   }
   cancel(event) {

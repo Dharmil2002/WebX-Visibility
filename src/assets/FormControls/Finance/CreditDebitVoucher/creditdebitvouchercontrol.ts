@@ -43,18 +43,37 @@ export class CreditDebitVoucherControl {
         type: "text",
         value: localStorage.getItem('Branch'),
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [],
       },
+
       {
         name: "Accountinglocation",
         label: "Accounting location",
         placeholder: "Accounting location",
-        type: "text",
-        value: localStorage.getItem('Branch'),
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
         generatecontrol: true,
-        disable: true,
-        Validations: [],
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Accounting location is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+          metaData: "Basic"
+        },
       },
       {
         name: "Preparedfor",
@@ -167,33 +186,43 @@ export class CreditDebitVoucherControl {
         name: "Paymentstate",
         label: "Payment state",
         placeholder: "Payment state",
-        type: "dropdown",
+        type: "text",
         value: "",
-        filterOptions: "",
-        displaywith: "",
         generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Payment state is required"
-          },
-          {
-            name: "invalidAutocompleteObject",
-            message: "Choose proper value",
-          },
-          {
-            name: "autocomplete",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
-          metaData: "Basic"
-        },
-        functions: {
-          onOptionSelect: "StateChange"
-        },
+        disable: true,
+        Validations: [],
       },
+      // {
+      //   name: "Paymentstate",
+      //   label: "Payment state",
+      //   placeholder: "Payment state",
+      //   type: "dropdown",
+      //   value: "",
+      //   filterOptions: "",
+      //   displaywith: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [
+      //     {
+      //       name: "required",
+      //       message: "Payment state is required"
+      //     },
+      //     {
+      //       name: "invalidAutocompleteObject",
+      //       message: "Choose proper value",
+      //     },
+      //     {
+      //       name: "autocomplete",
+      //     },
+      //   ],
+      //   additionalData: {
+      //     showNameAndValue: false,
+      //     metaData: "Basic"
+      //   },
+      //   functions: {
+      //     onOptionSelect: "StateChange"
+      //   },
+      // },
 
 
 
@@ -430,16 +459,31 @@ export class CreditDebitVoucherControl {
     this.CreditDebitVoucherTaxationPaymentSummaryArray = [
 
 
+
       {
-        name: 'PaymentAmount', label: 'Payment Amount', placeholder: 'Payment Amount', type: 'dayhour',
+        name: 'PaymentAmount',
+        label: 'Payment Amount',
+        placeholder: 'Payment Amount',
+        type: 'number',
         value: "",
-        Validations: [], generatecontrol: true, disable: true,
+        Validations: [],
+        generatecontrol: true, disable: false,
         additionalData: {
-          metaData: "Basic",
-          label: 'Net Payable',
-          fieldName: "NetPayable",
-          disable: false,
-        },
+          metaData: "PaymentAmount"
+        }
+      },
+
+      {
+        name: 'NetPayable',
+        label: 'Net Payable',
+        placeholder: 'Net Payable',
+        type: 'number',
+        value: "",
+        Validations: [],
+        generatecontrol: true, disable: true,
+        additionalData: {
+          metaData: "NetPayable"
+        }
       },
 
       {
@@ -452,18 +496,7 @@ export class CreditDebitVoucherControl {
         disable: false,
         Validations: [],
       },
-      {
-        name: 'NetPayable',
-        label: '',
-        placeholder: '',
-        type: 'number',
-        value: "",
-        Validations: [],
-        generatecontrol: false, disable: true,
-        additionalData: {
-          metaData: "NetPayable"
-        }
-      }
+
 
     ];
     this.CreditDebitVoucherTaxationPaymentDetailsArray = [
@@ -742,8 +775,26 @@ export class CreditDebitVoucherControl {
         disable: false,
         Validations: [],
       },
-
-
+      {
+        name: "LedgerHdn",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "SACCodeHdn",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
     ]
   }
 

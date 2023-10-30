@@ -55,12 +55,12 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-4">
+        <div class="col-5">
             <form [formGroup]="CreditDebitVoucherTaxationPaymentSummaryForm">
                 <app-form-webxpress [form]="CreditDebitVoucherTaxationPaymentSummaryForm"
                     [FormTitle]="'Payment Summary'" [DisplayCheckbox]="true" [CheckBoxMessage]="'Round Off'"
                     [formData]="jsonControlCreditDebitVoucherTaxationPaymentSummaryArray"
-                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                    [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2'"
                     (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
                     [showSaveAndCancelButton]="false">
                 </app-form-webxpress>

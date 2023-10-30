@@ -12,6 +12,12 @@
             </div>
             <div class="col d-flex justify-content-end">
               <section *ngIf="DisplayCheckbox" class="example-section">
+                <button *ngIf="checkboxChecked" (click)="toggleUpDown()" type="button"
+                  class="btn btn-border-radius waves-effect msl-2  mb-2"
+                  style="margin-top:10px;margin-bottom: 10px; margin-right:10px; ">
+                  <mat-icon>{{isUpDown ?
+                    'arrow_upward' : 'arrow_downward'}}</mat-icon>
+                </button>
                 <mat-checkbox (change)="OnChangeCheckBox($event)">
                   {{CheckBoxMessage}} &nbsp;
                 </mat-checkbox>
@@ -27,7 +33,7 @@
                   'expand_more' : 'expand_less'}}</mat-icon>
               </button>
             </div>
-            <hr>
+            <hr style="margin:0px">
           </div>
           <div *ngIf="isExpanded" [@fadeInOut]="isExpanded">
             <form class="register-form " style="margin-right: 20px;" *ngIf="formData" [formGroup]="form">

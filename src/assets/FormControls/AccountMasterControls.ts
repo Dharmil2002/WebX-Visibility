@@ -6,7 +6,7 @@ export class AccountMasterControls {
   AccountGroupAddArray: FormControls[];
 
 
-  constructor() {
+  constructor(isUpdate) {
     this.AccountQureyArray = [
       {
         name: "RadioAccountCode",
@@ -145,7 +145,7 @@ export class AccountMasterControls {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "required",
@@ -325,7 +325,7 @@ export class AccountMasterControls {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "required",

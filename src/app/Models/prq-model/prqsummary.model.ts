@@ -18,6 +18,8 @@ export class PrqSummaryModel implements IFieldDefinition {
       Title: "PRQ No",
       class: "matcolumnleft",
       Style: "min-width:200px",
+      type:'windowLink',
+      functionName:'OpenPrq'
     },
     size: {
       Title: "Veh/Cont-Size",
@@ -52,7 +54,7 @@ export class PrqSummaryModel implements IFieldDefinition {
   };
 
   public staticField = [
-    "prqNo",
+    // "prqNo",
     "pickUpDate",
     "billingParty",
     "fromToCity",

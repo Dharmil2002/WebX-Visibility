@@ -43,7 +43,7 @@ export class AccountListFilterComponent implements OnInit {
   }
 
   initializeFormControl() {
-    const AccountQueryFormControls = new AccountMasterControls();
+    const AccountQueryFormControls = new AccountMasterControls(false);
     this.jsonControlAccountQueryArray =
       AccountQueryFormControls.getAccountQureyArray();
     // Build the form group using formGroupBuilder function and the values of accordionData

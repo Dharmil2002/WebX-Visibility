@@ -23,67 +23,6 @@ export class PrqSummaryPageComponent implements OnInit {
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
 
-  columnHeader = {
-    createdDate: {
-      Title: "Created On",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    prqNo: {
-      Title: "PRQ No",
-      class: "matcolumnleft",
-      Style: "min-width:200px",
-      type:'windowLink',
-      functionName:'OpenPrq'
-    },
-    size: {
-      Title: "Size(MT)",
-      class: "matcolumncenter",
-      Style: "max-width:80px",
-    },
-    billingParty: {
-      Title: "Billing Party",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
-    fromToCity: {
-      Title: "From-To City",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    pickUpDate: {
-      Title: "Pickup Time",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    status: {
-      Title: "Status",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-    },
-    actionsItems: {
-      Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:80px",
-    }
-  };
-  //#endregion
-  staticField = [
-    "pickUpDate",
-    "billingParty",
-    "fromToCity",
-    "status",
-    "createdDate",
-    "size"
-  ];
-  menuItems = [
-    { label: 'Confirm' },
-    { label: 'Reject' },
-    { label: 'Assign Vehicle' },
-    { label: 'Add Docket' },
-    { label: 'Modify' },
-    { label: 'Create THC' },
-  ];
   menuItemflag: boolean = true;
   addAndEditPath: string;
   tableData: any[];
@@ -172,5 +111,4 @@ export class PrqSummaryPageComponent implements OnInit {
     const url = `${window.location.origin}/#/Operation/prq-view?prqNo=${prqNo}`;
     window.open(url,'','width=1000,height=800');
   }
-
 }

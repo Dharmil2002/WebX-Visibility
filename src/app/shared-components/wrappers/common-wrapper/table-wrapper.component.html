@@ -5,13 +5,11 @@
   } */
 
   .breadcrumbs {
-    background-color: #fff;
     /* Set the background color as needed */
     position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 100;
-    border-radius: 10px;
   }
 
   .scrollable-content {
@@ -20,21 +18,20 @@
     overflow-y: auto;
     overflow-x: hidden;
     border-radius: 10px;
+    padding-left: 10px;
     /* Add any other desired styles for this section */
   }
 </style>
 
 <section class="content">
   <div class="container-fluid">
-    <div class="card" style="margin-bottom: 5px !important;">
-      <div class="breadcrumbs">
-        <div *ngIf="breadscrums !== undefined">
-          <div class="block-header" *ngFor="let breadscrum of breadscrums">
-            <app-breadcrumb [backPath]="backPath" [title]="breadscrum.title" [items]="breadscrum.items"
-              [active_item]="breadscrum.active" [generatecontrol]="breadscrum.generatecontrol"
-              (toggleChange)="onToggleChange($event)" [toggle]="breadscrum.toggle">
-            </app-breadcrumb>
-          </div>
+    <div class="breadcrumbs" style="margin-bottom: 0px !important;">
+      <div *ngIf="breadscrums !== undefined">
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+          <app-breadcrumb [backPath]="backPath" [title]="breadscrum.title" [items]="breadscrum.items"
+            [active_item]="breadscrum.active" [generatecontrol]="breadscrum.generatecontrol"
+            (toggleChange)="onToggleChange($event)" [toggle]="breadscrum.toggle">
+          </app-breadcrumb>
         </div>
       </div>
     </div>

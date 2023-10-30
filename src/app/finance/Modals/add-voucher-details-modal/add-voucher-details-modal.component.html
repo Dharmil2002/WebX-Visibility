@@ -1,4 +1,4 @@
-<div mat-dialog-title style="display: flex;
+<!-- <div mat-dialog-title style="display: flex;
   justify-content: space-between;margin: 0 0 0px;
   align-items: center;">
     <h3>Voucher Details
@@ -7,11 +7,11 @@
         <mat-icon>close</mat-icon>
     </button>
 </div>
-<div class="body">
-    <form [formGroup]="CreditDebitVoucherDetailsForm">
-        <app-form-webxpress [form]="CreditDebitVoucherDetailsForm" [FormTitle]="'Debit Voucher Details'"
-            [formData]="jsonControlCreditDebitVoucherDetailsArray" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
-        </app-form-webxpress>
-    </form>
-</div>
+<div class="body"> -->
+<form [formGroup]="CreditDebitVoucherDetailsForm">
+    <app-form-webxpress [form]="CreditDebitVoucherDetailsForm" [FormTitle]="'Debit Voucher Details'"
+        [formData]="jsonControlCreditDebitVoucherDetailsArray" (functionCallEmitter)="functionCallHandler($event)"
+        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+    </app-form-webxpress>
+</form>
+<!-- </div> -->

@@ -1,3 +1,4 @@
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { FormGroupDirective, UntypedFormGroup } from '@angular/forms';
 import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-date-picker/custome-date-picker.component';
@@ -6,6 +7,14 @@ import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-da
 @Component({
   selector: 'app-form-webxpress',
   templateUrl: './form.component.html',
+  animations: [
+    trigger('fadeInOut', [
+      state('void', style({ opacity: 0 })),
+      transition(':enter, :leave', [
+        animate(300)
+      ]),
+    ]),
+  ],
 })
 export class FormComponent {
   @Input() formData
@@ -35,6 +44,7 @@ export class FormComponent {
   ConfirmshowPassword: boolean = false;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   @Input() url: string;
+  isExpanded = true;
   // ngOnChanges(changes: SimpleChanges) {
   //   this.formData=changes.formData.currentValue
   //   }
@@ -51,7 +61,9 @@ export class FormComponent {
 
   ngOnInit(): void {
   }
-
+  toggleSection() {
+    this.isExpanded = !this.isExpanded;
+  }
   functionCalled(context) {
     // console.log(context , "from form components");
     if ((context.functionName !== undefined || context.functionName != null) && context.functionName?.length > 0) {
@@ -59,7 +71,7 @@ export class FormComponent {
     }
   }
 
-  AddNew(){
+  AddNew() {
     this.AddNewButtonEvent.emit()
   }
   togglePasswordInputType(field: any) {

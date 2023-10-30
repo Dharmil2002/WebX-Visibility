@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -8,7 +8,15 @@ import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/Credi
 @Component({
   selector: 'app-add-voucher-details-modal',
   templateUrl: './add-voucher-details-modal.component.html',
+  encapsulation: ViewEncapsulation.None,
+  styles: [
+    `.mat-dialog-container {
+  padding: 3px 11px 0 11px !important;
+}
+    `,
+  ]
 })
+
 export class AddVoucherDetailsModalComponent implements OnInit {
   creditDebitVoucherControl: CreditDebitVoucherControl;
 

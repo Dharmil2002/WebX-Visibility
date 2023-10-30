@@ -3,17 +3,17 @@ import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/creditdebitvouchercontrol';
+import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 
 @Component({
   selector: 'app-add-details-debit-against-document-modal',
   templateUrl: './add-details-debit-against-document-modal.component.html',
 })
 export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
-  creditDebitVoucherControl: CreditDebitVoucherControl;
+  DebitVoucherControl: DebitVoucherControl;
 
-  CreditDebitAgainstDocumentForm: UntypedFormGroup;
-  jsonControlCreditDebitAgainstDocumentArray: any;
+  DebitAgainstDocumentForm: UntypedFormGroup;
+  jsonControlDebitAgainstDocumentArray: any;
 
   constructor(private filter: FilterUtils, private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<AddDetailsDebitAgainstDocumentModalComponent>,
@@ -28,13 +28,13 @@ export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
     this.dialogRef.close()
   }
   initializeFormControl() {
-    this.creditDebitVoucherControl = new CreditDebitVoucherControl(this.objResult.Details);
-    this.jsonControlCreditDebitAgainstDocumentArray = this.creditDebitVoucherControl.getCreditDebitAgainstDocumentArrayControls();
-    this.CreditDebitAgainstDocumentForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitAgainstDocumentArray]);
+    this.DebitVoucherControl = new DebitVoucherControl(this.objResult.Details);
+    this.jsonControlDebitAgainstDocumentArray = this.DebitVoucherControl.getDebitAgainstDocumentArrayControls();
+    this.DebitAgainstDocumentForm = formGroupBuilder(this.fb, [this.jsonControlDebitAgainstDocumentArray]);
 
     this.filter.Filter(
-      this.jsonControlCreditDebitAgainstDocumentArray,
-      this.CreditDebitAgainstDocumentForm,
+      this.jsonControlDebitAgainstDocumentArray,
+      this.DebitAgainstDocumentForm,
       this.objResult.DocumentList,
       "Document",
       false
@@ -42,7 +42,7 @@ export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
 
 
     if (this.objResult.Details) {
-      this.CreditDebitAgainstDocumentForm.controls.Document.setValue(this.objResult.DocumentList.find(x => x.value == this.objResult.Details
+      this.DebitAgainstDocumentForm.controls.Document.setValue(this.objResult.DocumentList.find(x => x.value == this.objResult.Details
         .DocumentHdn))
     }
 
@@ -56,10 +56,10 @@ export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
     }
   }
   save(event) {
-    const Document = this.CreditDebitAgainstDocumentForm.value['Document'];
-    this.CreditDebitAgainstDocumentForm.controls.Document.patchValue(Document.name)
-    this.CreditDebitAgainstDocumentForm.controls.DocumentHdn.patchValue(Document.value)
-    this.dialogRef.close(this.CreditDebitAgainstDocumentForm.value)
+    const Document = this.DebitAgainstDocumentForm.value['Document'];
+    this.DebitAgainstDocumentForm.controls.Document.patchValue(Document.name)
+    this.DebitAgainstDocumentForm.controls.DocumentHdn.patchValue(Document.value)
+    this.dialogRef.close(this.DebitAgainstDocumentForm.value)
   }
   cancel(event) {
     this.dialogRef.close()

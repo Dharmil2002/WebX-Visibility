@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/creditdebitvouchercontrol';
+import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 
 @Component({
   selector: 'app-add-voucher-details-modal',
@@ -18,10 +18,10 @@ import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/Credi
 })
 
 export class AddVoucherDetailsModalComponent implements OnInit {
-  creditDebitVoucherControl: CreditDebitVoucherControl;
+  DebitVoucherControl: DebitVoucherControl;
 
-  CreditDebitVoucherDetailsForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherDetailsArray: any;
+  DebitVoucherDetailsForm: UntypedFormGroup;
+  jsonControlDebitVoucherDetailsArray: any;
 
   constructor(private filter: FilterUtils, private fb: UntypedFormBuilder, public dialogRef: MatDialogRef<AddVoucherDetailsModalComponent>,
     @Inject(MAT_DIALOG_DATA)
@@ -35,28 +35,28 @@ export class AddVoucherDetailsModalComponent implements OnInit {
     this.dialogRef.close()
   }
   initializeFormControl() {
-    this.creditDebitVoucherControl = new CreditDebitVoucherControl(this.objResult.Details);
-    this.jsonControlCreditDebitVoucherDetailsArray = this.creditDebitVoucherControl.getCreditDebitVoucherDetailsArrayControls();
-    this.CreditDebitVoucherDetailsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherDetailsArray]);
+    this.DebitVoucherControl = new DebitVoucherControl(this.objResult.Details);
+    this.jsonControlDebitVoucherDetailsArray = this.DebitVoucherControl.getDebitVoucherDetailsArrayControls();
+    this.DebitVoucherDetailsForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherDetailsArray]);
 
     this.filter.Filter(
-      this.jsonControlCreditDebitVoucherDetailsArray,
-      this.CreditDebitVoucherDetailsForm,
+      this.jsonControlDebitVoucherDetailsArray,
+      this.DebitVoucherDetailsForm,
       this.objResult.LedgerList,
       "Ledger",
       false
     );
 
     this.filter.Filter(
-      this.jsonControlCreditDebitVoucherDetailsArray,
-      this.CreditDebitVoucherDetailsForm,
+      this.jsonControlDebitVoucherDetailsArray,
+      this.DebitVoucherDetailsForm,
       this.objResult.SACCode,
       "SACCode",
       false
     );
     if (this.objResult.Details) {
-      this.CreditDebitVoucherDetailsForm.controls.Ledger.setValue(this.objResult.LedgerList.find(x => x.value == this.objResult.Details.LedgerHdn))
-      this.CreditDebitVoucherDetailsForm.controls.SACCode.setValue(this.objResult.SACCode.find(x => x.value == this.objResult.Details.SACCodeHdn))
+      this.DebitVoucherDetailsForm.controls.Ledger.setValue(this.objResult.LedgerList.find(x => x.value == this.objResult.Details.LedgerHdn))
+      this.DebitVoucherDetailsForm.controls.SACCode.setValue(this.objResult.SACCode.find(x => x.value == this.objResult.Details.SACCodeHdn))
     }
 
   }
@@ -69,27 +69,27 @@ export class AddVoucherDetailsModalComponent implements OnInit {
     }
   }
   save(event) {
-    const Ledger = this.CreditDebitVoucherDetailsForm.value['Ledger'];
-    const SACCode = this.CreditDebitVoucherDetailsForm.value['SACCode'];
-    this.CreditDebitVoucherDetailsForm.controls.Ledger.patchValue(Ledger.name)
-    this.CreditDebitVoucherDetailsForm.controls.SACCode.patchValue(SACCode.name)
-    this.CreditDebitVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value)
-    this.CreditDebitVoucherDetailsForm.controls.SACCodeHdn.patchValue(SACCode.value)
-    this.dialogRef.close(this.CreditDebitVoucherDetailsForm.value)
+    const Ledger = this.DebitVoucherDetailsForm.value['Ledger'];
+    const SACCode = this.DebitVoucherDetailsForm.value['SACCode'];
+    this.DebitVoucherDetailsForm.controls.Ledger.patchValue(Ledger.name)
+    this.DebitVoucherDetailsForm.controls.SACCode.patchValue(SACCode.name)
+    this.DebitVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value)
+    this.DebitVoucherDetailsForm.controls.SACCodeHdn.patchValue(SACCode.value)
+    this.dialogRef.close(this.DebitVoucherDetailsForm.value)
   }
   cancel(event) {
     this.dialogRef.close()
   }
   calculateGSTAndTotal(event) {
-    const DebitAmount = Number(this.CreditDebitVoucherDetailsForm.value['DebitAmount']);
-    const GSTRate = Number(this.CreditDebitVoucherDetailsForm.value['GSTRate']);
+    const DebitAmount = Number(this.DebitVoucherDetailsForm.value['DebitAmount']);
+    const GSTRate = Number(this.DebitVoucherDetailsForm.value['GSTRate']);
 
     if (!isNaN(DebitAmount) && !isNaN(GSTRate)) {
       const GSTAmount = (DebitAmount * GSTRate) / 100;
       const Total = GSTAmount + DebitAmount;
 
-      this.CreditDebitVoucherDetailsForm.controls.GSTAmount.setValue(GSTAmount.toFixed(2));
-      this.CreditDebitVoucherDetailsForm.controls.Total.setValue(Total.toFixed(2));
+      this.DebitVoucherDetailsForm.controls.GSTAmount.setValue(GSTAmount.toFixed(2));
+      this.DebitVoucherDetailsForm.controls.Total.setValue(Total.toFixed(2));
     } else {
       console.error('Invalid input values for DebitAmount or GSTRate');
     }

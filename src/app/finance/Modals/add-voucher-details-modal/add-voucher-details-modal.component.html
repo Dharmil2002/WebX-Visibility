@@ -8,9 +8,9 @@
     </button>
 </div>
 <div class="body">
-    <form [formGroup]="CreditDebitVoucherDetailsForm">
-        <app-form-webxpress [form]="CreditDebitVoucherDetailsForm" [FormTitle]="'Debit Voucher Details'"
-            [formData]="jsonControlCreditDebitVoucherDetailsArray" (functionCallEmitter)="functionCallHandler($event)"
+    <form [formGroup]="DebitVoucherDetailsForm">
+        <app-form-webxpress [form]="DebitVoucherDetailsForm" [FormTitle]="'Debit Voucher Details'"
+            [formData]="jsonControlDebitVoucherDetailsArray" (functionCallEmitter)="functionCallHandler($event)"
             (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
         </app-form-webxpress>
     </form>

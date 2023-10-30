@@ -3,9 +3,9 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/creditdebitvouchercontrol';
 import { GetLedgerDocument } from '../../credit-debit-voucher/debitvoucherCommonUtitlity';
 import { AddDetailsDebitAgainstDocumentModalComponent } from '../add-details-debit-against-document-modal/add-details-debit-against-document-modal.component';
+import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 
 @Component({
   selector: 'app-add-debit-against-document-modal',
@@ -13,10 +13,10 @@ import { AddDetailsDebitAgainstDocumentModalComponent } from '../add-details-deb
 
 })
 export class AddDebitAgainstDocumentModalComponent implements OnInit {
-  creditDebitVoucherControl: CreditDebitVoucherControl;
+  DebitVoucherControl: DebitVoucherControl;
 
-  CreditDebitVoucherDocumentDebitsForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherDocumentDebitsArray: any;
+  DebitVoucherDocumentDebitsForm: UntypedFormGroup;
+  jsonControlDebitVoucherDocumentDebitsArray: any;
   DocumentDebitsDisplayedColumns = GetLedgerDocument()
   staticFieldForLedgerDocument = ['Document', 'DebitAmountAgaintsDocument']
   LoadDocumentDebitsDetails = true;
@@ -56,10 +56,10 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
     this.initializeFormControl()
   }
   initializeFormControl() {
-    this.creditDebitVoucherControl = new CreditDebitVoucherControl("");
+    this.DebitVoucherControl = new DebitVoucherControl("");
 
-    this.jsonControlCreditDebitVoucherDocumentDebitsArray = this.creditDebitVoucherControl.getCreditDebitVoucherDocumentDebitsArrayControls();
-    this.CreditDebitVoucherDocumentDebitsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherDocumentDebitsArray]);
+    this.jsonControlDebitVoucherDocumentDebitsArray = this.DebitVoucherControl.getDebitVoucherDocumentDebitsArrayControls();
+    this.DebitVoucherDocumentDebitsForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherDocumentDebitsArray]);
 
   } Close() {
     this.dialogRef.close()

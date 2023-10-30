@@ -1,17 +1,17 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
-export class CreditDebitVoucherControl {
-  CreditDebitVoucherSummaryArray: FormControls[];
-  CreditDebitVoucherTaxationTDSArray: FormControls[];
-  CreditDebitVoucherTaxationTCSArray: FormControls[];
-  CreditDebitVoucherTaxationGSTArray: FormControls[];
-  CreditDebitVoucherTaxationPaymentSummaryArray: FormControls[];
-  CreditDebitVoucherTaxationPaymentDetailsArray: FormControls[];
-  CreditDebitVoucherDocumentDebitsArray: FormControls[];
-  CreditDebitVoucherDetailsArray: FormControls[];
-  CreditDebitAgainstDocumentArray: FormControls[];
+export class DebitVoucherControl {
+  DebitVoucherSummaryArray: FormControls[];
+  DebitVoucherTaxationTDSArray: FormControls[];
+  DebitVoucherTaxationTCSArray: FormControls[];
+  DebitVoucherTaxationGSTArray: FormControls[];
+  DebitVoucherTaxationPaymentSummaryArray: FormControls[];
+  DebitVoucherTaxationPaymentDetailsArray: FormControls[];
+  DebitVoucherDocumentDebitsArray: FormControls[];
+  DebitVoucherDetailsArray: FormControls[];
+  DebitAgainstDocumentArray: FormControls[];
   constructor(FormValues) {
-    this.CreditDebitVoucherSummaryArray = [
+    this.DebitVoucherSummaryArray = [
 
       {
         name: "VoucherNumber",
@@ -253,7 +253,7 @@ export class CreditDebitVoucherControl {
       },
 
     ];
-    this.CreditDebitVoucherTaxationTDSArray = [
+    this.DebitVoucherTaxationTDSArray = [
 
       {
         name: "TDSSection",
@@ -343,7 +343,7 @@ export class CreditDebitVoucherControl {
 
 
     ];
-    this.CreditDebitVoucherTaxationTCSArray = [
+    this.DebitVoucherTaxationTCSArray = [
 
       {
         name: "TCSSection",
@@ -411,7 +411,7 @@ export class CreditDebitVoucherControl {
       },
 
     ];
-    this.CreditDebitVoucherTaxationGSTArray = [
+    this.DebitVoucherTaxationGSTArray = [
 
       {
         name: "IGST",
@@ -457,7 +457,7 @@ export class CreditDebitVoucherControl {
         }
       }
     ];
-    this.CreditDebitVoucherTaxationPaymentSummaryArray = [
+    this.DebitVoucherTaxationPaymentSummaryArray = [
 
 
 
@@ -500,7 +500,7 @@ export class CreditDebitVoucherControl {
 
 
     ];
-    this.CreditDebitVoucherTaxationPaymentDetailsArray = [
+    this.DebitVoucherTaxationPaymentDetailsArray = [
       {
         name: "PaymentMode",
         label: "Payment Mode",
@@ -589,7 +589,7 @@ export class CreditDebitVoucherControl {
 
     ];
 
-    this.CreditDebitVoucherDocumentDebitsArray = [
+    this.DebitVoucherDocumentDebitsArray = [
       {
         name: "TotalDebit",
         label: "Total Debit",
@@ -633,7 +633,7 @@ export class CreditDebitVoucherControl {
       },
 
     ]
-    this.CreditDebitVoucherDetailsArray = [
+    this.DebitVoucherDetailsArray = [
       {
         name: "Ledger",
         label: "Ledger",
@@ -798,7 +798,7 @@ export class CreditDebitVoucherControl {
       },
     ]
 
-    this.CreditDebitAgainstDocumentArray = [
+    this.DebitAgainstDocumentArray = [
       {
         name: "Document",
         label: "Document",
@@ -850,31 +850,31 @@ export class CreditDebitVoucherControl {
     ]
   }
 
-  getCreditDebitVoucherSummaryArrayControls() {
-    return this.CreditDebitVoucherSummaryArray;
+  getDebitVoucherSummaryArrayControls() {
+    return this.DebitVoucherSummaryArray;
   }
-  getCreditDebitVoucherTaxationTDSArrayControls() {
-    return this.CreditDebitVoucherTaxationTDSArray;
+  getDebitVoucherTaxationTDSArrayControls() {
+    return this.DebitVoucherTaxationTDSArray;
   }
-  getCreditDebitVoucherTaxationTCSArrayControls() {
-    return this.CreditDebitVoucherTaxationTCSArray;
+  getDebitVoucherTaxationTCSArrayControls() {
+    return this.DebitVoucherTaxationTCSArray;
   }
-  getCreditDebitVoucherTaxationGSTArrayControls() {
-    return this.CreditDebitVoucherTaxationGSTArray;
+  getDebitVoucherTaxationGSTArrayControls() {
+    return this.DebitVoucherTaxationGSTArray;
   }
-  getCreditDebitVoucherTaxationPaymentSummaryArrayControls() {
-    return this.CreditDebitVoucherTaxationPaymentSummaryArray;
+  getDebitVoucherTaxationPaymentSummaryArrayControls() {
+    return this.DebitVoucherTaxationPaymentSummaryArray;
   }
-  getCreditDebitVoucherTaxationPaymentDetailsArrayControls() {
-    return this.CreditDebitVoucherTaxationPaymentDetailsArray;
+  getDebitVoucherTaxationPaymentDetailsArrayControls() {
+    return this.DebitVoucherTaxationPaymentDetailsArray;
   }
-  getCreditDebitVoucherDocumentDebitsArrayControls() {
-    return this.CreditDebitVoucherDocumentDebitsArray;
+  getDebitVoucherDocumentDebitsArrayControls() {
+    return this.DebitVoucherDocumentDebitsArray;
   }
-  getCreditDebitVoucherDetailsArrayControls() {
-    return this.CreditDebitVoucherDetailsArray;
+  getDebitVoucherDetailsArrayControls() {
+    return this.DebitVoucherDetailsArray;
   }
-  getCreditDebitAgainstDocumentArrayControls() {
-    return this.CreditDebitAgainstDocumentArray;
+  getDebitAgainstDocumentArrayControls() {
+    return this.DebitAgainstDocumentArray;
   }
 }

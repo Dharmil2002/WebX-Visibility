@@ -10,9 +10,9 @@
 <div class="body">
     <div class="row">
         <div class="col-4">
-            <form [formGroup]="CreditDebitVoucherDocumentDebitsForm">
-                <app-form-webxpress [form]="CreditDebitVoucherDocumentDebitsForm" [FormTitle]="'Document Debits'"
-                    [formData]="jsonControlCreditDebitVoucherDocumentDebitsArray"
+            <form [formGroup]="DebitVoucherDocumentDebitsForm">
+                <app-form-webxpress [form]="DebitVoucherDocumentDebitsForm" [FormTitle]="'Document Debits'"
+                    [formData]="jsonControlDebitVoucherDocumentDebitsArray"
                     [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
                     (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
                     [showSaveAndCancelButton]="true">

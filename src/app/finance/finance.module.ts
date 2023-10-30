@@ -37,18 +37,18 @@ import { utilityService } from '../Utility/utility.service';
 import { OperationService } from '../core/service/operations/operation.service';
 import { AssignVehiclePageMethods } from '../operation/assign-vehicle-page/assgine-vehicle-utility';
 import { AddManualVoucherComponent } from './manual voucher/add-manual-voucher/add-manual-voucher.component';
-import { CreditDebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
 import { FilterUtils } from "../Utility/dropdownFilter";
 import { VoucherServicesService } from '../core/service/Finance/voucher-services.service';
 import { AddVoucherDetailsModalComponent } from './Modals/add-voucher-details-modal/add-voucher-details-modal.component';
 import { AddDebitAgainstDocumentModalComponent } from './Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
 import { AddDetailsDebitAgainstDocumentModalComponent } from './Modals/add-details-debit-against-document-modal/add-details-debit-against-document-modal.component';
+import { DebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
 
 @NgModule({
     declarations: [
         InvoiceSummaryBillComponent,
         AddManualVoucherComponent,
-        CreditDebitVoucherComponent,
+        DebitVoucherComponent,
         AddVoucherDetailsModalComponent,
         AddDebitAgainstDocumentModalComponent,
         AddDetailsDebitAgainstDocumentModalComponent

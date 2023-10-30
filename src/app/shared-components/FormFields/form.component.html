@@ -16,6 +16,11 @@
                   {{CheckBoxMessage}} &nbsp;
                 </mat-checkbox>
               </section>
+              <button *ngIf="DisplayAddNewButton" matTooltip="Add New Record" mat-stroked-button
+                style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " (click)="AddNew()" class="filter_btn">
+                <mat-icon>add</mat-icon>
+                Add New
+              </button>
               <button type="button" (click)="toggleSection()" class="btn btn-border-radius waves-effect msl-2  mb-2"
                 style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " matTooltip="Expand Section">
                 <mat-icon>{{isExpanded ?
@@ -24,7 +29,6 @@
             </div>
             <hr>
           </div>
-
           <div *ngIf="isExpanded" [@fadeInOut]="isExpanded">
             <form class="register-form " style="margin-right: 20px;" *ngIf="formData" [formGroup]="form">
               <div class="row">

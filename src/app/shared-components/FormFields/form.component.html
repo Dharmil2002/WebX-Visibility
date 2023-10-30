@@ -297,7 +297,7 @@
                     (click)="fileInput.click()" class="example-full-width"
                     [multiple]="formItem.additionalData?.multiple || false">
                   <button mat-icon-button matSuffix class="example-full-width">
-                    <ng-container *ngIf="formItem.additionalData?.isFileSelected; else eyeIcon">
+                    <ng-container *ngIf="formItem.additionalData.isFileSelected; else eyeIcon">
                       <mat-icon>attach_file</mat-icon>
                     </ng-container>
                     <ng-template #eyeIcon>

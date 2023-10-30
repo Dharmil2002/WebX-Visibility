@@ -17,7 +17,7 @@ import { getShipment } from "../thc-generation/thc-utlity";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { JobEntryService } from "src/app/Utility/module/operation/job-entry/job-entry-service";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
-import { containorConsigmentDetail } from "../consignment-entry-form/consigment-utlity";
+import { ConsigmentUtility } from "../../Utility/module/operation/docket/consigment-utlity.module";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
@@ -148,7 +148,8 @@ export class JobEntryPageComponent implements OnInit {
     private locationService: LocationService,
     private pinCodeService: PinCodeService,
     private jobEntryService: JobEntryService,
-    private docketService: DocketService
+    private docketService: DocketService,
+    private consigmentUtility: ConsigmentUtility
   ) {
 
     this.initializeFormControl();
@@ -344,9 +345,7 @@ export class JobEntryPageComponent implements OnInit {
   /*End*/
 
   async getDockeContainorDetail() {
-    const resContainerType = await containorConsigmentDetail(
-      this.operationService
-    );
+    const resContainerType = await this.consigmentUtility.containorConsigmentDetail();
     this.containerTypeList = resContainerType;
     //const docketDetail=this.dock
   }

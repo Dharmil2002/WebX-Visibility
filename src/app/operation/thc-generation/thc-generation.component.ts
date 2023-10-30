@@ -15,7 +15,7 @@ import { calculateTotalField } from "../unbilled-prq/unbilled-utlity";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { getLocationApiDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
-import { updatePrq } from "../consignment-entry-form/consigment-utlity";
+import { ConsigmentUtility } from "../../Utility/module/operation/docket/consigment-utlity.module";
 import { showConfirmationDialogThc } from "../thc-summary/thc-update-utlity";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { MatDialog } from "@angular/material/dialog";
@@ -194,7 +194,8 @@ export class ThcGenerationComponent implements OnInit {
     private vendorService: VendorService,
     private driverService: DriverService,
     private pinCodeService: PinCodeService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private consigmentUtility: ConsigmentUtility
   ) 
   {
     /* here the code which is used to bind data for add thc edit thc add thc based on
@@ -705,7 +706,7 @@ export class ThcGenerationComponent implements OnInit {
         const prqData = {
           prqNo: this.thcTableForm.controls["prqNo"].value,
         };
-        await updatePrq(this.operationService, prqData, "7");
+        await this.consigmentUtility.updatePrq(prqData, "7");
       }
       for (const element of docket) {
         await this.docketService.updateDocket(element,{ "status": "1" });

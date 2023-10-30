@@ -318,17 +318,16 @@ export class CustomerMasterAddComponent implements OnInit {
             });
 
             // For setting image data, assuming you have imageData defined
-            for (const controlName in this.imageData) {
-              if (this.imageData.hasOwnProperty(controlName)) {
-                const url = this.imageData[controlName];
-                const fileName = this.objImageHandling.extractFileName(url);
-                // Set the form control value using the control name
-                this.customerTableForm.controls[controlName].setValue(fileName);
-              }
+            Object.keys(this.imageData).forEach((controlName) => {
+              const url = this.imageData[controlName];
+              const fileName = this.objImageHandling.extractFileName(url);
+              // Set the form control value using the control name
+              this.customerTableForm.controls[controlName].setValue(fileName);
+
               //setting isFileSelected to true
               const control = this.jsonControlCustomerArray.find(x => x.name === controlName);
               control.additionalData.isFileSelected = false
-            }
+            });
           }
           this.filter.Filter(
             this.jsonControlCustomerArray,
@@ -739,7 +738,7 @@ export class CustomerMasterAddComponent implements OnInit {
       // Set the URL in the corresponding control name
       Body[controlName] = file;
     });
-    
+
     if (this.isUpdate) {
       delete Body._id;
       delete Body.customerCode;

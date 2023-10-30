@@ -202,19 +202,18 @@ export class AddFleetMasterComponent implements OnInit {
       this.fleetTableForm.controls.vehicleNo.setValue(this.vehicleData);
       this.vehicleData = this.vehTypeDet.find((x) => x.name == this.fleetTableData.vehicleType);
       this.fleetTableForm.controls.vehicleType.setValue(this.vehicleData);
-      
+
       // For setting image data, assuming you have imageData defined
-      for (const controlName in this.imageData) {
-        if (this.imageData.hasOwnProperty(controlName)) {
-          const url = this.imageData[controlName];
-          const fileName = this.objImageHandling.extractFileName(url);
-          // Set the form control value using the control name
-          this.fleetTableForm.controls[controlName].setValue(fileName);
-        }
+      Object.keys(this.imageData).forEach((controlName) => {
+        const url = this.imageData[controlName];
+        const fileName = this.objImageHandling.extractFileName(url);
+        // Set the form control value using the control name
+        this.fleetTableForm.controls[controlName].setValue(fileName);
+
         //setting isFileSelected to true
         const control = this.jsonControlFleetArray.find(x => x.name === controlName);
         control.additionalData.isFileSelected = false
-      }
+      });
     }
   }
 

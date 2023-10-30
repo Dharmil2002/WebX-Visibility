@@ -3,7 +3,9 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class BeneficiaryControl {
     beneficiaryHeaderControlArray: FormControls[]
     beneficiaryDetailControlArray: FormControls[]
-    constructor() {
+    constructor(
+        //BeneficiaryTable: any,isUpdate: boolean
+        ) {
         this.beneficiaryHeaderControlArray = [
             {
                 name: "beneficiaryType",

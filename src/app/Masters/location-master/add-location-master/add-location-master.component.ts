@@ -85,9 +85,9 @@ export class AddLocationMasterComponent implements OnInit {
       this.locationTable = router.getCurrentNavigation().extras.state.data;
       this.locationTable = {
         ...this.locationTable,
-        mappedPinCode: this.locationTable.mappedPinCode.join(', '),
-        mappedCity: this.locationTable.mappedCity.join(', '),
-        mappedState: this.locationTable.mappedState.join(', '),
+        mappedPinCode: this.locationTable?.mappedPinCode.join(', '),
+        mappedCity: this.locationTable?.mappedCity.join(', '),
+        mappedState: this.locationTable?.mappedState.join(', '),
       };
 
       this.isUpdate = true;
@@ -171,7 +171,6 @@ export class AddLocationMasterComponent implements OnInit {
         text: 'Please fill at least one mapped area pincode/city/state',
         showConfirmButton: true,
       });
-      // Add a return statement here to prevent further execution
       return;
     }
     const locValue = this.locationTableForm.value;
@@ -186,9 +185,9 @@ export class AddLocationMasterComponent implements OnInit {
       "ownership",
     ];
     const extractControlValue = (controlName) => formValue[controlName]?.value;
-    const resultArraypinCodeList = this.locationTableForm.value.mappedPinCode.split(',');
-    const resultArraycityList = this.locationTableForm.value.mappedCity.split(',');
-    const resultArraystateList = this.locationTableForm.value.mappedState.split(',');
+    const resultArraypinCodeList = this.locationTableForm.value.mappedPinCode ? this.locationTableForm.value.mappedPinCode.split(',') : [];
+    const resultArraycityList = this.locationTableForm.value.mappedCity ? this.locationTableForm.value.mappedCity.split(',') : [];
+    const resultArraystateList = this.locationTableForm.value.mappedState ? this.locationTableForm.value.mappedState.split(',') : [];
 
     controlNames.forEach((controlName) => {
       const controlValue = extractControlValue(controlName);

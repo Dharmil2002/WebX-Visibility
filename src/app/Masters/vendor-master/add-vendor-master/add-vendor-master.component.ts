@@ -212,17 +212,17 @@ export class AddVendorMasterComponent implements OnInit {
         this.vendorTableForm.controls.vendorType.setValue(this.vendorTypDetail);
 
         // For setting image data, assuming you have imageData defined
-        for (const controlName in this.imageData) {
-          if (this.imageData.hasOwnProperty(controlName)) {
-            const url = this.imageData[controlName];
-            const fileName = this.objImageHandling.extractFileName(url);
-            // Set the form control value using the control name
-            this.vendorTableForm.controls[controlName].setValue(fileName);
-          }
-          //setting isFileSelected to true
+        Object.keys(this.imageData).forEach((controlName) => {
+          const url = this.imageData[controlName];
+          const fileName = this.objImageHandling.extractFileName(url);
+          // Set the form control value using the control name
+          this.vendorTableForm.controls[controlName].setValue(fileName);
+
+          // Set isFileSelected to true
           const control = this.jsonControlVendorArray.find(x => x.name === controlName);
-          control.additionalData.isFileSelected = false
-        }
+          control.additionalData.isFileSelected = false;
+        });
+
       }
       const filterParams = [
         [this.jsonControlVendorArray, this.vendorTypeData, this.vendorType, this.vendorTypeStatus],
@@ -507,47 +507,58 @@ export class AddVendorMasterComponent implements OnInit {
   //#endregion
 
   async addData() {
-    this.tableLoad = true;
-    this.isLoad = true;
-    const tableData = this.tableData;
-    const gstNumber = this.otherDetailForm.controls.gstNumber.value;
-    if (tableData.length > 0) {
-      // Check if the gstNumber already exists in tableData
-      const isDuplicate = this.tableData.some((item) => item.gstNumber === gstNumber);
+    if (this.otherDetailForm.valid) {
+      this.tableLoad = true;
+      this.isLoad = true;
+      const tableData = this.tableData;
+      const gstNumber = this.otherDetailForm.controls.gstNumber.value;
+      if (tableData.length > 0) {
+        // Check if the gstNumber already exists in tableData
+        const isDuplicate = this.tableData.some((item) => item.gstNumber === gstNumber);
 
-      if (isDuplicate) {
-        this.otherDetailForm.controls['gstNumber'].setValue('');
-        // Show an error message using Swal (SweetAlert)
-        Swal.fire({
-          text: 'GST Number already exists! Please try with another.',
-          icon: "error",
-          title: 'error',
-          showConfirmButton: true,
-        });
-        this.tableLoad = false;
-        this.isLoad = false;
-        return false
+        if (isDuplicate) {
+          this.otherDetailForm.controls['gstNumber'].setValue('');
+          // Show an error message using Swal (SweetAlert)
+          Swal.fire({
+            text: 'GST Number already exists! Please try with another.',
+            icon: "error",
+            title: 'error',
+            showConfirmButton: true,
+          });
+          this.tableLoad = false;
+          this.isLoad = false;
+          return false
+        }
       }
+      const delayDuration = 1000;
+      // Create a promise that resolves after the specified delay
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      // Use async/await to introduce the delay
+      await delay(delayDuration);
+      const json = {
+        id: tableData.length + 1,
+        gstNumber: this.otherDetailForm.value.gstNumber,
+        gstState: this.otherDetailForm.value.gstState,
+        gstAddress: this.otherDetailForm.value.gstAddress,
+        gstPincode: this.otherDetailForm.value.gstPincode.value,
+        gstCity: this.otherDetailForm.value.gstCity,
+        // invoice: false,
+        actions: ['Edit', 'Remove']
+      }
+      this.tableData.push(json);
+      this.otherDetailForm.reset(); // Reset form values
+      this.isLoad = false;
+      this.tableLoad = false;
+    } else {
+      Swal.fire({
+        text: 'Please Fill Vendor Other Details',
+        icon: "warning",
+        title: 'Warning',
+        showConfirmButton: true,
+      });
+      return false
     }
-    const delayDuration = 1000;
-    // Create a promise that resolves after the specified delay
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    // Use async/await to introduce the delay
-    await delay(delayDuration);
-    const json = {
-      id: tableData.length + 1,
-      gstNumber: this.otherDetailForm.value.gstNumber,
-      gstState: this.otherDetailForm.value.gstState,
-      gstAddress: this.otherDetailForm.value.gstAddress,
-      gstPincode: this.otherDetailForm.value.gstPincode.value,
-      gstCity: this.otherDetailForm.value.gstCity,
-      // invoice: false,
-      actions: ['Edit', 'Remove']
-    }
-    this.tableData.push(json);
-    this.otherDetailForm.reset(); // Reset form values
-    this.isLoad = false;
-    this.tableLoad = false;
+
   }
 
   handleMenuItemClick(data) {

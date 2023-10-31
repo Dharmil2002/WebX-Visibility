@@ -642,10 +642,12 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   async createThc() {
+    
     let extractedData = {};
+    this.selectedData= this.tableData.filter((x)=>x.isSelected==true);
     /* here the condition block which is execution while the 
     selected value is zero and isUpdate is false */
-    if (!this.selectedData && !this.isUpdate) {
+    if (this.selectedData.length<=0 && !this.isUpdate) {
       Swal.fire({
         icon: 'info',
         title: 'Information',

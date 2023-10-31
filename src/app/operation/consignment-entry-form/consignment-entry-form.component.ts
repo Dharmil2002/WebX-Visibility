@@ -321,10 +321,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         value: this.prqData?.prqNo,
       });
 
-      if (this.prqData.transMode == "trailer") {
-        this.consignmentTableForm.controls["cd"].setValue(true);
-        this.contFlag = true;
-      }
+        
     }
   }
   //#endregion
@@ -366,14 +363,15 @@ export class ConsignmentEntryFormComponent implements OnInit {
 
     this.setFormValue(this.consignmentTableForm, "fromCity", this.prqData, true, "fromCity", "fromCity");
     this.setFormValue(this.consignmentTableForm, "toCity", this.prqData, true, "toCity", "toCity");
+    await this.getLocBasedOnCity();
     this.setFormValue(this.consignmentTableForm, "billingParty", billingParty);
     this.setFormValue(this.consignmentTableForm, "payType", this.prqData?.payType);
     this.setFormValue(this.consignmentTableForm, "docketDate", this.prqData?.pickupDate);
     this.setFormValue(this.consignmentTableForm, "transMode", "Road");
     this.setFormValue(this.consignmentTableForm, "pAddress", this.prqData?.pAddress);
     this.setFormValue(this.consignmentTableForm, "ccbp", true);
-    this.setFormValue(this.consignmentTableForm, "vendorType", vehicleDetail?.vendorType, false, "", "", this.vendorFieldChanged);
-
+    this.setFormValue(this.consignmentTableForm, "vendorType", vehicleDetail?.vendorType, false, "", "");
+   await  this.vendorFieldChanged()
     if (vehicleDetail?.vendorType == "Market") {
       this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail.vendor);
     } else {
@@ -434,6 +432,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.filter.Filter(this.jsonControlArrayBasic, this.consignmentTableForm, vendorDetail, this.vendorName, this.vendorNameStatus );
     this.filter.Filter(this.jsonControlArrayBasic, this.consignmentTableForm, prqDetail, this.prqNo, this.prqNoStatus );
     this.filter.Filter(this.jsonControlArrayBasic, this.consignmentTableForm, vehFieldMap, this.vehicleNo, this.vehicleNoStatus );
+    if (this.prqData.transMode == "trailer") {
+      this.consignmentTableForm.controls["cd"].setValue(true);
+      this.contFlag = true;
+      this.containerDetail();
+    }    
     this.prqFlag && this.prqDetail();
     this.isUpdate && this.autofillDropDown();
   }
@@ -491,6 +494,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     };
    //this.setFormValue(this.consignmentTableForm, "fromCity", this.prqData, true, "fromCity", "fromCity");
     this.consignmentTableForm.controls["fromCity"].setValue(city);
+    
     // mapControlArray(this.consignorControlArray, consignorMappings); // Map consignor control array
     // mapControlArray(this.consigneeControlArray, consigneeMappings); // Map consignee control array
     //mapControlArray(this.contractControlArray, destinationMapping);
@@ -913,6 +917,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
 
   containerDetail() {
+    debugger
     const cd = this.consignmentTableForm.controls["cd"].value;
     if (cd) {
       this.contFlag = true;

@@ -15,7 +15,7 @@
                             <button *ngIf="DisplayCheckbox" matTooltip="TDS at line item " mat-stroked-button
                                 style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " class="filter_btn">
                                 TDS at line item &nbsp;
-                                <mat-checkbox color="primary"></mat-checkbox>
+                                <mat-checkbox  color="primary"></mat-checkbox>
                             </button>
                             <button *ngIf="DisplayAddNewButton" matTooltip="Add New Record" mat-stroked-button
                                 style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " (click)="AddNew()"
@@ -114,14 +114,14 @@
                                         <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;"
                                             *ngIf="tableData === 'checkBoxRequired'" color="primary"
                                             (change)="selectAll($event)" [(ngModel)]="AllChack"
-                                            [indeterminate]="someComplete()"></mat-checkbox>
+                                            [indeterminate]="someComplete()"  [disabled]="this.disbleCheckbox"></mat-checkbox>
                                     </mat-header-cell>
                                 </ng-template>
                                 <mat-cell *matCellDef="let element" [style]="columnHeader[tableData].Style"
                                     [class]="columnHeader[tableData].class">
                                     <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;"
                                         *ngIf="tableData=='checkBoxRequired'" color="primary"
-                                        [(ngModel)]="element.isSelected" (change)="getCheckData($event)"></mat-checkbox>
+                                        [(ngModel)]="element.isSelected"  [disabled]="this.disbleCheckbox" (change)="getCheckData($event)"></mat-checkbox>
                                     <ng-container
                                         *ngIf="Link && !shouldDisplayLink(tableData) && toggleArray && !toggleArray.includes(tableData) ">
                                         <p style="text-decoration: none;">{{formatData(element[tableData], tableData )}}

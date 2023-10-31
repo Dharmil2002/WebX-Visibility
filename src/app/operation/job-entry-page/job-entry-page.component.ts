@@ -261,6 +261,7 @@ export class JobEntryPageComponent implements OnInit {
   }
   /*end*/
   async getShipmentDetail() {
+    
     const shipmentList = await getShipment(this.operationService);
     const tableData = await this.jobEntryService.processShipmentListJob(shipmentList, this.orgBranch);
     this.docketData = tableData.filter((x) => x.jobNo == "");
@@ -271,6 +272,7 @@ export class JobEntryPageComponent implements OnInit {
 
   /*below method is called when tranportMode changed*/
   tranPortChanged() {
+    
     const transportedBy = this.jobEntryTableForm.value.transportedBy;
     const transportMode = this.jobEntryTableForm.value.transportMode;
 
@@ -650,8 +652,9 @@ export class JobEntryPageComponent implements OnInit {
   goBack(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
+
   getDocketBasedOnCity() {
-    
+      
       if(this.jobEntryTableForm.value.transportedBy=="E"&& this.jobEntryTableForm.value.transportMode=="Road"){
         const toCity = this.jobEntryTableForm.value.toCity?this.jobEntryTableForm.value.toCity.value.trim():"";
         const billingPartyName = this.jobEntryTableForm.value.billingParty.name.toLowerCase();

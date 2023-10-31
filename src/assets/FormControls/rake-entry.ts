@@ -2,6 +2,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class RakeEntryControl {
     rakeEntryArray: FormControls[];
+    ContainerDetail:FormControls[];
     constructor() {
         this.rakeEntryArray = [
             {
@@ -366,9 +367,124 @@ export class RakeEntryControl {
                 generatecontrol: false, disable: false
             },
         ]
+        this.ContainerDetail = [
+            {
+                name: "cnNo",
+                label: "CNNO",
+                placeholder: "CNNO",
+                type: "dropdown",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+                functions: {
+                    onOptionSelect:"getCnoteDetails"
+                },
+                additionalData: {
+                    showNameAndValue: false
+                }
+            },
+            {
+                name: "cnDate",
+                label: "CN Date",
+                placeholder: "CN Date",
+                type: "date",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "jobNo",
+                label: "Job No",
+                placeholder: "Job No",
+                type: "dropdown",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+                functions: {
+                    onOptionSelect:"getJobDetails"
+                },
+                additionalData: {
+                    showNameAndValue: false
+                }
+            },
+            {
+                name: "jobDate",
+                label: "Job Date",
+                placeholder: "Job Date",
+                type: "date",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "noOfPkg",
+                label: "No Of Package",
+                placeholder: "No Of Package",
+                type: "mobile-number",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "weight",
+                label: "Weight",
+                placeholder: "Weight",
+                type: "mobile-number",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "fCity",
+                label: "From City",
+                placeholder: "From City",
+                type: "text",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [
+                ]
+            },
+            {
+                name: "tCity",
+                label: "To City",
+                placeholder: "To City",
+                type: "text",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [
+                ]
+            },
+            {
+                name: "billingParty",
+                label: "Billing Party",
+                placeholder: "Billing Party",
+                type: "text",
+                value: "",
+                generatecontrol: true,
+                disable: true,
+                Validations: [
+                ]
+            },
+            
+        ]
     }
 
     getRakeEntryFormControls() {
         return this.rakeEntryArray;
+    }
+    getRakeContainerDetail(){
+        return this.ContainerDetail;
     }
 }

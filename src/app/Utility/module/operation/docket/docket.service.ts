@@ -13,23 +13,29 @@ export class DocketService {
     // Define a mapping object
     statusMapping = {
         default: {
-            status: "Thc Generated",
+            status: "",
             actions: [""],
         },
         "0": {
             status: "Booked",
             actions: ["Edit Docket", "Create THC"],
         },
+        "1": {
+            status: "Thc Generated",
+            actions: [""],
+        },
+        "2": {
+            status: "Delivered",
+            actions: [""],
+        }
         // Add more status mappings as needed
     };
 
     constructor(
-        private masterService: MasterService,
         private operation: OperationService
     ) { }
 
     async updateDocket(data, filter) {
-        debugger
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
@@ -59,7 +65,7 @@ export class DocketService {
     // Define a common service function
     async processShipmentList(shipmentList, orgBranch) {
         const res = shipmentList.map((x) => {
-            if (x.origin === orgBranch) {
+            if (x.origin === orgBranch || (x.destination==orgBranch && x.status=="2")) {
 
                 // Assuming x.status is a string (e.g., "0", "1", "2", etc.)
                 const statusInfo = this.statusMapping[x.status] || this.statusMapping.default;
@@ -87,4 +93,17 @@ export class DocketService {
         return sortedData
     }
     /*End*/
+
+    async getDocket() {
+        const req = {
+            "companyCode": localStorage.getItem("companyCode"),
+            "filter": {},
+            "collectionName": "docket_temp"
+        }
+
+        const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
+        return res.data.filter((x)=>x.origin === localStorage.getItem("Branch"));
+    }
+
+
 }

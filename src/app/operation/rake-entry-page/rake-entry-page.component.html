@@ -5,10 +5,31 @@
             [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
-    <app-table-boilerplate *ngIf="tableData" [tableData]="tableData" [columnHeader]="displayedColumns"
-        (DeleteAction)="delete($event,'tableData')" (functionCallEmitter)="functionCallHandler($event)"
-        (Submit)="saveData($event)" [showsubmit]="true" [ActionObject]="actionObject"
-        (callFunction)="functionCallHandler($event)"></app-table-boilerplate>
+      <form [formGroup]="rakeContainerTableForm">
+        <app-form-webxpress [form]="rakeContainerTableForm" [formData]="containerJsonArray"
+            (callFunction)="functionCallHandler($event)"  [FormTitle]="'Container Details'"  (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
+    <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    <button matTooltip="Add Data" mat-stroked-button class="filter_btn"
+    style="margin-left: 85%;
+    top: -271px;
+    position: relative;" (click)="addContainor()" [disabled]="!this.rakeContainerTableForm.controls['cnNo'].value && !this.rakeContainerTableForm.controls['jobNo'].value">
+    <mat-icon>add</mat-icon>
+    Add New 
+  </button>
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="definition.columnHeader"
+            [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+            [menuItems]="definition.menuItems" [staticField]="definition.staticField" [Link]="linkArray" [height]="height" [width]="width"
+            [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
+            [menuItemFlag]="menuItemflag">
+        </app-generic-table-v2>
         <div class="row">
             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
                 <div class="example-button-row  d-flex justify-content-end">

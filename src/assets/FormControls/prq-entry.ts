@@ -259,6 +259,10 @@ export class PrqEntryControls {
         additionalData: {
           showNameAndValue: false,
         },
+        functions: {
+          onModel: "getPincodeDetail",
+          onOptionSelect: ''
+        },
       },
 
       {

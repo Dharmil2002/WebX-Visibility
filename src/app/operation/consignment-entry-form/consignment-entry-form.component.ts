@@ -452,6 +452,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   //#endregion
 
   async commonDropDownMapping() {
+    
     const mapControlArray = (controlArray, mappings) => {
       controlArray.forEach((data) => {
         const mapping = mappings.find((mapping) => mapping.name === data.name);
@@ -488,7 +489,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       name: destinationMapping[0].city,
       value: destinationMapping[0].city,
     };
-    this.setFormValue(this.consignmentTableForm, "fromCity", this.prqData, true, "fromCity", "fromCity");
+   //this.setFormValue(this.consignmentTableForm, "fromCity", this.prqData, true, "fromCity", "fromCity");
     this.consignmentTableForm.controls["fromCity"].setValue(city);
     // mapControlArray(this.consignorControlArray, consignorMappings); // Map consignor control array
     // mapControlArray(this.consigneeControlArray, consigneeMappings); // Map consignee control array
@@ -1202,6 +1203,14 @@ export class ConsignmentEntryFormComponent implements OnInit {
     const mfactor = rateTypeMap[freightRateType] || 1;
     let total = parseFloat(freightRate) * parseFloat(mfactor);
     this.FreightTableForm.controls["freight_amount"]?.setValue(total);
+    this.FreightTableForm.get("grossAmount")?.setValue(
+      (parseFloat(this.FreightTableForm.get("freight_amount")?.value) || 0) +
+      (parseFloat(this.FreightTableForm.get("otherAmount")?.value) || 0)
+    );
+    this.FreightTableForm.get("totalAmount")?.setValue(
+      (parseFloat(this.FreightTableForm.get("grossAmount")?.value) || 0) +
+      (parseFloat(this.FreightTableForm.get("gstChargedAmount")?.value) || 0)
+    );
   }
 
   containorCsvDetail() {
@@ -1287,22 +1296,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   /*end*/
 
-  /*here the function which is declare for the gross calucation Which is called when the freight and
-   otherAmount is enter*/
-  calculateGross() {
-    this.FreightTableForm.get("grossAmount")?.setValue(
-      (parseFloat(this.FreightTableForm.get("freight_amount")?.value) || 0) +
-      (parseFloat(this.FreightTableForm.get("otherAmount")?.value) || 0)
-    );
-  }
-  /*End*/
-  /*here the calucation */
-  calculateTotalamt() {
-    this.FreightTableForm.get("totalAmount")?.setValue(
-      (parseFloat(this.FreightTableForm.get("grossAmount")?.value) || 0) +
-      (parseFloat(this.FreightTableForm.get("gstChargedAmount")?.value) || 0)
-    );
-  }
+
   /*end*/
   getInvoiceAggValue(fielName) {
     if (this.invoiceData.length > 0) {

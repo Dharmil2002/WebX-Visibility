@@ -1,4 +1,5 @@
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { calculateTotalField } from "../unbilled-prq/unbilled-utlity";
 const branch=localStorage.getItem("Branch") 
 export function renameKeys(originalObject, keyNameMapping) {
     const modifiedObject = {};
@@ -47,14 +48,19 @@ export async function genericGet(masterService, collectionName) {
 }
 
 export async function filterDocketDetail(data) {
+    
     let docketList = [];
     data.forEach(element => {
+        const actualWeights = element.invoiceDetails.map((item) => calculateTotalField([item], 'actualWeight')).reduce((acc, weight) => acc + weight, 0);
+        const noofPkts = element.invoiceDetails.map((item) => calculateTotalField([item], 'noofPkts')).reduce((acc, pkg) => acc + pkg, 0);
         let docketDetails = {
-            CNNo: element?.docketNumber || "",
-            CNDate: formatDocketDate(element?.docketDate || new Date()),
-            pkgs: element?.totalChargedNoOfpkg || 0,
-            weight: element?.actualwt || 0,
-            fromToCity: element?.fromCity + "-" + element?.toCity,
+            cnNo: element?.docketNumber || "",
+            cnDate: formatDocketDate(element?.docketDate || new Date()),
+            docketDate: element?.docketDate||new Date(),
+            noOfPkg: noofPkts || 0,
+            weight: actualWeights || 0,
+            fCity: element?.fromCity,
+            tCity: element?.toCity,
             billingParty: element?.billingParty || ""
         }
         docketList.push(docketDetails);

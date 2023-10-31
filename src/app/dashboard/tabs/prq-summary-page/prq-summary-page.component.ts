@@ -14,6 +14,7 @@ export class PrqSummaryPageComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
+  FormTitle='Prq List'
   dynamicControls = {
     add: true,
     edit: true,

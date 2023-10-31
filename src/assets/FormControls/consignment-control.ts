@@ -891,7 +891,7 @@ export class FreightControl {
         }
         ],
         functions: {
-          onModel: "calculateGross"
+          onChange: "calculateFreight"
         }
         ,
         generatecontrol: true, disable: false
@@ -899,14 +899,14 @@ export class FreightControl {
       {
         name: 'otherAmount', label: 'Other Amount (₹)', placeholder: 'Other Amount', type: 'mobile-number',
         value: docketDetail.otherAmount, Validations: [], generatecontrol: true, functions: {
-          onModel: "calculateGross"
+          onChange: "calculateFreight"
         }, disable: false
       },
       {
         name: 'grossAmount', label: 'Gross Amount (₹)', placeholder: 'Gross Amount', type: 'mobile-number',
         value: docketDetail.grossAmount, Validations: [], generatecontrol: true, disable: true,
         functions: {
-          onModel: "calculateTotalamt"
+          onChange: "calculateFreight"
         },
       },
       {
@@ -922,7 +922,7 @@ export class FreightControl {
         name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'mobile-number',
         value: docketDetail.gstChargedAmount, Validations: [], generatecontrol: true, disable: false,
         functions: {
-          onModel: "calculateTotalamt"
+          onChange: "calculateFreight"
         }
       },
       {

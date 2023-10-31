@@ -316,7 +316,7 @@ export class thcControl {
                     name: 'capacity',
                     label: 'Capacity(In Tons)',
                     placeholder: '',
-                    type: 'text',
+                    type: 'mobile-number',
                     value: '',
                     Validations: [],
                     generatecontrol: true,

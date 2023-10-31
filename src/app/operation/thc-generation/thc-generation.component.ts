@@ -849,6 +849,9 @@ export class ThcGenerationComponent implements OnInit {
       if (x.name === "vehicle") {
         x.type = vendorType === "Market" ? "text" : "dropdown";
       }
+      if (x.name === "capacity") {
+        x.disable = vendorType === "Market" ? false : true;
+      }
     });
     if (vendorType !== 'Market') {
       const vendorDetail = this.vendorDetail.filter((x) => x.type.toLowerCase() == vendorType.toLowerCase());

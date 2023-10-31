@@ -8,7 +8,6 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { fleetModel } from 'src/app/core/models/Masters/fleetMaster';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { FormComponent } from 'src/app/shared-components/FormFields/form.component';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { FleetControls } from 'src/assets/FormControls/fleet-control';
 import Swal from 'sweetalert2';
@@ -36,12 +35,10 @@ export class AddFleetMasterComponent implements OnInit {
   vehicleDet: any;
   vehTypeDet: any;
   imageName: string;
-  selectedFiles: boolean;
   vehicleType: any;
   vehicleTypeStatus: any;
   submit = 'Save';
   imageData: any = {};
-  @ViewChild(FormComponent) childComponent: FormComponent;
 
   constructor(
     private filter: FilterUtils,
@@ -205,16 +202,18 @@ export class AddFleetMasterComponent implements OnInit {
       this.fleetTableForm.controls.vehicleNo.setValue(this.vehicleData);
       this.vehicleData = this.vehTypeDet.find((x) => x.name == this.fleetTableData.vehicleType);
       this.fleetTableForm.controls.vehicleType.setValue(this.vehicleData);
-      this.childComponent.hide = false;
+
       // For setting image data, assuming you have imageData defined
-      for (const controlName in this.imageData) {
-        if (this.imageData.hasOwnProperty(controlName)) {
-          const url = this.imageData[controlName];
-          const fileName = this.objImageHandling.extractFileName(url);
-          // Set the form control value using the control name
-          this.fleetTableForm.controls[controlName].setValue(fileName);
-        }
-      }
+      Object.keys(this.imageData).forEach((controlName) => {
+        const url = this.imageData[controlName];
+        const fileName = this.objImageHandling.extractFileName(url);
+        // Set the form control value using the control name
+        this.fleetTableForm.controls[controlName].setValue(fileName);
+
+        //setting isFileSelected to true
+        const control = this.jsonControlFleetArray.find(x => x.name === controlName);
+        control.additionalData.isFileSelected = false
+      });
     }
   }
 
@@ -264,7 +263,7 @@ export class AddFleetMasterComponent implements OnInit {
       }
     } else {
       const randomNumber = this.fleetTableForm.value.vehicleNo;
-      this.fleetTableForm.controls["_id"].setValue(randomNumber);
+      data._id = randomNumber;
       //API FOR ADD
       let req = {
         companyCode: this.companyCode,
@@ -358,70 +357,20 @@ export class AddFleetMasterComponent implements OnInit {
     });
   }
   //#endregion
-  //#region to handle file selection
-  async selectedFile(event, controlName) {
-    // Get the selected files from the input element
-    const files: FileList = event;
-
-    if (files.length > 0) {
-      const file: File = files[0];
-
-      // Extract the file format from the MIME type
-      const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
-
-      // Allowed file formats
-      const allowedFormats = ["jpeg", "png", "jpg"];
-
-      if (allowedFormats.includes(fileFormat)) {
-
-        // Create a FormData object to prepare the file for upload
-        const formData = new FormData();
-        formData.append('companyCode', this.companyCode);
-        formData.append('docType', "Fleet");
-        formData.append('docGroup', 'Master');
-        formData.append('docNo', file.name);
-        formData.append('file', file);
-
-        try {
-          // Make the HTTP request to upload the file and await its response
-          const res = await this.masterService.masterPost("blob/upload", formData).toPromise();
-          const url = res.url
-          // Store the file data and URL in the imageData variable
-          this.imageData = {
-            ...this.imageData,
-            [controlName]: url
-          };
-          this.childComponent.hide = false;
-          // Set the form control value to the file name
-          this.fleetTableForm.controls[controlName].setValue(file.name);
-        } catch (error) {
-          // Handle HTTP request errors
-          console.error("HTTP request error:", error);
-        }
-      } else {
-        // Show a warning if the selected format is not allowed
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a valid file format: ${allowedFormats.join(', ')}`,
-          showConfirmButton: true,
-        });
-        return false;
-      }
-    }
+  //#region to handle image selection Fitness Certificate Scan
+  async selectedFilefitnesscertificateScan(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "fitnesscertificateScan", this.
+      fleetTableForm, this.imageData, "Fleet", 'Master', this.jsonControlFleetArray);
   }
 
-  // Fitness Certificate Scan
-  selectedFilefitnesscertificateScan(data) {
-    this.selectedFile(data.eventArgs, "fitnesscertificateScan");
-  }
   // Insurance Scan
-  selectedFileinsuranceScan(data) {
-    this.selectedFile(data.eventArgs, "insuranceScan");
+  async selectedFileinsuranceScan(data) {
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "insuranceScan", this.fleetTableForm, this.imageData, "Fleet", 'Master', this.jsonControlFleetArray);
   }
   // Registration Scan
-  selectedFileregistrationScan(data) {
-    this.selectedFile(data.eventArgs, "registrationScan");
+  async selectedFileregistrationScan(data) {
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "registrationScan", this.fleetTableForm, this.imageData, "Fleet", 'Master', this.jsonControlFleetArray);
   }
   //#endregion
 }

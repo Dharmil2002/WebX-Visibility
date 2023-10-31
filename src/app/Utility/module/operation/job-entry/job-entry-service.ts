@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { OperationService } from "src/app/core/service/operations/operation.service";
 import { calculateTotalField } from "src/app/operation/unbilled-prq/unbilled-utlity";
 
 @Injectable({
@@ -8,10 +9,11 @@ import { calculateTotalField } from "src/app/operation/unbilled-prq/unbilled-utl
 export class JobEntryService {
    
   constructor(
+    private operation: OperationService
       ) { }
       async processShipmentListJob(shipmentList, orgBranch) {
         return shipmentList.map((x) => {
-            if (x.origin === orgBranch) {
+          if (x.origin === orgBranch || (x.destination==orgBranch && x.status=="2")) {
                 const actualWeights = x.invoiceDetails.map((item) => calculateTotalField([item], 'actualWeight')).reduce((acc, weight) => acc + weight, 0);
                 const noofPkts = x.invoiceDetails.map((item) => calculateTotalField([item], 'noofPkts')).reduce((acc, pkg) => acc + pkg, 0);
                 x.cnoteNo = x.docketNumber;
@@ -28,4 +30,14 @@ export class JobEntryService {
             return null;
         }).filter((x) => x !== null);
     }
+      async getJobDetail(){
+        const req = {
+          "companyCode": localStorage.getItem("companyCode"),
+          "filter": {},
+          "collectionName": "job_detail"
+      }
+
+      const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
+      return res.data.filter((x)=>x.jobLocation == localStorage.getItem("Branch"));
+      }
 }

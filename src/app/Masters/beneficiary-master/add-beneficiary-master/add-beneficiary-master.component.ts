@@ -8,7 +8,9 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { BeneficiaryControl } from 'src/assets/FormControls/BeneficiaryMaster';
 import Swal from 'sweetalert2';
-import { handleFileSelection } from '../../vendor-master/vendor-utility';
+import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-beneficiary-master',
@@ -115,9 +117,14 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   toggleArray = []
   addFlag = true;
   newVendorCode: string;
+  imageData: any = {};
+  url: any;
   constructor(private route: Router, private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private masterService: MasterService,) {
+    private masterService: MasterService,
+    private objImageHandling: ImageHandling,
+    private dialog: MatDialog,
+  ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.beneficiaryTabledata = this.route.getCurrentNavigation().extras.state.data;
       // console.log(this.beneficiaryTabledata);
@@ -130,7 +137,6 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       this.beneficiaryTabledata.otherdetails.forEach((item, index) => {
         item.id = index + 1;
         item.actions = ['Edit', 'Remove'];
-
         // Push the modified object into this.tableData
         this.tableData.push(item);
       });
@@ -205,7 +211,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     // console.log(this.beneficiaryHeaderForm.value);
     let data = convertNumericalStringsToInteger(this.beneficiaryHeaderForm.value)
     if (this.isUpdate) {
-      let id = data._id;
+      let id = this.beneficiaryTabledata._id;
       data.otherdetails = newData;
       // Remove the "id" field from the form controls
       delete data._id;
@@ -306,7 +312,6 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       const data = dropdownData.find(
         x => x.customerName == this.beneficiaryTabledata.beneficiary.name
       )
-      console.log(data);
       this.beneficiaryHeaderForm.controls['beneficiary'].setValue(data)
     }
     // Call the Filter function with the filtered dropdown data
@@ -341,52 +346,68 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   }
   //#region to add data to form
   async addData() {
-    this.tableLoad = true;
-    this.isLoad = true;
-    const tableData = this.tableData;
-    const accountCode = this.beneficiaryDetailForm.controls.accountCode.value;
-    if (tableData.length > 0) {
-      // Check if the gstNumber already exists in tableData
-      const isDuplicate = this.tableData.some((item) => item.accountCode === accountCode);
+    if (this.beneficiaryDetailForm.valid) {
+      this.tableLoad = true;
+      this.isLoad = true;
+      const tableData = this.tableData;
+      const accountCode = this.beneficiaryDetailForm.controls.accountCode.value;
+      if (tableData.length > 0) {
+        // Check if the gstNumber already exists in tableData
+        const isDuplicate = this.tableData.some((item) => item.accountCode === accountCode);
 
-      if (isDuplicate) {
-        this.beneficiaryDetailForm.controls['accountCode'].setValue('');
-        // Show an error message using Swal (SweetAlert)
-        Swal.fire({
-          text: 'Account Code already exists! Please try with another.',
-          toast: true,
-          icon: 'warning',
-          title: 'Warning',
-          showConfirmButton: true,
-        });
-        this.tableLoad = false;
-        this.isLoad = false;
-        return false
+        if (isDuplicate) {
+          this.beneficiaryDetailForm.controls['accountCode'].setValue('');
+          // Show an error message using Swal (SweetAlert)
+          Swal.fire({
+            text: 'Account Code already exists! Please try with another.',
+            toast: true,
+            icon: 'warning',
+            title: 'Warning',
+            showConfirmButton: true,
+          });
+          this.tableLoad = false;
+          this.isLoad = false;
+          return false
+        }
       }
+      const delayDuration = 1000;
+      // Create a promise that resolves after the specified delay
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      // Use async/await to introduce the delay
+      await delay(delayDuration);
+      const fileName = this.objImageHandling.getFileByKey('uploadKYC', this.imageData);
+      const json = {
+        id: tableData.length + 1,
+        accountCode: this.beneficiaryDetailForm.value.accountCode,
+        IFSCcode: this.beneficiaryDetailForm.value.IFSCcode,
+        bankName: this.beneficiaryDetailForm.value.bankName,
+        branchName: this.beneficiaryDetailForm.value.branchName,
+        city: this.beneficiaryDetailForm.value.city,
+        UPIId: this.beneficiaryDetailForm.value.UPIId,
+        uploadKYC: fileName,
+        contactPerson: this.beneficiaryDetailForm.value.contactPerson,
+        mobileNo: this.beneficiaryDetailForm.value.mobileNo,
+        emailId: this.beneficiaryDetailForm.value.emailId,
+        actions: ['Edit', 'Remove']
+      }
+      this.tableData.push(json);
+      this.beneficiaryDetailForm.reset();
+      clearValidatorsAndValidate(this.beneficiaryDetailForm)
+
+      //setting isFileSelected  
+      const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
+      control.additionalData.isFileSelected = true;
+      this.isLoad = false;
+      this.tableLoad = false;
+    } else {
+      Swal.fire({
+        text: 'Please Fill Beneficiary Details',
+        icon: "warning",
+        title: 'Warning',
+        showConfirmButton: true,
+      });
+      return false
     }
-    const delayDuration = 1000;
-    // Create a promise that resolves after the specified delay
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    // Use async/await to introduce the delay
-    await delay(delayDuration);
-    const json = {
-      id: tableData.length + 1,
-      accountCode: this.beneficiaryDetailForm.value.accountCode,
-      IFSCcode: this.beneficiaryDetailForm.value.IFSCcode,
-      bankName: this.beneficiaryDetailForm.value.bankName,
-      branchName: this.beneficiaryDetailForm.value.branchName,
-      city: this.beneficiaryDetailForm.value.city,
-      UPIId: this.beneficiaryDetailForm.value.UPIId,
-      uploadKYC: this.beneficiaryDetailForm.value.uploadKYC,
-      contactPerson: this.beneficiaryDetailForm.value.contactPerson,
-      mobileNo: this.beneficiaryDetailForm.value.mobileNo,
-      emailId: this.beneficiaryDetailForm.value.emailId,
-      actions: ['Edit', 'Remove']
-    }
-    this.tableData.push(json);
-    this.beneficiaryDetailForm.reset(); // Reset form values
-    this.isLoad = false;
-    this.tableLoad = false;
   }
   //#endregion
   //#region  to fill or remove data form table to controls
@@ -398,6 +419,9 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
     else {
+      // this.beneficiaryDetailForm.value.uploadKYC = data.data?.uploadKYC
+      // this.beneficiaryDetailForm.controls['uploadKYC'].setValue(data.data?.uploadKYC);
+
       this.beneficiaryDetailForm.controls['accountCode'].setValue(data.data?.accountCode || "");
       this.beneficiaryDetailForm.controls['IFSCcode'].setValue(data.data?.IFSCcode || "");
       this.beneficiaryDetailForm.controls['bankName'].setValue(data.data?.bankName || "");
@@ -407,58 +431,35 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       this.beneficiaryDetailForm.controls['contactPerson'].setValue(data.data?.contactPerson || "");
       this.beneficiaryDetailForm.controls['mobileNo'].setValue(data.data?.mobileNo || "");
       this.beneficiaryDetailForm.controls['emailId'].setValue(data.data?.emailId || "");
-      //this.beneficiaryDetailForm.controls['uploadKYC'].setValue(data.data?.uploadKYC || "");
-
+      const updateData = this.tableData.find(x => x.id === data.data.id);
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+      this.url = updateData.uploadKYC;
+
+      //setting isFileSelected  
+      const fileName = this.objImageHandling.extractFileName(this.url);
+      // Set isFileSelected to true
+      const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
+      control.additionalData.isFileSelected = false;
+      // Set the form control value using the control name
+      this.beneficiaryDetailForm.controls['uploadKYC'].setValue(fileName);
+
     }
   }
   //#endregion
   //#region to upload Kyc image
-  async uploadImage(event) {
-    try {
-      const field = event.field.name;
-      const extensions = ["jpeg", "png", "jpg"];
-      const fileList: FileList = event.eventArgs;
-      const fileFormat = fileList[0].type.split('/')[1];
-
-      // Check if the file format is valid
-      if (!extensions.includes(fileFormat)) {
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a valid file format: ${extensions.join(', ')}`,
-          showConfirmButton: true,
-        });
-        return; // Exit the function if the format is not valid
-      }
-
-
-      // Prepare the data for the HTTP request
-      const formData = new FormData();
-      formData.append('companyCode', this.companyCode);
-      formData.append('docType', "Beneficiary");
-      formData.append('docGroup', 'Master');
-      formData.append('docNo', fileList[0].name);
-      formData.append('file', fileList[0]);
-
-      // Make the HTTP request
-      const res = await this.masterService.masterPost("blob/upload", formData).toPromise();
-
-      // Check if the request was successful
-      if (res.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: "Image uploaded successfully",
-          showConfirmButton: true,
-        });
-      }
-      //setting image file name in control
-      this.beneficiaryDetailForm.controls['uploadKYC'].setValue(fileList[0].name);
-    } catch (error) {
-      console.error("Error uploading image:", error);
-    }
+  async uploadKYC(data) {
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uploadKYC", this.beneficiaryDetailForm, this.imageData, "Beneficiary", 'Master', this.jsonDetailControl);
   }
-
+  //#endregion
+  //#region to preview image
+  openImageDialog(control) {
+    let file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    file = file ? file : this.url
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
   //#endregion
 }

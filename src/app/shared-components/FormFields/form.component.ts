@@ -1,3 +1,4 @@
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { FormGroupDirective, UntypedFormGroup } from '@angular/forms';
 import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-date-picker/custome-date-picker.component';
@@ -6,6 +7,14 @@ import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-da
 @Component({
   selector: 'app-form-webxpress',
   templateUrl: './form.component.html',
+  animations: [
+    trigger('fadeInOut', [
+      state('void', style({ opacity: 0 })),
+      transition(':enter, :leave', [
+        animate(300)
+      ]),
+    ]),
+  ],
 })
 export class FormComponent {
   @Input() formData
@@ -20,23 +29,29 @@ export class FormComponent {
   @Input() showSaveAndCancelButton: boolean
   @Input() showSaveButton: boolean
   @Output() functionCallEmitter = new EventEmitter();
+  @Output() AddNewButtonEvent = new EventEmitter();
   @Input() uploadedFiles;
   @Input() AddNewButton;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
-  hide: boolean = true;
+  @Input() DisplayCheckbox: boolean = false;
+  @Input() DisplayAddNewButton: boolean = false;
+  @Input() CheckBoxMessage: string = "";
   selectedValue: any;
   isTouchUIActivated = false;
   // field required for password input.
   showPassword: boolean = false;
   ConfirmshowPassword: boolean = false;
+  checkboxChecked: boolean = false;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   @Input() url: string;
+  isExpanded = true;
+  isUpDown = true;
   // ngOnChanges(changes: SimpleChanges) {
   //   this.formData=changes.formData.currentValue
   //   }
   constructor(private rootFormGroup: FormGroupDirective,
-    
+
   ) {
     this.form = this.rootFormGroup.control  // get parent form control
 
@@ -48,7 +63,16 @@ export class FormComponent {
 
   ngOnInit(): void {
   }
-
+  toggleSection() {
+    this.isExpanded = !this.isExpanded;
+  }
+  toggleUpDown() {
+    this.isUpDown = !this.isUpDown;
+    let isUpDown = this.isUpDown;
+    let context = { isUpDown };
+    context['functionName'] = 'toggleUpDown';
+    this.functionCallEmitter.emit(context)
+  }
   functionCalled(context) {
     // console.log(context , "from form components");
     if ((context.functionName !== undefined || context.functionName != null) && context.functionName?.length > 0) {
@@ -56,11 +80,8 @@ export class FormComponent {
     }
   }
 
-  AddNew(FunctionName){
-    const context = {
-      functionName : FunctionName
-    }
-    this.functionCallEmitter.emit(context)
+  AddNew() {
+    this.AddNewButtonEvent.emit()
   }
   togglePasswordInputType(field: any) {
     field.additionalData.showPassword = !field.additionalData.showPassword;
@@ -88,6 +109,13 @@ export class FormComponent {
     context['functionName'] = 'cancel';
     this.functionCallEmitter.emit(context)
   }
+  OnChangeCheckBox(event) {
+    this.checkboxChecked = event.checked;
+
+    let context = { event };
+    context['functionName'] = 'OnChangeCheckBox';
+    this.functionCallEmitter.emit(context)
+  }
   download(url) {
     const link = document.createElement('a');
     link.href = url;
@@ -101,7 +129,6 @@ export class FormComponent {
   }
   //#region to emit function to preview image
   openImageDialog(functionName: string, imageName: string) {
-    this.hide = false;
     let context = {
       functionName: functionName,
       imageName: imageName

@@ -109,6 +109,9 @@ export class FleetControls {
                 functions: {
                     onChange: 'selectedFileregistrationScan',
                 },
+                additionalData: {
+                    isFileSelected: true
+                },
             },
             {
                 name: 'vehicleInsurancePolicy', label: "Vehicle Insurance Policy", placeholder: "Enter Vehicle Insurance Policy",
@@ -161,7 +164,10 @@ export class FleetControls {
                 ],
                 functions: {
                     onChange: 'selectedFileinsuranceScan',
-                }
+                },
+                additionalData: {
+                    isFileSelected: true
+                },
             },
             {
                 name: 'fitnessValidityDate', label: "Fitness Validity Date", placeholder: "", type: 'date',
@@ -188,6 +194,9 @@ export class FleetControls {
                 ],
                 functions: {
                     onChange: 'selectedFilefitnesscertificateScan',
+                },
+                additionalData: {
+                    isFileSelected: true
                 },
             },
             {

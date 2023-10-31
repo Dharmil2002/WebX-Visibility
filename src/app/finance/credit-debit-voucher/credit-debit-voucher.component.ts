@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { financialYear } from 'src/app/Utility/date/date-utils';
@@ -9,50 +8,51 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { SessionService } from 'src/app/core/service/session.service';
-import { CreditDebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/creditdebitvouchercontrol';
 import Swal from 'sweetalert2';
 import { AddVoucherDetailsModalComponent } from '../Modals/add-voucher-details-modal/add-voucher-details-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
-import { DriversFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
+import { DriversFromApi, GetLocationDetailFromApi, GetSingleCustomerDetailsFromApi, GetSingleVendorDetailsFromApi, UsersFromApi, customerFromApi, vendorFromApi } from './debitvoucherAPIUtitlity';
+import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUtitlity';
+import { AddDebitAgainstDocumentModalComponent } from '../Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
+import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 @Component({
   selector: 'app-credit-debit-voucher',
   templateUrl: './credit-debit-voucher.component.html',
 })
-export class CreditDebitVoucherComponent implements OnInit {
+export class DebitVoucherComponent implements OnInit {
   companyCode: number | null
   breadScrums = [
     {
-      title: "Credit Debit Voucher",
+      title: "Debit Voucher",
       items: ["Finance"],
-      active: "Credit Debit Voucher",
+      active: "Debit Voucher",
     },
   ];
   className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
-  creditDebitVoucherControl: CreditDebitVoucherControl;
+  DebitVoucherControl: DebitVoucherControl;
 
-  CreditDebitVoucherSummaryForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherSummaryArray: any;
+  DebitVoucherSummaryForm: UntypedFormGroup;
+  jsonControlDebitVoucherSummaryArray: any;
 
   //Taxation Form Config
-  CreditDebitVoucherTaxationTDSForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherTaxationTDSArray: any;
+  DebitVoucherTaxationTDSForm: UntypedFormGroup;
+  jsonControlDebitVoucherTaxationTDSArray: any;
 
-  CreditDebitVoucherTaxationTCSForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherTaxationTCSArray: any;
+  DebitVoucherTaxationTCSForm: UntypedFormGroup;
+  jsonControlDebitVoucherTaxationTCSArray: any;
 
-  CreditDebitVoucherTaxationGSTForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherTaxationGSTArray: any;
+  DebitVoucherTaxationGSTForm: UntypedFormGroup;
+  jsonControlDebitVoucherTaxationGSTArray: any;
+  AlljsonControlDebitVoucherTaxationGSTArray: any;
 
-  CreditDebitVoucherTaxationPaymentSummaryForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherTaxationPaymentSummaryArray: any;
+  DebitVoucherTaxationPaymentSummaryForm: UntypedFormGroup;
+  jsonControlDebitVoucherTaxationPaymentSummaryArray: any;
 
-  CreditDebitVoucherTaxationPaymentDetailsForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherTaxationPaymentDetailsArray: any;
+  DebitVoucherTaxationPaymentDetailsForm: UntypedFormGroup;
+  jsonControlDebitVoucherTaxationPaymentDetailsArray: any;
 
 
-  CreditDebitVoucherDocumentDebitsForm: UntypedFormGroup;
-  jsonControlCreditDebitVoucherDocumentDebitsArray: any;
 
   dynamicControls = {
     add: false,
@@ -69,80 +69,12 @@ export class CreditDebitVoucherComponent implements OnInit {
   menuItemflag = true;
   staticField = ['Ledger', 'SACCode', 'DebitAmount', 'GSTRate', 'GSTAmount', 'Total', 'TDSApplicable', 'Narration']
 
-  columnHeader = {
-    Ledger: {
-      Title: "Ledger",
-      class: "matcolumnfirst",
-      Style: "min-width:200px",
-    },
-    SACCode: {
-      Title: "SACCode",
-      class: "matcolumncenter",
-      Style: "min-width:200px",
-    },
-    DebitAmount: {
-      Title: "Debit Amount ₹",
-      class: "matcolumncenter",
-      Style: "max-width:120px",
-    },
-    GSTRate: {
-      Title: "GST Rate %",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    GSTAmount: {
-      Title: "GST Amount ₹",
-      class: "matcolumncenter",
-      Style: "max-width:120px",
-    },
-    Total: {
-      Title: "Total ₹",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    TDSApplicable: {
-      Title: "TDS Applicable",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    Narration: {
-      Title: "Narration",
-      class: "matcolumncenter",
-      Style: "min-width:170px",
-    },
-    actionsItems: {
-      Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:100px",
-    }
-  };
+  columnHeader = GetLedgercolumnHeader()
 
   tableData: any = [];
   LoadVoucherDetails = true;
-  DocumentDebits: any = [];
 
-  DocumentDebitsDisplayedColumns = {
-    Document: {
-      name: "Document ",
-      key: "Dropdown",
-      option: [],
-      style: "",
-      class: 'matcolumnfirst'
-    },
-    DebitAmount: {
-      name: "Debit Amount ₹",
-      key: "inputnumber",
-      style: "",
-      class: 'matcolumncenter'
-    },
 
-    action: {
-      name: "Action",
-      key: "Action",
-      style: "",
-      class: 'matcolumncenter'
-    }
-  };
   actionObject = {
     addRow: true,
     submit: true,
@@ -150,9 +82,10 @@ export class CreditDebitVoucherComponent implements OnInit {
   };
 
   PartyNameList: any;
+  AllStateList: any;
   StateList: any;
   AccountGroupList: any;
-  DisplayCreditDebitVoucherDocument: boolean = false;
+  AllLocationsList: any;
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -168,37 +101,34 @@ export class CreditDebitVoucherComponent implements OnInit {
   ngOnInit(): void {
     this.BindDataFromApi();
     this.initializeFormControl();
-    this.AddDocumentDebits('');
   }
   initializeFormControl() {
-    this.creditDebitVoucherControl = new CreditDebitVoucherControl("");
-    this.jsonControlCreditDebitVoucherSummaryArray = this.creditDebitVoucherControl.getCreditDebitVoucherSummaryArrayControls();
-    this.CreditDebitVoucherSummaryForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherSummaryArray]);
+    this.DebitVoucherControl = new DebitVoucherControl("");
+    this.jsonControlDebitVoucherSummaryArray = this.DebitVoucherControl.getDebitVoucherSummaryArrayControls();
+    this.DebitVoucherSummaryForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherSummaryArray]);
 
-    this.jsonControlCreditDebitVoucherTaxationTDSArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationTDSArrayControls();
-    this.CreditDebitVoucherTaxationTDSForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationTDSArray]);
+    this.jsonControlDebitVoucherTaxationTDSArray = this.DebitVoucherControl.getDebitVoucherTaxationTDSArrayControls();
+    this.DebitVoucherTaxationTDSForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherTaxationTDSArray]);
 
-    this.jsonControlCreditDebitVoucherTaxationTCSArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationTCSArrayControls();
-    this.CreditDebitVoucherTaxationTCSForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationTCSArray]);
+    this.jsonControlDebitVoucherTaxationTCSArray = this.DebitVoucherControl.getDebitVoucherTaxationTCSArrayControls();
+    this.DebitVoucherTaxationTCSForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherTaxationTCSArray]);
 
-    this.jsonControlCreditDebitVoucherTaxationGSTArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationGSTArrayControls();
-    this.CreditDebitVoucherTaxationGSTForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationGSTArray]);
+    this.jsonControlDebitVoucherTaxationGSTArray = this.DebitVoucherControl.getDebitVoucherTaxationGSTArrayControls();
+    this.AlljsonControlDebitVoucherTaxationGSTArray = this.jsonControlDebitVoucherTaxationGSTArray;
+    this.DebitVoucherTaxationGSTForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherTaxationGSTArray]);
 
-    this.jsonControlCreditDebitVoucherTaxationPaymentSummaryArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationPaymentSummaryArrayControls();
-    this.CreditDebitVoucherTaxationPaymentSummaryForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationPaymentSummaryArray]);
+    this.jsonControlDebitVoucherTaxationPaymentSummaryArray = this.DebitVoucherControl.getDebitVoucherTaxationPaymentSummaryArrayControls();
+    this.DebitVoucherTaxationPaymentSummaryForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherTaxationPaymentSummaryArray]);
 
-    this.jsonControlCreditDebitVoucherTaxationPaymentDetailsArray = this.creditDebitVoucherControl.getCreditDebitVoucherTaxationPaymentDetailsArrayControls();
-    this.CreditDebitVoucherTaxationPaymentDetailsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherTaxationPaymentDetailsArray]);
-
-    this.jsonControlCreditDebitVoucherDocumentDebitsArray = this.creditDebitVoucherControl.getCreditDebitVoucherDocumentDebitsArrayControls();
-    this.CreditDebitVoucherDocumentDebitsForm = formGroupBuilder(this.fb, [this.jsonControlCreditDebitVoucherDocumentDebitsArray]);
+    this.jsonControlDebitVoucherTaxationPaymentDetailsArray = this.DebitVoucherControl.getDebitVoucherTaxationPaymentDetailsArrayControls();
+    this.DebitVoucherTaxationPaymentDetailsForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherTaxationPaymentDetailsArray]);
 
   }
   async BindDataFromApi() {
     const stateReqBody = {
       companyCode: this.companyCode,
       filter: {},
-      collectionName: "state_master",
+      collectionName: "state_detail",
     };
     const account_groupReqBody = {
       companyCode: this.companyCode,
@@ -207,10 +137,13 @@ export class CreditDebitVoucherComponent implements OnInit {
     };
 
     const resState = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
+    this.AllStateList = resState?.data;
     this.StateList = resState?.data
-      .map(x => ({ value: x.STNM, name: x.ST }))
+      .map(x => ({
+        value: x.stateCode, name: x.stateName
+      }))
       .filter(x => x != null)
-      .sort((a, b) => a.value.localeCompare(b.value));
+      .sort((a, b) => a.name.localeCompare(b.name));
 
     const resaccount_group = await this.masterService.masterPost('generic/get', account_groupReqBody).toPromise();
     this.AccountGroupList = resaccount_group?.data
@@ -219,20 +152,23 @@ export class CreditDebitVoucherComponent implements OnInit {
       .sort((a, b) => a.value.localeCompare(b.value));
 
     this.filter.Filter(
-      this.jsonControlCreditDebitVoucherSummaryArray,
-      this.CreditDebitVoucherSummaryForm,
+      this.jsonControlDebitVoucherSummaryArray,
+      this.DebitVoucherSummaryForm,
       this.StateList,
       "Partystate",
-      null
-    );
-    this.filter.Filter(
-      this.jsonControlCreditDebitVoucherSummaryArray,
-      this.CreditDebitVoucherSummaryForm,
-      this.StateList,
-      "Paymentstate",
-      false
+      true
     );
 
+    this.AllLocationsList = await GetLocationDetailFromApi(this.masterService)
+    this.filter.Filter(
+      this.jsonControlDebitVoucherSummaryArray,
+      this.DebitVoucherSummaryForm,
+      this.AllLocationsList,
+      "Accountinglocation",
+      false
+    );
+    const paymentstate = this.AllLocationsList.find(item => item.name == localStorage.getItem("Branch"))?.value
+    this.DebitVoucherSummaryForm.get('Paymentstate').setValue(paymentstate);
 
   }
   functionCallHandler($event) {
@@ -241,6 +177,57 @@ export class CreditDebitVoucherComponent implements OnInit {
       this[functionName]($event);
     } catch (error) {
       console.log("failed");
+    }
+  }
+  StateChange(event) {
+    const Partystate = this.DebitVoucherSummaryForm.value.Partystate;
+    const Paymentstate = this.DebitVoucherSummaryForm.value.Paymentstate;
+    if (Partystate && Paymentstate) {
+      const IsStateTypeUT = this.AllStateList.find(item => item.stateName == Paymentstate).stateType == "UT";
+      const GSTAmount = this.tableData.reduce((accumulator, currentValue) => {
+        return accumulator + parseFloat(currentValue['GSTAmount']);
+      }, 0);
+      if (IsStateTypeUT) {
+        this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTAmount)
+      }
+      else if (!IsStateTypeUT && Partystate.name == Paymentstate) {
+        this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTAmount)
+      }
+      else if (!IsStateTypeUT && Partystate.name != Paymentstate) {
+        this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTAmount)
+      }
+    }
+  }
+  ShowOrHideBasedOnSameOrDifferentState(Check, GSTAmount) {
+    let filterFunction;
+    switch (Check) {
+      case 'UT':
+        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'SGST' && x.name !== 'CGST';
+        break;
+      case 'SAME':
+        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'UGST';
+        break;
+      case 'DIFF':
+        filterFunction = (x) => x.name !== 'SGST' && x.name !== 'UGST' && x.name !== 'CGST';
+        break;
+    }
+    this.jsonControlDebitVoucherTaxationGSTArray = this.AlljsonControlDebitVoucherTaxationGSTArray.filter(filterFunction);
+    this.jsonControlDebitVoucherTaxationGSTArray.forEach(item => {
+      this.DebitVoucherTaxationGSTForm.get(item.name).setValue((GSTAmount / this.jsonControlDebitVoucherTaxationGSTArray.length).toFixed(2));
+    });
+    this.CalculatePaymentAmount();
+  }
+  calculateTDSAndTotal(event) {
+    const TDSRate = Number(this.DebitVoucherTaxationTDSForm.value['TDSRate']);
+    const Total = this.tableData.reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue['Total']);
+    }, 0);
+    if (!isNaN(Total) && !isNaN(TDSRate)) {
+      const TDSAmount = (Total * TDSRate) / 100;
+      this.DebitVoucherTaxationTDSForm.controls.TDSDeduction.setValue(TDSAmount.toFixed(2));
+      this.CalculatePaymentAmount();
+    } else {
+      console.error('Invalid input values for DebitAmount or GSTRate');
     }
   }
   handleMenuItemClick(data) {
@@ -255,10 +242,10 @@ export class CreditDebitVoucherComponent implements OnInit {
   }
 
   async PreparedforFieldChanged(event) {
-    const Preparedfor = this.CreditDebitVoucherSummaryForm.value.Preparedfor;
-    const PartyName = this.CreditDebitVoucherSummaryForm.get('PartyName');
+    const Preparedfor = this.DebitVoucherSummaryForm.value.Preparedfor;
+    const PartyName = this.DebitVoucherSummaryForm.get('PartyName');
     PartyName.setValue("");
-    const partyNameControl = this.jsonControlCreditDebitVoucherSummaryArray.find(x => x.name === "PartyName");
+    const partyNameControl = this.jsonControlDebitVoucherSummaryArray.find(x => x.name === "PartyName");
     partyNameControl.type = "dropdown";
     PartyName.setValidators([Validators.required, autocompleteObjectValidator()]);
     PartyName.updateValueAndValidity();
@@ -267,8 +254,8 @@ export class CreditDebitVoucherComponent implements OnInit {
       case 'Vendor':
         responseFromAPI = await vendorFromApi(this.masterService)
         this.filter.Filter(
-          this.jsonControlCreditDebitVoucherSummaryArray,
-          this.CreditDebitVoucherSummaryForm,
+          this.jsonControlDebitVoucherSummaryArray,
+          this.DebitVoucherSummaryForm,
           responseFromAPI,
           "PartyName",
           false
@@ -277,8 +264,8 @@ export class CreditDebitVoucherComponent implements OnInit {
       case 'Customer':
         responseFromAPI = await customerFromApi(this.masterService)
         this.filter.Filter(
-          this.jsonControlCreditDebitVoucherSummaryArray,
-          this.CreditDebitVoucherSummaryForm,
+          this.jsonControlDebitVoucherSummaryArray,
+          this.DebitVoucherSummaryForm,
           responseFromAPI,
           "PartyName",
           false
@@ -287,8 +274,8 @@ export class CreditDebitVoucherComponent implements OnInit {
       case 'Employee':
         responseFromAPI = await UsersFromApi(this.masterService)
         this.filter.Filter(
-          this.jsonControlCreditDebitVoucherSummaryArray,
-          this.CreditDebitVoucherSummaryForm,
+          this.jsonControlDebitVoucherSummaryArray,
+          this.DebitVoucherSummaryForm,
           responseFromAPI,
           "PartyName",
           false
@@ -297,8 +284,8 @@ export class CreditDebitVoucherComponent implements OnInit {
       case 'Driver':
         responseFromAPI = await DriversFromApi(this.masterService)
         this.filter.Filter(
-          this.jsonControlCreditDebitVoucherSummaryArray,
-          this.CreditDebitVoucherSummaryForm,
+          this.jsonControlDebitVoucherSummaryArray,
+          this.DebitVoucherSummaryForm,
           responseFromAPI,
           "PartyName",
           false
@@ -310,11 +297,72 @@ export class CreditDebitVoucherComponent implements OnInit {
         PartyName.updateValueAndValidity();
 
     }
-
   }
-  async AddNewButtonEvent() {
+  async PartyNameFieldChanged(event) {
+    const Preparedfor = this.DebitVoucherSummaryForm.value.Preparedfor;
+    const PartyName = this.DebitVoucherSummaryForm.value.PartyName
+    const Partystate = this.DebitVoucherSummaryForm.get('Partystate');
+    Partystate.setValue("");
+    let responseFromAPI = [];
+    switch (Preparedfor) {
+      case 'Vendor':
+        responseFromAPI = await GetSingleVendorDetailsFromApi(this.masterService, PartyName.value)
+        this.filter.Filter(
+          this.jsonControlDebitVoucherSummaryArray,
+          this.DebitVoucherSummaryForm,
+          responseFromAPI,
+          "Partystate",
+          false
+        );
+        break;
+      case 'Customer':
+        responseFromAPI = await GetSingleCustomerDetailsFromApi(this.masterService, PartyName.value)
+        this.filter.Filter(
+          this.jsonControlDebitVoucherSummaryArray,
+          this.DebitVoucherSummaryForm,
+          responseFromAPI,
+          "Partystate",
+          false
+        );
+        break;
+      default:
+        this.filter.Filter(
+          this.jsonControlDebitVoucherSummaryArray,
+          this.DebitVoucherSummaryForm,
+          this.StateList,
+          "Partystate",
+          false
+        );
+
+
+    }
+  }
+  OnChangeCheckBox(event) {
+    const TotalPaymentAmount = this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value;
+    const netPayable = event?.event?.checked ? Math.ceil(TotalPaymentAmount) : TotalPaymentAmount;
+    this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(netPayable);
+  }
+  CalculatePaymentAmount() {
+    const totalSum = this.tableData.reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue['Total']);
+    }, 0);
+    debugger
+    const TDSAmount = this.DebitVoucherTaxationTDSForm.controls.TDSDeduction.value || 0;
+    let GSTAmount = 0;
+    this.jsonControlDebitVoucherTaxationGSTArray.forEach(item => {
+      const value = parseFloat(this.DebitVoucherTaxationGSTForm.get(item.name).value);
+      GSTAmount += isNaN(value) ? 0 : value; // Check for NaN and handle it as 0
+    });
+
+    const CalculatedSum = totalSum + GSTAmount - TDSAmount
+    this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").setValue(CalculatedSum.toFixed(2));
+    this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(CalculatedSum.toFixed(2));
+  }
+
+  async AddNewDebits() {
     this.addVoucherDetails('')
   }
+
   async save() {
     // Create a new array to store the transformed data
     var transformedData = this.tableData.map(function (item) {
@@ -328,7 +376,7 @@ export class CreditDebitVoucherComponent implements OnInit {
         "narration": item.Narration
       };
     });
-    console.log(this.CreditDebitVoucherSummaryForm.value)
+    console.log(this.DebitVoucherSummaryForm.value)
     let reqBody = {
       companyCode: this.companyCode,
       voucherNo: "VR0002",
@@ -338,8 +386,8 @@ export class CreditDebitVoucherComponent implements OnInit {
       transType: "DebitVoucher",
       docType: "Voucher",
       docNo: "VR0002",
-      partyCode: this.CreditDebitVoucherSummaryForm.value?.PartyName?.value,
-      partyName: this.CreditDebitVoucherSummaryForm.value?.PartyName?.name,
+      partyCode: this.DebitVoucherSummaryForm.value?.PartyName?.value,
+      partyName: this.DebitVoucherSummaryForm.value?.PartyName?.name,
       entryBy: localStorage.getItem("UserName"),
       entryDate: Date(),
       debit: transformedData,
@@ -372,14 +420,33 @@ export class CreditDebitVoucherComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   showhidebuttonclick(event) {
-    this.DisplayCreditDebitVoucherDocument = !this.DisplayCreditDebitVoucherDocument
+    const dialogRef = this.matDialog.open(AddDebitAgainstDocumentModalComponent, {
+      data: "request",
+      width: "100%",
+      disableClose: true,
+      position: {
+        top: "20px",
+      },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+
+      }
+    });
+
+  }
+  toggleUpDown(event) {
+    const totalPaymentAmount = this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value;
+    const roundedValue = event.isUpDown ? Math.ceil(totalPaymentAmount) : Math.floor(totalPaymentAmount);
+    this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(roundedValue);
+
   }
   // Add a new item to the table
   addVoucherDetails(event) {
     const SACCode = [
-      { "name": "12022: Local conveyance", "value": "12022" },
-      { "name": "12088: Telecom services", "value": "12088" },
-      { "name": "12089: Telecom services", "value": "12089" }
+      { "name": "Local conveyance", "value": "12022" },
+      { "name": "Telecom services", "value": "12088" },
+      { "name": "Telecom services", "value": "12089" }
     ];
     const EditableId = event?.id
     const request = {
@@ -404,7 +471,9 @@ export class CreditDebitVoucherComponent implements OnInit {
         const json = {
           id: this.tableData.length + 1,
           Ledger: result?.Ledger,
-          SACCode: result?.Ledger,
+          LedgerHdn: result?.LedgerHdn,
+          SACCode: result?.SACCode,
+          SACCodeHdn: result?.SACCodeHdn,
           DebitAmount: result?.DebitAmount,
           GSTRate: result?.GSTRate,
           GSTAmount: result?.GSTAmount,
@@ -415,24 +484,11 @@ export class CreditDebitVoucherComponent implements OnInit {
         }
         this.tableData.push(json);
         this.LoadVoucherDetails = true;
+        this.StateChange("");
       }
       this.LoadVoucherDetails = true;
     });
 
-
-  }
-  // Add a new item to the table
-  AddDocumentDebits(event) {
-    const addObj = {
-      Ledger: "EXP001",
-      SACCode: "12088",
-      action: ""
-    };
-    this.DocumentDebits.splice(0, 0, addObj);
-
-  }
-
-  saveData(event) {
 
   }
 }

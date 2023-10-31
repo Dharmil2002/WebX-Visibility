@@ -136,7 +136,7 @@ export class AccountGroupComponent implements OnInit {
   }
 
   initializeFormControl() {
-    const AccountFormControls = new AccountMasterControls();
+    const AccountFormControls = new AccountMasterControls(this.isUpdate);
     this.jsonControlAccountGroupArray =
       AccountFormControls.getAccountGroupAddArray();
     // Build the form group using formGroupBuilder function and the values of accordionData
@@ -153,9 +153,6 @@ export class AccountGroupComponent implements OnInit {
     this.jsonControlAccountGroupArray.forEach((data) => {
       if (data.name === "CategoryCode") {
         // Set category-related variables
-        if(this.isUpdate){
-          data.disable = true
-        }
         this.CategoryCodeCode = data.name;
         this.CategoryCodeStatus = data.additionalData.showNameAndValue;
         this.getCategoryCodeDropdown();
@@ -306,8 +303,7 @@ export class AccountGroupComponent implements OnInit {
         ].GroupCode.substring(3)
       );
       const Body = {
-        GroupCode:
-        this.AccountGroupForm.value.CategoryCode.name.substring(3) +
+        GroupCode:this.AccountGroupForm.value.CategoryCode.name.substr(0, 3)+
           (index < 9 ? "00" : index > 9 && index < 99 ? "0" : "") +
           (index + 1),
         GroupName: this.AccountGroupForm.value.GroupName,

@@ -13,22 +13,29 @@ export class DocketService {
     // Define a mapping object
     statusMapping = {
         default: {
-          status: "Thc Generated",
-          actions: [""],
+            status: "",
+            actions: [""],
         },
         "0": {
-          status: "Booked",
-          actions: ["Edit Docket", "Create THC"],
+            status: "Booked",
+            actions: ["Edit Docket", "Create THC"],
         },
+        "1": {
+            status: "Thc Generated",
+            actions: [""],
+        },
+        "2": {
+            status: "Delivered",
+            actions: [""],
+        }
         // Add more status mappings as needed
-      };
+    };
 
     constructor(
-        private masterService: MasterService,
         private operation: OperationService
     ) { }
 
-    async updateDocket(data,filter) {
+    async updateDocket(data, filter) {
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
@@ -57,8 +64,8 @@ export class DocketService {
     /* below the function  was generated for the mapping of data */
     // Define a common service function
     async processShipmentList(shipmentList, orgBranch) {
-        return shipmentList.map((x) => {
-            if (x.origin === orgBranch) {
+        const res = shipmentList.map((x) => {
+            if (x.origin === orgBranch || (x.destination==orgBranch && x.status=="2")) {
 
                 // Assuming x.status is a string (e.g., "0", "1", "2", etc.)
                 const statusInfo = this.statusMapping[x.status] || this.statusMapping.default;
@@ -70,11 +77,33 @@ export class DocketService {
                 x.invoiceCount = x.invoiceDetails.length || 0;
                 x.status = statusInfo.status || "";
                 x.actions = statusInfo.actions || ["Rake Update"];
-                x.createOn= formatDocketDate(x?.entryDate || new Date())
+                x.createOn = formatDocketDate(x?.entryDate || new Date())
                 return x;
             }
             return null;
         }).filter((x) => x !== null);
+        // Sort the PRQ list by pickupDate in descending order
+        const sortedData = res.sort((a, b) => {
+            const dateA: Date | any = new Date(a.entryDate);
+            const dateB: Date | any = new Date(b.entryDate);
+
+            // Compare the date objects
+            return dateB - dateA; // Sort in descending order
+        });
+        return sortedData
     }
     /*End*/
+
+    async getDocket() {
+        const req = {
+            "companyCode": localStorage.getItem("companyCode"),
+            "filter": {},
+            "collectionName": "docket_temp"
+        }
+
+        const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
+        return res.data.filter((x)=>x.origin === localStorage.getItem("Branch"));
+    }
+
+
 }

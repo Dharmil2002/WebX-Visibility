@@ -17,7 +17,7 @@ import { getShipment } from "../thc-generation/thc-utlity";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { JobEntryService } from "src/app/Utility/module/operation/job-entry/job-entry-service";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
-import { containorConsigmentDetail } from "../consignment-entry-form/consigment-utlity";
+import { ConsigmentUtility } from "../../Utility/module/operation/docket/consigment-utlity.module";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
@@ -148,7 +148,8 @@ export class JobEntryPageComponent implements OnInit {
     private locationService: LocationService,
     private pinCodeService: PinCodeService,
     private jobEntryService: JobEntryService,
-    private docketService: DocketService
+    private docketService: DocketService,
+    private consigmentUtility: ConsigmentUtility
   ) {
 
     this.initializeFormControl();
@@ -260,6 +261,7 @@ export class JobEntryPageComponent implements OnInit {
   }
   /*end*/
   async getShipmentDetail() {
+    
     const shipmentList = await getShipment(this.operationService);
     const tableData = await this.jobEntryService.processShipmentListJob(shipmentList, this.orgBranch);
     this.docketData = tableData.filter((x) => x.jobNo == "");
@@ -270,6 +272,7 @@ export class JobEntryPageComponent implements OnInit {
 
   /*below method is called when tranportMode changed*/
   tranPortChanged() {
+    
     const transportedBy = this.jobEntryTableForm.value.transportedBy;
     const transportMode = this.jobEntryTableForm.value.transportMode;
 
@@ -344,9 +347,7 @@ export class JobEntryPageComponent implements OnInit {
   /*End*/
 
   async getDockeContainorDetail() {
-    const resContainerType = await containorConsigmentDetail(
-      this.operationService
-    );
+    const resContainerType = await this.consigmentUtility.containorConsigmentDetail();
     this.containerTypeList = resContainerType;
     //const docketDetail=this.dock
   }
@@ -651,8 +652,9 @@ export class JobEntryPageComponent implements OnInit {
   goBack(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
+
   getDocketBasedOnCity() {
-    debugger
+      
       if(this.jobEntryTableForm.value.transportedBy=="E"&& this.jobEntryTableForm.value.transportMode=="Road"){
         const toCity = this.jobEntryTableForm.value.toCity?this.jobEntryTableForm.value.toCity.value.trim():"";
         const billingPartyName = this.jobEntryTableForm.value.billingParty.name.toLowerCase();

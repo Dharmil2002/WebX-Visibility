@@ -53,7 +53,7 @@
     </div>
   </div>
     <app-generic-table-v2 *ngIf="!tableLoad&&!addThc" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-      [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
+      [tableData]="tableData" [metaData]="metaData"[disbleCheckbox]="disbleCheckbox" [menuItems]="menuItems" [staticField]="staticField"
       [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
       (menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"
       [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles">

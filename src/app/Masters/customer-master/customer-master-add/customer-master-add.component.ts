@@ -2,9 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
-  ValidationErrors,
 } from "@angular/forms";
-// import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { customerControl } from "src/assets/FormControls/customer-master";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { Router } from "@angular/router";
@@ -16,6 +14,9 @@ import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.s
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 import { columnHeader, staticField } from "../customer-master-list/customer-utlity";
+import { MatDialog } from "@angular/material/dialog";
+import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
+import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 
 @Component({
   selector: "app-customer-master-add",
@@ -24,7 +25,6 @@ import { columnHeader, staticField } from "../customer-master-list/customer-utli
 export class CustomerMasterAddComponent implements OnInit {
   customerTableForm: UntypedFormGroup;
   GSTcustomerTableForm: UntypedFormGroup;
-
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   //#region Variable declaration
   error: string;
@@ -88,6 +88,7 @@ export class CustomerMasterAddComponent implements OnInit {
   pinCodeData: any;
   pinCodeResData: any;
   jsonControlGSTArray: any;
+  imageData: any = {};
   dynamicControls = {
     add: false,
     edit: false,
@@ -126,11 +127,18 @@ export class CustomerMasterAddComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private objPinCodeService: PinCodeService,
-    private objState: StateService
+    private objState: StateService,
+    private dialog: MatDialog,
+    private objImageHandling: ImageHandling
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.customerTable = Route.getCurrentNavigation().extras.state.data;
       this.isUpdate = true;
+      this.imageData = {
+        'MSMEscan': this.customerTable.MSMEscan,
+        'uplodPANcard': this.customerTable.uplodPANcard
+      };
+
       this.submit = 'Modify';
       this.action = "edit";
     } else {
@@ -211,6 +219,7 @@ export class CustomerMasterAddComponent implements OnInit {
     this.getDataAndPopulateForm();
     this.CustomerCodeIndex()
     this.backPath = "/Masters/CustomerMaster/CustomerMasterList";
+    // this.getImage();
   }
 
   bindGSTDropdown() {
@@ -306,6 +315,18 @@ export class CustomerMasterAddComponent implements OnInit {
                   value: x.groupCode,
                 });
               }
+            });
+
+            // For setting image data, assuming you have imageData defined
+            Object.keys(this.imageData).forEach((controlName) => {
+              const url = this.imageData[controlName];
+              const fileName = this.objImageHandling.extractFileName(url);
+              // Set the form control value using the control name
+              this.customerTableForm.controls[controlName].setValue(fileName);
+
+              //setting isFileSelected to true
+              const control = this.jsonControlCustomerArray.find(x => x.name === controlName);
+              control.additionalData.isFileSelected = false
             });
           }
           this.filter.Filter(
@@ -411,10 +432,10 @@ export class CustomerMasterAddComponent implements OnInit {
         "collectionName": collectionName,
         "filter": {}
       };
-     
+
       const response = await this.masterService.masterPost("generic/get", reqBody).toPromise()
       const dataList = response.data.map(x => ({
-        name:nameProperty=="locName"? x[dataProperty]:x[nameProperty],
+        name: nameProperty == "locName" ? x[dataProperty] : x[nameProperty],
         value: x[dataProperty]
       }));
 
@@ -436,57 +457,6 @@ export class CustomerMasterAddComponent implements OnInit {
     await this.fetchDataAndPopulateForm("location_detail", "customerLocations", "locCode", "locName", true);
   }
 
-  selectedFileMSMEScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        const MSMEScanName = file.name;
-        this.selectedFiles = true;
-        this.customerTableForm.controls["MSMEscan"].setValue(MSMEScanName);
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
-  }
-
-  selectedFilePanCardScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        const PANcardName = file.name;
-        this.selectedFiles = true;
-        this.customerTableForm.controls["uplodPANcard"].setValue(PANcardName);
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
-  }
   // ------------------------------------------------------#endregion----------------------------------------------
 
   // ******************************************************/All Control Function/**********************************************
@@ -730,7 +700,6 @@ export class CustomerMasterAddComponent implements OnInit {
     const customerLocationsDrop = controlDetail ? controlDetail.map((item: any) => item.value) : "";
     this.customerTableForm.controls["customerLocations"].setValue(customerLocationsDrop);
     this.customerTableForm.removeControl('customerLocationsDrop')
-
     const Body = {
       ...this.customerTableForm.value,
       customerName: this.customerTableForm.value.customerName.toUpperCase(), // Convert to uppercase
@@ -739,7 +708,7 @@ export class CustomerMasterAddComponent implements OnInit {
       // CustomerLocations: this.customerTableForm.value.CustomerLocations.name,
       PinCode: this.customerTableForm.value.PinCode.name,
       customerGroup: this.customerTableForm.value.customerGroup.name,
-      activeFlag: this.customerTableForm.value.activeFlag ,
+      activeFlag: this.customerTableForm.value.activeFlag,
       BlackListed: this.customerTableForm.value.BlackListed,
       _id: `${this.customerTableForm.value.customerGroup.value.replaceAll(/ /g, "")
         }-${this.customerTableForm.value.customerName.replaceAll(/ /g, "").substring(
@@ -762,8 +731,14 @@ export class CustomerMasterAddComponent implements OnInit {
         };
       }),
     };
+    const imageControlNames = ['uplodPANcard', 'MSMEscan'];
+    imageControlNames.forEach(controlName => {
+      const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
 
-    // this.customerTableForm.removeControl("customerLocationsDrop")
+      // Set the URL in the corresponding control name
+      Body[controlName] = file;
+    });
+
     if (this.isUpdate) {
       delete Body._id;
       delete Body.customerCode;
@@ -937,15 +912,15 @@ export class CustomerMasterAddComponent implements OnInit {
   }
 
   // Function to check if ERP Id already exists
-  async CheckPANNo() {
-    await this.checkValueExists("PANnumber", "PAN No");
-  }
+  // async CheckPANNo() {
+  //   await this.checkValueExists("PANnumber", "PAN No");
+  // }
   async CheckCINnumber() {
     await this.checkValueExists("CINnumber", "CIN number");
   }
-  async CheckmsmeNumber() {
-    await this.checkValueExists("MSMENumber", "MSME Number");
-  }
+  // async CheckmsmeNumber() {
+  //   await this.checkValueExists("MSMENumber", "MSME Number");
+  // }
   //#endregion
 
   //#region
@@ -969,6 +944,26 @@ export class CustomerMasterAddComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.customerTableForm.controls['activeFlag'].setValue(event);
-    // console.log("Toggle value :", event);
   }
+
+  // Uplod PAN card
+  async selectedFilePanCardScan(data) {
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uplodPANcard", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray);
+  }
+
+  // MSME Scan
+  async selectedFileMSMEScan(data) {
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "MSMEscan", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray);
+  }
+
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
+  //#endregion
 }

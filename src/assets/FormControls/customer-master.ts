@@ -193,6 +193,7 @@ export class customerControl {
         Validations: [],
         additionalData: {
           multiple: true,
+          isFileSelected: true
         },
         functions: {
           onChange: "selectedFilePanCardScan",
@@ -351,8 +352,8 @@ export class customerControl {
         value: isUpdate ? customerTable.MSMEscan : "",
         Validations: [],
         additionalData: {
-          // multiple: true,
-        },
+          isFileSelected: true
+      },
         functions: {
           onChange: "selectedFileMSMEScan",
         },
@@ -365,11 +366,8 @@ export class customerControl {
         label: "Black Listed",
         placeholder: "",
         type: "toggle",
-        value: isUpdate
-          ? customerTable.BlackListed == "Y"
-            ? true
-            : false
-          : false,
+        // value: isUpdate ? customerTable.BlackListed == "Y" ? true : false : false,
+        value: isUpdate ? customerTable.BlackListed : false,
         generatecontrol: true,
         disable: false,
         Validations: [

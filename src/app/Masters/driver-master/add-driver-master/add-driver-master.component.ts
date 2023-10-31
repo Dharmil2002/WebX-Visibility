@@ -8,7 +8,10 @@ import { DriverMaster } from "src/app/core/models/Masters/Driver";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
-import { HttpErrorResponse } from "@angular/common/http";
+import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
+import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
+import { MatDialog } from "@angular/material/dialog";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 @Component({
   selector: "app-add-driver-master",
   templateUrl: "./add-driver-master.component.html",
@@ -23,27 +26,20 @@ export class AddDriverMasterComponent implements OnInit {
   action: any;
   updateCountry: any;
   jsonControlDriverArray: any;
-  accordionData: any;
   location: any;
-  backPath:string;
+  backPath: string;
   locationStatus: any;
   category: any;
   categoryStatus: any;
   breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
-  selectedFiles: boolean;
-  SelectFile: File;
   vehicleDet: any;
   imageName: string;
   routeLocation: any;
   categoryDet: any;
   LocationList: any;
   locData: any;
-  pincode: any;
   pincodeStatus: any;
   tableLoad: boolean;
-  pincodeDet: any;
-  allData: { locationData: any; pincodeData: any; vehicleData: any };
-  driverData: any;
   newDriverId: string;
   vehicleNo: any;
   vehicleNoStatus: any;
@@ -54,18 +50,33 @@ export class AddDriverMasterComponent implements OnInit {
   countryCodeStatus: any;
   newDriverCode: any;
   submit = 'Save';
+  imageData: any = {};
+  allData: { locationData: any; pincodeData: any; vehicleData: any; driverData: any; };
+  pincode: any;
+  pincodeDet: any;
+
   //#endregion
 
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private objImageHandling: ImageHandling,
+    private dialog: MatDialog,
+    private objPinCodeService: PinCodeService
+
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.DriverTable = Route.getCurrentNavigation().extras.state.data;
 
       this.isUpdate = true;
+      this.imageData = {
+        'DOBProofScan': this.DriverTable.DOBProofScan,
+        'addressProofScan': this.DriverTable.addressProofScan,
+        'licenseScan': this.DriverTable.licenseScan,
+        'driverPhoto': this.DriverTable.driverPhoto
+      }
       this.submit = 'Modify';
       this.action = "edit";
     } else {
@@ -140,18 +151,21 @@ export class AddDriverMasterComponent implements OnInit {
         filter: {},
         collectionName: "location_detail",
       };
-
       let pincodeReq = {
         companyCode: this.companyCode,
         filter: {},
-        collectionName: "pincode_detail",
+        collectionName: "pincode_master",
       };
       let vehicleReq = {
         companyCode: this.companyCode,
         filter: {},
         collectionName: "vehicle_detail",
       };
-
+      let driverReq = {
+        companyCode: this.companyCode,
+        filter: {},
+        collectionName: "driver_detail",
+      };
       const locationRes = await this.masterService
         .masterPost("generic/get", locationReq)
         .toPromise();
@@ -161,11 +175,15 @@ export class AddDriverMasterComponent implements OnInit {
       const vehicleRes = await this.masterService
         .masterPost("generic/get", vehicleReq)
         .toPromise();
+      const driverRes = await this.masterService
+        .masterPost("generic/get", driverReq)
+        .toPromise();
 
       const mergedData = {
         locationData: locationRes?.data,
         pincodeData: pincodeRes?.data,
         vehicleData: vehicleRes?.data,
+        driverData: driverRes?.data
       };
       this.allData = mergedData;
 
@@ -174,8 +192,8 @@ export class AddDriverMasterComponent implements OnInit {
         value: element.vehicleNo,
       }));
       const pincodeDet = mergedData.pincodeData.map((element) => ({
-        name: element.pincode.toString(),
-        value: element.pincode.toString(),
+        name: element.PIN.toString(),
+        value: element.PIN.toString(),
       }));
 
       this.vehicleDet = vehicleDet;
@@ -188,13 +206,6 @@ export class AddDriverMasterComponent implements OnInit {
         this.vehicleNo,
         this.vehicleNoStatus
       );
-      // this.filter.Filter(
-      //   this.jsonControlDriverArray,
-      //   this.DriverTableForm,
-      //   pincodeDet,
-      //   this.pincode,
-      //   this.pincodeStatus
-      // );
       this.tableLoad = true;
       this.autofillDropdown();
     } catch (error) {
@@ -233,6 +244,17 @@ export class AddDriverMasterComponent implements OnInit {
       );
       this.DriverTableForm.controls.vehicleNo.setValue(this.vehicleData);
     }
+    // For setting image data, assuming you have imageData defined
+    Object.keys(this.imageData).forEach((controlName) => {
+      const url = this.imageData[controlName];
+      const fileName = this.objImageHandling.extractFileName(url);
+      // Set the form control value using the control name
+      this.DriverTableForm.controls[controlName].setValue(fileName);
+
+      //setting isFileSelected to true
+      const control = this.jsonControlDriverArray.find(x => x.name === controlName);
+      control.additionalData.isFileSelected = false
+    });
   }
   //#endregion
 
@@ -278,184 +300,34 @@ export class AddDriverMasterComponent implements OnInit {
   //#endregion
 
   //#region Driver Photo
-  selectedFileDriverPhoto(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["driverPhoto"].setValue(
-          this.SelectFile.name
-        );
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  async selectFileDriverPhoto(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "driverPhoto", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
   }
   //#endregion
 
   //#region License Scan
-  selectedFileLicenseScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["licenseScan"].setValue(
-          this.SelectFile.name
-        );
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  async selectedFileLicenseScan(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "licenseScan", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
   }
   //#endregion
 
   //#region DOB proof scan
-  selectedFileDOBProofScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["DOBProofScan"].setValue(
-          this.SelectFile.name
-        );
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  async selectedFileDOBProofScan(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "DOBProofScan", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
   }
   //#endregion
 
   //#region Address Proof Scan
-  selectedFileAddressProofScan(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["addressProofScan"].setValue(
-          this.SelectFile.name
-        );
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
-  }
-  //#endregion
-
-  //#region License No
-  selectedFile(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["license"].setValue(this.SelectFile.name);
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
-  }
-  //#endregion
-
-  //#region Pan Card
-  selectedPngFile(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
-
-      if (allowedFormats.includes(fileFormat)) {
-        this.SelectFile = file;
-        this.imageName = file.name;
-        this.selectedFiles = true;
-        this.DriverTableForm.controls["panCard"].setValue(this.SelectFile.name);
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  async selectedFileAddressProofScan(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "addressProofScan", this.
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
   }
   //#endregion
 
@@ -464,20 +336,12 @@ export class AddDriverMasterComponent implements OnInit {
     const controls = this.DriverTableForm;
     clearValidatorsAndValidate(controls);
     const formValue = this.DriverTableForm.value;
-    const controlNames = ["country","pincode","vehicleNo"];
+    const controlNames = ["country", "pincode", "vehicleNo"];
     controlNames.forEach((controlName) => {
       const controlValue = formValue[controlName]?.name;
       this.DriverTableForm.controls[controlName].setValue(controlValue);
     });
-    // this.DriverTableForm.controls["country"].setValue(
-    //   this.DriverTableForm.value.country.name
-    // );
-    // this.DriverTableForm.controls["pincode"].setValue(
-    //   this.DriverTableForm.value.pincode.name
-    // );
-    // this.DriverTableForm.controls["vehicleNo"].setValue(
-    //   this.DriverTableForm.value.vehicleNo.name
-    // );
+
     // Remove field from the form controls
     this.DriverTableForm.removeControl("companyCode");
     this.DriverTableForm.removeControl("updateBy");
@@ -486,6 +350,16 @@ export class AddDriverMasterComponent implements OnInit {
     this.DriverTableForm.controls["activeFlag"].setValue(
       this.DriverTableForm.value.activeFlag === true ? true : false
     );
+    // Define an array of control names
+    const imageControlNames = ['driverPhoto', 'licenseScan', 'addressProofScan', 'DOBProofScan'];
+    let data = { ...this.DriverTableForm.value };
+
+    imageControlNames.forEach(controlName => {
+      const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
+
+      // Set the URL in the corresponding control name
+      data[controlName] = file;
+    });
 
     let req = {
       companyCode: this.companyCode,
@@ -514,9 +388,8 @@ export class AddDriverMasterComponent implements OnInit {
         this.newDriverCode = generateDriverCode(lastDriverCode);
       }
       //generate unique manualDriverCode
-      this.DriverTableForm.controls["manualDriverCode"].setValue(
-        this.newDriverCode
-      );
+      data.manualDriverCode = this.newDriverCode
+
       if (this.isUpdate) {
         let id = this.DriverTableForm.value._id;
         // Remove the "_id" field from the form controls
@@ -525,7 +398,7 @@ export class AddDriverMasterComponent implements OnInit {
           companyCode: this.companyCode,
           collectionName: "driver_detail",
           filter: { _id: id },
-          update: this.DriverTableForm.value,
+          update: data,
         };
         const res = await this.masterService
           .masterPut("generic/update", req)
@@ -541,7 +414,7 @@ export class AddDriverMasterComponent implements OnInit {
           this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList");
         }
       } else {
-        const data = this.DriverTableForm.value;
+        //const data = this.DriverTableForm.value;
         this.DriverTableForm.removeControl("_id");
         // Assign the generated _id directly
         const id = { _id: this.newDriverCode };
@@ -576,134 +449,42 @@ export class AddDriverMasterComponent implements OnInit {
     this.Route.navigateByUrl("/Masters/DriverMaster/DriverMasterList");
   }
 
-  //#region
-  getManualDriverCodeExists() {
-    let req = {
-      companyCode: this.companyCode,
-      filter: {},
-      collectionName: "driver_detail",
-    };
-    this.masterService.masterPost("generic/get", req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.driverData = res.data;
-          const count = res.data.filter(
-            (item) =>
-              item.manualDriverCode ==
-              this.DriverTableForm.controls.manualDriverCode.value
-          );
-          if (count.length > 0) {
-            Swal.fire({
-              title:
-                "Driver Manual Code already exists! Please try with another",
-              toast: true,
-              icon: "error",
-              showCloseButton: false,
-              showCancelButton: false,
-              showConfirmButton: true,
-              confirmButtonText: "OK",
-            });
-            this.DriverTableForm.controls["manualDriverCode"].reset();
-          }
-        }
-      },
-    });
-  }
-  //#endregion
-
   setStateCityData() {
-    const fetchData = this.allData.pincodeData.find(
-      (item) =>
-        item.pincode == this.DriverTableForm.controls.pincode.value.value
+    const fetchData = this.allData.pincodeData.find((item) =>
+      item.PIN == this.DriverTableForm.controls.pincode.value.value
     );
-    this.DriverTableForm.controls.city.setValue(fetchData.city);
+    this.DriverTableForm.controls.city.setValue(fetchData.CT);
   }
 
-  //#region
+  //#region to set pin code
   getPincodeData() {
-    const pincodeValue = this.DriverTableForm.controls["pincode"].value;
-    // Check if pincodeValue is a valid number and has at least 3 characters
-    if (!isNaN(pincodeValue) && pincodeValue.length >= 3) {
-      // Find an exact pincode match in the pincodeDet array
-      const exactPincodeMatch = this.pincodeDet.find(
-        (element) => element.name === pincodeValue
-      );
-
-      if (!exactPincodeMatch) {
-        // Filter pincodeDet for partial matches
-        const filteredPincodeDet = this.pincodeDet.filter((element) =>
-          element.name.includes(pincodeValue)
-        );
-
-        if (filteredPincodeDet.length === 0) {
-          // Show a popup indicating no data found for the given pincode
-          Swal.fire({
-            icon: "info",
-            title: "No Data Found",
-            text: `No data found for pincode ${pincodeValue}`,
-            showConfirmButton: true,
-          });
-        } else {
-          // Call the filter function with the filtered data
-          this.filter.Filter(
-            this.jsonControlDriverArray,
-            this.DriverTableForm,
-            filteredPincodeDet,
-            this.pincode,
-            this.pincodeStatus
-          );
-        }
-      }
-    }
+    this.objPinCodeService.validateAndFilterPincode(this.DriverTableForm, "", this.jsonControlDriverArray, 'pincode', this.pincodeStatus);
   }
   //#endregion
 
   //#region
   async checkDriverNameExist() {
-    let req = {
-      companyCode: this.companyCode,
-      collectionName: "driver_detail",
-      filter: {},
-    };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
-    const drivernameExists = res.data.some(
+    const drivernameExists = this.allData.driverData.some(
       (res) =>
         res._id === this.DriverTableForm.value._id ||
-        res.driverName === this.DriverTableForm.value.driverName
+        res.driverName.toUpperCase() === this.DriverTableForm.value.driverName.toUpperCase()
     );
     if (drivernameExists) {
       // Show the popup indicating that the state already exists
       Swal.fire({
-        title: "Driver Name already exists! Please try with another",
-        toast: true,
+        text: "Driver Name already exists! Please try with another",
+        title: 'Error',
         icon: "error",
-        showCloseButton: false,
-        showCancelButton: false,
         showConfirmButton: true,
-        confirmButtonText: "OK",
       });
       this.DriverTableForm.controls["driverName"].reset();
     }
-    error: (err: any) => {
-      // Handle error if required
-      console.error(err);
-    };
   }
   //#endregion
 
   //#region
   async checkLicenseNumberExist() {
-    let req = {
-      companyCode: this.companyCode,
-      collectionName: "driver_detail",
-      filter: {},
-    };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
-    const licenseExists = res.data.some(
+    const licenseExists = this.allData.driverData.some(
       (res) =>
         res._id === this.DriverTableForm.value._id ||
         res.licenseNo === this.DriverTableForm.value.licenseNo
@@ -711,13 +492,10 @@ export class AddDriverMasterComponent implements OnInit {
     if (licenseExists) {
       // Show the popup indicating that the state already exists
       Swal.fire({
-        title: "license Number already exists! Please try with another",
-        toast: true,
+        text: "License Number already exists! Please try with another",
+        title: 'Error',
         icon: "error",
-        showCloseButton: false,
-        showCancelButton: false,
         showConfirmButton: true,
-        confirmButtonText: "OK",
       });
       this.DriverTableForm.controls["licenseNo"].reset();
     }
@@ -743,6 +521,16 @@ export class AddDriverMasterComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.DriverTableForm.controls['activeFlag'].setValue(event);
-    console.log("Toggle value :", event);
+    // console.log("Toggle value :", event);
   }
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
+  //#endregion
 }

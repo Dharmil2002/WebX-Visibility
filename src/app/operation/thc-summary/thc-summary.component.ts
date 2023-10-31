@@ -16,7 +16,7 @@ export class ThcSummaryComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
-  branch:string=localStorage.getItem("Branch");
+
   //add dyamic controls for generic table
   dynamicControls = {
     add: true,
@@ -28,6 +28,11 @@ export class ThcSummaryComponent implements OnInit {
   //#region create columnHeader object,as data of only those columns will be shown in table.
   // < column name : Column name you want to display on table >
   columnHeader = {
+    createOn: {
+      Title: "Create On",
+      class: "matcolumncenter",
+      Style: "max-width:250px",
+    },
     tripId: {
       Title: "THC No",
       class: "matcolumncenter",
@@ -50,11 +55,6 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:100px",
     },
-    updateDate: {
-      Title: "CreateAt",
-      class: "matcolumncenter",
-      Style: "max-width:250px",
-    },
     statusAction:{
       Title:"Status",
       class: "matcolumncenter",
@@ -72,7 +72,7 @@ export class ThcSummaryComponent implements OnInit {
     "vehicle",
     "loadedKg",
     "statusAction",
-    "updateDate",
+    "createOn"
   ];
   // linkArray = [
   //   { Row: 'tripId', Path: 'Operation/thc-view'},
@@ -98,18 +98,27 @@ export class ThcSummaryComponent implements OnInit {
   async getThcDetails() {
 
     const thcList = await getThcDetail(this._operationService);
-
-    const thcDetail= thcList.data
+    const branch=localStorage.getItem("Branch");
+    const thcDetail= thcList.data.filter((x)=>x.branch==branch || x.closingBranch.toLowerCase() === branch.toLowerCase())
     .map((item) => {
-      const action= item.closingBranch.toLowerCase() === this.branch.toLowerCase();
+      const action= item.closingBranch.toLowerCase() === branch.toLowerCase();
       if (item.updateDate) {
-        item.updateDate = formatDate(item.updateDate, 'dd-MM-yy HH:mm');
+        item.createOn = formatDate(item.updateDate, 'dd-MM-yy HH:mm');
         item.statusAction=item?.status === "1" ? "In Transit" :"Delivered",
         item.actions =item.status === "1" && action?  ["Update THC","View"] :item.status === "1"?["View"]:["Delivered","View"];
       }
       return item;
     });
-    this.tableData =thcDetail;
+       // Sort the PRQ list by pickupDate in descending order
+       const sortedData = thcDetail.sort((a, b) => {
+        const dateA: Date | any = new Date(a.updateDate);
+        const dateB: Date | any = new Date(b.updateDate);
+  
+        // Compare the date objects
+        return dateB - dateA; // Sort in descending order
+      });
+  
+    this.tableData =sortedData;
 
    this.tableLoad=false;
   }

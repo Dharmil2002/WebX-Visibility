@@ -161,11 +161,8 @@ const routes: Routes = [
   { path: "ProductMaster/shardProductList", component: ShardProductComponent },
 
   //Account Master Router
-  { path: "Account/AccountMasterList", component: AccountMasterComponent },
-  { path: "Account/AddAccountMaster", component: AddAccountComponent },
-
-
-
+  { path: "AccountMaster/AccountMasterList", component: AccountMasterComponent },
+  { path: "AccountMaster/AddAccountMaster", component: AddAccountComponent },
 ];
 
 @NgModule({

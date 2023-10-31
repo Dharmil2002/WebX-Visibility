@@ -29,6 +29,7 @@ import { ConsignmentEntryFormComponent } from "./consignment-entry-form/consignm
 import { ThcGenerationComponent } from "./thc-generation/thc-generation.component";
 import { THCViewComponent } from "./ViewPrint/thc-view/thc-view.component";
 import { WESTERNCARRIERSComponent } from "./ViewPrint/westerncarriers/westerncarriers.component";
+import { PrqViewComponent } from "./ViewPrint/prq-view/prq-view.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -145,6 +146,10 @@ const routes: Routes = [
   {
     path: "westerncarriers-view",
     component: WESTERNCARRIERSComponent
+  },
+  {
+    path: "prq-view",
+    component: PrqViewComponent
   }
 ]
 

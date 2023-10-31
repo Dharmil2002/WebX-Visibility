@@ -79,7 +79,7 @@
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('Rake')" label="Rake">
                     <ng-template mat-tab-label>
-                        Rake Updation
+                        Rake Summary 
                     </ng-template>
                     <app-rake-update (CurrentIndex)="GetSelectedIndex($event)" *ngIf="tabName === 'Rake'"
                         [selectedIndex]="9"></app-rake-update>

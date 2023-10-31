@@ -25,6 +25,7 @@ export class GenericTableV2Component
   @Input() columnHeader;
   @Input() TableStyle;
   @Input() addAndEditPath;
+  @Input() disbleCheckbox;
   @Input() uploadComponent;
   @Input() csvHeaders; // csvHeader contains object in form of 'column id: column Title' in a particular order
   @Input() viewComponent;
@@ -51,6 +52,9 @@ export class GenericTableV2Component
   @Input() FormTitle: string = "";
   @Input() btndisabled: boolean = false;
   @Input() refreshbtn: boolean = false;
+  @Input() showHeader: boolean = true;
+  @Input() DisplayAddNewButton: boolean = false;
+  @Input() DisplayCheckbox: boolean = false;
   @Input() staticField = [];
   triggered: boolean = false;
   objectKeys = Object.keys;
@@ -361,7 +365,8 @@ export class GenericTableV2Component
     );
   }
   getMenuItems(labels: string[]): any[] {
-    // Check if this.menuItems is defined and is an array before filtering
+   
+     // Check if this.menuItems is defined and is an array before filtering
     if (Array.isArray(this.menuItems)) {
       return this.menuItems.filter(item => labels.includes(item.label));
     } else {

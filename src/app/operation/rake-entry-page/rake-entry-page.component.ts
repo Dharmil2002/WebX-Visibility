@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from "@angular/core";
-import { UntypedFormBuilder, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { processProperties } from "src/app/Masters/processUtility";
 import { RakeEntryControl } from "src/assets/FormControls/rake-entry";
@@ -10,6 +10,12 @@ import { Router } from "@angular/router";
 import { addRakeEntry, filterDocketDetail, genericGet, vendorDetailFromApi } from "./rate-utility";
 import Swal from "sweetalert2";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
+import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
+import { JobEntryService } from "src/app/Utility/module/operation/job-entry/job-entry-service";
+import { RakeEntryModel } from "src/app/Models/rake-entry/rake-entry";
+import { RakeEntryService } from "src/app/Utility/module/operation/rake-entry/rake-entry-service";
+import { formatDate } from "src/app/Utility/date/date-utils";
+import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -17,11 +23,30 @@ import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComp
     providers: [FilterUtils],
 })
 export class RakeEntryPageComponent implements OnInit {
+    /*below code for tableData*/
+    tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
+    METADATA = {
+        checkBoxRequired: true,
+        noColumnSort: ["checkBoxRequired"],
+    };
+    FormTitle = 'Prq List'
+    dynamicControls = {
+        add: true,
+        edit: true,
+        csv: false,
+    };
+    isLoad: boolean = false;
+    menuItemflag: boolean = true;
+    addAndEditPath: string;
+    containerJsonArray: any;
+    linkArray = [];
+    boxData: { count: number; title: string; class: string; }[];
+    /*End*/
     jsonControlArray: any;
     rakeEntryFormControl: RakeEntryControl;
-    rakeEntryTableForm: any;
+    rakeEntryTableForm: UntypedFormGroup;
+    rakeContainerTableForm: UntypedFormGroup;
     tableData: any = [];
-    tableLoad = false;
     tableData1: any = [];
     type: any;
     show = false;
@@ -29,7 +54,7 @@ export class RakeEntryPageComponent implements OnInit {
     actionObject = {
         addRow: false,
         submit: false,
-        search: true,
+        search: false,
     };
     companyCode = parseInt(localStorage.getItem("companyCode"));
     fromCity: string; //it's used in getCity() for the binding a fromCity
@@ -47,6 +72,10 @@ export class RakeEntryPageComponent implements OnInit {
     balanceLocation: string;
     displayedColumns: any
     balanceLocationStatus: boolean;
+    cnNo:any;
+    cnNoStatus:boolean;
+    jobNo:any;
+    jobNoStatus:boolean;
     cnDetail: any[];
     breadScrums = [
         {
@@ -58,6 +87,8 @@ export class RakeEntryPageComponent implements OnInit {
     jobDetail: any;
     allCn: any[];
     vendorData: any;
+    allContainer: any;
+    allJobs: any;
 
     ngOnInit(): void {
         this.initializeFormControl();
@@ -72,58 +103,18 @@ export class RakeEntryPageComponent implements OnInit {
         private fb: UntypedFormBuilder,
         private Route: Router,
         private masterService: MasterService,
-        private filter: FilterUtils) {
+        private filter: FilterUtils,
+        private definition: RakeEntryModel,
+        private rakeEntryService: RakeEntryService,
+        private docketService:DocketService,
+        private jobEntryService:JobEntryService
+    ) {
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
             this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data;
         }
-        this.displayedColumns = {
-            isSelect: {
-                name: "#",
-                key: "checkbox",
-                style: "",
-            },
-            jobNo: {
-                name: "Job No",
-                key: "input",
-                readonly: true,
-                style: "",
-            },
-            jobDate: {
-                name: "Job Date",
-                key: "input",
-                option: [],
-                style: ""
-            },
-            noOfPkts: {
-                name: "No Of Pkts",
-                key: "input",
-                Headerstyle: { 'min-width': '10px' },
-            },
-            weight: {
-                name: "Weight",
-                key: "input",
-                style: "",
-            },
-            fromCity: {
-                name: "From City",
-                key: "input",
-                style: "",
-            },
-            toCity: {
-                name: "To City",
-                key: "input",
-                style: "",
-            },
-            billingParty: {
-                name: "Billing Party",
-                key: "input",
-                style: "",
-            }
-        };
+
 
     }
-
-
 
     bindDropDown() {
         const jobPropertiesMapping = {
@@ -136,9 +127,15 @@ export class RakeEntryPageComponent implements OnInit {
             balanceLocation: { variable: 'balanceLocation', status: 'balanceLocationStatus' },
             fromCity: { variable: 'fromCity', status: 'fromCityStatus' },
             toCity: { variable: 'toCity', status: 'toCityStatus' },
-            destination: { variable: 'destination', status: 'destinationStatus' },
+            destination: { variable: 'destination', status: 'destinationStatus' }
         };
         processProperties.call(this, this.jsonControlArray, jobPropertiesMapping);
+        const containorPropertiesMapping=
+        {
+            cnNo: { variable: 'cnNo', status: 'cnNoStatus' },
+            jobNo: { variable: 'jobNo', status: 'jobNoStatus' }
+        }
+        processProperties.call(this,this.allContainer, containorPropertiesMapping);
     }
 
     initializeFormControl() {
@@ -146,96 +143,26 @@ export class RakeEntryPageComponent implements OnInit {
         this.rakeEntryFormControl = new RakeEntryControl();
         // Get form controls for city Location Details section
         this.jsonControlArray = this.rakeEntryFormControl.getRakeEntryFormControls();
+        this.containerJsonArray = this.rakeEntryFormControl.getRakeContainerDetail();
+        this.allContainer = this.containerJsonArray;
         // Build the form group using formGroupBuilder function and the values of jsonControlArray
         this.rakeEntryTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+        this.rakeContainerTableForm = formGroupBuilder(this.fb, [this.containerJsonArray]);
         this.show = false;
+        this.containerJsonArray = this.allContainer.filter((x) => x.name != "cnNo" && x.name != "cnDate")
         this.rakeEntryTableForm.controls['documentType'].setValue('JOB');
-        this.loadTempData([this.jobDetail], "job");
+        this.definition.columnHeader = this.definition.columnHeader;
+        const jobDetail=this.jobDetail?[this.jobDetail]:[]
+        this.loadTempData(jobDetail);
+
     }
 
-    loadTempData(jobDetail, field) {
+    async loadTempData(jobDetail) {
         this.tableData = [];
-
-        const isStringField = typeof jobDetail === "string";
-        const JobList = jobDetail.map(element => {
-            return {
-                srNo: true,
-                [field + 'No']: isStringField ? "" : element?.[field + 'No'] || "",
-                [field + 'Date']: isStringField ? "" : element?.[field + 'Date'] || "",
-                noOfPkts: isStringField ? "" : element?.pkgs || 0,
-                weight: isStringField ? "" : element?.weight || 0,
-                fromCity: isStringField ? "" : element?.fromToCity.split("-")[0] || "",
-                toCity: isStringField ? "" : element?.fromToCity.split("-")[1] || "",
-                billingParty: isStringField ? "" : element?.billingParty || ""
-            };
-        });
-        this.tableData = JobList;
+        const jobList = jobDetail?await this.rakeEntryService.processRakeListJob(jobDetail):[];
+        this.tableData = jobList;
+        this.tableLoad = false;
     }
-
-
-    display($event) {
-        // Get the selected value (either 'CN' or 'JOB')
-        const generateControl = typeof ($event) === "object" ? $event.eventArgs.value : $event;
-
-        if (generateControl === 'CN') {
-            // Define a mapping for changing keys in the displayedColumns object
-            const keyMapping = {
-                jobNo: "CNNo",
-                jobDate: "CNDate"
-                // ... define other mappings if needed
-            };
-
-            // Update displayedColumns using the key mapping
-            this.displayedColumns = Object.keys(this.displayedColumns).reduce((acc, key) => {
-                const newKey = keyMapping[key] || key;
-                acc[newKey] = this.displayedColumns[key];
-
-                // Update the name property for specific keys
-                if (newKey === "CNNo") {
-                    acc[newKey].name = "CNNo";
-                }
-                if (newKey === "CNDate") {
-                    acc[newKey].name = "CNDate";
-                }
-
-                return acc;
-            }, {});
-
-            // Load CN data and set the show flag
-            this.loadTempData(this.cnDetail, "CN");
-            this.show = true;
-        }
-
-        if (generateControl === 'JOB') {
-            // Define a mapping for changing keys back to original values
-            const keyMapping = {
-                CNNo: "jobNo",
-                CNDate: "jobDate"
-                // ... define other mappings if needed
-            };
-
-            // Update displayedColumns using the key mapping
-            this.displayedColumns = Object.keys(this.displayedColumns).reduce((acc, key) => {
-                const newKey = keyMapping[key] || key;
-                acc[newKey] = this.displayedColumns[key];
-
-                // Update the name property for specific keys
-                if (newKey === "jobNo") {
-                    acc[newKey].name = "Job No";
-                }
-                if (newKey === "jobDate") {
-                    acc[newKey].name = "Job Date";
-                }
-
-                return acc;
-            }, {});
-
-            // Load JOB data and set the show flag
-            this.loadTempData([this.jobDetail], "job");
-            this.show = false;
-        }
-    }
-
 
     functionCallHandler($event) {
         let functionName = $event.functionName;     // name of the function , we have to call
@@ -282,16 +209,14 @@ export class RakeEntryPageComponent implements OnInit {
     }
 
     async getDocketDetail() {
-        try {
-            const resDetail = await genericGet(this.masterService, "docket");
-            const docketFilter = await filterDocketDetail(resDetail.filter((x) => x.orgLoc === localStorage.getItem("Branch")));
-            this.allCn = await filterDocketDetail(resDetail);
-            this.cnDetail = docketFilter
-        } catch (error) {
-            // Handle the error appropriately, e.g., logging or throwing it further.
-            console.error("Error in getDocketDetail:", error);
-            throw error;
-        }
+        const docketDetail = await this.docketService.getDocket();
+        const docketFilter = await filterDocketDetail(docketDetail);
+        const jobDetail=await this.jobEntryService.getJobDetail();
+        this.allJobs=jobDetail;
+        this.allCn =docketFilter;
+        this.cnDetail = docketFilter
+        this.cityMapping()
+       
     }
 
     cancel() {
@@ -314,11 +239,70 @@ export class RakeEntryPageComponent implements OnInit {
             this.vendorStatus
         );
     }
+    
     async save() {
+        let fieldsToFromRemove = [];
+        let containorDetail = {}
+        let jobs = []
+        let cnote=[]
+        if (this.tableData.length > 0) {
+            const controlsToRemove = [
+                'cnNo',
+                'cnDate',
+                'noOfPkg',
+                'weight',
+                'fCity',
+                'tCity',
+                'billingParty',
+                'jobNo',
+                'jobDate'
+              ];
+              
+              controlsToRemove.forEach(control => {
+                this.rakeEntryTableForm.removeControl(control);
+              });
+    
+            if (Array.isArray(this.tableData)) {
+              this.tableData.forEach((item) => {
+                if (item.hasOwnProperty('jobNo') && item.jobDate) {
+                  item.jobDate = item.jobDateUtc;
+                  fieldsToFromRemove = ["actions", "type", "jobDateDateUtc"]
+                  jobs.push(item.jobNo);
+                }
+                else if (item.hasOwnProperty('cnNo') && item.cnDate) {
+                    item.cnDate = item.cnDateUtc;
+                    fieldsToFromRemove = ["id", "actions", "cnDate"],
+                    cnote.push(item.cnNo);
+                  }
+              });
+          }
+        
+    
+        }
+        else if (this.rakeEntryTableForm.value.cnNo) {
+          const cnDetail = {
+            cnNo: this.rakeEntryTableForm.value.cnNo.value,
+            cnDate: this.rakeEntryTableForm.value?.cnDateUtc || new Date(),
+            noOfPkg: this.rakeEntryTableForm.value.noOfPkg,
+            weight: this.rakeEntryTableForm.value.weight
+          }
+          this.tableData.push(cnDetail);
+          cnote = this.tableData.map((x) => x.cnNo);
+        }
+        else if (this.rakeEntryTableForm.value.jobNo) {
+          const containerDetail = {
+            jobNo: this.rakeEntryTableForm.value.jobNo.value,
+            jobDate: this.rakeEntryTableForm.value?.jobDateDateUtc || new Date(),
+            weight: this.rakeEntryTableForm.value.weight,
+            fCity: this.rakeEntryTableForm.value.fCity,
+            tCity: this.rakeEntryTableForm.value.tCity,
+            billingParty: this.rakeEntryTableForm.value.billingParty,
+          }
+          this.tableData.push(containerDetail);
+        }
+        containorDetail =  this.tableData
         // Create a new array without the 'srNo' property
-        let modifiedTableData = this.tableData.map(({ srNo, ...rest }) => rest);
         // Assign the modified array back to 'this.tableData'
-        this.tableData = modifiedTableData;
         const thisYear = new Date().getFullYear();
         const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
         const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
@@ -337,9 +321,9 @@ export class RakeEntryPageComponent implements OnInit {
         const cityMap = viaCity ? viaCity.map((x) => x.name) : [];
         this.rakeEntryTableForm.controls['via'].setValue(cityMap);
         this.rakeEntryTableForm.removeControl('viaControlHandler');
-        this.tableData = this.tableData.map(({ srNo, ...rest }) => rest);
+        const containorList = fieldsToFromRemove.length > 0 ? removeFieldsFromArray(containorDetail, fieldsToFromRemove) : [];
         let docDetail = {
-            containorDetail: this.tableData.filter((x) => x.isSelect === true),
+            containorDetail: containorList,
         };
         let jobDetail = {
             ...this.rakeEntryTableForm.value,
@@ -387,23 +371,38 @@ export class RakeEntryPageComponent implements OnInit {
     }
 
     cityMapping() {
+        this.rakeContainerTableForm.reset();
+        this.tableData=[];
         if (this.rakeEntryTableForm.value.documentType !== "JOB") {
-            const fromCityControl = this.rakeEntryTableForm.controls['fromCity'];
-            const toCityControl = this.rakeEntryTableForm.controls['toCity'];
-            if (fromCityControl.value && toCityControl.value) {
-                const city = `${fromCityControl.value.value}-${toCityControl.value.value}`;
-                this.cnDetail = this.allCn.filter(x => x.fromToCity === city);
-                this.display('CN');
-            }
-            else {
-                this.display('CN');
-            }
+            this.containerJsonArray = this.allContainer.filter((x) => x.name != "jobNo" && x.name != "jobDate")
+            this.definition.columnHeader = this.definition.cnoteHeader;
+            const cnValues=this.allCn.map((x)=>{return {name:x.cnNo,value:x.cnNo,extraData:x} });
+            this.filter.Filter(
+                this.containerJsonArray,
+                this.rakeContainerTableForm,
+                cnValues,
+                this.cnNo,
+                this.cnNoStatus
+            ); 
+
         }
         else {
-            this.display('JOB');
+            this.containerJsonArray = this.allContainer.filter((x) => x.name != "cnNo" && x.name != "cnDate");
+            this.definition.columnHeader = this.definition.jobHeader;
+            const jobValues=this.allJobs.map((x)=>{return {name:x.jobId,value:x.jobId,extraData:x} });
+            this.tableData=this.jobDetail?[this.jobDetail]:[];
+            this.filter.Filter(
+                this.containerJsonArray,
+                this.rakeContainerTableForm,
+                jobValues,
+                this.jobNo,
+                this.jobNoStatus
+            ); 
+
         }
     }
     vendorFieldChanged() {
+
         const rakeControl = this.rakeEntryTableForm.get('vendorName');
         const vendorType = this.rakeEntryTableForm.value.vendorType;
         this.jsonControlArray.forEach((x) => {
@@ -420,14 +419,131 @@ export class RakeEntryPageComponent implements OnInit {
                 this.vendor,
                 this.vendorStatus
             );
-            rakeControl.setValidators([Validators.required,autocompleteObjectValidator()]);
+            rakeControl.setValidators([Validators.required, autocompleteObjectValidator()]);
             rakeControl.updateValueAndValidity();
         }
-        else{
+        else {
             const rakeControl = this.rakeEntryTableForm.get('vendorName');
             rakeControl.setValidators(Validators.required);
             rakeControl.updateValueAndValidity();
         }
+        
+    }
+
+/*below the function for Cnote details*/
+  getCnoteDetails(){
+    
+    const dktDetail=this.rakeContainerTableForm.controls['cnNo'].value;
+    this.rakeContainerTableForm.controls['cnDate'].setValue(dktDetail.extraData.docketDate);
+    this.rakeContainerTableForm.controls['noOfPkg'].setValue(dktDetail.extraData.noOfPkg);
+    this.rakeContainerTableForm.controls['weight'].setValue(dktDetail.extraData.weight);
+    this.rakeContainerTableForm.controls['fCity'].setValue(dktDetail.extraData.fCity);
+    this.rakeContainerTableForm.controls['tCity'].setValue(dktDetail.extraData.tCity);
+    this.rakeContainerTableForm.controls['billingParty'].setValue(dktDetail.extraData.billingParty);
+  }
+  /*end*/
+  getJobDetails(){
+    
+    const jobDetail=this.rakeContainerTableForm.controls['jobNo'].value;
+    this.rakeContainerTableForm.controls['jobDate'].setValue(jobDetail.extraData.jobDate);
+    this.rakeContainerTableForm.controls['noOfPkg'].setValue(jobDetail.extraData.noOfpkg);
+    this.rakeContainerTableForm.controls['weight'].setValue(jobDetail.extraData.loadedWeight);
+    this.rakeContainerTableForm.controls['fCity'].setValue(jobDetail.extraData.fromCity);
+    this.rakeContainerTableForm.controls['tCity'].setValue(jobDetail.extraData.toCity);
+    this.rakeContainerTableForm.controls['billingParty'].setValue(jobDetail.extraData.billingParty);
+  }
+  /*THC*/
+   async addContainor() {
+    const docType=this.rakeEntryTableForm.controls['documentType'].value;
+    const mappend=docType=="JOB"?"job":"cn";
+    this.tableLoad = true;
+    this.isLoad = true;
+    const tableData = this.tableData;
+    if (tableData.length > 0) {
+      const exist = tableData.find(
+        (x) =>
+          x.cnNo === this.rakeContainerTableForm.value.cnNo
+      );
+      if (exist) {
+        this.rakeContainerTableForm.controls["cnNo"].setValue("");
+        Swal.fire({
+          icon: "info", // Use the "info" icon for informational messages
+          title: "Information",
+          text: "Please avoid duplicate entering CNNO Number.",
+          showConfirmButton: true,
+        });
+        this.tableLoad = false;
+        this.isLoad = false;
+        return false;
+      }
+    }
+    const delayDuration = 1000;
+    // Create a promise that resolves after the specified delay
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Use async/await to introduce the delay
+    await delay(delayDuration);
+    const json = {
+        [`${mappend}No`]:this.rakeContainerTableForm.controls[`${mappend}No`].value?.value,
+        [`${mappend}Date`]:formatDate(this.rakeContainerTableForm.controls[`${mappend}Date`].value, "dd-MM-yy HH:mm"),
+        noOfPkg:this.rakeContainerTableForm.controls['noOfPkg'].value,
+        weight:this.rakeContainerTableForm.controls['weight'].value,
+        fCity:this.rakeContainerTableForm.controls['fCity'].value,
+        tCity:this.rakeContainerTableForm.controls['tCity'].value,
+        billingParty :this.rakeContainerTableForm.controls['billingParty'].value,
+        [`${mappend}DateUtc`]:this.rakeContainerTableForm.controls[`${mappend}Date`].value,
+        type:mappend,
+        actions: ["Edit", "Remove"]
+    };
+    this.tableData.push(json);
+    this.isLoad = false;
+    this.tableLoad = false;
+    const fieldsToClear = [
+        `${mappend}No`,
+        `${mappend}Date`,
+        'noOfPkg',
+        'weight',
+        'tCity',
+        'fCity',
+        'billingParty'
+      ];
+      fieldsToClear.forEach(field => {
+        this.rakeContainerTableForm.controls[field].setValue("");
+      });
+      
+
+  }
+  /*End*/
+  handleMenuItemClick(data) {
+    this.fillRakeUpdate(data)
+}
+ fillRakeUpdate(data: any) {
+    const mapping=data.data.type;
+    if (data.label.label === "Remove") {
+      this.tableData = this.tableData.filter(x => x[`${mapping}No`] !== data.data[`${mapping}No`]);
+    } else {
+      this.rakeContainerTableForm.controls[`${mapping}No`].setValue(
+        { name:  data.data[`${mapping}No`], value:  data.data[`${mapping}No`] } || ""
+      );
+      this.rakeContainerTableForm.controls[`${mapping}Date`].setValue(
+        data.data?.[`${mapping}DateUtc`] || new Date()
+      );
+      this.rakeContainerTableForm.controls["noOfPkg"].setValue(
+        data.data?.noOfPkg || ""
+      );
+      this.rakeContainerTableForm.controls["weight"].setValue(
+        data.data?.weight || ""
+      );
+      this.rakeContainerTableForm.controls["fCity"].setValue(
+        data.data?.fCity || ""
+      );
+      this.rakeContainerTableForm.controls["tCity"].setValue(
+        data.data?.tCity || ""
+      );
+      this.rakeContainerTableForm.controls["billingParty"].setValue(
+        data.data?.billingParty || ""
+      );
+      this.tableData = this.tableData.filter(x => x[`${mapping}No`] !== data.data[`${mapping}No`]);;
 
     }
+  }
 }

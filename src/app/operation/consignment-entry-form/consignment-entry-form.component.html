@@ -108,8 +108,12 @@
     <div class="row paddingdiv">
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content-start">
+          <div *ngIf="isSubmit">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Loading...
+          </div>
           <button class="msr-3" mat-raised-button color="primary" (click)="save()"
-            [disabled]="!consignmentTableForm.valid || !FreightTableForm.valid">{{isUpdate?"Edit Docket":"Generate
+            [disabled]="!consignmentTableForm.valid || !FreightTableForm.valid ||   isSubmit" >{{isUpdate?"Edit Docket":"Generate
             Docket"}} </button>
           <button class="msr-3" mat-raised-button color="primary">Back</button>
         </div>

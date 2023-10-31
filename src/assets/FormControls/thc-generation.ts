@@ -314,7 +314,7 @@ export class thcControl {
                 },
                 {
                     name: 'capacity',
-                    label: 'capacity(In Tons)',
+                    label: 'Capacity(In Tons)',
                     placeholder: '',
                     type: 'text',
                     value: '',
@@ -359,7 +359,7 @@ export class thcControl {
                     value: '',
                     Validations: [],
                     functions: {
-                        onModelChange: 'onCalculateTotal'
+                        onChange: 'onCalculateTotal'
                     },
                     generatecontrol: true,
                     additionalData: {
@@ -375,7 +375,7 @@ export class thcControl {
                     value: '',
                     Validations: [],
                     functions: {
-                        onModelChange: 'onCalculateTotal'
+                        onChange: 'onCalculateTotal'
                     },
                     generatecontrol: true,
                     additionalData: {
@@ -390,7 +390,7 @@ export class thcControl {
                     type: 'text',
                     value: '',
                     functions: {
-                        onModelChange: 'onCalculateTotal'
+                        onChange: 'onCalculateTotal'
                     },
                     Validations: [],
                     generatecontrol: true,
@@ -534,6 +534,20 @@ export class thcControl {
                     placeholder: '',
                     type: '',
                     value: localStorage.getItem("UserName"),
+                    Validations: [],
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData: "Basic"
+                    },
+                    generatecontrol: false,
+                    disable: true
+                },
+                {
+                    name: 'branch',
+                    label: '',
+                    placeholder: '',
+                    type: '',
+                    value: localStorage.getItem("Branch"),
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,

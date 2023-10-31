@@ -72,7 +72,7 @@ export class AddAccountComponent implements OnInit {
   }
 
   initializeFormControl() {
-    const AccountFormControls = new AccountMasterControls();
+    const AccountFormControls = new AccountMasterControls(this.isUpdate);
     this.AlljsonControlAccountArray = AccountFormControls.getAccountAddArray();
     this.jsonControlAccountArray = AccountFormControls.getAccountAddArray();
     // Build the form group using formGroupBuilder function and the values of accordionData
@@ -314,7 +314,7 @@ export class AddAccountComponent implements OnInit {
     }
   }
 
-  addNewAccountGroup(event) {
+  addNewAccountGroup() {
     const dialogRef = this.dialog.open(AccountGroupComponent, {
       data: {},
       width: "1000px",
@@ -359,7 +359,7 @@ export class AddAccountComponent implements OnInit {
         .masterPut("generic/update", req)
         .toPromise();
       if (res.success) {
-        this.Route.navigateByUrl("/Masters/Account/AccountMasterList");
+        this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
         Swal.fire({
           icon: "success",
           title: "Successful",
@@ -398,7 +398,7 @@ export class AddAccountComponent implements OnInit {
         .masterPost("generic/create", req)
         .toPromise();
       if (res.success) {
-        this.Route.navigateByUrl("/Masters/Account/AccountMasterList");
+        this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
         Swal.fire({
           icon: "success",
           title: "Successful",
@@ -432,7 +432,7 @@ export class AddAccountComponent implements OnInit {
   }
 
   Cancle() {
-    this.Route.navigateByUrl("/Masters/Account/AccountMasterList");
+    this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
   }
 
   toggleSelectAll(argData: any) {

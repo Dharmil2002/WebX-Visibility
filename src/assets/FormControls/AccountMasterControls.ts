@@ -6,7 +6,7 @@ export class AccountMasterControls {
   AccountGroupAddArray: FormControls[];
 
 
-  constructor() {
+  constructor(isUpdate) {
     this.AccountQureyArray = [
       {
         name: "RadioAccountCode",
@@ -133,7 +133,7 @@ export class AccountMasterControls {
         label: "Account Code",
         placeholder: "System Genreted",
         type: "text",
-        value: "",
+        value: "System Genreted",
         Validations: [],
         generatecontrol: true,
         disable: true,
@@ -145,7 +145,7 @@ export class AccountMasterControls {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "required",
@@ -313,7 +313,7 @@ export class AccountMasterControls {
         label: "Group Code",
         placeholder: "System Genreted",
         type: "text",
-        value: "",
+        value: "System Genreted",
         Validations: [],
         generatecontrol: true,
         disable: true,
@@ -325,7 +325,7 @@ export class AccountMasterControls {
         type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: false,
+        disable: isUpdate?true:false,
         Validations: [
           {
             name: "required",

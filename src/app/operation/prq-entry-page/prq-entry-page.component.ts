@@ -19,6 +19,7 @@ import { PrqService } from "src/app/Utility/module/operation/prq/prq.service";
 import { CityService } from "src/app/Utility/module/masters/city/city.service";
 import { customerFromApi } from "./prq-utitlity";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 
 @Component({
   selector: "app-prq-entry-page",
@@ -77,7 +78,7 @@ export class PrqEntryPageComponent implements OnInit {
     private containerService: ContainerService,
     private locationService: LocationService,
     private masterService:MasterService,
-    private cityService: CityService,
+    private pinCodeService: PinCodeService,
     private prqService: PrqService
   ) {
     this.prqDetail = new prqDetail({});
@@ -95,22 +96,23 @@ export class PrqEntryPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.bindDropDown();
-    this.getCity();
+    this.getFromCity();
     this.bindDataFromDropdown();
     this.backPath = "dashboard/Index?tab=6";
   }
 
   autoFill() {
 
+    
     if (this.isUpdate) {
       this.prqEntryTableForm.controls["transMode"].setValue(
         this.prqDetail.transMode
       );
       this.disableSize()
       if(this.prqDetail.transMode=="trailer"){
-      this.prqEntryTableForm.controls["vehicleSize"].setValue(
-        this.prqDetail?.vehicleSize?.split("-")[0] ?? ""
-      );
+      const trailerlist=this.resContainer.find((x)=>x.name==this.prqDetail?.typeContainer||x.value==this.prqDetail?.typeContainer);
+      this.prqEntryTableForm.controls["vehicleSize"].setValue(trailerlist);
+      this.prqEntryTableForm.controls["typeContainer"].setValue(trailerlist);
       }
       else{
         this.prqEntryTableForm.controls["vehicleSize"].setValue(
@@ -132,8 +134,6 @@ export class PrqEntryPageComponent implements OnInit {
       this.prqEntryTableForm.controls["containerSize"].setValue(
        this.prqDetail.containerSize
       );
-      const containor= this.resContainer.find((x)=>x.name.trim()==this.prqDetail.typeContainer.trim())
-      this.prqEntryTableForm.controls["typeContainer"].setValue(containor);
       this.prqEntryTableForm.controls["payType"].setValue(
         this.prqDetail.payType
       );
@@ -142,6 +142,7 @@ export class PrqEntryPageComponent implements OnInit {
       this.prqEntryTableForm.controls["payType"].setValue("TBB");
     }
   }
+
   initializeFormControl() {
     // Create an instance of PrqEntryControls to get form controls for different sections
     this.prqControls = new PrqEntryControls(this.prqDetail, this.isUpdate);
@@ -154,6 +155,7 @@ export class PrqEntryPageComponent implements OnInit {
     this.allFormGrop = this.jsonControlPrqArray;
 
   }
+
   bindDropDown() {
     const locationPropertiesMapping = {
       billingParty: { variable: "customer", status: "billingPartyStatus" },
@@ -179,6 +181,7 @@ export class PrqEntryPageComponent implements OnInit {
       locationPropertiesMapping
     );
   }
+
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call
     // function of this name may not exists, hence try..catch
@@ -189,8 +192,8 @@ export class PrqEntryPageComponent implements OnInit {
       console.log("failed");
     }
   }
-
-  async getCity() {
+  /*below the method a getting a default city Based on Location*/
+  async getFromCity() {
     try {
       const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode })
       const city={
@@ -198,25 +201,25 @@ export class PrqEntryPageComponent implements OnInit {
         value:destinationMapping[0].city
       }
       this.prqEntryTableForm.controls['fromCity'].setValue(city);
-      const cityDetail = await this.cityService.getCity();
+      // const cityDetail = await this.cityService.getCity();
 
-      if (cityDetail) {
-        // this.filter.Filter(
-        //   this.jsonControlPrqArray,
-        //   this.prqEntryTableForm,
-        //   cityDetail,
-        //   this.fromCity,
-        //   this.fromCityStatus
-        // ); // Filter the docket control array based on fromCity details
+      // if (cityDetail) {
+      //   // this.filter.Filter(
+      //   //   this.jsonControlPrqArray,
+      //   //   this.prqEntryTableForm,
+      //   //   cityDetail,
+      //   //   this.fromCity,
+      //   //   this.fromCityStatus
+      //   // ); // Filter the docket control array based on fromCity details
 
-        this.filter.Filter(
-          this.jsonControlPrqArray,
-          this.prqEntryTableForm,
-          cityDetail,
-          this.toCity,
-          this.toCityStatus
-        ); // Filter the docket control array based on toCity details
-      }
+      //   this.filter.Filter(
+      //     this.jsonControlPrqArray,
+      //     this.prqEntryTableForm,
+      //     cityDetail,
+      //     this.toCity,
+      //     this.toCityStatus
+      //   ); // Filter the docket control array based on toCity details
+      // }
       if(!this.isUpdate){
       this.prqEntryTableForm.controls['transMode'].setValue("truck");
       this.disableSize();
@@ -226,23 +229,19 @@ export class PrqEntryPageComponent implements OnInit {
       console.error("Error getting city details:", error);
     }
   }
+  /*End*/
+  
+  /*below the method for the getting a CityName for PinCode Collection*/
+  async getPincodeDetail(event) {
+    const cityMapping = event.field.name == 'toCity' ?? this.fromCityStatus ;
+    this.pinCodeService.getCity(this.prqEntryTableForm, this.jsonControlPrqArray, event.field.name, cityMapping);
+  }
+ /*End*/
+
   cancel() {
     this.goBack(6);
   }
-  // GetBranchChanges() {
-  //   const locationDetail = this.locationDetail.filter(
-  //     (x) =>
-  //       x.city.toLowerCase() ===
-  //       this.prqEntryTableForm.value.fromCity.name.toLowerCase()
-  //   );
-  //   this.filter.Filter(
-  //     this.jsonControlPrqArray,
-  //     this.prqEntryTableForm,
-  //     locationDetail,
-  //     this.prqBranchCode,
-  //     this.prqBranchStatus
-  //   );
-  // }
+
   async save() {
 
     const tabcontrols = this.prqEntryTableForm;
@@ -375,6 +374,7 @@ export class PrqEntryPageComponent implements OnInit {
       // });
     }
   }
+
   prqView(prqDetail) {
     const dialogref = this.dialog.open(PrqListComponent, {
       width: "100vw",
@@ -386,7 +386,9 @@ export class PrqEntryPageComponent implements OnInit {
       this.autoFillPqrDetail(result[0]);
     });
   }
+
   autoFillPqrDetail(result) {
+    
     if (result) {
       setControlValue(
         this.prqEntryTableForm.get("transMode"),

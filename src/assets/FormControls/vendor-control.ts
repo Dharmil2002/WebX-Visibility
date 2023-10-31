@@ -168,7 +168,7 @@ export class VendorControl {
                 name: 'vendorPhoneNo',
                 label: 'Vendor Phone No',
                 placeholder: 'Vendor Phone No',
-                type: 'number', value: vendorMasterTable.vendorPhoneNo,
+                type: 'mobile-number', value: vendorMasterTable.vendorPhoneNo,
                 Validations: [
                     {
                         name: "required",
@@ -248,8 +248,11 @@ export class VendorControl {
                     },
                 ],
                 functions: {
-                    onChange: 'selectHandleFileSelection',
-                }
+                    onChange: 'selectPanCardScan',
+                },
+                additionalData: {
+                    isFileSelected: true
+                },
             },
             {
                 name: 'cinNumber',
@@ -311,8 +314,11 @@ export class VendorControl {
                     },
                 ],
                 functions: {
-                    onChange: 'selectHandleFileSelection',
-                }
+                    onChange: 'selectMsmeScan',
+                },
+                additionalData: {
+                    isFileSelected: true
+                },
             },
             {
                 name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isActive, Validations: [],
@@ -359,14 +365,14 @@ export class VendorControl {
                 generatecontrol: false, disable: false
             },
             {
-              name: "companyCode",
-              label: "Company Code",
-              placeholder: "Company Code",
-              type: "text",
-              value: parseInt(localStorage.getItem("companyCode")),
-              Validations: [],
-              generatecontrol: false,
-              disable: false,
+                name: "companyCode",
+                label: "Company Code",
+                placeholder: "Company Code",
+                type: "text",
+                value: parseInt(localStorage.getItem("companyCode")),
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
             },
             {
                 name: '_id',

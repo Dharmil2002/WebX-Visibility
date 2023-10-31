@@ -1,0 +1,32 @@
+<div mat-dialog-title style="display: flex;
+  justify-content: space-between;margin: 0 0 0px;
+  align-items: center;">
+    <h3>Debit Against Document
+    </h3>
+    <button mat-icon-button (click)="Close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+<div class="body">
+    <div class="row">
+        <div class="col-4">
+            <form [formGroup]="DebitVoucherDocumentDebitsForm">
+                <app-form-webxpress [form]="DebitVoucherDocumentDebitsForm" [FormTitle]="'Document Debits'"
+                    [formData]="jsonControlDebitVoucherDocumentDebitsArray"
+                    [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="true">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col-8">
+            <app-generic-table-v2 *ngIf="LoadDocumentDebitsDetails" [dynamicControls]="dynamicControls"
+                [columnHeader]="DocumentDebitsDisplayedColumns" [tableData]="DocumentDebits" [menuItems]="menuItems"
+                [staticField]="staticFieldForLedgerDocument" [Link]="linkArray" [FormTitle]="'Document Debits'"
+                [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="false"
+                (menuItemClicked)="handleMenuItemClick($event)" [DisplayAddNewButton]=true [DisplayCheckbox]="false"
+                (AddNewButtonEvent)="AddNewDocumentDebits()">
+            </app-generic-table-v2>
+        </div>
+    </div>
+</div>

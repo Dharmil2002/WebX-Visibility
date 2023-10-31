@@ -15,7 +15,7 @@ import { calculateTotalField } from "../unbilled-prq/unbilled-utlity";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { getLocationApiDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
-import { updatePrq } from "../consignment-entry-form/consigment-utlity";
+import { ConsigmentUtility } from "../../Utility/module/operation/docket/consigment-utlity.module";
 import { showConfirmationDialogThc } from "../thc-summary/thc-update-utlity";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 import { MatDialog } from "@angular/material/dialog";
@@ -48,6 +48,7 @@ export class ThcGenerationComponent implements OnInit {
   tableLoad: boolean;
   backPath: string;
   thcLoad: boolean = true;
+  disbleCheckbox:boolean;
   // Declaring breadcrumbs
   breadscrums = [
     {
@@ -194,7 +195,8 @@ export class ThcGenerationComponent implements OnInit {
     private vendorService: VendorService,
     private driverService: DriverService,
     private pinCodeService: PinCodeService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private consigmentUtility: ConsigmentUtility
   ) 
   {
     /* here the code which is used to bind data for add thc edit thc add thc based on
@@ -206,13 +208,14 @@ export class ThcGenerationComponent implements OnInit {
       this.isView = navigationState.hasOwnProperty("isView") ? true : false;
        /* if user going  to update Thc below condition is true */
       if (this.isUpdate) {
+        this.disbleCheckbox=true;
         /*Bind the Thc detail and in Update thc time below some field was added in table for docket and upload Pod*/
         this.thcDetail = navigationState.data;
         const field =
           ["pod", "receiveBy", "arrivalTime", "remarks"]
         this.staticField.push(...field)
       } else if (this.isView) {
-        
+        this.disbleCheckbox=true;
         /*Bind the Thc detail and in View thc time below some field was added in table for docket and upload Pod*/
         const field =
           ["pod", "receiveBy", "arrivalTime", "remarks"]
@@ -487,6 +490,7 @@ export class ThcGenerationComponent implements OnInit {
 
   async bindPrqData
   () {
+    
     const vehicleDetail = await this.vehicleStatusService.vehiclList(
       this.prqDetail?.prqNo
     );
@@ -505,7 +509,6 @@ export class ThcGenerationComponent implements OnInit {
       this.prqDetail?.fromToCity || ""
     );
     const fcity = this.prqDetail?.fromToCity.split('-')[0] || "";
-    console.log(fcity)
     const tcity = this.prqDetail?.fromToCity.split('-')[1] || "";
     this.thcTableForm.controls["fromCity"].setValue(
       {name:fcity,value:fcity}
@@ -514,7 +517,7 @@ export class ThcGenerationComponent implements OnInit {
       {name:tcity,value:tcity}
     );
     this.thcTableForm.controls["capacity"].setValue(
-      this.prqDetail?.vehicleSize || this.prqDetail?.containerSize.split(" ")[0] || ""
+      this.prqDetail?.vehicleSize || this.prqDetail?.containerSize|| ""
     );
     this.thcTableForm.controls["driverName"].setValue(
       vehicleDetail?.driver || ""
@@ -639,33 +642,35 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   async createThc() {
+    
     let extractedData = {};
-    if (!this.selectedData || (this.isUpdate && this.hasBlankFields())) {
-      if (!this.selectedData) {
-        Swal.fire({
-          icon: "info",
-          title: "Information",
-          text: "You must select any one of Shipment",
-          showConfirmButton: true,
-        });
-      } else if (this.isUpdate && this.hasBlankFields()) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: `The following fields are blank: ${this.getBlankFields()}`,
-        });
-      }
+    this.selectedData= this.tableData.filter((x)=>x.isSelected==true);
+    /* here the condition block which is execution while the 
+    selected value is zero and isUpdate is false */
+    if (this.selectedData.length<=0 && !this.isUpdate) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Information',
+        text: 'You must select any one of Shipment',
+        showConfirmButton: true,
+      });
       return false;
-    } else {
-      extractedData = this.selectedData.map((item) => ({
-        docketNumber: item.docketNumber,
-        remarks: item.remarks,
-        pod: item.pod,
-        arrivalTime: item.arrivalTime,
-      }));
     }
-    const docket = this.selectedData.map((x) => x.docketNumber);
-    this.thcTableForm.controls["docket"].setValue(docket);
+    
+    if (this.isUpdate && this.hasBlankFields()) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Incomplete Update: Please fill in all required fields before updating.',
+      });
+      return;
+    }
+     /* here the condition block which is execution while the 
+        isUpdate is true */
+   
+    const selectedDkt= this.isUpdate?this.tableData : this.selectedData;
+    extractedData = selectedDkt.map(({ docketNumber, remarks, pod, arrivalTime }) => ({ docketNumber, remarks, pod, arrivalTime }));
+    const docket = selectedDkt.map((x) => x.docketNumber);
     const prqNo = this.thcTableForm.controls["prqNo"].value.value;
     const advPdAt = this.thcTableForm.controls["advPdAt"].value?.value || "";
     const balAmtAt = this.thcTableForm.controls["balAmtAt"].value?.value || "";
@@ -685,12 +690,16 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['fromCity'].setValue(fromCity);
     this.thcTableForm.controls['toCity'].setValue(toCity);
     if (this.isUpdate) {
+      for (const element of docket) {
+        await this.docketService.updateDocket(element,{ "status": "2" });
+      }
       this.thcTableForm.controls["podDetail"].setValue(extractedData);
       this.thcTableForm.controls["status"].setValue("2");
       const res = await showConfirmationDialogThc(
         this.thcTableForm.value,
         this.operationService
       );
+    
       if (res) {
         Swal.fire({
           icon: "success",
@@ -701,11 +710,13 @@ export class ThcGenerationComponent implements OnInit {
         this.goBack("THC");
       }
     } else {
+       /*this docket detail was stored while the Thc is Generated*/
+        this.thcTableForm.controls["docket"].setValue(docket);
       if (this.prqFlag) {
         const prqData = {
           prqNo: this.thcTableForm.controls["prqNo"].value,
         };
-        await updatePrq(this.operationService, prqData, "7");
+        await this.consigmentUtility.updatePrq(prqData, "7");
       }
       for (const element of docket) {
         await this.docketService.updateDocket(element,{ "status": "1" });
@@ -745,7 +756,7 @@ export class ThcGenerationComponent implements OnInit {
       arrivalTime: 'Arrival Time',
     };
 
-    return Object.keys(fieldMap).some(fieldName => this.selectedData.some(item => !item[fieldName]));
+    return Object.keys(fieldMap).some(fieldName => this.tableData.some(item => !item[fieldName]));
   }
 
   // Helper function to get the names of blank fields
@@ -947,7 +958,7 @@ export class ThcGenerationComponent implements OnInit {
     );
     this.thcTableForm.controls["balAmtAt"].setValue(balAmtAt);
     const closingBranch = this.locationData.find(
-      (x) => x.value === this.thcDetail?.balAmtAt
+      (x) => x.value === this.thcDetail?.closingBranch
     );
     this.thcTableForm.controls["closingBranch"].setValue(closingBranch);
     const fromCity = { name: this.thcDetail?.route.split('-')[0] || "", value: this.thcDetail?.route.split('-')[0] || "" }

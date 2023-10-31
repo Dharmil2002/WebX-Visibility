@@ -62,7 +62,7 @@ export class AssignVehiclePageComponent implements OnInit {
   async fetchAvailabelVehicles() {
     try {
       const vehicleStatusData = await getVehicleStatusFromApi(this.companyCode, this._operationService);
-       const sizeContainer=this.NavData.size.split(' ')[0];
+       const sizeContainer=this.NavData.size;
       const checkCap=vehicleStatusData.filter((x)=>parseInt(x.capacity)==parseInt(sizeContainer));
       if (checkCap.length > 0) {
         const loadData=await this.vehicleStatusService.createTableData(this.NavData,checkCap)

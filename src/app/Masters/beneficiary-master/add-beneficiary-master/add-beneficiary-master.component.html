@@ -12,11 +12,11 @@
             (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
-    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 91%;"
+    <!-- <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 91%;"
         [disabled]="!beneficiaryDetailForm.valid" (click)="addData()">
         <mat-icon>add</mat-icon>
         Add New
-    </button>
+    </button> -->
     <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
 
         <div class="spinner-border text-primary" role="status">
@@ -26,8 +26,8 @@
 
     <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [FormTitle]="'List'" [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField"
-        [Link]="linkArray" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-        (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+        [Link]="linkArray" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
+        [addFlag]="addFlag" [FormTitle]="'Details'" [DisplayAddNewButton]=true (AddNewButtonEvent)="addData()">
     </app-generic-table-v2>
 
     <button type="button" [disabled]="!beneficiaryHeaderForm.valid" mat-raised-button color="primary" (click)="save()">

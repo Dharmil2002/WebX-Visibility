@@ -2,6 +2,13 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
+const lastToday = new Date(); // Get the current date and time
+const yesterday = new Date(today); // Create a new date object with the current date and time
+yesterday.setDate(lastToday.getDate() - 1); // Set the date to one day before
+// Set the time to the end of the day (23:59:59:999)
+yesterday.setHours(23, 59, 59, 999);
+let minDate = yesterday; // Now, maxDate holds the date for yesterday at the end of the day
+
 export class marketVehicleControls {
   private marketVehicle: FormControls[];
   constructor(
@@ -146,7 +153,8 @@ export class marketVehicleControls {
           },
         ],
         additionalData: {
-          maxDate:maxDate
+          maxDate:maxDate,
+          minDate:minDate
         },
       },
       

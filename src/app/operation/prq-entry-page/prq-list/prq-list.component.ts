@@ -87,7 +87,7 @@ export class PrqListComponent implements OnInit {
   getShipment() {
     this.tableData = this.items.map((x) => {
       x.isSelected = false;
-      x.size=x.vehicleSize?x.vehicleSize+" "+"MT" : x.containerSize?x.containerSize+" "+"MT":""
+      x.size=x.vehicleSize?x.vehicleSize : x.containerSize?x.containerSize:""
       return x;
     });
 

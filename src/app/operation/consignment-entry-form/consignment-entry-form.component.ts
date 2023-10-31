@@ -917,7 +917,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
 
   containerDetail() {
-    debugger
+    
     const cd = this.consignmentTableForm.controls["cd"].value;
     if (cd) {
       this.contFlag = true;

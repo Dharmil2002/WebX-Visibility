@@ -243,7 +243,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async save() {
-
+    
     const tabcontrols = this.prqEntryTableForm;
     clearValidatorsAndValidate(tabcontrols);
     this.prqEntryTableForm.controls["typeContainer"].enable();
@@ -270,6 +270,8 @@ export class PrqEntryPageComponent implements OnInit {
         this.prqEntryTableForm.controls[controlName].setValue("");
       }
     });
+    const resDetail=this.prqEntryTableForm.value
+    console.log(resDetail+"testing");
     if (!this.isUpdate) {
       const res = await this.prqService.addPrqData(
         this.prqEntryTableForm.value,

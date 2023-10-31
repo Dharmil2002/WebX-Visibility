@@ -4,8 +4,8 @@ export class BeneficiaryControl {
     beneficiaryHeaderControlArray: FormControls[]
     beneficiaryDetailControlArray: FormControls[]
     constructor(
-        //BeneficiaryTable: any,isUpdate: boolean
-        ) {
+        uploadKYC: any, isEditable: boolean
+    ) {
         this.beneficiaryHeaderControlArray = [
             {
                 name: "beneficiaryType",
@@ -118,7 +118,7 @@ export class BeneficiaryControl {
                 name: 'accountCode',
                 label: 'Account code',
                 placeholder: 'Enter Account code',
-                type: 'number', 
+                type: 'number',
                 value: '',
                 Validations: [{
                     name: "required",
@@ -129,7 +129,9 @@ export class BeneficiaryControl {
                     message: "Please enter valid Account code of length upto 12.",
                     pattern: "^[0-9]{12}$",
                 },
-                ],
+                ], functions: {
+                    onChange: 'OnAccountChange'
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -219,7 +221,7 @@ export class BeneficiaryControl {
                 label: 'Upload KYC',
                 placeholder: 'select Upload KYC',
                 type: 'file',
-                value: '',
+                value: isEditable ? uploadKYC : "",
                 Validations: [{
                     name: "required",
                     message: "Upload KYC is required"

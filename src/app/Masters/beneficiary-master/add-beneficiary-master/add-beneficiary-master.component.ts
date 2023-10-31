@@ -118,7 +118,10 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   addFlag = true;
   newVendorCode: string;
   imageData: any = {};
+  urlList: any = {};
+  isEditable: boolean;
   url: any;
+  editableData: any;
   constructor(private route: Router, private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
@@ -127,7 +130,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.beneficiaryTabledata = this.route.getCurrentNavigation().extras.state.data;
-      // console.log(this.beneficiaryTabledata);
+      // console.log(this.beneficiaryTabledata);   
 
       this.action = 'edit';
       this.isUpdate = true;
@@ -141,6 +144,13 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         this.tableData.push(item);
       });
 
+      this.beneficiaryTabledata.otherdetails.forEach(item => {
+        this.urlList[item.accountCode] = item.uploadKYC;
+      });
+      this.tableData = this.tableData.map(item => ({
+        ...item, // Spread the existing properties
+        uploadKYC: "Done" // Replace the uploadKYC property
+      }));
       this.isLoad = false;
       this.tableLoad = false;
     } else {
@@ -152,8 +162,6 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         title: activeTitle,
         items: ['Home'],
         active: activeTitle,
-        //generatecontrol: true,
-        //toggle: this.isUpdate ? this.vendorTabledata.isActive : false
       },
     ];
     this.initializeFormControl();
@@ -164,7 +172,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   }
   //#region to initialize form controls
   initializeFormControl() {
-    const beneficiaryControls = new BeneficiaryControl();
+    const beneficiaryControls = new BeneficiaryControl(this.beneficiaryTabledata, this.isEditable);
     this.jsonHeaderControl = beneficiaryControls.getHeaderControl();
     this.beneficiaryHeaderForm = formGroupBuilder(this.fb, [this.jsonHeaderControl]);
     this.jsonDetailControl = beneficiaryControls.getDetailContol();
@@ -189,6 +197,11 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   async save() {
     clearValidatorsAndValidate(this.beneficiaryHeaderForm)
     clearValidatorsAndValidate(this.beneficiaryDetailForm)
+    this.tableData = this.tableData.map(item => ({
+      ...item,
+      uploadKYC: this.urlList[item.accountCode]
+    }));
+
     const newData = this.tableData.map(x => {
       const { actions, id, ...rest } = x;
       return rest;
@@ -239,7 +252,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         collectionName: "beneficiary_detail",
         filter: {},
       }
-      const response = await this.masterService.masterPost("generic/get", req).toPromise()
+       const response = await this.masterService.masterPost("generic/get", req).toPromise()
       if (response) {
         // Generate srno for each object in the array
         const lastCode = response.data[response.data.length - 1];
@@ -375,24 +388,31 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       // Use async/await to introduce the delay
       await delay(delayDuration);
-      const fileName = this.objImageHandling.getFileByKey('uploadKYC', this.imageData);
+      const id = this.isEditable ? this.editableData.id : tableData.length + 1;
       const json = {
-        id: tableData.length + 1,
+        id: id,
         accountCode: this.beneficiaryDetailForm.value.accountCode,
         IFSCcode: this.beneficiaryDetailForm.value.IFSCcode,
         bankName: this.beneficiaryDetailForm.value.bankName,
         branchName: this.beneficiaryDetailForm.value.branchName,
         city: this.beneficiaryDetailForm.value.city,
         UPIId: this.beneficiaryDetailForm.value.UPIId,
-        uploadKYC: fileName,
+        uploadKYC: "Done",
         contactPerson: this.beneficiaryDetailForm.value.contactPerson,
         mobileNo: this.beneficiaryDetailForm.value.mobileNo,
         emailId: this.beneficiaryDetailForm.value.emailId,
         actions: ['Edit', 'Remove']
       }
       this.tableData.push(json);
-      this.beneficiaryDetailForm.reset();
-      clearValidatorsAndValidate(this.beneficiaryDetailForm)
+      const filedata = this.objImageHandling.getFileByKey('uploadKYC', this.imageData);
+      if (Object.keys(this.imageData).length !== 0) {
+        this.urlList = {
+          ...this.urlList,  // Initialize as an empty object if urlList is undefined
+          [json.accountCode]: filedata
+        };
+      }
+      //this.beneficiaryDetailForm.reset();
+      this.initialize('', false)
 
       //setting isFileSelected  
       const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
@@ -419,9 +439,10 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
     else {
-      // this.beneficiaryDetailForm.value.uploadKYC = data.data?.uploadKYC
-      // this.beneficiaryDetailForm.controls['uploadKYC'].setValue(data.data?.uploadKYC);
-
+      this.isEditable = true
+      this.editableData = data.data;
+      this.url = this.urlList[data.data.accountCode]
+      this.initialize(this.url, this.isEditable);
       this.beneficiaryDetailForm.controls['accountCode'].setValue(data.data?.accountCode || "");
       this.beneficiaryDetailForm.controls['IFSCcode'].setValue(data.data?.IFSCcode || "");
       this.beneficiaryDetailForm.controls['bankName'].setValue(data.data?.bankName || "");
@@ -433,16 +454,14 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       this.beneficiaryDetailForm.controls['emailId'].setValue(data.data?.emailId || "");
       const updateData = this.tableData.find(x => x.id === data.data.id);
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
-      this.url = updateData.uploadKYC;
 
       //setting isFileSelected  
-      const fileName = this.objImageHandling.extractFileName(this.url);
+      const fileName = this.objImageHandling.extractFileName(this.urlList[data.data.accountCode]);
       // Set isFileSelected to true
       const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
       control.additionalData.isFileSelected = false;
       // Set the form control value using the control name
       this.beneficiaryDetailForm.controls['uploadKYC'].setValue(fileName);
-
     }
   }
   //#endregion
@@ -460,6 +479,20 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       width: '30%',
       height: '50%',
     });
+  }
+  //#endregion
+  //#region to initialize beneficiaryControl
+  initialize(beneficiaryTabledata, isEditable) {
+    const beneficiaryControls = new BeneficiaryControl(beneficiaryTabledata, isEditable);
+    this.jsonDetailControl = beneficiaryControls.getDetailContol();
+    this.beneficiaryDetailForm = formGroupBuilder(this.fb, [this.jsonDetailControl])
+  }
+  //#endregion
+  //#region to set image at the change of accountCode
+  OnAccountChange() {
+    this.beneficiaryDetailForm.controls['uploadKYC'].setValue('');
+    const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
+    control.additionalData.isFileSelected = true;
   }
   //#endregion
 }

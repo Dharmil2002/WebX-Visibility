@@ -1,0 +1,50 @@
+{
+     "data": [
+          {
+               "Route": "DELB - MUMBAI",
+               "tripId": "TH/MUMB/2324/000008",
+               "updateDate": "27/10/2023",
+               "origin": "DELB",
+               "transMode": "Road", 
+               "dest": "MUMBAI",
+               "Manual_ID": "",
+               "vehicle": "GJ74587",
+               "vehicleType": "Attached",
+               "capacity": "5",
+               "engineNo": "JHJ877 474747",
+               "chassisNo":"7788",
+               "insuranceExpiryDate": "27/10/2023 17:50",
+               "fitnessValidityDate": "29/10/2023 12:45",
+               "weightUtilization": "4.00",
+               "vendorName": "V0011 - Payal",
+               "contAmt": "1000",
+               "otherAmount": "1000",
+               "Deductions": "100",
+               "totalAmt":"2100",
+               "advAmt": "100",
+               "balAmt": "900",
+               "Driver1": {
+                    "Name": "Mahesh",
+                    "Phone": "78784711114",
+                    "Licence": "AZ-125457"
+               },
+               "Driver2": {
+                    "Name": "Mahesh",
+                    "Phone": "78784711114",
+                    "Licence": "AZ-125457"
+               },
+               "Movement_Summary": "NEW DELHI-MUMBAI",
+               "ETA": "24/10/2023 16:22",
+               "Departed": "31/10/2023 16:22",
+               "Manifest": "MF/CNDELBHIN2324000001",
+               "CEWB": "",
+               "Utility": "20",
+               "length": "3",
+               "noofPkts": "10",
+               "chargedWeight": "100",
+               "Document_History": "18-10-23 11:01",
+               "Location": "MUMB",
+               "Updatedby": "Dhaval"
+          }
+     ]
+}

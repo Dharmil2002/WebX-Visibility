@@ -211,7 +211,7 @@ export class PrqEntryControls {
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -226,7 +226,7 @@ export class PrqEntryControls {
           }
         ],
         functions: {
-          onOptionSelect: 'GetBranchChanges'
+          onOptionSelect: ''
         },
         additionalData: {
           showNameAndValue: false,

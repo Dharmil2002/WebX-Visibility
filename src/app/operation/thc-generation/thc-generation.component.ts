@@ -956,7 +956,7 @@ export class ThcGenerationComponent implements OnInit {
     );
     this.thcTableForm.controls["balAmtAt"].setValue(balAmtAt);
     const closingBranch = this.locationData.find(
-      (x) => x.value === this.thcDetail?.balAmtAt
+      (x) => x.value === this.thcDetail?.closingBranch
     );
     this.thcTableForm.controls["closingBranch"].setValue(closingBranch);
     const fromCity = { name: this.thcDetail?.route.split('-')[0] || "", value: this.thcDetail?.route.split('-')[0] || "" }

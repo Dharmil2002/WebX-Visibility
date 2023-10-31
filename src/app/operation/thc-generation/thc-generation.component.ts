@@ -642,7 +642,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   async createThc() {
-    debugger
+    
     let extractedData = {};
     this.selectedData = this.tableData.filter((x) => x.isSelected == true);
     /* here the condition block which is execution while the 

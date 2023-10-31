@@ -243,7 +243,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async save() {
-    debugger
+    
     const tabcontrols = this.prqEntryTableForm;
     clearValidatorsAndValidate(tabcontrols);
     this.prqEntryTableForm.controls["typeContainer"].enable();

@@ -283,6 +283,7 @@ export class ThcGenerationComponent implements OnInit {
         x.noofPkts = totalnoofPkts
         return x; // Make sure to return x to update the original object in the 'tableData' array.
       });
+      //this.tableData= this.allShipment 
       this.tableLoad = false;
     }
   }
@@ -882,7 +883,7 @@ export class ThcGenerationComponent implements OnInit {
 
       const filteredShipments = this.allShipment.filter((x) =>
         x.fromCity.toLowerCase() === formCity.toLowerCase() &&
-        x.toCity.toLowerCase() === toCity.toLowerCase() && x.status == "0" && x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value
+        x.toCity.toLowerCase() === toCity.toLowerCase() && x.status == "0" || x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value
       );
 
       this.tableData = filteredShipments.map((x) => {

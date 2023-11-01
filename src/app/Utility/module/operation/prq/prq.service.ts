@@ -247,9 +247,9 @@ export class PrqService {
       .masterMongoPost("generic/get", reqBody)
       .toPromise();
     let prqList = [];
-
+    const prqDetails= res.data.filter((x)=>x.prqBranch.toLowerCase()===this.branchCode.toLowerCase());
     // Map and transform the PRQ data
-    res.data.map((element, index) => {
+    prqDetails.map((element, index) => {
       let prqDataItem = {
         srNo: (element.srNo = index + 1),
         prqNo: element?.prqNo || "",
@@ -281,7 +281,7 @@ export class PrqService {
       };
       prqList.push(prqDataItem);
     });
-
+    
     // Sort the PRQ list by pickupDate in descending order
     const sortedData = prqList.sort((a, b) => {
       const dateA: Date | any = new Date(a.createDateOrg);

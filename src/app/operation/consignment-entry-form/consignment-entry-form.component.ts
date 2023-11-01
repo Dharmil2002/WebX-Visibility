@@ -34,6 +34,9 @@ import { LocationService } from "src/app/Utility/module/masters/location/locatio
 import { AddFleetMasterComponent } from "src/app/Masters/fleet-master/add-fleet-master/add-fleet-master.component";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import { PrqService } from "../../Utility/module/operation/prq/prq.service";
+import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
+import { vehicleMarket } from "src/app/Models/vehicle-market/vehicle-market";
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -47,6 +50,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   FreightTableForm: UntypedFormGroup;
   invoiceTableForm: UntypedFormGroup;
   ewayBillTableForm: UntypedFormGroup;
+  marketVehicleTableForm:UntypedFormGroup;
   tableData: any = [];
   invoiceData: any = [];
   tableLoadIn: boolean = true;
@@ -208,10 +212,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
   destinationStatus: any;
   packagingType: any;
   allformControl: any[];
-  vehileList: any;
   marketVendor: boolean;
   /*Below Compotent is used for market vehicle*/
-  @ViewChild(AddFleetMasterComponent) addFleetMaster: AddFleetMasterComponent;
+  jsonMarketVehicle: FormControls[];
+  vehicleList: any;
+  allVehicle: any;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -227,7 +232,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private pinCodeService: PinCodeService,
     private locationService: LocationService,
     private prqService: PrqService,
-    private consigmentUtility: ConsigmentUtility
+    private consigmentUtility: ConsigmentUtility,
+    private vehicleService:VehicleService
   ) {
     const navigationState =
       this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -275,7 +281,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     // Create LocationFormControls instance to get form controls for different sections
     this.ConsignmentFormControls = new ConsignmentControl(this.docketDetail);
     this.FreightFromControl = new FreightControl(this.docketDetail);
-
+     
     // Get form controls for Driver Details section
     this.jsonControlArrayBasic =
       this.ConsignmentFormControls.getConsignmentControlControls().filter(
@@ -295,13 +301,14 @@ export class ConsignmentEntryFormComponent implements OnInit {
       ...this.jsonControlArrayConsignee,
     ];
     this.jsonControlArray = this.FreightFromControl.getFreightControlControls();
-
     this.jsonContainerDetail =
       this.ConsignmentFormControls.getContainerDetail();
     this.jsonInvoiceDetail = this.ConsignmentFormControls.getInvoiceDetail();
     this.jsonEwayBill = this.ConsignmentFormControls.getEwayBillDetail();
+    /*market vechile form group*/
+    this.jsonMarketVehicle=this.ConsignmentFormControls.getMarketVehicle();
+    /*End*/
     // Build the form group using formGroupBuilder function and the values of accordionData
-
     this.consignmentTableForm = formGroupBuilder(this.fb, [
       this.allformControl,
     ]);
@@ -311,6 +318,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     ]);
     this.invoiceTableForm = formGroupBuilder(this.fb, [this.jsonInvoiceDetail]);
     this.ewayBillTableForm = formGroupBuilder(this.fb, [this.jsonEwayBill]);
+    this.marketVehicleTableForm=formGroupBuilder(this.fb, [this.jsonMarketVehicle]);
     this.commonDropDownMapping();
     this.consignmentTableForm.controls["payType"].setValue("TBB");
     this.consignmentTableForm.controls["transMode"].setValue("Road");
@@ -406,14 +414,21 @@ export class ConsignmentEntryFormComponent implements OnInit {
   async bindDataFromDropdown() {
     const resCust = await customerFromApi(this.masterService);
     this.billingParty = resCust;
-    const vehileList = await getVehicleStatusFromApi(
+    const vehicleList = await getVehicleStatusFromApi(
       this.companyCode,
       this.operationService
     );
-    this.vehileList = vehileList;
-    const vehFieldMap = vehileList.map((x) => {
-      return { name: x.vehNo, value: x.vehNo };
+    /* reasone for diffreacial the both vehicle list and all vehicle is  for all 
+    vehicle are for the market vehicle autofield details agaist prq */
+    this.allVehicle=vehicleList;
+    this.vehicleList = vehicleList;
+    const vehFieldMap = this.vehicleList.map((x) => {
+      return {
+         name: x.vehNo,
+         value: x.vehNo
+         };
     });
+      /* end */
     const resContainerType =
       await this.consigmentUtility.containorConsigmentDetail();
     this.containerTypeList = resContainerType;
@@ -736,7 +751,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
         this.vendorName,
         this.vendorNameStatus
       );
-      const vehFieldMap = this.vehileList
+      const vehFieldMap = this.vehicleList
         .filter((x) => x.vendorType.toLowerCase() == vendorType.toLowerCase())
         .map((x) => {
           return { name: x.vehNo, value: x.vehNo };
@@ -761,6 +776,10 @@ export class ConsignmentEntryFormComponent implements OnInit {
       vendorName.updateValueAndValidity();
       vehicleNo.updateValueAndValidity();
       this.marketVendor = true;
+      // if(this.prqFlag&&this.marketVendor){
+      //  const vehDetail:vehicleMarket=this.allVehicle.find((x)=>x.vehNo==this.prqData.vehicleNo); 
+      //   this.marketVehicleTableForm.controls['vehNo'].setValue("")
+      // }
     }
   }
   /*Below function is only call those time when user can come to only edit a
@@ -962,8 +981,17 @@ export class ConsignmentEntryFormComponent implements OnInit {
     clearValidatorsAndValidate(contractcontrols);
     /*End*/
     const vendorType = this.consignmentTableForm.value.vendorType;
-
+    if (vendorType === "Market") {
+      const vendorName = this.consignmentTableForm.controls['vendorName']?.value|| "";
+      const vehicleNoValue = this.consignmentTableForm.controls['vehicleNo']?.value || "";
+      const _id=`${vendorName.substring(0, 3)}-${vehicleNoValue}`;
+      this.marketVehicleTableForm.controls['vehNo'].setValue(vehicleNoValue);
+      this.marketVehicleTableForm.controls['vendor'].setValue(vendorName);
+      this.marketVehicleTableForm.controls['_id'].setValue(_id);
+      await this.vehicleService.addMarketVehicle(this.marketVehicleTableForm.value);
+    }
     const vendorName = this.consignmentTableForm.value.vendorName;
+
     const vehNo =
       this.consignmentTableForm.value.vehicleNo?.value ||
       this.consignmentTableForm.value.vehicleNo;

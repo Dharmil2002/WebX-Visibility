@@ -1,0 +1,17 @@
+<div mat-dialog-title style="display: flex;
+  justify-content: space-between;margin: 0 0 0px;
+  align-items: center;">
+    <h3>Beneficiary Details
+    </h3>
+    <button mat-icon-button (click)="Close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+<div class="body">
+    <form [formGroup]="beneficiaryDetailForm">
+        <app-form-webxpress [form]="beneficiaryDetailForm" [formData]="jsonDetailControl"
+            [FormTitle]="'Beneficiary Other Details'" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>

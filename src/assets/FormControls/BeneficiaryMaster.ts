@@ -55,6 +55,9 @@ export class BeneficiaryControl {
                 additionalData: {
                     showNameAndValue: false
                 },
+                functions: {
+                    onOptionSelect: 'checkDuplicate'
+                },
                 generatecontrol: true, disable: false
             },
             {

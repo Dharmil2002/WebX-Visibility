@@ -146,6 +146,7 @@ import { AccountMasterComponent } from "./Account/Account Master/account-master/
 import { AccountListFilterComponent } from './Account/Account Master/account-list-filter/account-list-filter.component';
 import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
 import { AccountGroupComponent } from './Account/AccoutGroupMaster/account-group/account-group.component';
+import { BeneficiaryModalComponent } from './beneficiary-master/add-beneficiary-master/beneficiary-modal/beneficiary-modal.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -315,6 +316,7 @@ import { AccountGroupComponent } from './Account/AccoutGroupMaster/account-group
     AccountListFilterComponent,
     AddAccountComponent,
     AccountGroupComponent,
+    BeneficiaryModalComponent,
   ],
 
   providers: [

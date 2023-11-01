@@ -9,8 +9,8 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { BeneficiaryControl } from 'src/assets/FormControls/BeneficiaryMaster';
 import Swal from 'sweetalert2';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
-import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { MatDialog } from '@angular/material/dialog';
+import { BeneficiaryModalComponent } from './beneficiary-modal/beneficiary-modal.component';
 
 @Component({
   selector: 'app-add-beneficiary-master',
@@ -21,13 +21,11 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   jsonHeaderControl: any
   jsonDetailControl: any
   beneficiaryHeaderForm: UntypedFormGroup
-  beneficiaryDetailForm: UntypedFormGroup
   isUpdate: boolean = false;
   backPath: string;
   beneficiaryTabledata: any;
   action: string;
-  isLoad: boolean;
-  tableLoad: boolean;
+  tableLoad: boolean = true;
   tableData: any = [];
   breadScrums: { title: string; items: string[]; active: string; }[];
   beneficiary: any;
@@ -125,7 +123,6 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   constructor(private route: Router, private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
-    private objImageHandling: ImageHandling,
     private dialog: MatDialog,
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
@@ -134,8 +131,6 @@ export class AddBeneficiaryMasterComponent implements OnInit {
 
       this.action = 'edit';
       this.isUpdate = true;
-      this.isLoad = true;
-      this.tableLoad = true;
       // setting data in table at update time
       this.beneficiaryTabledata.otherdetails.forEach((item, index) => {
         item.id = index + 1;
@@ -151,8 +146,6 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         ...item, // Spread the existing properties
         uploadKYC: "Done" // Replace the uploadKYC property
       }));
-      this.isLoad = false;
-      this.tableLoad = false;
     } else {
       this.action = 'Add';
     }
@@ -175,8 +168,6 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     const beneficiaryControls = new BeneficiaryControl(this.beneficiaryTabledata, this.isEditable);
     this.jsonHeaderControl = beneficiaryControls.getHeaderControl();
     this.beneficiaryHeaderForm = formGroupBuilder(this.fb, [this.jsonHeaderControl]);
-    this.jsonDetailControl = beneficiaryControls.getDetailContol();
-    this.beneficiaryDetailForm = formGroupBuilder(this.fb, [this.jsonDetailControl])
     this.jsonHeaderControl.forEach((data) => {
       if (data.name === "beneficiary") {
         // Set beneficiary -related variables
@@ -186,22 +177,29 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     });
     this.beneficiaryHeaderForm.controls["beneficiaryType"].setValue("Customer")
     if (this.isUpdate) {
-      const location = this.beneficiaryTabledata.beneficiaryType.toLowerCase()
-      this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue(`${location}_detail`);
+      const location = this.beneficiaryTabledata.beneficiaryType.toLowerCase();
+      const updatedValue = location === 'employee' ? 'user_master' : `${location}_detail`;
+      this.beneficiaryHeaderForm.controls['beneficiaryType'].setValue(updatedValue);
       this.getBeneficiaryData();
     }
-
   }
   //#endregion
   //#region to save data
   async save() {
+    if (this.tableData.length === 0) {
+      Swal.fire({
+        text: 'Please Fill Beneficiary Details',
+        icon: "warning",
+        title: 'Warning',
+        showConfirmButton: true,
+      });
+      return false
+    }
     clearValidatorsAndValidate(this.beneficiaryHeaderForm)
-    clearValidatorsAndValidate(this.beneficiaryDetailForm)
     this.tableData = this.tableData.map(item => ({
       ...item,
       uploadKYC: this.urlList[item.accountCode]
     }));
-
     const newData = this.tableData.map(x => {
       const { actions, id, ...rest } = x;
       return rest;
@@ -252,7 +250,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         collectionName: "beneficiary_detail",
         filter: {},
       }
-       const response = await this.masterService.masterPost("generic/get", req).toPromise()
+      const response = await this.masterService.masterPost("generic/get", req).toPromise()
       if (response) {
         // Generate srno for each object in the array
         const lastCode = response.data[response.data.length - 1];
@@ -323,7 +321,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     }
     if (this.isUpdate) {
       const data = dropdownData.find(
-        x => x.customerName == this.beneficiaryTabledata.beneficiary.name
+        x => x.name === this.beneficiaryTabledata.beneficiary
       )
       this.beneficiaryHeaderForm.controls['beneficiary'].setValue(data)
     }
@@ -358,141 +356,169 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     }
   }
   //#region to add data to form
-  async addData() {
-    if (this.beneficiaryDetailForm.valid) {
-      this.tableLoad = true;
-      this.isLoad = true;
-      const tableData = this.tableData;
-      const accountCode = this.beneficiaryDetailForm.controls.accountCode.value;
-      if (tableData.length > 0) {
-        // Check if the gstNumber already exists in tableData
-        const isDuplicate = this.tableData.some((item) => item.accountCode === accountCode);
+  // async addData() {
+  //   if (this.beneficiaryDetailForm.valid) {
+  //     this.tableLoad = true;
+  //     this.isLoad = true;
+  //     const tableData = this.tableData;
+  //     const accountCode = this.beneficiaryDetailForm.controls.accountCode.value;
+  //     if (tableData.length > 0) {
+  //       // Check if the gstNumber already exists in tableData
+  //       const isDuplicate = this.tableData.some((item) => item.accountCode === accountCode);
 
-        if (isDuplicate) {
-          this.beneficiaryDetailForm.controls['accountCode'].setValue('');
-          // Show an error message using Swal (SweetAlert)
-          Swal.fire({
-            text: 'Account Code already exists! Please try with another.',
-            toast: true,
-            icon: 'warning',
-            title: 'Warning',
-            showConfirmButton: true,
-          });
-          this.tableLoad = false;
-          this.isLoad = false;
-          return false
-        }
-      }
-      const delayDuration = 1000;
-      // Create a promise that resolves after the specified delay
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      // Use async/await to introduce the delay
-      await delay(delayDuration);
-      const id = this.isEditable ? this.editableData.id : tableData.length + 1;
-      const json = {
-        id: id,
-        accountCode: this.beneficiaryDetailForm.value.accountCode,
-        IFSCcode: this.beneficiaryDetailForm.value.IFSCcode,
-        bankName: this.beneficiaryDetailForm.value.bankName,
-        branchName: this.beneficiaryDetailForm.value.branchName,
-        city: this.beneficiaryDetailForm.value.city,
-        UPIId: this.beneficiaryDetailForm.value.UPIId,
-        uploadKYC: "Done",
-        contactPerson: this.beneficiaryDetailForm.value.contactPerson,
-        mobileNo: this.beneficiaryDetailForm.value.mobileNo,
-        emailId: this.beneficiaryDetailForm.value.emailId,
-        actions: ['Edit', 'Remove']
-      }
-      this.tableData.push(json);
-      const filedata = this.objImageHandling.getFileByKey('uploadKYC', this.imageData);
-      if (Object.keys(this.imageData).length !== 0) {
-        this.urlList = {
-          ...this.urlList,  // Initialize as an empty object if urlList is undefined
-          [json.accountCode]: filedata
-        };
-      }
-      //this.beneficiaryDetailForm.reset();
-      this.initialize('', false)
+  //       if (isDuplicate) {
+  //         this.beneficiaryDetailForm.controls['accountCode'].setValue('');
+  //         // Show an error message using Swal (SweetAlert)
+  //         Swal.fire({
+  //           text: 'Account Code already exists! Please try with another.',
+  //           toast: true,
+  //           icon: 'warning',
+  //           title: 'Warning',
+  //           showConfirmButton: true,
+  //         });
+  //         this.tableLoad = false;
+  //         this.isLoad = false;
+  //         return false
+  //       }
+  //     }
+  //     const delayDuration = 1000;
+  //     // Create a promise that resolves after the specified delay
+  //     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  //     // Use async/await to introduce the delay
+  //     await delay(delayDuration);
+  //     const id = this.isEditable ? this.editableData.id : tableData.length + 1;
+  //     // const json = {
+  //     //   id: id,
+  //     //   accountCode: result.accountCode,
+  //     //   IFSCcode: this.beneficiaryDetailForm.value.IFSCcode,
+  //     //   bankName: this.beneficiaryDetailForm.value.bankName,
+  //     //   branchName: this.beneficiaryDetailForm.value.branchName,
+  //     //   city: this.beneficiaryDetailForm.value.city,
+  //     //   UPIId: this.beneficiaryDetailForm.value.UPIId,
+  //     //   uploadKYC: "Done",
+  //     //   contactPerson: this.beneficiaryDetailForm.value.contactPerson,
+  //     //   mobileNo: this.beneficiaryDetailForm.value.mobileNo,
+  //     //   emailId: this.beneficiaryDetailForm.value.emailId,
+  //     //   actions: ['Edit', 'Remove']
+  //     // }
+  //     // this.tableData.push(json);
+  //     // const filedata = this.objImageHandling.getFileByKey('uploadKYC', this.imageData);
+  //     // if (Object.keys(this.imageData).length !== 0) {
+  //     //   this.urlList = {
+  //     //     ...this.urlList,  // Initialize as an empty object if urlList is undefined
+  //     //     [json.accountCode]: filedata
+  //     //   };
+  //     // }
+  //     //this.beneficiaryDetailForm.reset();
+  //     this.initialize('', false)
 
-      //setting isFileSelected  
-      const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
-      control.additionalData.isFileSelected = true;
-      this.isLoad = false;
-      this.tableLoad = false;
-    } else {
-      Swal.fire({
-        text: 'Please Fill Beneficiary Details',
-        icon: "warning",
-        title: 'Warning',
-        showConfirmButton: true,
-      });
-      return false
-    }
-  }
+  //     //setting isFileSelected  
+  //     const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
+  //     control.additionalData.isFileSelected = true;
+  //     this.isLoad = false;
+  //     this.tableLoad = false;
+  //   } else {
+  //     Swal.fire({
+  //       text: 'Please Fill Beneficiary Details',
+  //       icon: "warning",
+  //       title: 'Warning',
+  //       showConfirmButton: true,
+  //     });
+  //     return false
+  //   }
+  // }
   //#endregion
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
-    this.fillTable(data);
-  }
-  fillTable(data: any) {
     if (data.label.label === 'Remove') {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
-    }
-    else {
-      this.isEditable = true
-      this.editableData = data.data;
+    } else {
       this.url = this.urlList[data.data.accountCode]
-      this.initialize(this.url, this.isEditable);
-      this.beneficiaryDetailForm.controls['accountCode'].setValue(data.data?.accountCode || "");
-      this.beneficiaryDetailForm.controls['IFSCcode'].setValue(data.data?.IFSCcode || "");
-      this.beneficiaryDetailForm.controls['bankName'].setValue(data.data?.bankName || "");
-      this.beneficiaryDetailForm.controls['branchName'].setValue(data.data?.branchName || "");
-      this.beneficiaryDetailForm.controls['city'].setValue(data.data?.city || "");
-      this.beneficiaryDetailForm.controls['UPIId'].setValue(data.data?.UPIId || "");
-      this.beneficiaryDetailForm.controls['contactPerson'].setValue(data.data?.contactPerson || "");
-      this.beneficiaryDetailForm.controls['mobileNo'].setValue(data.data?.mobileNo || "");
-      this.beneficiaryDetailForm.controls['emailId'].setValue(data.data?.emailId || "");
-      const updateData = this.tableData.find(x => x.id === data.data.id);
-      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
-
-      //setting isFileSelected  
-      const fileName = this.objImageHandling.extractFileName(this.urlList[data.data.accountCode]);
-      // Set isFileSelected to true
-      const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
-      control.additionalData.isFileSelected = false;
-      // Set the form control value using the control name
-      this.beneficiaryDetailForm.controls['uploadKYC'].setValue(fileName);
+      const beneficiaryDetails = this.tableData.find(x => x.id == data.data.id);
+      this.addDetails(beneficiaryDetails)
     }
   }
-  //#endregion
-  //#region to upload Kyc image
-  async uploadKYC(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uploadKYC", this.beneficiaryDetailForm, this.imageData, "Beneficiary", 'Master', this.jsonDetailControl);
-  }
-  //#endregion
-  //#region to preview image
-  openImageDialog(control) {
-    let file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
-    file = file ? file : this.url
-    this.dialog.open(ImagePreviewComponent, {
-      data: { imageUrl: file },
-      width: '30%',
-      height: '50%',
+  //#endregion 
+  //#region to Add a new item to the table or edit
+  addDetails(event) {
+    const EditableId = event?.id
+    const request = {
+      beneficiaryList: this.tableData,
+      Details: event,
+      url: this.url
+    }
+    this.tableLoad = false;
+    const dialogRef = this.dialog.open(BeneficiaryModalComponent, {
+      data: request,
+      width: "100%",
+      disableClose: true,
+      position: {
+        top: "20px",
+      },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      // console.log(result);
+
+      if (result != undefined) {
+        if (EditableId) {
+          this.tableData = this.tableData.filter((x) => x.id !== EditableId);
+        }
+        const json = {
+          id: this.tableData.length + 1,
+          accountCode: result.accountCode,
+          IFSCcode: result.IFSCcode,
+          bankName: result.bankName,
+          branchName: result.branchName,
+          city: result.city,
+          UPIId: result.UPIId,
+          uploadKYC: "Done",
+          contactPerson: result.contactPerson,
+          mobileNo: result.mobileNo,
+          emailId: result.emailId,
+          actions: ['Edit', 'Remove']
+        }
+        this.tableData.push(json);
+        this.tableLoad = true
+        this.urlList = {
+          ...this.urlList,  // Initialize as an empty object if urlList is undefined
+          [json.accountCode]: result.uploadKYC
+        };
+      }
+      this.tableLoad = true;
     });
   }
   //#endregion
-  //#region to initialize beneficiaryControl
-  initialize(beneficiaryTabledata, isEditable) {
-    const beneficiaryControls = new BeneficiaryControl(beneficiaryTabledata, isEditable);
-    this.jsonDetailControl = beneficiaryControls.getDetailContol();
-    this.beneficiaryDetailForm = formGroupBuilder(this.fb, [this.jsonDetailControl])
+  //#region to check Duplicate Beneficiary
+  async checkDuplicate() {
+    try {
+      // Create a request object to fetch data from "beneficiary_detail" collection
+      const req = {
+        companyCode: this.companyCode,
+        filter: {},
+        collectionName: "beneficiary_detail",
+      };
+
+      // Make the API call and await the response
+      const res = await this.masterService.masterPost('generic/get', req).toPromise();
+      const newBeneficiary = this.beneficiaryHeaderForm.value.beneficiary.value;
+      const isDuplicate = res.data.some((item) => item.beneficiary === newBeneficiary);
+      if (isDuplicate) {
+        // Show an error message using Swal
+        Swal.fire({
+          text: `Beneficiary : ${this.beneficiaryHeaderForm.value.beneficiary.name} already exists! Please try with another.`,
+          toast: true,
+          icon: 'warning',
+          title: 'Warning',
+          showConfirmButton: true,
+        });
+        this.beneficiaryHeaderForm.controls['beneficiary'].setValue('');
+        return;
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Handle the error (e.g., show an error message to the user).
+    }
   }
-  //#endregion
-  //#region to set image at the change of accountCode
-  OnAccountChange() {
-    this.beneficiaryDetailForm.controls['uploadKYC'].setValue('');
-    const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
-    control.additionalData.isFileSelected = true;
-  }
+
   //#endregion
 }

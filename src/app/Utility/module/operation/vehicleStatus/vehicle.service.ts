@@ -25,7 +25,9 @@ interface VehicleRequest {
   dMobNo?: string;
   driverPan?: string;
   lcNo?: string;
-  lcExpireDate?: Date;
+  fitnessValidityDate?: Date;
+  insuranceExpiryDate?: Date;
+  lcExpireDate?:Date;
   distance?: number;
   currentLocation?: string;
   updateBy?: string;
@@ -49,6 +51,7 @@ export class VehicleStatusService {
   /*below method is used for the vehicle status update*/
 
   async vehicleStatusUpdate(arrivalData: any, prqdata: any, market: boolean) {
+    
     try {
       // Check if essential data is provided
       if (!arrivalData) {
@@ -74,10 +77,11 @@ export class VehicleStatusService {
         dMobNo: arrivalData.dMobNo,
         vMobNo: arrivalData.vMobNo,
         driverPan: arrivalData.driverPan,
+        insuranceExpiryDate:arrivalData.insuranceExpiryDate,
+        fitnessValidityDate:arrivalData.fitnessValidityDate,
         currentLocation: localStorage.getItem("Branch"),
         updateBy: localStorage.getItem("Username"),
-        updateDate: new Date(),
-
+        updateDate: new Date()
       };
 
       // Create the request body object

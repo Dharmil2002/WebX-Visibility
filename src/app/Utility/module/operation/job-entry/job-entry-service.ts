@@ -40,4 +40,18 @@ export class JobEntryService {
       const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
       return res.data.filter((x)=>x.jobLocation == localStorage.getItem("Branch"));
       }
+      async updateJob(data, status) {
+        const reqBody = {
+          companyCode: localStorage.getItem("companyCode"),
+          collectionName: "job_detail",
+          filter: {
+            jobId: data?.jobId || data?.jobId || "", // Use the current PRQ ID in the filter
+          },
+          update: {
+            status: status
+          }
+        };
+        const res = await this.operation.operationPut("generic/update", reqBody).toPromise();
+        return res;
+      }
 }

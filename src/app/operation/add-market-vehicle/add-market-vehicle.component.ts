@@ -56,8 +56,6 @@ export class AddMarketVehicleComponent implements OnInit {
     // Create vehicleFormControls instance to get form controls for different sections
     const  maketVehicleControl = new marketVehicleControls();
     this.jsonControlVehicleArray = maketVehicleControl.getFormControls();
-    this.jsonControlVehicleArray.forEach(data => {
-    });
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.marketVehicleTableForm = formGroupBuilder(this.fb, [this.jsonControlVehicleArray]);
   }

@@ -17,6 +17,9 @@ export class marketVehicleControls {
       {
         name: 'vehicelNo', label: "Vehicle Number", placeholder: "Vehicle Number", type: 'government-id',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        functions: {
+          onChange: "onVehicleNoChange"
+        },
         Validations: [
           {
             name: "required",

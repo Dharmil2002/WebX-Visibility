@@ -11,6 +11,18 @@ export class StorageService {
     this.storage = localStorage; // or sessionStorage
   }
 
+  get companyCode(): number {
+    return this.getItemObject<number>("companyCode");
+  }
+
+  get branch(): string {
+    return this.getItem("Branch");
+  }
+
+  get userName(): string {
+    return this.getItem("Username");
+  }
+
   setItem(key: string, value: any, useSessionStorage = false): void {
     this.storage = useSessionStorage ? sessionStorage : localStorage;
     this.storage.setItem(key, value);

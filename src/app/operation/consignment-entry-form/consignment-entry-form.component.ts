@@ -379,7 +379,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.setFormValue(this.consignmentTableForm, "pAddress", this.prqData?.pAddress);
     this.setFormValue(this.consignmentTableForm, "ccbp", true);
     this.setFormValue(this.consignmentTableForm, "vendorType", vehicleDetail?.vendorType, false, "", "");
-   await  this.vendorFieldChanged()
+    await  this.vendorFieldChanged()
     if (vehicleDetail?.vendorType == "Market") {
       this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail.vendor);
     } else {
@@ -388,7 +388,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo);
 
     this.getLocBasedOnCity();
-    this.onAutoBillingBased("true");
+
+    this.onAutoBillingBased({ eventArgs: { checked: true } });
   }
 
   setFormValue(
@@ -516,7 +517,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
 
   onAutoBillingBased(event) {
-    const checked = typeof event === "string" ? event : event.eventArgs.checked;
+    const checked = event.eventArgs.checked;
     if (checked) {
       const billingParty =
         this.consignmentTableForm.controls["billingParty"].value;

@@ -102,22 +102,8 @@ import { CityLocationMappingMaster } from "./city-location-mapping-master/city-l
 import { ContainerMasterListComponent } from "./container-master/container-master-list/container-master-list.component";
 import { AddContainerMasterComponent } from "./container-master/add-container-master/add-container-master.component";
 import { MenuBidingAccessComponent } from "./menu-biding-access/menu-biding-access.component";
-import { VendorQueryPageComponent } from "./Vendor Contract/vendor-query-page/vendor-query-page.component";
-import { AddContractProfileComponent } from "./Vendor Contract/add-contract-profile/add-contract-profile.component";
-import { VendorContractHeaderComponent } from "./Vendor Contract/vendor-contract-header/vendor-contract-header.component";
-import { BasicInformationComponent } from "./Vendor Contract/vendor-tabs/basic-information/basic-information.component";
-import { VendorTabsIndexComponent } from "./Vendor Contract/vendor-tabs-index/vendor-tabs-index.component";
-import { VendorContractListComponent } from "./Vendor Contract/vendor-contract-list/vendor-contract-list.component";
-import { ServiceSelectionComponent } from "./Vendor Contract/vendor-tabs/service-selection/service-selection.component";
 import { FleetMasterListComponent } from "./fleet-master/fleet-master-list/fleet-master-list.component";
 import { AddFleetMasterComponent } from "./fleet-master/add-fleet-master/add-fleet-master.component";
-import { AddStandardChargesComponent } from "./Vendor Contract/vendor-tabs/pop-UP/standard-charges/add-standard-charges.component";
-import { AddTripLaneBasedComponent } from "./Vendor Contract/vendor-tabs/pop-UP/add-trip-lane-based/add-trip-lane-based.component";
-import { StandardChargesComponent } from "./Vendor Contract/vendor-tabs/standard-charges/standard-charges.component";
-import { AddAdditionalDeliveryChargesComponent } from "./Vendor Contract/vendor-tabs/pop-UP/add-additional-delivery-charges/add-additional-delivery-charges.component";
-import { AddWaitingChargesComponent } from "./Vendor Contract/vendor-tabs/pop-UP/add-waiting-charges/add-waiting-charges.component";
-import { TripLaneBasedComponent } from "./Vendor Contract/vendor-tabs/trip-lane-based/trip-lane-based.component";
-import { SpecialChargesComponent } from "./Vendor Contract/vendor-tabs/special-charges/special-charges.component";
 import { PinCodeService } from "../Utility/module/masters/pincode/pincode.service";
 import { StateService } from "../Utility/module/masters/state/state.service";
 import { VirtualLoginComponent } from "../layout/virtual-login/virtual-login.component";
@@ -147,6 +133,9 @@ import { AccountListFilterComponent } from './Account/Account Master/account-lis
 import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
 import { AccountGroupComponent } from './Account/AccoutGroupMaster/account-group/account-group.component';
 import { BeneficiaryModalComponent } from './beneficiary-master/add-beneficiary-master/beneficiary-modal/beneficiary-modal.component';
+import { VendorContractListComponent } from "./vendor-contract/vendor-contract-list/vendor-contract-list.component";
+import { VendorIndexComponent } from './vendor-contract/vendor-index/vendor-index.component';
+import { VendorContractBasicInformationComponent } from './vendor-contract/vendorContractTabs/vendor-contract-basic-information/vendor-contract-basic-information.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -262,36 +251,14 @@ import { BeneficiaryModalComponent } from './beneficiary-master/add-beneficiary-
     ContainerMasterListComponent,
     MenuBidingAccessComponent,
     AddContainerMasterComponent,
-    VendorQueryPageComponent,
-    AddContractProfileComponent,
-    VendorContractHeaderComponent,
-    BasicInformationComponent,
-    VendorTabsIndexComponent,
-    VendorContractListComponent,
-    ServiceSelectionComponent,
-    AddStandardChargesComponent,
     FleetMasterListComponent,
     AddFleetMasterComponent,
-    AddTripLaneBasedComponent,
-    StandardChargesComponent,
-    AddAdditionalDeliveryChargesComponent,
-    AddWaitingChargesComponent,
-    TripLaneBasedComponent,
-    SpecialChargesComponent,
     CustomerContractListComponent,
     CustomerContractTabsIndexComponent,
     CustomerContractBasicInformationComponent,
     CustomerContractServiceSelectionComponent,
-    ServiceSelectionComponent,
-    AddStandardChargesComponent,
     FleetMasterListComponent,
     AddFleetMasterComponent,
-    AddTripLaneBasedComponent,
-    StandardChargesComponent,
-    AddAdditionalDeliveryChargesComponent,
-    AddWaitingChargesComponent,
-    TripLaneBasedComponent,
-    SpecialChargesComponent,
     CustomerContractListComponent,
     CustomerContractTabsIndexComponent,
     CustomerContractBasicInformationComponent,
@@ -317,6 +284,9 @@ import { BeneficiaryModalComponent } from './beneficiary-master/add-beneficiary-
     AddAccountComponent,
     AccountGroupComponent,
     BeneficiaryModalComponent,
+    VendorContractListComponent,
+    VendorIndexComponent,
+    VendorContractBasicInformationComponent
   ],
 
   providers: [

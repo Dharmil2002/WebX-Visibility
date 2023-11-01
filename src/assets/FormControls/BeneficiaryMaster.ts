@@ -214,7 +214,7 @@ export class BeneficiaryControl {
                     {
                         name: "pattern",
                         message: "Please enter upto 100 Alpha numeric UPI Id.",
-                        pattern: "^[a-zA-Z 0-9]{1,100}$",
+                        pattern: "^[a-z0-9@]{1,100}$",
                     },
                 ],
                 generatecontrol: true, disable: false

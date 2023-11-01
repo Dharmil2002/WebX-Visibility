@@ -80,6 +80,10 @@ export class AddVoucherDetailsModalComponent implements OnInit {
   cancel(event) {
     this.dialogRef.close()
   }
+  SACCodeFieldChanged(event) {
+    this.DebitVoucherDetailsForm.controls.GSTRate.patchValue(event?.eventArgs?.option?.value?.GSTRT)
+    this.calculateGSTAndTotal('');
+  }
   calculateGSTAndTotal(event) {
     const DebitAmount = Number(this.DebitVoucherDetailsForm.value['DebitAmount']);
     const GSTRate = Number(this.DebitVoucherDetailsForm.value['GSTRate']);

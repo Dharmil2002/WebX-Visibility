@@ -70,7 +70,7 @@ export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
         const res = await masterService.masterPost('generic/get', req).toPromise();
 
         if (res && res.data && res.data[0].otherdetails) {
-            return res.data[0].otherdetails.map(x => ({ name: x.gstState, value: x.gstNumber, ...x }));
+            return res.data[0].otherdetails.map(x => ({ name: x.gstState, value: x.gstNumber, othersdetails: res.data[0] }));
         }
     } catch (error) {
         console.error('An error occurred:', error);
@@ -86,7 +86,7 @@ export async function GetSingleCustomerDetailsFromApi(masterService, customerCod
 
         if (res && res.data && res.data[0].GSTdetails) {
             return res.data[0].GSTdetails.map(x => ({
-                name: x.gstState, value: x.gstNo, ...x
+                name: x.gstState, value: x.gstNo, othersdetails: res.data[0]
             }));
         }
     } catch (error) {
@@ -105,6 +105,41 @@ export async function GetLocationDetailFromApi(masterService) {
         if (res && res.data) {
             return res.data.map(x => ({
                 name: x.locCode, value: x.locState
+            }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}
+
+export async function GetsachsnFromApi(masterService) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = {};
+        const req = { companyCode, collectionName: 'sachsn_master', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+        if (res && res.data) {
+            return res.data.map(x => ({
+                name: x.SNM, value: x.SHCD, ...x
+            }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}
+export async function GetAccountDetailFromApi(masterService, AccountCategoryName) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = {
+            AccountCategoryName: AccountCategoryName
+        };
+        const req = { companyCode, collectionName: 'account_detail', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+        if (res && res.data) {
+            return res.data.map(x => ({
+                name: x.AccountDescription, value: x.AccountCode, ...x
             }));
         }
     } catch (error) {

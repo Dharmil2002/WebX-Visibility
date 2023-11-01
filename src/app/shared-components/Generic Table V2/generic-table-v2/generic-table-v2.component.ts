@@ -378,7 +378,7 @@ export class GenericTableV2Component
   AddNew() {
     if (this.addAndEditPath) {
       this.router.navigateByUrl(this.addAndEditPath);
-    }else{
+    } else {
       this.AddNewButtonEvent.emit()
     }
   }
@@ -388,5 +388,9 @@ export class GenericTableV2Component
   FunctionHendel(name, element) {
     this.functionCallEmitter.emit({ functionName: name, data: element })
   }
-
+  OnChangeToggle(event) {
+    let context = { event };
+    context['functionName'] = 'OnChangeToggle';
+    this.functionCallEmitter.emit(context)
+  }
 }

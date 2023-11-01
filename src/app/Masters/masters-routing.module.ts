@@ -61,11 +61,6 @@ import { CityLocationMappingMaster } from './city-location-mapping-master/city-l
 import { CompanygstmasterAddComponent } from './Company GST Master/companygstmaster-add/companygstmaster-add.component';
 import { ContainerMasterListComponent } from './container-master/container-master-list/container-master-list.component';
 import { AddContainerMasterComponent } from './container-master/add-container-master/add-container-master.component';
-import { VendorQueryPageComponent } from './Vendor Contract/vendor-query-page/vendor-query-page.component';
-import { AddContractProfileComponent } from './Vendor Contract/add-contract-profile/add-contract-profile.component';
-import { BasicInformationComponent } from './Vendor Contract/vendor-tabs/basic-information/basic-information.component';
-import { VendorContractListComponent } from './Vendor Contract/vendor-contract-list/vendor-contract-list.component';
-import { VendorTabsIndexComponent } from './Vendor Contract/vendor-tabs-index/vendor-tabs-index.component';
 import { FleetMasterListComponent } from './fleet-master/fleet-master-list/fleet-master-list.component';
 import { AddFleetMasterComponent } from './fleet-master/add-fleet-master/add-fleet-master.component';
 import { CustomerContractListComponent } from './Customer Contract/customer-contract-list/customer-contract-list.component';
@@ -76,6 +71,8 @@ import { ListProductComponent } from './product-master/list-product/list-product
 import { ShardProductComponent } from './product-master/shard-product/shard-product.component';
 import { AccountMasterComponent } from './Account/Account Master/account-master/account-master.component';
 import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
+import { VendorContractListComponent } from './vendor-contract/vendor-contract-list/vendor-contract-list.component';
+import { VendorIndexComponent } from './vendor-contract/vendor-index/vendor-index.component';
 
 
 const routes: Routes = [
@@ -145,13 +142,6 @@ const routes: Routes = [
   { path: 'BeneficiaryMaster/BeneficiaryMasterList', component: BeneficiaryMasterListComponent },
   { path: 'BeneficiaryMaster/AddBeneficiaryMaster', component: AddBeneficiaryMasterComponent },
 
-  // Vendor Contract Router
-  { path: "VendorContract/VendorQueryPage", component: VendorQueryPageComponent },
-  { path: "VendorContract/AddContractProfile", component: AddContractProfileComponent },
-  { path: "VendorContract/BasicInformation", component: BasicInformationComponent },
-  { path: "VendorContract/VendorContractList", component: VendorContractListComponent },
-  { path: "VendorContract/VendorIndex", component: VendorTabsIndexComponent },
-
   // Customer Contract Router
   { path: "CustomerContract/CustomerContractList", component: CustomerContractListComponent },
   { path: "CustomerContract/CustomerIndex", component: CustomerContractTabsIndexComponent },
@@ -163,6 +153,11 @@ const routes: Routes = [
   //Account Master Router
   { path: "AccountMaster/AccountMasterList", component: AccountMasterComponent },
   { path: "AccountMaster/AddAccountMaster", component: AddAccountComponent },
+
+  //Vendor Contract Router
+  { path: "VendorContract/VendorContractList", component: VendorContractListComponent },
+  { path: "VendorContract/VendorContractIndex", component: VendorIndexComponent },
+  
 ];
 
 @NgModule({

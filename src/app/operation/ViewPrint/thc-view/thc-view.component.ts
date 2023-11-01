@@ -83,8 +83,6 @@ export class THCViewComponent implements OnInit {
         // Subscribe to the master service to fetch THC data
         this.masterService.masterPost("generic/get", req).subscribe({
             next: (res: any) => {
-                debugger
-                console.log(res);
                 // Check if data is present in the response
                 if (res.data && res.data.length > 0) {
                     // Split the route into origin and destination parts

@@ -6,7 +6,7 @@ export const GetHtmlTemplate = () => {
             <div class="row mt-5">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <img src='/assets/images/globe.png' height="75" />
+                        <img src='/assets/images/globe.png' height="75"/>
                     </div>
                 </div>
                 <div class="col-md-4" style="border-left:4px solid #D8DAD9;">
@@ -192,7 +192,7 @@ export const GetHtmlTemplate = () => {
                                                     <tr>
                                                         <td style="background-color: gainsboro;">
                                                             <span> Total Amount</span>
-                                                            <span style="font-weight:bold;float:right"> [totalAmt]
+                                                            <span style="font-weight:bold;float:right"> [contAmt]
                                                                 ₹</span><br />
                                                         </td>
                                                         <td
@@ -212,15 +212,15 @@ export const GetHtmlTemplate = () => {
                                                         <td>
                                                             <span style="font-size: 16px;">Driver 1</span><br />
                                                             <span
-                                                                style="font-size: 16px;font-weight: bold;">[Driver1.Name]</span>
+                                                                style="font-size: 16px;font-weight: bold;">[driverName]</span>
                                                         </td>
                                                         <td>
                                                             <span
                                                                 style="font-size: 16px;margin-right: 25px;">Phone</span><span
-                                                                style="font-size: 16px;">[Driver1.Phone]</span><br />
+                                                                style="font-size: 16px;">[driverMno]</span><br />
                                                             <span
                                                                 style="font-size: 16px;margin-right: 12px;">Licence</span>
-                                                            <span style="font-size: 16px;">[Driver1.Licence]</span>
+                                                            <span style="font-size: 16px;">[driverLno]</span>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -248,7 +248,7 @@ export const GetHtmlTemplate = () => {
                             <br />
                             <span style="font-size: 16px;color:#464855;font-weight: bold;">Movement Summary</span><br />
                             <span
-                                style="font-size: 15px;color:#8C001A; text-transform: uppercase; font-weight: bold;">[Route]</span>
+                                style="font-size: 15px;color:#8C001A; text-transform: uppercase; font-weight: bold;">[route]</span>
                             <br /><br />
 
                             <table style="font-size: 16px; width: 100%;" border="0" cellpadding="0" cellspacing="0">
@@ -276,9 +276,9 @@ export const GetHtmlTemplate = () => {
                                     </td>
                                     <td></td>
                                     <td>[Utility]</td>
-                                    <td>[length]</td>
+                                    <td>[CNs]</td>
                                     <td>[noofPkts]</td>
-                                    <td>[chargedWeight]</td>
+                                    <td>[loadedKg]</td>
                                 </tr>
                                 <tr style="font-size:15px;">
                                     <td style="font-weight:bold; text-transform: uppercase;">[dest]</td>
@@ -303,12 +303,12 @@ export const GetHtmlTemplate = () => {
                                     </td>
                                     <td style="font-size: 15px; background-color: #dcdada;font-weight: bold;">[Utility]
                                     </td>
-                                    <td style="font-size: 15px; background-color: #dcdada;font-weight: bold;">[length]
+                                    <td style="font-size: 15px; background-color: #dcdada;font-weight: bold;">[CNs]
                                     </td>
                                     <td style="font-size: 15px; background-color:#dcdada;font-weight:bold;">[noofPkts]
                                     </td>
                                     <td style="font-size: 15px; background-color:#dcdada;font-weight:bold;">
-                                        [chargedWeight]</td>
+                                        [loadedKg]</td>
                                 </tr>
                             </table>
                             <br />
@@ -328,7 +328,7 @@ export const GetHtmlTemplate = () => {
                                                 <td><span>[updateDate]</span>
                                                 </td>
                                                 <td><span>[origin]</span></td>
-                                                <td><span></span>[Updatedby]</td>
+                                                <td><span></span>[updateBy]</td>
                                             </tr>
                                             <tr style="font-size: 16px">
                                                 <td><span> </span></td>
@@ -373,8 +373,8 @@ export const GetHtmlTemplate = () => {
 };
 export const FieldMapping = [
     {
-        Key: "[totalAmt]",
-        Value: "totalAmt",
+        Key: "[contAmt]",
+        Value: "contAmt",
     },
     {
         Key: "[Utility]",
@@ -525,20 +525,20 @@ export const FieldMapping = [
         Value: "origin",
     },
     {
-        Key: "[Driver1.Name]",
-        Value: "Driver1.Name",
+        Key: "[driverName]",
+        Value: "driverName",
     },
     {
-        Key: "[Driver1.Phone]",
-        Value: "Driver1.Phone",
+        Key: "[driverMno]",
+        Value: "driverMno",
     },
     {
-        Key: "[Driver1.Licence]",
-        Value: "Driver1.Licence",
+        Key: "[driverLno]",
+        Value: "driverLno",
     },
     {
-        Key: "[Route]",
-        Value: "Route",
+        Key: "[route]",
+        Value: "route",
     },
     {
         Key: "[closingBranch]",
@@ -549,8 +549,12 @@ export const FieldMapping = [
         Value: "updateBy",
     },
     {
-        Key: "[chargedWeight]",
-        Value: "chargedWeight",
+        Key: "[loadedKg]",
+        Value: "loadedKg",
+    },
+    {
+        Key: "[loadedKg]",
+        Value: "loadedKg",
     },
     {
         Key: "[chargedWeight]",
@@ -561,8 +565,12 @@ export const FieldMapping = [
         Value: "ETA",
     },
     {
-        Key: "[length]",
-        Value: "length",
+        Key: "[CNs]",
+        Value: "CNs",
+    },
+    {
+        Key: "[CNs]",
+        Value: "CNs",
     },
     {
         Key: "[length]",

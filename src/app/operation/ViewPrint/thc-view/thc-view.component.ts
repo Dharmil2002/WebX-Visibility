@@ -58,9 +58,9 @@ export class THCViewComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        //this.getTHC()
+        this.getTHC()
         this.HtmlTemplate = GetHtmlTemplate()
-        this.getThcDetail()
+        // this.getThcDetail()
     }
 
     // * retrieves detailed information about a vehicle.
@@ -73,49 +73,58 @@ export class THCViewComponent implements OnInit {
     // }
 
     // Function to retrieve THC data
-    // getTHC() {
-    //     // Prepare request object for THC data retrieval
-    //     const req = {
-    //         companyCode: this.companyCode,
-    //         collectionName: "thc_detail",
-    //         filter: { tripId: this.tripId },
-    //     };
-    //     // Subscribe to the master service to fetch THC data
-    //     this.masterService.masterPost("generic/get", req).subscribe({
-    //         next: (res: any) => {
-    //             // Check if data is present in the response
-    //             if (res.data && res.data.length > 0) {
-    //                 // Split the route into origin and destination parts
-    //                 const routeParts = res.data[0].route.split('-');
-    //                 // Check if the route format is valid (should have exactly two parts)
-    //                 if (routeParts.length === 2) {
-    //                     // Extract origin and destination from routeParts
-    //                     const origin = routeParts[0].trim();
-    //                     const destination = routeParts[1].trim();
-    //                     // Update thcNestedData with additional properties
-    //                     this.thcNestedData = {
-    //                         ...res.data[0],
-    //                         origin: origin,
-    //                         dest: destination,
-    //                         updateDate: res.data[0]?.updateDate || new Date()
-    //                     };
-    //                     const originalDate = new Date(this.thcNestedData.updateDate);
-    //                     this.ETA = originalDate.setDate(originalDate.getDate() + 2);
-    //                     this.Departed = this.thcNestedData.updateDate
-    //                     // Fetch additional vehicle details
-    //                     this.getVehicleDetail()
-    //                 } else {
-    //                     console.error("Invalid route format:", res.data[0].route);
-    //                 }
-    //             } else {
-    //                 console.error("No data received or empty array.");
-    //             }
-    //         },
-    //         error: (err: any) => {
-    //             console.error("Error fetching THC data:", err);
-    //         },
-    //     });
-    // }
+    getTHC() {
+        // Prepare request object for THC data retrieval
+        const req = {
+            companyCode: this.companyCode,
+            collectionName: "thc_detail",
+            filter: { tripId: this.tripId },
+        };
+        // Subscribe to the master service to fetch THC data
+        this.masterService.masterPost("generic/get", req).subscribe({
+            next: (res: any) => {
+                debugger
+                console.log(res);
+                // Check if data is present in the response
+                if (res.data && res.data.length > 0) {
+                    // Split the route into origin and destination parts
+                    const routeParts = res.data[0].route.split('-');
+                    // Check if the route format is valid (should have exactly two parts)
+                    if (routeParts.length === 2) {
+                        // Extract origin and destination from routeParts
+                        const origin = routeParts[0].trim();
+                        const destination = routeParts[1].trim();
+                        // Extract the update date (assuming it's a string)
+                        const updateDate = res.data[0]?.updateDate || new Date().toISOString();
+                        // Format the date using the formatDocketDate function
+                        const formattedUpdateDate = formatDocketDate(updateDate);
+                        // Update thcNestedData with additional properties
+                        this.thcNestedData = {
+                            ...res.data[0],
+                            origin: origin,
+                            dest: destination,
+                            updateDate: formattedUpdateDate,
+                            CNs: res.data[0].docket.length
+                        };
+                        // const originalDate = new Date(this.thcNestedData.updateDate);
+                        // this.ETA = originalDate.setDate(originalDate.getDate() + 2);
+                        // this.Departed = this.thcNestedData.updateDate
+                        this.jsonData = this.thcNestedData
+                        // Fetch additional vehicle details
+                        // this.getVehicleDetail()
+                        this.THCViewPrint = true
+                    } else {
+                        console.error("Invalid route format:", res.data[0].route);
+                    }
+                } else {
+                    console.error("No data received or empty array.");
+                }
+            },
+            error: (err: any) => {
+                console.error("Error fetching THC data:", err);
+            },
+        });
+    }
 
     // async getDocketDetail() {
     //     const req = {
@@ -160,9 +169,9 @@ export class THCViewComponent implements OnInit {
     //     
     // }
 
-    async getThcDetail() {
-        const res = await this.masterService.getJsonFileDetails("thcDetail").toPromise();
-        this.THCViewPrint = true
-        this.jsonData = res.data[0]
-    }
+    // async getThcDetail() {
+    //     const res = await this.masterService.getJsonFileDetails("thcDetail").toPromise();
+    //     this.THCViewPrint = true
+    //     this.jsonData = res.data[0]
+    // }
 }

@@ -24,7 +24,8 @@ export class AccountMasterComponent implements OnInit {
   menuItems = [];
   EventButton = {
     functionName:'AddFunction',
-    name: "Add New"
+    name: "Add New",
+    iconName:'add'
   }
   dynamicControls = {
     add: false,

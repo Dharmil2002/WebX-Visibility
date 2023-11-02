@@ -83,7 +83,7 @@
                                                 style="margin-left:10px; "
                                                 (click)="FunctionHendel(EventButton.functionName , {})"
                                                 >
-                                                <mat-icon>add</mat-icon>
+                                                <mat-icon *ngIf="EventButton?.iconName">{{EventButton.iconName}}</mat-icon>
                                                 {{EventButton.name}}
                                             </button>
                                         </div>

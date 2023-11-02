@@ -25,7 +25,7 @@ export class AssignedVehicleService {
         prqDetail.status = "2";
         delete prqDetail.actions
         const res = await updatePrqStatus(prqDetail, masterService);
-        const result = await this.vehicleStatusService.vehicleStatusUpdate(item, prqDetail,market);
+        const result = await this.vehicleStatusService.SaveVehicleData(item, prqDetail);
         if (res && result) {
             const confirmationResult = await Swal.fire({
                 icon: "success",

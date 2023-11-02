@@ -35,6 +35,7 @@ import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.s
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
+import { MarkerVehicleService } from "src/app/Utility/module/operation/market-vehicle/marker-vehicle.service";
 
 @Component({
   selector: "app-thc-generation",
@@ -200,7 +201,8 @@ export class ThcGenerationComponent implements OnInit {
     private pinCodeService: PinCodeService,
     private locationService: LocationService,
     private consigmentUtility: ConsigmentUtility,
-    private vehicleService:VehicleService
+    private vehicleService:VehicleService,
+    private markerVehicleService: MarkerVehicleService,
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -436,7 +438,9 @@ export class ThcGenerationComponent implements OnInit {
     if (this.prqFlag) {
       this.bindDataPrq();
     }
+    
     if (this.isUpdate || this.isView) {
+      
       this.autoFillThc();
     }
     /*below autoFillDocketDetail call when your try to create Multiple THC using one Docket */
@@ -510,6 +514,9 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls["vehicle"].setValue(vehno);
     this.thcTableForm.controls["vendorType"].setValue(vehicleDetail?.vendorType || "");
     this.thcTableForm.controls["vendorName"].setValue(vendor);
+    if(this.prqFlag){
+    this.thcTableForm.controls["transMode"].setValue(this.prqDetail?.transMode=="truck"?"Road":"");
+    }
     this.thcTableForm.controls["route"].setValue(
       this.prqDetail?.fromToCity || ""
     );
@@ -537,6 +544,28 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls["panNo"].setValue(
       vehicleDetail?.driverPan || ""
     );
+    this.thcTableForm.controls['insuranceExpiryDate'].setValue(new Date());
+    this.thcTableForm.controls['fitnessValidityDate'].setValue(new Date());
+    if(vehicleDetail?.vendorType=="Market"){
+      let vehData = await this.markerVehicleService.GetVehicleData(this.prqDetail?.vehicleNo||"");
+      if(vehData){
+       this.marketVehicleTableForm.controls['vehicleSize'].setValue(vehData.wTCAP);
+       this.marketVehicleTableForm.controls['vehNo'].setValue(this.prqDetail?.vehicleNo||"");
+       this.marketVehicleTableForm.controls['vendor'].setValue(vehData.vndNM ?? '');
+       this.marketVehicleTableForm.controls['vMobileNo'].setValue(vehData.vndPH ?? '');
+       this.marketVehicleTableForm.controls['driver'].setValue(vehData.drvNM ?? '');
+       this.marketVehicleTableForm.controls['driverPan'].setValue(vehData.pANNO ?? '');
+       this.marketVehicleTableForm.controls['lcNo'].setValue(vehData.dLNO ?? '');
+       this.marketVehicleTableForm.controls['lcExpireDate'].setValue(vehData.dLEXP ?? new Date());
+       this.marketVehicleTableForm.controls['dmobileNo'].setValue(vehData.drvPH ?? '');
+       this.marketVehicleTableForm.controls['insuranceExpiryDate'].setValue(vehData.iNCEXP ?? new Date());
+       this.marketVehicleTableForm.controls['fitnessValidityDate'].setValue(vehData.fITDT ?? new Date());
+       this.thcTableForm.controls['insuranceExpiryDate'].setValue(vehData.iNCEXP ?? new Date());
+       this.thcTableForm.controls['fitnessValidityDate'].setValue(vehData.fITDT ?? new Date());
+      }
+
+    }
+    this.vendorFieldChanged();
   }
 
   async getShipmentDetails() {
@@ -647,7 +676,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   async createThc() {
-    
+     
     let extractedData = {};
     this.selectedData = this.tableData.filter((x) => x.isSelected == true);
     /* here the condition block which is execution while the 
@@ -698,6 +727,24 @@ export class ThcGenerationComponent implements OnInit {
     const vendorType = this.thcTableForm.controls['vendorType'].value;
     const isMarket = vendorType === 'Market';
     this.thcTableForm.controls['vendorCode'].setValue(isMarket ? "8888" : this.thcTableForm.controls['vendorName'].value?.value || "");
+     if(isMarket){
+      const data = {      
+        vID: this.thcTableForm.value.vehicle,
+        vndNM:   this.thcTableForm.controls['vendorName'].value,
+        vndPH: this.marketVehicleTableForm.value.vMobileNo,
+        pANNO: this.marketVehicleTableForm.value.driverPan,
+        wTCAP: this.marketVehicleTableForm.value.vehicleSize,
+        drvNM: this.marketVehicleTableForm.value.driver,
+        drvPH: this.marketVehicleTableForm.value.dmobileNo,
+        dLNO: this.marketVehicleTableForm.value.lcNo,
+        dLEXP: this.marketVehicleTableForm.value.lcExpireDate,
+        iNCEXP: this.marketVehicleTableForm.value.insuranceExpiryDate,
+        fITDT: this.marketVehicleTableForm.value.fitnessValidityDate
+      };
+      this.thcTableForm.controls['insuranceExpiryDate'].setValue(this.marketVehicleTableForm.value?.insuranceExpiryDate||new Date());
+      this.thcTableForm.controls['fitnessValidityDate'].setValue(this.marketVehicleTableForm.value?.fitnessValidityDate||new Date());
+      await this.markerVehicleService.SaveVehicleData(data);
+     }
     if (this.isUpdate) {
       
       /*here the code when We are Updating docket Details While Update THC*/
@@ -867,9 +914,6 @@ export class ThcGenerationComponent implements OnInit {
       if (x.name === "vehicle") {
         x.type = vendorType === "Market" ? "text" : "dropdown";
       }
-      if (x.name === "capacity") {
-        x.disable = vendorType === "Market" ? false : true;
-      }
     });
     if (vendorType !== 'Market') {
       const vendorDetail = this.vendorDetail.filter((x) => x.type.toLowerCase() == vendorType.toLowerCase());
@@ -883,6 +927,7 @@ export class ThcGenerationComponent implements OnInit {
 
     }
     else {
+      
       this.marketVendor = true
     }
   }
@@ -939,6 +984,7 @@ export class ThcGenerationComponent implements OnInit {
   /*below function call when user will try to view or
    edit Thc the function are create for autofill the value*/
   autoFillThc() {
+    
     let propertiesToSet = [
       "route",
       "prqNo",
@@ -959,6 +1005,7 @@ export class ThcGenerationComponent implements OnInit {
       "status",
       "vendorType",
       "panNo",
+      "transMode"
     ];
     if (this.prqFlag) {
       propertiesToSet = propertiesToSet.filter((x) => x !== "tripId");
@@ -1038,4 +1085,17 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   /*End*/
+
+ /* if vehicle type is market vehicle in that form when we select vehicleSize then below function is call */
+   getSize(){
+     this.thcTableForm.controls['capacity'].setValue(this.marketVehicleTableForm.value.vehicleSize);
+    }  
+  /*End*/
+  autoFillDriverDetails(){
+    this.thcTableForm.controls['driverName'].setValue(this.marketVehicleTableForm.value?.driver||"");
+    this.thcTableForm.controls['driverMno'].setValue(this.marketVehicleTableForm.value?.dmobileNo||"");
+    this.thcTableForm.controls['driverLno'].setValue(this.marketVehicleTableForm.value?.lcNo||"");
+    this.thcTableForm.controls['driverLexd'].setValue(this.marketVehicleTableForm.value?.lcExpireDate||"");
+    this.thcTableForm.controls['panNo'].setValue(this.marketVehicleTableForm.value?.driverPan||"");
+  }
 }

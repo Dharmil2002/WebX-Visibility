@@ -232,8 +232,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private pinCodeService: PinCodeService,
     private locationService: LocationService,
     private prqService: PrqService,
-    private consigmentUtility: ConsigmentUtility,
-    private vehicleService:VehicleService
+    private consigmentUtility: ConsigmentUtility
   ) {
     const navigationState =
       this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -318,7 +317,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     ]);
     this.invoiceTableForm = formGroupBuilder(this.fb, [this.jsonInvoiceDetail]);
     this.ewayBillTableForm = formGroupBuilder(this.fb, [this.jsonEwayBill]);
-    this.marketVehicleTableForm=formGroupBuilder(this.fb, [this.jsonMarketVehicle]);
     this.commonDropDownMapping();
     this.consignmentTableForm.controls["payType"].setValue("TBB");
     this.consignmentTableForm.controls["transMode"].setValue("Road");
@@ -982,17 +980,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     clearValidatorsAndValidate(contractcontrols);
     /*End*/
     const vendorType = this.consignmentTableForm.value.vendorType;
-    if (vendorType === "Market") {
-      const vendorName = this.consignmentTableForm.controls['vendorName']?.value|| "";
-      const vehicleNoValue = this.consignmentTableForm.controls['vehicleNo']?.value || "";
-      const _id=`${vendorName.substring(0, 3)}-${vehicleNoValue}`;
-      this.marketVehicleTableForm.controls['vehNo'].setValue(vehicleNoValue);
-      this.marketVehicleTableForm.controls['vendor'].setValue(vendorName);
-      this.marketVehicleTableForm.controls['_id'].setValue(_id);
-      await this.vehicleService.addMarketVehicle(this.marketVehicleTableForm.value);
-    }
     const vendorName = this.consignmentTableForm.value.vendorName;
-
     const vehNo =
       this.consignmentTableForm.value.vehicleNo?.value ||
       this.consignmentTableForm.value.vehicleNo;

@@ -42,9 +42,9 @@ export class AssignVehiclePageComponent implements OnInit {
 
   linkArray = [{ Row: "action" }];
   menuItems = [{ label: "action", componentDetails: ViewPrintComponent }];
-  tableData: any;
+  tableData: any=[];
   NavData: any;
-  
+
   constructor(
     private Route: Router,
     private _operationService: OperationService,
@@ -53,7 +53,7 @@ export class AssignVehiclePageComponent implements OnInit {
     private vehicleStatusService: VehicleStatusService,
     private markerVehicleService: MarkerVehicleService
   ) {
-    
+
     this.staticField.pop();
 
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
@@ -110,6 +110,18 @@ export class AssignVehiclePageComponent implements OnInit {
   }
 
   async bindTableData(result: any) {
+    
+    const existsInTableData =this.tableData.length>0? this.tableData.some((x) => x.vehNo.toLowerCase() === result.vehicelNo.toLowerCase()):false;
+    if (existsInTableData) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vehicle Already Exists",
+        text: "The vehicle is already available at this location.",
+        confirmButtonText: "OK",
+        showConfirmButton: true,
+      });
+      return false
+    }
     const tableData = await bindMarketVehicle(result);
     const fromToCitySplit = this.NavData.fromToCity.split("-");
 
@@ -132,6 +144,11 @@ export class AssignVehiclePageComponent implements OnInit {
     this.tableData = this.tableData
       ? this.tableData.concat(marketData)
       : marketData;
+      Swal.fire({
+        icon: "success",
+        title: "Add Market Vehicle Successfully", // Update the title here
+        showConfirmButton: true,
+      });
     this.tableLoad = false;
   }
 

@@ -237,6 +237,30 @@ export class thcControl {
                     disable: view ? view : update
                 },
                 {
+                    name: "transMode",
+                    label: "Transport Mode",
+                    placeholder: "Transport Mode",
+                    type: "Staticdropdown",
+                    value: [
+                      { value: "Air", name: "Air" },
+                      { value: "Road", name: "Road" },
+                      { value: "Rail", name: "Rail" }
+                    ],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : prq?prq:false,
+                    functions: {
+                      onSelection: ""
+                    },
+                    Validations: [],
+                    additionalData: {
+                      showNameAndValue: false,
+                      metaData: "Basic"
+                    },
+                  },
+                {
                     name: 'driverName',
                     label: 'Driver Name',
                     placeholder: '',
@@ -255,7 +279,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: view ? view :  prq?prq:update
+                    disable:true
                 },
                 {
                     name: 'driverMno',
@@ -276,7 +300,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: view ? view :  prq?prq:update
+                    disable: true
                 },
                 {
                     name: 'driverLno',
@@ -297,7 +321,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: view ? view :  prq?prq:update
+                    disable: true
                 },
                 {
                     name: 'driverLexd',
@@ -318,7 +342,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable: view ? view :  prq?prq:update
+                    disable: true
                 },
                 {
                     name: 'capacity',
@@ -405,7 +429,7 @@ export class thcControl {
                     additionalData: {
                         metaData: "vehLoad"
                     },
-                    disable: view ? view : update
+                    disable: true
                 },
                 {
                     name: 'advPdAt',
@@ -439,7 +463,7 @@ export class thcControl {
                         message: "Balance Paid At is required",
                     }],
                     generatecontrol: true,
-                    disable: view ? view : update
+                    disable: false
                 },
                 {
                     name: 'overload',
@@ -681,6 +705,24 @@ export class thcControl {
                     label: "Vendor Code",
                     placeholder: "Vendor Code",
                     type:'',
+                    value: "8888",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: true,
+                    Validations: [],
+                    functions: {},
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    }
+                },
+                {
+                    name: "insuranceExpiryDate",
+                    label: "insuranceExpiryDate",
+                    placeholder: "insuranceExpiryDate",
+                    type:'',
                     value: "",
                     filterOptions: "",
                     autocomplete: "",
@@ -694,8 +736,24 @@ export class thcControl {
                         metaData: "Basic"
                     }
                 },
-
-
+                {
+                    name: "fitnessValidityDate",
+                    label: "fitnessValidityDate",
+                    placeholder: "fitnessValidityDate",
+                    type:'',
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: true,
+                    Validations: [],
+                    functions: {},
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    }
+                }
             ];
         this.marketVehicle = [
                 {
@@ -714,6 +772,9 @@ export class thcControl {
                   displaywith: "",
                   generatecontrol: true,
                   disable: false,
+                  functions:{
+                    onSelection:"getSize"
+                  },
                   Validations: [
                     {
                       name: "required",
@@ -737,6 +798,9 @@ export class thcControl {
                 {
                   name: 'driver', label: "Driver", placeholder: "Driver", type: 'text',
                   value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                  functions:{
+                    onChange:"autoFillDriverDetails"
+                  },
                   Validations: [
                     {
                       name: "required",
@@ -747,6 +811,9 @@ export class thcControl {
                 {
                   name: 'driverPan', label: "Pan No", placeholder: "Pan No", type: 'government-id',
                   value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                  functions:{
+                    onChange:"autoFillDriverDetails"
+                  },
                   Validations: [
                     {
                       name: "required",
@@ -762,6 +829,9 @@ export class thcControl {
                 {
                   name: 'lcNo', label: "Driving Licence No", placeholder: "Driving Licence No", type: 'government-id',
                   value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                  functions:{
+                    onChange:"autoFillDriverDetails"
+                  },
                   Validations: [
                     {
                       name: "required",
@@ -772,12 +842,16 @@ export class thcControl {
                       message:
                         "Please Enter alphanumeric License No",
                       pattern: "^[A-Z]{2}[0-9]{13}$",
-                    }
+                    },
+                    
                   ],
                 },
                 {
                   name: 'lcExpireDate', label: "Driving Licence Expiry Date", placeholder: "Driving Licence Expiry Date", type: 'date',
                   value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                  functions:{
+                    onChange:"autoFillDriverDetails"
+                  },
                   Validations: [
                     {
                       name: "required",
@@ -792,26 +866,15 @@ export class thcControl {
                 {
                   name: 'dmobileNo', label: "Driver Mobile No", placeholder: "Driver", type: 'mobile-number',
                   value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                  functions:{
+                    onChange:"autoFillDriverDetails"
+                  },
                   Validations: [
                     {
                       name: "required",
                       message: "Driver is required",
                     },
                   ],
-                },
-                {
-                  name: 'ETA', label: "ETA", placeholder: "ETA", type: 'datetimerpicker',
-                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                  Validations: [
-                    {
-                      name: "required",
-                      message: "ETA   is required",
-                    },
-                  ],
-                  additionalData: {
-                    maxDate: maxDate,
-                    minDate: minDate
-                  },
                 },
                 {
                   name: 'insuranceExpiryDate', label: "Insurance Expiry Date", placeholder: "Enter Insurance Expiry Date",

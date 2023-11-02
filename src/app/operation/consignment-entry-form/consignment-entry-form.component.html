@@ -21,15 +21,6 @@
       </app-form-webxpress>
     </form>
     <!-- End -->
-  <!-- fleet Detail -->
-  <div *ngIf="marketVendor">
-    <form [formGroup]="marketVehicleTableForm">
-      <app-form-webxpress [form]="marketVehicleTableForm"  [FormTitle]="'Market Vehicle'" [formData]="jsonMarketVehicle"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)">
-      </app-form-webxpress>
-    </form>
-  </div>
     <!-- Consignor Detail -->
     <form [formGroup]="consignmentTableForm">
       <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignor Detail'" [formData]="jsonControlArrayConsignor"

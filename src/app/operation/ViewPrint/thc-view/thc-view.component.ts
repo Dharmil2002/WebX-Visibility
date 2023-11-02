@@ -96,10 +96,14 @@ export class THCViewComponent implements OnInit {
                         const updateDate = res.data[0]?.updateDate || new Date().toISOString();
                         // Format the date using the formatDocketDate function
                         const formattedUpdateDate = formatDocketDate(updateDate);
+                        const insuranceExpiryDate = formatDocketDate(res.data[0]?.insuranceExpiryDate || new Date().toISOString());
+                        const fitnessValidityDate = formatDocketDate(res.data[0]?.fitnessValidityDate || new Date().toISOString());
                         // Update thcNestedData with additional properties
                         this.thcNestedData = {
                             ...res.data[0],
                             origin: origin,
+                            insuranceExpiryDate:insuranceExpiryDate,
+                            fitnessValidityDate:fitnessValidityDate,
                             dest: destination,
                             updateDate: formattedUpdateDate,
                             CNs: res.data[0].docket.length

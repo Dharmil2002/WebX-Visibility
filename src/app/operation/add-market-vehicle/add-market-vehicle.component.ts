@@ -81,12 +81,6 @@ export class AddMarketVehicleComponent implements OnInit {
 
     var res = await this.markerVehicleService.SaveVehicleData(data);
     if(res) {
-      Swal.fire({
-        icon: "success",
-        title: "Add Market Vehicle Successfully", // Update the title here
-        showConfirmButton: true,
-      });
-      
       this.dialogRef.close(this.marketVehicleTableForm.value);
     }
   }

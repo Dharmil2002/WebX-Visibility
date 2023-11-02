@@ -22,38 +22,36 @@ export class AccountMasterComponent implements OnInit {
   ];
   linkArray = [];
   menuItems = [];
-
+  EventButton = {
+    functionName:'AddFunction',
+    name: "Add New"
+  }
   dynamicControls = {
     add: false,
     edit: false,
     csv: false,
   };
   columnHeader = {
-    GroupCodeValue: {
-      Title: "Group Code",
-      class: "matcolumncenter",
-      Style: "min-width:20%",
-    },
-    AccountCode: {
-      Title: "Account Code",
-      class: "matcolumncenter",
-      Style: "min-width:20%",
-    },
-    AccountDescription: {
-      Title: "Account Description",
+    Account: {
+      Title: "Account",
       class: "matcolumncenter",
       Style: "min-width:25%",
     },
-    MainCategoryName: {
+    AccountGroup: {
+      Title: "Account Group",
+      class: "matcolumncenter",
+      Style: "min-width:25%",
+    },
+    AccountCategoryName: {
       Title: "Account Category",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:25%",
     },
     EditAction:{
       type:'iconClick',
       Title: "Action",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:25%",
       functionName:'EditFunction',
       iconName:'edit'
     }
@@ -63,10 +61,9 @@ export class AccountMasterComponent implements OnInit {
     functionName: "FilterList",
   };
   staticField = [
-    "AccountDescription",
-    "MainCategoryName",
-    "AccountCode",
-    "GroupCodeValue",
+    "Account",
+    "AccountCategoryName",
+    "AccountGroup",
   ];
   TableData: any;
   isTableLode = false;
@@ -118,11 +115,14 @@ export class AccountMasterComponent implements OnInit {
     const res = await this.masterService
       .masterPost("generic/get", Body)
       .toPromise();
+      console.log('res' , res)
     if (res.success && res.data.length > 0) {
       this.TableData = res.data.map((x, index) => {
         return {
           ...x,
           SrNo: index + 1,
+          Account:x.AccountCode+' : '+ x.AccountDescription,
+          AccountGroup:x.SubCategoryCode=="" && x.SubCategoryName==""?"":x.SubCategoryCode+' : '+ x.SubCategoryName,
         };
       });
     }
@@ -131,6 +131,10 @@ export class AccountMasterComponent implements OnInit {
 
   EditFunction(event){
     this.Route.navigate(["/Masters/AccountMaster/AddAccountMaster"], { state: { data: event?.data } });
+  }
+
+  AddFunction(event){
+    this.Route.navigate(["/Masters/AccountMaster/AddAccountMaster"]);
   }
   
 }

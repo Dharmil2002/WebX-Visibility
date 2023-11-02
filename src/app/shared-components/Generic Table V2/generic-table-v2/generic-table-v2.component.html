@@ -77,6 +77,17 @@
                                                 color="primary">{{FilterButton.name}}</button>
                                         </div>
                                     </li>
+                                    <li *ngIf="EventButton">
+                                        <div >
+                                            <button  mat-stroked-button
+                                                style="margin-left:10px; "
+                                                (click)="FunctionHendel(EventButton.functionName , {})"
+                                                >
+                                                <mat-icon>add</mat-icon>
+                                                {{EventButton.name}}
+                                            </button>
+                                        </div>
+                                    </li>
                                     <li *ngFor="let box of boxData" style="text-align: center;">
                                         <div class="msr-4 align-self-center">
                                             <h6 class="font-14 mb-1">{{box.title}}</h6>

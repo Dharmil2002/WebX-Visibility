@@ -51,12 +51,12 @@ export class AddAccountComponent implements OnInit {
   FormTitle = "Add Ledger";
   protected _onDestroy = new Subject<void>();
   FirstUpdate: boolean = false;
-  jsonControlAccountCategoryArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  jsonControlAccountCategoryArray: any;
   AccountCategoryForm: any;
   AccountLocationsCode: string;
   AccountLocationsStatus: any;
   AccountCategoryFormTitle: string;
-  AlljsonControlAccountCategoryArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  AlljsonControlAccountCategoryArray: any;
   Ddl_TDS_MappingStatus: any;
   Ddl_TDS_MappingCode: string;
   constructor(

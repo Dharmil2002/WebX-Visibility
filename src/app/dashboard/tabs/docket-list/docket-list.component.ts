@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
-import { OperationService } from 'src/app/core/service/operations/operation.service';
-import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
+import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 
 @Component({
   selector: 'app-docket-list',
@@ -103,10 +102,10 @@ export class DocketListComponent implements OnInit {
   addAndEditPath='Operation/ConsignmentEntry';
   // menuItems = [{label:"Edit Docket"},{label:"View"}];
 
-  constructor(
-    private operationService: OperationService,
+  constructor(    
     private router: Router,
-    private docketService:DocketService
+    private docketService:DocketService,
+    private thcService: ThcService
     ) {
     this.getShipmentDetail();
   }
@@ -116,33 +115,35 @@ export class DocketListComponent implements OnInit {
 
   async getShipmentDetail() {
    /*below the method to get docket Detail using service*/
-    const shipmentList = await getShipment(this.operationService, false);
+    const shipmentList = await this.thcService.getShipment(false);
     this.tableData = await this.docketService.processShipmentList(shipmentList,this.orgBranch)
     this.tableLoad = false;
     /*end*/
   }
 
   async handleMenuItemClick(data) {
-    if (data.label.label === "Edit Docket") {
-      this.router.navigate(['/Operation/ConsignmentEntry'], {
-        state: {
-          data: data.data
-
-        },
-      });
-    }
-    if (data.label.label === "Create THC") {
-      this.router.navigate(['/Operation/thc-create'], {
-        state: {
-          data:{ data:data.data,addThc:true}
-
-        },
-      });
-    }
-    if (data.label.label === "Rake Update") {
-      this.goBack('Job')
+    const { label } = data.label;
+  
+    switch (label) {
+      case "Edit Docket":
+        this.router.navigate(['/Operation/ConsignmentEntry'], {
+          state: { data: data.data },
+        });
+        break;
+      case "Create THC":
+        this.router.navigate(['/Operation/thc-create'], {
+          state: { data: { data: data.data, addThc: true, viewType: 'addthc' } },
+        });
+        break;
+      case "Rake Update":
+        this.goBack('Job');
+        break;
+      default:
+        // Handle any other cases here
+        break;
     }
   }
+  
   goBack(tabIndex: string): void {
     this.router.navigate(["/dashboard/Index"], {
       queryParams: { tab: tabIndex },

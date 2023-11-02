@@ -163,14 +163,14 @@
                         <input matInput type="number" formControlName="{{formItem.name}}"
                           placeholder="{{formItem.label}}"
                           (change)="functionCalled({field :formItem , functionName:formItem.functions?.onChange, eventArgs: $event })"
-                          [disabled]="formItem.disable">
+                          [readonly]="formItem.disable">
                       </mat-form-field>
                     </div>
                     <div class="col-6">
                       <mat-form-field appearance="outline" style="width: 100%;">
                         <mat-label class="fontbold">{{formItem.additionalData.label}}</mat-label>
                         <input matInput type="number" formControlName="{{formItem.additionalData.fieldName}}"
-                          placeholder="{{formItem.additionalData.label}}" [disabled]="formItem.additionalData.disable">
+                          placeholder="{{formItem.additionalData.label}}" [readonly]="formItem.additionalData.disable">
                       </mat-form-field>
                     </div>
                   </div>

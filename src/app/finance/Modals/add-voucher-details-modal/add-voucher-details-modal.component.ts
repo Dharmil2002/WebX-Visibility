@@ -8,13 +8,11 @@ import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebit
 @Component({
   selector: 'app-add-voucher-details-modal',
   templateUrl: './add-voucher-details-modal.component.html',
-  //   encapsulation: ViewEncapsulation.None,
-  //   styles: [
-  //     `.mat-dialog-container {
-  //   padding: 3px 11px 0 11px !important;
-  // }
-  //     `,
-  //   ]
+  encapsulation: ViewEncapsulation.None,
+  styles: [
+    `.mat-dialog-container {
+    padding-top: 5px !important;
+  }`]
 })
 
 export class AddVoucherDetailsModalComponent implements OnInit {
@@ -75,6 +73,7 @@ export class AddVoucherDetailsModalComponent implements OnInit {
     this.DebitVoucherDetailsForm.controls.SACCode.patchValue(SACCode.name)
     this.DebitVoucherDetailsForm.controls.LedgerHdn.patchValue(Ledger.value)
     this.DebitVoucherDetailsForm.controls.SACCodeHdn.patchValue(SACCode.value)
+    this.DebitVoucherDetailsForm.controls.SubCategoryName.patchValue(Ledger.SubCategoryName)
     this.dialogRef.close(this.DebitVoucherDetailsForm.value)
   }
   cancel(event) {

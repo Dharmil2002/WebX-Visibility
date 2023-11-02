@@ -75,6 +75,9 @@ export class DebitVoucherControl {
           showNameAndValue: false,
           metaData: "Basic"
         },
+        functions: {
+          onOptionSelect: "AccountinglocationFieldChanged"
+        },
       },
       {
         name: "Preparedfor",
@@ -275,31 +278,27 @@ export class DebitVoucherControl {
         name: "TDSSection",
         label: "TDS Section",
         placeholder: "TDS Section",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "Test1",
-            name: "Test1",
-          },
-          {
-            value: "Test2",
-            name: "Test2",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
-        autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "TDS Section is required",
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
           },
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "TDSSectionFieldChanged"
         },
       },
       {
@@ -315,7 +314,8 @@ export class DebitVoucherControl {
         functions: {
           onChange: "calculateTDSAndTotal"
         },
-        generatecontrol: true, disable: true,
+        generatecontrol: true,
+        disable: true,
         additionalData: {
           metaData: "Basic",
           label: 'TDS Deduction',
@@ -365,37 +365,35 @@ export class DebitVoucherControl {
         name: "TCSSection",
         label: "TCS Section",
         placeholder: "TCS Section",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "Test1",
-            name: "Test1",
-          },
-          {
-            value: "Test2",
-            name: "Test2",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
-        autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "TDS Section is required",
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
           },
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "TCSSectionFieldChanged"
         },
       },
+
+
       {
         name: 'TCSRate', label: 'TCS Rate %', placeholder: 'TCS Rate', type: 'dayhour',
         value: "",
-        Validations: [], generatecontrol: true, disable: false,
+        Validations: [], generatecontrol: true, disable: true,
         additionalData: {
           metaData: "Basic",
           label: 'TCS Deduction ₹',
@@ -484,7 +482,7 @@ export class DebitVoucherControl {
         type: 'number',
         value: "",
         Validations: [],
-        generatecontrol: true, disable: false,
+        generatecontrol: true, disable: true,
         additionalData: {
           metaData: "PaymentAmount"
         }
@@ -623,16 +621,16 @@ export class DebitVoucherControl {
           metaData: "Basic"
         },
       },
-      {
-        name: "ReceivedFromBank",
-        label: "Received From Bank",
-        placeholder: "Received From Bank",
-        type: "text",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
+      // {
+      //   name: "ReceivedFromBank",
+      //   label: "Received From Bank",
+      //   placeholder: "Received From Bank",
+      //   type: "text",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
       {
         name: "Date",
         label: "Date",
@@ -663,16 +661,7 @@ export class DebitVoucherControl {
     ];
 
     this.DebitVoucherDocumentDebitsArray = [
-      {
-        name: "TotalDebit",
-        label: "Total Debit ₹",
-        placeholder: "Total Debit ₹",
-        type: "text",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
+
       {
         name: "DocumentType",
         label: "Document Type",
@@ -680,14 +669,22 @@ export class DebitVoucherControl {
         type: "Staticdropdown",
         value: [
           {
-            value: "Test1",
-            name: "Test1",
+            value: "Consignment",
+            name: "Consignment",
+          }, {
+            value: "THC",
+            name: "THC",
+          }, {
+            value: "DRS",
+            name: "DRS",
+          }, {
+            value: "PRS",
+            name: "PRS",
           },
           {
-            value: "Test2",
-            name: "Test2",
+            value: "JOB",
+            name: "JOB",
           },
-
         ],
         filterOptions: "",
         autocomplete: "",
@@ -703,6 +700,15 @@ export class DebitVoucherControl {
         additionalData: {
           showNameAndValue: true,
         },
+      }, {
+        name: "TotalDebit",
+        label: "Total Debit ₹",
+        placeholder: "Total Debit ₹",
+        type: "text",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
       },
 
     ]
@@ -860,6 +866,16 @@ export class DebitVoucherControl {
       },
       {
         name: "SACCodeHdn",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "SubCategoryName",
         label: "",
         placeholder: "",
         type: "",

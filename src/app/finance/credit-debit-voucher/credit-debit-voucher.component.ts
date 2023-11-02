@@ -16,6 +16,7 @@ import { DriversFromApi, GetAccountDetailFromApi, GetLocationDetailFromApi, GetS
 import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUtitlity';
 import { AddDebitAgainstDocumentModalComponent } from '../Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
 import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
+import { DebitVoucherPreviewComponent } from '../Modals/debit-voucher-preview/debit-voucher-preview.component';
 @Component({
   selector: 'app-credit-debit-voucher',
   templateUrl: './credit-debit-voucher.component.html',
@@ -29,7 +30,7 @@ export class DebitVoucherComponent implements OnInit {
       active: "Debit Voucher",
     },
   ];
-  className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
+  className = "col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2";
   DebitVoucherControl: DebitVoucherControl;
 
   DebitVoucherSummaryForm: UntypedFormGroup;
@@ -136,7 +137,7 @@ export class DebitVoucherComponent implements OnInit {
     };
     const account_groupReqBody = {
       companyCode: this.companyCode,
-      collectionName: "account_group_detail",
+      collectionName: "account_detail",
       filter: {},
     };
 
@@ -151,7 +152,7 @@ export class DebitVoucherComponent implements OnInit {
 
     const resaccount_group = await this.masterService.masterPost('generic/get', account_groupReqBody).toPromise();
     this.AccountGroupList = resaccount_group?.data
-      .map(x => ({ value: x.GroupCode, name: x.GroupName }))
+      .map(x => ({ value: x.AccountCode, name: x.AccountDescription, ...x }))
       .filter(x => x != null)
       .sort((a, b) => a.value.localeCompare(b.value));
 
@@ -225,11 +226,11 @@ export class DebitVoucherComponent implements OnInit {
   }
   calculateTDSAndTotal(event) {
     const TDSRate = Number(this.DebitVoucherTaxationTDSForm.value['TDSRate']);
-    const Total = this.tableData.filter(item => item.TDSApplicable == "Yes").reduce((accumulator, currentValue) => {
-      return accumulator + parseFloat(currentValue['Total']);
+    const DebitAmount = this.tableData.filter(item => item.TDSApplicable == "Yes").reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue['DebitAmount']);
     }, 0);
-    if (!isNaN(Total) && !isNaN(TDSRate)) {
-      const TDSAmount = (Total * TDSRate) / 100;
+    if (!isNaN(DebitAmount) && !isNaN(TDSRate)) {
+      const TDSAmount = (DebitAmount * TDSRate) / 100;
       this.DebitVoucherTaxationTDSForm.controls.TDSDeduction.setValue(TDSAmount.toFixed(2));
       this.CalculatePaymentAmount();
     } else {
@@ -353,6 +354,29 @@ export class DebitVoucherComponent implements OnInit {
 
     }
   }
+  TDSSectionFieldChanged(event) {
+    this.DebitVoucherTaxationTDSForm.get("TDSRate").setValue(this.DebitVoucherTaxationTDSForm.value?.TDSSection?.ACdetail?.CorporateTDS)
+    this.calculateTDSAndTotal('');
+
+  }
+  TCSSectionFieldChanged(event) {
+    this.DebitVoucherTaxationTCSForm.get("TCSRate").setValue(this.DebitVoucherTaxationTCSForm.value?.TCSSection?.ACdetail?.CorporateTCS)
+    this.calculateTCSAndTotal('');
+
+  }
+  calculateTCSAndTotal(event) {
+    const TCSRate = Number(this.DebitVoucherTaxationTCSForm.value['TCSRate']);
+    const DebitAmount = this.tableData.reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue['DebitAmount']);
+    }, 0);
+    if (!isNaN(DebitAmount) && !isNaN(TCSRate)) {
+      const TCSAmount = (DebitAmount * TCSRate) / 100;
+      this.DebitVoucherTaxationTCSForm.controls.TCSDeduction.setValue(TCSAmount.toFixed(2));
+      this.CalculatePaymentAmount();
+    } else {
+      console.error('Invalid input values for DebitAmount or GSTRate');
+    }
+  }
   OnChangeCheckBox(event) {
     const TotalPaymentAmount = this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value;
     const netPayable = event?.event?.checked ? Math.ceil(TotalPaymentAmount) : TotalPaymentAmount;
@@ -366,6 +390,7 @@ export class DebitVoucherComponent implements OnInit {
       return accumulator + parseFloat(currentValue['Total']);
     }, 0);
     let TDSAmount = this.DebitVoucherTaxationTDSForm.controls.TDSDeduction.value || 0;
+    let TCSAmount = this.DebitVoucherTaxationTCSForm.controls.TCSDeduction.value || 0;
     let GSTAmount = 0;
     this.jsonControlDebitVoucherTaxationGSTArray.forEach(item => {
       const value = parseFloat(this.DebitVoucherTaxationGSTForm.get(item.name).value);
@@ -380,7 +405,7 @@ export class DebitVoucherComponent implements OnInit {
       });
       TDSAmount = TDSWithLineitems;
     }
-    const CalculatedSumWithTDS = totalSumWithTDS - TDSAmount;
+    const CalculatedSumWithTDS = totalSumWithTDS - TDSAmount - TCSAmount;
     const CalculatedSum = CalculatedSumWithTDS + totalSumWithoutTDS
     this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").setValue(CalculatedSum.toFixed(2));
     this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(CalculatedSum.toFixed(2));
@@ -507,12 +532,14 @@ export class DebitVoucherComponent implements OnInit {
           Total: result?.Total,
           TDSApplicable: result?.TDSApplicable == true ? "Yes" : "No",
           Narration: result?.Narration,
+          SubCategoryName: result?.SubCategoryName,
           actions: ['Edit', 'Remove']
         }
         this.tableData.push(json);
         this.LoadVoucherDetails = true;
         this.StateChange("");
         this.calculateTDSAndTotal('')
+        this.calculateTCSAndTotal('')
       }
       this.LoadVoucherDetails = true;
     });
@@ -525,21 +552,21 @@ export class DebitVoucherComponent implements OnInit {
     let filterFunction;
     switch (PaymentMode) {
       case 'Cheque':
-        filterFunction = (x) => x.name !== 'CashAccount' && x.name !== 'ReceivedFromBank';
+        filterFunction = (x) => x.name !== 'CashAccount';
 
         break;
       case 'Cash':
         filterFunction = (x) => x.name !== 'Cheque/RefNo' && x.name !== 'Bank';
         break;
       case 'RTGS/UTR':
-        filterFunction = (x) => x.name !== 'CashAccount' && x.name !== 'ReceivedFromBank' && x.name !== 'Cheque/RefNo';
+        filterFunction = (x) => x.name !== 'CashAccount';
         break;
     }
     this.jsonControlDebitVoucherTaxationPaymentDetailsArray = this.AlljsonControlDebitVoucherTaxationPaymentDetailsArray.filter(filterFunction);
-
+    const Accountinglocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
     switch (PaymentMode) {
       case 'Cheque':
-        const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK")
+        const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
         this.filter.Filter(
           this.jsonControlDebitVoucherTaxationPaymentDetailsArray,
           this.DebitVoucherTaxationPaymentDetailsForm,
@@ -549,7 +576,7 @@ export class DebitVoucherComponent implements OnInit {
         );
         break;
       case 'Cash':
-        const responseFromAPICash = await GetAccountDetailFromApi(this.masterService, "CASH")
+        const responseFromAPICash = await GetAccountDetailFromApi(this.masterService, "CASH", Accountinglocation)
         this.filter.Filter(
           this.jsonControlDebitVoucherTaxationPaymentDetailsArray,
           this.DebitVoucherTaxationPaymentDetailsForm,
@@ -562,14 +589,157 @@ export class DebitVoucherComponent implements OnInit {
         break;
     }
 
-    // this.jsonControlDebitVoucherTaxationGSTArray.forEach(item => {
-    //   this.DebitVoucherTaxationGSTForm.get(item.name).setValue((GSTAmount / this.jsonControlDebitVoucherTaxationGSTArray.length).toFixed(2));
-    // });
+  }
 
+  async AccountinglocationFieldChanged() {
+    let Accountinglocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
+    let responseFromAPITDS = await GetAccountDetailFromApi(this.masterService, "TDS", Accountinglocation)
+    let responseFromAPITCS = await GetAccountDetailFromApi(this.masterService, "TCS", Accountinglocation)
+    this.filter.Filter(
+      this.jsonControlDebitVoucherTaxationTDSArray,
+      this.DebitVoucherTaxationTDSForm,
+      responseFromAPITDS,
+      "TDSSection",
+      false
+    );
+    this.filter.Filter(
+      this.jsonControlDebitVoucherTaxationTCSArray,
+      this.DebitVoucherTaxationTCSForm,
+      responseFromAPITCS,
+      "TCSSection",
+      false
+    );
   }
 
   // Submit 
   Submit() {
+    const Accountinglocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
+    let FinalListOfDebitVoucher = [];
+    // Calculate debit voucher
+    var VoucherlineitemList = this.tableData.map(function (item) {
+      return {
+        "Instance": "debit voucher",
+        "Value": "Voucher line item",
+        "Ledgercode": item.LedgerHdn,
+        "Ledgername": item.Ledger,
+        "SubLedger": item.SubCategoryName,
+        "Dr": item.DebitAmount,
+        "Cr": "",
+        "Location": Accountinglocation,
+        "Narration": item.Narration
+      };
+    });
+    FinalListOfDebitVoucher = VoucherlineitemList;
+    // Calculate Round Off 
+    const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
+    const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+    if (PaymentAmount != NetPayable) {
+      const Amount = NetPayable - PaymentAmount;
+      var RoundOffList = {
+        "Instance": "debit voucher",
+        "Value": "Round Off Amount",
+        "Ledgercode": "AC007",
+        "Ledgername": "Round off ledger",
+        "SubLedger": "ASSET",
+        "Dr": Amount.toFixed(2),
+        "Cr": "",
+        "Location": Accountinglocation,
+        "Narration": ""
+      };
+      FinalListOfDebitVoucher.push(RoundOffList)
+    }
 
+    this.jsonControlDebitVoucherTaxationGSTArray.forEach(item => {
+      let GSTData = {
+        "Instance": "debit voucher",
+        "Value": item.name,
+        "Ledgercode": item.name,
+        "Ledgername": `${item.name} Payable`,
+        "SubLedger": "LIABILITY",
+        "Dr": (parseFloat(this.DebitVoucherTaxationGSTForm.get(item.name).value) / this.jsonControlDebitVoucherTaxationGSTArray.length).toFixed(2),
+        "Cr": "",
+        "Location": Accountinglocation,
+        "Narration": ""
+      };
+      FinalListOfDebitVoucher.push(GSTData)
+    });
+    // TDS Section
+    const TDSAmount = parseFloat(this.DebitVoucherTaxationTDSForm.get("TDSDeduction").value);
+    const TDSSection = this.DebitVoucherTaxationTDSForm.get("TDSSection").value;
+
+    if (TDSAmount > 0) {
+      let TDSData = {
+        "Instance": "debit voucher",
+        "Value": "TDS",
+        "Ledgercode": TDSSection.name,
+        "Ledgername": TDSSection.value,
+        "SubLedger": "LIABILITY",
+        "Dr": "",
+        "Cr": TDSAmount.toFixed(2),
+        "Location": Accountinglocation,
+        "Narration": ""
+      };
+      FinalListOfDebitVoucher.push(TDSData)
+    }
+    // TCS Section
+    const TCSAmount = parseFloat(this.DebitVoucherTaxationTCSForm.get("TCSDeduction").value);
+    const TCSSection = this.DebitVoucherTaxationTCSForm.get("TCSSection").value;
+
+    if (TDSAmount > 0) {
+      let TCSData = {
+        "Instance": "debit voucher",
+        "Value": "TCS",
+        "Ledgercode": TCSSection.name,
+        "Ledgername": TCSSection.value,
+        "SubLedger": "LIABILITY",
+        "Dr": "",
+        "Cr": TCSAmount.toFixed(2),
+        "Location": Accountinglocation,
+        "Narration": ""
+      };
+      FinalListOfDebitVoucher.push(TCSData)
+    }
+
+    // const PayableAmount = FinalListOfDebitVoucher.filter(item => item.Dr).reduce((sum, item) => sum + parseFloat(item.Dr), 0);
+    const PaymentMode = this.DebitVoucherTaxationPaymentDetailsForm.get("PaymentMode").value;
+    let Leadgerdata;
+    switch (PaymentMode) {
+      case 'Cheque':
+        Leadgerdata = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value
+        break;
+      case 'Cash':
+        Leadgerdata = this.DebitVoucherTaxationPaymentDetailsForm.get("CashAccount").value
+        break;
+      case 'RTGS/UTR':
+        Leadgerdata = this.DebitVoucherTaxationPaymentDetailsForm.get("Bank").value
+        break;
+    }
+
+    let PayableData = {
+      "Instance": "debit voucher",
+      "Value": PaymentMode,
+      "Ledgercode": Leadgerdata?.value,
+      "Ledgername": Leadgerdata?.name,
+      "SubLedger": "BANK",
+      "Dr": "",
+      "Cr": NetPayable.toFixed(2),
+      "Location": Accountinglocation,
+      "Narration": ""
+    };
+    FinalListOfDebitVoucher.push(PayableData)
+
+    const dialogRef = this.matDialog.open(DebitVoucherPreviewComponent, {
+      data: FinalListOfDebitVoucher,
+      width: "100%",
+      disableClose: true,
+      position: {
+        top: "20px",
+      },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+
+      }
+    });
   }
 }

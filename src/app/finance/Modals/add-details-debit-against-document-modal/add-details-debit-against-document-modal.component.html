@@ -1,17 +1,15 @@
 <div mat-dialog-title style="display: flex;
-  justify-content: space-between;margin: 0 0 0px;
-  align-items: center;">
-    <h3>Voucher Details
-    </h3>
+  justify-content: end;margin:0px;">
     <button mat-icon-button (click)="Close()">
         <mat-icon>close</mat-icon>
     </button>
 </div>
-<div class="body">
+<div class="body" style="max-height: 420px;">
     <form [formGroup]="DebitAgainstDocumentForm">
         <app-form-webxpress [form]="DebitAgainstDocumentForm" [FormTitle]="'Debit Voucher Details'"
             [formData]="jsonControlDebitAgainstDocumentArray" (functionCallEmitter)="functionCallHandler($event)"
-            (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+            [className]="'col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2'" (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true">
         </app-form-webxpress>
     </form>
 </div>

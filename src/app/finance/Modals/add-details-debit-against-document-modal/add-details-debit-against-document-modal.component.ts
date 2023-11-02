@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -8,6 +8,11 @@ import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebit
 @Component({
   selector: 'app-add-details-debit-against-document-modal',
   templateUrl: './add-details-debit-against-document-modal.component.html',
+  encapsulation: ViewEncapsulation.None,
+  styles: [
+    `.mat-dialog-container {
+    padding-top: 5px !important;
+  }`]
 })
 export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
   DebitVoucherControl: DebitVoucherControl;

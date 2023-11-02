@@ -10,7 +10,11 @@ import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebit
 @Component({
   selector: 'app-add-debit-against-document-modal',
   templateUrl: './add-debit-against-document-modal.component.html',
-
+  encapsulation: ViewEncapsulation.None,
+  styles: [
+    `.mat-dialog-container {
+    padding-top: 5px !important;
+  }`]
 })
 export class AddDebitAgainstDocumentModalComponent implements OnInit {
   DebitVoucherControl: DebitVoucherControl;

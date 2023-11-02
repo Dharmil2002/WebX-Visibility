@@ -129,11 +129,13 @@ export async function GetsachsnFromApi(masterService) {
     }
     return []; // Return an empty array in case of an error or missing data
 }
-export async function GetAccountDetailFromApi(masterService, AccountCategoryName) {
+export async function GetAccountDetailFromApi(masterService, AccountCategoryName, AccountingLocations) {
     try {
         const companyCode = localStorage.getItem('companyCode');
         const filter = {
-            AccountCategoryName: AccountCategoryName
+            ActiveFlag: true,
+            AccountCategoryName: AccountCategoryName,
+            //  AccountingLocations: [AccountingLocations]
         };
         const req = { companyCode, collectionName: 'account_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();

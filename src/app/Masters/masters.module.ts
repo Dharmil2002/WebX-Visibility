@@ -136,6 +136,10 @@ import { BeneficiaryModalComponent } from './beneficiary-master/add-beneficiary-
 import { VendorContractListComponent } from "./vendor-contract/vendor-contract-list/vendor-contract-list.component";
 import { VendorIndexComponent } from './vendor-contract/vendor-index/vendor-index.component';
 import { VendorContractBasicInformationComponent } from './vendor-contract/vendorContractTabs/vendor-contract-basic-information/vendor-contract-basic-information.component';
+import { VendorContractServiceSelectionComponent } from './vendor-contract/vendorContractTabs/vendor-contract-service-selection/vendor-contract-service-selection.component';
+import { VendorContractTripLaneComponent } from './vendor-contract/vendorContractTabs/vendor-contract-trip-lane/vendor-contract-trip-lane.component';
+import { VendorTERDetailComponent } from './vendor-contract/vendorContractTabs/vendor-terdetail/vendor-terdetail.component';
+import { VendorTERModalComponent } from './vendor-contract/vendorContractTabs/vendor-terdetail/vendor-termodal/vendor-termodal.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -286,7 +290,11 @@ import { VendorContractBasicInformationComponent } from './vendor-contract/vendo
     BeneficiaryModalComponent,
     VendorContractListComponent,
     VendorIndexComponent,
-    VendorContractBasicInformationComponent
+    VendorContractBasicInformationComponent,
+    VendorContractServiceSelectionComponent,
+    VendorContractTripLaneComponent,
+    VendorTERDetailComponent,
+    VendorTERModalComponent
   ],
 
   providers: [

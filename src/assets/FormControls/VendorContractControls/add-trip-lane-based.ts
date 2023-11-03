@@ -2,7 +2,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class TripLaneBased {
   tripLaneBasedArray: FormControls[];
-  constructor() {
+  constructor(data) {
     this.tripLaneBasedArray = [
       {
         name: "mode",

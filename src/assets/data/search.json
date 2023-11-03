@@ -305,6 +305,11 @@
         "tag": ["ContainerMaster", "AddContainerMaster"],
         "router": "Masters/ContainerMaster/AddContainerMaster"
       },
+      {
+        "title": "VendorContract/VendorContractList",
+        "tag": ["VendorContract", "VendorContractList"],
+        "router": "Masters/VendorContract/VendorContractList"
+      },
         {
           "title": "LoadingSheetView",
           "tag": ["LoadingSheetView"],

@@ -1,12 +1,12 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
-import { TableData } from '../../Customer Contract/customer-contract-list/StaticData';
 import { MatTableDataSource } from '@angular/material/table';
 import { fromEvent } from 'rxjs';
 import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { VendorTableData } from './VendorStaticData';
 
 @Component({
   selector: 'app-vendor-contract-list',
@@ -20,14 +20,15 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
       active: "Vendor Contract",
     },
   ];
-  tableData = TableData;
+  tableData = VendorTableData;
   boxData: { count: number; title: string; class: string; icon: string; }[];
   displayedColumns = [
-    { Key: "customer", title: "Vendor", width: "250", className: "matcolumnfirst", show: true },
-    { Key: "contractID", title: "Vendor Id", width: "100", className: "matcolumncenter", show: true },
+    { Key: "vendor", title: "Vendor", width: "250", className: "matcolumnfirst", show: true },
+    { Key: "contractID", title: "ContractID", width: "100", className: "matcolumncenter", show: true },
     { Key: "product", title: "Product", width: "70", className: "matcolumncenter", show: true },
-    { Key: "contractStartDate", title: "Start Date", width: "100", className: "matcolumncenter", show: true },
+    { Key: "contractStartDate", title: "Effective Date", width: "100", className: "matcolumncenter", show: true },
     { Key: "contractEndDate", title: "End Date", width: "100", className: "matcolumncenter", show: true },
+    //{ Key: "contractDate", title: "Contract Date", width: "100", className: "matcolumncenter", show: true },
     { Key: "expiringin", title: "Expiring In", width: "170", className: "matcolumncenter", show: true },
   ];
   columnKeys = this.displayedColumns.map((column) => column.Key);

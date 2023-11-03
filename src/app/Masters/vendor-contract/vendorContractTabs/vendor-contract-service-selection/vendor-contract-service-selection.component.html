@@ -1,0 +1,5 @@
+<app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [FormTitle]="'Services Selection Type'"
+    [columnHeader]="columnHeader" [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField"
+    [Link]="linkArray" [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [metaData]="METADATA"
+    (onFlagChange)="selectCheckBox($event)">
+</app-generic-table-v2>

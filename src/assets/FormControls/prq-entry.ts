@@ -79,6 +79,7 @@ export class PrqEntryControls {
         value: [
           { value: "truck", name: "Truck" },
           { value: "trailer", name: "Trailer" },
+          { value: "container", name: "Container" },
         ],
         filterOptions: "",
         autocomplete: "",

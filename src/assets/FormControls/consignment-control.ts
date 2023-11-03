@@ -358,16 +358,16 @@ export class ConsignmentControl {
           metaData: "Basic",
         },
       },
-      {
-        name: 'cargo_type', label: 'Type of Cargo', placeholder: 'Type of Cargo', type: 'Staticdropdown',
-        value: [
-          { "name": "Volume Cargo", "value": "Volume Cargo" },
-          { "name": "Weight Cargo", "value": "Weight Cargo" }
-        ], Validations: [], generatecontrol: true, disable: false,
-        additionalData: {
-          metaData: "Basic",
-        },
-      },
+        // {
+        //   name: 'cargo_type', label: 'Type of Cargo', placeholder: 'Type of Cargo', type: 'Staticdropdown',
+        //   value: [
+        //     { "name": "Volume Cargo", "value": "Volume Cargo" },
+        //     { "name": "Weight Cargo", "value": "Weight Cargo" }
+        //   ], Validations: [], generatecontrol: true, disable: false,
+        //   additionalData: {
+        //     metaData: "Basic",
+        //   },
+        // },
       {
         name: 'gp_ch_del', label: 'GP/CH/Del', placeholder: 'GP/CH/Del', type: 'text',
         value: docketDetail.gp_ch_del, Validations: [], generatecontrol: true, disable: false,
@@ -398,13 +398,13 @@ export class ConsignmentControl {
           metaData: "Basic",
         },
       },
-      {
-        name: 'rake_no', label: 'Rake', placeholder: 'Rake No', type: 'text',
-        value: docketDetail.rake_no, Validations: [], generatecontrol: true, disable: false,
-        additionalData: {
-          metaData: "Basic",
-        },
-      },
+      // {
+      //   name: 'rake_no', label: 'Rake', placeholder: 'Rake No', type: 'text',
+      //   value: docketDetail.rake_no, Validations: [], generatecontrol: true, disable: false,
+      //   additionalData: {
+      //     metaData: "Basic",
+      //   },
+      // },
       {
         name: 'issuing_from', label: 'Issuing From', placeholder: 'Rake No', type: 'Staticdropdown',
         value: [
@@ -659,7 +659,20 @@ export class ConsignmentControl {
         Validations: [],
         functions: {
         },
-      }
+      },
+      {
+        name: "isEmpty",
+        label: "Is Empty",
+        placeholder: "Is Empty",
+        type: "toggle",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        Validations: [],
+        generatecontrol: true,
+        disable: false
+      },
     ]
     this.invoiceDetail = [
       {

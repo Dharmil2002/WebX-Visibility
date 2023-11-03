@@ -105,6 +105,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
+    isEmpty:{
+      Title: "Is Empty",
+      class: "matcolumncenter",
+      Style: "min-width:2px",
+    },
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
@@ -171,7 +176,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     "actualWeight",
     "chargedWeight",
   ];
-  staticField = ["containerNumber", "containerType", "containerCapacity"];
+  staticField = ["containerNumber", "containerType", "containerCapacity","isEmpty"];
   menuItems = [{ label: "Edit" }, { label: "Remove" }];
   menuItemflag = true;
   //#endregion
@@ -300,8 +305,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       ...this.jsonControlArrayConsignee,
     ];
     this.jsonControlArray = this.FreightFromControl.getFreightControlControls();
-    this.jsonContainerDetail =
-      this.ConsignmentFormControls.getContainerDetail();
+    this.jsonContainerDetail = this.ConsignmentFormControls.getContainerDetail();
     this.jsonInvoiceDetail = this.ConsignmentFormControls.getInvoiceDetail();
     this.jsonEwayBill = this.ConsignmentFormControls.getEwayBillDetail();
     /*market vechile form group*/
@@ -560,6 +564,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   /*this function is for the add multiple containor*/
   async addData() {
+
     this.tableLoad = true;
     this.isLoad = true;
     const tableData = this.tableData;
@@ -603,6 +608,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       containerNumber: this.containerTableForm.value.containerNumber,
       containerType: this.containerTableForm.value.containerType.value,
       containerCapacity: this.containerTableForm.value.containerCapacity,
+      isEmpty: this.containerTableForm.value.isEmpty?"Y":"N",
       invoice: false,
       actions: ["Edit", "Remove"],
     };
@@ -615,6 +621,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.containerTableForm.controls["containerNumber"].setValue("");
     this.containerTableForm.controls["containerType"].setValue("");
     this.containerTableForm.controls["containerCapacity"].setValue("");
+    this.containerTableForm.controls["isEmpty"].setValue(false);
     // Remove all validation
 
     this.isLoad = false;
@@ -631,7 +638,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     if (data.label.label === "Remove") {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     } else {
-      const excludedKeys = ['Download_Icon', 'Company_file'];
+      const excludedKeys = ['Download_Icon', 'Company_file','isEmpty'];
       const atLeastOneValuePresent = Object.keys(this.containerTableForm.controls)
         .filter(key => !excludedKeys.includes(key)) // Filter out excluded keys
         .some(key => {
@@ -868,9 +875,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.consignmentTableForm.controls["weight_in"].setValue(
       this.docketDetail.weight_in
     );
-    this.consignmentTableForm.controls["cargo_type"].setValue(
-      this.docketDetail.cargo_type
-    );
+    // this.consignmentTableForm.controls["cargo_type"].setValue(
+    //   this.docketDetail.cargo_type
+    // );
     this.consignmentTableForm.controls["delivery_type"].setValue(
       this.docketDetail.delivery_type
     );
@@ -1039,7 +1046,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       "transMode",
       "vendorType",
       "weight_in",
-      "cargo_type",
+     // "cargo_type",
       "delivery_type",
       "issuing_from",
     ];
@@ -1333,7 +1340,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   /*end*/
 
-
   /*end*/
   getInvoiceAggValue(fielName) {
     if (this.invoiceData.length > 0) {
@@ -1347,35 +1353,30 @@ export class ConsignmentEntryFormComponent implements OnInit {
     return 0;
   }
   /*AutoFiill Invoice data*/
-  fillInvoiceDetails(data){
-       
-    this.invoiceTableForm.controls["ewayBillNo"].setValue(
-      data.data?.ewayBillNo || ""
-    );
-    this.invoiceTableForm.controls["expiryDate"].setValue(
-      data.data?.expiryDateO || new Date()
-    );
-    this.invoiceTableForm.controls["invoiceNo"].setValue(
-      data.data?.invoiceNo || ""
-    );
-    this.invoiceTableForm.controls["invoiceAmount"].setValue(
-      data.data?.invoiceAmount || ""
-    );
-    this.invoiceTableForm.controls["noofPkts"].setValue(
-      data.data?.noofPkts || ""
-    );
-    this.invoiceTableForm.controls["materialName"].setValue(
-      data.data?.materialName || ""
-    );
-    this.invoiceTableForm.controls["actualWeight"].setValue(
-      data.data?.actualWeight || ""
-    );
-    this.invoiceTableForm.controls["chargedWeight"].setValue(
-      data.data?.chargedWeight || ""
-    );
-    this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
+  fillInvoiceDetails(data) {
+    // Define a mapping of form control names to their respective keys in the incoming data
+    const formFields = {
+      ewayBillNo: "ewayBillNo",
+      expiryDate: "expiryDateO",
+      invoiceNo: "invoiceNo",
+      invoiceAmount: "invoiceAmount",
+      noofPkts: "noofPkts",
+      materialName: "materialName",
+      actualWeight: "actualWeight",
+      chargedWeight: "chargedWeight"
+    };
+  
+    // Loop through the defined form fields and set their values from the incoming data
+    Object.keys(formFields).forEach(field => {
+      // Set form control value to the data property if available, otherwise set it to an empty string
+      this.invoiceTableForm.controls[field].setValue(data.data?.[formFields[field]] || "");
+    });
+  
+    // Filter the invoiceData to exclude the entry with the provided data ID
+    this.invoiceData = this.invoiceData.filter(x => x.id !== data.data.id);
   }
   /*End*/
+
   /* AutoFill Containor Details */
   fillContainerDetails(data){
     const container = this.containerTypeList.find(
@@ -1388,6 +1389,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
       data.data?.containerCapacity || ""
     );
     this.containerTableForm.controls["containerType"].setValue(container);
+    this.containerTableForm.controls["isEmpty"].setValue(data.data.isEmpty=="Y"?true:false);
     this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
   }
   /* End */

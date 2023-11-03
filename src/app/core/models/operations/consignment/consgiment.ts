@@ -25,11 +25,11 @@ export class DocketDetail {
     cnalternateContactNo: string
     companyCode: string
     vehicleNo: string
-    rake_no: string
+    //rake_no: string
     delivery_type: string
     risk: string
     gp_ch_del: string
-    cargo_type: string
+    //cargo_type: string
     weight_in: string
     packaging_type: string
     edd: Date
@@ -108,11 +108,11 @@ export class DocketDetail {
         this.edd=data.edd??new Date();
         this.packaging_type=data.packaging_type??""
         this.weight_in=data.weight_in??""
-        this.cargo_type=data.cargo_type??""
+      //  this.cargo_type=data.cargo_type??""
         this.gp_ch_del=data.gp_ch_del??""
         this.risk=data.risk??""
         this.delivery_type=data.delivery_type??""
-        this.rake_no=data.rake_no??""
+       // this.rake_no=data.rake_no??""
         this.issuing_from=data.issuing_from??"" 
         this.tran_day= data.tran_day??"" 
         this.tran_hour= data.tran_hour??"" 

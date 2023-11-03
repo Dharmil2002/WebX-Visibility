@@ -62,7 +62,7 @@ export class PrqService {
     try {
       // Make an API request to create the PRQ
       const res = await this.masterService.masterMongoPost("operation/prq/create", reqBody).toPromise();
-      return res;
+      return res; 
     } catch (error) {
       // Handle errors gracefully and log them
       console.error("Error adding PRQ data:", error);

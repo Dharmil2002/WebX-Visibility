@@ -73,7 +73,7 @@ export class ThcUpdateComponent implements OnInit {
     let fileList: FileList = data.eventArgs;
     if (fileList.length > 0) {
       const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
+      const allowedFormats = ["jpeg", "png", "jpg","pdf"];
       const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
 
       if (allowedFormats.includes(fileFormat)) {
@@ -85,7 +85,7 @@ export class ThcUpdateComponent implements OnInit {
         Swal.fire({
           icon: "warning",
           title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
+          text: `Please select a JPEG, PNG,PDF, or JPG file.`,
           showConfirmButton: true,
         });
       }

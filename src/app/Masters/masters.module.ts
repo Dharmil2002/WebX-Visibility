@@ -140,6 +140,8 @@ import { VendorContractServiceSelectionComponent } from './vendor-contract/vendo
 import { VendorContractTripLaneComponent } from './vendor-contract/vendorContractTabs/vendor-contract-trip-lane/vendor-contract-trip-lane.component';
 import { VendorTERDetailComponent } from './vendor-contract/vendorContractTabs/vendor-terdetail/vendor-terdetail.component';
 import { VendorTERModalComponent } from './vendor-contract/vendorContractTabs/vendor-terdetail/vendor-termodal/vendor-termodal.component';
+import { SacMasterListComponent } from "./sac-master/sac-master-list/sac-master-list.component";
+import { AddSacMasterComponent } from "./sac-master/add-sac-master/add-sac-master.component";
 @NgModule({
   imports: [
     CommonModule,
@@ -187,6 +189,8 @@ import { VendorTERModalComponent } from './vendor-contract/vendorContractTabs/ve
   ],
 
   declarations: [
+    SacMasterListComponent,
+    AddSacMasterComponent,
     VirtualLoginComponent,
     CNoteGenerationComponent,
     EwaybillConfigComponent,

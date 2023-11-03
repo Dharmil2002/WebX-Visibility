@@ -73,9 +73,13 @@ import { AccountMasterComponent } from './Account/Account Master/account-master/
 import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
 import { VendorContractListComponent } from './vendor-contract/vendor-contract-list/vendor-contract-list.component';
 import { VendorIndexComponent } from './vendor-contract/vendor-index/vendor-index.component';
+import { SacMasterListComponent } from './sac-master/sac-master-list/sac-master-list.component';
+import { AddSacMasterComponent } from './sac-master/add-sac-master/add-sac-master.component';
 
 
 const routes: Routes = [
+  { path: "SAC-HSNMaster/SAC-HSNView", component: SacMasterListComponent },
+  { path: "SAC-HSNMaster/AddSAC-HSN", component: AddSacMasterComponent },
   { path: 'Docket/Create', component: CNoteGenerationComponent },
   { path: 'Docket/Ewaybill-Config', component: EwaybillConfigComponent },
   { path: 'Docket/Ewaybill', component: EwayBillDetailsComponent },

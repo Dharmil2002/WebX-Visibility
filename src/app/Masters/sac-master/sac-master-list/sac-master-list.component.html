@@ -1,0 +1,19 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+  <!-- <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
+        [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
+          [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+        [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)"
+        [TableStyle]="TableStyle">
+    </generic-table-webxpress> -->
+  <form [formGroup]="sacTableForm">
+    <app-form-webxpress [form]="sacTableForm" [formData]="jsonControlSACArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveButton]="true">
+    </app-form-webxpress>
+  </form>
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    [tableData]="csv" [metaData]="metaData" [csvHeaders]="headerForCsv" [csvFileName]="csvFileName"
+    (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems" [staticField]="staticField"
+    [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth" (onFlagChange)="IsActiveFuntion($event)"
+    [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+  </app-generic-table-v2>
+</app-common-wrapper-webxpress>

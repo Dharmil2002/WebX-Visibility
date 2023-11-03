@@ -1,0 +1,7 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="sacTableForm">
+        <app-form-webxpress [form]="sacTableForm" [formData]="jsonControlSACArray"
+            (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"[showSaveAndCancelButton]="true">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

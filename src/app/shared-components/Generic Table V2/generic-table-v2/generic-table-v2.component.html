@@ -23,7 +23,7 @@
                         </div>
                         <hr style="margin:0px">
                     </div>
-                    <div class="materialTableHeader" style="min-width:auto !important;" *ngIf="showHeader">
+                    <div  [ngStyle]="{'display': showHeader ? 'block' : 'none'}" class="materialTableHeader" style="min-width:auto !important;" >
                         <div class="row">
                             <div class="col-auto">
                                 <ul class="header-buttons-left ml-0">
@@ -83,7 +83,7 @@
                                                 style="margin-left:10px; "
                                                 (click)="FunctionHendel(EventButton.functionName , {})"
                                                 >
-                                                <mat-icon>add</mat-icon>
+                                                <mat-icon *ngIf="EventButton?.iconName">{{EventButton.iconName}}</mat-icon>
                                                 {{EventButton.name}}
                                             </button>
                                         </div>

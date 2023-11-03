@@ -493,10 +493,6 @@ export class AccountMasterControls {
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "DdlTDS Ledger Mapping is required",
-          },
-          {
             name: "autocomplete",
           },
           {

@@ -201,7 +201,7 @@ export class VehicleStatusService {
   }
 
   async SaveVehicleData(arrivalData: any, prqdata: any) {
-    debugger
+    
          // Define common vehicle details
       const vehicleDetails = {
         _id: arrivalData.vehNo,

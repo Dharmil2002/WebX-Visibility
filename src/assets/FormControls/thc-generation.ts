@@ -388,7 +388,7 @@ export class thcControl {
                     label: 'Vendor Contract  Amount(₹)',
                     placeholder: '',
                     type: 'text',
-                    value: '',
+                    value: 0,
                     Validations: [],
                     functions: {
                         onChange: 'onCalculateTotal'
@@ -404,7 +404,7 @@ export class thcControl {
                     label: 'Advance Amount(₹)',
                     placeholder: '',
                     type: 'text',
-                    value: '',
+                    value: 0,
                     Validations: [],
                     functions: {
                         onChange: 'onCalculateTotal'
@@ -420,7 +420,7 @@ export class thcControl {
                     label: 'Balance Amount(₹)',
                     placeholder: '',
                     type: 'text',
-                    value: '',
+                    value: 0,
                     functions: {
                         onChange: 'onCalculateTotal'
                     },

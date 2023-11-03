@@ -631,17 +631,32 @@ export class ConsignmentEntryFormComponent implements OnInit {
     if (data.label.label === "Remove") {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     } else {
-      const container = this.containerTypeList.find(
-        (x) => x.name.trim() === data.data?.containerType.trim()
-      );
-      this.containerTableForm.controls["containerNumber"].setValue(
-        data.data?.containerNumber || ""
-      );
-      this.containerTableForm.controls["containerCapacity"].setValue(
-        data.data?.containerCapacity || ""
-      );
-      this.containerTableForm.controls["containerType"].setValue(container);
-      this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+      const excludedKeys = ['Download_Icon', 'Company_file'];
+      const atLeastOneValuePresent = Object.keys(this.containerTableForm.controls)
+        .filter(key => !excludedKeys.includes(key)) // Filter out excluded keys
+        .some(key => {
+          const control = this.containerTableForm.get(key);
+          return control && (control.value !== null && control.value !== undefined && control.value !== '');
+        });
+      if (atLeastOneValuePresent) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Data is already present and being edited. Are you sure you want to discard the changes?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, proceed!',
+            cancelButtonText: 'No, cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+              this.fillContainerDetails(data)
+            }
+        });
+      }
+      else{
+        this.fillContainerDetails(data)
+      }
     }
   }
 
@@ -697,31 +712,31 @@ export class ConsignmentEntryFormComponent implements OnInit {
     if (data.label.label === "Remove") {
       this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
     } else {
-      this.invoiceTableForm.controls["ewayBillNo"].setValue(
-        data.data?.ewayBillNo || ""
-      );
-      this.invoiceTableForm.controls["expiryDate"].setValue(
-        data.data?.expiryDateO || new Date()
-      );
-      this.invoiceTableForm.controls["invoiceNo"].setValue(
-        data.data?.invoiceNo || ""
-      );
-      this.invoiceTableForm.controls["invoiceAmount"].setValue(
-        data.data?.invoiceAmount || ""
-      );
-      this.invoiceTableForm.controls["noofPkts"].setValue(
-        data.data?.noofPkts || ""
-      );
-      this.invoiceTableForm.controls["materialName"].setValue(
-        data.data?.materialName || ""
-      );
-      this.invoiceTableForm.controls["actualWeight"].setValue(
-        data.data?.actualWeight || ""
-      );
-      this.invoiceTableForm.controls["chargedWeight"].setValue(
-        data.data?.chargedWeight || ""
-      );
-      this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
+        const atLeastOneValuePresent = Object.keys(this.invoiceTableForm.controls)
+          .some(key => {
+            const control = this.invoiceTableForm.get(key);
+            return control && (control.value !== null && control.value !== undefined && control.value !== '');
+          });
+      
+          if (atLeastOneValuePresent) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Data is already present and being edited. Are you sure you want to discard the changes?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, proceed!',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                  this.fillInvoiceDetails(data)
+                }
+            });
+          }
+          else{
+            this.fillInvoiceDetails(data)
+          }
     }
   }
 
@@ -1331,4 +1346,49 @@ export class ConsignmentEntryFormComponent implements OnInit {
     }
     return 0;
   }
+  /*AutoFiill Invoice data*/
+  fillInvoiceDetails(data){
+       
+    this.invoiceTableForm.controls["ewayBillNo"].setValue(
+      data.data?.ewayBillNo || ""
+    );
+    this.invoiceTableForm.controls["expiryDate"].setValue(
+      data.data?.expiryDateO || new Date()
+    );
+    this.invoiceTableForm.controls["invoiceNo"].setValue(
+      data.data?.invoiceNo || ""
+    );
+    this.invoiceTableForm.controls["invoiceAmount"].setValue(
+      data.data?.invoiceAmount || ""
+    );
+    this.invoiceTableForm.controls["noofPkts"].setValue(
+      data.data?.noofPkts || ""
+    );
+    this.invoiceTableForm.controls["materialName"].setValue(
+      data.data?.materialName || ""
+    );
+    this.invoiceTableForm.controls["actualWeight"].setValue(
+      data.data?.actualWeight || ""
+    );
+    this.invoiceTableForm.controls["chargedWeight"].setValue(
+      data.data?.chargedWeight || ""
+    );
+    this.invoiceData = this.invoiceData.filter((x) => x.id !== data.data.id);
+  }
+  /*End*/
+  /* AutoFill Containor Details */
+  fillContainerDetails(data){
+    const container = this.containerTypeList.find(
+      (x) => x.name.trim() === data.data?.containerType.trim()
+    );
+    this.containerTableForm.controls["containerNumber"].setValue(
+      data.data?.containerNumber || ""
+    );
+    this.containerTableForm.controls["containerCapacity"].setValue(
+      data.data?.containerCapacity || ""
+    );
+    this.containerTableForm.controls["containerType"].setValue(container);
+    this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+  }
+  /* End */
 }

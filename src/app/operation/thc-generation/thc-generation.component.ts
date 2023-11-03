@@ -32,7 +32,6 @@ import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/ve
 import { MarkerVehicleService } from "src/app/Utility/module/operation/market-vehicle/marker-vehicle.service";
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { StorageService } from "src/app/core/service/storage.service";
-import { tr } from "date-fns/locale";
 
 @Component({
   selector: "app-thc-generation",
@@ -426,15 +425,15 @@ export class ThcGenerationComponent implements OnInit {
   }
   
   async bindPrqData() {
+    
     const vehicleDetail = await this.vehicleStatusService.vehiclList( this.prqDetail?.prqNo );
 
     const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
-
     const jsonData = {
       vehicle: { name: this.prqDetail?.vehicleNo, value: this.prqDetail?.vehicleNo },
       vendorType: vehicleDetail?.vendorType || "",
       vendorName: { name: vehicleDetail?.vendor || '', value:  vehicleDetail?.vendor || ''},
-      transMode: (this.prqFlag && this.prqDetail?.transMode === 'truck') ? 'Road' : '',
+      transMode: this.prqDetail?.transMode === 'truck' ? 'Road' : '',
       route: this.prqDetail?.fromToCity || '',
       fromCity: { name: fromToCityParts[0], value: fromToCityParts[0] },
       toCity: { name: fromToCityParts[1], value:fromToCityParts[1] },
@@ -471,16 +470,16 @@ export class ThcGenerationComponent implements OnInit {
           fitnessValidityDate: vehData.fITDT || new Date(),
         };
 
-        for (const controlName in jsonData) {
-          if (jsonData.hasOwnProperty(controlName)) {
+        for (const controlName in vehJson) {
+          if (vehJson.hasOwnProperty(controlName)) {
             const control = this.marketVehicleTableForm.get(controlName);
             if (control) {
-              control.setValue(jsonData[controlName]);
+              control.setValue(vehJson[controlName]);
             }
-            const thcControl = this.thcTableForm.get(controlName);
-            if (thcControl) {
-              thcControl.setValue(jsonData[controlName]);
-            }
+            // const thcControl = this.thcTableForm.get(controlName);
+            // if (thcControl) {
+            //   thcControl.setValue(jsonData[controlName]);
+            // }
           }
         }
       }
@@ -489,6 +488,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   async getShipmentDetails() {
+    
     this.tableLoad = true;
     if (!this.prqFlag && this.thcTableForm.controls["prqNo"].value.value) {
       const prqData = await this.thcService.prqDetail(false);
@@ -592,6 +592,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   async createThc() {
+    
     const selectedDkt = this.isUpdate ? this.tableData : this.selectedData;
   
     if (selectedDkt.length === 0 && !this.isUpdate) {
@@ -691,7 +692,7 @@ export class ThcGenerationComponent implements OnInit {
   
       if (isMarket || !this.prqFlag) {
         const vendorName = this.thcTableForm.get('vendorName').value || "";
-        const vehicleNoValue = this.thcTableForm.get('vehicleNo').value || "";
+        const vehicleNoValue = this.thcTableForm.get('vehicle').value || "";
         const _id = `${vendorName.substring(0, 3)}-${vehicleNoValue}`;
         this.marketVehicleTableForm.get('vehNo').setValue(vehicleNoValue);
         this.marketVehicleTableForm.get('vendor').setValue(vendorName);
@@ -752,7 +753,21 @@ export class ThcGenerationComponent implements OnInit {
     const control1 = "contAmt";
     const control2 = "advAmt";
     const resultControl = "balAmt";
+    const advAmt= parseInt(this.thcTableForm.value.advAmt)
+    const contAmt=parseInt(this.thcTableForm.value.contAmt)
+    if (advAmt > contAmt) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Advance amount cannot be greater than contract amount'
+      });
+      this.thcTableForm.controls['contAmt'].setValue(0);
+      this.thcTableForm.controls['balAmt'].setValue(0);
+      return false
+    }
+    else{
     calculateTotal(form, control1, control2, resultControl);
+    }
   }
   /*here get vehicle detail function if it is not market*/
   async getVehicleDetail() {
@@ -946,7 +961,7 @@ export class ThcGenerationComponent implements OnInit {
   */
 
   async autoFillDocketDetail() {
-
+   
     const route = `${this.docketDetail?.fromCity || ""}-${this.docketDetail?.toCity || ""}`
     const prq = { name: this.docketDetail?.prqNo || "", value: this.docketDetail?.prqNo || "" }
     const vehicle = { name: this.docketDetail?.vehicleNo || "", value: this.docketDetail?.vehicleNo || "" }

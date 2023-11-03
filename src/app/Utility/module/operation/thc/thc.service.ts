@@ -30,14 +30,14 @@ export class ThcService {
     }
     async prqDetail(isDropDown) {
         //Need to default max date range, and 
-        const startDate = new Date();
-        startDate.setMonth(startDate.getMonth() - 1);
-        const endDate = new Date();
+        // const startDate = new Date();
+        // startDate.setMonth(startDate.getMonth() - 1);
+        // const endDate = new Date();
 
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.PrqDetails,
-            filter: { pickUpTime: { $gte: startDate, $lte: endDate } }
+            filter: {}
         };
     
         // Perform an asynchronous operation to fetch data from the operation service

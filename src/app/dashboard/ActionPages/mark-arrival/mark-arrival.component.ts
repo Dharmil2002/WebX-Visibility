@@ -101,6 +101,7 @@ export class MarkArrivalComponent implements OnInit {
   }
 
   save() {
+    
     this.MarkArrivalTableForm.controls['LateReason']
       .setValue(
         this.MarkArrivalTableForm.controls['LateReason']?.

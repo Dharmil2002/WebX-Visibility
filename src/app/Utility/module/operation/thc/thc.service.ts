@@ -87,5 +87,27 @@ export class ThcService {
        const result = await this.operationService.operationMongoPost(GenericActions.Get, reqBody).toPromise();
        return result;
     }
+    async getNestedDockDetail(shipments) {
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: Collections.docketOp,
+            filter: {}
+        };
+    
+        const promises = shipments.map(async (element) => {
+            reqBody.filter = { dKTNO: element.docketNumber, sFX: 0 };
+            let nestedDetail = await this.operationService.operationPost(GenericActions.Get, reqBody).toPromise();
+            element.noOfPkg = nestedDetail.data[0]?.tOTPKG || 0;
+            element.totWeight = nestedDetail.data[0]?.tOTWT || 0;
+            element.orgNoOfPkg = nestedDetail.data[0]?.tOTPKG || 0;
+            element.orgTotWeight = nestedDetail.data[0]?.tOTWT || 0;
+            element.sFX= nestedDetail.data[0]?.sFX || 0;
+            return element;
+        });
+    
+        // Wait for all promises to resolve
+        const updatedShipments = await Promise.all(promises);
+        return updatedShipments;
+    }
+    
 }
-

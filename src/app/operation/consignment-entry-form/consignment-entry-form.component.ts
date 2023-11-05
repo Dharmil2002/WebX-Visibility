@@ -37,6 +37,8 @@ import { PrqService } from "../../Utility/module/operation/prq/prq.service";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
 import { vehicleMarket } from "src/app/Models/vehicle-market/vehicle-market";
+import { StorageService } from "src/app/core/service/storage.service";
+import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -237,7 +239,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private pinCodeService: PinCodeService,
     private locationService: LocationService,
     private prqService: PrqService,
-    private consigmentUtility: ConsigmentUtility
+    private consigmentUtility: ConsigmentUtility,
+    private storage: StorageService,
+    private docketService:DocketService
   ) {
     const navigationState =
       this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -1114,20 +1118,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
         .operationMongoPost("operation/docket/create", reqBody)
         .subscribe({
           next: (res: any) => {
-            Swal.fire({
-              icon: "success",
-              title: "Booked Successfully",
-              text: "DocketNo: " + res.data.ops[0].docketNumber,
-              showConfirmButton: true,
-            }).then((result) => {
-              if (result.isConfirmed) {
-                // Redirect to the desired page after the success message is confirmed.
-                this._NavigationService.navigateTotab(
-                  "docket",
-                  "dashboard/Index"
-                );
-              }
-            });
+            const dkt= res.data.ops[0].docketNumber
+            this.addDocketNestedtDetail(dkt,invoiceDetails);
+           
           },
         });
     } else {
@@ -1165,6 +1158,49 @@ export class ConsignmentEntryFormComponent implements OnInit {
         });
       }
     }
+  }
+  async addDocketNestedtDetail(dkt,invoiceDetails) {
+    
+  // Assuming invoiceDetails might be null or an empty array
+const totalPkg = invoiceDetails ? invoiceDetails.invoiceDetails.reduce((accumulator, currentValue) => accumulator + (parseInt(currentValue.noofPkts) || 0), 0) : 0;
+const totalWt = invoiceDetails ? invoiceDetails.invoiceDetails.reduce((accumulator, currentValue) => accumulator + (parseFloat(currentValue.actualWeight) || 0), 0) : 0;
+
+    const data={
+        "cID":this.storage.companyCode,
+        "dKTNO": dkt,
+        "sFX": 0,
+        "cLOC": this.storage.branch,
+        "cNO": "",
+        "nLoc": "",
+        "tId": "",
+        "tOTWT": totalWt,
+        "tOTPKG": totalPkg,
+        "vEHNO": "",
+        "aRRTM": "",
+        "aRRPKG": "",
+        "aRRWT": "",
+        "dTime": "",
+        "dPKG": "",
+        "dWT": "",
+        "sTS": "",
+        "sTSTM": ""
+      
+    }
+     await this.docketService.addDktDetail(data);
+    Swal.fire({
+      icon: "success",
+      title: "Booked Successfully",
+      text: "DocketNo: " +dkt,
+      showConfirmButton: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Redirect to the desired page after the success message is confirmed.
+        this._NavigationService.navigateTotab(
+          "docket",
+          "dashboard/Index"
+        );
+      }
+    });
   }
   /*End Save*/
   public selectedFile(event) {
@@ -1339,7 +1375,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     );
   }
   /*end*/
-
   /*end*/
   getInvoiceAggValue(fielName) {
     if (this.invoiceData.length > 0) {
@@ -1376,7 +1411,6 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.invoiceData = this.invoiceData.filter(x => x.id !== data.data.id);
   }
   /*End*/
-
   /* AutoFill Containor Details */
   fillContainerDetails(data){
     const container = this.containerTypeList.find(
@@ -1393,4 +1427,5 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
   }
   /* End */
+  
 }

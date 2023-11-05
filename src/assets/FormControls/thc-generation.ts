@@ -27,6 +27,28 @@ export class thcControl {
                     }
                 },
                 {
+                    name: "tripDate",
+                    label: 'Trip Date',
+                    placeholder: 'Trip Date',
+                    type: "datetimerpicker",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable:   view ? view : update,
+                    Validations: [
+                      {
+                        name: "required",
+                        message: "Trip Date is required",
+                      },
+                    ],
+                    additionalData: {
+                      maxDate: maxDate,
+                      metaData: "Basic"
+                    },
+                  },
+                {
                     name: 'route',
                     label: 'Route',
                     placeholder: '',
@@ -211,31 +233,31 @@ export class thcControl {
                         metaData: "Basic"
                     },
                 },
-                {
-                    name: 'closingBranch',
-                    label: 'Closing Branch',
-                    placeholder: '',
-                    type: 'dropdown',
-                    value: '',
-                    additionalData: {
-                        showNameAndValue: true,
-                        metaData: "Basic"
-                    },
-                    Validations: [{
-                        name: "required",
-                        message: "Closing Branch  is required",
-                    },
-                    {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "autocomplete",
-                    },
-                    ],
-                    generatecontrol: true,
-                    disable: view ? view : update
-                },
+                // {
+                //     name: 'closingBranch',
+                //     label: 'Closing Branch',
+                //     placeholder: '',
+                //     type: 'dropdown',
+                //     value: '',
+                //     additionalData: {
+                //         showNameAndValue: true,
+                //         metaData: "Basic"
+                //     },
+                //     Validations: [{
+                //         name: "required",
+                //         message: "Closing Branch  is required",
+                //     },
+                //     {
+                //         name: "invalidAutocompleteObject",
+                //         message: "Choose proper value",
+                //     },
+                //     {
+                //         name: "autocomplete",
+                //     },
+                //     ],
+                //     generatecontrol: true,
+                //     disable: view ? view : update
+                // },
                 {
                     name: "transMode",
                     label: "Transport Mode",
@@ -753,7 +775,21 @@ export class thcControl {
                         showNameAndValue: false,
                         metaData: "Basic"
                     }
-                }
+                },
+                {
+                    name: 'closingBranch',
+                    label: 'Closing Branch',
+                    placeholder: '',
+                    type: '',
+                    value: '',
+                    additionalData: {
+                        showNameAndValue: true,
+                        metaData: "Basic"
+                    },
+                    Validations: [],
+                    generatecontrol: true,
+                    disable: true
+                },
             ];
         this.marketVehicle = [
                 {

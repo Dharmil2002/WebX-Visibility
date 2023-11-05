@@ -5,7 +5,8 @@ export const Collections = {
     vehicleStatus: 'vehicle_status',
     Dockets: 'docket_temp',
     PrqDetails: 'prq_detail',
-    ThcDetails: 'thc_detail'
+    ThcDetails: 'thc_detail',
+    docketOp: 'Docket_Operation_Details'
 };
 
 export const GenericActions = {

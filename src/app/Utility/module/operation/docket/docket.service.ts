@@ -1,9 +1,8 @@
 import { Injectable } from "@angular/core";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
-import { MasterService } from "src/app/core/service/Masters/master.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { calculateTotalField } from "src/app/operation/unbilled-prq/unbilled-utlity";
-
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Injectable({
     providedIn: "root",
@@ -32,7 +31,8 @@ export class DocketService {
     };
 
     constructor(
-        private operation: OperationService
+        private operation: OperationService,
+        private storage:StorageService
     ) { }
 
     async updateDocket(data, filter) {
@@ -42,6 +42,19 @@ export class DocketService {
             collectionName: "docket_temp",
             filter: { "docketNumber": data },
             update: filter
+        };
+        // Perform an asynchronous operation to fetch data from the operation service
+        const result = await this.operation.operationMongoPut("generic/update", reqBody).toPromise();
+        return result;
+    }
+    
+    async updateDocketSuffix(filter,data) {
+        // Define the request body with companyCode, collectionName, and an empty filter
+        const reqBody = {
+            companyCode: localStorage.getItem("companyCode"),
+            collectionName: "Docket_Operation_Details",
+            filter:filter,
+            update: data
         };
         // Perform an asynchronous operation to fetch data from the operation service
         const result = await this.operation.operationMongoPut("generic/update", reqBody).toPromise();
@@ -104,6 +117,53 @@ export class DocketService {
         const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
         return res.data.filter((x)=>x.origin === localStorage.getItem("Branch"));
     }
+    async addDktDetail(data){
+        
+        const req = {
+            "companyCode": localStorage.getItem("companyCode"),
+            "collectionName": "Docket_Operation_Details",
+            "data":data
+        }
 
-
+        const res = await this.operation.operationMongoPost('generic/create', req).toPromise();
+        return res.data;
+    }
+    async updateSelectedData(selectedData: any[],tripId="") {
+        for (const element of selectedData) {
+          const data = {
+            tOTWT: parseFloat(element.orgTotWeight) - parseFloat(element.totWeight),
+            tOTPKG: parseFloat(element.orgNoOfPkg) - parseFloat(element.noOfPkg)
+          };
+    
+          const filter = {
+            dKTNO: element.docketNumber
+          };
+    
+          await this.updateDocketSuffix(filter, data);
+    
+          const DktNew = {
+            cID: this.storage.companyCode,
+            dKTNO: element.docketNumber,
+            sFX: parseInt(element.sFX) + 1,
+            cLOC: this.storage.branch,
+            cNO: '',
+            nLoc: '',
+            tId: tripId,
+            tOTWT: element.totWeight,
+            tOTPKG: element.noOfPkg,
+            vEHNO: '',
+            aRRTM: '',
+            aRRPKG: '',
+            aRRWT: '',
+            dTime: new Date(),
+            dPKG: element.noOfPkg,
+            dWT: element.totWeight,
+            sTS: '',
+            sTSTM: ''
+          };
+    
+          await this.addDktDetail(DktNew);
+        
+      }
+    }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 
@@ -20,10 +20,14 @@ export class VendorIndexComponent implements OnInit {
     "Express Route based",
     "Long Haul full truck- route based",
     "Long Haul lane based",
-    "Trip Lane Based (Location - Area)",
     "Last mile delivery",
-    "Business Associate"         
+    "Business Associate"
   ];
+  selectedFolders = [
+    "Basic Information",
+    "Services Selection",
+  ];
+
   CurrentContractDetails: any;
   selectedFolder: string;
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,) {
@@ -33,11 +37,21 @@ export class VendorIndexComponent implements OnInit {
       this.CurrentContractDetails = JSON.parse(decryptedData)
     });
     this.selectFolder('Basic Information')
+
+    // Retrieving the array from session storage
+    const storedData = sessionStorage.getItem('selectedContractType');
+
+    if (storedData) {
+      const selectedData = JSON.parse(storedData);
+
+      // Remove "Transportation- " from each item in the array
+      const selectedContractTypeData = selectedData.map(item => item.replace('Transportation- ', ''));
+      this.selectedFolders = this.selectedFolders.concat(selectedContractTypeData);
+    }
   }
 
   selectFolder(folder: string) {
     this.selectedFolder = folder;
-    // Add logic to handle folder selection
   }
   ngOnInit(): void {
   }

@@ -42,7 +42,6 @@ export class VendorContractBasicInformationComponent implements OnInit {
     "Last mile delivery",
     "Business Associate"
   ];
-  selectedContractType: string;
   constructor(private fb: UntypedFormBuilder,
     private objImageHandling: ImageHandling,
 
@@ -52,6 +51,7 @@ export class VendorContractBasicInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+   
   }
   ngOnChanges(changes: SimpleChanges) {
     console.log(changes);

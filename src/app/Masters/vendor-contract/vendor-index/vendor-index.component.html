@@ -14,13 +14,6 @@
                                 <h5 class="b-b p-10 text-strong">Contract Management</h5>
                                 <div class="card-body" style="padding-bottom: 0px;">
                                     <ul class="list-unstyled user-progress list-unstyled-border list-unstyled-noborder">
-                                        <!-- <li class="lecture-list" style="margin-bottom: -10px;">
-                                            <div class="set-flex" style="text-align: center;">
-                                                <div class="text-job text-muted-blue font-14">
-                                                    {{CurrentContractDetails.customer}}
-                                                </div>
-                                            </div>
-                                        </li> -->
                                         <li class="lecture-list" style="margin-bottom: 0px;">
                                             <div class="set-flex">
                                                 <div class="text-job text-muted-blue mb-0" style="white-space: pre;">
@@ -42,10 +35,14 @@
                                     </ul>
                                 </div>
                                 <h5 class="b-b p-10 text-strong">Contract Tabs</h5>
-                                <ul id="mail-folders" style="padding:5px">
-                                    <li *ngFor="let folder of folders" [class.active]="folder === selectedFolder">
-                                        <a href="javascript:;" (click)="selectFolder(folder)" [title]="folder">{{ folder
-                                            }}</a>
+                                <ul id="mail-folders" style="padding: 5px">
+                                    <li *ngFor="let folder of folders"
+                                        [class.active]="selectedFolders.includes(folder)?folder === selectedFolder:null">
+                                        <a href="javascript:;"
+                                            (click)="selectedFolders.includes(folder) ? selectFolder(folder):null"
+                                            [title]="folder">
+                                            {{ folder }}
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -65,14 +62,21 @@
                 <div class="boxs mail_listing" *ngIf="'Express Route based' === selectedFolder">
                     <app-vendor-terdetail [contractData]="CurrentContractDetails"></app-vendor-terdetail>
                 </div>
-                <!-- <div class="boxs mail_listing" *ngIf="'Special Charges' === selectedFolder">
-                    <app-vendor-contract-non-freight-charges-component
-                        [contractData]="CurrentContractDetails"></app-vendor-contract-non-freight-charges-component>
+
+                <div class="boxs mail_listing" *ngIf="'Long Haul lane based' === selectedFolder">
+                    <app-vendor-lhldetail [contractData]="CurrentContractDetails"></app-vendor-lhldetail>
                 </div>
-                <div class="boxs mail_listing" *ngIf="'Trip Lane Based (Location - Area)' === selectedFolder">
-                    <app-vendor-contract-trip-lane
-                        [contractData]="CurrentContractDetails"></app-vendor-contract-trip-lane>
-                </div> -->
+                <div class="boxs mail_listing" *ngIf="'Long Haul full truck- route based' === selectedFolder">
+                    <app-vendor-lhftrdetail [contractData]="CurrentContractDetails"></app-vendor-lhftrdetail>
+                </div>
+                <div class="boxs mail_listing" *ngIf="'Last mile delivery' === selectedFolder">
+                    <app-vendor-lmddetail [contractData]="CurrentContractDetails"></app-vendor-lmddetail>
+
+                </div>
+                <div class="boxs mail_listing" *ngIf="'Business Associate' === selectedFolder">
+                    <app-vendor-busi-assoc-detail
+                        [contractData]="CurrentContractDetails"></app-vendor-busi-assoc-detail>
+                </div>
             </div>
         </div>
     </div>

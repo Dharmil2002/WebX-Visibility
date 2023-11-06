@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
+import { vehicleMarket } from 'src/app/Models/vehicle-market/vehicle-market';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Injectable({
     providedIn: 'root'
 })
+
 export class VehicleService {
 
     constructor(private masterService: MasterService,) { }
@@ -25,5 +27,22 @@ export class VehicleService {
         // Returning the vehicle data
         return vehicleData.data;
     }
-
+    async addMarketVehicle(data?:vehicleMarket) {
+        const req = {
+            companyCode: localStorage.getItem("companyCode"),
+            collectionName: "markets_vehicles",
+            data: data,
+        };
+        // Making an asynchronous request to fetch vehicle data using the master service
+        return this.masterService.masterPost("generic/create",req).toPromise();
+    }
+    async getMarketVehicledata(filter={}){
+        const req = {
+            companyCode: localStorage.getItem("companyCode"),
+            collectionName: "markets_vehicles",
+            filter: filter,
+        };
+        // Making an asynchronous request to fetch vehicle data using the master service
+        return this.masterService.masterPost("generic/get",req).toPromise();
+    }
 }

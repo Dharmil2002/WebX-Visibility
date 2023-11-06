@@ -16,6 +16,8 @@ export class JobTrackerComponent implements OnInit {
     edit: true,
     csv: false,
   };
+  filterColumn:boolean=true;
+  allColumnFilter:any;
   columnHeader = {
     createdOn:{
       Title: "Created On",
@@ -93,7 +95,9 @@ export class JobTrackerComponent implements OnInit {
     // { Row: 'VendorBillAmount', Path: 'Operation/VendorBillDetails',componentDetails: ""},
     // { Row: 'CustomerBillAmount', Path: 'Operation/CustomerBillDetails',componentDetails: ""}
   ]
-  constructor(private masterService: MasterService) {  }
+  constructor(private masterService: MasterService) { 
+    this.allColumnFilter=this.columnHeader
+   }
 
   ngOnInit(): void {
     this.getRakeDetail();

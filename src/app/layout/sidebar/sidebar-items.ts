@@ -492,9 +492,9 @@ export const ROUTES: RouteInfo[] =
       class: "menu-toggle",
       groupTitle: false,
       submenu: [{
-        path: "Finance/CreditDebitVoucher",
-        title: "Credit Debit Voucher",
-        moduleName: "Credit Debit Voucher",
+        path: "Finance/DebitVoucher",
+        title: "Debit Voucher",
+        moduleName: "Debit Voucher",
         icon: "star",
         class: "",
         groupTitle: false,

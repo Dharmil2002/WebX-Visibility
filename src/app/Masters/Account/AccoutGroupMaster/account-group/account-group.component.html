@@ -1,7 +1,7 @@
 <div>
-  
+
   <div *ngIf="showTable">
-    <div style="margin: 5px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
       <mat-form-field appearance="outline">
         <mat-label>Select Account Category</mat-label>
         <mat-select (selectionChange)="sortAccountCategory()" [(value)]="SelectAccountCategory">
@@ -13,9 +13,9 @@
         <mat-icon>close</mat-icon>
       </button>
     </div>
-    <div>
-      <app-generic-table-v2 *ngIf="isTableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="TableData"
-        (AddNewButtonEvent)="AddNew()" [DisplayAddNewButton]="true" (functionCallEmitter)="functionCallHandler($event)"
+    <div style="width: 96%; margin: 0px auto;">
+      <app-generic-table-v2 *ngIf="isTableLode" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="TableData" [EventButton]="EventButton" (functionCallEmitter)="functionCallHandler($event)"
         [metaData]="metaData" [Link]="linkArray" [FormTitle]="'Accounts Group List'" [staticField]="staticField">
       </app-generic-table-v2>
     </div>
@@ -32,14 +32,16 @@
         <mat-icon>close</mat-icon>
       </button>
     </div>
-    <form [formGroup]="AccountGroupForm">
-      <app-form-webxpress [form]="AccountGroupForm" [formData]="jsonControlAccountGroupArray"
-        [showSaveAndCancelButton]="false" [FormTitle]="FormTitle"
-        [className]="'col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2'" (callFunction)="functionCallHandler($event)"
-        (functionCallEmitter)="functionCallHandler($event)">
-      </app-form-webxpress>
-    </form>
-    <div>
+    <div style="width: 96%; margin: 0px auto;">
+      <form [formGroup]="AccountGroupForm">
+        <app-form-webxpress [form]="AccountGroupForm" [formData]="jsonControlAccountGroupArray"
+          [showSaveAndCancelButton]="false" [FormTitle]="FormTitle"
+          [className]="'col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2'" (callFunction)="functionCallHandler($event)"
+          (functionCallEmitter)="functionCallHandler($event)">
+        </app-form-webxpress>
+      </form>
+    </div>
+    <div style="margin-top: 10px;">
       <button mat-raised-button [disabled]="!AccountGroupForm.valid" (click)="Save()" color="primary"
         class="mx-3">Save</button>
       <button mat-raised-button (click)="Cancle()">Cancle</button>

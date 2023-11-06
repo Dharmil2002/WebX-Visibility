@@ -55,6 +55,9 @@ export class BeneficiaryControl {
                 additionalData: {
                     showNameAndValue: false
                 },
+                functions: {
+                    onOptionSelect: 'checkDuplicate'
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -126,8 +129,8 @@ export class BeneficiaryControl {
                 },
                 {
                     name: "pattern",
-                    message: "Please enter valid Account code of length upto 12.",
-                    pattern: "^[0-9]{12}$",
+                    message: "Please enter valid Account code of length 10 to 15.",
+                    pattern: "^[0-9]{10,15}$",
                 },
                 ], functions: {
                     onChange: 'OnAccountChange'
@@ -138,7 +141,7 @@ export class BeneficiaryControl {
                 name: 'IFSCcode',
                 label: 'IFSC code',
                 placeholder: 'Enter IFSC code',
-                type: 'text',
+                type: 'government-id',
                 value: '',
                 Validations: [{
                     name: "required",
@@ -211,7 +214,7 @@ export class BeneficiaryControl {
                     {
                         name: "pattern",
                         message: "Please enter upto 100 Alpha numeric UPI Id.",
-                        pattern: "^[a-zA-Z 0-9]{1,100}$",
+                        pattern: "^[a-z0-9@]{1,100}$",
                     },
                 ],
                 generatecontrol: true, disable: false

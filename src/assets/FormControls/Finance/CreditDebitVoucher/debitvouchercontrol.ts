@@ -75,6 +75,9 @@ export class DebitVoucherControl {
           showNameAndValue: false,
           metaData: "Basic"
         },
+        functions: {
+          onOptionSelect: "AccountinglocationFieldChanged"
+        },
       },
       {
         name: "Preparedfor",
@@ -242,7 +245,7 @@ export class DebitVoucherControl {
         name: "EntryDateandtime",
         label: "Entry Date and time",
         placeholder: "Entry Date and time",
-        type: "date",
+        type: "datetimerpicker",
         value: new Date(),
         generatecontrol: true,
         disable: true,
@@ -250,6 +253,22 @@ export class DebitVoucherControl {
         additionalData: {
           minDate: new Date(),
         },
+      },
+      {
+        name: "PANnumber",
+        label: "PAN No",
+        placeholder: "PAN No",
+        type: "text",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$",
+            message: "Please enter a valid PAN NO (e.g., ABCDE1234F)",
+          },
+        ],
       },
 
     ];
@@ -259,31 +278,27 @@ export class DebitVoucherControl {
         name: "TDSSection",
         label: "TDS Section",
         placeholder: "TDS Section",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "Test1",
-            name: "Test1",
-          },
-          {
-            value: "Test2",
-            name: "Test2",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
-        autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "TDS Section is required",
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
           },
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "TDSSectionFieldChanged"
         },
       },
       {
@@ -299,10 +314,11 @@ export class DebitVoucherControl {
         functions: {
           onChange: "calculateTDSAndTotal"
         },
-        generatecontrol: true, disable: false,
+        generatecontrol: true,
+        disable: true,
         additionalData: {
           metaData: "Basic",
-          label: 'TDS Deduction',
+          label: 'TDS Deduction ₹',
           fieldName: "TDSDeduction",
           disable: true,
         },
@@ -330,8 +346,8 @@ export class DebitVoucherControl {
 
       {
         name: "TDSDeduction",
-        label: "TDS Deduction",
-        placeholder: "TDS Deduction",
+        label: "TDS Deduction ₹",
+        placeholder: "TDS Deduction ₹",
         type: "number",
         value: "",
         generatecontrol: false,
@@ -349,40 +365,38 @@ export class DebitVoucherControl {
         name: "TCSSection",
         label: "TCS Section",
         placeholder: "TCS Section",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "Test1",
-            name: "Test1",
-          },
-          {
-            value: "Test2",
-            name: "Test2",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
-        autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [
           {
-            name: "required",
-            message: "TDS Section is required",
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
           },
         ],
         additionalData: {
           showNameAndValue: true,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "TCSSectionFieldChanged"
         },
       },
+
+
       {
-        name: 'TCSRate', label: 'TCS Rate', placeholder: 'TCS Rate', type: 'dayhour',
+        name: 'TCSRate', label: 'TCS Rate %', placeholder: 'TCS Rate', type: 'dayhour',
         value: "",
-        Validations: [], generatecontrol: true, disable: false,
+        Validations: [], generatecontrol: true, disable: true,
         additionalData: {
           metaData: "Basic",
-          label: 'TCS Deduction',
+          label: 'TCS Deduction ₹',
           fieldName: "TCSDeduction",
           disable: true,
         },
@@ -415,8 +429,8 @@ export class DebitVoucherControl {
 
       {
         name: "IGST",
-        label: "IGST",
-        placeholder: "IGST",
+        label: "IGST ₹",
+        placeholder: "IGST ₹",
         type: "number",
         value: "",
         generatecontrol: true,
@@ -425,8 +439,8 @@ export class DebitVoucherControl {
       },
       {
         name: "UGST",
-        label: "UGST",
-        placeholder: "UGST",
+        label: "UGST ₹",
+        placeholder: "UGST ₹",
         type: "number",
         value: "",
         generatecontrol: true,
@@ -434,12 +448,12 @@ export class DebitVoucherControl {
         Validations: [],
       },
       {
-        name: 'SGST', label: 'SGST', placeholder: 'SGST', type: 'dayhour',
+        name: 'SGST', label: 'SGST ₹', placeholder: 'SGST ₹', type: 'dayhour',
         value: "",
         Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
-          label: 'CGST',
+          label: 'CGST ₹',
           fieldName: "CGST",
           disable: true,
         },
@@ -463,12 +477,12 @@ export class DebitVoucherControl {
 
       {
         name: 'PaymentAmount',
-        label: 'Payment Amount',
-        placeholder: 'Payment Amount',
+        label: 'Payment Amount ₹',
+        placeholder: 'Payment Amount ₹',
         type: 'number',
         value: "",
         Validations: [],
-        generatecontrol: true, disable: false,
+        generatecontrol: true, disable: true,
         additionalData: {
           metaData: "PaymentAmount"
         }
@@ -476,8 +490,8 @@ export class DebitVoucherControl {
 
       {
         name: 'NetPayable',
-        label: 'Net Payable',
-        placeholder: 'Net Payable',
+        label: 'Net Payable ₹',
+        placeholder: 'Net Payable ₹',
         type: 'number',
         value: "",
         Validations: [],
@@ -508,8 +522,8 @@ export class DebitVoucherControl {
         type: "Staticdropdown",
         value: [
           {
-            value: "Bank",
-            name: "Bank",
+            value: "Cheque",
+            name: "Cheque",
           },
           {
             value: "Cash",
@@ -552,14 +566,71 @@ export class DebitVoucherControl {
       },
       {
         name: "Bank",
-        label: "Bank",
-        placeholder: "Bank",
-        type: "text",
+        label: "Select Bank",
+        placeholder: "Select Bank",
+        type: "dropdown",
         value: "",
+        filterOptions: "",
+        displaywith: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Bank is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
       },
+
+      {
+        name: "CashAccount",
+        label: "Cash Account",
+        placeholder: "Cash Account",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Account is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      // {
+      //   name: "ReceivedFromBank",
+      //   label: "Received From Bank",
+      //   placeholder: "Received From Bank",
+      //   type: "text",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
       {
         name: "Date",
         label: "Date",
@@ -590,32 +661,13 @@ export class DebitVoucherControl {
     ];
 
     this.DebitVoucherDocumentDebitsArray = [
-      {
-        name: "TotalDebit",
-        label: "Total Debit",
-        placeholder: "Total Debit",
-        type: "text",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
+
       {
         name: "DocumentType",
         label: "Document Type",
         placeholder: "Document Type",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "Test1",
-            name: "Test1",
-          },
-          {
-            value: "Test2",
-            name: "Test2",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -628,8 +680,25 @@ export class DebitVoucherControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
+        functions: {
+          onOptionSelect: "DocumentFieldChanged"
+        },
+      }, {
+        name: "TotalDebit",
+        label: "Total Debit ₹",
+        placeholder: "Total Debit ₹",
+        type: "number",
+        value: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [
+          {
+            name: "required",
+            message: "TotalDebit is required",
+          },
+        ],
       },
 
     ]
@@ -689,11 +758,14 @@ export class DebitVoucherControl {
           showNameAndValue: true,
           metaData: "Basic"
         },
+        functions: {
+          onOptionSelect: "SACCodeFieldChanged"
+        },
       },
       {
         name: "DebitAmount",
-        label: "Debit Amount",
-        placeholder: "Debit Amount",
+        label: "Debit Amount ₹",
+        placeholder: "Debit Amount ₹",
         type: "number",
         value: FormValues?.DebitAmount,
         generatecontrol: true,
@@ -703,11 +775,11 @@ export class DebitVoucherControl {
             name: "required",
             message: "Debit Amount is required!",
           },
-          // {
-          //   name: "pattern",
-          //   message: "Please Enter Valid Debit Amount",
-          //   pattern: '^\d+(\.\d{1,2})?$'
-          // },
+          {
+            name: "pattern",
+            message: "Please Enter Valid Debit Amount",
+            pattern: '^[^-]+$'
+          },
         ],
         functions: {
           onChange: "calculateGSTAndTotal"
@@ -720,7 +792,7 @@ export class DebitVoucherControl {
         type: "number",
         value: FormValues?.GSTRate,
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -738,8 +810,8 @@ export class DebitVoucherControl {
       },
       {
         name: "GSTAmount",
-        label: "GST Amount",
-        placeholder: "GST Amount",
+        label: "GST Amount ₹",
+        placeholder: "GST Amount ₹",
         type: "number",
         value: FormValues?.GSTAmount,
         generatecontrol: true,
@@ -748,30 +820,31 @@ export class DebitVoucherControl {
       },
       {
         name: "Total",
-        label: "Total",
-        placeholder: "Total",
+        label: "Total ₹",
+        placeholder: "Total ₹",
         type: "number",
         value: FormValues?.Total,
         generatecontrol: true,
         disable: true,
         Validations: [],
       },
-      // {
-      //   name: "TDSApplicable",
-      //   label: "TDS Applicable",
-      //   placeholder: "TDS Applicable",
-      //   type: "toggle",
-      //   value: FormValues?.TDSApplicable == "Yes" ? true : false,
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [],
-      // },
+
       {
         name: "Narration",
         label: "Narration",
         placeholder: "Narration",
         type: "text",
         value: FormValues?.Narration,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "TDSApplicable",
+        label: "TDS Applicable",
+        placeholder: "TDS Applicable",
+        type: "toggle",
+        value: FormValues?.TDSApplicable == "Yes" ? true : false,
         generatecontrol: true,
         disable: false,
         Validations: [],
@@ -796,9 +869,30 @@ export class DebitVoucherControl {
         disable: false,
         Validations: [],
       },
+      {
+        name: "SubCategoryName",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
     ]
 
     this.DebitAgainstDocumentArray = [
+      {
+        name: "DocumentType",
+        label: "DocumentType",
+        placeholder: "DocumentType",
+        type: "text",
+        value: FormValues?.DocumentType,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+
       {
         name: "Document",
         label: "Document",
@@ -823,19 +917,27 @@ export class DebitVoucherControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
           metaData: "Basic"
+        },
+        functions: {
+          onModel: 'SetDocumentOptions',
         },
       },
       {
         name: "DebitAmountAgaintsDocument",
-        label: "DebitAmount",
-        placeholder: "DebitAmount",
+        label: "DebitAmount ₹",
+        placeholder: "DebitAmount ₹",
         type: "number",
         value: FormValues?.DebitAmountAgaintsDocument,
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "DebitAmount is required",
+          },
+        ],
       },
       {
         name: "DocumentHdn",

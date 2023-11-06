@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { OperationService } from 'src/app/core/service/operations/operation.service';
-import { getThcDetail } from '../thc-generation/thc-utlity';
+import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { formatDate } from 'src/app/Utility/date/date-utils';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -12,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class ThcSummaryComponent implements OnInit {
   //here the declare the flag
   tableLoad: boolean;
+  filterColumn:boolean=true;
   METADATA = {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
@@ -38,7 +38,7 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:210px",
       functionName:'openExternalWindow',
-      type:'windowLink'
+      type:'windowLink',
     },
     route: {
       Title: "Route",
@@ -66,6 +66,7 @@ export class ThcSummaryComponent implements OnInit {
       Style: "max-width:100px",
     }
   };
+allColumnFilter:any;
   //#endregion
   staticField = [
     "route",
@@ -83,13 +84,14 @@ export class ThcSummaryComponent implements OnInit {
 
   //here declare varible for the KPi
   boxData: { count: number; title: string; class: string; }[];
-  constructor(
-    private _operationService:OperationService,
+  constructor(    
     private router: Router,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private thcService: ThcService
     ) {
       this.getThcDetails();
       this.addAndEditPath = "Operation/thc-create";
+      this.allColumnFilter=this.columnHeader;
     }
 
     
@@ -97,7 +99,7 @@ export class ThcSummaryComponent implements OnInit {
     //here the code which is get details of Thc Which is Display in Fron-end
   async getThcDetails() {
 
-    const thcList = await getThcDetail(this._operationService);
+    const thcList = await this.thcService.getThcDetail();
     const branch=localStorage.getItem("Branch");
     const thcDetail= thcList.data.filter((x)=>x.branch==branch || x.closingBranch.toLowerCase() === branch.toLowerCase())
     .map((item) => {
@@ -130,14 +132,14 @@ export class ThcSummaryComponent implements OnInit {
     if (data.label.label === "Update THC") {
       this.router.navigate([this.addAndEditPath], {
         state: {
-          data: {data:thcDetail,isUpdate:true},
+          data: {data:thcDetail,isUpdate:true, viewType: 'update'},
         },
       });
     }
     if (data.label.label === "View") {
       this.router.navigate([this.addAndEditPath], {
         state: {
-          data: {data:thcDetail,isView:true},
+          data: {data:thcDetail, isView:true, viewType: 'view'},
         },
       });
       // const dialogref = this.dialog.open(ThcViewComponent, {

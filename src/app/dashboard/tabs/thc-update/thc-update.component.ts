@@ -1,12 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { formatDate } from 'src/app/Utility/date/date-utils';
-import { OperationService } from 'src/app/core/service/operations/operation.service';
-import { getThcDetail } from 'src/app/operation/thc-generation/thc-utlity';
-import { showConfirmationDialogThc } from '../../../operation/thc-summary/thc-update-utlity';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { GenericTableComponent } from 'src/app/shared-components/Generic Table/generic-table.component';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ThcUpdateControls } from 'src/assets/FormControls/thc-update';
@@ -35,11 +28,10 @@ export class ThcUpdateComponent implements OnInit {
   thcDetail: ThcUpdate;
   selectedFiles: boolean;
   constructor(
-    public dialogRef: MatDialogRef<GenericTableComponent>,
-    public dialog: MatDialog,
-    private _operationService:OperationService,
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
+    public dialogRef: MatDialogRef<GenericTableComponent>,
+    public dialog: MatDialog
     ) {
     this.thcDetail = item;
   }
@@ -81,7 +73,7 @@ export class ThcUpdateComponent implements OnInit {
     let fileList: FileList = data.eventArgs;
     if (fileList.length > 0) {
       const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg"];
+      const allowedFormats = ["jpeg", "png", "jpg","pdf"];
       const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
 
       if (allowedFormats.includes(fileFormat)) {
@@ -93,7 +85,7 @@ export class ThcUpdateComponent implements OnInit {
         Swal.fire({
           icon: "warning",
           title: "Alert",
-          text: `Please select a JPEG, PNG, or JPG file.`,
+          text: `Please select a JPEG, PNG,PDF, or JPG file.`,
           showConfirmButton: true,
         });
       }

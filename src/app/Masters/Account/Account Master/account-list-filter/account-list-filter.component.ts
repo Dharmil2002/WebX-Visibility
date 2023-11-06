@@ -147,22 +147,19 @@ export class AccountListFilterComponent implements OnInit {
 
   Save() {
     let Body;
-    if (this.AccountQueryForm.value.AccountCode) {
-      if(this.AccountQueryForm.value.RadioAccountCode == 'SystemAccount'){
-        Body = {
-          AccountCode: this.AccountQueryForm.value.AccountCode,
-        };
-      }else{
-        Body = {
-          AccountDescription: this.AccountQueryForm.value.AccountCode,
-        };
-      }
-      
-    }else if(this.AccountQueryForm.value.GroupCode?.value){
+    if (this.AccountQueryForm.value.AccountCode != "") {
       Body = {
-        GroupCodeValue: this.AccountQueryForm.value.GroupCode.value,
+        AccountCode: this.AccountQueryForm.value.AccountCode,
       };
-    }else{
+    } else if (this.AccountQueryForm.value.GroupCode?.value) {
+      Body = {
+        SubCategoryCode: this.AccountQueryForm.value.GroupCode.value,
+      };
+    }else if (this.AccountQueryForm.value.GroupCode?.value){
+      Body = {
+        MainCategoryCode: this.AccountQueryForm.value.MainCategory.value,
+      };
+    }else {
       Body = {}
     }
     this.dialogRef.close({ event: true, data: Body });

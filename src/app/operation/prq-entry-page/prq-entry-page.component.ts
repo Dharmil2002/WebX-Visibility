@@ -109,10 +109,9 @@ export class PrqEntryPageComponent implements OnInit {
         this.prqDetail.transMode
       );
       this.disableSize()
-      if(this.prqDetail.transMode=="trailer"){
-      const trailerlist=this.resContainer.find((x)=>x.name==this.prqDetail?.typeContainer||x.value==this.prqDetail?.typeContainer);
-      this.prqEntryTableForm.controls["vehicleSize"].setValue(trailerlist);
-      this.prqEntryTableForm.controls["typeContainer"].setValue(trailerlist);
+      if(this.prqDetail.transMode=="container"){
+      const containerlist=this.resContainer.find((x)=>x.name==this.prqDetail?.typeContainer||x.value==this.prqDetail?.typeContainer);
+      this.prqEntryTableForm.controls["typeContainer"].setValue(containerlist);
       }
       else{
         this.prqEntryTableForm.controls["vehicleSize"].setValue(
@@ -245,6 +244,8 @@ export class PrqEntryPageComponent implements OnInit {
   async save() {
     
     const tabcontrols = this.prqEntryTableForm;
+    const prqDetails=this.prqEntryTableForm.value
+    console.log(this.prqEntryTableForm.value);
     clearValidatorsAndValidate(tabcontrols);
     this.prqEntryTableForm.controls["typeContainer"].enable();
     this.prqEntryTableForm.controls["containerSize"].enable();
@@ -271,7 +272,6 @@ export class PrqEntryPageComponent implements OnInit {
       }
     });
     const resDetail=this.prqEntryTableForm.value
-    console.log(resDetail+"testing");
     if (!this.isUpdate) {
       const res = await this.prqService.addPrqData(
         this.prqEntryTableForm.value,
@@ -436,7 +436,7 @@ export class PrqEntryPageComponent implements OnInit {
 
   disableSize() {
 
-    if (this.prqEntryTableForm.controls['transMode'].value==="trailer") {
+    if (this.prqEntryTableForm.controls['transMode'].value==="container") {
       //this.prqEntryTableForm.controls["vehicleSize"].disable();
       this.jsonControlPrqArray = this.allFormGrop.filter((x) => x.name !== "vehicleSize");
       // const foundItem = this.jsonControlPrqArray.find(x => x.name === 'hide');

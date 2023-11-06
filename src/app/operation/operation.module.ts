@@ -59,6 +59,7 @@ import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.s
 import { MastersModule } from "../Masters/masters.module";
 import { PrqViewComponent } from './ViewPrint/prq-view/prq-view.component';
 import { NgxPrintModule } from "ngx-print";
+import { ShipmentEditComponent } from './shipment-edit/shipment-edit.component';
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -96,9 +97,8 @@ import { NgxPrintModule } from "ngx-print";
     ThcViewComponent,
     THCViewComponent,
     WESTERNCARRIERSComponent,
-    PrqViewComponent
-    
-    
+    PrqViewComponent,
+    ShipmentEditComponent
   ],
   imports: [
     CommonModule,

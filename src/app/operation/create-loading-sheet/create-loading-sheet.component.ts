@@ -388,7 +388,7 @@ export class CreateLoadingSheetComponent implements OnInit {
         if (res) {
 
           let vehicleDetails = res.data
-            .filter((x) => x.status === "available" && x.currentLocation === this.orgBranch)
+            .filter((x) => x.status === "Available" && x.currentLocation === this.orgBranch)
             .map((x) => {
               return { name: x.vehNo, value: x.vehNo };
             });

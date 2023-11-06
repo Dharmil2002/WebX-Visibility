@@ -1,0 +1,79 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <!-- breadcrumb -->
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+                <div class="card">
+                    <div class="body">
+                        <div class="task-list">
+                            <div id="mail-nav">
+                                <h5 class="b-b p-10 text-strong">Contract Management</h5>
+                                <div class="card-body" style="padding-bottom: 0px;">
+                                    <ul class="list-unstyled user-progress list-unstyled-border list-unstyled-noborder">
+                                        <!-- <li class="lecture-list" style="margin-bottom: -10px;">
+                                            <div class="set-flex" style="text-align: center;">
+                                                <div class="text-job text-muted-blue font-14">
+                                                    {{CurrentContractDetails.customer}}
+                                                </div>
+                                            </div>
+                                        </li> -->
+                                        <li class="lecture-list" style="margin-bottom: 0px;">
+                                            <div class="set-flex">
+                                                <div class="text-job text-muted-blue mb-0" style="white-space: pre;">
+                                                </div>
+                                                <div class="text-job text-muted-blue mb-0">Vendor : </div>
+                                                <div class="text-job text-muted-blue mb-0">Contract ID : </div>
+
+                                            </div>
+                                            <div class="ms-auto">
+                                                <div class="text-job text-muted-blue mb-0">
+                                                    {{CurrentContractDetails.vendor}}
+                                                </div>
+                                                <div class="text-job text-muted-blue mb-0">
+                                                    {{CurrentContractDetails.contractID}}
+                                                </div>
+
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <h5 class="b-b p-10 text-strong">Contract Tabs</h5>
+                                <ul id="mail-folders" style="padding:5px">
+                                    <li *ngFor="let folder of folders" [class.active]="folder === selectedFolder">
+                                        <a href="javascript:;" (click)="selectFolder(folder)" [title]="folder">{{ folder
+                                            }}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+                <div class="boxs mail_listing" *ngIf="'Basic Information' === selectedFolder">
+                    <app-vendor-contract-basic-information
+                        [contractData]="CurrentContractDetails"></app-vendor-contract-basic-information>
+                </div>
+                <div class="boxs mail_listing" *ngIf="'Services Selection' === selectedFolder">
+                    <app-vendor-contract-service-selection
+                        [contractData]="CurrentContractDetails"></app-vendor-contract-service-selection>
+                </div>
+                <div class="boxs mail_listing" *ngIf="'Express Route based' === selectedFolder">
+                    <app-vendor-terdetail [contractData]="CurrentContractDetails"></app-vendor-terdetail>
+                </div>
+                <!-- <div class="boxs mail_listing" *ngIf="'Special Charges' === selectedFolder">
+                    <app-vendor-contract-non-freight-charges-component
+                        [contractData]="CurrentContractDetails"></app-vendor-contract-non-freight-charges-component>
+                </div>
+                <div class="boxs mail_listing" *ngIf="'Trip Lane Based (Location - Area)' === selectedFolder">
+                    <app-vendor-contract-trip-lane
+                        [contractData]="CurrentContractDetails"></app-vendor-contract-trip-lane>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</section>

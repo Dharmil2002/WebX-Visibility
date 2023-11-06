@@ -9,7 +9,7 @@ export class ContainerControl {
                 label: 'Container Code',
                 placeholder: 'Container Code',
                 type: 'text',
-                value: containerMasterTable?.containerCode ? containerMasterTable.containerCode : "System Generated",
+                value: isUpdate ? containerMasterTable?.containerCode : "System Generated",
                 Validations: [
                     {
                         name: "required",
@@ -18,28 +18,28 @@ export class ContainerControl {
                 ],
                 generatecontrol: true, disable: true
             },
-            {
-                name: 'containerName',
-                label: 'Container Name',
-                placeholder: 'Container Name',
-                type: 'text',
-                value: containerMasterTable?.containerName,
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Container name is required"
-                    },
-                    {
-                        name: "pattern",
-                        message: "Please Enter only text with 1-20 alphabets",
-                        pattern: '^[a-zA-Z0-9 ]{1,20}$'
-                    }
-                ],
-                generatecontrol: true, disable: isUpdate ? true : false,
-                functions: {
-                    onChange: "checkContainerExists",
-                },
-            },
+            // {
+            //     name: 'containerName',
+            //     label: 'Container Name',
+            //     placeholder: 'Container Name',
+            //     type: 'text',
+            //     value: containerMasterTable?.containerName,
+            //     Validations: [
+            //         {
+            //             name: "required",
+            //             message: "Container name is required"
+            //         },
+            //         {
+            //             name: "pattern",
+            //             message: "Please Enter only text with 1-20 alphabets",
+            //             pattern: '^[a-zA-Z0-9 ]{1,20}$'
+            //         }
+            //     ],
+            //     generatecontrol: true, disable: isUpdate ? true : false,
+            //     functions: {
+            //         onChange: "checkContainerExists",
+            //     },
+            // },
             {
                 name: 'containerType',
                 label: "Container Type",

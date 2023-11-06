@@ -14,6 +14,8 @@ export class PrqSummaryPageComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
+  filterColumn:boolean=true;
+  allColumnFilter:any;
   FormTitle='Prq List'
   dynamicControls = {
     add: true,
@@ -36,6 +38,7 @@ export class PrqSummaryPageComponent implements OnInit {
     private definition: PrqSummaryModel
     ) {
     this.addAndEditPath = "Operation/PRQEntry";
+    this.allColumnFilter=this.definition.columnHeader
   }
 
   ngOnInit(): void {

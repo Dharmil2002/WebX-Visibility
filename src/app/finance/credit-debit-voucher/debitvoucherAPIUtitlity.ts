@@ -70,7 +70,7 @@ export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
         const res = await masterService.masterPost('generic/get', req).toPromise();
 
         if (res && res.data && res.data[0].otherdetails) {
-            return res.data[0].otherdetails.map(x => ({ name: x.gstState, value: x.gstNumber, ...x }));
+            return res.data[0].otherdetails.map(x => ({ name: x.gstState, value: x.gstNumber, othersdetails: res.data[0] }));
         }
     } catch (error) {
         console.error('An error occurred:', error);
@@ -86,7 +86,7 @@ export async function GetSingleCustomerDetailsFromApi(masterService, customerCod
 
         if (res && res.data && res.data[0].GSTdetails) {
             return res.data[0].GSTdetails.map(x => ({
-                name: x.gstState, value: x.gstNo, ...x
+                name: x.gstState, value: x.gstNo, othersdetails: res.data[0]
             }));
         }
     } catch (error) {
@@ -113,4 +113,63 @@ export async function GetLocationDetailFromApi(masterService) {
     return []; // Return an empty array in case of an error or missing data
 }
 
+export async function GetsachsnFromApi(masterService) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = {};
+        const req = { companyCode, collectionName: 'sachsn_master', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+        if (res && res.data) {
+            return res.data.map(x => ({
+                name: x.SNM, value: x.SHCD, ...x
+            }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}
+export async function GetAccountDetailFromApi(masterService, AccountCategoryName, AccountingLocations) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = {
+            ActiveFlag: true,
+            AccountCategoryName: AccountCategoryName,
+            //  AccountingLocations: [AccountingLocations]
+        };
+        const req = { companyCode, collectionName: 'account_detail', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+        if (res && res.data) {
+            return res.data.map(x => ({
+                name: x.AccountDescription, value: x.AccountCode, ...x
+            }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}
 
+
+export async function GetDocumentsWiseListFromApi(masterService, collectionName, field, value) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filters = [
+            {
+                "field": field,
+                "value": value,
+                "exactMatch": false
+            }
+        ];
+        const req = { companyCode, collectionName: collectionName, filters };
+        const res = await masterService.masterPost('generic/getaggregate', req).toPromise();
+        if (res && res.data) {
+            return res.data.map(x => ({
+                name: x[field], value: x[field]
+            }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}

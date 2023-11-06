@@ -1,6 +1,16 @@
 {
     "data": [
       {
+        "title": "SAC-HSNMaster/SAC-HSNView",
+        "tag": ["SacMaster", "SAC-HSNView"],
+        "router": "Masters/SAC-HSNMaster/SAC-HSNView"
+      },
+      {
+        "title": "SAC-HSNMaster/AddSAC-HSN",
+        "tag": ["SacMaster", "AddSAC-HSN"],
+        "router": "Masters/SAC-HSNMaster/AddSAC-HSN"
+      },
+      {
         "title": "Docket/Create",
         "tag": ["Docket", "Create"],
         "router": "Masters/Docket/Create"
@@ -304,6 +314,11 @@
         "title": "ContainerMaster/AddContainerMaster",
         "tag": ["ContainerMaster", "AddContainerMaster"],
         "router": "Masters/ContainerMaster/AddContainerMaster"
+      },
+      {
+        "title": "VendorContract/VendorContractList",
+        "tag": ["VendorContract", "VendorContractList"],
+        "router": "Masters/VendorContract/VendorContractList"
       },
         {
           "title": "LoadingSheetView",

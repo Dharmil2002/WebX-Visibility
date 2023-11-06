@@ -1,0 +1,17 @@
+<mat-dialog-content>
+    <!-- Title -->
+    <h2>Shipment Edit</h2>
+    <div class="paddingdiv">
+        <form [formGroup]="shipmentTableForm">
+            <app-form-webxpress [form]="shipmentTableForm" [formData]="jsonControlArray"
+                (callFunction)="functionCaller($event)" (functionCallEmitter)="functionCaller($event)"
+                [showSaveAndCancelButton]="false">
+            </app-form-webxpress>
+        </form>
+    </div>
+          <div class="example-button-row d-flex justify-content-end">
+            <button class="msr-3" mat-raised-button color="primary" *ngIf="!tableLoad"
+              (click)="save()" [disabled]="!shipmentTableForm.valid">Save</button>
+            <button class="msr-3" mat-raised-button color="primary"   (click)="cancel()">Back</button>
+          </div>
+</mat-dialog-content>

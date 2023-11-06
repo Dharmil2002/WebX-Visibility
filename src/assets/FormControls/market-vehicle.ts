@@ -17,6 +17,9 @@ export class marketVehicleControls {
       {
         name: 'vehicelNo', label: "Vehicle Number", placeholder: "Vehicle Number", type: 'government-id',
         value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+        functions: {
+          onChange: "onVehicleNoChange"
+        },
         Validations: [
           {
             name: "required",
@@ -157,7 +160,56 @@ export class marketVehicleControls {
           minDate:minDate
         },
       },
-      
+      {
+        name: 'insuranceExpiryDate', label: "Insurance Expiry Date", placeholder: "Enter Insurance Expiry Date",
+        type: 'date', value:"", generatecontrol: true, disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Insurance Expiry Date is required"
+          },
+        ],
+        additionalData: {
+          minDate: new Date(), // Set the minimum date to the current date
+          maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
+        }
+      },
+
+      {
+        name: 'fitnessValidityDate', label: "Fitness Validity Date", placeholder: "", type: 'date',
+        value: "", generatecontrol: true, disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Fitness Validity Date is required"
+          },
+        ],
+        additionalData: {
+          minDate: new Date(), // Set the minimum date to the current date
+          maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
+        }
+      },
+      {
+        name: 'vendCode',
+        label: 'vendCode',
+        placeholder: 'vendCode',
+        type: '',
+        value: "8888",
+        Validations: [],
+        generatecontrol: false, disable: false
+      },
+      {
+        name: 'companyCode', label: "Company Code", placeholder: "Company Code", type: '',
+        value: localStorage.getItem("companyCode"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+        Validations: [
+        ],
+      },
+      {
+        name: '_id', label: "_id", placeholder: "_id", type: '',
+        value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+        Validations: [
+        ],
+      },
       {
         name: 'entryBy',
         label: 'Entry By',

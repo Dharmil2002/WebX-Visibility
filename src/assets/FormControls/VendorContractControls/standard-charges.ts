@@ -1,13 +1,13 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
-export class StandardCharges {
+export class TERCharges {
   StandardChargesArray: FormControls[];
-  constructor() {
+  constructor(StandardChargesData) {
     this.StandardChargesArray = [
       {
-        name: "chargeName",
-        label: "Charge Name",
-        placeholder: "Charge Name",
+        name: "route",
+        label: "Route",
+        placeholder: "Route",
         type: "dropdown",
         value: "",
         generatecontrol: true,
@@ -47,9 +47,9 @@ export class StandardCharges {
         },
       },
       {
-        name: "vehicleCapacity",
-        label: "Vehicle Capacity",
-        placeholder: "Vehicle Capacity",
+        name: "capacity",
+        label: "  Capacity",
+        placeholder: "  Capacity",
         type: "dropdown",
         value: "",
         generatecontrol: true,
@@ -68,15 +68,35 @@ export class StandardCharges {
         },
       },
       {
-        name: "amount",
-        label: "Amount",
+        name: "rate",
+        label: "Rate",
         placeholder: "Amount",
-        type: "text",
+        type: "number",
         value: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
-      }
+      },
+      {
+        name: "min",
+        label: "Min Amount",
+        placeholder: "Min Amount",
+        type: "number",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "max",
+        label: "Max Amount",
+        placeholder: "Max Amount",
+        type: "number",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
     ];
   }
   getStandardChargesArrayControls() {

@@ -21,10 +21,6 @@
       </app-form-webxpress>
     </form>
     <!-- End -->
-  <!-- fleet Detail -->
-  <div *ngIf="marketVendor && !this.prqFlag">
-   <app-add-fleet-master [thc]="true"></app-add-fleet-master>
-  </div>
     <!-- Consignor Detail -->
     <form [formGroup]="consignmentTableForm">
       <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignor Detail'" [formData]="jsonControlArrayConsignor"

@@ -52,6 +52,11 @@ export function GetLedgercolumnHeader() {
 export function GetLedgerDocument() {
 
     return {
+        DocumentType: {
+            Title: "DocumentType",
+            class: "matcolumncenter",
+            Style: "min-width:200px",
+        },
         Document: {
             Title: "Document",
             class: "matcolumnfirst",
@@ -72,3 +77,58 @@ export function GetLedgerDocument() {
 }
 
 
+export function GetDebitLedgerPreviewcolumnHeader() {
+    return {
+        Instance: {
+            Title: "Instance",
+            class: "matcolumnfirst",
+            Style: "min-width:100px",
+        },
+        Value: {
+            Title: "Value",
+            class: "matcolumncenter",
+            Style: "min-width:100px",
+        },
+        Ledgercode: {
+            Title: "Ledger code",
+            class: "matcolumncenter",
+            Style: "max-width:100px",
+        },
+        Ledgername: {
+            Title: "Ledger name",
+            class: "matcolumncenter",
+            Style: "max-width:100px",
+        },
+        SubLedger: {
+            Title: "Sub Ledger",
+            class: "matcolumncenter",
+            Style: "max-width:120px",
+        },
+        Dr: {
+            Title: "Dr. ₹",
+            class: "matcolumncenter",
+            Style: "max-width:100px",
+        },
+        Cr: {
+            Title: "Cr. ₹",
+            class: "matcolumncenter",
+            Style: "max-width:100px",
+        },
+        Location: {
+            Title: "Location",
+            class: "matcolumncenter",
+            Style: "min-width:100px",
+        },
+        Narration: {
+            Title: "Narration",
+            class: "matcolumncenter",
+            Style: "min-width:200px",
+        },
+        DocumentReference: {
+            Title: "Document Reference",
+            class: "matcolumncenter",
+            Style: "min-width:150px",
+        },
+
+    }
+}

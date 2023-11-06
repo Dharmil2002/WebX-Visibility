@@ -1,13 +1,10 @@
 <div mat-dialog-title style="display: flex;
-  justify-content: space-between;margin: 0 0 0px;
-  align-items: center;">
-    <h3>Debit Against Document
-    </h3>
+  justify-content: end;margin:0px;">
     <button mat-icon-button (click)="Close()">
         <mat-icon>close</mat-icon>
     </button>
 </div>
-<div class="body">
+<div class="body" style="max-height: 420px;">
     <div class="row">
         <div class="col-4">
             <form [formGroup]="DebitVoucherDocumentDebitsForm">
@@ -21,10 +18,11 @@
         </div>
         <div class="col-8">
             <app-generic-table-v2 *ngIf="LoadDocumentDebitsDetails" [dynamicControls]="dynamicControls"
-                [columnHeader]="DocumentDebitsDisplayedColumns" [tableData]="DocumentDebits" [menuItems]="menuItems"
-                [staticField]="staticFieldForLedgerDocument" [Link]="linkArray" [FormTitle]="'Document Debits'"
-                [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="false"
-                (menuItemClicked)="handleMenuItemClick($event)" [DisplayAddNewButton]=true [DisplayCheckbox]="false"
+                [columnHeader]="DocumentDebitsDisplayedColumns" [tableData]="DisplayOnlyDocumentDebits"
+                [menuItems]="menuItems" [staticField]="staticFieldForLedgerDocument" [Link]="linkArray"
+                [FormTitle]="'Document Debits'" [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="false"
+                (menuItemClicked)="handleMenuItemClick($event)"
+                [DisplayAddNewButton]=this.DebitVoucherDocumentDebitsForm.value.DocumentType [DisplayCheckbox]="false"
                 (AddNewButtonEvent)="AddNewDocumentDebits()">
             </app-generic-table-v2>
         </div>

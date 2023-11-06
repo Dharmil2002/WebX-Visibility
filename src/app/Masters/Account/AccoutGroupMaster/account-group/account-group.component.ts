@@ -77,6 +77,11 @@ export class AccountGroupComponent implements OnInit {
   updateData: any;
   FirstUpdate: boolean = false;
   FormTitle = 'Add Account Group'
+  EventButton = {
+    functionName:'AddNew',
+    name: "Add Account Group",
+    iconName:'add'
+  }
   constructor(
     public dialogRef: MatDialogRef<AccountGroupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,

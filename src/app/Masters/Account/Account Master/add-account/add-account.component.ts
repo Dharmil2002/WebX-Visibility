@@ -18,9 +18,9 @@ import { Subject, take, takeUntil } from "rxjs";
 export class AddAccountComponent implements OnInit {
   breadScrums = [
     {
-      title: "Account Master",
+      title: "Ledger Master",
       items: ["Home"],
-      active: "Account Master",
+      active: "Ledger Master",
     },
   ];
   jsonControlAccountArray: any;
@@ -38,19 +38,27 @@ export class AddAccountComponent implements OnInit {
   LocationsCode: any;
   LocationsStatus: any;
   AlljsonControlAccountArray: any;
-  AddNewButton = {
-    name: "Add Account Group",
-    iconName: "add",
+  EventButton = {
     functionName: "addNewAccountGroup",
+    name: "Show Account Group",
   };
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
   CompanyName: any;
   TableData: any;
   UpdateData: any;
   isUpdate: boolean = false;
-  FormTitle = "Add Account";
+  isAccountCategory: boolean = false;
+  FormTitle = "Add Ledger";
   protected _onDestroy = new Subject<void>();
   FirstUpdate: boolean = false;
+  jsonControlAccountCategoryArray: any;
+  AccountCategoryForm: any;
+  AccountLocationsCode: string;
+  AccountLocationsStatus: any;
+  AccountCategoryFormTitle: string;
+  AlljsonControlAccountCategoryArray: any;
+  Ddl_TDS_MappingStatus: any;
+  Ddl_TDS_MappingCode: string;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -60,8 +68,9 @@ export class AddAccountComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
+      console.log("this.UpdateData", this.UpdateData);
       this.isUpdate = true;
-      this.FormTitle = "Edit Account";
+      this.FormTitle = "Edit Ledger";
     }
   }
 
@@ -71,6 +80,20 @@ export class AddAccountComponent implements OnInit {
     this.GetTableData();
   }
 
+  // --Ledger detail Function--
+  async GetTableData() {
+    const Body = {
+      companyCode: this.CompanyCode,
+      collectionName: "account_detail",
+      filter: {},
+    };
+    const res = await this.masterService
+      .masterPost("generic/get", Body)
+      .toPromise();
+    if (res.success) {
+      this.TableData = res.data;
+    }
+  }
   initializeFormControl() {
     const AccountFormControls = new AccountMasterControls(this.isUpdate);
     this.AlljsonControlAccountArray = AccountFormControls.getAccountAddArray();
@@ -113,8 +136,10 @@ export class AddAccountComponent implements OnInit {
         this.getLocationsDropdown();
       }
 
-      if (data.name === "CompanyName") {
-        this.getCompanyName();
+      if (data.name === "AccountCategory") {
+        this.AccountCategoryCode = data.name;
+        this.AccountCategoryStatus = data.additionalData.showNameAndValue;
+        this.getAccountCategoryDropdown();
       }
       if (data.name === "PartySelection") {
         // Set category-related variables
@@ -125,24 +150,36 @@ export class AddAccountComponent implements OnInit {
     });
   }
 
-  async getCompanyName() {
-    if (!this.isUpdate) {
-      const Body = {
-        companyCode: this.CompanyCode,
-        collectionName: "company_master",
-        filter: { companyCode: "10065" },
-      };
+  async getAccountCategoryDropdown() {
+    const Body = {
+      companyCode: this.CompanyCode,
+      collectionName: "General_master",
+      filter: { codeType: "ACT", activeFlag: true },
+    };
 
-      const res = await this.masterService
-        .masterPost("generic/get", Body)
-        .toPromise();
-      if (res.success) {
-        this.CompanyName = res.data[0].company_Name;
-        this.AccountForm.controls["CompanyName"].setValue(this.CompanyName);
+    const res = await this.masterService
+      .masterPost("generic/get", Body)
+      .toPromise();
+    if (res.success && res.data.length > 0) {
+      const AccountCategoryData = res.data.map((x) => {
+        return {
+          name: x.codeDesc,
+          value: x.codeId,
+        };
+      });
+      if (this.isUpdate) {
+        const element = AccountCategoryData.find(
+          (x) => x.name == this.UpdateData.AccountCategoryName
+        );
+        this.AccountForm.controls["AccountCategory"].setValue(element);
+        this.HandlAccountCategory();
       }
-    } else {
-      this.AccountForm.controls["CompanyName"].setValue(
-        this.UpdateData.CompanyName
+      this.filter.Filter(
+        this.jsonControlAccountArray,
+        this.AccountForm,
+        AccountCategoryData,
+        this.AccountCategoryCode,
+        this.AccountCategoryStatus
       );
     }
   }
@@ -151,7 +188,7 @@ export class AddAccountComponent implements OnInit {
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "General_master",
-      filter: { codeType: "ACT", activeFlag: true },
+      filter: { codeType: "MCT", activeFlag: true },
     };
 
     const res = await this.masterService
@@ -203,7 +240,7 @@ export class AddAccountComponent implements OnInit {
       });
       if (this.isUpdate && !this.FirstUpdate) {
         const element = GroupCodeData.find(
-          (x) => x.value == this.UpdateData.GroupCodeValue
+          (x) => x.value == this.UpdateData.SubCategoryCode
         );
         this.AccountForm.controls["GroupCode"].setValue(element);
         this.FirstUpdate = true;
@@ -238,9 +275,9 @@ export class AddAccountComponent implements OnInit {
         });
       });
       if (this.isUpdate) {
-        const Locetion = this.UpdateData.AccountingLocations.split(",");
+        const Locetion = this.UpdateData.AccountingLocations;
         const selectedData = LocationsData.filter((x) =>
-          Locetion.includes(x.name)
+          Locetion.includes(x.value)
         );
         this.AccountForm.controls["LocationsDrop"].setValue(selectedData);
       }
@@ -287,130 +324,8 @@ export class AddAccountComponent implements OnInit {
     }
   }
 
-  functionCallHandler($event) {
-    let functionName = $event.functionName;
-    try {
-      this[functionName]($event);
-    } catch (error) {
-      console.log("failed");
-    }
-  }
-
-  HandleisBranch(event) {
-    const checked = event.eventArgs.checked;
-    if (checked == true) {
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray.filter(
-        (x) => x.name != "Locations"
-      );
-      this.AccountForm.get("Locations").clearValidators();
-      this.AccountForm.updateValueAndValidity();
-    } else {
-      this.jsonControlAccountArray = this.AlljsonControlAccountArray;
-      this.AccountForm.get("Locations").setValidators([
-        Validators.required,
-        autocompleteObjectValidator(),
-      ]);
-      this.AccountForm.updateValueAndValidity();
-    }
-  }
-
-  addNewAccountGroup() {
-    const dialogRef = this.dialog.open(AccountGroupComponent, {
-      data: {},
-      width: "1000px",
-      height: "500px",
-      disableClose: true,
-    });
-  }
-  async GetTableData() {
-    const Body = {
-      companyCode: this.CompanyCode,
-      collectionName: "account_detail",
-      filter: {},
-    };
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
-    if (res.success) {
-      this.TableData = res.data;
-    }
-  }
-
-  async Save() {
-    if (this.isUpdate) {
-      const body = {
-        AccountDescription: this.AccountForm.value.AccountDescription,
-        AccountingLocations: this.AccountForm.value.LocationsDrop.map(
-          (x) => x.name
-        ).join(","),
-        MainCategoryName: this.AccountForm.value.MainCategory.name,
-        GroupCodeValue: this.AccountForm.value.GroupCode.value,
-        GroupCodeName: this.AccountForm.value.GroupCode.Name,
-        PartySelection: this.AccountForm.value.PartySelection.name,
-        ActiveFlag: this.AccountForm.value.ActiveFlag,
-      };
-      const req = {
-        companyCode: this.CompanyCode,
-        collectionName: "account_detail",
-        filter: { AccountCode: this.UpdateData.AccountCode },
-        update: body,
-      };
-      const res = await this.masterService
-        .masterPut("generic/update", req)
-        .toPromise();
-      if (res.success) {
-        this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: res.message,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      const length = this.TableData.length;
-      const index =
-        length == 0
-          ? 0
-          : parseInt(this.TableData[length - 1].AccountCode.substring(2));
-      const Body = {
-        AccountCode:
-          "AC" +
-          (index < 9 ? "00" : index > 9 && index < 99 ? "0" : "") +
-          (index + 1),
-        CompanyName: this.AccountForm.value.CompanyName,
-        AccountDescription: this.AccountForm.value.AccountDescription,
-        AccountingLocations: this.AccountForm.value.LocationsDrop.map(
-          (x) => x.name
-        ).join(","),
-        MainCategoryName: this.AccountForm.value.MainCategory.name,
-        GroupCodeValue: this.AccountForm.value.GroupCode.value,
-        GroupCodeName: this.AccountForm.value.GroupCode.Name,
-        PartySelection: this.AccountForm.value.PartySelection.name,
-        ActiveFlag: this.AccountForm.value.ActiveFlag,
-      };
-      let req = {
-        companyCode: this.CompanyCode,
-        collectionName: "account_detail",
-        data: Body,
-      };
-      const res = await this.masterService
-        .masterPost("generic/create", req)
-        .toPromise();
-      if (res.success) {
-        this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: res.message,
-          showConfirmButton: true,
-        });
-      }
-    }
-  }
-
   async getAccountDescription() {
-    console.log('ok')
+    console.log("ok");
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "account_detail",
@@ -420,19 +335,22 @@ export class AddAccountComponent implements OnInit {
       .masterPost("generic/get", Body)
       .toPromise();
     if (res.success && res.data.length > 0) {
-      const FilterData = res.data.filter(x => x.AccountDescription == this.AccountForm.value.AccountDescription.trim());
-      if(FilterData.length > 0){
-        if(!this.isUpdate){
+      const FilterData = res.data.filter(
+        (x) =>
+          x.AccountDescription ==
+          this.AccountForm.value.AccountDescription.trim()
+      );
+      if (FilterData.length > 0) {
+        if (!this.isUpdate) {
           this.AccountForm.controls["AccountDescription"].setValue("");
-        }else if(this.AccountForm.value.AccountDescription.trim() != this.UpdateData.AccountDescription){
+        } else if (
+          this.AccountForm.value.AccountDescription.trim() !=
+          this.UpdateData.AccountDescription
+        ) {
           this.AccountForm.controls["AccountDescription"].setValue("");
         }
       }
     }
-  }
-
-  Cancle() {
-    this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
   }
 
   toggleSelectAll(argData: any) {
@@ -451,4 +369,375 @@ export class AddAccountComponent implements OnInit {
         );
       });
   }
+  // --End-- //
+
+  // --Handl Account Category Function--
+  HandlAccountCategory() {
+    this.isAccountCategory = false;
+    if (
+      ["BANK", "EXPENSE", "TDS", "TCS"].includes(
+        this.AccountForm.value.AccountCategory.name
+      )
+    ) {
+      this.initializeAccountCategory();
+    }
+  }
+  initializeAccountCategory() {
+    const AccountFormControls = new AccountMasterControls(this.isUpdate);
+    this.jsonControlAccountCategoryArray =
+      AccountFormControls.getAccountCategoryArray(
+        this.AccountForm.value.AccountCategory.name
+      );
+    // Build the form group using formGroupBuilder function and the values of accordionData
+    this.AccountCategoryForm = formGroupBuilder(this.fb, [
+      this.jsonControlAccountCategoryArray,
+    ]);
+    this.bindAccountCategoryDropdown();
+  }
+  bindAccountCategoryDropdown() {
+    const ACdetail = this.isUpdate ? this.UpdateData.ACdetail : "";
+    if (
+      ["BANK", "EXPENSE", "TDS", "TCS"].includes(
+        this.AccountForm.value.AccountCategory.name
+      )
+    ) {
+      if (this.AccountForm.value.AccountCategory.name == "BANK") {
+        this.AccountCategoryFormTitle =
+          "Provide Location detail for a Bank account";
+        this.jsonControlAccountCategoryArray.forEach((data) => {
+          if (data.name === "AccountLocations") {
+            // Set category-related variables
+            this.AccountLocationsCode = data.name;
+            this.AccountLocationsStatus = data.additionalData.showNameAndValue;
+            this.getAccountLocationsDropdown();
+          }
+        });
+        if (
+          this.isUpdate &&
+          this.AccountForm.value.AccountCategory.name ==
+            this.UpdateData.AccountCategoryName
+        ) {
+          this.AccountCategoryForm.controls["AccountNumber"].setValue(
+            ACdetail.ACno
+          );
+        }
+      } else if (this.AccountForm.value.AccountCategory.name == "EXPENSE") {
+        // debugger
+        this.AccountCategoryFormTitle = "TDS Applicable Details";
+        this.jsonControlAccountCategoryArray.forEach((data) => {
+          if (data.name === "Ddl_TDS_Mapping") {
+            // Set category-related variables
+            this.Ddl_TDS_MappingCode = data.name;
+            this.Ddl_TDS_MappingStatus = data.additionalData.showNameAndValue;
+            if (
+              this.isUpdate &&
+              this.AccountForm.value.AccountCategory.name ==
+                this.UpdateData.AccountCategoryName
+            ) {
+              this.AccountCategoryForm.controls["isTDSApplicable"].setValue(
+                ACdetail.isTDSApplicable
+              );
+              this.AccountCategoryForm.controls["isTDSMapping"].setValue(
+                ACdetail.isTDSMapping
+              );
+              data.generatecontrol = !ACdetail.isTDSMapping;
+            }
+          }
+        });
+        this.getDdlTDSMappingDropdown();
+      } else if (this.AccountForm.value.AccountCategory.name == "TCS") {
+        this.AccountCategoryFormTitle = "Provide TCS Details";
+        if (
+          this.isUpdate &&
+          this.AccountForm.value.AccountCategory.name ==
+            this.UpdateData.AccountCategoryName
+        ) {
+          this.AccountCategoryForm.controls["NonCorporateTCS"].setValue(
+            ACdetail.NonCorporateTCS
+          );
+          this.AccountCategoryForm.controls["CorporateTCS"].setValue(
+            ACdetail.CorporateTCS
+          );
+        }
+      } else if (this.AccountForm.value.AccountCategory.name == "TDS") {
+        this.AccountCategoryFormTitle = "Provide TDS Details";
+        if (
+          this.isUpdate &&
+          this.AccountForm.value.AccountCategory.name ==
+            this.UpdateData.AccountCategoryName
+        ) {
+          this.AccountCategoryForm.controls["NonCorporateTDS"].setValue(
+            ACdetail.NonCorporateTDS
+          );
+          this.AccountCategoryForm.controls["CorporateTDS"].setValue(
+            ACdetail.CorporateTDS
+          );
+        }
+      }
+    }
+
+    this.isAccountCategory = true;
+  }
+  HandleisTDSMapping(event) {
+    console.log("event", event);
+    const checked = event.eventArgs.checked;
+    this.jsonControlAccountCategoryArray.forEach((x) => {
+      if (x.name == "Ddl_TDS_Mapping") {
+        x.generatecontrol = !checked;
+      }
+    });
+    if (checked) {
+      this.AccountCategoryForm.get("Ddl_TDS_Mapping").clearValidators();
+      this.AccountCategoryForm.updateValueAndValidity();
+    } else {
+      this.AccountCategoryForm.get("Ddl_TDS_Mapping").setValidators([
+        Validators.required,
+        autocompleteObjectValidator(),
+      ]);
+      this.AccountCategoryForm.updateValueAndValidity();
+    }
+  }
+  async getDdlTDSMappingDropdown() {
+    const Body = {
+      companyCode: this.CompanyCode,
+      collectionName: "account_detail",
+      filter: { AccountCategoryName: "TDS" },
+    };
+
+    const res = await this.masterService
+      .masterPost("generic/get", Body)
+      .toPromise();
+    console.log("res", res);
+    if (res.success && res.data.length > 0) {
+      let DdlTDSData = [];
+      res.data.forEach((x) => {
+        DdlTDSData.push({
+          name: x.AccountDescription,
+          value: x.AccountCode,
+        });
+      });
+      // debugger;
+      if (
+        this.isUpdate &&
+        this.AccountForm.value.AccountCategory.name ==
+          this.UpdateData.AccountCategoryName
+      ) {
+        if (!this.UpdateData.ACdetail.isTDSMapping) {
+          const selectedData = DdlTDSData.find(
+            (x) => x.value == this.UpdateData.ACdetail.DdlTDSMapping
+          );
+          console.log('old' , this.AccountCategoryForm.value.Ddl_TDS_Mapping)
+          // this.AccountCategoryForm.controls["Ddl_TDS_Mapping"].setValue(selectedData);
+          this.AccountCategoryForm.controls["Ddl_TDS_Mapping"].setValue(
+            selectedData
+          );
+          console.log('letest' , this.AccountCategoryForm.value.Ddl_TDS_Mapping)
+
+        } else {
+          this.AccountCategoryForm.get("Ddl_TDS_Mapping").clearValidators();
+          this.AccountCategoryForm.updateValueAndValidity();
+        }
+      }
+      this.filter.Filter(
+        this.jsonControlAccountCategoryArray,
+        this.AccountCategoryForm,
+        DdlTDSData,
+        this.Ddl_TDS_MappingCode,
+        this.Ddl_TDS_MappingStatus
+      );
+    }
+  }
+  async getAccountLocationsDropdown() {
+    const Body = {
+      companyCode: this.CompanyCode,
+      collectionName: "location_detail",
+      filter: {},
+    };
+
+    const res = await this.masterService
+      .masterPost("generic/get", Body)
+      .toPromise();
+
+    if (res.success && res.data.length > 0) {
+      let LocationsData = [];
+      res.data.forEach((x) => {
+        LocationsData.push({
+          name: x.locName,
+          value: x.locCode,
+        });
+      });
+      if (
+        this.isUpdate &&
+        this.AccountForm.value.AccountCategory.name ==
+          this.UpdateData.AccountCategoryName
+      ) {
+        const Locetion = this.UpdateData.ACdetail.AccountLocations;
+        const selectedData = LocationsData.filter((x) =>
+          Locetion.includes(x.value)
+        );
+        this.AccountCategoryForm.controls["AccountLocationsDrop"].setValue(
+          selectedData
+        );
+      }
+      this.filter.Filter(
+        this.jsonControlAccountCategoryArray,
+        this.AccountCategoryForm,
+        LocationsData,
+        this.AccountLocationsCode,
+        this.AccountLocationsStatus
+      );
+    }
+  }
+  toggleSelectAccountLocationsAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+
+    const index = this.jsonControlAccountCategoryArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlAccountCategoryArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.AccountCategoryForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
+  // --End-- //
+
+  // --Additional Function--
+  addNewAccountGroup() {
+    const dialogRef = this.dialog.open(AccountGroupComponent, {
+      data: {},
+      width: "1000px",
+      height: "500px",
+      disableClose: true,
+    });
+  }
+
+  getAccountCategorydetail() {
+    console.log("AccountCategoryForm", this.AccountCategoryForm);
+    const AccountCategory = this.AccountForm.value.AccountCategory.name;
+    const FormData = this.AccountCategoryForm.value;
+    if (AccountCategory == "BANK") {
+      return {
+        ACno: FormData.AccountNumber,
+        AccountLocations:
+          FormData.AccountLocationsDrop == ""
+            ? []
+            : FormData.AccountLocationsDrop.map((x) => x.value),
+      };
+    } else if (AccountCategory == "EXPENSE") {
+      if (FormData.isTDSMapping) {
+        return {
+          isTDSApplicable: FormData.isTDSApplicable,
+          isTDSMapping: FormData.isTDSMapping,
+        };
+      } else {
+        return {
+          isTDSApplicable: FormData.isTDSApplicable,
+          isTDSMapping: FormData.isTDSMapping,
+          DdlTDSMapping: FormData.Ddl_TDS_Mapping.value,
+        };
+      }
+    } else if (AccountCategory == "TCS") {
+      return {
+        CorporateTCS: parseFloat(FormData.CorporateTCS),
+        NonCorporateTCS: parseFloat(FormData.NonCorporateTCS),
+      };
+    } else if (AccountCategory == "TDS") {
+      return {
+        CorporateTDS: parseFloat(FormData.CorporateTDS),
+        NonCorporateTDS: parseFloat(FormData.NonCorporateTDS),
+      };
+    } else {
+      return {};
+    }
+  }
+
+  HandleSaveBody() {
+    const accountFormValue = this.AccountForm.value;
+    const AccountCategory = accountFormValue.AccountCategory.name;
+
+    if (
+      ["BANK", "EXPENSE", "TDS", "TCS"].includes(AccountCategory) &&
+      !this.AccountCategoryForm.valid
+    ) {
+      Swal.fire({
+        icon: "info",
+        title: "info",
+        text: "Enter Valid Detail",
+        showConfirmButton: true,
+      });
+      return;
+    }
+
+    let body = {
+      AccountDescription: accountFormValue.AccountDescription,
+      AccountingLocations:
+        accountFormValue.LocationsDrop === ""
+          ? []
+          : accountFormValue.LocationsDrop.map((x) => x.value),
+      MainCategoryName: accountFormValue.MainCategory.name,
+      MainCategoryCode: accountFormValue.MainCategory.value,
+      SubCategoryCode: accountFormValue.GroupCode.value,
+      SubCategoryName: accountFormValue.GroupCode.name,
+      AccountCategoryName: accountFormValue.AccountCategory.name,
+      PartySelection: accountFormValue.PartySelection.name,
+      ActiveFlag: accountFormValue.ActiveFlag,
+      ACdetail: ["BANK", "EXPENSE", "TDS", "TCS"].includes(AccountCategory)
+        ? this.getAccountCategorydetail()
+        : {},
+    };
+
+    if (!this.isUpdate) {
+      const length = this.TableData.length;
+      const index =
+        length === 0
+          ? 0
+          : parseInt(this.TableData[length - 1].AccountCode.substring(2));
+      const padding = index < 9 ? "00" : index < 99 ? "0" : "";
+      body["AccountCode"] = `AC${padding}${index + 1}`;
+    }
+    this.Save(body);
+  }
+
+  async Save(body) {
+    const req = {
+      companyCode: this.CompanyCode,
+      collectionName: "account_detail",
+      filter: this.isUpdate
+        ? { AccountCode: this.UpdateData.AccountCode }
+        : undefined,
+      update: this.isUpdate ? body : undefined,
+      data: this.isUpdate ? undefined : body,
+    };
+
+    const res = this.isUpdate
+      ? await this.masterService.masterPut("generic/update", req).toPromise()
+      : await this.masterService.masterPost("generic/create", req).toPromise();
+
+    if (res.success) {
+      this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: res.message,
+        showConfirmButton: true,
+      });
+    }
+  }
+  Cancle() {
+    this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
+  }
+  functionCallHandler($event) {
+    let functionName = $event.functionName;
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+  // --End-- //
 }

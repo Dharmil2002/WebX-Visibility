@@ -13,7 +13,7 @@ import { customerFromApi } from "../prq-entry-page/prq-utitlity";
 import { getCity } from "../quick-booking/quick-utility";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
-import { getShipment } from "../thc-generation/thc-utlity";
+import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { JobEntryService } from "src/app/Utility/module/operation/job-entry/job-entry-service";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
@@ -149,7 +149,8 @@ export class JobEntryPageComponent implements OnInit {
     private pinCodeService: PinCodeService,
     private jobEntryService: JobEntryService,
     private docketService: DocketService,
-    private consigmentUtility: ConsigmentUtility
+    private consigmentUtility: ConsigmentUtility,
+    private thcService: ThcService
   ) {
 
     this.initializeFormControl();
@@ -262,7 +263,7 @@ export class JobEntryPageComponent implements OnInit {
   /*end*/
   async getShipmentDetail() {
     
-    const shipmentList = await getShipment(this.operationService);
+    const shipmentList = await this.thcService.getShipment();
     const tableData = await this.jobEntryService.processShipmentListJob(shipmentList, this.orgBranch);
     this.docketData = tableData.filter((x) => x.jobNo == "");
     this.getDockeContainorDetail();

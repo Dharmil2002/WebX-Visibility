@@ -198,7 +198,6 @@ export class ThcGenerationComponent implements OnInit {
     private pinCodeService: PinCodeService,
     private locationService: LocationService,
     private consigmentUtility: ConsigmentUtility,
-    private vehicleService:VehicleService,
     private markerVehicleService: MarkerVehicleService,
     private thcService: ThcService,
     private storage: StorageService
@@ -803,7 +802,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['driverLno'].setValue(driverDetail[0].licenseNo);
     this.thcTableForm.controls['capacity'].setValue(vehDetail.capacity);
     if (vehDetail.value) {
-      const filteredShipments = this.allShipment.filter((x) => x.vehicleNo == vehDetail.value && x.orgTotWeight != "0" ||x.orgNoOfPkg!="0");
+      const filteredShipments = this.allShipment.filter((x) => x.vehicleNo == vehDetail.value && (x.orgTotWeight != "0" ||x.orgNoOfPkg!="0"));
       this.tableData = filteredShipments.map((x) => {
         x.actions=["Edit"]
         return x; // Make sure to return x to update the original object in the 'tableData' array.
@@ -858,8 +857,12 @@ export class ThcGenerationComponent implements OnInit {
         x.fromCity.toLowerCase() === formCity.toLowerCase() &&
         x.toCity.toLowerCase() === toCity.toLowerCase && x.orgTotWeight != "0" ||x.orgNoOfPkg!="0" || x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value
       );
-
-      this.tableData = filteredShipments
+      const addEditAction = (shipments) => {
+        return shipments.map((shipment) => {
+          return { ...shipment, actions: ["Edit"] };
+        });
+      };
+      this.tableData = addEditAction(filteredShipments);
     }
   }
   /*below function call when user will try to view or

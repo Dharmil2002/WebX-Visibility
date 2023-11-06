@@ -18,7 +18,7 @@ import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebit
 })
 export class AddDebitAgainstDocumentModalComponent implements OnInit {
   DebitVoucherControl: DebitVoucherControl;
-
+  TotalDebitAmount: { count: any; title: string; class: string }[];
   DebitVoucherDocumentDebitsForm: UntypedFormGroup;
   jsonControlDebitVoucherDocumentDebitsArray: any;
   DocumentDebitsDisplayedColumns = GetLedgerDocument()
@@ -45,7 +45,8 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
     private matDialog: MatDialog,
     public dialogRef: MatDialogRef<AddDebitAgainstDocumentModalComponent>,
     @Inject(MAT_DIALOG_DATA)
-    public objResult: any) { }
+    public objResult: any) {
+  }
 
   ngOnInit(): void {
     this.initializeFormControl()
@@ -150,7 +151,13 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
     const totalDebitAmountAgaintsDocument = this.DisplayOnlyDocumentDebits.reduce((accumulator, currentValue) => {
       return accumulator + parseFloat(currentValue['DebitAmountAgaintsDocument']);
     }, 0);
-    this.DebitVoucherDocumentDebitsForm.get("TotalDebit").setValue(totalDebitAmountAgaintsDocument)
+    this.TotalDebitAmount = [
+      {
+        count: totalDebitAmountAgaintsDocument,
+        title: "Total Debit Amount",
+        class: `color-Ocean-light`,
+      }
+    ]
 
   }
   async AddNewDocumentDebits() {

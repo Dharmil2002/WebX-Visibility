@@ -37,7 +37,7 @@ export class DebitVoucherPreviewComponent implements OnInit {
   columnHeader = GetDebitLedgerPreviewcolumnHeader()
   totalDebit;
   totalCredit
-
+  TotalAmountList: { count: any; title: string; class: string }[];
   tableData: any = [];
   constructor(private filter: FilterUtils,
     private fb: UntypedFormBuilder,
@@ -56,9 +56,18 @@ export class DebitVoucherPreviewComponent implements OnInit {
       const drValue = parseFloat(currentValue['Cr']);
       return isNaN(drValue) ? accumulator : accumulator + drValue;
     }, 0);
-
-
-
+    this.TotalAmountList = [
+      {
+        count: this.totalDebit,
+        title: "Total Debit Amount",
+        class: `color-Ocean-danger`,
+      },
+      {
+        count: this.totalCredit,
+        title: "Total Credit Amount",
+        class: `color-Success-light`,
+      }
+    ]
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;

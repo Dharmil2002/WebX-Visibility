@@ -21,7 +21,7 @@
                 [columnHeader]="DocumentDebitsDisplayedColumns" [tableData]="DisplayOnlyDocumentDebits"
                 [menuItems]="menuItems" [staticField]="staticFieldForLedgerDocument" [Link]="linkArray"
                 [FormTitle]="'Document Debits'" [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="false"
-                (menuItemClicked)="handleMenuItemClick($event)"
+                (menuItemClicked)="handleMenuItemClick($event)" [TitleBoxData]="this.TotalDebitAmount"
                 [DisplayAddNewButton]=this.DebitVoucherDocumentDebitsForm.value.DocumentType [DisplayCheckbox]="false"
                 (AddNewButtonEvent)="AddNewDocumentDebits()">
             </app-generic-table-v2>

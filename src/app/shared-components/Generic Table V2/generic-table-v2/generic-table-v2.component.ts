@@ -39,6 +39,7 @@ export class GenericTableV2Component
   @Input() menuItems: any;
   @Input() menuItemFlag;
   @Input() boxData: any;
+  @Input() TitleBoxData: any;
   @Input() AddNewButton: any = false;
   @Output() AddNewButtonEvent = new EventEmitter<any>();
   @Output() menuItemClicked = new EventEmitter<any>();

@@ -555,7 +555,7 @@ export class DebitVoucherControl {
       },
 
       {
-        name: "Cheque/RefNo",
+        name: "ChequeOrRefNo",
         label: "Cheque/Ref No.",
         placeholder: "Cheque/Ref No.",
         type: "text",
@@ -685,21 +685,22 @@ export class DebitVoucherControl {
         functions: {
           onOptionSelect: "DocumentFieldChanged"
         },
-      }, {
-        name: "TotalDebit",
-        label: "Total Debit ₹",
-        placeholder: "Total Debit ₹",
-        type: "number",
-        value: "",
-        generatecontrol: true,
-        disable: true,
-        Validations: [
-          {
-            name: "required",
-            message: "TotalDebit is required",
-          },
-        ],
       },
+      //{
+      //   name: "TotalDebit",
+      //   label: "Total Debit ₹",
+      //   placeholder: "Total Debit ₹",
+      //   type: "number",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: true,
+      //   Validations: [
+      //     {
+      //       name: "required",
+      //       message: "TotalDebit is required",
+      //     },
+      //   ],
+      // },
 
     ]
     this.DebitVoucherDetailsArray = [

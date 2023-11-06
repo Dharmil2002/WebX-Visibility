@@ -13,6 +13,7 @@ export class ModifyTableCollumnsComponent {
     public dialogRef: MatDialogRef<ModifyTableCollumnsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    const Detaildata= this.data;
     for (let index = 0; index < this.data.length; index++) {
       const element = this.data[index];
       if (element.show) {

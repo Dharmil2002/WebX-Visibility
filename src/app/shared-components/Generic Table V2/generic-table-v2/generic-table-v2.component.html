@@ -23,10 +23,11 @@
                         </div>
                         <hr style="margin:0px">
                     </div>
-                    <div  [ngStyle]="{'display': showHeader ? 'block' : 'none'}" class="materialTableHeader" style="min-width:auto !important;" >
+                    <div [ngStyle]="{'display': showHeader ? 'block' : 'none'}" class="materialTableHeader"
+                        style="min-width:auto !important;">
                         <div class="row">
                             <div class="col-auto">
-                                <ul class="header-buttons-left ml-0">
+                                <ul class="header-buttons-left ml-0 container-column">
                                     <li class="dropdown m-l-20">
                                         <label for="search-input"><i class="material-icons search-icon">search</i>
                                         </label>
@@ -61,6 +62,13 @@
                                             </button>
                                         </div>
                                     </li>
+                                    <li *ngIf="filterColumn">
+                                        <button type="button"
+                                            class="btn btn-warning btn-border-radius waves-effect msr-2" (click)="openDialog()">
+                                            <i-feather style="width: 24px;height: 24px;color:white"
+                                                name="filter"></i-feather>
+                                        </button>
+                                    </li>
                                 </ul>
                             </div>
                             <div class="col-auto ms-auto">
@@ -78,12 +86,11 @@
                                         </div>
                                     </li>
                                     <li *ngIf="EventButton">
-                                        <div >
-                                            <button  mat-stroked-button
-                                                style="margin-left:10px; "
-                                                (click)="FunctionHendel(EventButton.functionName , {})"
-                                                >
-                                                <mat-icon *ngIf="EventButton?.iconName">{{EventButton.iconName}}</mat-icon>
+                                        <div>
+                                            <button mat-stroked-button style="margin-left:10px; "
+                                                (click)="FunctionHendel(EventButton.functionName , {})">
+                                                <mat-icon
+                                                    *ngIf="EventButton?.iconName">{{EventButton.iconName}}</mat-icon>
                                                 {{EventButton.name}}
                                             </button>
                                         </div>

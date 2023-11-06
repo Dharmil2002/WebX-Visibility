@@ -14,6 +14,8 @@ export class JobSummaryPageComponent implements OnInit {
     noColumnSort: ["checkBoxRequired"],
   };
   tableData: any[];
+  filterColumn:boolean=true;
+  allColumnFilter:any;
   dynamicControls = {
     add: true,
     edit: true,
@@ -96,6 +98,7 @@ export class JobSummaryPageComponent implements OnInit {
   linkArray = [{ Row: "Action", Path: "Operation/CHAEntry" }];
   constructor(private _masterService: MasterService) {
     this.addAndEditPath = "Operation/JobEntry";
+    this.allColumnFilter=this.columnHeader
   }
 
   ngOnInit(): void {

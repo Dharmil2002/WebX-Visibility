@@ -587,6 +587,11 @@ a {
   overflow-y: auto;
 }
 
+.container-column {
+  gap: 4px;
+  display: flex;
+}
+
 .google-autocomplete-item {
   padding: 5px 5px;
   /* Adjust the padding to control vertical and horizontal spacing */

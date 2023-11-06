@@ -2,6 +2,6 @@
 <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" [metaData]="metaData" (functionCallEmitter)="functionCallHandler($event)" (selectAllClicked)="onSelectAllClicked($event)"
         [menuItems]="menuItems" [staticField]="staticField" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width"
-        [maxWidth]="maxWidth" [FormTitle]="'Thc List'" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+        [maxWidth]="maxWidth" [allColumnFilter]="allColumnFilter" [filterColumn]="filterColumn" [FormTitle]="'Thc List'" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
     </app-generic-table-v2>
 </div>

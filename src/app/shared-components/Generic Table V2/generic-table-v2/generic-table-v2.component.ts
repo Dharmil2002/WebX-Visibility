@@ -10,6 +10,7 @@ import moment from "moment";
 import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-service.service";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
+import { ModifyTableCollumnsComponent } from "../../modify-table-collumns/modify-table-collumns.component";
 
 @Component({
   selector: "app-generic-table-v2",
@@ -22,7 +23,7 @@ export class GenericTableV2Component
   @Input() dataSource: MatTableDataSource<any>;
   @Input() tableData;
   @Input() csvData;
-  @Input() columnHeader;
+  @Input() columnHeader = [];
   @Input() TableStyle;
   @Input() addAndEditPath;
   @Input() disbleCheckbox;
@@ -57,12 +58,14 @@ export class GenericTableV2Component
   @Input() DisplayAddNewButton: boolean = false;
   @Input() DisplayCheckbox: boolean = false;
   @Input() staticField = [];
+  @Input() allColumnFilter = [];
   triggered: boolean = false;
   objectKeys = Object.keys;
   // @Input() checkBoxRequired;
   // @Input() selectAllorRenderedData;
   @Input() metaData;
   @Input() addFlag;
+  @Input() filterColumn = false;
   @ViewChild("table") table1: any;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild("filter", { static: true }) filter: ElementRef;
@@ -366,8 +369,8 @@ export class GenericTableV2Component
     );
   }
   getMenuItems(labels: string[]): any[] {
-   
-     // Check if this.menuItems is defined and is an array before filtering
+
+    // Check if this.menuItems is defined and is an array before filtering
     if (Array.isArray(this.menuItems)) {
       return this.menuItems.filter(item => labels.includes(item.label));
     } else {
@@ -393,5 +396,41 @@ export class GenericTableV2Component
     let context = { event };
     context['functionName'] = 'OnChangeToggle';
     this.functionCallEmitter.emit(context)
+  }
+  /*below code add for the edit column*/
+  openDialog(): void {
+    // Convert the initial object into the desired array structure
+    const desiredArray = Object.entries(this.allColumnFilter).map(([key, value]) => ({
+      Key: key,
+      title: value.Title,
+      width: value.Style ? value.Style.split(':')[1] : "", // Extracting width from Style
+      className: value.class,
+      show: value,
+    }));
+    const dialogRef = this.dialog.open(ModifyTableCollumnsComponent, {
+      position: {
+        top: "50px",
+      },
+      data: desiredArray,
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.event) {
+        const filteredData = result.data.filter(column => result.columnKeys.includes(column.Key));
+        this.columnHeader = filteredData.filter((x) => x).reduce((acc, curr) => {
+          const style = Object.entries(this.allColumnFilter)
+            .find(([key, value]) => key === curr.Key)
+          [1];
+          acc[curr.Key] = {
+            Title: curr.title,
+            class: curr.className,
+            Style: style.Style, // Creating Style property
+            type:style.type
+          };
+          return acc;
+        }, {});
+      }
+
+    });
   }
 }

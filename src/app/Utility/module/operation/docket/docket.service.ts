@@ -52,7 +52,7 @@ export class DocketService {
         // Define the request body with companyCode, collectionName, and an empty filter
         const reqBody = {
             companyCode: localStorage.getItem("companyCode"),
-            collectionName: "Docket_Operation_Details",
+            collectionName: "docket_operation_details",
             filter:filter,
             update: data
         };
@@ -121,7 +121,7 @@ export class DocketService {
         
         const req = {
             "companyCode": localStorage.getItem("companyCode"),
-            "collectionName": "Docket_Operation_Details",
+            "collectionName": "docket_operation_details",
             "data":data
         }
 

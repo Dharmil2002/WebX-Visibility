@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class ThcSummaryComponent implements OnInit {
   //here the declare the flag
   tableLoad: boolean;
+  filterColumn:boolean=true;
   METADATA = {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
@@ -37,7 +38,7 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:210px",
       functionName:'openExternalWindow',
-      type:'windowLink'
+      type:'windowLink',
     },
     route: {
       Title: "Route",
@@ -65,6 +66,7 @@ export class ThcSummaryComponent implements OnInit {
       Style: "max-width:100px",
     }
   };
+allColumnFilter:any;
   //#endregion
   staticField = [
     "route",
@@ -89,6 +91,7 @@ export class ThcSummaryComponent implements OnInit {
     ) {
       this.getThcDetails();
       this.addAndEditPath = "Operation/thc-create";
+      this.allColumnFilter=this.columnHeader;
     }
 
     

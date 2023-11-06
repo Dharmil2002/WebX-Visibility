@@ -16,6 +16,9 @@ export class ShipmentEditControls {
                         message: "Weight is Required"
                     }
                 ],
+                functions:{
+                    onChange:"getValidate"
+                },
                 generatecontrol: true, disable: false
             },
             {
@@ -33,7 +36,7 @@ export class ShipmentEditControls {
                 additionalData: {
                 },
                 functions: {
-                    onChange: '',
+                    onChange:"getValidate",
                 },
                 generatecontrol: true,
                 disable: false

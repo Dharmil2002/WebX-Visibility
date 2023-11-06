@@ -6,7 +6,7 @@ export const Collections = {
     Dockets: 'docket_temp',
     PrqDetails: 'prq_detail',
     ThcDetails: 'thc_detail',
-    docketOp: 'Docket_Operation_Details'
+    docketOp: 'docket_operation_details'
 };
 
 export const GenericActions = {

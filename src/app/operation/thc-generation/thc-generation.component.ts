@@ -565,19 +565,13 @@ export class ThcGenerationComponent implements OnInit {
 
   selectCheckBox(event) {
     // Assuming event is an array of objects
-    const actualWeights = event.map((item) => {
-      return item
-        ? calculateTotalField(item.invoiceDetails, "actualWeight")
-        : 0;
-    });
     // Sum all the calculated actualWeights
-    const totalActualWeight = actualWeights.reduce((acc, weight) => acc + weight,);
-
+    const totalActualWeight = event.reduce((acc, weight) => acc + weight.totWeight,0);
     let capacityTons = parseFloat(this.thcTableForm.controls["capacity"].value); // Get the capacity value in tons
-    let loadedTons = totalActualWeight / 1000;
-    let percentage = (loadedTons * 100) / capacityTons;
-    this.thcTableForm.controls["loadedKg"].setValue(totalActualWeight);
-    this.thcTableForm.controls["weightUtilization"].setValue( percentage.toFixed(2) );
+    let loadedTons = totalActualWeight?totalActualWeight / 1000:0;
+    let percentage = loadedTons ?(loadedTons * 100) / capacityTons:0;
+    this.thcTableForm.controls["loadedKg"].setValue(parseFloat(totalActualWeight));
+    this.thcTableForm.controls["weightUtilization"].setValue(parseFloat(percentage.toFixed(2)));
     this.selectedData = event;
   }
   async handleMenuItemClick(data) {
@@ -611,6 +605,7 @@ export class ThcGenerationComponent implements OnInit {
             if (x.docketNumber === shipment) {
               x.totWeight = actualWeight || 0;
               x.noOfPkg = noofPkts || 0;
+              x.isSelected=false
             }
           });
         }
@@ -645,7 +640,6 @@ export class ThcGenerationComponent implements OnInit {
       "prqNo",
       "advPdAt",
       "balAmtAt",
-      "closingBranch",
       "fromCity",
       "toCity",
       "vehicle",
@@ -862,7 +856,7 @@ export class ThcGenerationComponent implements OnInit {
 
       const filteredShipments = this.allShipment.filter((x) =>
         x.fromCity.toLowerCase() === formCity.toLowerCase() &&
-        x.toCity.toLowerCase() === toCity.toLowerCase()  || x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value
+        x.toCity.toLowerCase() === toCity.toLowerCase && x.orgTotWeight != "0" ||x.orgNoOfPkg!="0" || x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value
       );
 
       this.tableData = filteredShipments

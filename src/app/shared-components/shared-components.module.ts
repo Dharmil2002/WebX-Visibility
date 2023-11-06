@@ -56,6 +56,7 @@ import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { ImagePreviewComponent } from './image-preview/image-preview.component';
 import { ImageHandling } from '../Utility/Form Utilities/imageHandling';
 import { NgxPrintModule } from "ngx-print";
+import { MatDialogModule } from '@angular/material/dialog';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -90,6 +91,7 @@ const MY_DATE_FORMAT = {
     MatSortModule,
     MatStepperModule,
     MatAutocompleteModule,
+    MatDialogModule,
     NgxMatSelectSearchModule,
     FormsModule,
     MatCheckboxModule,

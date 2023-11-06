@@ -9,6 +9,8 @@ import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 })
 export class DocketListComponent implements OnInit {
     /*Below is for the table displaye data */
+    filterColumn:boolean=true;
+    allColumnFilter:any;
     tableData: any;
     tableLoad: boolean;
     orgBranch: string = localStorage.getItem("Branch");
@@ -108,6 +110,7 @@ export class DocketListComponent implements OnInit {
     private thcService: ThcService
     ) {
     this.getShipmentDetail();
+    this.allColumnFilter=this.columnHeader
   }
 
   ngOnInit(): void {

@@ -788,19 +788,20 @@ export class ThcGenerationComponent implements OnInit {
   }
   /*here get vehicle detail function if it is not market*/
   async getVehicleDetail() {
+    debugger
     const vehDetail: Vehicle = this.thcTableForm.controls['vehicle'].value
-    const vendorName = this.vendorDetail.find((x) => x.name === vehDetail.vendor)
+    const vendorName = this.vendorDetail.find((x) => x.name.toUpperCase() === vehDetail.vendor.toUpperCase())
     this.thcTableForm.controls['vendorName'].setValue(vendorName);
-    this.thcTableForm.controls['driverName'].setValue(vehDetail.driver);
-    this.thcTableForm.controls['driverMno'].setValue(vehDetail.dMobNo);
-    const vendorDetail: VendorDetail[] = await this.vendorService.getVendorDetail({ vendorName: vendorName.name });
+    const vendorDetail: VendorDetail[] = await this.vendorService.getVendorDetail({ vendorName: vendorName.name.toUpperCase() });
     const driverDetail: DriverMaster[] = await this.driverService.getDriverDetail({ vehicleNo: vehDetail.value });
-    const vendorType = vendorTypeList.find((x) => x.value.toLowerCase() == vehDetail.vendorType.toLowerCase());
-    this.thcTableForm.controls['vendorType'].setValue(vendorType?.value);
+    this.thcTableForm.controls['driverName'].setValue(driverDetail[0].driverName);
+    this.thcTableForm.controls['driverMno'].setValue(driverDetail[0].telno);
     this.thcTableForm.controls['panNo'].setValue(vendorDetail[0].panNo);
     this.thcTableForm.controls['driverLexd'].setValue(driverDetail[0].valdityDt);
     this.thcTableForm.controls['driverLno'].setValue(driverDetail[0].licenseNo);
     this.thcTableForm.controls['capacity'].setValue(vehDetail.capacity);
+    const vendorType = vendorTypeList.find((x) => x.value.toLowerCase() == vehDetail.vendorType.toLowerCase());
+    this.thcTableForm.controls['vendorType'].setValue(vendorType?.value);
     if (vehDetail.value) {
       const filteredShipments = this.allShipment.filter((x) => x.vehicleNo == vehDetail.value && (x.orgTotWeight != "0" ||x.orgNoOfPkg!="0"));
       this.tableData = filteredShipments.map((x) => {

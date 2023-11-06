@@ -11,12 +11,21 @@
                             </h4>
                         </div>
                         <div class="col d-flex justify-content-end">
+                            <div *ngFor="let box of TitleBoxData" style="text-align: center;margin-top:5px"
+                                class="msr-4 align-self-center">
+                                <h6 class="font-14 mb-1">{{box.title}}</h6>
+                                <p class="badge  shadow-style " [class]="box.class"
+                                    style="width: -webkit-fill-available; font-size: 16px !important;">
+                                    {{box.count}}
+                                </p>
+                            </div>
                             <section *ngIf="DisplayCheckbox" class="example-section">
                                 <mat-slide-toggle (change)="OnChangeToggle($event)" color="primary">Calculate TDS at
                                     line item &nbsp;</mat-slide-toggle>
-                            </section> <button *ngIf="DisplayAddNewButton" matTooltip="Add New Record"
-                                mat-stroked-button style="margin-top:10px;margin-bottom: 10px; margin-right:10px; "
-                                (click)="AddNew()" class="filter_btn">
+                            </section>
+                            <button *ngIf="DisplayAddNewButton" matTooltip="Add New Record" mat-stroked-button
+                                style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " (click)="AddNew()"
+                                class="filter_btn">
                                 <mat-icon>add</mat-icon>
                                 Add New
                             </button>

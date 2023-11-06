@@ -318,7 +318,7 @@ export class DebitVoucherControl {
         disable: true,
         additionalData: {
           metaData: "Basic",
-          label: 'TDS Deduction',
+          label: 'TDS Deduction ₹',
           fieldName: "TDSDeduction",
           disable: true,
         },
@@ -666,26 +666,8 @@ export class DebitVoucherControl {
         name: "DocumentType",
         label: "Document Type",
         placeholder: "Document Type",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "Consignment",
-            name: "Consignment",
-          }, {
-            value: "THC",
-            name: "THC",
-          }, {
-            value: "DRS",
-            name: "DRS",
-          }, {
-            value: "PRS",
-            name: "PRS",
-          },
-          {
-            value: "JOB",
-            name: "JOB",
-          },
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -698,17 +680,25 @@ export class DebitVoucherControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
+        },
+        functions: {
+          onOptionSelect: "DocumentFieldChanged"
         },
       }, {
         name: "TotalDebit",
         label: "Total Debit ₹",
         placeholder: "Total Debit ₹",
-        type: "text",
+        type: "number",
         value: "",
         generatecontrol: true,
-        disable: false,
-        Validations: [],
+        disable: true,
+        Validations: [
+          {
+            name: "required",
+            message: "TotalDebit is required",
+          },
+        ],
       },
 
     ]
@@ -784,6 +774,11 @@ export class DebitVoucherControl {
           {
             name: "required",
             message: "Debit Amount is required!",
+          },
+          {
+            name: "pattern",
+            message: "Please Enter Valid Debit Amount",
+            pattern: '^[^-]+$'
           },
         ],
         functions: {
@@ -888,6 +883,17 @@ export class DebitVoucherControl {
 
     this.DebitAgainstDocumentArray = [
       {
+        name: "DocumentType",
+        label: "DocumentType",
+        placeholder: "DocumentType",
+        type: "text",
+        value: FormValues?.DocumentType,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+
+      {
         name: "Document",
         label: "Document",
         placeholder: "Document",
@@ -911,8 +917,11 @@ export class DebitVoucherControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
           metaData: "Basic"
+        },
+        functions: {
+          onModel: 'SetDocumentOptions',
         },
       },
       {
@@ -923,7 +932,12 @@ export class DebitVoucherControl {
         value: FormValues?.DebitAmountAgaintsDocument,
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "DebitAmount is required",
+          },
+        ],
       },
       {
         name: "DocumentHdn",

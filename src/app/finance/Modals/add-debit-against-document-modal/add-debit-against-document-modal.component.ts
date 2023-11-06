@@ -22,7 +22,7 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
   DebitVoucherDocumentDebitsForm: UntypedFormGroup;
   jsonControlDebitVoucherDocumentDebitsArray: any;
   DocumentDebitsDisplayedColumns = GetLedgerDocument()
-  staticFieldForLedgerDocument = ['Document', 'DebitAmountAgaintsDocument']
+  staticFieldForLedgerDocument = ['DocumentType', 'Document', 'DebitAmountAgaintsDocument']
   LoadDocumentDebitsDetails = true;
   dynamicControls = {
     add: false,
@@ -38,17 +38,8 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
   addFlag = true;
   menuItemflag = true;
   DocumentDebits: any = [];
-  DocumentList = [
-    {
-      value: "Test1",
-      name: "Test1",
-    },
-    {
-      value: "Test2",
-      name: "Test2",
-    },
+  DisplayOnlyDocumentDebits: any = [];
 
-  ];
   constructor(private filter: FilterUtils,
     private fb: UntypedFormBuilder,
     private matDialog: MatDialog,
@@ -65,6 +56,32 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
     this.jsonControlDebitVoucherDocumentDebitsArray = this.DebitVoucherControl.getDebitVoucherDocumentDebitsArrayControls();
     this.DebitVoucherDocumentDebitsForm = formGroupBuilder(this.fb, [this.jsonControlDebitVoucherDocumentDebitsArray]);
 
+    const DocumentType = [
+      {
+        value: "Consignment",
+        name: "Consignment",
+      }, {
+        value: "THC",
+        name: "THC",
+      }, {
+        value: "DRS",
+        name: "DRS",
+      }, {
+        value: "PRS",
+        name: "PRS",
+      },
+      {
+        value: "JOB",
+        name: "JOB",
+      },
+    ];
+    this.filter.Filter(
+      this.jsonControlDebitVoucherDocumentDebitsArray,
+      this.DebitVoucherDocumentDebitsForm,
+      DocumentType,
+      "DocumentType",
+      false
+    );
   } Close() {
     this.dialogRef.close()
   }
@@ -79,21 +96,25 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
   handleMenuItemClick(data) {
     if (data.label.label === 'Remove') {
       this.DocumentDebits = this.DocumentDebits.filter((x) => x.id !== data.data.id);
+      this.DisplayOnlyDocumentDebits = this.DisplayOnlyDocumentDebits.filter((x) => x.id !== data.data.id);
     }
     else {
-
       const LedgerDetails = this.DocumentDebits.find(x => x.id == data.data.id);
       this.addDocumentDebits(LedgerDetails)
     }
   }
+  DocumentFieldChanged(event) {
+    const DocumentType = this.DebitVoucherDocumentDebitsForm.value.DocumentType;
+    this.CalculateTotalAmountBasedOnDocumentType(DocumentType.value)
+
+  }
   addDocumentDebits(event) {
     const EditableId = event?.id
+    const DocumentType = this.DebitVoucherDocumentDebitsForm.value.DocumentType;
     const request = {
-      DocumentList: this.DocumentList,
+      DocumentType: DocumentType,
       Details: event,
     }
-
-
     this.LoadDocumentDebitsDetails = false
     const dialogRef = this.matDialog.open(AddDetailsDebitAgainstDocumentModalComponent, {
       data: request,
@@ -107,25 +128,35 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
       if (result != undefined) {
         if (EditableId) {
           this.DocumentDebits = this.DocumentDebits.filter((x) => x.id !== EditableId);
+          this.DisplayOnlyDocumentDebits = this.DisplayOnlyDocumentDebits.filter((x) => x.id !== EditableId);
         }
-
         const json = {
           id: this.DocumentDebits.length + 1,
           Document: result?.Document,
           DocumentHdn: result?.DocumentHdn,
           DebitAmountAgaintsDocument: result?.DebitAmountAgaintsDocument,
+          DocumentType: result?.DocumentType,
           actions: ['Edit', 'Remove']
         }
         this.DocumentDebits.push(json);
+        this.CalculateTotalAmountBasedOnDocumentType(result?.DocumentType)
       }
       this.LoadDocumentDebitsDetails = true
     });
+
+  }
+  CalculateTotalAmountBasedOnDocumentType(DocumentType) {
+    this.DisplayOnlyDocumentDebits = this.DocumentDebits.filter(item => item.DocumentType == DocumentType);
+    const totalDebitAmountAgaintsDocument = this.DisplayOnlyDocumentDebits.reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue['DebitAmountAgaintsDocument']);
+    }, 0);
+    this.DebitVoucherDocumentDebitsForm.get("TotalDebit").setValue(totalDebitAmountAgaintsDocument)
 
   }
   async AddNewDocumentDebits() {
     this.addDocumentDebits('');
   }
   save() {
-    this.DocumentDebits.close()
+    this.dialogRef.close(this.DocumentDebits)
   }
 }

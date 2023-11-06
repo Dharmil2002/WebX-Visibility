@@ -52,6 +52,11 @@ export function GetLedgercolumnHeader() {
 export function GetLedgerDocument() {
 
     return {
+        DocumentType: {
+            Title: "DocumentType",
+            class: "matcolumncenter",
+            Style: "min-width:200px",
+        },
         Document: {
             Title: "Document",
             class: "matcolumnfirst",
@@ -100,12 +105,12 @@ export function GetDebitLedgerPreviewcolumnHeader() {
             Style: "max-width:120px",
         },
         Dr: {
-            Title: "Dr.",
+            Title: "Dr. ₹",
             class: "matcolumncenter",
             Style: "max-width:100px",
         },
         Cr: {
-            Title: "Cr.",
+            Title: "Cr. ₹",
             class: "matcolumncenter",
             Style: "max-width:100px",
         },

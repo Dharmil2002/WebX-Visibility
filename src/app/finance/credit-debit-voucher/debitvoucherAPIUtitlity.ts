@@ -151,3 +151,25 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
 }
 
 
+export async function GetDocumentsWiseListFromApi(masterService, collectionName, field, value) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filters = [
+            {
+                "field": field,
+                "value": value,
+                "exactMatch": false
+            }
+        ];
+        const req = { companyCode, collectionName: collectionName, filters };
+        const res = await masterService.masterPost('generic/getaggregate', req).toPromise();
+        if (res && res.data) {
+            return res.data.map(x => ({
+                name: x[field], value: x[field]
+            }));
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}

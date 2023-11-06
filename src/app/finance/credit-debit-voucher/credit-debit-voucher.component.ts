@@ -486,7 +486,7 @@ export class DebitVoucherComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-
+        console.log(result)
       }
     });
 
@@ -738,7 +738,7 @@ export class DebitVoucherComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-
+        alert(result)
       }
     });
   }

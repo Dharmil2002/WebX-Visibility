@@ -19,6 +19,10 @@ export class DebitVoucherPreviewComponent implements OnInit {
     edit: false,
     csv: false,
   };
+  EventButton = {
+    functionName: "Submit",
+    name: "Generate Voucher",
+  };
   menuItems = [
     { label: 'Edit' },
     { label: 'Remove' }
@@ -31,6 +35,8 @@ export class DebitVoucherPreviewComponent implements OnInit {
     'Value', 'Ledgercode', 'Ledgername', 'SubLedger', 'Dr', 'Cr', 'Location', 'Narration', 'DocumentReference']
 
   columnHeader = GetDebitLedgerPreviewcolumnHeader()
+  totalDebit;
+  totalCredit
 
   tableData: any = [];
   constructor(private filter: FilterUtils,
@@ -41,12 +47,31 @@ export class DebitVoucherPreviewComponent implements OnInit {
 
   ngOnInit(): void {
     this.tableData = this.objResult
-  }
+    this.totalDebit = this.tableData.reduce((accumulator, currentValue) => {
+      const drValue = parseFloat(currentValue['Dr']);
+      return isNaN(drValue) ? accumulator : accumulator + drValue;
+    }, 0);
 
+    this.totalCredit = this.tableData.reduce((accumulator, currentValue) => {
+      const drValue = parseFloat(currentValue['Cr']);
+      return isNaN(drValue) ? accumulator : accumulator + drValue;
+    }, 0);
+
+
+
+  }
+  functionCallHandler($event) {
+    let functionName = $event.functionName;
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
   Close() {
     this.dialogRef.close()
   }
   Submit() {
-
+    this.dialogRef.close("Submit")
   }
 }

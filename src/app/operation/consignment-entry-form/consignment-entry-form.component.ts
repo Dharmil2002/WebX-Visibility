@@ -1187,9 +1187,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
       "eNTLOC": "",
       "eNTBY":this.storage.userName,
       "eNTDT": new Date(),
-      "mODDT": new Date(),
+      "mODDT":"",
       "mODLOC": "",
-      "mODBY": this.storage.userName
+      "mODBY":""
 
     }
     await this.docketService.addDktDetail(data);

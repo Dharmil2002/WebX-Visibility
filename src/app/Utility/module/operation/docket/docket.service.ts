@@ -132,7 +132,9 @@ export class DocketService {
         for (const element of selectedData) {
           const data = {
             tOTWT: parseFloat(element.orgTotWeight) - parseFloat(element.totWeight),
-            tOTPKG: parseFloat(element.orgNoOfPkg) - parseFloat(element.noOfPkg)
+            tOTPKG: parseFloat(element.orgNoOfPkg) - parseFloat(element.noOfPkg),
+            mODDT:new Date(),
+            mODBY: this.storage.userName
           };
     
           const filter = {
@@ -163,9 +165,9 @@ export class DocketService {
             eNTLOC: "",
             eNTBY:this.storage.userName,
             eNTDT: new Date(),
-            mODDT: new Date(),
+            mODDT:"",
             mODLOC: "",
-            mODBY: this.storage.userName
+            mODBY: ""
           };
     
           await this.addDktDetail(DktNew);

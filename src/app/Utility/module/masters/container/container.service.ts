@@ -72,4 +72,22 @@ export class ContainerService {
     }
   }
   //#endregion
+
+  //#region 
+  async getDetail() {
+    const request = {
+      companyCode: this.companyCode,
+      collectionName: 'container_detail',
+      filter: {}
+    };
+    const res = await this.masterService.masterPost('generic/get', request).toPromise();
+    const sortedData = res.data.sort((a, b) => {
+      const A: any = a.entryDate;
+      const B: any = b.entryDate;
+
+      return B - A; // Sort in descending order
+    });
+    return sortedData;
+  }
+  //#endregion
 }

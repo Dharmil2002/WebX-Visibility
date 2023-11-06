@@ -18,7 +18,7 @@ export class ContainerMasterListComponent implements OnInit {
       // "srNo": "Sr No.",
       "entryDate": "Created Date",
       "containerCode": "Container Code",
-      "containerName": "Container Name",
+      // "containerName": "Container Name",
       "activeFlag": "Active Status",
       "actions": "Actions"
     }
@@ -26,7 +26,7 @@ export class ContainerMasterListComponent implements OnInit {
     // "srNo": "Sr No.",
     "entryDate": "Created Date",
     "containerCode": "Container Code",
-    "containerName": "Container Name",
+    // "containerName": "Container Name",
     "activeFlag": "Active Status",
   }
   breadScrums = [

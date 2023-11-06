@@ -1183,7 +1183,13 @@ export class ConsignmentEntryFormComponent implements OnInit {
       "dPKG": "",
       "dWT": "",
       "sTS": "",
-      "sTSTM": ""
+      "sTSTM": "",
+      "eNTLOC": "",
+      "eNTBY":this.storage.userName,
+      "eNTDT": new Date(),
+      "mODDT": new Date(),
+      "mODLOC": "",
+      "mODBY": this.storage.userName
 
     }
     await this.docketService.addDktDetail(data);

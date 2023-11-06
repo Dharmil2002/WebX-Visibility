@@ -159,7 +159,13 @@ export class DocketService {
             dPKG: element.noOfPkg,
             dWT: element.totWeight,
             sTS: '',
-            sTSTM: ''
+            sTSTM: '',
+            eNTLOC: "",
+            eNTBY:this.storage.userName,
+            eNTDT: new Date(),
+            mODDT: new Date(),
+            mODLOC: "",
+            mODBY: this.storage.userName
           };
     
           await this.addDktDetail(DktNew);

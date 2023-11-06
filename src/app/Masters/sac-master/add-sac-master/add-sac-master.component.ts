@@ -130,7 +130,54 @@ export class AddSacMasterComponent implements OnInit {
   }
   //#endregion
 
- 
+
+  //#region
+  async checkValueExists(fieldName, errorMessage) {
+    try {
+      // Get the field value from the form controls
+      let fieldValue = this.sacTableForm.controls[fieldName].value;
+      // Create a request object with the filter criteria
+      const req = {
+        collectionName: "sachsn_master",
+        filter: { [fieldName]: fieldValue },
+      };
+
+      // Send the request to fetch user data
+      const list = await this.masterService.masterPost("generic/get", req).toPromise();
+      // Check if data exists for the given filter criteria
+      if (list.data.length > 0) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          icon: "error",
+          title: 'error',
+          text: `${errorMessage} already exists! Please try with another !`,
+          showConfirmButton: true,
+        });
+
+        // Reset the input field
+        this.sacTableForm.controls[fieldName].reset();
+      }
+    }
+    catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+    }
+  }
+  //#endregion
+
+  //#region 
+  async checkCodeExist() {
+    await this.checkValueExists("SHCD", "Service Code");
+  }
+  //#endregion
+
+  //#region 
+  async checkNameExist() {
+    await this.checkValueExists("SNM", "Serive Name");
+  }
+  //#endregion
+
+
 
   cancel() {
     this.route.navigateByUrl('/Masters/SAC-HSNMaster/SAC-HSNView');

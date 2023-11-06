@@ -56,7 +56,10 @@ export class SACControl {
                               message: "Please Enter 6 digit Service Code",
                               pattern: '^[0-9]{4,6}$'
                          }
-                    ]
+                    ],
+                    functions: {
+                         onChange: "checkCodeExist",
+                    }
                },
                {
                     name: 'SNM',

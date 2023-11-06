@@ -8,6 +8,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import Swal from 'sweetalert2';
 import { convertNumericalStringsToInteger } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
+import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 @Component({
   selector: 'app-add-container-master',
   templateUrl: './add-container-master.component.html',
@@ -26,7 +27,7 @@ export class AddContainerMasterComponent implements OnInit {
   isUpdate = false;
   newContainerCode: string;
   data: any;
-  backPath:string;
+  backPath: string;
   containerData: any;
   containerType: any;
   containerTypeStatus: any;
@@ -38,12 +39,13 @@ export class AddContainerMasterComponent implements OnInit {
     this.getContainerTypeData();
     this.backPath = "/Masters/ContainerMaster/ContainerMasterList";
   }
-  constructor(private Route: Router, private fb: UntypedFormBuilder,
+  constructor(
+    private Route: Router, private fb: UntypedFormBuilder,
     private masterService: MasterService, private filter: FilterUtils,
+    private containerService: ContainerService,
   ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.data = Route.getCurrentNavigation().extras.state.data;
-      console.log(this.data);
 
       this.action = 'edit'
       this.submit = 'Modify';
@@ -94,66 +96,59 @@ export class AddContainerMasterComponent implements OnInit {
   }
 
   //#region Save Function
-  save() {
+  async save() {
     this.containerTableForm.controls.containerType.setValue(this.containerTableForm.value.containerType.name);
     // Remove all form errors
     const controls = this.containerTableForm;
     clearValidatorsAndValidate(controls);
     if (this.isUpdate) {
-      let id = this.containerTableForm.value._id;
       this.containerTableForm.removeControl("_id");
       let req = {
         companyCode: this.companyCode,
         collectionName: "container_detail",
-        filter: { _id: id },
-        update: convertNumericalStringsToInteger(this.containerTableForm.value)
+        filter: {
+          _id: this.data._id,
+        },
+        update: this.containerTableForm.value
       };
-      this.masterService.masterPut('generic/update', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.Route.navigateByUrl('/Masters/ContainerMaster/ContainerMasterList');
-          }
-        }
-      });
-    } else {
-      const lastCode = this.containerData[this.containerData.length - 1];
-      const lastContainerCode = lastCode ? parseInt(lastCode.containerCode.substring(3)) : 0;
-      // Function to generate a new Container code
-      function generateContainerCode(initialCode: number = 0) {
-        const nextContainerCode = initialCode + 1;
-        const containerNumber = nextContainerCode.toString().padStart(4, '0');
-        const containerCode = `CON${containerNumber}`;
-        return containerCode;
+      const res = await this.masterService.masterPut('generic/update', req).toPromise()
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "edited successfully",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.Route.navigateByUrl('/Masters/ContainerMaster/ContainerMasterList');
       }
-      this.newContainerCode = generateContainerCode(lastContainerCode);
-      this.containerTableForm.controls["_id"].setValue(this.newContainerCode);
-      this.containerTableForm.controls["containerCode"].setValue(this.newContainerCode);
+    } else {
+      const getSeq = await this.containerService.getDetail();
+      const containerCode = getSeq[getSeq.length - 1].containerCode;
+      // Extract the last two digits from the containerCode
+      const lastTwoDigits = containerCode.slice(-2);
+      // Increment the last two digits by 1
+      const incrementedDigits = (parseInt(lastTwoDigits) + 1).toString().padStart(2, '0');
+      // Replace the last two digits in the containerCode with the incremented value
+      const updatedContainerCode = containerCode.slice(0, -2) + incrementedDigits;
+      this.containerTableForm.controls["containerCode"].setValue(updatedContainerCode);
+      const id = `${updatedContainerCode}`
+      this.containerTableForm.controls["_id"].setValue(id);
       let req = {
         companyCode: this.companyCode,
         collectionName: "container_detail",
-        data: convertNumericalStringsToInteger(this.containerTableForm.value)
+        data: this.containerTableForm.value
       };
-      this.masterService.masterPost('generic/create', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.Route.navigateByUrl('/Masters/ContainerMaster/ContainerMasterList');
-          }
-        }
-      });
+      const res = await this.masterService.masterPost("generic/create", req).toPromise();
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "data added successfully",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.Route.navigateByUrl('/Masters/ContainerMaster/ContainerMasterList');
+      }
     }
   }
   //#endregion
@@ -168,33 +163,7 @@ export class AddContainerMasterComponent implements OnInit {
       console.log("failed");
     }
   }
-  checkContainerExists() {
-    let req = {
-      companyCode: this.companyCode,
-      "collectionName": "container_detail",
-      "filter": {}
-    }
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.containerData = res.data;
-          const count = res.data.filter(item => item.containerName == this.containerTableForm.controls.containerName.value)
-          if (count.length > 0) {
-            Swal.fire({
-              title: 'Container Name already exists! Please try with another',
-              toast: true,
-              icon: "error",
-              showCloseButton: false,
-              showCancelButton: false,
-              showConfirmButton: true,
-              confirmButtonText: "OK"
-            });
-            this.containerTableForm.controls['containerName'].reset();
-          }
-        }
-      }
-    })
-  }
+
   //#region to get Container Type List
   getContainerTypeData() {
     this.masterService.getJsonFileDetails("containerTypeUrl").subscribe((res) => {

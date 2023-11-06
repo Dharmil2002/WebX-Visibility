@@ -555,7 +555,7 @@ export class DebitVoucherControl {
       },
 
       {
-        name: "Cheque/RefNo",
+        name: "ChequeOrRefNo",
         label: "Cheque/Ref No.",
         placeholder: "Cheque/Ref No.",
         type: "text",

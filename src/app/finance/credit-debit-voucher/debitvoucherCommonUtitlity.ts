@@ -64,7 +64,7 @@ export function GetLedgerDocument() {
         },
 
         DebitAmountAgaintsDocument: {
-            Title: "DebitAmount",
+            Title: "DebitAmount ₹",
             class: "matcolumncenter",
             Style: "min-width:170px",
         },
@@ -79,30 +79,30 @@ export function GetLedgerDocument() {
 
 export function GetDebitLedgerPreviewcolumnHeader() {
     return {
-        Instance: {
-            Title: "Instance",
-            class: "matcolumnfirst",
-            Style: "min-width:100px",
-        },
-        Value: {
-            Title: "Value",
-            class: "matcolumncenter",
-            Style: "min-width:100px",
-        },
+        // Instance: {
+        //     Title: "Instance",
+        //     class: "matcolumnfirst",
+        //     Style: "min-width:100px",
+        // },
+        // Value: {
+        //     Title: "Value",
+        //     class: "matcolumncenter",
+        //     Style: "min-width:100px",
+        // },
         Ledgercode: {
             Title: "Ledger code",
             class: "matcolumncenter",
-            Style: "max-width:100px",
+            Style: "max-width:200px",
         },
         Ledgername: {
             Title: "Ledger name",
             class: "matcolumncenter",
-            Style: "max-width:100px",
+            Style: "max-width:200px",
         },
         SubLedger: {
             Title: "Sub Ledger",
             class: "matcolumncenter",
-            Style: "max-width:120px",
+            Style: "max-width:150px",
         },
         Dr: {
             Title: "Dr. ₹",
@@ -124,11 +124,11 @@ export function GetDebitLedgerPreviewcolumnHeader() {
             class: "matcolumncenter",
             Style: "min-width:200px",
         },
-        DocumentReference: {
-            Title: "Document Reference",
-            class: "matcolumncenter",
-            Style: "min-width:150px",
-        },
+        // DocumentReference: {
+        //     Title: "Document Reference",
+        //     class: "matcolumncenter",
+        //     Style: "min-width:150px",
+        // },
 
     }
 }

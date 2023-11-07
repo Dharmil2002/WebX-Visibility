@@ -137,11 +137,18 @@ import { VendorContractListComponent } from "./vendor-contract/vendor-contract-l
 import { VendorIndexComponent } from './vendor-contract/vendor-index/vendor-index.component';
 import { VendorContractBasicInformationComponent } from './vendor-contract/vendorContractTabs/vendor-contract-basic-information/vendor-contract-basic-information.component';
 import { VendorContractServiceSelectionComponent } from './vendor-contract/vendorContractTabs/vendor-contract-service-selection/vendor-contract-service-selection.component';
-import { VendorContractTripLaneComponent } from './vendor-contract/vendorContractTabs/vendor-contract-trip-lane/vendor-contract-trip-lane.component';
 import { VendorTERDetailComponent } from './vendor-contract/vendorContractTabs/vendor-terdetail/vendor-terdetail.component';
 import { VendorTERModalComponent } from './vendor-contract/vendorContractTabs/vendor-terdetail/vendor-termodal/vendor-termodal.component';
 import { SacMasterListComponent } from "./sac-master/sac-master-list/sac-master-list.component";
 import { AddSacMasterComponent } from "./sac-master/add-sac-master/add-sac-master.component";
+import { VendorLHFTRDetailComponent } from './vendor-contract/vendorContractTabs/vendor-lhftrdetail/vendor-lhftrdetail.component';
+import { VendorLHFTRModalComponent } from './vendor-contract/vendorContractTabs/vendor-lhftrdetail/vendor-lhftrmodal/vendor-lhftrmodal.component';
+import { VendorLHLDetailComponent } from './vendor-contract/vendorContractTabs/vendor-lhldetail/vendor-lhldetail.component';
+import { VendorLHLModalComponent } from './vendor-contract/vendorContractTabs/vendor-lhldetail/vendor-lhlmodal/vendor-lhlmodal.component';
+import { VendorLMDDetailComponent } from './vendor-contract/vendorContractTabs/vendor-lmddetail/vendor-lmddetail.component';
+import { VendorLMDModalComponent } from './vendor-contract/vendorContractTabs/vendor-lmddetail/vendor-lmdmodal/vendor-lmdmodal.component';
+import { VendorBusiAssocDetailComponent } from './vendor-contract/vendorContractTabs/vendor-busi-assoc-detail/vendor-busi-assoc-detail.component';
+import { VendorBusiAssocModalComponent } from './vendor-contract/vendorContractTabs/vendor-busi-assoc-detail/vendor-busi-assoc-modal/vendor-busi-assoc-modal.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -296,9 +303,16 @@ import { AddSacMasterComponent } from "./sac-master/add-sac-master/add-sac-maste
     VendorIndexComponent,
     VendorContractBasicInformationComponent,
     VendorContractServiceSelectionComponent,
-    VendorContractTripLaneComponent,
     VendorTERDetailComponent,
-    VendorTERModalComponent
+    VendorTERModalComponent,
+    VendorLHFTRDetailComponent,
+    VendorLHFTRModalComponent,
+    VendorLHLDetailComponent,
+    VendorLHLModalComponent,
+    VendorLMDDetailComponent,
+    VendorLMDModalComponent,
+    VendorBusiAssocDetailComponent,
+    VendorBusiAssocModalComponent
   ],
 
   providers: [

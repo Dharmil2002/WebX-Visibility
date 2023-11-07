@@ -19,7 +19,7 @@ export class ManualVoucherComponent implements OnInit {
   };
   TableStyle = "width:100%"
   columnHeader = {
-    voucherNo: {
+    docNo: {
       Title: "Voucher No",
       class: "matcolumncenter",
       Style: "max-width:200px",
@@ -61,7 +61,7 @@ export class ManualVoucherComponent implements OnInit {
     }
   };
   staticField = [
-    "voucherNo",
+    "docNo",
     "voucherType",
     "voucherDate",
     "amount",
@@ -93,6 +93,7 @@ export class ManualVoucherComponent implements OnInit {
   }
   async getRakeDetail() {
     const detail = await manualvoucharDetail(this.masterService);
+    console.log(detail)
     const result = detail.map((x) => {
       if (x.status === "0") {
         // Modify the status property to "Generated"

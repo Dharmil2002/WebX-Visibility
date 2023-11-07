@@ -312,7 +312,7 @@
                       [multiple]="formItem.additionalData?.multiple || false">
                     <button mat-icon-button matSuffix class="example-full-width">
                       <ng-container *ngIf="formItem.additionalData?.isFileSelected; else eyeIcon">
-                        <mat-icon>attach_file</mat-icon>
+                        <mat-icon (click)="fileInput.click()">attach_file</mat-icon>
                       </ng-container>
                       <ng-template #eyeIcon>
                         <app-feather-icons [icon]="'eye'" style="cursor: pointer" [class]="'tbl-fav-edit'"

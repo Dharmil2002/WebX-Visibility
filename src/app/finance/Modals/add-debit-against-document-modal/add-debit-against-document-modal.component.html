@@ -6,7 +6,7 @@
 </div>
 <div class="body" style="max-height: 420px;">
     <div class="row">
-        <div class="col-4">
+        <!-- <div class="col-4">
             <form [formGroup]="DebitVoucherDocumentDebitsForm">
                 <app-form-webxpress [form]="DebitVoucherDocumentDebitsForm" [FormTitle]="'Document Debits'"
                     [formData]="jsonControlDebitVoucherDocumentDebitsArray"
@@ -15,15 +15,24 @@
                     [showSaveAndCancelButton]="true">
                 </app-form-webxpress>
             </form>
-        </div>
-        <div class="col-8">
+        </div> -->
+        <div class="col-12">
+            <form [formGroup]="DebitVoucherDocumentDebitsForm">
+                <app-form-webxpress [form]="DebitVoucherDocumentDebitsForm"
+                    [formData]="jsonControlDebitVoucherDocumentDebitsArray"
+                    [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-2'"
+                    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+                    [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
             <app-generic-table-v2 *ngIf="LoadDocumentDebitsDetails" [dynamicControls]="dynamicControls"
                 [columnHeader]="DocumentDebitsDisplayedColumns" [tableData]="DisplayOnlyDocumentDebits"
                 [menuItems]="menuItems" [staticField]="staticFieldForLedgerDocument" [Link]="linkArray"
                 [FormTitle]="'Document Debits'" [menuItemFlag]="menuItemflag" [addFlag]="addFlag" [showHeader]="false"
                 (menuItemClicked)="handleMenuItemClick($event)" [TitleBoxData]="this.TotalDebitAmount"
                 [DisplayAddNewButton]=this.DebitVoucherDocumentDebitsForm.value.DocumentType [DisplayCheckbox]="false"
-                (AddNewButtonEvent)="AddNewDocumentDebits()">
+                (AddNewButtonEvent)="AddNewDocumentDebits()" (SubmitButtonEvent)="Submit()"
+                [DisplaySaveButton]=this.DebitVoucherDocumentDebitsForm.value.DocumentType>
             </app-generic-table-v2>
         </div>
     </div>

@@ -647,16 +647,33 @@ export class DebitVoucherControl {
       {
         name: "ScanSupportingdocument",
         label: "Scan Supporting document",
-        placeholder: "Scan Supporting document",
+        placeholder: "",
         type: "file",
         value: "",
+        Validations: [
+        ],
+        additionalData: {
+          isFileSelected: true
+        },
+        functions: {
+          onChange: "selectFileScanDocument",
+        },
         generatecontrol: true,
         disable: false,
-        Validations: [],
-        functions: {
-          onChange: "onFileSelected",
-        },
       },
+      // {
+      //   name: "ScanSupportingdocument",
+      //   label: "Scan Supporting document",
+      //   placeholder: "Scan Supporting document",
+      //   type: "file",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      //   functions: {
+      //     onChange: "onFileSelected",
+      //   },
+      // },
 
     ];
 
@@ -939,6 +956,9 @@ export class DebitVoucherControl {
             message: "DebitAmount is required",
           },
         ],
+        functions: {
+          onModel: "DebitAmountAgaintsDocumentChange"
+        },
       },
       {
         name: "DocumentHdn",

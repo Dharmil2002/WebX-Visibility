@@ -17,7 +17,9 @@ import { GetLedgerDocument, GetLedgercolumnHeader } from './debitvoucherCommonUt
 import { AddDebitAgainstDocumentModalComponent } from '../Modals/add-debit-against-document-modal/add-debit-against-document-modal.component';
 import { DebitVoucherControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/debitvouchercontrol';
 import { DebitVoucherPreviewComponent } from '../Modals/debit-voucher-preview/debit-voucher-preview.component';
-import { DebitVoucherDataRequestModel, DebitVoucherRequestModel, DebitVoucherdetailsRequestModel } from 'src/app/Models/Finance/Finance';
+import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from 'src/app/Models/Finance/Finance';
+import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 @Component({
   selector: 'app-credit-debit-voucher',
   templateUrl: './credit-debit-voucher.component.html',
@@ -26,7 +28,6 @@ export class DebitVoucherComponent implements OnInit {
   companyCode: number | null
   debitVoucherRequestModel = new DebitVoucherRequestModel();
   debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
-  debitVoucherdetailsRequestModel: DebitVoucherdetailsRequestModel[] = [];
   breadScrums = [
     {
       title: "Debit Voucher",
@@ -78,6 +79,7 @@ export class DebitVoucherComponent implements OnInit {
   columnHeader = GetLedgercolumnHeader()
 
   tableData: any = [];
+  DebitAgainstDocumentList: any = [];
   SACCodeList: any = [];
   LoadVoucherDetails = true;
   TDSAtLineItem: boolean = false;
@@ -87,7 +89,7 @@ export class DebitVoucherComponent implements OnInit {
     submit: true,
     search: true
   };
-
+  imageData: any;
   PartyNameList: any;
   AllStateList: any;
   StateList: any;
@@ -102,8 +104,12 @@ export class DebitVoucherComponent implements OnInit {
     private navigationService: NavigationService,
     private voucherServicesService: VoucherServicesService,
     private matDialog: MatDialog,
+    private objImageHandling: ImageHandling,
   ) {
     this.companyCode = this.sessionService.getCompanyCode()
+    // this.imageData = {
+    //   'driverPhoto': this.DebitVoucherTaxationPaymentDetailsForm.driverPhoto
+    // }
   }
   ngOnInit(): void {
     this.BindDataFromApi();
@@ -423,65 +429,18 @@ export class DebitVoucherComponent implements OnInit {
     this.addVoucherDetails('')
   }
 
-  async save() {
-    // Create a new array to store the transformed data
-    var transformedData = this.tableData.map(function (item) {
-      // Split the "Ledger" value into "accCode" and "accName"
-      var ledgerParts = item.Ledger.split(":");
-      // Create a new object with the desired structure
-      return {
-        "accCode": ledgerParts[0],
-        "accName": ledgerParts[1],
-        "amount": item.Total,
-        "narration": item.Narration
-      };
-    });
-    console.log(this.DebitVoucherSummaryForm.value)
-    let reqBody = {
-      companyCode: this.companyCode,
-      voucherNo: "VR0002",
-      transDate: Date(),
-      finYear: financialYear,
-      branch: localStorage.getItem("Branch"),
-      transType: "DebitVoucher",
-      docType: "Voucher",
-      docNo: "VR0002",
-      partyCode: this.DebitVoucherSummaryForm.value?.PartyName?.value,
-      partyName: this.DebitVoucherSummaryForm.value?.PartyName?.name,
-      entryBy: localStorage.getItem("UserName"),
-      entryDate: Date(),
-      debit: transformedData,
-      credit: transformedData,
-
-    };
-    this.voucherServicesService
-      .FinancePost("fin/account/posting", reqBody)
-      .subscribe({
-        next: (res: any) => {
-          Swal.fire({
-            icon: "success",
-            title: "Voucher Created Successfully",
-            text:
-              "",
-            showConfirmButton: true,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // Redirect to the desired page after the success message is confirmed.
-              this.navigationService.navigateTotab(
-                "docket",
-                "dashboard/Index"
-              );
-            }
-          });
-        },
-      });
-  }
   cancel(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
   showhidebuttonclick(event) {
+    const MaxAllowedAmount = this.tableData.reduce((accumulator, currentValue) => {
+      return accumulator + parseFloat(currentValue['DebitAmount']);
+    }, 0);
+    const request = {
+      MaxAllowedAmount: MaxAllowedAmount
+    }
     const dialogRef = this.matDialog.open(AddDebitAgainstDocumentModalComponent, {
-      data: "request",
+      data: request,
       width: "100%",
       disableClose: true,
       position: {
@@ -490,7 +449,7 @@ export class DebitVoucherComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log(result)
+        this.DebitAgainstDocumentList = result;
       }
     });
 
@@ -771,7 +730,7 @@ export class DebitVoucherComponent implements OnInit {
     this.debitVoucherDataRequestModel.partyName = this.DebitVoucherSummaryForm.value.PartyName?.name;
     this.debitVoucherDataRequestModel.partyState = this.DebitVoucherSummaryForm.value.Partystate?.name;
     this.debitVoucherDataRequestModel.entryBy = this.DebitVoucherSummaryForm.value.Preparedby;
-    this.debitVoucherDataRequestModel.entryDate = new Date().toISOString();
+    this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString()
     this.debitVoucherDataRequestModel.panNo = ""
 
     this.debitVoucherDataRequestModel.tdsSectionCode = this.DebitVoucherTaxationTDSForm.value.TDSSection.value;
@@ -779,6 +738,11 @@ export class DebitVoucherComponent implements OnInit {
     this.debitVoucherDataRequestModel.tdsRate = this.DebitVoucherTaxationTDSForm.value.TDSRate;
     this.debitVoucherDataRequestModel.tdsAmount = this.DebitVoucherTaxationTDSForm.value.TDSDeduction;
     this.debitVoucherDataRequestModel.tdsAtlineitem = this.TDSAtLineItem
+
+    this.debitVoucherDataRequestModel.tcsSectionCode = this.DebitVoucherTaxationTCSForm.value.TCSSection.value;
+    this.debitVoucherDataRequestModel.tcsSectionName = this.DebitVoucherTaxationTCSForm.value.TCSSection.name;
+    this.debitVoucherDataRequestModel.tcsRate = this.DebitVoucherTaxationTCSForm.value.TCSRate;
+    this.debitVoucherDataRequestModel.tcsAmount = this.DebitVoucherTaxationTCSForm.value.TCSDeduction;
 
     this.debitVoucherDataRequestModel.IGST = this.DebitVoucherTaxationGSTForm.value.IGST || 0;
     this.debitVoucherDataRequestModel.SGST = this.DebitVoucherTaxationGSTForm.value.SGST || 0;
@@ -791,11 +755,11 @@ export class DebitVoucherComponent implements OnInit {
     this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount
     this.debitVoucherDataRequestModel.voucherCanceled = false
 
-    this.debitVoucherDataRequestModel.paymentMode = this.DebitVoucherTaxationPaymentDetailsForm.value.PaymentMode.value;
+    this.debitVoucherDataRequestModel.paymentMode = this.DebitVoucherTaxationPaymentDetailsForm.value.PaymentMode;
     this.debitVoucherDataRequestModel.refNo = this.DebitVoucherTaxationPaymentDetailsForm.value.ChequeOrRefNo;
-    this.debitVoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.value;
+    this.debitVoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
     this.debitVoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
-    this.debitVoucherDataRequestModel.scanSupportingDocument = ""
+    this.debitVoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
     this.debitVoucherDataRequestModel.paymentAmtount = NetPayable
 
 
@@ -823,28 +787,100 @@ export class DebitVoucherComponent implements OnInit {
         "narration": item.Narration
       };
     });
+
+    var debitAgainstDocumentList = this.DebitAgainstDocumentList.map(function (item) {
+      return {
+
+        "companyCode": companyCode,
+        "voucherNo": "",
+        "transType": "DebitVoucher",
+        "transDate": new Date(),
+        "finYear": financialYear,
+        "branch": CurrentBranchCode,
+        "Document": item?.Document,
+        "DebitAmountAgaintsDocument": parseFloat(item?.DebitAmountAgaintsDocument) || 0,
+        "DocumentType": item?.DocumentType,
+      };
+    });
+
     this.debitVoucherRequestModel.details = VoucherlineitemList
     this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
-    console.log(this.debitVoucherRequestModel)
+    this.debitVoucherRequestModel.debitAgainstDocumentList = debitAgainstDocumentList;
 
 
     const res = await this.voucherServicesService
       .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)
       .toPromise();
     if (res) {
-      Swal.fire({
-        icon: "success",
-        title: "Voucher Created Successfully",
-        text:
-          "VocherNo: " + res?.data?.mainData?.insertedId,
-        showConfirmButton: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Redirect to the desired page after the success message is confirmed.
-          // this._NavigationService.navigateTotab("docket", "dashboard/Index");
-        }
-      });
+      this.UploadLedgerInformations(res)
     }
 
   }
+  UploadLedgerInformations(res) {
+    // Create a new array to store the transformed data
+    var transformedData = this.tableData.map(function (item) {
+      // Split the "Ledger" value into "accCode" and "accName"
+      return {
+        "accCode": item.Ledger,
+        "accName": item.LedgerHdn,
+        "amount": item.Total,
+        "narration": item.Narration
+      };
+    });
+    let reqBody = {
+      companyCode: this.companyCode,
+      voucherNo: res?.data?.mainData?.insertedId,
+      transDate: Date(),
+      finYear: financialYear,
+      branch: localStorage.getItem("CurrentBranchCode"),
+      transType: "DebitVoucher",
+      docType: "Voucher",
+      docNo: res?.data?.mainData?.insertedId,
+      partyCode: this.DebitVoucherSummaryForm.value?.PartyName?.value,
+      partyName: this.DebitVoucherSummaryForm.value?.PartyName?.name,
+      entryBy: localStorage.getItem("UserName"),
+      entryDate: Date(),
+      debit: transformedData,
+      credit: transformedData,
+
+    };
+    this.voucherServicesService
+      .FinancePost("fin/account/posting", reqBody)
+      .subscribe({
+        next: (res: any) => {
+          Swal.fire({
+            icon: "success",
+            title: "Voucher Created Successfully",
+            text:
+              "VocherNo: " + reqBody.docNo,
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirect to the desired page after the success message is confirmed.
+              this.navigationService.navigateTotab(
+                "Voucher",
+                "dashboard/Index"
+              );
+            }
+          });
+        },
+      });
+  }
+  //#region Driver Photo
+
+  async selectFileScanDocument(data) {
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "ScanSupportingdocument", this.
+      DebitVoucherTaxationPaymentDetailsForm, this.imageData, "Voucher", 'Finance', this.jsonControlDebitVoucherTaxationPaymentDetailsArray);
+
+  }
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.matDialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
+  //#endregion
 }

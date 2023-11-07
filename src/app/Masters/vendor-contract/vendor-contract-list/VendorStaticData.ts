@@ -29,26 +29,31 @@ export const VendorTableData = [
 ]
 export const ContractTypeData = [
     {
+        isSelected: false,
         type: 'Long haul',
         typeName: 'Transportation- Express Route based',
         mode: 'Road',
     },
     {
+        isSelected: false,
         type: 'Long haul',
         typeName: 'Transportation- Long Haul full truck- route based',
         mode: 'Road',
     },
     {
+        isSelected: false,
         type: 'Long haul',
         typeName: 'Transportation- Long Haul lane based',
         mode: 'Road',
     },
     {
+        isSelected: false,
         type: 'Last Mile',
-        typeName: 'Transportation- last mile delivery',
+        typeName: 'Transportation- Last mile delivery',
         mode: 'Road',
     },
     {
+        isSelected: false,
         type: 'Last Mile',
         typeName: 'Business Associate',
         mode: 'Road/ Air/ Rail',
@@ -56,9 +61,18 @@ export const ContractTypeData = [
 ]
 export const RouteBasedTableData = [
     {
-        id:0,route: 'S00123: BHW-AMD-GGN', rateType: 'Flat', capacity: '20 Ton', rate: 55000, min: 0, max: 55000
+        id: 0, route: 'S00123: BHW-AMD-GGN', rateType: 'Flat', capacity: '20 Ton', rate: 55000, min: 0, max: 55000
     },
     {
-        id:1,route: 'S00324: BLR-CHN-HYD', rateType: 'Per Ton', capacity: '32 Ton Mxl', rate: 2450, min: 0, max: 9999999
+        id: 1, route: 'S00324: BLR-CHN-HYD', rateType: 'Per Ton', capacity: '32 Ton Mxl', rate: 2450, min: 0, max: 9999999
     }
 ]
+export const LastMileData = [
+    {
+        id: 0, location:'MUMB',rateType: 'Per KM', timeFrame: 'Per Month', capacity: '1 Ton', minCharge: 35000, committedKm: 3000,
+        additionalKm: 12.5, maxCharges: 55000
+    }
+]
+export const BusinessAssociates=[{
+    id:0,city:'Bhiwandi',controlLocation:'BHW',mode:'Road',operation:'Booking',rateType:'% of Freight',rate:5.5,min:100,max:1000
+}]

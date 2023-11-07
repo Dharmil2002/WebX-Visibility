@@ -8,11 +8,29 @@ export class AddContractProfile {
         name: "vendor",
         label: "Vendor",
         placeholder: "Vendor",
-        type: "text",
-        value: vendorInformationData.vendor,
+        type: 'dropdown',
+        value: "",
+        Validations: [
+          {
+            name: "required",
+            message: "Vendor is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true
+        },
+        functions: {
+          onOptionSelect: 'checkDuplicate'
+        },
         generatecontrol: true,
-        disable: false,
-        Validations: [],
+        disable: true,
       },
       {
         name: "contractID",
@@ -22,7 +40,11 @@ export class AddContractProfile {
         value: vendorInformationData.contractID,
         generatecontrol: true,
         disable: true,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "contractID is required"
+          },],
       },
       {
         name: "contractScan",

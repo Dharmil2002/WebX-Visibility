@@ -716,14 +716,19 @@ export class DebitVoucherComponent implements OnInit {
     const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
 
     this.debitVoucherRequestModel.companyCode = this.companyCode;
-    this.debitVoucherRequestModel.voucherNo = "";
     this.debitVoucherRequestModel.docType = "VR";
-    this.debitVoucherRequestModel.transType = "DebitVoucher"
-    this.debitVoucherRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
-    this.debitVoucherRequestModel.finYear = financialYear
     this.debitVoucherRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+    this.debitVoucherRequestModel.finYear = financialYear
+
 
     this.debitVoucherDataRequestModel.companyCode = this.companyCode;
+    this.debitVoucherDataRequestModel.voucherNo = "";
+    this.debitVoucherDataRequestModel.transType = "DebitVoucher";
+    this.debitVoucherDataRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
+    this.debitVoucherDataRequestModel.docType = "VR";
+    this.debitVoucherDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+    this.debitVoucherDataRequestModel.finYear = financialYear
+
     this.debitVoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
     this.debitVoucherDataRequestModel.preperedFor = this.DebitVoucherSummaryForm.value.Preparedfor;
     this.debitVoucherDataRequestModel.partyCode = this.DebitVoucherSummaryForm.value.PartyName?.value;
@@ -806,7 +811,6 @@ export class DebitVoucherComponent implements OnInit {
     this.debitVoucherRequestModel.details = VoucherlineitemList
     this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
     this.debitVoucherRequestModel.debitAgainstDocumentList = debitAgainstDocumentList;
-
 
     const res = await this.voucherServicesService
       .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)

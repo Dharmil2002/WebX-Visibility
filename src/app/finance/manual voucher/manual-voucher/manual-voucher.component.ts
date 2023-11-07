@@ -19,61 +19,57 @@ export class ManualVoucherComponent implements OnInit {
   };
   TableStyle = "width:100%"
   columnHeader = {
-    docNo: {
+    voucherNo: {
       Title: "Voucher No",
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
-    voucherType: {
+    transType: {
       Title: "Voucher Type",
       class: "matcolumncenter",
       Style: "max-width: 160px",
     },
-    voucherDate: {
+    transDate: {
       Title: "Voucher  Date",
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
-    amount: {
+    paymentAmtount: {
       Title: "Amount (₹)",
       class: "matcolumncenter",
       Style: "max-width: 120px",
     },
-    createdBy: {
+    entryBy: {
       Title: "Created By",
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
-    createdOn: {
+    entryDate: {
       Title: "Created on",
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
-    status: {
+    voucherCanceled: {
       Title: "Status",
       class: "matcolumncenter",
       Style: "max-width: 110px",
     },
-    actionsItems: {
-      Title: "Action",
-      class: "matcolumncenter",
-      Style: "max-width: 140px",
-    }
+    // actionsItems: {
+    //   Title: "Action",
+    //   class: "matcolumncenter",
+    //   Style: "max-width: 140px",
+    // }
   };
   staticField = [
-    "docNo",
-    "voucherType",
-    "voucherDate",
-    "amount",
-    "createdBy",
-    "createdOn",
-    "status"
+    "voucherNo",
+    "transType",
+    "transDate",
+    "paymentAmtount",
+    "entryBy",
+    "entryDate",
+    "voucherCanceled"
   ];
-  menuItems = [
-    { label: 'Modify' },
-    { label: 'Delete' }
-  ];
-  menuItemflag: boolean = true;
+
   linkArray = [
     // { Row: 'CHAAmount', Path: 'Operation/ChaDetail',componentDetails: ""},
     // { Row: 'NoofVoucher', Path: 'Operation/VoucherDetails',componentDetails: ""},
@@ -85,7 +81,7 @@ export class ManualVoucherComponent implements OnInit {
     private datePipe: DatePipe,
     private router: Router
   ) {
-    this.addAndEditPath = "Finance/CreditDebitVoucher";
+    this.addAndEditPath = "Finance/DebitVoucher";
   }
 
   ngOnInit(): void {
@@ -93,20 +89,13 @@ export class ManualVoucherComponent implements OnInit {
   }
   async getRakeDetail() {
     const detail = await manualvoucharDetail(this.masterService);
-    console.log(detail)
     const result = detail.map((x) => {
-      if (x.status === "0") {
-        // Modify the status property to "Generated"
-        const formattedDate = this.datePipe.transform(x.voucherDate, 'dd-MMM-yy HH:mm a');
-        const createdDate = this.datePipe.transform(x.createdDate, 'dd-MMM-yy HH:mm a');
-        return {
-          ...x, status: "Generated", voucherDate: formattedDate, createdOn: createdDate,
-          actions: ["Modify", "Delete"]
-        };
-      } else {
-        // Keep the object unchanged
-        return x;
-      }
+      const formattedDate = this.datePipe.transform(x.transDate, 'dd-MMM-yy HH:mm a');
+      const createdDate = this.datePipe.transform(x.entryDate, 'dd-MMM-yy HH:mm a');
+      return {
+        ...x, voucherCanceled: "Generated", transDate: formattedDate, entryDate: createdDate,
+        actions: ["Modify", "Delete"]
+      };
     });
 
     this.tableData = result;
@@ -115,7 +104,7 @@ export class ManualVoucherComponent implements OnInit {
 
   async handleMenuItemClick(data) {
     if (data.label.label === "Modify") {
-      this.router.navigate(['Finance/CreditDebitVoucher'], {
+      this.router.navigate(['Finance/DebitVoucher'], {
         state: {
           data: data.data
         },

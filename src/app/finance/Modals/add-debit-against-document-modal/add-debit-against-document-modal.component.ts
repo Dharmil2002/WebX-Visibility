@@ -37,6 +37,7 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
   ];
   addFlag = true;
   menuItemflag = true;
+  totalDebitAmountAgaintsDocument = 0;
   DocumentDebits: any = [];
   DisplayOnlyDocumentDebits: any = [];
 
@@ -107,6 +108,7 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
   DocumentFieldChanged(event) {
     const DocumentType = this.DebitVoucherDocumentDebitsForm.value.DocumentType;
     this.CalculateTotalAmountBasedOnDocumentType(DocumentType.value)
+    this.DebitVoucherDocumentDebitsForm.get("DocumentType").disable()
 
   }
   addDocumentDebits(event) {
@@ -115,6 +117,8 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
     const request = {
       DocumentType: DocumentType,
       Details: event,
+      TotalAmount: this.totalDebitAmountAgaintsDocument,
+      MaxAllowedAmount: this.objResult.MaxAllowedAmount
     }
     this.LoadDocumentDebitsDetails = false
     const dialogRef = this.matDialog.open(AddDetailsDebitAgainstDocumentModalComponent, {
@@ -148,12 +152,12 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
   }
   CalculateTotalAmountBasedOnDocumentType(DocumentType) {
     this.DisplayOnlyDocumentDebits = this.DocumentDebits.filter(item => item.DocumentType == DocumentType);
-    const totalDebitAmountAgaintsDocument = this.DisplayOnlyDocumentDebits.reduce((accumulator, currentValue) => {
+    this.totalDebitAmountAgaintsDocument = this.DisplayOnlyDocumentDebits.reduce((accumulator, currentValue) => {
       return accumulator + parseFloat(currentValue['DebitAmountAgaintsDocument']);
     }, 0);
     this.TotalDebitAmount = [
       {
-        count: totalDebitAmountAgaintsDocument,
+        count: this.totalDebitAmountAgaintsDocument,
         title: "Total Debit Amount",
         class: `color-Ocean-light`,
       }
@@ -163,7 +167,7 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
   async AddNewDocumentDebits() {
     this.addDocumentDebits('');
   }
-  save() {
+  Submit() {
     this.dialogRef.close(this.DocumentDebits)
   }
 }

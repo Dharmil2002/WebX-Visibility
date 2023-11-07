@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
@@ -93,6 +93,26 @@ export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
   cancel(event) {
     this.dialogRef.close()
   }
+  DebitAmountAgaintsDocumentChange(event) {
+    const maxAllowedAmount = parseFloat(this.objResult.MaxAllowedAmount) || 0;
+    const totalAmount = parseFloat(this.objResult.TotalAmount) || 0;
+    const eventArgs = parseFloat(event?.eventArgs) || 0;
+    const totalAllowedAmt = maxAllowedAmount - totalAmount;
+
+    const DebitAmountAgaintsDocument = this.DebitAgainstDocumentForm.get('DebitAmountAgaintsDocument');
+    if (eventArgs > totalAllowedAmt) {
+      const allowedAmt = totalAllowedAmt == 0 ? 0 : eventArgs - totalAllowedAmt;
+      DebitAmountAgaintsDocument.setValidators([
+        Validators.required,
+        Validators.max(allowedAmt),
+      ]);
+
+      const customErrorMessage = 'Value exceeds the maximum allowed amount.';
+      DebitAmountAgaintsDocument.setErrors({ customError: customErrorMessage });
+    }
+    DebitAmountAgaintsDocument.updateValueAndValidity();
+  }
+
 
 }
 

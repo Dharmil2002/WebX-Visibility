@@ -29,6 +29,11 @@
                                 <mat-icon>add</mat-icon>
                                 Add New
                             </button>
+                            <button *ngIf="DisplaySaveButton" matTooltip="Submit" mat-stroked-button
+                                style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " (click)="Submit()"
+                                class="filter_btn">
+                                Submit
+                            </button>
                         </div>
                         <hr style="margin:0px">
                     </div>
@@ -73,7 +78,8 @@
                                     </li>
                                     <li *ngIf="filterColumn">
                                         <button type="button"
-                                            class="btn btn-warning btn-border-radius waves-effect msr-2" (click)="openDialog()">
+                                            class="btn btn-warning btn-border-radius waves-effect msr-2"
+                                            (click)="openDialog()">
                                             <i-feather style="width: 24px;height: 24px;color:white"
                                                 name="filter"></i-feather>
                                         </button>

@@ -8,6 +8,7 @@ export class DebitVoucherRequestModel {
   branch: string
   data: DebitVoucherDataRequestModel
   details: DebitVoucherdetailsRequestModel[]
+  debitAgainstDocumentList: DebitAgainstDocumentList[]
 }
 
 export class DebitVoucherDataRequestModel {
@@ -65,4 +66,15 @@ export class DebitVoucherdetailsRequestModel {
   Total: number
   TDSApplicable: boolean
   narration: string
+}
+export class DebitAgainstDocumentList {
+  companyCode: number
+  voucherNo: string
+  transType: string
+  transDate: string
+  finYear: string
+  branch: string
+  Document: string
+  DebitAmountAgaintsDocument: string
+  DocumentType: string
 }

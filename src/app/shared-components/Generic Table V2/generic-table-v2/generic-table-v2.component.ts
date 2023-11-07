@@ -42,6 +42,7 @@ export class GenericTableV2Component
   @Input() TitleBoxData: any;
   @Input() AddNewButton: any = false;
   @Output() AddNewButtonEvent = new EventEmitter<any>();
+  @Output() SubmitButtonEvent = new EventEmitter<any>();
   @Output() menuItemClicked = new EventEmitter<any>();
   @Output() selectAllClicked = new EventEmitter<any>();
   @Output() DeleteFunction = new EventEmitter<any>();
@@ -57,6 +58,7 @@ export class GenericTableV2Component
   @Input() refreshbtn: boolean = false;
   @Input() showHeader: boolean = true;
   @Input() DisplayAddNewButton: boolean = false;
+  @Input() DisplaySaveButton: boolean = false;
   @Input() DisplayCheckbox: boolean = false;
   @Input() staticField = [];
   @Input() allColumnFilter = [];
@@ -175,7 +177,6 @@ export class GenericTableV2Component
       this.addEmitter.emit();
     }
   }
-
   //#region this function is called when rendering data in table and returns formatted data if required.
   formatData(val: string, key: string) {
     if (key === "valdity_dt" && val !== null) {
@@ -387,6 +388,13 @@ export class GenericTableV2Component
       this.AddNewButtonEvent.emit()
     }
   }
+  Submit() {
+    if (this.addAndEditPath) {
+      this.router.navigateByUrl(this.addAndEditPath);
+    } else {
+      this.SubmitButtonEvent.emit()
+    }
+  }
   Delete(element) {
     this.DeleteFunction.emit({ element })
   }
@@ -426,7 +434,7 @@ export class GenericTableV2Component
             Title: curr.title,
             class: curr.className,
             Style: style.Style, // Creating Style property
-            type:style.type
+            type: style.type
           };
           return acc;
         }, {});

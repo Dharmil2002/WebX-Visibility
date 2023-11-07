@@ -31,9 +31,9 @@ export class DebitVoucherPreviewComponent implements OnInit {
   ];
   addFlag = true;
   menuItemflag = true;
-  staticField = ['Instance',
-    'Value', 'Ledgercode', 'Ledgername', 'SubLedger', 'Dr', 'Cr', 'Location', 'Narration', 'DocumentReference']
-
+  staticField = ['Ledgercode', 'Ledgername', 'SubLedger', 'Dr', 'Cr', 'Location', 'Narration',]
+  //'Instance',
+  // 'Value',DocumentReference
   columnHeader = GetDebitLedgerPreviewcolumnHeader()
   totalDebit;
   totalCredit

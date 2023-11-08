@@ -151,21 +151,40 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
 }
 
 
-export async function GetDocumentsWiseListFromApi(masterService, collectionName, field, value) {
+export async function GetDocumentsWiseListFromApi(
+    masterService,
+    collectionName,
+    field,
+    value,
+    fixedfield?,
+    fixedvalue?
+) {
     try {
         const companyCode = localStorage.getItem('companyCode');
         const filters = [
             {
-                "field": field,
-                "value": value,
-                "exactMatch": false
-            }
+                field: field,
+                value: value,
+                exactMatch: false,
+            },
         ];
+
+        // Check if fixedfield and fixedvalue are provided and not undefined
+        if (fixedfield !== undefined && fixedvalue !== undefined) {
+            filters.push({
+                field: fixedfield,
+                value: fixedvalue,
+                exactMatch: true,
+            });
+        }
+
         const req = { companyCode, collectionName: collectionName, filters };
         const res = await masterService.masterPost('generic/getaggregate', req).toPromise();
+
         if (res && res.data) {
-            return res.data.map(x => ({
-                name: x[field], value: x[field]
+            return res.data.map((x) => ({
+                name: x[field],
+                value: x[field],
             }));
         }
     } catch (error) {
@@ -173,3 +192,4 @@ export async function GetDocumentsWiseListFromApi(masterService, collectionName,
     }
     return []; // Return an empty array in case of an error or missing data
 }
+

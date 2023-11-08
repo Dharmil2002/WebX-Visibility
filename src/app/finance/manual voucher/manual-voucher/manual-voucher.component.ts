@@ -19,37 +19,37 @@ export class ManualVoucherComponent implements OnInit {
   };
   TableStyle = "width:100%"
   columnHeader = {
-    voucherNo: {
+    vNO: {
       Title: "Voucher No",
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
-    transType: {
+    tTYP: {
       Title: "Voucher Type",
       class: "matcolumncenter",
       Style: "max-width: 160px",
     },
-    transDate: {
+    tTDT: {
       Title: "Voucher  Date",
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
-    paymentAmtount: {
+    pAMT: {
       Title: "Amount (₹)",
       class: "matcolumncenter",
       Style: "max-width: 120px",
     },
-    entryBy: {
+    eBY: {
       Title: "Created By",
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
-    entryDate: {
+    eDT: {
       Title: "Created on",
       class: "matcolumncenter",
       Style: "max-width: 200px",
     },
-    voucherCanceled: {
+    vCAN: {
       Title: "Status",
       class: "matcolumncenter",
       Style: "max-width: 110px",
@@ -61,13 +61,13 @@ export class ManualVoucherComponent implements OnInit {
     // }
   };
   staticField = [
-    "voucherNo",
-    "transType",
-    "transDate",
-    "paymentAmtount",
-    "entryBy",
-    "entryDate",
-    "voucherCanceled"
+    "vNO",
+    "tTYP",
+    "tTDT",
+    "pAMT",
+    "eBY",
+    "eDT",
+    "vCAN"
   ];
 
   linkArray = [
@@ -90,10 +90,10 @@ export class ManualVoucherComponent implements OnInit {
   async getRakeDetail() {
     const detail = await manualvoucharDetail(this.masterService);
     const result = detail.map((x) => {
-      const formattedDate = this.datePipe.transform(x.transDate, 'dd-MMM-yy HH:mm a');
-      const createdDate = this.datePipe.transform(x.entryDate, 'dd-MMM-yy HH:mm a');
+      const formattedDate = this.datePipe.transform(x.tTDT, 'dd-MMM-yy HH:mm a');
+      const createdDate = this.datePipe.transform(x.eDT, 'dd-MMM-yy HH:mm a');
       return {
-        ...x, voucherCanceled: "Generated", transDate: formattedDate, entryDate: createdDate,
+        ...x, vCAN: "Generated", tTDT: formattedDate, eDT: createdDate,
         actions: ["Modify", "Delete"]
       };
     });

@@ -36,11 +36,17 @@
                                 </div>
                                 <h5 class="b-b p-10 text-strong">Contract Tabs</h5>
                                 <ul id="mail-folders" style="padding: 5px">
-                                    <li *ngFor="let folder of folders"
+                                    <!-- <li *ngFor="let folder of folders"
                                         [class.active]="selectedFolders.includes(folder)?folder === selectedFolder:null">
                                         <a href="javascript:;"
                                             (click)="selectedFolders.includes(folder) ? selectFolder(folder):null"
                                             [title]="folder">
+                                            {{ folder }}
+                                        </a>
+                                    </li> -->
+                                    <li *ngFor="let folder of selectedFolders"
+                                        [class.active]="folder === selectedFolder">
+                                        <a href="javascript:;" (click)="selectFolder(folder)" [title]="folder">
                                             {{ folder }}
                                         </a>
                                     </li>

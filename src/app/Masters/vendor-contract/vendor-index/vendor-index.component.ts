@@ -1,6 +1,7 @@
-import { Component, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
+import { VendorContractListingService } from 'src/app/core/service/vendor-contract-listing.service';
 
 @Component({
   selector: 'app-vendor-index',
@@ -17,43 +18,35 @@ export class VendorIndexComponent implements OnInit {
   folders = [
     "Basic Information",
     "Services Selection",
-    "Express Route based",
-    "Long Haul full truck- route based",
-    "Long Haul lane based",
-    "Last mile delivery",
-    "Business Associate"
   ];
-  selectedFolders = [
-    "Basic Information",
-    "Services Selection",
-  ];
-
+  selectedFolders = [];
   CurrentContractDetails: any;
   selectedFolder: string;
-  constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,) {
+  selectedContractType: any;
+
+  constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
+    private contractService: VendorContractListingService,
+  ) {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
     });
     this.selectFolder('Basic Information')
-
-    // Retrieving the array from session storage
-    const storedData = sessionStorage.getItem('selectedContractType');
-
-    if (storedData) {
-      const selectedData = JSON.parse(storedData);
-
-      // Remove "Transportation- " from each item in the array
-      const selectedContractTypeData = selectedData.map(item => item.replace('Transportation- ', ''));
-      this.selectedFolders = this.selectedFolders.concat(selectedContractTypeData);
-    }
   }
 
   selectFolder(folder: string) {
     this.selectedFolder = folder;
   }
-  ngOnInit(): void {
+  ngOnInit() {
+    this.contractService.getContractType().subscribe((contractTypes) => {
+      this.processData(contractTypes);
+    });
   }
 
+  processData(contractTypes: any[]) {
+    // Process the data after receiving it in the subscription
+    const selectedContractTypeData = contractTypes.map(item => item.replace('Transportation- ', ''));
+    this.selectedFolders = this.folders.concat(selectedContractTypeData)
+  }
 }

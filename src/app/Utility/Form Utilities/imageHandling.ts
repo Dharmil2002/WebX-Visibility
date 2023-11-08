@@ -12,7 +12,7 @@ export class ImageHandling {
     constructor(private masterService: MasterService,) { }
 
     //#region to handle file selection
-    async uploadFile(event, controlName, formControl, imageData, masterName, documentGroup, jsonControl) {
+    async uploadFile(event, controlName, formControl, imageData, masterName, documentGroup, jsonControl, allowedformates?: string[]) {
         // Get the selected files from the input element
         const files: FileList = event;
         if (files.length > 0) {
@@ -22,7 +22,7 @@ export class ImageHandling {
             const fileFormat = file.type.split('/')[1]; // Extract file format from MIME type
 
             // Allowed file formats
-            const allowedFormats = ["jpeg", "png", "jpg"];
+            const allowedFormats = allowedformates;
 
             if (allowedFormats.includes(fileFormat)) {
 

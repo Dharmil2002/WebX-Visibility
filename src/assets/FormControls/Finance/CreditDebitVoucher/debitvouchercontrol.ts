@@ -650,8 +650,7 @@ export class DebitVoucherControl {
         placeholder: "",
         type: "file",
         value: "",
-        Validations: [
-        ],
+        Validations: [],
         additionalData: {
           isFileSelected: true
         },

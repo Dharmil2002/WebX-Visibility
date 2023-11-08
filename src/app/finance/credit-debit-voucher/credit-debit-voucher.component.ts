@@ -437,7 +437,8 @@ export class DebitVoucherComponent implements OnInit {
       return accumulator + parseFloat(currentValue['DebitAmount']);
     }, 0);
     const request = {
-      MaxAllowedAmount: MaxAllowedAmount
+      MaxAllowedAmount: MaxAllowedAmount,
+      PartName: this.DebitVoucherSummaryForm.value.PartyName?.name
     }
     const dialogRef = this.matDialog.open(AddDebitAgainstDocumentModalComponent, {
       data: request,
@@ -875,7 +876,8 @@ export class DebitVoucherComponent implements OnInit {
   async selectFileScanDocument(data) {
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "ScanSupportingdocument", this.
-      DebitVoucherTaxationPaymentDetailsForm, this.imageData, "Voucher", 'Finance', this.jsonControlDebitVoucherTaxationPaymentDetailsArray);
+      DebitVoucherTaxationPaymentDetailsForm, this.imageData, "Voucher", 'Finance', this.jsonControlDebitVoucherTaxationPaymentDetailsArray,
+      ["jpg", "png", "jpeg", "pdf"]);
 
   }
   openImageDialog(control) {

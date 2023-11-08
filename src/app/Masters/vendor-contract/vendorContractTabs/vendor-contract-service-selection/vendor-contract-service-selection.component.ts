@@ -1,56 +1,15 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Subject, take, takeUntil } from 'rxjs';
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { Component, OnInit } from '@angular/core';
 import { SessionService } from 'src/app/core/service/session.service';
 import { ContractTypeData } from '../../vendor-contract-list/VendorStaticData';
-interface CurrentAccessListType {
-  productAccess: string[];
-  ServicesSelectionAccess: string[];
-}
+import { VendorContractListingService } from 'src/app/core/service/vendor-contract-listing.service';
+
 @Component({
   selector: 'app-vendor-contract-service-selection',
   templateUrl: './vendor-contract-service-selection.component.html'
 })
 export class VendorContractServiceSelectionComponent implements OnInit {
 
-  //#region Form Configration Fields
-
   companyCode: any;
-  CurrentAccessList: CurrentAccessListType;
-  ProductsForm: UntypedFormGroup;
-  jsonControlArrayProductsForm: any;
-
-  ServicesForm: UntypedFormGroup;
-  jsonControlArrayServicesForm: any;
-
-  CODDODForm: UntypedFormGroup;
-  jsonControlArrayCODDODForm: any;
-
-  VolumtericForm: UntypedFormGroup;
-  jsonControlArrayVolumtericForm: any;
-
-  DemurrageForm: UntypedFormGroup;
-  jsonControlArrayDemurrageForm: any;
-
-  InsuranceCarrierRiskForm: UntypedFormGroup;
-  jsonControlArrayInsuranceCarrierRiskForm: any;
-
-  CutOfftimeForm: UntypedFormGroup;
-  jsonControlArrayCutOfftimeForm: any;
-
-  YieldProtectionForm: UntypedFormGroup;
-  jsonControlArrayYieldProtectionForm: any;
-
-  FuelSurchargeForm: UntypedFormGroup;
-  jsonControlArrayFuelSurchargeForm: any;
-
-  //#endregion
-  protected _onDestroy = new Subject<void>();
-
   //#region Table Configration Fields
   isLoad: boolean = false;
   linkArray = [
@@ -111,14 +70,14 @@ export class VendorContractServiceSelectionComponent implements OnInit {
   //#endregion
 
 
-  constructor(private sessionService: SessionService) {
+  constructor(private sessionService: SessionService, private objContractService: VendorContractListingService) {
     this.companyCode = this.sessionService.getCompanyCode()
     // Retrieving the array from session storage
-    const storedData = sessionStorage.getItem('selectedContractType');
+    this.objContractService.getContractType().subscribe((contractTypes) => {
+      this.previousContractType = contractTypes;
+    });
 
-    if (storedData) {
-      this.previousContractType = JSON.parse(storedData);
-    
+    if (this.previousContractType) {
       // Iterate through tableData and update isSelected based on previousContractType
       this.tableData.forEach(item => {
         if (this.previousContractType.includes(item.typeName)) {
@@ -128,27 +87,18 @@ export class VendorContractServiceSelectionComponent implements OnInit {
         }
       });
     }
-    
   }
 
-  //#region to initialize form controls
 
   ngOnInit() {
   }
 
-
   selectCheckBox(event) {
-    // console.log(event);
-  
     // Create a new array to store the selected contract types
     this.selectedContractType = event
       .filter(item => item.isSelected)
       .map(item => item.typeName);
-  
-    console.log(this.selectedContractType);
-  
-    // Storing the array in session storage
-    sessionStorage.setItem('selectedContractType', JSON.stringify(this.selectedContractType));
+    // console.log(this.selectedContractType);
+    this.objContractService.setContractType(this.selectedContractType);
   }
-  
 }

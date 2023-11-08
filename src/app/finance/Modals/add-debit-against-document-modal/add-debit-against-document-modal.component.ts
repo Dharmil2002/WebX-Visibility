@@ -118,7 +118,8 @@ export class AddDebitAgainstDocumentModalComponent implements OnInit {
       DocumentType: DocumentType,
       Details: event,
       TotalAmount: this.totalDebitAmountAgaintsDocument,
-      MaxAllowedAmount: this.objResult.MaxAllowedAmount
+      MaxAllowedAmount: this.objResult.MaxAllowedAmount,
+      PartName: this.objResult.PartName
     }
     this.LoadDocumentDebitsDetails = false
     const dialogRef = this.matDialog.open(AddDetailsDebitAgainstDocumentModalComponent, {

@@ -5,14 +5,14 @@
             [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
-    <div
+    <!-- <div
         style="width: 100%; background-color: rgba(39, 39, 39, 0.1); color: black; text-align: center; font-weight: 600; ">
         <h3 style="font-size: 1.5rem; padding: 5px 0px;">Details</h3>
-    </div>
-    <hr>
+    </div> -->
+    <!-- <hr> -->
     <form [formGroup]="RouteDetailTableForm">
         <app-form-webxpress [form]="RouteDetailTableForm" [formData]="jsonControlRouteDetailArray"
-            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [FormTitle]="'Details'"
             (functionCallEmitter)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>

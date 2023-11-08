@@ -1,481 +1,753 @@
 {
-    "data": [
-      {
-        "title": "SAC-HSNMaster/SAC-HSNView",
-        "tag": ["SacMaster", "SAC-HSNView"],
-        "router": "Masters/SAC-HSNMaster/SAC-HSNView"
-      },
-      {
-        "title": "SAC-HSNMaster/AddSAC-HSN",
-        "tag": ["SacMaster", "AddSAC-HSN"],
-        "router": "Masters/SAC-HSNMaster/AddSAC-HSN"
-      },
-      {
-        "title": "Docket/Create",
-        "tag": ["Docket", "Create"],
-        "router": "Masters/Docket/Create"
-      },
-      {
-        "title": "Docket/Ewaybill-Config",
-        "tag": ["Docket", "Ewaybill-Config"],
-        "router": "Masters/Docket/Ewaybill-Config"
-      },
-      {
-        "title": "Docket/Ewaybill",
-        "tag": ["Docket", "Ewaybill"],
-        "router": "Masters/Docket/Ewaybill"
-      },
-      {
-        "title": "Docket/EwayBillDocketBooking",
-        "tag": ["Docket", "EwayBillDocketBooking"],
-        "router": "Masters/Docket/EwayBillDocketBooking"
-      },
-      {
-        "title": "Docket/EwayBillDocketBookingV2",
-        "tag": ["Docket", "EwayBillDocketBookingV2"],
-        "router": "Masters/Docket/EwayBillDocketBookingV2"
-      },
-      {
-        "title": "Docket/LoadingSheet",
-        "tag": ["Docket", "LoadingSheet"],
-        "router": "Masters/Docket/LoadingSheet"
-      },
-      {
-        "title": "Docket/LoadingSheetDetails",
-        "tag": ["Docket", "LoadingSheetDetails"],
-        "router": "Masters/Docket/LoadingSheetDetails"
-      },
-      {
-        "title": "Docket/DispatchVehicle",
-        "tag": ["Docket", "DispatchVehicle"],
-        "router": "Masters/Docket/DispatchVehicle"
-      },
-      {
-        "title": "Docket/ManifestGeneration",
-        "tag": ["Docket", "ManifestGeneration"],
-        "router": "Masters/Docket/ManifestGeneration"
-      },
-      {
-        "title": "CompanyGSTMaster/CompanyGSTMasterList",
-        "tag": ["CompanyGSTMaster", "CompanyGSTMasterList"],
-        "router": "Masters/CompanyGSTMaster/CompanyGSTMasterList"
-      },
-      {
-        "title": "CompanyGSTMaster/AddCompanyGSTMaster",
-        "tag": ["CompanyGSTMaster", "AddCompanyGSTMaster"],
-        "router": "Masters/CompanyGSTMaster/AddCompanyGSTMaster"
-      },
-      {
-        "title": "StateMaster/StateMasterView",
-        "tag": ["StateMaster", "StateMasterView"],
-        "router": "Masters/StateMaster/StateMasterView"
-      },
-      {
-        "title": "StateMaster/AddState",
-        "tag": ["StateMaster", "AddState"],
-        "router": "Masters/StateMaster/AddState"
-      },
-      {
-        "title": "CityMaster/CityMasterView",
-        "tag": ["CityMaster", "CityMasterView"],
-        "router": "Masters/CityMaster/CityMasterView"
-      },
-      {
-        "title": "CityMaster/AddCity",
-        "tag": ["CityMaster", "AddCity"],
-        "router": "Masters/CityMaster/AddCity"
-      },
-      {
-        "title": "DriverMaster/DriverMasterList",
-        "tag": ["DriverMaster", "DriverMasterList"],
-        "router": "Masters/DriverMaster/DriverMasterList"
-      },
-      {
-        "title": "DriverMaster/AddDriverMaster",
-        "tag": ["DriverMaster", "AddDriverMaster"],
-        "router": "Masters/DriverMaster/AddDriverMaster"
-      },
-      {
-        "title": "LocationMaster/LocationMasterList",
-        "tag": ["LocationMaster", "LocationMasterList"],
-        "router": "Masters/LocationMaster/LocationMasterList"
-      },
-      {
-        "title": "LocationMaster/AddLocationMaster",
-        "tag": ["LocationMaster", "AddLocationMaster"],
-        "router": "Masters/LocationMaster/AddLocationMaster"
-      },
-      {
-        "title": "CompanyMaster/AddCompany",
-        "tag": ["CompanyMaster", "AddCompany"],
-        "router": "Masters/CompanyMaster/AddCompany"
-      },
-      {
-        "title": "CustomerMaster/CustomerMasterList",
-        "tag": ["CustomerMaster", "CustomerMasterList"],
-        "router": "Masters/CustomerMaster/CustomerMasterList"
-      },
-      {
-        "title": "CustomerMaster/AddCustomerMaster",
-        "tag": ["CustomerMaster", "AddCustomerMaster"],
-        "router": "Masters/CustomerMaster/AddCustomerMaster"
-      },
-      {
-        "title": "DocumentControlRegister/AddDCR",
-        "tag": ["DocumentControlRegister", "AddDCR"],
-        "router": "Masters/DocumentControlRegister/AddDCR"
-      },
-      {
-        "title": "CustomerGroupMaster/CustomerGroupMasterList",
-        "tag": ["CustomerGroupMaster", "CustomerGroupMasterList"],
-        "router": "Masters/CustomerGroupMaster/CustomerGroupMasterList"
-      },
-      {
-        "title": "CustomerGroupMaster/AddCustomerGroupMaster",
-        "tag": ["CustomerGroupMaster", "AddCustomerGroupMaster"],
-        "router": "Masters/CustomerGroupMaster/AddCustomerGroupMaster"
-      },
-      {
-        "title": "DocumentControlRegister/TrackDCR",
-        "tag": ["DocumentControlRegister", "TrackDCR"],
-        "router": "Masters/DocumentControlRegister/TrackDCR"
-      },
-      {
-        "title": "DocumentControlRegister/DCRDetail",
-        "tag": ["DocumentControlRegister", "DCRDetail"],
-        "router": "Masters/DocumentControlRegister/DCRDetail"
-      },
-      {
-        "title": "DocumentControlRegister/SplitDCR",
-        "tag": ["DocumentControlRegister", "SplitDCR"],
-        "router": "Masters/DocumentControlRegister/SplitDCR"
-      },
-      {
-        "title": "VehicleTypeMaster/VehicleTypeMasterList",
-        "tag": ["VehicleTypeMaster", "VehicleTypeMasterList"],
-        "router": "Masters/VehicleTypeMaster/VehicleTypeMasterList"
-      },
-      {
-        "title": "VehicleTypeMaster/AddVehicleTypeMaster",
-        "tag": ["VehicleTypeMaster", "AddVehicleTypeMaster"],
-        "router": "Masters/VehicleTypeMaster/AddVehicleTypeMaster"
-      },
-      {
-        "title": "PinCodeMaster/PinCodeMasterList",
-        "tag": ["PinCodeMaster", "PinCodeMasterList"],
-        "router": "Masters/PinCodeMaster/PinCodeMasterList"
-      },
-      {
-        "title": "PinCodeMaster/AddPinCodeMaster",
-        "tag": ["PinCodeMaster", "AddPinCodeMaster"],
-        "router": "Masters/PinCodeMaster/AddPinCodeMaster"
-      },
-      {
-        "title": "VehicleMaster/VehicleMasterList",
-        "tag": ["VehicleMaster", "VehicleMasterList"],
-        "router": "Masters/VehicleMaster/VehicleMasterList"
-      },
-      {
-        "title": "VehicleMaster/AddVehicle",
-        "tag": ["VehicleMaster", "AddVehicle"],
-        "router": "Masters/VehicleMaster/AddVehicle"
-      },
-      {
-        "title": "RouteLocationWise/RouteList",
-        "tag": ["RouteLocationWise", "RouteList"],
-        "router": "Masters/RouteLocationWise/RouteList"
-      },
-      {
-        "title": "RouteLocationWise/RouteAdd",
-        "tag": ["RouteLocationWise", "RouteAdd"],
-        "router": "Masters/RouteLocationWise/RouteAdd"
-      },
-      {
-        "title": "UserMaster/UserMasterView",
-        "tag": ["UserMaster", "UserMasterView"],
-        "router": "Masters/UserMaster/UserMasterView"
-      },
-      {
-        "title": "UserMaster/AddUser",
-        "tag": ["UserMaster", "AddUser"],
-        "router": "Masters/UserMaster/AddUser"
-      },
-      {
-        "title": "VendorMaster/VendorMasterList",
-        "tag": ["VendorMaster", "VendorMasterList"],
-        "router": "Masters/VendorMaster/VendorMasterList"
-      },
-      {
-        "title": "VendorMaster/AddVendorMaster",
-        "tag": ["VendorMaster", "AddVendorMaster"],
-        "router": "Masters/VendorMaster/AddVendorMaster"
-      },
-      {
-        "title": "AirportMaster/AirportMasterList",
-        "tag": ["AirportMaster", "AirportMasterList"],
-        "router": "Masters/AirportMaster/AirportMasterList"
-      },
-      {
-        "title": "AirportMaster/AddAirportMaster",
-        "tag": ["AirportMaster", "AddAirportMaster"],
-        "router": "Masters/AirportMaster/AddAirportMaster"
-      },
-      {
-        "title": "PincodeLocation/PincodeLocationMapping",
-        "tag": ["PincodeLocation", "PincodeLocationMapping"],
-        "router": "Masters/PincodeLocation/PincodeLocationMapping"
-      },
-      {
-        "title": "AddressMaster/AddAddressMaster",
-        "tag": ["AddressMaster", "AddAddressMaster"],
-        "router": "Masters/AddressMaster/AddAddressMaster"
-      },
-      {
-        "title": "AddressMaster/AddressMasterList",
-        "tag": ["AddressMaster", "AddressMasterList"],
-        "router": "Masters/AddressMaster/AddressMasterList"
-      },
-      {
-        "title": "ClusterMaster/AddClusterMaster",
-        "tag": ["ClusterMaster", "AddClusterMaster"],
-        "router": "Masters/ClusterMaster/AddClusterMaster"
-      },
-      {
-        "title": "ClusterMaster/ClusterMasterList",
-        "tag": ["ClusterMaster", "ClusterMasterList"],
-        "router": "Masters/ClusterMaster/ClusterMasterList"
-      },
-      {
-        "title": "RouteScheduleMaster/RouteScheduleMasterList",
-        "tag": ["RouteScheduleMaster", "RouteScheduleMasterList"],
-        "router": "Masters/RouteScheduleMaster/RouteScheduleMasterList"
-      },
-      {
-        "title": "RouteScheduleMaster/AddRouteScheduleMaster",
-        "tag": ["RouteScheduleMaster", "AddRouteScheduleMaster"],
-        "router": "Masters/RouteScheduleMaster/AddRouteScheduleMaster"
-      },
-      {
-        "title": "TripRouteMaster/TripRouteMasterList",
-        "tag": ["TripRouteMaster", "TripRouteMasterList"],
-        "router": "Masters/TripRouteMaster/TripRouteMasterList"
-      },
-      {
-        "title": "TripRouteMaster/TripRouteMasterAdd",
-        "tag": ["TripRouteMaster", "TripRouteMasterAdd"],
-        "router": "Masters/TripRouteMaster/TripRouteMasterAdd"
-      },
-      {
-        "title": "GeneralMaster/GeneralMasterList",
-        "tag": ["GeneralMaster", "GeneralMasterList"],
-        "router": "Masters/GeneralMaster/GeneralMasterList"
-      },
-      {
-        "title": "GeneralMaster/GeneralMasterCodeList",
-        "tag": ["GeneralMaster", "GeneralMasterCodeList"],
-        "router": "Masters/GeneralMaster/GeneralMasterCodeList"
-      },
-      {
-        "title": "GeneralMaster/AddGeneralMaster",
-        "tag": ["GeneralMaster", "AddGeneralMaster"],
-        "router": "Masters/GeneralMaster/AddGeneralMaster"
-      },
-      {
-        "title": "Vehicle/Status",
-        "tag": ["Vehicle", "Status"],
-        "router": "Masters/Vehicle/Status"
-      },
-      {
-        "title": "Vehicle/Status/Add",
-        "tag": ["Vehicle", "Status", "Add"],
-        "router": "Masters/Vehicle/Status/Add"
-      },
-      {
-        "title": "HolidayMaster/HolidayMasterList",
-        "tag": ["HolidayMaster", "HolidayMasterList"],
-        "router": "Masters/HolidayMaster/HolidayMasterList"
-      },
-      {
-        "title": "HolidayMaster/AddHolidayMaster",
-        "tag": ["HolidayMaster", "AddHolidayMaster"],
-        "router": "Masters/HolidayMaster/AddHolidayMaster"
-      },
-      {
-        "title": "CityLocationMapping/CityLocationIndex",
-        "tag": ["CityLocationMapping", "CityLocationIndex"],
-        "router": "Masters/CityLocationMapping/CityLocationIndex"
-      },
-      {
-        "title": "ContainerMaster/ContainerMasterList",
-        "tag": ["ContainerMaster", "ContainerMasterList"],
-        "router": "Masters/ContainerMaster/ContainerMasterList"
-      },
-      {
-        "title": "ContainerMaster/AddContainerMaster",
-        "tag": ["ContainerMaster", "AddContainerMaster"],
-        "router": "Masters/ContainerMaster/AddContainerMaster"
-      },
-      {
-        "title": "VendorContract/VendorContractList",
-        "tag": ["VendorContract", "VendorContractList"],
-        "router": "Masters/VendorContract/VendorContractList"
-      },
-        {
-          "title": "LoadingSheetView",
-          "tag": ["LoadingSheetView"],
-          "router": "Operation/LoadingSheetView"
-        },
-        {
-          "title": "CreateLoadingSheet",
-          "tag": ["CreateLoadingSheet"],
-          "router": "Operation/CreateLoadingSheet"
-        },
-        {
-          "title": "LodingSheetGenerate",
-          "tag": ["LodingSheetGenerate"],
-          "router": "Operation/LodingSheetGenerate"
-        },
-        {
-          "title": "DepartVehicle",
-          "tag": ["DepartVehicle"],
-          "router": "Operation/DepartVehicle"
-        },
-        {
-          "title": "ManifestGenerated",
-          "tag": ["ManifestGenerated"],
-          "router": "Operation/ManifestGenerated"
-        },
-        {
-          "title": "RunSheetGenerated",
-          "tag": ["RunSheetGenerated"],
-          "router": "Operation/RunSheetGenerated"
-        },
-        {
-          "title": "UpdateLoadingSheet",
-          "tag": ["UpdateLoadingSheet"],
-          "router": "Operation/UpdateLoadingSheet"
-        },
-        {
-          "title": "CreateRunSheet",
-          "tag": ["CreateRunSheet"],
-          "router": "Operation/CreateRunSheet"
-        },
-        {
-          "title": "UpdateRunSheet",
-          "tag": ["UpdateRunSheet"],
-          "router": "Operation/UpdateRunSheet"
-        },
-        {
-          "title": "VehicleLoading",
-          "tag": ["VehicleLoading"],
-          "router": "Operation/VehicleLoading"
-        },
-        {
-          "title": "ViewPrint",
-          "tag": ["ViewPrint"],
-          "router": "Operation/ViewPrint"
-        },
-        {
-          "title": "QuickCreateDocket",
-          "tag": ["QuickCreateDocket"],
-          "router": "Operation/QuickCreateDocket"
-        },
-        {
-          "title": "DocketTracking",
-          "tag": ["DocketTracking"],
-          "router": "Operation/DocketTracking"
-        },
-        {
-          "title": "PRQEntry",
-          "tag": ["PRQEntry"],
-          "router": "Operation/PRQEntry"
-        },
-        {
-          "title": "JobEntry",
-          "tag": ["JobEntry"],
-          "router": "Operation/JobEntry"
-        },
-        {
-          "title": "AssignVehicle",
-          "tag": ["AssignVehicle"],
-          "router": "Operation/AssignVehicle"
-        },
-        {
-          "title": "RakeEntry",
-          "tag": ["RakeEntry"],
-          "router": "Operation/RakeEntry"
-        },
-        {
-          "title": "CHAEntry",
-          "tag": ["CHAEntry"],
-          "router": "Operation/CHAEntry"
-        },
-        {
-          "title": "Handover",
-          "tag": ["Handover"],
-          "router": "Operation/Handover"
-        },
-        {
-          "title": "ChaDetail",
-          "tag": ["ChaDetail"],
-          "router": "Operation/ChaDetail"
-        },
-        {
-          "title": "VoucherDetails",
-          "tag": ["VoucherDetails"],
-          "router": "Operation/VoucherDetails"
-        },
-        {
-          "title": "VendorBillDetails",
-          "tag": ["VendorBillDetails"],
-          "router": "Operation/VendorBillDetails"
-        },
-        {
-          "title": "CustomerBillDetails",
-          "tag": ["CustomerBillDetails"],
-          "router": "Operation/CustomerBillDetails"
-        },
-        {
-          "title": "Unbilled",
-          "tag": ["Unbilled"],
-          "router": "Operation/Unbilled"
-        },
-        {
-          "title": "IssueTracker",
-          "tag": ["IssueTracker"],
-          "router": "Operation/IssueTracker"
-        },
-        {
-          "title": "ConsignmentEntry",
-          "tag": ["ConsignmentEntry"],
-          "router": "Operation/ConsignmentEntry"
-        },
-        {
-          "title": "FleetMaster/AddFleet",
-          "tag": ["FleetMaster", "AddFleet"],
-          "router": "Masters/FleetMaster/AddFleetMaster"
-        },
-        {
-          "title": "FleetMaster/FleetmasterList",
-          "tag": ["FleetMaster", "FleetmasterList"],
-          "router": "Masters/FleetMaster/FleetMasterList"
-        },
-        {
-          "title": "ProductMaster/ListProduct",
-          "tag": ["ProductMaster", "ListProduct"],
-          "router": "Masters/ProductMaster/ListProduct"
-        },
-        {
-          "title": "BeneficiaryMaster/BeneficiaryMasterList",
-          "tag": ["BeneficiaryMaster", "BeneficiaryMasterList"],
-          "router": "Masters/BeneficiaryMaster/BeneficiaryMasterList"
-        },
-        {
-          "title": "BeneficiaryMaster/AddBeneficiaryMaster",
-          "tag": ["BeneficiaryMaster", "AddBeneficiaryMaster"],
-          "router": "Masters/BeneficiaryMaster/AddBeneficiaryMaster"
-        }
-
-      ]
-
-  }
+  "data": [
+    {
+      "title": "SAC-HSNMaster/SAC-HSNView",
+      "tag": [
+        "SacMaster",
+        "SAC-HSNView"
+      ],
+      "router": "Masters/SAC-HSNMaster/SAC-HSNView"
+    },
+    {
+      "title": "SAC-HSNMaster/AddSAC-HSN",
+      "tag": [
+        "SacMaster",
+        "AddSAC-HSN"
+      ],
+      "router": "Masters/SAC-HSNMaster/AddSAC-HSN"
+    },
+    {
+      "title": "Docket/Create",
+      "tag": [
+        "Docket",
+        "Create"
+      ],
+      "router": "Masters/Docket/Create"
+    },
+    {
+      "title": "Docket/Ewaybill-Config",
+      "tag": [
+        "Docket",
+        "Ewaybill-Config"
+      ],
+      "router": "Masters/Docket/Ewaybill-Config"
+    },
+    {
+      "title": "Docket/Ewaybill",
+      "tag": [
+        "Docket",
+        "Ewaybill"
+      ],
+      "router": "Masters/Docket/Ewaybill"
+    },
+    {
+      "title": "Docket/EwayBillDocketBooking",
+      "tag": [
+        "Docket",
+        "EwayBillDocketBooking"
+      ],
+      "router": "Masters/Docket/EwayBillDocketBooking"
+    },
+    {
+      "title": "Docket/EwayBillDocketBookingV2",
+      "tag": [
+        "Docket",
+        "EwayBillDocketBookingV2"
+      ],
+      "router": "Masters/Docket/EwayBillDocketBookingV2"
+    },
+    {
+      "title": "Docket/LoadingSheet",
+      "tag": [
+        "Docket",
+        "LoadingSheet"
+      ],
+      "router": "Masters/Docket/LoadingSheet"
+    },
+    {
+      "title": "Docket/LoadingSheetDetails",
+      "tag": [
+        "Docket",
+        "LoadingSheetDetails"
+      ],
+      "router": "Masters/Docket/LoadingSheetDetails"
+    },
+    {
+      "title": "Docket/DispatchVehicle",
+      "tag": [
+        "Docket",
+        "DispatchVehicle"
+      ],
+      "router": "Masters/Docket/DispatchVehicle"
+    },
+    {
+      "title": "Docket/ManifestGeneration",
+      "tag": [
+        "Docket",
+        "ManifestGeneration"
+      ],
+      "router": "Masters/Docket/ManifestGeneration"
+    },
+    {
+      "title": "CompanyGSTMaster/CompanyGSTMasterList",
+      "tag": [
+        "CompanyGSTMaster",
+        "CompanyGSTMasterList"
+      ],
+      "router": "Masters/CompanyGSTMaster/CompanyGSTMasterList"
+    },
+    {
+      "title": "CompanyGSTMaster/AddCompanyGSTMaster",
+      "tag": [
+        "CompanyGSTMaster",
+        "AddCompanyGSTMaster"
+      ],
+      "router": "Masters/CompanyGSTMaster/AddCompanyGSTMaster"
+    },
+    {
+      "title": "StateMaster/StateMasterView",
+      "tag": [
+        "StateMaster",
+        "StateMasterView"
+      ],
+      "router": "Masters/StateMaster/StateMasterView"
+    },
+    {
+      "title": "StateMaster/AddState",
+      "tag": [
+        "StateMaster",
+        "AddState"
+      ],
+      "router": "Masters/StateMaster/AddState"
+    },
+    {
+      "title": "CityMaster/CityMasterView",
+      "tag": [
+        "CityMaster",
+        "CityMasterView"
+      ],
+      "router": "Masters/CityMaster/CityMasterView"
+    },
+    {
+      "title": "CityMaster/AddCity",
+      "tag": [
+        "CityMaster",
+        "AddCity"
+      ],
+      "router": "Masters/CityMaster/AddCity"
+    },
+    {
+      "title": "DriverMaster/DriverMasterList",
+      "tag": [
+        "DriverMaster",
+        "DriverMasterList"
+      ],
+      "router": "Masters/DriverMaster/DriverMasterList"
+    },
+    {
+      "title": "DriverMaster/AddDriverMaster",
+      "tag": [
+        "DriverMaster",
+        "AddDriverMaster"
+      ],
+      "router": "Masters/DriverMaster/AddDriverMaster"
+    },
+    {
+      "title": "LocationMaster/LocationMasterList",
+      "tag": [
+        "LocationMaster",
+        "LocationMasterList"
+      ],
+      "router": "Masters/LocationMaster/LocationMasterList"
+    },
+    {
+      "title": "LocationMaster/AddLocationMaster",
+      "tag": [
+        "LocationMaster",
+        "AddLocationMaster"
+      ],
+      "router": "Masters/LocationMaster/AddLocationMaster"
+    },
+    {
+      "title": "CompanyMaster/AddCompany",
+      "tag": [
+        "CompanyMaster",
+        "AddCompany"
+      ],
+      "router": "Masters/CompanyMaster/AddCompany"
+    },
+    {
+      "title": "CustomerMaster/CustomerMasterList",
+      "tag": [
+        "CustomerMaster",
+        "CustomerMasterList"
+      ],
+      "router": "Masters/CustomerMaster/CustomerMasterList"
+    },
+    {
+      "title": "CustomerMaster/AddCustomerMaster",
+      "tag": [
+        "CustomerMaster",
+        "AddCustomerMaster"
+      ],
+      "router": "Masters/CustomerMaster/AddCustomerMaster"
+    },
+    {
+      "title": "DocumentControlRegister/AddDCR",
+      "tag": [
+        "DocumentControlRegister",
+        "AddDCR"
+      ],
+      "router": "Masters/DocumentControlRegister/AddDCR"
+    },
+    {
+      "title": "CustomerGroupMaster/CustomerGroupMasterList",
+      "tag": [
+        "CustomerGroupMaster",
+        "CustomerGroupMasterList"
+      ],
+      "router": "Masters/CustomerGroupMaster/CustomerGroupMasterList"
+    },
+    {
+      "title": "CustomerGroupMaster/AddCustomerGroupMaster",
+      "tag": [
+        "CustomerGroupMaster",
+        "AddCustomerGroupMaster"
+      ],
+      "router": "Masters/CustomerGroupMaster/AddCustomerGroupMaster"
+    },
+    {
+      "title": "DocumentControlRegister/TrackDCR",
+      "tag": [
+        "DocumentControlRegister",
+        "TrackDCR"
+      ],
+      "router": "Masters/DocumentControlRegister/TrackDCR"
+    },
+    {
+      "title": "DocumentControlRegister/DCRDetail",
+      "tag": [
+        "DocumentControlRegister",
+        "DCRDetail"
+      ],
+      "router": "Masters/DocumentControlRegister/DCRDetail"
+    },
+    {
+      "title": "DocumentControlRegister/SplitDCR",
+      "tag": [
+        "DocumentControlRegister",
+        "SplitDCR"
+      ],
+      "router": "Masters/DocumentControlRegister/SplitDCR"
+    },
+    {
+      "title": "VehicleTypeMaster/VehicleTypeMasterList",
+      "tag": [
+        "VehicleTypeMaster",
+        "VehicleTypeMasterList"
+      ],
+      "router": "Masters/VehicleTypeMaster/VehicleTypeMasterList"
+    },
+    {
+      "title": "VehicleTypeMaster/AddVehicleTypeMaster",
+      "tag": [
+        "VehicleTypeMaster",
+        "AddVehicleTypeMaster"
+      ],
+      "router": "Masters/VehicleTypeMaster/AddVehicleTypeMaster"
+    },
+    {
+      "title": "PinCodeMaster/PinCodeMasterList",
+      "tag": [
+        "PinCodeMaster",
+        "PinCodeMasterList"
+      ],
+      "router": "Masters/PinCodeMaster/PinCodeMasterList"
+    },
+    {
+      "title": "PinCodeMaster/AddPinCodeMaster",
+      "tag": [
+        "PinCodeMaster",
+        "AddPinCodeMaster"
+      ],
+      "router": "Masters/PinCodeMaster/AddPinCodeMaster"
+    },
+    {
+      "title": "VehicleMaster/VehicleMasterList",
+      "tag": [
+        "VehicleMaster",
+        "VehicleMasterList"
+      ],
+      "router": "Masters/VehicleMaster/VehicleMasterList"
+    },
+    {
+      "title": "VehicleMaster/AddVehicle",
+      "tag": [
+        "VehicleMaster",
+        "AddVehicle"
+      ],
+      "router": "Masters/VehicleMaster/AddVehicle"
+    },
+    {
+      "title": "RouteLocationWise/RouteList",
+      "tag": [
+        "RouteLocationWise",
+        "RouteList"
+      ],
+      "router": "Masters/RouteLocationWise/RouteList"
+    },
+    {
+      "title": "RouteLocationWise/RouteAdd",
+      "tag": [
+        "RouteLocationWise",
+        "RouteAdd"
+      ],
+      "router": "Masters/RouteLocationWise/RouteAdd"
+    },
+    {
+      "title": "UserMaster/UserMasterView",
+      "tag": [
+        "UserMaster",
+        "UserMasterView"
+      ],
+      "router": "Masters/UserMaster/UserMasterView"
+    },
+    {
+      "title": "UserMaster/AddUser",
+      "tag": [
+        "UserMaster",
+        "AddUser"
+      ],
+      "router": "Masters/UserMaster/AddUser"
+    },
+    {
+      "title": "VendorMaster/VendorMasterList",
+      "tag": [
+        "VendorMaster",
+        "VendorMasterList"
+      ],
+      "router": "Masters/VendorMaster/VendorMasterList"
+    },
+    {
+      "title": "VendorMaster/AddVendorMaster",
+      "tag": [
+        "VendorMaster",
+        "AddVendorMaster"
+      ],
+      "router": "Masters/VendorMaster/AddVendorMaster"
+    },
+    {
+      "title": "AirportMaster/AirportMasterList",
+      "tag": [
+        "AirportMaster",
+        "AirportMasterList"
+      ],
+      "router": "Masters/AirportMaster/AirportMasterList"
+    },
+    {
+      "title": "AirportMaster/AddAirportMaster",
+      "tag": [
+        "AirportMaster",
+        "AddAirportMaster"
+      ],
+      "router": "Masters/AirportMaster/AddAirportMaster"
+    },
+    {
+      "title": "PincodeLocation/PincodeLocationMapping",
+      "tag": [
+        "PincodeLocation",
+        "PincodeLocationMapping"
+      ],
+      "router": "Masters/PincodeLocation/PincodeLocationMapping"
+    },
+    {
+      "title": "AddressMaster/AddAddressMaster",
+      "tag": [
+        "AddressMaster",
+        "AddAddressMaster"
+      ],
+      "router": "Masters/AddressMaster/AddAddressMaster"
+    },
+    {
+      "title": "AddressMaster/AddressMasterList",
+      "tag": [
+        "AddressMaster",
+        "AddressMasterList"
+      ],
+      "router": "Masters/AddressMaster/AddressMasterList"
+    },
+    {
+      "title": "ClusterMaster/AddClusterMaster",
+      "tag": [
+        "ClusterMaster",
+        "AddClusterMaster"
+      ],
+      "router": "Masters/ClusterMaster/AddClusterMaster"
+    },
+    {
+      "title": "ClusterMaster/ClusterMasterList",
+      "tag": [
+        "ClusterMaster",
+        "ClusterMasterList"
+      ],
+      "router": "Masters/ClusterMaster/ClusterMasterList"
+    },
+    {
+      "title": "RouteScheduleMaster/RouteScheduleMasterList",
+      "tag": [
+        "RouteScheduleMaster",
+        "RouteScheduleMasterList"
+      ],
+      "router": "Masters/RouteScheduleMaster/RouteScheduleMasterList"
+    },
+    {
+      "title": "RouteScheduleMaster/AddRouteScheduleMaster",
+      "tag": [
+        "RouteScheduleMaster",
+        "AddRouteScheduleMaster"
+      ],
+      "router": "Masters/RouteScheduleMaster/AddRouteScheduleMaster"
+    },
+    {
+      "title": "TripRouteMaster/TripRouteMasterList",
+      "tag": [
+        "TripRouteMaster",
+        "TripRouteMasterList"
+      ],
+      "router": "Masters/TripRouteMaster/TripRouteMasterList"
+    },
+    {
+      "title": "TripRouteMaster/TripRouteMasterAdd",
+      "tag": [
+        "TripRouteMaster",
+        "TripRouteMasterAdd"
+      ],
+      "router": "Masters/TripRouteMaster/TripRouteMasterAdd"
+    },
+    {
+      "title": "GeneralMaster/GeneralMasterList",
+      "tag": [
+        "GeneralMaster",
+        "GeneralMasterList"
+      ],
+      "router": "Masters/GeneralMaster/GeneralMasterList"
+    },
+    {
+      "title": "GeneralMaster/GeneralMasterCodeList",
+      "tag": [
+        "GeneralMaster",
+        "GeneralMasterCodeList"
+      ],
+      "router": "Masters/GeneralMaster/GeneralMasterCodeList"
+    },
+    {
+      "title": "GeneralMaster/AddGeneralMaster",
+      "tag": [
+        "GeneralMaster",
+        "AddGeneralMaster"
+      ],
+      "router": "Masters/GeneralMaster/AddGeneralMaster"
+    },
+    {
+      "title": "Vehicle/Status",
+      "tag": [
+        "Vehicle",
+        "Status"
+      ],
+      "router": "Masters/Vehicle/Status"
+    },
+    {
+      "title": "Vehicle/Status/Add",
+      "tag": [
+        "Vehicle",
+        "Status",
+        "Add"
+      ],
+      "router": "Masters/Vehicle/Status/Add"
+    },
+    {
+      "title": "HolidayMaster/HolidayMasterList",
+      "tag": [
+        "HolidayMaster",
+        "HolidayMasterList"
+      ],
+      "router": "Masters/HolidayMaster/HolidayMasterList"
+    },
+    {
+      "title": "HolidayMaster/AddHolidayMaster",
+      "tag": [
+        "HolidayMaster",
+        "AddHolidayMaster"
+      ],
+      "router": "Masters/HolidayMaster/AddHolidayMaster"
+    },
+    {
+      "title": "CityLocationMapping/CityLocationIndex",
+      "tag": [
+        "CityLocationMapping",
+        "CityLocationIndex"
+      ],
+      "router": "Masters/CityLocationMapping/CityLocationIndex"
+    },
+    {
+      "title": "ContainerMaster/ContainerMasterList",
+      "tag": [
+        "ContainerMaster",
+        "ContainerMasterList"
+      ],
+      "router": "Masters/ContainerMaster/ContainerMasterList"
+    },
+    {
+      "title": "ContainerMaster/AddContainerMaster",
+      "tag": [
+        "ContainerMaster",
+        "AddContainerMaster"
+      ],
+      "router": "Masters/ContainerMaster/AddContainerMaster"
+    },
+    {
+      "title": "VendorContract/VendorContractList",
+      "tag": [
+        "VendorContract",
+        "VendorContractList"
+      ],
+      "router": "Masters/VendorContract/VendorContractList"
+    },
+    {
+      "title": "LoadingSheetView",
+      "tag": [
+        "LoadingSheetView"
+      ],
+      "router": "Operation/LoadingSheetView"
+    },
+    {
+      "title": "CreateLoadingSheet",
+      "tag": [
+        "CreateLoadingSheet"
+      ],
+      "router": "Operation/CreateLoadingSheet"
+    },
+    {
+      "title": "LodingSheetGenerate",
+      "tag": [
+        "LodingSheetGenerate"
+      ],
+      "router": "Operation/LodingSheetGenerate"
+    },
+    {
+      "title": "DepartVehicle",
+      "tag": [
+        "DepartVehicle"
+      ],
+      "router": "Operation/DepartVehicle"
+    },
+    {
+      "title": "ManifestGenerated",
+      "tag": [
+        "ManifestGenerated"
+      ],
+      "router": "Operation/ManifestGenerated"
+    },
+    {
+      "title": "RunSheetGenerated",
+      "tag": [
+        "RunSheetGenerated"
+      ],
+      "router": "Operation/RunSheetGenerated"
+    },
+    {
+      "title": "UpdateLoadingSheet",
+      "tag": [
+        "UpdateLoadingSheet"
+      ],
+      "router": "Operation/UpdateLoadingSheet"
+    },
+    {
+      "title": "CreateRunSheet",
+      "tag": [
+        "CreateRunSheet"
+      ],
+      "router": "Operation/CreateRunSheet"
+    },
+    {
+      "title": "UpdateRunSheet",
+      "tag": [
+        "UpdateRunSheet"
+      ],
+      "router": "Operation/UpdateRunSheet"
+    },
+    {
+      "title": "VehicleLoading",
+      "tag": [
+        "VehicleLoading"
+      ],
+      "router": "Operation/VehicleLoading"
+    },
+    {
+      "title": "ViewPrint",
+      "tag": [
+        "ViewPrint"
+      ],
+      "router": "Operation/ViewPrint"
+    },
+    {
+      "title": "QuickCreateDocket",
+      "tag": [
+        "QuickCreateDocket"
+      ],
+      "router": "Operation/QuickCreateDocket"
+    },
+    {
+      "title": "DocketTracking",
+      "tag": [
+        "DocketTracking"
+      ],
+      "router": "Operation/DocketTracking"
+    },
+    {
+      "title": "PRQEntry",
+      "tag": [
+        "PRQEntry"
+      ],
+      "router": "Operation/PRQEntry"
+    },
+    {
+      "title": "JobEntry",
+      "tag": [
+        "JobEntry"
+      ],
+      "router": "Operation/JobEntry"
+    },
+    {
+      "title": "AssignVehicle",
+      "tag": [
+        "AssignVehicle"
+      ],
+      "router": "Operation/AssignVehicle"
+    },
+    {
+      "title": "RakeEntry",
+      "tag": [
+        "RakeEntry"
+      ],
+      "router": "Operation/RakeEntry"
+    },
+    {
+      "title": "CHAEntry",
+      "tag": [
+        "CHAEntry"
+      ],
+      "router": "Operation/CHAEntry"
+    },
+    {
+      "title": "Handover",
+      "tag": [
+        "Handover"
+      ],
+      "router": "Operation/Handover"
+    },
+    {
+      "title": "ChaDetail",
+      "tag": [
+        "ChaDetail"
+      ],
+      "router": "Operation/ChaDetail"
+    },
+    {
+      "title": "VoucherDetails",
+      "tag": [
+        "VoucherDetails"
+      ],
+      "router": "Operation/VoucherDetails"
+    },
+    {
+      "title": "VendorBillDetails",
+      "tag": [
+        "VendorBillDetails"
+      ],
+      "router": "Operation/VendorBillDetails"
+    },
+    {
+      "title": "CustomerBillDetails",
+      "tag": [
+        "CustomerBillDetails"
+      ],
+      "router": "Operation/CustomerBillDetails"
+    },
+    {
+      "title": "Unbilled",
+      "tag": [
+        "Unbilled"
+      ],
+      "router": "Operation/Unbilled"
+    },
+    {
+      "title": "IssueTracker",
+      "tag": [
+        "IssueTracker"
+      ],
+      "router": "Operation/IssueTracker"
+    },
+    {
+      "title": "ConsignmentEntry",
+      "tag": [
+        "ConsignmentEntry"
+      ],
+      "router": "Operation/ConsignmentEntry"
+    },
+    {
+      "title": "FleetMaster/AddFleet",
+      "tag": [
+        "FleetMaster",
+        "AddFleet"
+      ],
+      "router": "Masters/FleetMaster/AddFleetMaster"
+    },
+    {
+      "title": "FleetMaster/FleetmasterList",
+      "tag": [
+        "FleetMaster",
+        "FleetmasterList"
+      ],
+      "router": "Masters/FleetMaster/FleetMasterList"
+    },
+    {
+      "title": "ProductMaster/ListProduct",
+      "tag": [
+        "ProductMaster",
+        "ListProduct"
+      ],
+      "router": "Masters/ProductMaster/ListProduct"
+    },
+    {
+      "title": "BeneficiaryMaster/BeneficiaryMasterList",
+      "tag": [
+        "BeneficiaryMaster",
+        "BeneficiaryMasterList"
+      ],
+      "router": "Masters/BeneficiaryMaster/BeneficiaryMasterList"
+    },
+    {
+      "title": "BeneficiaryMaster/AddBeneficiaryMaster",
+      "tag": [
+        "BeneficiaryMaster",
+        "AddBeneficiaryMaster"
+      ],
+      "router": "Masters/BeneficiaryMaster/AddBeneficiaryMaster"
+    },
+    {
+      "title": "DebitVoucher",
+      "tag": [
+        "DebitVoucher"
+      ],
+      "router": "Finance/DebitVoucher"
+    },
+    {
+      "title": "CustomerContractList",
+      "tag": [
+        "CustomerContractList"
+      ],
+      "router": "Masters/CustomerContract/CustomerContractList"
+    }
+  ]
+}

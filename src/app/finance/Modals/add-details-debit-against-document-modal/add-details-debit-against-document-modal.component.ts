@@ -54,7 +54,7 @@ export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
     if (search.length >= 2) {
       switch (this.objResult.DocumentType?.name) {
         case "Consignment":
-          data = await GetDocumentsWiseListFromApi(this.masterService, 'docket_temp', 'docketNumber', search)
+          data = await GetDocumentsWiseListFromApi(this.masterService, 'docket_temp', 'docketNumber', search, 'billingParty', this.objResult?.PartName)
           break;
         case "THC":
           data = await GetDocumentsWiseListFromApi(this.masterService, 'thc_detail', 'prqNo', search)

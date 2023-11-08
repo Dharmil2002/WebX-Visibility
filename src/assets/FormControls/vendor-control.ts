@@ -38,6 +38,26 @@ export class VendorControl {
                 generatecontrol: true, disable: isUpdate ? true : false
             },
             {
+                name: "vendorManager",
+                label: "Vendor Manager",
+                placeholder: "Vendor Manager",
+                type: "text",
+                value: vendorMasterTable.vendorManager,
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Vendor Manager is required"
+                    },
+                    {
+                        name: "pattern",
+                        message: "Please Enter only text of length 3 to 25 characters",
+                        pattern: '^[a-zA-Z - a-zA-Z]{3,25}$',
+                    }
+                ],
+            },
+            {
                 name: 'vendorType',
                 label: 'Vendor Type',
                 placeholder: 'Search Vendor Type',
@@ -199,15 +219,6 @@ export class VendorControl {
                 generatecontrol: true, disable: false
             },
             {
-                name: '',
-                label: '',
-                placeholder: '',
-                type: '', value: "",
-                Validations: [
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
                 name: 'panNo',
                 label: 'PAN NO',
                 placeholder: 'PAN NO',
@@ -321,35 +332,9 @@ export class VendorControl {
                 },
             },
             {
-                name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isActive, Validations: [],
-                generatecontrol: false, disable: false
-            },
-
-            {
                 name: 'isBlackListed', label: 'Black Listed', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isBlackListed, Validations: [],
                 generatecontrol: true, disable: false
             },
-
-            {
-                name: '',
-                label: '',
-                placeholder: '',
-                type: '', value: "",
-                Validations: [
-                ],
-                generatecontrol: true, disable: false
-            },
-            {
-                name: '',
-                label: '',
-                placeholder: '',
-                type: '', value: "",
-                Validations: [
-                ],
-                generatecontrol: true, disable: false
-            },
-
-
             {
                 name: 'vendorLocationDropdown',
                 label: 'Vendor Location',
@@ -362,6 +347,10 @@ export class VendorControl {
                         message: "Location is Required...!",
                     }
                 ],
+                generatecontrol: false, disable: false
+            },
+            {
+                name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isActive, Validations: [],
                 generatecontrol: false, disable: false
             },
             {

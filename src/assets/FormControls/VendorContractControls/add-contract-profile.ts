@@ -27,10 +27,11 @@ export class AddContractProfile {
           showNameAndValue: true
         },
         functions: {
-          onOptionSelect: 'checkDuplicate'
+          onOptionSelect: 'setManager',
+          // onModel: "",
         },
         generatecontrol: true,
-        disable: true,
+        disable: false,
       },
       {
         name: "contractID",
@@ -39,7 +40,7 @@ export class AddContractProfile {
         type: "text",
         value: vendorInformationData.contractID,
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [
           {
             name: "required",
@@ -54,7 +55,11 @@ export class AddContractProfile {
         value: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "contractScan is required"
+          },],
         functions: {
           onChange: "onFileSelected",
         },
@@ -70,18 +75,26 @@ export class AddContractProfile {
         type: "text",
         value: vendorInformationData.vendorManager,
         generatecontrol: true,
-        disable: false,
-        Validations: [],
+        disable: true,
+        Validations: [
+          {
+            name: "required",
+            message: "vendor Manager is required"
+          },],
       },
       {
         name: "contractStartDate",
-        label: " Start Date",
+        label: "Start Date",
         placeholder: " Start Date",
         type: "date",
         value: vendorInformationData.contractStartDate,
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Start Date is required"
+          },],
         additionalData: {
           minDate: new Date(),
         },
@@ -94,7 +107,11 @@ export class AddContractProfile {
         value: vendorInformationData.expiryDate,
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Expiry Date is required"
+          },],
         additionalData: {
           minDate: new Date(),
         },
@@ -107,7 +124,11 @@ export class AddContractProfile {
         value: vendorInformationData.pendingDays,
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Pending days is required"
+          },],
       },
     ];
   }

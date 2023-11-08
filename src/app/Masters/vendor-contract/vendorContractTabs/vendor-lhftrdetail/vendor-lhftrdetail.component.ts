@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { RouteBasedTableData } from '../../vendor-contract-list/VendorStaticData';
+import { VendorLHFTRModalComponent } from './vendor-lhftrmodal/vendor-lhftrmodal.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-vendor-lhftrdetail',
@@ -56,9 +58,50 @@ export class VendorLHFTRDetailComponent implements OnInit {
     { label: 'Remove' }
   ]
   staticFieldTErouteBased=['min','rate','capacity','route','rateType','max']
-  constructor() { }
+  constructor(private dialog: MatDialog,) { }
 
   ngOnInit(): void {
   }
+//#region to Add a new item to the table or edit
+addDetails(event) {
+  const EditableId = event?.id
+  const request = {
+    beneficiaryList: this.TErouteBasedTableData,
+    Details: event,
+    //url: this.url
+  }
+  this.tableLoad = false;
+  const dialogRef = this.dialog.open(VendorLHFTRModalComponent, {
+    data: request,
+    width: "100%",
+    disableClose: true,
+    position: {
+      top: "20px",
+    },
+  });
+  dialogRef.afterClosed().subscribe((result) => {
+    console.log(result);
 
+    if (result != undefined) {
+      if (EditableId) {
+        this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== EditableId);
+      }
+      const json = {
+        id: this.TErouteBasedTableData.length + 1,
+        route: result.route.name,
+        rateType: result.rateType,
+        capacity: result.capacity.name,
+        rate: result.rate,
+        min: result.min,
+        max: result.max,
+        actions: ['Edit', 'Remove']
+      }
+      this.TErouteBasedTableData.push(json);
+      this.tableLoad = true
+
+    }
+    this.tableLoad = true;
+  });
+}
+//#endregion
 }

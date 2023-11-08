@@ -1024,5 +1024,15 @@
             "name": "S0008-MUMB-BNGB",
             "value": "5"
         }
+    ],
+    "rateTypeDropDown": [
+        {
+            "name": "Flat",
+            "value": "1"
+        },
+        {
+            "name": "Per Ton",
+            "value": "2"
+        }
     ]
 }

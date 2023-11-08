@@ -135,7 +135,7 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
         const filter = {
             ActiveFlag: true,
             AccountCategoryName: AccountCategoryName,
-            //  AccountingLocations: [AccountingLocations]
+            AccountingLocations: AccountingLocations
         };
         const req = { companyCode, collectionName: 'account_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();

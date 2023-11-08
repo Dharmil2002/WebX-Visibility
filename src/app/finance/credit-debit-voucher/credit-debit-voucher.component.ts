@@ -166,13 +166,13 @@ export class DebitVoucherComponent implements OnInit {
       .filter(x => x != null)
       .sort((a, b) => a.value.localeCompare(b.value));
 
-    this.filter.Filter(
-      this.jsonControlDebitVoucherSummaryArray,
-      this.DebitVoucherSummaryForm,
-      this.StateList,
-      "Partystate",
-      true
-    );
+    // this.filter.Filter(
+    //   this.jsonControlDebitVoucherSummaryArray,
+    //   this.DebitVoucherSummaryForm,
+    //   this.StateList,
+    //   "Partystate",
+    //   true
+    // );
 
     this.AllLocationsList = await GetLocationDetailFromApi(this.masterService)
     this.filter.Filter(
@@ -182,8 +182,6 @@ export class DebitVoucherComponent implements OnInit {
       "Accountinglocation",
       false
     );
-    const paymentstate = this.AllLocationsList.find(item => item.name == localStorage.getItem("Branch"))?.value
-    this.DebitVoucherSummaryForm.get('Paymentstate').setValue(paymentstate);
 
     this.SACCodeList = await GetsachsnFromApi(this.masterService)
     console.log(this.SACCodeList)
@@ -573,6 +571,10 @@ export class DebitVoucherComponent implements OnInit {
       "TCSSection",
       false
     );
+    debugger
+    const paymentstate = this.AllLocationsList.find(item => item.name == Accountinglocation)?.value
+    this.DebitVoucherSummaryForm.get('Paymentstate').setValue(paymentstate);
+
   }
 
   // Submit 

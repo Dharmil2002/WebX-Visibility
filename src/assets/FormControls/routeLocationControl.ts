@@ -187,16 +187,40 @@ export class RouteLocationControl {
         ]
 
         this.RouteDetailControlArray = [
-            {
-                name: "loccd",
-                label: "Branch Name",
-                placeholder: "Branch Name",
-                type: "text",
-                value: routeLocationData?.loccd,
-                generatecontrol: true,
-                disable: false,
-                Validations: [],
+            // {
+            //     name: "loccd",
+            //     label: "Branch Name",
+            //     placeholder: "Branch Name",
+            //     type: "text",
+            //     value: routeLocationData?.loccd,
+            //     generatecontrol: true,
+            //     disable: false,
+            //     Validations: [],
 
+            // },
+            {
+                name: 'loccd', label: "Branch Name", placeholder: "Branch Name", type: 'dropdown',
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Branch Name is required.."
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
+                ],
+                functions: {
+                   // onModel: 'getLocation'
+
+                },
+                additionalData: {
+                    showNameAndValue: false
+                }
             },
             {
                 name: "distKm",

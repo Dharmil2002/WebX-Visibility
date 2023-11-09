@@ -53,31 +53,33 @@ export class RouteMasterLocationWiseComponent implements OnInit {
   }
   getRouteDetails() {
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
-      "filter": {},
-      "collectionName": "routeMasterLocWise"
-    }
-  
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        "filter": {},
+        "collectionName": "routeMasterLocWise"
+    };
     this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          this.csv = res.data.map((obj, index) => {
-            obj["srNo"] = index + 1;
-            // Extract loccd values from GSTdetails array
-            const loccdValues = obj.GSTdetails.map((gst) => gst.loccd);
-            // Concatenate loccd values with a hyphen
-            const route = loccdValues.join("-");
-            // Concatenate route and GSTdetails
-            obj["routeName"] = route; // You can replace 'distKm' with the actual property you want to use
-  
-            return obj;
-          });
-          this.tableLoad = false;
+        next: (res: any) => {
+            if (res) {
+                // Process each object in the array
+                this.csv = res.data.map((obj, index) => {
+                    obj["srNo"] = index + 1;
+
+                    // Check if GSTdetails exists and is an array
+                    if (Array.isArray(obj.GSTdetails)) {
+                        const loccdValues = obj.GSTdetails.map((gst) => gst.loccd);
+                        const route = loccdValues.join("-");
+                        obj["routeName"] = route;
+                    } else {
+                        obj["routeName"] = ''; // Or set a default value if GSTdetails is not an array
+                    }
+
+                    return obj;
+                });
+                this.tableLoad = false;
+            }
         }
-      }
-    })
-  }
+    });
+}
 
   async isActiveFuntion(det) {
     let id = det._id;

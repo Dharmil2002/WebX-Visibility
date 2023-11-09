@@ -162,9 +162,11 @@ export class DocketListComponent implements OnInit {
     }
   }
   OpenCnote(data){
-    const Docket = data.docketNumber
-    console.log('Docket',Docket)
-    const url = `${window.location.origin}/#/Operation/westerncarriers-view?Docket=${Docket}`;
+    const templateBody = {
+      DocNo:data.docketNumber,
+      templateName:'docket'
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url,'','width=1000,height=800');
   }
 }

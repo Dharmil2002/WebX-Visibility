@@ -112,7 +112,11 @@ export class PrqSummaryPageComponent implements OnInit {
   OpenPrq(data){
     console.log('data' ,data)
     const prqNo = data.prqNo
-    const url = `${window.location.origin}/#/Operation/prq-view?prqNo=${prqNo}`;
+    const templateBody = {
+      DocNo:prqNo,
+      templateName:'prq'
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url,'','width=1000,height=800');
   }
 }

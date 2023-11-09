@@ -1033,6 +1033,38 @@
         {
             "name": "Per Ton",
             "value": "2"
+        },
+        {
+            "name": "Per Km",
+            "value": "3"
+        },
+        {
+            "name": "% of Freight",
+            "value": "4"
+        }
+    ],
+    "operationDropdown": [
+        {
+            "name": "Delivery",
+            "value": 1
+        },
+        {
+            "name": "Booking",
+            "value": 2
+        }
+    ],
+    "modeDropdown": [
+        {
+            "name": "Road",
+            "value": 1
+        },
+        {
+            "name": "Air",
+            "value": 2
+        },
+        {
+            "name": "Rail",
+            "value": 3
         }
     ]
 }

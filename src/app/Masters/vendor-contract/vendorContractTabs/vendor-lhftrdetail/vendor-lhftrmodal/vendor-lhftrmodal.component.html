@@ -1,1 +1,18 @@
-<p>vendor-lhftrmodal works!</p>
+<div mat-dialog-title style="display: flex;
+  justify-content: space-between;margin: 0 0 0px;
+  align-items: center;">
+    <h3>Transportation- Long Haul full truck- route based
+    </h3>
+    <button mat-icon-button (click)="Close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+<div class="body">
+    <form [formGroup]="TLHFTRForm">
+        <app-form-webxpress [form]="TLHFTRForm" [formData]="jsonControlArray"
+            [FormTitle]="'Transportation- Long Haul full truck- route based Details'"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+            (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>

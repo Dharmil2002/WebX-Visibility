@@ -1,6 +1,5 @@
 <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeaderTErouteBased"
-    [FormTitle]="'Business Associate'" [tableData]="TErouteBasedTableData"
-     [menuItems]="menuItems"
+    [FormTitle]="'Business Associate'" [tableData]="TErouteBasedTableData" [menuItems]="menuItems"
     [staticField]="staticFieldTErouteBased" [Link]="linkArray" [menuItemFlag]="menuItemflag"
     (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" [DisplayAddNewButton]=true
     (AddNewButtonEvent)="addDetails()">

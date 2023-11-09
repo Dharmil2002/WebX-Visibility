@@ -16,7 +16,7 @@
             (functionCallEmitter)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
-    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 91%;"
+    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 90%; margin-bottom: 0.5%;"
         [disabled]="!RouteDetailTableForm.valid" (click)="AddRowData()">
         <mat-icon>add</mat-icon>
         Add New
@@ -27,21 +27,22 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <div class="paddingdiv">
-        <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-            [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
-            [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-            (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" [addAndEditPath]="addAndEditPath"
-            [menuItemFlag]="menuItemflag">
-        </app-generic-table-v2>
-    </div>
-    <div style="padding-left: 35px;">
-        <button type="button" [disabled]="!routeMasterLocationForm.valid" mat-raised-button color="primary" (click)="save()">
-            <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
-            <ng-template #saveButton>Save</ng-template>
-          </button>&nbsp;&nbsp;
-        <button type="button" mat-raised-button (click)="cancel()">
-            Cancel
-        </button>
-    </div>
+
+    <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" [metaData]="metaData" [menuItems]="menuItems" [staticField]="staticField"
+        [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+        (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
+        [menuItemFlag]="menuItemflag">
+    </app-generic-table-v2>
+
+
+    <button type="button" [disabled]="!routeMasterLocationForm.valid" mat-raised-button color="primary"
+        (click)="save()">
+        <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
+        <ng-template #saveButton>Save</ng-template>
+    </button>&nbsp;&nbsp;
+    <button type="button" mat-raised-button (click)="cancel()">
+        Cancel
+    </button>
+
 </app-common-wrapper-webxpress>

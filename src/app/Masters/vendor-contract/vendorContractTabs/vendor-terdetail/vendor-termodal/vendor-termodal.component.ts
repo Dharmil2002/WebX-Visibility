@@ -43,14 +43,14 @@ export class VendorTERModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     this.getRouteList();
     this.getRouteList();
     this.getContainerList();
     this.getDropDownData();
     this.initializeFormControl();
-    console.log(this.objResult);
+    // console.log(this.objResult);
   }
+  //#region to initialize form control
   initializeFormControl() {
     this.ContractTERControls = new TERCharges(this.data);
     this.jsonControlArray = this.ContractTERControls.getTERChargesArrayControls();
@@ -75,7 +75,11 @@ export class VendorTERModalComponent implements OnInit {
       this.TERForm.controls['max'].setValue(this.objResult.Details.max);
     }
   }
+  //#endregion
   Close() {
+    this.dialogRef.close()
+  }
+  cancel() {
     this.dialogRef.close()
   }
   //#region to send data to parent component using dialogRef
@@ -94,7 +98,7 @@ export class VendorTERModalComponent implements OnInit {
     }
   }
   //#endregion
- 
+  //#region to get route list
   async getRouteList() {
     this.routeList = await this.objRouteLocationService.getRouteLocationDetail()
     if (this.objResult.Details) {
@@ -103,6 +107,8 @@ export class VendorTERModalComponent implements OnInit {
     }
     this.filter.Filter(this.jsonControlArray, this.TERForm, this.routeList, this.routeName, this.routestatus);
   }
+  //#endregion
+  //#region to get container list
   async getContainerList() {
     const container = await this.objContainerService.getDetail();
     this.containerData = container.filter((item) => item.activeFlag) // Filter based on the isActive property
@@ -116,7 +122,8 @@ export class VendorTERModalComponent implements OnInit {
     }
     this.filter.Filter(this.jsonControlArray, this.TERForm, this.containerData, this.capacityName, this.capacitystatus);
   }
-  
+  //#endregion
+  //#region to get rateType list
   getDropDownData() {
     this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
       const { rateTypeDropDown } = res;
@@ -127,4 +134,6 @@ export class VendorTERModalComponent implements OnInit {
       this.filter.Filter(this.jsonControlArray, this.TERForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
     });
   }
+  //#endregion
+
 }

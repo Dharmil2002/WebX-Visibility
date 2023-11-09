@@ -70,9 +70,9 @@ export const RouteBasedTableData = [
 export const LastMileData = [
     {
         id: 0, location: 'MUMB', rateType: 'Per KM', timeFrame: 'Per Month', capacity: '1 Ton', minCharge: 35000, committedKm: 3000,
-        additionalKm: 12.5, maxCharges: 55000
+        additionalKm: 12.5, maxCharges: 55000,actions: ['Edit', 'Remove']
     }
 ]
 export const BusinessAssociates = [{
-    id: 0, city: 'Bhiwandi', controlLocation: 'BHW', mode: 'Road', operation: 'Booking', rateType: '% of Freight', rate: 5.5, min: 100, max: 1000
+    id: 0, city: 'Bhiwandi', controlLocation: 'BHW', mode: 'Road', operation: 'Booking', rateType: '% of Freight', rate: 5.5, min: 100, max: 1000,actions: ['Edit', 'Remove']
 }]

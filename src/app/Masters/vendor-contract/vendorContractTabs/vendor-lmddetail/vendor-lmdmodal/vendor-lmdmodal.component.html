@@ -1,1 +1,18 @@
-<p>vendor-lmdmodal works!</p>
+<div mat-dialog-title style="display: flex;
+  justify-content: space-between;margin: 0 0 0px;
+  align-items: center;">
+    <h3>Transportation- Last mile delivery
+    </h3>
+    <button mat-icon-button (click)="Close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+<div class="body">
+    <form [formGroup]="TLMDForm">
+        <app-form-webxpress [form]="TLMDForm" [formData]="jsonControlArray"
+            [FormTitle]="'Transportation- Last mile delivery Details'"
+             (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</div>

@@ -10,8 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class VendorTERDetailComponent implements OnInit {
   @Input() contractData: any;
 
-  // TErouteBasedTableData :any = [];
-  TErouteBasedTableData  =  RouteBasedTableData
+  TErouteBasedTableData = RouteBasedTableData
   columnHeaderTErouteBased = {
     route: {
       Title: "Route",
@@ -80,8 +79,8 @@ export class VendorTERDetailComponent implements OnInit {
     if (data.label.label === 'Remove') {
       this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
     } else {
-      const beneficiaryDetails = this.TErouteBasedTableData.find(x => x.id == data.data.id);
-      this.addDetails(beneficiaryDetails)
+      const terDetails = this.TErouteBasedTableData.find(x => x.id == data.data.id);
+      this.addDetails(terDetails)
     }
   }
   //#endregion 
@@ -89,9 +88,8 @@ export class VendorTERDetailComponent implements OnInit {
   addDetails(event) {
     const EditableId = event?.id
     const request = {
-      beneficiaryList: this.TErouteBasedTableData,
+      TERList: this.TErouteBasedTableData,
       Details: event,
-      //url: this.url
     }
     this.tableLoad = false;
     const dialogRef = this.dialog.open(VendorTERModalComponent, {
@@ -103,7 +101,7 @@ export class VendorTERDetailComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
+      // console.log(result);
 
       if (result != undefined) {
         if (EditableId) {

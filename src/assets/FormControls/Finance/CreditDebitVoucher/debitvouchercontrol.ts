@@ -854,7 +854,13 @@ export class DebitVoucherControl {
         value: FormValues?.Narration,
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Narration is required!",
+          },
+        ]
+
       },
       {
         name: "TDSApplicable",
@@ -953,6 +959,10 @@ export class DebitVoucherControl {
           {
             name: "required",
             message: "DebitAmount is required",
+          },
+          {
+            name: "max",
+            message: "Value exceeds the maximum allowed amount.",
           },
         ],
         functions: {

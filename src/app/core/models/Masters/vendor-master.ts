@@ -27,6 +27,7 @@ export class VendorMaster {
   gstPincode: string
   msmeRegistered: boolean
   otherdetails: any
+  vendorManager: string
   constructor(VendorMaster) {
     {
       this.vendorCode = VendorMaster.vendorCode || 'System Genrated';

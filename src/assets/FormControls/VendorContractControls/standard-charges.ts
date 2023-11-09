@@ -1,9 +1,9 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class TERCharges {
-  StandardChargesArray: FormControls[];
-  constructor(StandardChargesData) {
-    this.StandardChargesArray = [
+  TERChargesArray: FormControls[];
+  constructor(chargesData) {
+    this.TERChargesArray = [
       {
         name: "route",
         label: "Route",
@@ -13,6 +13,10 @@ export class TERCharges {
         generatecontrol: true,
         disable: false,
         Validations: [
+          {
+            name: "required",
+            message: "Route is required"
+          },
           {
             name: "autocomplete",
           },
@@ -30,17 +34,20 @@ export class TERCharges {
         label: "Rate Type",
         placeholder: "Rate Type",
         type: "dropdown",
-        value: "",
+        value: '',
         generatecontrol: true,
         disable: false,
-        Validations: [
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocomplete",
-            message: "please select values from list only",
-          },
+        Validations: [{
+          name: "required",
+          message: "Rate Type is required"
+        },
+        {
+          name: "autocomplete",
+        },
+        {
+          name: "invalidAutocomplete",
+          message: "please select values from list only",
+        },
         ],
         additionalData: {
           showNameAndValue: false,
@@ -48,13 +55,17 @@ export class TERCharges {
       },
       {
         name: "capacity",
-        label: "  Capacity",
-        placeholder: "  Capacity",
+        label: "Capacity(Ton)",
+        placeholder: "Capacity",
         type: "dropdown",
         value: "",
         generatecontrol: true,
         disable: false,
         Validations: [
+          {
+            name: "required",
+            message: "Capacity is required"
+          },
           {
             name: "autocomplete",
           },
@@ -75,7 +86,10 @@ export class TERCharges {
         value: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [{
+          name: "required",
+          message: "Rate is required"
+        },],
       },
       {
         name: "min",
@@ -85,7 +99,10 @@ export class TERCharges {
         value: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [{
+          name: "required",
+          message: "Min Amount is required"
+        },],
       },
       {
         name: "max",
@@ -95,11 +112,14 @@ export class TERCharges {
         value: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [{
+          name: "required",
+          message: "Max Amount is required"
+        },],
       },
     ];
   }
-  getStandardChargesArrayControls() {
-    return this.StandardChargesArray;
+  getTERChargesArrayControls() {
+    return this.TERChargesArray;
   }
 }

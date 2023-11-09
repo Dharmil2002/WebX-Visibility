@@ -54,7 +54,7 @@ export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
     if (search.length >= 2) {
       switch (this.objResult.DocumentType?.name) {
         case "Consignment":
-          data = await GetDocumentsWiseListFromApi(this.masterService, 'docket_temp', 'docketNumber', search, 'billingParty', this.objResult?.PartName)
+          data = await GetDocumentsWiseListFromApi(this.masterService, 'docket_temp', 'docketNumber', search, 'billingParty', this.objResult?.PartName, 'origin', this.objResult?.Origin)
           break;
         case "THC":
           data = await GetDocumentsWiseListFromApi(this.masterService, 'thc_detail', 'prqNo', search)
@@ -107,12 +107,8 @@ export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
         Validators.max(allowedAmt),
       ]);
 
-      const customErrorMessage = 'Value exceeds the maximum allowed amount.';
-      DebitAmountAgaintsDocument.setErrors({ customError: customErrorMessage });
     }
     DebitAmountAgaintsDocument.updateValueAndValidity();
   }
-
-
 }
 

@@ -5,13 +5,14 @@ import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-vendor-terdetail',
-  templateUrl: './vendor-terdetail.component.html' 
+  templateUrl: './vendor-terdetail.component.html'
 })
 export class VendorTERDetailComponent implements OnInit {
   @Input() contractData: any;
 
-  TErouteBasedTableData=RouteBasedTableData
-  columnHeaderTErouteBased={
+  // TErouteBasedTableData :any = [];
+  TErouteBasedTableData  =  RouteBasedTableData
+  columnHeaderTErouteBased = {
     route: {
       Title: "Route",
       class: "matcolumnleft",
@@ -42,8 +43,13 @@ export class VendorTERDetailComponent implements OnInit {
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
+    actionsItems: {
+      Title: "Action",
+      class: "matcolumnleft",
+      Style: "max-width:80px",
+    }
   }
-  tableLoad: boolean=true;
+  tableLoad: boolean = true;
   dynamicControls = {
     add: false,
     edit: false,
@@ -57,29 +63,29 @@ export class VendorTERDetailComponent implements OnInit {
     { label: 'Edit' },
     { label: 'Remove' }
   ]
-  staticFieldTErouteBased=['min','rate','capacity','route','rateType','max']
+  staticFieldTErouteBased = ['min', 'rate', 'capacity', 'route', 'rateType', 'max']
 
-  constructor( private dialog: MatDialog,) { }
+  constructor(private dialog: MatDialog,) { }
 
   ngOnInit(): void {
   }
   ngOnChanges(changes: SimpleChanges) {
-    console.log(changes);
+    // console.log(changes);
 
     const data = changes.contractData?.currentValue
     //this.initializeFormControl(data);
   }
-    //#region  to fill or remove data form table to controls
-    handleMenuItemClick(data) {
-      if (data.label.label === 'Remove') {
-        this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
-      } else {
-         const beneficiaryDetails = this.TErouteBasedTableData.find(x => x.id == data.data.id);
-        this.addDetails(beneficiaryDetails)
-      }
+  //#region  to fill or remove data form table to controls
+  handleMenuItemClick(data) {
+    if (data.label.label === 'Remove') {
+      this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
+    } else {
+      const beneficiaryDetails = this.TErouteBasedTableData.find(x => x.id == data.data.id);
+      this.addDetails(beneficiaryDetails)
     }
-    //#endregion 
-      //#region to Add a new item to the table or edit
+  }
+  //#endregion 
+  //#region to Add a new item to the table or edit
   addDetails(event) {
     const EditableId = event?.id
     const request = {
@@ -97,7 +103,7 @@ export class VendorTERDetailComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      // console.log(result);
+      console.log(result);
 
       if (result != undefined) {
         if (EditableId) {
@@ -105,21 +111,17 @@ export class VendorTERDetailComponent implements OnInit {
         }
         const json = {
           id: this.TErouteBasedTableData.length + 1,
-          // accountCode: result.accountCode,
-          // IFSCcode: result.IFSCcode,
-          // bankName: result.bankName,
-          // branchName: result.branchName,
-          // city: result.city,
-          // UPIId: result.UPIId,
-          // uploadKYC: "Done",
-          // contactPerson: result.contactPerson,
-          // mobileNo: result.mobileNo,
-          // emailId: result.emailId,
+          route: result.route.name,
+          rateType: result.rateType.name,
+          capacity: result.capacity.name,
+          rate: result.rate,
+          min: result.min,
+          max: result.max,
           actions: ['Edit', 'Remove']
         }
-       // this.TErouteBasedTableData.push(json);
+        this.TErouteBasedTableData.push(json);
         this.tableLoad = true
-       
+
       }
       this.tableLoad = true;
     });

@@ -167,9 +167,11 @@ allColumnFilter:any;
   //   window.open(url,'','width=1000,height=800');
   // }
   openExternalWindow(data){
-
-    const THC = data.tripId
-    const url = `${window.location.origin}/#/Operation/thc-view?THC=${THC}`;
+    const templateBody = {
+      DocNo:data.tripId,
+      templateName:'thc'
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url,'','width=1500,height=800');
   }
 }

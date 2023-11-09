@@ -157,7 +157,9 @@ export async function GetDocumentsWiseListFromApi(
     field,
     value,
     fixedfield?,
-    fixedvalue?
+    fixedvalue?,
+    fixedoriginfield?,
+    fixedoriginvalue?
 ) {
     try {
         const companyCode = localStorage.getItem('companyCode');
@@ -174,6 +176,14 @@ export async function GetDocumentsWiseListFromApi(
             filters.push({
                 field: fixedfield,
                 value: fixedvalue,
+                exactMatch: true,
+            });
+        }
+        // Check if fixedfield and fixedvalue are provided and not undefined
+        if (fixedoriginfield !== undefined && fixedoriginvalue !== undefined) {
+            filters.push({
+                field: fixedoriginfield,
+                value: fixedoriginvalue,
                 exactMatch: true,
             });
         }

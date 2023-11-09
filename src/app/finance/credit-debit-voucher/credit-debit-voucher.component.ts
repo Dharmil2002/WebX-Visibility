@@ -20,6 +20,7 @@ import { DebitVoucherPreviewComponent } from '../Modals/debit-voucher-preview/de
 import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from 'src/app/Models/Finance/Finance';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 @Component({
   selector: 'app-credit-debit-voucher',
   templateUrl: './credit-debit-voucher.component.html',
@@ -105,6 +106,7 @@ export class DebitVoucherComponent implements OnInit {
     private voucherServicesService: VoucherServicesService,
     private matDialog: MatDialog,
     private objImageHandling: ImageHandling,
+    public snackBarUtilityService: SnackBarUtilityService,
   ) {
     this.companyCode = this.sessionService.getCompanyCode()
     // this.imageData = {
@@ -436,7 +438,8 @@ export class DebitVoucherComponent implements OnInit {
     }, 0);
     const request = {
       MaxAllowedAmount: MaxAllowedAmount,
-      PartName: this.DebitVoucherSummaryForm.value.PartyName?.name
+      PartName: this.DebitVoucherSummaryForm.value.PartyName?.name,
+      Origin: this.DebitVoucherSummaryForm.value.Accountinglocation?.name
     }
     const dialogRef = this.matDialog.open(AddDebitAgainstDocumentModalComponent, {
       data: request,
@@ -536,6 +539,15 @@ export class DebitVoucherComponent implements OnInit {
           "Bank",
           false
         );
+        const Bank = this.DebitVoucherTaxationPaymentDetailsForm.get('Bank');
+        Bank.setValidators([Validators.required, autocompleteObjectValidator()]);
+        Bank.updateValueAndValidity();
+
+        const CashAccount = this.DebitVoucherTaxationPaymentDetailsForm.get('CashAccount');
+        CashAccount.setValue("");
+        CashAccount.clearValidators();
+        CashAccount.updateValueAndValidity();
+
         break;
       case 'Cash':
         const responseFromAPICash = await GetAccountDetailFromApi(this.masterService, "CASH", Accountinglocation)
@@ -546,6 +558,16 @@ export class DebitVoucherComponent implements OnInit {
           "CashAccount",
           false
         );
+
+        const CashAccountS = this.DebitVoucherTaxationPaymentDetailsForm.get('CashAccount');
+        CashAccountS.setValidators([Validators.required, autocompleteObjectValidator()]);
+        CashAccountS.updateValueAndValidity();
+
+        const BankS = this.DebitVoucherTaxationPaymentDetailsForm.get('Bank');
+        BankS.setValue("");
+        BankS.clearValidators();
+        BankS.updateValueAndValidity();
+
         break;
       case 'RTGS/UTR':
         break;
@@ -571,7 +593,7 @@ export class DebitVoucherComponent implements OnInit {
       "TCSSection",
       false
     );
-    debugger
+
     const paymentstate = this.AllLocationsList.find(item => item.name == Accountinglocation)?.value
     this.DebitVoucherSummaryForm.get('Paymentstate').setValue(paymentstate);
 
@@ -589,7 +611,7 @@ export class DebitVoucherComponent implements OnInit {
         "Ledgercode": item.LedgerHdn,
         "Ledgername": item.Ledger,
         "SubLedger": item.SubCategoryName,
-        "Dr": item.DebitAmount,
+        "Dr": parseFloat(item.DebitAmount).toFixed(2),
         "Cr": "",
         "Location": Accountinglocation,
         "Narration": item.Narration
@@ -651,7 +673,7 @@ export class DebitVoucherComponent implements OnInit {
     const TCSAmount = parseFloat(this.DebitVoucherTaxationTCSForm.get("TCSDeduction").value);
     const TCSSection = this.DebitVoucherTaxationTCSForm.get("TCSSection").value;
 
-    if (TDSAmount > 0) {
+    if (TCSAmount > 0) {
       let TCSData = {
         "Instance": "debit voucher",
         "Value": "TCS",
@@ -709,171 +731,195 @@ export class DebitVoucherComponent implements OnInit {
     });
   }
   async SubmitRequest() {
-    let GSTAmount = 0;
-    this.jsonControlDebitVoucherTaxationGSTArray.forEach(item => {
-      const value = parseFloat(this.DebitVoucherTaxationGSTForm.get(item.name).value);
-      GSTAmount += isNaN(value) ? 0 : value; // Check for NaN and handle it as 0
-    });
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        let GSTAmount = 0;
+        this.jsonControlDebitVoucherTaxationGSTArray.forEach(item => {
+          const value = parseFloat(this.DebitVoucherTaxationGSTForm.get(item.name).value);
+          GSTAmount += isNaN(value) ? 0 : value; // Check for NaN and handle it as 0
+        });
 
-    const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
-    const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
+        const PaymentAmount = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").value);
+        const NetPayable = parseFloat(this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").value);
 
-    this.debitVoucherRequestModel.companyCode = this.companyCode;
-    this.debitVoucherRequestModel.docType = "VR";
-    this.debitVoucherRequestModel.branch = localStorage.getItem("CurrentBranchCode");
-    this.debitVoucherRequestModel.finYear = financialYear
-
-
-    this.debitVoucherDataRequestModel.companyCode = this.companyCode;
-    this.debitVoucherDataRequestModel.voucherNo = "";
-    this.debitVoucherDataRequestModel.transType = "DebitVoucher";
-    this.debitVoucherDataRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
-    this.debitVoucherDataRequestModel.docType = "VR";
-    this.debitVoucherDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
-    this.debitVoucherDataRequestModel.finYear = financialYear
-
-    this.debitVoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
-    this.debitVoucherDataRequestModel.preperedFor = this.DebitVoucherSummaryForm.value.Preparedfor;
-    this.debitVoucherDataRequestModel.partyCode = this.DebitVoucherSummaryForm.value.PartyName?.value;
-    this.debitVoucherDataRequestModel.partyName = this.DebitVoucherSummaryForm.value.PartyName?.name;
-    this.debitVoucherDataRequestModel.partyState = this.DebitVoucherSummaryForm.value.Partystate?.name;
-    this.debitVoucherDataRequestModel.entryBy = this.DebitVoucherSummaryForm.value.Preparedby;
-    this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString()
-    this.debitVoucherDataRequestModel.panNo = ""
-
-    this.debitVoucherDataRequestModel.tdsSectionCode = this.DebitVoucherTaxationTDSForm.value.TDSSection.value;
-    this.debitVoucherDataRequestModel.tdsSectionName = this.DebitVoucherTaxationTDSForm.value.TDSSection.name;
-    this.debitVoucherDataRequestModel.tdsRate = this.DebitVoucherTaxationTDSForm.value.TDSRate;
-    this.debitVoucherDataRequestModel.tdsAmount = this.DebitVoucherTaxationTDSForm.value.TDSDeduction;
-    this.debitVoucherDataRequestModel.tdsAtlineitem = this.TDSAtLineItem
-
-    this.debitVoucherDataRequestModel.tcsSectionCode = this.DebitVoucherTaxationTCSForm.value.TCSSection.value;
-    this.debitVoucherDataRequestModel.tcsSectionName = this.DebitVoucherTaxationTCSForm.value.TCSSection.name;
-    this.debitVoucherDataRequestModel.tcsRate = this.DebitVoucherTaxationTCSForm.value.TCSRate;
-    this.debitVoucherDataRequestModel.tcsAmount = this.DebitVoucherTaxationTCSForm.value.TCSDeduction;
-
-    this.debitVoucherDataRequestModel.IGST = this.DebitVoucherTaxationGSTForm.value.IGST || 0;
-    this.debitVoucherDataRequestModel.SGST = this.DebitVoucherTaxationGSTForm.value.SGST || 0;
-    this.debitVoucherDataRequestModel.CGST = this.DebitVoucherTaxationGSTForm.value.CGST || 0;
-    this.debitVoucherDataRequestModel.UGST = this.DebitVoucherTaxationGSTForm.value.UGST || 0;
-    this.debitVoucherDataRequestModel.GSTTotal = GSTAmount;
-
-    this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
-    this.debitVoucherDataRequestModel.netPayable = NetPayable;
-    this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount
-    this.debitVoucherDataRequestModel.voucherCanceled = false
-
-    this.debitVoucherDataRequestModel.paymentMode = this.DebitVoucherTaxationPaymentDetailsForm.value.PaymentMode;
-    this.debitVoucherDataRequestModel.refNo = this.DebitVoucherTaxationPaymentDetailsForm.value.ChequeOrRefNo;
-    this.debitVoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
-    this.debitVoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
-    this.debitVoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
-    this.debitVoucherDataRequestModel.paymentAmtount = NetPayable
+        this.debitVoucherRequestModel.companyCode = this.companyCode;
+        this.debitVoucherRequestModel.docType = "VR";
+        this.debitVoucherRequestModel.branch = this.DebitVoucherSummaryForm.value.Accountinglocation?.name
+        this.debitVoucherRequestModel.finYear = financialYear
 
 
-    const companyCode = this.companyCode;
-    const CurrentBranchCode = localStorage.getItem("CurrentBranchCode");
-    var VoucherlineitemList = this.tableData.map(function (item) {
-      return {
+        this.debitVoucherDataRequestModel.companyCode = this.companyCode;
+        this.debitVoucherDataRequestModel.voucherNo = "";
+        this.debitVoucherDataRequestModel.transType = "DebitVoucher";
+        this.debitVoucherDataRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
+        this.debitVoucherDataRequestModel.docType = "VR";
+        this.debitVoucherDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+        this.debitVoucherDataRequestModel.finYear = financialYear
 
-        "companyCode": companyCode,
-        "voucherNo": "",
-        "transType": "DebitVoucher",
-        "transDate": new Date(),
-        "finYear": financialYear,
-        "branch": CurrentBranchCode,
-        "accCode": item.LedgerHdn,
-        "accName": item.Ledger,
-        "sacCode": item.SACCodeHdn.toString(),
-        "sacName": item.SACCode,
-        "debit": item.DebitAmount,
-        "credit": 0,
-        "GSTRate": item.GSTRate,
-        "GSTAmount": item.GSTAmount,
-        "Total": item.Total,
-        "TDSApplicable": item.TDSApplicable == "Yes" ? true : false,
-        "narration": item.Narration
-      };
-    });
+        this.debitVoucherDataRequestModel.accLocation = this.DebitVoucherSummaryForm.value.Accountinglocation?.name;
+        this.debitVoucherDataRequestModel.preperedFor = this.DebitVoucherSummaryForm.value.Preparedfor;
+        this.debitVoucherDataRequestModel.partyCode = this.DebitVoucherSummaryForm.value.PartyName?.value;
+        this.debitVoucherDataRequestModel.partyName = this.DebitVoucherSummaryForm.value.PartyName?.name;
+        this.debitVoucherDataRequestModel.partyState = this.DebitVoucherSummaryForm.value.Partystate?.name;
+        this.debitVoucherDataRequestModel.entryBy = this.DebitVoucherSummaryForm.value.Preparedby;
+        this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString()
+        this.debitVoucherDataRequestModel.panNo = ""
 
-    var debitAgainstDocumentList = this.DebitAgainstDocumentList.map(function (item) {
-      return {
+        this.debitVoucherDataRequestModel.tdsSectionCode = this.DebitVoucherTaxationTDSForm.value.TDSSection.value;
+        this.debitVoucherDataRequestModel.tdsSectionName = this.DebitVoucherTaxationTDSForm.value.TDSSection.name;
+        this.debitVoucherDataRequestModel.tdsRate = Number(this.DebitVoucherTaxationTDSForm.value.TDSRate) ?? 0;
+        this.debitVoucherDataRequestModel.tdsAmount = parseFloat(this.DebitVoucherTaxationTDSForm.value.TDSDeduction) || 0;
+        this.debitVoucherDataRequestModel.tdsAtlineitem = this.TDSAtLineItem
+        this.debitVoucherDataRequestModel.tcsSectionCode = this.DebitVoucherTaxationTCSForm.value.TCSSection.value;
+        this.debitVoucherDataRequestModel.tcsSectionName = this.DebitVoucherTaxationTCSForm.value.TCSSection.name;
+        this.debitVoucherDataRequestModel.tcsRate = Number(this.DebitVoucherTaxationTCSForm.value.TCSRate) ?? 0;
+        this.debitVoucherDataRequestModel.tcsAmount = parseFloat(this.DebitVoucherTaxationTCSForm.value.TCSDeduction) || 0;
 
-        "companyCode": companyCode,
-        "voucherNo": "",
-        "transType": "DebitVoucher",
-        "transDate": new Date(),
-        "finYear": financialYear,
-        "branch": CurrentBranchCode,
-        "Document": item?.Document,
-        "DebitAmountAgaintsDocument": parseFloat(item?.DebitAmountAgaintsDocument) || 0,
-        "DocumentType": item?.DocumentType,
-      };
-    });
+        this.debitVoucherDataRequestModel.IGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.IGST) || 0;
+        this.debitVoucherDataRequestModel.SGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.SGST) || 0;
+        this.debitVoucherDataRequestModel.CGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.CGST) || 0;
+        this.debitVoucherDataRequestModel.UGST = parseFloat(this.DebitVoucherTaxationGSTForm.value.UGST) || 0;
+        this.debitVoucherDataRequestModel.GSTTotal = GSTAmount;
 
-    this.debitVoucherRequestModel.details = VoucherlineitemList
-    this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
-    this.debitVoucherRequestModel.debitAgainstDocumentList = debitAgainstDocumentList;
+        this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
+        this.debitVoucherDataRequestModel.netPayable = NetPayable;
+        this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount
+        this.debitVoucherDataRequestModel.voucherCanceled = false
 
-    const res = await this.voucherServicesService
-      .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)
-      .toPromise();
-    if (res) {
-      this.UploadLedgerInformations(res)
-    }
+        this.debitVoucherDataRequestModel.paymentMode = this.DebitVoucherTaxationPaymentDetailsForm.value.PaymentMode;
+        this.debitVoucherDataRequestModel.refNo = this.DebitVoucherTaxationPaymentDetailsForm.value.ChequeOrRefNo;
+        this.debitVoucherDataRequestModel.accountName = this.DebitVoucherTaxationPaymentDetailsForm.value.Bank.name;
+        this.debitVoucherDataRequestModel.date = this.DebitVoucherTaxationPaymentDetailsForm.value.Date;
+        this.debitVoucherDataRequestModel.scanSupportingDocument = this.imageData?.ScanSupportingdocument
+        this.debitVoucherDataRequestModel.paymentAmtount = NetPayable
+
+
+        const companyCode = this.companyCode;
+        const CurrentBranchCode = localStorage.getItem("CurrentBranchCode");
+        var VoucherlineitemList = this.tableData.map(function (item) {
+          return {
+
+            "companyCode": companyCode,
+            "voucherNo": "",
+            "transType": "DebitVoucher",
+            "transDate": new Date(),
+            "finYear": financialYear,
+            "branch": CurrentBranchCode,
+            "accCode": item.LedgerHdn,
+            "accName": item.Ledger,
+            "sacCode": item.SACCodeHdn.toString(),
+            "sacName": item.SACCode,
+            "debit": parseFloat(item.DebitAmount).toFixed(2),
+            "credit": 0,
+            "GSTRate": item.GSTRate,
+            "GSTAmount": parseFloat(item.GSTAmount).toFixed(2),
+            "Total": item.Total,
+            "TDSApplicable": item.TDSApplicable == "Yes" ? true : false,
+            "narration": item.Narration ?? ""
+          };
+        });
+
+        var debitAgainstDocumentList = this.DebitAgainstDocumentList.map(function (item) {
+          return {
+
+            "companyCode": companyCode,
+            "voucherNo": "",
+            "transType": "DebitVoucher",
+            "transDate": new Date(),
+            "finYear": financialYear,
+            "branch": CurrentBranchCode,
+            "Document": item?.Document,
+            "DebitAmountAgaintsDocument": parseFloat(item?.DebitAmountAgaintsDocument) || 0,
+            "DocumentType": item?.DocumentType,
+          };
+        });
+
+        this.debitVoucherRequestModel.details = VoucherlineitemList
+        this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
+        this.debitVoucherRequestModel.debitAgainstDocumentList = debitAgainstDocumentList;
+
+        this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)
+          .subscribe({
+            next: (res: any) => {
+              var transformedData = this.tableData.map(function (item) {
+                // Split the "Ledger" value into "accCode" and "accName"
+                return {
+                  "accCode": item.Ledger,
+                  "accName": item.LedgerHdn,
+                  "amount": item.Total,
+                  "narration": item.Narration ?? ""
+                };
+              });
+              let reqBody = {
+                companyCode: this.companyCode,
+                voucherNo: res?.data?.mainData?.insertedId,
+                transDate: Date(),
+                finYear: financialYear,
+                branch: localStorage.getItem("CurrentBranchCode"),
+                transType: "DebitVoucher",
+                docType: "Voucher",
+                docNo: res?.data?.mainData?.ops[0].vNO,
+                partyCode: this.DebitVoucherSummaryForm.value?.PartyName?.value,
+                partyName: this.DebitVoucherSummaryForm.value?.PartyName?.name,
+                entryBy: localStorage.getItem("UserName"),
+                entryDate: Date(),
+                debit: transformedData,
+                credit: transformedData,
+
+              };
+
+              this.voucherServicesService
+                .FinancePost("fin/account/posting", reqBody)
+                .subscribe({
+                  next: (res: any) => {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Voucher Created Successfully",
+                      text: "Voucher No: " + reqBody.docNo,
+                      showConfirmButton: true,
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        Swal.hideLoading();
+                        setTimeout(() => {
+                          Swal.close();
+                        }, 2000);
+                        this.navigationService.navigateTotab("Voucher", "dashboard/Index");
+                      }
+                    });
+                  },
+                  error: (err: any) => {
+
+                    if (err.status === 400) {
+                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
+                    } else {
+                      this.snackBarUtilityService.ShowCommonSwal("error", err);
+                    }
+                  },
+                });
+
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+            },
+          });
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+      }
+
+
+    }, "Debit Voucher Generating..!");
 
   }
   UploadLedgerInformations(res) {
     // Create a new array to store the transformed data
-    var transformedData = this.tableData.map(function (item) {
-      // Split the "Ledger" value into "accCode" and "accName"
-      return {
-        "accCode": item.Ledger,
-        "accName": item.LedgerHdn,
-        "amount": item.Total,
-        "narration": item.Narration
-      };
-    });
-    let reqBody = {
-      companyCode: this.companyCode,
-      voucherNo: res?.data?.mainData?.insertedId,
-      transDate: Date(),
-      finYear: financialYear,
-      branch: localStorage.getItem("CurrentBranchCode"),
-      transType: "DebitVoucher",
-      docType: "Voucher",
-      docNo: res?.data?.mainData?.insertedId,
-      partyCode: this.DebitVoucherSummaryForm.value?.PartyName?.value,
-      partyName: this.DebitVoucherSummaryForm.value?.PartyName?.name,
-      entryBy: localStorage.getItem("UserName"),
-      entryDate: Date(),
-      debit: transformedData,
-      credit: transformedData,
 
-    };
-    this.voucherServicesService
-      .FinancePost("fin/account/posting", reqBody)
-      .subscribe({
-        next: (res: any) => {
-          Swal.fire({
-            icon: "success",
-            title: "Voucher Created Successfully",
-            text:
-              "VocherNo: " + reqBody.docNo,
-            showConfirmButton: true,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // Redirect to the desired page after the success message is confirmed.
-              this.navigationService.navigateTotab(
-                "Voucher",
-                "dashboard/Index"
-              );
-            }
-          });
-        },
-      });
   }
   //#region Driver Photo
+
+  async test(event) {
+
+  }
 
   async selectFileScanDocument(data) {
     // Call the uploadFile method from the service

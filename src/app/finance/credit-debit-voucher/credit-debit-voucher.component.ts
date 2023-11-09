@@ -147,11 +147,7 @@ export class DebitVoucherComponent implements OnInit {
       filter: {},
       collectionName: "state_detail",
     };
-    const account_groupReqBody = {
-      companyCode: this.companyCode,
-      collectionName: "account_detail",
-      filter: {},
-    };
+
 
     const resState = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
     this.AllStateList = resState?.data;
@@ -162,11 +158,7 @@ export class DebitVoucherComponent implements OnInit {
       .filter(x => x != null)
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    const resaccount_group = await this.masterService.masterPost('generic/get', account_groupReqBody).toPromise();
-    this.AccountGroupList = resaccount_group?.data
-      .map(x => ({ value: x.AccountCode, name: x.AccountDescription, ...x }))
-      .filter(x => x != null)
-      .sort((a, b) => a.value.localeCompare(b.value));
+
 
     // this.filter.Filter(
     //   this.jsonControlDebitVoucherSummaryArray,
@@ -188,6 +180,22 @@ export class DebitVoucherComponent implements OnInit {
     this.SACCodeList = await GetsachsnFromApi(this.masterService)
     console.log(this.SACCodeList)
   }
+  async BindLedger(BindLedger) {
+    const account_groupReqBody = {
+      companyCode: this.companyCode,
+      collectionName: "account_detail",
+      filter: {
+        PartySelection: BindLedger,
+        // MainCategoryName: ["ASSET", "EXPENSE"],
+        AccountingLocations: this.DebitVoucherSummaryForm.value.Accountinglocation?.name
+      },
+    };
+    const resaccount_group = await this.masterService.masterPost('generic/get', account_groupReqBody).toPromise();
+    this.AccountGroupList = resaccount_group?.data
+      .map(x => ({ value: x.AccountCode, name: x.AccountDescription, ...x }))
+      .filter(x => x != null)
+      .sort((a, b) => a.value.localeCompare(b.value));
+  }
   functionCallHandler($event) {
     let functionName = $event.functionName;
     try {
@@ -204,22 +212,24 @@ export class DebitVoucherComponent implements OnInit {
       const GSTAmount = this.tableData.reduce((accumulator, currentValue) => {
         return accumulator + parseFloat(currentValue['GSTAmount']);
       }, 0);
-      if (IsStateTypeUT) {
-        this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTAmount)
-      }
-      else if (!IsStateTypeUT && Partystate.name == Paymentstate) {
+
+      if (!IsStateTypeUT && Partystate.name == Paymentstate) {
         this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTAmount)
+      }
+      else if (IsStateTypeUT) {
+        this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTAmount)
       }
       else if (!IsStateTypeUT && Partystate.name != Paymentstate) {
         this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTAmount)
       }
+
     }
   }
   ShowOrHideBasedOnSameOrDifferentState(Check, GSTAmount) {
     let filterFunction;
     switch (Check) {
       case 'UT':
-        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'SGST' && x.name !== 'CGST';
+        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'SGST';
         break;
       case 'SAME':
         filterFunction = (x) => x.name !== 'IGST' && x.name !== 'UGST';
@@ -316,6 +326,7 @@ export class DebitVoucherComponent implements OnInit {
         PartyName.updateValueAndValidity();
 
     }
+    this.BindLedger(Preparedfor);
   }
   async PartyNameFieldChanged(event) {
     const Preparedfor = this.DebitVoucherSummaryForm.value.Preparedfor;
@@ -396,7 +407,7 @@ export class DebitVoucherComponent implements OnInit {
     const totalSumWithTDS = this.tableData.filter(item => item.TDSApplicable == "Yes").reduce((accumulator, currentValue) => {
       return accumulator + parseFloat(currentValue['Total']);
     }, 0);
-    const totalSumWithoutTDS = this.tableData.filter(item => item.TDSApplicable == "No").reduce((accumulator, currentValue) => {
+    const DebitAmountSumWithoutTDS = this.tableData.filter(item => item.TDSApplicable == "No").reduce((accumulator, currentValue) => {
       return accumulator + parseFloat(currentValue['Total']);
     }, 0);
     let TDSAmount = this.DebitVoucherTaxationTDSForm.controls.TDSDeduction.value || 0;
@@ -410,13 +421,17 @@ export class DebitVoucherComponent implements OnInit {
     const TDSRate = Number(this.DebitVoucherTaxationTDSForm.value['TDSRate']);
     if (this.TDSAtLineItem) {
       this.tableData.filter(item => item.TDSApplicable == "Yes").forEach(item => {
-        const TDSAmountForLineitem = parseFloat(item.Total) * TDSRate / 100;
+        const TDSAmountForLineitem = parseFloat(item.DebitAmount) * TDSRate / 100;
         TDSWithLineitems += isNaN(TDSAmountForLineitem) ? 0 : TDSAmountForLineitem; // Check for NaN and handle it as 0
       });
       TDSAmount = TDSWithLineitems;
     }
-    const CalculatedSumWithTDS = totalSumWithTDS - TDSAmount - TCSAmount;
-    const CalculatedSum = CalculatedSumWithTDS + totalSumWithoutTDS
+    debugger
+    var parsedTDSAmount = parseFloat(TDSAmount) || 0;
+    var parsedTCSAmount = parseFloat(TCSAmount) || 0;
+
+    const CalculatedSumWithTDS = totalSumWithTDS - (parsedTDSAmount + parsedTCSAmount);
+    const CalculatedSum = CalculatedSumWithTDS + DebitAmountSumWithoutTDS
     this.DebitVoucherTaxationPaymentSummaryForm.get("PaymentAmount").setValue(CalculatedSum.toFixed(2));
     this.DebitVoucherTaxationPaymentSummaryForm.get("NetPayable").setValue(CalculatedSum.toFixed(2));
   }
@@ -543,6 +558,12 @@ export class DebitVoucherComponent implements OnInit {
         Bank.setValidators([Validators.required, autocompleteObjectValidator()]);
         Bank.updateValueAndValidity();
 
+        const ChequeOrRefNo = this.DebitVoucherTaxationPaymentDetailsForm.get('ChequeOrRefNo');
+        ChequeOrRefNo.setValidators([Validators.required]);
+        ChequeOrRefNo.updateValueAndValidity();
+
+
+
         const CashAccount = this.DebitVoucherTaxationPaymentDetailsForm.get('CashAccount');
         CashAccount.setValue("");
         CashAccount.clearValidators();
@@ -567,6 +588,11 @@ export class DebitVoucherComponent implements OnInit {
         BankS.setValue("");
         BankS.clearValidators();
         BankS.updateValueAndValidity();
+
+        const ChequeOrRefNoS = this.DebitVoucherTaxationPaymentDetailsForm.get('ChequeOrRefNo');
+        ChequeOrRefNoS.setValue("");
+        ChequeOrRefNoS.clearValidators();
+        ChequeOrRefNoS.updateValueAndValidity();
 
         break;
       case 'RTGS/UTR':
@@ -644,7 +670,7 @@ export class DebitVoucherComponent implements OnInit {
         "Ledgercode": item.name,
         "Ledgername": `${item.name} Payable`,
         "SubLedger": "LIABILITY",
-        "Dr": (parseFloat(this.DebitVoucherTaxationGSTForm.get(item.name).value) / this.jsonControlDebitVoucherTaxationGSTArray.length).toFixed(2),
+        "Dr": (parseFloat(this.DebitVoucherTaxationGSTForm.get(item.name).value)).toFixed(2),
         "Cr": "",
         "Location": Accountinglocation,
         "Narration": ""

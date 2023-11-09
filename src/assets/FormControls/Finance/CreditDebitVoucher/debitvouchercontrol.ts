@@ -448,28 +448,48 @@ export class DebitVoucherControl {
         Validations: [],
       },
       {
-        name: 'SGST', label: 'SGST ₹', placeholder: 'SGST ₹', type: 'dayhour',
+        name: "SGST",
+        label: "SGST ₹",
+        placeholder: "SGST ₹",
+        type: "number",
         value: "",
-        Validations: [], generatecontrol: true, disable: false,
-        additionalData: {
-          metaData: "Basic",
-          label: 'CGST ₹',
-          fieldName: "CGST",
-          disable: true,
-        },
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
       },
       {
-        name: 'CGST',
-        label: '',
-        placeholder: '',
-        type: '',
+        name: "CGST",
+        label: "CGST ₹",
+        placeholder: "CGST ₹",
+        type: "number",
         value: "",
+        generatecontrol: true,
+        disable: true,
         Validations: [],
-        generatecontrol: false, disable: false,
-        additionalData: {
-          metaData: "CGST"
-        }
-      }
+      },
+      // {
+      //   name: 'SGST', label: 'SGST ₹', placeholder: 'SGST ₹', type: 'dayhour',
+      //   value: "",
+      //   Validations: [], generatecontrol: true, disable: false,
+      //   additionalData: {
+      //     metaData: "Basic",
+      //     label: 'CGST ₹',
+      //     fieldName: "CGST",
+      //     disable: true,
+      //   },
+      // },
+      // {
+      //   name: 'CGST',
+      //   label: '',
+      //   placeholder: '',
+      //   type: '',
+      //   value: "",
+      //   Validations: [],
+      //   generatecontrol: false, disable: false,
+      //   additionalData: {
+      //     metaData: "CGST"
+      //   }
+      // }
     ];
     this.DebitVoucherTaxationPaymentSummaryArray = [
 
@@ -562,7 +582,11 @@ export class DebitVoucherControl {
         value: "",
         generatecontrol: true,
         disable: false,
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Cheque/Ref No is required"
+          },],
       },
       {
         name: "Bank",

@@ -14,7 +14,8 @@ export class DocketDetail {
     containerNumber: string
     vendorType: string
     vendorName: string
-    ccbp: boolean
+    cnbp: boolean
+    cnebp: boolean
     consignorName: string
     pAddress: string
     ccontactNumber: string
@@ -75,7 +76,8 @@ export class DocketDetail {
         this.containerNumber = data.containerNumber ?? '';
         this.vendorType = data.vendorType ?? '';
         this.vendorName = data.vendorName ?? '';
-        this.ccbp = data.ccbp ?? false;
+        this.cnbp = data.cnbp ?? false;
+        this.cnebp = data.cnebp ?? false;
         this.consignorName = data.consignorName ?? '';
         this.pAddress = data.pAddress ?? '';
         this.ccontactNumber = data.ccontactNumber ?? '';

@@ -1,6 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class ContractBasicInformationControl {
   private ContractBasicInformationControlArray: FormControls[];
+  private AddNewCustomerContractControlArray: FormControls[];
   constructor(BasicInformation) {
     this.ContractBasicInformationControlArray = [
       {
@@ -23,6 +24,7 @@ export class ContractBasicInformationControl {
         disable: true,
         Validations: [],
       },
+
       {
         name: "ContractScan",
         label: "Upload Contract Scan",
@@ -121,7 +123,7 @@ export class ContractBasicInformationControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
       },
       {
@@ -227,9 +229,160 @@ export class ContractBasicInformationControl {
         Validations: [],
       },
     ];
+
+    this.AddNewCustomerContractControlArray = [
+      {
+        name: "Customer",
+        label: "Customer",
+        placeholder: "Customer",
+        type: "dropdown",
+        value: BasicInformation.Customer,
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: BasicInformation.Customer ?? false,
+        Validations: [
+          {
+            name: "required",
+            message: "Customer is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "PartyNameFieldChanged"
+        },
+      },
+
+      {
+        name: "ContractID",
+        label: "ContractID",
+        placeholder: "ContractID",
+        type: "text",
+        value: "System Generated",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+
+      {
+        name: "Product",
+        label: "Product",
+        placeholder: "Product",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Product is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "ProductFieldChanged"
+        },
+      },
+      {
+        name: "PayBasis",
+        label: "PayBasis",
+        placeholder: "PayBasis",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "PayBasis is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "PayBasisFieldChanged"
+        },
+      },
+
+
+      {
+        name: "ContractStartDate",
+        label: "Contract Start Date",
+        placeholder: "Contract Start Date",
+        type: "date",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [{
+          name: "required",
+          message: "Start Date is required",
+        },],
+        additionalData: {
+          minDate: new Date("01 Jan 2000"),
+        },
+        functions: {
+          onDate: "onContractStartDateChanged",
+        },
+
+      },
+      {
+        name: "Expirydate",
+        label: "Expiry Date",
+        placeholder: "Expiry Date",
+        type: "date",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [{
+          name: "required",
+          message: "Expiry Date is required",
+        },],
+        additionalData: {
+          minDate: new Date("01 Jan 2000"),
+        },
+      },
+
+
+    ];
   }
   getContractBasicInformationControlControls(CurrentAccess: string[]) {
-    // this.ContractBasicInformationControlArray = this.ContractBasicInformationControlArray.filter(item => CurrentAccess.includes(item.name))
+    this.ContractBasicInformationControlArray = this.ContractBasicInformationControlArray.filter(item => CurrentAccess.includes(item.name))
     return this.ContractBasicInformationControlArray;
+  }
+  getAddNewCustomerContractControlArrayControls() {
+    return this.AddNewCustomerContractControlArray;
   }
 }

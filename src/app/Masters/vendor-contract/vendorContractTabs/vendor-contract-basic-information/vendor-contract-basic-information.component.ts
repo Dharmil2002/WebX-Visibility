@@ -90,7 +90,7 @@ export class VendorContractBasicInformationComponent implements OnInit {
   }
   //#endregion
   save() {
-   // console.log(this.ProductsForm.value);
+   console.log(this.ProductsForm.value);
   }
   cancel() {
 

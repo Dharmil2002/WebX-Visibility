@@ -59,3 +59,32 @@ export function convertNumericalStringsToInteger(dataObj) {
       return newObj; // Return the object without the specified fields
     });
   }
+  export function removeFields(data, fieldsToRemove) {
+    return data.map(obj => {
+      const newObj = { ...obj };
+      fieldsToRemove.forEach(field => {
+        if (newObj.hasOwnProperty(field)) {
+          delete newObj[field];
+        }
+      });
+      return newObj;
+    });
+  }
+  
+// Function to check if all fields are empty
+export function areAllFieldsEmpty(Detail): boolean {
+  for (let fields of Detail) {
+    for (let key in fields) {
+      if (fields.hasOwnProperty(key) && fields[key] !== '') {
+        return false; // At least one field is not empty
+      }
+    }
+  }
+  return true; // All fields are empty
+}
+export function updateProperty(arr, propertyToUpdate, propertyToUpdateFrom) {
+  return arr.map(item => ({
+    ...item,
+    [propertyToUpdate]: item[propertyToUpdateFrom]
+  }));
+}

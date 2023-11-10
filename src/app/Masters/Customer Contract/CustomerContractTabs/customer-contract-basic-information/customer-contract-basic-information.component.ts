@@ -46,7 +46,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     private sessionService: SessionService) {
     this.companyCode = this.sessionService.getCompanyCode()
     this.CurrentAccessList = {
-      productAccess: ['loadType', 'rateType', 'originRateOption', 'destinationRateOption', 'originRateOptionHandler', 'destinationRateOptionHandler']
+      productAccess: ['Customer', 'ContractID', 'ContractScan', 'ContractScanView', 'Product', 'PayBasis', 'AccountManager', 'PayBasis', 'ContractStartDate', 'Expirydate', 'Pendingdays', 'CustomerPONo', 'POValiditydate', 'ContractPOScan', 'ContractPOScanView', 'UpdateHistory']
     } as CurrentAccessListType;
   }
   ngOnChanges(changes: SimpleChanges) {

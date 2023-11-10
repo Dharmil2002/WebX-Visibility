@@ -61,7 +61,8 @@ export async function filterDocketDetail(data) {
             weight: actualWeights || 0,
             fCity: element?.fromCity,
             tCity: element?.toCity,
-            billingParty: element?.billingParty || ""
+            billingParty: element?.billingParty || "",
+            containerDetail:element.hasOwnProperty("containerDetail")?element.containerDetail:['']
         }
         docketList.push(docketDetails);
     });

@@ -2,8 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { OperationService } from 'src/app/core/service/operations/operation.service';
+import { StorageService } from 'src/app/core/service/storage.service';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
+import { RakeEntryService } from 'src/app/Utility/module/operation/rake-entry/rake-entry-service';
+import { ThcService } from 'src/app/Utility/module/operation/thc/thc.service';
 import { HandoverControl } from 'src/assets/FormControls/hand-over-control';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-handed-over',
   templateUrl: './handed-over.component.html'
@@ -11,34 +16,40 @@ import { HandoverControl } from 'src/assets/FormControls/hand-over-control';
 export class HandedOverComponent implements OnInit {
   HandFormControls: HandoverControl;
   jsonControlArray: any;
-  
+
   handTableForm: UntypedFormGroup;
-    columnHeader = {
-      checkBoxRequired:{
-        Title: "Select",
-        class: "matcolumncenter",
-        Style: "min-width:200px",
-      },
-      ContainerNo: {
-        Title: "Container No",
-        class: "matcolumncenter",
-        Style: "min-width:200px",
-      },
-      IsEmpty: {
-        Title: "Is Empty",
-        class: "matcolumncenter",
-        Style: "min-width:200px",
-      }
+  columnHeader = {
+    checkBoxRequired: {
+      Title: "Select",
+      class: "matcolumncenter",
+      Style: "min-width:200px",
+    },
+    containerNumber: {
+      Title: "Container No",
+      class: "matcolumncenter",
+      Style: "min-width:200px",
+    },
+    containerType: {
+      Title: "Container Type",
+      class: "matcolumncenter",
+      Style: "min-width:200px",
+    },
+    isEmpty: {
+      Title: "Is Empty",
+      class: "matcolumncenter",
+      Style: "min-width:200px",
     }
-    staticField = [
-      "ContainerNo",
-      "IsEmpty"
-    ]
+  }
+  staticField = [
+    "containerNumber",
+    "containerType",
+    "isEmpty"
+  ]
   breadScrums = [
     {
-      title: "Handover to Liner",
+      title: "Diverted For Export",
       items: ["Home"],
-      active: "Handover",
+      active: "Diverted For Export",
     },
   ];
   METADATA = {
@@ -50,27 +61,25 @@ export class HandedOverComponent implements OnInit {
     edit: true,
     csv: false,
   };
-tableData=[{
-  "ContainerNo":"2843885785P3848754",
-  "IsEmpty":"Yes"
-},
-{
-  "ContainerNo":"2843845785P3848778",
-  "IsEmpty":"Yes"
-},
-{
-  "ContainerNo":"2843885785P3848005",
-  "IsEmpty":"Yes"
-}]
-  tableLoad: boolean=true;
-  constructor(private router: Router, private fb: UntypedFormBuilder, private masterService: MasterService) {
-    if (this.router.getCurrentNavigation()?.extras?.state != null) {
-      const data = this.router.getCurrentNavigation()?.extras?.state.data.columnData;
-      this.breadScrums[0].title=data.Action
+  tableData = [];
+  tableLoad: boolean = true;
+  data: any;
+  constructor(
+    private router: Router,
+    private fb: UntypedFormBuilder,
+    private thcService: ThcService,
+    private rakeEntryService:RakeEntryService
+
+  ) {
+    const navigationState = this.router.getCurrentNavigation()?.extras?.state?.data;
+    if (navigationState) {
+      this.breadScrums[0].title = navigationState.flag
+      this.breadScrums[0].active = navigationState.flag
     }
-    this.tableLoad=false;
+    this.data = navigationState;
+    this.tableLoad = false;
     this.initializeFormControl();
-   
+
   }
 
   ngOnInit(): void {
@@ -94,7 +103,9 @@ tableData=[{
     this.jsonControlArray = this.HandFormControls.getHandOverArrayControls();
     // Build the form group using formGroupBuilder function
     this.handTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-   
+    this.handTableForm.controls['locationCode'].setValue(this.data?.rakeDetails.branch || "");
+    this.handTableForm.controls['rktUptDt'].setValue(this.data?.rakeDetails.oRakeEntryDate || "");
+    this.getShipmentDetails();
   }
   cancel() {
     this.goBack('Rake');
@@ -102,7 +113,61 @@ tableData=[{
   goBack(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
-save(){
+  async getShipmentDetails() {
 
-}
+    const docket = this.data?.rakeDetails.containorDetail.map((x) => x.cnNo);
+    const docketList = await this.thcService.getShipment(false);
+    // Function to get containerDetail based on cnNo
+    const getContainerDetailByCnNo = (objectArray, cnNo) => {
+      const containerDetailArray = [];
+
+      // Iterate through the objectArray
+      objectArray.forEach((obj) => {
+        // Check if the docketNumber matches any cnNo in the cnNoArray
+        if (cnNo.includes(obj.docketNumber)) {
+          // If there are container details, add them to the containerDetailArray
+          if (obj.containerDetail && obj.containerDetail.length > 0) {
+            containerDetailArray.push({
+              docketNumber: obj.docketNumber,
+              containerDetail: obj.containerDetail,
+            });
+          }
+        }
+      });
+
+      return containerDetailArray;
+    };
+
+    // Get containerDetail for the given cnNoArray
+    const resultContainerDetail = getContainerDetailByCnNo(docketList, docket);
+    const containersArray = resultContainerDetail.flatMap(container => container.containerDetail);
+    this.tableData = containersArray;
+
+
+  }
+  save() {
+    let containers = this.tableData
+    .filter((x) => x.isSelected)
+    .map((container) => ({
+      ...container,
+      rakeNo: this.data.rakeDetails.RakeNo, // Replace with the actual value
+      update: this.data.flag === 'Diverted For Export',
+      del: this.data.flag === 'Delivered',
+      dexport: this.data.flag === 'Updated'
+    }));
+    const rakeDetails=this.rakeEntryService.addRakeContainer(containers);
+    if(rakeDetails){
+    Swal.fire({
+      icon: "success",
+      title: "Update Successfully",
+      text: "Rake No: " + this.data.rakeDetails.RakeNo,
+      showConfirmButton: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.goBack('Rake');
+      }
+    });
+  }
+  }
+
 }

@@ -2,6 +2,8 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class JobControl {
     jobControlArray: FormControls[];
+    containordetail: FormControls[];
+    blDetail: FormControls[];
     constructor() {
         this.jobControlArray = [
             {
@@ -38,7 +40,7 @@ export class JobControl {
                 type: "number",
                 value: "",
                 generatecontrol: true,
-                disable: false, 
+                disable: false,
                 additionalData: {
                     metaData: "jobControls"
                 },
@@ -60,33 +62,35 @@ export class JobControl {
                     }
                 ],
                 functions: {
-                    onOptionSelect:"getDocketBasedOnCity"
+                    onOptionSelect: "getDocketBasedOnCity"
                 },
                 additionalData: {
                     metaData: "jobControls",
                     showNameAndValue: false
                 }
-            }, {
-                name: 'vehicleSize', label: "Vehicle Size (MTs)", placeholder: "Select Vehicle Size", type: 'Staticdropdown',
-                value: [
-                    { value: '1', name: '1-MT' },
-                    { value: '9', name: '9-MT' },
-                    { value: '16', name: '16-MT' },
-                    { value: '32', name: '32-MT' }
-                ],
-                filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                additionalData: {
-                    showNameAndValue: false,
-                    metaData: "jobControls"
-                },
-                Validations: [
-                    {
-                        name: "required",
-                        message: "Vehicle Size  is required"
-                    }
-                ],
+            },
+            //  {
+            //     name: 'vehicleSize', label: "Vehicle Size (MTs)", placeholder: "Select Vehicle Size", type: 'Staticdropdown',
+            //     value: [
+            //         { value: '1', name: '1-MT' },
+            //         { value: '9', name: '9-MT' },
+            //         { value: '16', name: '16-MT' },
+            //         { value: '32', name: '32-MT' }
+            //     ],
+            //     filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+            //     additionalData: {
+            //         showNameAndValue: false,
+            //         metaData: "jobControls"
+            //     },
+            //     Validations: [
+            //         {
+            //             name: "required",
+            //             message: "Vehicle Size  is required"
+            //         }
+            //     ],
 
-            }, {
+            // }, 
+            {
                 name: "mobileNo",
                 label: "Mobile No",
                 placeholder: "Enter Mobile No",
@@ -105,7 +109,7 @@ export class JobControl {
                     metaData: "jobControls"
                 },
             }, {
-                name: 'fromCity', label: "From City", placeholder: "Enter From City", type: 'dropdown', value: '',
+                name: 'fromCity', label: "PORT of Loading", placeholder: "PORT of Loading", type: 'dropdown', value: '',
                 generatecontrol: true,
                 disable: true,
                 Validations: [
@@ -118,15 +122,16 @@ export class JobControl {
                     },
                     {
                         name: "required",
-                        message: "From City is required"
+                        message: "PORT of Loading is required"
                     },
                 ],
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "jobControls"
                 },
-            }, {
-                name: 'toCity', label: "To City", placeholder: "Enter To City", type: 'dropdown', value: '',
+            },
+            {
+                name: 'toCity', label: "PORT of Discharge", placeholder: "PORT of Discharge", type: 'dropdown', value: '',
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -139,17 +144,31 @@ export class JobControl {
                     },
                     {
                         name: "required",
-                        message: "To City is required"
+                        message: "PORT of Discharge is required"
                     },
                 ],
                 functions: {
                     onModel: "getPincodeDetail",
-                    onOptionSelect:"getDocketBasedOnCity"
+                    onOptionSelect: "getDocketBasedOnCity"
                 },
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "jobControls"
                 }
+            },
+            {
+                name: "DestCountry",
+                label: "Destination Country",
+                placeholder: "Destination Country",
+                type: "text",
+                value: "",
+                additionalData: {
+                    metaData: "jobControls"
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
             },
             {
                 name: "jobType",
@@ -168,6 +187,9 @@ export class JobControl {
                 ],
                 additionalData: {
                     metaData: "jobControls"
+                },
+                functions:{
+                    onSelection:'onJobChanged'
                 },
                 generatecontrol: true,
                 disable: false
@@ -203,7 +225,7 @@ export class JobControl {
                 ],
                 functions: {
                     onSelection: "tranPortChanged"
-                  },
+                },
                 additionalData: {
                     metaData: "jobControls"
                 },
@@ -249,7 +271,7 @@ export class JobControl {
                 Validations: [],
                 functions: {
                     onSelection: "tranPortChanged"
-                  },
+                },
                 additionalData: {
                     showNameAndValue: false,
                     metaData: "jobControls"
@@ -268,6 +290,68 @@ export class JobControl {
                 disable: false,
                 Validations: [
                 ]
+            },
+            {
+                name: "companyCode",
+                label: "companyCode",
+                placeholder: "company Code",
+                type: "",
+                value: localStorage.getItem("companyCode"),
+                generatecontrol: false,
+                disable: false,
+                additionalData: {
+                    metaData: "jobControls"
+                },
+                Validations: [
+                ]
+            },
+            {
+                name: "_id",
+                label: "id",
+                placeholder: "",
+                type: "",
+                value: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
+                generatecontrol: false,
+                disable: false,
+                Validations: [
+                ]
+            }
+        ];
+
+        this.containordetail = [
+            {
+                name: "Company_file",
+                label: "Select File",
+                placeholder: "",
+                type: "file",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
+                Validations: [".xls, .xlsx, .csv"],
+                functions: {
+                    onChange: "selectedFile",
+                },
+            },
+            {
+                name: "Download_Icon",
+                label: "Dowload Container Template",
+                placeholder: "",
+                type: "filelink",
+                value: "assets/Download/job-container-temp.xlsx",
+                generatecontrol: true,
+                disable: false,
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
+                Validations: [],
+                functions: {
+                },
             },
             {
                 name: "contNo",
@@ -293,24 +377,25 @@ export class JobControl {
                 autocomplete: "",
                 displaywith: "",
                 Validations: [
-                {
-                    name: "autocomplete",
-                },
-                {
-                    name: "invalidAutocompleteObject",
-                    message: "Choose proper value",
-                }
-            ],
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
+                ],
                 additionalData: {
-                  showNameAndValue: false,
-                  metaData: "jobTableControls"
+                    showNameAndValue: false,
+                    metaData: "jobTableControls"
                 },
                 functions: {
-                  onOptionSelect: 'getContainerType'
+                    onOptionSelect: 'getContainerType'
                 },
                 generatecontrol: true,
                 disable: false,
-              },
+            },
+
             {
                 name: "cnoteNo",
                 label: "Cnote Number",
@@ -335,9 +420,9 @@ export class JobControl {
                 ]
                 ,
                 functions: {
-                  onChange: "getDocketDetail",
-                  onOptionSelect: 'fillDocketDetail'
-                  }
+                    onChange: "getDocketDetail",
+                    onOptionSelect: 'fillDocketDetail'
+                }
             },
             {
                 name: "cnoteDate",
@@ -394,20 +479,6 @@ export class JobControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: "_id",
-                label: "id",
-                placeholder: "",
-                type: "",
-                value: "",
-                additionalData: {
-                    metaData: "jobTableControls"
-                },
-                generatecontrol: false,
-                disable: false,
-                Validations: [
-                ]
-            },
-            {
                 name: "entryBy",
                 label: "Entry by",
                 placeholder: "",
@@ -448,25 +519,197 @@ export class JobControl {
                 disable: false,
                 Validations: [
                 ]
-            },
+            }
+        ];
+
+        this.blDetail = [
             {
-                name: "companyCode",
-                label: "companyCode",
-                placeholder: "company Code",
-                type: "",
-                value: localStorage.getItem("companyCode"),
-                generatecontrol: false,
-                disable: false,
+                name: "blNum",
+                label: "BL Num",
+                placeholder: "BL Num",
+                type: "text",
+                value: "",
                 additionalData: {
-                    metaData: "jobControls"
+                    metaData: ""
                 },
+                generatecontrol: true,
+                disable: false,
                 Validations: [
                 ]
             },
-        ];
+            {
+                name: "blDate",
+                label: "BL Date",
+                placeholder: "BL Date",
+                type: "date",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "beNum",
+                label: "BE Num",
+                placeholder: "BE Num",
+                type: "text",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+             {
+                name: "beDT",
+                label: "BE Date",
+                placeholder: "BE Date",
+                type: "date",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "invNum",
+                label: "Inv Num",
+                placeholder: "Inv Num",
+                type: "text",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "invDate",
+                label: "Inv Date",
+                placeholder: "Inv Date",
+                type: "date",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "sbNum",
+                label: "SBNum",
+                placeholder: "SBNum",
+                type: "text",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "sbDt",
+                label: "SBDate",
+                placeholder: "SBDate",
+                type: "date",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "pod",
+                label: "POD",
+                placeholder: "POD",
+                type: "text",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "cod",
+                label: "COD",
+                placeholder: "COD",
+                type: "text",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "containerType",
+                label: "Container Type",
+                placeholder: "Container Type",
+                type: "dropdown",
+                value: "",
+                additionalData: {
+                    showNameAndValue: false
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "autocomplete",
+                    },
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    }
+
+                ]
+            },
+            {
+                name: "containerNum",
+                label: "Container Num",
+                placeholder: "Container Num",
+                type: "text",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+        ]
     }
 
     getJobFormControls() {
         return this.jobControlArray;
     }
+    getContainorDetails() {
+        return this.containordetail
+    }
+    getBlDetail() {
+        return this.blDetail
+    }
+
 }

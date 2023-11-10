@@ -11,11 +11,10 @@ import { addRakeEntry, filterDocketDetail, genericGet, vendorDetailFromApi } fro
 import Swal from "sweetalert2";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
-import { JobEntryService } from "src/app/Utility/module/operation/job-entry/job-entry-service";
 import { RakeEntryModel } from "src/app/Models/rake-entry/rake-entry";
-import { RakeEntryService } from "src/app/Utility/module/operation/rake-entry/rake-entry-service";
 import { formatDate } from "src/app/Utility/date/date-utils";
-import { removeFieldsFromArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { areAllFieldsEmpty, removeFields, removeFieldsFromArray, updateProperty } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 @Component({
     selector: 'app-rake-entry-page',
@@ -29,9 +28,9 @@ export class RakeEntryPageComponent implements OnInit {
         checkBoxRequired: true,
         noColumnSort: ["checkBoxRequired"],
     };
-    FormTitle = 'Prq List'
+
     dynamicControls = {
-        add: true,
+        add: false,
         edit: true,
         csv: false,
     };
@@ -46,16 +45,17 @@ export class RakeEntryPageComponent implements OnInit {
     rakeEntryFormControl: RakeEntryControl;
     rakeEntryTableForm: UntypedFormGroup;
     rakeContainerTableForm: UntypedFormGroup;
+    rakeDetailsTableForm: UntypedFormGroup;
+    invDetailsTableForm:UntypedFormGroup;
     tableData: any = [];
     tableData1: any = [];
+    tableRakeData: any = [];
+    tableInvData:any=[];
+    TableStyle = "width:20%"
     type: any;
     show = false;
     apiShow = false;
-    actionObject = {
-        addRow: false,
-        submit: false,
-        search: false,
-    };
+    rrLoad:boolean =true;
     companyCode = parseInt(localStorage.getItem("companyCode"));
     fromCity: string; //it's used in getCity() for the binding a fromCity
     fromCityStatus: boolean; //it's used in getCity() for binding fromCity
@@ -72,10 +72,11 @@ export class RakeEntryPageComponent implements OnInit {
     balanceLocation: string;
     displayedColumns: any
     balanceLocationStatus: boolean;
-    cnNo:any;
-    cnNoStatus:boolean;
-    jobNo:any;
-    jobNoStatus:boolean;
+    cnNo: any;
+    cnNoStatus: boolean;
+    jobNo: any;
+    jobNoStatus: boolean;
+    isRRLoad: boolean;
     cnDetail: any[];
     breadScrums = [
         {
@@ -89,7 +90,13 @@ export class RakeEntryPageComponent implements OnInit {
     vendorData: any;
     allContainer: any;
     allJobs: any;
-
+    jsonRakeDetails: FormControls[];
+    width: '800px'
+    height: '500px'
+    jsonInvoiceDetails: FormControls[];
+    invLoad: boolean=true;
+    isInvLoad: boolean;
+    shipments: { name: any; value: any; extraData: any; }[];
     ngOnInit(): void {
         this.initializeFormControl();
         this.bindDropDown();
@@ -105,9 +112,7 @@ export class RakeEntryPageComponent implements OnInit {
         private masterService: MasterService,
         private filter: FilterUtils,
         private definition: RakeEntryModel,
-        private rakeEntryService: RakeEntryService,
-        private docketService:DocketService,
-        private jobEntryService:JobEntryService
+        private docketService: DocketService
     ) {
         if (this.Route.getCurrentNavigation()?.extras?.state != null) {
             this.jobDetail = this.Route.getCurrentNavigation()?.extras?.state.data;
@@ -130,12 +135,11 @@ export class RakeEntryPageComponent implements OnInit {
             destination: { variable: 'destination', status: 'destinationStatus' }
         };
         processProperties.call(this, this.jsonControlArray, jobPropertiesMapping);
-        const containorPropertiesMapping=
+        const containorPropertiesMapping =
         {
             cnNo: { variable: 'cnNo', status: 'cnNoStatus' },
-            jobNo: { variable: 'jobNo', status: 'jobNoStatus' }
         }
-        processProperties.call(this,this.allContainer, containorPropertiesMapping);
+        processProperties.call(this, this.allContainer, containorPropertiesMapping);
     }
 
     initializeFormControl() {
@@ -144,24 +148,19 @@ export class RakeEntryPageComponent implements OnInit {
         // Get form controls for city Location Details section
         this.jsonControlArray = this.rakeEntryFormControl.getRakeEntryFormControls();
         this.containerJsonArray = this.rakeEntryFormControl.getRakeContainerDetail();
+        this.jsonRakeDetails = this.rakeEntryFormControl.getrakeDetailsControls();
+        this.jsonInvoiceDetails=this.rakeEntryFormControl.getInvoiceDetails() ;
         this.allContainer = this.containerJsonArray;
         // Build the form group using formGroupBuilder function and the values of jsonControlArray
         this.rakeEntryTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
         this.rakeContainerTableForm = formGroupBuilder(this.fb, [this.containerJsonArray]);
+        this.rakeDetailsTableForm = formGroupBuilder(this.fb, [this.jsonRakeDetails]);
+        this.invDetailsTableForm = formGroupBuilder(this.fb, [this.jsonInvoiceDetails]);
         this.show = false;
-        this.containerJsonArray = this.allContainer.filter((x) => x.name != "cnNo" && x.name != "cnDate")
-        this.rakeEntryTableForm.controls['documentType'].setValue('JOB');
+        this.rakeEntryTableForm.controls['documentType'].setValue('CN');
         this.definition.columnHeader = this.definition.columnHeader;
-        const jobDetail=this.jobDetail?[this.jobDetail]:[]
-        this.loadTempData(jobDetail);
+        //this.loadTempData(jobDetail);
 
-    }
-
-    async loadTempData(jobDetail) {
-        this.tableData = [];
-        const jobList = jobDetail?await this.rakeEntryService.processRakeListJob(jobDetail):[];
-        this.tableData = jobList;
-        this.tableLoad = false;
     }
 
     functionCallHandler($event) {
@@ -211,12 +210,18 @@ export class RakeEntryPageComponent implements OnInit {
     async getDocketDetail() {
         const docketDetail = await this.docketService.getDocket();
         const docketFilter = await filterDocketDetail(docketDetail);
-        const jobDetail=await this.jobEntryService.getJobDetail();
-        this.allJobs=jobDetail;
-        this.allCn =docketFilter;
+        const cnValues = docketFilter.map((x) => { return { name: x.cnNo, value: x.cnNo, extraData: x } });
+        this.filter.Filter(
+            this.containerJsonArray,
+            this.rakeContainerTableForm,
+            cnValues,
+            this.cnNo,
+            this.cnNoStatus
+        );
+        this.shipments=cnValues;
+        this.allCn = docketFilter;
         this.cnDetail = docketFilter
-        this.cityMapping()
-       
+
     }
 
     cancel() {
@@ -239,68 +244,39 @@ export class RakeEntryPageComponent implements OnInit {
             this.vendorStatus
         );
     }
-    
+
     async save() {
         let fieldsToFromRemove = [];
-        let containorDetail = {}
+        let containorDetail = {};
+        let invoiceDetail={};
+        let rakeDetails={};
         let jobs = []
-        let cnote=[]
+        let cnote = []
         if (this.tableData.length > 0) {
-            const controlsToRemove = [
-                'cnNo',
-                'cnDate',
-                'noOfPkg',
-                'weight',
-                'fCity',
-                'tCity',
-                'billingParty',
-                'jobNo',
-                'jobDate'
-              ];
-              
-              controlsToRemove.forEach(control => {
-                this.rakeEntryTableForm.removeControl(control);
-              });
-    
             if (Array.isArray(this.tableData)) {
-              this.tableData.forEach((item) => {
-                if (item.hasOwnProperty('jobNo') && item.jobDate) {
-                  item.jobDate = item.jobDateUtc;
-                  fieldsToFromRemove = ["actions", "type", "jobDateDateUtc"]
-                  jobs.push(item.jobNo);
-                }
-                else if (item.hasOwnProperty('cnNo') && item.cnDate) {
-                    item.cnDate = item.cnDateUtc;
-                    fieldsToFromRemove = ["id", "actions", "cnDate"],
-                    cnote.push(item.cnNo);
-                  }
-              });
-          }
-        
-    
+                this.tableData.forEach((item) => {
+                 if (item.hasOwnProperty('cnNo') && item.cnDate) {
+                        item.cnDate = item.cnDateUtc;
+                        fieldsToFromRemove = ["id", "actions","jsonColumn","tableData","fieldsToFromRemove",],
+                            cnote.push(item.cnNo);
+                    }
+                });
+            }
+
         }
         else if (this.rakeEntryTableForm.value.cnNo) {
-          const cnDetail = {
-            cnNo: this.rakeEntryTableForm.value.cnNo.value,
-            cnDate: this.rakeEntryTableForm.value?.cnDateUtc || new Date(),
-            noOfPkg: this.rakeEntryTableForm.value.noOfPkg,
-            weight: this.rakeEntryTableForm.value.weight
-          }
-          this.tableData.push(cnDetail);
-          cnote = this.tableData.map((x) => x.cnNo);
+            const cnDetail = {
+                cnNo: this.rakeEntryTableForm.value.cnNo.value,
+                cnDate: this.rakeEntryTableForm.value?.cnDateUtc || new Date(),
+                noOfPkg: this.rakeEntryTableForm.value.noOfPkg,
+                weight: this.rakeEntryTableForm.value.weight
+            }
+            this.tableData.push(cnDetail);
+            cnote = this.tableData.map((x) => x.cnNo);
         }
-        else if (this.rakeEntryTableForm.value.jobNo) {
-          const containerDetail = {
-            jobNo: this.rakeEntryTableForm.value.jobNo.value,
-            jobDate: this.rakeEntryTableForm.value?.jobDateDateUtc || new Date(),
-            weight: this.rakeEntryTableForm.value.weight,
-            fCity: this.rakeEntryTableForm.value.fCity,
-            tCity: this.rakeEntryTableForm.value.tCity,
-            billingParty: this.rakeEntryTableForm.value.billingParty,
-          }
-          this.tableData.push(containerDetail);
-        }
-        containorDetail =  this.tableData
+        containorDetail = this.tableData
+        invoiceDetail = this.tableInvData.length>0?this.tableInvData:[this.invDetailsTableForm.value];
+        rakeDetails = this.tableRakeData.length>0?this.tableRakeData:[this.rakeDetailsTableForm.value];
         // Create a new array without the 'srNo' property
         // Assign the modified array back to 'this.tableData'
         const thisYear = new Date().getFullYear();
@@ -315,22 +291,32 @@ export class RakeEntryPageComponent implements OnInit {
         this.rakeEntryTableForm.controls['fromCity'].setValue(this.rakeEntryTableForm.controls['fromCity']?.value.name || "");
         this.rakeEntryTableForm.controls['toCity'].setValue(this.rakeEntryTableForm.controls['toCity']?.value.name || "");
         this.rakeEntryTableForm.controls['destination'].setValue(this.rakeEntryTableForm.controls['destination']?.value.value);
-        this.rakeEntryTableForm.controls['advancedLocation'].setValue(this.rakeEntryTableForm.controls['advancedLocation']?.value.value);
-        this.rakeEntryTableForm.controls['balanceLocation'].setValue(this.rakeEntryTableForm.controls['balanceLocation']?.value.value);
         const viaCity = this.rakeEntryTableForm.controls['viaControlHandler'].value;
         const cityMap = viaCity ? viaCity.map((x) => x.name) : [];
         this.rakeEntryTableForm.controls['via'].setValue(cityMap);
         this.rakeEntryTableForm.removeControl('viaControlHandler');
-        const containorList = fieldsToFromRemove.length > 0 ? removeFieldsFromArray(containorDetail, fieldsToFromRemove) : [];
+        const containorList =  removeFields(containorDetail, fieldsToFromRemove);
+        const updatedinvoiceList = updateProperty(invoiceDetail,'invDate','oinvDate');
+        const invoiceList =  removeFields(updatedinvoiceList,['actions','oinvDate']);
+        const updatedRakeDetails = updateProperty(rakeDetails,'rrDate','orrDate');
+        const rakeDetailsData =  removeFields(updatedRakeDetails,['actions','orrDate']);
+        
         let docDetail = {
             containorDetail: containorList,
+            invoiceDetails:invoiceList,
+            rakeDetails:rakeDetailsData
+            
         };
         let jobDetail = {
             ...this.rakeEntryTableForm.value,
             ...docDetail,
         };
+        for (const element of cnote) {
+            await this.docketService.updateDocket(element, { "rakeId": rake});
+          }
         const res = await addRakeEntry(jobDetail, this.masterService)
         if (res) {
+          
             Swal.fire({
                 icon: "success",
                 title: "Generated Successfully",
@@ -343,24 +329,9 @@ export class RakeEntryPageComponent implements OnInit {
             });
         }
     }
-
     async getLocation() {
         const location = await genericGet(this.masterService, "location_detail");
         const locList = location.map((x) => { return { name: x.locCode, value: x.locCode } });
-        this.filter.Filter(
-            this.jsonControlArray,
-            this.rakeEntryTableForm,
-            locList,
-            this.advancedLocation,
-            this.advancedLocationStatus
-        );
-        this.filter.Filter(
-            this.jsonControlArray,
-            this.rakeEntryTableForm,
-            locList,
-            this.balanceLocation,
-            this.balanceLocationStatus
-        );
         this.filter.Filter(
             this.jsonControlArray,
             this.rakeEntryTableForm,
@@ -370,37 +341,6 @@ export class RakeEntryPageComponent implements OnInit {
         );
     }
 
-    cityMapping() {
-        this.rakeContainerTableForm.reset();
-        this.tableData=[];
-        if (this.rakeEntryTableForm.value.documentType !== "JOB") {
-            this.containerJsonArray = this.allContainer.filter((x) => x.name != "jobNo" && x.name != "jobDate")
-            this.definition.columnHeader = this.definition.cnoteHeader;
-            const cnValues=this.allCn.map((x)=>{return {name:x.cnNo,value:x.cnNo,extraData:x} });
-            this.filter.Filter(
-                this.containerJsonArray,
-                this.rakeContainerTableForm,
-                cnValues,
-                this.cnNo,
-                this.cnNoStatus
-            ); 
-
-        }
-        else {
-            this.containerJsonArray = this.allContainer.filter((x) => x.name != "cnNo" && x.name != "cnDate");
-            this.definition.columnHeader = this.definition.jobHeader;
-            const jobValues=this.allJobs.map((x)=>{return {name:x.jobId,value:x.jobId,extraData:x} });
-            this.tableData=this.jobDetail?[this.jobDetail]:[];
-            this.filter.Filter(
-                this.containerJsonArray,
-                this.rakeContainerTableForm,
-                jobValues,
-                this.jobNo,
-                this.jobNoStatus
-            ); 
-
-        }
-    }
     vendorFieldChanged() {
 
         const rakeControl = this.rakeEntryTableForm.get('vendorName');
@@ -427,123 +367,239 @@ export class RakeEntryPageComponent implements OnInit {
             rakeControl.setValidators(Validators.required);
             rakeControl.updateValueAndValidity();
         }
-        
-    }
 
-/*below the function for Cnote details*/
-  getCnoteDetails(){
-    
-    const dktDetail=this.rakeContainerTableForm.controls['cnNo'].value;
-    this.rakeContainerTableForm.controls['cnDate'].setValue(dktDetail.extraData.docketDate);
-    this.rakeContainerTableForm.controls['noOfPkg'].setValue(dktDetail.extraData.noOfPkg);
-    this.rakeContainerTableForm.controls['weight'].setValue(dktDetail.extraData.weight);
-    this.rakeContainerTableForm.controls['fCity'].setValue(dktDetail.extraData.fCity);
-    this.rakeContainerTableForm.controls['tCity'].setValue(dktDetail.extraData.tCity);
-    this.rakeContainerTableForm.controls['billingParty'].setValue(dktDetail.extraData.billingParty);
-  }
-  /*end*/
-  getJobDetails(){
-    
-    const jobDetail=this.rakeContainerTableForm.controls['jobNo'].value;
-    this.rakeContainerTableForm.controls['jobDate'].setValue(jobDetail.extraData.jobDate);
-    this.rakeContainerTableForm.controls['noOfPkg'].setValue(jobDetail.extraData.noOfpkg);
-    this.rakeContainerTableForm.controls['weight'].setValue(jobDetail.extraData.loadedWeight);
-    this.rakeContainerTableForm.controls['fCity'].setValue(jobDetail.extraData.fromCity);
-    this.rakeContainerTableForm.controls['tCity'].setValue(jobDetail.extraData.toCity);
-    this.rakeContainerTableForm.controls['billingParty'].setValue(jobDetail.extraData.billingParty);
-  }
-  /*THC*/
-   async addContainor() {
-    const docType=this.rakeEntryTableForm.controls['documentType'].value;
-    const mappend=docType=="JOB"?"job":"cn";
-    this.tableLoad = true;
-    this.isLoad = true;
-    const tableData = this.tableData;
-    if (tableData.length > 0) {
-      const exist = tableData.find(
-        (x) =>
-          x.cnNo === this.rakeContainerTableForm.value.cnNo
-      );
-      if (exist) {
-        this.rakeContainerTableForm.controls["cnNo"].setValue("");
-        Swal.fire({
-          icon: "info", // Use the "info" icon for informational messages
-          title: "Information",
-          text: "Please avoid duplicate entering CNNO Number.",
-          showConfirmButton: true,
-        });
-        this.tableLoad = false;
+    }
+    /*below the function for Cnote details*/
+    getCnoteDetails() {
+        const dktDetail = this.rakeContainerTableForm.controls['cnNo'].value;
+        const containerDetails=areAllFieldsEmpty(dktDetail.extraData?.containerDetail);
+        this.rakeContainerTableForm.controls['cnDate'].setValue(dktDetail.extraData.docketDate);
+        this.rakeContainerTableForm.controls['noOfContainer'].setValue(containerDetails?0:dktDetail.extraData?.containerDetail.length);
+        this.rakeContainerTableForm.controls['noOfPkg'].setValue(dktDetail.extraData.noOfPkg);
+        this.rakeContainerTableForm.controls['weight'].setValue(dktDetail.extraData.weight);
+        this.rakeContainerTableForm.controls['fCity'].setValue(dktDetail.extraData.fCity);
+        this.rakeContainerTableForm.controls['tCity'].setValue(dktDetail.extraData.tCity);
+        this.rakeContainerTableForm.controls['contDtl'].setValue(containerDetails?['']:dktDetail.extraData?.containerDetail);
+        this.rakeContainerTableForm.controls['billingParty'].setValue(dktDetail.extraData.billingParty);
+    }
+    /*THC*/
+    async addContainor() {
+        this.tableLoad = true;
+        this.isLoad = true;
+        const tableData = this.tableData;
+        if (tableData.length > 0) {
+            const exist = tableData.find(
+                (x) =>
+                    x.cnNo === this.rakeContainerTableForm.value.cnNo
+            );
+            if (exist) {
+                this.rakeContainerTableForm.controls["cnNo"].setValue("");
+                Swal.fire({
+                    icon: "info", // Use the "info" icon for informational messages
+                    title: "Information",
+                    text: "Please avoid duplicate entering CNNO Number.",
+                    showConfirmButton: true,
+                });
+                this.tableLoad = false;
+                this.isLoad = false;
+                return false;
+            }
+        }
+        const delayDuration = 1000;
+        // Create a promise that resolves after the specified delay
+        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        // Use async/await to introduce the delay
+        await delay(delayDuration);
+        const json = {
+            cnNo: this.rakeContainerTableForm.controls['cnNo'].value?.value,
+            cnDate: formatDate(this.rakeContainerTableForm.controls['cnDate'].value, "dd-MM-yy HH:mm"),
+            contCnt: this.rakeContainerTableForm.controls['noOfContainer']?.value||0,
+            noOfPkg: this.rakeContainerTableForm.controls['noOfPkg'].value,
+            weight: this.rakeContainerTableForm.controls['weight'].value,
+            fCity: this.rakeContainerTableForm.controls['fCity'].value,
+            tCity: this.rakeContainerTableForm.controls['tCity'].value,
+            billingParty: this.rakeContainerTableForm.controls['billingParty'].value,
+            cnDateDateUtc: this.rakeContainerTableForm.controls['cnDate'].value,
+            type: 'cn',
+            jsonColumn:this.definition.jsonColumn,
+            staticField:['containerNumber','containerType'],
+            tableData: this.rakeContainerTableForm.controls['contDtl']?.value,
+            actions: ["Edit", "Remove"]
+        };
+        this.tableData.push(json);
         this.isLoad = false;
-        return false;
-      }
-    }
-    const delayDuration = 1000;
-    // Create a promise that resolves after the specified delay
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    // Use async/await to introduce the delay
-    await delay(delayDuration);
-    const json = {
-        [`${mappend}No`]:this.rakeContainerTableForm.controls[`${mappend}No`].value?.value,
-        [`${mappend}Date`]:formatDate(this.rakeContainerTableForm.controls[`${mappend}Date`].value, "dd-MM-yy HH:mm"),
-        noOfPkg:this.rakeContainerTableForm.controls['noOfPkg'].value,
-        weight:this.rakeContainerTableForm.controls['weight'].value,
-        fCity:this.rakeContainerTableForm.controls['fCity'].value,
-        tCity:this.rakeContainerTableForm.controls['tCity'].value,
-        billingParty :this.rakeContainerTableForm.controls['billingParty'].value,
-        [`${mappend}DateUtc`]:this.rakeContainerTableForm.controls[`${mappend}Date`].value,
-        type:mappend,
-        actions: ["Edit", "Remove"]
-    };
-    this.tableData.push(json);
-    this.isLoad = false;
-    this.tableLoad = false;
-    const fieldsToClear = [
-        `${mappend}No`,
-        `${mappend}Date`,
-        'noOfPkg',
-        'weight',
-        'tCity',
-        'fCity',
-        'billingParty'
-      ];
-      fieldsToClear.forEach(field => {
-        this.rakeContainerTableForm.controls[field].setValue("");
-      });
-      
+        this.tableLoad = false;
+        const fieldsToClear = [
+            'cnNo',
+            'cnDate',
+            'noOfPkg',
+            'weight',
+            'tCity',
+            'fCity',
+            'billingParty'
+        ];
+        fieldsToClear.forEach(field => {
+            this.rakeContainerTableForm.controls[field].setValue("");
+        });
 
-  }
-  /*End*/
-  handleMenuItemClick(data) {
-    this.fillRakeUpdate(data)
-}
- fillRakeUpdate(data: any) {
-    const mapping=data.data.type;
-    if (data.label.label === "Remove") {
-      this.tableData = this.tableData.filter(x => x[`${mapping}No`] !== data.data[`${mapping}No`]);
-    } else {
-      this.rakeContainerTableForm.controls[`${mapping}No`].setValue(
-        { name:  data.data[`${mapping}No`], value:  data.data[`${mapping}No`] } || ""
-      );
-      this.rakeContainerTableForm.controls[`${mapping}Date`].setValue(
-        data.data?.[`${mapping}DateUtc`] || new Date()
-      );
-      this.rakeContainerTableForm.controls["noOfPkg"].setValue(
-        data.data?.noOfPkg || ""
-      );
-      this.rakeContainerTableForm.controls["weight"].setValue(
-        data.data?.weight || ""
-      );
-      this.rakeContainerTableForm.controls["fCity"].setValue(
-        data.data?.fCity || ""
-      );
-      this.rakeContainerTableForm.controls["tCity"].setValue(
-        data.data?.tCity || ""
-      );
-      this.rakeContainerTableForm.controls["billingParty"].setValue(
-        data.data?.billingParty || ""
-      );
-      this.tableData = this.tableData.filter(x => x[`${mapping}No`] !== data.data[`${mapping}No`]);;
 
     }
-  }
+    /*End*/
+    handleMenuItemClick(data) {
+        if(data.data.rrNo){
+         this.fillRakeDetails(data);
+        }
+        else if(data.data.invNum){
+            this.fillInvoiceDetails(data);
+        }
+        else{
+            this.fillContainersDetails(data)
+        }
+    }
+    fillContainersDetails(data: any) {
+        if (data.label.label === "Remove") {
+            this.tableData = this.tableData.filter(x => x.cnNo !== data.data.cnNo);
+        } else {
+            const cnNoToFind = data?.data?.cnNo;
+            const dktDetails = cnNoToFind ? this.shipments.find(x => x.value === cnNoToFind) : '';
+            this.rakeContainerTableForm.controls['cnNo'].setValue(
+                dktDetails || ""
+            );
+            this.rakeContainerTableForm.controls['cnDate'].setValue(
+                data.data?.cnNoDateUtc || new Date()
+            );
+            this.rakeContainerTableForm.controls["noOfPkg"].setValue(
+                data.data?.noOfPkg || ""
+            );
+            this.rakeContainerTableForm.controls["weight"].setValue(
+                data.data?.weight || ""
+            );
+            this.rakeContainerTableForm.controls["fCity"].setValue(
+                data.data?.fCity || ""
+            );
+            this.rakeContainerTableForm.controls["tCity"].setValue(
+                data.data?.tCity || ""
+            );
+            this.rakeContainerTableForm.controls["billingParty"].setValue(
+                data.data?.billingParty || ""
+            );
+            this.tableData = this.tableData.filter(x => x['cnNo'] !== data.data.cnNo);;
+
+        }
+    }
+
+    fillRakeDetails(data){
+        this.rrLoad=true;
+        if (data.label.label === "Remove") {
+            this.tableRakeData = this.tableRakeData.filter(x => x.rrNo !== data.data.rrNo);
+        } else {
+            this.rakeDetailsTableForm.controls['rrNo'].setValue(data.data['rrNo']);
+            this.rakeDetailsTableForm.controls['rrDate'].setValue(
+                data.data?.orrDate || new Date()
+            );
+           
+            this.tableRakeData = this.tableRakeData.filter(x => x.rrNo !== data.data.rrNo);;
+            this.rrLoad=false;
+        }
+    }
+    async addRakeData() {
+        this.rrLoad = true;
+        this.isRRLoad = true;
+        const tableData = this.tableRakeData;
+        if (tableData.length > 0) {
+            const exist = tableData.find(
+                (x) =>
+                    x.rrNo === this.rakeDetailsTableForm.value.rrNo
+            );
+            if (exist) {
+                this.rakeDetailsTableForm.controls["rrNo"].setValue("");
+                Swal.fire({
+                    icon: "info", // Use the "info" icon for informational messages
+                    title: "Information",
+                    text: "Please avoid duplicate entering RR NO.",
+                    showConfirmButton: true,
+                });
+                this.rrLoad = false;
+                this.isRRLoad = false;
+                return false;
+            }
+        }
+        const delayDuration = 1000;
+        // Create a promise that resolves after the specified delay
+        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        // Use async/await to introduce the delay
+        await delay(delayDuration);
+        const json = {
+            rrNo: this.rakeDetailsTableForm.controls['rrNo'].value,
+            rrDate: formatDate(this.rakeDetailsTableForm.controls['rrDate'].value, "dd-MM-yy HH:mm"),
+            orrDate: this.rakeDetailsTableForm.controls['rrDate'].value,
+            actions: ["Edit", "Remove"]
+        };
+        this.tableRakeData.push(json);
+        this.rrLoad = false;
+        this.isRRLoad = false;
+        const fieldsToClear = [
+            'rrNo',
+            'rrDate'
+        ];
+        fieldsToClear.forEach(field => {
+            this.rakeDetailsTableForm.controls[field].setValue("");
+        });
+
+    }
+    async addInvoiceData() {
+        this.invLoad = true;
+        this.isInvLoad = true;
+        const tableData = this.tableInvData;
+        if (tableData.length > 0) {
+            const exist = tableData.find(
+                (x) =>
+                    x.invNum === this.invDetailsTableForm.value.invNum
+            );
+            if (exist) {
+                this.invDetailsTableForm.controls["invNum"].setValue("");
+                Swal.fire({
+                    icon: "info", // Use the "info" icon for informational messages
+                    title: "Information",
+                    text: "Please avoid duplicate entering RR NO.",
+                    showConfirmButton: true,
+                });
+                this.invLoad = false;
+                this.isInvLoad = false;
+                return false;
+            }
+        }
+        const delayDuration = 1000;
+        // Create a promise that resolves after the specified delay
+        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        // Use async/await to introduce the delay
+        await delay(delayDuration);
+        const json = {
+            invNum: this.invDetailsTableForm.controls['invNum'].value,
+            invDate: formatDate(this.invDetailsTableForm.controls['invDate'].value, "dd-MM-yy HH:mm"),
+            invAmt: this.invDetailsTableForm.controls['invAmt'].value,
+            oinvDate: this.invDetailsTableForm.controls['invDate'].value,
+            actions: ["Edit", "Remove"]
+        };
+        this.tableInvData.push(json);
+        this.invLoad = false;
+        this.isInvLoad = false;
+        this.invDetailsTableForm.reset();
+
+    }
+    fillInvoiceDetails(data){
+        this.isInvLoad=true;
+        if (data.label.label === "Remove") {
+            this.tableInvData = this.tableInvData.filter(x => x.invNum !== data.data.invNum);
+            this.isInvLoad=false;
+        } else {
+            this.invDetailsTableForm.controls['invNum'].setValue(data.data.invNum);
+            this.invDetailsTableForm.controls['invAmt'].setValue(data.data.invAmt);
+            this.invDetailsTableForm.controls['invDate'].setValue(
+                data.data?.orrDate || new Date()
+            );
+            this.tableInvData = this.tableInvData.filter(x => x.invNum !== data.data.invNum);
+            this.isInvLoad=false;
+        }
+    }
 }

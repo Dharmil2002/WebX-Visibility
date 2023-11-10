@@ -1,0 +1,9 @@
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+
+    <form [formGroup]="ContractForm">
+        <app-form-webxpress [form]="ContractForm" [FormTitle]="'SUMMARY'" [formData]="jsonControlArrayContractForm"
+            (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+            (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

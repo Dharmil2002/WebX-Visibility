@@ -75,6 +75,17 @@ export class ConsignmentControl {
         },
       },
       {
+        name: 'movementType', label: 'Movement Type', placeholder: 'Movement Type', type: 'Staticdropdown',
+        value: [
+          { "name": "Import", "value": "I" },
+          { "name": "Export", "value": "E" },
+          { "name": "Domestic", "value": "D" }
+        ], Validations: [], generatecontrol: true, disable: false,
+        additionalData: {
+          metaData: "Basic",
+        },
+      },
+      {
         name: "payType",
         label: "Payment Mode",
         placeholder: "Payment Mode",
@@ -433,11 +444,26 @@ export class ConsignmentControl {
         },
       },
       {
-        name: "ccbp",
-        label: "consignor and consignee are same as the billing party",
+        name: "cnbp",
+        label: " Consignor same as Billing Party",
         placeholder: "",
         type: "toggle",
-        value: docketDetail.ccbp,
+        value: docketDetail.cnbp,
+        generatecontrol: true,
+        disable: false,
+        functions: { onChange: "onAutoBillingBased" },
+        Validations: [],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic",
+        }
+      },
+      {
+        name: "cnebp",
+        label: "Consignee same as Billing Party",
+        placeholder: "",
+        type: "toggle",
+        value: docketDetail.cnebp,
         generatecontrol: true,
         disable: false,
         functions: { onChange: "onAutoBillingBased" },

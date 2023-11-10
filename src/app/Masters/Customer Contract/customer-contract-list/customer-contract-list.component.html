@@ -39,7 +39,7 @@
                                                         [class]="'setting-sidebar-icon'"></app-feather-icons>
                                                 </a>
                                                 <mat-menu #action="matMenu">
-                                                    <button mat-menu-item>
+                                                    <button mat-menu-item (click)="AddNewContract()">
                                                         <mat-icon color="primary">add_circle</mat-icon>
                                                         <span>Add New Contract</span>
                                                     </button>

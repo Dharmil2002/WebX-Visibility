@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { IFieldDefinition } from "../../Interface/IFieldDefinition.interface";
+import { GenericViewTableComponent } from "src/app/shared-components/generic-view-table/generic-view-table.component";
 
 @Injectable({
     providedIn: "root",
@@ -53,12 +54,17 @@ export class RakeEntryModel implements IFieldDefinition {
         cnNo: {
             Title: "CNNo",
             class: "matcolumnleft",
-            Style: "min-width:100px",
+            Style: "min-width:180px",
         },
         cnDate: {
             Title: "CNDate",
             class: "matcolumnleft",
             Style: "min-width:200px",
+        },
+        contCnt: {
+            Title: "Containers",
+            class: "matcolumnleft",
+            Style: "max-width:100px",
         },
         noOfPkg: {
             Title: "No Of Pkts",
@@ -91,20 +97,84 @@ export class RakeEntryModel implements IFieldDefinition {
             Style: "max-width:150px",
         }
     };
-    public columnHeader:{}=this.jobHeader;
+    public rakeHeader = {
+        rrNo: {
+            Title: "RR No",
+            class: "matcolumnleft",
+            Style: "min-width:250px",
+        },
+        rrDate: {
+            Title: "RR Date",
+            class: "matcolumnleft",
+            Style: "min-width:250px",
+        },
+        actionsItems: {
+            Title: "Action",
+            class: "matcolumnleft",
+            Style: "max-width:150px",
+        }
+    }
+    public invDetails = {
+        invNum: {
+            Title: "InvNo",
+            class: "matcolumnleft",
+            Style: "min-width:250px",
+        },
+        invDate: {
+            Title: "InvDate",
+            class: "matcolumnleft",
+            Style: "min-width:250px",
+        },
+        invAmt: {
+            Title: "Inv Amount(Rs)",
+            class: "matcolumnleft",
+            Style: "min-width:250px",
+        },
+        actionsItems: {
+            Title: "Action",
+            class: "matcolumnleft",
+            Style: "max-width:150px",
+        }
+    }
+    public columnHeader: {} = this.jobHeader;
+    public rakeStaticField =
+        [
+            "rrNo",
+            "rrDate"
+        ]
     public staticField = [
         "cnNo",
         "cnDate",
-        "jobNo",
-        "jobDate",
         "noOfPkg",
         "weight",
         "fCity",
         "tCity",
         "billingParty",
+        "contDtl"
     ];
-
+    public staticInvField =
+        [
+            'invNum',
+            'invDate',
+            'invAmt'
+        ]
     public menuItems = [{ label: "Edit" }, { label: "Remove" }]
+    public linkArray = [
+        { Row: 'contCnt', Path: '', componentDetails: GenericViewTableComponent },
+    ]
+    public jsonColumn = {
+        containerNumber: {
+            Title: "Container No",
+            class: "matcolumnleft",
+            Style: "min-width:250px",
+        },
+        containerType: {
+            Title: "Container Date",
+            class: "matcolumnleft",
+            Style: "min-width:250px",
+        }
+
+    }
     getColumn(columnName: string): any | undefined {
         return this.columnHeader[columnName] ?? undefined;
     }

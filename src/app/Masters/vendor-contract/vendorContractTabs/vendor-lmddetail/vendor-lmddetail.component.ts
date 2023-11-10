@@ -8,8 +8,8 @@ import { MatDialog } from '@angular/material/dialog';
   templateUrl: './vendor-lmddetail.component.html'
 })
 export class VendorLMDDetailComponent implements OnInit {
-  TErouteBasedTableData=LastMileData
-  columnHeaderTErouteBased={
+  TErouteBasedTableData = LastMileData
+  columnHeaderTErouteBased = {
     location: {
       Title: "Location",
       class: "matcolumnleft",
@@ -56,7 +56,7 @@ export class VendorLMDDetailComponent implements OnInit {
       Style: "max-width:80px",
     }
   }
-  tableLoad: boolean=true;
+  tableLoad: boolean = true;
   dynamicControls = {
     add: false,
     edit: false,
@@ -70,9 +70,9 @@ export class VendorLMDDetailComponent implements OnInit {
     { label: 'Edit' },
     { label: 'Remove' }
   ]
-  staticFieldTErouteBased=['location','rateType','timeFrame','capacity','minCharge','committedKm','additionalKm','maxCharges']
+  staticFieldTErouteBased = ['location', 'rateType', 'timeFrame', 'capacity', 'minCharge', 'committedKm', 'additionalKm', 'maxCharges']
   className = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
- 
+
   constructor(private dialog: MatDialog,) { }
 
   ngOnInit(): void {
@@ -115,8 +115,8 @@ export class VendorLMDDetailComponent implements OnInit {
           location: result.location.value,
           rateType: result.rateType.name,
           timeFrame: result.timeFrame,
-          committedKm:result.committedKm,
-          additionalKm:result.additionalKm,
+          committedKm: result.committedKm,
+          additionalKm: result.additionalKm,
           capacity: result.capacity.name,
           minCharge: result.minCharge,
           maxCharges: result.maxCharges,
@@ -130,4 +130,7 @@ export class VendorLMDDetailComponent implements OnInit {
     });
   }
   //#endregion
+  Submit() {
+    console.log(this.TErouteBasedTableData);
+  }
 }

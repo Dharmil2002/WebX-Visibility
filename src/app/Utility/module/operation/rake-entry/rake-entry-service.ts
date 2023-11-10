@@ -1,5 +1,7 @@
 import { Injectable } from "@angular/core";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
+import { OperationService } from "src/app/core/service/operations/operation.service";
+import { StorageService } from "src/app/core/service/storage.service";
 import { calculateTotalField } from "src/app/operation/unbilled-prq/unbilled-utlity";
 
 @Injectable({
@@ -8,6 +10,8 @@ import { calculateTotalField } from "src/app/operation/unbilled-prq/unbilled-utl
 export class RakeEntryService {
 
   constructor(
+    private operations: OperationService,
+    private storage: StorageService
   ) { }
   async processRakeListJob(rakeList) {
     return rakeList.map((x) => {
@@ -23,5 +27,14 @@ export class RakeEntryService {
       x.actions = ["Edit", "Remove"]
       return x;
     }).filter((x) => x !== null);
+  }
+  async addRakeContainer(data){
+    const reqBody = {
+      companyCode: this.storage.companyCode,
+      collectionName: 'rake_container_details',
+      data: data
+    }
+    const res = this.operations.operationPost('generic/create', reqBody).toPromise();
+    return res;
   }
 }

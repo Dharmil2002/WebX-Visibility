@@ -383,7 +383,8 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.setFormValue(this.consignmentTableForm, "docketDate", this.prqData?.pickupDate);
     this.setFormValue(this.consignmentTableForm, "transMode", "Road");
     this.setFormValue(this.consignmentTableForm, "pAddress", this.prqData?.pAddress);
-    this.setFormValue(this.consignmentTableForm, "ccbp", true);
+    this.setFormValue(this.consignmentTableForm, "cnebp", true);
+    this.setFormValue(this.consignmentTableForm, "cnbp", true);
     this.setFormValue(this.consignmentTableForm, "vendorType", vehicleDetail?.vendorType, false, "", "");
     await this.vendorFieldChanged()
     if (vehicleDetail?.vendorType == "Market") {
@@ -454,7 +455,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.filter.Filter(this.jsonControlArrayBasic, this.consignmentTableForm, vendorDetail, this.vendorName, this.vendorNameStatus);
     this.filter.Filter(this.jsonControlArrayBasic, this.consignmentTableForm, prqDetail, this.prqNo, this.prqNoStatus);
     this.filter.Filter(this.jsonControlArrayBasic, this.consignmentTableForm, vehFieldMap, this.vehicleNo, this.vehicleNoStatus);
-    if (this.prqData.transMode == "trailer") {
+    if (this.prqFlag&&this.prqData.transMode == "trailer") {
       this.consignmentTableForm.controls["cd"].setValue(true);
       this.contFlag = true;
       this.containerDetail();
@@ -523,32 +524,35 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
 
   onAutoBillingBased(event) {
-    const checked = event.eventArgs.checked;
-    if (checked) {
-      const billingParty =
-        this.consignmentTableForm.controls["billingParty"].value;
+    const fieldConsignorName = 'consignorName';
+    const fieldConsigneeName = 'consigneeName';
+    const fieldContactNumber = 'ccontactNumber';
+    const fieldConsigneeContactNumber = 'cncontactNumber';
+    const fieldBillingParty = 'billingParty';
+    const { field: { name: fieldName }, eventArgs: { checked } } = event;
+    const { contactNo } = this.prqData || {};
+    const billingPartyValue = this.consignmentTableForm.controls[fieldBillingParty].value;
+    const mobile = billingPartyValue?.mobile || '';
 
-      this.consignmentTableForm.controls["ccontactNumber"].setValue(
-        this.prqData?.contactNo ||
-        this.consignmentTableForm.controls["billingParty"].value?.mobile ||
-        ""
-      );
-      this.consignmentTableForm.controls["cncontactNumber"].setValue(
-        this.prqData?.contactNo ||
-        this.consignmentTableForm.controls["billingParty"].value?.mobile ||
-        ""
-      );
-      this.consignmentTableForm.controls["consignorName"].setValue(
-        billingParty
-      );
-      this.consignmentTableForm.controls["consigneeName"].setValue(
-        billingParty
-      );
+    const updateForm = (nameField, contactField, billingPartyName) => {
+      this.consignmentTableForm.controls[nameField].setValue(billingPartyName);
+      this.consignmentTableForm.controls[contactField].setValue(contactNo || mobile);
+    };
+
+    if (checked) {
+      switch (fieldName) {
+        case 'cnbp':
+          updateForm(fieldConsignorName, fieldContactNumber, billingPartyValue);
+          break;
+        case 'cnebp':
+          updateForm(fieldConsigneeName, fieldConsigneeContactNumber, billingPartyValue);
+          break;
+        default:
+        // Handle other cases or throw an error
+      }
     } else {
-      this.consignmentTableForm.controls["ccontactNumber"].setValue("");
-      this.consignmentTableForm.controls["cncontactNumber"].setValue("");
-      this.consignmentTableForm.controls["consignorName"].setValue("");
-      this.consignmentTableForm.controls["consigneeName"].setValue("");
+      [fieldConsignorName, fieldConsigneeName, fieldContactNumber, fieldConsigneeContactNumber]
+        .forEach(field => this.consignmentTableForm.controls[field].setValue(''));
     }
   }
 
@@ -634,7 +638,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     Object.keys(this.containerTableForm.controls).forEach((key) => {
       this.containerTableForm.get(key).setValidators(Validators.required);
     });
-    this.consignmentTableForm.updateValueAndValidity();
+    this.containerTableForm.updateValueAndValidity();
   }
   /*End*/
   /*this function*/
@@ -809,87 +813,54 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   /*Below function is only call those time when user can come to only edit a
    docket not for prq or etc etc*/
-  autofillDropDown() {
-    const { vendorType, vendorName } = this.docketDetail;
-    const vendor =
-      vendorType !== "Market"
-        ? this.vendorDetail.find((x) => x.name === vendorName)
-        : vendorName;
-    this.consignmentTableForm.controls["vendorName"].setValue(vendor);
-    this.consignmentTableForm.controls["vendorType"].setValue(vendorType);
+   autofillDropDown() {
+    const { vendorType, vendorName, fromCity, toCity, destination, vehicleNo, billingParty, consignorName, consigneeName, prqNo, risk, payType, transMode, freightRatetype, packaging_type, weight_in, delivery_type, issuing_from } = this.docketDetail;
+    const { controls } = this.consignmentTableForm;
+  
+    // Helper function to set form control values.
+    const setControlValue = (controlName, value) => {
+      controls[controlName].setValue(value);
+    };
+  
+    // Set vendor details.
+    const vendor = vendorType !== "Market" ? this.vendorDetail.find(v => v.name === vendorName) : vendorName;
+   
+    setControlValue("vendorType", vendorType);
+    
+    // Trigger vendor field change actions.
     this.vendorFieldChanged();
-    const fromCity = {
-      name: this.docketDetail.fromCity,
-      value: this.docketDetail.fromCity,
-    };
-
-    this.consignmentTableForm.controls["fromCity"].setValue(fromCity);
-    const vehicleNo = {
-      name: this.docketDetail?.vehicleNo || "",
-      value: this.docketDetail?.vehicleNo || "",
-    };
-    this.consignmentTableForm.controls["vehicleNo"].setValue(vehicleNo);
-    const toCity = {
-      name: this.docketDetail.toCity,
-      value: this.docketDetail.toCity,
-    };
-
-    const destination = {
-      name: this.docketDetail.destination,
-      value: this.docketDetail.destination,
-    };
-
-    this.consignmentTableForm.controls["destination"].setValue(destination);
-    this.consignmentTableForm.controls["toCity"].setValue(toCity);
-    const billingParty = this.billingParty.find(
-      (x) => x.name == this.docketDetail.billingParty
-    );
-    const consignorName = this.billingParty.find(
-      (x) => x.name == this.docketDetail.consignorName
-    );
-    const consigneeName = this.billingParty.find(
-      (x) => x.name == this.docketDetail.consigneeName
-    );
-    const prqNo = {
-      name: this.docketDetail.prqNo,
-      value: this.docketDetail.prqNo,
-    };
-
-    this.consignmentTableForm.controls["risk"].setValue(this.docketDetail.risk);
-    this.consignmentTableForm.controls["vendorType"].setValue(
-      this.docketDetail.vendorType
-    );
-
-    this.consignmentTableForm.controls["prqNo"].setValue(prqNo);
-    this.consignmentTableForm.controls["consignorName"].setValue(consignorName);
-    this.consignmentTableForm.controls["consigneeName"].setValue(consigneeName);
-    this.consignmentTableForm.controls["billingParty"].setValue(billingParty);
-    this.consignmentTableForm.controls["payType"].setValue(
-      this.docketDetail.payType
-    );
-    this.consignmentTableForm.controls["transMode"].setValue(
-      this.docketDetail.transMode
-    );
-    this.FreightTableForm.controls["freightRatetype"].setValue(
-      this.docketDetail.freightRatetype
-    );
-    this.consignmentTableForm.controls["packaging_type"].setValue(
-      this.docketDetail.packaging_type
-    );
-    this.consignmentTableForm.controls["weight_in"].setValue(
-      this.docketDetail.weight_in
-    );
-    // this.consignmentTableForm.controls["cargo_type"].setValue(
-    //   this.docketDetail.cargo_type
-    // );
-    this.consignmentTableForm.controls["delivery_type"].setValue(
-      this.docketDetail.delivery_type
-    );
-    this.consignmentTableForm.controls["issuing_from"].setValue(
-      this.docketDetail.issuing_from
-    );
+    setControlValue("vendorName", vendor);
+    // Set city details.
+    setControlValue("fromCity", { name: fromCity, value: fromCity });
+    setControlValue("toCity", { name: toCity, value: toCity });
+    setControlValue("destination", { name: destination, value: destination });
+    
+    // Set vehicle number.
+    setControlValue("vehicleNo", { name: vehicleNo || "", value: vehicleNo || "" });
+  
+    // Find and set parties.
+    const findPartyByName = name => this.billingParty.find(x => x.name.toLowerCase() === name.toLowerCase());
+    setControlValue("billingParty", findPartyByName(billingParty));
+    setControlValue("consignorName", findPartyByName(consignorName));
+    setControlValue("consigneeName", findPartyByName(consigneeName));
+  
+    // Set various details.
+    setControlValue("risk", risk);
+    setControlValue("prqNo", { name: prqNo, value: prqNo });
+    setControlValue("payType", payType);
+    setControlValue("transMode", transMode);
+    setControlValue("packaging_type", packaging_type);
+    setControlValue("weight_in", weight_in);
+    setControlValue("delivery_type", delivery_type);
+    setControlValue("issuing_from", issuing_from);
+  
+    // Set Freight Table Form details.
+    this.FreightTableForm.controls["freightRatetype"].setValue(freightRatetype);
+  
+    // Bind table data after form update.
     this.bindTableData();
   }
+  
 
   bindTableData() {
     if (this.docketDetail.invoiceDetails.length > 0) {
@@ -1185,11 +1156,11 @@ export class ConsignmentEntryFormComponent implements OnInit {
       "sTS": "",
       "sTSTM": "",
       "eNTLOC": "",
-      "eNTBY":this.storage.userName,
+      "eNTBY": this.storage.userName,
       "eNTDT": new Date(),
-      "mODDT":"",
+      "mODDT": "",
       "mODLOC": "",
-      "mODBY":""
+      "mODBY": ""
 
     }
     await this.docketService.addDktDetail(data);
@@ -1210,7 +1181,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   /*End Save*/
   public selectedFile(event) {
-    
+
     let fileList: FileList = event.eventArgs;
     if (fileList.length !== 1) {
       throw new Error("Cannot use multiple files");

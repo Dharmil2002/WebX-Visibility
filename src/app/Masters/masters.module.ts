@@ -149,6 +149,7 @@ import { VendorLMDDetailComponent } from './vendor-contract/vendorContractTabs/v
 import { VendorLMDModalComponent } from './vendor-contract/vendorContractTabs/vendor-lmddetail/vendor-lmdmodal/vendor-lmdmodal.component';
 import { VendorBusiAssocDetailComponent } from './vendor-contract/vendorContractTabs/vendor-busi-assoc-detail/vendor-busi-assoc-detail.component';
 import { VendorBusiAssocModalComponent } from './vendor-contract/vendorContractTabs/vendor-busi-assoc-detail/vendor-busi-assoc-modal/vendor-busi-assoc-modal.component';
+import { AddNewCustomerContractComponent } from './Customer Contract/add-new-customer-contract/add-new-customer-contract.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -312,7 +313,8 @@ import { VendorBusiAssocModalComponent } from './vendor-contract/vendorContractT
     VendorLMDDetailComponent,
     VendorLMDModalComponent,
     VendorBusiAssocDetailComponent,
-    VendorBusiAssocModalComponent
+    VendorBusiAssocModalComponent,
+    AddNewCustomerContractComponent
   ],
 
   providers: [

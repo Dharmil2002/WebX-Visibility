@@ -7,13 +7,7 @@ import { EncryptionService } from 'src/app/core/service/encryptionService.servic
   templateUrl: './customer-contract-tabs-index.component.html',
 })
 export class CustomerContractTabsIndexComponent implements AfterViewInit {
-  breadscrums = [
-    {
-      title: "Customer Contract",
-      items: ["Home"],
-      active: "Customer Contract",
-    },
-  ];
+  breadscrums;
   CurrentContractDetails: any;
   selectedTabIndex = 0;
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,) {
@@ -21,6 +15,14 @@ export class CustomerContractTabsIndexComponent implements AfterViewInit {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
+      this.breadscrums =
+        [
+          {
+            title: "Customer Contract / " + this.CurrentContractDetails.customer,
+            items: ["Home"],
+            active: "Customer Contract",
+          }
+        ]
     });
     this.selectFolder('Contract Summary')
   }

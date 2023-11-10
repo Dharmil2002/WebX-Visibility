@@ -116,4 +116,7 @@ export class VendorLHLDetailComponent implements OnInit {
     });
   }
   //#endregion
+  Submit() {
+    console.log(this.TErouteBasedTableData);
+  }
 }

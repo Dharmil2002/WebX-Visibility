@@ -1,44 +1,80 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+  <!-- Job basic Form -->
+  <form [formGroup]="jobEntryTableForm">
+    <app-form-webxpress [form]="jobEntryTableForm" [FormTitle]="'Job Detail'" [formData]="jsonJobFormControls"
+      (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+  <!-- End -->
 
-    <form [formGroup]="jobEntryTableForm">
-        <app-form-webxpress [form]="jobEntryTableForm" [FormTitle]="'Job Detail'" [formData]="jsonJobFormControls"
-            (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
-    <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
-        <!-- Bootstrap loader -->
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-        <form [formGroup]="jobEntryTableForm">
-            <app-form-webxpress [form]="jobEntryTableForm"  [FormTitle]="'Add Job Detail'" [formData]="jsonFormTableControls"
-                (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-                [showSaveAndCancelButton]="false">
-            </app-form-webxpress>
-        </form>
-        <button matTooltip="Add Data" mat-stroked-button class="filter_btn"
-        style="margin-left: 85%;
-        top: -214px;
-        position: relative;" (click)="addDetail()" [disabled]="!this.jobEntryTableForm.controls['cnoteNo'].value && !this.jobEntryTableForm.value.contNo">
-        <mat-icon>add</mat-icon>
-        Add New 
-      </button>
-        <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnJobDetail"
-            [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-            [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-            [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-            (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-        </app-generic-table-v2>
-    <div class="row">
-        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
-            <div class="example-button-row  d-flex justify-content-end">
-
-                <button mat-button (click)="cancel()">Back</button>
-                <button class="msr-3" mat-raised-button color="primary" (click)="save()"
-                    [disabled]="!jobEntryTableForm.valid">Save</button>
-            </div>
-        </div>
+  <!--Bootstrap Loader while Adding Data into Table it's Execute While isLoad Would Be true -->
+  <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
+  </div>
+  <!--  End-->
+
+  <!--Add Containor Details Form Code Which Push into table  -->
+  <form [formGroup]="containorTableForm">
+    <app-form-webxpress [form]="containorTableForm" [FormTitle]="'Add Job Detail'" [formData]="jsonFormTableControls"
+      (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+  <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 83%;
+        top: -15em;
+        position: relative;" (click)="addDetail('cnote')"
+    [disabled]="!this.containorTableForm.controls['cnoteNo'].value && !this.containorTableForm.value.contNo">
+    <mat-icon>add</mat-icon>
+    Add New
+  </button>
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnJobDetail"
+    [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+    [staticField]="definition.staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+    [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
+    [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+  </app-generic-table-v2>
+  <!-- End -->
+  <!-- Add BL/CHALAN DETAILS Form Code whish Push data into table -->
+  <button matTooltip="Add Data" mat-stroked-button class="filter_btn"
+    [ngStyle]="{'margin-left': '80%','top': '50px','position': 'relative','z-index': '1' }" (click)="addDetail('bl')"
+    [disabled]="!this.blTableForm.valid">
+    <mat-icon>add</mat-icon>
+    Add New BLChalan
+  </button>
+  <form [formGroup]="blTableForm">
+    <app-form-webxpress [form]="blTableForm" [FormTitle]="'BL/Chalan Details'" [formData]="jsonFormBlControls"
+      (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+    <!--Bootstrap Loader while Adding Data into Table it's Execute While isLoad Would Be true -->
+    <div *ngIf="isBlLoad" class="d-flex justify-content-center align-items-center">
+      <!-- Bootstrap loader -->
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <!--  End-->
+
+    <app-generic-table-v2 *ngIf="!jobTableLoad && !isBlLoad" [dynamicControls]="dynamicControls"
+      [columnHeader]="columnChallan" [tableData]="TblChallan" (selectAllClicked)="onSelectAllClicked($event)"
+      [menuItems]="menuItems" [staticField]="definition.invoiceStaticField" [Link]="linkArray" [height]="height"
+      [width]="width" [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
+      (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+    </app-generic-table-v2>
+  </form>
+  <!-- End -->
+  <div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+      <div class="example-button-row  d-flex justify-content-end">
+
+        <button mat-button (click)="cancel()">Back</button>
+        <button class="msr-3" mat-raised-button color="primary" (click)="save()"
+          [disabled]="!jobEntryTableForm.valid">Save</button>
+      </div>
+    </div>
+  </div>
 </app-common-wrapper-webxpress>

@@ -1,43 +1,101 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
-    <form [formGroup]="rakeEntryTableForm">
-        <app-form-webxpress [form]="rakeEntryTableForm" [formData]="jsonControlArray"
-            (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
-      <form [formGroup]="rakeContainerTableForm">
-        <app-form-webxpress [form]="rakeContainerTableForm" [formData]="containerJsonArray"
-            (callFunction)="functionCallHandler($event)"  [FormTitle]="'Container Details'"  (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false">
-        </app-form-webxpress>
-    </form>
-    <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
-        <!-- Bootstrap loader -->
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    <button matTooltip="Add Data" mat-stroked-button class="filter_btn"
-    style="margin-left: 85%;
-    top: -271px;
-    position: relative;" (click)="addContainor()" [disabled]="!this.rakeContainerTableForm.controls['cnNo'].value && !this.rakeContainerTableForm.controls['jobNo'].value">
+  <form [formGroup]="rakeEntryTableForm">
+    <app-form-webxpress [form]="rakeEntryTableForm" [formData]="jsonControlArray"
+      (callFunction)="functionCallHandler($event)" (functionCallEmitter)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+
+  <div *ngIf="isRRLoad" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+
+  <!-- Rake Details -->
+  <button matTooltip="Add Data Rake" mat-stroked-button class="filter_btn" style=" margin-left: 85%;
+  top: 50px;
+  position: relative;
+  z-index: 1;" (click)="addRakeData()" [disabled]="!this.rakeDetailsTableForm.controls['rrNo'].value">
     <mat-icon>add</mat-icon>
-    Add New 
+    Add New
   </button>
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="definition.columnHeader"
-            [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-            [menuItems]="definition.menuItems" [staticField]="definition.staticField" [Link]="linkArray" [height]="height" [width]="width"
-            [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
-            [menuItemFlag]="menuItemflag">
-        </app-generic-table-v2>
-        <div class="row">
-            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
-                <div class="example-button-row  d-flex justify-content-end">
-    
-                    <button mat-button   (click)="cancel()">Back</button>
-                    <button class="msr-3" mat-raised-button color="primary"
-                        (click)="save()">Save</button>
-                </div>
-            </div>  
-        </div>
+
+  <form [formGroup]="rakeDetailsTableForm">
+    <app-form-webxpress [form]="rakeDetailsTableForm" [formData]="jsonRakeDetails"
+      (callFunction)="functionCallHandler($event)" [FormTitle]="'Rake Details'"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+  <app-generic-table-v2 *ngIf="!rrLoad" [dynamicControls]="dynamicControls" [columnHeader]="definition.rakeHeader"
+    [tableData]="tableRakeData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="definition.menuItems" [staticField]="definition.rakeStaticField" [Link]="linkArray" [height]="height"
+    [width]="width" [maxWidth]="maxWidth" [TableStyle]="TableStyle" (menuItemClicked)="handleMenuItemClick($event)"
+    [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+  </app-generic-table-v2>
+  <!-- End -->
+  <!-- Invoice Details -->
+  <button matTooltip="Add Data Invoice" mat-stroked-button class="filter_btn"
+    style="margin-left: 85%;top: 49px;position: relative;z-index: 1;" (click)="addInvoiceData()"
+    [disabled]="!this.invDetailsTableForm.controls['invNum'].value">
+    <mat-icon>add</mat-icon>
+    Add New
+  </button>
+  <form [formGroup]="invDetailsTableForm">
+    <app-form-webxpress [form]="invDetailsTableForm" [formData]="jsonInvoiceDetails"
+      (callFunction)="functionCallHandler($event)" [FormTitle]="'Invoice Details'"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+  <div *ngIf="isInvLoad" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <app-generic-table-v2 *ngIf="!invLoad" [dynamicControls]="dynamicControls" [columnHeader]="definition.invDetails"
+    [tableData]="tableInvData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="definition.menuItems" [staticField]="definition.staticInvField" [Link]="definition.linkArray"
+    [height]="height" [width]="width" [TableStyle]="TableStyle" [maxWidth]="maxWidth"
+    (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+  </app-generic-table-v2>
+  <!-- End -->
+
+  <button matTooltip="Add Data Cn" mat-stroked-button class="filter_btn"
+    style="margin-left: 85%;top: 49px;position: relative;z-index: 1;" (click)="addContainor()"
+    [disabled]="!this.rakeContainerTableForm.controls['cnNo'].value">
+    <mat-icon>add</mat-icon>
+    Add New
+  </button>
+  <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+    <!-- Bootstrap loader -->
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <form [formGroup]="rakeContainerTableForm">
+    <app-form-webxpress [form]="rakeContainerTableForm" [formData]="containerJsonArray"
+      (callFunction)="functionCallHandler($event)" [FormTitle]="'Container Details'"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="definition.cnoteHeader"
+    [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="definition.menuItems" [staticField]="definition.staticField" [Link]="definition.linkArray"
+    [height]="height" [width]="width" [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)"
+    [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
+  </app-generic-table-v2>
+  <!-- End -->
+
+  <div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+      <div class="example-button-row  d-flex justify-content-end">
+
+        <button mat-button (click)="cancel()">Back</button>
+        <button class="msr-3" mat-raised-button color="primary" (click)="save()">Save</button>
+      </div>
+    </div>
+  </div>
 </app-common-wrapper-webxpress>

@@ -2,7 +2,9 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class RakeEntryControl {
     rakeEntryArray: FormControls[];
-    ContainerDetail:FormControls[];
+    ContainerDetail: FormControls[];
+    rakeDetails: FormControls[];
+    invDetails: FormControls[];
     constructor() {
         this.rakeEntryArray = [
             {
@@ -72,10 +74,10 @@ export class RakeEntryControl {
                     {
                         name: "invalidAutocompleteObject",
                         message: "Choose proper value",
-                      },
-                      {
+                    },
+                    {
                         name: "autocomplete",
-                      }
+                    }
                 ],
                 additionalData: {
                     showNameAndValue: false
@@ -134,19 +136,19 @@ export class RakeEntryControl {
                         message: ""
                     }]
                 },
-            }, {
+            },
+            {
                 name: "documentType",
                 label: "Document Type",
                 placeholder: 'Select Document Type',
-                type: "Staticdropdown",
-                value: [{ value: "CN", name: "CN Wise"},
-                { value: "JOB", name: "Job Wise" }],
+                type: "text",
+                value: 'CN',
                 Validations: [
                 ], functions: {
-                    onSelection: "cityMapping"
+                    onSelection: ""
                 },
                 generatecontrol: true,
-                disable: false
+                disable: true
             },
             {
                 name: 'loadType', label: "Load Type", placeholder: "Enter Load Type", type: 'Staticdropdown',
@@ -167,8 +169,9 @@ export class RakeEntryControl {
             {
                 name: 'movementType', label: "Movement Type", placeholder: "Enter Movement Type", type: 'Staticdropdown',
                 value: [
-                    { name: "Exim", value: "exim" },
-                    { name: "Domestic", value: "domestic" }
+                    { name: "Export", value: "E" },
+                    { name: "Domestic", value: "D" },
+                    { name: "Import ", value: "I" }
                 ],
                 generatecontrol: true,
                 disable: false,
@@ -203,67 +206,61 @@ export class RakeEntryControl {
                 ]
             },
             {
-                name: "rrNo",
-                label: "RR No",
-                placeholder: "Enter RR No",
-                type: "text",
-                value: "",
-                generatecontrol: true,
+                name: "branch",
+                label: "branch",
+                placeholder: "branch",
+                type: "",
+                value:localStorage.getItem("Branch"),
+                generatecontrol: false,
                 disable: false,
                 Validations: [
                 ]
             },
-            {
-                name: 'rrDate', label: 'RR Date', placeholder: 'RR Date', type: 'date', value: "", filterOptions: '', autocomplete: '', displaywith: '',
-                generatecontrol: true, disable: false, Validations: [],
-                additionalData: {
-                }
-            },
-            {
-                name: "contractAmount",
-                label: "Contract Amount (₹)",
-                placeholder: "Enter Contract Amount",
-                type: "number",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                ]
-            }, {
-                name: "advancedAmount",
-                label: "Advanced Amount (₹)",
-                placeholder: "Enter Advanced Amount",
-                type: "number",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                ]
-            }, {
-                name: "balanceAmount",
-                label: "Balance Amount (₹)",
-                placeholder: "Enter Balance Amount",
-                type: "number",
-                value: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                ]
-            }, {
-                name: 'advancedLocation', label: "Advanced Location", placeholder: "Select Advanced Location", type: 'dropdown',
-                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                Validations: [],
-                additionalData: {
-                    showNameAndValue: false
-                }
-            }, {
-                name: 'balanceLocation', label: "Balance Location", placeholder: "Select Balance Location", type: 'dropdown',
-                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                Validations: [],
-                additionalData: {
-                    showNameAndValue: false
-                }
-            },
+            // {
+            //     name: "contractAmount",
+            //     label: "Contract Amount (₹)",
+            //     placeholder: "Enter Contract Amount",
+            //     type: "number",
+            //     value: "",
+            //     generatecontrol: true,
+            //     disable: false,
+            //     Validations: [
+            //     ]
+            // }, {
+            //     name: "advancedAmount",
+            //     label: "Advanced Amount (₹)",
+            //     placeholder: "Enter Advanced Amount",
+            //     type: "number",
+            //     value: "",
+            //     generatecontrol: true,
+            //     disable: false,
+            //     Validations: [
+            //     ]
+            // }, {
+            //     name: "balanceAmount",
+            //     label: "Balance Amount (₹)",
+            //     placeholder: "Enter Balance Amount",
+            //     type: "number",
+            //     value: "",
+            //     generatecontrol: true,
+            //     disable: false,
+            //     Validations: [
+            //     ]
+            // }, {
+            //     name: 'advancedLocation', label: "Advanced Location", placeholder: "Select Advanced Location", type: 'dropdown',
+            //     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+            //     Validations: [],
+            //     additionalData: {
+            //         showNameAndValue: false
+            //     }
+            // }, {
+            //     name: 'balanceLocation', label: "Balance Location", placeholder: "Select Balance Location", type: 'dropdown',
+            //     value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+            //     Validations: [],
+            //     additionalData: {
+            //         showNameAndValue: false
+            //     }
+            // },
             // {
             //     name: 'mappingMode',
             //     label: '',
@@ -378,7 +375,7 @@ export class RakeEntryControl {
                 disable: false,
                 Validations: [],
                 functions: {
-                    onOptionSelect:"getCnoteDetails"
+                    onOptionSelect: "getCnoteDetails"
                 },
                 additionalData: {
                     showNameAndValue: false
@@ -396,32 +393,43 @@ export class RakeEntryControl {
                 ]
             },
             {
-                name: "jobNo",
-                label: "Job No",
-                placeholder: "Job No",
-                type: "dropdown",
+                name: "noOfContainer",
+                label: "Containers",
+                placeholder: "Containers",
+                type: "text",
                 value: "",
                 generatecontrol: true,
-                disable: false,
-                Validations: [],
-                functions: {
-                    onOptionSelect:"getJobDetails"
-                },
-                additionalData: {
-                    showNameAndValue: false
-                }
-            },
-            {
-                name: "jobDate",
-                label: "Job Date",
-                placeholder: "Job Date",
-                type: "date",
-                value: "",
-                generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: [
                 ]
             },
+            // {
+            //     name: "jobNo",
+            //     label: "Job No",
+            //     placeholder: "Job No",
+            //     type: "dropdown",
+            //     value: "",
+            //     generatecontrol: true,
+            //     disable: false,
+            //     Validations: [],
+            //     functions: {
+            //         onOptionSelect:"getJobDetails"
+            //     },
+            //     additionalData: {
+            //         showNameAndValue: false
+            //     }
+            // },
+            // {
+            //     name: "jobDate",
+            //     label: "Job Date",
+            //     placeholder: "Job Date",
+            //     type: "date",
+            //     value: "",
+            //     generatecontrol: true,
+            //     disable: false,
+            //     Validations: [
+            //     ]
+            // },
             {
                 name: "noOfPkg",
                 label: "No Of Package",
@@ -477,14 +485,77 @@ export class RakeEntryControl {
                 Validations: [
                 ]
             },
-            
+            {
+                name: 'contDtl',
+                label: "contDtl",
+                placeholder: "contDtl",
+                type: "",
+                value: "",
+                generatecontrol: false,
+                disable: false,
+                Validations: []
+            }
+
+
+        ]
+        this.rakeDetails = [{
+            name: "rrNo",
+            label: "RR No",
+            placeholder: "Enter RR No",
+            type: "text",
+            value: "",
+            generatecontrol: true,
+            disable: false,
+            Validations: [
+            ]
+        },
+        {
+            name: 'rrDate', label: 'RR Date', placeholder: 'RR Date', type: 'date', value: "", filterOptions: '', autocomplete: '', displaywith: '',
+            generatecontrol: true, disable: false, Validations: [],
+            additionalData: {
+            }
+        }],
+            this.invDetails = [{
+                name: "invNum",
+                label: "Inv No",
+                placeholder: "Enter Inv No",
+                type: "text",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: 'invDate', label: 'Inv Date', placeholder: 'Inv Date', type: 'date', value: "", filterOptions: '', autocomplete: '', displaywith: '',
+                generatecontrol: true, disable: false, Validations: [],
+                additionalData: {
+                }
+            },
+            {
+                name: "invAmt",
+                label: "Inv Amount(₹)",
+                placeholder: "Enter Inv No",
+                type: "number",
+                value: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
+            },
         ]
     }
 
     getRakeEntryFormControls() {
         return this.rakeEntryArray;
     }
-    getRakeContainerDetail(){
+    getRakeContainerDetail() {
         return this.ContainerDetail;
+    }
+    getrakeDetailsControls() {
+        return this.rakeDetails;
+    }
+    getInvoiceDetails() {
+        return this.invDetails;
     }
 }

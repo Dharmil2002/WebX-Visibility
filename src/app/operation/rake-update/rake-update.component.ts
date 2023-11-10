@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { getGeneric, rakeFieldMapping } from './rake-update-utility';
 import { RakeDetailComponent } from '../rake-detail/rake-detail.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rake-update',
@@ -9,14 +10,16 @@ import { RakeDetailComponent } from '../rake-detail/rake-detail.component';
 })
 export class RakeUpdateComponent implements OnInit {
   tableLoad: boolean = true;
+  menuItemflag:boolean=true;
   tableData: any;
   boxData: any;
+  filterColumn:boolean=true;
   METADATA = {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
   dynamicControls = {
-    add: false,
+    add: true,
     edit: true,
     csv: false,
   };
@@ -71,13 +74,13 @@ export class RakeUpdateComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:100px",
     },
-    Action: {
+    actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
       Style: "min-width:200px",
     },
   };
-  menuItemflag:boolean=true;
+  menuItems = [{ label: "Diverted For Export" }, { label: "Delivered" },{ label: "Updated" }];
   //#endregion
   staticField = [
     "SlNo",
@@ -90,15 +93,22 @@ export class RakeUpdateComponent implements OnInit {
     "CurrentStatus"
   ];
   linkArray = [
-    { Row: 'Action', Path: 'Operation/Handover', componentDetails: "" },
+   // { Row: 'Action', Path: 'Operation/Handover', componentDetails: "" },
     { Row: 'BillingParty', Path: '', componentDetails: RakeDetailComponent },
     { Row: 'CNNo', Path: '', componentDetails: RakeDetailComponent },
     { Row: 'JobNo', Path: '', componentDetails: RakeDetailComponent }
   ]
+  
+  addAndEditPath: string;
+  allColumnFilter:any;
 
   constructor(
-    private masterService: MasterService
-    ) { }
+    private masterService: MasterService,
+    private router: Router
+    ) { 
+       this.allColumnFilter=this.columnHeader;
+       this.addAndEditPath='Operation/RakeEntry'
+    }
 
   ngOnInit(): void {
     this.getRakeDetail();
@@ -135,5 +145,32 @@ export class RakeUpdateComponent implements OnInit {
     this.tableData = rakeDetail;
     this.tableLoad = false;
   }
- 
+  handleMenuItemClick(data) {
+    if(data.label.label=='Diverted For Export'){
+          this.router.navigate(['Operation/Handover'], {
+            state: {
+              data:{ rakeDetails:data.data,
+              flag:'Diverted For Export'
+              }
+            },
+          });
+    }
+    else if(data.label.label=='Delivered'){
+      this.router.navigate(['Operation/Handover'], {
+        state: {
+          data: {rakeDetails:data.data,flag:'Delivered'},
+        },
+      });
+    }
+    else if(data.label.label=='Updated'){
+      this.router.navigate(['Operation/Handover'], {
+        state: {
+          data: data.data,
+          flag:'Updated'
+        },
+      });
+    }
+}
+
+
 }

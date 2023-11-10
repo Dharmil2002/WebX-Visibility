@@ -5,24 +5,34 @@ export class HandoverControl {
     constructor() {
         this.handOverArray = [
            {
-                name: "dateTime",
-                label: "Job Date",
-                placeholder: "select Job Date",
+                name: "rktUptDt",
+                label: "Rake Update Date",
+                placeholder: "Rake Update Date",
                 type: "date",
                 value: new Date(),
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: [],
                 additionalData: {
                     minDate: new Date(),
                 },
             },
             {
-                name: "linerName",
+                name: "locationCode",
                 label: "Location Code",
                 placeholder: "Location Code ",
                 type: "text",
-                value:localStorage.getItem("Branch"),
+                value:"",
+                generatecontrol: true,
+                disable: true,
+                Validations: []
+            },
+            {
+                name: "location",
+                label: "Location",
+                placeholder: "Location",
+                type: "text",
+                value:"",
                 generatecontrol: true,
                 disable: true,
                 Validations: []

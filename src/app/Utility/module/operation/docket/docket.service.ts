@@ -110,12 +110,12 @@ export class DocketService {
     async getDocket() {
         const req = {
             "companyCode": localStorage.getItem("companyCode"),
-            "filter": {},
+            "filter": {origin:this.storage.branch},
             "collectionName": "docket_temp"
         }
 
         const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
-        return res.data.filter((x)=>x.origin === localStorage.getItem("Branch"));
+        return res.data;
     }
     async addDktDetail(data){
         

@@ -256,7 +256,11 @@ export class GenericTableV2Component
           data: { columnData: item, extraData: this.extraData },
         },
       });
-    } else {
+    }
+    else if(!drillDownLink.Path && drillDownLink.componentDetails){
+      this.GeneralMultipleView(item,drillDownLink.componentDetails);
+    }
+     else {
       if (this.menuItems) {
         let navigateToComponent;
         if (tableData === "Action") {
@@ -321,7 +325,6 @@ export class GenericTableV2Component
       (item) => item["isSelected"] == true
     );
   }
-
   getCheckData(data) {
     //this.onFlagChange.emit(data)
     this.AllChack = this.dataSource.filteredData.every((t) => t.isSelected)

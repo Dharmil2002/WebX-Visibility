@@ -57,6 +57,7 @@ import { ImagePreviewComponent } from './image-preview/image-preview.component';
 import { ImageHandling } from '../Utility/Form Utilities/imageHandling';
 import { NgxPrintModule } from "ngx-print";
 import { MatDialogModule } from '@angular/material/dialog';
+import { GenericViewTableComponent } from './generic-view-table/generic-view-table.component';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -74,7 +75,8 @@ const MY_DATE_FORMAT = {
     FormComponent, FormWithoutAutoCompleteComponent, GenericDashBoardComponent,
     GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent, TreeViewComponent, GenericChartDashboardComponent, GenericCardComponent, DecimaRangeValidatorDirective, GenericTableV2Component
     , ExpandableTableComponent, ModifyTableCollumnsComponent, LazyloadingeditabletableComponent, XlsxPreviewPageComponent, GenericViewPrintComponent,
-  ImagePreviewComponent],
+  ImagePreviewComponent,
+  GenericViewTableComponent],
 
   imports: [
     CommonModule,

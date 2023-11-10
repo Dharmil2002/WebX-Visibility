@@ -64,7 +64,7 @@ export class AddDetailsDebitAgainstDocumentModalComponent implements OnInit {
         case "PRS":
           break;
         case "JOB":
-          data = await GetDocumentsWiseListFromApi(this.masterService, 'job_detail', 'jobId', search)
+          data = await GetDocumentsWiseListFromApi(this.masterService, 'job_detail', 'jobId', search, 'billingParty', this.objResult?.PartName, 'jobLocation', this.objResult?.Origin)
           break;
       }
       this.filter.Filter(

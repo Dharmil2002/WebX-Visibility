@@ -112,4 +112,7 @@ export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter i
       queryParams: { data: EncriptedData },
     });
   }
+  AddNewContract() {
+    this.router.navigate(['/Masters/CustomerContract/AddNewCustomerContract']);
+  }
 }

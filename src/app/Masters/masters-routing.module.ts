@@ -75,6 +75,7 @@ import { VendorContractListComponent } from './vendor-contract/vendor-contract-l
 import { VendorIndexComponent } from './vendor-contract/vendor-index/vendor-index.component';
 import { SacMasterListComponent } from './sac-master/sac-master-list/sac-master-list.component';
 import { AddSacMasterComponent } from './sac-master/add-sac-master/add-sac-master.component';
+import { AddNewCustomerContractComponent } from './Customer Contract/add-new-customer-contract/add-new-customer-contract.component';
 
 
 const routes: Routes = [
@@ -149,6 +150,9 @@ const routes: Routes = [
   // Customer Contract Router
   { path: "CustomerContract/CustomerContractList", component: CustomerContractListComponent },
   { path: "CustomerContract/CustomerIndex", component: CustomerContractTabsIndexComponent },
+  { path: "CustomerContract/AddNewCustomerContract", component: AddNewCustomerContractComponent },
+
+
 
   //Product Master Router
   { path: "ProductMaster/ListProduct", component: ListProductComponent },
@@ -161,7 +165,7 @@ const routes: Routes = [
   //Vendor Contract Router
   { path: "VendorContract/VendorContractList", component: VendorContractListComponent },
   { path: "VendorContract/VendorContractIndex", component: VendorIndexComponent },
-  
+
 ];
 
 @NgModule({

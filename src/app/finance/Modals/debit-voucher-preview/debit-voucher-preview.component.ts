@@ -35,8 +35,8 @@ export class DebitVoucherPreviewComponent implements OnInit {
   //'Instance',
   // 'Value',DocumentReference
   columnHeader = GetDebitLedgerPreviewcolumnHeader()
-  totalDebit;
-  totalCredit
+  totalDebit: number;
+  totalCredit: number;
   TotalAmountList: { count: any; title: string; class: string }[];
   tableData: any = [];
   constructor(private filter: FilterUtils,
@@ -51,19 +51,18 @@ export class DebitVoucherPreviewComponent implements OnInit {
       const drValue = parseFloat(currentValue['Dr']);
       return isNaN(drValue) ? accumulator : accumulator + drValue;
     }, 0);
-
     this.totalCredit = this.tableData.reduce((accumulator, currentValue) => {
       const drValue = parseFloat(currentValue['Cr']);
       return isNaN(drValue) ? accumulator : accumulator + drValue;
     }, 0);
     this.TotalAmountList = [
       {
-        count: this.totalDebit,
+        count: this.totalDebit.toFixed(2),
         title: "Total Debit Amount",
         class: `color-Ocean-danger`,
       },
       {
-        count: this.totalCredit,
+        count: this.totalCredit.toFixed(2),
         title: "Total Credit Amount",
         class: `color-Success-light`,
       }

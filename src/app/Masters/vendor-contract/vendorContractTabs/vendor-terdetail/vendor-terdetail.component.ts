@@ -125,4 +125,7 @@ export class VendorTERDetailComponent implements OnInit {
     });
   }
   //#endregion
+  Submit() {
+    console.log(this.TErouteBasedTableData);
+  }
 }

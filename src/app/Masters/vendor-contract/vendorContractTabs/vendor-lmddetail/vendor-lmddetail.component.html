@@ -2,5 +2,5 @@
     [FormTitle]="'Transportation- Last mile delivery'" [tableData]="TErouteBasedTableData" [menuItems]="menuItems"
     [staticField]="staticFieldTErouteBased" [Link]="linkArray" [menuItemFlag]="menuItemflag"
     (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" [DisplayAddNewButton]=true
-    (AddNewButtonEvent)="addDetails()">
+    (AddNewButtonEvent)="addDetails()" [DisplaySaveButton]="true" (SubmitButtonEvent)="Submit()">
 </app-generic-table-v2>

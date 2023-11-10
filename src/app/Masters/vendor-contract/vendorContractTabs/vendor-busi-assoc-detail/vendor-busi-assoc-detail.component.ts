@@ -131,4 +131,7 @@ export class VendorBusiAssocDetailComponent implements OnInit {
     });
   }
   //#endregion
+  Submit() {
+    console.log(this.TErouteBasedTableData);
+  }
 }

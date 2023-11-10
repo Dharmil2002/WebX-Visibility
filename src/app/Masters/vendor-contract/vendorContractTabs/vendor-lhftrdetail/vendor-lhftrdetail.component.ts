@@ -119,4 +119,7 @@ addDetails(event) {
   });
 }
 //#endregion
+Submit() {
+  console.log(this.TErouteBasedTableData);
+}
 }

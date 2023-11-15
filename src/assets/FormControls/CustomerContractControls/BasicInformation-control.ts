@@ -34,96 +34,83 @@ export class ContractBasicInformationControl {
         generatecontrol: true,
         disable: false,
         Validations: [],
+        additionalData: {
+          isFileSelected: true
+        },
         functions: {
-          onChange: "onFileSelected",
+          onChange: "selectFileContractScan",
         },
       },
-      {
-        name: "ContractScanView",
-        label: "View Contract Scan",
-        placeholder: "View Contract Scan",
-        type: "filelink",
-        value: "test",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
+      // {
+      //   name: "ContractScanView",
+      //   label: "View Contract Scan",
+      //   placeholder: "View Contract Scan",
+      //   type: "filelink",
+      //   value: "test",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
       {
         name: "Product",
         label: "Product",
         placeholder: "Product",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "Express",
-            name: "Express",
-          },
-          {
-            value: "Air",
-            name: "Air",
-          },
-          {
-            value: "Rail",
-            name: "Rail",
-          },
-          {
-            value: "Road",
-            name: "Road",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
-        autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [
           {
             name: "required",
-            message: "Product is required",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: true,
-        },
-      },
-      {
-        name: "PayBasis",
-        label: "Pay Basis",
-        placeholder: "Pay Basis",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "All",
-            name: "All",
+            message: "Product is required"
           },
           {
-            value: "TBB",
-            name: "TBB",
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
           },
           {
-            value: "LTL",
-            name: "LTL",
-          },
-          {
-            value: "FTL",
-            name: "FTL",
-          },
-
-        ],
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Product is required",
+            name: "autocomplete",
           },
         ],
         additionalData: {
           showNameAndValue: false,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "ProductFieldChanged"
+        },
+      },
+      {
+        name: "PayBasis",
+        label: "PayBasis",
+        placeholder: "PayBasis",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "PayBasis is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+          metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "PayBasisFieldChanged"
         },
       },
       {
@@ -133,7 +120,7 @@ export class ContractBasicInformationControl {
         type: "text",
         value: BasicInformation.AccountManager,
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
 
@@ -142,7 +129,7 @@ export class ContractBasicInformationControl {
         label: "Contract Start Date",
         placeholder: "Contract Start Date",
         type: "date",
-        value: BasicInformation.EffectiveDateFrom,
+        value: BasicInformation.ContractStartDate,
         generatecontrol: true,
         disable: false,
         Validations: [],
@@ -155,7 +142,7 @@ export class ContractBasicInformationControl {
         label: "Expiry Date",
         placeholder: "Expiry Date",
         type: "date",
-        value: BasicInformation.ValidUntil,
+        value: BasicInformation.Expirydate,
         generatecontrol: true,
         disable: false,
         Validations: [],
@@ -167,10 +154,10 @@ export class ContractBasicInformationControl {
         name: "Pendingdays",
         label: "Pending days",
         placeholder: "Pending days",
-        type: "text",
+        type: "number",
         value: BasicInformation.pendingdays,
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [],
       },
       {
@@ -195,6 +182,7 @@ export class ContractBasicInformationControl {
           minDate: new Date("01 Jan 2000"),
         },
       },
+
       {
         name: "ContractPOScan",
         label: "Upload Contract PO Scan",
@@ -204,20 +192,23 @@ export class ContractBasicInformationControl {
         generatecontrol: true,
         disable: false,
         Validations: [],
+        additionalData: {
+          isFileSelected: true
+        },
         functions: {
-          onChange: "onFileSelected",
+          onChange: "selectFileContractPOScan",
         },
       },
-      {
-        name: "ContractPOScanView",
-        label: "View Contract PO Scan",
-        placeholder: "View Contract PO Scan",
-        type: "filelink",
-        value: "test",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
+      // {
+      //   name: "ContractPOScanView",
+      //   label: "View Contract PO Scan",
+      //   placeholder: "View Contract PO Scan",
+      //   type: "filelink",
+      //   value: "test",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
       {
         name: "UpdateHistory",
         label: "View Update History",
@@ -373,13 +364,16 @@ export class ContractBasicInformationControl {
         additionalData: {
           minDate: new Date("01 Jan 2000"),
         },
+        functions: {
+          onDate: "onContractStartDateChanged",
+        },
       },
 
 
     ];
   }
   getContractBasicInformationControlControls(CurrentAccess: string[]) {
-    this.ContractBasicInformationControlArray = this.ContractBasicInformationControlArray.filter(item => CurrentAccess.includes(item.name))
+    //this.ContractBasicInformationControlArray = this.ContractBasicInformationControlArray.filter(item => CurrentAccess.includes(item.name))
     return this.ContractBasicInformationControlArray;
   }
   getAddNewCustomerContractControlArrayControls() {

@@ -1,5 +1,5 @@
 
-import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
+import { ChangeDetectorRef, Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Subject, take, takeUntil } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
@@ -8,6 +8,7 @@ import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
 import { ContractServiceSelectionControl } from "src/assets/FormControls/CustomerContractControls/ServiceSelection-control";
+import Swal from "sweetalert2";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -19,10 +20,14 @@ interface CurrentAccessListType {
 })
 export class CustomerContractServiceSelectionComponent implements OnInit {
   companyCode: number | null
-
+  @Input() contractData: any;
   //#region Form Configration Fields
   ContractServiceSelectionControls: ContractServiceSelectionControl;
-
+  EventButton = {
+    functionName: 'SaveProduct',
+    name: "Save",
+    iconName: 'save'
+  }
   ProductsForm: UntypedFormGroup;
   jsonControlArrayProductsForm: any;
 
@@ -389,6 +394,51 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
   }
+  ngOnChanges(changes: SimpleChanges) {
+    // let data = {
+    //   "Customer": changes.contractData?.currentValue?.cUSTID + ":" + changes.contractData?.currentValue?.cUSTNM ?? '',
+    //   "ContractID": changes.contractData?.currentValue?.cONID ?? '',
+    //   "PayBasis": changes.contractData?.currentValue?.pBAS ?? '',
+    //   "ContractStartDate": changes.contractData?.currentValue?.cSTARTDT ?? '',
+    //   "Expirydate": changes.contractData?.currentValue?.cENDDT ?? '',
+    //   "cSCAN": changes.contractData?.currentValue?.cSCAN ?? '',
+    //   "cPOSCAN": changes.contractData?.currentValue?.cPOSCAN ?? '',
+    //   "AccountManager": changes.contractData?.currentValue?.aCMGR ?? '',
+    //   "CustomerPONo": changes.contractData?.currentValue?.cPONO ?? '',
+    //   "POValiditydate": changes.contractData?.currentValue?.cPODt ?? '',
+    // }
 
+  }
+  SaveProduct(event) {
+    let contractDetails = this.contractData
+    debugger
+    contractDetails.lTYP = this.ProductsForm.value.loadType.name;
+    contractDetails.rTYP = this.ProductsForm.value.rateType.name;
+    contractDetails.oRTOP = this.ProductsForm.value.originRateOption.name;
+    contractDetails.dRTOP = this.ProductsForm.value.destinationRateOption.name;
+    const reqBody = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract",
+      filter: { _id: this.contractData._id },
+      update: { ...contractDetails }
+    };
+
+    delete contractDetails._id;
+
+    this.masterService.masterPut('generic/update', reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+        }
+      }
+    });
+
+  }
 }
 

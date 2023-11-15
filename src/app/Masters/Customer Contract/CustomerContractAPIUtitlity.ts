@@ -33,3 +33,22 @@ export async function productdetailFromApi(masterService) {
         return data
     }
 }
+export async function GetContractListFromApi(masterService) {
+    let req = {
+        "companyCode": localStorage.getItem('companyCode'),
+        "collectionName": "cust_contract",
+        "filter": {}
+    }
+    const res = await masterService.masterPost("generic/get", req).toPromise()
+    if (res) {
+        const data = res?.data
+            .filter(x => x != null)
+            .sort((a, b) => a.cONID.localeCompare(b.value))
+            .map(item => ({
+                ...item,
+                status: "Active", // You need to replace this with your actual status calculation logic
+            }));
+
+        return data
+    }
+}

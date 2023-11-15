@@ -8,6 +8,13 @@ import { SessionService } from 'src/app/core/service/session.service';
 import { ContractBasicInformationControl } from 'src/assets/FormControls/CustomerContractControls/BasicInformation-control';
 import { customerFromApi, productdetailFromApi } from '../CustomerContractAPIUtitlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import Swal from 'sweetalert2';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { CustomerContractDataRequestModel, CustomerContractRequestModel } from '../../../Models/CustomerContract/customerContract';
+import { financialYear } from 'src/app/Utility/date/date-utils';
+import { CustomerContractService } from 'src/app/core/service/customerContract/customerContract-services.service';
+import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
+import { Router } from '@angular/router';
 interface CurrentAccessListType {
   productAccess: string[];
 }
@@ -16,6 +23,9 @@ interface CurrentAccessListType {
   templateUrl: './add-new-customer-contract.component.html',
 })
 export class AddNewCustomerContractComponent implements OnInit {
+  customerContractRequestModel = new CustomerContractRequestModel();
+
+  customerContractDataRequestModel = new CustomerContractDataRequestModel();
 
   companyCode: number | null
   //#region Form Configration Fields
@@ -41,7 +51,11 @@ export class AddNewCustomerContractComponent implements OnInit {
   constructor(private fb: UntypedFormBuilder,
     public ObjcontractMethods: locationEntitySearch,
     private filter: FilterUtils,
+    private router: Router,
+    private navigationService: NavigationService,
+    public snackBarUtilityService: SnackBarUtilityService,
     private masterService: MasterService,
+    private customerContractService: CustomerContractService,
     private sessionService: SessionService) {
     this.companyCode = this.sessionService.getCompanyCode()
     this.CurrentAccessList = {
@@ -121,8 +135,82 @@ export class AddNewCustomerContractComponent implements OnInit {
     }
   }
   onContractStartDateChanged(event) {
-    console.log(event)
-  }
+    const startDate = this.ContractForm.get('ContractStartDate')?.value;
+    const endDate = this.ContractForm.get('Expirydate')?.value;
 
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      Swal.fire({
+        title: 'Contract End date must be greater than or equal to start date.',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+    }
+  }
+  save() {
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+
+        this.customerContractRequestModel.companyCode = this.companyCode;
+        this.customerContractRequestModel.docType = "CON";
+        this.customerContractRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+        this.customerContractRequestModel.finYear = financialYear
+
+
+        this.customerContractDataRequestModel.companyCode = this.companyCode;
+        this.customerContractDataRequestModel.contractID = "";
+        this.customerContractDataRequestModel.docType = "CON";
+        this.customerContractDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+        this.customerContractDataRequestModel.finYear = financialYear
+        this.customerContractDataRequestModel.customerId = this.ContractForm.value?.Customer?.value
+        this.customerContractDataRequestModel.customerName = this.ContractForm.value?.Customer?.name
+        this.customerContractDataRequestModel.productId = this.ContractForm.value?.Product?.value
+        this.customerContractDataRequestModel.productName = this.ContractForm.value?.Product?.name
+        this.customerContractDataRequestModel.payBasis = this.ContractForm.value?.PayBasis?.value
+        this.customerContractDataRequestModel.ContractStartDate = this.ContractForm.value?.ContractStartDate
+        this.customerContractDataRequestModel.Expirydate = this.ContractForm.value?.Expirydate
+        this.customerContractDataRequestModel.entryDate = new Date().toString()
+
+        this.customerContractRequestModel.data = this.customerContractDataRequestModel;
+
+        this.customerContractService
+          .ContractPost("contract/addNewContract", this.customerContractRequestModel)
+          .subscribe({
+            next: (res: any) => {
+              Swal.fire({
+                icon: "success",
+                title: "Contract Created Successfully",
+                text: "Contract Id: " + res?.cONID,
+                showConfirmButton: true,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  Swal.hideLoading();
+                  setTimeout(() => {
+                    Swal.close();
+                  }, 2000);
+                  this.router.navigate(['/Masters/CustomerContract/CustomerContractList']);
+                }
+              });
+            },
+            error: (err: any) => {
+              this.snackBarUtilityService.ShowCommonSwal("error", err);
+              Swal.hideLoading();
+              setTimeout(() => {
+                Swal.close();
+              }, 2000);
+            },
+          });
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+        Swal.hideLoading();
+        setTimeout(() => {
+          Swal.close();
+        }, 2000);
+      }
+    }, "Contract Generating..!");
+  }
 }
 

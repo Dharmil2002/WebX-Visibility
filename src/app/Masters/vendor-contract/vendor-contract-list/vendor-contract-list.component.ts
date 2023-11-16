@@ -7,12 +7,16 @@ import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroy
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { VendorTableData } from './VendorStaticData';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { getContractList } from '../vendorContractApiUtility';
+import moment from 'moment';
 
 @Component({
   selector: 'app-vendor-contract-list',
   templateUrl: './vendor-contract-list.component.html'
 })
 export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   breadscrums = [
     {
       title: "Vendor Contract",
@@ -20,15 +24,14 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
       active: "Vendor Contract",
     },
   ];
-  tableData = VendorTableData;
+  tableData: any[]
   boxData: { count: number; title: string; class: string; icon: string; }[];
   displayedColumns = [
-    { Key: "vendor", title: "Vendor", width: "250", className: "matcolumnfirst", show: true },
-    { Key: "contractID", title: "ContractID", width: "100", className: "matcolumncenter", show: true },
-    { Key: "product", title: "Product", width: "70", className: "matcolumncenter", show: true },
-    { Key: "contractStartDate", title: "Effective Date", width: "100", className: "matcolumncenter", show: true },
-    { Key: "contractEndDate", title: "End Date", width: "100", className: "matcolumncenter", show: true },
-    //{ Key: "contractDate", title: "Contract Date", width: "100", className: "matcolumncenter", show: true },
+    { Key: "vNID", title: "Vendor", width: "250", className: "matcolumnfirst", show: true },
+    { Key: "cNID", title: "ContractID", width: "100", className: "matcolumncenter", show: true },
+    { Key: "pDTID", title: "Product", width: "70", className: "matcolumncenter", show: true },
+    { Key: "cNSDT", title: "Effective Date", width: "100", className: "matcolumncenter", show: true },
+    { Key: "eNDDT", title: "End Date", width: "100", className: "matcolumncenter", show: true },
     { Key: "expiringin", title: "Expiring In", width: "170", className: "matcolumncenter", show: true },
   ];
   columnKeys = this.displayedColumns.map((column) => column.Key);
@@ -39,20 +42,25 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild("filter", { static: true }) filter: ElementRef;
-  constructor(private router: Router, private encryptionService: EncryptionService) {
+  constructor(private router: Router, private encryptionService: EncryptionService,
+    private masterService: MasterService,
+  ) {
     super();
     this.columnKeys.push('status')
     this.columnKeys.push('actions')
-    this.getContractKpiCount()
   }
 
   ngOnInit() {
     this.SearchData();
   }
-  SearchData() {
+  async SearchData() {
+    this.tableData = await getContractList(this.masterService);
+    console.log(this.tableData);
     this.tableData.forEach((item: any) => {
-      const startDate: Date = new Date(item.contractStartDate);
-      const endDate: Date = new Date(item.contractEndDate);
+      const startDate: Date = new Date(item.cNSDT);
+      const endDate: Date = new Date(item.eNDDT);
+      item.cNSDT = moment(startDate).format('DD-MM-YYYY');
+      item.eNDDT = moment(endDate).format('DD-MM-YYYY');
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -84,6 +92,7 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
       }
       this.ModeldataSource.filter = this.filter.nativeElement.value;
     });
+    this.getContractKpiCount();
   }
   getContractKpiCount() {
     const createContractsDataObject = (
@@ -110,5 +119,8 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
     this.router.navigate(['/Masters/VendorContract/VendorContractIndex'], {
       queryParams: { data: EncriptedData },
     });
+  }
+  AddNewContract() {
+    this.router.navigate(['/Masters/VendorContract/AddNewVendorContract']);
   }
 }

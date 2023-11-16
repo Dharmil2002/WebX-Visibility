@@ -31,6 +31,8 @@ export class VendorIndexComponent implements OnInit {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
+      console.log(this.CurrentContractDetails);
+      
     });
     this.selectFolder('Basic Information')
   }

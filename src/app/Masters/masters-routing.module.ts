@@ -76,6 +76,7 @@ import { VendorIndexComponent } from './vendor-contract/vendor-index/vendor-inde
 import { SacMasterListComponent } from './sac-master/sac-master-list/sac-master-list.component';
 import { AddSacMasterComponent } from './sac-master/add-sac-master/add-sac-master.component';
 import { AddNewCustomerContractComponent } from './Customer Contract/add-new-customer-contract/add-new-customer-contract.component';
+import { AddNewVendorContractComponent } from './vendor-contract/add-new-vendor-contract/add-new-vendor-contract.component';
 
 
 const routes: Routes = [
@@ -165,6 +166,7 @@ const routes: Routes = [
   //Vendor Contract Router
   { path: "VendorContract/VendorContractList", component: VendorContractListComponent },
   { path: "VendorContract/VendorContractIndex", component: VendorIndexComponent },
+  { path: "VendorContract/AddNewVendorContract", component: AddNewVendorContractComponent },
 
 ];
 

@@ -1,12 +1,14 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { VendorService } from 'src/app/Utility/module/masters/vendor-master/vendor.service';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { AddContractProfile } from 'src/assets/FormControls/VendorContractControls/add-contract-profile';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vendor-contract-basic-information',
@@ -14,7 +16,7 @@ import { AddContractProfile } from 'src/assets/FormControls/VendorContractContro
 })
 export class VendorContractBasicInformationComponent implements OnInit {
   @Input() contractData: any;
-
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   ProductsForm: UntypedFormGroup;
   jsonControlArrayProductsForm: any;
   className = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
@@ -43,38 +45,61 @@ export class VendorContractBasicInformationComponent implements OnInit {
   constructor(private fb: UntypedFormBuilder,
     private objImageHandling: ImageHandling,
     private objVendorService: VendorService,
-    private filter: FilterUtils,
     private dialog: MatDialog,
+    private route: Router,
+    private masterService: MasterService,
 
   ) {
 
   }
 
   ngOnInit(): void {
-    this.getVendorList();
   }
   ngOnChanges(changes: SimpleChanges) {
-    const data = changes.contractData?.currentValue
-    this.initializeFormControl(data);
+    let newData = changes.contractData.currentValue;
+
+    // Parse start date
+    newData.cNSDT = this.isValidDateFormat(newData.cNSDT) ? this.parseAndFormatDate(newData.cNSDT) : newData.cNSDT;
+
+    // // Parse end date
+    newData.eNDDT = this.isValidDateFormat(newData.eNDDT) ? this.parseAndFormatDate(newData.eNDDT) : newData.eNDDT;
+
+    // Initialize form controls with updated data
+    this.initializeFormControl(newData);
+
+    // Set manager based on vendor ID
+    this.setManager(newData.vNID);
   }
+  //#region to format date
+  parseAndFormatDate(dateString: string): string {
+    // Extract day, month, and year from the input date string
+    const [day, month, year] = dateString.split('-').map(Number);
+
+    // Create a Date object using the correct order: month-day-year
+    const parsedDate = new Date(year, month - 1, day);
+
+    // Get the ISO string representation in UTC format
+    return parsedDate.toISOString();
+  }
+
+  isValidDateFormat(dateString) {
+    // Define a regular expression for the "DD-MM-YYYY" format
+    const dateFormatRegex = /^\d{2}-\d{2}-\d{4}$/;
+
+    // Check if the date string matches the pattern
+    return dateFormatRegex.test(dateString);
+  }
+  //#endregion
   //#region to initialize form control
-  initializeFormControl(data) {
+  initializeFormControl(newData) {
     // Create the 'VendorBasicInformationControls' using 'AddContractProfile' with 'data'
-    this.VendorBasicInformationControls = new AddContractProfile(data);
+    this.VendorBasicInformationControls = new AddContractProfile(newData);
 
     // Get the array of form controls from 'VendorBasicInformationControls'
     this.jsonControlArrayProductsForm = this.VendorBasicInformationControls.getAddContractProfileArrayControls();
 
     // Create the 'ProductsForm' using 'formGroupBuilder' with 'jsonControlArrayProductsForm'
     this.ProductsForm = formGroupBuilder(this.fb, [this.jsonControlArrayProductsForm]);
-
-    // Iterate through the form control array to find the 'vendor' control and set related properties
-    this.jsonControlArrayProductsForm.forEach(data => {
-      if (data.name === 'vendor') {
-        this.vendorName = data.name; // Store the name of the 'vendor' control
-        this.vendorStatus = data.additionalData.showNameAndValue; // Store the showNameAndValue property
-      }
-    });
   }
   //#endregion  
   //#region functionCallHandler
@@ -89,43 +114,67 @@ export class VendorContractBasicInformationComponent implements OnInit {
     }
   }
   //#endregion
-  save() {
-   console.log(this.ProductsForm.value);
-  }
-  cancel() {
+  //#region to save contract details
+  async save() {
+    // Clone the form value to avoid modifying the original form data
+    const data = { ...this.ProductsForm.value };
 
-  }
-  //#region to upload Contract Scan
-  async onFileSelected(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "contractScan", this.ProductsForm, this.imageData, "VendorContract", 'Master', this.jsonControlArrayProductsForm);
+    // Remove unnecessary properties
+    delete data.vendor;
+    delete data.CNID;
+
+    // Get the file using objImageHandling and set it in the corresponding control name
+    const file = this.objImageHandling.getFileByKey('cNSCN', this.imageData);
+    data.cNSCN = file;
+
+    // Prepare request body using object destructuring
+    const reqBody = {
+      companyCode: this.companyCode,
+      collectionName: "vendor_contract",
+      filter: { _id: this.contractData._id },
+      update: { ...data }
+    };
+
+    try {
+      // Make the API call to update the contract
+      const res = await this.masterService.masterPut("generic/update", reqBody).toPromise();
+
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: 'Contract Updated Successfully',
+          showConfirmButton: true,
+        });
+
+        // Navigate to the vendor contract list page
+        this.route.navigateByUrl('/Masters/VendorContract/VendorContractList');
+      }
+    } catch (error) {
+      // Handle errors appropriately (e.g., log, display error message)
+      console.error("An error occurred:", error);
+    }
   }
   //#endregion
-  //#region to get vendor List
-  async getVendorList() {
-    // Fetch the vendor list using the 'objVendorService' service
-    this.vendorList = await this.objVendorService.getVendorDetail('');
-
-    // Filter the vendor list based on the 'isActive' property
-    const vendor = this.vendorList
-      .filter((item) => item.isActive) // Filter based on the isActive property
-      .map(e => ({
-        name: e.vendorName, // Map the name to the specified nameKey
-        value: e.vendorCode // Map the value to the specified valueKey
-      }));
-
-    // Call the 'Filter' function with the filtered 'vendor' array and other parameters
-    this.filter.Filter(this.jsonControlArrayProductsForm, this.ProductsForm, vendor, this.vendorName, this.vendorStatus);
+  //#region  to call cancel  
+  cancel() {
+    this.route.navigateByUrl('/Masters/VendorContract/VendorContractList');
+  }
+  //#endregion
+  //#region to upload Contract Scan
+  async onFileSelected(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "cNSCN", this.ProductsForm, this.imageData, "VendorContract", 'Master', this.jsonControlArrayProductsForm, allowedFormats);
   }
   //#endregion
   //#region to get the selected vendor code from the 'ProductsForm' value
-  async setManager() {
-    const vendorcode = this.ProductsForm.value.vendor.value;
-
+  async setManager(vendorcode) {
     // Fetch the vendor details for the selected vendor code using 'objVendorService'
     const manager = await this.objVendorService.getVendorDetail({ vendorCode: vendorcode });
 
     // Set the 'vendorManager' form control's value to the manager's value from the retrieved data
-    this.ProductsForm.controls['vendorManager'].setValue(manager[0].vendorManager);
+    this.ProductsForm.controls['vNMGR'].setValue(manager[0].vendorManager);
   }
   //#endregion
   //#region to preview image

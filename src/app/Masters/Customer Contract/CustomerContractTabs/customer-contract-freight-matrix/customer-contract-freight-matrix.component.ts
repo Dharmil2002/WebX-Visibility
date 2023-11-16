@@ -19,7 +19,11 @@ const fieldsToSearch = ['PIN', 'CT', 'STNM', 'ZN'];
 })
 export class CustomerContractFreightMatrixComponent implements OnInit {
   @Input() contractData: any;
-
+  EventButton = {
+    functionName: 'AddNewButtonEvent',
+    name: "Add Ne",
+    iconName: 'add'
+  }
   companyCode: number | null
   //#region Form Configration Fields
   ContractFreightMatrixControls: ContractFreightMatrixControl;
@@ -186,7 +190,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       console.log("failed", error);
     }
   }
-  async AddNewButtonEvent() {
+  async AddNewButtonEvent(event) {
     this.tableLoad = false;
     this.isLoad = true;
     const tableData = this.tableData;

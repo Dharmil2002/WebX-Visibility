@@ -279,31 +279,6 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     }
     this.SetDefaultProductsData()
   }
-  //#region All Multi Selection Actions
-
-  //#region toggle SelectAllOriginRateOptions
-  setSelectedPincodeData(event) {
-  }
-  //#endregion
-  //#region toggle SelectAllOriginRateOptions
-  toggleSelectAllRateOptions(argData: any) {
-    let fieldName = argData.field.name;
-    let autocompleteSupport = argData.field.additionalData.support;
-    let isSelectAll = argData.eventArgs;
-
-    const index = this.jsonControlArrayProductsForm.findIndex(
-      (obj) => obj.name === fieldName
-    );
-    this.jsonControlArrayProductsForm[index].filterOptions
-      .pipe(take(1), takeUntil(this._onDestroy))
-      .subscribe((val) => {
-        this.ProductsForm.controls[autocompleteSupport].patchValue(
-          isSelectAll ? val : []
-        );
-      });
-
-  }
-  //#endregion
 
   //#region Set OriginRateOptions
   SetRateOptions(event) {

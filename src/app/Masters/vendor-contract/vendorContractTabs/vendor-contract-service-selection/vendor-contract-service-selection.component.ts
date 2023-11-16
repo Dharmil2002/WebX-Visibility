@@ -98,7 +98,7 @@ export class VendorContractServiceSelectionComponent implements OnInit {
     this.selectedContractType = event
       .filter(item => item.isSelected)
       .map(item => item.typeName);
-    // console.log(this.selectedContractType);
+    console.log(event);
     this.objContractService.setContractType(this.selectedContractType);
   }
 }

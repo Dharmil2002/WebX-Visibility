@@ -39,6 +39,7 @@ import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/ve
 import { vehicleMarket } from "src/app/Models/vehicle-market/vehicle-market";
 import { StorageService } from "src/app/core/service/storage.service";
 import { DocketService } from "src/app/Utility/module/operation/docket/docket.service";
+import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 
 @Component({
   selector: "app-consignment-entry-form",
@@ -46,7 +47,19 @@ import { DocketService } from "src/app/Utility/module/operation/docket/docket.se
 })
 
 /*Please organize the code in order of priority, with the code that is used first placed at the top.*/
-export class ConsignmentEntryFormComponent implements OnInit {
+export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
+
+  addInvoiceEventButton = {
+    functionName: 'addInvoiceData',
+    name: "Add Invoice",
+    iconName: 'add'
+  }
+  containerTableEventButton = {
+    functionName: 'addData',
+    name: "Add Container",
+    iconName: 'add'
+  }
+
   consignmentTableForm: UntypedFormGroup;
   containerTableForm: UntypedFormGroup;
   FreightTableForm: UntypedFormGroup;
@@ -243,6 +256,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     private storage: StorageService,
     private docketService: DocketService
   ) {
+    super();
     const navigationState =
       this.route.getCurrentNavigation()?.extras?.state?.data;
     this.docketDetail = new DocketDetail({});
@@ -269,6 +283,9 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.bindDataFromDropdown();
     this.isTableLoad = false;
     this.backPath = "/dashboard/Index?tab=6";
+
+    //removed it 
+    this.flagEwayBill();
   }
 
   /*Here the function which is used for the bind staticDropdown Value*/
@@ -396,7 +413,20 @@ export class ConsignmentEntryFormComponent implements OnInit {
 
     this.getLocBasedOnCity();
 
-    this.onAutoBillingBased({ eventArgs: { checked: true } });
+    // Done By Harikesh 
+    const autoBillingConfigs = [
+      { name: "cnbp", checked: true },
+      { name: "cnebp", checked: true }
+    ];
+
+    autoBillingConfigs.forEach(config => {
+      const autoBillingData = {
+        eventArgs: { checked: config.checked },
+        field: { name: config.name }
+      };
+      this.onAutoBillingBased(autoBillingData);
+    });
+
   }
 
   setFormValue(
@@ -455,7 +485,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     this.filter.Filter(this.jsonControlArrayBasic, this.consignmentTableForm, vendorDetail, this.vendorName, this.vendorNameStatus);
     this.filter.Filter(this.jsonControlArrayBasic, this.consignmentTableForm, prqDetail, this.prqNo, this.prqNoStatus);
     this.filter.Filter(this.jsonControlArrayBasic, this.consignmentTableForm, vehFieldMap, this.vehicleNo, this.vehicleNoStatus);
-    if (this.prqFlag&&this.prqData.transMode == "trailer") {
+    if (this.prqFlag && this.prqData.transMode == "trailer") {
       this.consignmentTableForm.controls["cd"].setValue(true);
       this.contFlag = true;
       this.containerDetail();
@@ -551,8 +581,20 @@ export class ConsignmentEntryFormComponent implements OnInit {
         // Handle other cases or throw an error
       }
     } else {
-      [fieldConsignorName, fieldConsigneeName, fieldContactNumber, fieldConsigneeContactNumber]
-        .forEach(field => this.consignmentTableForm.controls[field].setValue(''));
+      // done by harikesh 
+      switch (fieldName) {
+        case 'cnbp':
+          [fieldConsignorName, fieldContactNumber]
+            .forEach(field => this.consignmentTableForm.controls[field].setValue(''));
+          break;
+        case 'cnebp':
+          [fieldConsigneeName, fieldConsigneeContactNumber]
+            .forEach(field => this.consignmentTableForm.controls[field].setValue(''));
+          break;
+        default:
+        // Handle other cases or throw an error
+      }
+
     }
   }
 
@@ -571,7 +613,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     }
   }
   /*this function is for the add multiple containor*/
-  async addData() {
+  async addData(event) {
 
     this.tableLoad = true;
     this.isLoad = true;
@@ -675,7 +717,7 @@ export class ConsignmentEntryFormComponent implements OnInit {
     }
   }
 
-  async addInvoiceData() {
+  async addInvoiceData(event) {
     if (await this.calculateValidation()) {
       const invoice = this.invoiceData;
       if (invoice.length > 0) {
@@ -813,20 +855,20 @@ export class ConsignmentEntryFormComponent implements OnInit {
   }
   /*Below function is only call those time when user can come to only edit a
    docket not for prq or etc etc*/
-   autofillDropDown() {
+  autofillDropDown() {
     const { vendorType, vendorName, fromCity, toCity, destination, vehicleNo, billingParty, consignorName, consigneeName, prqNo, risk, payType, transMode, freightRatetype, packaging_type, weight_in, delivery_type, issuing_from } = this.docketDetail;
     const { controls } = this.consignmentTableForm;
-  
+
     // Helper function to set form control values.
     const setControlValue = (controlName, value) => {
       controls[controlName].setValue(value);
     };
-  
+
     // Set vendor details.
     const vendor = vendorType !== "Market" ? this.vendorDetail.find(v => v.name === vendorName) : vendorName;
-   
+
     setControlValue("vendorType", vendorType);
-    
+
     // Trigger vendor field change actions.
     this.vendorFieldChanged();
     setControlValue("vendorName", vendor);
@@ -834,16 +876,16 @@ export class ConsignmentEntryFormComponent implements OnInit {
     setControlValue("fromCity", { name: fromCity, value: fromCity });
     setControlValue("toCity", { name: toCity, value: toCity });
     setControlValue("destination", { name: destination, value: destination });
-    
+
     // Set vehicle number.
     setControlValue("vehicleNo", { name: vehicleNo || "", value: vehicleNo || "" });
-  
+
     // Find and set parties.
     const findPartyByName = name => this.billingParty.find(x => x.name.toLowerCase() === name.toLowerCase());
     setControlValue("billingParty", findPartyByName(billingParty));
     setControlValue("consignorName", findPartyByName(consignorName));
     setControlValue("consigneeName", findPartyByName(consigneeName));
-  
+
     // Set various details.
     setControlValue("risk", risk);
     setControlValue("prqNo", { name: prqNo, value: prqNo });
@@ -853,14 +895,14 @@ export class ConsignmentEntryFormComponent implements OnInit {
     setControlValue("weight_in", weight_in);
     setControlValue("delivery_type", delivery_type);
     setControlValue("issuing_from", issuing_from);
-  
+
     // Set Freight Table Form details.
     this.FreightTableForm.controls["freightRatetype"].setValue(freightRatetype);
-  
+
     // Bind table data after form update.
     this.bindTableData();
   }
-  
+
 
   bindTableData() {
     if (this.docketDetail.invoiceDetails.length > 0) {

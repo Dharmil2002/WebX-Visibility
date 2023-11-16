@@ -14,5 +14,5 @@
 <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
     [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
     [menuItemFlag]="menuItemflag" [addFlag]="addFlag" (menuItemClicked)="handleMenuItemClick($event)"
-    [AddNewButton]=true [btndisabled]="!FreightMatrixForm.valid" (AddNewButtonEvent)="AddNewButtonEvent()">
+    [EventButton]="FreightMatrixForm.valid==true ? EventButton : false">
 </app-generic-table-v2>

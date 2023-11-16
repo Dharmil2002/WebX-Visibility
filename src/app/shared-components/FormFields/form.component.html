@@ -29,7 +29,8 @@
               </button>
               <div *ngIf="EventButton">
                 <button mat-raised-button (click)="EventButtonfunctionCalled(EventButton.functionName , {})"
-                  color="primary" style="margin-top:10px;margin-bottom: 10px; margin-right:10px;">{{EventButton.name}}</button>
+                  color="primary"
+                  style="margin-top:10px;margin-bottom: 10px; margin-right:10px;">{{EventButton.name}}</button>
               </div>
               <button type="button" (click)="toggleSection()" class="btn btn-border-radius waves-effect msl-2  mb-2"
                 style="margin-top:10px;margin-bottom: 10px; margin-right:10px; " matTooltip="Expand Section">

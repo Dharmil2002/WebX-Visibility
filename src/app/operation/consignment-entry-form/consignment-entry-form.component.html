@@ -2,7 +2,7 @@
   <!-- Eway Bill Verfication -->
   <div *ngIf="ewayBill">
     <form [formGroup]="invoiceTableForm">
-      <app-form-webxpress [form]="invoiceTableForm"  [formData]="jsonEwayBill"
+      <app-form-webxpress [form]="invoiceTableForm" [formData]="jsonEwayBill"
         (functionCallEmitter)="functionCallHandler($event)" [submit]="ewayBillButton" [showSaveAndCancelButton]="true"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
@@ -23,64 +23,68 @@
     <!-- End -->
     <!-- Consignor Detail -->
     <form [formGroup]="consignmentTableForm">
-      <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignor Detail'" [formData]="jsonControlArrayConsignor"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)">
+      <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignor Detail'"
+        [formData]="jsonControlArrayConsignor" (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
     </form>
     <!-- End -->
     <!-- Consignee Detail -->
     <form [formGroup]="consignmentTableForm">
-      <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignee Detail'" [formData]="jsonControlArrayConsignee"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)">
+      <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignee Detail'"
+        [formData]="jsonControlArrayConsignee" (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
     </form>
     <!-- ENd -->
 
     <!--  Container Detail-->
     <div *ngIf="contFlag">
-    <form [formGroup]="containerTableForm">
-      <app-form-webxpress [form]="containerTableForm" [FormTitle]="'Container Detail'" [formData]="jsonContainerDetail"
-        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)">
-      </app-form-webxpress>
-    </form>
-    <button matTooltip="Add Data Container" mat-stroked-button class="filter_btn" [disabled]="!containerTableForm.valid"
-      style="margin-left: 80%;
+      <form [formGroup]="containerTableForm">
+        <app-form-webxpress [form]="containerTableForm" [FormTitle]="'Container Detail'"
+          [formData]="jsonContainerDetail" (functionCallEmitter)="functionCallHandler($event)"
+          [showSaveAndCancelButton]="false"
+          [EventButton]="containerTableForm.valid==true ? containerTableEventButton : false"
+          (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+      </form>
+      <!-- <button matTooltip="Add Data Container" mat-stroked-button class="filter_btn"
+        [disabled]="!containerTableForm.valid" style="margin-left: 80%;
       position: relative;
       top: -208px" (click)="addData()">
-      <mat-icon>add</mat-icon>
-      Add New Container
-    </button>
-    <!-- End -->
-  </div>
+        <mat-icon>add</mat-icon>
+        Add New Container
+      </button> -->
+      <!-- End -->
+    </div>
     <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
       <!-- Bootstrap loader -->
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
-      <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-        [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-        [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
-        [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-      </app-generic-table-v2>
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+      [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+      [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+      [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
+      [addFlag]="addFlag" (addEmitter)="addPopUp($event)" [showHeader]=false>
+    </app-generic-table-v2>
     <!--  Invoice Details-->
     <form [formGroup]="invoiceTableForm">
       <app-form-webxpress [form]="invoiceTableForm" [FormTitle]="'Invoice Details'" [formData]="jsonInvoiceDetail"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)">
+        (callFunction)="functionCallHandler($event)"
+        [EventButton]="invoiceTableForm.valid==true ? addInvoiceEventButton : false">
       </app-form-webxpress>
+
+      <app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="dynamicControls" [columnHeader]="columnInvoice"
+        [tableData]="invoiceData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+        [staticField]="staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
+        [addFlag]="addFlag" (addEmitter)="addPopUp($event)" [showHeader]=false>
+      </app-generic-table-v2>
     </form>
-    <button matTooltip="Add Data Invoice Detail" mat-stroked-button class="filter_btn" [disabled]="!invoiceTableForm.valid"
-      style="margin-left: 81%;margin-left: 80%;
-      position: relative;
-      top: -278px" (click)="addInvoiceData()">
-      <mat-icon>add</mat-icon>
-      Add Invoice
-    </button>
+
     <div *ngIf="loadIn" class="d-flex justify-content-center align-items-center">
       <!-- Bootstrap loader -->
       <div class="spinner-border text-primary" role="status">
@@ -88,15 +92,10 @@
       </div>
     </div>
     <!-- End -->
-      <app-generic-table-v2 *ngIf="!tableLoadIn" [dynamicControls]="dynamicControls" [columnHeader]="columnInvoice"
-        [tableData]="invoiceData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-        [staticField]="staticFieldInvoice" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
-        [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-      </app-generic-table-v2>
+
     <!--Freight Detail  -->
     <form [formGroup]="FreightTableForm">
-      <app-form-webxpress [form]="FreightTableForm"  [FormTitle]="'Freight Details'" [formData]="jsonControlArray"
+      <app-form-webxpress [form]="FreightTableForm" [FormTitle]="'Freight Details'" [formData]="jsonControlArray"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
@@ -105,11 +104,12 @@
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content-start">
           <div *ngIf="isSubmit">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-          Loading...
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading...
           </div>
           <button class="msr-3" mat-raised-button color="primary" (click)="save()"
-            [disabled]="!consignmentTableForm.valid || !FreightTableForm.valid ||   isSubmit" >{{isUpdate?"Edit Docket":"Generate
+            [disabled]="!consignmentTableForm.valid || !FreightTableForm.valid ||   isSubmit">{{isUpdate?"Edit
+            Docket":"Generate
             Docket"}} </button>
           <button class="msr-3" mat-raised-button color="primary">Back</button>
         </div>

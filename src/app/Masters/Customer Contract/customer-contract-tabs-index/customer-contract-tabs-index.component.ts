@@ -18,7 +18,7 @@ export class CustomerContractTabsIndexComponent implements AfterViewInit {
       this.breadscrums =
         [
           {
-            title: "Customer Contract / " + this.CurrentContractDetails.customer,
+            title: "Customer Contract / " + this.CurrentContractDetails.cUSTID + ":" + this.CurrentContractDetails.cUSTNM,
             items: ["Home"],
             active: "Customer Contract",
           }

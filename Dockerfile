@@ -1,6 +1,7 @@
 # Use an official Node.js runtime as a parent image
 FROM node:18-alpine AS builder
 
+
 # Set the working directory to /app
 WORKDIR /app
 
@@ -15,6 +16,7 @@ COPY . .
 
 # Build the Angular application
 RUN npm run build --prod
+
 
 
 # Use an official Nginx runtime as a parent image

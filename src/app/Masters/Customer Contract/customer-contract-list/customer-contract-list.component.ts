@@ -4,9 +4,12 @@ import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { fromEvent } from "rxjs";
-import { TableData } from "./StaticData";
+//import { TableData } from "./StaticData";
 import { Route, Router } from "@angular/router";
 import { EncryptionService } from "src/app/core/service/encryptionService.service";
+import { GetContractListFromApi } from "../CustomerContractAPIUtitlity";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import moment from "moment";
 @Component({
   selector: 'app-customer-contract-list',
   templateUrl: './customer-contract-list.component.html',
@@ -20,40 +23,46 @@ export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter i
     },
   ];
   displayedColumns = [
-    { Key: "customer", title: "Customer", width: "250", className: "matcolumnfirst", show: true },
-    { Key: "contractID", title: "Contract Id", width: "100", className: "matcolumncenter", show: true },
-    { Key: "product", title: "Product", width: "70", className: "matcolumncenter", show: true },
-    { Key: "contractStartDate", title: "Start Date", width: "100", className: "matcolumncenter", show: true },
-    { Key: "contractEndDate", title: "End Date", width: "100", className: "matcolumncenter", show: true },
+    { Key: "cUSTID", title: "Customer", width: "250", className: "matcolumnfirst", show: true },
+    { Key: "cONID", title: "Contract Id", width: "100", className: "matcolumncenter", show: true },
+    { Key: "pNM", title: "Product", width: "70", className: "matcolumncenter", show: true },
+    { Key: "cSTARTDT", title: "Start Date", width: "100", className: "matcolumncenter", show: true },
+    { Key: "cENDDT", title: "End Date", width: "100", className: "matcolumncenter", show: true },
     { Key: "expiringin", title: "Expiring In", width: "170", className: "matcolumncenter", show: true },
   ];
   columnKeys = this.displayedColumns.map((column) => column.Key);
   boxData: { count: number; title: string; class: string; }[];
-  tableData = TableData;
+  tableData: any;
   public ModeldataSource = new MatTableDataSource<any>();
   error;
   remarks;
   geoJsonData = '';
   isTouchUIActivated = false;
   isTblLoading = false;
-  constructor(private router: Router, private encryptionService: EncryptionService) {
+  constructor(private router: Router, private masterService: MasterService, private encryptionService: EncryptionService) {
     super();
     this.columnKeys.push('status')
     this.columnKeys.push('actions')
-    this.getContractKpiCount()
+
   }
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild("filter", { static: true }) filter: ElementRef;
 
-  ngOnInit() {
+  async ngOnInit() {
     this.SearchData();
   }
-  SearchData() {
+  async SearchData() {
+    this.tableData = await GetContractListFromApi(this.masterService)
+    console.log(this.tableData)
     this.tableData.forEach((item: any) => {
-      const startDate: Date = new Date(item.contractStartDate);
-      const endDate: Date = new Date(item.contractEndDate);
+      const startDate: Date = new Date(item.cSTARTDT);
+      const endDate: Date = new Date(item.cENDDT);
+
+      item.cSTARTDT = moment(startDate).format('DD-MM-YYYY');
+      item.cENDDT = moment(endDate).format('DD-MM-YYYY');
+
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -85,6 +94,7 @@ export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter i
       }
       this.ModeldataSource.filter = this.filter.nativeElement.value;
     });
+    this.getContractKpiCount()
   }
   getContractKpiCount() {
     const createContractsDataObject = (

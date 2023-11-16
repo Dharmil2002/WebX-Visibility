@@ -19,18 +19,8 @@ export class ContractServiceSelectionControl {
         name: "loadType",
         label: "Load Type",
         placeholder: "Load Type",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "LTL",
-            name: "LTL",
-          },
-          {
-            value: "FTL",
-            name: "FTL",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -44,25 +34,15 @@ export class ContractServiceSelectionControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
       },
       {
         name: "rateType",
         label: "Rate Type",
         placeholder: "Rate Type",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "1",
-            name: "Per Kg",
-          },
-          {
-            value: "2",
-            name: "Per Pkg",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -76,32 +56,32 @@ export class ContractServiceSelectionControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
       },
 
 
       {
         name: "originRateOption",
-        label: "Origin Rate option",
-        placeholder: "Origin Rate option",
-        type: "multiselect",
+        label: "Origin Rate ",
+        placeholder: "Origin Rate ",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Origin Rate is required",
+          },
+        ],
         additionalData: {
-          isIndeterminate: false,
-          isChecked: false,
-          support: "originRateOptionHandler",
           showNameAndValue: false,
 
         },
         functions: {
-          onToggleAll: 'toggleSelectAllRateOptions',
           onModel: 'SetRateOptions',
-          onSelect: "setSelectedRateOptions"
         },
         generatecontrol: true,
         disable: false,
@@ -109,57 +89,59 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "destinationRateOption",
-        label: "Destination Rate option",
-        placeholder: "Destination Rate option",
-        type: "multiselect",
+        label: "Destination Rate",
+        placeholder: "Destination Rate",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "estination Rate is required",
+          },
+        ],
+        functions: {
+          onModel: 'SetRateOptions',
+        },
         additionalData: {
-          isIndeterminate: false,
-          isChecked: false,
-          support: "destinationRateOptionHandler",
+
           showNameAndValue: false,
 
         },
-        functions: {
-          onToggleAll: 'toggleSelectAllRateOptions',
-          onModel: 'SetRateOptions',
-          onSelect: "setSelectedRateOptions"
-        },
+
         generatecontrol: true,
         disable: false,
         accessallowed: true,
       },
 
-      {
-        name: 'originRateOptionHandler',
-        label: 'Origin Rate option',
-        placeholder: 'Origin Rate option',
-        type: '',
-        value: '',
-        Validations: [{
-          name: "required",
-          message: " ",
-        }],
-        generatecontrol: false, disable: false,
-        accessallowed: true,
-      },
-      {
-        name: 'destinationRateOptionHandler',
-        label: 'Destination Rate option',
-        placeholder: 'Destination Rate option',
-        type: '',
-        value: '',
-        Validations: [{
-          name: "required",
-          message: " ",
-        }],
-        generatecontrol: false, disable: false,
-        accessallowed: true,
-      },
+      // {
+      //   name: 'originRateOptionHandler',
+      //   label: 'Origin Rate option',
+      //   placeholder: 'Origin Rate option',
+      //   type: '',
+      //   value: '',
+      //   Validations: [{
+      //     name: "required",
+      //     message: " ",
+      //   }],
+      //   generatecontrol: false, disable: false,
+      //   accessallowed: true,
+      // },
+      // {
+      //   name: 'destinationRateOptionHandler',
+      //   label: 'Destination Rate option',
+      //   placeholder: 'Destination Rate option',
+      //   type: '',
+      //   value: '',
+      //   Validations: [{
+      //     name: "required",
+      //     message: " ",
+      //   }],
+      //   generatecontrol: false, disable: false,
+      //   accessallowed: true,
+      // },
     ]
 
     this.ContractServiceSelectionControlArray = [

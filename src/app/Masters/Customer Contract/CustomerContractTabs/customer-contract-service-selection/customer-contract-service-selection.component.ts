@@ -1,5 +1,5 @@
 
-import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
+import { ChangeDetectorRef, Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Subject, take, takeUntil } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
@@ -8,6 +8,7 @@ import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
 import { ContractServiceSelectionControl } from "src/assets/FormControls/CustomerContractControls/ServiceSelection-control";
+import Swal from "sweetalert2";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -19,10 +20,14 @@ interface CurrentAccessListType {
 })
 export class CustomerContractServiceSelectionComponent implements OnInit {
   companyCode: number | null
-
+  @Input() contractData: any;
   //#region Form Configration Fields
   ContractServiceSelectionControls: ContractServiceSelectionControl;
-
+  EventButton = {
+    functionName: 'SaveProduct',
+    name: "Save",
+    iconName: 'save'
+  }
   ProductsForm: UntypedFormGroup;
   jsonControlArrayProductsForm: any;
 
@@ -152,6 +157,29 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   protected _onDestroy = new Subject<void>();
 
   //#endregion
+
+  LoadTypeList: any = [
+    {
+      value: "LTL",
+      name: "LTL",
+    },
+    {
+      value: "FTL",
+      name: "FTL",
+    },
+
+  ];
+  RateTypeList: any = [
+    {
+      value: "1",
+      name: "Per Kg",
+    },
+    {
+      value: "2",
+      name: "Per Pkg",
+    },
+
+  ];;
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private changeDetectorRef: ChangeDetectorRef,
@@ -160,7 +188,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     this.companyCode = this.sessionService.getCompanyCode()
     this.CurrentAccessList = {
       ServicesSelectionAccess: ['Volumetric', "ODA", "DACC", "fuelSurcharge", "cutofftime", "COD/DOD", "Demurrage", "DPH", "Insurance", "YieldProtection"],
-      productAccess: ['loadType', 'rateType', 'originRateOption', 'destinationRateOption', 'originRateOptionHandler', 'destinationRateOptionHandler']
+      productAccess: ['loadType', 'rateType', 'originRateOption', 'destinationRateOption']
     } as CurrentAccessListType;
     this.initializeFormControl();
   }
@@ -211,6 +239,21 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   }
   //#endregion
   ngOnInit() {
+
+    this.filter.Filter(
+      this.jsonControlArrayProductsForm,
+      this.ProductsForm,
+      this.LoadTypeList,
+      "loadType",
+      true
+    );
+    this.filter.Filter(
+      this.jsonControlArrayProductsForm,
+      this.ProductsForm,
+      this.RateTypeList,
+      "rateType",
+      true
+    );
     this.getAllMastersData();
   }
 
@@ -234,6 +277,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       // Handle any errors that occurred during the request
       console.error("Error:", error);
     }
+    this.SetDefaultProductsData()
   }
   //#region All Multi Selection Actions
 
@@ -389,6 +433,68 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
   }
+  ngOnChanges(changes: SimpleChanges) {
+    // let data = {
+    //   "Customer": changes.contractData?.currentValue?.cUSTID + ":" + changes.contractData?.currentValue?.cUSTNM ?? '',
+    //   "ContractID": changes.contractData?.currentValue?.cONID ?? '',
+    //   "PayBasis": changes.contractData?.currentValue?.pBAS ?? '',
+    //   "ContractStartDate": changes.contractData?.currentValue?.cSTARTDT ?? '',
+    //   "Expirydate": changes.contractData?.currentValue?.cENDDT ?? '',
+    //   "cSCAN": changes.contractData?.currentValue?.cSCAN ?? '',
+    //   "cPOSCAN": changes.contractData?.currentValue?.cPOSCAN ?? '',
+    //   "AccountManager": changes.contractData?.currentValue?.aCMGR ?? '',
+    //   "CustomerPONo": changes.contractData?.currentValue?.cPONO ?? '',
+    //   "POValiditydate": changes.contractData?.currentValue?.cPODt ?? '',
+    // }
 
+  }
+  SetDefaultProductsData() {
+    this.ProductsForm.get("loadType").setValue(this.LoadTypeList.find(item => item.value == this.contractData.lTYP))
+    this.ProductsForm.get("rateType").setValue(this.RateTypeList.find(item => item.value == this.contractData.rTYP))
+    const originRateOption = {
+      name: this.contractData.oRTNM,
+      value: this.contractData.oRTVAL,
+    }
+    const destinationRateOption = {
+      name: this.contractData.dRTNM,
+      value: this.contractData.dRTVAL,
+    }
+    this.ProductsForm.get("originRateOption").setValue(originRateOption)
+    this.ProductsForm.get("destinationRateOption").setValue(destinationRateOption)
+
+  }
+  SaveProduct(event) {
+    let contractDetails = this.contractData
+    debugger
+    contractDetails.lTYP = this.ProductsForm.value.loadType.value;
+    contractDetails.rTYP = this.ProductsForm.value.rateType.value;
+    contractDetails.oRTNM = this.ProductsForm.value.originRateOption.name;
+    contractDetails.oRTVAL = this.ProductsForm.value.originRateOption.value;
+    contractDetails.dRTNM = this.ProductsForm.value.destinationRateOption.name;
+    contractDetails.dRTVAL = this.ProductsForm.value.destinationRateOption.value;
+    const reqBody = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract",
+      filter: { _id: this.contractData._id },
+      update: { ...contractDetails }
+    };
+
+    delete contractDetails._id;
+
+    this.masterService.masterPut('generic/update', reqBody).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+        }
+      }
+    });
+
+  }
 }
 

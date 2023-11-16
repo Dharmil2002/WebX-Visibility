@@ -6,7 +6,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
 import { SessionService } from 'src/app/core/service/session.service';
 import { ContractBasicInformationControl } from 'src/assets/FormControls/CustomerContractControls/BasicInformation-control';
-import { customerFromApi, productdetailFromApi } from '../CustomerContractAPIUtitlity';
+import { PayBasisdetailFromApi, customerFromApi, productdetailFromApi } from '../CustomerContractAPIUtitlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
@@ -15,6 +15,7 @@ import { financialYear } from 'src/app/Utility/date/date-utils';
 import { CustomerContractService } from 'src/app/core/service/customerContract/customerContract-services.service';
 import { NavigationService } from 'src/app/Utility/commonFunction/route/route';
 import { Router } from '@angular/router';
+import { UnsubscribeOnDestroyAdapter } from 'src/app/shared/UnsubscribeOnDestroyAdapter';
 interface CurrentAccessListType {
   productAccess: string[];
 }
@@ -22,7 +23,7 @@ interface CurrentAccessListType {
   selector: 'app-add-new-customer-contract',
   templateUrl: './add-new-customer-contract.component.html',
 })
-export class AddNewCustomerContractComponent implements OnInit {
+export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   customerContractRequestModel = new CustomerContractRequestModel();
 
   customerContractDataRequestModel = new CustomerContractDataRequestModel();
@@ -57,6 +58,7 @@ export class AddNewCustomerContractComponent implements OnInit {
     private masterService: MasterService,
     private customerContractService: CustomerContractService,
     private sessionService: SessionService) {
+    super();
     this.companyCode = this.sessionService.getCompanyCode()
     this.CurrentAccessList = {
       productAccess: ['Customer', 'ContractID', 'Product', 'PayBasis', 'ContractStartDate', 'Expirydate']
@@ -93,32 +95,15 @@ export class AddNewCustomerContractComponent implements OnInit {
       "Product",
       false
     );
-    //const responseFromAPI = await customerFromApi(this.masterService)
+    const PayBasisdetailFromAPI = await PayBasisdetailFromApi(this.masterService)
     this.filter.Filter(
       this.jsonControlArrayContractForm,
       this.ContractForm,
-      [
-        {
-          value: "All",
-          name: "All",
-        },
-        {
-          value: "TBB",
-          name: "TBB",
-        },
-        {
-          value: "LTL",
-          name: "LTL",
-        },
-        {
-          value: "FTL",
-          name: "FTL",
-        },
-
-      ],
+      PayBasisdetailFromAPI,
       "PayBasis",
       false
     );
+
   }
   //#endregion
   ngOnInit() {

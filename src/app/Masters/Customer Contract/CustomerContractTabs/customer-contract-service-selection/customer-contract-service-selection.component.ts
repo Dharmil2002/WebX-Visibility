@@ -157,6 +157,29 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   protected _onDestroy = new Subject<void>();
 
   //#endregion
+
+  LoadTypeList: any = [
+    {
+      value: "LTL",
+      name: "LTL",
+    },
+    {
+      value: "FTL",
+      name: "FTL",
+    },
+
+  ];
+  RateTypeList: any = [
+    {
+      value: "1",
+      name: "Per Kg",
+    },
+    {
+      value: "2",
+      name: "Per Pkg",
+    },
+
+  ];;
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private changeDetectorRef: ChangeDetectorRef,
@@ -165,7 +188,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     this.companyCode = this.sessionService.getCompanyCode()
     this.CurrentAccessList = {
       ServicesSelectionAccess: ['Volumetric', "ODA", "DACC", "fuelSurcharge", "cutofftime", "COD/DOD", "Demurrage", "DPH", "Insurance", "YieldProtection"],
-      productAccess: ['loadType', 'rateType', 'originRateOption', 'destinationRateOption', 'originRateOptionHandler', 'destinationRateOptionHandler']
+      productAccess: ['loadType', 'rateType', 'originRateOption', 'destinationRateOption']
     } as CurrentAccessListType;
     this.initializeFormControl();
   }
@@ -216,6 +239,21 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   }
   //#endregion
   ngOnInit() {
+
+    this.filter.Filter(
+      this.jsonControlArrayProductsForm,
+      this.ProductsForm,
+      this.LoadTypeList,
+      "loadType",
+      true
+    );
+    this.filter.Filter(
+      this.jsonControlArrayProductsForm,
+      this.ProductsForm,
+      this.RateTypeList,
+      "rateType",
+      true
+    );
     this.getAllMastersData();
   }
 
@@ -239,6 +277,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       // Handle any errors that occurred during the request
       console.error("Error:", error);
     }
+    this.SetDefaultProductsData()
   }
   //#region All Multi Selection Actions
 
@@ -409,13 +448,30 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     // }
 
   }
+  SetDefaultProductsData() {
+    this.ProductsForm.get("loadType").setValue(this.LoadTypeList.find(item => item.value == this.contractData.lTYP))
+    this.ProductsForm.get("rateType").setValue(this.RateTypeList.find(item => item.value == this.contractData.rTYP))
+    const originRateOption = {
+      name: this.contractData.oRTNM,
+      value: this.contractData.oRTVAL,
+    }
+    const destinationRateOption = {
+      name: this.contractData.dRTNM,
+      value: this.contractData.dRTVAL,
+    }
+    this.ProductsForm.get("originRateOption").setValue(originRateOption)
+    this.ProductsForm.get("destinationRateOption").setValue(destinationRateOption)
+
+  }
   SaveProduct(event) {
     let contractDetails = this.contractData
     debugger
-    contractDetails.lTYP = this.ProductsForm.value.loadType.name;
-    contractDetails.rTYP = this.ProductsForm.value.rateType.name;
-    contractDetails.oRTOP = this.ProductsForm.value.originRateOption.name;
-    contractDetails.dRTOP = this.ProductsForm.value.destinationRateOption.name;
+    contractDetails.lTYP = this.ProductsForm.value.loadType.value;
+    contractDetails.rTYP = this.ProductsForm.value.rateType.value;
+    contractDetails.oRTNM = this.ProductsForm.value.originRateOption.name;
+    contractDetails.oRTVAL = this.ProductsForm.value.originRateOption.value;
+    contractDetails.dRTNM = this.ProductsForm.value.destinationRateOption.name;
+    contractDetails.dRTVAL = this.ProductsForm.value.destinationRateOption.value;
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "cust_contract",

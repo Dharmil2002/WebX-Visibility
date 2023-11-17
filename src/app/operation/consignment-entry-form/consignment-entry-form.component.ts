@@ -285,8 +285,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.isTableLoad = false;
     this.backPath = "/dashboard/Index?tab=6";
 
-    //removed it 
-    this.flagEwayBill();
   }
 
   /*Here the function which is used for the bind staticDropdown Value*/

@@ -75,6 +75,7 @@ export class ViewPrintTemplateComponent implements OnInit {
     this.queryTableForm = formGroupBuilder(this.fb, [
       this.jsonControlqueryArray,
     ]);
+    this.queryTableForm.controls['vTYPE'].setValue("");
   }
   config: AngularEditorModule = {
     editable: true,
@@ -125,23 +126,21 @@ export class ViewPrintTemplateComponent implements OnInit {
   }
 
   async save() {
+    const controls = this.queryTableForm;
+    clearValidatorsAndValidate(controls);
+    const id = `${this.storage.companyCode}-${this.queryTableForm.value.vTYPE}`;
+    this.queryTableForm.controls["_id"].setValue(id);
     const Data ={
       ...this.queryTableForm.value,
       tHTML:this.tHTML
     }
     // const html = this.getDecodedHTML(this.queryTableForm.value.tHTML);
     // this.queryTableForm.controls["tHTML"].setValue(html);
-    const controls = this.queryTableForm;
-    clearValidatorsAndValidate(controls);
-    this.queryTableForm.removeControl("blank");
-    this.queryTableForm.removeControl("Blank");
-    const id = `${this.storage.companyCode}-${this.queryTableForm.value.vTYPE}`;
-    this.queryTableForm.controls["_id"].setValue(id);
      //API FOR ADD
     let req = {
       companyCode: this.companyCode,
       collectionName: "viewprint_template",
-      data: this.queryTableForm.value,
+      data: Data,
     };
     const res = await this.masterService
       .masterPost("generic/create", req)

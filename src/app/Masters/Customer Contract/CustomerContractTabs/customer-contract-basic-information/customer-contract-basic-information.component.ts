@@ -14,6 +14,7 @@ import { ImagePreviewComponent } from "src/app/shared-components/image-preview/i
 import { ContractBasicInformationControl } from "src/assets/FormControls/CustomerContractControls/BasicInformation-control";
 import { productdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
+import { Router } from "@angular/router";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -70,6 +71,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
   constructor(private fb: UntypedFormBuilder,
     public ObjcontractMethods: locationEntitySearch,
     private matDialog: MatDialog,
+    private Route: Router,
     private masterService: MasterService,
     private filter: FilterUtils, private objImageHandling: ImageHandling,
     private sessionService: SessionService) {
@@ -164,11 +166,6 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     }
   }
   async save() {
-    console.log(this.ProductsForm.value)
-    console.log(this.ContractScanimageData)
-    console.log(this.ContractPOScanimageData)
-    console.log(this.contractData)
-
     let contractDetails = {
       cID: this.contractData.cID,
       bRC: this.contractData.bRC,
@@ -231,5 +228,9 @@ export class CustomerContractBasicInformationComponent implements OnInit {
       ProductsForm, this.ContractPOScanimageData, "CustomerContract", 'ContractPOScan', this.jsonControlArrayProductsForm,
       ["jpg", "png", "jpeg", "pdf"]);
   }
+  cancel(){
+    this.Route.navigateByUrl('/Masters/CustomerContract/CustomerContractList');
+  }
+
 }
 

@@ -1,12 +1,14 @@
 
 import { ChangeDetectorRef, Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
 import { Subject, take, takeUntil } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
+import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { ContractServiceSelectionControl } from "src/assets/FormControls/CustomerContractControls/ServiceSelection-control";
 import Swal from "sweetalert2";
 
@@ -18,7 +20,7 @@ interface CurrentAccessListType {
   selector: 'app-customer-contract-service-selection',
   templateUrl: './customer-contract-service-selection.component.html',
 })
-export class CustomerContractServiceSelectionComponent implements OnInit {
+export class CustomerContractServiceSelectionComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
   companyCode: number | null
   @Input() contractData: any;
   //#region Form Configration Fields
@@ -179,12 +181,20 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       name: "Per Pkg",
     },
 
-  ];;
+  ];
+  CODDODRatetypeList: any = [
+    {
+      value: "100001",
+      name: "PerKG",
+    }
+  ];
   constructor(private fb: UntypedFormBuilder,
+    private Route: Router,
     private masterService: MasterService,
     private changeDetectorRef: ChangeDetectorRef,
     public ObjcontractMethods: locationEntitySearch,
     private filter: FilterUtils, private sessionService: SessionService) {
+    super();
     this.companyCode = this.sessionService.getCompanyCode()
     this.CurrentAccessList = {
       ServicesSelectionAccess: ['Volumetric', "ODA", "DACC", "fuelSurcharge", "cutofftime", "COD/DOD", "Demurrage", "DPH", "Insurance", "YieldProtection"],
@@ -252,6 +262,13 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
       this.ProductsForm,
       this.RateTypeList,
       "rateType",
+      true
+    );
+    this.filter.Filter(
+      this.jsonControlArrayCODDODForm,
+      this.CODDODForm,
+      this.CODDODRatetypeList,
+      "CODDODRatetype",
       true
     );
     this.getAllMastersData();
@@ -378,7 +395,7 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     this.InsuranceCarrierRiskForm.controls['Rate'].setValue('');
     this.InsuranceCarrierRiskForm.controls['MinCharge'].setValue('');
     this.InsuranceCarrierRiskForm.controls['MaxCharge'].setValue('');
-    // Remove all validation  
+    // Remove all validation
 
     this.isLoad = false;
     this.tableLoad = false;
@@ -426,6 +443,28 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
   SetDefaultProductsData() {
     this.ProductsForm.get("loadType").setValue(this.LoadTypeList.find(item => item.value == this.contractData.lTYP))
     this.ProductsForm.get("rateType").setValue(this.RateTypeList.find(item => item.value == this.contractData.rTYP))
+    this.CODDODForm.get("CODDODRatetype").setValue(this.CODDODRatetypeList.find(item => item.name == this.contractData.cODDODRTYP))
+    this.CODDODForm.get("Rate").setValue(this.contractData.rT)
+    this.CODDODForm.get("MinCharge").setValue(this.contractData.mIN)
+    this.CODDODForm.get("MaxCharge").setValue(this.contractData.mAX)
+    this.CutOfftimeForm.get("Timeofday").setValue(this.contractData.tDT)
+    this.CutOfftimeForm.get("AdditionalTransitdays").setValue(this.contractData.dAYS)
+    this.DemurrageForm.get("Freestoragedays").setValue(this.contractData.fSDAY)
+    this.DemurrageForm.get("Ratetype").setValue(this.contractData.rTYP)
+    this.DemurrageForm.get("Demurragerateperday").setValue(this.contractData.dMRTPD)
+    this.DemurrageForm.get("MinCharge").setValue(this.contractData.mIN)
+    this.DemurrageForm.get("MaxCharge").setValue(this.contractData.mAX)
+    this.VolumtericForm.get("VolumetricUoM").setValue(this.contractData.vUOM)
+    this.VolumtericForm.get("Volumtericcalculation").setValue(this.contractData.vCAL)
+    this.VolumtericForm.get("Volumetricapplied").setValue(this.contractData.vAPP)
+    this.VolumtericForm.get("Conversionratio").setValue(this.contractData.cN)
+    this.YieldProtectionForm.get("MinimumweightKg").setValue(this.contractData.mWKG)
+    this.YieldProtectionForm.get("MinimumpackagesNo").setValue(this.contractData.mPKGNO)
+    this.YieldProtectionForm.get("MinimumFreightvalueINR").setValue(this.contractData.mFREIGHT)
+    this.YieldProtectionForm.get("Yieldtype").setValue(this.contractData.yIELDTYP)
+    this.YieldProtectionForm.get("MinimumyieldINR").setValue(this.contractData.mYIELD)
+    this.YieldProtectionForm.get("CalculateYieldon").setValue(this.contractData.cYIELDON)
+
     const originRateOption = {
       name: this.contractData.oRTNM,
       value: this.contractData.oRTVAL,
@@ -437,16 +476,55 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
     this.ProductsForm.get("originRateOption").setValue(originRateOption)
     this.ProductsForm.get("destinationRateOption").setValue(destinationRateOption)
 
+
+    const mydata=["COD/DOD","cutofftime","Demurrage","Volumetric","YieldProtection"]
+
+    mydata.forEach(item=>{
+        const event={
+          "field":{
+            name:item
+          },
+          "eventArgs":{
+            checked:true
+          }
+        }
+        this.ServicesForm.get(event.field.name).setValue(event.eventArgs.checked)
+            this.OnChangeServiceSelections(event);
+    })
+
+
   }
+
   SaveProduct(event) {
     let contractDetails = this.contractData
-    debugger
     contractDetails.lTYP = this.ProductsForm.value.loadType.value;
     contractDetails.rTYP = this.ProductsForm.value.rateType.value;
     contractDetails.oRTNM = this.ProductsForm.value.originRateOption.name;
     contractDetails.oRTVAL = this.ProductsForm.value.originRateOption.value;
     contractDetails.dRTNM = this.ProductsForm.value.destinationRateOption.name;
     contractDetails.dRTVAL = this.ProductsForm.value.destinationRateOption.value;
+    contractDetails.cODDODRTYP = this.CODDODForm.value.CODDODRatetype.name;
+    contractDetails.rT = this.CODDODForm.value.Rate;
+    contractDetails.mIN = this.CODDODForm.value.MinCharge;
+    contractDetails.mAX = this.CODDODForm.value.MaxCharge;
+    contractDetails.tDT = this.CutOfftimeForm.value.Timeofday
+    contractDetails.dAYS = this.CutOfftimeForm.value.AdditionalTransitdays;
+    contractDetails.fSDAY = this.DemurrageForm.value.Freestoragedays;
+    contractDetails.rTYP = this.DemurrageForm.value.Ratetype;
+    contractDetails.dMRTPD = this.DemurrageForm.value.Demurragerateperday;
+    contractDetails.mIN = this.DemurrageForm.value.MinCharge;
+    contractDetails.mAX = this.DemurrageForm.value.MaxCharge;
+    contractDetails.vUOM = this.VolumtericForm.value.VolumetricUoM;
+    contractDetails.vCAL = this.VolumtericForm.value.Volumtericcalculation;
+    contractDetails.vAPP = this.VolumtericForm.value.Volumetricapplied;
+    contractDetails.cN = this.VolumtericForm.value.Conversionratio;
+    contractDetails.mWKG = this.YieldProtectionForm.value.MinimumweightKg;
+    contractDetails.mPKGNO = this.YieldProtectionForm.value.MinimumpackagesNo;
+    contractDetails.mFREIGHT = this.YieldProtectionForm.value.MinimumFreightvalueINR;
+    contractDetails.yIELDTYP = this.YieldProtectionForm.value.Yieldtype;
+    contractDetails.mYIELD = this.YieldProtectionForm.value.MinimumyieldINR;
+    contractDetails.cYIELDON = this.YieldProtectionForm.value.CalculateYieldon;
+
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "cust_contract",
@@ -466,10 +544,10 @@ export class CustomerContractServiceSelectionComponent implements OnInit {
             text: res.message,
             showConfirmButton: true,
           });
+          this.Route.navigateByUrl('/Masters/CustomerContract/CustomerContractList');
         }
       }
     });
-
   }
 }
 

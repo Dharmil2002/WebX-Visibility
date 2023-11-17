@@ -21,7 +21,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   @Input() contractData: any;
   EventButton = {
     functionName: 'AddNewButtonEvent',
-    name: "Add Ne",
+    name: "Add New",
     iconName: 'add'
   }
   companyCode: number | null
@@ -223,7 +223,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     this.FreightMatrixForm.controls['rateType'].setValue('');
     this.FreightMatrixForm.controls['capacity'].setValue('');
     this.FreightMatrixForm.controls['Rate'].setValue('');
-    // Remove all validation  
+    // Remove all validation
 
     this.isLoad = false;
     this.tableLoad = true;

@@ -293,13 +293,8 @@ export class ContractServiceSelectionControl {
         name: "CODDODRatetype",
         label: "COD/DOD Rate type",
         placeholder: "COD/DOD Rate type",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "PerKG",
-            name: "PerKG",
-          }
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -313,14 +308,14 @@ export class ContractServiceSelectionControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
       },
       {
         name: "Rate",
         label: "Rate",
         placeholder: "Rate",
-        type: "dropdown",
+        type: "text",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -330,9 +325,6 @@ export class ContractServiceSelectionControl {
         accessallowed: true,
         Validations: [
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -341,7 +333,7 @@ export class ContractServiceSelectionControl {
         name: "MinCharge",
         label: "Min Charge",
         placeholder: "Min Charge",
-        type: "dropdown",
+        type: "text",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -351,9 +343,6 @@ export class ContractServiceSelectionControl {
         accessallowed: true,
         Validations: [
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -372,9 +361,6 @@ export class ContractServiceSelectionControl {
         accessallowed: true,
         Validations: [
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },

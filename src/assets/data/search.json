@@ -743,8 +743,9 @@
       "router": "Finance/DebitVoucher"
     },
     {
-      "title": "CustomerContractList",
+      "title": "CustomerContract/CustomerContractList",
       "tag": [
+        "CustomerContract",
         "CustomerContractList"
       ],
       "router": "Masters/CustomerContract/CustomerContractList"

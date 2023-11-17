@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { updatePrqStatus, vehicleStatusUpdate } from "../prq-entry-page/prq-utitlity";
-const branch=localStorage.getItem("Branch");
+const branch = localStorage.getItem("Branch");
 export async function showVehicleConfirmationDialog(prqDetail, masterService, goBack, tabIndex, dialogRef, item) {
     const confirmationResult = await Swal.fire({
         icon: "success",
@@ -25,14 +25,14 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
                 text: "The vehicle has been successfully assigned.",
                 confirmButtonText: "OK",
             });
-            
+
             if (confirmationResult.isConfirmed) {
                 goBack(tabIndex);
                 dialogRef.close();
             }
         }
     }
-    
+
 
 }
 
@@ -56,7 +56,7 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
         collectionName: "vehicle_status",
         filter: {
             status: 'Available',
-            currentLocation:branch
+            currentLocation: branch
         }
     };
 
@@ -128,23 +128,23 @@ export class AssignVehiclePageMethods {
 export async function bindMarketVehicle(vehicledata: any) {
 
     const marketVehicle = {
-        vehNo:vehicledata?.vehicelNo||"",
-        distannce:0,
-        currentLocation:localStorage.getItem("Branch"),
-        capacity:vehicledata.vehicleSize,
-        vendorType:'Market',
-        vendor:vehicledata.vendor,
-        vMobNo:vehicledata.vMobileNo,
-        driver:vehicledata.driver,
-        dMobNo:vehicledata.dmobileNo,
-        lcNo:vehicledata.lcNo,
-        driverPan:vehicledata.driverPan,
-        lcExpireDate:vehicledata.lcExpireDate,
-        eta:vehicledata?.ETA || new Date(),
-        driver_info:`${vehicledata.driver}-${vehicledata.dmobileNo}`,
-        vendor_info:`${vehicledata.vendor}-${vehicledata.vMobileNo}`,
-        updateBy:localStorage.getItem('UserName'),
-        updateDate:new Date()
+        vehNo: vehicledata?.vehicelNo || "",
+        distannce: 0,
+        currentLocation: localStorage.getItem("Branch"),
+        capacity: vehicledata.vehicleSize,
+        vendorType: 'Market',
+        vendor: vehicledata.vendor,
+        vMobNo: vehicledata.vMobileNo,
+        driver: vehicledata.driver,
+        dMobNo: vehicledata.dmobileNo,
+        lcNo: vehicledata.lcNo,
+        driverPan: vehicledata.driverPan,
+        lcExpireDate: vehicledata.lcExpireDate,
+        eta: vehicledata?.ETA || new Date(),
+        driver_info: `${vehicledata.driver}-${vehicledata.dmobileNo}`,
+        vendor_info: `${vehicledata.vendor}-${vehicledata.vMobileNo}`,
+        updateBy: localStorage.getItem('UserName'),
+        updateDate: new Date()
     }
-  return marketVehicle;
+    return marketVehicle;
 }

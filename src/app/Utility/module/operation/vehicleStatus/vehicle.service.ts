@@ -112,7 +112,7 @@ export class VehicleStatusService {
     const companyCode = localStorage.getItem("companyCode");
 
     // Create a request object to fetch vehicle details
-    const vehicleRequest= {
+    const vehicleRequest = {
       companyCode,
       collectionName: "vehicle_detail",
       filter: { vehicleNo },
@@ -125,7 +125,7 @@ export class VehicleStatusService {
     const vendorName = vehicleResult.data[0].vendorName;
 
     // Create a request object to fetch vendor details
-    const vendorRequest= {
+    const vendorRequest = {
       companyCode,
       collectionName: 'vendor_detail',
       filter: { vendorName },
@@ -201,31 +201,32 @@ export class VehicleStatusService {
   }
 
   async SaveVehicleData(arrivalData: any, prqdata: any) {
-    
-         // Define common vehicle details
-      const vehicleDetails = {
-        _id: arrivalData.vehNo,
-        tripId: prqdata.prqNo,
-        vehNo: arrivalData.vehNo,
-        capacity: prqdata.vehicleSize,
-        fromCity: arrivalData.fromCity,
-        toCity: arrivalData.toCity,
-        status: "In Transit",
-        eta: arrivalData.eta,
-        lcNo: arrivalData.lcNo,
-        lcExpireDate: arrivalData.lcExpireDate,
-        distance: arrivalData.distance,
-        vendorType: arrivalData.vendorType,
-        vendor: arrivalData.vendor,
-        driver: arrivalData?.driver,
-        dMobNo: arrivalData.dMobNo,
-        vMobNo: arrivalData.vMobNo,
-        driverPan: arrivalData.driverPan,
-        currentLocation: localStorage.getItem("Branch"),
-        updateBy: localStorage.getItem("Username"),
-        updateDate: new Date(),
 
-      };
+    debugger
+    // Define common vehicle details
+    const vehicleDetails = {
+      _id: arrivalData.vehNo,
+      tripId: prqdata.prqNo,
+      vehNo: arrivalData.vehNo,
+      capacity: prqdata.vehicleSize,
+      fromCity: arrivalData.fromCity,
+      toCity: arrivalData.toCity,
+      status: "In Transit",
+      eta: arrivalData.eta,
+      lcNo: arrivalData.lcNo,
+      lcExpireDate: arrivalData.lcExpireDate,
+      distance: arrivalData.distance,
+      vendorType: arrivalData.vendorType,
+      vendor: arrivalData.vendor,
+      driver: arrivalData?.driver,
+      dMobNo: arrivalData.dMobNo,
+      vMobNo: arrivalData.vMobNo,
+      driverPan: arrivalData.driverPan,
+      currentLocation: localStorage.getItem("Branch"),
+      updateBy: localStorage.getItem("Username"),
+      updateDate: new Date(),
+
+    };
     var vehData = await this.GetVehicleData(vehicleDetails.vehNo);
     let request = {
       companyCode: this.storage.companyCode,
@@ -234,7 +235,7 @@ export class VehicleStatusService {
 
     //data['cID'] = this.storage.companyCode;
     vehicleDetails['_id'] = `${this.storage.companyCode}-${vehicleDetails.vehNo}`;
-    
+
     if (vehData && vehData.vehNo == vehicleDetails.vehNo) {
       request["filter"] = { _id: vehicleDetails._id };
       request["update"] = vehicleDetails;

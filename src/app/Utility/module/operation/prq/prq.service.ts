@@ -56,13 +56,13 @@ export class PrqService {
       docType: "PRQ",
       branch: branch,
       party: party,
-      finYear:financialYear, // Replace with a dynamic value if needed
+      finYear: financialYear, // Replace with a dynamic value if needed
     };
 
     try {
       // Make an API request to create the PRQ
       const res = await this.masterService.masterMongoPost("operation/prq/create", reqBody).toPromise();
-      return res; 
+      return res;
     } catch (error) {
       // Handle errors gracefully and log them
       console.error("Error adding PRQ data:", error);
@@ -172,7 +172,7 @@ export class PrqService {
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "prq_detail",
-      filter: {prqBranch:this.branchCode},
+      filter: { prqBranch: this.branchCode },
     };
 
     // Make an asynchronous request to the API using masterMongoPost method
@@ -190,33 +190,36 @@ export class PrqService {
     // Map and transform the PRQ data
     prqData.map((element, index) => {
       let pqrData = {
-          "srNo": element.srNo = index + 1,
-          "prqNo": element?.prqNo || '',
-          "vehicleSize": element?.vehicleSize||"",
-          "size":element.vehicleSize?element.vehicleSize : element.containerSize?element.containerSize:"",
-          "billingParty": element?.billingParty || '',
-          "fromToCity": element?.fromCity + "-" + element?.toCity,
-          "fromCity": element?.fromCity || "",
-          "contactNo": element?.contactNo || '',
-          "toCity": element?.toCity || "",
-          "transMode": element?.transMode || "",
-          "vehicleNo": element?.vehicleNo || "",
-          "prqBranch": element?.prqBranch || "",
-          "pickUpDate": formatDocketDate(element?.pickUpTime || new Date()),
-          "pickupDate": element?.pickUpTime || new Date(),
-          "status": element?.status === "0" ? "Awaiting Confirmation" : element.status === "1" ? "Awaiting Assign Vehicle" :element.status=="2"?"Awaiting For Docket":element.status=="3"?"Ready For THC":"THC Generated",
-          "actions": element?.status === "0" ? ["Confirm", "Reject", "Modify"] : element.status === "1" ? ["Assign Vehicle"] :element.status=="2"?["Add Docket"]:element.status=="3"?["Add Docket","Create THC"]:[""],
-          "containerSize":element?.containerSize||"",
-          "typeContainer":element?.typeContainer||"",
-          "pAddress":element?.pAddress||"",
-          "payType":element?.payType||"",
-          "contractAmt":element?.contractAmt||"",
-          "createdDate": formatDocketDate(element?.entryDate || new Date()),
-          "entryDate":element?.entryDate
+        "srNo": element.srNo = index + 1,
+        "prqNo": element?.prqNo || '',
+        "vehicleSize": element?.vehicleSize || "",
+        "size": element.vehicleSize ? element.vehicleSize : element.containerSize ? element.containerSize : "",
+        "billingParty": element?.billingParty || '',
+        "fromToCity": element?.fromCity + "-" + element?.toCity,
+        "fromCity": element?.fromCity || "",
+        "contactNo": element?.contactNo || '',
+        "toCity": element?.toCity || "",
+        "transMode": element?.transMode || "",
+        "vehicleNo": element?.vehicleNo || "",
+        "prqBranch": element?.prqBranch || "",
+        "pickUpDate": formatDocketDate(element?.pickUpTime || new Date()),
+        "pickupDate": element?.pickUpTime || new Date(),
+        "status": element?.status === "0" ? "Awaiting Confirmation" : element.status === "1" ? "Awaiting Assign Vehicle" : element.status == "2" ? "Awaiting For Docket" : element.status == "3" ? "Ready For THC" : "THC Generated",
+        "actions": element?.status === "0" ? ["Confirm", "Reject", "Modify"] : element.status === "1" ? ["Assign Vehicle"] : element.status == "2" ? ["Add Docket"] : element.status == "3" ? ["Add Docket", "Create THC"] : [""],
+        "containerSize": element?.containerSize || "",
+        "typeContainer": element?.typeContainer || "",
+        "pAddress": element?.pAddress || "",
+        "payType": element?.payType || "",
+        "contractAmt": element?.contractAmt || "",
+        "createdDate": formatDocketDate(element?.entryDate || new Date()),
+        "entryDate": element?.entryDate,
+        // added by harikesh
+        "vendorName": element?.vendorName || '',
+        "vendorType": element?.vendorType || '',
       }
       prqList.push(pqrData)
       // You need to return the modified element
-  });
+    });
     // Sort the PRQ list by pickupDate in descending order
     const sortedData = prqList.sort((a, b) => {
       const dateA: Date | any = new Date(a.entryDate);
@@ -247,7 +250,7 @@ export class PrqService {
       .masterMongoPost("generic/get", reqBody)
       .toPromise();
     let prqList = [];
-    const prqDetails= res.data.filter((x)=>x.prqBranch.toLowerCase()===this.branchCode.toLowerCase());
+    const prqDetails = res.data.filter((x) => x.prqBranch.toLowerCase() === this.branchCode.toLowerCase());
     // Map and transform the PRQ data
     prqDetails.map((element, index) => {
       let prqDataItem = {
@@ -277,11 +280,11 @@ export class PrqService {
         payType: element?.payType || "",
         contractAmt: element?.contractAmt || "",
         createdDate: formatDocketDate(element?.entryDate || new Date()),
-        createDateOrg:element?.entryDate 
+        createDateOrg: element?.entryDate
       };
       prqList.push(prqDataItem);
     });
-    
+
     // Sort the PRQ list by pickupDate in descending order
     const sortedData = prqList.sort((a, b) => {
       const dateA: Date | any = new Date(a.createDateOrg);

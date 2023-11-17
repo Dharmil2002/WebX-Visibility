@@ -42,7 +42,7 @@ export class AssignVehiclePageComponent implements OnInit {
 
   linkArray = [{ Row: "action" }];
   menuItems = [{ label: "action", componentDetails: ViewPrintComponent }];
-  tableData: any=[];
+  tableData: any = [];
   NavData: any;
 
   constructor(
@@ -72,7 +72,7 @@ export class AssignVehiclePageComponent implements OnInit {
       );
       const sizeContainer = this.NavData.size;
       const checkCap = vehicleStatusData.filter(
-        (x) => parseInt(x.capacity) == parseInt(sizeContainer)
+        (x) => parseInt(x.capacity) >= parseInt(sizeContainer)
       );
       if (checkCap.length > 0) {
         const loadData = await this.vehicleStatusService.createTableData(
@@ -110,8 +110,8 @@ export class AssignVehiclePageComponent implements OnInit {
   }
 
   async bindTableData(result: any) {
-    
-    const existsInTableData =this.tableData.length>0? this.tableData.some((x) => x.vehNo.toLowerCase() === result.vehicelNo.toLowerCase()):false;
+
+    const existsInTableData = this.tableData.length > 0 ? this.tableData.some((x) => x.vehNo.toLowerCase() === result.vehicelNo.toLowerCase()) : false;
     if (existsInTableData) {
       Swal.fire({
         icon: "warning",
@@ -144,11 +144,11 @@ export class AssignVehiclePageComponent implements OnInit {
     this.tableData = this.tableData
       ? this.tableData.concat(marketData)
       : marketData;
-      Swal.fire({
-        icon: "success",
-        title: "Add Market Vehicle Successfully", // Update the title here
-        showConfirmButton: true,
-      });
+    Swal.fire({
+      icon: "success",
+      title: "Add Market Vehicle Successfully", // Update the title here
+      showConfirmButton: true,
+    });
     this.tableLoad = false;
   }
 

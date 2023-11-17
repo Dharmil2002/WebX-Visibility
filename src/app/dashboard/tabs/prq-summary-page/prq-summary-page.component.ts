@@ -62,17 +62,18 @@ export class PrqSummaryPageComponent implements OnInit {
     if (data.label) {
       if (data.label.route) {
 
-        // added by harikesh
         const inputDate = moment(data.data.pickUpDate, "DD-MM-YY HH:mm", true);
-        const today = moment();
-        if (!inputDate.isSameOrBefore(today)) {
+        const onlyDate = inputDate.format("DD-MM-YY");
+
+        const today = moment().format("DD-MM-YY");
+
+        if (moment(onlyDate, "DD-MM-YY").isBefore(today, "day")) {
           Swal.fire({
             icon: "error",
             title: "Error",
             text: `This Pk-Up DateTime is for future Date hence not allowed .`,
           });
           return null;
-
         } else {
           this.router.navigate([data.label.route], {
             state: {

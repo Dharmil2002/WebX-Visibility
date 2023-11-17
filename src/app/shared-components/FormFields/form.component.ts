@@ -47,6 +47,7 @@ export class FormComponent {
   @Input() DisplayCheckbox: boolean = false;
   @Input() DisplayAddNewButton: boolean = false;
   @Input() CheckBoxMessage: string = "";
+  @Input() Expanded: boolean = true;
   selectedValue: any;
   isTouchUIActivated = false;
   // field required for password input.
@@ -55,7 +56,7 @@ export class FormComponent {
   checkboxChecked: boolean = false;
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   @Input() url: string;
-  isExpanded = true;
+  isExpanded;
   isUpDown = true;
   // ngOnChanges(changes: SimpleChanges) {
   //   this.formData=changes.formData.currentValue
@@ -73,7 +74,9 @@ export class FormComponent {
     );
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.isExpanded = this.Expanded
+  }
   toggleSection() {
     this.isExpanded = !this.isExpanded;
   }

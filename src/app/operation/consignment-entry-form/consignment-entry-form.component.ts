@@ -48,7 +48,7 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 
 /*Please organize the code in order of priority, with the code that is used first placed at the top.*/
 export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
-
+  expanded = false
   addInvoiceEventButton = {
     functionName: 'addInvoiceData',
     name: "Add Invoice",
@@ -261,6 +261,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.route.getCurrentNavigation()?.extras?.state?.data;
     this.docketDetail = new DocketDetail({});
     if (navigationState != null) {
+      console.log(navigationState)
       this.isUpdate =
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
@@ -346,6 +347,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.consignmentTableForm.controls["payType"].setValue("TBB");
     this.consignmentTableForm.controls["transMode"].setValue("Road");
 
+    const mode = localStorage.getItem("Mode")
+    const filteredMode = movementType.find(item => item.name == mode).value
+    this.consignmentTableForm.controls["movementType"].setValue(filteredMode);
+
     if (this.prqData) {
       this.consignmentTableForm.controls["prqNo"].setValue({
         name: this.prqData.prqNo,
@@ -385,6 +390,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //#endregion
   async prqDetail() {
+    debugger
     let billingParty = this.billingParty.find(
       (x) => x.name === this.prqData?.billingParty
     );
@@ -403,15 +409,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setFormValue(this.consignmentTableForm, "cnebp", true);
     this.setFormValue(this.consignmentTableForm, "cnbp", true);
     this.setFormValue(this.consignmentTableForm, "vendorType", vehicleDetail?.vendorType, false, "", "");
-    await this.vendorFieldChanged()
-    if (vehicleDetail?.vendorType == "Market") {
-      this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail.vendor);
-    } else {
-      this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
-    }
-    this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo);
-
-    this.getLocBasedOnCity();
 
     // Done By Harikesh 
     const autoBillingConfigs = [
@@ -427,6 +424,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.onAutoBillingBased(autoBillingData);
     });
 
+    await this.vendorFieldChanged()
+    if (vehicleDetail?.vendorType == "Market") {
+      this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail.vendor);
+    } else {
+      this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
+    }
+    this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo);
+    this.getLocBasedOnCity();
   }
 
   setFormValue(
@@ -573,6 +578,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       switch (fieldName) {
         case 'cnbp':
           updateForm(fieldConsignorName, fieldContactNumber, billingPartyValue);
+          this.expanded = true
           break;
         case 'cnebp':
           updateForm(fieldConsigneeName, fieldConsigneeContactNumber, billingPartyValue);
@@ -586,6 +592,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         case 'cnbp':
           [fieldConsignorName, fieldContactNumber]
             .forEach(field => this.consignmentTableForm.controls[field].setValue(''));
+          this.expanded = false
           break;
         case 'cnebp':
           [fieldConsigneeName, fieldConsigneeContactNumber]
@@ -798,7 +805,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   vendorFieldChanged() {
-    const vendorType = this.consignmentTableForm.value.vendorType;
+    const vendorType = this.consignmentTableForm.value.vendorType !== undefined
+      ? this.consignmentTableForm.value.vendorType
+      : 'Market';
     const vendorName = this.consignmentTableForm.get("vendorName");
     const vehicleNo = this.consignmentTableForm.get("vehicleNo");
     vendorName.setValue("");
@@ -1449,3 +1458,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /* End */
 
 }
+
+
+const movementType = [
+  { "name": "Import", "value": "I" },
+  { "name": "Export", "value": "E" },
+  { "name": "LTL", "value": "D" },
+  { "name": "FTL", "value": "D" }
+]

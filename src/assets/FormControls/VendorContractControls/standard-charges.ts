@@ -80,7 +80,7 @@ export class TERCharges {
       },
       {
         name: "rate",
-        label: "Rate",
+        label: "Rate(Rs)",
         placeholder: "Amount",
         type: "number",
         value: "",
@@ -93,7 +93,7 @@ export class TERCharges {
       },
       {
         name: "min",
-        label: "Min Amount",
+        label: "Min Amount(Rs)",
         placeholder: "Min Amount",
         type: "number",
         value: "",
@@ -106,7 +106,7 @@ export class TERCharges {
       },
       {
         name: "max",
-        label: "Max Amount",
+        label: "Max Amount(Rs)",
         placeholder: "Max Amount",
         type: "number",
         value: "",
@@ -116,6 +116,26 @@ export class TERCharges {
           name: "required",
           message: "Max Amount is required"
         },],
+      },
+      {
+        name: "ENBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "upBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
       },
     ];
   }

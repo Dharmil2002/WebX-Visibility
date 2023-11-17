@@ -2,6 +2,9 @@ import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { RouteBasedTableData } from '../../vendor-contract-list/VendorStaticData';
 import { VendorTERModalComponent } from './vendor-termodal/vendor-termodal.component';
 import { MatDialog } from '@angular/material/dialog';
+import Swal from 'sweetalert2';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vendor-terdetail',
@@ -10,19 +13,21 @@ import { MatDialog } from '@angular/material/dialog';
 export class VendorTERDetailComponent implements OnInit {
   @Input() contractData: any;
 
-  TErouteBasedTableData = RouteBasedTableData
+  TErouteBasedTableData: any[]
+
+  // = RouteBasedTableData
   columnHeaderTErouteBased = {
-    route: {
+    rtTpNM: {
       Title: "Route",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    rateType: {
+    rtNM: {
       Title: "Rate Type",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    capacity: {
+    cpctyNM: {
       Title: "Capacity",
       class: "matcolumnleft",
       //Style: "max-width:100px",
@@ -62,11 +67,14 @@ export class VendorTERDetailComponent implements OnInit {
     { label: 'Edit' },
     { label: 'Remove' }
   ]
-  staticFieldTErouteBased = ['min', 'rate', 'capacity', 'route', 'rateType', 'max']
-
-  constructor(private dialog: MatDialog,) { }
+  staticFieldTErouteBased = ['min', 'rate', 'cpctyNM', 'rtNM', 'rtTpNM', 'max']
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  constructor(private dialog: MatDialog,
+    private masterService: MasterService,
+    private route: Router,) { }
 
   ngOnInit(): void {
+    this.getXpressDetail()
   }
   ngOnChanges(changes: SimpleChanges) {
     // console.log(changes);
@@ -86,7 +94,6 @@ export class VendorTERDetailComponent implements OnInit {
   //#endregion 
   //#region to Add a new item to the table or edit
   addDetails(event) {
-    const EditableId = event?.id
     const request = {
       TERList: this.TErouteBasedTableData,
       Details: event,
@@ -101,31 +108,34 @@ export class VendorTERDetailComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      // console.log(result);
-
-      if (result != undefined) {
-        if (EditableId) {
-          this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== EditableId);
-        }
-        const json = {
-          id: this.TErouteBasedTableData.length + 1,
-          route: result.route.name,
-          rateType: result.rateType.name,
-          capacity: result.capacity.name,
-          rate: result.rate,
-          min: result.min,
-          max: result.max,
-          actions: ['Edit', 'Remove']
-        }
-        this.TErouteBasedTableData.push(json);
-        this.tableLoad = true
-
-      }
+      this.getXpressDetail();
       this.tableLoad = true;
     });
   }
   //#endregion
-  Submit() {
-    console.log(this.TErouteBasedTableData);
+  //#region to get tableData
+  async getXpressDetail() {
+    try {
+      const collectionName = "vendor_contract_xprs_rt";
+
+      const request = {
+        companyCode: this.companyCode,
+        collectionName: collectionName,
+        filter: {}
+      };
+
+      const response = await this.masterService.masterPost("generic/get", request).toPromise();
+
+      this.TErouteBasedTableData = response.data;
+      this.TErouteBasedTableData.forEach(item => {
+        item.actions = ['Edit', 'Remove'];
+      });
+
+    } catch (error) {
+      // Handle errors appropriately (e.g., log, display error message)
+      console.error("An error occurred:", error);
+
+    }
   }
+  //#endregion
 }

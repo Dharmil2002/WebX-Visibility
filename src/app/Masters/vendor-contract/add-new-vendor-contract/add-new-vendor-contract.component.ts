@@ -94,7 +94,7 @@ export class AddNewVendorContractComponent implements OnInit {
       if (existingVendorContracts) {
         // Generate a new vendor code
         const lastContract = existingVendorContracts[existingVendorContracts.length - 1];
-        const lastVendorCode = lastContract ? parseInt(lastContract.vendorCode.substring(2), 10) : 0;
+        const lastVendorCode = lastContract ? parseInt(lastContract.cNID.substring(2), 10) : 0;
 
         const newVendorCode = `VT${(lastVendorCode + 1).toString().padStart(5, '0')}`;
 
@@ -102,7 +102,7 @@ export class AddNewVendorContractComponent implements OnInit {
           "_id": newVendorCode,
           "cNID": newVendorCode,
           'cID': this.companyCode,
-          "fnYr": financialYear,
+          "fnYr": parseInt(financialYear),
           "vNID": this.vendorContractForm.value.VNID.value,
           "vNNM": this.vendorContractForm.value.VNID.name,
           "pDTID": this.vendorContractForm.value.PDTID.value,

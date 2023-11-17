@@ -126,7 +126,8 @@ export class VendorContractBasicInformationComponent implements OnInit {
     // Get the file using objImageHandling and set it in the corresponding control name
     const file = this.objImageHandling.getFileByKey('cNSCN', this.imageData);
     data.cNSCN = file;
-
+    data.pNDYS = parseInt(this.ProductsForm.value.pNDYS)
+    // data.UPDT=new Date(this.ProductsForm.value.UPDT)
     // Prepare request body using object destructuring
     const reqBody = {
       companyCode: this.companyCode,

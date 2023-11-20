@@ -388,7 +388,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //#endregion
   async prqDetail() {
-    debugger
     let billingParty = this.billingParty.find(
       (x) => x.name === this.prqData?.billingParty
     );
@@ -425,10 +424,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     await this.vendorFieldChanged()
     if (vehicleDetail?.vendorType == "Market") {
       this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail.vendor);
+      this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo, false);
     } else {
       this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
+      this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo, true);
     }
-    this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo);
     this.getLocBasedOnCity();
   }
 

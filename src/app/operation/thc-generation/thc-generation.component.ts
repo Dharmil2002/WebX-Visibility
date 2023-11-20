@@ -211,6 +211,7 @@ export class ThcGenerationComponent implements OnInit {
     let navigationState = this.route.getCurrentNavigation()?.extras?.state?.data;
 
     if (navigationState) {
+
       this.viewType = navigationState.viewType?.toLowerCase() || '';
 
       switch (this.viewType) {
@@ -258,11 +259,17 @@ export class ThcGenerationComponent implements OnInit {
 
   async getShipmentDetail() {
 
+    let nestedDetail;
     const shipmentList = await this.thcService.getShipment(false);
-    const branchWise = shipmentList.filter((x) => x.origin === this.orgBranch);
-    const nestedDetail = await this.thcService.getNestedDockDetail(branchWise)
-    this.allShipment = nestedDetail;
+    if (this.isUpdate || this.isView) {
+      this.allShipment = shipmentList;
+    } else {
+      const branchWise = shipmentList.filter((x) => x.origin === this.orgBranch);
+      nestedDetail = await this.thcService.getNestedDockDetail(branchWise)
+      this.allShipment = nestedDetail;
+    }
     if (this.addThc) {
+
       this.tableData = nestedDetail
       //  branchWise.map((x) => {
       //   const actualWeights = [x].map((item) => {
@@ -359,6 +366,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   async getDropDownDetail() {
+
     const locationList = await getLocationApiDetail(this.masterService);
 
     this.prqlist = await this.thcService.prqDetail(true);
@@ -378,9 +386,8 @@ export class ThcGenerationComponent implements OnInit {
       this.filter.Filter(this.jsonControlArray, this.thcTableForm, data, name, status);
     });
 
-    if (this.prqFlag) {
-      this.bindDataPrq();
-    }
+    const vendorDetail = await getVendorDetails(this.masterService);
+    this.vendorDetail = vendorDetail;
 
     if (this.isUpdate || this.isView) {
       this.autoFillThc();
@@ -397,7 +404,6 @@ export class ThcGenerationComponent implements OnInit {
         capacity,
       }));
 
-      const vendorDetail = await getVendorDetails(this.masterService);
       const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode });
       const city = {
         name: destinationMapping[0].city,
@@ -405,7 +411,6 @@ export class ThcGenerationComponent implements OnInit {
       };
 
       this.thcTableForm.controls['fromCity'].setValue(city);
-      this.vendorDetail = vendorDetail;
 
       const filterFieldsForVehicle = [
         { name: this.vehicleName, data: this.vehicleList, status: this.vehicleStatus },
@@ -415,7 +420,9 @@ export class ThcGenerationComponent implements OnInit {
       filterFieldsForVehicle.forEach(({ name, data, status }) => {
         this.filter.Filter(this.jsonControlArray, this.thcTableForm, data, name, status);
       });
-
+      if (this.prqFlag) {
+        this.bindDataPrq();
+      }
       if (this.addThc) {
         this.autoFillDocketDetail();
       }
@@ -494,7 +501,10 @@ export class ThcGenerationComponent implements OnInit {
         }
       }
     }
-    this.vendorFieldChanged();
+    if (!this.isView) {
+      this.vendorFieldChanged();
+    }
+
   }
 
   async getShipmentDetails() {
@@ -518,29 +528,6 @@ export class ThcGenerationComponent implements OnInit {
     this.tableLoad = false;
     const shipment = this.allShipment.filter((x) => x.prqNo == prqNo);
     this.tableData = shipment.map((x) => {
-      const actualWeights = [x].map((item) => {
-        return item
-          ? calculateTotalField(item.invoiceDetails, "actualWeight")
-          : 0;
-      });
-      const noofPkts = [x].map((item) => {
-        return item
-          ? calculateTotalField(item.invoiceDetails, "noofPkts")
-          : 0;
-      });
-      // Sum all the calculated actualWeights
-      const totalActualWeight = actualWeights.reduce(
-        (acc, weight) => acc + weight,
-        0
-      );
-      // Sum all the calculated actualWeights
-      const totalnoofPkts = noofPkts.reduce(
-        (acc, noofPkts) => acc + noofPkts,
-        0
-      );
-
-      x.actualWeight = totalActualWeight;
-      x.noofPkts = totalnoofPkts
       x.actions = ["Update"];
       return x; // Make sure to return x to update the original object in the 'tableData' array.
     });

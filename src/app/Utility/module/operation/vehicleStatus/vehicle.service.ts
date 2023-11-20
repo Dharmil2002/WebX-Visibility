@@ -234,7 +234,11 @@ export class VehicleStatusService {
     };
 
     //data['cID'] = this.storage.companyCode;
-    vehicleDetails['_id'] = `${this.storage.companyCode}-${vehicleDetails.vehNo}`;
+    // vehicleDetails['_id'] = `${this.storage.companyCode}-${vehicleDetails.vehNo}`;
+
+    // Changed By Harikesh
+    vehicleDetails['_id'] = `${vehicleDetails.vehNo}`;
+
 
     if (vehData && vehData.vehNo == vehicleDetails.vehNo) {
       request["filter"] = { _id: vehicleDetails._id };

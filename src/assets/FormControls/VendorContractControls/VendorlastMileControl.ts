@@ -1,10 +1,10 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
- 
+
 export class VendorlastMileControl {
   lastMileControlArray: FormControls[];
- 
+
   constructor() {
-    this. lastMileControlArray = [
+    this.lastMileControlArray = [
       {
         name: "location",
         label: "Location",
@@ -94,7 +94,7 @@ export class VendorlastMileControl {
       },
       {
         name: "minCharge",
-        label: "MinCharge Amount",
+        label: "MinCharge Amount (Rs)",
         placeholder: "MinCharge Amount",
         type: "number",
         value: "",
@@ -133,7 +133,7 @@ export class VendorlastMileControl {
       },
       {
         name: "maxCharges",
-        label: "MaxCharge Amount",
+        label: "MaxCharge Amount (Rs)",
         placeholder: "MaxCharge Amount",
         type: "number",
         value: "",
@@ -144,10 +144,28 @@ export class VendorlastMileControl {
           message: "MaxCharge Amount is required"
         },],
       },
-      
+      {
+        name: "ENBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "upBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
     ];
-    
-    
+
   }
   getVendorlastMileControl() {
     return this.lastMileControlArray;

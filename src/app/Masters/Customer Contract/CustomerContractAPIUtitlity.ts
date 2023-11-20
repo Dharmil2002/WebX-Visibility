@@ -25,7 +25,7 @@ export async function customerFromApi(masterService) {
     return null;
   }
 }
-export async function PayBasisdetailFromApi(masterService) {
+export async function PayBasisdetailFromApi(masterService, filterType?) {
   const reqBody = {
     companyCode: localStorage.getItem("companyCode"),
     collectionName: "General_master",
@@ -38,7 +38,7 @@ export async function PayBasisdetailFromApi(masterService) {
 
     // Use the correct filter condition with a return statement
     const data = PayBasisResponse.data.filter((x) => {
-      return x.codeType === "PAYTYP";
+      return x.codeType === filterType;
     });
     const dataList = data.map((x) => {
       return { value: x.codeId, name: x.codeDesc };

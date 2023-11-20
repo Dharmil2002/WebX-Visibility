@@ -137,6 +137,7 @@ export class PinCodeService {
             cityControlName,
             citycodeStatus
           );
+          return cityCodeData
         }
       }
      

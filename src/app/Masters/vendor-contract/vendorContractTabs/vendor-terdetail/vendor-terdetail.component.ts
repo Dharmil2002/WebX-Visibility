@@ -1,10 +1,7 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { RouteBasedTableData } from '../../vendor-contract-list/VendorStaticData';
 import { VendorTERModalComponent } from './vendor-termodal/vendor-termodal.component';
 import { MatDialog } from '@angular/material/dialog';
-import Swal from 'sweetalert2';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vendor-terdetail',
@@ -20,7 +17,7 @@ export class VendorTERDetailComponent implements OnInit {
     rtTpNM: {
       Title: "Route",
       class: "matcolumnleft",
-      //Style: "max-width:100px",
+      Style: "max-width:250px",
     },
     rtNM: {
       Title: "Rate Type",
@@ -29,7 +26,7 @@ export class VendorTERDetailComponent implements OnInit {
     },
     cpctyNM: {
       Title: "Capacity",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       //Style: "max-width:100px",
     },
     rate: {
@@ -65,13 +62,13 @@ export class VendorTERDetailComponent implements OnInit {
   menuItemflag = true;
   menuItems = [
     { label: 'Edit' },
-    { label: 'Remove' }
+    //{ label: 'Remove' }
   ]
   staticFieldTErouteBased = ['min', 'rate', 'cpctyNM', 'rtNM', 'rtTpNM', 'max']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   constructor(private dialog: MatDialog,
     private masterService: MasterService,
-    private route: Router,) { }
+  ) { }
 
   ngOnInit(): void {
     this.getXpressDetail()
@@ -84,12 +81,8 @@ export class VendorTERDetailComponent implements OnInit {
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
-    if (data.label.label === 'Remove') {
-      this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
-    } else {
-      const terDetails = this.TErouteBasedTableData.find(x => x.id == data.data.id);
-      this.addDetails(terDetails)
-    }
+    const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
+    this.addDetails(terDetails)
   }
   //#endregion 
   //#region to Add a new item to the table or edit
@@ -107,7 +100,7 @@ export class VendorTERDetailComponent implements OnInit {
         top: "20px",
       },
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe(() => {
       this.getXpressDetail();
       this.tableLoad = true;
     });

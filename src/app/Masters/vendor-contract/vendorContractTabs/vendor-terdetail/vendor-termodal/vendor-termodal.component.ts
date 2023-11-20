@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
@@ -45,11 +46,11 @@ export class VendorTERModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.getRouteList();
-    this.getRouteList();
     this.getContainerList();
     this.getDropDownData();
     this.initializeFormControl();
-    console.log(this.objResult);
+   // console.log(this.objResult);
+    
   }
   //#region to initialize form control
   initializeFormControl() {
@@ -84,117 +85,6 @@ export class VendorTERModalComponent implements OnInit {
     this.dialogRef.close()
   }
   //#region to send data to parent component using dialogRef
-  // async save(event) {
-  //   try {
-
-  //     // clearValidatorsAndValidate(this.TERForm);
-
-  //     const vendorContractCollection = "vendor_contract_xprs_rt";
-  //     if (this.objResult.Details) {
-  //       const data = {
-
-  //         rtTpID: this.TERForm.value.route.value,
-  //         rtTpNM: this.TERForm.value.route.name,
-  //         cpctyID: this.TERForm.value.capacity.value,
-  //         cpctyNM: this.TERForm.value.capacity.name,
-  //         rtID: this.TERForm.value.rateType.value,
-  //         rtNM: this.TERForm.value.rateType.name,
-  //         rate: parseInt(this.TERForm.value.rate),
-  //         min: parseInt(this.TERForm.value.min),
-  //         max: parseInt(this.TERForm.value.max),
-  //         upDT: new Date(),
-  //         upBY: this.TERForm.value.upBY
-  //       };
-  //       console.log(data);
-  //       const id = this.objResult.Details.vcxrID;
-  //       // Prepare request for creating a new vendor contract
-  //       let req = {
-  //         companyCode: this.companyCode,
-  //         collectionName: vendorContractCollection,
-  //         filter: {
-  //           _id: id
-  //         },
-  //         update: data
-  //       };
-  //       console.log(req);
-
-  //       // Create a new vendor contract
-  //       const createResponse = await this.masterService.masterPut("generic/update", req).toPromise()
-
-  //       if (createResponse) {
-  //         // Display success message
-  //         Swal.fire({
-  //           icon: "success",
-  //           title: "Success",
-  //           text: 'Transportation- Express Route',
-  //           showConfirmButton: true,
-  //         });
-  //       }
-
-  //     } else { // Fetch existing data
-  //       const req = {
-  //         companyCode: this.companyCode,
-  //         collectionName: vendorContractCollection,
-  //         filter: {}
-  //       };
-  //       const res = await this.masterService.masterPost("generic/get", req).toPromise();
-  //       const existingData = res.data;
-
-  //       if (existingData) {
-  //         // Generate a new vendor code
-  //         const lastContract = existingData[existingData.length - 1];
-  //         const lastVendorCode = lastContract ? parseInt(lastContract.vendorCode.substring(2), 10) : 0;
-  //         const newVendorCode = `Vcxr${(lastVendorCode + 1).toString().padStart(5, '0')}`;
-
-  //         // Prepare data for the new vendor contract
-  //         const data = {
-  //           _id: newVendorCode,
-  //           vcxrID: newVendorCode,
-  //           cID: this.companyCode,
-  //           rtTpID: this.TERForm.value.route.value,
-  //           rtTpNM: this.TERForm.value.route.name,
-  //           cpctyID: this.TERForm.value.capacity.value,
-  //           cpctyNM: this.TERForm.value.capacity.name,
-  //           rtID: this.TERForm.value.rateType.value,
-  //           rtNM: this.TERForm.value.rateType.name,
-  //           rate: parseInt(this.TERForm.value.rate),
-  //           min: parseInt(this.TERForm.value.min),
-  //           max: parseInt(this.TERForm.value.max),
-  //           eDT: new Date(),
-  //           eNBY: this.TERForm.value.ENBY
-  //         };
-  //         console.log(data);
-
-  //         // Prepare request for creating a new vendor contract
-  //         const createVendorContractRequest = {
-  //           companyCode: this.companyCode,
-  //           collectionName: vendorContractCollection,
-  //           data: data,
-  //         };
-  //         console.log(createVendorContractRequest);
-
-  //         // Create a new vendor contract
-  //         const createResponse = await this.masterService.masterPost("generic/create", createVendorContractRequest).toPromise();
-
-  //         if (createResponse) {
-  //           // Display success message
-  //           Swal.fire({
-  //             icon: "success",
-  //             title: "Success",
-  //             text: 'Transportation- Express Route',
-  //             showConfirmButton: true,
-  //           });
-  //         }
-  //       }
-  //     }
-  //     // Close the dialog regardless of success or failure
-  //     this.dialogRef.close();
-
-  //   } catch (error) {
-  //     // Handle errors appropriately (e.g., log, display error message)
-  //     console.error("An error occurred:", error);
-  //   }
-  // }
   async save(event) {
     try {
       const vendorContractCollection = "vendor_contract_xprs_rt";
@@ -231,6 +121,7 @@ export class VendorTERModalComponent implements OnInit {
         };
 
         const createResponse = await this.masterService.masterPost("generic/create", createRequest).toPromise();
+
         // Display success message
         Swal.fire({
           icon: "success",
@@ -279,7 +170,7 @@ export class VendorTERModalComponent implements OnInit {
   generateNewVendorCode(existingData: any[]) {
     // Generate a new vendor code based on existing data
     const lastContract = existingData[existingData.length - 1];
-    const lastVendorCode = lastContract ? parseInt(lastContract.vcxrID.substring(2), 10) : 0;
+    const lastVendorCode = lastContract ? parseInt(lastContract.vcxrID.substring(4), 10) : 0;
     return `Vcxr${(lastVendorCode + 1).toString().padStart(5, '0')}`;
   }
 
@@ -340,15 +231,14 @@ export class VendorTERModalComponent implements OnInit {
   }
   //#endregion
   //#region to get rateType list
-  getDropDownData() {
-    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-      const { rateTypeDropDown } = res;
-      if (this.objResult.Details) {
-        const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rtNM);
-        this.TERForm.controls.rateType.setValue(updaterateType);
-      }
-      this.filter.Filter(this.jsonControlArray, this.TERForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
-    });
+  async getDropDownData() {
+    const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
+
+    if (this.objResult.Details) {
+      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rtNM);
+      this.TERForm.controls.rateType.setValue(updaterateType);
+    }
+    this.filter.Filter(this.jsonControlArray, this.TERForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
   }
   //#endregion
 

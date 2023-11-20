@@ -9,7 +9,7 @@ export class VendorAssociateControls {
         label: "City",
         placeholder: "City",
         type: "dropdown",
-        value: "",
+        value:'' ,
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -25,6 +25,9 @@ export class VendorAssociateControls {
             message: "please select values from list only",
           },
         ],
+        functions: {
+          onModel: "getLocation",
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -89,16 +92,16 @@ export class VendorAssociateControls {
         disable: false,
         Validations: [
           {
-          name: "required",
-          message: "Rate Type is required"
-        },
-        {
-          name: "autocomplete",
-        },
-        {
-          name: "invalidAutocomplete",
-          message: "please select values from list only",
-        },
+            name: "required",
+            message: "Rate Type is required"
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "please select values from list only",
+          },
         ],
         additionalData: {
           showNameAndValue: false,
@@ -142,6 +145,26 @@ export class VendorAssociateControls {
           name: "required",
           message: "Max Amount is required"
         },],
+      },
+      {
+        name: "ENBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "upBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
       },
 
     ];

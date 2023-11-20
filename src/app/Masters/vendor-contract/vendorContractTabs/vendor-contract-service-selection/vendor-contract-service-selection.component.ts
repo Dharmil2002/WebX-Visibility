@@ -21,8 +21,8 @@ export class VendorContractServiceSelectionComponent implements OnInit {
   loadIn: boolean;
   tableLoad = true;
   isTableLoad: boolean = true;
-  tableData = ContractTypeData
-  // tableData: any[];
+  // tableData = ContractTypeData
+  tableData: any[];
   ContractType = ContractTypeData
   className = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   dynamicControls = {
@@ -83,13 +83,14 @@ export class VendorContractServiceSelectionComponent implements OnInit {
     this.objContractService.getContractType().subscribe((contractTypes) => {
       this.previousContractType = contractTypes;
     });
+    this.getServiceData()
     // Update isSelected based on previousContractType
-    if (this.previousContractType) {
-      // Iterate through tableData and update isSelected based on previousContractType
-      this.tableData.forEach((item) => {
-        item.isSelected = this.previousContractType.includes(item.typeName);
-      });
-    }
+    // if (this.previousContractType) {
+    //   // Iterate through tableData and update isSelected based on previousContractType
+    //   this.tableData.forEach((item) => {
+    //     item.isSelected = this.previousContractType.includes(item.typeName);
+    //   });
+    // }
 
   }
 
@@ -102,18 +103,18 @@ export class VendorContractServiceSelectionComponent implements OnInit {
   async selectCheckBox(event) {
     // Create a new array to store the selected contract types
     this.selectedContractType = event
-      .filter(item => item.isSelected)
+      // .filter(item => item.isSelected)
       .map(item => item.typeName);
     console.log(event);
     this.objContractService.setContractType(this.selectedContractType);
 
-    const newService = event.map(element => ({
-      _id: element.id,
-      service_id: element.id,
+    const newService = event.map((element, index) => ({
+      _id: index + 1, // Increment index to start from 1
+      service_id:  index + 1,
       service_name: element.typeName,
       active: element.isSelected
     }));
-    console.log(newService );
+    console.log(newService);
 
 
     // const reqBody = {
@@ -127,24 +128,25 @@ export class VendorContractServiceSelectionComponent implements OnInit {
     // // Make the API call to update the contract
     // const res = await this.masterService.masterPut("generic/create", reqBody).toPromise();
   }
-  // async getServiceData() {
-  //   const data = await PayBasisdetailFromApi(this.masterService, "VSTYP");
-  //   // Filter the ContractTypeData based on the data from the API
-  //   this.tableData = this.ContractType
-  //     .filter((contractType) =>
-  //       data.some((apiContractType) => apiContractType.name.includes(contractType.typeName))
-  //     );
+  async getServiceData() {
+    const data = await PayBasisdetailFromApi(this.masterService, "VSTYP");
+    // Filter the ContractTypeData based on the data from the API
+    this.tableData = this.ContractType
+      .filter((contractType) =>
+        data.some((apiContractType) => apiContractType.name.includes(contractType.typeName))
+      );
+    this.tableLoad = false;
 
-  //   // if (this.previousContractType) {
-  //   //   // Iterate through tableData and update isSelected based on previousContractType
-  //   //   this.tableData.forEach(item => {
-  //   //     if (this.previousContractType.includes(item.typeName)) {
-  //   //       item.isSelected = true;
-  //   //     } else {
-  //   //       item.isSelected = false;
-  //   //     }
-  //   //   });
-  //   // }
-  //   console.log(this.tableData);
-  // }
+    // if (this.previousContractType) {
+    //   // Iterate through tableData and update isSelected based on previousContractType
+    //   this.tableData.forEach(item => {
+    //     if (this.previousContractType.includes(item.typeName)) {
+    //       item.isSelected = true;
+    //     } else {
+    //       item.isSelected = false;
+    //     }
+    //   });
+    // }
+    console.log(this.tableData);
+  }
 }

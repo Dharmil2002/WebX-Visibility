@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { BusinessAssociates, RouteBasedTableData } from '../../vendor-contract-list/VendorStaticData';
 import { VendorBusiAssocModalComponent } from './vendor-busi-assoc-modal/vendor-busi-assoc-modal.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
   selector: 'app-vendor-busi-assoc-detail',
@@ -10,29 +10,24 @@ import { MatDialog } from '@angular/material/dialog';
 export class VendorBusiAssocDetailComponent implements OnInit {
   // @Input() contractData: any;
 
-  TErouteBasedTableData = BusinessAssociates
+  TErouteBasedTableData: any[]
   columnHeaderTErouteBased = {
-    city: {
+    ct: {
       Title: "City",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    controlLocation: {
-      Title: "CtrllLocation",
-      class: "matcolumnleft",
-      //Style: "max-width:100px",
-    },
-    operation: {
+    opNM: {
       Title: "Operation",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    rateType: {
+    rtNM: {
       Title: "Rate",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    mode: {
+    mdNM: {
       Title: "Transport Mode",
       class: "matcolumncenter",
       //Style: "max-width:100px",
@@ -70,30 +65,28 @@ export class VendorBusiAssocDetailComponent implements OnInit {
   menuItemflag = true;
   menuItems = [
     { label: 'Edit' },
-    { label: 'Remove' }
+    // { label: 'Remove' }
   ]
-  staticFieldTErouteBased = ['city', 'controlLocation', 'operation', 'rateType', 'mode', , 'rate', 'min', 'max']
-  constructor(private dialog: MatDialog,) { }
+  staticFieldTErouteBased = ['ct', 'opNM', 'rtNM', 'mdNM', , 'rate', 'min', 'max']
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
+  constructor(private dialog: MatDialog,
+    private masterService: MasterService,
+  ) { }
   ngOnInit(): void {
+    this.getTableDetail();
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
-    if (data.label.label === 'Remove') {
-      this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
-    } else {
-      const terDetails = this.TErouteBasedTableData.find(x => x.id == data.data.id);
-      this.addDetails(terDetails)
-    }
+    const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
+    this.addDetails(terDetails)
   }
   //#endregion 
   //#region to Add a new item to the table or edit
   addDetails(event) {
-    const EditableId = event?.id
     const request = {
       List: this.TErouteBasedTableData,
       Details: event,
-      //url: this.url
     }
     this.tableLoad = false;
     const dialogRef = this.dialog.open(VendorBusiAssocModalComponent, {
@@ -104,34 +97,35 @@ export class VendorBusiAssocDetailComponent implements OnInit {
         top: "20px",
       },
     });
-    dialogRef.afterClosed().subscribe((result) => {
-      //console.log(result);
-
-      if (result != undefined) {
-        if (EditableId) {
-          this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== EditableId);
-        }
-        const json = {
-          id: this.TErouteBasedTableData.length + 1,
-          city: result.city.name,
-          controlLocation: result.city.value,
-          mode: result.mode.name,
-          rateType: result.rateType.name,
-          min: result.min,
-          max: result.max,
-          rate: result.rate,
-          operation: result.operation.name,
-          actions: ['Edit', 'Remove']
-        }
-        this.TErouteBasedTableData.push(json);
-        this.tableLoad = true
-
-      }
+    dialogRef.afterClosed().subscribe(() => {
+      this.getTableDetail();
       this.tableLoad = true;
     });
   }
   //#endregion
-  Submit() {
-    console.log(this.TErouteBasedTableData);
+  //#region to get tableData
+  async getTableDetail() {
+    try {
+
+      const request = {
+        companyCode: this.companyCode,
+        collectionName: "vendor_contract_ba",
+        filter: {}
+      };
+
+      const response = await this.masterService.masterPost("generic/get", request).toPromise();
+
+      this.TErouteBasedTableData = response.data;
+      this.TErouteBasedTableData.forEach(item => {
+        item.actions = ['Edit', 'Remove'];
+      });
+
+    } catch (error) {
+      // Handle errors appropriately (e.g., log, display error message)
+      console.error("An error occurred:", error);
+
+    }
   }
+  //#endregion
+
 }

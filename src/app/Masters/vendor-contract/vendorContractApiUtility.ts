@@ -3,11 +3,11 @@
  * @param {MasterService} masterService - The service used to communicate with the API.
  * @returns {Promise<Array>} - A promise that resolves to an array of vendor contracts.
  */
-export async function getContractList(masterService,filterFieldName?: string,filterId?: string ) {
+export async function getContractList(masterService, filterFieldName?: string, filterId?: string) {
     try {
         // Prepare request to fetch existing vendor contracts
         const request = {
-            companyCode: parseInt(localStorage.getItem("companyCode")), 
+            companyCode: parseInt(localStorage.getItem("companyCode")),
             collectionName: "vendor_contract",
             filter: { [filterFieldName]: filterId }
         };
@@ -32,4 +32,20 @@ export async function getContractList(masterService,filterFieldName?: string,fil
         console.error("Error fetching vendor contracts:", error);
         throw error; // Rethrow the error to be handled by the caller or provide a default value
     }
-}  
+}
+export async function getStatelist(masterService) {
+    const stateReqBody = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        filter: {},
+        collectionName: "state_master",
+    };
+    const StateList = await masterService.masterPost('generic/get', stateReqBody).toPromise();
+    if (StateList) {
+        return StateList.data.map(item => ({
+            name: item.STNM,
+            value: item.STSN
+        }))
+    }
+
+
+}

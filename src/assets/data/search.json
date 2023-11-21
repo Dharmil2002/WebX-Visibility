@@ -749,6 +749,62 @@
         "CustomerContractList"
       ],
       "router": "Masters/CustomerContract/CustomerContractList"
+    },
+    {
+      "title": "AccountMasterList",
+      "tag": [
+        "AccountMasterList"
+      ],
+      "router": "Masters/AccountMaster/ListAccount"
+    },
+    {
+      "title": "AccountMasterAdd",
+      "tag": [
+        "AccountMasterAdd"
+      ],
+      "router": "Masters/AccountMaster/AddAccount"
+    },
+    {
+      "title": "BankMasterList",
+      "tag": [
+        "BankMasterList"
+      ],
+      "router": "Masters/AccountMaster/ListBank"
+    },
+    {
+      "title": "BankMasterAdd",
+      "tag": [
+        "BankMasterAdd"
+      ],
+      "router": "Masters/AccountMaster/AddBank"
+    },
+    {
+      "title": "TdsMasterList",
+      "tag": [
+        "TdsMasterList"
+      ],
+      "router": "Masters/AccountMaster/ListTds"
+    },
+    {
+      "title": "TdsMasterAdd",
+      "tag": [
+        "TdsMasterAdd"
+      ],
+      "router": "Masters/AccountMaster/AddTds"
+    },
+    {
+      "title": "AccountMasterList",
+      "tag": [
+        "AccountMasterList"
+      ],
+      "router": "Masters/AccountMaster/ListAccount"
+    },
+    {
+      "title": "AAccountGroupAdd",
+      "tag": [
+        "AccountGroupAdd"
+      ],
+      "router": "Masters/AccountMaster/ListAccountGroup"
     }
   ]
 }

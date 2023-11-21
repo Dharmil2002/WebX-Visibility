@@ -151,6 +151,14 @@ import { VendorBusiAssocDetailComponent } from './vendor-contract/vendorContract
 import { VendorBusiAssocModalComponent } from './vendor-contract/vendorContractTabs/vendor-busi-assoc-detail/vendor-busi-assoc-modal/vendor-busi-assoc-modal.component';
 import { AddNewCustomerContractComponent } from './Customer Contract/add-new-customer-contract/add-new-customer-contract.component';
 import { AddNewVendorContractComponent } from './vendor-contract/add-new-vendor-contract/add-new-vendor-contract.component';
+import { AddTdsComponent } from './Account-master/tds-master/add-tds/add-tds.component';
+import { ListTdsComponent } from './Account-master/tds-master/list-tds/list-tds.component';
+import { ListBankComponent } from './Account-master/bank-master/list-bank/list-bank.component';
+import { AddBankComponent } from './Account-master/bank-master/add-bank/add-bank.component';
+import { ListAccountComponent } from './Account-master/account-master/list-account/list-account.component';
+import { AddaccountComponent } from './Account-master/account-master/addaccount/addaccount.component';
+import { AddGroupComponent } from './Account-master/group-master/add-group/add-group.component';
+import { ListGroupComponent } from './Account-master/group-master/list-group/list-group.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -316,7 +324,15 @@ import { AddNewVendorContractComponent } from './vendor-contract/add-new-vendor-
     VendorBusiAssocDetailComponent,
     VendorBusiAssocModalComponent,
     AddNewCustomerContractComponent,
-    AddNewVendorContractComponent
+    AddNewVendorContractComponent,
+    AddTdsComponent,
+    ListTdsComponent,
+    ListBankComponent,
+    AddBankComponent,
+    ListAccountComponent,
+    AddaccountComponent,
+    AddGroupComponent,
+    ListGroupComponent,
   ],
 
   providers: [

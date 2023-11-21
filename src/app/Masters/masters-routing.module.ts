@@ -70,11 +70,20 @@ import { BeneficiaryMasterListComponent } from './beneficiary-master/beneficiary
 import { ListProductComponent } from './product-master/list-product/list-product.component';
 import { ShardProductComponent } from './product-master/shard-product/shard-product.component';
 import { AccountMasterComponent } from './Account/Account Master/account-master/account-master.component';
-import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
+// import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
 import { VendorContractListComponent } from './vendor-contract/vendor-contract-list/vendor-contract-list.component';
 import { VendorIndexComponent } from './vendor-contract/vendor-index/vendor-index.component';
 import { SacMasterListComponent } from './sac-master/sac-master-list/sac-master-list.component';
 import { AddSacMasterComponent } from './sac-master/add-sac-master/add-sac-master.component';
+import { AddaccountComponent } from './Account-master/account-master/addaccount/addaccount.component';
+import { ListAccountComponent } from './Account-master/account-master/list-account/list-account.component';
+import { AddBankComponent } from './Account-master/bank-master/add-bank/add-bank.component';
+import { ListBankComponent } from './Account-master/bank-master/list-bank/list-bank.component';
+import { AddGroupComponent } from './Account-master/group-master/add-group/add-group.component';
+import { ListGroupComponent } from './Account-master/group-master/list-group/list-group.component';
+import { AddTdsComponent } from './Account-master/tds-master/add-tds/add-tds.component';
+import { ListTdsComponent } from './Account-master/tds-master/list-tds/list-tds.component';
+import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
 import { AddNewCustomerContractComponent } from './Customer Contract/add-new-customer-contract/add-new-customer-contract.component';
 import { AddNewVendorContractComponent } from './vendor-contract/add-new-vendor-contract/add-new-vendor-contract.component';
 
@@ -163,6 +172,18 @@ const routes: Routes = [
   { path: "AccountMaster/AccountMasterList", component: AccountMasterComponent },
   { path: "AccountMaster/AddAccountMaster", component: AddAccountComponent },
 
+  { path: "AccountMaster/AddTds", component: AddTdsComponent },
+  { path: "AccountMaster/ListTds", component: ListTdsComponent },
+
+  { path: "AccountMaster/AddBank", component: AddBankComponent },
+  { path: "AccountMaster/ListBank", component: ListBankComponent },
+
+  { path: "AccountMaster/AddAccount", component: AddaccountComponent },
+  { path: "AccountMaster/ListAccount", component: ListAccountComponent },
+
+  { path: "AccountMaster/AddAccountGroup", component: AddGroupComponent },
+  { path: "AccountMaster/ListAccountGroup", component: ListGroupComponent },
+  
   //Vendor Contract Router
   { path: "VendorContract/VendorContractList", component: VendorContractListComponent },
   { path: "VendorContract/VendorContractIndex", component: VendorIndexComponent },

@@ -73,6 +73,52 @@ export const ROUTES: RouteInfo[] =
       "groupTitle": false,
       "submenu": [
         {
+          "path": "",
+          "title": "Account",
+          "moduleName": "Account",
+          "icon": "",
+          "class": "ml-menu",
+          "groupTitle": false,
+          "submenu": [
+            {
+              "path": "Masters/AccountMaster/AddAccount",
+              "title": "Account Master",
+              "moduleName": "Account Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": []
+            },
+            {
+              "path": "Masters/AccountMaster/AddAccountGroup",
+              "title": "Account Group Master",
+              "moduleName": "Account Group Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": []
+            },
+            {
+              "path": "Masters/AccountMaster/AddBank",
+              "title": "Bank Master",
+              "moduleName": "Bank Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": []
+            },
+            {
+              "path": "Masters/AccountMaster/AddTds",
+              "title": "TDS Master",
+              "moduleName": "TDS Master",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": []
+            }
+          ]
+        },
+        {
           "path": "Masters/DriverMaster/DriverMasterList",
           "title": "Admin",
           "moduleName": "Admin",

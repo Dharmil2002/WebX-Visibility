@@ -805,6 +805,14 @@
         "AccountGroupAdd"
       ],
       "router": "Masters/AccountMaster/ListAccountGroup"
+    },
+    {
+      "title": "Reports/Job-Register Report",
+      "tag": [
+        "job-query",
+        "job-query"
+      ],
+      "router": "Reports/job-query"
     }
   ]
 }

@@ -33,6 +33,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
   ContractBasicInformationControls: ContractBasicInformationControl;
   ContractForm: UntypedFormGroup;
   jsonControlArrayContractForm: any;
+  backPath:string;
   className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   breadscrums = [
     {
@@ -95,7 +96,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
       "Product",
       false
     );
-    const PayBasisdetailFromAPI = await PayBasisdetailFromApi(this.masterService)
+    const PayBasisdetailFromAPI = await PayBasisdetailFromApi(this.masterService,"PAYTYP")
     this.filter.Filter(
       this.jsonControlArrayContractForm,
       this.ContractForm,
@@ -107,6 +108,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
   }
   //#endregion
   ngOnInit() {
+    this.backPath = "/Masters/CustomerContract/CustomerContractList";
   }
   //#region functionCallHandler
   functionCallHandler($event) {

@@ -84,69 +84,151 @@ export class VendorContractServiceSelectionComponent implements OnInit {
       this.previousContractType = contractTypes;
     });
     this.getServiceData()
-    // Update isSelected based on previousContractType
-    // if (this.previousContractType) {
-    //   // Iterate through tableData and update isSelected based on previousContractType
-    //   this.tableData.forEach((item) => {
-    //     item.isSelected = this.previousContractType.includes(item.typeName);
-    //   });
-    // }
-
   }
-
-
 
   ngOnInit() {
 
   }
-
+  //#region to call function on change of service selection
   async selectCheckBox(event) {
     // Create a new array to store the selected contract types
     this.selectedContractType = event
-      // .filter(item => item.isSelected)
       .map(item => item.typeName);
     console.log(event);
     this.objContractService.setContractType(this.selectedContractType);
 
+    // Create a new array for saving
     const newService = event.map((element, index) => ({
       _id: index + 1, // Increment index to start from 1
-      service_id:  index + 1,
+      service_id: index + 1,
       service_name: element.typeName,
       active: element.isSelected
     }));
-    console.log(newService);
 
-
-    // const reqBody = {
-    //   companyCode: this.companyCode,
-    //   collectionName: "vndr_cnt_service",
-    //   filter: {},
-    //   // update: { ...data }
-    // };
-
-
-    // // Make the API call to update the contract
-    // const res = await this.masterService.masterPut("generic/create", reqBody).toPromise();
+    this.save(newService);
   }
+  //#endregion
+  //#region to get services from collection
   async getServiceData() {
+    // Step 1: Fetch data from the API
     const data = await PayBasisdetailFromApi(this.masterService, "VSTYP");
-    // Filter the ContractTypeData based on the data from the API
+
+    // Step 2: Filter the ContractTypeData based on the data from the API
     this.tableData = this.ContractType
       .filter((contractType) =>
         data.some((apiContractType) => apiContractType.name.includes(contractType.typeName))
       );
-    this.tableLoad = false;
 
-    // if (this.previousContractType) {
-    //   // Iterate through tableData and update isSelected based on previousContractType
-    //   this.tableData.forEach(item => {
-    //     if (this.previousContractType.includes(item.typeName)) {
-    //       item.isSelected = true;
-    //     } else {
-    //       item.isSelected = false;
-    //     }
-    //   });
-    // }
-    console.log(this.tableData);
+    // Step 3: Fetch existing data
+    const existingData = await this.fetchExistingData();
+
+    // Step 4: Extract active service names from existing data
+    this.selectedContractType = existingData
+      .filter(item => item.active)
+      .map(item => item.service_name);
+
+    // Step 5: Set the active service names in the shared service
+    this.objContractService.setContractType(this.selectedContractType);
+
+    // Step 6: Store the previousContractType for comparison
+    this.previousContractType = this.selectedContractType;
+
+    // Step 7: Update isSelected property based on previousContractType
+    if (this.previousContractType) {
+      this.tableData.forEach(item => {
+        item.isSelected = this.previousContractType.includes(item.typeName);
+      });
+    }
+
+    // Step 8: Set tableLoad flag to indicate that table data loading is complete
+    this.tableLoad = false;
   }
+  //#endregion
+  //#region to get existing data 
+  async fetchExistingData() {
+    // Fetch existing data for creating a new contract
+    const request = {
+      companyCode: this.companyCode,
+      collectionName: "vndr_cnt_service",
+      filter: {},
+    };
+
+    const response = await this.masterService.masterPost("generic/get", request).toPromise();
+    return response.data;
+  }
+  //#endregion
+  //#region to save service 
+  async save(data) {
+    try {
+      const collectionName = "vndr_cnt_service";
+      const existingData = await this.fetchExistingData()
+      // Find services in 'data' that are not in 'existingData'
+      const newServices = data.filter(item => {
+        return !existingData.some(existingItem => existingItem.service_name === item.service_name);
+      });
+
+      let updateServices = existingData.filter(item => {
+        return !data.some(existingItem => existingItem.service_name === item.service_name);
+      });
+
+      let updateId = await this.fetchExistingData()
+
+      updateId = updateId.filter(item => {
+        return item.active === false
+        //updateServices ? !updateServices.some(existingItem => existingItem.service_name === item.service_name) :
+
+      });
+      // console.log(updateId);
+      updateServices = updateServices.length > 0 ? updateServices : updateId
+      const Id = updateServices[0]._id
+      updateServices.map(x => {
+        delete x._id;
+        x.active = !x.active; // Toggle the active flag
+      })
+      // console.log(updateServices, updateId);
+
+      newServices.map(x => {
+        x._id = existingData.length + 1, x.service_id = existingData.length + 1
+
+      })
+
+      if (existingData.length === 0) {
+        const createRequest = {
+          companyCode: this.companyCode,
+          collectionName: collectionName,
+          data: data,
+        };
+        console.log(createRequest);
+
+        const createResponse = await this.masterService.masterPost("generic/create", createRequest).toPromise();
+      }
+      if (newServices.length > 0) {
+        const createRequest = {
+          companyCode: this.companyCode,
+          collectionName: collectionName,
+          data: newServices,
+        };
+        console.log(createRequest);
+
+        const createResponse = await this.masterService.masterPost("generic/create", createRequest).toPromise();
+      }
+      if (updateServices) {
+        const createRequest = {
+          companyCode: this.companyCode,
+          collectionName: collectionName,
+          filter: { _id: Id },
+          update: updateServices[0]
+        }
+        console.log(createRequest);
+
+        const updateResponse = await this.masterService.masterPut("generic/update", createRequest).toPromise();
+        // console.log(updateResponse);
+
+      }
+    } catch (error) {
+      // Handle errors appropriately (e.g., log, display error message)
+      console.error("An error occurred:", error);
+    }
+  }
+  //#endregion
 }

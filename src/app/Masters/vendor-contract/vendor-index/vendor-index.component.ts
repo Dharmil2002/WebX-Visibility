@@ -23,6 +23,7 @@ export class VendorIndexComponent implements OnInit {
   CurrentContractDetails: any;
   selectedFolder: string;
   selectedContractType: any;
+  backPath: string;
 
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private contractService: VendorContractListingService,
@@ -44,6 +45,7 @@ export class VendorIndexComponent implements OnInit {
     this.contractService.getContractType().subscribe((contractTypes) => {
       this.processData(contractTypes);
     });
+    this.backPath = "/Masters/VendorContract/VendorContractList";
   }
 
   processData(contractTypes: any[]) {

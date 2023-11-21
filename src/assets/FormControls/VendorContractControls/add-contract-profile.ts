@@ -103,6 +103,9 @@ export class AddContractProfile {
         additionalData: {
           minDate: new Date(),
         },
+        functions: {
+          onDate: 'setDays',
+        }
       },
       {
         name: "pNDYS",
@@ -111,7 +114,7 @@ export class AddContractProfile {
         type: "number",
         value: vendorInformationData.pNDYS,
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -247,13 +250,13 @@ export class AddContractProfile {
           minDate: new Date(),
         },
       },
-      {
-        name: 'ACTV',
-        label: 'Active Flag',
-        placeholder: 'Active Flag',
-        type: 'toggle', value: false, Validations: [],
-        generatecontrol: false, disable: false
-      },
+      // {
+      //   name: 'ACTV',
+      //   label: 'Active Flag',
+      //   placeholder: 'Active Flag',
+      //   type: 'toggle', value: false, Validations: [],
+      //   generatecontrol: false, disable: false
+      // },
       {
         name: '_id',
         label: 'id',

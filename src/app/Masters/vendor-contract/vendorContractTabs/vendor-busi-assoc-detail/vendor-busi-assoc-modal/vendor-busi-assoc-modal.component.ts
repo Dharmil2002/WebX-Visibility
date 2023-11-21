@@ -49,7 +49,11 @@ export class VendorBusiAssocModalComponent implements OnInit {
     // console.log(this.objResult);
   }
   //#region to get location list
- 
+  async getLocation() {
+    await this.objPinCodeService.getCity(
+      this.BusiAssocForm, this.jsonControlArray, this.cityName, this.citystatus
+    );
+  }
   //#endregion
 
   //#region to send data to parent component using dialogRef
@@ -174,7 +178,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
   }
   //#endregion
   //#region to initialize form control
-  initializeFormControl() {
+  async initializeFormControl() {
     this.ContractBusiAssocControls = new VendorAssociateControls();
     this.jsonControlArray = this.ContractBusiAssocControls.getVendorAssociateControls();
     this.BusiAssocForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -201,9 +205,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
       this.BusiAssocForm.controls['min'].setValue(this.objResult.Details.min);
       this.BusiAssocForm.controls['max'].setValue(this.objResult.Details.max);
       this.BusiAssocForm.controls['rate'].setValue(this.objResult.Details.rate);
-      // this.BusiAssocForm.controls['city'].setValue(this.objResult.Details.ct);
-      //this.getLocation();
-    }
+     }
   }
   //#endregion
   //#region to handle functionCallHandler
@@ -222,10 +224,22 @@ export class VendorBusiAssocModalComponent implements OnInit {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
     const operationDropdown = await PayBasisdetailFromApi(this.masterService, 'OPT')
     const modeDropdown = await productdetailFromApi(this.masterService)
-    const locationList = await getStatelist(this.masterService);
     // Check if Details is present in objResult
     if (this.objResult.Details) {
+      const pincodeBody = {
+        "companyCode": this.companyCode,
+        "collectionName": "pincode_master",
+        "filter": {}
+      }
 
+      const pincodeResponse = await this.masterService.masterPost("generic/get", pincodeBody).toPromise();
+      const pincodeData = pincodeResponse.data
+        .map((element) => ({
+          name: element.CT,
+          value: element.CT,
+        }));
+      const updatedData = pincodeData.find((x) => x.name == this.objResult.Details.ct);
+      this.BusiAssocForm.controls.city.setValue(updatedData);
       // Update operation dropdown based on Details.operation
       const updateOperation = operationDropdown.find(item => item.name === this.objResult.Details.opNM);
       this.BusiAssocForm.controls.operation.setValue(updateOperation);
@@ -237,10 +251,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
       // Update mode dropdown based on Details.mode
       const updatemode = modeDropdown.find(item => item.name === this.objResult.Details.mdNM);
       this.BusiAssocForm.controls.mode.setValue(updatemode);
-      const updatecity = locationList.find(item => item.name === this.objResult.Details.ct);
-      this.BusiAssocForm.controls.city.setValue(updatecity);
-
-    }
+      }
 
 
     // Filter and update rateType dropdown in the UI
@@ -252,7 +263,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
     // Filter and update operation dropdown in the UI
     this.filter.Filter(this.jsonControlArray, this.BusiAssocForm, operationDropdown, this.operationName, this.operationstatus);
     // Filter and update operation dropdown in the UI
-    this.filter.Filter(this.jsonControlArray, this.BusiAssocForm, locationList, this.cityName, this.citystatus);
+
   }
 
   //#endregion

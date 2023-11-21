@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadscrums" (toggleChange)="onToggleChange($event)">
+<app-common-wrapper-webxpress [breadscrums]="breadscrums" [backPath]="backPath">
 
     <form [formGroup]="vendorContractForm">
         <app-form-webxpress [form]="vendorContractForm" [FormTitle]="'SUMMARY'" [formData]="jsonControlArray"

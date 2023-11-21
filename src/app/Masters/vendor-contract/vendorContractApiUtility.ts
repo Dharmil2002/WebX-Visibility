@@ -22,7 +22,7 @@ export async function getContractList(masterService, filterFieldName?: string, f
                 .sort((a, b) => a.cNID.localeCompare(b.value))
                 .map(item => ({
                     ...item,
-                    status: item.aCTV ? "Active" : 'Expired', // Replace with your actual status calculation logic
+                    status: "Active", // You need to replace this with your actual status calculation logic
                 }));
 
             return processedData;

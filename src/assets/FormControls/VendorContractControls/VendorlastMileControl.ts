@@ -94,7 +94,7 @@ export class VendorlastMileControl {
       },
       {
         name: "minCharge",
-        label: "MinCharge Amount (Rs)",
+        label: "MinCharge Amount (₹)",
         placeholder: "MinCharge Amount",
         type: "number",
         value: "",
@@ -133,7 +133,7 @@ export class VendorlastMileControl {
       },
       {
         name: "maxCharges",
-        label: "MaxCharge Amount (Rs)",
+        label: "MaxCharge Amount (₹)",
         placeholder: "MaxCharge Amount",
         type: "number",
         value: "",

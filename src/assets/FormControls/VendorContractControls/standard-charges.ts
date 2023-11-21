@@ -80,7 +80,7 @@ export class TERCharges {
       },
       {
         name: "rate",
-        label: "Rate(Rs)",
+        label: "Rate(₹)",
         placeholder: "Amount",
         type: "number",
         value: "",
@@ -93,7 +93,7 @@ export class TERCharges {
       },
       {
         name: "min",
-        label: "Min Amount(Rs)",
+        label: "Min Amount(₹)",
         placeholder: "Min Amount",
         type: "number",
         value: "",
@@ -106,7 +106,7 @@ export class TERCharges {
       },
       {
         name: "max",
-        label: "Max Amount(Rs)",
+        label: "Max Amount(₹)",
         placeholder: "Max Amount",
         type: "number",
         value: "",

@@ -109,7 +109,7 @@ export class VendorAssociateControls {
       },
       {
         name: "rate",
-        label: "Rate",
+        label: "Rate(₹)",
         placeholder: "Rate",
         type: "number",
         value: "",
@@ -122,7 +122,7 @@ export class VendorAssociateControls {
       },
       {
         name: "min",
-        label: "Min Amount",
+        label: "Min Amount(₹)",
         placeholder: "Min Amount",
         type: "number",
         value: "",
@@ -135,7 +135,7 @@ export class VendorAssociateControls {
       },
       {
         name: "max",
-        label: "Max Amount",
+        label: "Max Amount(₹)",
         placeholder: "Max Amount",
         type: "number",
         value: "",

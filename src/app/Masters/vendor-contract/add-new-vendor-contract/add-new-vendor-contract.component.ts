@@ -23,7 +23,8 @@ export class AddNewVendorContractComponent implements OnInit {
   vendorContractForm: UntypedFormGroup;
   vendorName: any;
   vendorStatus: any;
-  breadscrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
+  breadscrums: { title: string; items: string[]; active: string }[];
+  backPath: string;
   constructor(private fb: UntypedFormBuilder,
     private route: Router,
     private objVendorService: VendorService,
@@ -35,8 +36,8 @@ export class AddNewVendorContractComponent implements OnInit {
         title: 'Add New Vendor Contract',
         items: ['Home'],
         active: 'AddNewVendorContract',
-        generatecontrol: true,
-        toggle: false
+        // generatecontrol: true,
+        // toggle: false
       },
     ];
   }
@@ -44,6 +45,7 @@ export class AddNewVendorContractComponent implements OnInit {
   ngOnInit(): void {
     this.initializeFormControl();
     this.getVendorList();
+    this.backPath = "/Masters/VendorContract/VendorContractList";
   }
   //#region to initialize form control
   initializeFormControl() {
@@ -168,11 +170,11 @@ export class AddNewVendorContractComponent implements OnInit {
   }
   //#endregion
   //#region to set active flag value
-  onToggleChange(event: boolean) {
-    // Handle the toggle change event in the parent component
-    this.vendorContractForm.controls['ACTV'].setValue(event);
-    // console.log("Toggle value :", event);
-  }
+  // onToggleChange(event: boolean) {
+  //   // Handle the toggle change event in the parent component
+  //   this.vendorContractForm.controls['ACTV'].setValue(event);
+  //   // console.log("Toggle value :", event);
+  // }
   //#endregion
   //#region to check existing vendor 
   async checkValueExists() {

@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder } from "@angular/forms";
 import { Router } from "@angular/router";
+import { Subject, take, takeUntil } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -29,6 +30,7 @@ export class AddBankComponent implements OnInit {
   BanknameStatus: any;
   ApplicationLocationsCode: any;
   ApplicationLocationsStatus: any;
+  protected _onDestroy = new Subject<void>();
   CompanyCode = parseInt(localStorage.getItem("companyCode"));
   constructor(
     private Route: Router,
@@ -38,7 +40,6 @@ export class AddBankComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log("this.UpdateData", this.UpdateData);
       this.isUpdate = true;
       this.FormTitle = "Edit TDS";
     }
@@ -211,6 +212,23 @@ export class AddBankComponent implements OnInit {
 
   cancel() {
     this.Route.navigateByUrl("/Masters/AccountMaster/ListBank");
+  }
+
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+
+    const index = this.jsonControlArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.BankForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
   }
 
   functionCallHandler($event) {

@@ -81,7 +81,6 @@ export class ListAccountComponent implements OnInit {
       filter: {},
     };
     const res = await this.masterService.masterPost("generic/get", req).toPromise();
-    console.log('res' , res)
     if(res.success){
       this.TableData = res.data
       this.isTableLode = true

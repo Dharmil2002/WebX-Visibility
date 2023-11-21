@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -39,7 +39,7 @@ export class AddFleetMasterComponent implements OnInit {
   vehicleTypeStatus: any;
   submit = 'Save';
   imageData: any = {};
-
+  
   constructor(
     private filter: FilterUtils,
     private route: Router,

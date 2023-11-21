@@ -46,7 +46,7 @@ export async function getJobDetailFromApi(masterServices) {
             "entryDate": element?.entryDate || new Date(),
             "totalChaAmt": totalCHAamt,
             "chaDate":formatDocketDate(chaEntry?.entryDate || new Date())||"",
-            "Action": element?.status === "0" ? "CHA Entry" : element.status === "1" ? "Rake Entry" : "Advance Payment"
+            "Action": element?.status === "0" ? "CHA Entry" : element.status === "1" ? "Rake Entry" : "CHA Entry"
         }
         jobList.push(jobData)
         // You need to return the modified element

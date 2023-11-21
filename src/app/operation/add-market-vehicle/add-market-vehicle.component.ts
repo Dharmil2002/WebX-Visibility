@@ -27,21 +27,21 @@ export class AddMarketVehicleComponent implements OnInit {
   prqDetail: any;
 
   constructor
-  (
-    public dialogRef: MatDialogRef<GenericTableComponent>,
-    @Inject(MAT_DIALOG_DATA) public item: any,
-    private fb: UntypedFormBuilder,
-    private markerVehicleService: MarkerVehicleService,
-    private storage: StorageService) { 
-      if(item){
-        this.prqDetail=item
-      }
+    (
+      public dialogRef: MatDialogRef<GenericTableComponent>,
+      @Inject(MAT_DIALOG_DATA) public item: any,
+      private fb: UntypedFormBuilder,
+      private markerVehicleService: MarkerVehicleService,
+      private storage: StorageService) {
+    if (item) {
+      this.prqDetail = item
+    }
 
     this.initializeFormControl()
   }
 
   ngOnInit(): void {
-    this.marketVehicleTableForm.controls['vehicleSize']?.setValue(this.prqDetail?.vehicleSize||this.prqDetail?.containerSize||"")
+    this.marketVehicleTableForm.controls['vehicleSize']?.setValue(this.prqDetail?.vehicleSize || this.prqDetail?.containerSize || "")
   }
 
   functionCallHandler($event) {
@@ -58,14 +58,14 @@ export class AddMarketVehicleComponent implements OnInit {
 
   initializeFormControl() {
     // Create vehicleFormControls instance to get form controls for different sections
-    const  maketVehicleControl = new marketVehicleControls();
+    const maketVehicleControl = new marketVehicleControls();
     this.jsonControlVehicleArray = maketVehicleControl.getFormControls();
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.marketVehicleTableForm = formGroupBuilder(this.fb, [this.jsonControlVehicleArray]);
   }
   async save() {
 
-    var data = {      
+    var data = {
       vID: this.marketVehicleTableForm.value.vehicelNo,
       vndNM: this.marketVehicleTableForm.value.vendor,
       vndPH: this.marketVehicleTableForm.value.vMobileNo,
@@ -80,15 +80,15 @@ export class AddMarketVehicleComponent implements OnInit {
     };
 
     var res = await this.markerVehicleService.SaveVehicleData(data);
-    if(res) {
+    if (res) {
       this.dialogRef.close(this.marketVehicleTableForm.value);
     }
   }
 
-  async onVehicleNoChange(){   
-     var vehData = await this.markerVehicleService.GetVehicleData(this.marketVehicleTableForm.value.vehicelNo);
-     if(vehData){
-      this.marketVehicleTableForm.controls['vehicleSize'].setValue(vehData.wTCAP);
+  async onVehicleNoChange() {
+    var vehData = await this.markerVehicleService.GetVehicleData(this.marketVehicleTableForm.value.vehicelNo);
+    if (vehData) {
+      //this.marketVehicleTableForm.controls['vehicleSize'].setValue(vehData.wTCAP);
       this.marketVehicleTableForm.controls['vendor'].setValue(vehData.vndNM ?? '');
       this.marketVehicleTableForm.controls['vMobileNo'].setValue(vehData.vndPH ?? '');
       this.marketVehicleTableForm.controls['driver'].setValue(vehData.drvNM ?? '');
@@ -98,14 +98,14 @@ export class AddMarketVehicleComponent implements OnInit {
       this.marketVehicleTableForm.controls['dmobileNo'].setValue(vehData.drvPH ?? '');
       this.marketVehicleTableForm.controls['insuranceExpiryDate'].setValue(vehData.iNCEXP ?? new Date());
       this.marketVehicleTableForm.controls['fitnessValidityDate'].setValue(vehData.fITDT ?? new Date());
-     }
+    }
   }
 
-  checkVehicleSize(){
-    const vehicleSize=parseInt(this.prqDetail?.vehicleSize||0);
-    const resultVehicleSize=parseInt(this.marketVehicleTableForm.controls['vehicleSize']?.value||0)
+  checkVehicleSize() {
+    const vehicleSize = parseInt(this.prqDetail?.vehicleSize || 0);
+    const resultVehicleSize = parseInt(this.marketVehicleTableForm.controls['vehicleSize']?.value || 0)
     // Assuming result.vehicleSize and this.NavData.vehicleSize are both defined
-    if (resultVehicleSize!=vehicleSize) {
+    if (resultVehicleSize != vehicleSize) {
       // Show a SweetAlert dialog
       Swal.fire({
         icon: 'warning',

@@ -1,7 +1,9 @@
 <form [formGroup]="FreightMatrixForm">
     <app-form-webxpress [form]="FreightMatrixForm" [FormTitle]="'Freight Charge Matrix'"
         [formData]="jsonControlArrayFreightMatrix" (functionCallEmitter)="functionCallHandler($event)"
-        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
+        [showSaveAndCancelButton]="false" (functionCallEmitter)="functionCallHandler($event)"
+        [EventButton]="FreightMatrixForm.valid==true ? EventButton : false" (callFunction)="functionCallHandler($event)"
+        [className]="className">
     </app-form-webxpress>
 </form>
 
@@ -13,7 +15,5 @@
 
 <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
     [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
-    [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
-    (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-    [EventButton]="FreightMatrixForm.valid==true ? EventButton : false">
+    [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)">
 </app-generic-table-v2>

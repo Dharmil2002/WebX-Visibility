@@ -73,7 +73,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       Style: "min-width:2px",
     },
     capacity: {
-      Title: "Min Charge",
+      Title: "Capacity",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -191,6 +191,11 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     }
   }
   async AddNewButtonEvent(event) {
+    debugger
+    console.log(this.FreightMatrixForm)
+    if (!this.FreightMatrixForm.valid) {
+      return
+    }
     this.tableLoad = false;
     this.isLoad = true;
     const tableData = this.tableData;
@@ -199,7 +204,6 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     // Use async/await to introduce the delay
     await delay(delayDuration);
-    debugger
     const json = {
       id: tableData.length + 1,
       From: this.FreightMatrixForm.value.FromHandler?.name,
@@ -229,7 +233,11 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     this.tableLoad = true;
     // Add the "required" validation rule
     Object.keys(this.FreightMatrixForm.controls).forEach(key => {
-      this.FreightMatrixForm.get(key).setValidators(Validators.required);
+      if (!['From', 'To'].includes(key)) {
+        this.FreightMatrixForm.get(key).setValidators(Validators.required);
+        this.FreightMatrixForm.get(key).updateValueAndValidity();
+      }
+
     });
   }
   handleMenuItemClick(data) {

@@ -262,7 +262,7 @@ export class ThcGenerationComponent implements OnInit {
     let nestedDetail;
     const shipmentList = await this.thcService.getShipment(false);
     if (this.isUpdate || this.isView) {
-      this.allShipment = shipmentList;
+      this.allShipment = await this.thcService.getNestedDockDetail(shipmentList);
     } else {
       const branchWise = shipmentList.filter((x) => x.origin === this.orgBranch);
       nestedDetail = await this.thcService.getNestedDockDetail(branchWise)
@@ -446,11 +446,14 @@ export class ThcGenerationComponent implements OnInit {
     const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
 
     const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
+
+    const validTransModes = ['truck', 'trailer'];
+    const transMode = validTransModes.includes(this.prqDetail?.transMode) ? 'Road' : '';
     const jsonData = {
       vehicle: { name: this.prqDetail?.vehicleNo, value: this.prqDetail?.vehicleNo },
       vendorType: vehicleDetail?.vendorType || "",
       vendorName: { name: vehicleDetail?.vendor || '', value: vehicleDetail?.vendor || '' },
-      transMode: this.prqDetail?.transMode === 'truck' ? 'Road' : '',
+      transMode: transMode,
       route: this.prqDetail?.fromToCity || '',
       fromCity: { name: fromToCityParts[0], value: fromToCityParts[0] },
       toCity: { name: fromToCityParts[1], value: fromToCityParts[1] },
@@ -506,9 +509,48 @@ export class ThcGenerationComponent implements OnInit {
     }
 
   }
+  async prqNoChangedEvent(event) {
+
+    const CheckPRQExist = this.prqlist.some(item => item.name === event?.eventArgs?.name);
+
+    if (!CheckPRQExist) {
+
+      const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode });
+      const city = {
+        name: destinationMapping[0].city,
+        value: destinationMapping[0].city,
+      };
+
+      this.thcTableForm.controls['fromCity'].setValue(city);
+
+      const jsonData = {
+        vehicle: { name: "", value: "" },
+        vendorType: "",
+        vendorName: { name: '', value: '' },
+        transMode: "",
+        route: '',
+        fromCity: city,
+        toCity: { name: "", value: "" },
+        capacity: '',
+        driverName: '',
+        driverMno: '',
+        driverLno: '',
+        driverLexd: '',
+        panNo: '',
+        insuranceExpiryDate: new Date(),
+        fitnessValidityDate: new Date(),
+      };
+
+      // Loop through the jsonData object and set the values in the form controls
+      Object.keys(jsonData).forEach(controlName => {
+        this.thcTableForm.controls[controlName].setValue(jsonData[controlName]);
+      });
+    }
+
+  }
 
   async getShipmentDetails() {
-
+    console.log("getShipmentDetails")
     this.tableLoad = true;
     if (!this.prqFlag && this.thcTableForm.controls["prqNo"].value.value) {
       const prqData = await this.thcService.prqDetail(false);
@@ -601,7 +643,7 @@ export class ThcGenerationComponent implements OnInit {
   }
   async createThc() {
 
-    const selectedDkt = this.isUpdate ? this.tableData : this.selectedData;
+    const selectedDkt = this.isUpdate ? this.tableData : this.selectedData ? this.selectedData : [];
     if (selectedDkt.length === 0 && !this.isUpdate) {
       Swal.fire({
         icon: 'info',
@@ -838,15 +880,17 @@ export class ThcGenerationComponent implements OnInit {
   /* below function was the call when */
   async getLocBasedOnCity() {
 
-    const formCity = this.thcTableForm.controls['fromCity'].value?.value || ''
+    const fromCity = this.thcTableForm.controls['fromCity'].value?.value || ''
     const toCity = this.thcTableForm.controls['toCity'].value?.value || ''
-    const fromTo = `${formCity}-${toCity}`
+    const fromTo = `${fromCity}-${toCity}`
     this.thcTableForm.controls['route'].setValue(fromTo)
     if (toCity) {
+      console.log(this.allShipment)
 
+      debugger
       const filteredShipments = this.allShipment.filter((x) =>
-        x.fromCity.toLowerCase() === formCity.toLowerCase() &&
-        x.toCity.toLowerCase() === toCity.toLowerCase && x.orgTotWeight != "0" || x.orgNoOfPkg != "0" || x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value
+        (x.fromCity.toLowerCase() === fromCity.toLowerCase() &&
+          x.toCity.toLowerCase() === toCity.toLowerCase()) && (x.orgTotWeight != "0" || x.orgNoOfPkg != "0" || x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value)
       );
       const addEditAction = (shipments) => {
         return shipments.map((shipment) => {

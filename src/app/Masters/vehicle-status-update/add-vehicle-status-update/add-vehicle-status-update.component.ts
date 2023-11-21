@@ -29,15 +29,15 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
   locationStatus: any;
   vehicle: any;
   vehicleStatus: any;
-  backPath:string;
+  backPath: string;
   vehicleData = [];
-  allVehDetail:any;
+  allVehDetail: any;
   constructor(
     private route: Router,
     private fb: UntypedFormBuilder,
     private _operationService: OperationService,
     private filter: FilterUtils,
-    private vehicleStatusService:VehicleStatusService
+    private vehicleStatusService: VehicleStatusService
 
   ) {
 
@@ -123,13 +123,13 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
     this.vehicleStatusTableForm.controls['capacity'].setValue(capacity != undefined ? capacity : '');
     this.vehicleStatusTableForm.controls['_id'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
     this.vehicleStatusTableForm.controls['vehNo'].setValue(this.vehicleStatusTableForm.value.vehNo.value);
-    this.vehicleStatusTableForm.controls['vMobNo'].setValue(this.allVehDetail?.vendorPhoneNo||"");
-    this.vehicleStatusTableForm.controls['vendor'].setValue(this.allVehDetail?.vendorName||"");
-    this.vehicleStatusTableForm.controls['vendorType'].setValue(this.allVehDetail?.vendorType||"");
-    this.vehicleStatusTableForm.controls['driver'].setValue(this.allVehDetail?.driverName||"");
-    this.vehicleStatusTableForm.controls['dMobNo'].setValue(this.allVehDetail?.telno||"");
-   const detail= this.allVehDetail;
-   console.log(detail);
+    this.vehicleStatusTableForm.controls['vMobNo'].setValue(this.allVehDetail?.vendorPhoneNo || "");
+    this.vehicleStatusTableForm.controls['vendor'].setValue(this.allVehDetail?.vendorName || "");
+    this.vehicleStatusTableForm.controls['vendorType'].setValue(this.allVehDetail?.vendorType || "");
+    this.vehicleStatusTableForm.controls['driver'].setValue(this.allVehDetail?.driverName || "");
+    this.vehicleStatusTableForm.controls['dMobNo'].setValue(this.allVehDetail?.telno || "");
+    const detail = this.allVehDetail;
+    console.log(detail);
     try {
 
       const vehicleData = await addVehicleStatusData(this.companyCode, this._operationService, this.vehicleStatusTableForm.value);
@@ -151,23 +151,33 @@ export class AddVehicleStatusUpdateComponent implements OnInit {
 
   }
   async ValidationForVehno() {
-    const vehNo= this.vehicleStatusTableForm.value.vehNo.value;
+    const vehNo = this.vehicleStatusTableForm.value.vehNo.value;
     const vehList = await getVehicleStatusFromApi(this.companyCode, this._operationService);
-    const existingVehicle = vehList.find(vehicle => vehicle.vehNo ===vehNo);
-  
+    const existingVehicle = vehList.find(vehicle => vehicle.vehNo === vehNo);
+
     if (existingVehicle) {
       Swal.fire({
         icon: "info",
         title: "Vehicle Already Exists",
         text: `Vehicle No ${existingVehicle.vehNo} is already exist!`,
         showConfirmButton: true,
-    });
-    this.vehicleStatusTableForm.controls['vehNo'].setValue({name:"",value:""})
+      });
+      this.vehicleStatusTableForm.controls['vehNo'].setValue({ name: "", value: "" })
     }
-    else{
-       this.allVehDetail = await this.vehicleStatusService.vehicleListFromMaster(vehNo);
+    else {
+      this.allVehDetail = await this.vehicleStatusService.vehicleListFromMaster(vehNo);
+
+      if (!this.allVehDetail.driverName) {
+        Swal.fire({
+          icon: "info",
+          title: "Not Available",
+          text: "Driver is Not Available",
+          showConfirmButton: true,
+        });
+        this.vehicleStatusTableForm.controls['vehNo'].setValue({ name: "", value: "" })
+      }
     }
-}
+  }
 
   cancel() {
     this.route.navigateByUrl('Masters/Vehicle/Status');

@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="'/Masters/AccountMaster/ListAccountGroup'">
     <form [formGroup]="GroupForm">
         <app-form-webxpress [form]="GroupForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
             [FormTitle]="FormTitle" (callFunction)="functionCallHandler($event)"

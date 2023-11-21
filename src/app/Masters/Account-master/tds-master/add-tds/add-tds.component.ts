@@ -33,7 +33,6 @@ export class AddTdsComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log("this.UpdateData", this.UpdateData);
       this.isUpdate = true;
       this.FormTitle = "Edit TDS";
     }

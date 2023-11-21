@@ -14,7 +14,7 @@ import Swal from "sweetalert2";
 export class AddaccountComponent implements OnInit {
   breadScrums = [
     {
-      title: "Bank Master",
+      title: "Account Master",
       items: ["Home"],
       active: "Account",
     },
@@ -44,7 +44,6 @@ export class AddaccountComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log("this.UpdateData", this.UpdateData);
       this.isUpdate = true;
       this.FormTitle = "Edit Account";
     }
@@ -139,7 +138,6 @@ export class AddaccountComponent implements OnInit {
     const res = await this.masterService
       .masterPost("generic/get", Body)
       .toPromise();
-    console.log("res", res);
     if (res.success && res.data.length > 0) {
       const AcGroupdata = res.data.map((x) => {
         return {
@@ -206,7 +204,6 @@ export class AddaccountComponent implements OnInit {
     const res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
-    console.log("res", res);
     if (res.success) {
       const TDSsectiondata = res.data.map((x) => {
         return {

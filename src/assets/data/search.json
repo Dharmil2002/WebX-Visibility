@@ -793,9 +793,9 @@
       "router": "Masters/AccountMaster/AddTds"
     },
     {
-      "title": "AccountMasterList",
+      "title": "AccountGroupList",
       "tag": [
-        "AccountMasterList"
+        "AccountGroupList"
       ],
       "router": "Masters/AccountMaster/ListAccount"
     },

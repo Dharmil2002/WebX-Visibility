@@ -38,7 +38,6 @@ export class AddGroupComponent implements OnInit {
   ) {
     if (this.Route.getCurrentNavigation().extras?.state) {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
-      console.log("this.UpdateData", this.UpdateData);
       this.isUpdate = true;
       this.FormTitle = "Edit Account Group";
     }
@@ -115,7 +114,6 @@ export class AddGroupComponent implements OnInit {
     const res = await this.masterService
       .masterPost("generic/get", Body)
       .toPromise();
-    console.log("res", res);
     if (res.success && res.data.length > 0) {
       const BalanceSheetnamedata = res.data.map((x) => {
         return {

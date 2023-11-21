@@ -6,24 +6,23 @@ import { financialYear } from "src/app/Utility/date/date-utils";
 
 @Injectable({
     providedIn: "root",
-  })
+})
 export class ThcService {
     constructor(
         private operationService: OperationService,
         private storage: StorageService
-    )
-    { }
+    ) { }
 
-    async getShipment(vehicle=false) {       
+    async getShipment(vehicle = false) {
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.Dockets,
             filter: {}
         };
-    
+
         // Perform an asynchronous operation to fetch data from the operation service
         const result = await this.operationService.operationMongoPost(GenericActions.Get, reqBody).toPromise();
-    
+
         // If the 'vehicle' flag is true, map the 'result' array to a new format
         // and return it; otherwise, return the 'result' array as is
         return vehicle ? result.data.map(x => ({ name: x.vehicleNo, value: x.vehicleNo })) : result.data;
@@ -37,29 +36,32 @@ export class ThcService {
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.PrqDetails,
-            filter: {}
+            filter: { prqBranch: this.storage.branch }
         };
-    
+
         // Perform an asynchronous operation to fetch data from the operation service
         const result = await this.operationService.operationMongoPost(GenericActions.Get, reqBody).toPromise();
-      if(isDropDown){
-        // Filter out entries with empty or falsy values in the 'prqNo' property
-        const filteredData = result.data.filter(x => x.prqNo && x.status !=7); // This filters out entries where 'prqNo' is falsy
-    
-        // Map the filtered data to the desired format
-        const mappedData = filteredData.map(x => ({ name: x.prqNo.toString(), value: x.prqNo.toString()}));
-    
-        return mappedData;
-      }
-      else{
-         return result.data;
-      }
+        if (isDropDown) {
+            // Added By Harikesh For Status Docket Confirmed For PRQ
+            // Filter out entries with empty or falsy values in the 'prqNo' property
+            const excludedStatusValues = [3];
+
+            const filteredData = result.data.filter(x => x.prqNo && excludedStatusValues.includes(Number(x.status)));
+
+            // Map the filtered data to the desired format
+            const mappedData = filteredData.map(x => ({ name: x.prqNo.toString(), value: x.prqNo.toString() }));
+
+            return mappedData;
+        }
+        else {
+            return result.data;
+        }
     }
-    
-    async thcGeneration(data){
-         
-         // Define the request body with companyCode, collectionName, and an empty filter
-         const reqBody = {
+
+    async thcGeneration(data) {
+
+        // Define the request body with companyCode, collectionName, and an empty filter
+        const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.ThcDetails,
             data: data,
@@ -71,21 +73,21 @@ export class ThcService {
         const result = await this.operationService.operationMongoPost(OperationActions.CreateThc, reqBody).toPromise();
         return result;
     }
-    async getThcDetail(){   
-        
+    async getThcDetail() {
+
         const startDate = new Date();
         startDate.setMonth(startDate.getMonth() - 1);
         const endDate = new Date();
 
         const reqBody = {
-           companyCode: this.storage.companyCode,
-           collectionName: Collections.ThcDetails,
-           filter: {} //{ tripDate: { $gte: startDate, $lte: endDate } }
-       };
+            companyCode: this.storage.companyCode,
+            collectionName: Collections.ThcDetails,
+            filter: {} //{ tripDate: { $gte: startDate, $lte: endDate } }
+        };
 
-       // Perform an asynchronous operation to fetch data from the operation service
-       const result = await this.operationService.operationMongoPost(GenericActions.Get, reqBody).toPromise();
-       return result;
+        // Perform an asynchronous operation to fetch data from the operation service
+        const result = await this.operationService.operationMongoPost(GenericActions.Get, reqBody).toPromise();
+        return result;
     }
     async getNestedDockDetail(shipments) {
         const reqBody = {
@@ -93,7 +95,7 @@ export class ThcService {
             collectionName: Collections.docketOp,
             filter: {}
         };
-    
+
         const promises = shipments.map(async (element) => {
             reqBody.filter = { dKTNO: element.docketNumber, sFX: 0 };
             let nestedDetail = await this.operationService.operationPost(GenericActions.Get, reqBody).toPromise();
@@ -101,13 +103,13 @@ export class ThcService {
             element.totWeight = nestedDetail.data[0]?.tOTWT || 0;
             element.orgNoOfPkg = nestedDetail.data[0]?.tOTPKG || 0;
             element.orgTotWeight = nestedDetail.data[0]?.tOTWT || 0;
-            element.sFX= nestedDetail.data[0]?.sFX || 0;
+            element.sFX = nestedDetail.data[0]?.sFX || 0;
             return element;
         });
-    
+
         // Wait for all promises to resolve
         const updatedShipments = await Promise.all(promises);
         return updatedShipments;
     }
-    
+
 }

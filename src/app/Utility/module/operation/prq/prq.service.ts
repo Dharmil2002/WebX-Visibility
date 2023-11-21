@@ -303,6 +303,74 @@ export class PrqService {
     return prqDetail;
 
   }
+  async getAllPrqDetailWithFilters(billingParty: any) {
+    const reqBody = {
+      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      collectionName: "prq_detail",
+      filter: {
+        prqBranch: this.branchCode,
+        billingParty: billingParty
+      },
+    };
+
+    // Make an asynchronous request to the API using masterMongoPost method
+    const res = await this.masterService
+      .masterMongoPost("generic/get", reqBody)
+      .toPromise();
+    let prqList = [];
+    const prqDetails = res.data.filter((x) => x.prqBranch.toLowerCase() === this.branchCode.toLowerCase());
+    // Map and transform the PRQ data
+    prqDetails.map((element, index) => {
+      let prqDataItem = {
+        srNo: (element.srNo = index + 1),
+        prqNo: element?.prqNo || "",
+        vehicleSize: element?.vehicleSize || "",
+        size: element.vehicleSize
+          ? element.vehicleSize + " " + "MT"
+          : element.containerSize
+            ? element.containerSize
+            : "",
+        billingParty: element?.billingParty || "",
+        fromToCity: element?.fromCity + "-" + element?.toCity,
+        fromCity: element?.fromCity || "",
+        contactNo: element?.contactNo || "",
+        toCity: element?.toCity || "",
+        transMode: element?.transMode || "",
+        vehicleNo: element?.vehicleNo || "",
+        prqBranch: element?.prqBranch || "",
+        pickUpDate: formatDocketDate(element?.pickUpTime || new Date()),
+        pickupDate: element?.pickUpTime || new Date(),
+        status: this.status[element.status] || this.status.default,
+        actions: this.statusActions[element.status] || this.statusActions.default,
+        containerSize: element?.containerSize || "",
+        typeContainer: element?.typeContainer || "",
+        pAddress: element?.pAddress || "",
+        payType: element?.payType || "",
+        contractAmt: element?.contractAmt || "",
+        createdDate: formatDocketDate(element?.entryDate || new Date()),
+        createDateOrg: element?.entryDate
+      };
+      prqList.push(prqDataItem);
+    });
+
+    // Sort the PRQ list by pickupDate in descending order
+    const sortedData = prqList.sort((a, b) => {
+      const dateA: Date | any = new Date(a.createDateOrg);
+      const dateB: Date | any = new Date(b.createDateOrg);
+
+      // Compare the date objects
+      return dateB - dateA; // Sort in descending order
+    });
+
+    // Create an object with sorted PRQ data and all PRQ details
+    const prqDetail = {
+      tableData: sortedData,
+      allPrqDetail: res.data,
+    };
+
+    return prqDetail;
+
+  }
   // This function sets the assigned vehicle details.
   setassignVehicleDetail(data: any) {
     this.vehicleDetail = data;

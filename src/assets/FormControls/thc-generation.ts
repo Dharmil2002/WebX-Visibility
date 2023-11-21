@@ -9,8 +9,8 @@ yesterday.setHours(23, 59, 59, 999);
 let minDate = yesterday; // Now, maxDate holds the date for yesterday at the end of the day
 export class thcControl {
     private thcControlArray: FormControls[];
-    private marketVehicle:FormControls[];
-    constructor(update: boolean, view: boolean,prq:boolean) {
+    private marketVehicle: FormControls[];
+    constructor(update: boolean, view: boolean, prq: boolean) {
 
         this.thcControlArray =
             [
@@ -36,30 +36,17 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable:   view ? view : update,
+                    disable: view ? view : update,
                     Validations: [
-                      {
-                        name: "required",
-                        message: "Trip Date is required",
-                      },
+                        {
+                            name: "required",
+                            message: "Trip Date is required",
+                        },
                     ],
                     additionalData: {
-                      maxDate: maxDate,
-                      metaData: "Basic"
-                    },
-                  },
-                {
-                    name: 'route',
-                    label: 'Route',
-                    placeholder: '',
-                    type: 'text',
-                    value: '',
-                    Validations: [],
-                    generatecontrol: true, disable: view ? view :  prq?prq:false,
-                    additionalData: {
+                        maxDate: maxDate,
                         metaData: "Basic"
-                    }
-
+                    },
                 },
                 {
                     name: 'prqNo',
@@ -68,6 +55,13 @@ export class thcControl {
                     type: 'dropdown',
                     value: '',
                     Validations: [
+                        {
+                            name: "invalidAutocompleteObject",
+                            message: "Choose proper value",
+                        },
+                        {
+                            name: "autocomplete",
+                        },
                     ],
                     generatecontrol: true,
                     additionalData: {
@@ -76,98 +70,10 @@ export class thcControl {
 
                     },
                     functions: {
-                        onOptionSelect: 'getShipmentDetails'
+                        onOptionSelect: 'getShipmentDetails',
+                        onModel: "prqNoChangedEvent",
                     },
-                    disable: view ? view :  prq?prq:update
-                },
-                {
-                    name: 'vehicle',
-                    label: 'Vehicle',
-                    placeholder: '',
-                    type: view ? 'text' : 'dropdown',
-                    value: '',
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "Vehicle  is required",
-                        }],
-                    generatecontrol: true,
-                    additionalData: {
-                        showNameAndValue: false,
-                        metaData: "Basic"
-                    },
-                    functions: {
-                        onOptionSelect: 'getVehicleDetail'
-                    },
-                    disable: view ? view : prq?prq:false
-                },
-                {
-                    name: "vendorType",
-                    label: "Vendor Type",
-                    placeholder: "Vendor Type",
-                    type: view ? 'text' : 'Staticdropdown',
-                    value: [
-                        { value: "Own", name: "Own" },
-                        { value: "Attached", name: "Attached" },
-                        { value: "Rail", name: "Rail" },
-                        { value: "Market", name: "Market" },
-                        { value: "Service Provider", name: "Service Provider" }
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    generatecontrol: true,
-                    disable: view ? view :  prq?prq:false,
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "Vendor Type  is required",
-                        }],
-                    functions: {
-                        onSelection: "vendorFieldChanged"
-                    },
-                    additionalData: { metaData: "Basic" }
-                },
-                {
-                    name: "vendorName",
-                    label: "Vendor Name",
-                    placeholder: "Vendor Name",
-                    type: view ? 'text' : 'dropdown',
-                    value: "",
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    generatecontrol: true,
-                    disable: view ? view :  prq?prq:update,
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "Vendor Name  is required",
-                        }],
-                    functions: {},
-                    additionalData: {
-                        showNameAndValue: false,
-                        metaData: "Basic"
-                    }
-                },
-                {
-                    name: "panNo",
-                    label: "PAN Number",
-                    placeholder: "PAN Number",
-                    type: "text",
-                    value: "",
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    generatecontrol: true,
-                    disable: view ? view :  prq?prq:update,
-                    Validations: [
-                        {
-                            name: "required",
-                            message: "PAN Number  is required",
-                        }],
-                    functions: {},
-                    additionalData: { metaData: "Basic" }
+                    disable: view ? view : prq ? prq : update
                 },
                 {
                     name: "fromCity",
@@ -210,7 +116,7 @@ export class thcControl {
                     filterOptions: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: prq?prq:false,
+                    disable: prq ? prq : false,
                     Validations: [
                         {
                             name: "required",
@@ -233,6 +139,118 @@ export class thcControl {
                         metaData: "Basic"
                     },
                 },
+                {
+                    name: 'route',
+                    label: 'Route',
+                    placeholder: '',
+                    type: 'text',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: true, disable: view ? view : prq ? prq : false,
+                    additionalData: {
+                        metaData: "Basic"
+                    }
+
+                },
+
+                {
+                    name: "vendorType",
+                    label: "Vendor Type",
+                    placeholder: "Vendor Type",
+                    type: view ? 'text' : 'Staticdropdown',
+                    value: [
+                        { value: "Own", name: "Own" },
+                        { value: "Attached", name: "Attached" },
+                        { value: "Rail", name: "Rail" },
+                        { value: "Market", name: "Market" },
+                        { value: "Service Provider", name: "Service Provider" }
+                    ],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : prq ? prq : false,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Vendor Type  is required",
+                        }],
+                    functions: {
+                        onSelection: "vendorFieldChanged"
+                    },
+                    additionalData: { metaData: "Basic" }
+                },
+                {
+                    name: "vendorName",
+                    label: "Vendor Name",
+                    placeholder: "Vendor Name",
+                    type: view ? 'text' : 'dropdown',
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : prq ? prq : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Vendor Name  is required",
+                        }],
+                    functions: {},
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    }
+                },
+                {
+                    name: 'vehicle',
+                    label: 'Vehicle',
+                    placeholder: '',
+                    type: view ? 'text' : 'dropdown',
+                    value: '',
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "Vehicle  is required",
+                        }],
+                    generatecontrol: true,
+                    additionalData: {
+                        showNameAndValue: false,
+                        metaData: "Basic"
+                    },
+                    functions: {
+                        onOptionSelect: 'getVehicleDetail'
+                    },
+                    disable: view ? view : prq ? prq : false
+                },
+
+
+                {
+                    name: "panNo",
+                    label: "Vendor PAN Number",
+                    placeholder: "Vendor PAN Number",
+                    type: "text",
+                    value: "",
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: view ? view : prq ? prq : update,
+                    Validations: [
+                        {
+                            name: "required",
+                            message: "PAN Number  is required",
+                        },
+                        {
+                            name: "pattern",
+                            pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$",
+                            message: "Please enter a valid PAN NO (e.g., ABCDE1234F)",
+                        },],
+                    functions: {},
+                    additionalData: { metaData: "Basic" }
+                },
+
+
                 // {
                 //     name: 'closingBranch',
                 //     label: 'Closing Branch',
@@ -264,24 +282,24 @@ export class thcControl {
                     placeholder: "Transport Mode",
                     type: "Staticdropdown",
                     value: [
-                      { value: "Air", name: "Air" },
-                      { value: "Road", name: "Road" },
-                      { value: "Rail", name: "Rail" }
+                        { value: "Air", name: "Air" },
+                        { value: "Road", name: "Road" },
+                        { value: "Rail", name: "Rail" }
                     ],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : prq?prq:false,
+                    disable: view ? view : prq ? prq : false,
                     functions: {
-                      onSelection: ""
+                        onSelection: ""
                     },
                     Validations: [],
                     additionalData: {
-                      showNameAndValue: false,
-                      metaData: "Basic"
+                        showNameAndValue: false,
+                        metaData: "Basic"
                     },
-                  },
+                },
                 {
                     name: 'driverName',
                     label: 'Driver Name',
@@ -301,7 +319,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: ''
                     },
-                    disable:true
+                    disable: true
                 },
                 {
                     name: 'driverMno',
@@ -726,7 +744,7 @@ export class thcControl {
                     name: "vendorCode",
                     label: "Vendor Code",
                     placeholder: "Vendor Code",
-                    type:'',
+                    type: '',
                     value: "8888",
                     filterOptions: "",
                     autocomplete: "",
@@ -744,7 +762,7 @@ export class thcControl {
                     name: "insuranceExpiryDate",
                     label: "insuranceExpiryDate",
                     placeholder: "insuranceExpiryDate",
-                    type:'',
+                    type: '',
                     value: "",
                     filterOptions: "",
                     autocomplete: "",
@@ -762,7 +780,7 @@ export class thcControl {
                     name: "fitnessValidityDate",
                     label: "fitnessValidityDate",
                     placeholder: "fitnessValidityDate",
-                    type:'',
+                    type: '',
                     value: "",
                     filterOptions: "",
                     autocomplete: "",
@@ -792,215 +810,216 @@ export class thcControl {
                 },
             ];
         this.marketVehicle = [
-                {
-                  name: "vehicleSize",
-                  label: "Vehicle Size (MT)",
-                  placeholder: "Vehicle Size",
-                  type: "Staticdropdown",
-                  value: [
+            {
+                name: "vehicleSize",
+                label: "Vehicle Size (MT)",
+                placeholder: "Vehicle Size",
+                type: "Staticdropdown",
+                value: [
                     { value: "1", name: "1-MT" },
                     { value: "9", name: "9-MT" },
                     { value: "16", name: "16-MT" },
                     { value: "32", name: "32-MT" },
-                  ],
-                  filterOptions: "",
-                  autocomplete: "",
-                  displaywith: "",
-                  generatecontrol: true,
-                  disable: false,
-                  functions:{
-                    onSelection:"getSize"
-                  },
-                  Validations: [
+                ],
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                functions: {
+                    onSelection: "getSize"
+                },
+                Validations: [
                     {
-                      name: "required",
-                      message: "Vehicle Size is required",
+                        name: "required",
+                        message: "Vehicle Size is required",
                     },
-                  ],
-                  additionalData: {
+                ],
+                additionalData: {
                     showNameAndValue: false,
-                  },
                 },
-                {
-                  name: 'vMobileNo', label: "Vendor Mobile", placeholder: "Vendor Mobile", type: 'mobile-number',
-                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                  Validations: [
+            },
+            {
+                name: 'vMobileNo', label: "Vendor Mobile", placeholder: "Vendor Mobile", type: 'mobile-number',
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                Validations: [
                     {
-                      name: "required",
-                      message: "Vendor Mobile is required",
+                        name: "required",
+                        message: "Vendor Mobile is required",
                     },
-                  ],
+                ],
+            },
+
+            {
+                name: 'driverPan', label: "Vendor PAN Number", placeholder: "Vendor PAN Number", type: 'government-id',
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                functions: {
+                    onChange: "autoFillDriverDetails"
                 },
-                {
-                  name: 'driver', label: "Driver", placeholder: "Driver", type: 'text',
-                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                  functions:{
-                    onChange:"autoFillDriverDetails"
-                  },
-                  Validations: [
+                Validations: [
                     {
-                      name: "required",
-                      message: "Driver is required",
+                        name: "required",
+                        message: "Pan No is required",
                     },
-                  ],
+                    {
+                        name: "pattern",
+                        pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$",
+                        message: "Please enter a valid PAN NO (e.g., ABCDE1234F)",
+                    },
+                ],
+            },
+            {
+                name: 'driver', label: "Driver Name", placeholder: "Driver Name", type: 'text',
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                functions: {
+                    onChange: "autoFillDriverDetails"
                 },
-                {
-                  name: 'driverPan', label: "Pan No", placeholder: "Pan No", type: 'government-id',
-                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                  functions:{
-                    onChange:"autoFillDriverDetails"
-                  },
-                  Validations: [
+                Validations: [
                     {
-                      name: "required",
-                      message: "Pan No is required",
+                        name: "required",
+                        message: "Driver is required",
                     },
-                    {
-                      name: "pattern",
-                      pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$",
-                      message: "Please enter a valid PAN NO (e.g., ABCDE1234F)",
-                    },
-                  ],
+                ],
+            },
+            {
+                name: 'lcNo', label: "Driving Licence No", placeholder: "Driving Licence No", type: 'government-id',
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                functions: {
+                    onChange: "autoFillDriverDetails"
                 },
-                {
-                  name: 'lcNo', label: "Driving Licence No", placeholder: "Driving Licence No", type: 'government-id',
-                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                  functions:{
-                    onChange:"autoFillDriverDetails"
-                  },
-                  Validations: [
+                Validations: [
                     {
-                      name: "required",
-                      message: "Driving Licence   is required",
+                        name: "required",
+                        message: "Driving Licence   is required",
                     },
                     {
-                      name: "pattern",
-                      message:
-                        "Please Enter alphanumeric License No",
-                      pattern: "^[A-Z]{2}[0-9]{13}$",
+                        name: "pattern",
+                        message:
+                            "Please Enter alphanumeric License No",
+                        pattern: "^[A-Z]{2}[0-9]{13}$",
                     },
-                    
-                  ],
+
+                ],
+            },
+            {
+                name: 'lcExpireDate', label: "Driving Licence Expiry Date", placeholder: "Driving Licence Expiry Date", type: 'date',
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                functions: {
+                    onChange: "autoFillDriverDetails"
                 },
-                {
-                  name: 'lcExpireDate', label: "Driving Licence Expiry Date", placeholder: "Driving Licence Expiry Date", type: 'date',
-                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                  functions:{
-                    onChange:"autoFillDriverDetails"
-                  },
-                  Validations: [
+                Validations: [
                     {
-                      name: "required",
-                      message: "Driving Licence Expiry Date  is required",
+                        name: "required",
+                        message: "Driving Licence Expiry Date  is required",
                     },
-                  ],
-                  additionalData: {
+                ],
+                additionalData: {
                     minDate: new Date()
-                  },
                 },
-          
-                {
-                  name: 'dmobileNo', label: "Driver Mobile No", placeholder: "Driver", type: 'mobile-number',
-                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
-                  functions:{
-                    onChange:"autoFillDriverDetails"
-                  },
-                  Validations: [
-                    {
-                      name: "required",
-                      message: "Driver is required",
-                    },
-                  ],
+            },
+
+            {
+                name: 'dmobileNo', label: "Driver Mobile No", placeholder: "Driver", type: 'mobile-number',
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                functions: {
+                    onChange: "autoFillDriverDetails"
                 },
-                {
-                  name: 'insuranceExpiryDate', label: "Insurance Expiry Date", placeholder: "Enter Insurance Expiry Date",
-                  type: 'date', value:"", generatecontrol: true, disable: false,
-                  Validations: [
+                Validations: [
                     {
-                      name: "required",
-                      message: "Insurance Expiry Date is required"
+                        name: "required",
+                        message: "Driver is required",
                     },
-                  ],
-                  additionalData: {
+                ],
+            },
+            {
+                name: 'insuranceExpiryDate', label: "Insurance Expiry Date", placeholder: "Enter Insurance Expiry Date",
+                type: 'date', value: "", generatecontrol: true, disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Insurance Expiry Date is required"
+                    },
+                ],
+                additionalData: {
                     minDate: new Date(), // Set the minimum date to the current date
                     maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
-                  }
-                },
-          
-                {
-                  name: 'fitnessValidityDate', label: "Fitness Validity Date", placeholder: "", type: 'date',
-                  value: "", generatecontrol: true, disable: false,
-                  Validations: [
+                }
+            },
+
+            {
+                name: 'fitnessValidityDate', label: "Fitness Validity Date", placeholder: "", type: 'date',
+                value: "", generatecontrol: true, disable: false,
+                Validations: [
                     {
-                      name: "required",
-                      message: "Fitness Validity Date is required"
+                        name: "required",
+                        message: "Fitness Validity Date is required"
                     },
-                  ],
-                  additionalData: {
+                ],
+                additionalData: {
                     minDate: new Date(), // Set the minimum date to the current date
                     maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
-                  }
-                },
-                {
-                  name: 'vendCode',
-                  label: 'vendCode',
-                  placeholder: 'vendCode',
-                  type: '',
-                  value: "",
-                  Validations: [],
-                  generatecontrol: false, disable: false
-                },
-                {
-                  name: 'vendor', label: "Vendor Name", placeholder: "Vendor Name", type: '',
-                  value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
-                  Validations: [
-                  ],
-                },
-                {
-                  name: 'companyCode', label: "Company Code", placeholder: "Company Code", type: '',
-                  value: localStorage.getItem("companyCode"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
-                  Validations: [
-                  ],
-                },
-                {
-                  name: '_id', label: "_id", placeholder: "_id", type: '',
-                  value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
-                  Validations: [
-                  ],
-                },
-                {
-                  name: 'entryBy',
-                  label: 'Entry By',
-                  placeholder: 'Entry By',
-                  type: 'text',
-                  value: localStorage.getItem("UserName"),
-                  Validations: [],
-                  generatecontrol: false, disable: false
-                },
-                {
-                  name: 'entryDate',
-                  label: 'Entry Date',
-                  placeholder: 'Entry Date',
-                  type: 'text',
-                  value: new Date(),
-                  Validations: [],
-                  generatecontrol: false, disable: false
-                },
-                {
-                  name: 'vehNo',
-                  label: 'Vehicle No',
-                  placeholder: 'Vehicle No',
-                  type: '',
-                  value: "",
-                  Validations: [],
-                  generatecontrol: false, disable: false
-                },
+                }
+            },
+            {
+                name: 'vendCode',
+                label: 'vendCode',
+                placeholder: 'vendCode',
+                type: '',
+                value: "",
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
+            {
+                name: 'vendor', label: "Vendor Name", placeholder: "Vendor Name", type: '',
+                value: '', filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+                Validations: [
+                ],
+            },
+            {
+                name: 'companyCode', label: "Company Code", placeholder: "Company Code", type: '',
+                value: localStorage.getItem("companyCode"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+                Validations: [
+                ],
+            },
+            {
+                name: '_id', label: "_id", placeholder: "_id", type: '',
+                value: "", filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
+                Validations: [
+                ],
+            },
+            {
+                name: 'entryBy',
+                label: 'Entry By',
+                placeholder: 'Entry By',
+                type: 'text',
+                value: localStorage.getItem("UserName"),
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
+            {
+                name: 'entryDate',
+                label: 'Entry Date',
+                placeholder: 'Entry Date',
+                type: 'text',
+                value: new Date(),
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
+            {
+                name: 'vehNo',
+                label: 'Vehicle No',
+                placeholder: 'Vehicle No',
+                type: '',
+                value: "",
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
         ]
     }
     getThcFormControls() {
         return this.thcControlArray;
     }
-    getMarketVehicle(){
+    getMarketVehicle() {
         return this.marketVehicle
     }
 

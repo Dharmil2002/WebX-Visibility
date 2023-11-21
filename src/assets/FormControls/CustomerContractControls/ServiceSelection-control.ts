@@ -38,83 +38,100 @@ export class ContractServiceSelectionControl {
         },
       },
       {
-        name: "rateType",
-        label: "Rate Type",
-        placeholder: "Rate Type",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        accessallowed: true,
-        Validations: [
-          {
-            name: "required",
-            message: "Rate Type is required",
-          },
-        ],
-        additionalData: {
-          showNameAndValue: false,
-        },
-      },
-
-
-      {
-        name: "originRateOption",
-        label: "Origin Rate ",
-        placeholder: "Origin Rate ",
-        type: "dropdown",
-        value: "",
+        name: 'rateTypeDetails',
+        label: 'Rate Type',
+        placeholder: 'Rate Type',
+        type: 'multiselect',
+        value: '',
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         Validations: [
-          {
-            name: "required",
-            message: "Origin Rate is required",
-          },
         ],
         additionalData: {
+          isIndeterminate: false,
+          isChecked: false,
+          support: "rateTypecontrolHandler",
           showNameAndValue: false,
-
+          Validations: [{
+            name: "",
+            message: ""
+          }]
         },
         functions: {
-          onModel: 'SetRateOptions',
+          onToggleAll: 'toggleSelectAll',
         },
-        generatecontrol: true,
-        disable: false,
-        accessallowed: true,
+        generatecontrol: true, disable: false
       },
+      //   ---------------Add support Controllers at last -----------------------
       {
-        name: "destinationRateOption",
-        label: "Destination Rate",
-        placeholder: "Destination Rate",
-        type: "dropdown",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        Validations: [
-          {
-            name: "required",
-            message: "estination Rate is required",
-          },
-        ],
+        name: 'rateTypecontrolHandler',
+        label: 'Rate Type',
+        placeholder: 'Rate Type',
+        type: '',
+        value: '',
+        Validations: [],
         functions: {
-          onModel: 'SetRateOptions',
+          onToggleAll: 'toggleSelectAll',
         },
-        additionalData: {
-
-          showNameAndValue: false,
-
-        },
-
-        generatecontrol: true,
-        disable: false,
-        accessallowed: true,
+        generatecontrol: false, disable: false
       },
+
+
+      // {
+      //   name: "originRateOption",
+      //   label: "Origin Rate ",
+      //   placeholder: "Origin Rate ",
+      //   type: "dropdown",
+      //   value: "",
+      //   filterOptions: "",
+      //   autocomplete: "",
+      //   displaywith: "",
+      //   Validations: [
+      //     {
+      //       name: "required",
+      //       message: "Origin Rate is required",
+      //     },
+      //   ],
+      //   additionalData: {
+      //     showNameAndValue: false,
+
+      //   },
+      //   functions: {
+      //     onModel: 'SetRateOptions',
+      //   },
+      //   generatecontrol: true,
+      //   disable: true,
+      //   accessallowed: true,
+      // },
+      // {
+      //   name: "destinationRateOption",
+      //   label: "Destination Rate",
+      //   placeholder: "Destination Rate",
+      //   type: "dropdown",
+      //   value: "",
+      //   filterOptions: "",
+      //   autocomplete: "",
+      //   displaywith: "",
+      //   Validations: [
+      //     {
+      //       name: "required",
+      //       message: "estination Rate is required",
+      //     },
+      //   ],
+      //   functions: {
+      //     onModel: 'SetRateOptions',
+      //   },
+      //   additionalData: {
+
+      //     showNameAndValue: false,
+
+      //   },
+
+      //   generatecontrol: true,
+      //   disable: true,
+      //   accessallowed: true,
+      // },
 
       // {
       //   name: 'originRateOptionHandler',
@@ -602,7 +619,7 @@ export class ContractServiceSelectionControl {
         accessallowed: true,
       },
       {
-        name: "rateType",
+        name: "irateType",
         label: "Rate Type",
         placeholder: "Rate Type",
         type: "text",

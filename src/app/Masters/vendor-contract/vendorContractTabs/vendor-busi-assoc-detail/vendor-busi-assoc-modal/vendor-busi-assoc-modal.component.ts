@@ -1,16 +1,16 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, SimpleChanges } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { PayBasisdetailFromApi, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { PinCodeService } from 'src/app/Utility/module/masters/pincode/pincode.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { SessionService } from 'src/app/core/service/session.service';
 import { VendorAssociateControls } from 'src/assets/FormControls/VendorContractControls/VendorAssociateControls';
 import Swal from 'sweetalert2';
-import { getStatelist } from '../../../vendorContractApiUtility';
 
 @Component({
   selector: 'app-vendor-busi-assoc-modal',
@@ -30,7 +30,9 @@ export class VendorBusiAssocModalComponent implements OnInit {
   modestatus: any;
   operationName: any;
   operationstatus: any;
-  constructor(private objLocationService: LocationService,
+  CurrentContractDetails: any;
+
+  constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private objPinCodeService: PinCodeService,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
@@ -40,14 +42,21 @@ export class VendorBusiAssocModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
     this.companyCode = this.sessionService.getCompanyCode();
-
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)      
+     // console.log(this.CurrentContractDetails.cNID);      
+    });
   }
+  
   ngOnInit(): void {
     this.getDropDownData();
     this.initializeFormControl();
 
     // console.log(this.objResult);
   }
+ 
   //#region to get location list
   async getLocation() {
     await this.objPinCodeService.getCity(
@@ -64,7 +73,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
       if (this.objResult.Details) {
         // Update existing vendor contract
         const updateData = this.extractFormData();
-        const id = this.objResult.Details.vcbaID;
+        const id = this.objResult.Details._id;
         const updateRequest = {
           companyCode: this.companyCode,
           collectionName: collectionName,
@@ -115,18 +124,18 @@ export class VendorBusiAssocModalComponent implements OnInit {
   extractFormData() {
     // Extract form data for updating an existing contract
     return {
-      ct: this.BusiAssocForm.value.city.value,
-      mdID: this.BusiAssocForm.value.mode.value,
-      mdNM: this.BusiAssocForm.value.mode.name,
-      opID: this.BusiAssocForm.value.operation.value,
-      opNM: this.BusiAssocForm.value.operation.name,
-      rtID: this.BusiAssocForm.value.rateType.value,
-      rtNM: this.BusiAssocForm.value.rateType.name,
-      min: parseInt(this.BusiAssocForm.value.min),
-      rate: parseInt(this.BusiAssocForm.value.rate),
-      max: parseInt(this.BusiAssocForm.value.max),
-      upDT: new Date(),
-      upBY: this.BusiAssocForm.value.upBY,
+      cT: this.BusiAssocForm.value.city.value,
+      mDID: this.BusiAssocForm.value.mode.value,
+      mDNM: this.BusiAssocForm.value.mode.name,
+      oPID: this.BusiAssocForm.value.operation.value,
+      oPNM: this.BusiAssocForm.value.operation.name,
+      rTID: this.BusiAssocForm.value.rateType.value,
+      rTNM: this.BusiAssocForm.value.rateType.name,
+      mIN: parseInt(this.BusiAssocForm.value.min),
+      rT: parseInt(this.BusiAssocForm.value.rate),
+      mAX: parseInt(this.BusiAssocForm.value.max),
+      uPDT: new Date(),
+      uPBY: this.BusiAssocForm.value.upBY,
     };
   }
 
@@ -152,19 +161,20 @@ export class VendorBusiAssocModalComponent implements OnInit {
   prepareContractData(newVendorCode: string) {
     // Prepare data for creating a new contract
     return {
-      _id: newVendorCode,
+      _id: this.companyCode + "-" + newVendorCode,
       vcbaID: newVendorCode,
       cID: this.companyCode,
-      ct: this.BusiAssocForm.value.city.value,
-      mdID: this.BusiAssocForm.value.mode.value,
-      mdNM: this.BusiAssocForm.value.mode.name,
-      opID: this.BusiAssocForm.value.operation.value,
-      opNM: this.BusiAssocForm.value.operation.name,
-      rtID: this.BusiAssocForm.value.rateType.value,
-      rtNM: this.BusiAssocForm.value.rateType.name,
-      min: parseInt(this.BusiAssocForm.value.min),
-      rate: parseInt(this.BusiAssocForm.value.rate),
-      max: parseInt(this.BusiAssocForm.value.max),
+      cNID:this.CurrentContractDetails.cNID,
+      cT: this.BusiAssocForm.value.city.value,
+      mDID: this.BusiAssocForm.value.mode.value,
+      mDNM: this.BusiAssocForm.value.mode.name,
+      oPID: this.BusiAssocForm.value.operation.value,
+      oPNM: this.BusiAssocForm.value.operation.name,
+      rTID: this.BusiAssocForm.value.rateType.value,
+      rTNM: this.BusiAssocForm.value.rateType.name,
+      mIN: parseInt(this.BusiAssocForm.value.min),
+      rT: parseInt(this.BusiAssocForm.value.rate),
+      mAX: parseInt(this.BusiAssocForm.value.max),
       eDT: new Date(),
       eNBY: this.BusiAssocForm.value.ENBY,
     };
@@ -202,10 +212,10 @@ export class VendorBusiAssocModalComponent implements OnInit {
       }
     });
     if (this.objResult.Details) {
-      this.BusiAssocForm.controls['min'].setValue(this.objResult.Details.min);
-      this.BusiAssocForm.controls['max'].setValue(this.objResult.Details.max);
-      this.BusiAssocForm.controls['rate'].setValue(this.objResult.Details.rate);
-     }
+      this.BusiAssocForm.controls['min'].setValue(this.objResult.Details.mIN);
+      this.BusiAssocForm.controls['max'].setValue(this.objResult.Details.mAX);
+      this.BusiAssocForm.controls['rate'].setValue(this.objResult.Details.rT);
+    }
   }
   //#endregion
   //#region to handle functionCallHandler
@@ -238,20 +248,20 @@ export class VendorBusiAssocModalComponent implements OnInit {
           name: element.CT,
           value: element.CT,
         }));
-      const updatedData = pincodeData.find((x) => x.name == this.objResult.Details.ct);
+      const updatedData = pincodeData.find((x) => x.name == this.objResult.Details.cT);
       this.BusiAssocForm.controls.city.setValue(updatedData);
       // Update operation dropdown based on Details.operation
-      const updateOperation = operationDropdown.find(item => item.name === this.objResult.Details.opNM);
+      const updateOperation = operationDropdown.find(item => item.name === this.objResult.Details.oPNM);
       this.BusiAssocForm.controls.operation.setValue(updateOperation);
 
       // Update rateType dropdown based on Details.rateType
-      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rtNM);
+      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTNM);
       this.BusiAssocForm.controls.rateType.setValue(updaterateType);
 
       // Update mode dropdown based on Details.mode
-      const updatemode = modeDropdown.find(item => item.name === this.objResult.Details.mdNM);
+      const updatemode = modeDropdown.find(item => item.name === this.objResult.Details.mDNM);
       this.BusiAssocForm.controls.mode.setValue(updatemode);
-      }
+    }
 
 
     // Filter and update rateType dropdown in the UI
@@ -265,6 +275,30 @@ export class VendorBusiAssocModalComponent implements OnInit {
     // Filter and update operation dropdown in the UI
 
   }
+  //#endregion
+  //#region to Validate the minimum and maximum charge values in the BusiAssocForm.
+  validateMinCharge() {
+    // Get the current values of 'min' and 'max' from the BusiAssocForm
+    const minValue = this.BusiAssocForm.get('min')?.value;
+    const maxValue = this.BusiAssocForm.get('max')?.value;
 
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue > maxValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Max charge must be greater than or equal to Min charge.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the BusiAssocForm to an empty string
+      this.BusiAssocForm.patchValue({
+        min: '',
+        max: ''
+      });
+    }
+  }
   //#endregion
 }

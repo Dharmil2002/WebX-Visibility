@@ -37,7 +37,7 @@ export class VendorContractServiceSelectionComponent implements OnInit {
 
   METADATA = {
     checkBoxRequired: true,
-    // selectAllorRenderedData : false,
+    selectAllorRenderedData : false,
     noColumnSort: ["checkBoxRequired"],
   };
   columnHeader = {
@@ -108,6 +108,9 @@ export class VendorContractServiceSelectionComponent implements OnInit {
     this.save(newService);
   }
   //#endregion
+  someComplete(){
+    
+  }
   //#region to get services from collection
   async getServiceData() {
     // Step 1: Fetch data from the API
@@ -160,6 +163,7 @@ export class VendorContractServiceSelectionComponent implements OnInit {
   //#region to save service 
   async save(data) {
     try {
+      debugger
       const collectionName = "vndr_cnt_service";
       const existingData = await this.fetchExistingData()
       // Find services in 'data' that are not in 'existingData'

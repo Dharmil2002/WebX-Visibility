@@ -56,7 +56,7 @@ export class VendorLHLModalComponent implements OnInit {
       if (this.objResult.Details) {
         // Update existing vendor contract
         const updateData = this.extractFormData();
-        const id = this.objResult.Details.vcxrID;
+        const id = this.objResult.Details._id;
         const updateRequest = {
           companyCode: this.companyCode,
           collectionName: vendorContractCollection,
@@ -105,17 +105,17 @@ export class VendorLHLModalComponent implements OnInit {
   extractFormData() {
     // Extract form data for updating an existing contract
     return {
-      rtTpID: this.TLHLForm.value.route.value,
-      rtTpNM: this.TLHLForm.value.route.name,
-      cpctyID: this.TLHLForm.value.capacity.value,
-      cpctyNM: this.TLHLForm.value.capacity.name,
-      rtID: this.TLHLForm.value.rateType.value,
-      rtNM: this.TLHLForm.value.rateType.name,
-      rate: parseInt(this.TLHLForm.value.rate),
-      min: parseInt(this.TLHLForm.value.min),
-      max: parseInt(this.TLHLForm.value.max),
-      upDT: new Date(),
-      upBY: this.TLHLForm.value.upBY,
+      rTID: this.TLHLForm.value.route.value,
+      rTNM: this.TLHLForm.value.route.name,
+      cPCTID: this.TLHLForm.value.capacity.value,
+      cPCTNM: this.TLHLForm.value.capacity.name,
+      rTTID: this.TLHLForm.value.rateType.value,
+      rTTNM: this.TLHLForm.value.rateType.name,
+      rT: parseInt(this.TLHLForm.value.rate),
+      mIN: parseInt(this.TLHLForm.value.min),
+      mAX: parseInt(this.TLHLForm.value.max),
+      uPDT: new Date(),
+      uPBY: this.TLHLForm.value.ENBY,
     };
   }
 
@@ -141,18 +141,18 @@ export class VendorLHLModalComponent implements OnInit {
   prepareContractData(newVendorCode: string) {
     // Prepare data for creating a new contract
     return {
-      _id: newVendorCode,
+      _id: this.companyCode + "-" + newVendorCode,
       vclbID: newVendorCode,
       cID: this.companyCode,
-      rtTpID: this.TLHLForm.value.route.value,
-      rtTpNM: this.TLHLForm.value.route.name,
-      cpctyID: this.TLHLForm.value.capacity.value,
-      cpctyNM: this.TLHLForm.value.capacity.name,
-      rtID: this.TLHLForm.value.rateType.value,
-      rtNM: this.TLHLForm.value.rateType.name,
-      rate: parseInt(this.TLHLForm.value.rate),
-      min: parseInt(this.TLHLForm.value.min),
-      max: parseInt(this.TLHLForm.value.max),
+      rTID: this.TLHLForm.value.route.value,
+      rTNM: this.TLHLForm.value.route.name,
+      cPCTID: this.TLHLForm.value.capacity.value,
+      cPCTNM: this.TLHLForm.value.capacity.name,
+      rTTID: this.TLHLForm.value.rateType.value,
+      rTTNM: this.TLHLForm.value.rateType.name,
+      rT: parseInt(this.TLHLForm.value.rate),
+      mIN: parseInt(this.TLHLForm.value.min),
+      mAX: parseInt(this.TLHLForm.value.max),
       eDT: new Date(),
       eNBY: this.TLHLForm.value.ENBY,
     };
@@ -186,9 +186,9 @@ export class VendorLHLModalComponent implements OnInit {
       }
     });
     if (this.objResult.Details) {
-      this.TLHLForm.controls['rate'].setValue(this.objResult.Details.rate);
-      this.TLHLForm.controls['min'].setValue(this.objResult.Details.min);
-      this.TLHLForm.controls['max'].setValue(this.objResult.Details.max);
+      this.TLHLForm.controls['rate'].setValue(this.objResult.Details.rT);
+      this.TLHLForm.controls['min'].setValue(this.objResult.Details.mIN);
+      this.TLHLForm.controls['max'].setValue(this.objResult.Details.mAX);
     }
   }
   //#endregion
@@ -206,7 +206,7 @@ export class VendorLHLModalComponent implements OnInit {
   async getRouteList() {
     const routeList = await this.objRouteLocationService.getRouteLocationDetail()
     if (this.objResult.Details) {
-      const updatedRoute = routeList.find((x) => x.name == this.objResult.Details.rtTpNM);
+      const updatedRoute = routeList.find((x) => x.name == this.objResult.Details.rTNM);
       this.TLHLForm.controls.route.setValue(updatedRoute);
     }
     this.filter.Filter(this.jsonControlArray, this.TLHLForm, routeList, this.routeName, this.routestatus);
@@ -221,7 +221,7 @@ export class VendorLHLModalComponent implements OnInit {
         value: e.containerCode // Map the value to the specified valueKey
       }));
     if (this.objResult.Details) {
-      const updatedData = containerData.find((x) => x.name == this.objResult.Details.cpctyNM);
+      const updatedData = containerData.find((x) => x.name == this.objResult.Details.cPCTNM);
       this.TLHLForm.controls.capacity.setValue(updatedData);
     }
     this.filter.Filter(this.jsonControlArray, this.TLHLForm, containerData, this.capacityName, this.capacitystatus);
@@ -231,10 +231,35 @@ export class VendorLHLModalComponent implements OnInit {
   async getDropDownData() {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
     if (this.objResult.Details) {
-      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rtNM);
+      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
       this.TLHLForm.controls.rateType.setValue(updaterateType);
     }
     this.filter.Filter(this.jsonControlArray, this.TLHLForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
+  }
+  //#endregion
+   //#region to Validate the minimum and maximum charge values in the TLHLForm.
+   validateMinCharge() {
+    // Get the current values of 'min' and 'max' from the TLHLForm
+    const minValue = this.TLHLForm.get('min')?.value;
+    const maxValue = this.TLHLForm.get('max')?.value;
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue > maxValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Max charge must be greater than or equal to Min charge.',
+        toast: false,
+        icon: "error",      
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TLHLForm to an empty string
+      this.TLHLForm.patchValue({
+        min: '',
+        max: ''
+      });
+    }
   }
   //#endregion
 }

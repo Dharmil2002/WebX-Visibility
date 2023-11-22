@@ -1,12 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { RouteLocationService } from 'src/app/Utility/module/masters/route-location/route-location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { SessionService } from 'src/app/core/service/session.service';
 import { TERCharges } from 'src/assets/FormControls/VendorContractControls/standard-charges';
 import Swal from 'sweetalert2';
@@ -30,8 +32,10 @@ export class VendorTERModalComponent implements OnInit {
   rateTypeDropDown: any;
   rateTypeName: any;
   rateTypestatus: any;
+  CurrentContractDetails: any;
 
-  constructor(private fb: UntypedFormBuilder,
+  constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
+    private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
     private sessionService: SessionService,
@@ -41,6 +45,12 @@ export class VendorTERModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
     this.companyCode = this.sessionService.getCompanyCode();
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)      
+      console.log(this.CurrentContractDetails.cNID);      
+    });
 
   }
 
@@ -49,8 +59,8 @@ export class VendorTERModalComponent implements OnInit {
     this.getContainerList();
     this.getDropDownData();
     this.initializeFormControl();
-   // console.log(this.objResult);
-    
+    // console.log(this.objResult);
+
   }
   //#region to initialize form control
   initializeFormControl() {
@@ -72,9 +82,9 @@ export class VendorTERModalComponent implements OnInit {
       }
     });
     if (this.objResult.Details) {
-      this.TERForm.controls['rate'].setValue(this.objResult.Details.rate);
-      this.TERForm.controls['min'].setValue(this.objResult.Details.min);
-      this.TERForm.controls['max'].setValue(this.objResult.Details.max);
+      this.TERForm.controls['rate'].setValue(this.objResult.Details.rT);
+      this.TERForm.controls['min'].setValue(this.objResult.Details.mIN);
+      this.TERForm.controls['max'].setValue(this.objResult.Details.mAX);
     }
   }
   //#endregion
@@ -92,7 +102,7 @@ export class VendorTERModalComponent implements OnInit {
       if (this.objResult.Details) {
         // Update existing vendor contract
         const updateData = this.extractFormData();
-        const id = this.objResult.Details.vcxrID;
+        const id = this.objResult.Details._id;
         const updateRequest = {
           companyCode: this.companyCode,
           collectionName: vendorContractCollection,
@@ -141,17 +151,17 @@ export class VendorTERModalComponent implements OnInit {
   extractFormData() {
     // Extract form data for updating an existing contract
     return {
-      rtTpID: this.TERForm.value.route.value,
-      rtTpNM: this.TERForm.value.route.name,
-      cpctyID: this.TERForm.value.capacity.value,
-      cpctyNM: this.TERForm.value.capacity.name,
-      rtID: this.TERForm.value.rateType.value,
-      rtNM: this.TERForm.value.rateType.name,
-      rate: parseInt(this.TERForm.value.rate),
-      min: parseInt(this.TERForm.value.min),
-      max: parseInt(this.TERForm.value.max),
-      upDT: new Date(),
-      upBY: this.TERForm.value.upBY,
+      rTID: this.TERForm.value.route.value,
+      rTNM: this.TERForm.value.route.name,
+      cPCTID: this.TERForm.value.capacity.value,
+      cPCTNM: this.TERForm.value.capacity.name,
+      rTTID: this.TERForm.value.rateType.value,
+      rTTNM: this.TERForm.value.rateType.name,
+      rT: parseInt(this.TERForm.value.rate),
+      mIN: parseInt(this.TERForm.value.min),
+      mAX: parseInt(this.TERForm.value.max),
+      uPDT: new Date(),
+      uPBY: this.TERForm.value.uPBY,
     };
   }
 
@@ -177,18 +187,19 @@ export class VendorTERModalComponent implements OnInit {
   prepareContractData(newVendorCode: string) {
     // Prepare data for creating a new contract
     return {
-      _id: newVendorCode,
+      _id: this.companyCode + "-" + newVendorCode,
       vcxrID: newVendorCode,
       cID: this.companyCode,
-      rtTpID: this.TERForm.value.route.value,
-      rtTpNM: this.TERForm.value.route.name,
-      cpctyID: this.TERForm.value.capacity.value,
-      cpctyNM: this.TERForm.value.capacity.name,
-      rtID: this.TERForm.value.rateType.value,
-      rtNM: this.TERForm.value.rateType.name,
-      rate: parseInt(this.TERForm.value.rate),
-      min: parseInt(this.TERForm.value.min),
-      max: parseInt(this.TERForm.value.max),
+      cNID:this.CurrentContractDetails.cNID,
+      rTID: this.TERForm.value.route.value,
+      rTNM: this.TERForm.value.route.name,
+      cPCTID: this.TERForm.value.capacity.value,
+      cPCTNM: this.TERForm.value.capacity.name,
+      rTTID: this.TERForm.value.rateType.value,
+      rTTNM: this.TERForm.value.rateType.name,
+      rT: parseInt(this.TERForm.value.rate),
+      mIN: parseInt(this.TERForm.value.min),
+      mAX: parseInt(this.TERForm.value.max),
       eDT: new Date(),
       eNBY: this.TERForm.value.ENBY,
     };
@@ -209,7 +220,7 @@ export class VendorTERModalComponent implements OnInit {
   async getRouteList() {
     this.routeList = await this.objRouteLocationService.getRouteLocationDetail()
     if (this.objResult.Details) {
-      const updatedRoute = this.routeList.find((TERForm) => TERForm.name == this.objResult.Details.rtTpNM);
+      const updatedRoute = this.routeList.find((TERForm) => TERForm.name == this.objResult.Details.rTNM);
       this.TERForm.controls.route.setValue(updatedRoute);
     }
     this.filter.Filter(this.jsonControlArray, this.TERForm, this.routeList, this.routeName, this.routestatus);
@@ -224,7 +235,7 @@ export class VendorTERModalComponent implements OnInit {
         value: e.containerCode // Map the value to the specified valueKey
       }));
     if (this.objResult.Details) {
-      const updatedData = this.containerData.find((TERForm) => TERForm.name == this.objResult.Details.cpctyNM);
+      const updatedData = this.containerData.find((TERForm) => TERForm.name == this.objResult.Details.cPCTNM);
       this.TERForm.controls.capacity.setValue(updatedData);
     }
     this.filter.Filter(this.jsonControlArray, this.TERForm, this.containerData, this.capacityName, this.capacitystatus);
@@ -235,11 +246,35 @@ export class VendorTERModalComponent implements OnInit {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
 
     if (this.objResult.Details) {
-      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rtNM);
+      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
       this.TERForm.controls.rateType.setValue(updaterateType);
     }
     this.filter.Filter(this.jsonControlArray, this.TERForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
   }
   //#endregion
+  //#region to Validate the minimum and maximum charge values in the TERForm.
+  validateMinCharge() {
+    // Get the current values of 'min' and 'max' from the TERForm
+    const minValue = this.TERForm.get('min')?.value;
+    const maxValue = this.TERForm.get('max')?.value;
 
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue > maxValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Max charge must be greater than or equal to Min charge.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.TERForm.patchValue({
+        min: '',
+        max: ''
+      });
+    }
+  }
+  //#endregion
 }

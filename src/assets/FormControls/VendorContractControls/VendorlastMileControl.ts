@@ -103,7 +103,14 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "MinCharge Amount is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
       {
         name: "committedKm",
@@ -116,7 +123,11 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "Committed Km is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
       },
       {
         name: "additionalKm",
@@ -129,7 +140,11 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "Additional Km is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
       },
       {
         name: "maxCharges",
@@ -142,10 +157,17 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "MaxCharge Amount is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
       {
-        name: "ENBY",
+        name: "eNBY",
         label: "",
         placeholder: "",
         type: "text",
@@ -155,7 +177,7 @@ export class VendorlastMileControl {
         disable: false,
       },
       {
-        name: "upBY",
+        name: "uPBY",
         label: "",
         placeholder: "",
         type: "text",

@@ -100,6 +100,17 @@ export class VendorContractBasicInformationComponent implements OnInit {
 
     // Create the 'ProductsForm' using 'formGroupBuilder' with 'jsonControlArrayProductsForm'
     this.ProductsForm = formGroupBuilder(this.fb, [this.jsonControlArrayProductsForm]);
+    this.setDays();
+
+    const cNSCN = this.objImageHandling.extractFileName(newData.cNSCN);
+
+    this.imageData = {
+      'cNSCN': newData.cNSCN,
+    };
+    this.ProductsForm.controls.cNSCN.setValue(cNSCN)
+    const ContractScan = this.jsonControlArrayProductsForm.find(x => x.name === 'cNSCN');
+    ContractScan.additionalData.isFileSelected = false;
+
   }
   //#endregion  
   //#region functionCallHandler
@@ -200,6 +211,28 @@ export class VendorContractBasicInformationComponent implements OnInit {
     const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
 
     this.ProductsForm.controls.pNDYS.setValue(numberOfDays)
+  }
+  //#endregion
+  //#region to validate contract date
+  onContractStartDateChanged(event) {
+    const startDate = this.ProductsForm.get('CNSDT')?.value;
+    const endDate = this.ProductsForm.get('ENDDT')?.value;
+
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      Swal.fire({
+        title: 'Contract End date must be greater than or equal to start date.',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+      this.ProductsForm.controls.ENDDT.setValue('');
+      this.ProductsForm.controls.CNSDT.setValue('');
+      return
+    }
+    this.setDays();
   }
   //#endregion
 }

@@ -11,43 +11,43 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 export class VendorLMDDetailComponent implements OnInit {
   TErouteBasedTableData: any[];
   columnHeaderTErouteBased = {
-    locNM: {
+    lOCNM: {
       Title: "Location",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    rtNM: {
+    rTTNM: {
       Title: "Rate Type",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    tmfrm: {
+    tMFRM: {
       Title: "Time Frame",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    cpctyNM: {
-      Title: "Capacity",
+    cPCTNM: {
+      Title: "Capacity(Ton)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    min: {
-      Title: "Min Change",
+    mIN: {
+      Title: "Min Charge (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    cmtkm: {
-      Title: "CommittedKm",
+    cMTKM: {
+      Title: "Committed Km",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    addkm: {
+    aDDKM: {
       Title: "Additional KM",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    max: {
-      Title: "Max Change",
+    mAX: {
+      Title: "Max Charge (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
@@ -71,7 +71,7 @@ export class VendorLMDDetailComponent implements OnInit {
     { label: 'Edit' },
     // { label: 'Remove' }
   ]
-  staticFieldTErouteBased = ['locNM', 'rtNM', 'tmfrm', 'cpctyNM', 'min', 'cmtkm', 'addkm', 'max']
+  staticFieldTErouteBased = ['lOCNM', 'rTTNM', 'tMFRM', 'cPCTNM', 'mIN', 'cMTKM', 'aDDKM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
   constructor(private dialog: MatDialog,

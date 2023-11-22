@@ -12,38 +12,38 @@ export class VendorBusiAssocDetailComponent implements OnInit {
 
   TErouteBasedTableData: any[]
   columnHeaderTErouteBased = {
-    ct: {
+    cT: {
       Title: "City",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    opNM: {
+    oPNM: {
       Title: "Operation",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    rtNM: {
-      Title: "Rate",
+    rTNM: {
+      Title: "Rate Type",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    mdNM: {
+    mDNM: {
       Title: "Transport Mode",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    rate: {
-      Title: "Rate",
+    rT: {
+      Title: "Rate(₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    min: {
-      Title: "Min",
+    mIN: {
+      Title: "Min(₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    max: {
-      Title: "Max",
+    mAX: {
+      Title: "Max (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
@@ -67,7 +67,7 @@ export class VendorBusiAssocDetailComponent implements OnInit {
     { label: 'Edit' },
     // { label: 'Remove' }
   ]
-  staticFieldTErouteBased = ['ct', 'opNM', 'rtNM', 'mdNM', , 'rate', 'min', 'max']
+  staticFieldTErouteBased = ['cT', 'oPNM', 'rTNM', 'mDNM', , 'rT', 'mIN', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
   constructor(private dialog: MatDialog,

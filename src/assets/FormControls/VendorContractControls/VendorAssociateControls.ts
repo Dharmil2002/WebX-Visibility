@@ -118,7 +118,11 @@ export class VendorAssociateControls {
         Validations: [{
           name: "required",
           message: "Rate is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
       },
       {
         name: "min",
@@ -131,7 +135,14 @@ export class VendorAssociateControls {
         Validations: [{
           name: "required",
           message: "Min Amount is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
       {
         name: "max",
@@ -144,10 +155,17 @@ export class VendorAssociateControls {
         Validations: [{
           name: "required",
           message: "Max Amount is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
       {
-        name: "ENBY",
+        name: "eNBY",
         label: "",
         placeholder: "",
         type: "text",
@@ -157,7 +175,7 @@ export class VendorAssociateControls {
         disable: false,
       },
       {
-        name: "upBY",
+        name: "uPBY",
         label: "",
         placeholder: "",
         type: "text",

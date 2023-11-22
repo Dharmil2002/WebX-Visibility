@@ -89,7 +89,12 @@ export class TERCharges {
         Validations: [{
           name: "required",
           message: "Rate is required"
-        },],
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
       },
       {
         name: "min",
@@ -102,7 +107,15 @@ export class TERCharges {
         Validations: [{
           name: "required",
           message: "Min Amount is required"
-        },],
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
       {
         name: "max",
@@ -115,7 +128,15 @@ export class TERCharges {
         Validations: [{
           name: "required",
           message: "Max Amount is required"
-        },],
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
       {
         name: "ENBY",

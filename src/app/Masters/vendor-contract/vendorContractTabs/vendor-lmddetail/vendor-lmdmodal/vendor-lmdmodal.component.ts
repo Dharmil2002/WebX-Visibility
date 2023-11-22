@@ -54,13 +54,13 @@ export class VendorLMDModalComponent implements OnInit {
   async getLocation() {
     const locationList = await this.objLocationService.getLocationList();
     if (this.objResult.Details) {
-      const updatedData = locationList.find((x) => x.value == this.objResult.Details.locID);
+      const updatedData = locationList.find((x) => x.value == this.objResult.Details.lOCID);
       this.TLMDForm.controls.location.setValue(updatedData);
     }
     this.filter.Filter(this.jsonControlArray, this.TLMDForm, locationList, this.locationName, this.locationtatus);
   }
   //#endregion
- 
+
   //#region to send data to parent component using dialogRef
   async save(event) {
     try {
@@ -96,7 +96,7 @@ export class VendorLMDModalComponent implements OnInit {
           collectionName: collectionName,
           data: newContractData,
         };
-        
+
         const createResponse = await this.masterService.masterPost("generic/create", createRequest).toPromise();
 
         // Display success message
@@ -118,19 +118,19 @@ export class VendorLMDModalComponent implements OnInit {
   extractFormData() {
     // Extract form data for updating an existing contract
     return {
-      locID: this.TLMDForm.value.location.value,
-      locNM: this.TLMDForm.value.location.name,
-      cpctyID: this.TLMDForm.value.capacity.value,
-      cpctyNM: this.TLMDForm.value.capacity.name,
-      rtID: this.TLMDForm.value.rateType.value,
-      rtNM: this.TLMDForm.value.rateType.name,
-      tmfrm: this.TLMDForm.value.timeFrame,
-      min: parseInt(this.TLMDForm.value.minCharge),
-      cmtkm: parseInt(this.TLMDForm.value.committedKm),
-      addkm: parseInt(this.TLMDForm.value.additionalKm),
-      max: parseInt(this.TLMDForm.value.maxCharges),
-      upDT: new Date(),
-      upBY: this.TLMDForm.value.upBY,
+      lOCID: this.TLMDForm.value.location.value,
+      lOCNM: this.TLMDForm.value.location.name,
+      cPCTID: this.TLMDForm.value.capacity.value,
+      cPCTNM: this.TLMDForm.value.capacity.name,
+      rTTID: this.TLMDForm.value.rateType.value,
+      rTTNM: this.TLMDForm.value.rateType.name,
+      tMFRM: this.TLMDForm.value.timeFrame,
+      mIN: parseInt(this.TLMDForm.value.minCharge),
+      cMTKM: parseInt(this.TLMDForm.value.committedKm),
+      aDDKM: parseInt(this.TLMDForm.value.additionalKm),
+      mAX: parseInt(this.TLMDForm.value.maxCharges),
+      uPDT: new Date(),
+      uPBY: this.TLMDForm.value.upBY,
     };
   }
 
@@ -156,20 +156,20 @@ export class VendorLMDModalComponent implements OnInit {
   prepareContractData(newVendorCode: string) {
     // Prepare data for creating a new contract
     return {
-      _id: newVendorCode,
+      _id: this.companyCode + "-" + newVendorCode,
       vclmID: newVendorCode,
       cID: this.companyCode,
-      locID: this.TLMDForm.value.location.value,
-      locNM: this.TLMDForm.value.location.name,
-      cpctyID: this.TLMDForm.value.capacity.value,
-      cpctyNM: this.TLMDForm.value.capacity.name,
-      rtID: this.TLMDForm.value.rateType.value,
-      rtNM: this.TLMDForm.value.rateType.name,
-      tmfrm: this.TLMDForm.value.timeFrame,
-      min: parseInt(this.TLMDForm.value.minCharge),
-      cmtkm: parseInt(this.TLMDForm.value.committedKm),
-      addkm: parseInt(this.TLMDForm.value.additionalKm),
-      max: parseInt(this.TLMDForm.value.maxCharges),
+      lOCID: this.TLMDForm.value.location.value,
+      lOCNM: this.TLMDForm.value.location.name,
+      cPCTID: this.TLMDForm.value.capacity.value,
+      cPCTNM: this.TLMDForm.value.capacity.name,
+      rTTID: this.TLMDForm.value.rateType.value,
+      rTTNM: this.TLMDForm.value.rateType.name,
+      tMFRM: this.TLMDForm.value.timeFrame,
+      mIN: parseInt(this.TLMDForm.value.minCharge),
+      cMTKM: parseInt(this.TLMDForm.value.committedKm),
+      aDDKM: parseInt(this.TLMDForm.value.additionalKm),
+      mAX: parseInt(this.TLMDForm.value.maxCharges),
       eDT: new Date(),
       eNBY: this.TLMDForm.value.ENBY,
     };
@@ -200,11 +200,11 @@ export class VendorLMDModalComponent implements OnInit {
       }
     });
     if (this.objResult.Details) {
-      this.TLMDForm.controls['additionalKm'].setValue(this.objResult.Details.addkm);
-      this.TLMDForm.controls['committedKm'].setValue(this.objResult.Details.cmtkm);
-      this.TLMDForm.controls['timeFrame'].setValue(this.objResult.Details.tmfrm);
-      this.TLMDForm.controls['minCharge'].setValue(this.objResult.Details.min);
-      this.TLMDForm.controls['maxCharges'].setValue(this.objResult.Details.max);
+      this.TLMDForm.controls['additionalKm'].setValue(this.objResult.Details.aDDKM);
+      this.TLMDForm.controls['committedKm'].setValue(this.objResult.Details.cMTKM);
+      this.TLMDForm.controls['timeFrame'].setValue(this.objResult.Details.tMFRM);
+      this.TLMDForm.controls['minCharge'].setValue(this.objResult.Details.mIN);
+      this.TLMDForm.controls['maxCharges'].setValue(this.objResult.Details.mAX);
     }
   }
   //#endregion
@@ -227,7 +227,7 @@ export class VendorLMDModalComponent implements OnInit {
         value: e.containerCode // Map the value to the specified valueKey
       }));
     if (this.objResult.Details) {
-      const updatedData = containerData.find((x) => x.name == this.objResult.Details.cpctyNM);
+      const updatedData = containerData.find((x) => x.name == this.objResult.Details.cPCTNM);
       this.TLMDForm.controls.capacity.setValue(updatedData);
     }
     this.filter.Filter(this.jsonControlArray, this.TLMDForm, containerData, this.capacityName, this.capacitystatus);
@@ -237,10 +237,35 @@ export class VendorLMDModalComponent implements OnInit {
   async getDropDownData() {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
     if (this.objResult.Details) {
-      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rtNM);
+      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
       this.TLMDForm.controls.rateType.setValue(updaterateType);
     }
     this.filter.Filter(this.jsonControlArray, this.TLMDForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
+  }
+  //#endregion
+  //#region to Validate the minimum and maximum charge values in the TLMDForm.
+  validateMinCharge() {
+    // Get the current values of 'min' and 'max' from the TLMDForm
+    const minValue = this.TLMDForm.get('minCharge')?.value;
+    const maxValue = this.TLMDForm.get('maxCharges')?.value;
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue > maxValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Max charge must be greater than or equal to Min charge.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TLMDForm to an empty string
+      this.TLMDForm.patchValue({
+        minCharge: '',
+        maxCharges: ''
+      });
+    }
   }
   //#endregion
 }

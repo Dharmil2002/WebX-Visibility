@@ -12,33 +12,33 @@ export class VendorLHLDetailComponent implements OnInit {
 
   TErouteBasedTableData: any[]
   columnHeaderTErouteBased = {
-    rtTpNM: {
+    rTNM: {
       Title: "Route",
       class: "matcolumnleft",
       Style: "max-width:250px",
     },
-    rtNM: {
+    rTTNM: {
       Title: "Rate Type",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    cpctyNM: {
-      Title: "Capacity",
+    cPCTNM: {
+      Title: "Capacity(Ton)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    rate: {
-      Title: "Rate",
+    rT: {
+      Title: "Rate (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    min: {
-      Title: "Min",
+    mIN: {
+      Title: "Min (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    max: {
-      Title: "Max",
+    mAX: {
+      Title: "Max (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
@@ -62,7 +62,7 @@ export class VendorLHLDetailComponent implements OnInit {
     { label: 'Edit' },
     //{ label: 'Remove' }
   ]
-  staticFieldTErouteBased = ['min', 'rate', 'cpctyNM', 'rtNM', 'rtTpNM', 'max']
+  staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   constructor(private dialog: MatDialog,
     private masterService: MasterService,

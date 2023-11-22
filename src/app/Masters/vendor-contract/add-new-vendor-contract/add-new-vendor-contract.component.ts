@@ -101,10 +101,10 @@ export class AddNewVendorContractComponent implements OnInit {
         const newVendorCode = `VT${(lastVendorCode + 1).toString().padStart(5, '0')}`;
 
         const data = {
-          "_id": newVendorCode,
+          "_id": this.companyCode + "-" + newVendorCode,
           "cNID": newVendorCode,
           'cID': this.companyCode,
-          "fnYr": parseInt(financialYear),
+          "fNYR": parseInt(financialYear),
           "vNID": this.vendorContractForm.value.VNID.value,
           "vNNM": this.vendorContractForm.value.VNID.name,
           "pDTID": this.vendorContractForm.value.PDTID.value,
@@ -201,6 +201,26 @@ export class AddNewVendorContractComponent implements OnInit {
     catch (error) {
       // Handle errors that may occur during the operation
       console.error(`An error occurred while fetching ${'VNID'} details:`, error);
+    }
+  }
+  //#endregion
+  //#region to validate contract dates
+  onContractStartDateChanged(event) {
+    const startDate = this.vendorContractForm.get('CNSDT')?.value;
+    const endDate = this.vendorContractForm.get('ENDDT')?.value;
+
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      Swal.fire({
+        title: 'Contract End date must be greater than or equal to start date.',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+      this.vendorContractForm.controls.ENDDT.setValue('');
+      this.vendorContractForm.controls.CNSDT.setValue('');
     }
   }
   //#endregion

@@ -55,7 +55,7 @@ export class VendorLHFTRModalComponent implements OnInit {
       if (this.objResult.Details) {
         // Update existing vendor contract
         const updateData = this.extractFormData();
-        const id = this.objResult.Details.vcxrID;
+        const id = this.objResult.Details._id;
         const updateRequest = {
           companyCode: this.companyCode,
           collectionName: collectionName,
@@ -104,17 +104,17 @@ export class VendorLHFTRModalComponent implements OnInit {
   extractFormData() {
     // Extract form data for updating an existing contract
     return {
-      rtTpID: this.TLHFTRForm.value.route.value,
-      rtTpNM: this.TLHFTRForm.value.route.name,
-      cpctyID: this.TLHFTRForm.value.capacity.value,
-      cpctyNM: this.TLHFTRForm.value.capacity.name,
-      rtID: this.TLHFTRForm.value.rateType.value,
-      rtNM: this.TLHFTRForm.value.rateType.name,
-      rate: parseInt(this.TLHFTRForm.value.rate),
-      min: parseInt(this.TLHFTRForm.value.min),
-      max: parseInt(this.TLHFTRForm.value.max),
-      upDT: new Date(),
-      upBY: this.TLHFTRForm.value.upBY,
+      rTID: this.TLHFTRForm.value.route.value,
+      rTNM: this.TLHFTRForm.value.route.name,
+      cPCTID: this.TLHFTRForm.value.capacity.value,
+      cPCTNM: this.TLHFTRForm.value.capacity.name,
+      rTTID: this.TLHFTRForm.value.rateType.value,
+      rTTNM: this.TLHFTRForm.value.rateType.name,
+      rT: parseInt(this.TLHFTRForm.value.rate),
+      mIN: parseInt(this.TLHFTRForm.value.min),
+      mAX: parseInt(this.TLHFTRForm.value.max),
+      uPDT: new Date(),
+      uPBY: this.TLHFTRForm.value.uPBY,
     };
   }
 
@@ -140,18 +140,18 @@ export class VendorLHFTRModalComponent implements OnInit {
   prepareContractData(newVendorCode: string) {
     // Prepare data for creating a new contract
     return {
-      _id: newVendorCode,
+      _id: this.companyCode + "-" + newVendorCode,
       vcftID: newVendorCode,
       cID: this.companyCode,
-      rtTpID: this.TLHFTRForm.value.route.value,
-      rtTpNM: this.TLHFTRForm.value.route.name,
-      cpctyID: this.TLHFTRForm.value.capacity.value,
-      cpctyNM: this.TLHFTRForm.value.capacity.name,
-      rtID: this.TLHFTRForm.value.rateType.value,
-      rtNM: this.TLHFTRForm.value.rateType.name,
-      rate: parseInt(this.TLHFTRForm.value.rate),
-      min: parseInt(this.TLHFTRForm.value.min),
-      max: parseInt(this.TLHFTRForm.value.max),
+      rTID: this.TLHFTRForm.value.route.value,
+      rTNM: this.TLHFTRForm.value.route.name,
+      cPCTID: this.TLHFTRForm.value.capacity.value,
+      cPCTNM: this.TLHFTRForm.value.capacity.name,
+      rTTID: this.TLHFTRForm.value.rateType.value,
+      rTTNM: this.TLHFTRForm.value.rateType.name,
+      rT: parseInt(this.TLHFTRForm.value.rate),
+      mIN: parseInt(this.TLHFTRForm.value.min),
+      mAX: parseInt(this.TLHFTRForm.value.max),
       eDT: new Date(),
       eNBY: this.TLHFTRForm.value.ENBY,
     };
@@ -185,9 +185,9 @@ export class VendorLHFTRModalComponent implements OnInit {
       }
     });
     if (this.objResult.Details) {
-      this.TLHFTRForm.controls['rate'].setValue(this.objResult.Details.rate);
-      this.TLHFTRForm.controls['min'].setValue(this.objResult.Details.min);
-      this.TLHFTRForm.controls['max'].setValue(this.objResult.Details.max);
+      this.TLHFTRForm.controls['rate'].setValue(this.objResult.Details.rT);
+      this.TLHFTRForm.controls['min'].setValue(this.objResult.Details.mIN);
+      this.TLHFTRForm.controls['max'].setValue(this.objResult.Details.mAX);
     }
   }
   //#endregion
@@ -205,7 +205,7 @@ export class VendorLHFTRModalComponent implements OnInit {
   async getRouteList() {
     const routeList = await this.objRouteLocationService.getRouteLocationDetail()
     if (this.objResult.Details) {
-      const updatedRoute = routeList.find((x) => x.name == this.objResult.Details.rtTpNM);
+      const updatedRoute = routeList.find((x) => x.name == this.objResult.Details.rTNM);
       this.TLHFTRForm.controls.route.setValue(updatedRoute);
     }
     this.filter.Filter(this.jsonControlArray, this.TLHFTRForm, routeList, this.routeName, this.routestatus);
@@ -220,7 +220,7 @@ export class VendorLHFTRModalComponent implements OnInit {
         value: e.containerCode // Map the value to the specified valueKey
       }));
     if (this.objResult.Details) {
-      const updatedData = containerData.find((x) => x.name == this.objResult.Details.cpctyNM);
+      const updatedData = containerData.find((x) => x.name == this.objResult.Details.cPCTNM);
       this.TLHFTRForm.controls.capacity.setValue(updatedData);
     }
     this.filter.Filter(this.jsonControlArray, this.TLHFTRForm, containerData, this.capacityName, this.capacitystatus);
@@ -230,10 +230,35 @@ export class VendorLHFTRModalComponent implements OnInit {
   async getDropDownData() {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
     if (this.objResult.Details) {
-      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rtNM);
+      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
       this.TLHFTRForm.controls.rateType.setValue(updaterateType);
     }
     this.filter.Filter(this.jsonControlArray, this.TLHFTRForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
+  }
+  //#endregion
+  //#region to Validate the minimum and maximum charge values in the TLHFTRForm.
+  validateMinCharge() {
+    // Get the current values of 'min' and 'max' from the TLHFTRForm
+    const minValue = this.TLHFTRForm.get('min')?.value;
+    const maxValue = this.TLHFTRForm.get('max')?.value;
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue > maxValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Max charge must be greater than or equal to Min charge.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TLHFTRForm to an empty string
+      this.TLHFTRForm.patchValue({
+        min: '',
+        max: ''
+      });
+    }
   }
   //#endregion
 }

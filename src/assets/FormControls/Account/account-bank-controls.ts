@@ -55,7 +55,7 @@ export class AccountBankControls {
           },
           {
             name: "pattern",
-            message: "Please Enter alphanumeric length 4 to 200",
+            message: "Please Enter Numeric length 10 to 15",
             pattern: "^[0-9]{10,15}$",
           },
         ],

@@ -81,7 +81,7 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": [
             {
-              "path": "Masters/AccountMaster/AddAccount",
+              "path": "Masters/AccountMaster/ListAccount",
               "title": "Account Master",
               "moduleName": "Account Master",
               "icon": "",
@@ -90,7 +90,7 @@ export const ROUTES: RouteInfo[] =
               "submenu": []
             },
             {
-              "path": "Masters/AccountMaster/AddAccountGroup",
+              "path": "Masters/AccountMaster/ListAccountGroup",
               "title": "Account Group Master",
               "moduleName": "Account Group Master",
               "icon": "",
@@ -99,7 +99,7 @@ export const ROUTES: RouteInfo[] =
               "submenu": []
             },
             {
-              "path": "Masters/AccountMaster/AddBank",
+              "path": "Masters/AccountMaster/ListBank",
               "title": "Bank Master",
               "moduleName": "Bank Master",
               "icon": "",
@@ -108,7 +108,7 @@ export const ROUTES: RouteInfo[] =
               "submenu": []
             },
             {
-              "path": "Masters/AccountMaster/AddTds",
+              "path": "Masters/AccountMaster/ListTds",
               "title": "TDS Master",
               "moduleName": "TDS Master",
               "icon": "",

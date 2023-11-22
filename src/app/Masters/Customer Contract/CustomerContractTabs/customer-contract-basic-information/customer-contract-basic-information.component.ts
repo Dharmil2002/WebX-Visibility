@@ -125,7 +125,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     ContractScan.additionalData.isFileSelected = false;
 
 
-    const cPOSCAN = this.objImageHandling.extractFileName(data.ContractPOScan);
+    const cPOSCAN = this.objImageHandling.extractFileName(data.cPOSCAN);
     this.ProductsForm.get("ContractPOScan").setValue(cPOSCAN)
     const ContractPOScan = this.jsonControlArrayProductsForm.find(x => x.name === 'ContractPOScan');
     ContractPOScan.additionalData.isFileSelected = false;
@@ -166,6 +166,8 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     }
   }
   async save() {
+    console.log(this.ContractScanimageData?.ContractScan ?? this.contractData.cSCAN)
+    debugger
     let contractDetails = {
       cID: this.contractData.cID,
       bRC: this.contractData.bRC,
@@ -179,11 +181,11 @@ export class CustomerContractBasicInformationComponent implements OnInit {
       cSTARTDT: this.ProductsForm.value?.ContractStartDate,
       cENDDT: this.ProductsForm.value?.Expirydate,
       eDT: this.contractData.eDT,
-      cSCAN: this.ContractScanimageData.ContractScan,
+      cSCAN: this.ContractScanimageData?.ContractScan ?? this.contractData.cSCAN,
       aCMGR: this.ProductsForm.value?.AccountManager,
       cPONO: this.ProductsForm.value?.CustomerPONo,
       cPODt: this.ProductsForm.value?.POValiditydate,
-      cPOSCAN: this.ContractPOScanimageData.ContractPOScan,
+      cPOSCAN: this.ContractPOScanimageData?.ContractPOScan ?? this.contractData.cPOSCAN,
 
     }
 
@@ -216,7 +218,18 @@ export class CustomerContractBasicInformationComponent implements OnInit {
 
   }
   openImageDialog(control) {
-    const file = this.objImageHandling.getFileByKey(control.imageName, this.ContractScanimageData);
+    let file;
+    if (control == 'ContractScan') {
+      file = this.objImageHandling.getFileByKey(control.imageName, this.ContractScanimageData);
+      if (file == null) {
+        file = this.contractData.cSCAN
+      }
+    } else {
+      file = this.objImageHandling.getFileByKey(control.imageName, this.ContractPOScanimageData);
+      if (file == null) {
+        file = this.contractData.cPOSCAN
+      }
+    }
     this.matDialog.open(ImagePreviewComponent, {
       data: { imageUrl: file },
       width: '30%',
@@ -228,7 +241,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
       ProductsForm, this.ContractPOScanimageData, "CustomerContract", 'ContractPOScan', this.jsonControlArrayProductsForm,
       ["jpg", "png", "jpeg", "pdf"]);
   }
-  cancel(){
+  cancel() {
     this.Route.navigateByUrl('/Masters/CustomerContract/CustomerContractList');
   }
 

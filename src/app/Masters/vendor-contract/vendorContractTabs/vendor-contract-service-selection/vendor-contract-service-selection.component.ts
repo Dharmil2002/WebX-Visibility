@@ -181,10 +181,10 @@ export class VendorContractServiceSelectionComponent implements OnInit {
       // console.log(updateId);
       updateServices = updateServices.length > 0 ? updateServices : updateId
       const Id = updateServices[0]._id
-      updateServices.map(x => {
-        delete x._id;
-        x.active = !x.active; // Toggle the active flag
-      })
+      updateServices.forEach(x => {
+        delete x._id;      // Delete the _id property from each element
+        x.active = !x.active; // Toggle the active flag by negating its current value
+    });    
       // console.log(updateServices, updateId);
 
       newServices.map(x => {

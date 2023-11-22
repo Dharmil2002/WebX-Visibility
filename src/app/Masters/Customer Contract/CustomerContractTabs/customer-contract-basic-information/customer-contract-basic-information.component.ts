@@ -12,7 +12,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { ContractBasicInformationControl } from "src/assets/FormControls/CustomerContractControls/BasicInformation-control";
-import { productdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { PayBasisdetailFromApi, productdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
 import { Router } from "@angular/router";
 
@@ -44,25 +44,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
   //#region Array List
   CurrentAccessList: any
   productdetailList: any
-  PayBasisList = [
-    {
-      value: "All",
-      name: "All",
-    },
-    {
-      value: "TBB",
-      name: "TBB",
-    },
-    {
-      value: "LTL",
-      name: "LTL",
-    },
-    {
-      value: "FTL",
-      name: "FTL",
-    },
 
-  ]
   //#endregion
 
   protected _onDestroy = new Subject<void>();
@@ -143,14 +125,23 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     );
     this.ProductsForm.get("Product").setValue(this.productdetailList.find(item => item.value == this.contractData.pID))
 
+    const PayBasisdetailFromAPI = await PayBasisdetailFromApi(this.masterService, "PAYTYP")
     this.filter.Filter(
       this.jsonControlArrayProductsForm,
       this.ProductsForm,
-      this.PayBasisList,
+      PayBasisdetailFromAPI,
       "PayBasis",
       false
     );
-    this.ProductsForm.get("PayBasis").setValue(this.PayBasisList.find(item => item.value == this.contractData.pBAS))
+
+    // this.filter.Filter(
+    //   this.jsonControlArrayProductsForm,
+    //   this.ProductsForm,
+    //   this.PayBasisList,
+    //   "PayBasis",
+    //   false
+    // );
+    this.ProductsForm.get("PayBasis").setValue(PayBasisdetailFromAPI.find(item => item.value == this.contractData.pBAS))
 
 
   }

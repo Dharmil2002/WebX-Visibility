@@ -442,7 +442,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   async bindPrqData() {
-    debugger
+    
     if (this.thcTableForm.controls["prqNo"].value.value) {
       const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
 
@@ -723,7 +723,7 @@ export class ThcGenerationComponent implements OnInit {
       for (const element of docket) {
         await this.docketService.updateDocket(element.docketNumber, { "status": "2" });
       }
-      debugger
+      
       const podDetails = typeof (docket) == "object" ? docket : ""
       this.thcTableForm.removeControl("docket");
       this.thcTableForm.get("podDetail").setValue(podDetails);
@@ -900,8 +900,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['route'].setValue(fromTo)
     if (toCity) {
       console.log(this.allShipment)
-
-      debugger
+      
       const filteredShipments = this.allShipment.filter((x) =>
         (x.fromCity.toLowerCase() === fromCity.toLowerCase() &&
           x.toCity.toLowerCase() === toCity.toLowerCase()) && (x.orgTotWeight != "0" || x.orgNoOfPkg != "0" || x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value)

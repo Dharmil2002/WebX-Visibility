@@ -11,7 +11,7 @@ export class AssignedVehicleService {
   ) {
   }
   async showVehicleConfirmationDialog(prqDetail, masterService, goBack, tabIndex, dialogRef, item, market) {
-    debugger
+    
     const confirmationResult = await Swal.fire({
       icon: "success",
       title: "Confirmation",

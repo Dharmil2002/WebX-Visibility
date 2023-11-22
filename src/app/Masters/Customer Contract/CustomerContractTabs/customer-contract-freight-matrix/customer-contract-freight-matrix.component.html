@@ -15,5 +15,7 @@
 
 <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
     [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray"
+    [EventButton]="tableData.length!=0 ? SaveEventButton : false" (callFunction)="functionCallHandler($event)"
+    (functionCallEmitter)="functionCallHandler($event)"
     [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)">
 </app-generic-table-v2>

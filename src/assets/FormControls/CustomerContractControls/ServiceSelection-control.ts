@@ -619,7 +619,7 @@ export class ContractServiceSelectionControl {
         accessallowed: true,
       },
       {
-        name: "irateType",
+        name: "rateType",
         label: "Rate Type",
         placeholder: "Rate Type",
         type: "text",

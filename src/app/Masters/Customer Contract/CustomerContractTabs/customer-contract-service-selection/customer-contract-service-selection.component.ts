@@ -77,6 +77,7 @@ export class CustomerContractServiceSelectionComponent
   linkArray = [];
   addFlag = true;
   menuItemflag = true;
+  data: any;
   loadIn: boolean;
   tableLoad: boolean = true;
   isTableLoad: boolean = true;
@@ -414,6 +415,7 @@ export class CustomerContractServiceSelectionComponent
       console.log("failed", error);
     }
   }
+
   async addData() {
     this.tableLoad = true;
     this.isLoad = true;
@@ -500,6 +502,7 @@ export class CustomerContractServiceSelectionComponent
     //   "POValiditydate": changes.contractData?.currentValue?.cPODt ?? '',
     // }
   }
+
   SetDefaultProductsData() {
     this.ProductsForm.get("loadType").setValue(
       this.LoadtypedetailFromAPI.find(
@@ -529,42 +532,32 @@ export class CustomerContractServiceSelectionComponent
     this.CODDODForm.get("MinCharge").setValue(this.contractData.mIN);
     this.CODDODForm.get("MaxCharge").setValue(this.contractData.mAX);
     this.CutOfftimeForm.get("Timeofday").setValue(this.contractData.tDT);
-    this.CutOfftimeForm.get("AdditionalTransitdays").setValue(
-      this.contractData.dAYS
-    );
+    this.CutOfftimeForm.get("AdditionalTransitdays").setValue(this.contractData.dAYS);
     this.DemurrageForm.get("Freestoragedays").setValue(this.contractData.fSDAY);
     this.DemurrageForm.get("Ratetype").setValue(this.contractData.dRTYP)
-    this.DemurrageForm.get("Demurragerateperday").setValue(
-      this.contractData.dMRTPD
-    );
+    this.DemurrageForm.get("Demurragerateperday").setValue(this.contractData.dMRTPD);
     this.DemurrageForm.get("MinCharge").setValue(this.contractData.mIN);
     this.DemurrageForm.get("MaxCharge").setValue(this.contractData.mAX);
     this.VolumtericForm.get("VolumetricUoM").setValue(this.contractData.vUOM);
-    this.VolumtericForm.get("Volumtericcalculation").setValue(
-      this.contractData.vCAL
-    );
-    this.VolumtericForm.get("Volumetricapplied").setValue(
-      this.contractData.vAPP
-    );
+    this.VolumtericForm.get("Volumtericcalculation").setValue(this.contractData.vCAL);
+    this.VolumtericForm.get("Volumetricapplied").setValue(this.contractData.vAPP);
     this.VolumtericForm.get("Conversionratio").setValue(this.contractData.cN);
-    this.YieldProtectionForm.get("MinimumweightKg").setValue(
-      this.contractData.mWKG
-    );
-    this.YieldProtectionForm.get("MinimumpackagesNo").setValue(
-      this.contractData.mPKGNO
-    );
-    this.YieldProtectionForm.get("MinimumFreightvalueINR").setValue(
-      this.contractData.mFREIGHT
-    );
-    this.YieldProtectionForm.get("Yieldtype").setValue(
-      this.contractData.yIELDTYP
-    );
-    this.YieldProtectionForm.get("MinimumyieldINR").setValue(
-      this.contractData.mYIELD
-    );
-    this.YieldProtectionForm.get("CalculateYieldon").setValue(
-      this.contractData.cYIELDON
-    );
+    this.YieldProtectionForm.get("MinimumweightKg").setValue(this.contractData.mWKG);
+    this.YieldProtectionForm.get("MinimumpackagesNo").setValue(this.contractData.mPKGNO);
+    this.YieldProtectionForm.get("MinimumFreightvalueINR").setValue(this.contractData.mFREIGHT);
+    this.YieldProtectionForm.get("Yieldtype").setValue(this.contractData.yIELDTYP);
+    this.YieldProtectionForm.get("MinimumyieldINR").setValue(this.contractData.mYIELD);
+    this.YieldProtectionForm.get("CalculateYieldon").setValue(this.contractData.cYIELDON);
+    // this.InsuranceCarrierRiskForm.get("InvoiceValueFrom").setValue(this.contractData.iVF);
+    // this.InsuranceCarrierRiskForm.get("InvoiceValueFrom").setValue(this.contractData.iVF);
+    // this.InsuranceCarrierRiskForm.get("tovalue").setValue(this.contractData.tV);
+    // this.InsuranceCarrierRiskForm.get("rateType").setValue(this.contractData.iRTYP);
+    // this.InsuranceCarrierRiskForm.get("Rate").setValue(this.contractData.rate);
+    // this.InsuranceCarrierRiskForm.get("MinCharge").setValue(this.contractData.mNCHG);
+    // this.InsuranceCarrierRiskForm.get("MaxCharge").setValue(this.contractData.mXCHG);
+    // Store the values in session storage
+    sessionStorage.setItem('ServiceSelectiondata', JSON.stringify(this.ProductsForm.value));
+
     // const originRateOption = {
     //   name: this.contractData.oRTNM,
     //   value: this.contractData.oRTVAL,
@@ -576,14 +569,7 @@ export class CustomerContractServiceSelectionComponent
     // this.ProductsForm.get("originRateOption").setValue(originRateOption)
     // this.ProductsForm.get("destinationRateOption").setValue(destinationRateOption)
 
-    const mydata = [
-      "COD/DOD",
-      "cutofftime",
-      "Demurrage",
-      "Volumetric",
-      "YieldProtection",
-    ];
-
+    const mydata = ["COD/DOD","cutofftime","Demurrage","Volumetric","YieldProtection","Insurance"];
     mydata.forEach((item) => {
       const event = {
         field: {
@@ -625,20 +611,25 @@ export class CustomerContractServiceSelectionComponent
     contractDetails.cN = this.VolumtericForm.value.Conversionratio;
     contractDetails.mWKG = this.YieldProtectionForm.value.MinimumweightKg;
     contractDetails.mPKGNO = this.YieldProtectionForm.value.MinimumpackagesNo;
-    contractDetails.mFREIGHT =
-      this.YieldProtectionForm.value.MinimumFreightvalueINR;
+    contractDetails.mFREIGHT = this.YieldProtectionForm.value.MinimumFreightvalueINR;
     contractDetails.yIELDTYP = this.YieldProtectionForm.value.Yieldtype;
     contractDetails.mYIELD = this.YieldProtectionForm.value.MinimumyieldINR;
     contractDetails.cYIELDON = this.YieldProtectionForm.value.CalculateYieldon;
+    // contractDetails.iVF = this.InsuranceCarrierRiskForm.value.InvoiceValueFrom;
+    // contractDetails.tV = this.InsuranceCarrierRiskForm.value.tovalue;
+    // contractDetails.iRTYP = this.InsuranceCarrierRiskForm.value.rateType;
+    // contractDetails.rate = this.InsuranceCarrierRiskForm.value.Rate;
+    // contractDetails.mNCHG = this.InsuranceCarrierRiskForm.value.MinCharge;
+    // contractDetails.mXCHG = this.InsuranceCarrierRiskForm.value.MaxCharge;
 
-    const reqBody = {
+      const reqBody = {
       companyCode: this.companyCode,
       collectionName: "cust_contract",
       filter: { _id: this.contractData._id },
       update: { ...contractDetails },
     };
 
-    // delete contractDetails._id;
+     delete contractDetails._id;
 
     this.masterService.masterPut("generic/update", reqBody).subscribe({
       next: (res: any) => {

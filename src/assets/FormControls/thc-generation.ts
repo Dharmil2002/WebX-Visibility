@@ -647,7 +647,7 @@ export class thcControl {
                     label: '',
                     placeholder: '',
                     type: '',
-                    value: new Date(),
+                    value: "",
                     Validations: [],
                     additionalData: {
                         showNameAndValue: true,

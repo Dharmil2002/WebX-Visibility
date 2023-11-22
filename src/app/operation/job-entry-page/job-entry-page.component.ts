@@ -667,6 +667,8 @@ export class JobEntryPageComponent implements OnInit {
       this.tableData.push(containerDetail);
     }
     containorDetail = this.tableData;
+    const containerType=this.blTableForm.controls['containerType'].value.value;
+    this.blTableForm.controls['containerType'].setValue(containerType);
     challlanDetails = this.TblChallan.length > 0 ? this.TblChallan : [this.blTableForm.value]
     clearValidatorsAndValidate(tabcontrols);
     // Create a new array without the 'srNo' property
@@ -691,10 +693,13 @@ export class JobEntryPageComponent implements OnInit {
     const containorList = removeFields(containorDetail, fieldsToFromRemove);
     const removeField = ['actions', 'osb', 'oinvDate', 'oblDate', 'osbDt'];
     const modifiedTblChallan = removeFields(challlanDetails, removeField);
+    /*below code is for  Data pass  in array Because for the store array in db*/
+    const containerDetails={containorDetails:containorList};
+    const chalanDetails={blChallan:modifiedTblChallan};
     let jobDetail = {
       ...this.jobEntryTableForm.value,
-      ...containorList,
-      ...modifiedTblChallan
+      ...containerDetails,
+      ...chalanDetails
     };
 
     const res = await addJobDetail(jobDetail, this.masterService, financialYear);

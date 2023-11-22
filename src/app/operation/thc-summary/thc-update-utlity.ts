@@ -17,7 +17,7 @@ export async function showConfirmationDialogThc(data, operationService) {
 
 }
 async function updateThcStatus(data, operationService) {
-
+debugger
     const reqBody = {
         "companyCode": localStorage.getItem('companyCode'),
         "collectionName": "thc_detail",

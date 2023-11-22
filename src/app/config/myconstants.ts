@@ -16,5 +16,6 @@ export const GenericActions = {
 };
 
 export const OperationActions = {
-    CreateThc: "operation/thc/create"
+    CreateThc: "operation/thc/create",
+    getThc: "operation/thc/get"
 }

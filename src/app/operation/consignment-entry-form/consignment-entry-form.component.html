@@ -33,7 +33,7 @@
     <form [formGroup]="consignmentTableForm">
       <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignee Detail'"
         [formData]="jsonControlArrayConsignee" (functionCallEmitter)="functionCallHandler($event)"
-        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [Expanded]="false">
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
     </form>
     <!-- ENd -->

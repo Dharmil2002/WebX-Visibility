@@ -204,6 +204,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   billingParty: any;
   prqNoDetail: any[];
   isLoad: boolean = false;
+  ccbp:boolean=true;
   containerTypeList: any;
   //#endregion
   branchCode = localStorage.getItem("Branch");
@@ -403,14 +404,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setFormValue(this.consignmentTableForm, "docketDate", this.prqData?.pickupDate);
     this.setFormValue(this.consignmentTableForm, "transMode", "Road");
     this.setFormValue(this.consignmentTableForm, "pAddress", this.prqData?.pAddress);
-    this.setFormValue(this.consignmentTableForm, "cnebp", true);
+    this.setFormValue(this.consignmentTableForm, "cnebp", false);
     this.setFormValue(this.consignmentTableForm, "cnbp", true);
     this.setFormValue(this.consignmentTableForm, "vendorType", vehicleDetail?.vendorType, false, "", "");
 
     // Done By Harikesh 
     const autoBillingConfigs = [
       { name: "cnbp", checked: true },
-      { name: "cnebp", checked: true }
+      { name: "cnebp", checked: false }
     ];
 
     autoBillingConfigs.forEach(config => {
@@ -1325,6 +1326,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.tableLoad = true;
       this.isLoad = true;
       let containerNo = [];
+      
       const containerDetail = this.previewResult.map((x, index) => {
         if (x) {
           const detail = containerNo.includes(x.containerNumber);
@@ -1339,6 +1341,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
               icon: "error",
               title: "Error",
               text: `Container Id '${x.containerNumber}' is Already exist`,
+            });
+            return null; // Returning null to indicate that this element should be removed
+          }
+          if (!x.isEmpty) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: `IsEmpty is Required`,
             });
             return null; // Returning null to indicate that this element should be removed
           }

@@ -144,7 +144,7 @@ export class VendorLHLModalComponent implements OnInit {
   generateNewVendorCode(existingData: any[]) {
     // Generate a new vendor code based on existing data
     const lastContract = existingData[existingData.length - 1];
-    const lastVendorCode = lastContract ? parseInt(lastContract.vclbID.substring(4), 10) : 0;
+    const lastVendorCode = lastContract ? parseInt(lastContract.vCLBID.substring(4), 10) : 0;
     return `Vclb${(lastVendorCode + 1).toString().padStart(5, '0')}`;
   }
 

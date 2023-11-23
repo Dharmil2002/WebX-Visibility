@@ -97,7 +97,9 @@ export class AddContainerMasterComponent implements OnInit {
 
   //#region Save Function
   async save() {
+    
     this.containerTableForm.controls.containerType.setValue(this.containerTableForm.value.containerType.name);
+    this.containerTableForm.controls.containerName.setValue(this.containerTableForm.value.containerType);
     // Remove all form errors
     const controls = this.containerTableForm;
     clearValidatorsAndValidate(controls);

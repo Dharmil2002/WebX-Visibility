@@ -55,6 +55,7 @@ export async function rakeFieldMapping(data) {
                 uniqueBillingPartySet.add(detail.billingParty);
             }
         });
+        //   const jobCount=element.rakeDetails.find((x)=>x.)
          // Calculate the sum of contCnt
             let sumOfContCnt = element.containorDetail.reduce((sum, item) => sum + (item.contCnt || 0), 0);
         // Construct and return the mapped object for the current element

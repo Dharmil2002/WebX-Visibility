@@ -1,26 +1,23 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class ContractFreightMatrixControl {
   private ContractFreightMatrixControlArray: FormControls[];
-  constructor(FreightMatrix) {
+  constructor( UpdateData ,isUpdate) {
     this.ContractFreightMatrixControlArray = [
 
       {
         name: "From",
         label: "From",
         placeholder: "From",
-        type: "select",
-        value: "",
+        type: "dropdown",
+        value: isUpdate?{
+          name:UpdateData.from,
+          value:UpdateData.fromType,
+        }: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         Validations: [],
-        additionalData: {
-          isIndeterminate: false,
-          isChecked: false,
-          support: "FromHandler",
-          showNameAndValue: false,
-
-        },
+        additionalData: {},
         functions: {
 
           onModel: 'SetOptions',
@@ -34,8 +31,11 @@ export class ContractFreightMatrixControl {
         name: "To",
         label: "To",
         placeholder: "To",
-        type: "select",
-        value: "",
+        type: "dropdown",
+        value: isUpdate?{
+          name:UpdateData.to,
+          value:UpdateData.toType,
+        }: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -60,63 +60,60 @@ export class ContractFreightMatrixControl {
         name: "rateType",
         label: "Rate Type",
         placeholder: "Rate Type",
-        type: "Staticdropdown",
-        value: [
-        ],
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
+        type: "dropdown",
+        value: "",
         generatecontrol: true,
         disable: false,
-        accessallowed: true,
         Validations: [
           {
             name: "required",
             message: "Rate Type is required",
           },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
+        functions: {},
       },
       {
         name: "capacity",
         label: "Capacity",
         placeholder: "Capacity",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "20",
-            name: "20 Ton",
-          },
-          {
-            value: "10",
-            name: "10 Ton",
-          },
-
-        ],
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
+        type: "dropdown",
+        value:"",
         generatecontrol: true,
         disable: false,
-        accessallowed: true,
         Validations: [
           {
             name: "required",
-            message: "Rate Type is required",
+            message: "Capacity is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
+        functions: {},
       },
       {
         name: "Rate",
         label: "Rate",
         placeholder: "Rate",
         type: "text",
-        value: "",
+        value: isUpdate?UpdateData.rT:"",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -131,34 +128,6 @@ export class ContractFreightMatrixControl {
             message: "Please enter a valid Rate EX. (100000.00)",
           },
         ],
-      },
-      {
-        name: 'FromHandler',
-        label: 'Origin Rate option',
-        placeholder: 'Origin Rate option',
-        type: '',
-        value: '',
-        filterOptions: "",
-        Validations: [{
-          name: "required",
-          message: " ",
-        }],
-        generatecontrol: false, disable: false,
-        accessallowed: true,
-      },
-      {
-        name: 'ToHandler',
-        label: 'Destination Rate option',
-        placeholder: 'Destination Rate option',
-        type: '',
-        value: '',
-        filterOptions: "",
-        Validations: [{
-          name: "required",
-          message: " ",
-        }],
-        generatecontrol: false, disable: false,
-        accessallowed: true,
       },
     ];
   }

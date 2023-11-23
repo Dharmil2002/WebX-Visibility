@@ -43,55 +43,43 @@
     <form [formGroup]="InsuranceCarrierRiskForm">
         <app-form-webxpress [form]="InsuranceCarrierRiskForm" [FormTitle]="'Insurance'"
             [formData]="jsonControlArrayInsuranceCarrierRiskForm" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
+            [showSaveAndCancelButton]="false" [EventButton]="InsuranceCarrierRiskForm.valid==true ? ADDEventButton : false"
+            (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
-    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!InsuranceCarrierRiskForm.valid"
-        style="margin-left: 85%;" (click)="addData()">
-        <mat-icon>add</mat-icon>
-        Add New
-    </button>
     <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
         <!-- Bootstrap loader -->
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <div class="paddingdiv">
         <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
             [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
             [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
             [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
             (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
         </app-generic-table-v2>
-    </div>
 </div>
 <div *ngIf="DisplayFuelSurchargeSection">
     <form [formGroup]="FuelSurchargeForm">
         <app-form-webxpress [form]="FuelSurchargeForm" [FormTitle]="'Fuel Surcharge'"
             [formData]="jsonControlArrayFuelSurchargeForm" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+            [EventButton]="FuelSurchargeForm.valid==true ? FADDEventButton : false" [className]="className">
         </app-form-webxpress>
     </form>
-    <button matTooltip="Add Data" mat-stroked-button class="filter_btn" [disabled]="!FuelSurchargeForm.valid"
-        style="margin-left: 85%;" (click)="addData()">
-        <mat-icon>add</mat-icon>
-        Add New
-    </button>
-    <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+    <div *ngIf="isFLoad" class="d-flex justify-content-center align-items-center">
         <!-- Bootstrap loader -->
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <div class="paddingdiv">
-        <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-            [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-            [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+        <app-generic-table-v2 *ngIf="!FtableLoad" [dynamicControls]="FdynamicControls" [columnHeader]="FcolumnHeader"
+            [tableData]="FtableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="FmenuItems"
+            [staticField]="FstaticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
             [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-            (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+            (menuItemClicked)="FhandleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
         </app-generic-table-v2>
-    </div>
 </div>
 <div *ngIf="DisplayCutOfftimeSection">
     <form [formGroup]="CutOfftimeForm">

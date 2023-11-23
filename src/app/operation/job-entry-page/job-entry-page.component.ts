@@ -667,8 +667,10 @@ export class JobEntryPageComponent implements OnInit {
       this.tableData.push(containerDetail);
     }
     containorDetail = this.tableData;
+    if(this.TblChallan.length<0){
     const containerType=this.blTableForm.controls['containerType'].value.value;
     this.blTableForm.controls['containerType'].setValue(containerType);
+    }
     challlanDetails = this.TblChallan.length > 0 ? this.TblChallan : [this.blTableForm.value]
     clearValidatorsAndValidate(tabcontrols);
     // Create a new array without the 'srNo' property

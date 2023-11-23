@@ -154,7 +154,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
   generateNewVendorCode(existingData: any[]) {
     // Generate a new vendor code based on existing data
     const lastContract = existingData[existingData.length - 1];
-    const lastVendorCode = lastContract ? parseInt(lastContract.vcbaID.substring(4), 10) : 0;
+    const lastVendorCode = lastContract ? parseInt(lastContract.vCBAID.substring(4), 10) : 0;
     return `Vcba${(lastVendorCode + 1).toString().padStart(5, '0')}`;
   }
 

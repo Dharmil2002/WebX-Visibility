@@ -434,7 +434,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   disableSize() {
-
+   
     if (this.prqEntryTableForm.controls['transMode'].value === "container") {
       //this.prqEntryTableForm.controls["vehicleSize"].disable();
       this.jsonControlPrqArray = this.allFormGrop.filter((x) => x.name !== "vehicleSize");

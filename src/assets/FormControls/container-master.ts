@@ -18,28 +18,6 @@ export class ContainerControl {
                 ],
                 generatecontrol: true, disable: true
             },
-            // {
-            //     name: 'containerName',
-            //     label: 'Container Name',
-            //     placeholder: 'Container Name',
-            //     type: 'text',
-            //     value: containerMasterTable?.containerName,
-            //     Validations: [
-            //         {
-            //             name: "required",
-            //             message: "Container name is required"
-            //         },
-            //         {
-            //             name: "pattern",
-            //             message: "Please Enter only text with 1-20 alphabets",
-            //             pattern: '^[a-zA-Z0-9 ]{1,20}$'
-            //         }
-            //     ],
-            //     generatecontrol: true, disable: isUpdate ? true : false,
-            //     functions: {
-            //         onChange: "checkContainerExists",
-            //     },
-            // },
             {
                 name: 'containerType',
                 label: "Container Type",
@@ -162,6 +140,17 @@ export class ContainerControl {
                 generatecontrol: false,
                 disable: false,
             },
+            {
+                name: "containerName",
+                label: "Container Name",
+                placeholder: "Container Name",
+                type: "",
+                value: "",
+                Validations: [],
+                generatecontrol: false,
+                disable: false,
+            },
+
         ];
     }
     getContainerFormControls() {

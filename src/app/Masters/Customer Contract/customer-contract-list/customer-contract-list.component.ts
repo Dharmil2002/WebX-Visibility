@@ -23,12 +23,13 @@ export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter i
     },
   ];
   displayedColumns = [
-    { Key: "cUSTNM", title: "Customer", width: "200", className: "matcolumnfirst", show: true },
-    { Key: "cONID", title: "Contract Id", width: "200", className: "matcolumncenter", show: true },
+    { Key: "cUSTNM", title: "Customer", width: "180", className: "matcolumnfirst", show: true },
+    { Key: "cONID", title: "Contract Id", width: "180", className: "matcolumncenter", show: true },
     { Key: "pNM", title: "Product", width: "70", className: "matcolumncenter", show: true },
+    { Key: "pBAS", title: "PayBasis", width: "70", className: "matcolumncenter", show: true },
     { Key: "cSTARTDT", title: "Start Date", width: "100", className: "matcolumncenter", show: true },
     { Key: "cENDDT", title: "End Date", width: "100", className: "matcolumncenter", show: true },
-    { Key: "expiringin", title: "Expiring In", width: "170", className: "matcolumncenter", show: true },
+    { Key: "expiringin", title: "Expiring In", width: "150", className: "matcolumncenter", show: true },
   ];
   columnKeys = this.displayedColumns.map((column) => column.Key);
   boxData: { count: number; title: string; class: string; }[];

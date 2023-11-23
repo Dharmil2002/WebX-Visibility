@@ -12,7 +12,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { ContractBasicInformationControl } from "src/assets/FormControls/CustomerContractControls/BasicInformation-control";
-import { PayBasisdetailFromApi, productdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { GetContractBasedOnCustomerAndProductListFromApi, PayBasisdetailFromApi, productdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
 import { Router } from "@angular/router";
 
@@ -163,7 +163,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     //   "PayBasis",
     //   false
     // );
-    this.ProductsForm.get("PayBasis").setValue(PayBasisdetailFromAPI.find(item => item.value == this.contractData.pBAS))
+    this.ProductsForm.get("PayBasis").setValue(PayBasisdetailFromAPI.find(item => item.name == this.contractData.pBAS))
 
 
   }
@@ -179,65 +179,69 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     }
   }
   async save() {
-    console.log(this.ContractScanimageData?.ContractScan ?? this.contractData.cSCAN)
-    debugger
-    let contractDetails = {
-      cID: this.contractData.cID,
-      bRC: this.contractData.bRC,
-      fYEAR: this.contractData.fYEAR,
-      cONID: this.contractData.cONID,
-      cUSTID: this.contractData.cUSTID,
-      cUSTNM: this.contractData.cUSTNM,
-      pID: this.ProductsForm.value?.Product?.value,
-      pNM: this.ProductsForm.value?.Product?.name,
-      pBAS: this.ProductsForm.value?.PayBasis?.value,
-      cSTARTDT: this.ProductsForm.value?.ContractStartDate,
-      cENDDT: this.ProductsForm.value?.Expirydate,
-      eDT: this.contractData.eDT,
-      cSCAN: this.ContractScanimageData?.ContractScan ?? this.contractData.cSCAN,
-      aCMGR: this.ProductsForm.value?.AccountManager,
-      cPONO: this.ProductsForm.value?.CustomerPONo,
-      cPODt: this.ProductsForm.value?.POValiditydate,
-      cPOSCAN: this.ContractPOScanimageData?.ContractPOScan ?? this.contractData.cPOSCAN,
+    const IsValidContract = await this.CheckItsvalidContract();
+    if (IsValidContract) {
+      let contractDetails = {
+        cID: this.contractData.cID,
+        bRC: this.contractData.bRC,
+        fYEAR: this.contractData.fYEAR,
+        cONID: this.contractData.cONID,
+        cUSTID: this.contractData.cUSTID,
+        cUSTNM: this.contractData.cUSTNM,
+        pID: this.ProductsForm.value?.Product?.value,
+        pNM: this.ProductsForm.value?.Product?.name,
+        pBAS: this.ProductsForm.value?.PayBasis?.name,
+        cSTARTDT: this.ProductsForm.value?.ContractStartDate,
+        cENDDT: this.ProductsForm.value?.Expirydate,
+        eDT: this.contractData.eDT,
+        cSCAN: this.ContractScanimageData?.ContractScan ?? this.contractData.cSCAN,
+        aCMGR: this.ProductsForm.value?.AccountManager,
+        cPONO: this.ProductsForm.value?.CustomerPONo,
+        cPODt: this.ProductsForm.value?.POValiditydate,
+        cPOSCAN: this.ContractPOScanimageData?.ContractPOScan ?? this.contractData.cPOSCAN,
 
+      }
+
+      const reqBody = {
+        companyCode: this.companyCode,
+        collectionName: "cust_contract",
+        filter: { _id: this.contractData._id },
+        update: { ...contractDetails }
+      };
+
+      this.masterService.masterPut('generic/update', reqBody).subscribe({
+        next: (res: any) => {
+          if (res) {
+
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                Swal.hideLoading();
+                setTimeout(() => {
+                  Swal.close();
+                }, 2000);
+                this.Route.navigate(['/Masters/CustomerContract/CustomerContractList']);
+              }
+            });
+          }
+        }
+      });
+    } else {
+      Swal.fire({
+        title: 'Already Contract Exists Between This Date Ranges',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
     }
 
-    const reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "cust_contract",
-      filter: { _id: this.contractData._id },
-      update: { ...contractDetails }
-    };
-
-    this.masterService.masterPut('generic/update', reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Swal.hideLoading();
-              setTimeout(() => {
-                Swal.close();
-              }, 2000);
-              this.Route.navigate(['/Masters/CustomerContract/CustomerContractList']);
-            }
-          });
-
-          // Display success message
-          // Swal.fire({
-          //   icon: "success",
-          //   title: "Successful",
-          //   text: res.message,
-          //   showConfirmButton: true,
-          // });
-        }
-      }
-    });
   }
   async selectFileContractScan(data) {
     // Call the uploadFile method from the service
@@ -274,5 +278,32 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     this.Route.navigateByUrl('/Masters/CustomerContract/CustomerContractList');
   }
 
+  async CheckItsvalidContract() {
+    const customerId = this.ProductsForm.value?.Customer?.value;
+    const productId = this.ProductsForm.value?.Product?.value;
+    let ExistingContracts = await GetContractBasedOnCustomerAndProductListFromApi(this.masterService, customerId, productId);
+
+    ExistingContracts = ExistingContracts.filter(item => item.cONID != this.contractData.cONID)
+    const startDate = new Date(this.ProductsForm.value?.ContractStartDate);
+    const endDate = new Date(this.ProductsForm.value?.Expirydate);
+
+    // Assume the contract is valid by default
+    let isValidContract = true;
+
+    // Perform your comparison logic with the predefined JSON data
+    for (const item of ExistingContracts) {
+      const jsonStartDate = new Date(item.cSTARTDT);
+      const jsonEndDate = new Date(item.cENDDT);
+
+      if ((startDate <= jsonEndDate && endDate >= jsonStartDate) ||
+        (endDate >= jsonStartDate && startDate <= jsonEndDate)) {
+        // If the contract dates overlap with any existing contract, set isValidContract to false
+        isValidContract = false;
+        break; // No need to continue checking, as the contract is already invalid
+      }
+    }
+    return isValidContract;
+
+  }
 }
 

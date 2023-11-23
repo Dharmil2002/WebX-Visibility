@@ -116,7 +116,7 @@ export class thcControl {
                     filterOptions: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: prq ? prq : false,
+                    disable: view ? view:prq ? prq : update,
                     Validations: [
                         {
                             name: "required",
@@ -146,7 +146,7 @@ export class thcControl {
                     type: 'text',
                     value: '',
                     Validations: [],
-                    generatecontrol: true, disable: view ? view : prq ? prq : false,
+                    generatecontrol: true, disable: view ? view : prq ? prq : update,
                     additionalData: {
                         metaData: "Basic"
                     }
@@ -169,7 +169,7 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : prq ? prq : false,
+                    disable: view ? view : prq ? prq : update,
                     Validations: [
                         {
                             name: "required",
@@ -221,7 +221,7 @@ export class thcControl {
                     functions: {
                         onOptionSelect: 'getVehicleDetail'
                     },
-                    disable: view ? view : prq ? prq : false
+                    disable: view ? view : prq ? prq : update
                 },
 
 
@@ -290,7 +290,7 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : prq ? prq : false,
+                    disable: view ? view : prq ? prq : update,
                     functions: {
                         onSelection: ""
                     },
@@ -503,7 +503,7 @@ export class thcControl {
                         message: "Balance Paid At is required",
                     }],
                     generatecontrol: true,
-                    disable: false
+                    disable:  view ? view : update
                 },
                 {
                     name: 'overload',

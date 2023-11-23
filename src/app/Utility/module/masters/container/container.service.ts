@@ -10,6 +10,7 @@ export class ContainerService {
   companyCode = localStorage.getItem("companyCode")
   // This async function retrieves container data from an API using the masterService.
   async containerFromApi() {
+    
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: this.companyCode, // Get company code from local storage

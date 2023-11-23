@@ -88,17 +88,32 @@ export async function GetContractListFromApi(masterService) {
   }
 }
 
-export async function GetContractBasedOnCustomerAndProductListFromApi(masterService, CustomerId, ProductId) {
+export async function GetContractBasedOnCustomerAndProductListFromApi(masterService, CustomerId?, ProductId?, payBasis?) {
+  let filter = {};
+  if (CustomerId) {
+    filter["cUSTID"] = CustomerId;
+  }
+  if (ProductId) {
+    filter["pID"] = ProductId;
+  }
+  if (payBasis) {
+    filter["pBAS"] = payBasis;
+  }
+
   let req = {
     companyCode: localStorage.getItem("companyCode"),
     collectionName: "cust_contract",
-    filter: { cUSTID: CustomerId, pID: ProductId },
+    filter: filter,
   };
+
   const res = await masterService.masterPost("generic/get", req).toPromise();
   if (res) {
     const data = res?.data
       .filter((x) => x != null)
-      .sort((a, b) => a.cONID.localeCompare(b.value));
+      .sort((a, b) => a.cONID.localeCompare(b.value)).map((item) => ({
+        ...item,
+        status: "Active", // You need to replace this with your actual status calculation logic
+      }));
 
     return data;
   }

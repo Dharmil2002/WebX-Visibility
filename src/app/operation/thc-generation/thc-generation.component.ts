@@ -343,6 +343,7 @@ export class ThcGenerationComponent implements OnInit {
 
     this.thcTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.marketVehicleTableForm = formGroupBuilder(this.fb, [this.jsonMarketVehicle]);
+   
   }
 
   filterFormControls(formControls, metaData) {
@@ -506,7 +507,7 @@ export class ThcGenerationComponent implements OnInit {
         }
       }
     }
-    if (!this.isView) {
+    if (!this.isView&&!this.isUpdate) {
       this.vendorFieldChanged();
     }
 
@@ -848,13 +849,13 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['capacity'].setValue(vehDetail.capacity);
     const vendorType = vendorTypeList.find((x) => x.value.toLowerCase() == vehDetail.vendorType.toLowerCase());
     this.thcTableForm.controls['vendorType'].setValue(vendorType?.value);
-    if (vehDetail.value) {
-      const filteredShipments = this.allShipment.filter((x) => x.vehicleNo == vehDetail.value && (x.orgTotWeight != "0" || x.orgNoOfPkg != "0"));
-      this.tableData = filteredShipments.map((x) => {
-        x.actions = ["Edit"]
-        return x; // Make sure to return x to update the original object in the 'tableData' array.
-      });
-    }
+    // if (vehDetail.value) {
+    //   const filteredShipments = this.allShipment.filter((x) => x.vehicleNo == vehDetail.value && (x.orgTotWeight != "0" || x.orgNoOfPkg != "0"));
+    //   this.tableData = filteredShipments.map((x) => {
+    //     x.actions = ["Edit"]
+    //     return x; // Make sure to return x to update the original object in the 'tableData' array.
+    //   });
+    // }
     // this.thcTableForm.controls['vehicle'].setValue();
 
   }
@@ -869,6 +870,7 @@ export class ThcGenerationComponent implements OnInit {
         x.type = vendorType === "Market" ? "text" : "dropdown";
       }
     });
+    this.thcTableForm.controls['vendorName'].setValue("");
     if (vendorType !== 'Market') {
       const vendorDetail = this.vendorDetail.filter((x) => x.type.toLowerCase() == vendorType.toLowerCase());
       this.filter.Filter(
@@ -916,7 +918,7 @@ export class ThcGenerationComponent implements OnInit {
   /*below function call when user will try to view or
    edit Thc the function are create for autofill the value*/
   async autoFillThc() {
-
+    
     const thcDetail = await this.thcService.getThcDetails(this.thcDetail.tripId);
     const thcNestedDetails = thcDetail.data;
     let propertiesToSet = [
@@ -931,9 +933,6 @@ export class ThcGenerationComponent implements OnInit {
       "driverMno",
       "driverLno",
       "driverLexd",
-      "contAmt",
-      "advAmt",
-      "balAmt",
       "advPdAt",
       "balAmtAt",
       "status",
@@ -963,11 +962,16 @@ export class ThcGenerationComponent implements OnInit {
     //  const closingBranch = this.locationData.find((x) => x.value === this.thcDetail?.closingBranch);
     this.thcTableForm.controls["advPdAt"].setValue(location);
     this.thcTableForm.controls["balAmtAt"].setValue(balAmtAt);
+    this.thcTableForm.controls["tripDate"].disable();
+    this.thcTableForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.contAmt||0);
+    this.thcTableForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.advAmt||0);
+    this.thcTableForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.balAmt||0);
     //this.thcTableForm.controls["closingBranch"].setValue(closingBranch);    
     this.thcTableForm.controls["fromCity"].setValue({ name: thcNestedDetails?.thcDetails.fromCity || "", value: thcNestedDetails?.thcDetails.fromCity || "" });
     this.thcTableForm.controls["toCity"].setValue({ name: thcNestedDetails?.thcDetails.toCity || "", value: thcNestedDetails?.thcDetails.toCity || "" });
     this.thcTableForm.controls["vehicle"].setValue({ name: thcNestedDetails?.thcDetails.vehicle, value: thcNestedDetails?.thcDetails.vehicle });
     this.thcTableForm.controls["vendorName"].setValue({ name: thcNestedDetails?.thcDetails.vendorName, value: thcNestedDetails?.thcDetails.vendorName });
+    this.thcTableForm.controls["driverLexd"].disable();
     if (this.addThc) {
       this.thcTableForm.controls['billingParty'].setValue(this.thcDetail?.billingParty);
       this.thcTableForm.controls['docketNumber'].setValue(this.thcDetail?.docketNumber);

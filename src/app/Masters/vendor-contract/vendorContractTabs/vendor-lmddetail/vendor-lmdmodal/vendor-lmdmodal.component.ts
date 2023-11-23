@@ -159,7 +159,7 @@ export class VendorLMDModalComponent implements OnInit {
   generateNewVendorCode(existingData: any[]) {
     // Generate a new vendor code based on existing data
     const lastContract = existingData[existingData.length - 1];
-    const lastVendorCode = lastContract ? parseInt(lastContract.vclmID.substring(4), 10) : 0;
+    const lastVendorCode = lastContract ? parseInt(lastContract.vCLMID.substring(4), 10) : 0;
     return `Vclm${(lastVendorCode + 1).toString().padStart(5, '0')}`;
   }
 

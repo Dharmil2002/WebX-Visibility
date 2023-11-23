@@ -44,15 +44,15 @@ export class CustomerContractServiceSelectionComponent
     iconName: "save",
   };
   ADDEventButton = {
-    functionName: 'addData',
+    functionName: "addData",
     name: "Add New",
-    iconName: 'add'
-  }
+    iconName: "add",
+  };
   FADDEventButton = {
-    functionName: 'FaddData',
+    functionName: "FaddData",
     name: "Add New",
-    iconName: 'add'
-  }
+    iconName: "add",
+  };
   ProductsForm: UntypedFormGroup;
   jsonControlArrayProductsForm: any;
 
@@ -93,7 +93,7 @@ export class CustomerContractServiceSelectionComponent
   tableLoad: boolean = true;
   FtableLoad: boolean = true;
   isTableLoad: boolean = true;
-  tableData: any = [];
+  tableData = [];
 
   className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   ServiceclassName = "col-xl-2 col-lg-3 col-md-12 col-sm-12";
@@ -116,7 +116,7 @@ export class CustomerContractServiceSelectionComponent
     csv: false,
   };
   menuItems = [{ label: "Edit" }, { label: "Remove" }];
-  FmenuItems = [{ label: 'Edit' },{ label: 'Remove' }];
+  FmenuItems = [{ label: "Edit" }, { label: "Remove" }];
 
   columnHeader = {
     InvoiceValueFrom: {
@@ -185,7 +185,7 @@ export class CustomerContractServiceSelectionComponent
       Title: "Action",
       class: "matcolumnleft",
       Style: "max-width:150px",
-    }
+    },
   };
   staticField = [
     "InvoiceValueFrom",
@@ -195,13 +195,7 @@ export class CustomerContractServiceSelectionComponent
     "MinCharge",
     "MaxCharge",
   ];
-  FstaticField = [
-    "fTYPE",
-    "fRTYPE",
-    "frT",
-    "fmIN",
-    "fmAX",
-  ];
+  FstaticField = ["fTYPE", "fRTYPE", "frT", "fmIN", "fmAX"];
 
   //#endregion
 
@@ -228,7 +222,7 @@ export class CustomerContractServiceSelectionComponent
   LoadtypedetailFromAPI: any;
   RatetypedetailFromAPI: any;
   VolumetricUoMFromAPI: any;
-  FtableData:any=[];
+  FtableData: any = [];
   InsuranceCarrierRiskSelectionData: any;
   VolumetricappliedFromAPI: any;
   CalculateYieldonFromAPI: any;
@@ -346,11 +340,13 @@ export class CustomerContractServiceSelectionComponent
   //#endregion
   //#endregion
   ngOnInit() {
-
     this.getAllMastersData();
   }
   async BindDataFromAPI() {
-    this.LoadtypedetailFromAPI = await PayBasisdetailFromApi(this.masterService,"LT");
+    this.LoadtypedetailFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "LT"
+    );
     this.filter.Filter(
       this.jsonControlArrayProductsForm,
       this.ProductsForm,
@@ -358,7 +354,10 @@ export class CustomerContractServiceSelectionComponent
       "loadType",
       false
     );
-    this.RatetypedetailFromAPI = await PayBasisdetailFromApi(this.masterService,"RTTYP");
+    this.RatetypedetailFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "RTTYP"
+    );
     this.filter.Filter(
       this.jsonControlArrayProductsForm,
       this.ProductsForm,
@@ -366,7 +365,10 @@ export class CustomerContractServiceSelectionComponent
       "rateTypeDetails",
       false
     );
-    this.VolumetricUoMFromAPI = await PayBasisdetailFromApi(this.masterService,"VolumetricUoM");
+    this.VolumetricUoMFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "VolumetricUoM"
+    );
     this.filter.Filter(
       this.jsonControlArrayVolumtericForm,
       this.VolumtericForm,
@@ -374,7 +376,10 @@ export class CustomerContractServiceSelectionComponent
       "VolumetricUoM",
       false
     );
-    this.VolumetricappliedFromAPI = await PayBasisdetailFromApi(this.masterService,"VA");
+    this.VolumetricappliedFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "VA"
+    );
     this.filter.Filter(
       this.jsonControlArrayVolumtericForm,
       this.VolumtericForm,
@@ -382,7 +387,10 @@ export class CustomerContractServiceSelectionComponent
       "Volumetricapplied",
       false
     );
-    this.CalculateYieldonFromAPI = await PayBasisdetailFromApi(this.masterService,"CYO");
+    this.CalculateYieldonFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "CYO"
+    );
     this.filter.Filter(
       this.jsonControlArrayYieldProtectionForm,
       this.YieldProtectionForm,
@@ -390,7 +398,10 @@ export class CustomerContractServiceSelectionComponent
       "CalculateYieldon",
       false
     );
-    this.CODDODRatetypeFromAPI = await PayBasisdetailFromApi(this.masterService,"RTTYP");
+    this.CODDODRatetypeFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "RTTYP"
+    );
     this.filter.Filter(
       this.jsonControlArrayCODDODForm,
       this.CODDODForm,
@@ -398,7 +409,10 @@ export class CustomerContractServiceSelectionComponent
       "CODDODRatetype",
       false
     );
-    this.DemurrageRatetypeFromAPI = await PayBasisdetailFromApi(this.masterService,"RTTYP");
+    this.DemurrageRatetypeFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "RTTYP"
+    );
     this.filter.Filter(
       this.jsonControlArrayDemurrageForm,
       this.DemurrageForm,
@@ -406,7 +420,10 @@ export class CustomerContractServiceSelectionComponent
       "DRatetype",
       false
     );
-    this.YieldTypeFromAPI = await PayBasisdetailFromApi(this.masterService,"YTYP");
+    this.YieldTypeFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "YTYP"
+    );
     this.filter.Filter(
       this.jsonControlArrayYieldProtectionForm,
       this.YieldProtectionForm,
@@ -414,7 +431,10 @@ export class CustomerContractServiceSelectionComponent
       "Yieldtype",
       false
     );
-    this.FuelSurchargeSelectionFromAPI = await PayBasisdetailFromApi(this.masterService,"FTYP");
+    this.FuelSurchargeSelectionFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "FTYP"
+    );
     this.filter.Filter(
       this.jsonControlArrayFuelSurchargeForm,
       this.FuelSurchargeForm,
@@ -422,7 +442,10 @@ export class CustomerContractServiceSelectionComponent
       "FuelType",
       false
     );
-    this.FuelSurchargeFromAPI = await PayBasisdetailFromApi(this.masterService,"RTTYP");
+    this.FuelSurchargeFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "RTTYP"
+    );
     this.filter.Filter(
       this.jsonControlArrayFuelSurchargeForm,
       this.FuelSurchargeForm,
@@ -430,7 +453,10 @@ export class CustomerContractServiceSelectionComponent
       "FRateType",
       false
     );
-    this.InsuranceFromAPI = await PayBasisdetailFromApi(this.masterService,"RTTYP");
+    this.InsuranceFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "RTTYP"
+    );
     this.filter.Filter(
       this.jsonControlArrayInsuranceCarrierRiskForm,
       this.InsuranceCarrierRiskForm,
@@ -547,7 +573,7 @@ export class CustomerContractServiceSelectionComponent
     // Use async/await to introduce the delay
     await delay(delayDuration);
     const json = {
-      id: tableData.length + 1,
+      id:tableData.length+1,
       InvoiceValueFrom: this.InsuranceCarrierRiskForm.value.InvoiceValueFrom,
       tovalue: this.InsuranceCarrierRiskForm.value.tovalue,
       rateType: this.InsuranceCarrierRiskForm.value.rateType.name,
@@ -557,6 +583,18 @@ export class CustomerContractServiceSelectionComponent
       actions: ["Edit", "Remove"],
     };
     this.tableData.push(json);
+    const requestBody = {
+      _id:this.companyCode + "-" + this.contractData.cONID+"-"+tableData.length,
+      cID: this.companyCode,
+      cONID: this.contractData.cONID,
+      iVFROM: this.InsuranceCarrierRiskForm.value.InvoiceValueFrom,
+      iVTO: this.InsuranceCarrierRiskForm.value.tovalue,
+      rtType:this.InsuranceCarrierRiskForm.value.rateType.name,
+      rT: this.InsuranceCarrierRiskForm.value.Rate,
+      mIN: this.InsuranceCarrierRiskForm.value.MinCharge,
+      mAX: this.InsuranceCarrierRiskForm.value.MaxCharge,
+    };
+    await this.InsuranceCarrierRiskSelectionSave(requestBody);
     Object.keys(this.InsuranceCarrierRiskForm.controls).forEach((key) => {
       this.InsuranceCarrierRiskForm.get(key).clearValidators();
       this.InsuranceCarrierRiskForm.get(key).updateValueAndValidity();
@@ -577,19 +615,32 @@ export class CustomerContractServiceSelectionComponent
     });
     // this.consignmentTableForm.updateValueAndValidity();
   }
+ 
   async FaddData() {
     this.FtableLoad = true;
     this.isFLoad = true;
     const json = {
-      id:this.FtableData.length + 1,
-      fTYPE:this.FuelSurchargeForm.value.FuelType.name,
-      fRTYPE:this.FuelSurchargeForm.value.FRateType.name,
-      frT:this.FuelSurchargeForm.value.FRate,
-      fmIN:this.FuelSurchargeForm.value.FMinCharge,
-      fmAX:this.FuelSurchargeForm.value.FMaxCharge,
+      id: this.FtableData.length + 1,
+      fTYPE: this.FuelSurchargeForm.value.FuelType.name,
+      fRTYPE: this.FuelSurchargeForm.value.FRateType.name,
+      frT: this.FuelSurchargeForm.value.FRate,
+      fmIN: this.FuelSurchargeForm.value.FMinCharge,
+      fmAX: this.FuelSurchargeForm.value.FMaxCharge,
       actions: ["Edit", "Remove"],
     };
     this.FtableData.push(json);
+    const requestBody = {
+      _id:this.companyCode + "-" + this.contractData.cONID+"-"+this.FtableData.length,
+      cID: this.companyCode,
+      cONID: this.contractData.cONID,
+      iVFROM: this.InsuranceCarrierRiskForm.value.InvoiceValueFrom,
+      iVTO: this.InsuranceCarrierRiskForm.value.tovalue,
+      rtType:this.InsuranceCarrierRiskForm.value.rateType.name,
+      rT: this.InsuranceCarrierRiskForm.value.Rate,
+      mIN: this.InsuranceCarrierRiskForm.value.MinCharge,
+      mAX: this.InsuranceCarrierRiskForm.value.MaxCharge,
+    };
+    await this.FuelSurchargeDataSave(requestBody);
     Object.keys(this.FuelSurchargeForm.controls).forEach((key) => {
       this.FuelSurchargeForm.get(key).clearValidators();
       this.FuelSurchargeForm.get(key).updateValueAndValidity();
@@ -622,9 +673,10 @@ export class CustomerContractServiceSelectionComponent
     this.FfillContainer(data);
   }
 
-  fillContainer(data: any) {
+  async fillContainer(data: any) {
     if (data.label.label === "Remove") {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
+      await this.removedata(data.data.id);
     } else {
       this.InsuranceCarrierRiskForm.controls["InvoiceValueFrom"].setValue(
         data.data?.InvoiceValueFrom || ""
@@ -644,12 +696,14 @@ export class CustomerContractServiceSelectionComponent
       this.InsuranceCarrierRiskForm.controls["MaxCharge"].setValue(
         data.data?.MaxCharge || ""
       );
+      await this.removedata(data.data.id);
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
   }
-  FfillContainer(data: any) {
+  async FfillContainer(data: any) {
     if (data.label.label === "Remove") {
       this.FtableData = this.FtableData.filter((x) => x.id !== data.data.id);
+      await this.Fremovedata(data.data.id);
     } else {
       this.FuelSurchargeForm.controls["FuelType"].setValue(
         data.data?.FuelType || ""
@@ -658,15 +712,14 @@ export class CustomerContractServiceSelectionComponent
       this.FuelSurchargeForm.controls["FRateType"].setValue(
         data.data?.FRateType || ""
       );
-      this.FuelSurchargeForm.controls["FRate"].setValue(
-        data.data?.FRate || ""
-      );
+      this.FuelSurchargeForm.controls["FRate"].setValue(data.data?.FRate || "");
       this.FuelSurchargeForm.controls["FMinCharge"].setValue(
         data.data?.FMinCharge || ""
       );
       this.FuelSurchargeForm.controls["FMaxCharge"].setValue(
         data.data?.FMaxCharge || ""
       );
+      await this.Fremovedata(data.data.id);
       this.FtableData = this.FtableData.filter((x) => x.id !== data.data.id);
     }
   }
@@ -686,49 +739,89 @@ export class CustomerContractServiceSelectionComponent
   }
 
   SetDefaultProductsData() {
-    this. SetDefaultInsuranceCarrierRiskSelectionData();
+    this.SetDefaultInsuranceCarrierRiskSelectionData();
     this.SetDefaultFuelSurchargeData();
-    this.ProductsForm.get("loadType").setValue(this.LoadtypedetailFromAPI.find((item) => item.name == this.contractData.lTYP)
+    this.ProductsForm.get("loadType").setValue(
+      this.LoadtypedetailFromAPI.find(
+        (item) => item.name == this.contractData.lTYP
+      )
     );
-    let rakeList=[]
+    let rakeList = [];
     if (this.contractData.rTYP) {
       this.contractData.rTYP.forEach((element) => {
-        const rType = this.RatetypedetailFromAPI.find(
-          (x) => x.name == element
-        );
+        const rType = this.RatetypedetailFromAPI.find((x) => x.name == element);
         if (rType) {
           rakeList.push(rType);
         }
       });
     }
     this.ProductsForm.get("rateTypecontrolHandler").setValue(
-      rakeList?rakeList:[]
+      rakeList ? rakeList : []
     );
-    this.CODDODForm.get("CODDODRatetype").setValue(this.CODDODRatetypeFromAPI.find((item) => item.name == this.contractData.cODDODRTYP)
+    this.CODDODForm.get("CODDODRatetype").setValue(
+      this.CODDODRatetypeFromAPI.find(
+        (item) => item.name == this.contractData.cODDODRTYP
+      )
     );
     this.CODDODForm.get("Rate").setValue(this.contractData.rT);
     this.CODDODForm.get("MinCharge").setValue(this.contractData.mIN);
     this.CODDODForm.get("MaxCharge").setValue(this.contractData.mAX);
     this.CutOfftimeForm.get("Timeofday").setValue(this.contractData.tDT);
-    this.CutOfftimeForm.get("AdditionalTransitdays").setValue(this.contractData.dAYS);
+    this.CutOfftimeForm.get("AdditionalTransitdays").setValue(
+      this.contractData.dAYS
+    );
     this.DemurrageForm.get("Freestoragedays").setValue(this.contractData.fSDAY);
-    this.DemurrageForm.get("DRatetype").setValue(this.DemurrageRatetypeFromAPI.find((item) => item.name == this.contractData.dRTYP));
-    this.DemurrageForm.get("Demurragerateperday").setValue(this.contractData.dMRTPD);
+    this.DemurrageForm.get("DRatetype").setValue(
+      this.DemurrageRatetypeFromAPI.find(
+        (item) => item.name == this.contractData.dRTYP
+      )
+    );
+    this.DemurrageForm.get("Demurragerateperday").setValue(
+      this.contractData.dMRTPD
+    );
     this.DemurrageForm.get("DMinCharge").setValue(this.contractData.mIN);
     this.DemurrageForm.get("DMaxCharge").setValue(this.contractData.mAX);
-    this.VolumtericForm.get("VolumetricUoM").setValue(this.VolumetricUoMFromAPI.find((item) => item.name == this.contractData.vUOM));
-    this.VolumtericForm.get("Volumetricapplied").setValue(this.VolumetricappliedFromAPI.find((item) => item.name == this.contractData.vAPP));
-    this.VolumtericForm.get("Volumtericcalculation").setValue(this.contractData.vCAL);
+    this.VolumtericForm.get("VolumetricUoM").setValue(
+      this.VolumetricUoMFromAPI.find(
+        (item) => item.name == this.contractData.vUOM
+      )
+    );
+    this.VolumtericForm.get("Volumetricapplied").setValue(
+      this.VolumetricappliedFromAPI.find(
+        (item) => item.name == this.contractData.vAPP
+      )
+    );
+    this.VolumtericForm.get("Volumtericcalculation").setValue(
+      this.contractData.vCAL
+    );
     this.VolumtericForm.get("Conversionratio").setValue(this.contractData.cN);
-    this.YieldProtectionForm.get("MinimumweightKg").setValue(this.contractData.mWKG);
-    this.YieldProtectionForm.get("MinimumpackagesNo").setValue(this.contractData.mPKGNO);
-    this.YieldProtectionForm.get("MinimumFreightvalueINR").setValue(this.contractData.mFREIGHT);
-    this.YieldProtectionForm.get("Yieldtype").setValue(this.YieldTypeFromAPI.find((item) => item.name == this.contractData.yIELDTYP));
-    this.YieldProtectionForm.get("MinimumyieldINR").setValue(this.contractData.mYIELD);
-    this.YieldProtectionForm.get("CalculateYieldon").setValue(this.CalculateYieldonFromAPI.find((item) => item.name == this.contractData.cYIELDON));
+    this.YieldProtectionForm.get("MinimumweightKg").setValue(
+      this.contractData.mWKG
+    );
+    this.YieldProtectionForm.get("MinimumpackagesNo").setValue(
+      this.contractData.mPKGNO
+    );
+    this.YieldProtectionForm.get("MinimumFreightvalueINR").setValue(
+      this.contractData.mFREIGHT
+    );
+    this.YieldProtectionForm.get("Yieldtype").setValue(
+      this.YieldTypeFromAPI.find(
+        (item) => item.name == this.contractData.yIELDTYP
+      )
+    );
+    this.YieldProtectionForm.get("MinimumyieldINR").setValue(
+      this.contractData.mYIELD
+    );
+    this.YieldProtectionForm.get("CalculateYieldon").setValue(
+      this.CalculateYieldonFromAPI.find(
+        (item) => item.name == this.contractData.cYIELDON
+      )
+    );
     // Store the values in session storage
-    sessionStorage.setItem('ServiceSelectiondata', JSON.stringify(this.ProductsForm.value));
-
+    sessionStorage.setItem(
+      "ServiceSelectiondata",
+      JSON.stringify(this.ProductsForm.value)
+    );
 
     // const originRateOption = {
     //   name: this.contractData.oRTNM,
@@ -741,7 +834,15 @@ export class CustomerContractServiceSelectionComponent
     // this.ProductsForm.get("originRateOption").setValue(originRateOption)
     // this.ProductsForm.get("destinationRateOption").setValue(destinationRateOption)
 
-    const mydata = ["COD/DOD","cutofftime","Demurrage","Volumetric","YieldProtection","Insurance","fuelSurcharge"];
+    const mydata = [
+      "COD/DOD",
+      "cutofftime",
+      "Demurrage",
+      "Volumetric",
+      "YieldProtection",
+      "Insurance",
+      "fuelSurcharge",
+    ];
     mydata.forEach((item) => {
       const event = {
         field: {
@@ -759,9 +860,8 @@ export class CustomerContractServiceSelectionComponent
   SaveProduct(event) {
     let contractDetails = {};
     contractDetails["lTYP"] = this.ProductsForm.value.loadType.name;
-    contractDetails["rTYP"] = this.ProductsForm.value.rateTypecontrolHandler.map(
-      (x) => x.name
-    );
+    contractDetails["rTYP"] =
+      this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.name);
     // contractDetails["oRTNM"] = this.ProductsForm.value.originRateOption.name;
     // contractDetails["oRTVAL"] = this.ProductsForm.value.originRateOption.value;
     // contractDetails["dRTNM"] = this.ProductsForm.value.destinationRateOption.name;
@@ -782,13 +882,16 @@ export class CustomerContractServiceSelectionComponent
     contractDetails["vAPP"] = this.VolumtericForm.value.Volumetricapplied.name;
     contractDetails["cN"] = this.VolumtericForm.value.Conversionratio;
     contractDetails["mWKG"] = this.YieldProtectionForm.value.MinimumweightKg;
-    contractDetails["mPKGNO"] = this.YieldProtectionForm.value.MinimumpackagesNo;
-    contractDetails["mFREIGHT"] = this.YieldProtectionForm.value.MinimumFreightvalueINR;
+    contractDetails["mPKGNO"] =
+      this.YieldProtectionForm.value.MinimumpackagesNo;
+    contractDetails["mFREIGHT"] =
+      this.YieldProtectionForm.value.MinimumFreightvalueINR;
     contractDetails["yIELDTYP"] = this.YieldProtectionForm.value.Yieldtype.name;
     contractDetails["mYIELD"] = this.YieldProtectionForm.value.MinimumyieldINR;
-    contractDetails["cYIELDON"] = this.YieldProtectionForm.value.CalculateYieldon.name;
+    contractDetails["cYIELDON"] =
+      this.YieldProtectionForm.value.CalculateYieldon.name;
 
-      const reqBody = {
+    const reqBody = {
       companyCode: this.companyCode,
       collectionName: "cust_contract",
       filter: { _id: this.contractData._id },
@@ -798,8 +901,8 @@ export class CustomerContractServiceSelectionComponent
     this.masterService.masterPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          this.InsuranceCarrierRiskSelectionSave();
-          this.FuelSurchargeDataSave();
+         // this.InsuranceCarrierRiskSelectionSave();
+          //this.FuelSurchargeDataSave();
           // Display success message
           Swal.fire({
             icon: "success",
@@ -810,154 +913,142 @@ export class CustomerContractServiceSelectionComponent
           this.Route.navigateByUrl(
             "/Masters/CustomerContract/CustomerContractList"
           );
-
         }
       },
     });
   }
 
-  InsuranceCarrierRiskSelectionSave(){
-    
-    //this.InsuranceCarrierRiskSelectionData = this.tableData
-    const genretedid = this.companyCode + "-" + this.contractData.cONID
-    const companyCode = this.companyCode
-    const cONID = this.contractData.cONID
-    let InsuranceCarrierRiskSelectiondetails = this.tableData.map((x,index) => {
-      return {
-        _id: genretedid + "-" + index,
-        companyCode:companyCode,
-        cONID:cONID,
-        InvoiceValueFrom: x.InvoiceValueFrom,
-        tovalue: x.tovalue,
-        rateType: x.rateType,
-        Rate: x.Rate,
-        MinCharge:x.MinCharge,
-        MaxCharge:x.MaxCharge
-
-      };
-    });
+  async InsuranceCarrierRiskSelectionSave(requestBody) {
     const tableData = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_insurance",
-      data: InsuranceCarrierRiskSelectiondetails
-
+      data: requestBody,
     };
-    this.masterService.masterPost("generic/create", tableData).subscribe({
+   await this.masterService.masterPost("generic/create", tableData).toPromise();
+   return true
+  }
+
+  SetDefaultInsuranceCarrierRiskSelectionData() {
+    const reqBody = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract_insurance",
+      filter: { cONID: this.contractData.cONID },
+    };
+    this.masterService.masterPost("generic/get", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-         // this.InsuranceCarrierRiskSelectionSave();
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
+          this.tableData = res.data;
+          this.tableData.forEach((item) => {
+            item.id=item._id,
+            item.InvoiceValueFrom=item.iVFROM,
+            item.tovalue=item.iVTO,
+            item.rateType=item.rtType,
+            item.Rate=item.rT,
+            item.MinCharge=item.mIN,
+            item.MaxCharge=item.mAX,
+            item.actions = ["Edit", "Remove"];
+            
           });
-          this.Route.navigateByUrl(
-            "/Masters/CustomerContract/CustomerContractList"
-          );
+          this.tableLoad = false;
         }
       },
     });
   }
 
-  SetDefaultInsuranceCarrierRiskSelectionData(){
-    // let InsuranceCarrierRiskSelectiondetails = this.tableData.map((x) => {
+  async FuelSurchargeDataSave(requestBody) {
+    const FtableData = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract_fuelsurcharge",
+      data: requestBody,
+    };
+   await this.masterService.masterPost("generic/create", FtableData).toPromise();
+   return true
+    //this.InsuranceCarrierRiskSelectionData = this.tableData
+    // const genretedid = this.companyCode + "-" + this.contractData.cONID;
+    // const companyCode = this.companyCode;
+    // const cONID = this.contractData.cONID;
+    // let FuelSurchargedetails = this.FtableData.map((x, index) => {
     //   return {
-    //     _id:x._id,
-    //     companyCode:x.companyCode,
-    //     cONID:x.cONID,
-    //     InvoiceValueFrom: x.InvoiceValueFrom,
-    //     tovalue: x.tovalue,
-    //     rateType: x.rateType,
-    //     Rate: x.Rate,
-    //     MinCharge:x.MinCharge,
-    //     MaxCharge:x.MaxCharge
+    //     _id: genretedid + "-" + index,
+    //     companyCode: companyCode,
+    //     cONID: cONID,
+    //     fTYPE: x.FuelType,
+    //     fRTYPE: x.FRateType,
+    //     frT: x.FRate,
+    //     fmIN: x.FMinCharge,
+    //     fmAX: x.FMaxCharge,
     //   };
     // });
-    const reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "cust_contract_insurance",
-      filter: { cONID:this.contractData.cONID}
-    };
-     //delete InsuranceCarrierRiskSelectiondetails._id;
-     this.masterService.masterPost("generic/get", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-          console.log('res',res)
-          this.tableData=res.data;
-          this.tableData.forEach(item => {
-            item.actions = ['Edit', 'Remove'];
-          });
-          this.tableLoad=false
-        }
-      }
-    });
+    // const FtableData = {
+    //   companyCode: this.companyCode,
+    //   collectionName: "cust_contract_fuelsurcharge",
+    //   data: FuelSurchargedetails,
+    // };
+    // this.masterService.masterPost("generic/create", FtableData).subscribe({
+    //   next: (res: any) => {
+    //     if (res) {
+    //       // this.InsuranceCarrierRiskSelectionSave();
+    //       // Display success message
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: "Successful",
+    //         text: res.message,
+    //         showConfirmButton: true,
+    //       });
+    //       this.Route.navigateByUrl(
+    //         "/Masters/CustomerContract/CustomerContractList"
+    //       );
+    //     }
+    //   },
+    // });
   }
 
-  FuelSurchargeDataSave(){
-     //this.InsuranceCarrierRiskSelectionData = this.tableData
-     const genretedid = this.companyCode + "-" + this.contractData.cONID
-     const companyCode = this.companyCode
-     const cONID = this.contractData.cONID
-     let FuelSurchargedetails = this.FtableData.map((x,index) => {
-       return {
-         _id: genretedid + "-" + index,
-         companyCode:companyCode,
-         cONID:cONID,
-         fTYPE: x.FuelType,
-         fRTYPE: x.FRateType,
-         frT: x.FRate,
-         fmIN: x.FMinCharge,
-         fmAX:x.FMaxCharge,
- 
-       };
-     });
-     const FtableData = {
-       companyCode: this.companyCode,
-       collectionName: "cust_contract_fuelsurcharge",
-       data: FuelSurchargedetails
- 
-     };
-     this.masterService.masterPost("generic/create", FtableData).subscribe({
-       next: (res: any) => {
-         if (res) {
-          // this.InsuranceCarrierRiskSelectionSave();
-           // Display success message
-           Swal.fire({
-             icon: "success",
-             title: "Successful",
-             text: res.message,
-             showConfirmButton: true,
-           });
-           this.Route.navigateByUrl(
-             "/Masters/CustomerContract/CustomerContractList"
-           );
-         }
-       },
-     });
-
-  }
-
-  SetDefaultFuelSurchargeData(){
+  SetDefaultFuelSurchargeData() {
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_fuelsurcharge",
-      filter: { cONID:this.contractData.cONID}
+      filter: { cONID: this.contractData.cONID },
     };
-     //delete InsuranceCarrierRiskSelectiondetails._id;
-     this.masterService.masterPost("generic/get", reqBody).subscribe({
+    //delete InsuranceCarrierRiskSelectiondetails._id;
+    this.masterService.masterPost("generic/get", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          console.log('res',res)
-          this.FtableData=res.data;
-          this.FtableData.forEach(item => {
-            item.actions = ['Edit', 'Remove'];
+          this.FtableData = res.data;
+          this.FtableData.forEach((item) => {
+            item.id=item._id,
+            item.InvoiceValueFrom=item.iVFROM,
+            item.tovalue=item.iVTO,
+            item.rateType=item.rtType,
+            item.Rate=item.rT,
+            item.MinCharge=item.mIN,
+            item.MaxCharge=item.mAX,
+            item.actions = ["Edit", "Remove"];
           });
-          this.FtableLoad=false
+          this.FtableLoad = false;
         }
-      }
+      },
     });
   }
 
+  async removedata(id){
+    const reqBody={
+      companyCode:this.companyCode,
+      collectionName:"cust_contract_insurance",
+      filter:{_id:id},
+    }
+    const res= await this.masterService.masterMongoRemove("generic/remove",reqBody).toPromise();
+    return res;
+
+  }
+
+  async Fremovedata(id){
+    const reqBody={
+      companyCode:this.companyCode,
+      collectionName:"cust_contract_fuelsurcharge",
+      filter:{_id:id},
+    }
+    const res= await this.masterService.masterMongoRemove("generic/remove",reqBody).toPromise();
+    return res;
+
+  }
 }

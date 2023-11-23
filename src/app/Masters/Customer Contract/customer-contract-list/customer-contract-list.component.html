@@ -32,10 +32,12 @@
                                 <div class="col-4">
                                     <ul class="header-buttons" style="padding: 16px 8px 8px 8px !important;">
                                         <li>
+
                                             <div matTooltip="Actions" class="msl-3">
+
                                                 <a href="javascript:void(0)" [matMenuTriggerFor]="action"
                                                     class="settingPanelToggle">
-                                                    <app-feather-icons [icon]="'settings'"
+                                                    <app-feather-icons [icon]="'more-vertical'"
                                                         [class]="'setting-sidebar-icon'"></app-feather-icons>
                                                 </a>
                                                 <mat-menu #action="matMenu">
@@ -43,7 +45,7 @@
                                                         <mat-icon color="primary">add_circle</mat-icon>
                                                         <span>Add New Contract</span>
                                                     </button>
-                                                    <button mat-menu-item>
+                                                    <!-- <button mat-menu-item>
                                                         <mat-icon color="accent">swap_horiz</mat-icon>
                                                         <span>Copy a contract</span>
                                                     </button>
@@ -51,11 +53,11 @@
                                                     <button mat-menu-item>
                                                         <mat-icon color="primary">save_alt</mat-icon>
                                                         <span>Export Data</span>
-                                                    </button>
+                                                    </button> -->
                                                 </mat-menu>
                                             </div>
                                         </li>
-                                        <li>
+                                        <!-- <li>
                                             <div matTooltip="Filters" class="msl-3">
                                                 <a href="javascript:void(0)" [matMenuTriggerFor]="menu"
                                                     class="settingPanelToggle">
@@ -79,7 +81,7 @@
                                                     </button>
                                                 </mat-menu>
                                             </div>
-                                        </li>
+                                        </li> -->
                                     </ul>
                                 </div>
                             </div>
@@ -152,7 +154,7 @@
                                     [style.display]="ModeldataSource.data.length == 0 ? '' : 'none'">
                                     No results
                                 </div>
-                                <mat-paginator #paginator [pageIndex]="0" [pageSize]="10"
+                                <mat-paginator #paginator [pageIndex]="0" [pageSize]="5"
                                     [pageSizeOptions]="[5, 10, 25, 100]">
                                 </mat-paginator>
                             </div>

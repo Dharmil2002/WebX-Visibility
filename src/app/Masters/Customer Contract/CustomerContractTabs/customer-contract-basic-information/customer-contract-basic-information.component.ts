@@ -91,15 +91,10 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     this.ProductsForm.get("ContractStartDate").setValue(moment(data.ContractStartDate, 'DD-MM-YYYY').toDate())
     this.ProductsForm.get("Expirydate").setValue(moment(data.Expirydate, 'DD-MM-YYYY').toDate())
 
-
-    const contractStartDate = moment(new Date(), 'DD-MM-YYYY');
-    const expiryDate = moment(data.Expirydate, 'DD-MM-YYYY');
-
-    const Pendingdays = expiryDate.diff(contractStartDate, 'days');
-    this.ProductsForm.get("Pendingdays").setValue(Pendingdays)
+    this.onContractStartDateChanged("")
 
     this.ProductsForm.get("CustomerPONo").setValue(data.CustomerPONo)
-    this.ProductsForm.get("POValiditydate").setValue(moment(data.POValiditydate, 'DD-MM-YYYY').toDate())
+    this.ProductsForm.get("POValiditydate").setValue(data.POValiditydate)
 
     const cSCAN = this.objImageHandling.extractFileName(data.cSCAN);
     this.ProductsForm.get("ContractScan").setValue(cSCAN)
@@ -113,6 +108,33 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     ContractPOScan.additionalData.isFileSelected = false;
 
   }
+  onContractStartDateChanged(event) {
+    const startDateString = this.ProductsForm.get('ContractStartDate')?.value;
+    const endDateString = this.ProductsForm.get('Expirydate')?.value;
+
+    const startDate = new Date(startDateString);
+    const endDate = new Date(endDateString);
+    console.log(startDate)
+    console.log(endDate)
+
+    if (startDate && endDate && startDate > endDate) {
+      Swal.fire({
+        title: 'Contract End date must be greater than or equal to start date.',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+    } else {
+      const timeDifference = endDate.getTime() - startDate.getTime();
+      const dayDifference = timeDifference / (1000 * 3600 * 24);
+
+      this.ProductsForm.get('Pendingdays')?.setValue(dayDifference);
+    }
+  }
+
   //#endregion
   async ngOnInit() {
     this.productdetailList = await productdetailFromApi(this.masterService)
@@ -190,13 +212,29 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     this.masterService.masterPut('generic/update', reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          // Display success message
+
           Swal.fire({
             icon: "success",
             title: "Successful",
             text: res.message,
             showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.hideLoading();
+              setTimeout(() => {
+                Swal.close();
+              }, 2000);
+              this.Route.navigate(['/Masters/CustomerContract/CustomerContractList']);
+            }
           });
+
+          // Display success message
+          // Swal.fire({
+          //   icon: "success",
+          //   title: "Successful",
+          //   text: res.message,
+          //   showConfirmButton: true,
+          // });
         }
       }
     });

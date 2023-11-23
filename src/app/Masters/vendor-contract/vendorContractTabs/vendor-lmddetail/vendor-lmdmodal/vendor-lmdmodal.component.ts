@@ -1,12 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { SessionService } from 'src/app/core/service/session.service';
 import { VendorlastMileControl } from 'src/assets/FormControls/VendorContractControls/VendorlastMileControl';
 import Swal from 'sweetalert2';
@@ -27,7 +29,10 @@ export class VendorLMDModalComponent implements OnInit {
   rateTypestatus: any;
   locationName: any;
   locationtatus: any;
-  constructor(private objLocationService: LocationService,
+  CurrentContractDetails: any;
+  constructor(private route: ActivatedRoute, 
+    private encryptionService: EncryptionService,
+    private objLocationService: LocationService,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
@@ -37,7 +42,12 @@ export class VendorLMDModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
     this.companyCode = this.sessionService.getCompanyCode();
-
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)      
+     // console.log(this.CurrentContractDetails.cNID);      
+    });
   }
 
   ngOnInit(): void {
@@ -69,7 +79,7 @@ export class VendorLMDModalComponent implements OnInit {
       if (this.objResult.Details) {
         // Update existing vendor contract
         const updateData = this.extractFormData();
-        const id = this.objResult.Details.vclmID;
+        const id = this.objResult.Details._id;
         const updateRequest = {
           companyCode: this.companyCode,
           collectionName: collectionName,
@@ -130,7 +140,7 @@ export class VendorLMDModalComponent implements OnInit {
       aDDKM: parseInt(this.TLMDForm.value.additionalKm),
       mAX: parseInt(this.TLMDForm.value.maxCharges),
       uPDT: new Date(),
-      uPBY: this.TLMDForm.value.upBY,
+      uPBY: this.TLMDForm.value.uPBY,
     };
   }
 
@@ -157,8 +167,9 @@ export class VendorLMDModalComponent implements OnInit {
     // Prepare data for creating a new contract
     return {
       _id: this.companyCode + "-" + newVendorCode,
-      vclmID: newVendorCode,
+      vCLMID: newVendorCode,
       cID: this.companyCode,
+      cNID:this.CurrentContractDetails.cNID,
       lOCID: this.TLMDForm.value.location.value,
       lOCNM: this.TLMDForm.value.location.name,
       cPCTID: this.TLMDForm.value.capacity.value,
@@ -171,7 +182,7 @@ export class VendorLMDModalComponent implements OnInit {
       aDDKM: parseInt(this.TLMDForm.value.additionalKm),
       mAX: parseInt(this.TLMDForm.value.maxCharges),
       eDT: new Date(),
-      eNBY: this.TLMDForm.value.ENBY,
+      eNBY: this.TLMDForm.value.eNBY,
     };
   }
   //#endregion

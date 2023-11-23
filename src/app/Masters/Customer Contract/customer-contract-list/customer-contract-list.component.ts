@@ -23,7 +23,7 @@ export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter i
     },
   ];
   displayedColumns = [
-    { Key: "cUSTID", title: "Customer", width: "200", className: "matcolumnfirst", show: true },
+    { Key: "cUSTNM", title: "Customer", width: "200", className: "matcolumnfirst", show: true },
     { Key: "cONID", title: "Contract Id", width: "200", className: "matcolumncenter", show: true },
     { Key: "pNM", title: "Product", width: "70", className: "matcolumncenter", show: true },
     { Key: "cSTARTDT", title: "Start Date", width: "100", className: "matcolumncenter", show: true },
@@ -85,6 +85,9 @@ export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter i
     this.ModeldataSource = new MatTableDataSource(
       this.tableData
     );
+    this.ModeldataSource.paginator = this.paginator;
+    this.ModeldataSource.sort = this.sort;
+
     this.subs.sink = fromEvent(
       this.filter.nativeElement,
       "keyup"

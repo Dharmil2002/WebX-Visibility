@@ -1,12 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { RouteLocationService } from 'src/app/Utility/module/masters/route-location/route-location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { SessionService } from 'src/app/core/service/session.service';
 import { TERCharges } from 'src/assets/FormControls/VendorContractControls/standard-charges';
 import Swal from 'sweetalert2';
@@ -27,7 +29,10 @@ export class VendorLHFTRModalComponent implements OnInit {
   capacitystatus: any;
   rateTypeName: any;
   rateTypestatus: any;
-  constructor(private fb: UntypedFormBuilder,
+  CurrentContractDetails: any;
+  constructor(private route: ActivatedRoute,
+    private encryptionService: EncryptionService,
+    private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
     private sessionService: SessionService,
@@ -37,6 +42,12 @@ export class VendorLHFTRModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
     this.companyCode = this.sessionService.getCompanyCode();
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)
+      // console.log(this.CurrentContractDetails.cNID);      
+    });
 
   }
 
@@ -107,14 +118,14 @@ export class VendorLHFTRModalComponent implements OnInit {
       rTID: this.TLHFTRForm.value.route.value,
       rTNM: this.TLHFTRForm.value.route.name,
       cPCTID: this.TLHFTRForm.value.capacity.value,
-      cPCTNM: this.TLHFTRForm.value.capacity.name,
+      cPCTNM: parseInt(this.TLHFTRForm.value.capacity.name),
       rTTID: this.TLHFTRForm.value.rateType.value,
       rTTNM: this.TLHFTRForm.value.rateType.name,
       rT: parseInt(this.TLHFTRForm.value.rate),
       mIN: parseInt(this.TLHFTRForm.value.min),
       mAX: parseInt(this.TLHFTRForm.value.max),
       uPDT: new Date(),
-      uPBY: this.TLHFTRForm.value.uPBY,
+      uPBY: this.TLHFTRForm.value.upBY,
     };
   }
 
@@ -141,12 +152,13 @@ export class VendorLHFTRModalComponent implements OnInit {
     // Prepare data for creating a new contract
     return {
       _id: this.companyCode + "-" + newVendorCode,
-      vcftID: newVendorCode,
+      vCFTID: newVendorCode,
       cID: this.companyCode,
+      cNID: this.CurrentContractDetails.cNID,
       rTID: this.TLHFTRForm.value.route.value,
       rTNM: this.TLHFTRForm.value.route.name,
       cPCTID: this.TLHFTRForm.value.capacity.value,
-      cPCTNM: this.TLHFTRForm.value.capacity.name,
+      cPCTNM: parseInt(this.TLHFTRForm.value.capacity.name),
       rTTID: this.TLHFTRForm.value.rateType.value,
       rTTNM: this.TLHFTRForm.value.rateType.name,
       rT: parseInt(this.TLHFTRForm.value.rate),

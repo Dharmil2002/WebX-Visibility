@@ -48,8 +48,8 @@ export class VendorTERModalComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
-      this.CurrentContractDetails = JSON.parse(decryptedData)      
-      console.log(this.CurrentContractDetails.cNID);      
+      this.CurrentContractDetails = JSON.parse(decryptedData)
+      console.log(this.CurrentContractDetails.cNID);
     });
 
   }
@@ -154,14 +154,14 @@ export class VendorTERModalComponent implements OnInit {
       rTID: this.TERForm.value.route.value,
       rTNM: this.TERForm.value.route.name,
       cPCTID: this.TERForm.value.capacity.value,
-      cPCTNM: this.TERForm.value.capacity.name,
+      cPCTNM: parseInt(this.TERForm.value.capacity.name),
       rTTID: this.TERForm.value.rateType.value,
       rTTNM: this.TERForm.value.rateType.name,
       rT: parseInt(this.TERForm.value.rate),
       mIN: parseInt(this.TERForm.value.min),
       mAX: parseInt(this.TERForm.value.max),
       uPDT: new Date(),
-      uPBY: this.TERForm.value.uPBY,
+      uPBY: this.TERForm.value.upBY,
     };
   }
 
@@ -188,13 +188,13 @@ export class VendorTERModalComponent implements OnInit {
     // Prepare data for creating a new contract
     return {
       _id: this.companyCode + "-" + newVendorCode,
-      vcxrID: newVendorCode,
+      vCXRID: newVendorCode,
       cID: this.companyCode,
-      cNID:this.CurrentContractDetails.cNID,
+      cNID: this.CurrentContractDetails.cNID,
       rTID: this.TERForm.value.route.value,
       rTNM: this.TERForm.value.route.name,
       cPCTID: this.TERForm.value.capacity.value,
-      cPCTNM: this.TERForm.value.capacity.name,
+      cPCTNM: parseInt(this.TERForm.value.capacity.name),
       rTTID: this.TERForm.value.rateType.value,
       rTTNM: this.TERForm.value.rateType.name,
       rT: parseInt(this.TERForm.value.rate),

@@ -25,22 +25,7 @@ export class ContractBasicInformationControl {
         Validations: [],
       },
 
-      {
-        name: "ContractScan",
-        label: "Upload Contract Scan",
-        placeholder: "Upload Contract Scan",
-        type: "file",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-        additionalData: {
-          isFileSelected: true
-        },
-        functions: {
-          onChange: "selectFileContractScan",
-        },
-      },
+
       // {
       //   name: "ContractScanView",
       //   label: "View Contract Scan",
@@ -60,7 +45,7 @@ export class ContractBasicInformationControl {
         filterOptions: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -114,6 +99,22 @@ export class ContractBasicInformationControl {
         },
       },
       {
+        name: "ContractScan",
+        label: "Upload Contract Scan",
+        placeholder: "Upload Contract Scan",
+        type: "file",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          isFileSelected: true
+        },
+        functions: {
+          onChange: "selectFileContractScan",
+        },
+      },
+      {
         name: "AccountManager",
         label: "Account Manager",
         placeholder: "Account Manager",
@@ -136,6 +137,9 @@ export class ContractBasicInformationControl {
         additionalData: {
           minDate: new Date("01 Jan 2000"),
         },
+        functions: {
+          onDate: "onContractStartDateChanged",
+        },
       },
       {
         name: "Expirydate",
@@ -148,6 +152,9 @@ export class ContractBasicInformationControl {
         Validations: [],
         additionalData: {
           minDate: new Date("01 Jan 2000"),
+        },
+        functions: {
+          onDate: "onContractStartDateChanged",
         },
       },
       {
@@ -165,7 +172,7 @@ export class ContractBasicInformationControl {
         label: "Customer PO No",
         placeholder: "Customer PO No",
         type: "text",
-        value: BasicInformation.pendingdays,
+        value: BasicInformation.CustomerPONo,
         generatecontrol: true,
         disable: false,
         Validations: [],
@@ -179,7 +186,9 @@ export class ContractBasicInformationControl {
         disable: false,
         Validations: [],
         additionalData: {
-          minDate: new Date("01 Jan 2000"),
+          minDate: new Date(), // Set the minimum date to the current date
+          maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
+
         },
       },
 
@@ -248,9 +257,6 @@ export class ContractBasicInformationControl {
         additionalData: {
           showNameAndValue: true,
           metaData: "Basic"
-        },
-        functions: {
-          onOptionSelect: "PartyNameFieldChanged"
         },
       },
 

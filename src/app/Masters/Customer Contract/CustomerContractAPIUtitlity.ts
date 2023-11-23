@@ -87,3 +87,19 @@ export async function GetContractListFromApi(masterService) {
     return data;
   }
 }
+
+export async function GetContractBasedOnCustomerAndProductListFromApi(masterService, CustomerId, ProductId) {
+  let req = {
+    companyCode: localStorage.getItem("companyCode"),
+    collectionName: "cust_contract",
+    filter: { cUSTID: CustomerId, pID: ProductId },
+  };
+  const res = await masterService.masterPost("generic/get", req).toPromise();
+  if (res) {
+    const data = res?.data
+      .filter((x) => x != null)
+      .sort((a, b) => a.cONID.localeCompare(b.value));
+
+    return data;
+  }
+}

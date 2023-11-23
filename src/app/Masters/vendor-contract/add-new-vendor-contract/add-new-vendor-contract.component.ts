@@ -23,7 +23,8 @@ export class AddNewVendorContractComponent implements OnInit {
   vendorContractForm: UntypedFormGroup;
   vendorName: any;
   vendorStatus: any;
-  breadscrums: { title: string; items: string[]; active: string; generatecontrol: boolean; toggle: any; }[];
+  breadscrums: { title: string; items: string[]; active: string }[];
+  backPath: string;
   constructor(private fb: UntypedFormBuilder,
     private route: Router,
     private objVendorService: VendorService,
@@ -35,8 +36,8 @@ export class AddNewVendorContractComponent implements OnInit {
         title: 'Add New Vendor Contract',
         items: ['Home'],
         active: 'AddNewVendorContract',
-        generatecontrol: true,
-        toggle: false
+        // generatecontrol: true,
+        // toggle: false
       },
     ];
   }
@@ -44,6 +45,7 @@ export class AddNewVendorContractComponent implements OnInit {
   ngOnInit(): void {
     this.initializeFormControl();
     this.getVendorList();
+    this.backPath = "/Masters/VendorContract/VendorContractList";
   }
   //#region to initialize form control
   initializeFormControl() {
@@ -94,15 +96,15 @@ export class AddNewVendorContractComponent implements OnInit {
       if (existingVendorContracts) {
         // Generate a new vendor code
         const lastContract = existingVendorContracts[existingVendorContracts.length - 1];
-        const lastVendorCode = lastContract ? parseInt(lastContract.vendorCode.substring(2), 10) : 0;
+        const lastVendorCode = lastContract ? parseInt(lastContract.cNID.substring(2), 10) : 0;
 
         const newVendorCode = `VT${(lastVendorCode + 1).toString().padStart(5, '0')}`;
 
         const data = {
-          "_id": newVendorCode,
+          "_id": this.companyCode + "-" + newVendorCode,
           "cNID": newVendorCode,
           'cID': this.companyCode,
-          "fnYr": financialYear,
+          "fNYR": parseInt(financialYear),
           "vNID": this.vendorContractForm.value.VNID.value,
           "vNNM": this.vendorContractForm.value.VNID.name,
           "pDTID": this.vendorContractForm.value.PDTID.value,
@@ -149,7 +151,7 @@ export class AddNewVendorContractComponent implements OnInit {
 
     // Filter the vendor list based on the 'isActive' property
     const vendor = vendorList
-      .filter((item) => item.isActive) // Filter based on the isActive property
+      .filter((item) => item.isActive && item.vendorType.toUpperCase() === 'ATTACHED') // Filter based on the isActive property
       .map(e => ({
         name: e.vendorName, // Map the name to the specified nameKey
         value: e.vendorCode // Map the value to the specified valueKey
@@ -168,11 +170,11 @@ export class AddNewVendorContractComponent implements OnInit {
   }
   //#endregion
   //#region to set active flag value
-  onToggleChange(event: boolean) {
-    // Handle the toggle change event in the parent component
-    this.vendorContractForm.controls['ACTV'].setValue(event);
-    // console.log("Toggle value :", event);
-  }
+  // onToggleChange(event: boolean) {
+  //   // Handle the toggle change event in the parent component
+  //   this.vendorContractForm.controls['ACTV'].setValue(event);
+  //   // console.log("Toggle value :", event);
+  // }
   //#endregion
   //#region to check existing vendor 
   async checkValueExists() {
@@ -199,6 +201,26 @@ export class AddNewVendorContractComponent implements OnInit {
     catch (error) {
       // Handle errors that may occur during the operation
       console.error(`An error occurred while fetching ${'VNID'} details:`, error);
+    }
+  }
+  //#endregion
+  //#region to validate contract dates
+  onContractStartDateChanged(event) {
+    const startDate = this.vendorContractForm.get('CNSDT')?.value;
+    const endDate = this.vendorContractForm.get('ENDDT')?.value;
+
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      Swal.fire({
+        title: 'Contract End date must be greater than or equal to start date.',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+      this.vendorContractForm.controls.ENDDT.setValue('');
+      this.vendorContractForm.controls.CNSDT.setValue('');
     }
   }
   //#endregion

@@ -743,11 +743,76 @@
       "router": "Finance/DebitVoucher"
     },
     {
-      "title": "CustomerContractList",
+      "title": "CustomerContract/CustomerContractList",
       "tag": [
+        "CustomerContract",
         "CustomerContractList"
       ],
       "router": "Masters/CustomerContract/CustomerContractList"
+    },
+    {
+      "title": "AccountMasterList",
+      "tag": [
+        "AccountMasterList"
+      ],
+      "router": "Masters/AccountMaster/ListAccount"
+    },
+    {
+      "title": "AccountMasterAdd",
+      "tag": [
+        "AccountMasterAdd"
+      ],
+      "router": "Masters/AccountMaster/AddAccount"
+    },
+    {
+      "title": "BankMasterList",
+      "tag": [
+        "BankMasterList"
+      ],
+      "router": "Masters/AccountMaster/ListBank"
+    },
+    {
+      "title": "BankMasterAdd",
+      "tag": [
+        "BankMasterAdd"
+      ],
+      "router": "Masters/AccountMaster/AddBank"
+    },
+    {
+      "title": "TdsMasterList",
+      "tag": [
+        "TdsMasterList"
+      ],
+      "router": "Masters/AccountMaster/ListTds"
+    },
+    {
+      "title": "TdsMasterAdd",
+      "tag": [
+        "TdsMasterAdd"
+      ],
+      "router": "Masters/AccountMaster/AddTds"
+    },
+    {
+      "title": "AccountGroupList",
+      "tag": [
+        "AccountGroupList"
+      ],
+      "router": "Masters/AccountMaster/ListAccount"
+    },
+    {
+      "title": "AAccountGroupAdd",
+      "tag": [
+        "AccountGroupAdd"
+      ],
+      "router": "Masters/AccountMaster/ListAccountGroup"
+    },
+    {
+      "title": "Reports/Job-Register Report",
+      "tag": [
+        "job-query",
+        "job-query"
+      ],
+      "router": "Reports/job-query"
     }
   ]
 }

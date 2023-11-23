@@ -209,16 +209,16 @@ export class ContractBasicInformationControl {
       //   disable: false,
       //   Validations: [],
       // },
-      {
-        name: "UpdateHistory",
-        label: "View Update History",
-        placeholder: "Update History",
-        type: "filelink",
-        value: "test",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
+      // {
+      //   name: "UpdateHistory",
+      //   label: "View Update History",
+      //   placeholder: "Update History",
+      //   type: "filelink",
+      //   value: "test",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
     ];
 
     this.AddNewCustomerContractControlArray = [

@@ -8,13 +8,7 @@ import { VendorContractListingService } from 'src/app/core/service/vendor-contra
   templateUrl: './vendor-index.component.html'
 })
 export class VendorIndexComponent implements OnInit {
-  breadscrums = [
-    {
-      title: "Vendor Contract",
-      items: ["Home"],
-      active: "Vendor Contract",
-    },
-  ];
+  breadscrums: { title: string; items: string[]; active: string; }[];
   folders = [
     "Basic Information",
     "Services Selection",
@@ -23,6 +17,7 @@ export class VendorIndexComponent implements OnInit {
   CurrentContractDetails: any;
   selectedFolder: string;
   selectedContractType: any;
+  backPath: string;
 
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private contractService: VendorContractListingService,
@@ -31,6 +26,13 @@ export class VendorIndexComponent implements OnInit {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
+      this.breadscrums = [
+        {
+          title: "Vendor Contract / "+this.CurrentContractDetails.vNID+":"+this.CurrentContractDetails.vNNM,
+          items: ["Home"],
+          active: "Vendor Contract",
+        },
+      ];
       console.log(this.CurrentContractDetails);
       
     });
@@ -44,6 +46,7 @@ export class VendorIndexComponent implements OnInit {
     this.contractService.getContractType().subscribe((contractTypes) => {
       this.processData(contractTypes);
     });
+    this.backPath = "/Masters/VendorContract/VendorContractList";
   }
 
   processData(contractTypes: any[]) {

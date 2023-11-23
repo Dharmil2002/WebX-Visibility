@@ -32,7 +32,11 @@
                                 <div class="col-4">
                                     <ul class="header-buttons" style="padding: 16px 8px 8px 8px !important;">
                                         <li>
-                                            <div matTooltip="Actions" class="msl-3">
+                                            <button mat-menu-item (click)="AddNewContract()" color="primary">
+                                                <mat-icon color="primary">add_circle</mat-icon>
+                                                <span>Add New Contract</span>
+                                            </button>
+                                            <!-- <div matTooltip="Actions" class="msl-3">
                                                 <a href="javascript:void(0)" [matMenuTriggerFor]="action"
                                                     class="settingPanelToggle">
                                                     <app-feather-icons [icon]="'settings'"
@@ -53,7 +57,7 @@
                                                         <span>Export Data</span>
                                                     </button>
                                                 </mat-menu>
-                                            </div>
+                                            </div> -->
                                         </li>
                                         <li>
                                             <div matTooltip="Filters" class="msl-3">

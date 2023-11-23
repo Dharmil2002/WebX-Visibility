@@ -25,7 +25,7 @@
     <form [formGroup]="consignmentTableForm">
       <app-form-webxpress [form]="consignmentTableForm" [FormTitle]="'Consignor Detail'"
         [formData]="jsonControlArrayConsignor" (functionCallEmitter)="functionCallHandler($event)"
-        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [Expanded]=expanded>
       </app-form-webxpress>
     </form>
     <!-- End -->

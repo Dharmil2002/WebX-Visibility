@@ -25,3 +25,14 @@ export function parseCustomDate(dateString, format) {
 export const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1)
   .toString()
   .slice(-2)}`;
+/* 
+  The following variables are used to generate a date and time string for a file name.
+*/
+export const commonCurrentDate = new Date();
+export const commonYear = commonCurrentDate.getFullYear();
+export const commonMonth = String(commonCurrentDate.getMonth() + 1).padStart(2, '0');
+export const commonDay = String(commonCurrentDate.getDate()).padStart(2, '0');
+export const commonHours = String(commonCurrentDate.getHours()).padStart(2, '0');
+export const commonMinutes = String(commonCurrentDate.getMinutes()).padStart(2, '0');
+export const timeString=`${commonDay}${commonMonth}${commonYear}${commonHours}${commonMinutes}`
+/*End*/

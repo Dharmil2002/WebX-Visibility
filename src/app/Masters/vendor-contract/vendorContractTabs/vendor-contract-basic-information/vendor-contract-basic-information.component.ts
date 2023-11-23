@@ -100,6 +100,17 @@ export class VendorContractBasicInformationComponent implements OnInit {
 
     // Create the 'ProductsForm' using 'formGroupBuilder' with 'jsonControlArrayProductsForm'
     this.ProductsForm = formGroupBuilder(this.fb, [this.jsonControlArrayProductsForm]);
+    this.setDays();
+
+    const cNSCN = this.objImageHandling.extractFileName(newData.cNSCN);
+
+    this.imageData = {
+      'cNSCN': newData.cNSCN,
+    };
+    this.ProductsForm.controls.cNSCN.setValue(cNSCN)
+    const ContractScan = this.jsonControlArrayProductsForm.find(x => x.name === 'cNSCN');
+    ContractScan.additionalData.isFileSelected = false;
+
   }
   //#endregion  
   //#region functionCallHandler
@@ -126,7 +137,8 @@ export class VendorContractBasicInformationComponent implements OnInit {
     // Get the file using objImageHandling and set it in the corresponding control name
     const file = this.objImageHandling.getFileByKey('cNSCN', this.imageData);
     data.cNSCN = file;
-
+    data.pNDYS = parseInt(this.ProductsForm.value.pNDYS)
+    // data.UPDT=new Date(this.ProductsForm.value.UPDT)
     // Prepare request body using object destructuring
     const reqBody = {
       companyCode: this.companyCode,
@@ -185,6 +197,42 @@ export class VendorContractBasicInformationComponent implements OnInit {
       width: '30%',
       height: '50%',
     });
+  }
+  //#endregion
+  //#region to set pending Days
+  setDays() {
+    const startDate = new Date(this.ProductsForm.value.eNDDT);
+    const endDate = new Date(this.ProductsForm.value.cNSDT);
+
+    // Calculate the difference in milliseconds
+    const timeDifference = Math.abs(startDate.getTime() - endDate.getTime());
+
+    // Calculate the number of days
+    const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+    this.ProductsForm.controls.pNDYS.setValue(numberOfDays)
+  }
+  //#endregion
+  //#region to validate contract date
+  onContractStartDateChanged(event) {
+    const startDate = this.ProductsForm.get('CNSDT')?.value;
+    const endDate = this.ProductsForm.get('ENDDT')?.value;
+
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      Swal.fire({
+        title: 'Contract End date must be greater than or equal to start date.',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+      this.ProductsForm.controls.ENDDT.setValue('');
+      this.ProductsForm.controls.CNSDT.setValue('');
+      return
+    }
+    this.setDays();
   }
   //#endregion
 }

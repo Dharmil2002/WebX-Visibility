@@ -9,7 +9,7 @@ export class VendorAssociateControls {
         label: "City",
         placeholder: "City",
         type: "dropdown",
-        value: "",
+        value:'' ,
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -25,6 +25,9 @@ export class VendorAssociateControls {
             message: "please select values from list only",
           },
         ],
+        functions: {
+          onModel: "getLocation",
+        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -89,16 +92,16 @@ export class VendorAssociateControls {
         disable: false,
         Validations: [
           {
-          name: "required",
-          message: "Rate Type is required"
-        },
-        {
-          name: "autocomplete",
-        },
-        {
-          name: "invalidAutocomplete",
-          message: "please select values from list only",
-        },
+            name: "required",
+            message: "Rate Type is required"
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "please select values from list only",
+          },
         ],
         additionalData: {
           showNameAndValue: false,
@@ -106,7 +109,7 @@ export class VendorAssociateControls {
       },
       {
         name: "rate",
-        label: "Rate",
+        label: "Rate(₹)",
         placeholder: "Rate",
         type: "number",
         value: "",
@@ -115,11 +118,15 @@ export class VendorAssociateControls {
         Validations: [{
           name: "required",
           message: "Rate is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
       },
       {
         name: "min",
-        label: "Min Amount",
+        label: "Min Amount(₹)",
         placeholder: "Min Amount",
         type: "number",
         value: "",
@@ -128,11 +135,18 @@ export class VendorAssociateControls {
         Validations: [{
           name: "required",
           message: "Min Amount is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
       {
         name: "max",
-        label: "Max Amount",
+        label: "Max Amount(₹)",
         placeholder: "Max Amount",
         type: "number",
         value: "",
@@ -141,7 +155,34 @@ export class VendorAssociateControls {
         Validations: [{
           name: "required",
           message: "Max Amount is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
+      },
+      {
+        name: "eNBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "uPBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
       },
 
     ];

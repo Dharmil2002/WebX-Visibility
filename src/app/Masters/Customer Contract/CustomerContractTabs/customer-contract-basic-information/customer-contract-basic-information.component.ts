@@ -12,8 +12,9 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { ContractBasicInformationControl } from "src/assets/FormControls/CustomerContractControls/BasicInformation-control";
-import { productdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { PayBasisdetailFromApi, productdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
+import { Router } from "@angular/router";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -43,25 +44,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
   //#region Array List
   CurrentAccessList: any
   productdetailList: any
-  PayBasisList = [
-    {
-      value: "All",
-      name: "All",
-    },
-    {
-      value: "TBB",
-      name: "TBB",
-    },
-    {
-      value: "LTL",
-      name: "LTL",
-    },
-    {
-      value: "FTL",
-      name: "FTL",
-    },
 
-  ]
   //#endregion
 
   protected _onDestroy = new Subject<void>();
@@ -70,6 +53,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
   constructor(private fb: UntypedFormBuilder,
     public ObjcontractMethods: locationEntitySearch,
     private matDialog: MatDialog,
+    private Route: Router,
     private masterService: MasterService,
     private filter: FilterUtils, private objImageHandling: ImageHandling,
     private sessionService: SessionService) {
@@ -123,7 +107,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     ContractScan.additionalData.isFileSelected = false;
 
 
-    const cPOSCAN = this.objImageHandling.extractFileName(data.ContractPOScan);
+    const cPOSCAN = this.objImageHandling.extractFileName(data.cPOSCAN);
     this.ProductsForm.get("ContractPOScan").setValue(cPOSCAN)
     const ContractPOScan = this.jsonControlArrayProductsForm.find(x => x.name === 'ContractPOScan');
     ContractPOScan.additionalData.isFileSelected = false;
@@ -141,14 +125,23 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     );
     this.ProductsForm.get("Product").setValue(this.productdetailList.find(item => item.value == this.contractData.pID))
 
+    const PayBasisdetailFromAPI = await PayBasisdetailFromApi(this.masterService, "PAYTYP")
     this.filter.Filter(
       this.jsonControlArrayProductsForm,
       this.ProductsForm,
-      this.PayBasisList,
+      PayBasisdetailFromAPI,
       "PayBasis",
       false
     );
-    this.ProductsForm.get("PayBasis").setValue(this.PayBasisList.find(item => item.value == this.contractData.pBAS))
+
+    // this.filter.Filter(
+    //   this.jsonControlArrayProductsForm,
+    //   this.ProductsForm,
+    //   this.PayBasisList,
+    //   "PayBasis",
+    //   false
+    // );
+    this.ProductsForm.get("PayBasis").setValue(PayBasisdetailFromAPI.find(item => item.value == this.contractData.pBAS))
 
 
   }
@@ -164,11 +157,8 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     }
   }
   async save() {
-    console.log(this.ProductsForm.value)
-    console.log(this.ContractScanimageData)
-    console.log(this.ContractPOScanimageData)
-    console.log(this.contractData)
-
+    console.log(this.ContractScanimageData?.ContractScan ?? this.contractData.cSCAN)
+    debugger
     let contractDetails = {
       cID: this.contractData.cID,
       bRC: this.contractData.bRC,
@@ -182,11 +172,11 @@ export class CustomerContractBasicInformationComponent implements OnInit {
       cSTARTDT: this.ProductsForm.value?.ContractStartDate,
       cENDDT: this.ProductsForm.value?.Expirydate,
       eDT: this.contractData.eDT,
-      cSCAN: this.ContractScanimageData.ContractScan,
+      cSCAN: this.ContractScanimageData?.ContractScan ?? this.contractData.cSCAN,
       aCMGR: this.ProductsForm.value?.AccountManager,
       cPONO: this.ProductsForm.value?.CustomerPONo,
       cPODt: this.ProductsForm.value?.POValiditydate,
-      cPOSCAN: this.ContractPOScanimageData.ContractPOScan,
+      cPOSCAN: this.ContractPOScanimageData?.ContractPOScan ?? this.contractData.cPOSCAN,
 
     }
 
@@ -219,7 +209,18 @@ export class CustomerContractBasicInformationComponent implements OnInit {
 
   }
   openImageDialog(control) {
-    const file = this.objImageHandling.getFileByKey(control.imageName, this.ContractScanimageData);
+    let file;
+    if (control == 'ContractScan') {
+      file = this.objImageHandling.getFileByKey(control.imageName, this.ContractScanimageData);
+      if (file == null) {
+        file = this.contractData.cSCAN
+      }
+    } else {
+      file = this.objImageHandling.getFileByKey(control.imageName, this.ContractPOScanimageData);
+      if (file == null) {
+        file = this.contractData.cPOSCAN
+      }
+    }
     this.matDialog.open(ImagePreviewComponent, {
       data: { imageUrl: file },
       width: '30%',
@@ -231,5 +232,9 @@ export class CustomerContractBasicInformationComponent implements OnInit {
       ProductsForm, this.ContractPOScanimageData, "CustomerContract", 'ContractPOScan', this.jsonControlArrayProductsForm,
       ["jpg", "png", "jpeg", "pdf"]);
   }
+  cancel() {
+    this.Route.navigateByUrl('/Masters/CustomerContract/CustomerContractList');
+  }
+
 }
 

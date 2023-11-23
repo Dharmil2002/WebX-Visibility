@@ -48,7 +48,7 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 
 /*Please organize the code in order of priority, with the code that is used first placed at the top.*/
 export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter implements OnInit {
-
+  expanded = false
   addInvoiceEventButton = {
     functionName: 'addInvoiceData',
     name: "Add Invoice",
@@ -204,6 +204,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   billingParty: any;
   prqNoDetail: any[];
   isLoad: boolean = false;
+  ccbp:boolean=true;
   containerTypeList: any;
   //#endregion
   branchCode = localStorage.getItem("Branch");
@@ -261,6 +262,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.route.getCurrentNavigation()?.extras?.state?.data;
     this.docketDetail = new DocketDetail({});
     if (navigationState != null) {
+      console.log(navigationState)
       this.isUpdate =
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
@@ -284,8 +286,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.isTableLoad = false;
     this.backPath = "/dashboard/Index?tab=6";
 
-    //removed it 
-    this.flagEwayBill();
   }
 
   /*Here the function which is used for the bind staticDropdown Value*/
@@ -346,6 +346,10 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.consignmentTableForm.controls["payType"].setValue("TBB");
     this.consignmentTableForm.controls["transMode"].setValue("Road");
 
+    const mode = localStorage.getItem("Mode")
+    const filteredMode = movementType.find(item => item.name == mode).value
+    this.consignmentTableForm.controls["movementType"].setValue(filteredMode);
+
     if (this.prqData) {
       this.consignmentTableForm.controls["prqNo"].setValue({
         name: this.prqData.prqNo,
@@ -400,23 +404,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setFormValue(this.consignmentTableForm, "docketDate", this.prqData?.pickupDate);
     this.setFormValue(this.consignmentTableForm, "transMode", "Road");
     this.setFormValue(this.consignmentTableForm, "pAddress", this.prqData?.pAddress);
-    this.setFormValue(this.consignmentTableForm, "cnebp", true);
+    this.setFormValue(this.consignmentTableForm, "cnebp", false);
     this.setFormValue(this.consignmentTableForm, "cnbp", true);
     this.setFormValue(this.consignmentTableForm, "vendorType", vehicleDetail?.vendorType, false, "", "");
-    await this.vendorFieldChanged()
-    if (vehicleDetail?.vendorType == "Market") {
-      this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail.vendor);
-    } else {
-      this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
-    }
-    this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo);
-
-    this.getLocBasedOnCity();
 
     // Done By Harikesh 
     const autoBillingConfigs = [
       { name: "cnbp", checked: true },
-      { name: "cnebp", checked: true }
+      { name: "cnebp", checked: false }
     ];
 
     autoBillingConfigs.forEach(config => {
@@ -427,6 +422,15 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.onAutoBillingBased(autoBillingData);
     });
 
+    await this.vendorFieldChanged()
+    if (vehicleDetail?.vendorType == "Market") {
+      this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail.vendor);
+      this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo, false);
+    } else {
+      this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
+      this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo, true);
+    }
+    this.getLocBasedOnCity();
   }
 
   setFormValue(
@@ -573,6 +577,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       switch (fieldName) {
         case 'cnbp':
           updateForm(fieldConsignorName, fieldContactNumber, billingPartyValue);
+          this.expanded = true
           break;
         case 'cnebp':
           updateForm(fieldConsigneeName, fieldConsigneeContactNumber, billingPartyValue);
@@ -586,6 +591,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         case 'cnbp':
           [fieldConsignorName, fieldContactNumber]
             .forEach(field => this.consignmentTableForm.controls[field].setValue(''));
+          this.expanded = false
           break;
         case 'cnebp':
           [fieldConsigneeName, fieldConsigneeContactNumber]
@@ -798,7 +804,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   vendorFieldChanged() {
-    const vendorType = this.consignmentTableForm.value.vendorType;
+    const vendorType = this.consignmentTableForm.value.vendorType !== undefined
+      ? this.consignmentTableForm.value.vendorType
+      : 'Market';
     const vendorName = this.consignmentTableForm.get("vendorName");
     const vehicleNo = this.consignmentTableForm.get("vehicleNo");
     vendorName.setValue("");
@@ -1318,6 +1326,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.tableLoad = true;
       this.isLoad = true;
       let containerNo = [];
+      
       const containerDetail = this.previewResult.map((x, index) => {
         if (x) {
           const detail = containerNo.includes(x.containerNumber);
@@ -1332,6 +1341,14 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
               icon: "error",
               title: "Error",
               text: `Container Id '${x.containerNumber}' is Already exist`,
+            });
+            return null; // Returning null to indicate that this element should be removed
+          }
+          if (!x.isEmpty) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: `IsEmpty is Required`,
             });
             return null; // Returning null to indicate that this element should be removed
           }
@@ -1449,3 +1466,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /* End */
 
 }
+
+
+const movementType = [
+  { "name": "Import", "value": "I" },
+  { "name": "Export", "value": "E" },
+  { "name": "LTL", "value": "D" },
+  { "name": "FTL", "value": "D" }
+]

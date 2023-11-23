@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="'/Masters/AccountMaster/ListTds'">
+    <form [formGroup]="TdsForm">
+        <app-form-webxpress [form]="TdsForm" [formData]="jsonControlArray" [showSaveAndCancelButton]="true"
+            [FormTitle]="FormTitle" (callFunction)="functionCallHandler($event)"
+            (functionCallEmitter)="functionCallHandler($event)">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

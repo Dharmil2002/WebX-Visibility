@@ -80,7 +80,7 @@ export class TERCharges {
       },
       {
         name: "rate",
-        label: "Rate",
+        label: "Rate(₹)",
         placeholder: "Amount",
         type: "number",
         value: "",
@@ -89,11 +89,16 @@ export class TERCharges {
         Validations: [{
           name: "required",
           message: "Rate is required"
-        },],
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
       },
       {
         name: "min",
-        label: "Min Amount",
+        label: "Min Amount(₹)",
         placeholder: "Min Amount",
         type: "number",
         value: "",
@@ -102,11 +107,19 @@ export class TERCharges {
         Validations: [{
           name: "required",
           message: "Min Amount is required"
-        },],
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
       {
         name: "max",
-        label: "Max Amount",
+        label: "Max Amount(₹)",
         placeholder: "Max Amount",
         type: "number",
         value: "",
@@ -115,7 +128,35 @@ export class TERCharges {
         Validations: [{
           name: "required",
           message: "Max Amount is required"
-        },],
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
+      },
+      {
+        name: "ENBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "upBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
       },
     ];
   }

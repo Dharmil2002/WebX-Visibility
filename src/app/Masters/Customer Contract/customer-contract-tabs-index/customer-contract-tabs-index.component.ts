@@ -9,6 +9,7 @@ import { EncryptionService } from 'src/app/core/service/encryptionService.servic
 export class CustomerContractTabsIndexComponent implements AfterViewInit {
   breadscrums;
   CurrentContractDetails: any;
+  backPath = "/Masters/CustomerContract/CustomerContractList";
   selectedTabIndex = 0;
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,) {
     this.route.queryParams.subscribe((params) => {

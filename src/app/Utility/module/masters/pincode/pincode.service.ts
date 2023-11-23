@@ -139,7 +139,6 @@ export class PinCodeService {
           );
         }
       }
-     
     } catch (error) {
       // Handle any errors that may occur during the asynchronous operation
       console.error("Error fetching city data:", error);

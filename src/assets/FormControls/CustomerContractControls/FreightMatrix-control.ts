@@ -62,15 +62,6 @@ export class ContractFreightMatrixControl {
         placeholder: "Rate Type",
         type: "Staticdropdown",
         value: [
-          {
-            value: "1",
-            name: "Per Kg",
-          },
-          {
-            value: "2",
-            name: "Per Pkg",
-          },
-
         ],
         filterOptions: "",
         autocomplete: "",

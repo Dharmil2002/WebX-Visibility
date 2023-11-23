@@ -318,7 +318,35 @@ export class JobControl {
                 disable: false,
                 Validations: [
                 ]
-            }
+            },
+            {
+                name: "entryBy",
+                label: "Entry by",
+                placeholder: "",
+                type: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
+                value: localStorage.getItem("UserName"),
+                generatecontrol: false,
+                disable: false,
+                Validations: [
+                ]
+            },
+            {
+                name: "entryDate",
+                label: "Entry Date",
+                placeholder: "",
+                type: "",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
+                value: new Date(),
+                generatecontrol: false,
+                disable: false,
+                Validations: [
+                ]
+            },
         ];
 
         this.containordetail = [

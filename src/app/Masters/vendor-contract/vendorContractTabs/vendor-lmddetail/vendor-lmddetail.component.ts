@@ -2,51 +2,52 @@ import { Component, OnInit } from '@angular/core';
 import { LastMileData } from '../../vendor-contract-list/VendorStaticData';
 import { VendorLMDModalComponent } from './vendor-lmdmodal/vendor-lmdmodal.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
   selector: 'app-vendor-lmddetail',
   templateUrl: './vendor-lmddetail.component.html'
 })
 export class VendorLMDDetailComponent implements OnInit {
-  TErouteBasedTableData = LastMileData
+  TErouteBasedTableData: any[];
   columnHeaderTErouteBased = {
-    location: {
+    lOCNM: {
       Title: "Location",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    rateType: {
+    rTTNM: {
       Title: "Rate Type",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    timeFrame: {
+    tMFRM: {
       Title: "Time Frame",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    capacity: {
-      Title: "Capacity",
+    cPCTNM: {
+      Title: "Capacity(Ton)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    minCharge: {
-      Title: "Min Change",
+    mIN: {
+      Title: "Min Charge (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    committedKm: {
-      Title: "CommittedKm",
+    cMTKM: {
+      Title: "Committed Km",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    additionalKm: {
+    aDDKM: {
       Title: "Additional KM",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    maxCharges: {
-      Title: "Max Change",
+    mAX: {
+      Title: "Max Charge (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
@@ -68,29 +69,32 @@ export class VendorLMDDetailComponent implements OnInit {
   menuItemflag = true;
   menuItems = [
     { label: 'Edit' },
-    { label: 'Remove' }
+    // { label: 'Remove' }
   ]
-  staticFieldTErouteBased = ['location', 'rateType', 'timeFrame', 'capacity', 'minCharge', 'committedKm', 'additionalKm', 'maxCharges']
-  className = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
+  staticFieldTErouteBased = ['lOCNM', 'rTTNM', 'tMFRM', 'cPCTNM', 'mIN', 'cMTKM', 'aDDKM', 'mAX']
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
-  constructor(private dialog: MatDialog,) { }
+  constructor(private dialog: MatDialog,
+    private masterService: MasterService,
+  ) { }
 
   ngOnInit(): void {
+    this.getTableDetail();
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
-    if (data.label.label === 'Remove') {
-      this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
-    } else {
-      const terDetails = this.TErouteBasedTableData.find(x => x.id == data.data.id);
-      this.addDetails(terDetails)
-    }
+    // if (data.label.label === 'Remove') {
+    //   this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
+    // } else {
+
+    const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
+    this.addDetails(terDetails)
+    // }
   }
   //#endregion 
   //#region to Add a new item to the table or edit
   addDetails(event) {
-    const EditableId = event?.id
-    const request = {
+     const request = {
       TERList: this.TErouteBasedTableData,
       Details: event,
     }
@@ -103,34 +107,33 @@ export class VendorLMDDetailComponent implements OnInit {
         top: "20px",
       },
     });
-    dialogRef.afterClosed().subscribe((result) => {
-      // console.log(result);
-
-      if (result != undefined) {
-        if (EditableId) {
-          this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== EditableId);
-        }
-        const json = {
-          id: this.TErouteBasedTableData.length + 1,
-          location: result.location.value,
-          rateType: result.rateType.name,
-          timeFrame: result.timeFrame,
-          committedKm: result.committedKm,
-          additionalKm: result.additionalKm,
-          capacity: result.capacity.name,
-          minCharge: result.minCharge,
-          maxCharges: result.maxCharges,
-          actions: ['Edit', 'Remove']
-        }
-        this.TErouteBasedTableData.push(json);
-        this.tableLoad = true
-
-      }
+    dialogRef.afterClosed().subscribe(() => {
+      this.getTableDetail();
       this.tableLoad = true;
     });
   }
   //#endregion
-  Submit() {
-    console.log(this.TErouteBasedTableData);
+
+  //#region to get tableData
+  async getTableDetail() {
+    try {
+      const request = {
+        companyCode: this.companyCode,
+        collectionName: "vendor_contract_lmd_rt",
+        filter: {}
+      };
+
+      const response = await this.masterService.masterPost("generic/get", request).toPromise();
+      this.TErouteBasedTableData = response.data;
+      this.TErouteBasedTableData.forEach(item => {
+        item.actions = ['Edit', 'Remove'];
+      });
+
+    } catch (error) {
+      // Handle errors appropriately (e.g., log, display error message)
+      console.error("An error occurred:", error);
+
+    }
   }
+  //#endregion
 }

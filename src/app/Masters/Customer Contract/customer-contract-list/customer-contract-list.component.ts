@@ -23,8 +23,8 @@ export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter i
     },
   ];
   displayedColumns = [
-    { Key: "cUSTID", title: "Customer", width: "250", className: "matcolumnfirst", show: true },
-    { Key: "cONID", title: "Contract Id", width: "100", className: "matcolumncenter", show: true },
+    { Key: "cUSTID", title: "Customer", width: "200", className: "matcolumnfirst", show: true },
+    { Key: "cONID", title: "Contract Id", width: "200", className: "matcolumncenter", show: true },
     { Key: "pNM", title: "Product", width: "70", className: "matcolumncenter", show: true },
     { Key: "cSTARTDT", title: "Start Date", width: "100", className: "matcolumncenter", show: true },
     { Key: "cENDDT", title: "End Date", width: "100", className: "matcolumncenter", show: true },

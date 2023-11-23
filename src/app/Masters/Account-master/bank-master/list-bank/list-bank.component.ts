@@ -1,0 +1,98 @@
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+
+@Component({
+  selector: 'app-list-bank',
+  templateUrl: './list-bank.component.html'
+})
+export class ListBankComponent implements OnInit {
+  breadScrums = [
+    {
+      title: "Bank Master",
+      items: ["Home"],
+      active: "Account",
+    },
+  ];
+  isTableLode = false;
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
+  EventButton = {
+    functionName: "AddNew",
+    name: "Add Bank",
+    iconName: "add",
+  };
+  columnHeader = {
+    Bankname: {
+      Title: "Bank Name",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    Accountnumber: {
+      Title: "Account Number",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    IFSCcode: {
+      Title: "IFSC Code",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    SWIFTcode: {
+      Title: "SWIFT code",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    EditAction: {
+      type: "iconClick",
+      Title: "Action",
+      class: "matcolumncenter",
+      Style: "min-width:10%",
+      functionName: "EditFunction",
+      iconName: "edit",
+    },
+  };
+  staticField = [
+    "Bankname",
+    "Accountnumber",
+    "IFSCcode",
+    "SWIFTcode",
+  ];
+  CompanyCode = parseInt(localStorage.getItem("companyCode"));
+  TableData: any = [];
+  constructor(private Route: Router, private masterService: MasterService) {}
+
+  async ngOnInit() {
+    const req = {
+      companyCode: this.CompanyCode,
+      collectionName: "Bank_detail",
+      filter: {},
+    };
+    const res = await this.masterService
+      .masterPost("generic/get", req)
+      .toPromise();
+    if(res.success){
+      this.TableData = res.data
+      this.isTableLode = true
+    }
+  }
+
+  AddNew(){
+    this.Route.navigateByUrl("/Masters/AccountMaster/AddBank");
+  }
+  EditFunction(event){
+    this.Route.navigate(["/Masters/AccountMaster/AddBank"], { state: { data: event?.data } });
+  }
+  functionCallHandler($event) {
+    let functionName = $event.functionName;
+    try {
+      this[functionName]($event);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+
+}

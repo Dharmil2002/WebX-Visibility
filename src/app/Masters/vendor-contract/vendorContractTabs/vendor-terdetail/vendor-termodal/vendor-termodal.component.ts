@@ -1,13 +1,17 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { RouteLocationService } from 'src/app/Utility/module/masters/route-location/route-location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { SessionService } from 'src/app/core/service/session.service';
 import { TERCharges } from 'src/assets/FormControls/VendorContractControls/standard-charges';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vendor-termodal',
@@ -28,8 +32,10 @@ export class VendorTERModalComponent implements OnInit {
   rateTypeDropDown: any;
   rateTypeName: any;
   rateTypestatus: any;
+  CurrentContractDetails: any;
 
-  constructor(private fb: UntypedFormBuilder,
+  constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
+    private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
     private sessionService: SessionService,
@@ -39,16 +45,22 @@ export class VendorTERModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
     this.companyCode = this.sessionService.getCompanyCode();
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)      
+      console.log(this.CurrentContractDetails.cNID);      
+    });
 
   }
 
   ngOnInit(): void {
     this.getRouteList();
-    this.getRouteList();
     this.getContainerList();
     this.getDropDownData();
     this.initializeFormControl();
     // console.log(this.objResult);
+
   }
   //#region to initialize form control
   initializeFormControl() {
@@ -70,9 +82,9 @@ export class VendorTERModalComponent implements OnInit {
       }
     });
     if (this.objResult.Details) {
-      this.TERForm.controls['rate'].setValue(this.objResult.Details.rate);
-      this.TERForm.controls['min'].setValue(this.objResult.Details.min);
-      this.TERForm.controls['max'].setValue(this.objResult.Details.max);
+      this.TERForm.controls['rate'].setValue(this.objResult.Details.rT);
+      this.TERForm.controls['min'].setValue(this.objResult.Details.mIN);
+      this.TERForm.controls['max'].setValue(this.objResult.Details.mAX);
     }
   }
   //#endregion
@@ -83,10 +95,116 @@ export class VendorTERModalComponent implements OnInit {
     this.dialogRef.close()
   }
   //#region to send data to parent component using dialogRef
-  save(event) {
-    const data = this.TERForm.value;
-    this.dialogRef.close(data)
+  async save(event) {
+    try {
+      const vendorContractCollection = "vendor_contract_xprs_rt";
+
+      if (this.objResult.Details) {
+        // Update existing vendor contract
+        const updateData = this.extractFormData();
+        const id = this.objResult.Details._id;
+        const updateRequest = {
+          companyCode: this.companyCode,
+          collectionName: vendorContractCollection,
+          filter: { _id: id },
+          update: updateData,
+        };
+
+        const updateResponse = await this.masterService.masterPut("generic/update", updateRequest).toPromise();
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Updated Transportation-Express Route",
+          showConfirmButton: true,
+        });
+      } else {
+        // Create a new vendor contract
+        const existingData = await this.fetchExistingData(vendorContractCollection);
+        const newVendorCode = this.generateNewVendorCode(existingData);
+        const newContractData = this.prepareContractData(newVendorCode);
+
+        const createRequest = {
+          companyCode: this.companyCode,
+          collectionName: vendorContractCollection,
+          data: newContractData,
+        };
+
+        const createResponse = await this.masterService.masterPost("generic/create", createRequest).toPromise();
+
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Created Transportation-Express Route",
+          showConfirmButton: true,
+        });
+      }
+      // Close the dialog regardless of success or failure
+      this.dialogRef.close();
+    } catch (error) {
+      // Handle errors appropriately (e.g., log, display error message)
+      console.error("An error occurred:", error);
+    }
   }
+
+  extractFormData() {
+    // Extract form data for updating an existing contract
+    return {
+      rTID: this.TERForm.value.route.value,
+      rTNM: this.TERForm.value.route.name,
+      cPCTID: this.TERForm.value.capacity.value,
+      cPCTNM: this.TERForm.value.capacity.name,
+      rTTID: this.TERForm.value.rateType.value,
+      rTTNM: this.TERForm.value.rateType.name,
+      rT: parseInt(this.TERForm.value.rate),
+      mIN: parseInt(this.TERForm.value.min),
+      mAX: parseInt(this.TERForm.value.max),
+      uPDT: new Date(),
+      uPBY: this.TERForm.value.uPBY,
+    };
+  }
+
+  async fetchExistingData(collectionName: string) {
+    // Fetch existing data for creating a new contract
+    const request = {
+      companyCode: this.companyCode,
+      collectionName: collectionName,
+      filter: {},
+    };
+
+    const response = await this.masterService.masterPost("generic/get", request).toPromise();
+    return response.data;
+  }
+
+  generateNewVendorCode(existingData: any[]) {
+    // Generate a new vendor code based on existing data
+    const lastContract = existingData[existingData.length - 1];
+    const lastVendorCode = lastContract ? parseInt(lastContract.vcxrID.substring(4), 10) : 0;
+    return `Vcxr${(lastVendorCode + 1).toString().padStart(5, '0')}`;
+  }
+
+  prepareContractData(newVendorCode: string) {
+    // Prepare data for creating a new contract
+    return {
+      _id: this.companyCode + "-" + newVendorCode,
+      vcxrID: newVendorCode,
+      cID: this.companyCode,
+      cNID:this.CurrentContractDetails.cNID,
+      rTID: this.TERForm.value.route.value,
+      rTNM: this.TERForm.value.route.name,
+      cPCTID: this.TERForm.value.capacity.value,
+      cPCTNM: this.TERForm.value.capacity.name,
+      rTTID: this.TERForm.value.rateType.value,
+      rTTNM: this.TERForm.value.rateType.name,
+      rT: parseInt(this.TERForm.value.rate),
+      mIN: parseInt(this.TERForm.value.min),
+      mAX: parseInt(this.TERForm.value.max),
+      eDT: new Date(),
+      eNBY: this.TERForm.value.ENBY,
+    };
+  }
+
   //#endregion
   //#region to handle functionCallHandler
   functionCallHandler($event) {
@@ -102,7 +220,7 @@ export class VendorTERModalComponent implements OnInit {
   async getRouteList() {
     this.routeList = await this.objRouteLocationService.getRouteLocationDetail()
     if (this.objResult.Details) {
-      const updatedRoute = this.routeList.find((x) => x.name == this.objResult.Details.route);
+      const updatedRoute = this.routeList.find((TERForm) => TERForm.name == this.objResult.Details.rTNM);
       this.TERForm.controls.route.setValue(updatedRoute);
     }
     this.filter.Filter(this.jsonControlArray, this.TERForm, this.routeList, this.routeName, this.routestatus);
@@ -117,23 +235,46 @@ export class VendorTERModalComponent implements OnInit {
         value: e.containerCode // Map the value to the specified valueKey
       }));
     if (this.objResult.Details) {
-      const updatedData = this.containerData.find((x) => x.name == this.objResult.Details.capacity);
+      const updatedData = this.containerData.find((TERForm) => TERForm.name == this.objResult.Details.cPCTNM);
       this.TERForm.controls.capacity.setValue(updatedData);
     }
     this.filter.Filter(this.jsonControlArray, this.TERForm, this.containerData, this.capacityName, this.capacitystatus);
   }
   //#endregion
   //#region to get rateType list
-  getDropDownData() {
-    this.masterService.getJsonFileDetails('dropDownUrl').subscribe(res => {
-      const { rateTypeDropDown } = res;
-      if (this.objResult.Details) {
-        const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rateType);
-        this.TERForm.controls.rateType.setValue(updaterateType);
-      }
-      this.filter.Filter(this.jsonControlArray, this.TERForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
-    });
+  async getDropDownData() {
+    const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
+
+    if (this.objResult.Details) {
+      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
+      this.TERForm.controls.rateType.setValue(updaterateType);
+    }
+    this.filter.Filter(this.jsonControlArray, this.TERForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
   }
   //#endregion
+  //#region to Validate the minimum and maximum charge values in the TERForm.
+  validateMinCharge() {
+    // Get the current values of 'min' and 'max' from the TERForm
+    const minValue = this.TERForm.get('min')?.value;
+    const maxValue = this.TERForm.get('max')?.value;
 
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue > maxValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Max charge must be greater than or equal to Min charge.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.TERForm.patchValue({
+        min: '',
+        max: ''
+      });
+    }
+  }
+  //#endregion
 }

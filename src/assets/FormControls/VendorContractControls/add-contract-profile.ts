@@ -37,8 +37,8 @@ export class AddContractProfile {
       },
       {
         name: "cNSCN",
-        label: "Upload Contract Scan",
-        placeholder: "Upload Contract Scan",
+        label: "UPload Contract Scan",
+        placeholder: "UPload Contract Scan",
         type: "file",
         value: vendorInformationData.cNSCN,
         generatecontrol: true,
@@ -84,8 +84,11 @@ export class AddContractProfile {
             message: "Start Date is required"
           },],
         additionalData: {
-          minDate: new Date(),
+         minDate: new Date("01 Jan 2000"),
         },
+        functions: {
+          onDate: 'onContractStartDateChanged',
+        }
       },
       {
         name: "eNDDT",
@@ -101,8 +104,11 @@ export class AddContractProfile {
             message: "Expiry Date is required"
           },],
         additionalData: {
-          minDate: new Date(),
+         minDate: new Date("01 Jan 2000"),
         },
+        functions: {
+          onDate: 'onContractStartDateChanged',
+        }
       },
       {
         name: "pNDYS",
@@ -111,7 +117,7 @@ export class AddContractProfile {
         type: "number",
         value: vendorInformationData.pNDYS,
         generatecontrol: true,
-        disable: false,
+        disable: true,
         Validations: [
           {
             name: "required",
@@ -119,7 +125,7 @@ export class AddContractProfile {
           },],
       },
       {
-        name: 'UPDT',
+        name: 'uPDT',
         label: ' ',
         placeholder: ' ',
         type: 'date',
@@ -132,7 +138,7 @@ export class AddContractProfile {
         disable: false
       },
       {
-        name: "UPBY",
+        name: "uPBY",
         label: "",
         placeholder: "",
         type: "text",
@@ -223,7 +229,7 @@ export class AddContractProfile {
           message: "Start Date is required",
         },],
         additionalData: {
-          maxDate: new Date(),
+          minDate: new Date("01 Jan 2000"),
         },
         functions: {
           onDate: "onContractStartDateChanged",
@@ -244,16 +250,19 @@ export class AddContractProfile {
             message: "Expiry Date is required"
           },],
         additionalData: {
-          minDate: new Date(),
+          minDate: new Date("01 Jan 2000"),
+        },
+        functions: {
+          onDate: "onContractStartDateChanged",
         },
       },
-      {
-        name: 'ACTV',
-        label: 'Active Flag',
-        placeholder: 'Active Flag',
-        type: 'toggle', value: false, Validations: [],
-        generatecontrol: false, disable: false
-      },
+      // {
+      //   name: 'ACTV',
+      //   label: 'Active Flag',
+      //   placeholder: 'Active Flag',
+      //   type: 'toggle', value: false, Validations: [],
+      //   generatecontrol: false, disable: false
+      // },
       {
         name: '_id',
         label: 'id',

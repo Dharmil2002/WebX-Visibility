@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { RouteBasedTableData } from '../../vendor-contract-list/VendorStaticData';
 import { VendorLHFTRModalComponent } from './vendor-lhftrmodal/vendor-lhftrmodal.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
   selector: 'app-vendor-lhftrdetail',
@@ -10,35 +11,35 @@ import { MatDialog } from '@angular/material/dialog';
 export class VendorLHFTRDetailComponent implements OnInit {
   @Input() contractData: any;
 
-  TErouteBasedTableData=RouteBasedTableData
-  columnHeaderTErouteBased={
-    route: {
+  TErouteBasedTableData: any[]
+  columnHeaderTErouteBased = {
+    rTNM: {
       Title: "Route",
       class: "matcolumnleft",
-      //Style: "max-width:100px",
+      Style: "max-width:250px",
     },
-    rateType: {
+    rTTNM: {
       Title: "Rate Type",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    capacity: {
-      Title: "Capacity",
-      class: "matcolumnleft",
-      //Style: "max-width:100px",
-    },
-    rate: {
-      Title: "Rate",
+    cPCTNM: {
+      Title: "Capacity(Ton)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    min: {
-      Title: "Min",
+    rT: {
+      Title: "Rate (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    max: {
-      Title: "Max",
+    mIN: {
+      Title: "Min (₹)",
+      class: "matcolumncenter",
+      //Style: "max-width:100px",
+    },
+    mAX: {
+      Title: "Max (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
@@ -48,7 +49,7 @@ export class VendorLHFTRDetailComponent implements OnInit {
       Style: "max-width:80px",
     }
   }
-  tableLoad: boolean=true;
+  tableLoad: boolean = true;
   dynamicControls = {
     add: false,
     edit: false,
@@ -60,66 +61,75 @@ export class VendorLHFTRDetailComponent implements OnInit {
   menuItemflag = true;
   menuItems = [
     { label: 'Edit' },
-    { label: 'Remove' }
+    //{ label: 'Remove' }
   ]
-  staticFieldTErouteBased=['min','rate','capacity','route','rateType','max']
-  constructor(private dialog: MatDialog,) { }
+  staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
+  companyCode: any = parseInt(localStorage.getItem("companyCode"));
+
+  constructor(private dialog: MatDialog,
+    private masterService: MasterService,
+  ) { }
 
   ngOnInit(): void {
+    this.getXpressDetail();
+
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
-    if (data.label.label === 'Remove') {
-      this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
-    } else {
-      const terDetails = this.TErouteBasedTableData.find(x => x.id == data.data.id);
-      this.addDetails(terDetails)
-    }
+    // if (data.label.label === 'Remove') {
+    //   this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
+    // } else {
+    const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
+    this.addDetails(terDetails)
+    // }
   }
   //#endregion 
-//#region to Add a new item to the table or edit
-addDetails(event) {
-  const EditableId = event?.id
-  const request = {
-    beneficiaryList: this.TErouteBasedTableData,
-    Details: event,
-    //url: this.url
+  //#region to Add a new item to the table or edit
+  addDetails(event) {
+    const EditableId = event?.id
+    const request = {
+      beneficiaryList: this.TErouteBasedTableData,
+      Details: event,
+      //url: this.url
+    }
+    this.tableLoad = false;
+    const dialogRef = this.dialog.open(VendorLHFTRModalComponent, {
+      data: request,
+      width: "100%",
+      disableClose: true,
+      position: {
+        top: "20px",
+      },
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getXpressDetail();
+      this.tableLoad = true;
+    });
   }
-  this.tableLoad = false;
-  const dialogRef = this.dialog.open(VendorLHFTRModalComponent, {
-    data: request,
-    width: "100%",
-    disableClose: true,
-    position: {
-      top: "20px",
-    },
-  });
-  dialogRef.afterClosed().subscribe((result) => {
-    // console.log(result);
+  //#endregion
+  //#region to get tableData
+  async getXpressDetail() {
+    try {
+      const collectionName = "vendor_contract_lhft_rt";
 
-    if (result != undefined) {
-      if (EditableId) {
-        this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== EditableId);
-      }
-      const json = {
-        id: this.TErouteBasedTableData.length + 1,
-        route: result.route.name,
-        rateType: result.rateType.name,
-        capacity: result.capacity.name,
-        rate: result.rate,
-        min: result.min,
-        max: result.max,
-        actions: ['Edit', 'Remove']
-      }
-      this.TErouteBasedTableData.push(json);
-      this.tableLoad = true
+      const request = {
+        companyCode: this.companyCode,
+        collectionName: collectionName,
+        filter: {}
+      };
+
+      const response = await this.masterService.masterPost("generic/get", request).toPromise();
+
+      this.TErouteBasedTableData = response.data;
+      this.TErouteBasedTableData.forEach(item => {
+        item.actions = ['Edit', 'Remove'];
+      });
+
+    } catch (error) {
+      // Handle errors appropriately (e.g., log, display error message)
+      console.error("An error occurred:", error);
 
     }
-    this.tableLoad = true;
-  });
-}
-//#endregion
-Submit() {
-  console.log(this.TErouteBasedTableData);
-}
+  }
+  //#endregion
 }

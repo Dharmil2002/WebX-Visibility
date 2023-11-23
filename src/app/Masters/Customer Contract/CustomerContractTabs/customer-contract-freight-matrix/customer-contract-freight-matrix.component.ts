@@ -1,13 +1,14 @@
-
 import { ChangeDetectorRef, Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject} from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
+import Swal from "sweetalert2";
 import { ContractFreightMatrixControl } from "src/assets/FormControls/CustomerContractControls/FreightMatrix-control";
+import { Router } from "@angular/router";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -21,9 +22,14 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   @Input() contractData: any;
   EventButton = {
     functionName: 'AddNewButtonEvent',
-    name: "Add Ne",
+    name: "Add New",
     iconName: 'add'
   }
+  SaveEventButton = {
+    functionName: "Save",
+    name: "Save",
+    iconName: "save",
+  };
   companyCode: number | null
   //#region Form Configration Fields
   ContractFreightMatrixControls: ContractFreightMatrixControl;
@@ -73,7 +79,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       Style: "min-width:2px",
     },
     capacity: {
-      Title: "Min Charge",
+      Title: "Capacity",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -100,14 +106,26 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   //#endregion
   protected _onDestroy = new Subject<void>();
+  custcontractList: any;
+  data: any;
+  FreightMatrixData: any;
 
   //#endregion
   constructor(private fb: UntypedFormBuilder,
     public ObjcontractMethods: locationEntitySearch,
     private masterService: MasterService,
+    private Route: Router,
     private filter: FilterUtils,
     private changeDetectorRef: ChangeDetectorRef,
     private sessionService: SessionService) {
+        // Retrieve the stored value from session storage
+        const storedData = sessionStorage.getItem('ServiceSelectiondata');
+
+        // Check if the storedData is not null or undefined
+        if (storedData) {
+          this.data = JSON.parse(storedData);
+        }
+
     this.companyCode = this.sessionService.getCompanyCode()
     this.CurrentAccessList = {
       productAccess: ['loadType', 'rateType', 'originRateOption', 'destinationRateOption', 'originRateOptionHandler', 'destinationRateOptionHandler']
@@ -123,13 +141,21 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   //#endregion
   initializeFormControl(data) {
-
     this.ContractFreightMatrixControls = new ContractFreightMatrixControl(data);
     this.jsonControlArrayFreightMatrix = this.ContractFreightMatrixControls.getContractFreightMatrixControlControls(this.CurrentAccessList.productAccess);
+    if(this.data.loadType.name=="LTL"){
+      this.jsonControlArrayFreightMatrix=this.jsonControlArrayFreightMatrix.filter((x)=>x.name!=="capacity");
+      // this.columnHeader=this.columnHeader.((x)=>x.staticField!=="capacity");
+    }
     this.FreightMatrixForm = formGroupBuilder(this.fb, [
       this.jsonControlArrayFreightMatrix,
     ]);
-
+    this.jsonControlArrayFreightMatrix = this.jsonControlArrayFreightMatrix.map((x) => {
+      if (x.name === 'rateType') {
+        return { ...x, value: this.data.rateTypecontrolHandler };
+      }
+      return x;
+    });
 
   }
   //#endregion
@@ -191,6 +217,9 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     }
   }
   async AddNewButtonEvent(event) {
+    if (!this.FreightMatrixForm.valid) {
+      return
+    }
     this.tableLoad = false;
     this.isLoad = true;
     const tableData = this.tableData;
@@ -199,7 +228,6 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     // Use async/await to introduce the delay
     await delay(delayDuration);
-    debugger
     const json = {
       id: tableData.length + 1,
       From: this.FreightMatrixForm.value.FromHandler?.name,
@@ -221,15 +249,19 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     this.FreightMatrixForm.controls['FromHandler'].setValue('');
     this.FreightMatrixForm.controls['ToHandler'].setValue('');
     this.FreightMatrixForm.controls['rateType'].setValue('');
-    this.FreightMatrixForm.controls['capacity'].setValue('');
+   // this.FreightMatrixForm.controls['capacity'].setValue('');
     this.FreightMatrixForm.controls['Rate'].setValue('');
-    // Remove all validation  
+    // Remove all validation
 
     this.isLoad = false;
     this.tableLoad = true;
     // Add the "required" validation rule
     Object.keys(this.FreightMatrixForm.controls).forEach(key => {
-      this.FreightMatrixForm.get(key).setValidators(Validators.required);
+      if (!['From', 'To'].includes(key)) {
+        this.FreightMatrixForm.get(key).setValidators(Validators.required);
+        this.FreightMatrixForm.get(key).updateValueAndValidity();
+      }
+
     });
   }
   handleMenuItemClick(data) {
@@ -237,7 +269,6 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   }
 
   fillContainer(data: any) {
-    console.log(data)
     if (data.label.label === 'Remove') {
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
@@ -254,6 +285,48 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       this.FreightMatrixForm.controls['Rate'].setValue(data.data?.Rate || "");
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
     }
+  }
+
+  Save(){
+    this.FreightMatrixData = this.tableData
+    const genretedid = this.companyCode + "-" + this.contractData.cONID
+    const companyCode = this.companyCode
+    const cONID = this.contractData.cONID
+    let FreightMatrixdetails = this.tableData.map((x,index) => {
+      return {
+        _id: genretedid + "-" + index,
+        companyCode:companyCode,
+        cONID:cONID,
+        From: x.From,
+        To: x.To,
+        rateType: x.rateType,
+        Rate: x.Rate,
+      };
+    });
+    const tableData = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract_freight_charge_matrix",
+      data: FreightMatrixdetails,
+    };
+
+    // delete contractDetails._id;
+
+    this.masterService.masterPost("generic/create", tableData).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.Route.navigateByUrl(
+            "/Masters/CustomerContract/CustomerContractList"
+          );
+        }
+      },
+    });
   }
 
 }

@@ -68,6 +68,15 @@ export class ThcUpdateControls {
                 generatecontrol: true, disable: false
             },
             {
+                name: 'receivedBy',
+                label: 'Received By',
+                placeholder: '',
+                type: 'text',
+                value: '',
+                Validations: [],
+                generatecontrol: true, disable: false
+            },
+            {
                 name: 'shipment',
                 label: '',
                 placeholder: '',

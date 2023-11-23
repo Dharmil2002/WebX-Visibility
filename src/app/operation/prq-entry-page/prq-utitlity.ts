@@ -10,7 +10,7 @@ export async function addPrqData(prqData, masterService) {
     return res
 }
 
-export async function updatePrqStatus(prqData,masterService) {
+export async function updatePrqStatus(prqData, masterService) {
 
     delete prqData.srNo
     delete prqData.Action
@@ -27,7 +27,7 @@ export async function updatePrqStatus(prqData,masterService) {
 }
 
 
-export async function showConfirmationDialog(prqDetail, masterService, goBack, tabIndex,status) {
+export async function showConfirmationDialog(prqDetail, masterService, goBack, tabIndex, status) {
     const confirmationResult = await Swal.fire({
         icon: "success",
         title: "Confirmation",
@@ -38,7 +38,7 @@ export async function showConfirmationDialog(prqDetail, masterService, goBack, t
     });
 
     if (confirmationResult.isConfirmed) {
-        prqDetail.status =status;
+        prqDetail.status = status;
         delete prqDetail._id
         delete prqDetail.srNo
 
@@ -48,7 +48,7 @@ export async function showConfirmationDialog(prqDetail, masterService, goBack, t
         }
     }
 }
-export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqdata, operation,isClose) {
+export async function vehicleStatusUpdate(rptLoc, companyCode, arrivalData, prqdata, operation, isClose) {
     try {
         if (!rptLoc || !companyCode || !arrivalData || !arrivalData.vehNo) {
             throw new Error("Missing required data for vehicle status update. Ensure all parameters are provided.");
@@ -89,11 +89,11 @@ export async function locationFromApi(masterService) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "location_detail",
-        filter:{}
+        filter: {}
     }
     try {
-        const res = await masterService.masterMongoPost("generic/get",reqBody).toPromise();
-        const filterMap = res?.data?.map(x => ({ value: x.locCode, name: x.locName, city: x.locCity,state:x.locState})) ?? null;
+        const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
+        const filterMap = res?.data?.map(x => ({ value: x.locCode, name: x.locName, city: x.locCity, state: x.locState })) ?? null;
         return filterMap.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
     } catch (error) {
         console.error("An error occurred:", error);
@@ -103,15 +103,15 @@ export async function locationFromApi(masterService) {
 
 
 export async function customerFromApi(masterService) {
-    const branch=localStorage.getItem("Branch");
+    const branch = localStorage.getItem("Branch");
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "customer_detail",
-        filter:{}
+        filter: {}
     }
     try {
         const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
-        const result = res?.data.filter((x)=>x.customerLocations.includes(branch)).map(x => ({ value: x.customerCode, name: x.customerName ,pinCode:x.PinCode,mobile:x.customer_mobile})) ?? null;
+        const result = res?.data.filter((x) => x.customerLocations.includes(branch)).map(x => ({ value: x.customerCode, name: x.customerName, pinCode: x.PinCode, mobile: x.customer_mobile })) ?? null;
         return result.sort((a, b) => a.name.localeCompare(b.name)); // Sort in ascending order by locCode;
     } catch (error) {
         console.error("An error occurred:", error);
@@ -123,7 +123,7 @@ export async function containerFromApi(masterService) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "container_detail",
-        filter:{}
+        filter: {}
     }
     try {
         const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();

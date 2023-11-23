@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 
-export async function showConfirmationDialogThc(data,operationService) {
+export async function showConfirmationDialogThc(data, operationService) {
     const confirmationResult = await Swal.fire({
         icon: "success",
         title: "Confirmation",
@@ -11,18 +11,18 @@ export async function showConfirmationDialogThc(data,operationService) {
     });
 
     if (confirmationResult.isConfirmed) {
-        const res=  await updateThcStatus(data,operationService);
+        const res = await updateThcStatus(data, operationService);
         return res
     }
-      
-}   
-async function updateThcStatus(data,operationService) {
+
+}
+async function updateThcStatus(data, operationService) {
 
     const reqBody = {
         "companyCode": localStorage.getItem('companyCode'),
         "collectionName": "thc_detail",
-        "filter": {tripId:data.tripId},
-        "update":data
+        "filter": { tripId: data.tripId },
+        "update": data
     }
     const res = await operationService.operationMongoPut("generic/update", reqBody).toPromise();
     return res

@@ -1,10 +1,10 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
- 
+
 export class VendorlastMileControl {
   lastMileControlArray: FormControls[];
- 
+
   constructor() {
-    this. lastMileControlArray = [
+    this.lastMileControlArray = [
       {
         name: "location",
         label: "Location",
@@ -94,7 +94,7 @@ export class VendorlastMileControl {
       },
       {
         name: "minCharge",
-        label: "MinCharge Amount",
+        label: "MinCharge Amount (₹)",
         placeholder: "MinCharge Amount",
         type: "number",
         value: "",
@@ -103,7 +103,14 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "MinCharge Amount is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
       {
         name: "committedKm",
@@ -116,7 +123,11 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "Committed Km is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
       },
       {
         name: "additionalKm",
@@ -129,11 +140,15 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "Additional Km is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
       },
       {
         name: "maxCharges",
-        label: "MaxCharge Amount",
+        label: "MaxCharge Amount (₹)",
         placeholder: "MaxCharge Amount",
         type: "number",
         value: "",
@@ -142,12 +157,37 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "MaxCharge Amount is required"
-        },],
+        }, {
+          name: "pattern",
+          message: "Please Enter only positive numbers",
+          pattern: '^\\d+(\\.\\d+)?$'
+        }],
+        functions: {
+          onChange: 'validateMinCharge'
+        },
       },
-      
+      {
+        name: "eNBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: "uPBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
     ];
-    
-    
+
   }
   getVendorlastMileControl() {
     return this.lastMileControlArray;

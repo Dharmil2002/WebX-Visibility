@@ -94,7 +94,7 @@ export class JobControl {
                 name: "mobileNo",
                 label: "Mobile No",
                 placeholder: "Enter Mobile No",
-                type: "number",
+                type: "mobile-number",
                 value: "",
                 generatecontrol: true,
                 disable: false,

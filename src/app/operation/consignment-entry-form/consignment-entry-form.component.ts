@@ -389,6 +389,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //#endregion
   async prqDetail() {
+    
     let billingParty = this.billingParty.find(
       (x) => x.name === this.prqData?.billingParty
     );
@@ -428,7 +429,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo, false);
     } else {
       this.setFormValue(this.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
-      this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo, true);
+      this.consignmentTableForm.controls['vehicleNo'].setValue({name:this.prqData?.vehicleNo||"",value:this.prqData?.vehicleNo||""});
+     
+    //  this.setFormValue(this.consignmentTableForm, "vehicleNo", this.prqData?.vehicleNo, true,"vehicleNo","vehicleNo");
     }
     this.getLocBasedOnCity();
   }
@@ -494,8 +497,9 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       this.contFlag = true;
       this.containerDetail();
     }
-    this.prqFlag && this.prqDetail();
     this.isUpdate && this.autofillDropDown();
+    this.prqFlag && this.prqDetail();
+
   }
 
   /* below function was the call when */
@@ -864,6 +868,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   /*Below function is only call those time when user can come to only edit a
    docket not for prq or etc etc*/
   autofillDropDown() {
+    
     const { vendorType, vendorName, fromCity, toCity, destination, vehicleNo, billingParty, consignorName, consigneeName, prqNo, risk, payType, transMode, freightRatetype, packaging_type, weight_in, delivery_type, issuing_from } = this.docketDetail;
     const { controls } = this.consignmentTableForm;
 

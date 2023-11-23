@@ -1165,8 +1165,7 @@ export class FreightControl {
       },
       {
         name: 'gstAmount', label: 'GST Amount (₹)', placeholder: 'GST Amount', type: 'mobile-number',
-        value: docketDetail.gstAmount, Validations: [], generatecontrol: true, disable: false,
-
+        value: docketDetail.gstAmount, Validations: [], generatecontrol: true, disable: false
       },
       {
         name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'mobile-number',
@@ -1176,8 +1175,8 @@ export class FreightControl {
         }
       },
       {
-        name: 'totalAmount', label: 'Total Amount (₹)', placeholder: 'Total Amount', type: 'mobile-number',
-        value: docketDetail.totalAmount, Validations: [], generatecontrol: true, disable: false
+        name: 'totalAmount', label: 'Total Amount (₹)', placeholder: 'Total Amount', type: 'text',
+        value: docketDetail.totalAmount, Validations: [], generatecontrol: true, disable: true
       },
       {
         name: 'companyCode',

@@ -30,16 +30,20 @@
                                     </ul>
                                 </div>
                                 <div class="col-4">
-                                    <ul class="header-buttons" style="padding: 16px 8px 8px 8px !important;">
+                                    <ul class="header-buttons" style="padding: 0px 8px 8px 8px !important;">
                                         <li>
 
-                                            <div matTooltip="Actions" class="msl-3">
+                                            <div matTooltip="Actions" class="msl-0">
 
-                                                <a href="javascript:void(0)" [matMenuTriggerFor]="action"
+                                                <!-- <a href="javascript:void(0)" [matMenuTriggerFor]="action"
                                                     class="settingPanelToggle">
                                                     <app-feather-icons [icon]="'more-vertical'"
                                                         [class]="'setting-sidebar-icon'"></app-feather-icons>
-                                                </a>
+                                                </a> -->
+                                                <button mat-menu-item (click)="AddNewContract()">
+                                                    <mat-icon color="primary">add_circle</mat-icon>
+                                                    <span>Add New Contract</span>
+                                                </button>
                                                 <mat-menu #action="matMenu">
                                                     <button mat-menu-item (click)="AddNewContract()">
                                                         <mat-icon color="primary">add_circle</mat-icon>

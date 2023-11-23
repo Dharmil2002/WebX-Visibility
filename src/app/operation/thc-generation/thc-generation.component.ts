@@ -449,7 +449,7 @@ export class ThcGenerationComponent implements OnInit {
 
       const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
 
-      const validTransModes = ['truck', 'trailer'];
+      const validTransModes = ['truck', 'trailer','container'];
       const transMode = validTransModes.includes(this.prqDetail?.transMode) ? 'Road' : '';
       const jsonData = {
         vehicle: { name: this.prqDetail?.vehicleNo, value: this.prqDetail?.vehicleNo },
@@ -870,7 +870,9 @@ export class ThcGenerationComponent implements OnInit {
         x.type = vendorType === "Market" ? "text" : "dropdown";
       }
     });
+    if(!this.prqFlag){
     this.thcTableForm.controls['vendorName'].setValue("");
+    }
     if (vendorType !== 'Market') {
       const vendorDetail = this.vendorDetail.filter((x) => x.type.toLowerCase() == vendorType.toLowerCase());
       this.filter.Filter(

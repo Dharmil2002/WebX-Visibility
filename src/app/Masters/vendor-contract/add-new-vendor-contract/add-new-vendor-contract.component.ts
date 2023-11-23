@@ -177,32 +177,32 @@ export class AddNewVendorContractComponent implements OnInit {
   // }
   //#endregion
   //#region to check existing vendor 
-  async checkValueExists() {
-    try {
-      // Get the field value from the form controls
-      const fieldValue = this.vendorContractForm.controls['VNID'].value.value;
+  // async checkValueExists() {
+  //   try {
+  //     // Get the field value from the form controls
+  //     const fieldValue = this.vendorContractForm.controls['VNID'].value.value;
 
-      // Send the request to fetch user data
-      const userlist = await getContractList(this.masterService, 'vNID', fieldValue);
-      // Check if data exists for the given filter criteria
-      if (userlist.length > 0) {
-        // Show an error message using Swal (SweetAlert)
-        Swal.fire({
-          text: ` This Vendor already exists! Please try with another !`,
-          icon: "error",
-          title: 'error',
-          showConfirmButton: true,
-        });
-        // Reset the input field
-        this.vendorContractForm.controls['VNID'].reset();
-        this.getVendorList();
-      }
-    }
-    catch (error) {
-      // Handle errors that may occur during the operation
-      console.error(`An error occurred while fetching ${'VNID'} details:`, error);
-    }
-  }
+  //     // Send the request to fetch user data
+  //     const userlist = await getContractList(this.masterService, 'vNID', fieldValue);
+  //     // Check if data exists for the given filter criteria
+  //     if (userlist.length > 0) {
+  //       // Show an error message using Swal (SweetAlert)
+  //       Swal.fire({
+  //         text: ` This Vendor already exists! Please try with another !`,
+  //         icon: "error",
+  //         title: 'error',
+  //         showConfirmButton: true,
+  //       });
+  //       // Reset the input field
+  //       this.vendorContractForm.controls['VNID'].reset();
+  //       this.getVendorList();
+  //     }
+  //   }
+  //   catch (error) {
+  //     // Handle errors that may occur during the operation
+  //     console.error(`An error occurred while fetching ${'VNID'} details:`, error);
+  //   }
+  // }
   //#endregion
   //#region to validate contract dates
   onContractStartDateChanged(event) {

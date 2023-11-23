@@ -21,7 +21,7 @@ export class VendorLMDDetailComponent implements OnInit {
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
-    tMFRM: {
+    tMFRMNM: {
       Title: "Time Frame",
       class: "matcolumnleft",
       //Style: "max-width:100px",
@@ -71,7 +71,7 @@ export class VendorLMDDetailComponent implements OnInit {
     { label: 'Edit' },
     // { label: 'Remove' }
   ]
-  staticFieldTErouteBased = ['lOCNM', 'rTTNM', 'tMFRM', 'cPCTNM', 'mIN', 'cMTKM', 'aDDKM', 'mAX']
+  staticFieldTErouteBased = ['lOCNM', 'rTTNM', 'tMFRMNM', 'cPCTNM', 'mIN', 'cMTKM', 'aDDKM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
   constructor(private dialog: MatDialog,

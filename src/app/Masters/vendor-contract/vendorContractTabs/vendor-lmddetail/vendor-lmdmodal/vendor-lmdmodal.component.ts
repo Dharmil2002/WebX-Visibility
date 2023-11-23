@@ -30,7 +30,10 @@ export class VendorLMDModalComponent implements OnInit {
   locationName: any;
   locationtatus: any;
   CurrentContractDetails: any;
-  constructor(private route: ActivatedRoute, 
+  timeFrameName: any;
+  timeFramestatus: any;
+  existingLocation: any;
+  constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private objLocationService: LocationService,
     private fb: UntypedFormBuilder,
@@ -45,8 +48,9 @@ export class VendorLMDModalComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
-      this.CurrentContractDetails = JSON.parse(decryptedData)      
-     // console.log(this.CurrentContractDetails.cNID);      
+      this.CurrentContractDetails = JSON.parse(decryptedData)
+    
+      // console.log(this.CurrentContractDetails.cNID);      
     });
   }
 
@@ -56,6 +60,7 @@ export class VendorLMDModalComponent implements OnInit {
     this.getDropDownData();
     this.initializeFormControl();
     console.log(this.objResult);
+    this.existingLocation = this.objResult.TERList;
   }
   cancel() {
     this.dialogRef.close()
@@ -131,14 +136,15 @@ export class VendorLMDModalComponent implements OnInit {
       lOCID: this.TLMDForm.value.location.value,
       lOCNM: this.TLMDForm.value.location.name,
       cPCTID: this.TLMDForm.value.capacity.value,
-      cPCTNM: this.TLMDForm.value.capacity.name,
+      cPCTNM: parseInt(this.TLMDForm.value.capacity.name),
       rTTID: this.TLMDForm.value.rateType.value,
       rTTNM: this.TLMDForm.value.rateType.name,
-      tMFRM: this.TLMDForm.value.timeFrame,
-      mIN: parseInt(this.TLMDForm.value.minCharge),
-      cMTKM: parseInt(this.TLMDForm.value.committedKm),
-      aDDKM: parseInt(this.TLMDForm.value.additionalKm),
-      mAX: parseInt(this.TLMDForm.value.maxCharges),
+      tMFRMID: this.TLMDForm.value.timeFrame.value,
+      tMFRMNM: this.TLMDForm.value.timeFrame.name,
+      mIN: parseFloat(this.TLMDForm.value.minCharge),
+      cMTKM: parseFloat(this.TLMDForm.value.committedKm),
+      aDDKM: parseFloat(this.TLMDForm.value.additionalKm),
+      mAX: parseFloat(this.TLMDForm.value.maxCharges),
       uPDT: new Date(),
       uPBY: this.TLMDForm.value.uPBY,
     };
@@ -169,18 +175,19 @@ export class VendorLMDModalComponent implements OnInit {
       _id: this.companyCode + "-" + newVendorCode,
       vCLMID: newVendorCode,
       cID: this.companyCode,
-      cNID:this.CurrentContractDetails.cNID,
+      cNID: this.CurrentContractDetails.cNID,
       lOCID: this.TLMDForm.value.location.value,
       lOCNM: this.TLMDForm.value.location.name,
       cPCTID: this.TLMDForm.value.capacity.value,
-      cPCTNM: this.TLMDForm.value.capacity.name,
+      cPCTNM: parseInt(this.TLMDForm.value.capacity.name),
       rTTID: this.TLMDForm.value.rateType.value,
       rTTNM: this.TLMDForm.value.rateType.name,
-      tMFRM: this.TLMDForm.value.timeFrame,
-      mIN: parseInt(this.TLMDForm.value.minCharge),
-      cMTKM: parseInt(this.TLMDForm.value.committedKm),
-      aDDKM: parseInt(this.TLMDForm.value.additionalKm),
-      mAX: parseInt(this.TLMDForm.value.maxCharges),
+      tMFRMID: this.TLMDForm.value.timeFrame.value,
+      tMFRMNM: this.TLMDForm.value.timeFrame.name,
+      mIN: parseFloat(this.TLMDForm.value.minCharge),
+      cMTKM: parseFloat(this.TLMDForm.value.committedKm),
+      aDDKM: parseFloat(this.TLMDForm.value.additionalKm),
+      mAX: parseFloat(this.TLMDForm.value.maxCharges),
       eDT: new Date(),
       eNBY: this.TLMDForm.value.eNBY,
     };
@@ -208,6 +215,10 @@ export class VendorLMDModalComponent implements OnInit {
       if (element.name === 'rateType') {
         this.rateTypeName = element.name,
           this.rateTypestatus = element.additionalData.showNameAndValue
+      }
+      if (element.name === 'timeFrame') {
+        this.timeFrameName = element.name,
+          this.timeFramestatus = element.additionalData.showNameAndValue
       }
     });
     if (this.objResult.Details) {
@@ -247,11 +258,17 @@ export class VendorLMDModalComponent implements OnInit {
   //#region to get rateType list
   async getDropDownData() {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
+    const timeFrameDropDown = await PayBasisdetailFromApi(this.masterService, 'TMFRM')
+
     if (this.objResult.Details) {
       const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
       this.TLMDForm.controls.rateType.setValue(updaterateType);
+
+      const updateTMFRM = timeFrameDropDown.find(item => item.name === this.objResult.Details.tMFRMNM);
+      this.TLMDForm.controls.rateType.setValue(updateTMFRM);
     }
     this.filter.Filter(this.jsonControlArray, this.TLMDForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
+    this.filter.Filter(this.jsonControlArray, this.TLMDForm, timeFrameDropDown, this.timeFrameName, this.timeFramestatus);
   }
   //#endregion
   //#region to Validate the minimum and maximum charge values in the TLMDForm.
@@ -278,5 +295,34 @@ export class VendorLMDModalComponent implements OnInit {
       });
     }
   }
+  //#endregion
+  //#region to check existing location 
+  async checkValueExists() {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.TLMDForm.controls['location'].value.name;
+  
+      // Find the location in existing locations
+      const existingLocation = this.existingLocation.find(x => x.lOCNM === fieldValue);      
+  
+      // Check if data exists for the given filter criteria
+      if (existingLocation) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          text: `Location: ${fieldValue} already exists in Last mile delivery! Please try with another!`,
+          icon: "error",
+          title: 'Error',
+          showConfirmButton: true,
+        });
+  
+        // Reset the input field
+        this.TLMDForm.controls['location'].reset();
+        this.getLocation();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching 'location' details:`, error);
+    }
+  }  
   //#endregion
 }

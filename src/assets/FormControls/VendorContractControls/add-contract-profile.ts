@@ -84,7 +84,7 @@ export class AddContractProfile {
             message: "Start Date is required"
           },],
         additionalData: {
-         minDate: new Date("01 Jan 2000"),
+         minDate: new Date(),
         },
         functions: {
           onDate: 'onContractStartDateChanged',
@@ -104,7 +104,7 @@ export class AddContractProfile {
             message: "Expiry Date is required"
           },],
         additionalData: {
-         minDate: new Date("01 Jan 2000"),
+         minDate: new Date(),
         },
         functions: {
           onDate: 'onContractStartDateChanged',
@@ -229,7 +229,7 @@ export class AddContractProfile {
           message: "Start Date is required",
         },],
         additionalData: {
-          minDate: new Date("01 Jan 2000"),
+          minDate: new Date( ),
         },
         functions: {
           onDate: "onContractStartDateChanged",
@@ -250,7 +250,7 @@ export class AddContractProfile {
             message: "Expiry Date is required"
           },],
         additionalData: {
-          minDate: new Date("01 Jan 2000"),
+          minDate: new Date(),
         },
         functions: {
           onDate: "onContractStartDateChanged",

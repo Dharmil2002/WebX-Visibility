@@ -33,6 +33,7 @@ export class VendorTERModalComponent implements OnInit {
   rateTypeName: any;
   rateTypestatus: any;
   CurrentContractDetails: any;
+  existRouteList: any;
 
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private fb: UntypedFormBuilder,
@@ -60,7 +61,7 @@ export class VendorTERModalComponent implements OnInit {
     this.getDropDownData();
     this.initializeFormControl();
     // console.log(this.objResult);
-
+    this.existRouteList=this.objResult.TERList;
   }
   //#region to initialize form control
   initializeFormControl() {
@@ -276,5 +277,34 @@ export class VendorTERModalComponent implements OnInit {
       });
     }
   }
+  //#endregion
+  //#region to check existing location 
+  async checkValueExists() {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.TERForm.controls['route'].value.name;
+  
+      // Find the route in existing routes
+      const existingRoute = this.existRouteList.find(x => x.rTNM === fieldValue);      
+  
+      // Check if data exists for the given filter criteria
+      if (existingRoute) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          text: `Route: ${fieldValue} already exists in Express Route! Please try with another!`,
+          icon: "error",
+          title: 'Error',
+          showConfirmButton: true,
+        });
+  
+        // Reset the input field
+        this.TERForm.controls['route'].reset();
+        this.getRouteList();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching 'route' details:`, error);
+    }
+  }  
   //#endregion
 }

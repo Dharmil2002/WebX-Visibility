@@ -33,19 +33,31 @@ export async function getContractList(masterService, filterFieldName?: string, f
         throw error; // Rethrow the error to be handled by the caller or provide a default value
     }
 }
-export async function getStatelist(masterService) {
-    const stateReqBody = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        filter: {},
-        collectionName: "state_master",
-    };
-    const StateList = await masterService.masterPost('generic/get', stateReqBody).toPromise();
-    if (StateList) {
-        return StateList.data.map(item => ({
-            name: item.STNM,
-            value: item.STSN
-        }))
+export async function GetContractBasedOnCustomerAndProduct(masterService, vendorID?, productId?) {
+    let filter = {};
+    if (vendorID) {
+        filter["vNID"] = vendorID;
+    }
+    if (productId) {
+        filter["pDTID"] = productId;
     }
 
+    let req = {
+        companyCode: localStorage.getItem("companyCode"),
+        collectionName: "vendor_contract",
+        filter: filter,
+    };
 
+    const res = await masterService.masterPost("generic/get", req).toPromise();
+    if (res) {
+        const data = res?.data
+            .filter((x) => x != null)
+            .sort((a, b) => a.cNID.localeCompare(b.value)).map((item) => ({
+                ...item,
+                status: "Active", // You need to replace this with your actual status calculation logic
+            }));
+        console.log(data);
+
+        return data;
+    }
 }

@@ -172,7 +172,7 @@ export class AddContractProfile {
           showNameAndValue: true
         },
         functions: {
-          onOptionSelect: 'checkValueExists',
+          onOptionSelect: 'getTableData',
         },
         generatecontrol: true,
         disable: false,
@@ -209,11 +209,10 @@ export class AddContractProfile {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
-          metaData: "Basic"
+          showNameAndValue: false, 
         },
         functions: {
-          onOptionSelect: "ProductFieldChanged"
+          onOptionSelect: 'getTableData',
         },
       },
       {

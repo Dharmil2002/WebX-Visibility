@@ -6,4 +6,98 @@
             (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
     </form>
+    
+    <div class="row">
+        <div class="col-12" style="padding: 0px;">
+            <div class="card" style="margin-bottom: 6px;margin-right: 3px;margin-left: 3px;padding: 0px;">
+                <div class="body" style="padding: 0px;">
+                    <div class="task-list">
+                        <div class="materialTableHeader">
+                            <div class="row">
+                                <div class="col-8">
+                                    <ul class="header-buttons-left ml-0">
+
+                                        <li class="dropdown ">
+                                            <label for="search-input"><i
+                                                    class="material-icons search-icon">search</i></label>
+                                            <input placeholder="Search" type="text" #filter
+                                                class="browser-default search-field" aria-label="Search box">
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-4">
+                                    <ul class="header-buttons" style="padding: 0px 8px 8px 8px !important;">
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="body overflow-auto">
+                            <div class="responsive_table" style="overflow-x: unset !important;">
+                                <mat-table [dataSource]="ModeldataSource" matSort class="table-hover" class="mat-cell">
+
+                                    <!-- Order Column -->
+                                    <ng-container *ngFor="let displayedColumn of displayedColumns"
+                                        [matColumnDef]="displayedColumn.Key">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header
+                                            [ngStyle]="{'min-width': displayedColumn.width+ 'px'}"
+                                            [ngClass]=displayedColumn.className>
+                                            {{displayedColumn.title}}</mat-header-cell>
+                                        <mat-cell *matCellDef="let element"
+                                            [ngStyle]="{'min-width': displayedColumn.width+ 'px'}"
+                                            [ngClass]=displayedColumn.className>
+                                            <ng-container>
+                                                {{element[displayedColumn.Key]}}
+                                            </ng-container>
+                                        </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="status">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header class="matcolumncenter"
+                                            style="min-width: 100px !important;">Status</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" style="min-width: 100px !important;"
+                                            class="matcolumncenter">
+                                            <span class="badge"
+                                                [ngClass]="{'col-green': row.status=='Active','col-red': row.status=='Expired'}">
+                                                {{row.status}}
+                                            </span>
+                                        </mat-cell>
+                                    </ng-container>
+                                    <ng-container matColumnDef="actions">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header class="matcolumncenter"
+                                            style="min-width: 150px !important;">Actions</mat-header-cell>
+                                        <mat-cell *matCellDef="let row" style="min-width: 150px !important;"
+                                            class="matcolumncenter">
+                                            <span>
+                                                <button mat-icon-button matTooltip="Copy Contract" (click)="Copy(row)"
+                                                    class="tbl-action-btn">
+                                                    <app-feather-icons [icon]="'copy'"
+                                                        [class]="'tbl-fav-download'"></app-feather-icons>
+                                                </button>
+                                            </span>
+                                        </mat-cell>
+                                    </ng-container>
+                                    <mat-header-row *matHeaderRowDef="columnKeys"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: columnKeys;" matRipple>
+                                    </mat-row>
+                                </mat-table>
+                                <div *ngIf="isTblLoading" class="tbl-spinner">
+                                    <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                                    </mat-progress-spinner>
+                                </div>
+
+                                <div *ngIf="isTblLoading" class="no-results"
+                                    [style.display]="ModeldataSource.data.length == 0 ? '' : 'none'">
+                                    No results
+                                </div>
+                                <mat-paginator #paginator [pageIndex]="0" [pageSize]="5"
+                                    [pageSizeOptions]="[5, 10, 25, 100]">
+                                </mat-paginator>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </app-common-wrapper-webxpress>

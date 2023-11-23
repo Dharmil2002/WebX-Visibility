@@ -102,15 +102,16 @@ export class VendorContractBasicInformationComponent implements OnInit {
     this.ProductsForm = formGroupBuilder(this.fb, [this.jsonControlArrayProductsForm]);
     this.setDays();
 
-    const cNSCN = this.objImageHandling.extractFileName(newData.cNSCN);
+    if (newData.cNSCN) {
+      const cNSCN = this.objImageHandling.extractFileName(newData.cNSCN);
 
-    this.imageData = {
-      'cNSCN': newData.cNSCN,
-    };
-    this.ProductsForm.controls.cNSCN.setValue(cNSCN)
-    const ContractScan = this.jsonControlArrayProductsForm.find(x => x.name === 'cNSCN');
-    ContractScan.additionalData.isFileSelected = false;
-
+      this.imageData = {
+        'cNSCN': newData.cNSCN,
+      };
+      this.ProductsForm.controls.cNSCN.setValue(cNSCN)
+      const ContractScan = this.jsonControlArrayProductsForm.find(x => x.name === 'cNSCN');
+      ContractScan.additionalData.isFileSelected = false;
+    }
   }
   //#endregion  
   //#region functionCallHandler

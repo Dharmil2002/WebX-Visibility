@@ -1,12 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { RouteLocationService } from 'src/app/Utility/module/masters/route-location/route-location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { SessionService } from 'src/app/core/service/session.service';
 import { TERCharges } from 'src/assets/FormControls/VendorContractControls/standard-charges';
 import Swal from 'sweetalert2';
@@ -27,8 +29,11 @@ export class VendorLHLModalComponent implements OnInit {
   capacitystatus: any;
   rateTypeName: any;
   rateTypestatus: any;
+  CurrentContractDetails: any;
 
-  constructor(private fb: UntypedFormBuilder,
+  constructor(private route: ActivatedRoute,
+    private encryptionService: EncryptionService,
+    private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
     private sessionService: SessionService,
@@ -38,7 +43,12 @@ export class VendorLHLModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
     this.companyCode = this.sessionService.getCompanyCode();
-
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)
+      // console.log(this.CurrentContractDetails.cNID);      
+    });
   }
 
   ngOnInit(): void {
@@ -108,7 +118,7 @@ export class VendorLHLModalComponent implements OnInit {
       rTID: this.TLHLForm.value.route.value,
       rTNM: this.TLHLForm.value.route.name,
       cPCTID: this.TLHLForm.value.capacity.value,
-      cPCTNM: this.TLHLForm.value.capacity.name,
+      cPCTNM: parseInt(this.TLHLForm.value.capacity.name),
       rTTID: this.TLHLForm.value.rateType.value,
       rTTNM: this.TLHLForm.value.rateType.name,
       rT: parseInt(this.TLHLForm.value.rate),
@@ -142,12 +152,13 @@ export class VendorLHLModalComponent implements OnInit {
     // Prepare data for creating a new contract
     return {
       _id: this.companyCode + "-" + newVendorCode,
-      vclbID: newVendorCode,
+      vCLBID: newVendorCode,
       cID: this.companyCode,
+      cNID: this.CurrentContractDetails.cNID,
       rTID: this.TLHLForm.value.route.value,
       rTNM: this.TLHLForm.value.route.name,
       cPCTID: this.TLHLForm.value.capacity.value,
-      cPCTNM: this.TLHLForm.value.capacity.name,
+      cPCTNM: parseInt(this.TLHLForm.value.capacity.name),
       rTTID: this.TLHLForm.value.rateType.value,
       rTTNM: this.TLHLForm.value.rateType.name,
       rT: parseInt(this.TLHLForm.value.rate),
@@ -237,8 +248,8 @@ export class VendorLHLModalComponent implements OnInit {
     this.filter.Filter(this.jsonControlArray, this.TLHLForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
   }
   //#endregion
-   //#region to Validate the minimum and maximum charge values in the TLHLForm.
-   validateMinCharge() {
+  //#region to Validate the minimum and maximum charge values in the TLHLForm.
+  validateMinCharge() {
     // Get the current values of 'min' and 'max' from the TLHLForm
     const minValue = this.TLHLForm.get('min')?.value;
     const maxValue = this.TLHLForm.get('max')?.value;
@@ -249,7 +260,7 @@ export class VendorLHLModalComponent implements OnInit {
       Swal.fire({
         title: 'Max charge must be greater than or equal to Min charge.',
         toast: false,
-        icon: "error",      
+        icon: "error",
         showConfirmButton: true,
         confirmButtonText: "OK"
       });

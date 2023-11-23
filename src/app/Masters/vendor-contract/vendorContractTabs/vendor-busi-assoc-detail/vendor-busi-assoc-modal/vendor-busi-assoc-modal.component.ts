@@ -135,7 +135,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
       rT: parseInt(this.BusiAssocForm.value.rate),
       mAX: parseInt(this.BusiAssocForm.value.max),
       uPDT: new Date(),
-      uPBY: this.BusiAssocForm.value.upBY,
+      uPBY: this.BusiAssocForm.value.uPBY,
     };
   }
 
@@ -162,7 +162,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
     // Prepare data for creating a new contract
     return {
       _id: this.companyCode + "-" + newVendorCode,
-      vcbaID: newVendorCode,
+      vCBAID: newVendorCode,
       cID: this.companyCode,
       cNID:this.CurrentContractDetails.cNID,
       cT: this.BusiAssocForm.value.city.value,
@@ -176,7 +176,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
       rT: parseInt(this.BusiAssocForm.value.rate),
       mAX: parseInt(this.BusiAssocForm.value.max),
       eDT: new Date(),
-      eNBY: this.BusiAssocForm.value.ENBY,
+      eNBY: this.BusiAssocForm.value.eNBY,
     };
   }
   //#endregion

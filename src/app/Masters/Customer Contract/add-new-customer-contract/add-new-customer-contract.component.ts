@@ -6,7 +6,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { locationEntitySearch } from 'src/app/Utility/locationEntitySearch';
 import { SessionService } from 'src/app/core/service/session.service';
 import { ContractBasicInformationControl } from 'src/assets/FormControls/CustomerContractControls/BasicInformation-control';
-import { PayBasisdetailFromApi, customerFromApi, productdetailFromApi } from '../CustomerContractAPIUtitlity';
+import { GetContractBasedOnCustomerAndProductListFromApi, PayBasisdetailFromApi, customerFromApi, productdetailFromApi } from '../CustomerContractAPIUtitlity';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
@@ -33,7 +33,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
   ContractBasicInformationControls: ContractBasicInformationControl;
   ContractForm: UntypedFormGroup;
   jsonControlArrayContractForm: any;
-  backPath:string;
+  backPath: string;
   className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
   breadscrums = [
     {
@@ -96,7 +96,7 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
       "Product",
       false
     );
-    const PayBasisdetailFromAPI = await PayBasisdetailFromApi(this.masterService,"PAYTYP")
+    const PayBasisdetailFromAPI = await PayBasisdetailFromApi(this.masterService, "PAYTYP")
     this.filter.Filter(
       this.jsonControlArrayContractForm,
       this.ContractForm,
@@ -137,67 +137,109 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
       });
     }
   }
-  save() {
-    this.snackBarUtilityService.commonToast(async () => {
-      try {
+  async save() {
+    const IsValidContract = await this.CheckItsvalidContract();
+    if (IsValidContract) {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
 
-        this.customerContractRequestModel.companyCode = this.companyCode;
-        this.customerContractRequestModel.docType = "CON";
-        this.customerContractRequestModel.branch = localStorage.getItem("CurrentBranchCode");
-        this.customerContractRequestModel.finYear = financialYear
+          this.customerContractRequestModel.companyCode = this.companyCode;
+          this.customerContractRequestModel.docType = "CON";
+          this.customerContractRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+          this.customerContractRequestModel.finYear = financialYear
 
 
-        this.customerContractDataRequestModel.companyCode = this.companyCode;
-        this.customerContractDataRequestModel.contractID = "";
-        this.customerContractDataRequestModel.docType = "CON";
-        this.customerContractDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
-        this.customerContractDataRequestModel.finYear = financialYear
-        this.customerContractDataRequestModel.customerId = this.ContractForm.value?.Customer?.value
-        this.customerContractDataRequestModel.customerName = this.ContractForm.value?.Customer?.name
-        this.customerContractDataRequestModel.productId = this.ContractForm.value?.Product?.value
-        this.customerContractDataRequestModel.productName = this.ContractForm.value?.Product?.name
-        this.customerContractDataRequestModel.payBasis = this.ContractForm.value?.PayBasis?.value
-        this.customerContractDataRequestModel.ContractStartDate = this.ContractForm.value?.ContractStartDate
-        this.customerContractDataRequestModel.Expirydate = this.ContractForm.value?.Expirydate
-        this.customerContractDataRequestModel.entryDate = new Date().toString()
+          this.customerContractDataRequestModel.companyCode = this.companyCode;
+          this.customerContractDataRequestModel.contractID = "";
+          this.customerContractDataRequestModel.docType = "CON";
+          this.customerContractDataRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+          this.customerContractDataRequestModel.finYear = financialYear
+          this.customerContractDataRequestModel.customerId = this.ContractForm.value?.Customer?.value
+          this.customerContractDataRequestModel.customerName = this.ContractForm.value?.Customer?.name
+          this.customerContractDataRequestModel.productId = this.ContractForm.value?.Product?.value
+          this.customerContractDataRequestModel.productName = this.ContractForm.value?.Product?.name
+          this.customerContractDataRequestModel.payBasis = this.ContractForm.value?.PayBasis?.value
+          this.customerContractDataRequestModel.ContractStartDate = this.ContractForm.value?.ContractStartDate
+          this.customerContractDataRequestModel.Expirydate = this.ContractForm.value?.Expirydate
+          this.customerContractDataRequestModel.entryDate = new Date().toString()
 
-        this.customerContractRequestModel.data = this.customerContractDataRequestModel;
+          this.customerContractRequestModel.data = this.customerContractDataRequestModel;
 
-        this.customerContractService
-          .ContractPost("contract/addNewContract", this.customerContractRequestModel)
-          .subscribe({
-            next: (res: any) => {
-              Swal.fire({
-                icon: "success",
-                title: "Contract Created Successfully",
-                text: "Contract Id: " + res?.cONID,
-                showConfirmButton: true,
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  Swal.hideLoading();
-                  setTimeout(() => {
-                    Swal.close();
-                  }, 2000);
-                  this.router.navigate(['/Masters/CustomerContract/CustomerContractList']);
-                }
-              });
-            },
-            error: (err: any) => {
-              this.snackBarUtilityService.ShowCommonSwal("error", err);
-              Swal.hideLoading();
-              setTimeout(() => {
-                Swal.close();
-              }, 2000);
-            },
-          });
-      } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
-        Swal.hideLoading();
-        setTimeout(() => {
-          Swal.close();
-        }, 2000);
-      }
-    }, "Contract Generating..!");
+          this.customerContractService
+            .ContractPost("contract/addNewContract", this.customerContractRequestModel)
+            .subscribe({
+              next: (res: any) => {
+                Swal.fire({
+                  icon: "success",
+                  title: "Contract Created Successfully",
+                  text: "Contract Id: " + res?.data?.ops[0].cONID,
+                  showConfirmButton: true,
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    Swal.hideLoading();
+                    setTimeout(() => {
+                      Swal.close();
+                    }, 2000);
+                    this.router.navigate(['/Masters/CustomerContract/CustomerContractList']);
+                  }
+                });
+              },
+              error: (err: any) => {
+                this.snackBarUtilityService.ShowCommonSwal("error", err);
+                Swal.hideLoading();
+                setTimeout(() => {
+                  Swal.close();
+                }, 2000);
+              },
+            });
+        } catch (error) {
+          this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+          Swal.hideLoading();
+          setTimeout(() => {
+            Swal.close();
+          }, 2000);
+        }
+      }, "Contract Generating..!");
+    } else {
+      Swal.fire({
+        title: 'Already Contract Exists Between This Date Ranges',
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+    }
   }
+  cancel() {
+    this.router.navigateByUrl('/Masters/CustomerContract/CustomerContractList');
+  }
+  async CheckItsvalidContract() {
+    const customerId = this.ContractForm.value?.Customer?.value;
+    const productId = this.ContractForm.value?.Product?.value;
+    const ExistingContracts = await GetContractBasedOnCustomerAndProductListFromApi(this.masterService, customerId, productId);
+    console.log(ExistingContracts);
+
+    const startDate = new Date(this.ContractForm.value?.ContractStartDate);
+    const endDate = new Date(this.ContractForm.value?.Expirydate);
+
+    // Assume the contract is valid by default
+    let isValidContract = false;
+
+    // Perform your comparison logic with the predefined JSON data
+    for (const item of ExistingContracts) {
+      const jsonStartDate = new Date(item.cSTARTDT);
+      const jsonEndDate = new Date(item.cENDDT);
+
+      if (startDate && endDate && (startDate > jsonEndDate || endDate < jsonStartDate)) {
+        // If the contract dates overlap with any existing contract, set isValidContract to false
+        isValidContract = true;
+        break; // No need to continue checking, as the contract is already invalid
+      }
+    }
+    return isValidContract;
+  }
+
 }
 

@@ -2,6 +2,8 @@ import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { VendorTERModalComponent } from './vendor-termodal/vendor-termodal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { ActivatedRoute } from '@angular/router';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 
 @Component({
   selector: 'app-vendor-terdetail',
@@ -34,7 +36,7 @@ export class VendorTERDetailComponent implements OnInit {
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
-    mIN: { 
+    mIN: {
       Title: "Min (₹)",
       class: "matcolumncenter",
       //Style: "max-width:100px",
@@ -66,9 +68,21 @@ export class VendorTERDetailComponent implements OnInit {
   ]
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  constructor(private dialog: MatDialog,
+  CurrentContractDetails: any;
+  constructor(private route: ActivatedRoute,
+    private encryptionService: EncryptionService,
+    private dialog: MatDialog,
     private masterService: MasterService,
-  ) { }
+  ) {
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)
+
+      //console.log(this.CurrentContractDetails);
+
+    });
+  }
 
   ngOnInit(): void {
     this.getXpressDetail()
@@ -118,8 +132,11 @@ export class VendorTERDetailComponent implements OnInit {
       };
 
       const response = await this.masterService.masterPost("generic/get", request).toPromise();
+      // Sort the filtered data based on the 'eDT' property in descending order
+      this.TErouteBasedTableData = response.data
+        .filter(x => x.cNID === this.CurrentContractDetails.cNID)
+        .sort((a, b) => b._id.localeCompare(a._id));
 
-      this.TErouteBasedTableData = response.data;
       this.TErouteBasedTableData.forEach(item => {
         item.actions = ['Edit', 'Remove'];
       });

@@ -117,7 +117,7 @@ export class TERCharges {
           pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
-          onChange: 'validateMinCharge'
+          onChange: 'validateMinChargeOnRate'
         },
       },
       {

@@ -117,20 +117,23 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
         // Clear validators and validate the form
         clearValidatorsAndValidate(this.vendorContractForm);
 
-        const existingVendorContracts = await getContractList(this.masterService);
-
+        let existingVendorContracts = await getContractList(this.masterService);
+        existingVendorContracts = existingVendorContracts.sort((a, b) => a.cNID.localeCompare(b.cNID))
         if (existingVendorContracts) {
+          debugger
           // Generate a new vendor code
           const lastContract = existingVendorContracts[existingVendorContracts.length - 1];
-          const lastVendorCode = lastContract ? parseInt(lastContract.cNID.substring(2), 10) : 0;
+          const lastVendorCode = lastContract ? parseInt(lastContract.cNID.substring(6), 10) : 0;
 
-          const newVendorCode = `VT${(lastVendorCode + 1).toString().padStart(5, '0')}`;
+          // Use template literals for better readability
+          const newVendorCode = `VT${financialYear}${(lastVendorCode + 1).toString().padStart(5, '0')}`;
 
           const data = {
             "_id": this.companyCode + "-" + newVendorCode,
             "cNID": newVendorCode,
             'cID': this.companyCode,
             "fNYR": parseInt(financialYear),
+            "branch": localStorage.getItem("CurrentBranchCode"),
             "vNID": this.vendorContractForm.value.VNID.value,
             "vNNM": this.vendorContractForm.value.VNID.name,
             "pDTID": this.vendorContractForm.value.PDTID.value,
@@ -150,13 +153,14 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
 
           // Create a new vendor contract
           const createResponse = await this.masterService.masterPost("generic/create", createVendorContractRequest).toPromise();
+          const existingContracts = await getContractList(this.masterService);
 
           if (createResponse) {
             // Display success message
             Swal.fire({
               icon: "success",
-              title: "Success",
-              text: 'Contract Created Successfully',
+              title: "Contract Created Successfully",
+              text: "Contract Id: " + existingContracts[0].cNID,
               showConfirmButton: true,
             });
 

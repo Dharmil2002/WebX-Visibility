@@ -96,7 +96,7 @@ export class VendorContractServiceSelectionComponent implements OnInit {
       .map(item => item.typeName);
     console.log(event);
     this.objContractService.setContractType(this.selectedContractType);
-
+debugger
     // Create a new array for saving
     const newService = event.map((element, index) => ({
       _id: index + 1, // Increment index to start from 1
@@ -105,7 +105,7 @@ export class VendorContractServiceSelectionComponent implements OnInit {
       active: element.isSelected
     }));
 
-    this.save(newService);
+   // this.save(newService);
   }
   //#endregion
   someComplete(){

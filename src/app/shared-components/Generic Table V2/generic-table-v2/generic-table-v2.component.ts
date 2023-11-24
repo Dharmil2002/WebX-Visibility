@@ -62,6 +62,7 @@ export class GenericTableV2Component
   @Input() DisplayCheckbox: boolean = false;
   @Input() staticField = [];
   @Input() allColumnFilter = [];
+  @Input() onFlagChangeGetAll: boolean = false;
   triggered: boolean = false;
   objectKeys = Object.keys;
   // @Input() checkBoxRequired;
@@ -328,7 +329,12 @@ export class GenericTableV2Component
   getCheckData(data) {
     //this.onFlagChange.emit(data)
     this.AllChack = this.dataSource.filteredData.every((t) => t.isSelected)
-    this.onFlagChange.emit(this.getSelecteditems());
+    if(this.onFlagChangeGetAll){
+      this.onFlagChange.emit(this.dataSource.filteredData);
+    }else{
+      this.onFlagChange.emit(this.getSelecteditems());
+    }
+    
     this.selectAllClicked.emit(this.dataSource.filteredData);
     // console.log(this.getSelecteditems());
     //get data on single selection

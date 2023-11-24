@@ -59,15 +59,15 @@ export class VendorlastMileControl {
       },
       {
         name: "timeFrame",
-        label: "Time frame",
-        placeholder: "Time frame",
+        label: "Time Frame",
+        placeholder: "Time Frame",
         type: "dropdown",
         value: "",
         generatecontrol: true,
         disable: false,
         Validations: [{
           name: "required",
-          message: "Time frame is required"
+          message: "Time Frame is required"
         }, {
           name: "autocomplete",
         },

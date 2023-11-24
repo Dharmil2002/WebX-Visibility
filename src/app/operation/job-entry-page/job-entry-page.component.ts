@@ -700,7 +700,7 @@ export class JobEntryPageComponent implements OnInit {
   }
   /*Below the code Which fill */
   async save() {
-    debugger
+    
     this.jobEntryTableForm.controls['vendorName'].enable();
     this.jobEntryTableForm.controls['transportMode'].enable();
     let fieldsToFromRemove = [];
@@ -745,9 +745,18 @@ export class JobEntryPageComponent implements OnInit {
       this.tableData.push(containerDetail);
     }
     containorDetail = this.tableData;
-    if (this.TblChallan.length < 0) {
-      const containerType = this.blTableForm.controls['containerType'].value.value;
+      const containerType = this.blTableForm.controls['containerType'].value?.value||"";
       this.blTableForm.controls['containerType'].setValue(containerType);
+    if(this.TblChallan.length > 0){
+      this.TblChallan = this.TblChallan.map(element => {
+        // Check if the properties are not undefined or null before assigning
+        element.invDate = element.oinvDate !== undefined && element.oinvDate !== null ? element.oinvDate : "";
+        element.blDate = element.oblDate !== undefined && element.oblDate !== null ? element.oblDate : "";
+        element.sbDt = element.sbDt !== undefined && element.sbDt !== null ? element.osbDt : "";
+        element.beDT = element.obeDT !== undefined && element.obeDT !== null ? element.obeDT : "";
+        return element;
+      });
+      
     }
     challlanDetails = this.TblChallan.length > 0 ? this.TblChallan : [this.blTableForm.value]
     clearValidatorsAndValidate(tabcontrols);

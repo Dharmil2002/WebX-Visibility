@@ -279,11 +279,12 @@ export class CustomerContractBasicInformationComponent implements OnInit {
   }
 
   async CheckItsvalidContract() {
-    const customerId = this.ProductsForm.value?.Customer?.value;
+    const customerId = this.contractData.cUSTID;
     const productId = this.ProductsForm.value?.Product?.value;
     let ExistingContracts = await GetContractBasedOnCustomerAndProductListFromApi(this.masterService, customerId, productId);
 
     ExistingContracts = ExistingContracts.filter(item => item.cONID != this.contractData.cONID)
+    console.log(ExistingContracts)
     const startDate = new Date(this.ProductsForm.value?.ContractStartDate);
     const endDate = new Date(this.ProductsForm.value?.Expirydate);
 

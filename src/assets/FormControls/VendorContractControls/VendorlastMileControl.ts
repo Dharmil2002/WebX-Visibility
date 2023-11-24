@@ -29,6 +29,9 @@ export class VendorlastMileControl {
         additionalData: {
           showNameAndValue: false,
         },
+        functions: {
+          onOptionSelect: 'checkValueExists'
+        },
       },
       {
         name: "rateType",
@@ -58,14 +61,24 @@ export class VendorlastMileControl {
         name: "timeFrame",
         label: "Time frame",
         placeholder: "Time frame",
-        type: "text",
+        type: "dropdown",
         value: "",
         generatecontrol: true,
         disable: false,
         Validations: [{
           name: "required",
           message: "Time frame is required"
-        },],
+        }, {
+          name: "autocomplete",
+        },
+        {
+          name: "invalidAutocomplete",
+          message: "please select values from list only",
+        },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        }
       },
       {
         name: "capacity",
@@ -103,11 +116,13 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "MinCharge Amount is required"
-        }, {
+        },
+        {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
-        }],
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
+        }
+        ],
         functions: {
           onChange: 'validateMinCharge'
         },
@@ -123,10 +138,10 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "Committed Km is required"
-        }, {
+        },  {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
       },
       {
@@ -140,10 +155,10 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "Additional Km is required"
-        }, {
+        },  {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
       },
       {
@@ -157,10 +172,10 @@ export class VendorlastMileControl {
         Validations: [{
           name: "required",
           message: "MaxCharge Amount is required"
-        }, {
+        },   {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
           onChange: 'validateMinCharge'

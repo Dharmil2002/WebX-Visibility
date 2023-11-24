@@ -32,6 +32,13 @@ export class ContractServiceSelectionControl {
             name: "required",
             message: "Load Type is required",
           },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
         additionalData: {
           showNameAndValue: false,
@@ -70,7 +77,15 @@ export class ContractServiceSelectionControl {
         placeholder: 'Rate Type',
         type: '',
         value: '',
-        Validations: [],
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
         functions: {
           onToggleAll: 'toggleSelectAll',
         },
@@ -321,7 +336,14 @@ export class ContractServiceSelectionControl {
         Validations: [
           {
             name: "required",
-            message: "Load Type is required",
+            message: "COD/DOD Rate type is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
           },
         ],
         additionalData: {
@@ -330,9 +352,9 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "Rate",
-        label: "Rate",
+        label: "Rate(₹)",
         placeholder: "Rate",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -348,9 +370,9 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "MinCharge",
-        label: "Min Charge",
+        label: "Min Charge(₹)",
         placeholder: "Min Charge",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -366,9 +388,9 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "MaxCharge",
-        label: "Max Charge",
+        label: "Max Charge(₹)",
         placeholder: "Max Charge",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -388,7 +410,7 @@ export class ContractServiceSelectionControl {
         name: "VolumetricUoM",
         label: "Volumetric UoM",
         placeholder: "Volumetric UoM",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -397,10 +419,14 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -430,7 +456,7 @@ export class ContractServiceSelectionControl {
         name: "Volumetricapplied",
         label: "Volumetric applied",
         placeholder: "Volumetric applied",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -439,10 +465,14 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -451,7 +481,7 @@ export class ContractServiceSelectionControl {
         name: "Conversionratio",
         label: "Conversion ratio",
         placeholder: "Conversion ratio",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -475,7 +505,7 @@ export class ContractServiceSelectionControl {
         name: "Freestoragedays",
         label: "Free storage days",
         placeholder: "Free storage days",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -493,10 +523,10 @@ export class ContractServiceSelectionControl {
         },
       },
       {
-        name: "Ratetype",
+        name: "DRatetype",
         label: "Rate type",
         placeholder: "Rate type",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -505,10 +535,14 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -517,7 +551,7 @@ export class ContractServiceSelectionControl {
         name: "Demurragerateperday",
         label: "Demurrage rate - per day",
         placeholder: "Demurrage rate- per day",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -535,10 +569,10 @@ export class ContractServiceSelectionControl {
         },
       },
       {
-        name: "MinCharge",
-        label: "Min Charge",
+        name: "DMinCharge",
+        label: "Min Charge(₹)",
         placeholder: "Min Charge",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -556,10 +590,10 @@ export class ContractServiceSelectionControl {
         },
       },
       {
-        name: "MaxCharge",
-        label: "Min Charge",
+        name: "DMaxCharge",
+        label: "Max Charge(₹)",
         placeholder: "Max Charge",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -622,22 +656,34 @@ export class ContractServiceSelectionControl {
         name: "rateType",
         label: "Rate Type",
         placeholder: "Rate Type",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [{
-          name: "required",
-          message: "Rate Type is required",
-        }],
         generatecontrol: true,
         disable: false,
         accessallowed: true,
+        Validations: [
+          {
+            name: "required",
+            message: "Rate Type is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
       },
       {
         name: "Rate",
-        label: "Rate",
+        label: "Rate(₹)",
         placeholder: "Rate",
         type: "text",
         value: "",
@@ -654,7 +700,7 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "MinCharge",
-        label: "Min Charge",
+        label: "Min Charge(₹)",
         placeholder: "Min Charge",
         type: "text",
         value: "",
@@ -671,7 +717,7 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "MaxCharge",
-        label: "Max Charge",
+        label: "Max Charge(₹)",
         placeholder: "Max Charge",
         type: "text",
         value: "",
@@ -690,31 +736,27 @@ export class ContractServiceSelectionControl {
     this.ContractCutOfftimeControlArray = [
       {
         name: "Timeofday",
-        label: 'Time of day',
-        placeholder: 'Time of day',
-        type: "datetimerpicker",
+        label: "Time of day",
+        placeholder: "Time of day",
+        type: "time",
         value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        accessallowed: true,
         Validations: [
           {
             name: "required",
             message: "Time of day is required",
           },
         ],
-        additionalData: {
-          minDate: new Date("01 Jan 2023"),
-        },
       },
       {
         name: "AdditionalTransitdays",
         label: "Additional Transit days",
         placeholder: "Additional Transit days",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -733,7 +775,7 @@ export class ContractServiceSelectionControl {
         name: "MinimumweightKg",
         label: "Minimum weight- Kg",
         placeholder: "Minimum weight- Kg",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -754,7 +796,7 @@ export class ContractServiceSelectionControl {
         name: "MinimumpackagesNo",
         label: "Minimum packages - No",
         placeholder: "Minimum packages - No",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -776,7 +818,7 @@ export class ContractServiceSelectionControl {
         name: "MinimumFreightvalueINR",
         label: "Minimum Freight value- INR",
         placeholder: "Minimum Freight value- INR",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -797,7 +839,7 @@ export class ContractServiceSelectionControl {
         name: "Yieldtype",
         label: "Yield Type",
         placeholder: "Yield Type",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -806,10 +848,14 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -818,7 +864,7 @@ export class ContractServiceSelectionControl {
         name: "MinimumyieldINR",
         label: "Minimum yield - INR",
         placeholder: "Minimum yield - INR",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -839,7 +885,7 @@ export class ContractServiceSelectionControl {
         name: "CalculateYieldon",
         label: "Calculate Yield on",
         placeholder: "Calculate Yield on",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -848,10 +894,14 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },
@@ -862,7 +912,7 @@ export class ContractServiceSelectionControl {
         name: "FuelType",
         label: "Fuel Type",
         placeholder: "Fuel Type",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -871,19 +921,23 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },
       },
       {
-        name: "RateType",
+        name: "FRateType",
         label: "Rate Type",
         placeholder: "Rate Type",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -892,20 +946,23 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },
       },
-
       {
-        name: "Rate",
-        label: "Rate",
+        name: "FRate",
+        label: "Rate(₹)",
         placeholder: "Rate",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -923,10 +980,10 @@ export class ContractServiceSelectionControl {
         },
       },
       {
-        name: "MinCharge",
-        label: "Min Charge",
+        name: "FMinCharge",
+        label: "Min Charge(₹)",
         placeholder: "Min Charge",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -944,10 +1001,10 @@ export class ContractServiceSelectionControl {
         },
       },
       {
-        name: "MaxCharge",
-        label: "Max Charge",
+        name: "FMaxCharge",
+        label: "Max Charge(₹)",
         placeholder: "Max Charge",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",

@@ -5,11 +5,65 @@ export class VendorAssociateControls {
   constructor() {
     this.VendorAssociateArray = [
       {
+        name: "operation",
+        label: "Operation",
+        placeholder: "Operation",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Operation is required"
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "please select values from list only",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
+        name: "location",
+        label: "Location",
+        placeholder: "Location",
+        type: "dropdown",
+        value: '',
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Location is required"
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "please select values from list only",
+          },
+        ],
+        functions: {
+          // onModel: "getLocation",
+          onOptionSelect: "checkValueExists"
+        },
+        additionalData: {
+          showNameAndValue: false,
+        },
+      },
+      {
         name: "city",
         label: "City",
         placeholder: "City",
         type: "dropdown",
-        value:'' ,
+        value: '',
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -27,6 +81,7 @@ export class VendorAssociateControls {
         ],
         functions: {
           onModel: "getLocation",
+          onOptionSelect: "checkValueExists"
         },
         additionalData: {
           showNameAndValue: false,
@@ -58,28 +113,34 @@ export class VendorAssociateControls {
         },
       },
       {
-        name: "operation",
-        label: "Operation",
-        placeholder: "Operation",
+        name: "PayBasis",
+        label: "PayBasis",
+        placeholder: "PayBasis",
         type: "dropdown",
         value: "",
+        filterOptions: "",
+        displaywith: "",
         generatecontrol: true,
         disable: false,
         Validations: [
           {
             name: "required",
-            message: "Operation is required"
+            message: "PayBasis is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
           },
           {
             name: "autocomplete",
           },
-          {
-            name: "invalidAutocomplete",
-            message: "please select values from list only",
-          },
         ],
         additionalData: {
           showNameAndValue: false,
+          //metaData: "Basic"
+        },
+        functions: {
+          onOptionSelect: "PayBasisFieldChanged"
         },
       },
       {
@@ -120,8 +181,8 @@ export class VendorAssociateControls {
           message: "Rate is required"
         }, {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
       },
       {
@@ -137,8 +198,8 @@ export class VendorAssociateControls {
           message: "Min Amount is required"
         }, {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
           onChange: 'validateMinCharge'
@@ -157,8 +218,8 @@ export class VendorAssociateControls {
           message: "Max Amount is required"
         }, {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
           onChange: 'validateMinCharge'

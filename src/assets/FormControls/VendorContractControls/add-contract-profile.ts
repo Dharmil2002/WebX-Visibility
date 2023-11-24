@@ -84,7 +84,7 @@ export class AddContractProfile {
             message: "Start Date is required"
           },],
         additionalData: {
-         minDate: new Date("01 Jan 2000"),
+         minDate: new Date(),
         },
         functions: {
           onDate: 'onContractStartDateChanged',
@@ -104,7 +104,7 @@ export class AddContractProfile {
             message: "Expiry Date is required"
           },],
         additionalData: {
-         minDate: new Date("01 Jan 2000"),
+         minDate: new Date(),
         },
         functions: {
           onDate: 'onContractStartDateChanged',
@@ -172,7 +172,7 @@ export class AddContractProfile {
           showNameAndValue: true
         },
         functions: {
-          onOptionSelect: 'checkValueExists',
+          onOptionSelect: 'getTableData',
         },
         generatecontrol: true,
         disable: false,
@@ -209,11 +209,10 @@ export class AddContractProfile {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
-          metaData: "Basic"
+          showNameAndValue: false, 
         },
         functions: {
-          onOptionSelect: "ProductFieldChanged"
+          onOptionSelect: 'getTableData',
         },
       },
       {
@@ -229,7 +228,7 @@ export class AddContractProfile {
           message: "Start Date is required",
         },],
         additionalData: {
-          minDate: new Date("01 Jan 2000"),
+          minDate: new Date( ),
         },
         functions: {
           onDate: "onContractStartDateChanged",
@@ -250,7 +249,7 @@ export class AddContractProfile {
             message: "Expiry Date is required"
           },],
         additionalData: {
-          minDate: new Date("01 Jan 2000"),
+          minDate: new Date(),
         },
         functions: {
           onDate: "onContractStartDateChanged",

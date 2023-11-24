@@ -30,6 +30,7 @@ export class VendorLHFTRModalComponent implements OnInit {
   rateTypeName: any;
   rateTypestatus: any;
   CurrentContractDetails: any;
+  existRouteList: any;
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private fb: UntypedFormBuilder,
@@ -57,6 +58,7 @@ export class VendorLHFTRModalComponent implements OnInit {
     this.getDropDownData();
     this.initializeFormControl();
     // console.log(this.objResult);
+    this.existRouteList=this.objResult.TERList;
   }
   //#region to send data to parent component using dialogRef
   async save(event) {
@@ -121,9 +123,9 @@ export class VendorLHFTRModalComponent implements OnInit {
       cPCTNM: parseInt(this.TLHFTRForm.value.capacity.name),
       rTTID: this.TLHFTRForm.value.rateType.value,
       rTTNM: this.TLHFTRForm.value.rateType.name,
-      rT: parseInt(this.TLHFTRForm.value.rate),
-      mIN: parseInt(this.TLHFTRForm.value.min),
-      mAX: parseInt(this.TLHFTRForm.value.max),
+      rT: parseFloat(this.TLHFTRForm.value.rate),
+      mIN: parseFloat(this.TLHFTRForm.value.min),
+      mAX: parseFloat(this.TLHFTRForm.value.max),
       uPDT: new Date(),
       uPBY: this.TLHFTRForm.value.upBY,
     };
@@ -161,9 +163,9 @@ export class VendorLHFTRModalComponent implements OnInit {
       cPCTNM: parseInt(this.TLHFTRForm.value.capacity.name),
       rTTID: this.TLHFTRForm.value.rateType.value,
       rTTNM: this.TLHFTRForm.value.rateType.name,
-      rT: parseInt(this.TLHFTRForm.value.rate),
-      mIN: parseInt(this.TLHFTRForm.value.min),
-      mAX: parseInt(this.TLHFTRForm.value.max),
+      rT: parseFloat(this.TLHFTRForm.value.rate),
+      mIN: parseFloat(this.TLHFTRForm.value.min),
+      mAX: parseFloat(this.TLHFTRForm.value.max),
       eDT: new Date(),
       eNBY: this.TLHFTRForm.value.ENBY,
     };
@@ -273,4 +275,33 @@ export class VendorLHFTRModalComponent implements OnInit {
     }
   }
   //#endregion
+   //#region to check existing location 
+ async checkValueExists() {
+  try {
+    // Get the field value from the form controls
+    const fieldValue = this.TLHFTRForm.controls['route'].value.name;
+
+    // Find the route in existing routes
+    const existingRoute = this.existRouteList.find(x => x.rTNM === fieldValue);      
+
+    // Check if data exists for the given filter criteria
+    if (existingRoute) {
+      // Show an error message using Swal (SweetAlert)
+      Swal.fire({
+        text: `Route: ${fieldValue} already exists in Long Haul full truck lane based! Please try with another!`,
+        icon: "error",
+        title: 'Error',
+        showConfirmButton: true,
+      });
+
+      // Reset the input field
+      this.TLHFTRForm.controls['route'].reset();
+      this.getRouteList();
+    }
+  } catch (error) {
+    // Handle errors that may occur during the operation
+    console.error(`An error occurred while fetching 'route' details:`, error);
+  }
+}  
+//#endregion
 }

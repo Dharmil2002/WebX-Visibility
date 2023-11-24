@@ -28,6 +28,9 @@ export class TERCharges {
         additionalData: {
           showNameAndValue: false,
         },
+        functions: {
+          onOptionSelect: 'checkValueExists',
+        },
       },
       {
         name: "rateType",
@@ -92,8 +95,8 @@ export class TERCharges {
         },
         {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
       },
       {
@@ -110,8 +113,8 @@ export class TERCharges {
         },
         {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
           onChange: 'validateMinCharge'
@@ -131,8 +134,8 @@ export class TERCharges {
         },
         {
           name: "pattern",
-          message: "Please Enter only positive numbers",
-          pattern: '^\\d+(\\.\\d+)?$'
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
           onChange: 'validateMinCharge'

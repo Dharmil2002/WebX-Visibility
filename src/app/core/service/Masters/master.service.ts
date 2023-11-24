@@ -52,6 +52,9 @@ export class MasterService {
   masterMongoPut(ApiURL, Request) {
     return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
+ masterMongoRemove(ApiURL,Request){
+    return this.http.delete<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  }
   setValueheaderCode(data: string) {
     this.headerCode = data
   }

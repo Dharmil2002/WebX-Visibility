@@ -88,7 +88,7 @@ export class VendorLHFTRDetailComponent implements OnInit {
   addDetails(event) {
     const EditableId = event?.id
     const request = {
-      beneficiaryList: this.TErouteBasedTableData,
+      TERList: this.TErouteBasedTableData,
       Details: event,
       //url: this.url
     }

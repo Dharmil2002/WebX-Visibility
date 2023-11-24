@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { PayBasisdetailFromApi, productdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { PinCodeService } from 'src/app/Utility/module/masters/pincode/pincode.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
@@ -23,14 +24,19 @@ export class VendorBusiAssocModalComponent implements OnInit {
   ContractBusiAssocControls: VendorAssociateControls;
   jsonControlArray: any;
   rateTypeName: any;
-  rateTypestatus: any;
+  rateTypestatus: boolean;
   cityName: any;
   citystatus: any;
   modeName: any;
-  modestatus: any;
+  modestatus: boolean;
   operationName: any;
-  operationstatus: any;
+  operationstatus: boolean;
   CurrentContractDetails: any;
+  existCityList: any;
+  payBasisName: any;
+  payBasisstatus: boolean;
+  locationName: any;
+  locationStatus: boolean;
 
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private objPinCodeService: PinCodeService,
@@ -38,6 +44,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
     private masterService: MasterService,
     private filter: FilterUtils,
     private sessionService: SessionService,
+    private objLocationService: LocationService,
     public dialogRef: MatDialogRef<VendorBusiAssocModalComponent>,
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
@@ -45,18 +52,18 @@ export class VendorBusiAssocModalComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
-      this.CurrentContractDetails = JSON.parse(decryptedData)      
-     // console.log(this.CurrentContractDetails.cNID);      
+      this.CurrentContractDetails = JSON.parse(decryptedData)
+      // console.log(this.CurrentContractDetails.cNID);      
     });
   }
-  
+
   ngOnInit(): void {
     this.getDropDownData();
     this.initializeFormControl();
-
+    this.existCityList = this.objResult.List;
     // console.log(this.objResult);
   }
- 
+
   //#region to get location list
   async getLocation() {
     await this.objPinCodeService.getCity(
@@ -131,9 +138,11 @@ export class VendorBusiAssocModalComponent implements OnInit {
       oPNM: this.BusiAssocForm.value.operation.name,
       rTID: this.BusiAssocForm.value.rateType.value,
       rTNM: this.BusiAssocForm.value.rateType.name,
-      mIN: parseInt(this.BusiAssocForm.value.min),
-      rT: parseInt(this.BusiAssocForm.value.rate),
-      mAX: parseInt(this.BusiAssocForm.value.max),
+      lOCID: this.BusiAssocForm.value.location.value,
+      lOCNM: this.BusiAssocForm.value.location.name,
+      mIN: parseFloat(this.BusiAssocForm.value.min),
+      rT: parseFloat(this.BusiAssocForm.value.rate),
+      mAX: parseFloat(this.BusiAssocForm.value.max),
       uPDT: new Date(),
       uPBY: this.BusiAssocForm.value.uPBY,
     };
@@ -164,7 +173,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
       _id: this.companyCode + "-" + newVendorCode,
       vCBAID: newVendorCode,
       cID: this.companyCode,
-      cNID:this.CurrentContractDetails.cNID,
+      cNID: this.CurrentContractDetails.cNID,
       cT: this.BusiAssocForm.value.city.value,
       mDID: this.BusiAssocForm.value.mode.value,
       mDNM: this.BusiAssocForm.value.mode.name,
@@ -172,9 +181,13 @@ export class VendorBusiAssocModalComponent implements OnInit {
       oPNM: this.BusiAssocForm.value.operation.name,
       rTID: this.BusiAssocForm.value.rateType.value,
       rTNM: this.BusiAssocForm.value.rateType.name,
-      mIN: parseInt(this.BusiAssocForm.value.min),
-      rT: parseInt(this.BusiAssocForm.value.rate),
-      mAX: parseInt(this.BusiAssocForm.value.max),
+      pBSID: this.BusiAssocForm.value.PayBasis.value,
+      pBSNM: this.BusiAssocForm.value.PayBasis.name,
+      lOCID: this.BusiAssocForm.value.location.value,
+      lOCNM: this.BusiAssocForm.value.location.name,
+      mIN: parseFloat(this.BusiAssocForm.value.min),
+      rT: parseFloat(this.BusiAssocForm.value.rate),
+      mAX: parseFloat(this.BusiAssocForm.value.max),
       eDT: new Date(),
       eNBY: this.BusiAssocForm.value.eNBY,
     };
@@ -210,6 +223,14 @@ export class VendorBusiAssocModalComponent implements OnInit {
         this.operationName = element.name,
           this.operationstatus = element.additionalData.showNameAndValue
       }
+      if (element.name === 'PayBasis') {
+        this.payBasisName = element.name,
+          this.payBasisstatus = element.additionalData.showNameAndValue
+      }
+      if (element.name === 'location') {
+        this.locationName = element.name,
+          this.locationStatus = element.additionalData.showNameAndValue
+      }
     });
     if (this.objResult.Details) {
       this.BusiAssocForm.controls['min'].setValue(this.objResult.Details.mIN);
@@ -231,50 +252,68 @@ export class VendorBusiAssocModalComponent implements OnInit {
 
   //#region to get rateType list
   async getDropDownData() {
-    const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
-    const operationDropdown = await PayBasisdetailFromApi(this.masterService, 'OPT')
-    const modeDropdown = await productdetailFromApi(this.masterService)
-    // Check if Details is present in objResult
-    if (this.objResult.Details) {
-      const pincodeBody = {
-        "companyCode": this.companyCode,
-        "collectionName": "pincode_master",
-        "filter": {}
+    try {
+      const [locationList, rateTypeDropDown, operationDropdown, payBasisDropdown, modeDropdown] = await Promise.all([
+        this.objLocationService.getLocationList(),
+        PayBasisdetailFromApi(this.masterService, 'RTTYP'),
+        PayBasisdetailFromApi(this.masterService, 'OPT'),
+        PayBasisdetailFromApi(this.masterService, 'PAYTYP'),
+        productdetailFromApi(this.masterService)
+      ]);
+  
+      // Check if Details is present in objResult
+      if (this.objResult.Details) {
+        const pincodeBody = {
+          "companyCode": this.companyCode,
+          "collectionName": "pincode_master",
+          "filter": {}
+        }
+  
+        const pincodeResponse = await this.masterService.masterPost("generic/get", pincodeBody).toPromise();
+        const pincodeData = pincodeResponse.data
+          .map((element) => ({ name: element.CT, value: element.CT }));
+        const updatedData = pincodeData.find((x) => x.name == this.objResult.Details.cT);
+        this.BusiAssocForm.controls.city.setValue(updatedData);
+  
+        // Helper function to update dropdown values based on Details
+        const updateDropdownValue = (formControl, dropdownData, detailName) => {
+          const updateValue = dropdownData.find(item => item.name === this.objResult.Details[detailName]);
+          formControl.setValue(updateValue);
+        };
+  
+        // Update form controls based on Details
+        updateDropdownValue(this.BusiAssocForm.controls.operation, operationDropdown, 'oPNM');
+        updateDropdownValue(this.BusiAssocForm.controls.rateType, rateTypeDropDown, 'rTNM');
+        updateDropdownValue(this.BusiAssocForm.controls.mode, modeDropdown, 'mDNM');
+        updateDropdownValue(this.BusiAssocForm.controls.PayBasis, payBasisDropdown, 'pBSNM');
+        updateDropdownValue(this.BusiAssocForm.controls.location, locationList, 'lOCNM');
       }
-
-      const pincodeResponse = await this.masterService.masterPost("generic/get", pincodeBody).toPromise();
-      const pincodeData = pincodeResponse.data
-        .map((element) => ({
-          name: element.CT,
-          value: element.CT,
-        }));
-      const updatedData = pincodeData.find((x) => x.name == this.objResult.Details.cT);
-      this.BusiAssocForm.controls.city.setValue(updatedData);
-      // Update operation dropdown based on Details.operation
-      const updateOperation = operationDropdown.find(item => item.name === this.objResult.Details.oPNM);
-      this.BusiAssocForm.controls.operation.setValue(updateOperation);
-
-      // Update rateType dropdown based on Details.rateType
-      const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTNM);
-      this.BusiAssocForm.controls.rateType.setValue(updaterateType);
-
-      // Update mode dropdown based on Details.mode
-      const updatemode = modeDropdown.find(item => item.name === this.objResult.Details.mDNM);
-      this.BusiAssocForm.controls.mode.setValue(updatemode);
+  
+      // Helper function to filter and update dropdown in the UI
+      const filterAndUpdateDropdown = (formControl, dropdownData, controlName, controlStatus) => {
+        this.filter.Filter(this.jsonControlArray, formControl, dropdownData, controlName, controlStatus);
+      };
+  
+      // Filter and update rateType dropdown in the UI
+      filterAndUpdateDropdown(this.BusiAssocForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
+  
+      // Filter and update mode dropdown in the UI
+      filterAndUpdateDropdown(this.BusiAssocForm, modeDropdown, this.modeName, this.modestatus);
+  
+      // Filter and update operation dropdown in the UI
+      filterAndUpdateDropdown(this.BusiAssocForm, operationDropdown, this.operationName, this.operationstatus);
+  
+      // Filter and update payBasis dropdown in the UI
+      filterAndUpdateDropdown(this.BusiAssocForm, payBasisDropdown, this.payBasisName, this.payBasisstatus);
+  
+      // Filter and update location dropdown in the UI
+      filterAndUpdateDropdown(this.BusiAssocForm, locationList, this.locationName, this.locationStatus);
+  
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error('An error occurred in getDropDownData:', error);
     }
-
-
-    // Filter and update rateType dropdown in the UI
-    this.filter.Filter(this.jsonControlArray, this.BusiAssocForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
-
-    // Filter and update mode dropdown in the UI
-    this.filter.Filter(this.jsonControlArray, this.BusiAssocForm, modeDropdown, this.modeName, this.modestatus);
-
-    // Filter and update operation dropdown in the UI
-    this.filter.Filter(this.jsonControlArray, this.BusiAssocForm, operationDropdown, this.operationName, this.operationstatus);
-    // Filter and update operation dropdown in the UI
-
-  }
+  }  
   //#endregion
   //#region to Validate the minimum and maximum charge values in the BusiAssocForm.
   validateMinCharge() {
@@ -298,6 +337,35 @@ export class VendorBusiAssocModalComponent implements OnInit {
         min: '',
         max: ''
       });
+    }
+  }
+  //#endregion
+  //#region to check existing location 
+  async checkValueExists() {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.BusiAssocForm.controls['city'].value.name;
+
+      // Find the city in existing citys
+      const existingcity = this.existCityList.find(x => x.cT === fieldValue);
+
+      // Check if data exists for the given filter criteria
+      if (existingcity) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          text: `City: ${fieldValue} already exists in Business Associate! Please try with another!`,
+          icon: "error",
+          title: 'Error',
+          showConfirmButton: true,
+        });
+
+        // Reset the input field
+        this.BusiAssocForm.controls['city'].reset();
+        this.getLocation();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching 'city' details:`, error);
     }
   }
   //#endregion

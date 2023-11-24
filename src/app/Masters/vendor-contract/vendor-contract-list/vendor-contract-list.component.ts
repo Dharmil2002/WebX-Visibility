@@ -27,9 +27,9 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
   tableData: any[]
   boxData: { count: number; title: string; class: string; icon: string; }[];
   displayedColumns = [
-    { Key: "vNID", title: "Vendor", width: "250", className: "matcolumnfirst", show: true },
+    { Key: "vNNM", title: "Vendor", width: "250", className: "matcolumnfirst", show: true },
     { Key: "cNID", title: "ContractID", width: "100", className: "matcolumncenter", show: true },
-    { Key: "pDTID", title: "Product", width: "70", className: "matcolumncenter", show: true },
+    { Key: "pDTNM", title: "Product", width: "70", className: "matcolumncenter", show: true },
     { Key: "cNSDT", title: "Effective Date", width: "100", className: "matcolumncenter", show: true },
     { Key: "eNDDT", title: "End Date", width: "100", className: "matcolumncenter", show: true },
     { Key: "expiringin", title: "Expiring In", width: "170", className: "matcolumncenter", show: true },

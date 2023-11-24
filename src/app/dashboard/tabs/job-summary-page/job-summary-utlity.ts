@@ -56,19 +56,17 @@ export async function getJobDetailFromApi(masterServices) {
             "ojobDate": element?.jobDate || new Date(),
             "jobType": element?.jobType == "I" ? "Import" : element?.jobType == "E" ? "Export" : "",
             "billingParty": element?.billingParty || '',
-            // "fromToCity": element?.fromCity + "-" + element?.toCity,
-            // "jobLocation": element?.jobLocation || "",
+             "fromToCity": element?.fromCity + "-" + element?.toCity,
+             "jobLocation": element?.jobLocation || "",
             "pkgs": element?.noOfPkg || "",
             // "weight": element?.noOfPkg || "",
             "vehicleSize": element?.vehicleSize || "",
             "transportedBy": element?.transportedBy || "",
-            // "statusCode": element?.status || "",
-            "status": element?.status === "0" ? "Awaiting CHA Entry" : element.status === "1" ? "Awaiting Rake Entry" : "Awaiting Advance Payment",
+             "statusCode": element?.status || "",
             "createdOn": formatDocketDate(element?.entryDate || new Date()),
             "entryDate": element?.entryDate || new Date(),
             "totalChaAmt": totalCHAamt,
-            // "chaDate": formatDocketDate(chaEntry?.entryDate || new Date()) || "",
-            "Action": element?.status === "0" ? "CHA Entry" : element.status === "1" ? "Rake Entry" : "CHA Entry",
+            //"chaDate": formatDocketDate(chaEntry?.entryDate || new Date()) || "",
             "bookingFrom": element?.fromCity || "",
             "toCity": element?.toCity || "",
             "weight": element?.weight || "",
@@ -81,13 +79,28 @@ export async function getJobDetailFromApi(masterServices) {
             "cNoteNumber": element.containorDetails && element.containorDetails.length > 0 ? element.containorDetails[0].cnoteNo : "",
             "cNoteDate": element.containorDetails && element.containorDetails.length > 0 ? element.containorDetails[0].cnoteDate : "",
             // "cNoteDate": formatDocketDate(element?.cnoteNo?.cnoteDate || new Date()),
-            "jobLocation": element?.jobLocation || ""
+           // "jobLocation": element?.jobLocation || "",
+            "status": element.status == "0"
+                && (element.hasOwnProperty("containorDetails") && element.containorDetails.length < 1)
+                ? "Update job"
+                : element?.status == "0"
+                    ? "Awaiting CHA Entry"
+                    : element?.status == "1"
+                        ? "Awaiting Rake Entry"
+                        : "",
+            "Action": element.hasOwnProperty("containorDetails") && element?.status === "0" && element.containorDetails.length < 1
+                ? "Update"
+                : element?.status === "0"
+                    ? "CHA Entry"
+                    : element?.status === "1"
+                        ? "Rake Entry"
+                        : "CHA Entry"
         }
         // Push the modified job data to the array
         jobList.push(jobData)
     });
 
-     // Return the array of modified job data
+    // Return the array of modified job data
     return jobList
 }
 

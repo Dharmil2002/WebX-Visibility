@@ -167,7 +167,7 @@ export class RakeEntryControl {
                 }
             },
             {
-                name: 'movementType', label: "Movement Type", placeholder: "Enter Movement Type", type: 'Staticdropdown',
+                name: 'movementType', label: "Cargo Type", placeholder: "Cargo Type", type: 'Staticdropdown',
                 value: [
                     { name: "Export", value: "E" },
                     { name: "Domestic", value: "D" },

@@ -10,8 +10,6 @@ import Swal from "sweetalert2";
 import { addJobDetail, getNextNumber, getVendorDetails } from "./job-entry-utility";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { customerFromApi } from "../prq-entry-page/prq-utitlity";
-import { LocationService } from "src/app/Utility/module/masters/location/location.service";
-import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { JobEntryService } from "src/app/Utility/module/operation/job-entry/job-entry-service";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
@@ -24,6 +22,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { XlsxPreviewPageComponent } from "src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component";
 import { JobSummaryModel } from "src/app/Models/job-model/job.entry";
 import { formatDate } from "src/app/Utility/date/date-utils";
+import { timeStamp } from "console";
 
 
 @Component({
@@ -53,7 +52,7 @@ export class JobEntryPageComponent implements OnInit {
   toCityStatus: any;
   jobFormControls: JobControl;
   columnChallan: any;
-  isUpdate: boolean;
+  isUpdate: boolean = false;
   jsonControlArray: any;
   jobEntryTableForm: UntypedFormGroup;
   containorTableForm: UntypedFormGroup;
@@ -100,22 +99,29 @@ export class JobEntryPageComponent implements OnInit {
   previewResult: any;
   jsonFormBlControls: FormControls[];
   allBlControls: FormControls[];
+  jsonAllJobControls: FormControls[];
+  isImport: boolean = false;
+  jobDetails: any;
+  custList: any;
   constructor(
     private router: Router,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private filter: FilterUtils,
-    private locationService: LocationService,
-    private pinCodeService: PinCodeService,
     private jobEntryService: JobEntryService,
     private docketService: DocketService,
     private consigmentUtility: ConsigmentUtility,
     private thcService: ThcService,
     public xlsxutils: xlsxutilityService,
     private definition: JobSummaryModel,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private route: Router
   ) {
-
+    const navigationState = this.route.getCurrentNavigation()?.extras?.state?.data || "";
+    if (navigationState) {
+      this.jobDetails = navigationState;
+      this.isUpdate = true;
+    }
     this.initializeFormControl();
   }
 
@@ -145,9 +151,9 @@ export class JobEntryPageComponent implements OnInit {
       billingParty: { variable: 'billingParty', status: 'billingPartyStatus' },
       jobLocation: { variable: 'jobLocation', status: 'jobLocationStatus' },
       transportMode: { variable: 'transportMode', status: 'transportModeStatus' },
-      fromCity: { variable: 'fromCity', status: 'fromCityStatus' },
+      // fromCity: { variable: 'fromCity', status: 'fromCityStatus' },
       vendorName: { variable: 'vendorNameCode', status: 'vendorNameStatus' },
-      toCity: { variable: 'toCity', status: 'toCityStatus' }
+      //    toCity: { variable: 'toCity', status: 'toCityStatus' }
 
     };
     const containorDetail = {
@@ -166,7 +172,7 @@ export class JobEntryPageComponent implements OnInit {
     this.jobFormControls = new JobControl();
     // Get form controls for job Entry form section
     this.jsonJobFormControls = this.jobFormControls.getJobFormControls()
-
+    this.jsonAllJobControls = this.jsonJobFormControls;
     this.jsonFormTableControls = this.jobFormControls.getContainorDetails();
     this.jsonFormBlControls = this.jobFormControls.getBlDetail();
     this.allBlControls = this.jsonFormBlControls;
@@ -174,13 +180,65 @@ export class JobEntryPageComponent implements OnInit {
     this.jobEntryTableForm = formGroupBuilder(this.fb, [this.jsonJobFormControls]);
     this.containorTableForm = formGroupBuilder(this.fb, [this.jsonFormTableControls]);
     this.blTableForm = formGroupBuilder(this.fb, [this.jsonFormBlControls]);
-    this.jobEntryTableForm.controls['transportedBy'].setValue('E');
+    this.jobEntryTableForm.controls['transportedBy'].setValue('O');
     this.jobEntryTableForm.controls['jobType'].setValue('E');
     this.onJobChanged();
     this.jobEntryTableForm.controls['transportMode'].setValue('Road');
 
   }
 
+  async autoFillJobDetails() {
+
+    this.jobTableLoad = true
+    const resJob = await this.jobEntryService.getjobDetailsByJob(this.jobDetails.jobNo);
+    let propertiesToSet = [
+      "_id",
+      "jobId",
+      "weight",
+      "mobileNo",
+      "DestCountry",
+      "fromCity",
+      "toCity",
+      "jobType",
+      "noOfPkg",
+      "transportedBy",
+      "nOOFCONT",
+      "transportMode",
+      "poNumber",
+      "exportType"];
+    propertiesToSet.forEach((property) => {
+      this.jobEntryTableForm.controls[property].setValue(
+        resJob?.[property] || ""
+      );
+
+    });
+    const vendorName = this.vendors.find((x) => x.name = resJob.vendorName);
+    const custName = this.custList.find((x) => x.name == this.jobDetails.billingParty);
+    this.jobEntryTableForm.controls['vendorName'].setValue(vendorName);
+    this.jobEntryTableForm.controls['billingParty'].setValue(custName);
+    this.TblChallan = resJob.blChallan.map((element, index) => {
+      const formattedInvDate = element.invDate?formatDate(element.invDate, 'dd-MM-yy HH:mm'):"";
+      const formattedSbDt = element.sbDt?formatDate(element.sbDt, 'dd-MM-yy HH:mm'):"";
+      const formattedblDate = element.blDate?formatDate(element.blDate, 'dd-MM-yy HH:mm'):"";
+      const formattedbeDT = element.beDT?formatDate(element.beDT, 'dd-MM-yy HH:mm'):"";
+      element.id = index + 1,
+        element.oinvDate = element.invDate,
+        element.osb = element.sbDt,
+        element.oblDate = element.blDate,
+        element.sbDt = formattedSbDt,
+        element.blNum=element?.blNum||"",
+        element.blDate=formattedblDate,
+        element.beDT=formattedbeDT,
+        element.invDate = formattedInvDate,
+        element.invoice = true,
+        element.actions = ["Edit", "Remove"]
+      return element
+    });
+
+    this.isBlLoad = false;
+    this.jobTableLoad = false;
+
+  }
   async getDropDownDetail() {
 
     // Fetch city details, customer list, and vendor details concurrently
@@ -203,24 +261,27 @@ export class JobEntryPageComponent implements OnInit {
     // Use the helper function to filter based on different details
     filterDocketControlArray(this.jsonJobFormControls, resCust, this.billingPartyStatus, this.billingParty, this.jobEntryTableForm);
     //filterDocketControlArray(cityDetail, this.fromCityStatus, this.fromCity);
-    const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode })
-    const city = {
-      name: destinationMapping[0].city,
-      value: destinationMapping[0].city
-    }
-    this.jobEntryTableForm.controls['fromCity'].setValue(city);
+    // const destinationMapping = await this.locationService.locationFromApi({ locCode: this.branchCode })
+    // const city = {
+    //   name: destinationMapping[0].city,
+    //   value: destinationMapping[0].city
+    // }
+    // this.jobEntryTableForm.controls['fromCity'].setValue(city);
     //filterDocketControlArray(cityDetail, this.toCityStatus, this.toCity);
     this.vendors = vendorList;
+    this.custList = resCust;
     filterDocketControlArray(this.jsonJobFormControls, vendorList, this.vendorNameStatus, this.vendorNameCode, this.jobEntryTableForm);
+
     this.getShipmentDetail();
+    if (this.isUpdate) { this.autoFillJobDetails() }
   }
   /*get form city from pincode Master*/
   /*pincode based city*/
-  async getPincodeDetail(event) {
+  // async getPincodeDetail(event) {
 
-    const cityMapping = event.field.name == 'fromCity' ? this.fromCityStatus : this.toCityStatus;
-    this.pinCodeService.getCity(this.jobEntryTableForm, this.jsonJobFormControls, event.field.name, cityMapping);
-  }
+  //   const cityMapping = event.field.name == 'fromCity' ? this.fromCityStatus : this.toCityStatus;
+  //   this.pinCodeService.getCity(this.jobEntryTableForm, this.jsonJobFormControls, event.field.name, cityMapping);
+  // }
   /*end*/
   async getShipmentDetail() {
 
@@ -235,11 +296,22 @@ export class JobEntryPageComponent implements OnInit {
 
     const transportedBy = this.jobEntryTableForm.value.transportedBy;
     const transportMode = this.jobEntryTableForm.value.transportMode;
-
-    this.jobEntryTableForm.controls['vendorName'].setValue("");
-
+    const jobType = this.jobEntryTableForm.controls['jobType'].value;
+    if (!this.isUpdate) {
+      this.jobEntryTableForm.controls['vendorName'].setValue("");
+    }
     switch (transportedBy) {
-      case "I":
+      case "T":
+        if (jobType == "I") {
+          this.isImport = false
+          const controls = [
+            "invNum",
+            "invDate",
+            "sbDt",
+            "sbNum"
+          ]
+          this.jsonFormBlControls = this.allBlControls.filter(x => !controls.includes(x.name));
+        }
         const vendorAtteched = this.vendors.filter((x) => x.type == "Attached");
         this.filter.Filter(
           this.jsonJobFormControls,
@@ -248,13 +320,14 @@ export class JobEntryPageComponent implements OnInit {
           this.vendorNameCode,
           this.vendorNameStatus
         );
+        this.columnChallan = this.definition.columnExport;
         this.jobEntryTableForm.controls['vendorName'].setValue("");
         this.jobEntryTableForm.controls['vendorName'].disable();
         this.jobEntryTableForm.controls['transportMode'].disable();
-
+        const remove = ['exportType'];
+        this.jsonJobFormControls = this.jsonAllJobControls.filter((x) => !remove.includes(x.name));
         break;
-
-      case "E":
+      case "O":
         this.jobEntryTableForm.controls['vendorName'].enable();
         this.jobEntryTableForm.controls['transportMode'].enable();
         if (transportMode == "Road") {
@@ -266,6 +339,12 @@ export class JobEntryPageComponent implements OnInit {
           this.jsonFormTableControls = this.jsonFormTableControls = this.jobFormControls.getContainorDetails()
             .filter(control => !filterCriteria.excludeNames.includes(control.name));
           ;
+          if (jobType == "E") {
+            this.isImport = false;
+          }
+          else {
+            this.isImport = true;
+          }
           const transformedData = this.docketData.map(({ docketNumber, docketDate, loadedWeight, noOfpkg, fromCity, toCity }) => ({
             name: docketNumber,
             value: docketNumber,
@@ -283,6 +362,7 @@ export class JobEntryPageComponent implements OnInit {
             this.cnoteNo,
             this.cnoteNoStatus
           );
+          this.jsonJobFormControls = this.jsonAllJobControls
         }
         if (transportMode == "Rail") {
           this.columnJobDetail = this.definition.columnContainorDetail;
@@ -311,7 +391,6 @@ export class JobEntryPageComponent implements OnInit {
           this.vendorNameStatus
         );
         break;
-
       default:
         this.jobEntryTableForm.controls['vendorName'].enable();
         this.jobEntryTableForm.controls['transportMode'].enable();
@@ -341,7 +420,6 @@ export class JobEntryPageComponent implements OnInit {
   }
   /*below function is called when the add new data was clicked*/
   async addDetail(type: string) {
-
     const formData = this.columnJobDetail;
     const columnHeader = this.columnChallan;
     // Define a mapping of types to handler functions
@@ -622,7 +700,7 @@ export class JobEntryPageComponent implements OnInit {
   }
   /*Below the code Which fill */
   async save() {
-
+    debugger
     this.jobEntryTableForm.controls['vendorName'].enable();
     this.jobEntryTableForm.controls['transportMode'].enable();
     let fieldsToFromRemove = [];
@@ -667,9 +745,9 @@ export class JobEntryPageComponent implements OnInit {
       this.tableData.push(containerDetail);
     }
     containorDetail = this.tableData;
-    if(this.TblChallan.length<0){
-    const containerType=this.blTableForm.controls['containerType'].value.value;
-    this.blTableForm.controls['containerType'].setValue(containerType);
+    if (this.TblChallan.length < 0) {
+      const containerType = this.blTableForm.controls['containerType'].value.value;
+      this.blTableForm.controls['containerType'].setValue(containerType);
     }
     challlanDetails = this.TblChallan.length > 0 ? this.TblChallan : [this.blTableForm.value]
     clearValidatorsAndValidate(tabcontrols);
@@ -681,62 +759,69 @@ export class JobEntryPageComponent implements OnInit {
     const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
     const location = localStorage.getItem("Branch"); // Replace with your dynamic value
     //  const dynamicNumber = Math.floor(jobIndex * 10000); // Generate a random number between 0 and 9999
-    const paddedNumber = getNextNumber();
-    const blParty = this.jobEntryTableForm.controls['billingParty'].value?.name || "";
-    const jobType = this.jobEntryTableForm.controls['jobType'].value == "I" ? "IM" : "EX";
     //  let jeNo = `JE/${dynamicValue}/${financialYear}/${paddedNumber}`;
-    let jeNo = `${location.substring(0, 3)}${blParty.substring(0, 3)}${jobType}${financialYear}${paddedNumber}`;
-    this.jobEntryTableForm.controls['_id'].setValue(jeNo.toUpperCase());
-    this.jobEntryTableForm.controls['jobId'].setValue(jeNo.toUpperCase());
     this.jobEntryTableForm.controls['billingParty'].setValue(this.jobEntryTableForm.controls['billingParty'].value.name);
     this.jobEntryTableForm.controls['vendorName'].setValue(this.jobEntryTableForm.controls['vendorName'].value.name);
-    this.jobEntryTableForm.controls['fromCity'].setValue(this.jobEntryTableForm.controls['fromCity'].value.value);
-    this.jobEntryTableForm.controls['toCity'].setValue(this.jobEntryTableForm.controls['toCity'].value.value);
+    //this.jobEntryTableForm.controls['fromCity'].setValue(this.jobEntryTableForm.controls['fromCity'].value.value);
+    //this.jobEntryTableForm.controls['toCity'].setValue(this.jobEntryTableForm.controls['toCity'].value.value);
     const containorList = removeFields(containorDetail, fieldsToFromRemove);
-    const removeField = ['actions', 'osb', 'oinvDate', 'oblDate', 'osbDt'];
+    const removeField = ['actions', 'osb', 'oinvDate', 'oblDate', 'osbDt', 'invoice', 'id'];
     const modifiedTblChallan = removeFields(challlanDetails, removeField);
     /*below code is for  Data pass  in array Because for the store array in db*/
-    const containerDetails={containorDetails:containorList};
-    const chalanDetails={blChallan:modifiedTblChallan};
+    const containerDetails = { containorDetails: containorList };
+    const chalanDetails = { blChallan: modifiedTblChallan };
+
     let jobDetail = {
       ...this.jobEntryTableForm.value,
       ...containerDetails,
       ...chalanDetails
     };
-
-    const res = await addJobDetail(jobDetail, this.masterService, financialYear);
-    if (res) {
-      if (docket.length <= 0) {
-        Swal.fire({
-          icon: "success",
-          title: "Generated Successfuly",
-          text: "Job Entry No: " + res.toUpperCase(),
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.goBack('Job')
-          }
-        });
-
-      }
-      else {
-        for (const element of docket) {
-          await this.docketService.updateDocket(element, { "jobNo": res.toUpperCase() });
+    if (this.isUpdate) {
+      const jobEntryNo = this.jobDetails.jobNo;
+      const res = await this.jobEntryService.updateJobDetails(jobDetail,jobEntryNo);
+      if (res) {
+        if (docket.length <= 0) {
+          this.showSuccessMessage(jobEntryNo,"Job Updated Successfully");
+        } else {
+          await Promise.all(docket.map((element) => this.updateDocket(element, jobEntryNo)));
+          this.showSuccessMessage(jobEntryNo,"Job Updated Successfully");
         }
-        Swal.fire({
-          icon: "success",
-          title: "Generated Successfuly",
-          text: "Job Entry No: " + res.toUpperCase(),
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.goBack('Job')
-          }
-        });
+        this.goBack('Job');
+      }
+    }
+    else {
+      const res = await addJobDetail(jobDetail, this.masterService, financialYear);
+      if (res) {
+        const jobEntryNo = res.toUpperCase();
+
+        if (docket.length <= 0) {
+          this.showSuccessMessage(jobEntryNo,"Job Add Successfully");
+        } else {
+          await Promise.all(docket.map((element) => this.updateDocket(element, jobEntryNo)));
+          this.showSuccessMessage(jobEntryNo,"Job Add Successfully");
+        }
+
+        this.goBack('Job');
       }
     }
   }
 
+  async updateDocket(element: any, jobEntryNo: string) {
+    await this.docketService.updateDocket(element, { "jobNo": jobEntryNo });
+  }
+
+  showSuccessMessage(jobEntryNo: string,message) {
+    Swal.fire({
+      icon: "success",
+      title: message,
+      text: "Job Entry No: " + jobEntryNo,
+      showConfirmButton: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.goBack('Job');
+      }
+    });
+  }
   cancel() {
     this.goBack('Job')
   }
@@ -747,8 +832,8 @@ export class JobEntryPageComponent implements OnInit {
 
   getDocketBasedOnCity() {
 
-    if (this.jobEntryTableForm.value.transportedBy == "E" && this.jobEntryTableForm.value.transportMode == "Road") {
-      const toCity = this.jobEntryTableForm.value.toCity ? this.jobEntryTableForm.value.toCity.value.trim() : "";
+    if (this.jobEntryTableForm.value.transportedBy == "T" && this.jobEntryTableForm.value.transportMode == "Road") {
+      const toCity = this.jobEntryTableForm.value.toCity;
       const billingPartyName = this.jobEntryTableForm.value.billingParty.name.toLowerCase();
 
       const filteredDocketData = this.docketData.filter((docket) => {
@@ -934,9 +1019,9 @@ export class JobEntryPageComponent implements OnInit {
       sbDt: formatDate(sbDt, 'dd-MM-yy HH:mm'),
       pod,
       cod,
-      invoice: true,
       containerNum,
       containerType: containerType.name,
+      invoice: true,
       actions: ["Edit", "Remove"]
     });
     const controls = ['invNum', 'invDate', 'sbNum', 'sbDt', 'pod', 'cod', 'containerNum', 'containerType'];
@@ -949,10 +1034,10 @@ export class JobEntryPageComponent implements OnInit {
     this.isBlLoad = false
     this.jobTableLoad = false;
   }
-  async addChalanDetails() {
 
+  async addChalanDetails() {
     this.isBlLoad = true;
-    const { blNum, blDate, beNum, beDT, pod, cod, containerNum, containerType } = this.blTableForm.value;
+    const { blNum, blDate, beNum, beDT, pod, cod } = this.blTableForm.value;
     const tableData = this.TblChallan || [];
     if (tableData.some(x => x.blNum === blNum)) {
       this.jobEntryService.alertDuplicateContNo();
@@ -960,7 +1045,6 @@ export class JobEntryPageComponent implements OnInit {
       this.isBlLoad = false
       return false;
     }
-
     await this.jobEntryService.delay(1000);
     this.TblChallan.push({
       oblDate: blDate,
@@ -973,8 +1057,6 @@ export class JobEntryPageComponent implements OnInit {
       pod,
       cod,
       invoice: true,
-      containerNum,
-      containerType: containerType.name,
       actions: ["Edit", "Remove"]
     });
     const controls = ['invNum', 'invDate', 'sbNum', 'sbDt', 'pod', 'cod', 'containerNum', 'containerType'];
@@ -989,27 +1071,50 @@ export class JobEntryPageComponent implements OnInit {
   /* End */
   /*on JOB details Changed*/
   onJobChanged() {
+
     this.TblChallan = [];
     const jobType = this.jobEntryTableForm.controls['jobType'].value;
+    const transportedBy = this.jobEntryTableForm.controls['transportedBy'].value;
     if (jobType == 'I') {
-
       const controls = [
         "invNum",
         "invDate",
         "sbDt",
-        "sbNum"
+        "sbNum",
+        "containerType",
+        "containerNum"
       ]
       this.jsonFormBlControls = this.allBlControls.filter(x => !controls.includes(x.name));
+      const dropdownValue = this.jobEntryService.getExportType("import");
+      this.isImport = true;
+      this.jsonJobFormControls = this.jsonJobFormControls.map((x) => {
+        if (x.name === "exportType") {
+          return { ...x, value: dropdownValue };
+        } else {
+          return x;
+        }
+      });
       this.columnChallan = this.definition.columnImport;
+
     }
     else {
+
       const controls = [
         "blNum",
         "blDate",
         "beNum",
         "beDT"
       ]
+      this.isImport = false;
       this.jsonFormBlControls = this.allBlControls.filter(x => !controls.includes(x.name));
+      const dropdownValue = this.jobEntryService.getExportType("export");
+      this.jsonJobFormControls = this.jsonJobFormControls.map((x) => {
+        if (x.name === "exportType") {
+          return { ...x, value: dropdownValue };
+        } else {
+          return x;
+        }
+      });
       this.columnChallan = this.definition.columnExport;
     }
   }
@@ -1020,13 +1125,13 @@ export class JobEntryPageComponent implements OnInit {
     if (data.label.label === "Remove") {
       this.TblChallan = this.TblChallan.filter((x) => x.id !== data.data.id);
     } else {
-      const excludedKeys = 
+      const excludedKeys =
         [
           "invNum",
           "invDate",
           "sbNum",
           "sbDt",
-      ]
+        ]
       const atLeastOneValuePresent = Object.keys(this.blTableForm.controls)
         .filter(key => !excludedKeys.includes(key)) // Filter out excluded keys
         .some(key => {

@@ -49,17 +49,16 @@ export class VendorLMDModalComponent implements OnInit {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
-    
+
       // console.log(this.CurrentContractDetails.cNID);      
     });
   }
 
   ngOnInit(): void {
     this.getLocation();
-    this.getContainerList();
     this.getDropDownData();
     this.initializeFormControl();
-    console.log(this.objResult);
+    // console.log(this.objResult);
     this.existingLocation = this.objResult.TERList;
   }
   cancel() {
@@ -136,7 +135,7 @@ export class VendorLMDModalComponent implements OnInit {
       lOCID: this.TLMDForm.value.location.value,
       lOCNM: this.TLMDForm.value.location.name,
       cPCTID: this.TLMDForm.value.capacity.value,
-      cPCTNM: parseInt(this.TLMDForm.value.capacity.name),
+      cPCTNM: this.TLMDForm.value.capacity.name,
       rTTID: this.TLMDForm.value.rateType.value,
       rTTNM: this.TLMDForm.value.rateType.name,
       tMFRMID: this.TLMDForm.value.timeFrame.value,
@@ -179,7 +178,7 @@ export class VendorLMDModalComponent implements OnInit {
       lOCID: this.TLMDForm.value.location.value,
       lOCNM: this.TLMDForm.value.location.name,
       cPCTID: this.TLMDForm.value.capacity.value,
-      cPCTNM: parseInt(this.TLMDForm.value.capacity.name),
+      cPCTNM: this.TLMDForm.value.capacity.name,
       rTTID: this.TLMDForm.value.rateType.value,
       rTTNM: this.TLMDForm.value.rateType.name,
       tMFRMID: this.TLMDForm.value.timeFrame.value,
@@ -224,7 +223,7 @@ export class VendorLMDModalComponent implements OnInit {
     if (this.objResult.Details) {
       this.TLMDForm.controls['additionalKm'].setValue(this.objResult.Details.aDDKM);
       this.TLMDForm.controls['committedKm'].setValue(this.objResult.Details.cMTKM);
-      this.TLMDForm.controls['timeFrame'].setValue(this.objResult.Details.tMFRM);
+      //this.TLMDForm.controls['timeFrame'].setValue(this.objResult.Details.tMFRM);
       this.TLMDForm.controls['minCharge'].setValue(this.objResult.Details.mIN);
       this.TLMDForm.controls['maxCharges'].setValue(this.objResult.Details.mAX);
     }
@@ -240,32 +239,29 @@ export class VendorLMDModalComponent implements OnInit {
     }
   }
   //#endregion
-  //#region to get container list
-  async getContainerList() {
-    const container = await this.objContainerService.getDetail();
-    const containerData = container.filter((item) => item.activeFlag) // Filter based on the isActive property
-      .map(e => ({
-        name: e.loadCapacity, // Map the name to the specified nameKey
-        value: e.containerCode // Map the value to the specified valueKey
-      }));
-    if (this.objResult.Details) {
-      const updatedData = containerData.find((x) => x.name == this.objResult.Details.cPCTNM);
-      this.TLMDForm.controls.capacity.setValue(updatedData);
-    }
-    this.filter.Filter(this.jsonControlArray, this.TLMDForm, containerData, this.capacityName, this.capacitystatus);
-  }
-  //#endregion
+
   //#region to get rateType list
   async getDropDownData() {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
     const timeFrameDropDown = await PayBasisdetailFromApi(this.masterService, 'TMFRM')
+    const containerData = await this.objContainerService.getContainerList();
+    const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VehicleCapacity')
+    const containerDataWithPrefix = vehicleData.map((item) => ({
+      name: `Veh- ${item.name}`,
+      value: item.value,
+    }));
+    // Merge containerData and vehicleData into a single array
+    const mergedData = [...containerData, ...containerDataWithPrefix];
 
+    this.filter.Filter(this.jsonControlArray, this.TLMDForm, mergedData, this.capacityName, this.capacitystatus);
     if (this.objResult.Details) {
+      const updatedData = mergedData.find((x) => x.name == this.objResult.Details.cPCTNM);
+      this.TLMDForm.controls.capacity.setValue(updatedData);
       const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
       this.TLMDForm.controls.rateType.setValue(updaterateType);
 
       const updateTMFRM = timeFrameDropDown.find(item => item.name === this.objResult.Details.tMFRMNM);
-      this.TLMDForm.controls.rateType.setValue(updateTMFRM);
+      this.TLMDForm.controls.timeFrame.setValue(updateTMFRM);
     }
     this.filter.Filter(this.jsonControlArray, this.TLMDForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
     this.filter.Filter(this.jsonControlArray, this.TLMDForm, timeFrameDropDown, this.timeFrameName, this.timeFramestatus);
@@ -274,8 +270,8 @@ export class VendorLMDModalComponent implements OnInit {
   //#region to Validate the minimum and maximum charge values in the TLMDForm.
   validateMinCharge() {
     // Get the current values of 'min' and 'max' from the TLMDForm
-    const minValue = this.TLMDForm.get('minCharge')?.value;
-    const maxValue = this.TLMDForm.get('maxCharges')?.value;
+    const minValue = parseFloat(this.TLMDForm.get('minCharge')?.value);
+    const maxValue = parseFloat(this.TLMDForm.get('maxCharges')?.value);
 
     // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
     if (minValue && maxValue && minValue > maxValue) {
@@ -301,10 +297,10 @@ export class VendorLMDModalComponent implements OnInit {
     try {
       // Get the field value from the form controls
       const fieldValue = this.TLMDForm.controls['location'].value.name;
-  
+
       // Find the location in existing locations
-      const existingLocation = this.existingLocation.find(x => x.lOCNM === fieldValue);      
-  
+      const existingLocation = this.existingLocation.find(x => x.lOCNM === fieldValue);
+
       // Check if data exists for the given filter criteria
       if (existingLocation) {
         // Show an error message using Swal (SweetAlert)
@@ -314,7 +310,7 @@ export class VendorLMDModalComponent implements OnInit {
           title: 'Error',
           showConfirmButton: true,
         });
-  
+
         // Reset the input field
         this.TLMDForm.controls['location'].reset();
         this.getLocation();
@@ -323,6 +319,31 @@ export class VendorLMDModalComponent implements OnInit {
       // Handle errors that may occur during the operation
       console.error(`An error occurred while fetching 'location' details:`, error);
     }
-  }  
+  }
+  //#endregion
+  //#region to Validate the minimum  charge values on rate in the TERForm.
+  validateMinChargeOnRate() {
+    // Get the current values of 'min' and 'max' from the TERForm
+    const minValue = parseFloat(this.TLMDForm.get('minCharge')?.value);
+    const maxValue = parseFloat(this.TLMDForm.get('rate')?.value);
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue >= maxValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Min charge must be less Rate.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.TLMDForm.patchValue({
+        minCharge: '',
+      });
+    }
+    this.validateMinCharge();
+  }
   //#endregion
 }

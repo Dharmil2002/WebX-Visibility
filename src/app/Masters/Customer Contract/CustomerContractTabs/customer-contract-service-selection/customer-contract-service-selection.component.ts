@@ -156,27 +156,27 @@ export class CustomerContractServiceSelectionComponent
     },
   };
   FcolumnHeader = {
-    fTYPE: {
+    FuelType: {
       Title: "Fule Type",
       class: "matcolumnfirst",
       Style: "min-width:80px",
     },
-    fRTYPE: {
+    FRateType: {
       Title: "Rate Type",
       class: "matcolumncenter",
       Style: "min-width:80px",
     },
-    frT: {
+    FRate: {
       Title: "Rate",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    fmIN: {
+    FMinCharge: {
       Title: "Mix Charge",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    fmAX: {
+    FMaxCharge: {
       Title: "Max Charge",
       class: "matcolumncenter",
       Style: "min-width:2px",
@@ -187,15 +187,8 @@ export class CustomerContractServiceSelectionComponent
       Style: "max-width:150px",
     },
   };
-  staticField = [
-    "InvoiceValueFrom",
-    "tovalue",
-    "rateType",
-    "Rate",
-    "MinCharge",
-    "MaxCharge",
-  ];
-  FstaticField = ["fTYPE", "fRTYPE", "frT", "fmIN", "fmAX"];
+  staticField = ["InvoiceValueFrom","tovalue","rateType","Rate","MinCharge","MaxCharge"];
+  FstaticField = ["FuelType","FRateType","FRate","FMinCharge","FMaxCharge"];
 
   //#endregion
 
@@ -582,11 +575,8 @@ export class CustomerContractServiceSelectionComponent
     this.tableLoad = this.isLoad = true;
     const tableData = this.tableData;
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
     await delay(1000);
-
     const formValue = this.InsuranceCarrierRiskForm.value;
-
     const json = {
       id: tableData.length + 1,
       InvoiceValueFrom: formValue.InvoiceValueFrom,
@@ -597,9 +587,7 @@ export class CustomerContractServiceSelectionComponent
       MaxCharge: formValue.MaxCharge,
       actions: ["Edit", "Remove"],
     };
-
     this.tableData.push(json);
-
     const requestBody = {
       _id: `${this.companyCode}-${this.contractData.cONID}-${tableData.length}`,
       cID: this.companyCode,
@@ -611,13 +599,11 @@ export class CustomerContractServiceSelectionComponent
       mIN: formValue.MinCharge,
       mAX: formValue.MaxCharge,
     };
-
     if (this.isUpdate) {
       delete requestBody._id;
       delete requestBody.cID;
       delete requestBody.cONID;
     }
-
     const req = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_insurance",
@@ -625,16 +611,13 @@ export class CustomerContractServiceSelectionComponent
       update: this.isUpdate ? requestBody : undefined,
       data: !this.isUpdate ? requestBody : undefined,
     };
-
     const method = this.isUpdate ? "generic/update" : "generic/create";
     const res = this.isUpdate
       ? await this.masterService.masterPut(method, req).toPromise()
       : await this.masterService.masterPost(method, req).toPromise();
-
     if (res.success) {
       this.isUpdate = false;
       this.SetDefaultInsuranceCarrierRiskSelectionData();
-
       Swal.fire({
         icon: "success",
         title: "Successful",
@@ -642,62 +625,79 @@ export class CustomerContractServiceSelectionComponent
         showConfirmButton: true,
       });
     }
-
     // Clear form validators and reset values
     this.InsuranceCarrierRiskForm.reset();
-
     // Add the "required" validation rule
     Object.keys(this.InsuranceCarrierRiskForm.controls).forEach((key) => {
       this.InsuranceCarrierRiskForm.get(key).setValidators(Validators.required);
     });
-
     this.isLoad = this.tableLoad = false;
   }
 
-
   async FuelSurchargeAddData() {
-    this.FtableLoad = true;
-    this.isFLoad = true;
+    this.FtableLoad = this.isFLoad = true;
+    const FtableData = this.FtableData;
+    const formValue = this.FuelSurchargeForm.value;
     const json = {
-      _id: this.companyCode + "-" + this.contractData.cONID + "-" + this.FtableData.length + 1,
-      id: this.companyCode + "-" + this.contractData.cONID + "-" + this.FtableData.length + 1,
-      cID: this.companyCode,
-      cONID: this.contractData.cONID,
-      fTYPE: this.FuelSurchargeForm.value.FuelType.name,
-      fRTYPE: this.FuelSurchargeForm.value.FRateType.name,
-      frT: this.FuelSurchargeForm.value.FRate,
-      fmIN: this.FuelSurchargeForm.value.FMinCharge,
-      fmAX: this.FuelSurchargeForm.value.FMaxCharge,
-      actions: ["Edit", "Remove"]
+      id: FtableData.length + 1,
+      FuelType: formValue.FuelType.name,
+      FRateType: formValue.FRateType.name,
+      FRate: formValue.FRate,
+      FMinCharge: formValue.FMinCharge,
+      FMaxCharge: formValue.FMaxCharge,
+      actions: ["Edit", "Remove"],
     };
     this.FtableData.push(json);
-
-    await this.FuelSurchargeDataSave(json);
-    Object.keys(this.FuelSurchargeForm.controls).forEach((key) => {
-      this.FuelSurchargeForm.get(key).clearValidators();
-      this.FuelSurchargeForm.get(key).updateValueAndValidity();
+    const requestBody = {
+      _id: `${this.companyCode}-${this.contractData.cONID}-${FtableData.length}`,
+      cID: this.companyCode,
+      cONID: this.contractData.cONID,
+      fTYPE: formValue.FuelType.name,
+      fRTYPE: formValue.FRateType.name,
+      frT: formValue.FRate,
+      fmIN: formValue.FMinCharge,
+      fmAX: formValue.FMaxCharge,
+    };
+    if (this.isUpdate) {
+      delete requestBody._id;
+      delete requestBody.cID;
+      delete requestBody.cONID;
+    }
+    const req = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract_fuelsurcharge",
+      filter: this.isUpdate ? { cONID: this.UpdateData.cONID } : undefined,
+      update: this.isUpdate ? requestBody : undefined,
+      data: !this.isUpdate ? requestBody : undefined,
+    };
+    const method = this.isUpdate ? "generic/update" : "generic/create";
+    const res = this.isUpdate
+      ? await this.masterService.masterPut(method, req).toPromise()
+      : await this.masterService.masterPost(method, req).toPromise();
+    if (res.success) {
+      this.isUpdate = false;
+      this.SetDefaultFuelSurchargeData();
+      this.BindDataFromAPI()
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: res.message,
+        showConfirmButton: true,
+      });
+    }
+    // Clear form validators and reset values
+    const controls=["FuelType", "FRateType", "FRate", "FMinCharge", "FMaxCharge"]
+    controls.forEach(element => {
+      this.FuelSurchargeForm.controls[element].setValue("");
     });
-
-    this.FuelSurchargeForm.controls["FuelType"].setValue("");
-    this.FuelSurchargeForm.controls["FRateType"].setValue("");
-    this.FuelSurchargeForm.controls["FRate"].setValue("");
-    this.FuelSurchargeForm.controls["FMinCharge"].setValue("");
-    this.FuelSurchargeForm.controls["FMaxCharge"].setValue("");
-    // Remove all validation
+   // this.FuelSurchargeForm.reset();
     // Add the "required" validation rule
     Object.keys(this.FuelSurchargeForm.controls).forEach((key) => {
       this.FuelSurchargeForm.get(key).setValidators(Validators.required);
     });
-    // this.consignmentTableForm.updateValueAndValidity();
-
-    const delayDuration = 1000;
-    // Create a promise that resolves after the specified delay
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    // Use async/await to introduce the delay
-    await delay(delayDuration);
-    this.isFLoad = false;
-    this.FtableLoad = false;
+    this.isFLoad = this.FtableLoad = false;
   }
+
   handleMenuItemClick(data) {
     this.fillServiceSelectionData(data);
   }
@@ -737,7 +737,7 @@ export class CustomerContractServiceSelectionComponent
   async FfillServiceSelectionData(data: any) {
     if (data.label.label === "Remove") {
       this.FtableData = this.FtableData.filter((x) => x.id !== data.data.id);
-      await this.Fremovedata(data.data.id);
+      await this.removedata(data.data.id);
     } else {
       this.FuelSurchargeForm.controls["FuelType"].setValue(
         data.data?.FuelType || ""
@@ -753,30 +753,16 @@ export class CustomerContractServiceSelectionComponent
       this.FuelSurchargeForm.controls["FMaxCharge"].setValue(
         data.data?.FMaxCharge || ""
       );
-      await this.Fremovedata(data.data.id);
-      this.FtableData = this.FtableData.filter((x) => x.id !== data.data.id);
+      this.UpdateData = this.FtableData.find((x) => x.id == data.data.id)
+      this.tableData = this.FtableData.filter((x) => x.id !== data.data.id);
+      this.isUpdate = true;
     }
+
   }
-  ngOnChanges(changes: SimpleChanges) {
-    // let data = {
-    //   "Customer": changes.contractData?.currentValue?.cUSTID + ":" + changes.contractData?.currentValue?.cUSTNM ?? '',
-    //   "ContractID": changes.contractData?.currentValue?.cONID ?? '',
-    //   "PayBasis": changes.contractData?.currentValue?.pBAS ?? '',
-    //   "ContractStartDate": changes.contractData?.currentValue?.cSTARTDT ?? '',
-    //   "Expirydate": changes.contractData?.currentValue?.cENDDT ?? '',
-    //   "cSCAN": changes.contractData?.currentValue?.cSCAN ?? '',
-    //   "cPOSCAN": changes.contractData?.currentValue?.cPOSCAN ?? '',
-    //   "AccountManager": changes.contractData?.currentValue?.aCMGR ?? '',
-    //   "CustomerPONo": changes.contractData?.currentValue?.cPONO ?? '',
-    //   "POValiditydate": changes.contractData?.currentValue?.cPODt ?? '',
-    // }
-  }
+  ngOnChanges(changes: SimpleChanges) {}
 
   SetDefaultProductsData() {
-
-    /// Added Buy Harikesh
-
-    //#region  Set Default Products 
+    //#region  Set Default Products
 
     if (this.contractData?.lTYP != null) {
       this.ProductsForm.get("loadType").setValue(
@@ -801,7 +787,7 @@ export class CustomerContractServiceSelectionComponent
 
     //#endregion
 
-    //#region  Set Default Service Selection 
+    //#region  Set Default Service Selection
 
     this.contractData?.sERVSELEC.forEach((item) => {
       const event = {
@@ -902,7 +888,7 @@ export class CustomerContractServiceSelectionComponent
         );
       },
       fuelSurcharge: () => {
-        // Your logic for fuelSurcharge
+       this.SetDefaultFuelSurchargeData();
       },
     };
 
@@ -915,35 +901,6 @@ export class CustomerContractServiceSelectionComponent
       }
     });
     //#endregion
-
-
-    // this.SetDefaultFuelSurchargeData();
-
-
-
-
-
-
-
-
-    // Store the values in session storage
-    // sessionStorage.setItem(
-    //   "ServiceSelectiondata",
-    //   JSON.stringify(this.ProductsForm.value)
-    // );
-
-    // const originRateOption = {
-    //   name: this.contractData.oRTNM,
-    //   value: this.contractData.oRTVAL,
-    // }
-    // const destinationRateOption = {
-    //   name: this.contractData.dRTNM,
-    //   value: this.contractData.dRTVAL,
-    // }
-    // this.ProductsForm.get("originRateOption").setValue(originRateOption)
-    // this.ProductsForm.get("destinationRateOption").setValue(destinationRateOption)
-
-
   }
 
   SaveServiceSelection(event) {
@@ -1050,21 +1007,6 @@ export class CustomerContractServiceSelectionComponent
     contractDetails["lTYP"] = this.ProductsForm.value.loadType.name;
     contractDetails["rTYP"] =
       this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.name);
-
-
-    // return
-
-
-    // // contractDetails["oRTNM"] = this.ProductsForm.value.originRateOption.name;
-    // // contractDetails["oRTVAL"] = this.ProductsForm.value.originRateOption.value;
-    // // contractDetails["dRTNM"] = this.ProductsForm.value.destinationRateOption.name;
-    // // contractDetails["dRTVAL"] = this.ProductsForm.value.destinationRateOption.value;
-
-
-
-
-
-
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "cust_contract",
@@ -1075,8 +1017,6 @@ export class CustomerContractServiceSelectionComponent
     this.masterService.masterPut("generic/update", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          // this.InsuranceCarrierRiskSelectionSave();
-          //this.FuelSurchargeDataSave();
           // Display success message
           Swal.fire({
             icon: "success",
@@ -1091,16 +1031,6 @@ export class CustomerContractServiceSelectionComponent
       },
     });
   }
-
-  // async InsuranceCarrierRiskSelectionSave(requestBody) {
-  //   const tableData = {
-  //     companyCode: this.companyCode,
-  //     collectionName: "cust_contract_insurance",
-  //     data: requestBody,
-  //   };
-  //   await this.masterService.masterPost("generic/create", tableData).toPromise();
-  //   return true
-  // }
 
   SetDefaultInsuranceCarrierRiskSelectionData() {
     const reqBody = {
@@ -1121,27 +1051,11 @@ export class CustomerContractServiceSelectionComponent
               item.MinCharge = item.mIN,
               item.MaxCharge = item.mAX,
               item.actions = ["Edit", "Remove"];
-
           });
           this.tableLoad = false;
         }
       },
     });
-  }
-
-  async FuelSurchargeDataSave(requestBody) {
-    debugger
-    const removeFields = ['actions', '_id'];
-    const data = [requestBody].find((x) => !removeFields.includes(x));
-    const FtableData = {
-      companyCode: this.companyCode,
-      collectionName: "cust_contract_fuelsurcharge",
-      data: data,
-    };
-    //delete requestBody.id
-    //delete requestBody.actions
-    await this.masterService.masterPost("generic/create", FtableData).toPromise();
-    return true
   }
 
   SetDefaultFuelSurchargeData() {
@@ -1150,19 +1064,42 @@ export class CustomerContractServiceSelectionComponent
       collectionName: "cust_contract_fuelsurcharge",
       filter: { cONID: this.contractData.cONID },
     };
-    //delete InsuranceCarrierRiskSelectiondetails._id;
     this.masterService.masterPost("generic/get", reqBody).subscribe({
       next: (res: any) => {
         if (res) {
-          this.FtableData = res.data;
+          this.FtableData = res.data
           this.FtableData.forEach((item) => {
             item.id = item._id,
+              item.FuelType = item.fTYPE,
+              item.FRateType = item.fRTYPE,
+              item.FRate = item.frT,
+              item.FMinCharge = item.fmIN,
+              item.FMaxCharge = item.fmAX;
               item.actions = ["Edit", "Remove"];
           });
           this.FtableLoad = false;
         }
       },
     });
+    // const reqBody = {
+    //   companyCode: this.companyCode,
+    //   collectionName: "cust_contract_fuelsurcharge",
+    //   filter: { cONID: this.contractData.cONID },
+    // };
+    // //delete InsuranceCarrierRiskSelectiondetails._id;
+    // this.masterService.masterPost("generic/get", reqBody).subscribe({
+    //   next: (res: any) => {
+    //     if (res) {
+    //       this.FtableData = res.data;
+    //       this.FtableData.forEach((item) => {
+    //         item.id = item._id,
+    //           item.actions = ["Edit", "Remove"];
+    //       });
+    //       this.FtableLoad = false;
+    //     }
+    //   },
+    // });
+
   }
 
   async removedata(id) {
@@ -1198,7 +1135,6 @@ export class CustomerContractServiceSelectionComponent
     });
     //return
   }
-  ///////// Validation Selections ///////
 
   validateCodDodRates() {
     // Get the current values of 'min' and 'max' from the TERForm
@@ -1216,5 +1152,19 @@ export class CustomerContractServiceSelectionComponent
         MaxCharge: ''
       });
     }
+  }
+  checkInvoice(){
+    const invoiceNo = this.InsuranceCarrierRiskForm.value.InvoiceValueFrom;
+    const exists = this.tableData.some((x) => x.InvoiceValueFrom.includes(invoiceNo));
+     if(exists){
+      this.InsuranceCarrierRiskForm.controls['InvoiceValueFrom'].setValue("");
+      Swal.fire({
+        icon: "error",
+        title: "Already Exist",
+        text: "Invoice Value From Is Already Exist",
+        showConfirmButton: true,
+      });
+     }
+
   }
 }

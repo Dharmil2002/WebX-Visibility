@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { VendorLHLModalComponent } from './vendor-lhlmodal/vendor-lhlmodal.component';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { ActivatedRoute } from '@angular/router';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 
 @Component({
   selector: 'app-vendor-lhldetail',
@@ -64,9 +66,21 @@ export class VendorLHLDetailComponent implements OnInit {
   ]
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
-  constructor(private dialog: MatDialog,
+  CurrentContractDetails: any;
+  constructor(private route: ActivatedRoute,
+    private encryptionService: EncryptionService,
+    private dialog: MatDialog,
     private masterService: MasterService,
-  ) { }
+  ) {
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)
+
+      console.log(this.CurrentContractDetails);
+
+    });
+  }
 
   ngOnInit(): void {
     this.getTableDetail();
@@ -76,8 +90,8 @@ export class VendorLHLDetailComponent implements OnInit {
     // if (data.label.label === 'Remove') {
     //   this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
     // } else {
-      const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
-      this.addDetails(terDetails)
+    const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
+    this.addDetails(terDetails)
     // }
   }
   //#endregion 
@@ -115,8 +129,12 @@ export class VendorLHLDetailComponent implements OnInit {
       };
 
       const response = await this.masterService.masterPost("generic/get", request).toPromise();
+       
 
-      this.TErouteBasedTableData = response.data;
+      this.TErouteBasedTableData = response.data
+      .filter(x => x.cNID === this.CurrentContractDetails.cNID)
+      .sort((a, b) => b._id.localeCompare(a._id));
+      
       this.TErouteBasedTableData.forEach(item => {
         item.actions = ['Edit', 'Remove'];
       });

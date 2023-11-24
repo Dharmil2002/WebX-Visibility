@@ -815,7 +815,7 @@ export class ConsignmentControl {
       },
       {
         name: "actualWeight",
-        label: "Actual Weight (Kg)",
+        label: "Actual Weight (MT)",
         placeholder: "Actual Weight",
         type: "text",
         value: "",
@@ -834,7 +834,7 @@ export class ConsignmentControl {
       },
       {
         name: "chargedWeight",
-        label: "Charged Weight  (Kg)",
+        label: "Charged Weight  (MT)",
         placeholder: "Charged Weight",
         type: "text",
         value: "",

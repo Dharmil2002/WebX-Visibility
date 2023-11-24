@@ -54,11 +54,10 @@ export class VendorLHFTRModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.getRouteList();
-    this.getContainerList();
     this.getDropDownData();
     this.initializeFormControl();
     // console.log(this.objResult);
-    this.existRouteList=this.objResult.TERList;
+    this.existRouteList = this.objResult.TERList;
   }
   //#region to send data to parent component using dialogRef
   async save(event) {
@@ -120,7 +119,7 @@ export class VendorLHFTRModalComponent implements OnInit {
       rTID: this.TLHFTRForm.value.route.value,
       rTNM: this.TLHFTRForm.value.route.name,
       cPCTID: this.TLHFTRForm.value.capacity.value,
-      cPCTNM: parseInt(this.TLHFTRForm.value.capacity.name),
+      cPCTNM: this.TLHFTRForm.value.capacity.name,
       rTTID: this.TLHFTRForm.value.rateType.value,
       rTTNM: this.TLHFTRForm.value.rateType.name,
       rT: parseFloat(this.TLHFTRForm.value.rate),
@@ -160,7 +159,7 @@ export class VendorLHFTRModalComponent implements OnInit {
       rTID: this.TLHFTRForm.value.route.value,
       rTNM: this.TLHFTRForm.value.route.name,
       cPCTID: this.TLHFTRForm.value.capacity.value,
-      cPCTNM: parseInt(this.TLHFTRForm.value.capacity.name),
+      cPCTNM: this.TLHFTRForm.value.capacity.name,
       rTTID: this.TLHFTRForm.value.rateType.value,
       rTTNM: this.TLHFTRForm.value.rateType.name,
       rT: parseFloat(this.TLHFTRForm.value.rate),
@@ -225,37 +224,35 @@ export class VendorLHFTRModalComponent implements OnInit {
     this.filter.Filter(this.jsonControlArray, this.TLHFTRForm, routeList, this.routeName, this.routestatus);
   }
   //#endregion
-  //#region to get container list
-  async getContainerList() {
-    const container = await this.objContainerService.getDetail();
-    const containerData = container.filter((item) => item.activeFlag) // Filter based on the isActive property
-      .map(e => ({
-        name: e.loadCapacity, // Map the name to the specified nameKey
-        value: e.containerCode // Map the value to the specified valueKey
-      }));
-    if (this.objResult.Details) {
-      const updatedData = containerData.find((x) => x.name == this.objResult.Details.cPCTNM);
-      this.TLHFTRForm.controls.capacity.setValue(updatedData);
-    }
-    this.filter.Filter(this.jsonControlArray, this.TLHFTRForm, containerData, this.capacityName, this.capacitystatus);
-  }
-  //#endregion
+
   //#region to get rateType list
   async getDropDownData() {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
+    const containerData = await this.objContainerService.getContainerList();
+    const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VehicleCapacity')
+    const containerDataWithPrefix = vehicleData.map((item) => ({
+      name: `Veh- ${item.name}`,
+      value: item.value,
+    }));
+    // Merge containerData and vehicleData into a single array
+    const mergedData = [...containerData, ...containerDataWithPrefix];
+
     if (this.objResult.Details) {
+      const updatedData = containerData.find((x) => x.name == this.objResult.Details.cPCTNM);
+      this.TLHFTRForm.controls.capacity.setValue(updatedData);
+
       const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
       this.TLHFTRForm.controls.rateType.setValue(updaterateType);
     }
+    this.filter.Filter(this.jsonControlArray, this.TLHFTRForm, mergedData, this.capacityName, this.capacitystatus);
     this.filter.Filter(this.jsonControlArray, this.TLHFTRForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
   }
   //#endregion
   //#region to Validate the minimum and maximum charge values in the TLHFTRForm.
   validateMinCharge() {
     // Get the current values of 'min' and 'max' from the TLHFTRForm
-    const minValue = this.TLHFTRForm.get('min')?.value;
-    const maxValue = this.TLHFTRForm.get('max')?.value;
-
+    const minValue = parseFloat(this.TLHFTRForm.get('min')?.value);
+    const maxValue = parseFloat(this.TLHFTRForm.get('max')?.value);
     // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
     if (minValue && maxValue && minValue > maxValue) {
       // Display an error message using SweetAlert (Swal)
@@ -275,33 +272,58 @@ export class VendorLHFTRModalComponent implements OnInit {
     }
   }
   //#endregion
-   //#region to check existing location 
- async checkValueExists() {
-  try {
-    // Get the field value from the form controls
-    const fieldValue = this.TLHFTRForm.controls['route'].value.name;
+  //#region to check existing location 
+  async checkValueExists() {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.TLHFTRForm.controls['route'].value.name;
 
-    // Find the route in existing routes
-    const existingRoute = this.existRouteList.find(x => x.rTNM === fieldValue);      
+      // Find the route in existing routes
+      const existingRoute = this.existRouteList.find(x => x.rTNM === fieldValue);
 
-    // Check if data exists for the given filter criteria
-    if (existingRoute) {
-      // Show an error message using Swal (SweetAlert)
+      // Check if data exists for the given filter criteria
+      if (existingRoute) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          text: `Route: ${fieldValue} already exists in Long Haul full truck lane based! Please try with another!`,
+          icon: "error",
+          title: 'Error',
+          showConfirmButton: true,
+        });
+
+        // Reset the input field
+        this.TLHFTRForm.controls['route'].reset();
+        this.getRouteList();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching 'route' details:`, error);
+    }
+  }
+  //#endregion
+  //#region to Validate the minimum  charge values on rate in the TERForm.
+  validateMinChargeOnRate() {
+    // Get the current values of 'min' and 'max' from the TERForm
+    const minValue = parseFloat(this.TLHFTRForm.get('min')?.value);
+    const maxValue = parseFloat(this.TLHFTRForm.get('rate')?.value);
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue >= maxValue) {
+      // Display an error message using SweetAlert (Swal)
       Swal.fire({
-        text: `Route: ${fieldValue} already exists in Long Haul full truck lane based! Please try with another!`,
+        title: 'Min charge must be less Rate.',
+        toast: false,
         icon: "error",
-        title: 'Error',
         showConfirmButton: true,
+        confirmButtonText: "OK"
       });
 
-      // Reset the input field
-      this.TLHFTRForm.controls['route'].reset();
-      this.getRouteList();
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.TLHFTRForm.patchValue({
+        min: '',
+      });
     }
-  } catch (error) {
-    // Handle errors that may occur during the operation
-    console.error(`An error occurred while fetching 'route' details:`, error);
+    this.validateMinCharge();
   }
-}  
-//#endregion
+  //#endregion
 }

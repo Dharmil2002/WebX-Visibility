@@ -27,7 +27,6 @@ export class VendorTERModalComponent implements OnInit {
   routestatus: any;
   capacitystatus: any;
   capacityName: any;
-  containerData: any;
   routeList: any;
   rateTypeDropDown: any;
   rateTypeName: any;
@@ -57,11 +56,10 @@ export class VendorTERModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.getRouteList();
-    this.getContainerList();
     this.getDropDownData();
     this.initializeFormControl();
     // console.log(this.objResult);
-    this.existRouteList=this.objResult.TERList;
+    this.existRouteList = this.objResult.TERList;
   }
   //#region to initialize form control
   initializeFormControl() {
@@ -155,7 +153,7 @@ export class VendorTERModalComponent implements OnInit {
       rTID: this.TERForm.value.route.value,
       rTNM: this.TERForm.value.route.name,
       cPCTID: this.TERForm.value.capacity.value,
-      cPCTNM: parseInt(this.TERForm.value.capacity.name),
+      cPCTNM: this.TERForm.value.capacity.name,
       rTTID: this.TERForm.value.rateType.value,
       rTTNM: this.TERForm.value.rateType.name,
       rT: parseInt(this.TERForm.value.rate),
@@ -195,7 +193,7 @@ export class VendorTERModalComponent implements OnInit {
       rTID: this.TERForm.value.route.value,
       rTNM: this.TERForm.value.route.name,
       cPCTID: this.TERForm.value.capacity.value,
-      cPCTNM: parseInt(this.TERForm.value.capacity.name),
+      cPCTNM: this.TERForm.value.capacity.name,
       rTTID: this.TERForm.value.rateType.value,
       rTTNM: this.TERForm.value.rateType.name,
       rT: parseInt(this.TERForm.value.rate),
@@ -227,37 +225,34 @@ export class VendorTERModalComponent implements OnInit {
     this.filter.Filter(this.jsonControlArray, this.TERForm, this.routeList, this.routeName, this.routestatus);
   }
   //#endregion
-  //#region to get container list
-  async getContainerList() {
-    const container = await this.objContainerService.getDetail();
-    this.containerData = container.filter((item) => item.activeFlag) // Filter based on the isActive property
-      .map(e => ({
-        name: e.loadCapacity, // Map the name to the specified nameKey
-        value: e.containerCode // Map the value to the specified valueKey
-      }));
-    if (this.objResult.Details) {
-      const updatedData = this.containerData.find((TERForm) => TERForm.name == this.objResult.Details.cPCTNM);
-      this.TERForm.controls.capacity.setValue(updatedData);
-    }
-    this.filter.Filter(this.jsonControlArray, this.TERForm, this.containerData, this.capacityName, this.capacitystatus);
-  }
-  //#endregion
   //#region to get rateType list
   async getDropDownData() {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
-
+    const containerData = await this.objContainerService.getContainerList();
+    const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VehicleCapacity')
+    const containerDataWithPrefix = vehicleData.map((item) => ({
+      name: `Veh- ${item.name}`,
+      value: item.value,
+    }));
+    // Merge containerData and vehicleData into a single array
+    const mergedData = [...containerData, ...containerDataWithPrefix];
     if (this.objResult.Details) {
       const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
       this.TERForm.controls.rateType.setValue(updaterateType);
+
+      const updatedData = mergedData.find((TERForm) => TERForm.name == this.objResult.Details.cPCTNM);
+      this.TERForm.controls.capacity.setValue(updatedData);
     }
+    this.filter.Filter(this.jsonControlArray, this.TERForm, mergedData, this.capacityName, this.capacitystatus);
+
     this.filter.Filter(this.jsonControlArray, this.TERForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
   }
   //#endregion
   //#region to Validate the minimum and maximum charge values in the TERForm.
   validateMinCharge() {
     // Get the current values of 'min' and 'max' from the TERForm
-    const minValue = this.TERForm.get('min')?.value;
-    const maxValue = this.TERForm.get('max')?.value;
+    const minValue = parseFloat(this.TERForm.get('min')?.value);
+    const maxValue = parseFloat(this.TERForm.get('max')?.value);
 
     // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
     if (minValue && maxValue && minValue > maxValue) {
@@ -283,10 +278,10 @@ export class VendorTERModalComponent implements OnInit {
     try {
       // Get the field value from the form controls
       const fieldValue = this.TERForm.controls['route'].value.name;
-  
+
       // Find the route in existing routes
-      const existingRoute = this.existRouteList.find(x => x.rTNM === fieldValue);      
-  
+      const existingRoute = this.existRouteList.find(x => x.rTNM === fieldValue);
+
       // Check if data exists for the given filter criteria
       if (existingRoute) {
         // Show an error message using Swal (SweetAlert)
@@ -296,7 +291,7 @@ export class VendorTERModalComponent implements OnInit {
           title: 'Error',
           showConfirmButton: true,
         });
-  
+
         // Reset the input field
         this.TERForm.controls['route'].reset();
         this.getRouteList();
@@ -305,6 +300,31 @@ export class VendorTERModalComponent implements OnInit {
       // Handle errors that may occur during the operation
       console.error(`An error occurred while fetching 'route' details:`, error);
     }
-  }  
+  }
+  //#endregion
+  //#region to Validate the minimum  charge values on rate in the TERForm.
+  validateMinChargeOnRate() {
+    // Get the current values of 'min' and 'max' from the TERForm
+    const minValue = parseFloat(this.TERForm.get('min')?.value);
+    const maxValue = parseFloat(this.TERForm.get('rate')?.value);
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue >= maxValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Min charge must be less Rate.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.TERForm.patchValue({
+        min: '',
+      });
+    }
+    this.validateMinCharge();
+  }
   //#endregion
 }

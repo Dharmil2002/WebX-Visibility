@@ -10,7 +10,7 @@ export class ContainerService {
   companyCode = localStorage.getItem("companyCode")
   // This async function retrieves container data from an API using the masterService.
   async containerFromApi() {
-    
+
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: this.companyCode, // Get company code from local storage
@@ -91,4 +91,44 @@ export class ContainerService {
     return sortedData;
   }
   //#endregion
-}
+
+  async getContainerList() {
+    // Fetch container details asynchronously
+    const container = await this.getDetail();
+
+    // Use a Set to track unique names
+    const uniqueNamesSet = new Set<number>();
+
+    // Filter based on the isActive property and get unique names
+    const containerData = container
+      .filter((item) => item.activeFlag)
+      .reduce((result, e) => {
+
+        // Parse the loadCapacity as an integer
+        const name = parseInt(e.loadCapacity);
+
+        // Check if the name is not already in the set to ensure uniqueness
+        if (!uniqueNamesSet.has(name)) {
+          uniqueNamesSet.add(name);
+
+          // Add the unique name and its corresponding containerCode to the result array
+          result.push({
+            name,
+            value: e.containerCode
+          });
+        }
+
+        // Return the updated result array for the next iteration
+        return result;
+      }, [] as { name: number; value: string }[])
+      .sort((a, b) => a.name - b.name); // Sort numerically
+    // Add "Con-" to each name before returning
+    const containerDataWithPrefix = containerData.map((item) => ({
+      name: `Con- ${item.name} MT`,
+      value: item.value,
+    }));
+
+    return containerDataWithPrefix;
+    return containerData
+  }
+}  

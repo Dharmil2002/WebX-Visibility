@@ -55,7 +55,7 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
   }
   async SearchData() {
     this.tableData = await getContractList(this.masterService);
-    console.log(this.tableData);
+    // console.log(this.tableData);
     this.tableData.forEach((item: any) => {
       const startDate: Date = new Date(item.cNSDT);
       const endDate: Date = new Date(item.eNDDT);
@@ -83,6 +83,8 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
     this.ModeldataSource = new MatTableDataSource(
       this.tableData
     );
+    this.ModeldataSource.paginator = this.paginator;
+    this.ModeldataSource.sort = this.sort;
     this.subs.sink = fromEvent(
       this.filter.nativeElement,
       "keyup"

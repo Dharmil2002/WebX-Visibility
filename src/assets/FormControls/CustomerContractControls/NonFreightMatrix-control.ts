@@ -2,7 +2,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class ContractNonFreightMatrixControl {
   private ContractNonFreightChargesControlArray: FormControls[];
   private ContractNonFreightMatrixControlArray: FormControls[];
-  constructor(FreightMatrix) {
+  constructor() {
     this.ContractNonFreightChargesControlArray = [
       {
         name: "selectCharges",
@@ -283,15 +283,13 @@ export class ContractNonFreightMatrixControl {
       },
     ];
   }
-  getContractNonFreightMatrixControlControls(CurrentAccess: string[]) {
+  getContractNonFreightMatrixControlControls() {
     // this.ContractNonFreightMatrixControlArray = this.ContractNonFreightMatrixControlArray.filter(item => CurrentAccess.includes(item.name))
     return this.ContractNonFreightMatrixControlArray;
   }
 
-  getContractNonFreightChargesControlControls(CurrentAccess: string[]) {
+  getContractNonFreightChargesControlControls() {
     // this.ContractNonFreightChargesControlArray = this.ContractNonFreightChargesControlArray.filter(item => CurrentAccess.includes(item.name))
     return this.ContractNonFreightChargesControlArray;
   }
-
-
 }

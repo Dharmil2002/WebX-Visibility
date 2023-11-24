@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { VendorBusiAssocModalComponent } from './vendor-busi-assoc-modal/vendor-busi-assoc-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { ActivatedRoute } from '@angular/router';
+import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 
 @Component({
   selector: 'app-vendor-busi-assoc-detail',
@@ -16,14 +18,9 @@ export class VendorBusiAssocDetailComponent implements OnInit {
       Title: "Operation",
       class: "matcolumnleft",
       //Style: "max-width:100px",
-    },
-    cT: {
-      Title: "City",
-      class: "matcolumnleft",
-      //Style: "max-width:100px",
-    },
+    },     
     lOCNM: {
-      Title: "Location",
+      Title: "Control Location",
       class: "matcolumnleft",
       //Style: "max-width:100px",
     },
@@ -77,12 +74,22 @@ export class VendorBusiAssocDetailComponent implements OnInit {
     { label: 'Edit' },
     // { label: 'Remove' }
   ]
-  staticFieldTErouteBased = ['cT', 'oPNM', 'rTNM', 'mDNM', , 'rT', 'mIN', 'mAX', "pBSNM","lOCNM"]
+  staticFieldTErouteBased = ['cT', 'oPNM', 'rTNM', 'mDNM', , 'rT', 'mIN', 'mAX', "pBSNM", "lOCNM"]
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
+  CurrentContractDetails: any;
 
-  constructor(private dialog: MatDialog,
+  constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
+    private dialog: MatDialog,
     private masterService: MasterService,
-  ) { }
+  ) {
+    this.route.queryParams.subscribe((params) => {
+      const encryptedData = params['data']; // Retrieve the encrypted data from the URL
+      const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
+      this.CurrentContractDetails = JSON.parse(decryptedData)
+      console.log(this.CurrentContractDetails);
+
+    });
+  }
   ngOnInit(): void {
     this.getTableDetail();
   }
@@ -124,8 +131,17 @@ export class VendorBusiAssocDetailComponent implements OnInit {
       };
 
       const response = await this.masterService.masterPost("generic/get", request).toPromise();
-
-      this.TErouteBasedTableData = response.data;
+      
+      // Sort the filtered data based on the 'eDT' property in descending order
+      this.TErouteBasedTableData.sort((a, b) => {
+        const dateA: Date | any = new Date(a.eDT);
+        const dateB: Date | any = new Date(b.eDT);
+        return dateB - dateA; // Sort in descending order
+      });
+ 
+      // Filter based on cNID
+      this.TErouteBasedTableData = response.data.filter(x => x.cNID === this.CurrentContractDetails.cNID);
+      
       this.TErouteBasedTableData.forEach(item => {
         item.actions = ['Edit', 'Remove'];
       });

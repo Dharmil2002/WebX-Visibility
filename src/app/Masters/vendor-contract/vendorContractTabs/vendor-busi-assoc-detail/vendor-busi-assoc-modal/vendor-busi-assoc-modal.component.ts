@@ -64,13 +64,13 @@ export class VendorBusiAssocModalComponent implements OnInit {
     // console.log(this.objResult);
   }
 
-  //#region to get location list
-  async getLocation() {
-    await this.objPinCodeService.getCity(
-      this.BusiAssocForm, this.jsonControlArray, this.cityName, this.citystatus
-    );
-  }
-  //#endregion
+  // //#region to get location list
+  // async getLocation() {
+  //   await this.objPinCodeService.getCity(
+  //     this.BusiAssocForm, this.jsonControlArray, this.cityName, this.citystatus
+  //   );
+  // }
+  // //#endregion
 
   //#region to send data to parent component using dialogRef
   async save(event) {
@@ -131,7 +131,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
   extractFormData() {
     // Extract form data for updating an existing contract
     return {
-      cT: this.BusiAssocForm.value.city.value,
+      // cT: this.BusiAssocForm.value.city.value,
       mDID: this.BusiAssocForm.value.mode.value,
       mDNM: this.BusiAssocForm.value.mode.name,
       oPID: this.BusiAssocForm.value.operation.value,
@@ -174,7 +174,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
       vCBAID: newVendorCode,
       cID: this.companyCode,
       cNID: this.CurrentContractDetails.cNID,
-      cT: this.BusiAssocForm.value.city.value,
+      // cT: this.BusiAssocForm.value.city.value,
       mDID: this.BusiAssocForm.value.mode.value,
       mDNM: this.BusiAssocForm.value.mode.name,
       oPID: this.BusiAssocForm.value.operation.value,
@@ -260,27 +260,15 @@ export class VendorBusiAssocModalComponent implements OnInit {
         PayBasisdetailFromApi(this.masterService, 'PAYTYP'),
         productdetailFromApi(this.masterService)
       ]);
-  
+
       // Check if Details is present in objResult
       if (this.objResult.Details) {
-        const pincodeBody = {
-          "companyCode": this.companyCode,
-          "collectionName": "pincode_master",
-          "filter": {}
-        }
-  
-        const pincodeResponse = await this.masterService.masterPost("generic/get", pincodeBody).toPromise();
-        const pincodeData = pincodeResponse.data
-          .map((element) => ({ name: element.CT, value: element.CT }));
-        const updatedData = pincodeData.find((x) => x.name == this.objResult.Details.cT);
-        this.BusiAssocForm.controls.city.setValue(updatedData);
-  
         // Helper function to update dropdown values based on Details
         const updateDropdownValue = (formControl, dropdownData, detailName) => {
           const updateValue = dropdownData.find(item => item.name === this.objResult.Details[detailName]);
           formControl.setValue(updateValue);
         };
-  
+
         // Update form controls based on Details
         updateDropdownValue(this.BusiAssocForm.controls.operation, operationDropdown, 'oPNM');
         updateDropdownValue(this.BusiAssocForm.controls.rateType, rateTypeDropDown, 'rTNM');
@@ -288,38 +276,38 @@ export class VendorBusiAssocModalComponent implements OnInit {
         updateDropdownValue(this.BusiAssocForm.controls.PayBasis, payBasisDropdown, 'pBSNM');
         updateDropdownValue(this.BusiAssocForm.controls.location, locationList, 'lOCNM');
       }
-  
+
       // Helper function to filter and update dropdown in the UI
       const filterAndUpdateDropdown = (formControl, dropdownData, controlName, controlStatus) => {
         this.filter.Filter(this.jsonControlArray, formControl, dropdownData, controlName, controlStatus);
       };
-  
+
       // Filter and update rateType dropdown in the UI
       filterAndUpdateDropdown(this.BusiAssocForm, rateTypeDropDown, this.rateTypeName, this.rateTypestatus);
-  
+
       // Filter and update mode dropdown in the UI
       filterAndUpdateDropdown(this.BusiAssocForm, modeDropdown, this.modeName, this.modestatus);
-  
+
       // Filter and update operation dropdown in the UI
       filterAndUpdateDropdown(this.BusiAssocForm, operationDropdown, this.operationName, this.operationstatus);
-  
+
       // Filter and update payBasis dropdown in the UI
       filterAndUpdateDropdown(this.BusiAssocForm, payBasisDropdown, this.payBasisName, this.payBasisstatus);
-  
+
       // Filter and update location dropdown in the UI
       filterAndUpdateDropdown(this.BusiAssocForm, locationList, this.locationName, this.locationStatus);
-  
+
     } catch (error) {
       // Handle errors that may occur during the operation
       console.error('An error occurred in getDropDownData:', error);
     }
-  }  
+  }
   //#endregion
   //#region to Validate the minimum and maximum charge values in the BusiAssocForm.
   validateMinCharge() {
     // Get the current values of 'min' and 'max' from the BusiAssocForm
-    const minValue = this.BusiAssocForm.get('min')?.value;
-    const maxValue = this.BusiAssocForm.get('max')?.value;
+    const minValue = parseFloat(this.BusiAssocForm.get('min')?.value);
+    const maxValue = parseFloat(this.BusiAssocForm.get('max')?.value);
 
     // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
     if (minValue && maxValue && minValue > maxValue) {
@@ -344,29 +332,54 @@ export class VendorBusiAssocModalComponent implements OnInit {
   async checkValueExists() {
     try {
       // Get the field value from the form controls
-      const fieldValue = this.BusiAssocForm.controls['city'].value.name;
+      const fieldValue = this.BusiAssocForm.controls['location'].value.name;
 
       // Find the city in existing citys
-      const existingcity = this.existCityList.find(x => x.cT === fieldValue);
+      const existingcity = this.existCityList.find(x => x.lOCNM === fieldValue);
 
       // Check if data exists for the given filter criteria
       if (existingcity) {
         // Show an error message using Swal (SweetAlert)
         Swal.fire({
-          text: `City: ${fieldValue} already exists in Business Associate! Please try with another!`,
+          text: `Control Location: ${fieldValue} already exists in Business Associate! Please try with another!`,
           icon: "error",
           title: 'Error',
           showConfirmButton: true,
         });
 
         // Reset the input field
-        this.BusiAssocForm.controls['city'].reset();
-        this.getLocation();
+        this.BusiAssocForm.controls['location'].reset();
+        this.getDropDownData();
       }
     } catch (error) {
       // Handle errors that may occur during the operation
       console.error(`An error occurred while fetching 'city' details:`, error);
     }
+  }
+  //#endregion
+  //#region to Validate the minimum  charge values on rate in the TERForm.
+  validateMinChargeOnRate() {
+    // Get the current values of 'min' and 'max' from the TERForm
+    const minValue = parseFloat(this.BusiAssocForm.get('min')?.value);
+    const maxValue = parseFloat(this.BusiAssocForm.get('rate')?.value);
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && minValue >= maxValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Min charge must be less Rate.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.BusiAssocForm.patchValue({
+        min: '',
+      });
+    }
+    this.validateMinCharge();
   }
   //#endregion
 }

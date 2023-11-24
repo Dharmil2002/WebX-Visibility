@@ -84,7 +84,7 @@ export class AddContractProfile {
             message: "Start Date is required"
           },],
         additionalData: {
-         minDate: new Date(),
+          minDate: new Date(),
         },
         functions: {
           onDate: 'onContractStartDateChanged',
@@ -104,7 +104,7 @@ export class AddContractProfile {
             message: "Expiry Date is required"
           },],
         additionalData: {
-         minDate: new Date(),
+          minDate: new Date(),
         },
         functions: {
           onDate: 'onContractStartDateChanged',
@@ -150,6 +150,16 @@ export class AddContractProfile {
     ];
     this.AddNewVendorContractArray = [
       {
+        name: "CNID",
+        label: "ContractID",
+        placeholder: "ContractID",
+        type: "text",
+        value: "System Generated",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
         name: "VNID",
         label: "Vendor",
         placeholder: "Vendor",
@@ -177,16 +187,7 @@ export class AddContractProfile {
         generatecontrol: true,
         disable: false,
       },
-      {
-        name: "CNID",
-        label: "ContractID",
-        placeholder: "ContractID",
-        type: "text",
-        value: "System Generated",
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
+
       {
         name: "PDTID",
         label: "Product",
@@ -209,7 +210,7 @@ export class AddContractProfile {
           },
         ],
         additionalData: {
-          showNameAndValue: false, 
+          showNameAndValue: false,
         },
         functions: {
           onOptionSelect: 'getTableData',
@@ -228,7 +229,7 @@ export class AddContractProfile {
           message: "Start Date is required",
         },],
         additionalData: {
-          minDate: new Date( ),
+          minDate: new Date(),
         },
         functions: {
           onDate: "onContractStartDateChanged",

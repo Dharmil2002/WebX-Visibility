@@ -58,35 +58,35 @@ export class VendorAssociateControls {
           showNameAndValue: false,
         },
       },
-      {
-        name: "city",
-        label: "City",
-        placeholder: "City",
-        type: "dropdown",
-        value: '',
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "City is required"
-          },
-          {
-            name: "autocomplete",
-          },
-          {
-            name: "invalidAutocomplete",
-            message: "please select values from list only",
-          },
-        ],
-        functions: {
-          onModel: "getLocation",
-          onOptionSelect: "checkValueExists"
-        },
-        additionalData: {
-          showNameAndValue: false,
-        },
-      },
+      // {
+      //   name: "city",
+      //   label: "City",
+      //   placeholder: "City",
+      //   type: "dropdown",
+      //   value: '',
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [
+      //     {
+      //       name: "required",
+      //       message: "City is required"
+      //     },
+      //     {
+      //       name: "autocomplete",
+      //     },
+      //     {
+      //       name: "invalidAutocomplete",
+      //       message: "please select values from list only",
+      //     },
+      //   ],
+      //   functions: {
+      //     onModel: "getLocation",
+      //     onOptionSelect: "checkValueExists"
+      //   },
+      //   additionalData: {
+      //     showNameAndValue: false,
+      //   },
+      // },
       {
         name: "mode",
         label: "Transport mode",
@@ -202,7 +202,7 @@ export class VendorAssociateControls {
           pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
-          onChange: 'validateMinCharge'
+          onChange: 'validateMinChargeOnRate'
         },
       },
       {

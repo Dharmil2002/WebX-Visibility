@@ -105,7 +105,7 @@ export class VendorContractServiceSelectionComponent implements OnInit {
       active: element.isSelected
     }));
 
-    this.save(newService);
+   // this.save(newService);
   }
   //#endregion
   someComplete(){

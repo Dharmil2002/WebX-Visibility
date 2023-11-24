@@ -1,0 +1,29 @@
+<div>
+    <div class="row ">
+        <div class="col d-flex justify-content-end">
+            <button mat-icon-button class="mb-2" (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div class="task-list">
+        <form [formGroup]="NonFreightMatrixForm">
+            <app-form-webxpress [form]="NonFreightMatrixForm" [formData]="jsonControlArrayNonFreightMatrix"
+                (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+                [FormTitle]="'Add Charge'" (callFunction)="functionCallHandler($event)">
+            </app-form-webxpress>
+        </form>
+        <div>
+            <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+                [tableData]="tableData" [menuItems]="menuItems" [staticField]="staticField" [FormTitle]="'List Charge'"
+                [Link]="linkArray" [menuItemFlag]="menuItemflag" [addFlag]="addFlag"
+                (menuItemClicked)="handleMenuItemClick($event)">
+            </app-generic-table-v2>
+            <div *ngIf="isLoad" class="d-flex justify-content-center align-items-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

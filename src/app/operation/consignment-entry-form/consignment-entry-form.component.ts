@@ -59,7 +59,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     name: "Add Container",
     iconName: 'add'
   }
-
+  isSubmit: boolean = false;
   consignmentTableForm: UntypedFormGroup;
   containerTableForm: UntypedFormGroup;
   FreightTableForm: UntypedFormGroup;
@@ -1024,7 +1024,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async save() {
-
+    this.isSubmit =true;
     // Remove all form errors
     const tabcontrols = this.consignmentTableForm;
     clearValidatorsAndValidate(tabcontrols);

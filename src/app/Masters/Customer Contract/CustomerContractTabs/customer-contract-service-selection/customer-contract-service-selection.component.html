@@ -43,7 +43,8 @@
     <form [formGroup]="InsuranceCarrierRiskForm">
         <app-form-webxpress [form]="InsuranceCarrierRiskForm" [FormTitle]="'Insurance'"
             [formData]="jsonControlArrayInsuranceCarrierRiskForm" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" [EventButton]="InsuranceCarrierRiskForm.valid==true ? ADDEventButton : false"
+            [showSaveAndCancelButton]="false"
+            [EventButton]="InsuranceCarrierRiskForm.valid==true ? InsuranceEventButton : false"
             (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
@@ -53,19 +54,19 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-        <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-            [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-            [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-            [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-            (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-        </app-generic-table-v2>
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="InsurancecolumnHeader"
+        [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+        [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
+        [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+    </app-generic-table-v2>
 </div>
 <div *ngIf="DisplayFuelSurchargeSection">
     <form [formGroup]="FuelSurchargeForm">
         <app-form-webxpress [form]="FuelSurchargeForm" [FormTitle]="'Fuel Surcharge'"
             [formData]="jsonControlArrayFuelSurchargeForm" (functionCallEmitter)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
-            [EventButton]="FuelSurchargeForm.valid==true ? FADDEventButton : false" [className]="className">
+            [EventButton]="FuelSurchargeForm.valid==true ? FuelSurchargeEventButton : false" [className]="className">
         </app-form-webxpress>
     </form>
     <div *ngIf="isFLoad" class="d-flex justify-content-center align-items-center">
@@ -74,12 +75,12 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-        <app-generic-table-v2 *ngIf="!FtableLoad" [dynamicControls]="FdynamicControls" [columnHeader]="FcolumnHeader"
-            [tableData]="FtableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="FmenuItems"
-            [staticField]="FstaticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-            [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag"
-            (menuItemClicked)="FhandleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-        </app-generic-table-v2>
+    <app-generic-table-v2 *ngIf="!FtableLoad" [dynamicControls]="FdynamicControls" [columnHeader]="FcolumnHeader"
+        [tableData]="FtableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="FmenuItems"
+        [staticField]="FstaticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="FhandleMenuItemClick($event)"
+        [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+    </app-generic-table-v2>
 </div>
 <div *ngIf="DisplayCutOfftimeSection">
     <form [formGroup]="CutOfftimeForm">

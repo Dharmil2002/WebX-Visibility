@@ -236,6 +236,16 @@ export class ContractBasicInformationControl {
 
     this.AddNewCustomerContractControlArray = [
       {
+        name: "ContractID",
+        label: "ContractID",
+        placeholder: "ContractID",
+        type: "text",
+        value: "System Generated",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
         name: "Customer",
         label: "Customer",
         placeholder: "Customer",
@@ -266,18 +276,6 @@ export class ContractBasicInformationControl {
           onOptionSelect: "GeneralFieldChangedForTableData"
         },
       },
-
-      {
-        name: "ContractID",
-        label: "ContractID",
-        placeholder: "ContractID",
-        type: "text",
-        value: "System Generated",
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
-
       {
         name: "Product",
         label: "Product",

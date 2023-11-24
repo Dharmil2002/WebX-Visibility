@@ -435,7 +435,7 @@ export class ContractServiceSelectionControl {
         name: "Volumtericcalculation",
         label: "Volumteric calculation",
         placeholder: "Volumteric calculation",
-        type: "text",
+        type: "dropdown",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -444,10 +444,14 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
         ],
-        functions: {
-          onOptionSelect: 'getLocBasedOnCity'
-        },
         additionalData: {
           showNameAndValue: false,
         },

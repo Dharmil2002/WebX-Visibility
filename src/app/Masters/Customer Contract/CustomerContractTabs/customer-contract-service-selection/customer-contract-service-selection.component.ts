@@ -1,3 +1,4 @@
+import { removeFields } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import {
   ChangeDetectorRef,
   Component,
@@ -230,6 +231,7 @@ export class CustomerContractServiceSelectionComponent
   DemurrageRatetypeFromAPI: any;
   YieldTypeFromAPI: any;
   FuelSurchargeSelectionFromAPI: any;
+  VolumtericcalculationFromAPI: any;
   FuelSurchargeFromAPI: any;
   InsuranceFromAPI: any;
   constructor(
@@ -385,6 +387,17 @@ export class CustomerContractServiceSelectionComponent
       this.VolumtericForm,
       this.VolumetricappliedFromAPI,
       "Volumetricapplied",
+      false
+    );
+    this.VolumtericcalculationFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "VMC"
+    );
+    this.filter.Filter(
+      this.jsonControlArrayVolumtericForm,
+      this.VolumtericForm,
+      this.VolumtericcalculationFromAPI,
+      "Volumtericcalculation",
       false
     );
     this.CalculateYieldonFromAPI = await PayBasisdetailFromApi(
@@ -615,32 +628,26 @@ export class CustomerContractServiceSelectionComponent
     });
     // this.consignmentTableForm.updateValueAndValidity();
   }
- 
+
   async FaddData() {
+    debugger
     this.FtableLoad = true;
     this.isFLoad = true;
     const json = {
-      id: this.FtableData.length + 1,
+      _id:this.companyCode + "-" + this.contractData.cONID+"-"+this.FtableData.length+1,
+      id:this.companyCode + "-" + this.contractData.cONID+"-"+this.FtableData.length+1,
+      cID: this.companyCode,
+      cONID: this.contractData.cONID,
       fTYPE: this.FuelSurchargeForm.value.FuelType.name,
       fRTYPE: this.FuelSurchargeForm.value.FRateType.name,
       frT: this.FuelSurchargeForm.value.FRate,
       fmIN: this.FuelSurchargeForm.value.FMinCharge,
       fmAX: this.FuelSurchargeForm.value.FMaxCharge,
-      actions: ["Edit", "Remove"],
+      actions: ["Edit", "Remove"]
     };
     this.FtableData.push(json);
-    const requestBody = {
-      _id:this.companyCode + "-" + this.contractData.cONID+"-"+this.FtableData.length,
-      cID: this.companyCode,
-      cONID: this.contractData.cONID,
-      iVFROM: this.InsuranceCarrierRiskForm.value.InvoiceValueFrom,
-      iVTO: this.InsuranceCarrierRiskForm.value.tovalue,
-      rtType:this.InsuranceCarrierRiskForm.value.rateType.name,
-      rT: this.InsuranceCarrierRiskForm.value.Rate,
-      mIN: this.InsuranceCarrierRiskForm.value.MinCharge,
-      mAX: this.InsuranceCarrierRiskForm.value.MaxCharge,
-    };
-    await this.FuelSurchargeDataSave(requestBody);
+
+    await this.FuelSurchargeDataSave(json);
     Object.keys(this.FuelSurchargeForm.controls).forEach((key) => {
       this.FuelSurchargeForm.get(key).clearValidators();
       this.FuelSurchargeForm.get(key).updateValueAndValidity();
@@ -786,13 +793,13 @@ export class CustomerContractServiceSelectionComponent
         (item) => item.name == this.contractData.vUOM
       )
     );
-    this.VolumtericForm.get("Volumetricapplied").setValue(
-      this.VolumetricappliedFromAPI.find(
+    this.VolumtericForm.get("Volumetricapplied").setValue(this.VolumetricappliedFromAPI.find(
         (item) => item.name == this.contractData.vAPP
       )
     );
-    this.VolumtericForm.get("Volumtericcalculation").setValue(
-      this.contractData.vCAL
+    this.VolumtericForm.get("Volumtericcalculation").setValue(this.VolumtericcalculationFromAPI.find(
+      (item) => item.name == this.contractData.vCAL
+    )
     );
     this.VolumtericForm.get("Conversionratio").setValue(this.contractData.cN);
     this.YieldProtectionForm.get("MinimumweightKg").setValue(
@@ -878,7 +885,7 @@ export class CustomerContractServiceSelectionComponent
     contractDetails["mIN"] = this.DemurrageForm.value.DMinCharge;
     contractDetails["mAX"] = this.DemurrageForm.value.DMaxCharge;
     contractDetails["vUOM"] = this.VolumtericForm.value.VolumetricUoM.name;
-    contractDetails["vCAL"] = this.VolumtericForm.value.Volumtericcalculation;
+    contractDetails["vCAL"] = this.VolumtericForm.value.Volumtericcalculation.name;
     contractDetails["vAPP"] = this.VolumtericForm.value.Volumetricapplied.name;
     contractDetails["cN"] = this.VolumtericForm.value.Conversionratio;
     contractDetails["mWKG"] = this.YieldProtectionForm.value.MinimumweightKg;
@@ -888,8 +895,7 @@ export class CustomerContractServiceSelectionComponent
       this.YieldProtectionForm.value.MinimumFreightvalueINR;
     contractDetails["yIELDTYP"] = this.YieldProtectionForm.value.Yieldtype.name;
     contractDetails["mYIELD"] = this.YieldProtectionForm.value.MinimumyieldINR;
-    contractDetails["cYIELDON"] =
-      this.YieldProtectionForm.value.CalculateYieldon.name;
+    contractDetails["cYIELDON"] = this.YieldProtectionForm.value.CalculateYieldon.name;
 
     const reqBody = {
       companyCode: this.companyCode,
@@ -947,7 +953,7 @@ export class CustomerContractServiceSelectionComponent
             item.MinCharge=item.mIN,
             item.MaxCharge=item.mAX,
             item.actions = ["Edit", "Remove"];
-            
+
           });
           this.tableLoad = false;
         }
@@ -956,51 +962,18 @@ export class CustomerContractServiceSelectionComponent
   }
 
   async FuelSurchargeDataSave(requestBody) {
+    debugger
+    const removeFields = ['actions', '_id'];
+    const data = [requestBody].find((x) => !removeFields.includes(x));
     const FtableData = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_fuelsurcharge",
-      data: requestBody,
+      data: data,
     };
+    //delete requestBody.id
+    //delete requestBody.actions
    await this.masterService.masterPost("generic/create", FtableData).toPromise();
    return true
-    //this.InsuranceCarrierRiskSelectionData = this.tableData
-    // const genretedid = this.companyCode + "-" + this.contractData.cONID;
-    // const companyCode = this.companyCode;
-    // const cONID = this.contractData.cONID;
-    // let FuelSurchargedetails = this.FtableData.map((x, index) => {
-    //   return {
-    //     _id: genretedid + "-" + index,
-    //     companyCode: companyCode,
-    //     cONID: cONID,
-    //     fTYPE: x.FuelType,
-    //     fRTYPE: x.FRateType,
-    //     frT: x.FRate,
-    //     fmIN: x.FMinCharge,
-    //     fmAX: x.FMaxCharge,
-    //   };
-    // });
-    // const FtableData = {
-    //   companyCode: this.companyCode,
-    //   collectionName: "cust_contract_fuelsurcharge",
-    //   data: FuelSurchargedetails,
-    // };
-    // this.masterService.masterPost("generic/create", FtableData).subscribe({
-    //   next: (res: any) => {
-    //     if (res) {
-    //       // this.InsuranceCarrierRiskSelectionSave();
-    //       // Display success message
-    //       Swal.fire({
-    //         icon: "success",
-    //         title: "Successful",
-    //         text: res.message,
-    //         showConfirmButton: true,
-    //       });
-    //       this.Route.navigateByUrl(
-    //         "/Masters/CustomerContract/CustomerContractList"
-    //       );
-    //     }
-    //   },
-    // });
   }
 
   SetDefaultFuelSurchargeData() {
@@ -1016,12 +989,6 @@ export class CustomerContractServiceSelectionComponent
           this.FtableData = res.data;
           this.FtableData.forEach((item) => {
             item.id=item._id,
-            item.InvoiceValueFrom=item.iVFROM,
-            item.tovalue=item.iVTO,
-            item.rateType=item.rtType,
-            item.Rate=item.rT,
-            item.MinCharge=item.mIN,
-            item.MaxCharge=item.mAX,
             item.actions = ["Edit", "Remove"];
           });
           this.FtableLoad = false;

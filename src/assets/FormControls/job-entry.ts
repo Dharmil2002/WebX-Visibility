@@ -35,7 +35,7 @@ export class JobControl {
             },
             {
                 name: "weight",
-                label: "Weight (KGs)",
+                label: "Weight (MT)",
                 placeholder: "Enter weight",
                 type: "number",
                 value: "",
@@ -108,53 +108,6 @@ export class JobControl {
                 additionalData: {
                     metaData: "jobControls"
                 },
-            }, {
-                name: 'fromCity', label: "PORT of Loading", placeholder: "PORT of Loading", type: 'dropdown', value: '',
-                generatecontrol: true,
-                disable: true,
-                Validations: [
-                    {
-                        name: "autocomplete",
-                    },
-                    {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "required",
-                        message: "PORT of Loading is required"
-                    },
-                ],
-                additionalData: {
-                    showNameAndValue: false,
-                    metaData: "jobControls"
-                },
-            },
-            {
-                name: 'toCity', label: "PORT of Discharge", placeholder: "PORT of Discharge", type: 'dropdown', value: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: [
-                    {
-                        name: "autocomplete",
-                    },
-                    {
-                        name: "invalidAutocompleteObject",
-                        message: "Choose proper value",
-                    },
-                    {
-                        name: "required",
-                        message: "PORT of Discharge is required"
-                    },
-                ],
-                functions: {
-                    onModel: "getPincodeDetail",
-                    onOptionSelect: "getDocketBasedOnCity"
-                },
-                additionalData: {
-                    showNameAndValue: false,
-                    metaData: "jobControls"
-                }
             },
             {
                 name: "DestCountry",
@@ -169,6 +122,47 @@ export class JobControl {
                 disable: false,
                 Validations: [
                 ]
+            },
+            {
+                name: 'fromCity', label: "PORT of Loading", placeholder: "PORT of Loading", type: 'text', value: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: [{
+                    name: "required",
+                    message: "PORT of Loading  is required",
+                },
+                {
+                    name: "pattern",
+                    message: "Please enter only characters",
+                    pattern: "^^[a-zA-Z]+$",
+                },
+                ],
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "jobControls"
+                },
+            },
+            {
+                name: 'toCity', label: "PORT of Discharge", placeholder: "PORT of Discharge", type: 'text', value: '',
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                    {
+                        name: "required",
+                        message: "PORT of Discharge is required"
+                    },
+                    {
+                        name: "pattern",
+                        message: "Please enter only characters",
+                        pattern: "^^[a-zA-Z]+$",
+                    },
+                ],
+                functions: {
+                },
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "jobControls"
+                }
             },
             {
                 name: "jobType",
@@ -188,8 +182,8 @@ export class JobControl {
                 additionalData: {
                     metaData: "jobControls"
                 },
-                functions:{
-                    onSelection:'onJobChanged'
+                functions: {
+                    onSelection: 'onJobChanged'
                 },
                 generatecontrol: true,
                 disable: false
@@ -218,8 +212,8 @@ export class JobControl {
                 placeholder: 'Transported By',
                 type: "Staticdropdown",
                 value: [
-                    { value: 'I', name: 'Third Party' },
-                    { value: 'E', name: 'Own' }
+                    { value: 'T', name: 'Third Party' },
+                    { value: 'O', name: 'Own' }
                 ],
                 Validations: [
                 ],
@@ -231,6 +225,20 @@ export class JobControl {
                 },
                 generatecontrol: true,
                 disable: false
+            },
+            {
+                name: "nOOFCONT",
+                label: "No of Container",
+                placeholder: "No of Container",
+                type: "number",
+                value: "",
+                additionalData: {
+                    metaData: ""
+                },
+                generatecontrol: true,
+                disable: false,
+                Validations: [
+                ]
             },
             {
                 name: "vendorName",
@@ -292,6 +300,22 @@ export class JobControl {
                 ]
             },
             {
+                name: 'exportType', label: "Export Type", placeholder: "Export Type", type: 'Staticdropdown',
+                value: [{ name: "Container", value: "container" }],
+                filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
+                additionalData: {
+                    showNameAndValue: false,
+                    metaData: "jobControls"
+                },
+                Validations: [
+                    {
+                        name: "required",
+                        message: "Vehicle Size  is required"
+                    }
+                ],
+
+            },
+            {
                 name: "companyCode",
                 label: "companyCode",
                 placeholder: "company Code",
@@ -347,6 +371,20 @@ export class JobControl {
                 Validations: [
                 ]
             },
+            {
+                name: "status",
+                label: "Status",
+                placeholder: "",
+                type: "",
+                value: "0",
+                additionalData: {
+                    metaData: "jobTableControls"
+                },
+                generatecontrol: false,
+                disable: false,
+                Validations: [
+                ]
+            }
         ];
 
         this.containordetail = [
@@ -533,20 +571,6 @@ export class JobControl {
                 disable: false,
                 Validations: [
                 ]
-            },
-            {
-                name: "status",
-                label: "Status",
-                placeholder: "",
-                type: "",
-                value: "0",
-                additionalData: {
-                    metaData: "jobTableControls"
-                },
-                generatecontrol: false,
-                disable: false,
-                Validations: [
-                ]
             }
         ];
 
@@ -593,7 +617,7 @@ export class JobControl {
                 Validations: [
                 ]
             },
-             {
+            {
                 name: "beDT",
                 label: "BE Date",
                 placeholder: "BE Date",
@@ -717,7 +741,7 @@ export class JobControl {
                 name: "containerNum",
                 label: "Container Num",
                 placeholder: "Container Num",
-                type: "text",
+                type: "number",
                 value: "",
                 additionalData: {
                     metaData: ""

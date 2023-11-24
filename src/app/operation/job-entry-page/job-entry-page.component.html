@@ -16,34 +16,13 @@
     </div>
   </div>
   <!--  End-->
-
-  <!--Add Containor Details Form Code Which Push into table  -->
-  <form [formGroup]="containorTableForm">
-    <app-form-webxpress [form]="containorTableForm" [FormTitle]="'Add Job Detail'" [formData]="jsonFormTableControls"
-      (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
-      [showSaveAndCancelButton]="false">
-    </app-form-webxpress>
-  </form>
-  <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 83%;
-        top: -15em;
-        position: relative;" (click)="addDetail('cnote')"
-    [disabled]="!this.containorTableForm.controls['cnoteNo'].value && !this.containorTableForm.value.contNo">
-    <mat-icon>add</mat-icon>
-    Add New
-  </button>
-  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnJobDetail"
-    [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-    [staticField]="definition.staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-    [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
-    [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-  </app-generic-table-v2>
-  <!-- End -->
+  
   <!-- Add BL/CHALAN DETAILS Form Code whish Push data into table -->
-  <button matTooltip="Add Data" mat-stroked-button class="filter_btn"
+  <button matTooltip="Add BL/Chalan" mat-stroked-button class="filter_btn"
     [ngStyle]="{'margin-left': '80%','top': '50px','position': 'relative','z-index': '1' }" (click)="addDetail('bl')"
     [disabled]="!this.blTableForm.valid">
     <mat-icon>add</mat-icon>
-    Add New BLChalan
+    Add New
   </button>
   <form [formGroup]="blTableForm">
     <app-form-webxpress [form]="blTableForm" [FormTitle]="'BL/Chalan Details'" [formData]="jsonFormBlControls"
@@ -58,7 +37,6 @@
       </div>
     </div>
     <!--  End-->
-
     <app-generic-table-v2 *ngIf="!jobTableLoad && !isBlLoad" [dynamicControls]="dynamicControls"
       [columnHeader]="columnChallan" [tableData]="TblChallan" (selectAllClicked)="onSelectAllClicked($event)"
       [menuItems]="menuItems" [staticField]="definition.invoiceStaticField" [Link]="linkArray" [height]="height"
@@ -66,6 +44,30 @@
       (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
     </app-generic-table-v2>
   </form>
+  <!-- End -->
+
+  <!--Add Containor Details Form Code Which Push into table  -->
+  <div *ngIf="!isImport">
+  <form [formGroup]="containorTableForm">
+    <app-form-webxpress [form]="containorTableForm" [FormTitle]="'Add Job Detail'" [formData]="jsonFormTableControls"
+      (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="false">
+    </app-form-webxpress>
+  </form>
+  <button matTooltip="Add Data" mat-stroked-button class="filter_btn" style="margin-left: 83%;
+          top: -204px;
+          position: relative;" (click)="addDetail('cnote')"
+    [disabled]="!this.containorTableForm.controls['cnoteNo'].value && !this.containorTableForm.value.contNo">
+    <mat-icon>add</mat-icon>
+    Add New
+  </button>
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnJobDetail"
+    [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
+    [staticField]="definition.staticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+    [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"
+    [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+  </app-generic-table-v2>
+</div>
   <!-- End -->
   <div class="row">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">

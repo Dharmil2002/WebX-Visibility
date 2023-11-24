@@ -152,16 +152,16 @@ export class JobSummaryModel implements IFieldDefinition {
     class: "matcolumncenter",
     Style: "min-width:2px",
   },
-  containerType: {
-    Title: "ContainerType",
-    class: "matcolumncenter",
-    Style: "min-width:2px",
-  },
-  containerNum: {
-    Title: "ContainerNum",
-    class: "matcolumncenter",
-    Style: "min-width:2px",
-  },
+  // containerType: {
+  //   Title: "ContainerType",
+  //   class: "matcolumncenter",
+  //   Style: "min-width:2px",
+  // },
+  // containerNum: {
+  //   Title: "ContainerNum",
+  //   class: "matcolumncenter",
+  //   Style: "min-width:2px",
+  // },
   actionsItems: {
     Title: "Action",
     class: "matcolumnleft",

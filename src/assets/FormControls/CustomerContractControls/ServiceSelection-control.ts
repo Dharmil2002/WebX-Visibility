@@ -640,6 +640,9 @@ export class ContractServiceSelectionControl {
           name: "required",
           message: "Invoice Value From is required",
         }],
+        functions:{
+         onChange:"checkInvoice"
+        },
         generatecontrol: true,
         disable: false,
         accessallowed: true,

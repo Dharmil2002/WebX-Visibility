@@ -118,8 +118,8 @@ export class jobQueryControl {
             },
             {
                 name: 'LocationsHandler',
-                label: 'Locations',
-                placeholder: 'Locations',
+                label: 'LocationsHandler',
+                placeholder: 'LocationsHandler',
                 type: '',
                 value: '',
                 Validations: [],
@@ -137,7 +137,7 @@ export class jobQueryControl {
             {
                 name: 'cnoteHandler',
                 label: 'cnoteHandler',
-                placeholder: 'jobNoHandler',
+                placeholder: 'cnoteHandler',
                 type: '',
                 value: '',
                 Validations: [],

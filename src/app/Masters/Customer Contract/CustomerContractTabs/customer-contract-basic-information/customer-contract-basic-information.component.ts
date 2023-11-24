@@ -114,8 +114,6 @@ export class CustomerContractBasicInformationComponent implements OnInit {
 
     const startDate = new Date(startDateString);
     const endDate = new Date(endDateString);
-    console.log(startDate)
-    console.log(endDate)
 
     if (startDate && endDate && startDate > endDate) {
       Swal.fire({
@@ -284,7 +282,6 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     let ExistingContracts = await GetContractBasedOnCustomerAndProductListFromApi(this.masterService, customerId, productId);
 
     ExistingContracts = ExistingContracts.filter(item => item.cONID != this.contractData.cONID)
-    console.log(ExistingContracts)
     const startDate = new Date(this.ProductsForm.value?.ContractStartDate);
     const endDate = new Date(this.ProductsForm.value?.Expirydate);
 

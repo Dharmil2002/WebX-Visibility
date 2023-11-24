@@ -192,34 +192,34 @@ export class ContractServiceSelectionControl {
         accessallowed: true,
       },
 
-      {
-        name: "ODA",
-        label: "ODA",
-        placeholder: "ODA",
-        type: "toggle",
-        value: false,
-        Validations: [],
-        functions: {
-          onChange: "OnChangeServiceSelections",
-        },
-        generatecontrol: true,
-        disable: false,
-        accessallowed: true,
-      },
-      {
-        name: "DACC",
-        label: "DACC",
-        placeholder: "DACC",
-        type: "toggle",
-        value: false,
-        Validations: [],
-        functions: {
-          onChange: "OnChangeServiceSelections",
-        },
-        generatecontrol: true,
-        disable: false,
-        accessallowed: true,
-      },
+      // {
+      //   name: "ODA",
+      //   label: "ODA",
+      //   placeholder: "ODA",
+      //   type: "toggle",
+      //   value: false,
+      //   Validations: [],
+      //   functions: {
+      //     onChange: "OnChangeServiceSelections",
+      //   },
+      //   generatecontrol: true,
+      //   disable: false,
+      //   accessallowed: true,
+      // },
+      // {
+      //   name: "DACC",
+      //   label: "DACC",
+      //   placeholder: "DACC",
+      //   type: "toggle",
+      //   value: false,
+      //   Validations: [],
+      //   functions: {
+      //     onChange: "OnChangeServiceSelections",
+      //   },
+      //   generatecontrol: true,
+      //   disable: false,
+      //   accessallowed: true,
+      // },
       {
         name: "fuelSurcharge",
         label: "Fuel Surcharge",
@@ -276,20 +276,20 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
       },
-      {
-        name: "DPH",
-        label: "DPH",
-        placeholder: "DPH",
-        type: "toggle",
-        value: false,
-        Validations: [],
-        functions: {
-          onChange: "OnChangeServiceSelections",
-        },
-        generatecontrol: true,
-        disable: false,
-        accessallowed: true,
-      },
+      // {
+      //   name: "DPH",
+      //   label: "DPH",
+      //   placeholder: "DPH",
+      //   type: "toggle",
+      //   value: false,
+      //   Validations: [],
+      //   functions: {
+      //     onChange: "OnChangeServiceSelections",
+      //   },
+      //   generatecontrol: true,
+      //   disable: false,
+      //   accessallowed: true,
+      // },
       {
         name: "Insurance",
         label: "Insurance",
@@ -356,34 +356,41 @@ export class ContractServiceSelectionControl {
         placeholder: "Rate",
         type: "number",
         value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
         generatecontrol: true,
         disable: false,
-        accessallowed: true,
-        Validations: [
-        ],
-        additionalData: {
-          showNameAndValue: false,
+        Validations: [{
+          name: "required",
+          message: "Rate is required"
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
+        }],
+        functions: {
+          // onChange: 'validateCodDodRates'
         },
       },
+
       {
         name: "MinCharge",
         label: "Min Charge(₹)",
         placeholder: "Min Charge",
         type: "number",
         value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
         generatecontrol: true,
         disable: false,
-        accessallowed: true,
-        Validations: [
-        ],
-        additionalData: {
-          showNameAndValue: false,
+        Validations: [{
+          name: "required",
+          message: "Min Charge is required"
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
+        }],
+        functions: {
+          onChange: 'validateCodDodRates'
         },
       },
       {
@@ -392,18 +399,22 @@ export class ContractServiceSelectionControl {
         placeholder: "Max Charge",
         type: "number",
         value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
         generatecontrol: true,
         disable: false,
-        accessallowed: true,
-        Validations: [
-        ],
-        additionalData: {
-          showNameAndValue: false,
+        Validations: [{
+          name: "required",
+          message: "Max Charge is required"
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
+        }],
+        functions: {
+          onChange: 'validateCodDodRates'
         },
       },
+
     ]
     this.ContractVolumtericSelectionControlArray = [
       {

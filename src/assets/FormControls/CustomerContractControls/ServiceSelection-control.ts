@@ -66,7 +66,7 @@ export class ContractServiceSelectionControl {
           }]
         },
         functions: {
-          onToggleAll: 'toggleSelectAll',
+          onToggleAll: 'toggleSelectAll'
         },
         generatecontrol: true, disable: false
       },
@@ -86,9 +86,6 @@ export class ContractServiceSelectionControl {
             message: "Choose proper value",
           },
         ],
-        functions: {
-          onToggleAll: 'toggleSelectAll',
-        },
         generatecontrol: false, disable: false
       },
 
@@ -559,7 +556,7 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "Demurragerateperday",
-        label: "Demurrage rate - per day",
+        label: "Demurrage rate - per day(₹)",
         placeholder: "Demurrage rate- per day",
         type: "number",
         value: "",
@@ -570,6 +567,11 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter only positive numbers with up to two decimal places",
+            pattern: '^\\d+(\\.\\d{1,2})?$'
+          }
         ],
         functions: {
           onOptionSelect: 'getLocBasedOnCity'
@@ -642,9 +644,9 @@ export class ContractServiceSelectionControl {
     this.ContractInsuranceCarrierRiskSelectionControlArray = [
       {
         name: "InvoiceValueFrom",
-        label: "Invoice Value From",
+        label: "Invoice Value From(₹)",
         placeholder: "Invoice Value From",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -652,6 +654,11 @@ export class ContractServiceSelectionControl {
         Validations: [{
           name: "required",
           message: "Invoice Value From is required",
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions:{
          onChange:"checkInvoice"
@@ -662,9 +669,9 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "tovalue",
-        label: "To value",
+        label: "Invoice Value To(₹)",
         placeholder: "To value",
-        type: "text",
+        type: "number",
         value: "",
         filterOptions: "",
         autocomplete: "",
@@ -672,6 +679,11 @@ export class ContractServiceSelectionControl {
         Validations: [{
           name: "required",
           message: "To value is required",
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         additionalData: {
           showNameAndValue: false,
@@ -778,7 +790,7 @@ export class ContractServiceSelectionControl {
         generatecontrol: true,
         disable: false,
         accessallowed: true,
-      },
+      }
     ];
     this.ContractCutOfftimeControlArray = [
       {

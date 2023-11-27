@@ -22,6 +22,7 @@ import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroy
 import { ContractServiceSelectionControl } from "src/assets/FormControls/CustomerContractControls/ServiceSelection-control";
 import Swal from "sweetalert2";
 import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { StorageService } from 'src/app/core/service/storage.service';
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -236,7 +237,8 @@ export class CustomerContractServiceSelectionComponent
     private changeDetectorRef: ChangeDetectorRef,
     public ObjcontractMethods: locationEntitySearch,
     private filter: FilterUtils,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private storage:StorageService
   ) {
     super();
     this.companyCode = this.sessionService.getCompanyCode();
@@ -574,8 +576,6 @@ export class CustomerContractServiceSelectionComponent
   async addInsuranceData() {
     this.tableLoad = this.isLoad = true;
     const tableData = this.tableData;
-    // const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    // await delay(1000);
     const formValue = this.InsuranceCarrierRiskForm.value;
     const json = {
       id: tableData.length + 1,
@@ -598,11 +598,25 @@ export class CustomerContractServiceSelectionComponent
       rT: formValue.Rate,
       mIN: formValue.IMinCharge,
       mAX: formValue.IMaxCharge,
+      eNTDT:new Date(),
+      eNTLOC:this.storage.branch,
+      eNTBY:this.storage.userName,
+      mODDT:new Date(),
+      mODLOC:this.storage.branch,
+      mODBY:this.storage.userName
     };
     if (this.isUpdate) {
       delete requestBody._id;
       delete requestBody.cID;
       delete requestBody.cONID;
+      delete requestBody.eNTBY;
+      delete requestBody.eNTLOC;
+      delete requestBody.eNTDT;
+    }
+    else{
+      delete requestBody.mODDT;
+      delete requestBody.mODLOC;
+      delete requestBody.mODBY;
     }
     const req = {
       companyCode: this.companyCode,
@@ -661,11 +675,25 @@ export class CustomerContractServiceSelectionComponent
       frT: formValue.FRate,
       fmIN: formValue.FMinCharge,
       fmAX: formValue.FMaxCharge,
+      eNTDT:new Date(),
+      eNTLOC:this.storage.branch,
+      eNTBY:this.storage.userName,
+      mODDT:new Date(),
+      mODLOC:this.storage.branch,
+      mODBY:this.storage.userName
     };
     if (this.isUpdate) {
       delete requestBody._id;
       delete requestBody.cID;
       delete requestBody.cONID;
+      delete requestBody.eNTBY;
+      delete requestBody.eNTLOC;
+      delete requestBody.eNTDT;
+    }
+    else{
+      delete requestBody.mODDT;
+      delete requestBody.mODLOC;
+      delete requestBody.mODBY;
     }
     const req = {
       companyCode: this.companyCode,
@@ -1084,25 +1112,6 @@ export class CustomerContractServiceSelectionComponent
         }
       },
     });
-    // const reqBody = {
-    //   companyCode: this.companyCode,
-    //   collectionName: "cust_contract_fuelsurcharge",
-    //   filter: { cONID: this.contractData.cONID },
-    // };
-    // //delete InsuranceCarrierRiskSelectiondetails._id;
-    // this.masterService.masterPost("generic/get", reqBody).subscribe({
-    //   next: (res: any) => {
-    //     if (res) {
-    //       this.FtableData = res.data;
-    //       this.FtableData.forEach((item) => {
-    //         item.id = item._id,
-    //           item.actions = ["Edit", "Remove"];
-    //       });
-    //       this.FtableLoad = false;
-    //     }
-    //   },
-    // });
-
   }
 
   async removedata(id) {
@@ -1196,18 +1205,17 @@ export class CustomerContractServiceSelectionComponent
       return;
     }
   }
-  checkInvoice() {
-    const invoiceNo = this.InsuranceCarrierRiskForm.value.InvoiceValueFrom;
-    const exists = this.tableData.some((x) => x.InvoiceValueFrom.includes(invoiceNo));
-    if (exists) {
-      this.InsuranceCarrierRiskForm.controls['InvoiceValueFrom'].setValue("");
-      Swal.fire({
-        icon: "error",
-        title: "Already Exist",
-        text: "Invoice Value From Is Already Exist",
-        showConfirmButton: true,
-      });
-    }
-
-  }
+  // checkInvoice() {
+  //   const invoiceNo = this.InsuranceCarrierRiskForm.value.InvoiceValueFrom;
+  //   const exists = this.tableData.some((x) => x.InvoiceValueFrom.includes(invoiceNo));
+  //   if (exists) {
+  //     this.InsuranceCarrierRiskForm.controls['InvoiceValueFrom'].setValue("");
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Already Exist",
+  //       text: "Invoice Value From Is Already Exist",
+  //       showConfirmButton: true,
+  //     });
+  //   }
+  // }
 }

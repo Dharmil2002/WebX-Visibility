@@ -574,8 +574,8 @@ export class CustomerContractServiceSelectionComponent
   async addInsuranceData() {
     this.tableLoad = this.isLoad = true;
     const tableData = this.tableData;
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    await delay(1000);
+    // const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // await delay(1000);
     const formValue = this.InsuranceCarrierRiskForm.value;
     const json = {
       id: tableData.length + 1,
@@ -625,6 +625,10 @@ export class CustomerContractServiceSelectionComponent
         showConfirmButton: true,
       });
     }
+    const controls=["InvoiceValueFrom", "tovalue", "rateType","Rate", "IMinCharge", "IMaxCharge"]
+    controls.forEach(element => {
+      this.InsuranceCarrierRiskForm.controls[element].setValue("");
+    });
     // Clear form validators and reset values
     this.InsuranceCarrierRiskForm.reset();
     // Add the "required" validation rule
@@ -690,7 +694,7 @@ export class CustomerContractServiceSelectionComponent
     controls.forEach(element => {
       this.FuelSurchargeForm.controls[element].setValue("");
     });
-   // this.FuelSurchargeForm.reset();
+    this.FuelSurchargeForm.reset();
     // Add the "required" validation rule
     Object.keys(this.FuelSurchargeForm.controls).forEach((key) => {
       this.FuelSurchargeForm.get(key).setValidators(Validators.required);

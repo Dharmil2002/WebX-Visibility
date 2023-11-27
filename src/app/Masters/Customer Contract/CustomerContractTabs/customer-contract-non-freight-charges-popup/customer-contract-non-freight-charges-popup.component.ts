@@ -6,6 +6,7 @@ import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilde
 import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { ContractNonFreightMatrixControl } from "src/assets/FormControls/CustomerContractControls/NonFreightMatrix-control";
+import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
 
 @Component({
   selector: "app-customer-contract-non-freight-charges-popup",
@@ -13,12 +14,12 @@ import { ContractNonFreightMatrixControl } from "src/assets/FormControls/Custome
 })
 export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
   columnHeader = {
-    From: {
+    from: {
       Title: "From",
       class: "matcolumnfirst",
       Style: "min-width:80px",
     },
-    To: {
+    to: {
       Title: "To",
       class: "matcolumncenter",
       Style: "min-width:80px",
@@ -28,28 +29,31 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    Rate: {
+    rate: {
       Title: "Rate",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    MinValue: {
+    minValue: {
       Title: "Min Value",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    MaxValue: {
+    maxValue: {
       Title: "Max Value",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    actionsItems: {
+    EditAction: {
+      type: "iconClick",
       Title: "Action",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
+      class: "matcolumncenter",
+      Style: "min-width:10%",
+      functionName: "FillMatrixForAll",
+      iconName: "edit",
     },
   };
-  staticField = ["From", "To", "rateType", "Rate", "MinValue", "MaxValue"];
+  staticField = ["from", "to", "rateType", "rate", "minValue", "maxValue"];
   dynamicControls = {
     add: false,
     edit: false,
@@ -65,56 +69,10 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
   AlljsonControlArrayNonFreightCharges: any;
   jsonControlArrayNonFreightMatrix: any;
   NonFreightMatrixForm: any;
-  tableLoad = true;
-  isLoad = false;
+  tableLoad = false;
+  isLoad = true;
   className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
-  tableData = [
-    {
-      From: "From",
-      To: "To",
-      rateType: "Rate Type",
-      Rate: "Rate",
-      MinValue: "Min Value",
-      MaxValue: "Max Value",
-      actions: ['Edit', 'Remove']
-    },
-    {
-      From: "From",
-      To: "To",
-      rateType: "Rate Type",
-      Rate: "Rate",
-      MinValue: "Min Value",
-      MaxValue: "Max Value",
-      actions: ['Edit', 'Remove']
-    },
-    {
-      From: "From",
-      To: "To",
-      rateType: "Rate Type",
-      Rate: "Rate",
-      MinValue: "Min Value",
-      MaxValue: "Max Value",
-      actions: ['Edit', 'Remove']
-    },
-    {
-      From: "From",
-      To: "To",
-      rateType: "Rate Type",
-      Rate: "Rate",
-      MinValue: "Min Value",
-      MaxValue: "Max Value",
-      actions: ['Edit', 'Remove']
-    },
-    {
-      From: "From",
-      To: "To",
-      rateType: "Rate Type",
-      Rate: "Rate",
-      MinValue: "Min Value",
-      MaxValue: "Max Value",
-      actions: ['Edit', 'Remove']
-    },
-  ];
+  tableData: any;
   PinCodeList: any;
   companyCode = parseInt(localStorage.getItem("companyCode"));
   StateList: any;
@@ -123,6 +81,11 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     name: "Add New",
     iconName: "add",
   };
+  rateTypeCode: any;
+  rateTypeStatus: any;
+  isUpdate: any = false;
+  UpdateData: any;
+  ChargesData: any;
   constructor(
     private fb: UntypedFormBuilder,
     public ObjcontractMethods: locationEntitySearch,
@@ -130,11 +93,34 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     private filter: FilterUtils,
     public dialogRef: MatDialogRef<CustomerContractNonFreightChargesPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) {
+    this.ChargesData = data;
+    this.getTableData();
+  }
 
   ngOnInit(): void {
     this.initializeFormControl();
-    this.getAllMastersData()
+    this.getAllMastersData();
+  }
+
+  async getTableData() {
+    this.tableLoad = false;
+    this.isLoad = true;
+    let ChargesDatareq = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract_non_freight_charge_matrix",
+      filter: { nFCID: this.ChargesData.nFCID },
+    };
+    const res = await this.masterService
+      .masterPost("generic/get", ChargesDatareq)
+      .toPromise();
+    if (res.success && res.data.length > 0) {
+      const nfcData = res.data[0].nFC;
+      console.log("nfcData", nfcData);
+      this.tableData = nfcData;
+      this.tableLoad = true;
+      this.isLoad = false;
+    }
   }
 
   initializeFormControl() {
@@ -145,11 +131,38 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     this.NonFreightMatrixForm = formGroupBuilder(this.fb, [
       this.jsonControlArrayNonFreightMatrix,
     ]);
-    // this.AlljsonControlArrayNonFreightCharges = this.jsonControlArrayNonFreightCharges;
+    this.bindDropdown();
   }
-  close(){
-    this.dialogRef.close()
+  bindDropdown() {
+    this.jsonControlArrayNonFreightMatrix.forEach((data) => {
+      if (data.name === "rateType") {
+        // Set AcGroupCategory variables
+        this.rateTypeCode = data.name;
+        this.rateTypeStatus = data.additionalData.showNameAndValue;
+        this.getrateTypeDropdown();
+      }
+    });
   }
+  async getrateTypeDropdown() {
+    const AcGroupdata = await PayBasisdetailFromApi(
+      this.masterService,
+      "RTTYP"
+    );
+    this.filter.Filter(
+      this.jsonControlArrayNonFreightMatrix,
+      this.NonFreightMatrixForm,
+      AcGroupdata,
+      this.rateTypeCode,
+      this.rateTypeStatus
+    );
+    // if (this.isUpdate) {
+    //   const element = AcGroupdata.find(
+    //     (x) => x.name == this.UpdateData.AcGroupCategoryName
+    //   );
+    //   this.NonFreightMatrixForm.controls["rateType"].setValue(element);
+    // }
+  }
+
   async getAllMastersData() {
     try {
       const stateReqBody = {
@@ -162,13 +175,71 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
         filter: {},
         collectionName: "pincode_master",
       };
-      this.StateList = await this.masterService.masterPost('generic/get', stateReqBody).toPromise();
-      this.PinCodeList = await this.masterService.masterPost('generic/get', pincodeReqBody).toPromise();
-      this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(this.PinCodeList, this.StateList, 'ST')
+      this.StateList = await this.masterService
+        .masterPost("generic/get", stateReqBody)
+        .toPromise();
+      this.PinCodeList = await this.masterService
+        .masterPost("generic/get", pincodeReqBody)
+        .toPromise();
+      this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
+        this.PinCodeList,
+        this.StateList,
+        "ST"
+      );
     } catch (error) {
       // Handle any errors that occurred during the request
       console.error("Error:", error);
     }
+  }
+  async save() {
+    console.log("ChargesData", this.ChargesData);
+    let ChargesDatareq = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract_non_freight_charge_matrix",
+      filter: { nFCID: this.ChargesData.nFCID },
+    };
+    const res = await this.masterService
+      .masterPost("generic/get", ChargesDatareq)
+      .toPromise();
+    if (res.success && res.data.length > 0) {
+      const nfcData = res.data[0].nFC;
+      const index =
+        nfcData.length == 0 ? 1 : nfcData[nfcData.length - 1].id + 1;
+      const Body = {
+        id: index,
+        from: this.NonFreightMatrixForm.value.From.name,
+        fromType: this.NonFreightMatrixForm.value.From.value,
+        to: this.NonFreightMatrixForm.value.To.name,
+        toType: this.NonFreightMatrixForm.value.To.name,
+        maxValue: this.NonFreightMatrixForm.value.MaxValue,
+        minValue: this.NonFreightMatrixForm.value.MinValue,
+        rate: this.NonFreightMatrixForm.value.Rate,
+        rateType: this.NonFreightMatrixForm.value.rateType.name,
+      };
+      nfcData.push(Body);
+      this.saveUpdateData(nfcData);
+    } else {
+    }
+  }
+  async saveUpdateData(data) {
+    console.log("data", data);
+    const Updatebody = {
+      nFC: data,
+    };
+    const Updatereq = {
+      companyCode: this.companyCode,
+      collectionName: "cust_contract_non_freight_charge_matrix",
+      filter: { nFCID: this.ChargesData.nFCID },
+      update: Updatebody,
+    };
+
+    const Updateres = await this.masterService
+      .masterPut("generic/update", Updatereq)
+      .toPromise();
+    console.log("Updateres", Updateres);
+  }
+  close() {
+    this.dialogRef.close();
   }
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
@@ -182,7 +253,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
   }
   handleMenuItemClick(data) {
     // this.FillMatrixForAll(data);
-    console.log('data' ,data)
+    console.log("data", data);
   }
   SetOptions(event) {
     let fieldName = event.field.name;

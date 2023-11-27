@@ -149,7 +149,6 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
           selectCharges: x.sCT,
           ChargesBehaviour: x.cBT,
           Charges: x.cBT == "Variable" ? "Add" : x.nFC,
-          actions: ["Edit", "Remove"],
         };
       });
       this.tableLoad = true;
@@ -249,7 +248,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     const dialogRef = this.dialog.open(
       CustomerContractNonFreightChargesPopupComponent,
       {
-        data: {},
+        data: event.data,
         width: "70%",
         height: "90%",
       }

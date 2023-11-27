@@ -236,7 +236,9 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
     });
   }
   updateDepartureData(event) {
-
+    
+    this.tableload=true
+    this.getArrivalDetails()
     const result = Array.isArray(event) ? event.find((x) => x.Action === 'Arrival Scan') : null;
     const action = result?.Action ?? '';
     if (action) {
@@ -257,6 +259,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
       }
 
     }
+    this.tableload=false;
   }
   handleMenuItemClick(label: string, element) {
     let Data = { label: label, data: element }

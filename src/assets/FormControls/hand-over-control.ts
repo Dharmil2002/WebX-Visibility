@@ -28,14 +28,24 @@ export class HandoverControl {
                 Validations: []
             },
             {
-                name: "location",
-                label: "Location",
+                name: "containerFor",
+                label: "Container For",
                 placeholder: "Location",
-                type: "text",
-                value:"",
+                type: "Staticdropdown",
+                value:[
+                {name:"Diverted for Export",value:"DE"},
+                {name:"Empty Container Return to Origin",value:"EC"},
+                {name:"Handover to Liner",value:"HL"}
+                ],
+                functions: {
+                    onSelection: "getContainerData",
+                },
                 generatecontrol: true,
-                disable: true,
-                Validations: []
+                disable: false,
+                Validations: [{
+                        name: "required",
+                        message: "Container For is required",
+                }]
             }
 
         ];

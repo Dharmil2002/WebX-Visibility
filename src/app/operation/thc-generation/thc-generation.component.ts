@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 import { thcControl } from "src/assets/FormControls/thc-generation";
 import { calculateTotal, vendorTypeList } from "./thc-utlity";
 import { Router } from "@angular/router";
-import { calculateTotalField } from "../unbilled-prq/unbilled-utlity";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { getLocationApiDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
@@ -28,11 +27,11 @@ import { AddFleetMasterComponent } from "src/app/Masters/fleet-master/add-fleet-
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
-import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
 import { MarkerVehicleService } from "src/app/Utility/module/operation/market-vehicle/marker-vehicle.service";
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { ShipmentEditComponent } from "../shipment-edit/shipment-edit.component";
+import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 
 @Component({
   selector: "app-thc-generation",
@@ -50,6 +49,8 @@ export class ThcGenerationComponent implements OnInit {
   thcLoad: boolean = true;
   isSubmit: boolean = false;
   disbleCheckbox: boolean;
+  
+  linkArray = [];
   // Declaring breadcrumbs
   breadscrums = [
     {
@@ -106,6 +107,8 @@ export class ThcGenerationComponent implements OnInit {
     },
     pod: {
       Title: "Pod",
+      type:'view',
+      functionName:'view',
       class: "matcolumnleft",
       Style: "max-width:160px",
     },
@@ -220,7 +223,7 @@ export class ThcGenerationComponent implements OnInit {
         case 'view':
           this.disbleCheckbox = true;
           this.thcDetail = navigationState.data;
-          this.staticField.push('pod', 'receiveBy', 'arrivalTime', 'remarks');
+          this.staticField.push('receiveBy', 'arrivalTime', 'remarks');
           if (this.viewType === 'view') {
             this.isView = true;
             this.isSubmit = true;

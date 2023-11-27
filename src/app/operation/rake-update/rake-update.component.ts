@@ -80,7 +80,7 @@ export class RakeUpdateComponent implements OnInit {
       Style: "min-width:200px",
     },
   };
-  menuItems = [{ label: "Diverted For Export" }, { label: "Delivered" },{ label: "Updated" }];
+  menuItems = [{ label: "Updated" }];
   //#endregion
   staticField = [
     "SlNo",
@@ -90,7 +90,8 @@ export class RakeUpdateComponent implements OnInit {
     "ContainerNo",
     "FromToCity",
     "Weight",
-    "CurrentStatus"
+    "CurrentStatus",
+    "iconName"
   ];
   linkArray = [
    // { Row: 'Action', Path: 'Operation/Handover', componentDetails: "" },
@@ -146,23 +147,7 @@ export class RakeUpdateComponent implements OnInit {
     this.tableLoad = false;
   }
   handleMenuItemClick(data) {
-    if(data.label.label=='Diverted For Export'){
-          this.router.navigate(['Operation/Handover'], {
-            state: {
-              data:{ rakeDetails:data.data,
-              flag:'Diverted For Export'
-              }
-            },
-          });
-    }
-    else if(data.label.label=='Delivered'){
-      this.router.navigate(['Operation/Handover'], {
-        state: {
-          data: {rakeDetails:data.data,flag:'Delivered'},
-        },
-      });
-    }
-    else if(data.label.label=='Updated'){
+ if(data.label.label=='Updated'){
       this.router.navigate(['Operation/Handover'], {
         state: {
           data: data.data,

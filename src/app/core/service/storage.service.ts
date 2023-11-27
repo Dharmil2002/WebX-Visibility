@@ -20,7 +20,7 @@ export class StorageService {
   }
 
   get userName(): string {
-    return this.getItem("Username");
+    return this.getItem("UserName");
   }
 
   setItem(key: string, value: any, useSessionStorage = false): void {

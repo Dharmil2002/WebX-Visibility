@@ -17,7 +17,7 @@ export class DocketService {
         },
         "0": {
             status: "Booked",
-            actions: ["Edit Docket", "Create THC"],
+            actions: ["Edit Docket"],
         },
         "1": {
             status: "Thc Generated",
@@ -89,7 +89,7 @@ export class DocketService {
                 x.ftCity = `${x.fromCity}-${x.toCity}`;
                 x.invoiceCount = x.invoiceDetails.length || 0;
                 x.status = statusInfo.status || "";
-                x.actions = statusInfo.actions || ["Rake Update"];
+                x.actions = statusInfo.actions;
                 x.createOn = formatDocketDate(x?.entryDate || new Date())
                 return x;
             }

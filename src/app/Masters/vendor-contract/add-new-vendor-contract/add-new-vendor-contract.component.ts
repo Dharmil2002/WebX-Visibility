@@ -63,7 +63,7 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
       },
     ];
     this.columnKeys.push('status')
-    this.columnKeys.push('actions')
+   // this.columnKeys.push('actions')
   }
 
   ngOnInit(): void {

@@ -361,11 +361,6 @@ export class ContractServiceSelectionControl {
         Validations: [{
           name: "required",
           message: "Rate is required"
-        },
-        {
-          name: "pattern",
-          message: "Please Enter only positive numbers with up to two decimal places",
-          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
           // onChange: 'validateCodDodRates'
@@ -596,9 +591,18 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "required",
+            message: "Min Charge is required"
+          },
+          {
+            name: "pattern",
+            message: "Please Enter only positive numbers with up to two decimal places",
+            pattern: '^\\d+(\\.\\d{1,2})?$'
+          }
         ],
         functions: {
-          onOptionSelect: 'getLocBasedOnCity'
+          onChange: 'validateCodDodRates'
         },
         additionalData: {
           showNameAndValue: false,
@@ -617,9 +621,18 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "required",
+            message: "Max Charge is required"
+          },
+          {
+            name: "pattern",
+            message: "Please Enter only positive numbers with up to two decimal places",
+            pattern: '^\\d+(\\.\\d{1,2})?$'
+          }
         ],
         functions: {
-          onOptionSelect: 'getLocBasedOnCity'
+          onChange: 'validateCodDodRates'
         },
         additionalData: {
           showNameAndValue: false,
@@ -717,7 +730,7 @@ export class ContractServiceSelectionControl {
         accessallowed: true,
       },
       {
-        name: "MinCharge",
+        name: "IMinCharge",
         label: "Min Charge(₹)",
         placeholder: "Min Charge",
         type: "text",
@@ -727,14 +740,22 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         Validations: [{
           name: "required",
-          message: "Min Charge is required",
+          message: "Min Charge is required"
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
+        functions: {
+          onChange: 'validateCodDodRates'
+        },
         generatecontrol: true,
         disable: false,
         accessallowed: true,
       },
       {
-        name: "MaxCharge",
+        name: "IMaxCharge",
         label: "Max Charge(₹)",
         placeholder: "Max Charge",
         type: "text",
@@ -744,8 +765,16 @@ export class ContractServiceSelectionControl {
         displaywith: "",
         Validations: [{
           name: "required",
-          message: "Rate is required",
+          message: "Max Charge is required"
+        },
+        {
+          name: "pattern",
+          message: "Please Enter only positive numbers with up to two decimal places",
+          pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
+        functions: {
+          onChange: 'validateCodDodRates'
+        },
         generatecontrol: true,
         disable: false,
         accessallowed: true,
@@ -834,7 +863,7 @@ export class ContractServiceSelectionControl {
 
       {
         name: "MinimumFreightvalueINR",
-        label: "Minimum Freight value- INR",
+        label: "Minimum Freight value- INR(₹)",
         placeholder: "Minimum Freight value- INR",
         type: "number",
         value: "",
@@ -880,7 +909,7 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "MinimumyieldINR",
-        label: "Minimum yield - INR",
+        label: "Minimum yield - INR(₹)",
         placeholder: "Minimum yield - INR",
         type: "number",
         value: "",
@@ -1010,9 +1039,18 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "required",
+            message: "Min Charge is required"
+          },
+          {
+            name: "pattern",
+            message: "Please Enter only positive numbers with up to two decimal places",
+            pattern: '^\\d+(\\.\\d{1,2})?$'
+          }
         ],
         functions: {
-          onOptionSelect: 'getLocBasedOnCity'
+          onChange: 'validateCodDodRates'
         },
         additionalData: {
           showNameAndValue: false,
@@ -1031,9 +1069,18 @@ export class ContractServiceSelectionControl {
         disable: false,
         accessallowed: true,
         Validations: [
+          {
+            name: "required",
+            message: "Max Charge is required"
+          },
+          {
+            name: "pattern",
+            message: "Please Enter only positive numbers with up to two decimal places",
+            pattern: '^\\d+(\\.\\d{1,2})?$'
+          }
         ],
         functions: {
-          onOptionSelect: 'getLocBasedOnCity'
+          onChange: 'validateCodDodRates'
         },
         additionalData: {
           showNameAndValue: false,

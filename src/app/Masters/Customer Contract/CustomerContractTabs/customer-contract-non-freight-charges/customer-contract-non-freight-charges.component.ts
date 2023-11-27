@@ -162,7 +162,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   }
   initializeFormControl() {
     this.ContractNonFreightMatrixControls =
-      new ContractNonFreightMatrixControl();
+      new ContractNonFreightMatrixControl(this.isUpdate , this.UpdateData);
     this.jsonControlArrayNonFreightCharges =
       this.ContractNonFreightMatrixControls.getContractNonFreightChargesControlControls();
     this.NonFreightChargesForm = formGroupBuilder(this.fb, [
@@ -249,7 +249,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       CustomerContractNonFreightChargesPopupComponent,
       {
         data: event.data,
-        width: "70%",
+        width: "90%",
         height: "90%",
       }
     );

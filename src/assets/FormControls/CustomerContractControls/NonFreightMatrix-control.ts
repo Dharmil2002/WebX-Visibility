@@ -2,7 +2,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class ContractNonFreightMatrixControl {
   private ContractNonFreightChargesControlArray: FormControls[];
   private ContractNonFreightMatrixControlArray: FormControls[];
-  constructor() {
+  constructor(isUpdate,UpdateData) {
     this.ContractNonFreightChargesControlArray = [
       {
         name: "selectCharges",
@@ -101,7 +101,7 @@ export class ContractNonFreightMatrixControl {
         label: "From",
         placeholder: "From",
         type: "dropdown",
-        value: "",
+        value: isUpdate?{name:UpdateData.from,value:UpdateData.fromType}:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -122,7 +122,7 @@ export class ContractNonFreightMatrixControl {
         label: "To",
         placeholder: "To",
         type: "dropdown",
-        value: "",
+        value: isUpdate?{name:UpdateData.to,value:UpdateData.toType}:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -174,7 +174,7 @@ export class ContractNonFreightMatrixControl {
         label: "Rate",
         placeholder: "Rate",
         type: "text",
-        value: "",
+        value: isUpdate?UpdateData.rate:"",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -195,7 +195,7 @@ export class ContractNonFreightMatrixControl {
         label: "Min Value",
         placeholder: "Min Value",
         type: "text",
-        value: "",
+        value: isUpdate?UpdateData.minValue:"",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -216,7 +216,7 @@ export class ContractNonFreightMatrixControl {
         label: "Max Value",
         placeholder: "Max Value",
         type: "text",
-        value: "",
+        value: isUpdate?UpdateData.maxValue:"",
         generatecontrol: true,
         disable: false,
         Validations: [

@@ -133,14 +133,9 @@ export class VendorBusiAssocDetailComponent implements OnInit {
       const response = await this.masterService.masterPost("generic/get", request).toPromise();
       
       // Sort the filtered data based on the 'eDT' property in descending order
-      this.TErouteBasedTableData.sort((a, b) => {
-        const dateA: Date | any = new Date(a.eDT);
-        const dateB: Date | any = new Date(b.eDT);
-        return dateB - dateA; // Sort in descending order
-      });
- 
-      // Filter based on cNID
-      this.TErouteBasedTableData = response.data.filter(x => x.cNID === this.CurrentContractDetails.cNID);
+      this.TErouteBasedTableData = response.data
+        .filter(x => x.cNID === this.CurrentContractDetails.cNID)
+        .sort((a, b) => b._id.localeCompare(a._id));      
       
       this.TErouteBasedTableData.forEach(item => {
         item.actions = ['Edit', 'Remove'];

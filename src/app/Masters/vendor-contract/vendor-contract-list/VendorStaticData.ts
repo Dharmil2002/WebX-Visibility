@@ -30,26 +30,26 @@ export const VendorTableData = [
 export const ContractTypeData = [
     {
         isSelected: false,
-        type: 'Long haul',
-        typeName: 'Transportation- Express Route based',
+        type: 'Long Haul',
+        typeName: 'Transportation- Express Route Based',
         mode: 'Road',
     },
     {
         isSelected: false,
-        type: 'Long haul',
-        typeName: 'Transportation- Long Haul full truck- route based',
+        type: 'Long Haul',
+        typeName: 'Transportation- Long Haul Full Truck- Route Based',
         mode: 'Road',
     },
     {
         isSelected: false,
-        type: 'Long haul',
-        typeName: 'Transportation- Long Haul lane based',
+        type: 'Long Haul',
+        typeName: 'Transportation- Long Haul Lane Based',
         mode: 'Road',
     },
     {
         isSelected: false,
         type: 'Last Mile',
-        typeName: 'Transportation- Last mile delivery',
+        typeName: 'Transportation- Last Mile Delivery',
         mode: 'Road',
     },
     {
@@ -70,9 +70,9 @@ export const RouteBasedTableData = [
 export const LastMileData = [
     {
         id: 0, location: 'MUMB', rateType: 'Per KM', timeFrame: 'Per Month', capacity: '1 Ton', minCharge: 35000, committedKm: 3000,
-        additionalKm: 12.5, maxCharges: 55000,actions: ['Edit', 'Remove']
+        additionalKm: 12.5, maxCharges: 55000, actions: ['Edit', 'Remove']
     }
 ]
 export const BusinessAssociates = [{
-    id: 0, city: 'Bhiwandi', controlLocation: 'BHW', mode: 'Road', operation: 'Booking', rateType: '% of Freight', rate: 5.5, min: 100, max: 1000,actions: ['Edit', 'Remove']
+    id: 0, city: 'Bhiwandi', controlLocation: 'BHW', mode: 'Road', operation: 'Booking', rateType: '% of Freight', rate: 5.5, min: 100, max: 1000, actions: ['Edit', 'Remove']
 }]

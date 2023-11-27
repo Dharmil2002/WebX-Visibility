@@ -149,7 +149,6 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
           selectCharges: x.sCT,
           ChargesBehaviour: x.cBT,
           Charges: x.cBT == "Variable" ? "Add" : x.nFC,
-          actions: ["Edit", "Remove"],
         };
       });
       this.tableLoad = true;
@@ -163,7 +162,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   }
   initializeFormControl() {
     this.ContractNonFreightMatrixControls =
-      new ContractNonFreightMatrixControl();
+      new ContractNonFreightMatrixControl(this.isUpdate , this.UpdateData);
     this.jsonControlArrayNonFreightCharges =
       this.ContractNonFreightMatrixControls.getContractNonFreightChargesControlControls();
     this.NonFreightChargesForm = formGroupBuilder(this.fb, [
@@ -249,8 +248,8 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     const dialogRef = this.dialog.open(
       CustomerContractNonFreightChargesPopupComponent,
       {
-        data: {},
-        width: "70%",
+        data: event.data,
+        width: "90%",
         height: "90%",
       }
     );

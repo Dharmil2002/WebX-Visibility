@@ -139,12 +139,12 @@ export class CustomerContractServiceSelectionComponent
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    MinCharge: {
+    IMinCharge: {
       Title: "Min Charge",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    MaxCharge: {
+    IMaxCharge: {
       Title: "Max Charge",
       class: "matcolumncenter",
       Style: "min-width:2px",
@@ -187,7 +187,7 @@ export class CustomerContractServiceSelectionComponent
       Style: "max-width:150px",
     },
   };
-  staticField = ["InvoiceValueFrom","tovalue","rateType","Rate","MinCharge","MaxCharge"];
+  staticField = ["InvoiceValueFrom","tovalue","rateType","Rate","IMinCharge","IMaxCharge"];
   FstaticField = ["FuelType","FRateType","FRate","FMinCharge","FMaxCharge"];
 
   //#endregion
@@ -583,8 +583,8 @@ export class CustomerContractServiceSelectionComponent
       tovalue: formValue.tovalue,
       rateType: formValue.rateType.name,
       Rate: formValue.Rate,
-      MinCharge: formValue.MinCharge,
-      MaxCharge: formValue.MaxCharge,
+      IMinCharge: formValue.IMinCharge,
+      IMaxCharge: formValue.IMaxCharge,
       actions: ["Edit", "Remove"],
     };
     this.tableData.push(json);
@@ -596,8 +596,8 @@ export class CustomerContractServiceSelectionComponent
       iVTO: formValue.tovalue,
       rtType: formValue.rateType.name,
       rT: formValue.Rate,
-      mIN: formValue.MinCharge,
-      mAX: formValue.MaxCharge,
+      mIN: formValue.IMinCharge,
+      mAX: formValue.IMaxCharge,
     };
     if (this.isUpdate) {
       delete requestBody._id;
@@ -717,17 +717,16 @@ export class CustomerContractServiceSelectionComponent
       this.InsuranceCarrierRiskForm.controls["tovalue"].setValue(
         data.data?.tovalue || ""
       );
-      this.InsuranceCarrierRiskForm.controls["rateType"].setValue(
-        data.data?.rateType || ""
-      );
+      const rateTypeFilterData = this.InsuranceFromAPI.find((x)=> x.name == data.data?.rateType)
+      this.InsuranceCarrierRiskForm.controls["rateType"].setValue(rateTypeFilterData)
       this.InsuranceCarrierRiskForm.controls["Rate"].setValue(
         data.data?.Rate || ""
       );
-      this.InsuranceCarrierRiskForm.controls["MinCharge"].setValue(
-        data.data?.MinCharge || ""
+      this.InsuranceCarrierRiskForm.controls["IMinCharge"].setValue(
+        data.data?.IMinCharge || ""
       );
-      this.InsuranceCarrierRiskForm.controls["MaxCharge"].setValue(
-        data.data?.MaxCharge || ""
+      this.InsuranceCarrierRiskForm.controls["IMaxCharge"].setValue(
+        data.data?.IMaxCharge || ""
       );
       this.UpdateData = this.tableData.find((x) => x.id == data.data.id)
       this.tableData = this.tableData.filter((x) => x.id !== data.data.id);
@@ -737,15 +736,13 @@ export class CustomerContractServiceSelectionComponent
   async FfillServiceSelectionData(data: any) {
     if (data.label.label === "Remove") {
       this.FtableData = this.FtableData.filter((x) => x.id !== data.data.id);
-      await this.removedata(data.data.id);
+      await this.Fremovedata(data.data.id);
     } else {
-      this.FuelSurchargeForm.controls["FuelType"].setValue(
-        data.data?.FuelType || ""
-      );
+      const FuelTypeFilterData = this.FuelSurchargeSelectionFromAPI.find((x)=> x.name == data.data?.FuelType)
+      this.FuelSurchargeForm.controls["FuelType"].setValue(FuelTypeFilterData)
+      const FrateTypeFilterData = this.FuelSurchargeFromAPI.find((x)=> x.name == data.data?.FRateType)
+      this.FuelSurchargeForm.controls["FRateType"].setValue(FrateTypeFilterData)
 
-      this.FuelSurchargeForm.controls["FRateType"].setValue(
-        data.data?.FRateType || ""
-      );
       this.FuelSurchargeForm.controls["FRate"].setValue(data.data?.FRate || "");
       this.FuelSurchargeForm.controls["FMinCharge"].setValue(
         data.data?.FMinCharge || ""
@@ -754,7 +751,7 @@ export class CustomerContractServiceSelectionComponent
         data.data?.FMaxCharge || ""
       );
       this.UpdateData = this.FtableData.find((x) => x.id == data.data.id)
-      this.tableData = this.FtableData.filter((x) => x.id !== data.data.id);
+      this.FtableData = this.FtableData.filter((x) => x.id !== data.data.id);
       this.isUpdate = true;
     }
 
@@ -1048,8 +1045,8 @@ export class CustomerContractServiceSelectionComponent
               item.tovalue = item.iVTO,
               item.rateType = item.rtType,
               item.Rate = item.rT,
-              item.MinCharge = item.mIN,
-              item.MaxCharge = item.mAX,
+              item.IMinCharge = item.mIN,
+              item.IMaxCharge = item.mAX,
               item.actions = ["Edit", "Remove"];
           });
           this.tableLoad = false;
@@ -1138,8 +1135,14 @@ export class CustomerContractServiceSelectionComponent
 
   validateCodDodRates() {
     // Get the current values of 'min' and 'max' from the TERForm
-    const MinCharge = this.CODDODForm.get('MinCharge')?.value;
-    const MaxCharge = this.CODDODForm.get('MaxCharge')?.value;
+    const MinCharge = Number(this.CODDODForm.get('MinCharge')?.value) ?? 0;
+    const MaxCharge = Number(this.CODDODForm.get('MaxCharge')?.value) ?? 0;
+    const DMinCharge = Number(this.DemurrageForm.get('DMinCharge')?.value) ?? 0;
+    const DMaxCharge = Number(this.DemurrageForm.get('DMaxCharge')?.value) ?? 0;
+    const FMinCharge = Number(this.FuelSurchargeForm.get('FMinCharge')?.value) ?? 0;
+    const FMaxCharge = Number(this.FuelSurchargeForm.get('FMaxCharge')?.value) ?? 0;
+    const IMinCharge = Number(this.InsuranceCarrierRiskForm.get('IMinCharge')?.value) ?? 0;
+    const IMaxCharge = Number(this.InsuranceCarrierRiskForm.get('IMaxCharge')?.value) ?? 0;
 
     // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
     if (MinCharge && MaxCharge && MinCharge > MaxCharge) {
@@ -1151,6 +1154,40 @@ export class CustomerContractServiceSelectionComponent
         MinCharge: '',
         MaxCharge: ''
       });
+      return;
+    }
+    if (DMinCharge && DMaxCharge && DMinCharge > DMaxCharge) {
+      // Display an error message using SweetAlert (Swal)
+      this.CommanSwalWithReturn('Max charge must be greater than or equal to Min charge.', 'error')
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.DemurrageForm.patchValue({
+        DMinCharge: '',
+        DMaxCharge: ''
+      });
+      return;
+    }
+    if (FMinCharge && FMaxCharge && FMinCharge > FMaxCharge) {
+      // Display an error message using SweetAlert (Swal)
+      this.CommanSwalWithReturn('Max charge must be greater than or equal to Min charge.', 'error')
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.FuelSurchargeForm.patchValue({
+        FMinCharge: '',
+        FMaxCharge: ''
+      });
+      return;
+    }
+    if (IMinCharge && IMaxCharge && IMinCharge > IMaxCharge) {
+      // Display an error message using SweetAlert (Swal)
+      this.CommanSwalWithReturn('Max charge must be greater than or equal to Min charge.', 'error')
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.InsuranceCarrierRiskForm.patchValue({
+        IMinCharge: '',
+        IMaxCharge: ''
+      });
+      return;
     }
   }
   checkInvoice(){

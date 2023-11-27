@@ -138,8 +138,8 @@
                                         [style]="columnHeader[tableData].Style">
                                         {{columnHeader[tableData].Title}}
                                         <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;"
-                                            *ngIf="tableData === 'checkBoxRequired'" color="primary"
-                                            (change)="selectAll($event)" [(ngModel)]="AllChack"
+                                            *ngIf="tableData === 'checkBoxRequired' && selectAllRequired"
+                                            color="primary" (change)="selectAll($event)" [(ngModel)]="AllChack"
                                             [indeterminate]="someComplete()"
                                             [disabled]="this.disbleCheckbox"></mat-checkbox>
                                     </mat-header-cell>

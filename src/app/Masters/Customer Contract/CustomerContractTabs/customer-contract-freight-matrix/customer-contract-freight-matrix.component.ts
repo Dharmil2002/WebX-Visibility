@@ -206,7 +206,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     ]);
     this.bindDropdown()
   }
-  bindDropdown() {
+  async bindDropdown() {
     this.jsonControlArrayFreightMatrix.forEach((data) => {
       if (data.name === "rateType") {
         // Set AcGroupCategory variables
@@ -232,42 +232,42 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         }
       }
       if (data.name === "capacity") {
-        const capacitydata = [
-          {
-            name:'10 Ton',
-            value:'10'
-          },
-          {
-            name:'100 Ton',
-            value:'100'
-          },
-          {
-            name:'50 Ton',
-            value:'50'
-          },
-        ]
-        this.filter.Filter(
-          this.jsonControlArrayFreightMatrix,
-          this.FreightMatrixForm,
-          capacitydata,
-          data.name,
-          data.additionalData.showNameAndValue
-        );
-        if(this.isUpdate){
-          const FilterData = capacitydata.find((x)=> x.name == this.UpdateData.cAP)
-          this.FreightMatrixForm.controls["capacity"].setValue(FilterData)
-        }
+        this.capacityCode = data.name;
+        this.capacityStatus = data.additionalData.showNameAndValue;
+        this.getCapacityData()
       }
-      // if(data.name = "From"){
-      //   if(this.isUpdate){
-      //     const FromData = {
-      //       name:this.UpdateData.from,
-      //       value:this.UpdateData.fromType,
-      //     }
-      //     this.FreightMatrixForm.controls["From"].setValue(FromData)
-      //   }
-      // }
     });
+  }
+
+  async getCapacityData(){
+    const Body = {
+      companyCode: this.companyCode,
+      collectionName: "General_master",
+      filter: { codeType: "VehicleCapacity", activeFlag: true },
+    };
+
+    const res = await this.masterService
+      .masterPost("generic/get", Body)
+      .toPromise();
+    if (res.success && res.data.length > 0) {
+      const BalanceSheetdata = res.data.map((x) => {
+        return {
+          name: x.codeDesc,
+          value: x.codeId,
+        };
+      });
+      this.filter.Filter(
+        this.jsonControlArrayFreightMatrix,
+        this.FreightMatrixForm,
+        BalanceSheetdata,
+        this.capacityCode,
+        this.capacityStatus
+      );
+      if(this.isUpdate){
+        const FilterData = BalanceSheetdata.find((x)=> x.name == this.UpdateData.cAP)
+        this.FreightMatrixForm.controls["capacity"].setValue(FilterData)
+      }
+    }
   }
   //#endregion
   ngOnInit() {

@@ -2,7 +2,7 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class ContractNonFreightMatrixControl {
   private ContractNonFreightChargesControlArray: FormControls[];
   private ContractNonFreightMatrixControlArray: FormControls[];
-  constructor() {
+  constructor(isUpdate,UpdateData) {
     this.ContractNonFreightChargesControlArray = [
       {
         name: "selectCharges",
@@ -92,16 +92,6 @@ export class ContractNonFreightMatrixControl {
           },
         ],
       },
-      // {
-      //   name: "addCharges",
-      //   label: "Add Charges",
-      //   placeholder: "Add Charges",
-      //   type: "filelink",
-      //   value: "t",
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [],
-      // },
     ];
 
     this.ContractNonFreightMatrixControlArray = [
@@ -110,21 +100,16 @@ export class ContractNonFreightMatrixControl {
         name: "From",
         label: "From",
         placeholder: "From",
-        type: "select",
-        value: "",
+        type: "dropdown",
+        value: isUpdate?{name:UpdateData.from,value:UpdateData.fromType}:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         Validations: [],
         additionalData: {
-          isIndeterminate: false,
-          isChecked: false,
-          support: "FromHandler",
           showNameAndValue: false,
-
         },
         functions: {
-
           onModel: 'SetOptions',
           onSelect: "setSelectedOptions"
         },
@@ -136,21 +121,16 @@ export class ContractNonFreightMatrixControl {
         name: "To",
         label: "To",
         placeholder: "To",
-        type: "select",
-        value: "",
+        type: "dropdown",
+        value: isUpdate?{name:UpdateData.to,value:UpdateData.toType}:"",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         Validations: [],
         additionalData: {
-          isIndeterminate: false,
-          isChecked: false,
-          support: "ToHandler",
           showNameAndValue: false,
-
         },
         functions: {
-
           onModel: 'SetOptions',
           onSelect: "setSelectedOptions"
         },
@@ -162,40 +142,39 @@ export class ContractNonFreightMatrixControl {
         name: "rateType",
         label: "Rate Type",
         placeholder: "Rate Type",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "1",
-            name: "Per Kg",
-          },
-          {
-            value: "2",
-            name: "Per Pkg",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        accessallowed: true,
         Validations: [
           {
             name: "required",
-            message: "Rate Type is required",
+            message: "Perent Group Code is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
+        functions: {
+        },
+        
       },
       {
         name: "Rate",
         label: "Rate",
         placeholder: "Rate",
         type: "text",
-        value: "",
+        value: isUpdate?UpdateData.rate:"",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -216,7 +195,7 @@ export class ContractNonFreightMatrixControl {
         label: "Min Value",
         placeholder: "Min Value",
         type: "text",
-        value: "",
+        value: isUpdate?UpdateData.minValue:"",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -237,7 +216,7 @@ export class ContractNonFreightMatrixControl {
         label: "Max Value",
         placeholder: "Max Value",
         type: "text",
-        value: "",
+        value: isUpdate?UpdateData.maxValue:"",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -252,34 +231,6 @@ export class ContractNonFreightMatrixControl {
             message: "Please enter a valid Max Value",
           },
         ],
-      },
-      {
-        name: 'FromHandler',
-        label: 'Origin Rate option',
-        placeholder: 'Origin Rate option',
-        type: '',
-        value: '',
-        filterOptions: "",
-        Validations: [{
-          name: "required",
-          message: " ",
-        }],
-        generatecontrol: false, disable: false,
-        accessallowed: true,
-      },
-      {
-        name: 'ToHandler',
-        label: 'Destination Rate option',
-        placeholder: 'Destination Rate option',
-        type: '',
-        value: '',
-        filterOptions: "",
-        Validations: [{
-          name: "required",
-          message: " ",
-        }],
-        generatecontrol: false, disable: false,
-        accessallowed: true,
       },
     ];
   }

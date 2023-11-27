@@ -353,7 +353,9 @@ export class ContractBasicInformationControl {
           message: "Start Date is required",
         },],
         additionalData: {
-          minDate: new Date("01 Jan 2000"),
+          minDate: new Date(), // Set the minimum date to the current date
+          maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
+
         },
         functions: {
           onDate: "onContractStartDateChanged",
@@ -373,7 +375,9 @@ export class ContractBasicInformationControl {
           message: "Expiry Date is required",
         },],
         additionalData: {
-          minDate: new Date("01 Jan 2000"),
+          minDate: new Date(), // Set the minimum date to the current date
+          maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
+
         },
         functions: {
           onDate: "onContractStartDateChanged",

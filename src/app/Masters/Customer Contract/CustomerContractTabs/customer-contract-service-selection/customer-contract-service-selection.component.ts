@@ -187,8 +187,8 @@ export class CustomerContractServiceSelectionComponent
       Style: "max-width:150px",
     },
   };
-  staticField = ["InvoiceValueFrom","tovalue","rateType","Rate","IMinCharge","IMaxCharge"];
-  FstaticField = ["FuelType","FRateType","FRate","FMinCharge","FMaxCharge"];
+  staticField = ["InvoiceValueFrom", "tovalue", "rateType", "Rate", "IMinCharge", "IMaxCharge"];
+  FstaticField = ["FuelType", "FRateType", "FRate", "FMinCharge", "FMaxCharge"];
 
   //#endregion
 
@@ -625,7 +625,7 @@ export class CustomerContractServiceSelectionComponent
         showConfirmButton: true,
       });
     }
-    const controls=["InvoiceValueFrom", "tovalue", "rateType","Rate", "IMinCharge", "IMaxCharge"]
+    const controls = ["InvoiceValueFrom", "tovalue", "rateType", "Rate", "IMinCharge", "IMaxCharge"]
     controls.forEach(element => {
       this.InsuranceCarrierRiskForm.controls[element].setValue("");
     });
@@ -690,7 +690,7 @@ export class CustomerContractServiceSelectionComponent
       });
     }
     // Clear form validators and reset values
-    const controls=["FuelType", "FRateType", "FRate", "FMinCharge", "FMaxCharge"]
+    const controls = ["FuelType", "FRateType", "FRate", "FMinCharge", "FMaxCharge"]
     controls.forEach(element => {
       this.FuelSurchargeForm.controls[element].setValue("");
     });
@@ -721,7 +721,7 @@ export class CustomerContractServiceSelectionComponent
       this.InsuranceCarrierRiskForm.controls["tovalue"].setValue(
         data.data?.tovalue || ""
       );
-      const rateTypeFilterData = this.InsuranceFromAPI.find((x)=> x.name == data.data?.rateType)
+      const rateTypeFilterData = this.InsuranceFromAPI.find((x) => x.name == data.data?.rateType)
       this.InsuranceCarrierRiskForm.controls["rateType"].setValue(rateTypeFilterData)
       this.InsuranceCarrierRiskForm.controls["Rate"].setValue(
         data.data?.Rate || ""
@@ -742,9 +742,9 @@ export class CustomerContractServiceSelectionComponent
       this.FtableData = this.FtableData.filter((x) => x.id !== data.data.id);
       await this.Fremovedata(data.data.id);
     } else {
-      const FuelTypeFilterData = this.FuelSurchargeSelectionFromAPI.find((x)=> x.name == data.data?.FuelType)
+      const FuelTypeFilterData = this.FuelSurchargeSelectionFromAPI.find((x) => x.name == data.data?.FuelType)
       this.FuelSurchargeForm.controls["FuelType"].setValue(FuelTypeFilterData)
-      const FrateTypeFilterData = this.FuelSurchargeFromAPI.find((x)=> x.name == data.data?.FRateType)
+      const FrateTypeFilterData = this.FuelSurchargeFromAPI.find((x) => x.name == data.data?.FRateType)
       this.FuelSurchargeForm.controls["FRateType"].setValue(FrateTypeFilterData)
 
       this.FuelSurchargeForm.controls["FRate"].setValue(data.data?.FRate || "");
@@ -760,7 +760,7 @@ export class CustomerContractServiceSelectionComponent
     }
 
   }
-  ngOnChanges(changes: SimpleChanges) {}
+  ngOnChanges(changes: SimpleChanges) { }
 
   SetDefaultProductsData() {
     //#region  Set Default Products
@@ -889,7 +889,7 @@ export class CustomerContractServiceSelectionComponent
         );
       },
       fuelSurcharge: () => {
-       this.SetDefaultFuelSurchargeData();
+        this.SetDefaultFuelSurchargeData();
       },
     };
 
@@ -1008,6 +1008,8 @@ export class CustomerContractServiceSelectionComponent
     contractDetails["lTYP"] = this.ProductsForm.value.loadType.name;
     contractDetails["rTYP"] =
       this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.name);
+    contractDetails["uDT"] = new Date().toString(),
+      contractDetails["uBY"] = localStorage.getItem("UserName")
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "cust_contract",
@@ -1076,7 +1078,7 @@ export class CustomerContractServiceSelectionComponent
               item.FRate = item.frT,
               item.FMinCharge = item.fmIN,
               item.FMaxCharge = item.fmAX;
-              item.actions = ["Edit", "Remove"];
+            item.actions = ["Edit", "Remove"];
           });
           this.FtableLoad = false;
         }
@@ -1194,10 +1196,10 @@ export class CustomerContractServiceSelectionComponent
       return;
     }
   }
-  checkInvoice(){
+  checkInvoice() {
     const invoiceNo = this.InsuranceCarrierRiskForm.value.InvoiceValueFrom;
     const exists = this.tableData.some((x) => x.InvoiceValueFrom.includes(invoiceNo));
-     if(exists){
+    if (exists) {
       this.InsuranceCarrierRiskForm.controls['InvoiceValueFrom'].setValue("");
       Swal.fire({
         icon: "error",
@@ -1205,7 +1207,7 @@ export class CustomerContractServiceSelectionComponent
         text: "Invoice Value From Is Already Exist",
         showConfirmButton: true,
       });
-     }
+    }
 
   }
 }

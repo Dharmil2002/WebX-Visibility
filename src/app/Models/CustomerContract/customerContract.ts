@@ -19,6 +19,9 @@ export class CustomerContractDataRequestModel {
   payBasis: string
   ContractStartDate: string
   Expirydate: string
+  entryBy: string
   entryDate: string
+  updateBy: string
+  updateDate: string
 
 }

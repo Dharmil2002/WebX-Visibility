@@ -31,25 +31,25 @@ export const ContractTypeData = [
     {
         isSelected: false,
         type: 'Long Haul',
-        typeName: 'Transportation- Express Route Based',
+        typeName: 'Express Route Based',
         mode: 'Road',
     },
     {
         isSelected: false,
         type: 'Long Haul',
-        typeName: 'Transportation- Long Haul Full Truck- Route Based',
+        typeName: 'Long Haul Full Truck- Route Based',
         mode: 'Road',
     },
     {
         isSelected: false,
         type: 'Long Haul',
-        typeName: 'Transportation- Long Haul Lane Based',
+        typeName: 'Long Haul Lane Based',
         mode: 'Road',
     },
     {
         isSelected: false,
         type: 'Last Mile',
-        typeName: 'Transportation- Last Mile Delivery',
+        typeName: 'Last Mile Delivery',
         mode: 'Road',
     },
     {

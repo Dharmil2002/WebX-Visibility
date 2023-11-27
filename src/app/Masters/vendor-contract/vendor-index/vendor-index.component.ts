@@ -28,13 +28,16 @@ export class VendorIndexComponent implements OnInit {
       this.CurrentContractDetails = JSON.parse(decryptedData)
       this.breadscrums = [
         {
-          title: "Vendor Contract / "+this.CurrentContractDetails.vNID+":"+this.CurrentContractDetails.vNNM,
+          title: "Vendor Contract / " + this.CurrentContractDetails.vNID + ":" + this.CurrentContractDetails.vNNM,
           items: ["Home"],
           active: "Vendor Contract",
         },
       ];
       console.log(this.CurrentContractDetails);
-      
+      this.selectedContractType = this.CurrentContractDetails?.sERVSELEC;
+      //   Set the selected contract types using a service
+      this.contractService.setContractType(this.selectedContractType);
+
     });
     this.selectFolder('Basic Information')
   }
@@ -50,8 +53,6 @@ export class VendorIndexComponent implements OnInit {
   }
 
   processData(contractTypes: any[]) {
-    // Process the data after receiving it in the subscription
-    const selectedContractTypeData = contractTypes.map(item => item.replace('Transportation- ', ''));
-    this.selectedFolders = this.folders.concat(selectedContractTypeData)
+    this.selectedFolders = this.folders.concat(contractTypes)
   }
 }

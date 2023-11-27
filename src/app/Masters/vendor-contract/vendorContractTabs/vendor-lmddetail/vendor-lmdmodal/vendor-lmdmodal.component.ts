@@ -102,8 +102,11 @@ export class VendorLMDModalComponent implements OnInit {
       } else {
         // Create a new vendor contract
         const existingData = await this.fetchExistingData(collectionName);
-        const newVendorCode = this.generateNewVendorCode(existingData);
-        const newContractData = this.prepareContractData(newVendorCode);
+        let index = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+
+        // Check if index is found, then set to the count, otherwise set to 0
+        index = index ? existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID).length : 0;
+        const newContractData = this.prepareContractData(index);
 
         const createRequest = {
           companyCode: this.companyCode,
@@ -161,18 +164,10 @@ export class VendorLMDModalComponent implements OnInit {
     return response.data;
   }
 
-  generateNewVendorCode(existingData: any[]) {
-    // Generate a new vendor code based on existing data
-    const lastContract = existingData[existingData.length - 1];
-    const lastVendorCode = lastContract ? parseInt(lastContract.vCLMID.substring(4), 10) : 0;
-    return `Vclm${(lastVendorCode + 1).toString().padStart(5, '0')}`;
-  }
-
   prepareContractData(newVendorCode: string) {
     // Prepare data for creating a new contract
     return {
-      _id: this.companyCode + "-" + newVendorCode,
-      vCLMID: newVendorCode,
+      _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
       cNID: this.CurrentContractDetails.cNID,
       lOCID: this.TLMDForm.value.location.value,

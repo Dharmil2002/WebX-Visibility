@@ -120,8 +120,12 @@ export class VendorTERModalComponent implements OnInit {
       } else {
         // Create a new vendor contract
         const existingData = await this.fetchExistingData(vendorContractCollection);
-        const newVendorCode = this.generateNewVendorCode(existingData);
-        const newContractData = this.prepareContractData(newVendorCode);
+        let index = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+
+        // Check if index is found, then set to the count, otherwise set to 0
+        index = index ? existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID).length : 0;
+
+        const newContractData = this.prepareContractData(index);
 
         const createRequest = {
           companyCode: this.companyCode,
@@ -176,18 +180,10 @@ export class VendorTERModalComponent implements OnInit {
     return response.data;
   }
 
-  generateNewVendorCode(existingData: any[]) {
-    // Generate a new vendor code based on existing data
-    const lastContract = existingData[existingData.length - 1];
-    const lastVendorCode = lastContract ? parseInt(lastContract.vCXRID.substring(4), 10) : 0;
-    return `Vcxr${(lastVendorCode + 1).toString().padStart(5, '0')}`;
-  }
-
   prepareContractData(newVendorCode: string) {
     // Prepare data for creating a new contract
     return {
-      _id: this.companyCode + "-" + newVendorCode,
-      vCXRID: newVendorCode,
+      _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
       cNID: this.CurrentContractDetails.cNID,
       rTID: this.TERForm.value.route.value,
@@ -322,6 +318,31 @@ export class VendorTERModalComponent implements OnInit {
       // Reset the values of 'min' and 'max' in the TERForm to an empty string
       this.TERForm.patchValue({
         min: '',
+      });
+    }
+    this.validateMinCharge();
+  }
+  //#endregion
+  //#region to Validate the maximum  charge values on rate in the TERForm.
+  validateMAXChargeOnRate() {
+    // Get the current values of 'min' and 'max' from the TERForm
+    const minValue = parseFloat(this.TERForm.get('max')?.value);
+    const maxValue = parseFloat(this.TERForm.get('rate')?.value);
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && maxValue >= minValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Max charge must be greater than Rate.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.TERForm.patchValue({
+        max: '',
       });
     }
     this.validateMinCharge();

@@ -1138,8 +1138,8 @@ export class CustomerContractServiceSelectionComponent
 
   validateCodDodRates() {
     // Get the current values of 'min' and 'max' from the TERForm
-    const MinCharge = this.CODDODForm.get('MinCharge')?.value;
-    const MaxCharge = this.CODDODForm.get('MaxCharge')?.value;
+    const MinCharge = Number(this.CODDODForm.get('MinCharge')?.value) ?? 0;
+    const MaxCharge = Number(this.CODDODForm.get('MaxCharge')?.value) ?? 0;
 
     // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
     if (MinCharge && MaxCharge && MinCharge > MaxCharge) {

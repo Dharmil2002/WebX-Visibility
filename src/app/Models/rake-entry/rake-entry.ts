@@ -169,7 +169,7 @@ export class RakeEntryModel implements IFieldDefinition {
             Style: "min-width:250px",
         },
         containerType: {
-            Title: "Container Date",
+            Title: "Container Type",
             class: "matcolumnleft",
             Style: "min-width:250px",
         }

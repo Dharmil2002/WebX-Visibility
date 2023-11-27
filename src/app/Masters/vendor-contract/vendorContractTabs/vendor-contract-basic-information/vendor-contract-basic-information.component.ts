@@ -9,6 +9,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { AddContractProfile } from 'src/assets/FormControls/VendorContractControls/add-contract-profile';
 import Swal from 'sweetalert2';
+import { GetContractBasedOnVendorAndProduct } from '../../vendorContractApiUtility';
 
 @Component({
   selector: 'app-vendor-contract-basic-information',
@@ -42,6 +43,7 @@ export class VendorContractBasicInformationComponent implements OnInit {
   vendorName: any;
   vendorStatus: any;
   vendorList: any;
+  contractDatas: any;
   constructor(private fb: UntypedFormBuilder,
     private objImageHandling: ImageHandling,
     private objVendorService: VendorService,
@@ -56,19 +58,19 @@ export class VendorContractBasicInformationComponent implements OnInit {
   ngOnInit(): void {
   }
   ngOnChanges(changes: SimpleChanges) {
-    let newData = changes.contractData.currentValue;
+    this.contractDatas = changes.contractData.currentValue;
 
     // Parse start date
-    newData.cNSDT = this.isValidDateFormat(newData.cNSDT) ? this.parseAndFormatDate(newData.cNSDT) : newData.cNSDT;
+    this.contractDatas.cNSDT = this.isValidDateFormat(this.contractDatas.cNSDT) ? this.parseAndFormatDate(this.contractDatas.cNSDT) : this.contractDatas.cNSDT;
 
     // // Parse end date
-    newData.eNDDT = this.isValidDateFormat(newData.eNDDT) ? this.parseAndFormatDate(newData.eNDDT) : newData.eNDDT;
+    this.contractDatas.eNDDT = this.isValidDateFormat(this.contractDatas.eNDDT) ? this.parseAndFormatDate(this.contractDatas.eNDDT) : this.contractDatas.eNDDT;
 
     // Initialize form controls with updated data
-    this.initializeFormControl(newData);
+    this.initializeFormControl(this.contractDatas);
 
     // Set manager based on vendor ID
-    this.setManager(newData.vNID);
+    this.setManager(this.contractDatas.vNID);
   }
   //#region to format date
   parseAndFormatDate(dateString: string): string {
@@ -128,45 +130,56 @@ export class VendorContractBasicInformationComponent implements OnInit {
   //#endregion
   //#region to save contract details
   async save() {
-    // Clone the form value to avoid modifying the original form data
-    const data = { ...this.ProductsForm.value };
+    const IsValidContract = await this.CheckItsvalidContract();
+    if (IsValidContract) {
+      // Clone the form value to avoid modifying the original form data
+      const data = { ...this.ProductsForm.value };
 
-    // Remove unnecessary properties
-    delete data.vendor;
-    delete data.CNID;
+      // Remove unnecessary properties
+      delete data.vendor;
+      delete data.CNID;
 
-    // Get the file using objImageHandling and set it in the corresponding control name
-    const file = this.objImageHandling.getFileByKey('cNSCN', this.imageData);
-    data.cNSCN = file;
-    data.pNDYS = parseInt(this.ProductsForm.value.pNDYS)
-    // data.UPDT=new Date(this.ProductsForm.value.UPDT)
-    // Prepare request body using object destructuring
-    const reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "vendor_contract",
-      filter: { _id: this.contractData._id },
-      update: { ...data }
-    };
+      // Get the file using objImageHandling and set it in the corresponding control name
+      const file = this.objImageHandling.getFileByKey('cNSCN', this.imageData);
+      data.cNSCN = file;
+      data.pNDYS = parseInt(this.ProductsForm.value.pNDYS)
+      // data.UPDT=new Date(this.ProductsForm.value.UPDT)
+      // Prepare request body using object destructuring
+      const reqBody = {
+        companyCode: this.companyCode,
+        collectionName: "vendor_contract",
+        filter: { _id: this.contractData._id },
+        update: { ...data }
+      };
 
-    try {
-      // Make the API call to update the contract
-      const res = await this.masterService.masterPut("generic/update", reqBody).toPromise();
+      try {
+        // Make the API call to update the contract
+        const res = await this.masterService.masterPut("generic/update", reqBody).toPromise();
 
-      if (res) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: 'Contract Updated Successfully',
-          showConfirmButton: true,
-        });
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: 'Contract Updated Successfully',
+            showConfirmButton: true,
+          });
 
-        // Navigate to the vendor contract list page
-        this.route.navigateByUrl('/Masters/VendorContract/VendorContractList');
+          // Navigate to the vendor contract list page
+          this.route.navigateByUrl('/Masters/VendorContract/VendorContractList');
+        }
+      } catch (error) {
+        // Handle errors appropriately (e.g., log, display error message)
+        console.error("An error occurred:", error);
       }
-    } catch (error) {
-      // Handle errors appropriately (e.g., log, display error message)
-      console.error("An error occurred:", error);
+    } else {
+      Swal.fire({
+        title: 'Already Contract Exists Between This Date Ranges',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
     }
   }
   //#endregion
@@ -234,6 +247,36 @@ export class VendorContractBasicInformationComponent implements OnInit {
       return
     }
     this.setDays();
+  }
+  //#endregion
+  //#region to validate existing date range with existing contract
+  async CheckItsvalidContract() {
+    const vendorId = this.contractDatas.vNID;
+    const productId = this.contractDatas.pDTID;
+    // Fetch existing contracts based on vendorId and productId
+    let existingContracts = await GetContractBasedOnVendorAndProduct(this.masterService, vendorId, productId);
+
+    existingContracts = existingContracts.filter(item => item.cNID != this.contractData.cNID)
+    const startDate = new Date(this.ProductsForm.value?.cNSDT);
+    const endDate = new Date(this.ProductsForm.value?.eNDDT);
+
+    // Assume the contract is valid by default
+    let isValidContract = true;
+
+    // Perform your comparison logic with the predefined JSON data
+    for (const item of existingContracts) {
+      const jsonStartDate = new Date(item.cNSDT);
+      const jsonEndDate = new Date(item.eNDDT);
+
+      if ((startDate <= jsonEndDate && endDate >= jsonStartDate) ||
+        (endDate >= jsonStartDate && startDate <= jsonEndDate)) {
+        // If the contract dates overlap with any existing contract, set isValidContract to false
+        isValidContract = false;
+        break; // No need to continue checking, as the contract is already invalid
+      }
+    }
+    return isValidContract;
+
   }
   //#endregion
 }

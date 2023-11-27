@@ -83,6 +83,7 @@ export class GenericTableV2Component
   selectedItems: any[] = [];
   AllChack = false
   @Input() centerAligned;
+  @Input()selectAllRequired;
   ngOnChanges(changes: SimpleChanges) {
     this.tableData = changes.tableData?.currentValue ?? this.tableData;
     this.extraData = changes.extraData?.currentValue ?? this.extraData;

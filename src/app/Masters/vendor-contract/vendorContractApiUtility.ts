@@ -41,7 +41,7 @@ export async function getContractList(masterService, filterFieldName?: string, f
  * @param {string} productId - The product ID to filter contracts.
  * @returns {Promise<Array>} - An array of contracts that match the provided filters.
  */
-export async function GetContractBasedOnCustomerAndProduct(masterService, vendorID?, productId?) {
+export async function GetContractBasedOnVendorAndProduct(masterService, vendorID?, productId?) {
     // Create a filter object based on the provided vendor ID and/or product ID.
     let filter = {};
     if (vendorID) {

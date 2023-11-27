@@ -9,7 +9,7 @@ import { productdetailFromApi } from '../../Customer Contract/CustomerContractAP
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
-import { GetContractBasedOnCustomerAndProduct, getContractList } from '../vendorContractApiUtility';
+import { GetContractBasedOnVendorAndProduct, getContractList } from '../vendorContractApiUtility';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import moment from 'moment';
 import { MatTableDataSource } from '@angular/material/table';
@@ -120,7 +120,7 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
         let existingVendorContracts = await getContractList(this.masterService);
         existingVendorContracts = existingVendorContracts.sort((a, b) => a.cNID.localeCompare(b.cNID))
         if (existingVendorContracts) {
-          debugger
+
           // Generate a new vendor code
           const lastContract = existingVendorContracts[existingVendorContracts.length - 1];
           const lastVendorCode = lastContract ? parseInt(lastContract.cNID.substring(6), 10) : 0;
@@ -240,7 +240,7 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
     const productId = this.vendorContractForm.value?.PDTID?.value;
 
     if (vendorId) {
-      this.tableData = await GetContractBasedOnCustomerAndProduct(this.masterService, vendorId, productId);
+      this.tableData = await GetContractBasedOnVendorAndProduct(this.masterService, vendorId, productId);
 
       this.tableData.forEach((item: any) => {
         const startDate: Date = new Date(item.cNSDT);
@@ -294,7 +294,7 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
     const productId = this.vendorContractForm.value?.PDTID?.value;
 
     // Fetch existing contracts based on vendorId and productId
-    const existingContracts = await GetContractBasedOnCustomerAndProduct(this.masterService, vendorId, productId);
+    const existingContracts = await GetContractBasedOnVendorAndProduct(this.masterService, vendorId, productId);
 
     // Extract start and end dates from the form controls and strip the time component
     const startDate = stripTimeFromDate(new Date(this.vendorContractForm.value?.CNSDT));

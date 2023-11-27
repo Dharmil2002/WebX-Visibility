@@ -717,9 +717,8 @@ export class CustomerContractServiceSelectionComponent
       this.InsuranceCarrierRiskForm.controls["tovalue"].setValue(
         data.data?.tovalue || ""
       );
-      this.InsuranceCarrierRiskForm.controls["rateType"].setValue(
-        data.data?.rateType || ""
-      );
+      const rateTypeFilterData = this.InsuranceFromAPI.find((x)=> x.name == data.data?.rateType)
+      this.InsuranceCarrierRiskForm.controls["rateType"].setValue(rateTypeFilterData)
       this.InsuranceCarrierRiskForm.controls["Rate"].setValue(
         data.data?.Rate || ""
       );
@@ -737,15 +736,13 @@ export class CustomerContractServiceSelectionComponent
   async FfillServiceSelectionData(data: any) {
     if (data.label.label === "Remove") {
       this.FtableData = this.FtableData.filter((x) => x.id !== data.data.id);
-      await this.removedata(data.data.id);
+      await this.Fremovedata(data.data.id);
     } else {
-      this.FuelSurchargeForm.controls["FuelType"].setValue(
-        data.data?.FuelType || ""
-      );
+      const FuelTypeFilterData = this.FuelSurchargeSelectionFromAPI.find((x)=> x.name == data.data?.FuelType)
+      this.FuelSurchargeForm.controls["FuelType"].setValue(FuelTypeFilterData)
+      const FrateTypeFilterData = this.FuelSurchargeFromAPI.find((x)=> x.name == data.data?.FRateType)
+      this.FuelSurchargeForm.controls["FRateType"].setValue(FrateTypeFilterData)
 
-      this.FuelSurchargeForm.controls["FRateType"].setValue(
-        data.data?.FRateType || ""
-      );
       this.FuelSurchargeForm.controls["FRate"].setValue(data.data?.FRate || "");
       this.FuelSurchargeForm.controls["FMinCharge"].setValue(
         data.data?.FMinCharge || ""
@@ -754,7 +751,7 @@ export class CustomerContractServiceSelectionComponent
         data.data?.FMaxCharge || ""
       );
       this.UpdateData = this.FtableData.find((x) => x.id == data.data.id)
-      this.tableData = this.FtableData.filter((x) => x.id !== data.data.id);
+      this.FtableData = this.FtableData.filter((x) => x.id !== data.data.id);
       this.isUpdate = true;
     }
 

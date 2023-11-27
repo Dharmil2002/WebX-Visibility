@@ -73,7 +73,10 @@ export class ThcUpdateControls {
                 placeholder: '',
                 type: 'text',
                 value: '',
-                Validations: [],
+                Validations: [ {
+                    name: "required",
+                    message: "Received By is required"
+                }],
                 generatecontrol: true, disable: false
             },
             // {

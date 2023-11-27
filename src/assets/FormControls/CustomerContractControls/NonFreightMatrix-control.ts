@@ -105,7 +105,19 @@ export class ContractNonFreightMatrixControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Perent Group Code is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
         additionalData: {
           showNameAndValue: false,
         },
@@ -126,7 +138,19 @@ export class ContractNonFreightMatrixControl {
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "Perent Group Code is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
         additionalData: {
           showNameAndValue: false,
         },

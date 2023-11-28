@@ -219,7 +219,7 @@ export class VendorContractBasicInformationComponent implements OnInit {
     const endDate = new Date(this.ProductsForm.value.cNSDT);
 
     // Calculate the difference in milliseconds
-    const timeDifference = endDate.getTime() - startDate.getTime();
+    const timeDifference = startDate.getTime() - endDate.getTime();
 
     // Calculate the number of days
     const numberOfDays = Math.max(0, Math.ceil(timeDifference / (1000 * 3600 * 24)));

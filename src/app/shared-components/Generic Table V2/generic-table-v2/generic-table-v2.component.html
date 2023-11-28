@@ -96,14 +96,14 @@
                                     <li *ngIf="FilterButton">
                                         <div>
                                             <button mat-raised-button
-                                                (click)="FunctionHendel(FilterButton.functionName , {})"
+                                                (click)="functionHandle(FilterButton.functionName , {})"
                                                 color="primary">{{FilterButton.name}}</button>
                                         </div>
                                     </li>
                                     <li *ngIf="EventButton">
                                         <div>
                                             <button mat-stroked-button style="margin-left:10px; "
-                                                (click)="FunctionHendel(EventButton.functionName , {})">
+                                                (click)="functionHandle(EventButton.functionName , {})">
                                                 <mat-icon
                                                     *ngIf="EventButton?.iconName">{{EventButton.iconName}}</mat-icon>
                                                 {{EventButton.name}}
@@ -200,7 +200,7 @@
                                     <ng-container *ngIf="columnHeader[tableData]?.type === 'iconorvalue'">
                                         <div *ngIf="element[columnHeader[tableData]?.Title]=='Add'">
                                             <button mat-icon-button
-                                                (click)="FunctionHendel(columnHeader[tableData].functionName , element)">
+                                                (click)="functionHandle(columnHeader[tableData].functionName , element)">
                                                 <mat-icon>{{columnHeader[tableData].iconName}}</mat-icon>
                                             </button>
                                         </div>
@@ -211,15 +211,20 @@
                                     </ng-container>
                                     <ng-container *ngIf="columnHeader[tableData]?.type === 'iconClick'">
                                         <button mat-icon-button
-                                            (click)="FunctionHendel(columnHeader[tableData].functionName , element)">
+                                            (click)="functionHandle(columnHeader[tableData].functionName , element)">
                                             <mat-icon
                                                 style="color: #000000ec">{{columnHeader[tableData].iconName}}</mat-icon>
                                         </button>
                                     </ng-container>
+                                    <ng-container *ngIf="columnHeader[tableData]?.type === 'view'">
+                                        <app-feather-icons [icon]="'eye'" style="cursor: pointer"
+                                            [class]="'tbl-fav-edit'"
+                                            (click)="openImageDialog(element)"></app-feather-icons>
+                                    </ng-container>
 
                                     <ng-container *ngIf="columnHeader[tableData]?.type === 'windowLink'">
                                         <p class="windowLink"
-                                            (click)="FunctionHendel(columnHeader[tableData].functionName , element)">
+                                            (click)="functionHandle(columnHeader[tableData].functionName , element)">
                                             {{element[tableData]}}</p>
                                     </ng-container>
 

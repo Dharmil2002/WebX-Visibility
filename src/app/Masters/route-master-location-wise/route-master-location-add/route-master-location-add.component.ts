@@ -331,7 +331,7 @@ export class RouteMasterLocationAddComponent implements OnInit {
       routeMode: this.routeMasterLocationForm.value.routeMode,
       routeCat: this.routeMasterLocationForm.value.routeCat,
       routeKm: this.routeMasterLocationForm.value.routeKm,
-      departureTime: parseFloat(this.datePipe.transform(this.routeMasterLocationForm.value.departureTime, "HH:mm")),
+      departureTime: parseFloat(this.datePipe.transform(new Date(), "HH:mm")),
       controlLoc: this.routeMasterLocationForm.value.controlLoc.value,
       routeType: this.routeMasterLocationForm.value.routeType,
       scheduleType: this.routeMasterLocationForm.value.scheduleType,

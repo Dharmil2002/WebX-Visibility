@@ -301,33 +301,37 @@ export class AddDriverMasterComponent implements OnInit {
 
   //#region Driver Photo
   async selectFileDriverPhoto(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "driverPhoto", this.
-      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
   }
   //#endregion
 
   //#region License Scan
   async selectedFileLicenseScan(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "licenseScan", this.
-      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
   }
   //#endregion
 
   //#region DOB proof scan
   async selectedFileDOBProofScan(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "DOBProofScan", this.
-      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
   }
   //#endregion
 
   //#region Address Proof Scan
   async selectedFileAddressProofScan(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "addressProofScan", this.
-      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray);
+      DriverTableForm, this.imageData, "Driver", 'Master', this.jsonControlDriverArray, allowedFormats);
   }
   //#endregion
 

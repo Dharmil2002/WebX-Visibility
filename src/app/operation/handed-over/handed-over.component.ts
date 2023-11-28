@@ -68,15 +68,16 @@ export class HandedOverComponent implements OnInit {
     private router: Router,
     private fb: UntypedFormBuilder,
     private thcService: ThcService,
+    private storage:StorageService,
     private rakeEntryService:RakeEntryService
-
   ) {
-    const navigationState = this.router.getCurrentNavigation()?.extras?.state?.data;
+    
+    const navigationState = this.router.getCurrentNavigation()?.extras?.state;
     if (navigationState) {
       this.breadScrums[0].title = navigationState.flag
       this.breadScrums[0].active = navigationState.flag
     }
-    this.data = navigationState;
+    this.data = navigationState?.data||"";
     this.tableLoad = false;
     this.initializeFormControl();
 
@@ -103,8 +104,8 @@ export class HandedOverComponent implements OnInit {
     this.jsonControlArray = this.HandFormControls.getHandOverArrayControls();
     // Build the form group using formGroupBuilder function
     this.handTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.handTableForm.controls['locationCode'].setValue(this.data?.rakeDetails.branch || "");
-    this.handTableForm.controls['rktUptDt'].setValue(this.data?.rakeDetails.oRakeEntryDate || "");
+    this.handTableForm.controls['locationCode'].setValue(this.storage?.branch || "");
+    this.handTableForm.controls['rktUptDt'].setValue(this.data?.oRakeEntryDate || "");
     this.getShipmentDetails();
   }
   cancel() {
@@ -114,8 +115,8 @@ export class HandedOverComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
   async getShipmentDetails() {
-
-    const docket = this.data?.rakeDetails.containorDetail.map((x) => x.cnNo);
+    
+    const docket = this.data?.containorDetail.map((x) => x.cnNo);
     const docketList = await this.thcService.getShipment(false);
     // Function to get containerDetail based on cnNo
     const getContainerDetailByCnNo = (objectArray, cnNo) => {
@@ -141,33 +142,49 @@ export class HandedOverComponent implements OnInit {
     // Get containerDetail for the given cnNoArray
     const resultContainerDetail = getContainerDetailByCnNo(docketList, docket);
     const containersArray = resultContainerDetail.flatMap(container => container.containerDetail);
+    console.log(containersArray);
     this.tableData = containersArray;
 
 
   }
+
+
+  // async getContainerData(data){
+  //   const data = 
+  // }
   save() {
     let containers = this.tableData
-    .filter((x) => x.isSelected)
-    .map((container) => ({
-      ...container,
-      rakeNo: this.data.rakeDetails.RakeNo, // Replace with the actual value
-      update: this.data.flag === 'Diverted For Export',
-      del: this.data.flag === 'Delivered',
-      dexport: this.data.flag === 'Updated'
-    }));
-    const rakeDetails=this.rakeEntryService.addRakeContainer(containers);
-    if(rakeDetails){
-    Swal.fire({
-      icon: "success",
-      title: "Update Successfully",
-      text: "Rake No: " + this.data.rakeDetails.RakeNo,
-      showConfirmButton: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.goBack('Rake');
-      }
-    });
-  }
+      .filter((x) => x.isSelected)
+      .map((container) => ({
+          cID:this.storage.companyCode,
+          cONTNO: container?.containerNumber||"",
+          cONTYP: container?.containerType||"",
+          cONCPY:container?.containerCapacity||0,
+          iSEMPTY:container?.isEmpty||"",
+          rAKENO:this.data.RakeNo,
+          cONTFOR: this.handTableForm.value.containerFor,
+          cONTLOC:this.handTableForm.controls['locationCode'].value,
+          eNTDT:new Date(),
+          eNTBY:this.storage.userName,
+          mODDT:"",
+          mODLOC:"",
+          mODBY:"",
+          dKTNO:"",
+          tHCNO:""
+      }));
+    const rakeDetails = this.rakeEntryService.addRakeContainer(containers);
+    if (rakeDetails) {
+      Swal.fire({
+        icon: "success",
+        title: "Update Successfully",
+        text: "Rake No: " + this.data.RakeNo,
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.goBack('Rake');
+        }
+      });
+    }
   }
 
 }

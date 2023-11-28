@@ -21,11 +21,9 @@ import { updatePending } from "../../../../operation/update-loading-sheet/loadin
 import { MatDialog } from "@angular/material/dialog";
 import { CustomerContractNonFreightChargesPopupComponent } from "../customer-contract-non-freight-charges-popup/customer-contract-non-freight-charges-popup.component";
 import Swal from "sweetalert2";
+import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { StorageService } from "src/app/core/service/storage.service";
 
-interface CurrentAccessListType {
-  productAccess: string[];
-}
-const fieldsToSearch = ["PIN", "CT", "STNM", "ZN"];
 @Component({
   selector: "app-customer-contract-non-freight-charges",
   templateUrl: "./customer-contract-non-freight-charges.component.html",
@@ -67,7 +65,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     csv: false,
   };
   EventButton = {
-    functionName: "toggleDrawer",
+    functionName: "Save",
     name: "Add New",
     iconName: "add",
   };
@@ -113,6 +111,8 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   ContractID: any;
   isUpdate = false;
   UpdateData: any;
+  selectChargesCode: any;
+  selectChargesStatus: any;
 
   //#endregion
   constructor(
@@ -121,6 +121,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     private masterService: MasterService,
     private filter: FilterUtils,
     public dialog: MatDialog,
+    private storage: StorageService,
     private sessionService: SessionService
   ) {
     this.companyCode = this.sessionService.getCompanyCode();
@@ -141,7 +142,6 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     const res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
-    console.log("res", res);
     if (res.success) {
       this.tableData = res.data.map((x) => {
         return {
@@ -161,8 +161,10 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     this.initializeFormControl();
   }
   initializeFormControl() {
-    this.ContractNonFreightMatrixControls =
-      new ContractNonFreightMatrixControl(this.isUpdate , this.UpdateData);
+    this.ContractNonFreightMatrixControls = new ContractNonFreightMatrixControl(
+      this.isUpdate,
+      this.UpdateData
+    );
     this.jsonControlArrayNonFreightCharges =
       this.ContractNonFreightMatrixControls.getContractNonFreightChargesControlControls();
     this.NonFreightChargesForm = formGroupBuilder(this.fb, [
@@ -170,11 +172,31 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     ]);
     this.AlljsonControlArrayNonFreightCharges =
       this.jsonControlArrayNonFreightCharges;
+    this.bindDropdown();
+  }
+  bindDropdown() {
+    this.jsonControlArrayNonFreightCharges.forEach((data) => {
+      if (data.name === "selectCharges") {
+        // Set AcGroupCategory variables
+        this.selectChargesCode = data.name;
+        this.selectChargesStatus = data.additionalData.showNameAndValue;
+        this.getselectChargesDropdown();
+      }
+    });
+  }
+  async getselectChargesDropdown() {
+    const AcGroupdata = await PayBasisdetailFromApi(this.masterService, "SCH");
+    this.filter.Filter(
+      this.jsonControlArrayNonFreightCharges,
+      this.NonFreightChargesForm,
+      AcGroupdata,
+      this.selectChargesCode,
+      this.selectChargesStatus
+    );
   }
 
   // Charges Section
   ChargesBehaviour(event) {
-    console.log(this.NonFreightChargesForm.controls["ChargesBehaviour"].value);
     if (
       this.NonFreightChargesForm.controls["ChargesBehaviour"].value === "Fixed"
     ) {
@@ -194,14 +216,17 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     }
   }
 
-  async save(event) {
+  async Save() {
     const body = {
-      sCT: this.NonFreightChargesForm.value.selectCharges,
+      sCT: this.NonFreightChargesForm.value.selectCharges.name,
       cBT: this.NonFreightChargesForm.value.ChargesBehaviour,
       nFC:
         this.NonFreightChargesForm.value.ChargesBehaviour == "Fixed"
           ? this.NonFreightChargesForm.value.Charges
           : [],
+      mODDT: new Date(),
+      mODLOC: this.storage.branch,
+      mODBY: this.storage.userName,
     };
     if (!this.isUpdate) {
       let datareq = {
@@ -215,8 +240,12 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       const length = tableres.data.length;
       const Index = length == 0 ? 1 : tableres.data[length - 1].nFCID + 1;
       body["cONID"] = this.ContractID;
+      body["_id"] = `${this.companyCode}-${this.contractData.cONID}-${Index}`;
       body["nFCID"] = Index;
       body["cID"] = this.companyCode;
+      body["eNTDT"] = new Date();
+      body["eNTLOC"] = this.storage.branch;
+      body["eNTBY"] = this.storage.userName;
     }
     const req = {
       companyCode: this.companyCode,
@@ -235,6 +264,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       this.isUpdate = false;
       this.getTableData();
       this.initializeFormControl();
+      this.EventButton.name = "Add New";
       Swal.fire({
         icon: "success",
         title: "Successful",
@@ -262,9 +292,11 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     this.initializeFormControl();
   }
 
-  FillMatrixForAll(data: any) {
+  async FillMatrixForAll(data: any) {
+    const AcGroupdata = await PayBasisdetailFromApi(this.masterService, "SCH");
+    const element = AcGroupdata.find((x) => x.name == data.data?.selectCharges);
     this.NonFreightChargesForm.controls["selectCharges"].setValue(
-      data.data?.selectCharges || ""
+      element || ""
     );
     this.NonFreightChargesForm.controls["ChargesBehaviour"].setValue(
       data.data?.ChargesBehaviour || ""
@@ -276,6 +308,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       (x) => x.id !== data.data.id
     );
     this.ChargesBehaviour("");
+    this.EventButton.name = "Update";
     this.isUpdate = true;
     this.UpdateData = data.data;
   }
@@ -283,7 +316,6 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
     let functionName = $event.functionName; // name of the function , we have to call
-    console.log("functionName", functionName);
     try {
       this[functionName]($event);
     } catch (error) {

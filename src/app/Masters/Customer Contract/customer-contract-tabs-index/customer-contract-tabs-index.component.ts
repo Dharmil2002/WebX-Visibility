@@ -32,8 +32,8 @@ export class CustomerContractTabsIndexComponent implements AfterViewInit {
     "Services Selection",
     "Freight Charge Matrix",
     "Non Freight Charges",
-    "ODA Matrix",
-    "Fuel Price Hike Matrix"
+    // "ODA Matrix",
+    // "Fuel Price Hike Matrix"
   ];
   selectedFolder: string | undefined;
   ngOnInit(): void {

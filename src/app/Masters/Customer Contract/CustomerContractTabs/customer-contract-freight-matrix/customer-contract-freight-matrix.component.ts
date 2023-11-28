@@ -19,6 +19,9 @@ import { SessionService } from "src/app/core/service/session.service";
 import Swal from "sweetalert2";
 import { ContractFreightMatrixControl } from "src/assets/FormControls/CustomerContractControls/FreightMatrix-control";
 import { Router } from "@angular/router";
+import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
+import { StorageService } from "src/app/core/service/storage.service";
+import { ContainerService } from "src/app/Utility/module/masters/container/container.service";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -69,12 +72,12 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   menuItems = [{ label: "Edit" }, { label: "Remove" }];
 
   columnHeader = {
-    from: {
+    fROM: {
       Title: "From",
       class: "matcolumnfirst",
       Style: "min-width:80px",
     },
-    to: {
+    tO: {
       Title: "To",
       class: "matcolumncenter",
       Style: "min-width:80px",
@@ -90,7 +93,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       Style: "min-width:2px",
     },
     rT: {
-      Title: "Rate",
+      Title: "Rate (₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -103,7 +106,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       iconName: "edit",
     },
   };
-  staticField = ["from", "to", "rTYP", "cAP", "rT"];
+  staticField = ["fROM", "tO", "rTYP", "cAP", "rT"];
 
   //#endregion
   protected _onDestroy = new Subject<void>();
@@ -114,8 +117,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   ServiceSelectiondata: any;
   rateTypeCode: any;
   rateTypeStatus: any;
-  isUpdate=false;
-  UpdateData:any
+  isUpdate = false;
+  UpdateData: any;
   capacityCode: any;
   capacityStatus: any;
 
@@ -127,7 +130,9 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     private Route: Router,
     private filter: FilterUtils,
     private changeDetectorRef: ChangeDetectorRef,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private storage: StorageService,
+    private objContainerService: ContainerService
   ) {
     // Retrieve the stored value from session storage
     // const storedData = sessionStorage.getItem("ServiceSelectiondata");
@@ -159,14 +164,15 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       collectionName: "cust_contract",
       filter: { docNo: this.contractData.cONID },
     };
-    const res = await this.masterService.masterPost("generic/get", req).toPromise();
+    const res = await this.masterService
+      .masterPost("generic/get", req)
+      .toPromise();
     this.ServiceSelectiondata = {
-      loadType:res.data[0].lTYP,
-      rateTypecontrolHandler:res.data[0].rTYP
-    }
-    console.log('this.ServiceSelectiondata' ,this.ServiceSelectiondata)
-    if (this.ServiceSelectiondata.loadType == 'LTL') {
-      delete this.columnHeader.cAP
+      loadType: res.data[0].lTYP,
+      rateTypecontrolHandler: res.data[0].rTYP,
+    };
+    if (this.ServiceSelectiondata.loadType == "LT-0002") {
+      delete this.columnHeader.cAP;
     }
     this.initializeFormControl();
     this.getTableData();
@@ -177,12 +183,14 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "cust_contract_freight_charge_matrix",
-      filter: { cONID: this.contractData.cONID , lType:this.ServiceSelectiondata.loadType },
+      filter: {
+        cONID: this.contractData.cONID,
+        lTYPE: this.ServiceSelectiondata.loadType,
+      },
     };
     const res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
-    console.log("res", res);
     if (res.success) {
       this.tableData = res.data;
       this.tableLoad = true;
@@ -192,19 +200,22 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   //#endregion
   initializeFormControl() {
-    this.ContractFreightMatrixControls = new ContractFreightMatrixControl(this.UpdateData , this.isUpdate);
+    this.ContractFreightMatrixControls = new ContractFreightMatrixControl(
+      this.UpdateData,
+      this.isUpdate
+    );
     this.jsonControlArrayFreightMatrix =
       this.ContractFreightMatrixControls.getContractFreightMatrixControlControls(
         this.CurrentAccessList.productAccess
       );
-    if (this.ServiceSelectiondata.loadType == 'LTL') {
+    if (this.ServiceSelectiondata.loadType == "LT-0002") {
       this.jsonControlArrayFreightMatrix =
         this.jsonControlArrayFreightMatrix.filter((x) => x.name !== "capacity");
     }
     this.FreightMatrixForm = formGroupBuilder(this.fb, [
       this.jsonControlArrayFreightMatrix,
     ]);
-    this.bindDropdown()
+    this.bindDropdown();
   }
   async bindDropdown() {
     this.jsonControlArrayFreightMatrix.forEach((data) => {
@@ -212,61 +223,59 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         // Set AcGroupCategory variables
         this.rateTypeCode = data.name;
         this.rateTypeStatus = data.additionalData.showNameAndValue;
-        const rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map((x,index)=>{
-          return {
-            value:index.toString(),
-            name:x
-          }
-        })
-        console.log('rateTypedata' ,rateTypedata)
-        this.filter.Filter(
-          this.jsonControlArrayFreightMatrix,
-          this.FreightMatrixForm,
-          rateTypedata,
-          this.rateTypeCode,
-          this.rateTypeStatus
-        );
-        if(this.isUpdate){
-          const rateTypeFilterData = rateTypedata.find((x)=> x.name == this.UpdateData.rTYP)
-          this.FreightMatrixForm.controls["rateType"].setValue(rateTypeFilterData)
-        }
+        this.getRatType();
       }
       if (data.name === "capacity") {
         this.capacityCode = data.name;
         this.capacityStatus = data.additionalData.showNameAndValue;
-        this.getCapacityData()
+        this.getCapacityData();
       }
     });
   }
 
-  async getCapacityData(){
-    const Body = {
-      companyCode: this.companyCode,
-      collectionName: "General_master",
-      filter: { codeType: "VehicleCapacity", activeFlag: true },
-    };
-
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
-    if (res.success && res.data.length > 0) {
-      const BalanceSheetdata = res.data.map((x) => {
-        return {
-          name: x.codeDesc,
-          value: x.codeId,
-        };
-      });
-      this.filter.Filter(
-        this.jsonControlArrayFreightMatrix,
-        this.FreightMatrixForm,
-        BalanceSheetdata,
-        this.capacityCode,
-        this.capacityStatus
-      );
-      if(this.isUpdate){
-        const FilterData = BalanceSheetdata.find((x)=> x.name == this.UpdateData.cAP)
-        this.FreightMatrixForm.controls["capacity"].setValue(FilterData)
+  async getRatType() {
+    const RatData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
+    const rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map(
+      (x, index) => {
+        return RatData.find((t) => t.value == x);
       }
+    );
+    this.filter.Filter(
+      this.jsonControlArrayFreightMatrix,
+      this.FreightMatrixForm,
+      rateTypedata,
+      this.rateTypeCode,
+      this.rateTypeStatus
+    );
+    if (this.isUpdate) {
+      const rateTypeFilterData = rateTypedata.find(
+        (x) => x.name == this.UpdateData.rTYP
+      );
+      this.FreightMatrixForm.controls["rateType"].setValue(rateTypeFilterData);
+    }
+  }
+
+  async getCapacityData() {
+    const containerData = await this.objContainerService.getContainerList();
+    const vehicleData = await PayBasisdetailFromApi(
+      this.masterService,
+      "VehicleCapacity"
+    );
+    const containerDataWithPrefix = vehicleData.map((item) => ({
+      name: `Veh- ${item.name}`,
+      value: item.value,
+    }));
+    const data = [...containerDataWithPrefix, ...containerData];
+    this.filter.Filter(
+      this.jsonControlArrayFreightMatrix,
+      this.FreightMatrixForm,
+      data,
+      this.capacityCode,
+      this.capacityStatus
+    );
+    if (this.isUpdate) {
+      const FilterData = data.find((x) => x.name == this.UpdateData.cAP);
+      this.FreightMatrixForm.controls["capacity"].setValue(FilterData);
     }
   }
   //#endregion
@@ -306,7 +315,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   //#region Set OriginRateOptions
   SetOptions(event) {
     let fieldName = event.field.name;
-    console.log('fieldName' ,fieldName)
+    console.log("fieldName", fieldName);
     const search = this.FreightMatrixForm.controls[fieldName].value;
     let data = [];
     if (search.length >= 2) {
@@ -324,10 +333,6 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       );
     }
   }
-  setSelectedOptions(event) {
-    let fieldName = event.field.name;
-    // alert(fieldName)
-  }
   //#region functionCallHandler
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
@@ -340,39 +345,94 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     }
   }
   async AddNewButtonEvent(event) {
-    if (!this.FreightMatrixForm.valid) return;
-  
+    const isUpdate = this.isUpdate;
+    const formData = this.FreightMatrixForm.value;
+    const filterCondition = (item) => {
+      const commonConditions =
+        item.fROM == formData.From.name && item.tO == formData.To.name;
+
+      if (this.ServiceSelectiondata.loadType == "LT-0002") {
+        return isUpdate
+          ? commonConditions && item._id != this.UpdateData._id
+          : commonConditions;
+      } else {
+        return isUpdate
+          ? commonConditions &&
+              item.cAP == formData.capacity.name &&
+              item._id != this.UpdateData._id
+          : commonConditions && item.cAP == formData.capacity.name;
+      }
+    };
+    const filterData = this.tableData.filter(filterCondition);
+    if (filterData.length !== 0) {
+      Swal.fire({
+        icon: "info",
+        title: "info",
+        text: "Enter valid Freight Charges",
+        showConfirmButton: true,
+      });
+    } else {
+      this.save();
+    }
+  }
+
+  async save() {
     this.tableLoad = false;
     this.isLoad = true;
-  
     const json = {
-      cONID: this.contractData.cONID,
-      from: this.FreightMatrixForm.value.From.name,
-      fromType: this.FreightMatrixForm.value.From.value,
-      to: this.FreightMatrixForm.value.To.name,
-      toType: this.FreightMatrixForm.value.To.value,
+      fROM: this.FreightMatrixForm.value.From.name,
+      fTYPE: this.FreightMatrixForm.value.From.value,
+      tO: this.FreightMatrixForm.value.To.name,
+      tTYPE: this.FreightMatrixForm.value.To.value,
       rTYP: this.FreightMatrixForm.value.rateType.name,
-      lType: this.ServiceSelectiondata.loadType,
-      cAP: this.ServiceSelectiondata.loadType !== "LTL" ? this.FreightMatrixForm.value.capacity.name : "",
-      rT: this.FreightMatrixForm.value.Rate,
+      cAP:
+        this.ServiceSelectiondata.loadType != "LT-0002"
+          ? this.FreightMatrixForm.value.capacity.name
+          : 0,
+      rT: +this.FreightMatrixForm.value.Rate,
+      mODDT: new Date(),
+      mODLOC: this.storage.branch,
+      mODBY: this.storage.userName,
     };
-  
+    if (!this.isUpdate) {
+      let datareq = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "cust_contract_freight_charge_matrix",
+        filter: {},
+      };
+      const tableres = await this.masterService
+        .masterPost("generic/get", datareq)
+        .toPromise();
+      const length = tableres.data.length;
+      const Index = length == 0 ? 1 : tableres.data[length - 1].fCID + 1;
+      json["cONID"] = this.contractData.cONID;
+      json["lTYPE"] = this.ServiceSelectiondata.loadType;
+      json["cID"] = this.companyCode;
+      json["_id"] = `${this.companyCode}-${this.contractData.cONID}-${Index}`;
+      json["fCID"] = Index;
+      json["eNTDT"] = new Date();
+      json["eNTLOC"] = this.storage.branch;
+      json["eNTBY"] = this.storage.userName;
+    }
+
     const req = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_freight_charge_matrix",
-      filter: this.isUpdate ? { cONID: this.UpdateData.cONID } : undefined,
+      filter: this.isUpdate ? { fCID: this.UpdateData.fCID } : undefined,
       update: this.isUpdate ? json : undefined,
       data: !this.isUpdate ? json : undefined,
     };
-  
+
     const method = this.isUpdate ? "generic/update" : "generic/create";
-    const res = this.isUpdate? await this.masterService.masterPut(method, req).toPromise():await this.masterService.masterPost(method, req).toPromise();
-  
+    const res = this.isUpdate
+      ? await this.masterService.masterPut(method, req).toPromise()
+      : await this.masterService.masterPost(method, req).toPromise();
+
     if (res.success) {
       this.isUpdate = false;
+      this.UpdateData = undefined;
       this.getTableData();
       this.initializeFormControl();
-  
       Swal.fire({
         icon: "success",
         title: "Successful",
@@ -453,14 +513,15 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
             "/Masters/CustomerContract/CustomerContractList"
           );
         }
+        this.EventButton.name = "Add New";
       },
     });
   }
 
   EditFunction(event) {
-    console.log("edit",event);
     this.isUpdate = true;
-    this.UpdateData = event.data
+    this.UpdateData = event.data;
+    this.EventButton.name = "Update";
     this.initializeFormControl();
   }
 }

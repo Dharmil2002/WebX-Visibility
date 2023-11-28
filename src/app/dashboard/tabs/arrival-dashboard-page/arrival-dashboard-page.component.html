@@ -13,6 +13,12 @@
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
         -->
 <div class="verticalScrollbar">
+    <div *ngIf="tableload" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
     <generic-table-webxpress *ngIf="!tableload" [columnHeader]="columnHeader" [tableData]="arrivalTableData" [width]="width"
         [height]="height" [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA"
         [Link]="linkArray" [toggleArray]="toggleArray" [menuItems]="menuItems"

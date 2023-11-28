@@ -6,7 +6,7 @@ export class ShipmentEditControls {
         this.shipmentEditControlArray = [
             {
                 name: 'actualWeight',
-                label: 'Weight',
+                label: 'Weight(Kg)',
                 placeholder: '',
                 type: 'text',
                 value: '',

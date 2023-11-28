@@ -6,6 +6,7 @@ import { ThcUpdateControls } from 'src/assets/FormControls/thc-update';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { ThcUpdate } from 'src/app/core/models/operations/thc/thc-update';
 import Swal from 'sweetalert2';
+import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 
 @Component({
   selector: 'app-thc-update',
@@ -16,6 +17,7 @@ export class ThcUpdateComponent implements OnInit {
   tableLoad: boolean;
   thcTableForm: UntypedFormGroup;
   jsonControlArray: any;
+  imageData: any = {};
   METADATA = {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
@@ -31,8 +33,9 @@ export class ThcUpdateComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
     public dialogRef: MatDialogRef<GenericTableComponent>,
-    public dialog: MatDialog
-    ) {
+    public dialog: MatDialog,
+    private objImageHandling: ImageHandling
+  ) {
     this.thcDetail = item;
   }
 
@@ -58,7 +61,7 @@ export class ThcUpdateComponent implements OnInit {
   }
 
   IntializeFormControl() {
-      
+
     const thcFormControls = new ThcUpdateControls();
     this.jsonControlArray = thcFormControls.getThcFormControls();
     this.thcTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
@@ -68,35 +71,18 @@ export class ThcUpdateComponent implements OnInit {
   cancel() {
     this.dialogRef.close()
   }
-  
-  getFilePod(data) {
-    let fileList: FileList = data.eventArgs;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      const allowedFormats = ["jpeg", "png", "jpg","pdf"];
-      const fileFormat = file.type.split("/")[1]; // Extract file format from MIME type
 
-      if (allowedFormats.includes(fileFormat)) {
-        const podUpload = file.name;
-        this.selectedFiles = true;
-        this.thcTableForm.controls["podUpload"].setValue(podUpload);
-      } else {
-        this.selectedFiles = false;
-        Swal.fire({
-          icon: "warning",
-          title: "Alert",
-          text: `Please select a JPEG, PNG,PDF, or JPG file.`,
-          showConfirmButton: true,
-        });
-      }
-    } else {
-      this.selectedFiles = false;
-      alert("No file selected");
-    }
+  async getFilePod(data) {
+
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
+      thcTableForm, this.imageData, "ThcUpdate", 'Operations', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
+
   }
-  async save(){
-   // await showConfirmationDialogThc(this.thcTableForm.value,this._operationService);
+  async save() {
+    const pod = this.imageData?.Upload || ""
+    this.thcTableForm.controls['podUpload'].setValue(pod);
+    // await showConfirmationDialogThc(this.thcTableForm.value,this._operationService);
     this.dialogRef.close(this.thcTableForm.value)
   }
- 
+
 }

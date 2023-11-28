@@ -37,8 +37,8 @@ export class AddContractProfile {
       },
       {
         name: "cNSCN",
-        label: "UPload Contract Scan",
-        placeholder: "UPload Contract Scan",
+        label: "Upload Contract Scan",
+        placeholder: "Upload Contract Scan",
         type: "file",
         value: vendorInformationData.cNSCN,
         generatecontrol: true,
@@ -46,7 +46,7 @@ export class AddContractProfile {
         Validations: [
           {
             name: "required",
-            message: "contractScan is required"
+            message: "Contract Scan is required"
           },
         ],
         functions: {

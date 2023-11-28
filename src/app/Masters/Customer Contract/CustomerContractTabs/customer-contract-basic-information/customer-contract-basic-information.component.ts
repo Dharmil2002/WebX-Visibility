@@ -97,15 +97,18 @@ export class CustomerContractBasicInformationComponent implements OnInit {
     this.ProductsForm.get("POValiditydate").setValue(data.POValiditydate)
 
     const cSCAN = this.objImageHandling.extractFileName(data.cSCAN);
-    this.ProductsForm.get("ContractScan").setValue(cSCAN)
-    const ContractScan = this.jsonControlArrayProductsForm.find(x => x.name === 'ContractScan');
-    ContractScan.additionalData.isFileSelected = false;
-
+    if (cSCAN) {
+      this.ProductsForm.get("ContractScan").setValue(cSCAN)
+      const ContractScan = this.jsonControlArrayProductsForm.find(x => x.name === 'ContractScan');
+      ContractScan.additionalData.isFileSelected = false;
+    }
 
     const cPOSCAN = this.objImageHandling.extractFileName(data.cPOSCAN);
-    this.ProductsForm.get("ContractPOScan").setValue(cPOSCAN)
-    const ContractPOScan = this.jsonControlArrayProductsForm.find(x => x.name === 'ContractPOScan');
-    ContractPOScan.additionalData.isFileSelected = false;
+    if (cPOSCAN) {
+      this.ProductsForm.get("ContractPOScan").setValue(cPOSCAN)
+      const ContractPOScan = this.jsonControlArrayProductsForm.find(x => x.name === 'ContractPOScan');
+      ContractPOScan.additionalData.isFileSelected = false;
+    }
 
   }
   onContractStartDateChanged(event) {
@@ -126,7 +129,9 @@ export class CustomerContractBasicInformationComponent implements OnInit {
         confirmButtonText: "OK"
       });
     } else {
-      const timeDifference = endDate.getTime() - startDate.getTime();
+      const Today = new Date();
+      Today.setHours(0, 0, 0, 0);
+      const timeDifference = endDate.getTime() - Today.getTime();
       const dayDifference = timeDifference / (1000 * 3600 * 24);
 
       this.ProductsForm.get('Pendingdays')?.setValue(dayDifference);
@@ -197,7 +202,9 @@ export class CustomerContractBasicInformationComponent implements OnInit {
         cPONO: this.ProductsForm.value?.CustomerPONo,
         cPODt: this.ProductsForm.value?.POValiditydate,
         cPOSCAN: this.ContractPOScanimageData?.ContractPOScan ?? this.contractData.cPOSCAN,
-
+        mODDT: new Date(),
+        mODBY: localStorage.getItem("UserName"),
+        mODLOC: localStorage.getItem("CurrentBranchCode")
       }
 
       const reqBody = {
@@ -250,7 +257,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
   }
   openImageDialog(control) {
     let file;
-    if (control == 'ContractScan') {
+    if (control.imageName == 'ContractScan') {
       file = this.objImageHandling.getFileByKey(control.imageName, this.ContractScanimageData);
       if (file == null) {
         file = this.contractData.cSCAN

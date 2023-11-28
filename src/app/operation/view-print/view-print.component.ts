@@ -21,11 +21,12 @@ export class ViewPrintComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public item: any, 
     public dialogRef: MatDialogRef<GenericTableComponent>) {
     if (item) {
-      
+       
       this.prqDetail = this.prqService.getAssigneVehicleDetail();
       this.prqDetail.vehicleNo = item?.vehicleNo||item.vehNo;
       const tabIndex = 6; // Adjust the tab index as needed
       this.assignedVehicleService.showVehicleConfirmationDialog(this.prqDetail,this.masterService, this.goBack.bind(this), tabIndex, dialogRef, item,item.isMarket);
+      dialogRef.close();
     }
     else {
       Swal.fire({
@@ -37,7 +38,9 @@ export class ViewPrintComponent implements OnInit {
         if (result.isConfirmed) {
           dialogRef.close();
           // Call your function here 
-
+        }
+        else{
+          dialogRef.close();
         }
       });
     }

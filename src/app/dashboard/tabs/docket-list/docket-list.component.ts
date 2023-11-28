@@ -86,9 +86,7 @@ export class DocketListComponent implements OnInit {
   /*.......End................*/
   /* here the varible declare for menu Item option Both is required */
   menuItems=[
-    {label:"Edit Docket"},
-    {label:"Rake Update"},
-    {label:"Create THC"}
+    {label:"Edit Docket"}
   ]
   menuItemflag: boolean = true;
 //  TableStyle = "width:90%"

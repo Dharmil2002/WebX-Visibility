@@ -39,7 +39,7 @@ export class AddFleetMasterComponent implements OnInit {
   vehicleTypeStatus: any;
   submit = 'Save';
   imageData: any = {};
-  
+
   constructor(
     private filter: FilterUtils,
     private route: Router,
@@ -359,18 +359,21 @@ export class AddFleetMasterComponent implements OnInit {
   //#endregion
   //#region to handle image selection Fitness Certificate Scan
   async selectedFilefitnesscertificateScan(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "fitnesscertificateScan", this.
-      fleetTableForm, this.imageData, "Fleet", 'Master', this.jsonControlFleetArray);
+      fleetTableForm, this.imageData, "Fleet", 'Master', this.jsonControlFleetArray, allowedFormats);
   }
 
   // Insurance Scan
   async selectedFileinsuranceScan(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "insuranceScan", this.fleetTableForm, this.imageData, "Fleet", 'Master', this.jsonControlFleetArray);
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "insuranceScan", this.fleetTableForm, this.imageData, "Fleet", 'Master', this.jsonControlFleetArray, allowedFormats);
   }
   // Registration Scan
   async selectedFileregistrationScan(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "registrationScan", this.fleetTableForm, this.imageData, "Fleet", 'Master', this.jsonControlFleetArray);
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "registrationScan", this.fleetTableForm, this.imageData, "Fleet", 'Master', this.jsonControlFleetArray, allowedFormats);
   }
   //#endregion
 }

@@ -948,12 +948,14 @@ export class CustomerMasterAddComponent implements OnInit {
 
   // Uplod PAN card
   async selectedFilePanCardScan(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uplodPANcard", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray);
+ const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uplodPANcard", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray,allowedFormats);
   }
 
   // MSME Scan
   async selectedFileMSMEScan(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "MSMEscan", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray);
+     const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "MSMEscan", this.customerTableForm, this.imageData, "Customer", 'Master', this.jsonControlCustomerArray,allowedFormats);
   }
 
   //#region to preview image

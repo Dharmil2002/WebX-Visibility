@@ -620,14 +620,16 @@ export class AddVendorMasterComponent implements OnInit {
   }
   //#region to handle image selection
   async selectPanCardScan(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "panCardScan", this.
-      vendorTableForm, this.imageData, "Vendor", 'Master', this.jsonControlVendorArray);
+      vendorTableForm, this.imageData, "Vendor", 'Master', this.jsonControlVendorArray, allowedFormats);
   }
   async selectMsmeScan(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "msmeScan", this.
-      vendorTableForm, this.imageData, "Vendor", 'Master', this.jsonControlVendorArray);
+      vendorTableForm, this.imageData, "Vendor", 'Master', this.jsonControlVendorArray, allowedFormats);
   }
   //#endregion
   //#region to preview image

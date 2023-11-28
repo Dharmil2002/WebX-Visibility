@@ -28,7 +28,7 @@
                 Add New
               </button>
               <div *ngIf="EventButton">
-                <button mat-raised-button (click)="EventButtonfunctionCalled(EventButton.functionName , {})"
+                <button mat-raised-button [disabled]="!form.valid" (click)="EventButtonfunctionCalled(EventButton.functionName , {})"
                   color="primary"
                   style="margin-top:10px;margin-bottom: 10px; margin-right:10px;">{{EventButton.name}}</button>
               </div>

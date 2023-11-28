@@ -42,8 +42,14 @@ export class AssignedVehicleService {
           goBack(tabIndex);
           dialogRef.close();
         }
+        else{
+          goBack(tabIndex);
+          dialogRef.close();
+        }
+       
       }
     }
+    
   }
 
 }

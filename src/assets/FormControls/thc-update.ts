@@ -19,7 +19,7 @@ export class ThcUpdateControls {
                 generatecontrol: true, disable: false
             },
             {
-                name: 'podUpload',
+                name: 'Upload',
                 label: 'POD Upload',
                 placeholder: '',
                 type: 'file',
@@ -73,11 +73,32 @@ export class ThcUpdateControls {
                 placeholder: '',
                 type: 'text',
                 value: '',
-                Validations: [],
+                Validations: [ {
+                    name: "required",
+                    message: "Received By is required"
+                }],
                 generatecontrol: true, disable: false
             },
+            // {
+            //     name: 'link',
+            //     label: 'pod',
+            //     placeholder: '',
+            //     type: 'filelink',
+            //     value: '',
+            //     Validations: [],
+            //     generatecontrol: true, disable: false
+            // },
             {
                 name: 'shipment',
+                label: '',
+                placeholder: '',
+                type: '',
+                value: '',
+                Validations: [],
+                generatecontrol: false, disable: false
+            },
+             {
+                name: 'podUpload',
                 label: '',
                 placeholder: '',
                 type: '',

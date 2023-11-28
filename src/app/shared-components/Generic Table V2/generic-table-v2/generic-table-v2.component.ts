@@ -11,6 +11,8 @@ import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-ser
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { ModifyTableCollumnsComponent } from "../../modify-table-collumns/modify-table-collumns.component";
+import { ImagePreviewComponent } from "../../image-preview/image-preview.component";
+import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 
 @Component({
   selector: "app-generic-table-v2",
@@ -99,7 +101,8 @@ export class GenericTableV2Component
   constructor(
     public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private objImageHandling: ImageHandling,
   ) {
     super();
   }
@@ -408,7 +411,7 @@ export class GenericTableV2Component
   Delete(element) {
     this.DeleteFunction.emit({ element })
   }
-  FunctionHendel(name, element) {
+  functionHandle(name, element) {
     this.functionCallEmitter.emit({ functionName: name, data: element })
   }
   OnChangeToggle(event) {
@@ -450,6 +453,13 @@ export class GenericTableV2Component
         }, {});
       }
 
+    });
+  }
+  openImageDialog(data) {
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: data.pod },
+      width: '30%',
+      height: '50%',
     });
   }
 }

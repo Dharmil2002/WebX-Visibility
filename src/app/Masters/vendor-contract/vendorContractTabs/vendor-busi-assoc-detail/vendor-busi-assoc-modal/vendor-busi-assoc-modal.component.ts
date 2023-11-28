@@ -64,14 +64,6 @@ export class VendorBusiAssocModalComponent implements OnInit {
     // console.log(this.objResult);
   }
 
-  // //#region to get location list
-  // async getLocation() {
-  //   await this.objPinCodeService.getCity(
-  //     this.BusiAssocForm, this.jsonControlArray, this.cityName, this.citystatus
-  //   );
-  // }
-  // //#endregion
-
   //#region to send data to parent component using dialogRef
   async save(event) {
     try {
@@ -100,8 +92,11 @@ export class VendorBusiAssocModalComponent implements OnInit {
       } else {
         // Create a new vendor contract
         const existingData = await this.fetchExistingData(collectionName);
-        const newVendorCode = this.generateNewVendorCode(existingData);
-        const newContractData = this.prepareContractData(newVendorCode);
+        let index = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+
+        // Check if index is found, then set to the count, otherwise set to 0
+        index = index ? existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID).length : 0;
+        const newContractData = this.prepareContractData(index);
 
         const createRequest = {
           companyCode: this.companyCode,
@@ -160,21 +155,13 @@ export class VendorBusiAssocModalComponent implements OnInit {
     return response.data;
   }
 
-  generateNewVendorCode(existingData: any[]) {
-    // Generate a new vendor code based on existing data
-    const lastContract = existingData[existingData.length - 1];
-    const lastVendorCode = lastContract ? parseInt(lastContract.vCBAID.substring(4), 10) : 0;
-    return `Vcba${(lastVendorCode + 1).toString().padStart(5, '0')}`;
-  }
-
   prepareContractData(newVendorCode: string) {
     // Prepare data for creating a new contract
     return {
-      _id: this.companyCode + "-" + newVendorCode,
-      vCBAID: newVendorCode,
+      _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
       cNID: this.CurrentContractDetails.cNID,
-      // cT: this.BusiAssocForm.value.city.value,
+      branch: localStorage.getItem("CurrentBranchCode"),
       mDID: this.BusiAssocForm.value.mode.value,
       mDNM: this.BusiAssocForm.value.mode.name,
       oPID: this.BusiAssocForm.value.operation.value,

@@ -165,12 +165,12 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       Style: "min-width:2px",
     },
     actualWeight: {
-      Title: "Actual Weight (Kg)",
+      Title: "Actual Weight (MT)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
     chargedWeight: {
-      Title: "Charged Weight (Kg)",
+      Title: "Charged Weight (MT)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -1199,7 +1199,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       "cNO": "",
       "nLoc": "",
       "tId": "",
-      "tOTWT": totalWt,
+      "tOTWT": parseFloat(totalWt)*1000,/*temporary calucation*/
       "tOTPKG": totalPkg,
       "vEHNO": "",
       "aRRTM": "",
@@ -1308,8 +1308,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       rateTypeMap = {
         F: 1.0,
         P: this.getInvoiceAggValue("noofPkts"),
-        W: this.getInvoiceAggValue("chargedWeight"),
-        T: this.getInvoiceAggValue("chargedWeight") / 1000,
+        W: this.getInvoiceAggValue("chargedWeight") * 1000,
+        T: this.getInvoiceAggValue("chargedWeight"),
         C: this.tableData.length > 0 ? this.tableData.length : 1,
       };
     }

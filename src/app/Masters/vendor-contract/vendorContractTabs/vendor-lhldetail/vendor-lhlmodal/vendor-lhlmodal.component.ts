@@ -86,8 +86,11 @@ export class VendorLHLModalComponent implements OnInit {
       } else {
         // Create a new vendor contract
         const existingData = await this.fetchExistingData(vendorContractCollection);
-        const newVendorCode = this.generateNewVendorCode(existingData);
-        const newContractData = this.prepareContractData(newVendorCode);
+        let index = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+
+        // Check if index is found, then set to the count, otherwise set to 0
+        index = index ? existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID).length : 0;
+        const newContractData = this.prepareContractData(index);
 
         const createRequest = {
           companyCode: this.companyCode,
@@ -142,19 +145,12 @@ export class VendorLHLModalComponent implements OnInit {
     return response.data;
   }
 
-  generateNewVendorCode(existingData: any[]) {
-    // Generate a new vendor code based on existing data
-    const lastContract = existingData[existingData.length - 1];
-    const lastVendorCode = lastContract ? parseInt(lastContract.vCLBID.substring(4), 10) : 0;
-    return `Vclb${(lastVendorCode + 1).toString().padStart(5, '0')}`;
-  }
-
   prepareContractData(newVendorCode: string) {
     // Prepare data for creating a new contract
     return {
-      _id: this.companyCode + "-" + newVendorCode,
-      vCLBID: newVendorCode,
+      _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
+      branch: localStorage.getItem("CurrentBranchCode"),
       cNID: this.CurrentContractDetails.cNID,
       rTID: this.TLHLForm.value.route.value,
       rTNM: this.TLHLForm.value.route.name,
@@ -301,9 +297,9 @@ export class VendorLHLModalComponent implements OnInit {
     }
   }
   //#endregion
-  //#region to Validate the minimum  charge values on rate in the TERForm.
+  //#region to Validate the minimum  charge values on rate in the TLHLForm.
   validateMinChargeOnRate() {
-    // Get the current values of 'min' and 'max' from the TERForm
+    // Get the current values of 'min' and 'max' from the TLHLForm
     const minValue = parseFloat(this.TLHLForm.get('min')?.value);
     const maxValue = parseFloat(this.TLHLForm.get('rate')?.value);
 
@@ -318,7 +314,7 @@ export class VendorLHLModalComponent implements OnInit {
         confirmButtonText: "OK"
       });
 
-      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      // Reset the values of 'min' and 'max' in the TLHLForm to an empty string
       this.TLHLForm.patchValue({
         min: '',
       });
@@ -326,4 +322,30 @@ export class VendorLHLModalComponent implements OnInit {
     this.validateMinCharge();
   }
   //#endregion
+  //#region to Validate the maximum  charge values on rate in the TLHLForm.
+  validateMAXChargeOnRate() {
+    // Get the current values of 'min' and 'max' from the TLHLForm
+    const minValue = parseFloat(this.TLHLForm.get('max')?.value);
+    const maxValue = parseFloat(this.TLHLForm.get('rate')?.value);
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && maxValue >= minValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Max charge must be greater than Rate.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TLHLForm to an empty string
+      this.TLHLForm.patchValue({
+        max: '',
+      });
+    }
+    this.validateMinCharge();
+  }
+  //#endregion
+
 }

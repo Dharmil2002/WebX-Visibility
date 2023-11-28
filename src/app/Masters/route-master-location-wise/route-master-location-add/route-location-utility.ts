@@ -1,8 +1,8 @@
 export const columnHeader = {
     Srno: {
-        Title: "Sr.No.",
+        Title: "#",
         class: "matcolumncenter",
-        Style: "min-width:5%",
+        Style: "max-width:5%",
     },
     loccd: {
         Title: "Branch Name",
@@ -10,27 +10,27 @@ export const columnHeader = {
         Style: "min-width:9%",
     },
     distKm: {
-        Title: "Distance(KM)",
+        Title: "Distance (In Km)",
         class: "matcolumncenter",
         Style: "min-width:8%",
     },
     trtimeHr: {
-        Title: "Transit(Minutes)",
+        Title: "Transit(Hours)",
         class: "matcolumncenter",
         Style: "min-width:8%",
     },
     sttimeHr: {
-        Title: "Stoppage(Minutes)",
+        Title: "Stoppage(Hours)",
         class: "matcolumncenter",
         Style: "min-width:8%",
     },
     speedLightVeh: {
-        Title: "Speed-Light Vehicle",
+        Title: "Speed-Light Veh.",
         class: "matcolumncenter",
         Style: "min-width:8%",
     },
     speedHeavyVeh: {
-        Title: "Speed-Heavy Vehicle",
+        Title: "Speed-Heavy Veh.",
         class: "matcolumncenter",
         Style: "min-width:8%",
     },

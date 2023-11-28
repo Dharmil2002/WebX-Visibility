@@ -106,7 +106,8 @@ export class BeneficiaryModalComponent implements OnInit {
   //#endregion
   //#region to upload Kyc image
   async uploadKYC(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uploadKYC", this.beneficiaryDetailForm, this.imageData, "Beneficiary", 'Master', this.jsonDetailControl);
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "uploadKYC", this.beneficiaryDetailForm, this.imageData, "Beneficiary", 'Master', this.jsonDetailControl,allowedFormats);
   }
   //#endregion
   //#region to preview image

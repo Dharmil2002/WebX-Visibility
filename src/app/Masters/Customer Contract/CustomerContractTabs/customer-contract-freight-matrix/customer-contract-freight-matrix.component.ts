@@ -21,6 +21,7 @@ import { ContractFreightMatrixControl } from "src/assets/FormControls/CustomerCo
 import { Router } from "@angular/router";
 import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import { StorageService } from "src/app/core/service/storage.service";
+import { ContainerService } from "src/app/Utility/module/masters/container/container.service";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -130,7 +131,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     private filter: FilterUtils,
     private changeDetectorRef: ChangeDetectorRef,
     private sessionService: SessionService,
-    private storage: StorageService
+    private storage: StorageService,
+    private objContainerService: ContainerService
   ) {
     // Retrieve the stored value from session storage
     // const storedData = sessionStorage.getItem("ServiceSelectiondata");
@@ -254,35 +256,26 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   }
 
   async getCapacityData() {
-    const Body = {
-      companyCode: this.companyCode,
-      collectionName: "General_master",
-      filter: { codeType: "VehicleCapacity", activeFlag: true },
-    };
-
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
-    if (res.success && res.data.length > 0) {
-      const BalanceSheetdata = res.data.map((x) => {
-        return {
-          name: x.codeDesc,
-          value: x.codeId,
-        };
-      });
-      this.filter.Filter(
-        this.jsonControlArrayFreightMatrix,
-        this.FreightMatrixForm,
-        BalanceSheetdata,
-        this.capacityCode,
-        this.capacityStatus
-      );
-      if (this.isUpdate) {
-        const FilterData = BalanceSheetdata.find(
-          (x) => x.name == this.UpdateData.cAP
-        );
-        this.FreightMatrixForm.controls["capacity"].setValue(FilterData);
-      }
+    const containerData = await this.objContainerService.getContainerList();
+    const vehicleData = await PayBasisdetailFromApi(
+      this.masterService,
+      "VehicleCapacity"
+    );
+    const containerDataWithPrefix = vehicleData.map((item) => ({
+      name: `Veh- ${item.name}`,
+      value: item.value,
+    }));
+    const data = [...containerDataWithPrefix, ...containerData];
+    this.filter.Filter(
+      this.jsonControlArrayFreightMatrix,
+      this.FreightMatrixForm,
+      data,
+      this.capacityCode,
+      this.capacityStatus
+    );
+    if (this.isUpdate) {
+      const FilterData = data.find((x) => x.name == this.UpdateData.cAP);
+      this.FreightMatrixForm.controls["capacity"].setValue(FilterData);
     }
   }
   //#endregion
@@ -413,7 +406,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       const length = tableres.data.length;
       const Index = length == 0 ? 1 : tableres.data[length - 1].fCID + 1;
       json["cONID"] = this.contractData.cONID;
-      json["lTYPE"]= this.ServiceSelectiondata.loadType;
+      json["lTYPE"] = this.ServiceSelectiondata.loadType;
       json["cID"] = this.companyCode;
       json["_id"] = `${this.companyCode}-${this.contractData.cONID}-${Index}`;
       json["fCID"] = Index;

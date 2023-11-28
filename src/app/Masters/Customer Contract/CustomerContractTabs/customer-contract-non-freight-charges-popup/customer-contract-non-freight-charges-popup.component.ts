@@ -155,19 +155,33 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     });
   }
   async getrateTypeDropdown() {
-    const AcGroupdata = await PayBasisdetailFromApi(
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      collectionName: "cust_contract",
+      filter: { docNo: this.ChargesData.cONID },
+    };
+    const res = await this.masterService
+      .masterPost("generic/get", req)
+      .toPromise();
+    const SelectedData = res.data[0].rTYP;
+    const RatData = await PayBasisdetailFromApi(
       this.masterService,
       "RTTYP"
+    );
+    const rateTypedata = SelectedData.map(
+      (x, index) => {
+        return RatData.find((t) => t.value == x);
+      }
     );
     this.filter.Filter(
       this.jsonControlArrayNonFreightMatrix,
       this.NonFreightMatrixForm,
-      AcGroupdata,
+      rateTypedata,
       this.rateTypeCode,
       this.rateTypeStatus
     );
     if (this.isUpdate) {
-      const element = AcGroupdata.find((x) => x.name == this.UpdateData.rTYPE);
+      const element = rateTypedata.find((x) => x.name == this.UpdateData.rTYPE);
       this.NonFreightMatrixForm.controls["rateType"].setValue(element);
     }
   }

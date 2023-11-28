@@ -132,17 +132,15 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
             "_id": this.companyCode + "-" + newVendorCode,
             "cNID": newVendorCode,
             'cID': this.companyCode,
-            "fNYR": parseInt(financialYear),
-            "branch": localStorage.getItem("CurrentBranchCode"),
             "vNID": this.vendorContractForm.value.VNID.value,
             "vNNM": this.vendorContractForm.value.VNID.name,
             "pDTID": this.vendorContractForm.value.PDTID.value,
             "pDTNM": this.vendorContractForm.value.PDTID.name,
             "cNSDT": this.vendorContractForm.value.CNSDT,
             "eNDDT": this.vendorContractForm.value.ENDDT,
-            "aCTV": this.vendorContractForm.value.ACTV,
-            "eDT": new Date(),
-            "eNBY": this.vendorContractForm.value.ENBY
+            "eNTLOC":localStorage.getItem("Branch"),
+            "eNTDT": new Date(),
+            "eNTBY": this.vendorContractForm.value.ENBY
           }
           // Prepare request for creating a new vendor contract
           const createVendorContractRequest = {

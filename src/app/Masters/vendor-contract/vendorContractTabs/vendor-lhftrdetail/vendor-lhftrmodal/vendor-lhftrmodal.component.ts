@@ -31,6 +31,8 @@ export class VendorLHFTRModalComponent implements OnInit {
   rateTypestatus: any;
   CurrentContractDetails: any;
   existRouteList: any;
+  submit = 'Save';
+
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private fb: UntypedFormBuilder,
@@ -128,8 +130,9 @@ export class VendorLHFTRModalComponent implements OnInit {
       rT: parseFloat(this.TLHFTRForm.value.rate),
       mIN: parseFloat(this.TLHFTRForm.value.min),
       mAX: parseFloat(this.TLHFTRForm.value.max),
-      uPDT: new Date(),
-      uPBY: this.TLHFTRForm.value.upBY,
+      mODLOC: localStorage.getItem("Branch"),
+      mODDT: new Date(),
+      mODBY: this.TLHFTRForm.value.upBY,
     };
   }
 
@@ -150,7 +153,6 @@ export class VendorLHFTRModalComponent implements OnInit {
     return {
       _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
-      branch: localStorage.getItem("CurrentBranchCode"),
       cNID: this.CurrentContractDetails.cNID,
       rTID: this.TLHFTRForm.value.route.value,
       rTNM: this.TLHFTRForm.value.route.name,
@@ -161,8 +163,9 @@ export class VendorLHFTRModalComponent implements OnInit {
       rT: parseFloat(this.TLHFTRForm.value.rate),
       mIN: parseFloat(this.TLHFTRForm.value.min),
       mAX: parseFloat(this.TLHFTRForm.value.max),
-      eDT: new Date(),
-      eNBY: this.TLHFTRForm.value.ENBY,
+      eNTBY: this.TLHFTRForm.value.ENBY,
+      eNTLOC: localStorage.getItem("Branch"),
+      eNTDT: new Date(),
     };
   }
   //#endregion
@@ -197,6 +200,8 @@ export class VendorLHFTRModalComponent implements OnInit {
       this.TLHFTRForm.controls['rate'].setValue(this.objResult.Details.rT);
       this.TLHFTRForm.controls['min'].setValue(this.objResult.Details.mIN);
       this.TLHFTRForm.controls['max'].setValue(this.objResult.Details.mAX);
+      this.submit = 'Update';
+
     }
   }
   //#endregion

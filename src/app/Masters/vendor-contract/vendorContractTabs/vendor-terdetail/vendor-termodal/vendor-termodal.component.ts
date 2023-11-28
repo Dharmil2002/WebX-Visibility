@@ -33,6 +33,7 @@ export class VendorTERModalComponent implements OnInit {
   rateTypestatus: any;
   CurrentContractDetails: any;
   existRouteList: any;
+  submit = 'Save';
 
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private fb: UntypedFormBuilder,
@@ -84,6 +85,7 @@ export class VendorTERModalComponent implements OnInit {
       this.TERForm.controls['rate'].setValue(this.objResult.Details.rT);
       this.TERForm.controls['min'].setValue(this.objResult.Details.mIN);
       this.TERForm.controls['max'].setValue(this.objResult.Details.mAX);
+      this.submit = 'Update';
     }
   }
   //#endregion
@@ -163,8 +165,9 @@ export class VendorTERModalComponent implements OnInit {
       rT: parseFloat(this.TERForm.value.rate),
       mIN: parseFloat(this.TERForm.value.min),
       mAX: parseFloat(this.TERForm.value.max),
-      uPDT: new Date(),
-      uPBY: this.TERForm.value.upBY,
+      mODLOC: localStorage.getItem("Branch"),
+      mODDT: new Date(),
+      mODBY: this.TERForm.value.upBY,
     };
   }
 
@@ -185,7 +188,6 @@ export class VendorTERModalComponent implements OnInit {
     return {
       _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
-      branch: localStorage.getItem("CurrentBranchCode"),
       cNID: this.CurrentContractDetails.cNID,
       rTID: this.TERForm.value.route.value,
       rTNM: this.TERForm.value.route.name,
@@ -196,8 +198,9 @@ export class VendorTERModalComponent implements OnInit {
       rT: parseFloat(this.TERForm.value.rate),
       mIN: parseFloat(this.TERForm.value.min),
       mAX: parseFloat(this.TERForm.value.max),
-      eDT: new Date(),
-      eNBY: this.TERForm.value.ENBY,
+      eNTBY: this.TERForm.value.ENBY,
+      eNTLOC: localStorage.getItem("Branch"),
+      eNTDT: new Date(),
     };
   }
 

@@ -125,7 +125,7 @@ export class AddContractProfile {
           },],
       },
       {
-        name: 'uPDT',
+        name: 'mODDT',
         label: ' ',
         placeholder: ' ',
         type: 'date',
@@ -138,7 +138,7 @@ export class AddContractProfile {
         disable: false
       },
       {
-        name: "uPBY",
+        name: "mODBY",
         label: "",
         placeholder: "",
         type: "text",

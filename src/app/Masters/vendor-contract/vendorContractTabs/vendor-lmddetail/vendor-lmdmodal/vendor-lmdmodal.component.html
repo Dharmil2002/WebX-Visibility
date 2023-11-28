@@ -12,7 +12,8 @@
         <app-form-webxpress [form]="TLMDForm" [formData]="jsonControlArray"
             [FormTitle]="'Transportation- Last mile delivery Details'"
              (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)">
+            [showSaveAndCancelButton]="true" (callFunction)="functionCallHandler($event)"
+            [submit]="submit">
         </app-form-webxpress>
     </form>
 </div>

@@ -77,10 +77,13 @@ export class RouteLocationControl {
                 name: 'departureTime',
                 label: 'Departure time from starting Location',
                 placeholder: '',
-                type: 'time',
-                value: new Date(2023, 6, 18, 13, 14),
+                type: 'datetimerpicker',
+                value: new Date(),
                 Validations: [],
-                generatecontrol: true, disable: false
+                generatecontrol: true, disable: false,
+                additionalData: {
+                    minDate: new Date(),
+                  },
             },
             {
                 name: 'controlLoc', label: "Controlling Location", placeholder: "Select Location", type: 'dropdown',
@@ -238,7 +241,7 @@ export class RouteLocationControl {
             },
             {
                 name: "trtimeHr",
-                label: "Transit (Minutes)",
+                label: "Transit (Hours)",
                 placeholder: "",
                 type: "text",
                 value: routeLocationData?.trtimeHr,
@@ -249,7 +252,7 @@ export class RouteLocationControl {
             },
             {
                 name: "sttimeHr",
-                label: "Stoppage (Minutes)",
+                label: "Stoppage (Hours)",
                 placeholder: "",
                 type: "text",
                 value: routeLocationData?.sttimeHr,

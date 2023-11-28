@@ -493,11 +493,12 @@ export class CustomerContractServiceSelectionComponent
         this.StateList,
         "ST"
       );
+      this.SetDefaultProductsData();
     } catch (error) {
       // Handle any errors that occurred during the request
       console.error("Error:", error);
     }
-    this.SetDefaultProductsData();
+
   }
 
   //#region Set OriginRateOptions
@@ -539,15 +540,12 @@ export class CustomerContractServiceSelectionComponent
         break;
       case "COD/DOD":
         this.DisplayCODDODSection = checked;
-        this.onSelectrateTypeProduct(eventRateData)
         break;
       case "Demurrage":
         this.DisplayDemurragericSection = checked;
-        this.onSelectrateTypeProduct(eventRateData)
         break;
       case "Insurance":
         this.DisplayInsuranceSection = checked;
-        this.onSelectrateTypeProduct(eventRateData)
         break;
       case "cutofftime":
         this.DisplayCutOfftimeSection = checked;
@@ -556,7 +554,6 @@ export class CustomerContractServiceSelectionComponent
         this.DisplayYieldProtectionSection = checked;
         break;
       case "fuelSurcharge":
-        this.onSelectrateTypeProduct(eventRateData)
         this.DisplayFuelSurchargeSection = checked;
         break;
       default:
@@ -793,7 +790,7 @@ export class CustomerContractServiceSelectionComponent
   }
   ngOnChanges(changes: SimpleChanges) { }
 
-  SetDefaultProductsData() {
+  async SetDefaultProductsData() {
     //#region  Set Default Products
 
     if (this.contractData?.lTYP != null) {
@@ -959,6 +956,14 @@ export class CustomerContractServiceSelectionComponent
         // Default case
       }
     });
+    const eventRateData = {
+      eventArgs: {
+        value: this.ProductsForm.value.rateTypecontrolHandler
+      }
+    }
+    setTimeout(() => {
+      this.onSelectrateTypeProduct(eventRateData);
+    }, 5000);
     //#endregion
   }
 
@@ -1066,8 +1071,10 @@ export class CustomerContractServiceSelectionComponent
     contractDetails["lTYP"] = this.ProductsForm.value.loadType.value;
     contractDetails["rTYP"] =
       this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.value);
-    contractDetails["uDT"] = new Date(),
-      contractDetails["uBY"] = localStorage.getItem("UserName")
+    contractDetails["mODDT"] = new Date(),
+      contractDetails["mODBY"] = localStorage.getItem("UserName")
+    contractDetails["mODLOC"] = localStorage.getItem("CurrentBranchCode")
+
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "cust_contract",
@@ -1249,7 +1256,6 @@ export class CustomerContractServiceSelectionComponent
   //   }
   // }
   onSelectrateTypeProduct(event) {
-    debugger
     const FilteredRateType = event?.eventArgs?.value
       .map(element => this.RatetypedetailFromAPI.find(x => x.value === element.value))
       .filter(Boolean);
@@ -1272,8 +1278,6 @@ export class CustomerContractServiceSelectionComponent
             "CODDODRatetype",
             false
           );
-          const indexToRemove = FilteredRateType.findIndex(item => item.name !== this.contractData.cODDODRTYP);
-
           if (FilteredRateType.find(item => item && item.name !== this.contractData.cODDODRTYP)) {
             this.CODDODForm.get("CODDODRatetype").setValue("");
           }
@@ -1287,11 +1291,9 @@ export class CustomerContractServiceSelectionComponent
             "DRatetype",
             false
           );
-          // this.DemurrageForm.get("DRatetype").setValue(
-          //   FilteredRateType.find(
-          //     (item) => item.name == this.contractData.dRTYP
-          //   )
-          // );
+          if (FilteredRateType.find(item => item && item.name !== this.contractData.cODDODRTYP)) {
+            this.DemurrageForm.get("DRatetype").setValue("");
+          }
 
           break;
         case 'fuelSurcharge':
@@ -1302,13 +1304,12 @@ export class CustomerContractServiceSelectionComponent
             "FRateType",
             false
           );
-          // this.FuelSurchargeForm.get("FRateType").setValue(
-          //   FilteredRateType.find(
-          //     (item) => item.name == this.contractData.dRTYP
-          //   )
-          // );
+          if (FilteredRateType.find(item => item && item.name !== this.contractData.cODDODRTYP)) {
+            this.FuelSurchargeForm.get("FRateType").setValue("");
+          }
           break;
         case 'Insurance':
+          debugger
           this.filter.Filter(
             this.jsonControlArrayInsuranceCarrierRiskForm,
             this.InsuranceCarrierRiskForm,
@@ -1316,6 +1317,9 @@ export class CustomerContractServiceSelectionComponent
             "rateType",
             false
           );
+          if (FilteredRateType.find(item => item && item.name !== this.contractData.cODDODRTYP)) {
+            this.InsuranceCarrierRiskForm.get("rateType").setValue("");
+          }
           break;
         // Add more cases as needed
         default:

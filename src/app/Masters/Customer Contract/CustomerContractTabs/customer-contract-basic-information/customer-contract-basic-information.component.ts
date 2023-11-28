@@ -202,8 +202,9 @@ export class CustomerContractBasicInformationComponent implements OnInit {
         cPONO: this.ProductsForm.value?.CustomerPONo,
         cPODt: this.ProductsForm.value?.POValiditydate,
         cPOSCAN: this.ContractPOScanimageData?.ContractPOScan ?? this.contractData.cPOSCAN,
-        uDT: new Date(),
-        uBY: localStorage.getItem("UserName")
+        mODDT: new Date(),
+        mODBY: localStorage.getItem("UserName"),
+        mODLOC: localStorage.getItem("CurrentBranchCode")
       }
 
       const reqBody = {

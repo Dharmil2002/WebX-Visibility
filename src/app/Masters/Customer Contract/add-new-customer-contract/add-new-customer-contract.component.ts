@@ -340,8 +340,10 @@ export class AddNewCustomerContractComponent extends UnsubscribeOnDestroyAdapter
           this.customerContractDataRequestModel.Expirydate = this.ContractForm.value?.Expirydate
           this.customerContractDataRequestModel.entryDate = new Date().toString()
           this.customerContractDataRequestModel.entryBy = localStorage.getItem("UserName")
+          this.customerContractDataRequestModel.entryLocation = localStorage.getItem("CurrentBranchCode")
           this.customerContractDataRequestModel.updateDate = ""
           this.customerContractDataRequestModel.updateBy = ""
+          this.customerContractDataRequestModel.updateLocation = ""
 
           this.customerContractRequestModel.data = this.customerContractDataRequestModel;
 

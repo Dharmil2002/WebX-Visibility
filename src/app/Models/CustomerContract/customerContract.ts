@@ -23,5 +23,7 @@ export class CustomerContractDataRequestModel {
   entryDate: string
   updateBy: string
   updateDate: string
+  entryLocation: string
+  updateLocation: string
 
 }

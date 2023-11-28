@@ -66,7 +66,8 @@ export class ContractServiceSelectionControl {
           }]
         },
         functions: {
-          onToggleAll: 'toggleSelectAll'
+          onToggleAll: 'toggleSelectAll',
+          onSelect: 'onSelectrateTypeProduct'
         },
         generatecontrol: true, disable: false
       },

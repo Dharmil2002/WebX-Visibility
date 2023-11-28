@@ -84,6 +84,7 @@ export class CustomerContractServiceSelectionComponent
   //#endregion
 
   //#region Table Configration Fields
+  isCalledFirstTime = false;
   isLoad: boolean = false;
   isFLoad: boolean = false;
   linkArray = [];
@@ -412,13 +413,6 @@ export class CustomerContractServiceSelectionComponent
       this.masterService,
       "RTTYP"
     );
-    this.filter.Filter(
-      this.jsonControlArrayCODDODForm,
-      this.CODDODForm,
-      this.CODDODRatetypeFromAPI,
-      "CODDODRatetype",
-      false
-    );
     this.DemurrageRatetypeFromAPI = await PayBasisdetailFromApi(
       this.masterService,
       "RTTYP"
@@ -534,19 +528,26 @@ export class CustomerContractServiceSelectionComponent
   OnChangeServiceSelections(event) {
     const fieldName = typeof event === "string" ? event : event.field.name;
     const checked = typeof event === "string" ? event : event.eventArgs.checked;
-
+    const eventRateData = {
+      eventArgs: {
+        value: this.ProductsForm.value.rateTypecontrolHandler
+      }
+    }
     switch (fieldName) {
       case "Volumetric":
         this.DisplayVolumetricSection = checked;
         break;
       case "COD/DOD":
         this.DisplayCODDODSection = checked;
+        this.onSelectrateTypeProduct(eventRateData)
         break;
       case "Demurrage":
         this.DisplayDemurragericSection = checked;
+        this.onSelectrateTypeProduct(eventRateData)
         break;
       case "Insurance":
         this.DisplayInsuranceSection = checked;
+        this.onSelectrateTypeProduct(eventRateData)
         break;
       case "cutofftime":
         this.DisplayCutOfftimeSection = checked;
@@ -555,11 +556,13 @@ export class CustomerContractServiceSelectionComponent
         this.DisplayYieldProtectionSection = checked;
         break;
       case "fuelSurcharge":
+        this.onSelectrateTypeProduct(eventRateData)
         this.DisplayFuelSurchargeSection = checked;
         break;
       default:
         break;
     }
+    this.isCalledFirstTime = true
   }
   //#region functionCallHandler
   functionCallHandler($event) {
@@ -825,7 +828,9 @@ export class CustomerContractServiceSelectionComponent
         },
         eventArgs: {
           checked: true,
+          firstTime: true,
         },
+
       };
       this.ServicesForm.get(event.field.name).setValue(event.eventArgs.checked);
       this.OnChangeServiceSelections(event);
@@ -855,10 +860,21 @@ export class CustomerContractServiceSelectionComponent
       },
       "COD/DOD": () => {
         // Your logic for COD/DOD
+
+        const FilteredRateType = this.contractData.rTYP
+          .map(element => this.RatetypedetailFromAPI.find(x => x.value === element))
+          .filter(Boolean);
+
+        this.filter.Filter(
+          this.jsonControlArrayCODDODForm,
+          this.CODDODForm,
+          FilteredRateType,
+          "CODDODRatetype",
+          false
+        );
+
         this.CODDODForm.get("CODDODRatetype").setValue(
-          this.CODDODRatetypeFromAPI.find(
-            (item) => item.name == this.contractData.cODDODRTYP
-          )
+          FilteredRateType.find(item => item.name === this.contractData.cODDODRTYP)
         );
         this.CODDODForm.get("Rate").setValue(this.contractData.rT);
         this.CODDODForm.get("MinCharge").setValue(this.contractData.mIN);
@@ -868,6 +884,20 @@ export class CustomerContractServiceSelectionComponent
         // Your logic for Demurrage
 
         this.DemurrageForm.get("Freestoragedays").setValue(this.contractData.fSDAY);
+
+        const FilteredRateType = this.contractData.rTYP
+          .map(element => this.RatetypedetailFromAPI.find(x => x.value === element))
+          .filter(Boolean);
+
+        this.filter.Filter(
+          this.jsonControlArrayDemurrageForm,
+          this.DemurrageForm,
+          FilteredRateType,
+          "DRatetype",
+          false
+        );
+
+
         this.DemurrageForm.get("DRatetype").setValue(
           this.DemurrageRatetypeFromAPI.find(
             (item) => item.name == this.contractData.dRTYP
@@ -1218,4 +1248,79 @@ export class CustomerContractServiceSelectionComponent
   //     });
   //   }
   // }
+  onSelectrateTypeProduct(event) {
+    debugger
+    const FilteredRateType = event?.eventArgs?.value
+      .map(element => this.RatetypedetailFromAPI.find(x => x.value === element.value))
+      .filter(Boolean);
+
+    const formValues = this.ServicesForm.value;
+    // Use a Set for faster lookups
+    const selectedServicesSet = new Set(
+      Object.entries(formValues)
+        .filter(([key, value]) => value === true)
+        .map(([key]) => key)
+    );
+
+    selectedServicesSet.forEach(item => {
+      switch (item) {
+        case 'COD/DOD':
+          this.filter.Filter(
+            this.jsonControlArrayCODDODForm,
+            this.CODDODForm,
+            FilteredRateType,
+            "CODDODRatetype",
+            false
+          );
+          const indexToRemove = FilteredRateType.findIndex(item => item.name !== this.contractData.cODDODRTYP);
+
+          if (FilteredRateType.find(item => item && item.name !== this.contractData.cODDODRTYP)) {
+            this.CODDODForm.get("CODDODRatetype").setValue("");
+          }
+
+          break;
+        case 'Demurrage':
+          this.filter.Filter(
+            this.jsonControlArrayDemurrageForm,
+            this.DemurrageForm,
+            FilteredRateType,
+            "DRatetype",
+            false
+          );
+          // this.DemurrageForm.get("DRatetype").setValue(
+          //   FilteredRateType.find(
+          //     (item) => item.name == this.contractData.dRTYP
+          //   )
+          // );
+
+          break;
+        case 'fuelSurcharge':
+          this.filter.Filter(
+            this.jsonControlArrayFuelSurchargeForm,
+            this.FuelSurchargeForm,
+            FilteredRateType,
+            "FRateType",
+            false
+          );
+          // this.FuelSurchargeForm.get("FRateType").setValue(
+          //   FilteredRateType.find(
+          //     (item) => item.name == this.contractData.dRTYP
+          //   )
+          // );
+          break;
+        case 'Insurance':
+          this.filter.Filter(
+            this.jsonControlArrayInsuranceCarrierRiskForm,
+            this.InsuranceCarrierRiskForm,
+            FilteredRateType,
+            "rateType",
+            false
+          );
+          break;
+        // Add more cases as needed
+        default:
+        // Default case
+      }
+    });
+  }
 }

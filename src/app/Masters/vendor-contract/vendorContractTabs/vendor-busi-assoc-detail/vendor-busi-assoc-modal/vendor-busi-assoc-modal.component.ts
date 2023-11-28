@@ -64,14 +64,6 @@ export class VendorBusiAssocModalComponent implements OnInit {
     // console.log(this.objResult);
   }
 
-  // //#region to get location list
-  // async getLocation() {
-  //   await this.objPinCodeService.getCity(
-  //     this.BusiAssocForm, this.jsonControlArray, this.cityName, this.citystatus
-  //   );
-  // }
-  // //#endregion
-
   //#region to send data to parent component using dialogRef
   async save(event) {
     try {
@@ -169,7 +161,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
       _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
       cNID: this.CurrentContractDetails.cNID,
-      // cT: this.BusiAssocForm.value.city.value,
+      branch: localStorage.getItem("CurrentBranchCode"),
       mDID: this.BusiAssocForm.value.mode.value,
       mDNM: this.BusiAssocForm.value.mode.name,
       oPID: this.BusiAssocForm.value.operation.value,

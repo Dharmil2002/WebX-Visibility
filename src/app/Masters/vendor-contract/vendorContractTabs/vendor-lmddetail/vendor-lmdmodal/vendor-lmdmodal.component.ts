@@ -169,6 +169,7 @@ export class VendorLMDModalComponent implements OnInit {
     return {
       _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
+      branch: localStorage.getItem("CurrentBranchCode"),
       cNID: this.CurrentContractDetails.cNID,
       lOCID: this.TLMDForm.value.location.value,
       lOCNM: this.TLMDForm.value.location.name,

@@ -149,8 +149,8 @@ export class VendorLHLModalComponent implements OnInit {
     // Prepare data for creating a new contract
     return {
       _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
-      vCLBID: newVendorCode,
       cID: this.companyCode,
+      branch: localStorage.getItem("CurrentBranchCode"),
       cNID: this.CurrentContractDetails.cNID,
       rTID: this.TLHLForm.value.route.value,
       rTNM: this.TLHLForm.value.route.name,

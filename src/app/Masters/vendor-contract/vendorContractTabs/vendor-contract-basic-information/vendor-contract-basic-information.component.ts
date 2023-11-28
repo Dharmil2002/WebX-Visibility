@@ -219,12 +219,13 @@ export class VendorContractBasicInformationComponent implements OnInit {
     const endDate = new Date(this.ProductsForm.value.cNSDT);
 
     // Calculate the difference in milliseconds
-    const timeDifference = Math.abs(startDate.getTime() - endDate.getTime());
+    const timeDifference = endDate.getTime() - startDate.getTime();
 
     // Calculate the number of days
-    const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
+    const numberOfDays = Math.max(0, Math.ceil(timeDifference / (1000 * 3600 * 24)));
 
-    this.ProductsForm.controls.pNDYS.setValue(numberOfDays)
+    // Set the value in the form control
+    this.ProductsForm.controls.pNDYS.setValue(numberOfDays);
   }
   //#endregion
   //#region to validate contract date

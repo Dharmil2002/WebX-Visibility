@@ -149,7 +149,8 @@ export class VendorLHFTRModalComponent implements OnInit {
     // Prepare data for creating a new contract
     return {
       _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
-       cID: this.companyCode,
+      cID: this.companyCode,
+      branch: localStorage.getItem("CurrentBranchCode"),
       cNID: this.CurrentContractDetails.cNID,
       rTID: this.TLHFTRForm.value.route.value,
       rTNM: this.TLHFTRForm.value.route.name,
@@ -321,29 +322,29 @@ export class VendorLHFTRModalComponent implements OnInit {
     this.validateMinCharge();
   }
   //#endregion
-    //#region to Validate the maximum  charge values on rate in the TLHFTRForm.
-    validateMAXChargeOnRate() {
-      // Get the current values of 'min' and 'max' from the TLHFTRForm
-      const minValue = parseFloat(this.TLHFTRForm.get('max')?.value);
-      const maxValue = parseFloat(this.TLHFTRForm.get('rate')?.value);
-  
-      // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
-      if (minValue && maxValue && maxValue >= minValue) {
-        // Display an error message using SweetAlert (Swal)
-        Swal.fire({
-          title: 'Max charge must be greater than Rate.',
-          toast: false,
-          icon: "error",
-          showConfirmButton: true,
-          confirmButtonText: "OK"
-        });
-  
-        // Reset the values of 'min' and 'max' in the TLHFTRForm to an empty string
-        this.TLHFTRForm.patchValue({
-          max: '',
-        });
-      }
-      this.validateMinCharge();
+  //#region to Validate the maximum  charge values on rate in the TLHFTRForm.
+  validateMAXChargeOnRate() {
+    // Get the current values of 'min' and 'max' from the TLHFTRForm
+    const minValue = parseFloat(this.TLHFTRForm.get('max')?.value);
+    const maxValue = parseFloat(this.TLHFTRForm.get('rate')?.value);
+
+    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
+    if (minValue && maxValue && maxValue >= minValue) {
+      // Display an error message using SweetAlert (Swal)
+      Swal.fire({
+        title: 'Max charge must be greater than Rate.',
+        toast: false,
+        icon: "error",
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+
+      // Reset the values of 'min' and 'max' in the TLHFTRForm to an empty string
+      this.TLHFTRForm.patchValue({
+        max: '',
+      });
     }
-    //#endregion
+    this.validateMinCharge();
+  }
+  //#endregion
 }

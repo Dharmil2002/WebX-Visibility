@@ -71,6 +71,11 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     name: "Add New",
     iconName: "add",
   };
+  SaveEventButton = {
+    functionName: "Save",
+    name: "Save",
+    iconName: "save",
+  };
   menuItems = [{ label: "Edit" }, { label: "Remove" }];
 
   ChargescolumnHeader = {
@@ -162,7 +167,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   }
   initializeFormControl() {
     this.ContractNonFreightMatrixControls =
-      new ContractNonFreightMatrixControl(this.isUpdate , this.UpdateData);
+      new ContractNonFreightMatrixControl(this.isUpdate, this.UpdateData);
     this.jsonControlArrayNonFreightCharges =
       this.ContractNonFreightMatrixControls.getContractNonFreightChargesControlControls();
     this.NonFreightChargesForm = formGroupBuilder(this.fb, [
@@ -194,7 +199,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     }
   }
 
-  async save(event) {
+  async Save() {
     const body = {
       sCT: this.NonFreightChargesForm.value.selectCharges,
       cBT: this.NonFreightChargesForm.value.ChargesBehaviour,

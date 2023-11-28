@@ -1,7 +1,7 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class ContractFreightMatrixControl {
   private ContractFreightMatrixControlArray: FormControls[];
-  constructor( UpdateData ,isUpdate) {
+  constructor(UpdateData, isUpdate) {
     this.ContractFreightMatrixControlArray = [
 
       {
@@ -9,14 +9,26 @@ export class ContractFreightMatrixControl {
         label: "From",
         placeholder: "From",
         type: "dropdown",
-        value: isUpdate?{
-          name:UpdateData.from,
-          value:UpdateData.fromType,
-        }: "",
+        value: isUpdate ? {
+          name: UpdateData.from,
+          value: UpdateData.fromType,
+        } : "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "From is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
         additionalData: {},
         functions: {
 
@@ -32,14 +44,26 @@ export class ContractFreightMatrixControl {
         label: "To",
         placeholder: "To",
         type: "dropdown",
-        value: isUpdate?{
-          name:UpdateData.to,
-          value:UpdateData.toType,
-        }: "",
+        value: isUpdate ? {
+          name: UpdateData.to,
+          value: UpdateData.toType,
+        } : "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
-        Validations: [],
+        Validations: [
+          {
+            name: "required",
+            message: "To is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
         additionalData: {
           isIndeterminate: false,
           isChecked: false,
@@ -87,7 +111,7 @@ export class ContractFreightMatrixControl {
         label: "Capacity",
         placeholder: "Capacity",
         type: "dropdown",
-        value:"",
+        value: "",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -110,10 +134,10 @@ export class ContractFreightMatrixControl {
       },
       {
         name: "Rate",
-        label: "Rate",
-        placeholder: "Rate",
-        type: "text",
-        value: isUpdate?UpdateData.rT:"",
+        label: "Rate (₹)",
+        placeholder: "Rate (₹)",
+        type: "number",
+        value: isUpdate ? UpdateData.rT : "",
         generatecontrol: true,
         disable: false,
         Validations: [

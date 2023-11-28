@@ -14,6 +14,11 @@ import Swal from "sweetalert2";
   templateUrl: "./customer-contract-non-freight-charges-popup.component.html",
 })
 export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
+  SaveEventButton = {
+    functionName: "Save",
+    name: "Save",
+    iconName: "save",
+  };
   columnHeader = {
     from: {
       Title: "From",
@@ -31,17 +36,17 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       Style: "min-width:20%",
     },
     rate: {
-      Title: "Rate",
+      Title: "Rate (₹)",
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
     minValue: {
-      Title: "Min Value",
+      Title: "Min Value (₹)",
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
     maxValue: {
-      Title: "Max Value",
+      Title: "Max Value (₹)",
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
@@ -125,7 +130,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
 
   initializeFormControl() {
     this.ContractNonFreightMatrixControls =
-      new ContractNonFreightMatrixControl(this.isUpdate , this.UpdateData);
+      new ContractNonFreightMatrixControl(this.isUpdate, this.UpdateData);
     this.jsonControlArrayNonFreightMatrix =
       this.ContractNonFreightMatrixControls.getContractNonFreightMatrixControlControls();
     this.NonFreightMatrixForm = formGroupBuilder(this.fb, [
@@ -191,7 +196,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       console.error("Error:", error);
     }
   }
-  async save() {
+  async Save() {
     let ChargesDatareq = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_non_freight_charge_matrix",
@@ -268,7 +273,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       });
     }
   }
-  Updatecharges(event){
+  Updatecharges(event) {
     this.isUpdate = true;
     this.UpdateData = event.data
     this.initializeFormControl()

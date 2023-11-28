@@ -90,7 +90,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       Style: "min-width:2px",
     },
     rT: {
-      Title: "Rate",
+      Title: "Rate (₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -114,8 +114,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   ServiceSelectiondata: any;
   rateTypeCode: any;
   rateTypeStatus: any;
-  isUpdate=false;
-  UpdateData:any
+  isUpdate = false;
+  UpdateData: any
   capacityCode: any;
   capacityStatus: any;
 
@@ -161,10 +161,10 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     };
     const res = await this.masterService.masterPost("generic/get", req).toPromise();
     this.ServiceSelectiondata = {
-      loadType:res.data[0].lTYP,
-      rateTypecontrolHandler:res.data[0].rTYP
+      loadType: res.data[0].lTYP,
+      rateTypecontrolHandler: res.data[0].rTYP
     }
-    console.log('this.ServiceSelectiondata' ,this.ServiceSelectiondata)
+    console.log('this.ServiceSelectiondata', this.ServiceSelectiondata)
     if (this.ServiceSelectiondata.loadType == 'LTL') {
       delete this.columnHeader.cAP
     }
@@ -177,7 +177,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "cust_contract_freight_charge_matrix",
-      filter: { cONID: this.contractData.cONID , lType:this.ServiceSelectiondata.loadType },
+      filter: { cONID: this.contractData.cONID, lType: this.ServiceSelectiondata.loadType },
     };
     const res = await this.masterService
       .masterPost("generic/get", req)
@@ -192,7 +192,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   //#endregion
   initializeFormControl() {
-    this.ContractFreightMatrixControls = new ContractFreightMatrixControl(this.UpdateData , this.isUpdate);
+    this.ContractFreightMatrixControls = new ContractFreightMatrixControl(this.UpdateData, this.isUpdate);
     this.jsonControlArrayFreightMatrix =
       this.ContractFreightMatrixControls.getContractFreightMatrixControlControls(
         this.CurrentAccessList.productAccess
@@ -212,13 +212,13 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         // Set AcGroupCategory variables
         this.rateTypeCode = data.name;
         this.rateTypeStatus = data.additionalData.showNameAndValue;
-        const rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map((x,index)=>{
+        const rateTypedata = this.ServiceSelectiondata.rateTypecontrolHandler.map((x, index) => {
           return {
-            value:index.toString(),
-            name:x
+            value: index.toString(),
+            name: x
           }
         })
-        console.log('rateTypedata' ,rateTypedata)
+        console.log('rateTypedata', rateTypedata)
         this.filter.Filter(
           this.jsonControlArrayFreightMatrix,
           this.FreightMatrixForm,
@@ -226,8 +226,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
           this.rateTypeCode,
           this.rateTypeStatus
         );
-        if(this.isUpdate){
-          const rateTypeFilterData = rateTypedata.find((x)=> x.name == this.UpdateData.rTYP)
+        if (this.isUpdate) {
+          const rateTypeFilterData = rateTypedata.find((x) => x.name == this.UpdateData.rTYP)
           this.FreightMatrixForm.controls["rateType"].setValue(rateTypeFilterData)
         }
       }
@@ -239,7 +239,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     });
   }
 
-  async getCapacityData(){
+  async getCapacityData() {
     const Body = {
       companyCode: this.companyCode,
       collectionName: "General_master",
@@ -263,8 +263,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         this.capacityCode,
         this.capacityStatus
       );
-      if(this.isUpdate){
-        const FilterData = BalanceSheetdata.find((x)=> x.name == this.UpdateData.cAP)
+      if (this.isUpdate) {
+        const FilterData = BalanceSheetdata.find((x) => x.name == this.UpdateData.cAP)
         this.FreightMatrixForm.controls["capacity"].setValue(FilterData)
       }
     }
@@ -306,7 +306,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   //#region Set OriginRateOptions
   SetOptions(event) {
     let fieldName = event.field.name;
-    console.log('fieldName' ,fieldName)
+    console.log('fieldName', fieldName)
     const search = this.FreightMatrixForm.controls[fieldName].value;
     let data = [];
     if (search.length >= 2) {
@@ -341,10 +341,10 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   }
   async AddNewButtonEvent(event) {
     if (!this.FreightMatrixForm.valid) return;
-  
+
     this.tableLoad = false;
     this.isLoad = true;
-  
+
     const json = {
       cONID: this.contractData.cONID,
       from: this.FreightMatrixForm.value.From.name,
@@ -356,7 +356,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       cAP: this.ServiceSelectiondata.loadType !== "LTL" ? this.FreightMatrixForm.value.capacity.name : "",
       rT: this.FreightMatrixForm.value.Rate,
     };
-  
+
     const req = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_freight_charge_matrix",
@@ -364,15 +364,15 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       update: this.isUpdate ? json : undefined,
       data: !this.isUpdate ? json : undefined,
     };
-  
+
     const method = this.isUpdate ? "generic/update" : "generic/create";
-    const res = this.isUpdate? await this.masterService.masterPut(method, req).toPromise():await this.masterService.masterPost(method, req).toPromise();
-  
+    const res = this.isUpdate ? await this.masterService.masterPut(method, req).toPromise() : await this.masterService.masterPost(method, req).toPromise();
+
     if (res.success) {
       this.isUpdate = false;
       this.getTableData();
       this.initializeFormControl();
-  
+
       Swal.fire({
         icon: "success",
         title: "Successful",
@@ -458,7 +458,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
   }
 
   EditFunction(event) {
-    console.log("edit",event);
+    console.log("edit", event);
     this.isUpdate = true;
     this.UpdateData = event.data
     this.initializeFormControl();

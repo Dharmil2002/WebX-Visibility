@@ -135,7 +135,7 @@ export class ContractBasicInformationControl {
         disable: false,
         Validations: [],
         additionalData: {
-          minDate: new Date(), // Set the minimum date to the current date
+          // minDate: new Date(), // Set the minimum date to the current date
           maxDate: new Date(((new Date()).getFullYear() + 20), 11, 31) // Allow selection of dates in the current year and future years
 
         },

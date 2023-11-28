@@ -121,12 +121,12 @@ export class CustomerContractServiceSelectionComponent
 
   InsurancecolumnHeader = {
     InvoiceValueFrom: {
-      Title: "Invoice Value From",
+      Title: "Invoice Value From(₹)",
       class: "matcolumnfirst",
       Style: "min-width:80px",
     },
     tovalue: {
-      Title: "To value",
+      Title: "Invoice value To (₹)",
       class: "matcolumncenter",
       Style: "min-width:80px",
     },
@@ -136,17 +136,17 @@ export class CustomerContractServiceSelectionComponent
       Style: "min-width:2px",
     },
     Rate: {
-      Title: "Rate",
+      Title: "Rate (₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
     IMinCharge: {
-      Title: "Min Charge",
+      Title: "Min Charge (₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
     IMaxCharge: {
-      Title: "Max Charge",
+      Title: "Max Charge (₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -168,17 +168,17 @@ export class CustomerContractServiceSelectionComponent
       Style: "min-width:80px",
     },
     FRate: {
-      Title: "Rate",
+      Title: "Rate (₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
     FMinCharge: {
-      Title: "Mix Charge",
+      Title: "Mix Charge (₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
     FMaxCharge: {
-      Title: "Max Charge",
+      Title: "Max Charge (₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
@@ -238,7 +238,7 @@ export class CustomerContractServiceSelectionComponent
     public ObjcontractMethods: locationEntitySearch,
     private filter: FilterUtils,
     private sessionService: SessionService,
-    private storage:StorageService
+    private storage: StorageService
   ) {
     super();
     this.companyCode = this.sessionService.getCompanyCode();
@@ -598,12 +598,12 @@ export class CustomerContractServiceSelectionComponent
       rT: formValue.Rate,
       mIN: formValue.IMinCharge,
       mAX: formValue.IMaxCharge,
-      eNTDT:new Date(),
-      eNTLOC:this.storage.branch,
-      eNTBY:this.storage.userName,
-      mODDT:new Date(),
-      mODLOC:this.storage.branch,
-      mODBY:this.storage.userName
+      eNTDT: new Date(),
+      eNTLOC: this.storage.branch,
+      eNTBY: this.storage.userName,
+      mODDT: new Date(),
+      mODLOC: this.storage.branch,
+      mODBY: this.storage.userName
     };
     if (this.isUpdate) {
       delete requestBody._id;
@@ -613,7 +613,7 @@ export class CustomerContractServiceSelectionComponent
       delete requestBody.eNTLOC;
       delete requestBody.eNTDT;
     }
-    else{
+    else {
       delete requestBody.mODDT;
       delete requestBody.mODLOC;
       delete requestBody.mODBY;
@@ -675,12 +675,12 @@ export class CustomerContractServiceSelectionComponent
       frT: formValue.FRate,
       fmIN: formValue.FMinCharge,
       fmAX: formValue.FMaxCharge,
-      eNTDT:new Date(),
-      eNTLOC:this.storage.branch,
-      eNTBY:this.storage.userName,
-      mODDT:new Date(),
-      mODLOC:this.storage.branch,
-      mODBY:this.storage.userName
+      eNTDT: new Date(),
+      eNTLOC: this.storage.branch,
+      eNTBY: this.storage.userName,
+      mODDT: new Date(),
+      mODLOC: this.storage.branch,
+      mODBY: this.storage.userName
     };
     if (this.isUpdate) {
       delete requestBody._id;
@@ -690,7 +690,7 @@ export class CustomerContractServiceSelectionComponent
       delete requestBody.eNTLOC;
       delete requestBody.eNTDT;
     }
-    else{
+    else {
       delete requestBody.mODDT;
       delete requestBody.mODLOC;
       delete requestBody.mODBY;
@@ -796,7 +796,7 @@ export class CustomerContractServiceSelectionComponent
     if (this.contractData?.lTYP != null) {
       this.ProductsForm.get("loadType").setValue(
         this.LoadtypedetailFromAPI.find(
-          (item) => item.name == this.contractData.lTYP
+          (item) => item.value == this.contractData.lTYP
         )
       );
     }
@@ -804,7 +804,7 @@ export class CustomerContractServiceSelectionComponent
     if (this.contractData?.rTYP != null) {
       const rakeList = [];
       this.contractData.rTYP.forEach((element) => {
-        const rType = this.RatetypedetailFromAPI.find((x) => x.name == element);
+        const rType = this.RatetypedetailFromAPI.find((x) => x.value == element);
         if (rType) {
           rakeList.push(rType);
         }
@@ -1033,9 +1033,9 @@ export class CustomerContractServiceSelectionComponent
       return;  // Stop the execution if an error occurred
     }
     contractDetails["sERVSELEC"] = Array.from(selectedServicesSet);
-    contractDetails["lTYP"] = this.ProductsForm.value.loadType.name;
+    contractDetails["lTYP"] = this.ProductsForm.value.loadType.value;
     contractDetails["rTYP"] =
-      this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.name);
+      this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.value);
     contractDetails["uDT"] = new Date().toString(),
       contractDetails["uBY"] = localStorage.getItem("UserName")
     const reqBody = {

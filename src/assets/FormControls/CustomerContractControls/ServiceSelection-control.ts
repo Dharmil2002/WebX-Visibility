@@ -660,8 +660,8 @@ export class ContractServiceSelectionControl {
           message: "Please Enter only positive numbers with up to two decimal places",
           pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
-        functions:{
-         onChange:"checkInvoice"
+        functions: {
+          onChange: "checkInvoice"
         },
         generatecontrol: true,
         disable: false,
@@ -875,8 +875,8 @@ export class ContractServiceSelectionControl {
 
       {
         name: "MinimumFreightvalueINR",
-        label: "Minimum Freight value- INR(₹)",
-        placeholder: "Minimum Freight value- INR",
+        label: "Minimum Freight value (₹)",
+        placeholder: "Minimum Freight value",
         type: "number",
         value: "",
         filterOptions: "",
@@ -921,8 +921,8 @@ export class ContractServiceSelectionControl {
       },
       {
         name: "MinimumyieldINR",
-        label: "Minimum yield - INR(₹)",
-        placeholder: "Minimum yield - INR",
+        label: "Minimum yield (₹)",
+        placeholder: "Minimum yield (₹)",
         type: "number",
         value: "",
         filterOptions: "",

@@ -8,34 +8,34 @@ export class ContractNonFreightMatrixControl {
         name: "selectCharges",
         label: "Select Charges",
         placeholder: "Select Charges",
-        type: "Staticdropdown",
-        value: [
-          {
-            value: "Document Charge",
-            name: "Document Charge",
-          },
-          {
-            value: "Multi-point delivery",
-            name: "Multi-point delivery",
-          },
-
-        ],
+        type: "dropdown",
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: false,
-        accessallowed: true,
         Validations: [
           {
             name: "required",
-            message: "Charges is required",
+            message: "Perent Select Charges is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
+        functions: {
+        },
+
       },
+      
       {
         name: "ChargesBehaviour",
         label: "Charges Behaviour",
@@ -101,14 +101,14 @@ export class ContractNonFreightMatrixControl {
         label: "From",
         placeholder: "From",
         type: "dropdown",
-        value: isUpdate ? { name: UpdateData.from, value: UpdateData.fromType } : "",
+        value: isUpdate ? { name: UpdateData.fROM, value: UpdateData.fTYPE } : "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         Validations: [
           {
             name: "required",
-            message: "Perent Group Code is required",
+            message: "Perent From is required",
           },
           {
             name: "autocomplete",
@@ -123,7 +123,6 @@ export class ContractNonFreightMatrixControl {
         },
         functions: {
           onModel: 'SetOptions',
-          onSelect: "setSelectedOptions"
         },
         generatecontrol: true,
         disable: false,
@@ -134,14 +133,14 @@ export class ContractNonFreightMatrixControl {
         label: "To",
         placeholder: "To",
         type: "dropdown",
-        value: isUpdate ? { name: UpdateData.to, value: UpdateData.toType } : "",
+        value: isUpdate ? { name: UpdateData.tO, value: UpdateData.tTYPE } : "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         Validations: [
           {
             name: "required",
-            message: "Perent Group Code is required",
+            message: "Perent To is required",
           },
           {
             name: "autocomplete",
@@ -156,7 +155,6 @@ export class ContractNonFreightMatrixControl {
         },
         functions: {
           onModel: 'SetOptions',
-          onSelect: "setSelectedOptions"
         },
         generatecontrol: true,
         disable: false,
@@ -176,7 +174,7 @@ export class ContractNonFreightMatrixControl {
         Validations: [
           {
             name: "required",
-            message: "Perent Group Code is required",
+            message: "Perent Rate Type is required",
           },
           {
             name: "autocomplete",
@@ -198,7 +196,7 @@ export class ContractNonFreightMatrixControl {
         label: "Rate (₹)",
         placeholder: "Rate (₹)",
         type: "number",
-        value: isUpdate ? UpdateData.rate : "",
+        value: isUpdate ? UpdateData.rT : "",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -219,7 +217,7 @@ export class ContractNonFreightMatrixControl {
         label: "Min Value (₹)",
         placeholder: "Min Value (₹)",
         type: "number",
-        value: isUpdate ? UpdateData.minValue : "",
+        value: isUpdate ? UpdateData.mINV : "",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -240,7 +238,7 @@ export class ContractNonFreightMatrixControl {
         label: "Max Value (₹)",
         placeholder: "Max Value (₹)",
         type: "number",
-        value: isUpdate ? UpdateData.maxValue : "",
+        value: isUpdate ? UpdateData.mAXV : "",
         generatecontrol: true,
         disable: false,
         Validations: [

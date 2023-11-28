@@ -10,8 +10,8 @@ export class ContractFreightMatrixControl {
         placeholder: "From",
         type: "dropdown",
         value: isUpdate ? {
-          name: UpdateData.from,
-          value: UpdateData.fromType,
+          name: UpdateData.fROM,
+          value: UpdateData.fTYPE,
         } : "",
         filterOptions: "",
         autocomplete: "",
@@ -31,9 +31,7 @@ export class ContractFreightMatrixControl {
         ],
         additionalData: {},
         functions: {
-
           onModel: 'SetOptions',
-          onSelect: "setSelectedOptions"
         },
         generatecontrol: true,
         disable: false,
@@ -45,8 +43,8 @@ export class ContractFreightMatrixControl {
         placeholder: "To",
         type: "dropdown",
         value: isUpdate ? {
-          name: UpdateData.to,
-          value: UpdateData.toType,
+          name: UpdateData.tO,
+          value: UpdateData.tTYPE,
         } : "",
         filterOptions: "",
         autocomplete: "",
@@ -72,9 +70,7 @@ export class ContractFreightMatrixControl {
 
         },
         functions: {
-
           onModel: 'SetOptions',
-          onSelect: "setSelectedOptions"
         },
         generatecontrol: true,
         disable: false,

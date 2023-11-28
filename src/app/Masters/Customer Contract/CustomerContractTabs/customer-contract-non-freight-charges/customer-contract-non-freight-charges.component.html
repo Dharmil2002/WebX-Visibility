@@ -4,7 +4,7 @@
             <form [formGroup]="NonFreightChargesForm">
                 <app-form-webxpress [form]="NonFreightChargesForm" [FormTitle]="'Non Freight'"
                     [formData]="jsonControlArrayNonFreightCharges" (functionCallEmitter)="functionCallHandler($event)"
-                    [EventButton]="NonFreightChargesForm.valid==true ? SaveEventButton : false"
+                    [EventButton]="NonFreightChargesForm.valid==true ? EventButton : false"
                     [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
                 </app-form-webxpress>
             </form>

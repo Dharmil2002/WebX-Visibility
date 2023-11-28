@@ -10,7 +10,7 @@
         <form [formGroup]="NonFreightMatrixForm">
             <app-form-webxpress [form]="NonFreightMatrixForm" [formData]="jsonControlArrayNonFreightMatrix"
                 (functionCallEmitter)="functionCallHandler($event)"
-                [EventButton]="NonFreightMatrixForm.valid==true ? SaveEventButton : false"
+                [EventButton]="NonFreightMatrixForm.valid==true ? EventButton : false"
                 [showSaveAndCancelButton]="false" [FormTitle]="'Add Charge'"
                 (callFunction)="functionCallHandler($event)">
             </app-form-webxpress>

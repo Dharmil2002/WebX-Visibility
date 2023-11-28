@@ -202,7 +202,7 @@ export class CustomerContractBasicInformationComponent implements OnInit {
         cPONO: this.ProductsForm.value?.CustomerPONo,
         cPODt: this.ProductsForm.value?.POValiditydate,
         cPOSCAN: this.ContractPOScanimageData?.ContractPOScan ?? this.contractData.cPOSCAN,
-        uDT: new Date().toString(),
+        uDT: new Date(),
         uBY: localStorage.getItem("UserName")
       }
 

@@ -1036,7 +1036,7 @@ export class CustomerContractServiceSelectionComponent
     contractDetails["lTYP"] = this.ProductsForm.value.loadType.value;
     contractDetails["rTYP"] =
       this.ProductsForm.value.rateTypecontrolHandler.map((x) => x.value);
-    contractDetails["uDT"] = new Date().toString(),
+    contractDetails["uDT"] = new Date(),
       contractDetails["uBY"] = localStorage.getItem("UserName")
     const reqBody = {
       companyCode: this.companyCode,

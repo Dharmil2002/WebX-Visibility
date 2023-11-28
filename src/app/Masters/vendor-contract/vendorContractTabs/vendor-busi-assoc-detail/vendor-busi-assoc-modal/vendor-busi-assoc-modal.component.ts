@@ -348,29 +348,4 @@ export class VendorBusiAssocModalComponent implements OnInit {
     }
   }
   //#endregion
-  //#region to Validate the minimum  charge values on rate in the TERForm.
-  validateMinChargeOnRate() {
-    // Get the current values of 'min' and 'max' from the TERForm
-    const minValue = parseFloat(this.BusiAssocForm.get('min')?.value);
-    const maxValue = parseFloat(this.BusiAssocForm.get('rate')?.value);
-
-    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
-    if (minValue && maxValue && minValue >= maxValue) {
-      // Display an error message using SweetAlert (Swal)
-      Swal.fire({
-        title: 'Min charge must be less Rate.',
-        toast: false,
-        icon: "error",
-        showConfirmButton: true,
-        confirmButtonText: "OK"
-      });
-
-      // Reset the values of 'min' and 'max' in the TERForm to an empty string
-      this.BusiAssocForm.patchValue({
-        min: '',
-      });
-    }
-    this.validateMinCharge();
-  }
-  //#endregion
 }

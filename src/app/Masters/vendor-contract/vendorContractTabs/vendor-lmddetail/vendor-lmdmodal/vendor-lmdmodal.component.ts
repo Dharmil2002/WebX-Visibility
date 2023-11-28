@@ -245,9 +245,9 @@ export class VendorLMDModalComponent implements OnInit {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
     const timeFrameDropDown = await PayBasisdetailFromApi(this.masterService, 'TMFRM')
     const containerData = await this.objContainerService.getContainerList();
-    const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VehicleCapacity')
+    const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VC')
     const containerDataWithPrefix = vehicleData.map((item) => ({
-      name: `Veh- ${item.name}`,
+      name: item.name,
       value: item.value,
     }));
     // Merge containerData and vehicleData into a single array
@@ -319,31 +319,6 @@ export class VendorLMDModalComponent implements OnInit {
       // Handle errors that may occur during the operation
       console.error(`An error occurred while fetching 'location' details:`, error);
     }
-  }
-  //#endregion
-  //#region to Validate the minimum  charge values on rate in the TERForm.
-  validateMinChargeOnRate() {
-    // Get the current values of 'min' and 'max' from the TERForm
-    const minValue = parseFloat(this.TLMDForm.get('minCharge')?.value);
-    const maxValue = parseFloat(this.TLMDForm.get('rate')?.value);
-
-    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
-    if (minValue && maxValue && minValue >= maxValue) {
-      // Display an error message using SweetAlert (Swal)
-      Swal.fire({
-        title: 'Min charge must be less Rate.',
-        toast: false,
-        icon: "error",
-        showConfirmButton: true,
-        confirmButtonText: "OK"
-      });
-
-      // Reset the values of 'min' and 'max' in the TERForm to an empty string
-      this.TLMDForm.patchValue({
-        minCharge: '',
-      });
-    }
-    this.validateMinCharge();
   }
   //#endregion
 }

@@ -163,7 +163,6 @@ export class VendorBusiAssocModalComponent implements OnInit {
       _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
       cNID: this.CurrentContractDetails.cNID,
-      branch: localStorage.getItem("CurrentBranchCode"),
       mDID: this.BusiAssocForm.value.mode.value,
       mDNM: this.BusiAssocForm.value.mode.name,
       oPID: this.BusiAssocForm.value.operation.value,

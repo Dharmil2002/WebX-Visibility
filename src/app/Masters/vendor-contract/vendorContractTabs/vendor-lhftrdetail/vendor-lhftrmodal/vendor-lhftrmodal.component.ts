@@ -153,7 +153,6 @@ export class VendorLHFTRModalComponent implements OnInit {
     return {
       _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
-      branch: localStorage.getItem("CurrentBranchCode"),
       cNID: this.CurrentContractDetails.cNID,
       rTID: this.TLHFTRForm.value.route.value,
       rTNM: this.TLHFTRForm.value.route.name,

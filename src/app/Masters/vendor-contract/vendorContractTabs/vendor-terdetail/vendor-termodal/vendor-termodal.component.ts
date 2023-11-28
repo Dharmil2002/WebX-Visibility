@@ -188,7 +188,6 @@ export class VendorTERModalComponent implements OnInit {
     return {
       _id: this.companyCode + "-" + this.CurrentContractDetails.cNID + "-" + newVendorCode,
       cID: this.companyCode,
-      branch: localStorage.getItem("CurrentBranchCode"),
       cNID: this.CurrentContractDetails.cNID,
       rTID: this.TERForm.value.route.value,
       rTNM: this.TERForm.value.route.name,

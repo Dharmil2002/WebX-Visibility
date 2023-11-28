@@ -64,7 +64,7 @@ export class VendorContractListComponent extends UnsubscribeOnDestroyAdapter imp
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const timeDiff: number = endDate.getTime() - startDate.getTime();
+      const timeDiff: number = endDate.getTime() - today.getTime();
       const daysDiff: number = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
       if (endDate.toDateString() === today.toDateString()) {
         item.expiringin = `Expiring Today`;

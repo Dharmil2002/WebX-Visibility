@@ -37,6 +37,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
   payBasisstatus: boolean;
   locationName: any;
   locationStatus: boolean;
+  submit = 'Save';
 
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private objPinCodeService: PinCodeService,
@@ -138,8 +139,9 @@ export class VendorBusiAssocModalComponent implements OnInit {
       mIN: parseFloat(this.BusiAssocForm.value.min),
       rT: parseFloat(this.BusiAssocForm.value.rate),
       mAX: parseFloat(this.BusiAssocForm.value.max),
-      uPDT: new Date(),
-      uPBY: this.BusiAssocForm.value.uPBY,
+      mODLOC: localStorage.getItem("Branch"),
+      mODDT: new Date(),
+      mODBY: this.BusiAssocForm.value.uPBY,
     };
   }
 
@@ -175,8 +177,9 @@ export class VendorBusiAssocModalComponent implements OnInit {
       mIN: parseFloat(this.BusiAssocForm.value.min),
       rT: parseFloat(this.BusiAssocForm.value.rate),
       mAX: parseFloat(this.BusiAssocForm.value.max),
-      eDT: new Date(),
-      eNBY: this.BusiAssocForm.value.eNBY,
+      eNTBY: this.BusiAssocForm.value.eNBY,
+      eNTLOC: localStorage.getItem("Branch"),
+      eNTDT: new Date(),
     };
   }
   //#endregion
@@ -223,6 +226,8 @@ export class VendorBusiAssocModalComponent implements OnInit {
       this.BusiAssocForm.controls['min'].setValue(this.objResult.Details.mIN);
       this.BusiAssocForm.controls['max'].setValue(this.objResult.Details.mAX);
       this.BusiAssocForm.controls['rate'].setValue(this.objResult.Details.rT);
+      this.submit = 'Update';
+
     }
   }
   //#endregion

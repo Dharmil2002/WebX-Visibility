@@ -12,7 +12,7 @@
         <app-form-webxpress [form]="TLHFTRForm" [formData]="jsonControlArray"
             [FormTitle]="'Transportation- Long Haul Full Truck- Route Based'"
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
-            (callFunction)="functionCallHandler($event)">
+            (callFunction)="functionCallHandler($event)"[submit]="submit">
         </app-form-webxpress>
     </form>
 </div>

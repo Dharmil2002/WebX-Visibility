@@ -33,6 +33,7 @@ export class VendorLMDModalComponent implements OnInit {
   timeFrameName: any;
   timeFramestatus: any;
   existingLocation: any;
+  submit = 'Save';
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private objLocationService: LocationService,
@@ -147,8 +148,9 @@ export class VendorLMDModalComponent implements OnInit {
       cMTKM: parseFloat(this.TLMDForm.value.committedKm),
       aDDKM: parseFloat(this.TLMDForm.value.additionalKm),
       mAX: parseFloat(this.TLMDForm.value.maxCharges),
-      uPDT: new Date(),
-      uPBY: this.TLMDForm.value.uPBY,
+      mODLOC: localStorage.getItem("Branch"),
+      mODDT: new Date(),
+      mODBY: this.TLMDForm.value.uPBY,
     };
   }
 
@@ -183,8 +185,9 @@ export class VendorLMDModalComponent implements OnInit {
       cMTKM: parseFloat(this.TLMDForm.value.committedKm),
       aDDKM: parseFloat(this.TLMDForm.value.additionalKm),
       mAX: parseFloat(this.TLMDForm.value.maxCharges),
-      eDT: new Date(),
-      eNBY: this.TLMDForm.value.eNBY,
+      eNTBY: this.TLMDForm.value.eNBY,
+      eNTLOC: localStorage.getItem("Branch"),
+      eNTDT: new Date(),
     };
   }
   //#endregion
@@ -222,6 +225,8 @@ export class VendorLMDModalComponent implements OnInit {
       //this.TLMDForm.controls['timeFrame'].setValue(this.objResult.Details.tMFRM);
       this.TLMDForm.controls['minCharge'].setValue(this.objResult.Details.mIN);
       this.TLMDForm.controls['maxCharges'].setValue(this.objResult.Details.mAX);
+      this.submit = 'Update';
+
     }
   }
   //#endregion

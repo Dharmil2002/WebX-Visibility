@@ -31,6 +31,7 @@ export class VendorLHLModalComponent implements OnInit {
   rateTypestatus: any;
   CurrentContractDetails: any;
   existRouteList: any;
+  submit = 'Save';
 
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
@@ -128,8 +129,9 @@ export class VendorLHLModalComponent implements OnInit {
       rT: parseFloat(this.TLHLForm.value.rate),
       mIN: parseFloat(this.TLHLForm.value.min),
       mAX: parseFloat(this.TLHLForm.value.max),
-      uPDT: new Date(),
-      uPBY: this.TLHLForm.value.ENBY,
+      mODLOC: localStorage.getItem("Branch"),
+      mODDT: new Date(),
+      mODBY: this.TLHLForm.value.ENBY,
     };
   }
 
@@ -161,8 +163,9 @@ export class VendorLHLModalComponent implements OnInit {
       rT: parseFloat(this.TLHLForm.value.rate),
       mIN: parseFloat(this.TLHLForm.value.min),
       mAX: parseFloat(this.TLHLForm.value.max),
-      eDT: new Date(),
-      eNBY: this.TLHLForm.value.ENBY,
+      eNTBY: this.TLHLForm.value.ENBY,
+      eNTLOC: localStorage.getItem("Branch"),
+      eNTDT: new Date(),
     };
   }
 
@@ -197,6 +200,8 @@ export class VendorLHLModalComponent implements OnInit {
       this.TLHLForm.controls['rate'].setValue(this.objResult.Details.rT);
       this.TLHLForm.controls['min'].setValue(this.objResult.Details.mIN);
       this.TLHLForm.controls['max'].setValue(this.objResult.Details.mAX);
+      this.submit = 'Update';
+
     }
   }
   //#endregion

@@ -89,8 +89,8 @@ export class VendorAssociateControls {
       // },
       {
         name: "mode",
-        label: "Transport mode",
-        placeholder: "Transport mode",
+        label: "Transport Mode",
+        placeholder: "Transport Mode",
         type: "dropdown",
         value: "",
         generatecontrol: true,
@@ -98,7 +98,7 @@ export class VendorAssociateControls {
         Validations: [
           {
             name: "required",
-            message: "Transport mode is required"
+            message: "Transport Mode is required"
           },
           {
             name: "autocomplete",

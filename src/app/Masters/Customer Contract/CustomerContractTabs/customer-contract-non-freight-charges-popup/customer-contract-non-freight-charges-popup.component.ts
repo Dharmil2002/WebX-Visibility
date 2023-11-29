@@ -115,15 +115,16 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     let ChargesDatareq = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_non_freight_charge_matrix_details",
-      filter: { sCT: this.ChargesData.sCT },
+      filter: { sCT: this.ChargesData.sCT, cONID: this.ChargesData.cONID },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", ChargesDatareq)
-      .toPromise();
-      console.log('res' ,res)
+    
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", ChargesDatareq)
+    );
+    console.log("res", res);
     if (res.success) {
       this.tableData = res.data;
-      this.tableData.sort((a, b) => (a.cDID > b.cDID ? -1 : 1))
+      this.tableData.sort((a, b) => (a.cDID > b.cDID ? -1 : 1));
       this.tableLoad = true;
       this.isLoad = false;
     }
@@ -211,6 +212,23 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       console.error("Error:", error);
     }
   }
+  validateCodDodRates() {
+    const MaxValue = +this.NonFreightMatrixForm.value.MaxValue;
+    const MinValue = +this.NonFreightMatrixForm.value.MinValue;
+    if (MaxValue < MinValue && MaxValue && MinValue) {
+      this.NonFreightMatrixForm.controls["MaxValue"].setValue("");
+      this.NonFreightMatrixForm.controls["MinValue"].setValue("");
+      Swal.fire({
+        title: 'Max charge must be greater than to Min charge.',
+        toast: false,
+        icon: 'error',
+        showCloseButton: false,
+        showCancelButton: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK"
+      });
+    }
+  }
   async Save() {
     const body = {
       fROM: this.NonFreightMatrixForm.value.From.name,
@@ -236,9 +254,10 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
         .toPromise();
       const length = tableres.data.length;
       const Index = length == 0 ? 1 : tableres.data[length - 1].cDID + 1;
-      body["_id"] = `${this.companyCode}-${Index}`;
+      body["_id"] = `${this.companyCode}-${this.ChargesData.cONID}-${Index}`;
       body["cDID"] = Index;
       body["sCT"] = this.ChargesData.sCT;
+      body["cONID"] = this.ChargesData.cONID;
       body["cID"] = this.companyCode;
       body["eNTDT"] = new Date();
       body["eNTLOC"] = this.storage.branch;

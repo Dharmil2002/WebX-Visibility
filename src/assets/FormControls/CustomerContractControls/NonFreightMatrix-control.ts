@@ -233,6 +233,9 @@ export class ContractNonFreightMatrixControl {
             message: "Please enter a valid Min Value",
           },
         ],
+        functions: {
+          onChange: 'validateCodDodRates'
+        },
       },
       {
         name: "MaxValue",
@@ -254,6 +257,9 @@ export class ContractNonFreightMatrixControl {
             message: "Please enter a valid Max Value",
           },
         ],
+        functions: {
+          onChange: 'validateCodDodRates'
+        },
       },
     ];
   }

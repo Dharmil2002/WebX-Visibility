@@ -114,15 +114,16 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     this.isLoad = true;
     let ChargesDatareq = {
       companyCode: this.companyCode,
-      collectionName: "cust_contract_non_freight_charge_matrix",
-      filter: { nFCID: this.ChargesData.nFCID },
+      collectionName: "cust_contract_non_freight_charge_matrix_details",
+      filter: { sCT: this.ChargesData.sCT },
     };
     const res = await this.masterService
       .masterPost("generic/get", ChargesDatareq)
       .toPromise();
-    if (res.success && res.data.length > 0) {
-      const nfcData = res.data[0].nFC;
-      this.tableData = nfcData;
+      console.log('res' ,res)
+    if (res.success) {
+      this.tableData = res.data;
+      this.tableData.sort((a, b) => (a.cDID > b.cDID ? -1 : 1))
       this.tableLoad = true;
       this.isLoad = false;
     }
@@ -165,15 +166,10 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       .masterPost("generic/get", req)
       .toPromise();
     const SelectedData = res.data[0].rTYP;
-    const RatData = await PayBasisdetailFromApi(
-      this.masterService,
-      "RTTYP"
-    );
-    const rateTypedata = SelectedData.map(
-      (x, index) => {
-        return RatData.find((t) => t.value == x);
-      }
-    );
+    const RatData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
+    const rateTypedata = SelectedData.map((x, index) => {
+      return RatData.find((t) => t.value == x);
+    });
     this.filter.Filter(
       this.jsonControlArrayNonFreightMatrix,
       this.NonFreightMatrixForm,
@@ -216,68 +212,52 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     }
   }
   async Save() {
-    const ChargesDatareq = {
-      companyCode: this.companyCode,
-      collectionName: "cust_contract_non_freight_charge_matrix",
-      filter: { nFCID: this.ChargesData.nFCID },
+    const body = {
+      fROM: this.NonFreightMatrixForm.value.From.name,
+      fTYPE: this.NonFreightMatrixForm.value.From.value,
+      tO: this.NonFreightMatrixForm.value.To.name,
+      tTYPE: this.NonFreightMatrixForm.value.To.name,
+      mAXV: this.NonFreightMatrixForm.value.MaxValue,
+      mINV: this.NonFreightMatrixForm.value.MinValue,
+      rT: this.NonFreightMatrixForm.value.Rate,
+      rTYPE: this.NonFreightMatrixForm.value.rateType.name,
+      mODDT: new Date(),
+      mODLOC: this.storage.branch,
+      mODBY: this.storage.userName,
     };
-
-    const res = await firstValueFrom(this.masterService.masterPost("generic/get", ChargesDatareq));
-
-    if (res.success && res.data.length > 0) {
-      const nfcData = res.data;
-      const index = nfcData.length === 0 ? 1 : nfcData[nfcData.length - 1].id + 1;
-
-      const createBody = () => ({
-        id: this.isUpdate ? this.UpdateData.id : index,
-        fROM: this.NonFreightMatrixForm.value.From.name,
-        fTYPE: this.NonFreightMatrixForm.value.From.value,
-        tO: this.NonFreightMatrixForm.value.To.name,
-        tTYPE: this.NonFreightMatrixForm.value.To.name,
-        mAXV: this.NonFreightMatrixForm.value.MaxValue,
-        mINV: this.NonFreightMatrixForm.value.MinValue,
-        rT: this.NonFreightMatrixForm.value.Rate,
-        rTYPE: this.NonFreightMatrixForm.value.rateType.name,
-        mODDT: this.isUpdate ? this.UpdateData.mODDT : new Date(),
-        mODLOC: this.storage.branch,
-        mODBY: this.storage.userName,
-        eNTDT: this.isUpdate ? this.UpdateData.eNTDT : new Date(),
-        eNTLOC: this.storage.branch,
-        eNTBY: this.storage.userName,
-      });
-
-      if (this.isUpdate) {
-        const foundIndex = nfcData.findIndex((x) => x.id === this.UpdateData.id);
-        nfcData[foundIndex] = createBody();
-      } else {
-        nfcData.push(createBody());
-      }
-
-      this.saveUpdateData(nfcData);
-    } else {
-      Swal.fire({
-        icon: "info",
-        title: "info",
-        text: "Data not Found!",
-        showConfirmButton: true,
-      });
+    if (!this.isUpdate) {
+      let datareq = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "cust_contract_non_freight_charge_matrix_details",
+        filter: {},
+      };
+      const tableres = await this.masterService
+        .masterPost("generic/get", datareq)
+        .toPromise();
+      const length = tableres.data.length;
+      const Index = length == 0 ? 1 : tableres.data[length - 1].cDID + 1;
+      body["_id"] = `${this.companyCode}-${Index}`;
+      body["cDID"] = Index;
+      body["sCT"] = this.ChargesData.sCT;
+      body["cID"] = this.companyCode;
+      body["eNTDT"] = new Date();
+      body["eNTLOC"] = this.storage.branch;
+      body["eNTBY"] = this.storage.userName;
     }
-  }
-
-  async saveUpdateData(data) {
-    const Updatebody = {
-      nFC: data,
-    };
-    const Updatereq = {
+    const req = {
       companyCode: this.companyCode,
-      collectionName: "cust_contract_non_freight_charge_matrix",
-      filter: { nFCID: this.ChargesData.nFCID },
-      update: Updatebody,
+      collectionName: "cust_contract_non_freight_charge_matrix_details",
+      filter: this.isUpdate ? { _id: this.UpdateData._id } : undefined,
+      update: this.isUpdate ? body : undefined,
+      data: !this.isUpdate ? body : undefined,
     };
-    const Updateres = await this.masterService
-      .masterPut("generic/update", Updatereq)
-      .toPromise();
-    if (Updateres.success) {
+
+    const method = this.isUpdate ? "generic/update" : "generic/create";
+    const res = this.isUpdate
+      ? await this.masterService.masterPut(method, req).toPromise()
+      : await this.masterService.masterPost(method, req).toPromise();
+
+    if (res.success) {
       this.isUpdate = false;
       this.getTableData();
       this.initializeFormControl();
@@ -285,7 +265,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       Swal.fire({
         icon: "success",
         title: "Successful",
-        text: Updateres.message,
+        text: res.message,
         showConfirmButton: true,
       });
     }

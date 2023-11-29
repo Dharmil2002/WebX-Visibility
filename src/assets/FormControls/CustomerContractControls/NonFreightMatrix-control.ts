@@ -32,6 +32,7 @@ export class ContractNonFreightMatrixControl {
           showNameAndValue: false,
         },
         functions: {
+          onOptionSelect: "checkSelectCharges"
         },
 
       },

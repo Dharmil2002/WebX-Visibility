@@ -193,6 +193,7 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       .toPromise();
     if (res.success) {
       this.tableData = res.data;
+      this.tableData.sort((a, b) => (a.fCID > b.fCID ? -1 : 1))
       this.tableLoad = true;
       this.isLoad = false;
     }

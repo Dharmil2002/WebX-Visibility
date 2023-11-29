@@ -33,16 +33,10 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   showFiller = false;
   companyCode: number | null;
   //#region Form Configration Fields
-  ContractNonFreightMatrixControls: ContractNonFreightMatrixControl;
-  NonFreightMatrixForm: UntypedFormGroup;
-  jsonControlArrayNonFreightMatrix: any;
-
+  ContractNonFreightMatrixControls: any;
   NonFreightChargesForm: UntypedFormGroup;
   jsonControlArrayNonFreightCharges: any;
   AlljsonControlArrayNonFreightCharges: any;
-
-  productsclassName = "col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2";
-  className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
 
   //#region Array List
   CurrentAccessList: any;
@@ -128,6 +122,8 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   }
   //#endregion
   ngOnInit() {
+    this.ContractID = this.contractData.cONID;
+    this.initializeFormControl();
     this.getTableData();
   }
   /*get all Master Details*/
@@ -151,15 +147,12 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
           Charges: x.cBT == "Variable" ? "Add" : x.nFC,
         };
       });
+      this.tableData.sort((a, b) => (a.nFCID > b.nFCID ? -1 : 1))
       this.tableLoad = true;
       this.isLoad = false;
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    this.ContractID = this.contractData.cONID;
-    this.initializeFormControl();
-  }
   initializeFormControl() {
     this.ContractNonFreightMatrixControls = new ContractNonFreightMatrixControl(
       this.isUpdate,
@@ -193,6 +186,18 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       this.selectChargesCode,
       this.selectChargesStatus
     );
+  }
+  checkSelectCharges(){
+    const filterData = this.tableData.filter(x=> x.selectCharges == this.NonFreightChargesForm.value.selectCharges.name)
+    if(filterData.length != 0){
+      this.NonFreightChargesForm.controls["selectCharges"].setValue("");
+      Swal.fire({
+        icon: "info",
+        title: "info",
+        text: "Please, Select a different charges",
+        showConfirmButton: true,
+      });
+    }
   }
 
   // Charges Section

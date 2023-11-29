@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
 
@@ -53,7 +53,14 @@ export class MasterService {
     return this.http.put<any>(`${environment.APIBaseURL}` + ApiURL, Request);
   }
  masterMongoRemove(ApiURL,Request){
-    return this.http.delete<any>(`${environment.APIBaseURL}` + ApiURL, Request);
+  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+  const options = {
+    headers: headers,
+    body: Request
+  };
+
+    return this.http.delete<any>(`${environment.APIBaseURL}` + ApiURL,options);
   }
   setValueheaderCode(data: string) {
     this.headerCode = data

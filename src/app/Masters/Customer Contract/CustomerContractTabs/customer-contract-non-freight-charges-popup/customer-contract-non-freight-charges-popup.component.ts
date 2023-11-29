@@ -9,6 +9,7 @@ import { ContractNonFreightMatrixControl } from "src/assets/FormControls/Custome
 import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
 import { StorageService } from "src/app/core/service/storage.service";
+import { firstValueFrom, map, switchMap } from "rxjs";
 
 @Component({
   selector: "app-customer-contract-non-freight-charges-popup",
@@ -220,9 +221,9 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       collectionName: "cust_contract_non_freight_charge_matrix",
       filter: { nFCID: this.ChargesData.nFCID },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", ChargesDatareq)
-      .toPromise();
+
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", ChargesDatareq));
+
     if (res.success && res.data.length > 0) {
       const nfcData = res.data[0].nFC;
       const index =

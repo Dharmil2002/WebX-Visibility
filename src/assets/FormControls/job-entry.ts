@@ -587,10 +587,7 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "BL Num is required"
-                    }
+                   
                 ]
             },
             {
@@ -605,10 +602,7 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "BL Date is required"
-                    }
+                  
                 ]
             },
             {
@@ -623,10 +617,7 @@ export class JobControl {
                 generatecontrol: true,
                 disable: false,
                 Validations: [
-                    {
-                        name: "required",
-                        message: "BE Num is required"
-                    }
+                   
                 ]
             },
             {

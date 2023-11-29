@@ -26,19 +26,18 @@ export class VendorBusiAssocDetailComponent implements OnInit {
     },
     mDNM: {
       Title: "Transport Mode",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       //Style: "max-width:100px",
     },
     pBSNM: {
       Title: "PayBasis",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       //Style: "max-width:100px",
     },
     rTNM: {
       Title: "Rate Type",
-      class: "matcolumncenter",
-      //Style: "max-width:100px",
-    },
+      class: "matcolumnleft",
+      Style: "max-width:115px",    },
     rT: {
       Title: "Rate(₹)",
       class: "matcolumncenter",

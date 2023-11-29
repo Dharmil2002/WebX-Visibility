@@ -18,16 +18,16 @@ export class VendorLHFTRDetailComponent implements OnInit {
     rTNM: {
       Title: "Route",
       class: "matcolumnleft",
-      Style: "max-width:250px",
+      Style: "min-width:250px",
     },
     rTTNM: {
       Title: "Rate Type",
       class: "matcolumnleft",
-      //Style: "max-width:100px",
+      Style: "max-width:115px",
     },
     cPCTNM: {
       Title: "Capacity(Ton)",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       //Style: "max-width:100px",
     },
     rT: {

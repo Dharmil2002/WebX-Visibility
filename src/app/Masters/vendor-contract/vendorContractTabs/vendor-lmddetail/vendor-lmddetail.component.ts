@@ -21,7 +21,7 @@ export class VendorLMDDetailComponent implements OnInit {
     rTTNM: {
       Title: "Rate Type",
       class: "matcolumnleft",
-      //Style: "max-width:100px",
+      Style: "max-width:115px",
     },
     tMFRMNM: {
       Title: "Time Frame",
@@ -30,7 +30,7 @@ export class VendorLMDDetailComponent implements OnInit {
     },
     cPCTNM: {
       Title: "Capacity(Ton)",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       //Style: "max-width:100px",
     },
     mIN: {

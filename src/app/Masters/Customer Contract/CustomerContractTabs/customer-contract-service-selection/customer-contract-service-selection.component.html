@@ -1,8 +1,19 @@
+<style>
+    .floatButton {
+        position: fixed;
+        top: 22%;
+        right: 7%;
+        z-index: 1;
+    }
+</style>
+<button class="floatButton" mat-flat-button matTooltip="Save" (click)="SaveServiceSelection('')" color="primary"
+    [disabled]="!ProductsForm.valid">
+    Save
+</button>
 <form [formGroup]="ProductsForm">
     <app-form-webxpress [form]="ProductsForm" [FormTitle]="'PRODUCT'" [formData]="jsonControlArrayProductsForm"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)" [EventButton]="ProductsForm.valid==true ? EventButton : false"
-        [className]="className">
+        (callFunction)="functionCallHandler($event)" [className]="className">
     </app-form-webxpress>
 
 </form>

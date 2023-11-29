@@ -12,7 +12,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { Router } from "@angular/router";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
@@ -482,12 +482,10 @@ export class CustomerContractServiceSelectionComponent
         filter: {},
         collectionName: "pincode_master",
       };
-      this.StateList = await this.masterService
-        .masterPost("generic/get", stateReqBody)
-        .toPromise();
-      this.PinCodeList = await this.masterService
-        .masterPost("generic/get", pincodeReqBody)
-        .toPromise();
+      this.StateList = await firstValueFrom(this.masterService
+        .masterPost("generic/get", stateReqBody));
+      this.PinCodeList = await firstValueFrom(this.masterService
+        .masterPost("generic/get", pincodeReqBody))
       this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
         this.PinCodeList,
         this.StateList,
@@ -631,8 +629,8 @@ export class CustomerContractServiceSelectionComponent
     };
     const method = this.isUpdate ? "generic/update" : "generic/create";
     const res = this.isUpdate
-      ? await this.masterService.masterPut(method, req).toPromise()
-      : await this.masterService.masterPost(method, req).toPromise();
+      ? await firstValueFrom(this.masterService.masterPut(method, req))
+      : await firstValueFrom(this.masterService.masterPost(method, req));
     if (res.success) {
       this.isUpdate = false;
       this.SetDefaultInsuranceCarrierRiskSelectionData();
@@ -708,8 +706,8 @@ export class CustomerContractServiceSelectionComponent
     };
     const method = this.isUpdate ? "generic/update" : "generic/create";
     const res = this.isUpdate
-      ? await this.masterService.masterPut(method, req).toPromise()
-      : await this.masterService.masterPost(method, req).toPromise();
+      ? await firstValueFrom(this.masterService.masterPut(method, req))
+      : await firstValueFrom(this.masterService.masterPost(method, req));
     if (res.success) {
       this.isUpdate = false;
       this.SetDefaultFuelSurchargeData();
@@ -1157,7 +1155,7 @@ export class CustomerContractServiceSelectionComponent
       collectionName: "cust_contract_insurance",
       filter: { _id: id },
     }
-    const res = await this.masterService.masterMongoRemove("generic/remove", reqBody).toPromise();
+    const res = await firstValueFrom(this.masterService.masterMongoRemove("generic/remove", reqBody));
     return res;
 
   }
@@ -1168,7 +1166,7 @@ export class CustomerContractServiceSelectionComponent
       collectionName: "cust_contract_fuelsurcharge",
       filter: { _id: id },
     }
-    const res = await this.masterService.masterMongoRemove("generic/remove", reqBody).toPromise();
+    const res = await firstValueFrom(this.masterService.masterMongoRemove("generic/remove", reqBody));
     return res;
 
   }
@@ -1242,24 +1240,10 @@ export class CustomerContractServiceSelectionComponent
       return;
     }
   }
-  // checkInvoice() {
-  //   const invoiceNo = this.InsuranceCarrierRiskForm.value.InvoiceValueFrom;
-  //   const exists = this.tableData.some((x) => x.InvoiceValueFrom.includes(invoiceNo));
-  //   if (exists) {
-  //     this.InsuranceCarrierRiskForm.controls['InvoiceValueFrom'].setValue("");
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Already Exist",
-  //       text: "Invoice Value From Is Already Exist",
-  //       showConfirmButton: true,
-  //     });
-  //   }
-  // }
   onSelectrateTypeProduct(event) {
     const FilteredRateType = event?.eventArgs?.value
       .map(element => this.RatetypedetailFromAPI.find(x => x.value === element.value))
       .filter(Boolean);
-    debugger
 
     const formValues = this.ServicesForm.value;
     // Use a Set for faster lookups
@@ -1310,7 +1294,6 @@ export class CustomerContractServiceSelectionComponent
           }
           break;
         case 'Insurance':
-          debugger
           this.filter.Filter(
             this.jsonControlArrayInsuranceCarrierRiskForm,
             this.InsuranceCarrierRiskForm,

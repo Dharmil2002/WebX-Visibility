@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
+import { removeData } from '../../vendorContractApiUtility';
 
 @Component({
   selector: 'app-vendor-terdetail',
@@ -64,7 +65,7 @@ export class VendorTERDetailComponent implements OnInit {
   menuItemflag = true;
   menuItems = [
     { label: 'Edit' },
-    //{ label: 'Remove' }
+    { label: 'Remove' }
   ]
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
@@ -96,7 +97,8 @@ export class VendorTERDetailComponent implements OnInit {
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
     const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
-    this.addDetails(terDetails)
+    data.label.label === 'Remove' ? this.removeTableData(terDetails._id) :
+      this.addDetails(terDetails)
   }
   //#endregion 
   //#region to Add a new item to the table or edit
@@ -148,4 +150,10 @@ export class VendorTERDetailComponent implements OnInit {
     }
   }
   //#endregion
+  //#region to remove Data from table
+  async removeTableData(id) {
+    await removeData(this.masterService, id, 'vendor_contract_xprs_rt');
+    this.getXpressDetail()
+  }
+  //#endregion 
 }

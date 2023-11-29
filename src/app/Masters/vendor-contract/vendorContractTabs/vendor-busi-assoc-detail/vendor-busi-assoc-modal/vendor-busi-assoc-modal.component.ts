@@ -91,13 +91,24 @@ export class VendorBusiAssocModalComponent implements OnInit {
           showConfirmButton: true,
         });
       } else {
-        // Create a new vendor contract
+        // Fetch existing data
         const existingData = await this.fetchExistingData(collectionName);
-        let index = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+        let newId;
+        // Find the contract with the specified cNID
+        const existingContract = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
 
-        // Check if index is found, then set to the count, otherwise set to 0
-        index = index ? existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID).length : 0;
-        const newContractData = this.prepareContractData(index);
+        if (existingContract) {
+          // Sort existing data based on _id for consistency
+          const sortedData = existingData.sort((a, b) => a._id.localeCompare(b._id));
+
+          // Extract the last vendor code from the sorted data
+          const lastId = sortedData.length > 0 ? parseInt(sortedData[sortedData.length - 1]._id.split('-')[2], 10) : 0;
+
+          // Generate a new _id
+          newId = lastId + 1;
+        }
+        newId = existingContract ? newId : 0
+        const newContractData = this.prepareContractData(newId);
 
         const createRequest = {
           companyCode: this.companyCode,

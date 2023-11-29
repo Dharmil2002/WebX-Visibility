@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
+import { removeData } from '../../vendorContractApiUtility';
 
 @Component({
   selector: 'app-vendor-busi-assoc-detail',
@@ -18,7 +19,7 @@ export class VendorBusiAssocDetailComponent implements OnInit {
       Title: "Operation",
       class: "matcolumnleft",
       //Style: "max-width:100px",
-    },     
+    },
     lOCNM: {
       Title: "Control Location",
       class: "matcolumnleft",
@@ -37,7 +38,8 @@ export class VendorBusiAssocDetailComponent implements OnInit {
     rTNM: {
       Title: "Rate Type",
       class: "matcolumnleft",
-      Style: "max-width:115px",    },
+      Style: "max-width:115px",
+    },
     rT: {
       Title: "Rate(₹)",
       class: "matcolumncenter",
@@ -71,7 +73,7 @@ export class VendorBusiAssocDetailComponent implements OnInit {
   menuItemflag = true;
   menuItems = [
     { label: 'Edit' },
-    // { label: 'Remove' }
+    { label: 'Remove' }
   ]
   staticFieldTErouteBased = ['cT', 'oPNM', 'rTNM', 'mDNM', , 'rT', 'mIN', 'mAX', "pBSNM", "lOCNM"]
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
@@ -95,7 +97,8 @@ export class VendorBusiAssocDetailComponent implements OnInit {
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
     const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
-    this.addDetails(terDetails)
+    data.label.label === 'Remove' ? this.removeTableData(terDetails._id) :
+      this.addDetails(terDetails)
   }
   //#endregion 
   //#region to Add a new item to the table or edit
@@ -130,12 +133,12 @@ export class VendorBusiAssocDetailComponent implements OnInit {
       };
 
       const response = await this.masterService.masterPost("generic/get", request).toPromise();
-      
+
       // Sort the filtered data based on the 'eDT' property in descending order
       this.TErouteBasedTableData = response.data
         .filter(x => x.cNID === this.CurrentContractDetails.cNID)
-        .sort((a, b) => b._id.localeCompare(a._id));      
-      
+        .sort((a, b) => b._id.localeCompare(a._id));
+
       this.TErouteBasedTableData.forEach(item => {
         item.actions = ['Edit', 'Remove'];
       });
@@ -147,5 +150,10 @@ export class VendorBusiAssocDetailComponent implements OnInit {
     }
   }
   //#endregion
-
+  //#region to remove Data from table
+  async removeTableData(id) {
+    await removeData(this.masterService, id, 'vendor_contract_ba');
+    this.getTableDetail()
+  }
+  //#endregion 
 }

@@ -216,7 +216,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     }
   }
   async Save() {
-    let ChargesDatareq = {
+    const ChargesDatareq = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_non_freight_charge_matrix",
       filter: { nFCID: this.ChargesData.nFCID },
@@ -225,51 +225,35 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", ChargesDatareq));
 
     if (res.success && res.data.length > 0) {
-      const nfcData = res.data[0].nFC;
-      const index =
-        nfcData.length == 0 ? 1 : nfcData[nfcData.length - 1].id + 1;
+      const nfcData = res.data;
+      const index = nfcData.length === 0 ? 1 : nfcData[nfcData.length - 1].id + 1;
+
+      const createBody = () => ({
+        id: this.isUpdate ? this.UpdateData.id : index,
+        fROM: this.NonFreightMatrixForm.value.From.name,
+        fTYPE: this.NonFreightMatrixForm.value.From.value,
+        tO: this.NonFreightMatrixForm.value.To.name,
+        tTYPE: this.NonFreightMatrixForm.value.To.name,
+        mAXV: this.NonFreightMatrixForm.value.MaxValue,
+        mINV: this.NonFreightMatrixForm.value.MinValue,
+        rT: this.NonFreightMatrixForm.value.Rate,
+        rTYPE: this.NonFreightMatrixForm.value.rateType.name,
+        mODDT: this.isUpdate ? this.UpdateData.mODDT : new Date(),
+        mODLOC: this.storage.branch,
+        mODBY: this.storage.userName,
+        eNTDT: this.isUpdate ? this.UpdateData.eNTDT : new Date(),
+        eNTLOC: this.storage.branch,
+        eNTBY: this.storage.userName,
+      });
+
       if (this.isUpdate) {
-        const Body = {
-          id: this.UpdateData.id,
-          fROM: this.NonFreightMatrixForm.value.From.name,
-          fTYPE: this.NonFreightMatrixForm.value.From.value,
-          tO: this.NonFreightMatrixForm.value.To.name,
-          tTYPE: this.NonFreightMatrixForm.value.To.name,
-          mAXV: this.NonFreightMatrixForm.value.MaxValue,
-          mINV: this.NonFreightMatrixForm.value.MinValue,
-          rT: this.NonFreightMatrixForm.value.Rate,
-          rTYPE: this.NonFreightMatrixForm.value.rateType.name,
-          mODDT: new Date(),
-          mODLOC: this.storage.branch,
-          mODBY: this.storage.userName,
-          eNTDT: this.UpdateData.eNTDT,
-          eNTLOC: this.UpdateData.eNTLOC,
-          eNTBY: this.UpdateData.eNTBY,
-        };
-        var foundIndex = nfcData.findIndex((x) => x.id == this.UpdateData.id);
-        nfcData[foundIndex] = Body;
-        this.saveUpdateData(nfcData);
+        const foundIndex = nfcData.findIndex((x) => x.id === this.UpdateData.id);
+        nfcData[foundIndex] = createBody();
       } else {
-        const Body = {
-          id: index,
-          fROM: this.NonFreightMatrixForm.value.From.name,
-          fTYPE: this.NonFreightMatrixForm.value.From.value,
-          tO: this.NonFreightMatrixForm.value.To.name,
-          tTYPE: this.NonFreightMatrixForm.value.To.name,
-          mAXV: this.NonFreightMatrixForm.value.MaxValue,
-          mINV: this.NonFreightMatrixForm.value.MinValue,
-          rT: this.NonFreightMatrixForm.value.Rate,
-          rTYPE: this.NonFreightMatrixForm.value.rateType.name,
-          mODDT: new Date(),
-          mODLOC: this.storage.branch,
-          mODBY: this.storage.userName,
-          eNTDT: new Date(),
-          eNTLOC: this.storage.branch,
-          eNTBY: this.storage.userName,
-        };
-        nfcData.push(Body);
-        this.saveUpdateData(nfcData);
+        nfcData.push(createBody());
       }
+
+      this.saveUpdateData(nfcData);
     } else {
       Swal.fire({
         icon: "info",
@@ -279,6 +263,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       });
     }
   }
+
   async saveUpdateData(data) {
     const Updatebody = {
       nFC: data,

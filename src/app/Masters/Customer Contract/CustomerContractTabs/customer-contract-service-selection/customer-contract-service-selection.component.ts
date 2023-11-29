@@ -540,12 +540,15 @@ export class CustomerContractServiceSelectionComponent
         break;
       case "COD/DOD":
         this.DisplayCODDODSection = checked;
+        this.onSelectrateTypeProduct(eventRateData);
         break;
       case "Demurrage":
         this.DisplayDemurragericSection = checked;
+        this.onSelectrateTypeProduct(eventRateData);
         break;
       case "Insurance":
         this.DisplayInsuranceSection = checked;
+        this.onSelectrateTypeProduct(eventRateData);
         break;
       case "cutofftime":
         this.DisplayCutOfftimeSection = checked;
@@ -555,6 +558,7 @@ export class CustomerContractServiceSelectionComponent
         break;
       case "fuelSurcharge":
         this.DisplayFuelSurchargeSection = checked;
+        this.onSelectrateTypeProduct(eventRateData);
         break;
       default:
         break;
@@ -956,13 +960,9 @@ export class CustomerContractServiceSelectionComponent
         // Default case
       }
     });
-    const eventRateData = {
-      eventArgs: {
-        value: this.ProductsForm.value.rateTypecontrolHandler
-      }
-    }
+
     setTimeout(() => {
-      this.onSelectrateTypeProduct(eventRateData);
+      //this.onSelectrateTypeProduct(eventRateData);
     }, 5000);
     //#endregion
   }
@@ -1259,6 +1259,7 @@ export class CustomerContractServiceSelectionComponent
     const FilteredRateType = event?.eventArgs?.value
       .map(element => this.RatetypedetailFromAPI.find(x => x.value === element.value))
       .filter(Boolean);
+    debugger
 
     const formValues = this.ServicesForm.value;
     // Use a Set for faster lookups
@@ -1278,7 +1279,7 @@ export class CustomerContractServiceSelectionComponent
             "CODDODRatetype",
             false
           );
-          if (FilteredRateType.find(item => item && item.name !== this.contractData.cODDODRTYP)) {
+          if (FilteredRateType.filter(item => item && item.name != this.contractData.cODDODRTYP).length == 0) {
             this.CODDODForm.get("CODDODRatetype").setValue("");
           }
 
@@ -1291,7 +1292,7 @@ export class CustomerContractServiceSelectionComponent
             "DRatetype",
             false
           );
-          if (FilteredRateType.find(item => item && item.name !== this.contractData.cODDODRTYP)) {
+          if (FilteredRateType.filter(item => item && item.name != this.contractData.cODDODRTYP).length == 0) {
             this.DemurrageForm.get("DRatetype").setValue("");
           }
 
@@ -1304,7 +1305,7 @@ export class CustomerContractServiceSelectionComponent
             "FRateType",
             false
           );
-          if (FilteredRateType.find(item => item && item.name !== this.contractData.cODDODRTYP)) {
+          if (FilteredRateType.filter(item => item && item.name != this.contractData.cODDODRTYP).length == 0) {
             this.FuelSurchargeForm.get("FRateType").setValue("");
           }
           break;
@@ -1317,7 +1318,7 @@ export class CustomerContractServiceSelectionComponent
             "rateType",
             false
           );
-          if (FilteredRateType.find(item => item && item.name !== this.contractData.cODDODRTYP)) {
+          if (FilteredRateType.filter(item => item && item.name != this.contractData.cODDODRTYP).length == 0) {
             this.InsuranceCarrierRiskForm.get("rateType").setValue("");
           }
           break;

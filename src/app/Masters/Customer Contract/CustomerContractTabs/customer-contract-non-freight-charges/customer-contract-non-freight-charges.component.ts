@@ -188,16 +188,30 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
     );
   }
   checkSelectCharges(){
-    const filterData = this.tableData.filter(x=> x.selectCharges == this.NonFreightChargesForm.value.selectCharges.name)
-    if(filterData.length != 0){
-      this.NonFreightChargesForm.controls["selectCharges"].setValue("");
-      Swal.fire({
-        icon: "info",
-        title: "info",
-        text: "Please, Select a different charges",
-        showConfirmButton: true,
-      });
+    if(this.isUpdate){
+      const filterData = this.tableData.filter(x=> x.selectCharges == this.NonFreightChargesForm.value.selectCharges.name && x._id != this.UpdateData._id)
+      if(filterData.length != 0){
+        this.NonFreightChargesForm.controls["selectCharges"].setValue("");
+        Swal.fire({
+          icon: "info",
+          title: "info",
+          text: "Please, Select a different charges",
+          showConfirmButton: true,
+        });
+      }
+    }else{
+      const filterData = this.tableData.filter(x=> x.selectCharges == this.NonFreightChargesForm.value.selectCharges.name)
+      if(filterData.length != 0){
+        this.NonFreightChargesForm.controls["selectCharges"].setValue("");
+        Swal.fire({
+          icon: "info",
+          title: "info",
+          text: "Please, Select a different charges",
+          showConfirmButton: true,
+        });
+      }
     }
+    
   }
 
   // Charges Section

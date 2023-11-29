@@ -50,6 +50,7 @@ export class VendorContractServiceSelectionComponent implements OnInit {
     type: {
       Title: "Type",
       class: "matcolumnleft",
+      Style: "max-width:120px",
     },
     typeName: {
       Title: "Type",

@@ -10,7 +10,7 @@ import {
   UntypedFormGroup,
   Validators,
 } from "@angular/forms";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
@@ -135,9 +135,11 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       collectionName: "cust_contract_non_freight_charge_matrix",
       filter: { cONID: this.ContractID },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+
     if (res.success) {
       this.tableData = res.data.map((x) => {
         return {
@@ -147,7 +149,7 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
           Charges: x.cBT == "Variable" ? "Add" : x.nFC,
         };
       });
-      this.tableData.sort((a, b) => (a.nFCID > b.nFCID ? -1 : 1))
+      this.tableData.sort((a, b) => (a.nFCID > b.nFCID ? -1 : 1));
       this.tableLoad = true;
       this.isLoad = false;
     }
@@ -187,10 +189,15 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       this.selectChargesStatus
     );
   }
-  checkSelectCharges(){
-    if(this.isUpdate){
-      const filterData = this.tableData.filter(x=> x.selectCharges == this.NonFreightChargesForm.value.selectCharges.name && x._id != this.UpdateData._id)
-      if(filterData.length != 0){
+  checkSelectCharges() {
+    if (this.isUpdate) {
+      const filterData = this.tableData.filter(
+        (x) =>
+          x.selectCharges ==
+            this.NonFreightChargesForm.value.selectCharges.name &&
+          x._id != this.UpdateData._id
+      );
+      if (filterData.length != 0) {
         this.NonFreightChargesForm.controls["selectCharges"].setValue("");
         Swal.fire({
           icon: "info",
@@ -199,9 +206,12 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
           showConfirmButton: true,
         });
       }
-    }else{
-      const filterData = this.tableData.filter(x=> x.selectCharges == this.NonFreightChargesForm.value.selectCharges.name)
-      if(filterData.length != 0){
+    } else {
+      const filterData = this.tableData.filter(
+        (x) =>
+          x.selectCharges == this.NonFreightChargesForm.value.selectCharges.name
+      );
+      if (filterData.length != 0) {
         this.NonFreightChargesForm.controls["selectCharges"].setValue("");
         Swal.fire({
           icon: "info",
@@ -211,7 +221,6 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
         });
       }
     }
-    
   }
 
   // Charges Section
@@ -253,9 +262,9 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
         collectionName: "cust_contract_non_freight_charge_matrix",
         filter: {},
       };
-      const tableres = await this.masterService
-        .masterPost("generic/get", datareq)
-        .toPromise();
+      const tableres = await firstValueFrom(
+        this.masterService.masterPost("generic/get", datareq)
+      );
       const length = tableres.data.length;
       const Index = length == 0 ? 1 : tableres.data[length - 1].nFCID + 1;
       body["cONID"] = this.ContractID;
@@ -274,10 +283,10 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       data: !this.isUpdate ? body : undefined,
     };
 
-    const method = this.isUpdate ? "generic/update" : "generic/create";
-    const res = this.isUpdate
-      ? await this.masterService.masterPut(method, req).toPromise()
-      : await this.masterService.masterPost(method, req).toPromise();
+    const Service = this.isUpdate
+      ? this.masterService.masterPut("generic/update", req)
+      : this.masterService.masterPost("generic/create", req);
+    const res = await firstValueFrom(Service);
 
     if (res.success) {
       this.isUpdate = false;

@@ -117,7 +117,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       collectionName: "cust_contract_non_freight_charge_matrix_details",
       filter: { sCT: this.ChargesData.sCT, cONID: this.ChargesData.cONID },
     };
-    
+
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", ChargesDatareq)
     );
@@ -163,9 +163,9 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       collectionName: "cust_contract",
       filter: { docNo: this.ChargesData.cONID },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
     const SelectedData = res.data[0].rTYP;
     const RatData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
     const rateTypedata = SelectedData.map((x, index) => {
@@ -196,12 +196,12 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
         filter: {},
         collectionName: "pincode_master",
       };
-      this.StateList = await this.masterService
-        .masterPost("generic/get", stateReqBody)
-        .toPromise();
-      this.PinCodeList = await this.masterService
-        .masterPost("generic/get", pincodeReqBody)
-        .toPromise();
+      this.StateList = await firstValueFrom(
+        this.masterService.masterPost("generic/get", stateReqBody)
+      );
+      this.PinCodeList = await firstValueFrom(
+        this.masterService.masterPost("generic/get", pincodeReqBody)
+      );
       this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
         this.PinCodeList,
         this.StateList,
@@ -219,13 +219,13 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       this.NonFreightMatrixForm.controls["MaxValue"].setValue("");
       this.NonFreightMatrixForm.controls["MinValue"].setValue("");
       Swal.fire({
-        title: 'Max charge must be greater than to Min charge.',
+        title: "Max charge must be greater than to Min charge.",
         toast: false,
-        icon: 'error',
+        icon: "error",
         showCloseButton: false,
         showCancelButton: false,
         showConfirmButton: true,
-        confirmButtonText: "OK"
+        confirmButtonText: "OK",
       });
     }
   }
@@ -249,9 +249,10 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
         collectionName: "cust_contract_non_freight_charge_matrix_details",
         filter: {},
       };
-      const tableres = await this.masterService
-        .masterPost("generic/get", datareq)
-        .toPromise();
+
+      const tableres = await firstValueFrom(
+        this.masterService.masterPost("generic/get", datareq)
+      );
       const length = tableres.data.length;
       const Index = length == 0 ? 1 : tableres.data[length - 1].cDID + 1;
       body["_id"] = `${this.companyCode}-${this.ChargesData.cONID}-${Index}`;
@@ -271,11 +272,10 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       data: !this.isUpdate ? body : undefined,
     };
 
-    const method = this.isUpdate ? "generic/update" : "generic/create";
-    const res = this.isUpdate
-      ? await this.masterService.masterPut(method, req).toPromise()
-      : await this.masterService.masterPost(method, req).toPromise();
-
+    const Service = this.isUpdate
+      ? this.masterService.masterPut("generic/update", req)
+      : this.masterService.masterPost("generic/create", req);
+    const res = await firstValueFrom(Service);
     if (res.success) {
       this.isUpdate = false;
       this.getTableData();

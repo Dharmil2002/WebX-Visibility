@@ -1,13 +1,13 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
     <form [formGroup]="vendorTableForm">
-        <app-form-webxpress [form]="vendorTableForm" [FormTitle]="'Vendor Details'" [formData]="jsonControlVendorArray"
+        <app-form-webxpress [form]="vendorTableForm" [FormTitle]="'Details'" [formData]="jsonControlVendorArray"
             (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
 
     <form [formGroup]="otherDetailForm">
-        <app-form-webxpress [form]="otherDetailForm" [FormTitle]="'Vendor Other Details'"
+        <app-form-webxpress [form]="otherDetailForm" [FormTitle]="'GST Details'"
             [formData]="jsonControlOtherArray" (functionCallEmitter)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
@@ -22,7 +22,7 @@
 
     <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems"
-        [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"[addFlag]="addFlag"[FormTitle]="'Details'"  [DisplayAddNewButton]=true (AddNewButtonEvent)="addData()" >
+        [staticField]="staticField" [Link]="linkArray" [menuItemFlag]="menuItemflag" (menuItemClicked)="handleMenuItemClick($event)"[addFlag]="addFlag"[FormTitle]="'GST Details'"  [DisplayAddNewButton]=true (AddNewButtonEvent)="addData()" >
     </app-generic-table-v2>
   
     <button type="button" [disabled]="!vendorTableForm.valid" mat-raised-button color="primary" (click)="save()">

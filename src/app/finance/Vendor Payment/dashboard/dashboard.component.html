@@ -1,1 +1,5 @@
-<p>dashboard works!</p>
+<app-common-wrapper-webxpress [breadscrums]="breadscrums">
+    <app-generic-card-with-menu-actions (functionCallEmitter)="functionCallHandler($event)"
+        [boxData]="this.Transactions"></app-generic-card-with-menu-actions>
+    <app-generic-card-with-menu-actions [boxData]="this.OnlinePaymentApprovals"></app-generic-card-with-menu-actions>
+</app-common-wrapper-webxpress>

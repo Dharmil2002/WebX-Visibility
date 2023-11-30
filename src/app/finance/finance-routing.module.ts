@@ -10,8 +10,8 @@ const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
   { path: 'AddManualVouchar', component: AddManualVoucherComponent },
   { path: 'DebitVoucher', component: DebitVoucherComponent },
-  { path: 'VendorPaymentDashboard', component: DashboardComponent },
-  { path: 'thc-payments', component: ThcPaymentsComponent }
+  { path: 'VendorPayment/Dashboard', component: DashboardComponent },
+  { path: 'VendorPayment/THC-Payment', component: ThcPaymentsComponent }
 ];
 
 @NgModule({

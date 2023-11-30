@@ -747,7 +747,7 @@
       "tag": [
         "VendorPaymentDashboard"
       ],
-      "router": "Finance/VendorPaymentDashboard"
+      "router": "Finance/VendorPayment/Dashboard"
     },
     {
       "title": "CustomerContract/CustomerContractList",

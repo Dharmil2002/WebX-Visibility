@@ -58,6 +58,7 @@ import { ImageHandling } from '../Utility/Form Utilities/imageHandling';
 import { NgxPrintModule } from "ngx-print";
 import { MatDialogModule } from '@angular/material/dialog';
 import { GenericViewTableComponent } from './generic-view-table/generic-view-table.component';
+import { GenericCardWithMenuActionsComponent } from './generic-card-with-menu-actions/generic-card-with-menu-actions.component';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -75,8 +76,9 @@ const MY_DATE_FORMAT = {
     FormComponent, FormWithoutAutoCompleteComponent, GenericDashBoardComponent,
     GenericTabbedFormComponent, CommonWrapperComponent, EditAbleTableComponent, TreeViewComponent, GenericChartDashboardComponent, GenericCardComponent, DecimaRangeValidatorDirective, GenericTableV2Component
     , ExpandableTableComponent, ModifyTableCollumnsComponent, LazyloadingeditabletableComponent, XlsxPreviewPageComponent, GenericViewPrintComponent,
-  ImagePreviewComponent,
-  GenericViewTableComponent],
+    ImagePreviewComponent,
+    GenericViewTableComponent,
+    GenericCardWithMenuActionsComponent],
 
   imports: [
     CommonModule,
@@ -122,7 +124,7 @@ const MY_DATE_FORMAT = {
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMAT },
     { provide: OWL_DATE_TIME_LOCALE, useValue: 'en-IN' },
-    FilterUtils,ImageHandling
+    FilterUtils, ImageHandling
   ],
 
   exports: [GenericAccordionComponent,
@@ -142,6 +144,7 @@ const MY_DATE_FORMAT = {
     ReactiveFormsModule,
     MatDatepickerModule,
     MatMenuModule,
+    GenericCardWithMenuActionsComponent,
     GenericChartDashboardComponent,
     GenericCardComponent,
     DecimaRangeValidatorDirective,

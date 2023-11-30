@@ -1,0 +1,52 @@
+<style>
+    .clickable-grid {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .clickable-grid:hover {
+        background-color: #f0f0f0;
+        /* Add a hover effect if desired */
+    }
+</style>
+<div>
+    <h4 class="m-b-10">{{boxData?.Title}}</h4>
+    <div *ngIf="boxData?.Items" class="row clearfix dashboardcard">
+        <div class="col-lg-2 col-sm-2 clickable-grid" *ngFor="let box of boxData?.Items" [style]="style"
+            [matMenuTriggerFor]="box.Menu ? menu : null" (click)="handleItemClick(box)">
+            <div [class]="box.class">
+                <div class="info-box7-block" style="text-align:center;min-height: 120px;">
+                    <h5 class="m-b-10 m-t-20 white">{{box.title}}</h5>
+                </div>
+            </div>
+        </div>
+        <mat-menu #menu="matMenu" xPosition="before" yPosition="above">
+
+            <ng-container *ngFor="let item of boxData?.Items">
+                <ng-container *ngIf="item.Menu">
+                    <ng-container *ngFor="let menu of item.Menu">
+                        <button mat-menu-item [matMenuTriggerFor]="subMenu" (click)="handleItemClick(menu)">
+                            {{menu.title}}
+                        </button>
+                        <mat-menu #subMenu="matMenu">
+                            <ng-container *ngFor="let subItem of menu.SubMenu">
+                                <button mat-menu-item [matMenuTriggerFor]="innerMenu"
+                                    (click)="handleItemClick(subItem)">
+                                    {{subItem.title}}
+                                </button>
+                                <mat-menu #innerMenu="matMenu">
+                                    <button mat-menu-item *ngFor="let innerItem of subItem.InnerMenu"
+                                        (click)="handleItemClick(innerItem)">
+                                        {{innerItem.title}}
+                                    </button>
+                                </mat-menu>
+                            </ng-container>
+                        </mat-menu>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+        </mat-menu>
+    </div>
+</div>

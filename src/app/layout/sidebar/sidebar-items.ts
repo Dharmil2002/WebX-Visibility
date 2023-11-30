@@ -547,7 +547,7 @@ export const ROUTES: RouteInfo[] =
         submenu: []
       },
       {
-        path: "Finance/VendorPaymentDashboard",
+        path: "Finance/VendorPayment/Dashboard",
         title: "Vendor Payment Dashboard",
         moduleName: "Vendor Payment Dashboard",
         icon: "star",

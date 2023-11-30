@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { VendorMasterViewComponent } from "../vendor-master-view/vendor-master-view.component";
 import Swal from "sweetalert2";
+import moment from "moment";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -15,7 +16,7 @@ export class VendorMasterListComponent implements OnInit {
   // Define column headers for the table
   columnHeader =
     {
-      'entryDate': 'Created Date',
+      'eNTDT': 'Created Date',
       "vendorCode": "Vendor Code",
       "vendorName": "Vendor Name",
       "vendorType": "Vendor Type",
@@ -80,7 +81,7 @@ export class VendorMasterListComponent implements OnInit {
   }
   ngOnInit(): void {
     this.getVendorDetails();
-   // this.viewComponent = VendorMasterViewComponent
+    // this.viewComponent = VendorMasterViewComponent
     this.csvFileName = "Vendor Details"  //setting csv file Name so file will be saved as per this name
   }
   async getVendorDetails() {
@@ -92,22 +93,19 @@ export class VendorMasterListComponent implements OnInit {
     const res = await this.masterService.masterPost("generic/get", req).toPromise()
     if (res) {
       // Generate srno for each object in the array
-      const dataWithSrno = res.data.map((obj, index) => {
-        return {
-          ...obj,
-         // srNo: index + 1,
-          vendorName: obj.vendorName.toUpperCase(),
-          vendorType: obj.vendorType.toUpperCase()
-        };
-      });
-      const sortedData = dataWithSrno.sort((a, b) => {
-        const dateA: Date | any = new Date(a.entryDate);
-        const dateB: Date | any = new Date(b.entryDate);
+      const dataWithSrno = res.data
+        .map((obj) => {
+          return {
+            ...obj,
+            // srNo: index + 1,
+            vendorName: obj.vendorName.toUpperCase(),
+            vendorType: obj.vendorType.toUpperCase(),
+            eNTDT: moment(obj.eNTDT).format('DD-MM-YYYY HH:mm')
+          };
+        })
+        .sort((a, b) => b._id.localeCompare(a._id));
 
-        // Compare the date objects
-        return dateB - dateA; // Sort in descending order
-      });
-      this.csv = sortedData;
+      this.csv = dataWithSrno;
       this.tableLoad = false;
     }
   }
@@ -116,6 +114,9 @@ export class VendorMasterListComponent implements OnInit {
     // Remove the "_id" field from the form controls
     delete det._id;
     delete det.srNo;
+    det['mODDT'] = new Date()
+    det['mODBY'] = localStorage.getItem("UserName")
+    det['mODLOC'] = localStorage.getItem("Branch")
     let req = {
       companyCode: parseInt(localStorage.getItem("companyCode")),
       collectionName: "vendor_detail",

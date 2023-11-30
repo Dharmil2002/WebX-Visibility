@@ -375,34 +375,12 @@ export class VendorControl {
                 Validations: [],
                 generatecontrol: false,
                 disable: false
-            },
+            },            
             {
-                name: 'entryDate',
-                label: 'Entry Date',
-                placeholder: 'Select Entry Date',
-                type: 'date',
-                value: new Date(), // Set the value to the current date
-                filterOptions: '',
-                autocomplete: '',
-                displaywith: '',
-                Validations: [],
-                generatecontrol: false,
-                disable: false
-            },
-            {
-                name: 'entryBy', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("Username"), Validations: [],
+                name: 'eNTBY', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
                 generatecontrol: false, disable: false
             },
-            {
-                name: "updateBy",
-                label: "Update By",
-                placeholder: "Update By",
-                type: "text",
-                value: localStorage.getItem("UserName"),
-                Validations: [],
-                generatecontrol: false,
-                disable: false,
-            },
+           
         ];
         this.vendorOtherInfoArray = [
             {

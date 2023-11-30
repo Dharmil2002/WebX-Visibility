@@ -490,23 +490,50 @@ export class CustomerContractServiceSelectionComponent
         filter: {},
         collectionName: "pincode_master",
       };
-      this.StateList = await firstValueFrom(
+
+      // Fetch state data
+      const stateResponse = await firstValueFrom(
         this.masterService.masterPost("generic/get", stateReqBody)
       );
-      this.PinCodeList = await firstValueFrom(
+
+      // Check if state data is available and has the 'data' property
+      if (stateResponse && stateResponse.data) {
+        this.StateList = stateResponse;
+      } else {
+        console.error("State data is missing or has an unexpected structure");
+        return;
+      }
+
+      // Fetch pincode data
+      const pincodeResponse = await firstValueFrom(
         this.masterService.masterPost("generic/get", pincodeReqBody)
       );
-      this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
-        this.PinCodeList,
-        this.StateList,
-        "ST"
-      );
-      this.SetDefaultProductsData();
+
+      // Check if pincode data is available and has the 'data' property
+      if (pincodeResponse && pincodeResponse.data) {
+        this.PinCodeList = pincodeResponse;
+      } else {
+        console.error("Pincode data is missing or has an unexpected structure");
+        return;
+      }
+
+      // Check if 'data' property exists before accessing it
+      if (this.PinCodeList.data && this.StateList.data) {
+        this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
+          this.PinCodeList,
+          this.StateList,
+          "ST"
+        );
+        this.SetDefaultProductsData();
+      } else {
+        console.error("Data property is missing in either PinCodeList or StateList");
+      }
     } catch (error) {
       // Handle any errors that occurred during the request
       console.error("Error:", error);
     }
   }
+
 
   //#region Set OriginRateOptions
   SetRateOptions(event) {
@@ -752,11 +779,8 @@ export class CustomerContractServiceSelectionComponent
     //#region  Set Default Products
     this.SetDefaultFuelSurchargeData();
     this.SetDefaultInsuranceCarrierRiskSelectionData();
-    if (this.contractData?.lTYP != null) {
-      this.ProductsForm.get("loadType").setValue(
-        this.LoadtypedetailFromAPI.find(
-          (item) => item.value == this.contractData.lTYP
-        )
+    if (this.contractData?.lTYP != null) {this.ProductsForm.get("loadType").setValue(
+        this.LoadtypedetailFromAPI.find((item) => item.value == this.contractData.lTYP)
       );
     }
 
@@ -801,17 +825,17 @@ export class CustomerContractServiceSelectionComponent
 
         this.VolumtericForm.get("VolumetricUoM").setValue(
           this.VolumetricUoMFromAPI.find(
-            (item) => item.name == this.contractData.vUOM
+            (item) => item.value == this.contractData.vUOM
           )
         );
         this.VolumtericForm.get("Volumetricapplied").setValue(
           this.VolumetricappliedFromAPI.find(
-            (item) => item.name == this.contractData.vAPP
+            (item) => item.value == this.contractData.vAPP
           )
         );
         this.VolumtericForm.get("Volumtericcalculation").setValue(
           this.VolumtericcalculationFromAPI.find(
-            (item) => item.name == this.contractData.vCAL
+            (item) => item.value == this.contractData.vCAL
           )
         );
         this.VolumtericForm.get("Conversionratio").setValue(
@@ -837,7 +861,7 @@ export class CustomerContractServiceSelectionComponent
 
         this.CODDODForm.get("CODDODRatetype").setValue(
           FilteredRateType.find(
-            (item) => item.name === this.contractData.cODDODRTYP
+            (item) => item.value === this.contractData.cODDODRTYP
           )
         );
         this.CODDODForm.get("Rate").setValue(this.contractData.rT);
@@ -867,7 +891,7 @@ export class CustomerContractServiceSelectionComponent
 
         this.DemurrageForm.get("DRatetype").setValue(
           this.DemurrageRatetypeFromAPI.find(
-            (item) => item.name == this.contractData.dRTYP
+            (item) => item.value == this.contractData.dRTYP
           )
         );
         this.DemurrageForm.get("Demurragerateperday").setValue(
@@ -900,7 +924,7 @@ export class CustomerContractServiceSelectionComponent
         );
         this.YieldProtectionForm.get("Yieldtype").setValue(
           this.YieldTypeFromAPI.find(
-            (item) => item.name == this.contractData.yIELDTYP
+            (item) => item.value == this.contractData.yIELDTYP
           )
         );
         this.YieldProtectionForm.get("MinimumyieldINR").setValue(
@@ -908,7 +932,7 @@ export class CustomerContractServiceSelectionComponent
         );
         this.YieldProtectionForm.get("CalculateYieldon").setValue(
           this.CalculateYieldonFromAPI.find(
-            (item) => item.name == this.contractData.cYIELDON
+            (item) => item.value == this.contractData.cYIELDON
           )
         );
       },
@@ -950,12 +974,12 @@ export class CustomerContractServiceSelectionComponent
         // Your logic for Volumetric
         if (this.VolumtericForm.valid) {
           contractDetails["vUOM"] =
-            this.VolumtericForm.value.VolumetricUoM.name;
+            this.VolumtericForm.value.VolumetricUoM.value;
           contractDetails["vCAL"] =
-            this.VolumtericForm.value.Volumtericcalculation.name;
+            this.VolumtericForm.value.Volumtericcalculation.value;
           contractDetails["vAPP"] =
-            this.VolumtericForm.value.Volumetricapplied.name;
-          contractDetails["cN"] = this.VolumtericForm.value.Conversionratio;
+            this.VolumtericForm.value.Volumetricapplied.value;
+          contractDetails["cN"] = parseInt(this.VolumtericForm.value.Conversionratio);
         } else {
           this.CommanSwalWithReturn(
             "Please Fill Volumteric Forms Details Or UnChecked Service Selection",
@@ -968,10 +992,10 @@ export class CustomerContractServiceSelectionComponent
         // Your logic for COD/DOD
         if (this.CODDODForm.valid) {
           contractDetails["cODDODRTYP"] =
-            this.CODDODForm.value.CODDODRatetype.name;
-          contractDetails["rT"] = this.CODDODForm.value.Rate;
-          contractDetails["mIN"] = this.CODDODForm.value.MinCharge;
-          contractDetails["mAX"] = this.CODDODForm.value.MaxCharge;
+            this.CODDODForm.value.CODDODRatetype.value;
+          contractDetails["rT"] = parseInt(this.CODDODForm.value.Rate);
+          contractDetails["mIN"] = parseInt(this.CODDODForm.value.MinCharge);
+          contractDetails["mAX"] = parseInt(this.CODDODForm.value.MaxCharge);
         } else {
           this.CommanSwalWithReturn(
             "Please Fill COD/DOD Forms Details Or UnChecked Service Selection",
@@ -983,12 +1007,11 @@ export class CustomerContractServiceSelectionComponent
       Demurrage: () => {
         // Your logic for Demurrage
         if (this.DemurrageForm.valid) {
-          contractDetails["fSDAY"] = this.DemurrageForm.value.Freestoragedays;
-          contractDetails["dRTYP"] = this.DemurrageForm.value.DRatetype.name;
-          contractDetails["dMRTPD"] =
-            this.DemurrageForm.value.Demurragerateperday;
-          contractDetails["dMIN"] = this.DemurrageForm.value.DMinCharge;
-          contractDetails["dMAX"] = this.DemurrageForm.value.DMaxCharge;
+          contractDetails["fSDAY"] = parseInt(this.DemurrageForm.value.Freestoragedays);
+          contractDetails["dRTYP"] = this.DemurrageForm.value.DRatetype.value;
+          contractDetails["dMRTPD"] = parseInt(this.DemurrageForm.value.Demurragerateperday);
+          contractDetails["dMIN"] = parseInt(this.DemurrageForm.value.DMinCharge);
+          contractDetails["dMAX"] = parseInt(this.DemurrageForm.value.DMaxCharge);
         } else {
           this.CommanSwalWithReturn(
             "Please Fill Demurrage Forms Details Or UnChecked Service Selection",
@@ -1004,8 +1027,7 @@ export class CustomerContractServiceSelectionComponent
         // Your logic for cutofftime
         if (this.CutOfftimeForm.valid) {
           contractDetails["tDT"] = this.CutOfftimeForm.value.Timeofday;
-          contractDetails["dAYS"] =
-            this.CutOfftimeForm.value.AdditionalTransitdays;
+          contractDetails["dAYS"] = parseInt(this.CutOfftimeForm.value.AdditionalTransitdays);
         } else {
           this.CommanSwalWithReturn(
             "Please Fill Cut Off Time Forms Details Or UnChecked Service Selection",
@@ -1018,17 +1040,17 @@ export class CustomerContractServiceSelectionComponent
         // Your logic for YieldProtection
         if (this.YieldProtectionForm.valid) {
           contractDetails["mWKG"] =
-            this.YieldProtectionForm.value.MinimumweightKg;
+          parseInt(this.YieldProtectionForm.value.MinimumweightKg);
           contractDetails["mPKGNO"] =
-            this.YieldProtectionForm.value.MinimumpackagesNo;
+          parseInt(this.YieldProtectionForm.value.MinimumpackagesNo);
           contractDetails["mFREIGHT"] =
-            this.YieldProtectionForm.value.MinimumFreightvalueINR;
+          parseInt(this.YieldProtectionForm.value.MinimumFreightvalueINR);
           contractDetails["yIELDTYP"] =
-            this.YieldProtectionForm?.value?.Yieldtype?.name;
+            this.YieldProtectionForm?.value?.Yieldtype?.value;
           contractDetails["mYIELD"] =
-            this.YieldProtectionForm.value.MinimumyieldINR;
+          parseInt(this.YieldProtectionForm.value.MinimumyieldINR);
           contractDetails["cYIELDON"] =
-            this.YieldProtectionForm.value?.CalculateYieldon?.name;
+            this.YieldProtectionForm.value?.CalculateYieldon?.value;
         } else {
           this.CommanSwalWithReturn(
             "Please Fill Yield Protection Forms Details Or UnChecked Service Selection",
@@ -1108,16 +1130,17 @@ export class CustomerContractServiceSelectionComponent
   }
 
   async InsuranceCarrierRiskSelectionSave() {
-    const req = {
-      companyCode: this.storage.companyCode,
-      collectionName: "cust_contract_insurance",
-      filter: { cONID: this.contractData.cONID },
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterMongoRemove("generic/remove", req)
-    );
+
     const tableData = this.tableData;
     if (tableData.length > 0) {
+      const rmReq = {
+        companyCode: this.storage.companyCode,
+        collectionName: "cust_contract_insurance",
+        filter: { cONID: this.contractData.cONID },
+      };
+      await firstValueFrom(
+        this.masterService.masterMongoRemove("generic/removeAll", rmReq)
+      );
       let incData = [];
       tableData.forEach((element, index) => {
         const requestBody = {
@@ -1139,21 +1162,6 @@ export class CustomerContractServiceSelectionComponent
         };
         incData.push(requestBody);
       });
-      let modifiedTblChallan = [];
-      // if (this.isUpdate) {
-      //   const fieldsToFromRemove = [
-      //     "cONID",
-      //     "cID",
-      //     "_id",
-      //     "eNTDT",
-      //     "eNTLOC",
-      //     "eNTBY",
-      //   ];
-      //   modifiedTblChallan = removeFields(incData, fieldsToFromRemove);
-      // } else {
-      //   const fieldsToFromRemove = ["mODDT", "mODLOC", "mODBY"];
-      //   modifiedTblChallan = removeFields(incData, fieldsToFromRemove);
-      // }
       const req = {
         companyCode: this.companyCode,
         collectionName: "cust_contract_insurance",
@@ -1162,9 +1170,7 @@ export class CustomerContractServiceSelectionComponent
       //await this.masterService.masterPost("generic/create", req).toPromise();
       const method = "generic/create";
       try {
-        const res = await this.masterService
-          .masterPost(method, req)
-          .toPromise();
+        await firstValueFrom(this.masterService.masterPost(method, req));
         return true;
       } catch (error) {
         console.error("Error during API call:", error);
@@ -1177,16 +1183,16 @@ export class CustomerContractServiceSelectionComponent
   }
 
   async FuelSurchargeDataSave() {
-    const req = {
+    const FtableData = this.FtableData;
+    if (FtableData.length > 0) {
+    const fsreq = {
       companyCode: this.storage.companyCode,
       collectionName: "cust_contract_fuelsurcharge",
       filter: { cONID: this.contractData.cONID },
     };
-    const res = await firstValueFrom(
-      this.masterService.masterMongoRemove("generic/remove", req)
+    await firstValueFrom(
+      this.masterService.masterMongoRemove("generic/removeAll", fsreq)
     );
-    const FtableData = this.FtableData;
-    if (FtableData.length > 0) {
       let flsData = [];
       FtableData.forEach((element, index) => {
         const requestBody = {
@@ -1207,21 +1213,6 @@ export class CustomerContractServiceSelectionComponent
         };
         flsData.push(requestBody);
       });
-      let modifiedTblChallan = [];
-      // if (this.isUpdate) {
-      //   const fieldsToFromRemove = [
-      //     "cONID",
-      //     "cID",
-      //     "_id",
-      //     "eNTDT",
-      //     "eNTLOC",
-      //     "eNTBY",
-      //   ];
-      //   modifiedTblChallan = removeFields(flsData, fieldsToFromRemove);
-      // } else {
-      //   const fieldsToFromRemove = ["mODDT", "mODLOC", "mODBY"];
-      //   modifiedTblChallan = removeFields(flsData, fieldsToFromRemove);
-      // }
       const req = {
         companyCode: this.companyCode,
         collectionName: "cust_contract_fuelsurcharge",
@@ -1230,9 +1221,8 @@ export class CustomerContractServiceSelectionComponent
       //await this.masterService.masterPost("generic/create", req).toPromise();
       const method = "generic/create";
       try {
-        const res = await this.masterService
-          .masterPost(method, req)
-          .toPromise();
+        await firstValueFrom(this.masterService.masterPost(method, req));
+
         return true;
       } catch (error) {
         console.error("Error during API call:", error);
@@ -1254,9 +1244,9 @@ export class CustomerContractServiceSelectionComponent
       collectionName: "cust_contract_insurance",
       filter: { cONID: this.contractData.cONID },
     };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", reqBody)
-    );
+    const res = await this.masterService
+      .masterPost("generic/get", reqBody)
+      .toPromise();
     if (res) {
       this.tableData = res.data;
       this.tableData.forEach((item) => {
@@ -1280,8 +1270,14 @@ export class CustomerContractServiceSelectionComponent
 
   async SetDefaultFuelSurchargeData() {
     this.FtableLoad = true;
-    const FuelSurchargeSelectionFromAPI = await PayBasisdetailFromApi(this.masterService,"FTYP");
-    const FuelSurchargeFromAPI = await PayBasisdetailFromApi(this.masterService,"RTTYP");
+    const FuelSurchargeSelectionFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "FTYP"
+    );
+    const FuelSurchargeFromAPI = await PayBasisdetailFromApi(
+      this.masterService,
+      "RTTYP"
+    );
     const reqBody = {
       companyCode: this.companyCode,
       collectionName: "cust_contract_fuelsurcharge",
@@ -1291,18 +1287,21 @@ export class CustomerContractServiceSelectionComponent
       this.masterService.masterPost("generic/get", reqBody)
     );
     if (res.success) {
-      this.FtableData = res.data.map((item)=>{
+      this.FtableData = res.data.map((item) => {
         return {
-          id:item._id,
-          FuelType:FuelSurchargeSelectionFromAPI.find((x) => x.value == item.fTYPE)?.name,
-          FuelTypevalue:item.fTYPE,
-          FRateType:FuelSurchargeFromAPI.find((x) => x.value == item.fRTYPE)?.name,
-          FRateTypevalue:item.fRTYPE,
-          FRate:item.frT,
-          FMinCharge:item.fmIN,
-          FMaxCharge:item.fmAX,
-          actions:["Edit", "Remove"]
-        }
+          id: item._id,
+          FuelType: FuelSurchargeSelectionFromAPI.find(
+            (x) => x.value == item.fTYPE
+          )?.name,
+          FuelTypevalue: item.fTYPE,
+          FRateType: FuelSurchargeFromAPI.find((x) => x.value == item.fRTYPE)
+            ?.name,
+          FRateTypevalue: item.fRTYPE,
+          FRate: item.frT,
+          FMinCharge: item.fmIN,
+          FMaxCharge: item.fmAX,
+          actions: ["Edit", "Remove"],
+        };
       });
       this.FtableLoad = false;
     }

@@ -56,7 +56,6 @@ export class CustomerContractListComponent extends UnsubscribeOnDestroyAdapter i
   }
   async SearchData() {
     this.tableData = await GetContractListFromApi(this.masterService)
-    console.log(this.tableData)
     this.tableData.forEach((item: any) => {
       const startDate: Date = new Date(item.cSTARTDT);
       const endDate: Date = new Date(item.cENDDT);

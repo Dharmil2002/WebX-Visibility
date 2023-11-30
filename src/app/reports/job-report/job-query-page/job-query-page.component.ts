@@ -13,7 +13,7 @@ import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoi
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 
 import { jobQueryControl } from 'src/assets/FormControls/job-reports/job-query';
-import { getJobregisterReportDetail } from './job-register-utlity';
+import { getJobregisterReportDetail } from 'src/app/Reports/job-report/job-query-page/job-register-utlity';
 
 @Component({
   selector: 'app-job-query-page',

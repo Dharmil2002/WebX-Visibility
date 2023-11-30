@@ -1,0 +1,20 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+  <form [formGroup]="CustomerGSTTableForm">
+    <app-form-webxpress [form]="CustomerGSTTableForm" [formData]="jsonControlArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+      (callFunction)="functionCallHandler($event)" [FormTitle]="'Customer and GST Details'">
+    </app-form-webxpress>
+  </form>
+  <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="InvoiceDetailscolumnHeader"
+  [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+  [menuItems]="menuItems" [staticField]="staticField" [Link]="linkArray" [height]="height" [width]="width"
+  [maxWidth]="maxWidth" [addAndEditPath]="addAndEditPath">
+  </app-generic-table-v2>
+  <form [formGroup]="CollectionSummaryTableForm">
+    <app-form-webxpress [form]="CollectionSummaryTableForm" [formData]="CollectionSummaryjsonControlArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+      (callFunction)="functionCallHandler($event)" [FormTitle]="'Collection Summary'">
+    </app-form-webxpress>
+  </form>
+</app-common-wrapper-webxpress>
+

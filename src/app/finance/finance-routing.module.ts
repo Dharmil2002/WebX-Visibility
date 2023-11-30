@@ -5,13 +5,15 @@ import { AddManualVoucherComponent } from './manual voucher/add-manual-voucher/a
 import { DebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
 import { DashboardComponent } from './Vendor Payment/dashboard/dashboard.component';
 import { ThcPaymentsComponent } from './Vendor Payment/thc-payments/thc-payments.component';
+import { InvoiceCollectionComponent } from './invoice-collection/invoice-collection.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
   { path: 'AddManualVouchar', component: AddManualVoucherComponent },
   { path: 'DebitVoucher', component: DebitVoucherComponent },
   { path: 'VendorPayment/Dashboard', component: DashboardComponent },
-  { path: 'VendorPayment/THC-Payment', component: ThcPaymentsComponent }
+  { path: 'VendorPayment/THC-Payment', component: ThcPaymentsComponent },
+  { path: 'InvoiceCollection', component: InvoiceCollectionComponent }
 ];
 
 @NgModule({

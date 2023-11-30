@@ -47,6 +47,7 @@ import { DebitVoucherPreviewComponent } from './Modals/debit-voucher-preview/deb
 import { DashboardComponent } from './Vendor Payment/dashboard/dashboard.component';
 import { ThcPaymentsComponent } from './Vendor Payment/thc-payments/thc-payments.component';
 import { ThcPaymentFilterComponent } from './Vendor Payment/Modal/thc-payment-filter/thc-payment-filter.component';
+import { InvoiceCollectionComponent } from './invoice-collection/invoice-collection.component';
 
 @NgModule({
     declarations: [
@@ -59,7 +60,8 @@ import { ThcPaymentFilterComponent } from './Vendor Payment/Modal/thc-payment-fi
         DebitVoucherPreviewComponent,
         DashboardComponent,
         ThcPaymentsComponent,
-        ThcPaymentFilterComponent
+        ThcPaymentFilterComponent,
+        InvoiceCollectionComponent
     ],
     imports: [
         CommonModule,

@@ -1386,6 +1386,10 @@ export class CustomerContractServiceSelectionComponent
       Number(this.InsuranceCarrierRiskForm.get("IMinCharge")?.value) ?? 0;
     const IMaxCharge =
       Number(this.InsuranceCarrierRiskForm.get("IMaxCharge")?.value) ?? 0;
+    const InvoiceValueFrom =
+      Number(this.InsuranceCarrierRiskForm.get("InvoiceValueFrom")?.value) ?? 0;
+    const tovalue =
+      Number(this.InsuranceCarrierRiskForm.get("tovalue")?.value) ?? 0;
 
     // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
     if (MinCharge && MaxCharge && MinCharge > MaxCharge) {
@@ -1441,6 +1445,20 @@ export class CustomerContractServiceSelectionComponent
       this.InsuranceCarrierRiskForm.patchValue({
         IMinCharge: "",
         IMaxCharge: "",
+      });
+      return;
+    }
+    if (tovalue && InvoiceValueFrom && tovalue > InvoiceValueFrom) {
+      // Display an error message using SweetAlert (Swal)
+      this.CommanSwalWithReturn(
+        "InvoiceValueFrom charge must be greater than or equal to InvoiceValueTO charge.",
+        "error"
+      );
+
+      // Reset the values of 'min' and 'max' in the TERForm to an empty string
+      this.InsuranceCarrierRiskForm.patchValue({
+        tovalue: "",
+        InvoiceValueFrom: "",
       });
       return;
     }

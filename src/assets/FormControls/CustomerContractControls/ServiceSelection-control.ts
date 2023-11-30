@@ -662,7 +662,7 @@ export class ContractServiceSelectionControl {
           pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
-          onChange: "checkInvoice"
+          onChange: 'validateCodDodRates'
         },
         generatecontrol: true,
         disable: false,
@@ -686,11 +686,11 @@ export class ContractServiceSelectionControl {
           message: "Please Enter only positive numbers with up to two decimal places",
           pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
+        functions: {
+          onChange: 'validateCodDodRates'
+        },
         additionalData: {
           showNameAndValue: false,
-        },
-        functions: {
-          onOptionSelect: 'getContainerType'
         },
         generatecontrol: true,
         disable: false,

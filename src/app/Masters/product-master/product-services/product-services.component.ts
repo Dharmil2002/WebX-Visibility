@@ -66,8 +66,9 @@ export class ProductServicesComponent implements OnInit {
     private masterService: MasterService,
     public dialogRef: MatDialogRef<ProductServicesComponent>
   ) {
-    this.ProductId = data.ProductID;
-    this.ProductName = data.ProductName;
+    console.log('data' ,data)
+    this.ProductId = data.element.ProductID;
+    this.ProductName = data.element.ProductName;
   }
   ngOnInit(): void {
     this.GetTableData();

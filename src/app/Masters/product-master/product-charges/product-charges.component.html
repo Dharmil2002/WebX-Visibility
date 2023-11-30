@@ -1,4 +1,4 @@
-<div >
+<div>
     <ul class="m-0" style="padding-left: 10px; display: flex; justify-content: space-between;">
         <li style=" font-weight: 700; font-size: 1.5rem; list-style: none;">
             {{chargesTypeTitle}}
@@ -43,7 +43,8 @@
         </div>
         <div class="listTable" *ngIf="!Tabletab && TableLoad">
             <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-                [tableData]="tableData" (DeleteFunction)="DeleteFunction($event)" [AddNewButton]="true" (AddNewButtonEvent)="AddNew()" [metaData]="metaData"
+                [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)"
+                (DeleteFunction)="DeleteFunction($event)" [EventButton]="EventButton" [metaData]="metaData"
                 [staticField]="staticField">
             </app-generic-table-v2>
         </div>
@@ -61,14 +62,12 @@
                         </app-form-webxpress>
                     </form>
                 </div>
-                <div class="row" style=" margin-left: 0px;">
-                    <div class="col-3" style="display: flex; justify-content: space-between;">
-                        <button type="button" [disabled]="!customerTableForm.valid" mat-raised-button color="primary"
-                            (click)="save()">
-                            Submit
-                        </button>
-                        <button type="button" mat-raised-button mat-button (click)="AddNew()">Cancel</button>
-                    </div>
+                <div style="display: flex;">
+                    <button type="button" style="margin-right: 20px;" [disabled]="!customerTableForm.valid" mat-raised-button color="primary"
+                        (click)="save()">
+                        Submit
+                    </button>
+                    <button type="button" mat-raised-button mat-button (click)="AddNew()">Cancel</button>
                 </div>
             </div>
         </div>

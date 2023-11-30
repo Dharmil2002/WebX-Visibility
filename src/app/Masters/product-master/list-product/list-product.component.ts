@@ -60,6 +60,11 @@ export class ListProductComponent implements OnInit {
       iconName: "add_box",
     },
   };
+  EventButton = {
+    functionName: "AddNew",
+    name: "Add New",
+    iconName: "add",
+  };
 
   metaData = {
     checkBoxRequired: true,
@@ -222,17 +227,15 @@ export class ListProductComponent implements OnInit {
       data: { isCompany: this.isCompany, element: event },
     });
     dialogref.afterClosed().subscribe((result) => {
-      // this.dialogClosed.emit(result);
     });
   }
   addServices(event) {
     const dialogref = this.dialog.open(ProductServicesComponent, {
       width: "70%",
       height: "80%",
-      data: { isCompany: this.isCompany },
+      data: { isCompany: this.isCompany , element: event },
     });
     dialogref.afterClosed().subscribe((result) => {
-      // this.dialogClosed.emit(result);
     });
   }
 

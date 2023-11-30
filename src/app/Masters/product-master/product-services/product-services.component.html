@@ -61,7 +61,7 @@
     <div *ngIf="tableTab" class="row">
         <div class="col-12">
             <div class="title"
-                style="padding-left: 25px; font-size: 18px; font-weight: 700; margin: 10px 0px 0px 10px ;">
+                style=" font-size: 18px; font-weight: 700; margin: 10px 0px 0px 10px ;">
                 + Add Services
             </div>
         </div>
@@ -73,13 +73,12 @@
                 </app-form-webxpress>
             </form>
         </div>
-        <div class="col-12 row">
-            <div class="col-3" style="margin-left: 30px; display: flex; justify-content: space-between;">
-                <button type="button" mat-raised-button color="primary" (click)="save()">
-                    Submit
-                </button>
-                <button type="button" mat-raised-button mat-button (click)="Cancle()">Cancel</button>
-            </div>
+        <div style="display: flex;">
+            <button type="button" style="margin-right: 20px;" [disabled]="!customerTableForm.valid" mat-raised-button color="primary"
+                (click)="save()">
+                Submit
+            </button>
+            <button type="button" mat-raised-button mat-button (click)="AddNew()">Cancel</button>
         </div>
     </div>
 </div>

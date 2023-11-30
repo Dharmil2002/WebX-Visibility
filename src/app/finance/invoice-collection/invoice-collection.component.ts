@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { InvoiceCollectionControl } from 'src/assets/FormControls/Finance/CreditDebitVoucher/invoice-collection-control';
+import { InvoiceCollectionControl } from 'src/assets/FormControls/Finance/InvoiceCollection/invoice-collection-control';
 
 @Component({
   selector: 'app-invoice-collection',

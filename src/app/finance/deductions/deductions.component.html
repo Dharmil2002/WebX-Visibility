@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress>
+  <form [formGroup]="DeductionsTableForm">
+    <app-form-webxpress [form]="DeductionsTableForm" [formData]="DeductionsjsonControlArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+      (callFunction)="functionCallHandler($event)" [FormTitle]="'Deductions'">
+    </app-form-webxpress>
+  </form>
+</app-common-wrapper-webxpress>

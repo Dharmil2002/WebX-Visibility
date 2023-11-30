@@ -1,0 +1,15 @@
+<div mat-dialog-title style="display: flex;
+  justify-content: end;margin:0px;">
+    <button mat-icon-button (click)="Close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+<div class="body" style="max-height: 420px;">
+    <form [formGroup]="THCPaymentFilterForm">
+        <app-form-webxpress [form]="THCPaymentFilterForm" [FormTitle]="'Filter THC Payment List'"
+            [formData]="jsonControlTHCPaymentFilterArray" (functionCallEmitter)="functionCallHandler($event)"
+            [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1'" (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true">
+        </app-form-webxpress>
+    </form>
+</div>

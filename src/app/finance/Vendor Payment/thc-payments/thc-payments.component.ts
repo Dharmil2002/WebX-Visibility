@@ -1,4 +1,6 @@
 import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { ThcPaymentFilterComponent } from "../Modal/thc-payment-filter/thc-payment-filter.component";
 
 @Component({
   selector: "app-thc-payments",
@@ -41,14 +43,14 @@ export class ThcPaymentsComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:20%",
       type: "Link",
-      functionName:"AdvancePendingFunction"
+      functionName: "AdvancePendingFunction"
     },
     BalanceUnbilled: {
       Title: "Balance Unbilled",
       class: "matcolumncenter",
       Style: "min-width:20%",
       type: "Link",
-      functionName:"BalanceUnbilledFunction"
+      functionName: "BalanceUnbilledFunction"
     },
   };
   EventButton = {
@@ -85,19 +87,35 @@ export class ThcPaymentsComponent implements OnInit {
       AdvancePending: "87600.50",
       BalanceUnbilled: "87600.50",
     },
-    
+    {
+      SrNo: "4",
+      Vendor: "V0223: Kanishka Roadlines",
+      THCamount: "178650.60",
+      AdvancePending: "87600.50",
+      BalanceUnbilled: "87600.50",
+    },
+    {
+      SrNo: "5",
+      Vendor: "V0223: Kanishka Roadlines",
+      THCamount: "178650.60",
+      AdvancePending: "87600.50",
+      BalanceUnbilled: "87600.50",
+    },
+
   ];
   isTableLode = true;
-  constructor() {}
+  constructor(private matDialog: MatDialog,) { }
 
-  ngOnInit(): void {}
-
-  AdvancePendingFunction(event){
-    console.log('AdvancePendingFunction' ,event)
+  ngOnInit(): void {
+    this.filterFunction()
   }
 
-  BalanceUnbilledFunction(event){
-    console.log('BalanceUnbilledFunction' ,event)
+  AdvancePendingFunction(event) {
+    console.log('AdvancePendingFunction', event)
+  }
+
+  BalanceUnbilledFunction(event) {
+    console.log('BalanceUnbilledFunction', event)
   }
 
   functionCallHandler($event) {
@@ -109,5 +127,28 @@ export class ThcPaymentsComponent implements OnInit {
       // we have to handle , if function not exists.
       console.log("failed", error);
     }
+  }
+  filterFunction() {
+    let RequestData = {
+      vendorList: [
+        "V0006", "V0007"
+      ],
+      StartDate: "2023-11-21T18:30:00.000Z",
+      EndDate: "2023-11-23T18:30:00.000Z"
+
+    }
+    const dialogRef = this.matDialog.open(ThcPaymentFilterComponent, {
+      data: { DefaultData: RequestData },
+      width: "30%",
+      disableClose: true,
+      position: {
+        top: "20px",
+      },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+        console.log(result)
+      }
+    });
   }
 }

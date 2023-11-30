@@ -45,6 +45,7 @@ import { AddDetailsDebitAgainstDocumentModalComponent } from './Modals/add-detai
 import { DebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
 import { DebitVoucherPreviewComponent } from './Modals/debit-voucher-preview/debit-voucher-preview.component';
 import { DashboardComponent } from './Vendor Payment/dashboard/dashboard.component';
+import { ThcPaymentsComponent } from './Vendor Payment/thc-payments/thc-payments.component';
 
 @NgModule({
     declarations: [
@@ -55,7 +56,8 @@ import { DashboardComponent } from './Vendor Payment/dashboard/dashboard.compone
         AddDebitAgainstDocumentModalComponent,
         AddDetailsDebitAgainstDocumentModalComponent,
         DebitVoucherPreviewComponent,
-        DashboardComponent
+        DashboardComponent,
+        ThcPaymentsComponent
     ],
     imports: [
         CommonModule,

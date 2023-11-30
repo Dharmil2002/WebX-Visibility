@@ -228,6 +228,12 @@
                                             {{element[tableData]}}</p>
                                     </ng-container>
 
+                                    <ng-container *ngIf="columnHeader[tableData]?.type === 'Link'">
+                                        <p class="windowLink"
+                                            (click)="functionHandle(columnHeader[tableData].functionName , element)">
+                                            {{element[tableData]}}</p>
+                                    </ng-container>
+
                                     <button mat-icon-button *ngIf="tableData=='view'" (click)="$event.stopPropagation()"
                                         (click)="View(element)" class="tbl-action-btn">
                                         <app-feather-icons [icon]="'eye'" [class]="'tbl-fav-edit'"></app-feather-icons>

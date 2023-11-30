@@ -4,12 +4,14 @@ import { InvoiceSummaryBillComponent } from './invoice-summary-bill/invoice-summ
 import { AddManualVoucherComponent } from './manual voucher/add-manual-voucher/add-manual-voucher.component';
 import { DebitVoucherComponent } from './credit-debit-voucher/credit-debit-voucher.component';
 import { DashboardComponent } from './Vendor Payment/dashboard/dashboard.component';
+import { ThcPaymentsComponent } from './Vendor Payment/thc-payments/thc-payments.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
   { path: 'AddManualVouchar', component: AddManualVoucherComponent },
   { path: 'DebitVoucher', component: DebitVoucherComponent },
-  { path: 'VendorPaymentDashboard', component: DashboardComponent }
+  { path: 'VendorPaymentDashboard', component: DashboardComponent },
+  { path: 'thc-payments', component: ThcPaymentsComponent }
 ];
 
 @NgModule({

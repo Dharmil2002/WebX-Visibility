@@ -202,7 +202,7 @@ export class VendorAssociateControls {
           pattern: '^\\d+(\\.\\d{1,2})?$'
         }],
         functions: {
-          onChange: 'validateMinChargeOnRate'
+          onChange: 'validateMinCharge'
         },
       },
       {

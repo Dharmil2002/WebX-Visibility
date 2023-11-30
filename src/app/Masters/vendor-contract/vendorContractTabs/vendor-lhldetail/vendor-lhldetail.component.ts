@@ -4,6 +4,7 @@ import { VendorLHLModalComponent } from './vendor-lhlmodal/vendor-lhlmodal.compo
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
+import { removeData } from '../../vendorContractApiUtility';
 
 @Component({
   selector: 'app-vendor-lhldetail',
@@ -17,16 +18,16 @@ export class VendorLHLDetailComponent implements OnInit {
     rTNM: {
       Title: "Route",
       class: "matcolumnleft",
-      Style: "max-width:250px",
+      Style: "min-width:250px",
     },
     rTTNM: {
       Title: "Rate Type",
       class: "matcolumnleft",
-      //Style: "max-width:100px",
+      Style: "max-width:115px",
     },
     cPCTNM: {
       Title: "Capacity(Ton)",
-      class: "matcolumncenter",
+      class: "matcolumnleft",
       //Style: "max-width:100px",
     },
     rT: {
@@ -62,7 +63,7 @@ export class VendorLHLDetailComponent implements OnInit {
   menuItemflag = true;
   menuItems = [
     { label: 'Edit' },
-    //{ label: 'Remove' }
+    { label: 'Remove' }
   ]
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
@@ -87,12 +88,10 @@ export class VendorLHLDetailComponent implements OnInit {
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
-    // if (data.label.label === 'Remove') {
-    //   this.TErouteBasedTableData = this.TErouteBasedTableData.filter((x) => x.id !== data.data.id);
-    // } else {
     const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
-    this.addDetails(terDetails)
-    // }
+    data.label.label === 'Remove' ? this.removeTableData(terDetails._id) :
+      this.addDetails(terDetails)
+
   }
   //#endregion 
   //#region to Add a new item to the table or edit
@@ -129,12 +128,12 @@ export class VendorLHLDetailComponent implements OnInit {
       };
 
       const response = await this.masterService.masterPost("generic/get", request).toPromise();
-       
+
 
       this.TErouteBasedTableData = response.data
-      .filter(x => x.cNID === this.CurrentContractDetails.cNID)
-      .sort((a, b) => b._id.localeCompare(a._id));
-      
+        .filter(x => x.cNID === this.CurrentContractDetails.cNID)
+        .sort((a, b) => b._id.localeCompare(a._id));
+
       this.TErouteBasedTableData.forEach(item => {
         item.actions = ['Edit', 'Remove'];
       });
@@ -144,6 +143,12 @@ export class VendorLHLDetailComponent implements OnInit {
       console.error("An error occurred:", error);
 
     }
+  }
+  //#endregion
+  //#region to remove Data from table
+  async removeTableData(id) {
+    await removeData(this.masterService, id, 'vendor_contract_lhl_rt');
+    this.getTableDetail()
   }
   //#endregion
 }

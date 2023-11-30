@@ -86,13 +86,24 @@ export class VendorLHFTRModalComponent implements OnInit {
           showConfirmButton: true,
         });
       } else {
-        // Create a new vendor contract
+        // Fetch existing data
         const existingData = await this.fetchExistingData(collectionName);
-        let index = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+        let newId;
+        // Find the contract with the specified cNID
+        const existingContract = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
 
-        // Check if index is found, then set to the count, otherwise set to 0
-        index = index ? existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID).length : 0;
-        const newContractData = this.prepareContractData(index);
+        if (existingContract) {
+          // Sort existing data based on _id for consistency
+          const sortedData = existingData.sort((a, b) => a._id.localeCompare(b._id));
+
+          // Extract the last vendor code from the sorted data
+          const lastId = sortedData.length > 0 ? parseInt(sortedData[sortedData.length - 1]._id.split('-')[2], 10) : 0;
+
+          // Generate a new _id
+          newId = lastId + 1;
+        }
+        newId = existingContract ? newId : 0
+        const newContractData = this.prepareContractData(newId);
 
         const createRequest = {
           companyCode: this.companyCode,
@@ -230,9 +241,9 @@ export class VendorLHFTRModalComponent implements OnInit {
   async getDropDownData() {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
     const containerData = await this.objContainerService.getContainerList();
-    const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VehicleCapacity')
+    const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VC')
     const containerDataWithPrefix = vehicleData.map((item) => ({
-      name: `Veh- ${item.name}`,
+      name: item.name,
       value: item.value,
     }));
     // Merge containerData and vehicleData into a single array
@@ -300,56 +311,6 @@ export class VendorLHFTRModalComponent implements OnInit {
       // Handle errors that may occur during the operation
       console.error(`An error occurred while fetching 'route' details:`, error);
     }
-  }
-  //#endregion
-  //#region to Validate the minimum  charge values on rate in the TLHFTRForm.
-  validateMinChargeOnRate() {
-    // Get the current values of 'min' and 'max' from the TLHFTRForm
-    const minValue = parseFloat(this.TLHFTRForm.get('min')?.value);
-    const maxValue = parseFloat(this.TLHFTRForm.get('rate')?.value);
-
-    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
-    if (minValue && maxValue && minValue >= maxValue) {
-      // Display an error message using SweetAlert (Swal)
-      Swal.fire({
-        title: 'Min charge must be less Rate.',
-        toast: false,
-        icon: "error",
-        showConfirmButton: true,
-        confirmButtonText: "OK"
-      });
-
-      // Reset the values of 'min' and 'max' in the TLHFTRForm to an empty string
-      this.TLHFTRForm.patchValue({
-        min: '',
-      });
-    }
-    this.validateMinCharge();
-  }
-  //#endregion
-  //#region to Validate the maximum  charge values on rate in the TLHFTRForm.
-  validateMAXChargeOnRate() {
-    // Get the current values of 'min' and 'max' from the TLHFTRForm
-    const minValue = parseFloat(this.TLHFTRForm.get('max')?.value);
-    const maxValue = parseFloat(this.TLHFTRForm.get('rate')?.value);
-
-    // Check if both 'min' and 'max' have valid numeric values and if 'min' is greater than 'max'
-    if (minValue && maxValue && maxValue >= minValue) {
-      // Display an error message using SweetAlert (Swal)
-      Swal.fire({
-        title: 'Max charge must be greater than Rate.',
-        toast: false,
-        icon: "error",
-        showConfirmButton: true,
-        confirmButtonText: "OK"
-      });
-
-      // Reset the values of 'min' and 'max' in the TLHFTRForm to an empty string
-      this.TLHFTRForm.patchValue({
-        max: '',
-      });
-    }
-    this.validateMinCharge();
   }
   //#endregion
 }

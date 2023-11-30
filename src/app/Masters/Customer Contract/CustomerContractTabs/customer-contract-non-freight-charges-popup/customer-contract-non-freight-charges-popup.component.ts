@@ -9,6 +9,7 @@ import { ContractNonFreightMatrixControl } from "src/assets/FormControls/Custome
 import { PayBasisdetailFromApi } from "../../CustomerContractAPIUtitlity";
 import Swal from "sweetalert2";
 import { StorageService } from "src/app/core/service/storage.service";
+import { firstValueFrom, map, switchMap } from "rxjs";
 
 @Component({
   selector: "app-customer-contract-non-freight-charges-popup",
@@ -113,15 +114,17 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
     this.isLoad = true;
     let ChargesDatareq = {
       companyCode: this.companyCode,
-      collectionName: "cust_contract_non_freight_charge_matrix",
-      filter: { nFCID: this.ChargesData.nFCID },
+      collectionName: "cust_contract_non_freight_charge_matrix_details",
+      filter: { sCT: this.ChargesData.sCT, cONID: this.ChargesData.cONID },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", ChargesDatareq)
-      .toPromise();
-    if (res.success && res.data.length > 0) {
-      const nfcData = res.data[0].nFC;
-      this.tableData = nfcData;
+
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", ChargesDatareq)
+    );
+    console.log("res", res);
+    if (res.success) {
+      this.tableData = res.data;
+      this.tableData.sort((a, b) => (a.cDID > b.cDID ? -1 : 1));
       this.tableLoad = true;
       this.isLoad = false;
     }
@@ -160,19 +163,14 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       collectionName: "cust_contract",
       filter: { docNo: this.ChargesData.cONID },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
     const SelectedData = res.data[0].rTYP;
-    const RatData = await PayBasisdetailFromApi(
-      this.masterService,
-      "RTTYP"
-    );
-    const rateTypedata = SelectedData.map(
-      (x, index) => {
-        return RatData.find((t) => t.value == x);
-      }
-    );
+    const RatData = await PayBasisdetailFromApi(this.masterService, "RTTYP");
+    const rateTypedata = SelectedData.map((x, index) => {
+      return RatData.find((t) => t.value == x);
+    });
     this.filter.Filter(
       this.jsonControlArrayNonFreightMatrix,
       this.NonFreightMatrixForm,
@@ -198,12 +196,12 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
         filter: {},
         collectionName: "pincode_master",
       };
-      this.StateList = await this.masterService
-        .masterPost("generic/get", stateReqBody)
-        .toPromise();
-      this.PinCodeList = await this.masterService
-        .masterPost("generic/get", pincodeReqBody)
-        .toPromise();
+      this.StateList = await firstValueFrom(
+        this.masterService.masterPost("generic/get", stateReqBody)
+      );
+      this.PinCodeList = await firstValueFrom(
+        this.masterService.masterPost("generic/get", pincodeReqBody)
+      );
       this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
         this.PinCodeList,
         this.StateList,
@@ -214,84 +212,71 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       console.error("Error:", error);
     }
   }
-  async Save() {
-    let ChargesDatareq = {
-      companyCode: this.companyCode,
-      collectionName: "cust_contract_non_freight_charge_matrix",
-      filter: { nFCID: this.ChargesData.nFCID },
-    };
-    const res = await this.masterService
-      .masterPost("generic/get", ChargesDatareq)
-      .toPromise();
-    if (res.success && res.data.length > 0) {
-      const nfcData = res.data[0].nFC;
-      const index =
-        nfcData.length == 0 ? 1 : nfcData[nfcData.length - 1].id + 1;
-      if (this.isUpdate) {
-        const Body = {
-          id: this.UpdateData.id,
-          fROM: this.NonFreightMatrixForm.value.From.name,
-          fTYPE: this.NonFreightMatrixForm.value.From.value,
-          tO: this.NonFreightMatrixForm.value.To.name,
-          tTYPE: this.NonFreightMatrixForm.value.To.name,
-          mAXV: this.NonFreightMatrixForm.value.MaxValue,
-          mINV: this.NonFreightMatrixForm.value.MinValue,
-          rT: this.NonFreightMatrixForm.value.Rate,
-          rTYPE: this.NonFreightMatrixForm.value.rateType.name,
-          mODDT: new Date(),
-          mODLOC: this.storage.branch,
-          mODBY: this.storage.userName,
-          eNTDT: this.UpdateData.eNTDT,
-          eNTLOC: this.UpdateData.eNTLOC,
-          eNTBY: this.UpdateData.eNTBY,
-        };
-        var foundIndex = nfcData.findIndex((x) => x.id == this.UpdateData.id);
-        nfcData[foundIndex] = Body;
-        this.saveUpdateData(nfcData);
-      } else {
-        const Body = {
-          id: index,
-          fROM: this.NonFreightMatrixForm.value.From.name,
-          fTYPE: this.NonFreightMatrixForm.value.From.value,
-          tO: this.NonFreightMatrixForm.value.To.name,
-          tTYPE: this.NonFreightMatrixForm.value.To.name,
-          mAXV: this.NonFreightMatrixForm.value.MaxValue,
-          mINV: this.NonFreightMatrixForm.value.MinValue,
-          rT: this.NonFreightMatrixForm.value.Rate,
-          rTYPE: this.NonFreightMatrixForm.value.rateType.name,
-          mODDT: new Date(),
-          mODLOC: this.storage.branch,
-          mODBY: this.storage.userName,
-          eNTDT: new Date(),
-          eNTLOC: this.storage.branch,
-          eNTBY: this.storage.userName,
-        };
-        nfcData.push(Body);
-        this.saveUpdateData(nfcData);
-      }
-    } else {
+  validateCodDodRates() {
+    const MaxValue = +this.NonFreightMatrixForm.value.MaxValue;
+    const MinValue = +this.NonFreightMatrixForm.value.MinValue;
+    if (MaxValue < MinValue && MaxValue && MinValue) {
+      this.NonFreightMatrixForm.controls["MaxValue"].setValue("");
+      this.NonFreightMatrixForm.controls["MinValue"].setValue("");
       Swal.fire({
-        icon: "info",
-        title: "info",
-        text: "Data not Found!",
+        title: "Max charge must be greater than to Min charge.",
+        toast: false,
+        icon: "error",
+        showCloseButton: false,
+        showCancelButton: false,
         showConfirmButton: true,
+        confirmButtonText: "OK",
       });
     }
   }
-  async saveUpdateData(data) {
-    const Updatebody = {
-      nFC: data,
+  async Save() {
+    const body = {
+      fROM: this.NonFreightMatrixForm.value.From.name,
+      fTYPE: this.NonFreightMatrixForm.value.From.value,
+      tO: this.NonFreightMatrixForm.value.To.name,
+      tTYPE: this.NonFreightMatrixForm.value.To.name,
+      mAXV: this.NonFreightMatrixForm.value.MaxValue,
+      mINV: this.NonFreightMatrixForm.value.MinValue,
+      rT: this.NonFreightMatrixForm.value.Rate,
+      rTYPE: this.NonFreightMatrixForm.value.rateType.name,
+      mODDT: new Date(),
+      mODLOC: this.storage.branch,
+      mODBY: this.storage.userName,
     };
-    const Updatereq = {
+    if (!this.isUpdate) {
+      let datareq = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "cust_contract_non_freight_charge_matrix_details",
+        filter: {},
+      };
+
+      const tableres = await firstValueFrom(
+        this.masterService.masterPost("generic/get", datareq)
+      );
+      const length = tableres.data.length;
+      const Index = length == 0 ? 1 : tableres.data[length - 1].cDID + 1;
+      body["_id"] = `${this.companyCode}-${this.ChargesData.cONID}-${Index}`;
+      body["cDID"] = Index;
+      body["sCT"] = this.ChargesData.sCT;
+      body["cONID"] = this.ChargesData.cONID;
+      body["cID"] = this.companyCode;
+      body["eNTDT"] = new Date();
+      body["eNTLOC"] = this.storage.branch;
+      body["eNTBY"] = this.storage.userName;
+    }
+    const req = {
       companyCode: this.companyCode,
-      collectionName: "cust_contract_non_freight_charge_matrix",
-      filter: { nFCID: this.ChargesData.nFCID },
-      update: Updatebody,
+      collectionName: "cust_contract_non_freight_charge_matrix_details",
+      filter: this.isUpdate ? { _id: this.UpdateData._id } : undefined,
+      update: this.isUpdate ? body : undefined,
+      data: !this.isUpdate ? body : undefined,
     };
-    const Updateres = await this.masterService
-      .masterPut("generic/update", Updatereq)
-      .toPromise();
-    if (Updateres.success) {
+
+    const Service = this.isUpdate
+      ? this.masterService.masterPut("generic/update", req)
+      : this.masterService.masterPost("generic/create", req);
+    const res = await firstValueFrom(Service);
+    if (res.success) {
       this.isUpdate = false;
       this.getTableData();
       this.initializeFormControl();
@@ -299,7 +284,7 @@ export class CustomerContractNonFreightChargesPopupComponent implements OnInit {
       Swal.fire({
         icon: "success",
         title: "Successful",
-        text: Updateres.message,
+        text: res.message,
         showConfirmButton: true,
       });
     }

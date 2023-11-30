@@ -10,7 +10,7 @@ import {
   UntypedFormGroup,
   Validators,
 } from "@angular/forms";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
@@ -33,16 +33,10 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   showFiller = false;
   companyCode: number | null;
   //#region Form Configration Fields
-  ContractNonFreightMatrixControls: ContractNonFreightMatrixControl;
-  NonFreightMatrixForm: UntypedFormGroup;
-  jsonControlArrayNonFreightMatrix: any;
-
+  ContractNonFreightMatrixControls: any;
   NonFreightChargesForm: UntypedFormGroup;
   jsonControlArrayNonFreightCharges: any;
   AlljsonControlArrayNonFreightCharges: any;
-
-  productsclassName = "col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2";
-  className = "col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-2";
 
   //#region Array List
   CurrentAccessList: any;
@@ -128,6 +122,8 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
   }
   //#endregion
   ngOnInit() {
+    this.ContractID = this.contractData.cONID;
+    this.initializeFormControl();
     this.getTableData();
   }
   /*get all Master Details*/
@@ -139,9 +135,11 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       collectionName: "cust_contract_non_freight_charge_matrix",
       filter: { cONID: this.ContractID },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+
     if (res.success) {
       this.tableData = res.data.map((x) => {
         return {
@@ -151,15 +149,12 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
           Charges: x.cBT == "Variable" ? "Add" : x.nFC,
         };
       });
+      this.tableData.sort((a, b) => (a.nFCID > b.nFCID ? -1 : 1));
       this.tableLoad = true;
       this.isLoad = false;
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    this.ContractID = this.contractData.cONID;
-    this.initializeFormControl();
-  }
   initializeFormControl() {
     this.ContractNonFreightMatrixControls = new ContractNonFreightMatrixControl(
       this.isUpdate,
@@ -193,6 +188,39 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       this.selectChargesCode,
       this.selectChargesStatus
     );
+  }
+  checkSelectCharges() {
+    if (this.isUpdate) {
+      const filterData = this.tableData.filter(
+        (x) =>
+          x.selectCharges ==
+            this.NonFreightChargesForm.value.selectCharges.name &&
+          x._id != this.UpdateData._id
+      );
+      if (filterData.length != 0) {
+        this.NonFreightChargesForm.controls["selectCharges"].setValue("");
+        Swal.fire({
+          icon: "info",
+          title: "info",
+          text: "Please, Select a different charges",
+          showConfirmButton: true,
+        });
+      }
+    } else {
+      const filterData = this.tableData.filter(
+        (x) =>
+          x.selectCharges == this.NonFreightChargesForm.value.selectCharges.name
+      );
+      if (filterData.length != 0) {
+        this.NonFreightChargesForm.controls["selectCharges"].setValue("");
+        Swal.fire({
+          icon: "info",
+          title: "info",
+          text: "Please, Select a different charges",
+          showConfirmButton: true,
+        });
+      }
+    }
   }
 
   // Charges Section
@@ -234,9 +262,9 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
         collectionName: "cust_contract_non_freight_charge_matrix",
         filter: {},
       };
-      const tableres = await this.masterService
-        .masterPost("generic/get", datareq)
-        .toPromise();
+      const tableres = await firstValueFrom(
+        this.masterService.masterPost("generic/get", datareq)
+      );
       const length = tableres.data.length;
       const Index = length == 0 ? 1 : tableres.data[length - 1].nFCID + 1;
       body["cONID"] = this.ContractID;
@@ -255,10 +283,10 @@ export class CustomerContractNonFreightChargesComponent implements OnInit {
       data: !this.isUpdate ? body : undefined,
     };
 
-    const method = this.isUpdate ? "generic/update" : "generic/create";
-    const res = this.isUpdate
-      ? await this.masterService.masterPut(method, req).toPromise()
-      : await this.masterService.masterPost(method, req).toPromise();
+    const Service = this.isUpdate
+      ? this.masterService.masterPut("generic/update", req)
+      : this.masterService.masterPost("generic/create", req);
+    const res = await firstValueFrom(Service);
 
     if (res.success) {
       this.isUpdate = false;

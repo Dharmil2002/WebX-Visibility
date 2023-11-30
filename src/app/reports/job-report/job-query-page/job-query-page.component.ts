@@ -13,6 +13,7 @@ import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoi
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 
 import { jobQueryControl } from 'src/assets/FormControls/job-reports/job-query';
+import { getJobregisterReportDetail } from './job-register-utlity';
 
 @Component({
   selector: 'app-job-query-page',
@@ -37,6 +38,8 @@ export class JobQueryPageComponent implements OnInit {
   jobNoStatus: any;
   cnoteName: any;
   cnoteStatus: any;
+  allColumnFilter: any;
+  filterColumn: boolean = true;
   /*below the data which is for the report*/
 
   //#region 
@@ -54,7 +57,7 @@ export class JobQueryPageComponent implements OnInit {
     cNoteNumber: {
       Title: "Consignment Note Number",
       class: "matcolumncenter",
-      Style: "min-width:190px",
+      Style: "min-width:350px",
     },
     cNoteDate: {
       Title: "Consignment Note Date",
@@ -96,18 +99,128 @@ export class JobQueryPageComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:70px",
     },
-    noofcontainer: {
-      Title: "No of 20 Ft Container",
+    noof20ftStd: {
+      Title: "No of 20 ft Standard",
       class: "matcolumncenter",
       Style: "min-width:150px",
     },
-    noof40container: {
-      Title: "No of 40 Ft Container",
+    noof40ftStd: {
+      Title: "No of 40 ft Standard",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof40ftHC: {
+      Title: "No of 40 ft High Cube",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof45ftHC: {
+      Title: "No of 45 ft High Cube",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftRf: {
+      Title: "No of 20 ft Reefer",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof40ftRf: {
+      Title: "No of 40 ft Reefer",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof40ftHCR: {
+      Title: "No of 40 ft High Cube Reefer",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftOT: {
+      Title: "No of 20 ft Open Top",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof40ftOT: {
+      Title: "No of 40 ft Open Top",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftFR: {
+      Title: "No of 20 ft Flat Rack",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof40ftFR: {
+      Title: "No of 40 ft Flat Rack",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftPf: {
+      Title: "No of 20 ft Platform",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof40ftPf: {
+      Title: "No of 40 ft Platform",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftTk: {
+      Title: "No of 20 ft Tank",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftSO: {
+      Title: "No of 20 ft Side Open",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof40ftSO: {
+      Title: "No of 40 ft Side Open",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftI: {
+      Title: "No of 20 ft Insulated",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftH: {
+      Title: "No of 20 ft Hardtop",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof40ftH: {
+      Title: "No of 40 ft Hardtop",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftV: {
+      Title: "No of 20 ft Ventilated",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof20ftT: {
+      Title: "No of 20 ft Tunnel",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noof40ftT: {
+      Title: "No of 40 ft Tunnel",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noofBul: {
+      Title: "No of Bulktainers",
+      class: "matcolumncenter",
+      Style: "max-width:150px",
+    },
+    noofSB: {
+      Title: "No of Swap Bodies",
       class: "matcolumncenter",
       Style: "max-width:150px",
     },
     totalNoofcontainer: {
-      Title: "Total No of Container ",
+      Title: "Total No of Container",
       class: "matcolumncenter",
       Style: "max-width:150px",
     },
@@ -152,7 +265,7 @@ export class JobQueryPageComponent implements OnInit {
       Style: "max-width:90px",
     },
     customerBillAmt: {
-      Title: "Customer Bill Amount ",
+      Title: "Customer Bill Amount",
       class: "matcolumncenter",
       Style: "max-width:90px",
     },
@@ -161,27 +274,35 @@ export class JobQueryPageComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:100px",
     },
-    // fromToCity: {
-    //   Title: "From-To City",
-    //   class: "matcolumncenter",
-    //   Style: "min-width:150px",
-    // },
-    // jobLocation: {
-    //   Title: "Job Location",
-    //   class: "matcolumncenter",
-    //   Style: "max-width:90px",
-    // },
-    // vehicleSize: {
-    //   Title: "Vehicle Size",
-    //   class: "matcolumncenter",
-    //   Style: "max-width:90px",
-    // },
-
   };
   //#endregion
 
   //#region 
   staticField = [
+    "noof20ftRf",
+    "noof20ftStd",
+    "noof40ftStd",
+    "noof40ftHC",
+    "noof45ftHC",
+    "noof40ftRf",
+    "noof40ftHCR",
+    "noof20ftOT",
+    "noof40ftOT",
+    "noof20ftFR",
+    "noof40ftFR",
+    "noof20ftPf",
+    "noof40ftPf",
+    "noof20ftTk",
+    "noof20ftSO",
+    "noof40ftSO",
+    "noof20ftI",
+    "noof20ftH",
+    "noof40ftH",
+    "noof20ftV",
+    "noof20ftT",
+    "noof40ftT",
+    "noofBul",
+    "noofSB",
     "jobNo",
     "jobDate",
     "cNoteNumber",
@@ -193,8 +314,6 @@ export class JobQueryPageComponent implements OnInit {
     "pkgs",
     "weight",
     "transportMode",
-    "noofcontainer",
-    "noof40container",
     "totalNoofcontainer",
     "jobType",
     "chargWt",
@@ -206,9 +325,6 @@ export class JobQueryPageComponent implements OnInit {
     "vendorBillAmt",
     "customerBillAmt",
     "status",
-    // "fromToCity",
-    // "jobLocation",
-    // "vehicleSize",
   ];
   //#endregion
 
@@ -225,18 +341,59 @@ export class JobQueryPageComponent implements OnInit {
     edit: true,
     csv: true,
   };
+
   headerForCsv = {
     "jobNo": "Job No",
     "jobDate": "Job Date",
+    "cNoteNumber": "Consignment Note Number",
+    "cNoteDate": "Consignment Note Date",
+    "containerNumber": "Container Number",
+    "billingParty": "Billing Party",
+    "bookingFrom": "Booking From",
+    "toCity": "Destination",
+    "pkgs": "Pkgs",
+    "weight": "Gross Weight",
+    "transportMode": "Job Mode",
     "jobType": "Job Type",
-    "billingParty": "BillingParty",
-    "fromToCity": "FromToCity",
+    "chargWt": "Charged Weight",
+    "DespatchQty": "Despatch Qty",
+    "despatchWt": "Despatched Weight",
+    "poNumber": "PO Number",
+    "totalChaAmt": "CHA Amount",
+    "voucherAmt": "Voucher Amount",
+    "vendorBillAmt": "Vendor Bill Amount",
+    "customerBillAmt": "Customer Bill Amount",
+    "status": "Current Status",
+    "noof20ftRf": "Swap Bodies",
+    "noof40ftRf": "40 ft Reefer",
+    "noof40ftHCR": "40 ft High Cube Reefer",
+    "noof20ftOT": "20 ft Open Top",
+    "noof40ftOT": "40 ft Open Top",
+    "noof20ftFR": "20 ft Flat Rack",
+    "noof40ftFR": "40 ft Flat Rack",
+    "noof20ftPf": "20 ft Platform",
+    "noof40ftPf": "40 ft Platform",
+    "noof20ftTk": "20 ft Tank",
+    "noof20ftSO": "20 ft Side Open",
+    "noof40ftSO": "40 ft Side Open",
+    "noof20ftI": "20 ft Insulated",
+    "noof20ftH": "20 ft Hardtop",
+    "noof40ftH": "40 ft Hardtop",
+    "noof20ftV": "20 ft Ventilated",
+    "noof20ftT": "20 ft Tunnel",
+    "noof40ftT": "40 ft Tunnel",
+    "noofBul": "Bulktainers",
+    "noofSB": "Swap Bodies",
+    "noof20ftStd": "20 ft Standard",
+    "noof40ftStd": "40 ft Standard",
+    "noof40ftHC": "40 ft High Cube",
+    "noof45ftHC": "45 ft High Cube",
+    "totalNoofcontainer": "Total No of Container",
   }
   csvFileName: string;
 
   constructor(
     private router: Router,
-    private cdr: ChangeDetectorRef,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
@@ -244,6 +401,7 @@ export class JobQueryPageComponent implements OnInit {
     private datePipe: DatePipe
   ) {
     this.initializeFormControl();
+    this.allColumnFilter = this.columnHeader;
   }
 
   // Lifecycle hook called after Angular has initialized the component
@@ -259,20 +417,20 @@ export class JobQueryPageComponent implements OnInit {
     // Set the 'start' and 'end' controls in the form to the last week and current date, respectively
     this.jobQueryTableForm.controls["start"].setValue(lastweek);
     this.jobQueryTableForm.controls["end"].setValue(now);
-     // Generate a CSV file name with a timestamp
+    // Generate a CSV file name with a timestamp
     this.csvFileName = `Job-Summary-Reports-${timeString}.csv`;
-      // Call a method to get dropdown list data
+    // Call a method to get dropdown list data
     this.getDropDownList();
   }
 
   async getDropDownList() {
-     // Fetch location data from the API
+    // Fetch location data from the API
     const locationList = await getLocationApiDetail(this.masterService);
-     // Fetch job data from the API
-    let dataJob = await getJobDetailFromApi(this.masterService);
-     // Fetch shipment data from the API
+    // Fetch job data from the API
+    let dataJob = await getJobregisterReportDetail(this.masterService);
+    // Fetch shipment data from the API
     const shipmentList = await getShipment(this.operationService, false);
-     // Map location data to a format suitable for dropdowns
+    // Map location data to a format suitable for dropdowns
     const locationDetail = locationList.map((x) => {
       return { value: x.locCode, name: x.locCode };
     });
@@ -284,7 +442,7 @@ export class JobQueryPageComponent implements OnInit {
     const shipmentDetail = shipmentList.map((x) => {
       return { value: x.docketNumber, name: x.docketNumber };
     });
-     // Apply dropdown data to filter the form controls
+    // Apply dropdown data to filter the form controls
     this.filter.Filter(
       this.jsonFormArray,
       this.jobQueryTableForm,
@@ -351,9 +509,9 @@ export class JobQueryPageComponent implements OnInit {
 
   // Asynchronous method to filter and save job data based on user input
   async save() {
-     // Fetch job data from the API
-    let data = await getJobDetailFromApi(this.masterService);
-// Extract selected values from form controls
+    // Fetch job data from the API
+    let data = await getJobregisterReportDetail(this.masterService);
+    // Extract selected values from form controls
     const Location = Array.isArray(this.jobQueryTableForm.value.LocationsHandler)
       ? this.jobQueryTableForm.value.LocationsHandler.map(x => x.value)
       : [];
@@ -363,18 +521,25 @@ export class JobQueryPageComponent implements OnInit {
     const cNoteNum = Array.isArray(this.jobQueryTableForm.value.cnoteHandler)
       ? this.jobQueryTableForm.value.cnoteHandler.map(x => x.name)
       : [];
-// Filter records based on user-selected criteria
+    // Filter records based on user-selected criteria
     const filteredRecords = data.filter(record => {
-      const detail = jobNo.length === 0 || jobNo.includes(record.jobNo);
+      // Check if job number is empty or matches the record's job number
+      const jobDet = jobNo.length === 0 || jobNo.includes(record.jobNo);
+      // Check if location is empty or matches the record's job location
       const locDet = Location.length === 0 || Location.includes(record.jobLocation);
+      // Check if CNote number is empty or matches the record's CNote number
       const cnoteno = cNoteNum.length === 0 || cNoteNum.includes(record.cNoteNumber);
+      // Convert and check if the record's entry time is within the specified date range
       const startDate = this.datePipe.transform(this.jobQueryTableForm.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
       const endDate = this.datePipe.transform(this.jobQueryTableForm.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
       const entryTime = record.ojobDate;
       const isDateRangeValid = startDate <= entryTime && entryTime < endDate;
-      return detail && locDet && cnoteno && isDateRangeValid;
+      // Return true if all conditions are met, indicating the record should be included in the result
+      return jobDet && locDet && cnoteno && isDateRangeValid;
     });
+    // Update the component's tableData with the filtered records
     this.tableData = filteredRecords;
+    // Set the tableLoad flag to false to indicate that the data has been loaded
     this.tableLoad = false;
   }
 

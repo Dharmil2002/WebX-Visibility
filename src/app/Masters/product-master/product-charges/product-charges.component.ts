@@ -17,6 +17,11 @@ export class ProductChargesComponent implements OnInit {
     edit: false,
     csv: false,
   };
+  EventButton = {
+    functionName: "AddNew",
+    name: "Add New",
+    iconName: "add",
+  };
   chargesTypeTitle = "Product Charges";
   addTitle = "+ Add Product Charges";
   selectedValue = "Product";

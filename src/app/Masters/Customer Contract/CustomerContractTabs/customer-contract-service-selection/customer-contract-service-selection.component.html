@@ -1,8 +1,19 @@
+<style>
+    .floatButton {
+        position: fixed;
+        top: 22%;
+        right: 7%;
+        z-index: 1;
+    }
+</style>
+<button class="floatButton" mat-flat-button matTooltip="Save" (click)="SaveServiceSelection('')" color="primary"
+    [disabled]="!ProductsForm.valid">
+    Save
+</button>
 <form [formGroup]="ProductsForm">
     <app-form-webxpress [form]="ProductsForm" [FormTitle]="'PRODUCT'" [formData]="jsonControlArrayProductsForm"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-        (callFunction)="functionCallHandler($event)" [EventButton]="ProductsForm.valid==true ? EventButton : false"
-        [className]="className">
+        (callFunction)="functionCallHandler($event)" [className]="className">
     </app-form-webxpress>
 
 </form>
@@ -13,20 +24,21 @@
         [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="ServiceclassName">
     </app-form-webxpress>
 </form>
-<div *ngIf="DisplayVolumetricSection">
-    <form [formGroup]="VolumtericForm">
-        <app-form-webxpress [form]="VolumtericForm" [FormTitle]="'Volumteric'"
-            [formData]="jsonControlArrayVolumtericForm" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
-        </app-form-webxpress>
-    </form>
-</div>
+
 <div *ngIf="DisplayCODDODSection">
 
     <form [formGroup]="CODDODForm">
         <app-form-webxpress [form]="CODDODForm" [FormTitle]="'COD/DOD'" [formData]="jsonControlArrayCODDODForm"
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
             (callFunction)="functionCallHandler($event)" [className]="className">
+        </app-form-webxpress>
+    </form>
+</div>
+<div *ngIf="DisplayCutOfftimeSection">
+    <form [formGroup]="CutOfftimeForm">
+        <app-form-webxpress [form]="CutOfftimeForm" [FormTitle]="'Cut-Off time'"
+            [formData]="jsonControlArrayCutOfftimeForm" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
 </div>
@@ -37,6 +49,27 @@
             (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
+</div>
+<div *ngIf="DisplayFuelSurchargeSection">
+    <form [formGroup]="FuelSurchargeForm">
+        <app-form-webxpress [form]="FuelSurchargeForm" [FormTitle]="'Fuel Surcharge'"
+            [formData]="jsonControlArrayFuelSurchargeForm" (functionCallEmitter)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
+            [EventButton]="FuelSurchargeForm.valid==true ? FuelSurchargeEventButton : false" [className]="className">
+        </app-form-webxpress>
+    </form>
+    <div *ngIf="isFLoad" class="d-flex justify-content-center align-items-center">
+        <!-- Bootstrap loader -->
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <app-generic-table-v2 *ngIf="!FtableLoad" [dynamicControls]="FdynamicControls" [columnHeader]="FcolumnHeader"
+        [tableData]="FtableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="FmenuItems"
+        [staticField]="FstaticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
+        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="FhandleMenuItemClick($event)"
+        [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
+    </app-generic-table-v2>
 </div>
 <div *ngIf="DisplayInsuranceSection">
 
@@ -61,35 +94,15 @@
         [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
     </app-generic-table-v2>
 </div>
-<div *ngIf="DisplayFuelSurchargeSection">
-    <form [formGroup]="FuelSurchargeForm">
-        <app-form-webxpress [form]="FuelSurchargeForm" [FormTitle]="'Fuel Surcharge'"
-            [formData]="jsonControlArrayFuelSurchargeForm" (functionCallEmitter)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)"
-            [EventButton]="FuelSurchargeForm.valid==true ? FuelSurchargeEventButton : false" [className]="className">
-        </app-form-webxpress>
-    </form>
-    <div *ngIf="isFLoad" class="d-flex justify-content-center align-items-center">
-        <!-- Bootstrap loader -->
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-    <app-generic-table-v2 *ngIf="!FtableLoad" [dynamicControls]="FdynamicControls" [columnHeader]="FcolumnHeader"
-        [tableData]="FtableData" (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="FmenuItems"
-        [staticField]="FstaticField" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-        [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" (menuItemClicked)="FhandleMenuItemClick($event)"
-        [addFlag]="addFlag" (addEmitter)="addPopUp($event)">
-    </app-generic-table-v2>
-</div>
-<div *ngIf="DisplayCutOfftimeSection">
-    <form [formGroup]="CutOfftimeForm">
-        <app-form-webxpress [form]="CutOfftimeForm" [FormTitle]="'Cut-Off time'"
-            [formData]="jsonControlArrayCutOfftimeForm" (functionCallEmitter)="functionCallHandler($event)"
+<div *ngIf="DisplayVolumetricSection">
+    <form [formGroup]="VolumtericForm">
+        <app-form-webxpress [form]="VolumtericForm" [FormTitle]="'Volumteric'"
+            [formData]="jsonControlArrayVolumtericForm" (functionCallEmitter)="functionCallHandler($event)"
             [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)" [className]="className">
         </app-form-webxpress>
     </form>
 </div>
+
 <div *ngIf="DisplayYieldProtectionSection">
     <form [formGroup]="YieldProtectionForm">
         <app-form-webxpress [form]="YieldProtectionForm" [FormTitle]="'Yield Protection'"

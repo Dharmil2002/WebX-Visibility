@@ -1,3 +1,5 @@
+import Swal from "sweetalert2";
+
 /**
  * Retrieves the list of vendor contracts from the API.
  * @param {MasterService} masterService - The service used to communicate with the API.
@@ -86,3 +88,40 @@ export async function GetContractBasedOnVendorAndProduct(masterService, vendorID
     }
 }
 //#endregion
+
+//#region to remove Data from table
+/**
+ * Removes data from a specified collection using the master service.
+ *
+ * @param {Object} masterService - The master service object that provides data manipulation methods.
+ * @param {string} id - The ID of the document to be removed.
+ * @param {string} collectionName - The name of the collection from which to remove the document.
+ */
+export async function removeData(masterService, id, collectionName) {
+    // Construct the request object
+    const req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: collectionName,
+        filter: { _id: id },
+    };
+
+    try {
+        // Make an asynchronous request to remove data using the master service
+        const res = await masterService.masterMongoRemove("generic/remove", req).toPromise();
+       // console.log(res);
+        if (res.success) {
+            // Display success message
+            Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: res.message,
+                showConfirmButton: true,
+            });
+        }
+    } catch (error) {
+        // Handle errors, log them, or throw further as needed
+        console.error('Error removing data:', error);
+    }
+}
+
+//#endregion 

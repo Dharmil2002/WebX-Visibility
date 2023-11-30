@@ -8,6 +8,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { fleetModel } from 'src/app/core/models/Masters/fleetMaster';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { SessionService } from 'src/app/core/service/session.service';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { FleetControls } from 'src/assets/FormControls/fleet-control';
 import Swal from 'sweetalert2';
@@ -25,7 +26,6 @@ export class AddFleetMasterComponent implements OnInit {
   fleetTableForm: UntypedFormGroup;
   jsonControlFleetArray: any;
   FleetFormControls: FleetControls;
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   vehicleNo: any;
   vehicleNoStatus: any;
   allData: { vehicleData: any; };
@@ -39,8 +39,10 @@ export class AddFleetMasterComponent implements OnInit {
   vehicleTypeStatus: any;
   submit = 'Save';
   imageData: any = {};
+  companyCode: number;
 
   constructor(
+    private sessionService: SessionService,
     private filter: FilterUtils,
     private route: Router,
     private fb: UntypedFormBuilder,
@@ -49,6 +51,7 @@ export class AddFleetMasterComponent implements OnInit {
     private objImageHandling: ImageHandling
 
   ) {
+    this.companyCode = this.sessionService.getCompanyCode();
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.fleetTableData = route.getCurrentNavigation().extras.state.data;
       // console.log(this.fleetTableData);
@@ -240,6 +243,9 @@ export class AddFleetMasterComponent implements OnInit {
       let id = this.fleetTableData._id;
       // Remove the "id" field from the form controls
       delete data._id;
+      delete data.eNTDT
+      delete data.eNTBY
+      delete data.eNTLOC
       let req = {
         companyCode: this.companyCode,
         collectionName: "fleet_master",
@@ -264,6 +270,9 @@ export class AddFleetMasterComponent implements OnInit {
     } else {
       const randomNumber = this.fleetTableForm.value.vehicleNo;
       data._id = randomNumber;
+      delete data.mODBY
+      delete data.mODDT
+      delete data.mODLOC
       //API FOR ADD
       let req = {
         companyCode: this.companyCode,

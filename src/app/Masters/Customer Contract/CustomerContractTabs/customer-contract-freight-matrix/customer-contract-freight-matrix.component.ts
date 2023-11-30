@@ -10,7 +10,7 @@ import {
   UntypedFormGroup,
   Validators,
 } from "@angular/forms";
-import { Subject } from "rxjs";
+import { Subject, firstValueFrom } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { locationEntitySearch } from "src/app/Utility/locationEntitySearch";
@@ -164,9 +164,9 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       collectionName: "cust_contract",
       filter: { docNo: this.contractData.cONID },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
     this.ServiceSelectiondata = {
       loadType: res.data[0].lTYP,
       rateTypecontrolHandler: res.data[0].rTYP,
@@ -188,11 +188,14 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         lTYPE: this.ServiceSelectiondata.loadType,
       },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+
     if (res.success) {
       this.tableData = res.data;
+      this.tableData.sort((a, b) => (a.fCID > b.fCID ? -1 : 1));
       this.tableLoad = true;
       this.isLoad = false;
     }
@@ -295,12 +298,12 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         filter: {},
         collectionName: "pincode_master",
       };
-      this.StateList = await this.masterService
-        .masterPost("generic/get", stateReqBody)
-        .toPromise();
-      this.PinCodeList = await this.masterService
-        .masterPost("generic/get", pincodeReqBody)
-        .toPromise();
+      this.StateList = await firstValueFrom(
+        this.masterService.masterPost("generic/get", stateReqBody)
+      );
+      this.PinCodeList = await firstValueFrom(
+        this.masterService.masterPost("generic/get", pincodeReqBody)
+      );
       this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
         this.PinCodeList,
         this.StateList,
@@ -400,9 +403,9 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
         collectionName: "cust_contract_freight_charge_matrix",
         filter: {},
       };
-      const tableres = await this.masterService
-        .masterPost("generic/get", datareq)
-        .toPromise();
+      const tableres = await firstValueFrom(
+        this.masterService.masterPost("generic/get", datareq)
+      );
       const length = tableres.data.length;
       const Index = length == 0 ? 1 : tableres.data[length - 1].fCID + 1;
       json["cONID"] = this.contractData.cONID;
@@ -423,10 +426,10 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
       data: !this.isUpdate ? json : undefined,
     };
 
-    const method = this.isUpdate ? "generic/update" : "generic/create";
-    const res = this.isUpdate
-      ? await this.masterService.masterPut(method, req).toPromise()
-      : await this.masterService.masterPost(method, req).toPromise();
+    const Service = this.isUpdate
+      ? this.masterService.masterPut("generic/update", req)
+      : this.masterService.masterPost("generic/create", req);
+    const res = await firstValueFrom(Service);
 
     if (res.success) {
       this.isUpdate = false;

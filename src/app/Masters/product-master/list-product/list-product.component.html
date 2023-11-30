@@ -8,7 +8,7 @@
   <div *ngIf="isTableLode">
     <app-generic-table-v2  [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
       [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData" [menuItems]="menuItems"
-      [Link]="linkArray" [AddNewButton]="true" (AddNewButtonEvent)="AddNew()" [staticField]="staticField" >
+      [Link]="linkArray" [EventButton]="EventButton" [staticField]="staticField" >
     </app-generic-table-v2>
   </div>
 </app-common-wrapper-webxpress>

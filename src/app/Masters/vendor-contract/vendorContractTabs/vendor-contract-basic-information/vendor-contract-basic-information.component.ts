@@ -143,7 +143,7 @@ export class VendorContractBasicInformationComponent implements OnInit {
       const file = this.objImageHandling.getFileByKey('cNSCN', this.imageData);
       data.cNSCN = file;
       data.pNDYS = parseInt(this.ProductsForm.value.pNDYS)
-      data.mODBY = localStorage.getItem("Branch")
+      data.mODLOC = localStorage.getItem("Branch")
       // Prepare request body using object destructuring
       const reqBody = {
         companyCode: this.companyCode,
@@ -216,7 +216,7 @@ export class VendorContractBasicInformationComponent implements OnInit {
   //#region to set pending Days
   setDays() {
     const startDate = new Date(this.ProductsForm.value.eNDDT);
-    const endDate = new Date( );
+    const endDate = new Date();
 
     // Calculate the difference in milliseconds
     const timeDifference = startDate.getTime() - endDate.getTime();

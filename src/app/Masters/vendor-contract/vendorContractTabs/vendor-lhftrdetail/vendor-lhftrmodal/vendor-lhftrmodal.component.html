@@ -1,18 +1,16 @@
-<div mat-dialog-title style="display: flex;
-  justify-content: space-between;margin: 0 0 0px;
-  align-items: center;">
-    <h3>Transportation- Long Haul Full Truck- Route Based
-    </h3>
-    <button mat-icon-button (click)="Close()">
-        <mat-icon>close</mat-icon>
-    </button>
+<div class="row ">
+    <div class="col d-flex justify-content-end">
+        <button mat-icon-button class="mb-2" (click)="Close()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
 </div>
 <div class="body">
     <form [formGroup]="TLHFTRForm">
         <app-form-webxpress [form]="TLHFTRForm" [formData]="jsonControlArray"
             [FormTitle]="'Transportation- Long Haul Full Truck- Route Based'"
             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
-            (callFunction)="functionCallHandler($event)"[submit]="submit">
+            (callFunction)="functionCallHandler($event)" [submit]="submit">
         </app-form-webxpress>
     </form>
 </div>

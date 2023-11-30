@@ -481,6 +481,7 @@ export class CustomerContractServiceSelectionComponent
     );
   }
   /*get all Master Details*/
+
   async getAllMastersData() {
     try {
       const stateReqBody = {
@@ -493,46 +494,18 @@ export class CustomerContractServiceSelectionComponent
         filter: {},
         collectionName: "pincode_master",
       };
-
-      // Fetch state data
-      const stateResponse = await firstValueFrom(
+      this.StateList = await firstValueFrom(
         this.masterService.masterPost("generic/get", stateReqBody)
       );
-
-      // Check if state data is available and has the 'data' property
-      if (stateResponse && stateResponse.data) {
-        this.StateList = stateResponse;
-      } else {
-        console.error("State data is missing or has an unexpected structure");
-        return;
-      }
-
-      // Fetch pincode data
-      const pincodeResponse = await firstValueFrom(
+      this.PinCodeList = await firstValueFrom(
         this.masterService.masterPost("generic/get", pincodeReqBody)
       );
-
-      // Check if pincode data is available and has the 'data' property
-      if (pincodeResponse && pincodeResponse.data) {
-        this.PinCodeList = pincodeResponse;
-      } else {
-        console.error("Pincode data is missing or has an unexpected structure");
-        return;
-      }
-
-      // Check if 'data' property exists before accessing it
-      if (this.PinCodeList.data && this.StateList.data) {
-        this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
-          this.PinCodeList,
-          this.StateList,
-          "ST"
-        );
-        this.SetDefaultProductsData();
-      } else {
-        console.error(
-          "Data property is missing in either PinCodeList or StateList"
-        );
-      }
+      this.PinCodeList.data = this.ObjcontractMethods.GetMergedData(
+        this.PinCodeList,
+        this.StateList,
+        "ST"
+      );
+      this.SetDefaultProductsData();
     } catch (error) {
       // Handle any errors that occurred during the request
       console.error("Error:", error);
@@ -1190,7 +1163,6 @@ export class CustomerContractServiceSelectionComponent
         collectionName: "cust_contract_insurance",
         data: incData,
       };
-      //await this.masterService.masterPost("generic/create", req).toPromise();
       const method = "generic/create";
       try {
         await firstValueFrom(this.masterService.masterPost(method, req));
@@ -1214,9 +1186,8 @@ export class CustomerContractServiceSelectionComponent
           collectionName: "cust_contract_fuelsurcharge",
           filter: { cONID: this.contractData.cONID },
         };
-        await this.masterService
-          .masterMongoRemove("generic/removeAll", fsreq)
-          .toPromise();
+        await firstValueFrom (this.masterService
+          .masterMongoRemove("generic/removeAll", fsreq));
       }
       let flsData = [];
       FtableData.forEach((element, index) => {
@@ -1243,10 +1214,9 @@ export class CustomerContractServiceSelectionComponent
         collectionName: "cust_contract_fuelsurcharge",
         data: flsData,
       };
-      //await this.masterService.masterPost("generic/create", req).toPromise();
       const method = "generic/create";
       try {
-        await this.masterService.masterPost(method, req).toPromise();
+        await firstValueFrom (this.masterService.masterPost(method, req));
 
         return true;
       } catch (error) {
@@ -1269,9 +1239,8 @@ export class CustomerContractServiceSelectionComponent
       collectionName: "cust_contract_insurance",
       filter: { cONID: this.contractData.cONID },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", reqBody)
-      .toPromise();
+    const res = await firstValueFrom (this.masterService
+      .masterPost("generic/get", reqBody));
     if (res) {
       this.tableData = res.data;
       this.isInsuranceExist=this.tableData.length>0?true:false;

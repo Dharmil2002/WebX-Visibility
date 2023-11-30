@@ -545,6 +545,15 @@ export const ROUTES: RouteInfo[] =
         class: "",
         groupTitle: false,
         submenu: []
+      },
+      {
+        path: "Finance/VendorPaymentDashboard",
+        title: "Vendor Payment Dashboard",
+        moduleName: "Vendor Payment Dashboard",
+        icon: "star",
+        class: "",
+        groupTitle: false,
+        submenu: []
       }
       ],
     },

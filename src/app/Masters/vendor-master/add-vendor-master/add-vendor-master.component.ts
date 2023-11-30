@@ -316,8 +316,11 @@ export class AddVendorMasterComponent implements OnInit {
 
     if (this.isUpdate) {
       let id = data._id;
-      delete data.entryBy;
+      delete data.eNTBY;
       delete data._id;
+      data['mODDT'] = new Date()
+      data['mODBY'] = this.vendorTableForm.value.eNTBY
+      data['mODLOC'] = localStorage.getItem("Branch")
       let req = {
         companyCode: this.companyCode,
         collectionName: "vendor_detail",
@@ -357,6 +360,8 @@ export class AddVendorMasterComponent implements OnInit {
         this.newVendorCode = generateVendorCode(lastVendorCode);
         data.vendorCode = this.newVendorCode;
         data._id = this.newVendorCode;
+        data['eNTDT'] = new Date()
+        data['eNTLOC'] = localStorage.getItem("Branch")
         const newData = this.tableData.map(x => {
           const { actions, id, ...rest } = x;
           return rest;

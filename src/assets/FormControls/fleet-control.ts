@@ -243,17 +243,30 @@ export class FleetControls {
                 disable: false,
             },
             {
-                name: "companyCode",
-                label: "Company Code",
-                placeholder: "Company Code",
-                type: "",
-                value: parseInt(localStorage.getItem("companyCode")),
+                name: 'cID',
+                label: ' ',
+                placeholder: ' ',
+                type: 'date',
+                value: localStorage.getItem("companyCode"), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
+            {
+                name: "eNTBY",
+                label: "",
+                placeholder: "",
+                type: "text",
+                value: localStorage.getItem("UserName"),
                 Validations: [],
                 generatecontrol: false,
                 disable: false,
             },
             {
-                name: 'updateDate',
+                name: 'eNTDT',
                 label: ' ',
                 placeholder: ' ',
                 type: 'date',
@@ -266,9 +279,35 @@ export class FleetControls {
                 disable: false
             },
             {
-                name: "updateBy",
-                label: "Update By",
-                placeholder: "Update By",
+                name: 'eNTLOC',
+                label: ' ',
+                placeholder: ' ',
+                type: 'date',
+                value: localStorage.getItem("Branch"), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
+            {
+                name: 'mODDT',
+                label: ' ',
+                placeholder: ' ',
+                type: 'date',
+                value: new Date(), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
+                Validations: [],
+                generatecontrol: false,
+                disable: false
+            },
+            {
+                name: "mODBY",
+                label: "",
+                placeholder: "",
                 type: "text",
                 value: localStorage.getItem("UserName"),
                 Validations: [],
@@ -276,15 +315,62 @@ export class FleetControls {
                 disable: false,
             },
             {
-                name: "EntryBy",
-                label: "",
-                placeholder: "Update By",
-                type: "text",
-                value: localStorage.getItem("UserName"),
+                name: 'mODLOC',
+                label: ' ',
+                placeholder: ' ',
+                type: 'date',
+                value: localStorage.getItem("Branch"), // Set the value to the current date
+                filterOptions: '',
+                autocomplete: '',
+                displaywith: '',
                 Validations: [],
                 generatecontrol: false,
-                disable: false,
+                disable: false
             },
+            
+            // {
+            //     name: "companyCode",
+            //     label: "Company Code",
+            //     placeholder: "Company Code",
+            //     type: "",
+            //     value: parseInt(localStorage.getItem("companyCode")),
+            //     Validations: [],
+            //     generatecontrol: false,
+            //     disable: false,
+            // },
+            // {
+            //     name: 'updateDate',
+            //     label: ' ',
+            //     placeholder: ' ',
+            //     type: 'date',
+            //     value: new Date(), // Set the value to the current date
+            //     filterOptions: '',
+            //     autocomplete: '',
+            //     displaywith: '',
+            //     Validations: [],
+            //     generatecontrol: false,
+            //     disable: false
+            // },
+            // {
+            //     name: "updateBy",
+            //     label: "Update By",
+            //     placeholder: "Update By",
+            //     type: "text",
+            //     value: localStorage.getItem("UserName"),
+            //     Validations: [],
+            //     generatecontrol: false,
+            //     disable: false,
+            // },
+            // {
+            //     name: "EntryBy",
+            //     label: "",
+            //     placeholder: "Update By",
+            //     type: "text",
+            //     value: localStorage.getItem("UserName"),
+            //     Validations: [],
+            //     generatecontrol: false,
+            //     disable: false,
+            // },
         ]
     }
     getFormControls() {

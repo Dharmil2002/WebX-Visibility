@@ -1,5 +1,7 @@
 import { Component, OnInit } from "@angular/core";
+import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { SessionService } from "src/app/core/service/session.service";
 import Swal from "sweetalert2";
 
 @Component({
@@ -7,7 +9,6 @@ import Swal from "sweetalert2";
   templateUrl: "./fleet-master-list.component.html",
 })
 export class FleetMasterListComponent implements OnInit {
-  companyCode: any = parseInt(localStorage.getItem("companyCode"));
   tableLoad = true; // flag , indicates if data is still loading or not , used to show loading animation
   toggleArray = ["activeFlag"];
   linkArray = [];
@@ -15,6 +16,7 @@ export class FleetMasterListComponent implements OnInit {
   csvFileName: string;
   csv: any;
   tableData: any;
+  companyCode: number;
 
   breadScrums = [
     {
@@ -31,7 +33,7 @@ export class FleetMasterListComponent implements OnInit {
   };
 
   columnHeader = {
-    updateDate: "Created Date",
+    eNTDT: "Created Date",
     vehicleNo: "Vehicle No",
     vehicleType: "Vehicle Type",
     insuranceExpiryDate: "Insurance Expiry Date",
@@ -48,7 +50,9 @@ export class FleetMasterListComponent implements OnInit {
     activeFlag: "Active Status",
   };
 
-  constructor(private masterService: MasterService) { }
+  constructor(private sessionService: SessionService, private masterService: MasterService) {
+    this.companyCode = this.sessionService.getCompanyCode();
+  }
 
   ngOnInit(): void {
     this.csvFileName = "Fleet Details";
@@ -64,6 +68,11 @@ export class FleetMasterListComponent implements OnInit {
       if (fleetData) {
         const vehicleTypeData = await this.getVehicleTypeName();
         const modifiedData = this.processFleetData(fleetData, vehicleTypeData);
+        modifiedData.forEach(item => {
+          if (item.eNTDT) {
+            item.eNTDT = formatDocketDate(item.eNTDT);
+          }
+        });
         this.updateTableData(modifiedData);
       }
     } catch (error) {
@@ -86,12 +95,13 @@ export class FleetMasterListComponent implements OnInit {
   // #region Process Fleet Data
   processFleetData(fleetData, vehicleTypeData) {
     return fleetData.data.map(obj => {
-      const vehicleType = vehicleTypeData.find(x => x.vehicleTypeCode === obj.vehicleType);
-      obj.vehicleType = vehicleType ? vehicleType.vehicleTypeName : '';
+      const vehicleType = vehicleTypeData.find(x => x.vehicleTypeCode === obj.vehicleType || x.vehicleTypeName === obj.vehicleType);
+      obj.vehicleType = vehicleType ? vehicleType.vehicleTypeName : null;
+      // obj.vehicleType = vehicleType;
       return obj;
     }).sort((a, b) => {
-      const dateA = new Date(a.updateDate).getTime(); // Convert to a number
-      const dateB = new Date(b.updateDate).getTime(); // Convert to a number
+      const dateA = new Date(a.eNTDT).getTime(); // Convert to a number
+      const dateB = new Date(b.eNTDT).getTime(); // Convert to a number
       if (!isNaN(dateA) && !isNaN(dateB)) {
         return dateB - dateA;
       }
@@ -124,8 +134,14 @@ export class FleetMasterListComponent implements OnInit {
     // Remove the "id" field from the form controls
     delete det._id;
     delete det.srNo;
+    delete det.eNTDT
+    delete det.eNTBY
+    delete det.eNTLOC
+    det['mODLOC'] = localStorage.getItem("Branch")
+    det['mODBY'] = localStorage.getItem("UserName")
+    det['mODDT'] = new Date()
     let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
+      companyCode: this.companyCode,
       collectionName: "fleet_master",
       filter: {
         _id: id,

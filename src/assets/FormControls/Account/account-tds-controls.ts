@@ -19,13 +19,13 @@ export class AccountTdsControls {
           },
           {
             name: "pattern",
-            message: "Please Enter alphanumeric length 4 to 200",
-            pattern: "^[a-zA-Z0-9]{2,100}$",
+            message: "Please Enter alphanumeric length 4 to 100",
+            pattern: "^[a-zA-Z0-9]{4,100}$",
           },
         ],
         functions: {
-          
-        },
+          onChange:"CheckTDSSection"
+        }
       },
       {
         name: "PaymentType",
@@ -42,7 +42,7 @@ export class AccountTdsControls {
           },
         ],
         functions: {
-          
+          onChange:"CheckPaymentType"
         },
       },
       {
@@ -56,12 +56,12 @@ export class AccountTdsControls {
         Validations: [
           {
             name: "pattern",
-            message: "Please Enter alphanumeric length 4 to 200",
-            pattern: "^[0-9]{1,100}$",
+            message: "Please Enter only numeric length 4 to 200",
+            pattern: "^[0-9]{4,100}$",
           },
         ],
         functions: {
-          
+
         },
       },
       {
@@ -79,7 +79,7 @@ export class AccountTdsControls {
           },
           {
             name: "pattern",
-            message: "Please Enter alphanumeric length 4 to 200",
+            message: "Please Enter only numeric length 1 to 100",
             pattern: "^[0-9]{1,100}$",
           },
         ],
@@ -101,7 +101,7 @@ export class AccountTdsControls {
           },
           {
             name: "pattern",
-            message: "Please Enter alphanumeric length 4 to 200",
+            message: "Please Enter only numeric length 1 to 100",
             pattern: "^[0-9]{1,100}$",
           },
         ],

@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import { calculateVolume } from "../vehicle-utility";
 import { Subject, take, takeUntil } from "rxjs";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
+import { RouteLocationService } from "src/app/Utility/module/masters/route-location/route-location.service";
 @Component({
   selector: 'app-add-vehicle-master',
   templateUrl: './add-vehicle-master.component.html',
@@ -87,6 +88,7 @@ export class AddVehicleMasterComponent implements OnInit {
     private route: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
+    private objRouteLocationService: RouteLocationService
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vehicleTable = route.getCurrentNavigation().extras.state.data;
@@ -298,6 +300,7 @@ export class AddVehicleMasterComponent implements OnInit {
       };
 
       this.allData = mergedData;
+      console.log(venNameRes.data);
 
       const vehTypeDet = mergedData.vehTypeData.map(element => ({
         name: element.vehicleTypeName.toString(),
@@ -309,31 +312,21 @@ export class AddVehicleMasterComponent implements OnInit {
 
       // Filter the vendor names based on the user's location
       const venNameDet = mergedData.venNameData
-        .filter(element => element.isActive && element.vendorLocation.includes(userLocation))
+        // .filter(element => element.isActive && element.vendorLocation.includes(userLocation))
+        .filter(element => element.isActive)
         .map(element => ({
           name: element.vendorName.toString(),
           value: element.vendorCode.toString(),
           type: element.vendorType.toString(),
         }));
+      console.log(venNameDet);
 
       // Assign the filtered vendor names to the vendorDetailList variable
       this.vendorDetailList = venNameDet;
 
-      let routeDet = [];
-      mergedData.routeData.forEach((item, index, array) => {
-        if (index < array.length) {
-          const currentLocation = item.GSTdetails[0].loccd;
-          const nextLocation = array[index].GSTdetails[1].loccd;
+      // let routeDet = [];
+      const routeDet = await this.objRouteLocationService.getRouteLocationDetail()
 
-          const name = `${currentLocation} - ${nextLocation}`;
-          const value = name;
-
-          routeDet.push({
-            name,
-            value
-          });
-        }
-      });
 
       const FTLtype = mergedData.fltType.filter(item => item.codeType === "FTLTYP").
         map((x) => {
@@ -399,7 +392,20 @@ export class AddVehicleMasterComponent implements OnInit {
 
   vendorFieldChanged() {
     const vendorType = this.vehicleTableForm.value.vendorType;
+    const controls = this.jsonControlVehicleArray.find(x => x.name === 'vendorName');
+    controls.generatecontrol = true;
+
+    // Reset the vendorName value
     this.vehicleTableForm.controls.vendorName.setValue("");
+
+    if (vendorType.toLowerCase() === 'own') {
+      controls.generatecontrol = false;
+    } else {
+      //control.setValidators([Validators.required]);
+      // Enable control generation
+      controls.generatecontrol = true;
+    }
+
     const vendorDetail = this.vendorDetailList.filter((x) =>
       x.type.toLowerCase() == vendorType.toLowerCase()
     );
@@ -522,18 +528,22 @@ export class AddVehicleMasterComponent implements OnInit {
     const DivisionDrop = divisionDetail ? divisionDetail.map((item: any) => item.name) : "";
     this.vehicleTableForm.controls["division"].setValue(DivisionDrop);
 
-    this.vehicleTableForm.controls["isActive"].setValue(this.vehicleTableForm.value.isActive === true ? true : false);
     this.vehicleTableForm.removeControl("DivisionDrop")
     this.vehicleTableForm.removeControl("controllBranchDrop")
+    let data = this.vehicleTableForm.value;
     if (this.isUpdate) {
       let id = this.vehicleTableForm.value.vehicleNo;
       // Remove the "id" field from the form controls
-      this.vehicleTableForm.removeControl("_id");
+      delete data._id;
+      data['mODDT'] = new Date()
+      data['mODBY'] = this.vehicleTableForm.value.eNTBY
+      delete data.eNTBY;
+      data['mODLOC'] = localStorage.getItem("Branch")
       let req = {
         companyCode: this.companyCode,
         collectionName: "vehicle_detail",
         filter: { vehicleNo: id },
-        update: this.vehicleTableForm.value,
+        update: data,
       };
       //API FOR UPDATE
       const res = await this.masterService
@@ -551,11 +561,14 @@ export class AddVehicleMasterComponent implements OnInit {
       }
     } else {
       const randomNumber = (this.vehicleTableForm.value.vehicleNo);
-      this.vehicleTableForm.controls["_id"].setValue(randomNumber);
+      // this.vehicleTableForm.controls["_id"].setValue(randomNumber);
+      data._id = randomNumber;
+      data['eNTDT'] = new Date()
+      data['eNTLOC'] = localStorage.getItem("Branch")
       let req = {
         companyCode: this.companyCode,
         collectionName: "vehicle_detail",
-        data: this.vehicleTableForm.value,
+        data: data,
       };
       //API FOR ADD
       const res = await this.masterService

@@ -5,9 +5,16 @@
     </button>
 </div>
 <div class="body" style="max-height: 420px;">
+    <form [formGroup]=" tHCHeaderForm">
+        <app-form-webxpress [form]="tHCHeaderForm" [formData]="jsonHeaderControlArray"
+            (functionCallEmitter)="functionCallHandler($event)"
+            [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'" (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="false">
+        </app-form-webxpress>
+    </form>
     <form [formGroup]=" tHCDetailsForm">
-        <app-form-webxpress [form]=" tHCDetailsForm" [FormTitle]="'Filter THC Payment List'"
-            [formData]="jsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
+        <app-form-webxpress [form]="tHCDetailsForm" [FormTitle]="'THC Amounts'" [formData]="jsonControlArray"
+            (functionCallEmitter)="functionCallHandler($event)"
             [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'" (callFunction)="functionCallHandler($event)"
             [showSaveAndCancelButton]="true">
         </app-form-webxpress>

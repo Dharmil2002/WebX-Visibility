@@ -316,10 +316,12 @@ export class AddVendorMasterComponent implements OnInit {
 
     if (this.isUpdate) {
       let id = data._id;
-      delete data.eNTBY;
       delete data._id;
       data['mODDT'] = new Date()
       data['mODBY'] = this.vendorTableForm.value.eNTBY
+      delete data.eNTBY;
+      delete data.eNTLOC;
+      delete data.eNTDT;
       data['mODLOC'] = localStorage.getItem("Branch")
       let req = {
         companyCode: this.companyCode,
@@ -327,6 +329,8 @@ export class AddVendorMasterComponent implements OnInit {
         filter: { _id: id },
         update: data
       };
+      console.log(data);
+      
       const res = await this.masterService.masterPut("generic/update", req).toPromise()
       if (res) {
         // Display success message

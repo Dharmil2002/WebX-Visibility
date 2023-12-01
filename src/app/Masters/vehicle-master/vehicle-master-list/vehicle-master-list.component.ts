@@ -1,4 +1,6 @@
 import { Component, OnInit } from "@angular/core";
+import moment from "moment";
+import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 
@@ -13,7 +15,7 @@ export class VehicleMasterListComponent implements OnInit {
     columnHeader =
         {
             // "srNo": "Sr No",
-            "updatedDate": "Created Date",
+            "eNTDT": "Created Date",
             "vehicleNo": "Vehicle No.",
             "vehicleType": "Vehicle Type",
             "vendorName": "Vendor Name",
@@ -53,7 +55,9 @@ export class VehicleMasterListComponent implements OnInit {
         this.getVehicleDetails();
         this.csvFileName = "Vehicle Details";
     }
+    //#region to get Vehicle list
     async getVehicleDetails() {
+        // Prepare the request  
         let req = {
             "companyCode": parseInt(localStorage.getItem("companyCode")),
             "collectionName": "vehicle_detail",
@@ -61,32 +65,40 @@ export class VehicleMasterListComponent implements OnInit {
         }
         this.masterService.masterPost('generic/get', req).subscribe((res: any) => {
             if (res && res.data) {
-              const data = res.data;
-        
-              // Sort the data based on updatedDate in descending order
-              const dataWithDate = data.sort((a, b) => new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime());
-        
-              // Extract the updatedDate from the first element (latest record)
-              const latestUpdatedDate = dataWithDate.length > 0 ? dataWithDate[0].updatedDate : null;
-        
-              // Use latestUpdatedDate as needed
-        
-              this.csv = dataWithDate;
-              this.tableData = dataWithDate;
+                const data = res.data
+                const sortedData = data.sort((a, b) => {
+                    const dateA = new Date(a.eNTDT).getTime(); // Convert to a number
+                    const dateB = new Date(b.eNTDT).getTime(); // Convert to a number
+                    if (!isNaN(dateA) && !isNaN(dateB)) {
+                        return dateB - dateA;
+                    }
+                    return 0; // Handle invalid dates or NaN values
+                })
+                const dataWithDate = data.map(item => ({
+                    ...item,
+                    eNTDT: formatDocketDate(item.eNTDT)
+                  }));                  
+
+                this.csv = dataWithDate;
+                this.tableData = dataWithDate;
             }
-        
+
             this.tableLoad = false;
-          });
+        });
     }
+    //#endregion
     async isActiveFuntion(det) {
         let id = det._id;
         // Remove the "id" field from the form controls
         delete det._id;
         delete det.srNo;
+        det['mODDT'] = new Date()
+        det['mODBY'] = localStorage.getItem("UserName")
+        det['mODLOC'] = localStorage.getItem("Branch")
         let req = {
             companyCode: parseInt(localStorage.getItem("companyCode")),
             collectionName: "vehicle_detail",
-            filter: {_id: id},
+            filter: { _id: id },
             update: det
         };
         const res = await this.masterService.masterPut("generic/update", req).toPromise()

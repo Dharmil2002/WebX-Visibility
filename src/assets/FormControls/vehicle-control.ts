@@ -19,7 +19,7 @@ export class VehicleControls {
                         {
                             name: "pattern",
                             message: "Please enter ",
-                            pattern: '^[A-Z][A-Z0-9]+$'
+                            pattern: '^[A-Z0-9 ]+$'
                         }
                     ],
                     functions: {
@@ -120,10 +120,10 @@ export class VehicleControls {
                     name: 'vendorName', label: "Vendor Name", placeholder: "Search and select Vendor Name", type: 'dropdown',
                     value: vehicleTable.vendorName, filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: true, disable: false,
                     Validations: [
-                        {
-                            name: "required",
-                            message: "Vendor Name is required.."
-                        },
+                        // {
+                        //     name: "required",
+                        //     message: "Vendor Name is required.."
+                        // },
                         {
                             name: "autocomplete",
                         },
@@ -168,13 +168,13 @@ export class VehicleControls {
                     name: 'lengthinFeet',
                     label: 'Length in Feet',
                     placeholder: 'Enter Length in Feet',
-                    type: 'text',
+                    type: 'number',
                     value: vehicleTable.lengthinFeet,
                     Validations: [
                         {
                             name: "pattern",
-                            message: "Please Enter Proper Height(Max 50)",
-                            pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
+                            message: "Please Enter only positive numbers with up to two decimal places",
+                            pattern: '^\\d+(\\.\\d{1,2})?$'
                         }
                     ],
                     functions: {
@@ -186,13 +186,13 @@ export class VehicleControls {
                     name: 'widthinFeet',
                     label: 'Width in Feet',
                     placeholder: 'Enter Width in Feet',
-                    type: 'text',
+                    type: 'number',
                     value: vehicleTable.widthinFeet,
                     Validations: [
                         {
                             name: "pattern",
-                            message: "Please Enter Proper Height(Max 50)",
-                            pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
+                            message: "Please Enter only positive numbers with up to two decimal places",
+                            pattern: '^\\d+(\\.\\d{1,2})?$'
                         }
                     ],
                     functions: {
@@ -204,13 +204,13 @@ export class VehicleControls {
                     name: 'heightinFeet',
                     label: 'Height in Feet',
                     placeholder: 'Enter Height in Feet',
-                    type: 'text',
+                    type: 'number',
                     value: vehicleTable.heightinFeet,
                     Validations: [
                         {
                             name: "pattern",
-                            message: "Please Enter Proper Height(Max 50)",
-                            pattern: '^(?:[1-9]|[1-4][0-9]|50)$'
+                            message: "Please Enter only positive numbers with up to two decimal places",
+                            pattern: '^\\d+(\\.\\d{1,2})?$'
                         }
                     ],
                     functions: {
@@ -226,7 +226,11 @@ export class VehicleControls {
                     value: vehicleTable.cft,
                     generatecontrol: true,
                     disable: true,
-                    Validations: [],
+                    Validations: [{
+                        name: "pattern",
+                        message: "Please Enter only positive numbers with up to two decimal places",
+                        pattern: '^\\d+(\\.\\d{1,2})?$'
+                    }],
                 },
                 {
                     name: 'gvw', label: 'GVW(Ton)', placeholder: 'Enter GVW', type: 'number', value: vehicleTable.gvw, generatecontrol: true, disable: false,
@@ -264,7 +268,11 @@ export class VehicleControls {
                 },
                 {
                     name: 'capacity', label: 'Capacity(In Tons)', placeholder: 'Enter Payload Capacity', type: 'number', value: vehicleTable.capacity, generatecontrol: true, disable: true,
-                    Validations: [],
+                    Validations: [{
+                        name: "pattern",
+                        message: "Please Enter only positive numbers with up to two decimal places",
+                        pattern: '^\\d+(\\.\\d{1,2})?$'
+                    }],
                 },
                 {
                     name: 'gpsDeviceEnabled', label: 'GPS Device Enabled', placeholder: '', type: 'toggle', value: vehicleTable.gpsDeviceEnabled, generatecontrol: true, disable: false,
@@ -325,25 +333,12 @@ export class VehicleControls {
                     generatecontrol: false, disable: false
                 },
                 {
-                    name: 'isUpdate', label: 'IsUpdate', placeholder: '', type: 'text', value: false, generatecontrol: false, disable: false,
-                    Validations: []
-                },
-                {
                     name: 'companyCode', label: 'companyCode', placeholder: '', type: 'text', value: localStorage.getItem("companyCode"), generatecontrol: false, disable: false,
                     Validations: []
                 },
                 {
-                    name: 'updatedDate',
-                    label: 'Entry Date',
-                    placeholder: 'Select Entry Date',
-                    type: 'date',
-                    value: new Date(), // Set the value to the current date
-                    filterOptions: '',
-                    autocomplete: '',
-                    displaywith: '',
-                    Validations: [],
-                    generatecontrol: false,
-                    disable: false
+                    name: 'eNTBY', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
+                    generatecontrol: false, disable: false
                 },
             ]
     }

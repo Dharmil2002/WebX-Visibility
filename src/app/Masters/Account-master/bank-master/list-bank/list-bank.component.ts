@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
@@ -71,9 +72,8 @@ export class ListBankComponent implements OnInit {
       collectionName: "Bank_detail",
       filter: {},
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+    const res = await firstValueFrom (this.masterService
+      .masterPost("generic/get", req));
     if(res.success){
       this.TableData = res.data
       this.isTableLode = true

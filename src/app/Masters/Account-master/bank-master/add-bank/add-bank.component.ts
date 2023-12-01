@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder } from "@angular/forms";
 import { Router } from "@angular/router";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -89,7 +89,7 @@ export class AddBankComponent implements OnInit {
       };
 
       // Send the request to fetch user data
-      const userlist = await this.masterService.masterPost("generic/get", req).toPromise();
+      const userlist = await firstValueFrom (this.masterService.masterPost("generic/get", req));
 
       // Check if data exists for the given filter criteria
       if (userlist.data.length > 0) {
@@ -130,9 +130,8 @@ export class AddBankComponent implements OnInit {
       collectionName: "General_master",
       filter: { codeType: "BNK", activeFlag: true },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
+    const res = await firstValueFrom (this.masterService
+      .masterPost("generic/get", Body));
 
     if (res.success && res.data.length > 0) {
       const Banknamedata = res.data.map((x) => {
@@ -165,9 +164,8 @@ export class AddBankComponent implements OnInit {
       filter: {},
     };
 
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
+    const res = await firstValueFrom (this.masterService
+      .masterPost("generic/get", Body));
 
     if (res.success && res.data.length > 0) {
       let LocationsData = [];
@@ -215,13 +213,11 @@ export class AddBankComponent implements OnInit {
       };
       await this.handleRequest(req);
     } else {
-      const tabledata = await this.masterService
-        .masterPost("generic/get", {
+      const tabledata = await firstValueFrom (this.masterService.masterPost("generic/get", {
           companyCode: this.CompanyCode,
           collectionName: "Bank_detail",
           filter: {},
-        })
-        .toPromise();
+        }));
       const body = {
         Bankcode:
           tabledata.data.length === 0
@@ -243,8 +239,8 @@ export class AddBankComponent implements OnInit {
 
   async handleRequest(req: any) {
     const res = this.isUpdate
-      ? await this.masterService.masterPut("generic/update", req).toPromise()
-      : await this.masterService.masterPost("generic/create", req).toPromise();
+      ? await firstValueFrom (this.masterService.masterPut("generic/update", req))
+      : await firstValueFrom (this.masterService.masterPost("generic/create", req))
 
     if (res.success) {
       this.Route.navigateByUrl("/Masters/AccountMaster/BankAccountMasterList");

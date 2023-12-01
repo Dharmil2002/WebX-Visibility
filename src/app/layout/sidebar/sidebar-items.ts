@@ -374,6 +374,16 @@ export const ROUTES: RouteInfo[] =
           "groupTitle": false,
           "submenu": [
             {
+              "path": "Masters/CustomerContract/CustomerContractList",
+              "title": "Customer Contract",
+              "moduleName": "Customer Contract",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
+            {
               "path": "Masters/VendorContract/VendorQueryPage",
               "title": "Vendor Contract",
               "moduleName": "Vendor Contract",

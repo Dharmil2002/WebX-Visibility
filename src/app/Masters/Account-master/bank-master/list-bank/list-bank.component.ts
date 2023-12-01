@@ -81,10 +81,10 @@ export class ListBankComponent implements OnInit {
   }
 
   AddNew(){
-    this.Route.navigateByUrl("/Masters/AccountMaster/AddBank");
+    this.Route.navigateByUrl("/Masters/AccountMaster/AddBankAccount");
   }
   EditFunction(event){
-    this.Route.navigate(["/Masters/AccountMaster/AddBank"], { state: { data: event?.data } });
+    this.Route.navigate(["/Masters/AccountMaster/AddBankAccount"], { state: { data: event?.data } });
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;

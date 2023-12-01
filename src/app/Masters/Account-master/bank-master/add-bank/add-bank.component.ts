@@ -76,7 +76,54 @@ export class AddBankComponent implements OnInit {
       }
     });
   }
+  async checkValueExists(fieldName, errorMessage) {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.BankForm.controls[fieldName].value;
 
+      // Create a request object with the filter criteria
+      const req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "Bank_detail",
+        filter: { [fieldName]: fieldValue },
+      };
+
+      // Send the request to fetch user data
+      const userlist = await this.masterService.masterPost("generic/get", req).toPromise();
+
+      // Check if data exists for the given filter criteria
+      if (userlist.data.length > 0) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          title: `${errorMessage} already exists! Please try with another !`,
+          toast: true,
+          icon: "error",
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: "OK"
+        });
+
+        // Reset the input field
+        this.BankForm.controls[fieldName].reset();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+    }
+  }
+  async CheckAccountnumber() {
+    await this.checkValueExists("Accountnumber", "Account number");
+  }
+  async CheckIFSCcode() {
+    await this.checkValueExists("IFSCcode", "IFSC code");
+  }
+  async CheckMICRcode() {
+    await this.checkValueExists("MICRcode", "MICR code");
+  }
+  async CheckSWIFTcode() {
+    await this.checkValueExists("SWIFTcode", "SWIFT code");
+  }
   async getBanknameDropdown() {
     const Body = {
       companyCode: this.CompanyCode,
@@ -200,7 +247,7 @@ export class AddBankComponent implements OnInit {
       : await this.masterService.masterPost("generic/create", req).toPromise();
 
     if (res.success) {
-      this.Route.navigateByUrl("/Masters/AccountMaster/ListBank");
+      this.Route.navigateByUrl("/Masters/AccountMaster/BankAccountMasterList");
       Swal.fire({
         icon: "success",
         title: "Successful",
@@ -211,7 +258,7 @@ export class AddBankComponent implements OnInit {
   }
 
   cancel() {
-    this.Route.navigateByUrl("/Masters/AccountMaster/ListBank");
+    this.Route.navigateByUrl("/Masters/AccountMaster/BankAccountMasterList");
   }
 
   toggleSelectAll(argData: any) {

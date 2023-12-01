@@ -18,7 +18,7 @@ export class AccountBankControls {
         name: "Bankname",
         label: "Bank name",
         placeholder: "Bank name",
-        type: "dropdown", 
+        type: "dropdown",
         value: isUpdate?UpdateData.Bankname:"",
         generatecontrol: true,
         disable: false,
@@ -60,6 +60,7 @@ export class AccountBankControls {
           },
         ],
         functions: {
+          onChange: "CheckAccountnumber",
         },
       },
       {
@@ -81,7 +82,9 @@ export class AccountBankControls {
             pattern: "^[A-Z]{4}[0-9]{7}$",
           },
         ],
-        functions: {},
+        functions: {
+          onChange:"CheckIFSCcode"
+        },
       },
       {
         name: "MICRcode",
@@ -103,6 +106,7 @@ export class AccountBankControls {
           },
         ],
         functions: {
+          onChange:"CheckMICRcode"
         },
       },
       {
@@ -121,6 +125,7 @@ export class AccountBankControls {
           },
         ],
         functions: {
+          onChange:"CheckSWIFTcode"
         },
       },
       {

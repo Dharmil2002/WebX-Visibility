@@ -175,15 +175,15 @@ const routes: Routes = [
   { path: "AccountMaster/AddTds", component: AddTdsComponent },
   { path: "AccountMaster/ListTds", component: ListTdsComponent },
 
-  { path: "AccountMaster/AddBank", component: AddBankComponent },
-  { path: "AccountMaster/ListBank", component: ListBankComponent },
+  { path: "AccountMaster/AddBankAccount", component: AddBankComponent },
+  { path: "AccountMaster/BankAccountMasterList", component: ListBankComponent },
 
   { path: "AccountMaster/AddAccount", component: AddaccountComponent },
   { path: "AccountMaster/ListAccount", component: ListAccountComponent },
 
   { path: "AccountMaster/AddAccountGroup", component: AddGroupComponent },
   { path: "AccountMaster/ListAccountGroup", component: ListGroupComponent },
-  
+
   //Vendor Contract Router
   { path: "VendorContract/VendorContractList", component: VendorContractListComponent },
   { path: "VendorContract/VendorContractIndex", component: VendorIndexComponent },

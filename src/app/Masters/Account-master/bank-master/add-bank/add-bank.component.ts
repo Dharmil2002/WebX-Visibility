@@ -16,7 +16,7 @@ import Swal from "sweetalert2";
 export class AddBankComponent implements OnInit {
   breadScrums = [
     {
-      title: "Bank Master",
+      title: "Bank Account Master",
       items: ["Home"],
       active: "Account",
     },

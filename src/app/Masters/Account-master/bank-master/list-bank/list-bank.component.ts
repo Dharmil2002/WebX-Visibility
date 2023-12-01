@@ -9,7 +9,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 export class ListBankComponent implements OnInit {
   breadScrums = [
     {
-      title: "Bank Master",
+      title: "Bank Account Master",
       items: ["Home"],
       active: "Account",
     },

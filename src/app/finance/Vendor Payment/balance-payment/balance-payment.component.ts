@@ -1,27 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { VendorPaymentControl } from 'src/assets/FormControls/Finance/VendorPayment/vendorpaymentcontrol';
 import { THCAmountsDetailComponent } from '../Modal/thcamounts-detail/thcamounts-detail.component';
-import { MatDialog } from '@angular/material/dialog';
+import { VendorBalancePaymentControl } from 'src/assets/FormControls/Finance/VendorPayment/vendorbalancepaymentcontrol';
 
 @Component({
-  selector: 'app-advance-payments',
-  templateUrl: './advance-payments.component.html'
+  selector: 'app-balance-payment',
+  templateUrl: './balance-payment.component.html',
 })
-export class AdvancePaymentsComponent implements OnInit {
+export class BalancePaymentComponent implements OnInit {
   breadScrums = [
     {
-      title: "Advance Payments",
+      title: "Balance Payments",
       items: ["Home"],
-      active: "Advance Payments",
+      active: "Balance Payments",
     },
   ];
   linkArray = [];
   menuItems = [];
+  MakePaymentVisible: Boolean = false;
 
   dynamicControls = {
     add: false,
@@ -49,19 +50,24 @@ export class AdvancePaymentsComponent implements OnInit {
     VehicleNumber: {
       Title: "Vehicle No.",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
     },
     THCamount: {
       Title: "THC Amount",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
       type: "Link",
       functionName: "THCAmountFunction"
     },
     Advance: {
       Title: "Advance",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
+    },
+    BalancePending: {
+      Title: "Balance Pending",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
     },
   };
   EventButton = {
@@ -74,7 +80,7 @@ export class AdvancePaymentsComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: Object.keys(this.columnHeader),
   };
-  staticField = ["GenerationDate", "VehicleNumber", "Advance"];
+  staticField = ["GenerationDate", "VehicleNumber", "Advance", "BalancePending"];
   companyCode = parseInt(localStorage.getItem("companyCode"));
   tableData: any = [
     {
@@ -83,6 +89,7 @@ export class AdvancePaymentsComponent implements OnInit {
       VehicleNumber: "MH02CB6655",
       THCamount: "23450.45",
       Advance: "5000.00",
+      BalancePending: "2000.00",
     },
     {
       THC: "VHMUM00383",
@@ -90,6 +97,7 @@ export class AdvancePaymentsComponent implements OnInit {
       VehicleNumber: "MH02CB6655",
       THCamount: "23450.45",
       Advance: "5000.00",
+      BalancePending: "2000.00",
     },
     {
       THC: "VHMUM00383",
@@ -97,19 +105,27 @@ export class AdvancePaymentsComponent implements OnInit {
       VehicleNumber: "MH02CB6655",
       THCamount: "23450.45",
       Advance: "5000.00",
+      BalancePending: "2000.00",
     },
 
   ];
   isTableLode = true;
-
-  vendorPaymentControl: VendorPaymentControl;
+  TotalAmountList: { count: any; title: string; class: string }[];
+  vendorBalancePaymentControl: VendorBalancePaymentControl;
   protected _onDestroy = new Subject<void>();
 
-  PayableSummaryFilterForm: UntypedFormGroup;
-  jsonControlPayableSummaryFilterArray: any;
+  VendorBalanceTaxationTDSFilterForm: UntypedFormGroup;
+  jsonControlVendorBalanceTaxationTDSFilterArray: any;
 
-  PaymentSummaryFilterForm: UntypedFormGroup;
-  jsonControlPaymentSummaryFilterArray: any;
+  VendorBalanceTaxationGSTFilterForm: UntypedFormGroup;
+  jsonControlVendorBalanceTaxationGSTFilterArray: any;
+
+  VendorBalanceSummaryFilterForm: UntypedFormGroup;
+  jsonControlVendorBalanceSummaryFilterArray: any;
+
+  VendorBalancePaymentFilterForm: UntypedFormGroup;
+  jsonControlVendorBalancePaymentFilterArray: any;
+
 
   constructor(private filter: FilterUtils,
     private fb: UntypedFormBuilder,
@@ -117,15 +133,33 @@ export class AdvancePaymentsComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeFormControl();
+    this.TotalAmountList = [
+      {
+        count: "15000.00",
+        title: "Total Advance Amount",
+        class: `color-Ocean-danger`,
+      },
+      {
+        count: "6000.00",
+        title: "Total Balance Pending",
+        class: `color-Success-light`,
+      }
+    ]
   }
 
   initializeFormControl(): void {
-    this.vendorPaymentControl = new VendorPaymentControl("");
-    this.jsonControlPayableSummaryFilterArray = this.vendorPaymentControl.getTPayableSummaryFilterArrayControls();
-    this.PayableSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPayableSummaryFilterArray]);
+    this.vendorBalancePaymentControl = new VendorBalancePaymentControl("");
+    this.jsonControlVendorBalanceTaxationTDSFilterArray = this.vendorBalancePaymentControl.getVendorBalanceTaxationTDSArrayControls();
+    this.VendorBalanceTaxationTDSFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalanceTaxationTDSFilterArray]);
 
-    this.jsonControlPaymentSummaryFilterArray = this.vendorPaymentControl.getTPaymentSummaryFilterArrayControls();
-    this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPaymentSummaryFilterArray]);
+    this.jsonControlVendorBalanceTaxationGSTFilterArray = this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
+    this.VendorBalanceTaxationGSTFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalanceTaxationGSTFilterArray]);
+
+    this.jsonControlVendorBalanceSummaryFilterArray = this.vendorBalancePaymentControl.getVendorBalanceSummaryArrayControls();
+    this.VendorBalanceSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalanceSummaryFilterArray]);
+
+    this.jsonControlVendorBalancePaymentFilterArray = this.vendorBalancePaymentControl.getVendorBalanceTaxationPaymentDetailsArrayControls();
+    this.VendorBalancePaymentFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalancePaymentFilterArray]);
   }
 
   AdvancePendingFunction(event) {
@@ -166,4 +200,12 @@ export class AdvancePaymentsComponent implements OnInit {
   selectCheckBox(event) {
     console.log(event)
   }
+  MakePayment() {
+    this.MakePaymentVisible = true
+
+  }
+  BookVendorBill() {
+
+  }
+
 }

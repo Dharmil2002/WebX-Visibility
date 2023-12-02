@@ -51,31 +51,55 @@
             <div *ngIf="isTableLode">
                 <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
                     [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
-                    [menuItems]="menuItems" [Link]="linkArray" [staticField]="staticField"
-                    (onFlagChange)="selectCheckBox($event)" [onFlagChangeGetAll]="true">
+                    [FormTitle]="'THC List'" [menuItems]="menuItems" [Link]="linkArray" [staticField]="staticField"
+                    [TitleBoxData]="this.TotalAmountList" (onFlagChange)="selectCheckBox($event)"
+                    [onFlagChangeGetAll]="true">
                 </app-generic-table-v2>
             </div>
         </div>
-        <div class="row">
-            <div class="col-6">
-                <form [formGroup]="PayableSummaryFilterForm">
-                    <app-form-webxpress [form]="PayableSummaryFilterForm" [FormTitle]="'Payable Summary'"
-                        [formData]="jsonControlPayableSummaryFilterArray"
-                        (functionCallEmitter)="functionCallHandler($event)"
-                        [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 '"
-                        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-                    </app-form-webxpress>
-                </form>
-            </div>
-            <div class="col-6">
-                <form [formGroup]="PaymentSummaryFilterForm">
-                    <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Payment Summary'"
-                        [formData]="jsonControlPaymentSummaryFilterArray"
-                        (functionCallEmitter)="functionCallHandler($event)"
-                        [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 '"
-                        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-                    </app-form-webxpress>
-                </form>
+        <form [formGroup]="VendorBalanceTaxationTDSFilterForm">
+            <app-form-webxpress [form]="VendorBalanceTaxationTDSFilterForm" [FormTitle]="'TDS deduction'"
+                [formData]="jsonControlVendorBalanceTaxationTDSFilterArray"
+                (functionCallEmitter)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1'" (callFunction)="functionCallHandler($event)"
+                [showSaveAndCancelButton]="false">
+            </app-form-webxpress>
+        </form>
+
+        <form [formGroup]="VendorBalanceTaxationGSTFilterForm">
+            <app-form-webxpress [form]="VendorBalanceTaxationGSTFilterForm" [FormTitle]="'GST details'"
+                [formData]="jsonControlVendorBalanceTaxationGSTFilterArray"
+                (functionCallEmitter)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1'" (callFunction)="functionCallHandler($event)"
+                [showSaveAndCancelButton]="false">
+            </app-form-webxpress>
+        </form>
+
+        <form [formGroup]="VendorBalanceSummaryFilterForm">
+            <app-form-webxpress [form]="VendorBalanceSummaryFilterForm" [FormTitle]="'Summary'"
+                [formData]="jsonControlVendorBalanceSummaryFilterArray"
+                (functionCallEmitter)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1'" (callFunction)="functionCallHandler($event)"
+                [showSaveAndCancelButton]="false">
+            </app-form-webxpress>
+        </form>
+
+        <div *ngIf="MakePaymentVisible">
+            <form [formGroup]="VendorBalancePaymentFilterForm">
+                <app-form-webxpress [form]="VendorBalancePaymentFilterForm" [FormTitle]="'Payment'"
+                    [formData]="jsonControlVendorBalancePaymentFilterArray"
+                    (functionCallEmitter)="functionCallHandler($event)"
+                    [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1'"
+                    (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+            <div class="example-button-row  d-flex justify-content-end">
+                <button class="msr-3" mat-raised-button color="primary" (click)="MakePayment()">Make Payment</button>
+                <button mat-button (click)="BookVendorBill()">Book Vendor Bill</button>
             </div>
         </div>
     </div>

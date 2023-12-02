@@ -10,10 +10,15 @@ import { THCAmountsControl } from 'src/assets/FormControls/Finance/VendorPayment
   templateUrl: './thcamounts-detail.component.html'
 })
 export class THCAmountsDetailComponent implements OnInit {
-  jsonControlArray: any
-  jsonHeaderControlArray: any
-  tHCDetailsForm: UntypedFormGroup;
-  tHCHeaderForm: UntypedFormGroup;
+
+  THCAmountsLESSArray: any
+  THCAmountsLESSForm: UntypedFormGroup;
+
+  THCAmountsADDArray: any
+  THCAmountsADDForm: UntypedFormGroup;
+
+  THCAmountsArray: any
+  THCAmountsForm: UntypedFormGroup;
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private dialog: MatDialog,
@@ -25,10 +30,14 @@ export class THCAmountsDetailComponent implements OnInit {
   }
   initializeFormControl() {
     const thcAmountsFormControls = new THCAmountsControl('');
-    this.jsonControlArray = thcAmountsFormControls.getTHCDetailsControls();
-    this.jsonHeaderControlArray = thcAmountsFormControls.getTHCHeaderControls();
-    this.tHCDetailsForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.tHCHeaderForm = formGroupBuilder(this.fb, [this.jsonHeaderControlArray]);
+    this.THCAmountsADDArray = thcAmountsFormControls.getTHCAmountsADDControls();
+    this.THCAmountsADDForm = formGroupBuilder(this.fb, [this.THCAmountsADDArray]);
+
+    this.THCAmountsLESSArray = thcAmountsFormControls.getTHCAmountsLESSControls();
+    this.THCAmountsLESSForm = formGroupBuilder(this.fb, [this.THCAmountsLESSArray]);
+
+    this.THCAmountsArray = thcAmountsFormControls.getTHCAmountsControls();
+    this.THCAmountsForm = formGroupBuilder(this.fb, [this.THCAmountsArray]);
   }
 
   Close(): void {
@@ -47,7 +56,4 @@ export class THCAmountsDetailComponent implements OnInit {
     }
   }
 
-  save(): void {
-    this.dialogRef.close(this.tHCDetailsForm.value);
-  }
 }

@@ -19,10 +19,10 @@ const routes: Routes = [
   { path: 'VendorPayment/THC-Payment', component: ThcPaymentsComponent },
   { path: 'VendorPayment/AdvancePayment', component: AdvancePaymentsComponent },
   { path: 'VendorPayment/BalancePayment', component: BalancePaymentComponent },
+  { path: 'VendorPayment/VendorBillPayment', component: VendorBillPaymentComponent },
   { path: 'InvoiceCollection', component: InvoiceCollectionComponent },
   { path: 'Deductions', component: DeductionsComponent },
-  { path: 'VendorPayment/AdvancePayment', component: AdvancePaymentsComponent },
-  { path: 'VendorBillPayment', component: VendorBillPaymentComponent },
+
 
 ];
 

@@ -1,0 +1,29 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header" *ngFor="let breadscrum of breadscrums">
+            <app-breadcrumb [title]="breadscrum.title" [items]="breadscrum.items" [active_item]="breadscrum.active">
+            </app-breadcrumb>
+        </div>
+
+        <div class="card" *ngIf="this.menuDetail">
+            <mat-tab-group (selectedTabChange)="onTabChange($event)" (selectedIndexChange)="GetSelectedIndex($event)"
+                #myTabGroup>
+                <mat-tab label="VendorBills">
+                    <ng-template mat-tab-label>
+                        Vendor Bills
+                    </ng-template>
+                    <app-vendor-bill-list (CurrentIndex)="GetSelectedIndex($event)"
+                        [selectedIndex]="0"></app-vendor-bill-list>
+                </mat-tab>
+                <mat-tab label="OnlinePaymentApproval">
+                    <ng-template mat-tab-label>
+                        Online Payment Approval
+                    </ng-template>
+                    <!-- <app-docket-list (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="1"
+                        *ngIf="tabName === 'docket'"></app-docket-list> -->
+                </mat-tab>
+
+            </mat-tab-group>
+        </div>
+    </div>
+</section>

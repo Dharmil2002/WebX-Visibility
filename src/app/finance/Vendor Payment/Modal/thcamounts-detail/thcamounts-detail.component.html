@@ -5,11 +5,75 @@
     </button>
 </div>
 <div class="body" style="max-height: 420px;">
-    <form [formGroup]=" tHCDetailsForm">
-        <app-form-webxpress [form]=" tHCDetailsForm" [FormTitle]="'Filter THC Payment List'"
-            [formData]="jsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
+    <div class="col-12" style="padding: 0px;">
+        <div class="card" style="margin-bottom: 6px;margin-right: 3px;margin-left: 3px;padding: 0px;">
+            <div class="body" style="padding: 0px;">
+                <div class="task-list">
+
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6" style="margin-bottom: 0px;border-right: 2px solid gainsboro;">
+                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
+                                <div class="col-5">Vendor</div>
+                                <div class="col-5">V001: Adarsh Roadlines</div>
+                            </div>
+                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
+                                <div class="col-5">Date</div>
+                                <div class="col-5">12-Oct-23</div>
+
+                            </div>
+                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
+                                <div class="col-5">Contract</div>
+                                <div class="col-2 flex-center ">
+                                    <span class="hover p-1 px-3">View</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
+                                <div class="col-5">THC Number
+                                </div>
+                                <div class="col-5">VHMUM00383
+                                </div>
+                            </div>
+                            <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
+                                <div class="col-5">Vehicle
+                                </div>
+                                <div class="col-5">MH02CB6655
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-6">
+            <form [formGroup]=" THCAmountsADDForm">
+                <app-form-webxpress [form]="THCAmountsADDForm" [FormTitle]="'THC Amounts LESS (-)'"
+                    [formData]="THCAmountsADDArray" (functionCallEmitter)="functionCallHandler($event)"
+                    [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'"
+                    (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+        <div class="col-6">
+            <form [formGroup]="THCAmountsLESSForm">
+                <app-form-webxpress [form]="THCAmountsLESSForm" [formData]="THCAmountsLESSArray"
+                    (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'THC Amounts ADD (+)'"
+                    [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'"
+                    (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+                </app-form-webxpress>
+            </form>
+        </div>
+    </div>
+    <form [formGroup]="THCAmountsForm">
+        <app-form-webxpress [form]="THCAmountsForm" [formData]="THCAmountsArray"
+            (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="''"
             [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'" (callFunction)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="true">
+            [showSaveAndCancelButton]="false">
         </app-form-webxpress>
     </form>
 </div>

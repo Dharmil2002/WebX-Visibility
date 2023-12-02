@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { SessionService } from "src/app/core/service/session.service";
@@ -88,7 +89,7 @@ export class FleetMasterListComponent implements OnInit {
       filter: {},
       collectionName: "fleet_master",
     };
-    return this.masterService.masterPost("generic/get", req).toPromise();
+    return firstValueFrom(this.masterService.masterPost("generic/get", req));
   }
   // #endregion
 
@@ -125,7 +126,7 @@ export class FleetMasterListComponent implements OnInit {
       filter: {},
       collectionName: 'vehicleType_detail',
     };
-    const response = await this.masterService.masterPost('generic/get', req).toPromise();
+    const response = await firstValueFrom(this.masterService.masterPost('generic/get', req));
     return response.data;
   }
   //#endregion
@@ -148,9 +149,8 @@ export class FleetMasterListComponent implements OnInit {
       },
       update: det,
     };
-    const res = await this.masterService
-      .masterPut("generic/update", req)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService
+      .masterPut("generic/update", req));
     if (res) {
       // Display success message
       Swal.fire({

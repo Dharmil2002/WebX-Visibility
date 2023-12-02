@@ -40,6 +40,9 @@ export class DashboardComponent implements OnInit {
     if (event.data.id == 1) {
       this.router.navigate(['/Finance/VendorPayment/THC-Payment']);
     }
+    if (event.data.id == 7) {
+      this.router.navigate(['/Finance/VendorPayment/VendorBillPayment']);
+    }
   }
 
 }
@@ -85,12 +88,12 @@ const OnlinePaymentApprovals = {
   "Title": "Online Payment Approvals",
   "Items": [
     {
-
+      id: 7,
       "title": "Vendor Bill Payment Approval",
       "class": "info-box7  bg-c-Bottle-light order-info-box7"
     },
     {
-
+      id: 8,
       "title": "Voucher Payment Approval",
       "class": "info-box7 bg-c-Grape-light order-info-box7"
     },

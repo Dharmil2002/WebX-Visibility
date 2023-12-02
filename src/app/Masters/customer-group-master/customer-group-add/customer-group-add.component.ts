@@ -6,6 +6,7 @@ import { CustomerGroupMaster } from "src/app/core/models/Masters/customer-group-
 import { CustomerGroupControl } from "src/assets/FormControls/customer-group-master";
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: 'app-customer-group-add',
@@ -83,19 +84,21 @@ export class CustomerGroupAddComponent implements OnInit {
         filter: { _id: id },
         update: this.groupTableForm.value
       };
-      this.masterService.masterPut('generic/update', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
-          }
+      firstValueFrom(this.masterService.masterPut('generic/update', req))
+      .then((res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
         }
+      })
+      .catch((error) => {
+        console.error("Error updating data:", error);
       });
     } else {
       this.groupTableForm.controls["_id"].setValue(this.groupTableForm.controls.groupCode.value);
@@ -104,19 +107,22 @@ export class CustomerGroupAddComponent implements OnInit {
         collectionName: "customerGroup_detail",
         data: this.groupTableForm.value
       };
-      this.masterService.masterPost('generic/create', req).subscribe({
-        next: (res: any) => {
-          if (res) {
-            // Display success message
-            Swal.fire({
-              icon: "success",
-              title: "Successful",
-              text: res.message,
-              showConfirmButton: true,
-            });
-            this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
-          }
+      firstValueFrom (this.masterService.masterPost('generic/create', req))
+      .then((res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.Route.navigateByUrl('/Masters/CustomerGroupMaster/CustomerGroupMasterList');
         }
+      })
+      .catch((error) => {
+        // Handle errors here
+        console.error("Error creating data:", error);
       });
     }
   }
@@ -145,25 +151,28 @@ export class CustomerGroupAddComponent implements OnInit {
       "collectionName": "customerGroup_detail",
       "filter": {}
     }
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const count = res.data.filter(item => item.groupCode == this.groupTableForm.controls.groupCode.value)
-          if (count.length > 0) {
-            Swal.fire({
-              title: 'Group Code already exists! Please try with another',
-              toast: true,
-              icon: "error",
-              showCloseButton: false,
-              showCancelButton: false,
-              showConfirmButton: true,
-              confirmButtonText: "OK"
-            });
-            this.groupTableForm.controls['groupCode'].reset();
-          }
+    firstValueFrom(this.masterService.masterPost('generic/get', req))
+    .then((res: any) => {
+      if (res) {
+        // Generate srno for each object in the array
+        const count = res.data.filter(item => item.groupCode == this.groupTableForm.controls.groupCode.value)
+        if (count.length > 0) {
+          Swal.fire({
+            title: 'Group Code already exists! Please try with another',
+            toast: true,
+            icon: "error",
+            showCloseButton: false,
+            showCancelButton: false,
+            showConfirmButton: true,
+            confirmButtonText: "OK"
+          });
+          this.groupTableForm.controls['groupCode'].reset();
         }
       }
     })
+    .catch((error) => {
+      // Handle errors here
+      console.error("Error fetching data:", error);
+    });
   }
 }

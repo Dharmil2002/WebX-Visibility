@@ -6,7 +6,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import Swal from "sweetalert2";
-import { forkJoin } from "rxjs";
+import { firstValueFrom, forkJoin } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { CityControl } from "src/assets/FormControls/CityControls";
 
@@ -109,10 +109,10 @@ export class AddCityMasterComponent implements OnInit {
             collectionName: "General_master",
             filter: {}
         };
-        const [stateRes, zoneRes] = await forkJoin([
-            this.masterService.masterPost("generic/get", stateReq).toPromise(),
-            this.masterService.masterPost("generic/get", zoneReq).toPromise()
-        ]).toPromise();
+        const [stateRes, zoneRes] = await firstValueFrom (forkJoin([
+          firstValueFrom  (this.masterService.masterPost("generic/get", stateReq)),
+          firstValueFrom  (this.masterService.masterPost("generic/get", zoneReq))
+        ]));
         const stateList = stateRes.data
             .filter(item => item.activeFlag)
             .map(element => ({ name: element.stateName, value: element.stateName }));
@@ -169,7 +169,7 @@ export class AddCityMasterComponent implements OnInit {
                 },
                 update: this.cityTableForm.value
             };
-            const res = await this.masterService.masterPut("generic/update", req).toPromise()
+            const res = await firstValueFrom (this.masterService.masterPut("generic/update", req));
             if (res) {
                 // Display success message
                 Swal.fire({
@@ -186,7 +186,7 @@ export class AddCityMasterComponent implements OnInit {
                 collectionName: "city_detail",
                 data: this.cityTableForm.value
             };
-            const res = await this.masterService.masterPost("generic/create", req).toPromise()
+            const res = await firstValueFrom (this.masterService.masterPost("generic/create", req));
             // Display success message
             Swal.fire({
                 icon: "success",
@@ -203,7 +203,7 @@ export class AddCityMasterComponent implements OnInit {
         let field = $event.field;                   // the actual formControl instance
         let functionName = $event.functionName;     // name of the function , we have to call
 
-        // function of this name may not exists, hence try..catch 
+        // function of this name may not exists, hence try..catch
         try {
             this[functionName]($event);
         } catch (error) {

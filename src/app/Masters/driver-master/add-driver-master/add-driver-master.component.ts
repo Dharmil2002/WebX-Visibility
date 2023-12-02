@@ -12,6 +12,7 @@ import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { MatDialog } from "@angular/material/dialog";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
+import { firstValueFrom } from "rxjs";
 @Component({
   selector: "app-add-driver-master",
   templateUrl: "./add-driver-master.component.html",
@@ -166,18 +167,14 @@ export class AddDriverMasterComponent implements OnInit {
         filter: {},
         collectionName: "driver_detail",
       };
-      const locationRes = await this.masterService
-        .masterPost("generic/get", locationReq)
-        .toPromise();
-      const pincodeRes = await this.masterService
-        .masterPost("generic/get", pincodeReq)
-        .toPromise();
-      const vehicleRes = await this.masterService
-        .masterPost("generic/get", vehicleReq)
-        .toPromise();
-      const driverRes = await this.masterService
-        .masterPost("generic/get", driverReq)
-        .toPromise();
+      const locationRes = await firstValueFrom(this.masterService
+        .masterPost("generic/get", locationReq));
+      const pincodeRes = await firstValueFrom(this.masterService
+        .masterPost("generic/get", pincodeReq));
+      const vehicleRes = await firstValueFrom(this.masterService
+        .masterPost("generic/get", vehicleReq));
+      const driverRes = await firstValueFrom(this.masterService
+        .masterPost("generic/get", driverReq));
 
       const mergedData = {
         locationData: locationRes?.data,
@@ -259,10 +256,10 @@ export class AddDriverMasterComponent implements OnInit {
   //#endregion
 
   //#region
-  getDropDownData() {
-    this.masterService.getJsonFileDetails("dropDownUrl").subscribe((res) => {
+  async getDropDownData() {
+    try {
+      const res: any = await firstValueFrom(this.masterService.getJsonFileDetails("dropDownUrl"));
       this.countryList = res.countryList;
-
       if (this.isUpdate) {
         this.updateCountry = this.findDropdownItemByName(
           this.countryList,
@@ -289,7 +286,10 @@ export class AddDriverMasterComponent implements OnInit {
           );
         }
       );
-    });
+    } catch (error) {
+      // Handle errors here
+      console.error("Error fetching dropdown data:", error);
+    }
   }
   //#endregion
 
@@ -370,9 +370,8 @@ export class AddDriverMasterComponent implements OnInit {
       collectionName: "driver_detail",
       filter: {},
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService
+      .masterPost("generic/get", req));
     if (res) {
       // Generate srno for each object in the array
       const lastUsedDriverCode = res.data[res.data.length - 1];
@@ -404,9 +403,8 @@ export class AddDriverMasterComponent implements OnInit {
           filter: { _id: id },
           update: data,
         };
-        const res = await this.masterService
-          .masterPut("generic/update", req)
-          .toPromise();
+        const res = await firstValueFrom(this.masterService
+          .masterPut("generic/update", req));
         if (res) {
           // Display success message
           Swal.fire({
@@ -431,9 +429,8 @@ export class AddDriverMasterComponent implements OnInit {
           data: mergedObject,
         };
 
-        const res = await this.masterService
-          .masterPost("generic/create", req)
-          .toPromise();
+        const res = await firstValueFrom(this.masterService
+          .masterPost("generic/create", req));
         if (res) {
           // Display success message
           Swal.fire({

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 @Component({
@@ -74,68 +75,66 @@ export class CustomerMasterListComponent implements OnInit {
     this.getCustomerDetails();
   }
 
-  getCustomerDetails() {
-    let req = {
-      "companyCode": this.companyCode,
-      "filter": {},
-      "collectionName": "customer_detail"
-    };
-
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Sort the data based on updatedDate in descending order
-          const sortedData = res.data.sort((a, b) => {
-            return new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime();
-          });
-
-          // Generate srno for each object in the array
-          const dataWithDate = sortedData.map((obj, index) => {
-            return {
-              ...obj,
-              customerGroup: obj.customerGroup,
-              customerCode: obj.customerCode,
-              customerName: obj.customerName.toUpperCase()
-            };
-          });
-
-          // Extract the updatedDate from the first element (latest record)
-          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].updatedDate : null;
-
-          // Use latestUpdatedDate as needed
-
-          this.csv = dataWithDate;
-          this.tableData = dataWithDate;
-          this.tableLoad = false;
-        }
+  async getCustomerDetails() {
+    try {
+      let req = {
+        "companyCode": this.companyCode,
+        "filter": {},
+        "collectionName": "customer_detail"
+      };
+      const res: any = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+      if (res) {
+        // Sort the data based on updatedDate in descending order
+        const sortedData = res.data.sort((a, b) => {
+          return new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime();
+        });
+        // Generate srno for each object in the array
+        const dataWithDate = sortedData.map((obj, index) => {
+          return {
+            ...obj,
+            customerGroup: obj.customerGroup,
+            customerCode: obj.customerCode,
+            customerName: obj.customerName.toUpperCase()
+          };
+        });
+        // Extract the updatedDate from the first element (latest record)
+        const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].updatedDate : null;
+        // Use latestUpdatedDate as needed
+        this.csv = dataWithDate;
+        this.tableData = dataWithDate;
+        this.tableLoad = false;
       }
-    });
+    } catch (error) {
+      // Handle errors here
+      console.error("Error fetching customer details:", error);
+    }
   }
 
-  IsActiveFuntion(det) {
-    let id = det._id;
-    // Remove the "id" field from the form controls
-    delete det._id;
-    // delete det.srNo;
-    let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
-      collectionName: "customer_detail",
-      filter: { _id: id },
-      update: det
-    };
-    this.masterService.masterPut('generic/update', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-          this.getCustomerDetails();
-        }
+  async IsActiveFuntion(det) {
+    try {
+      let id = det._id;
+      // Remove the "id" field from the form controls
+      delete det._id;
+      let req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "customer_detail",
+        filter: { _id: id },
+        update: det
+      };
+      const res: any = await firstValueFrom(this.masterService.masterPut('generic/update', req));
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.getCustomerDetails();
       }
-    });
+    } catch (error) {
+      // Handle errors here
+      console.error("Error updating customer details:", error);
+    }
   }
 }

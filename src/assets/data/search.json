@@ -776,14 +776,14 @@
       "tag": [
         "BankMasterList"
       ],
-      "router": "Masters/AccountMaster/ListBank"
+      "router": "Masters/AccountMaster/BankAccountMasterList"
     },
     {
       "title": "BankMasterAdd",
       "tag": [
         "BankMasterAdd"
       ],
-      "router": "Masters/AccountMaster/AddBank"
+      "router": "Masters/AccountMaster/AddBankAccount"
     },
     {
       "title": "TdsMasterList",

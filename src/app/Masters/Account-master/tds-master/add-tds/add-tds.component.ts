@@ -6,6 +6,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { AccountTdsControls } from "src/assets/FormControls/Account/account-tds-controls";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import Swal from "sweetalert2";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: "app-add-tds",
@@ -52,6 +53,50 @@ export class AddTdsComponent implements OnInit {
     this.TdsForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
 
+  async checkValueExists(fieldName, errorMessage) {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.TdsForm.controls[fieldName].value;
+
+      // Create a request object with the filter criteria
+      const req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "tds_detail",
+        filter: { [fieldName]: fieldValue },
+      };
+
+      // Send the request to fetch user data
+      const tdslist = await firstValueFrom (this.masterService.masterPost("generic/get", req));
+
+      // Check if data exists for the given filter criteria
+      if (tdslist.data.length > 0) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          title: `${errorMessage} already exists! Please try with another !`,
+          toast: true,
+          icon: "error",
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: "OK"
+        });
+
+        // Reset the input field
+        this.TdsForm.controls[fieldName].reset();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+    }
+  }
+
+  async CheckTDSSection() {
+    await this.checkValueExists("TDSsection", "TDS Section");
+  }
+  async CheckPaymentType() {
+    await this.checkValueExists("PaymentType", "Nature of Payment");
+  }
+
   functionCallHandler($event) {
     let functionName = $event.functionName;
     try {
@@ -72,8 +117,8 @@ export class AddTdsComponent implements OnInit {
     };
 
     const res = this.isUpdate
-      ? await this.masterService.masterPut("generic/update", req).toPromise()
-      : await this.masterService.masterPost("generic/create", req).toPromise();
+      ? await firstValueFrom (this.masterService.masterPut("generic/update", req))
+      : await firstValueFrom (this.masterService.masterPost("generic/create", req))
 
     if (res.success) {
       this.Route.navigateByUrl("/Masters/AccountMaster/ListTds");
@@ -103,13 +148,12 @@ export class AddTdsComponent implements OnInit {
       };
       await this.handleRequest(req);
     } else {
-      const tabledata = await this.masterService
+      const tabledata = await firstValueFrom (this.masterService
         .masterPost("generic/get", {
           companyCode: this.CompanyCode,
           collectionName: "tds_detail",
           filter: {},
-        })
-        .toPromise();
+        }));
       const body = {
         TDScode:
           tabledata.data.length === 0
@@ -131,8 +175,8 @@ export class AddTdsComponent implements OnInit {
 
   async handleRequest(req: any) {
     const res = this.isUpdate
-      ? await this.masterService.masterPut("generic/update", req).toPromise()
-      : await this.masterService.masterPost("generic/create", req).toPromise();
+      ? await firstValueFrom (this.masterService.masterPut("generic/update", req))
+      : await firstValueFrom (this.masterService.masterPost("generic/create", req))
 
     if (res.success) {
       this.Route.navigateByUrl("/Masters/AccountMaster/ListTds");

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
@@ -9,7 +10,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 export class ListBankComponent implements OnInit {
   breadScrums = [
     {
-      title: "Bank Master",
+      title: "Bank Account Master",
       items: ["Home"],
       active: "Account",
     },
@@ -71,9 +72,8 @@ export class ListBankComponent implements OnInit {
       collectionName: "Bank_detail",
       filter: {},
     };
-    const res = await this.masterService
-      .masterPost("generic/get", req)
-      .toPromise();
+    const res = await firstValueFrom (this.masterService
+      .masterPost("generic/get", req));
     if(res.success){
       this.TableData = res.data
       this.isTableLode = true
@@ -81,10 +81,10 @@ export class ListBankComponent implements OnInit {
   }
 
   AddNew(){
-    this.Route.navigateByUrl("/Masters/AccountMaster/AddBank");
+    this.Route.navigateByUrl("/Masters/AccountMaster/AddBankAccount");
   }
   EditFunction(event){
-    this.Route.navigate(["/Masters/AccountMaster/AddBank"], { state: { data: event?.data } });
+    this.Route.navigate(["/Masters/AccountMaster/AddBankAccount"], { state: { data: event?.data } });
   }
   functionCallHandler($event) {
     let functionName = $event.functionName;

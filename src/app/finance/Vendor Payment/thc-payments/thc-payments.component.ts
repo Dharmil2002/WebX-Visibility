@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ThcPaymentFilterComponent } from "../Modal/thc-payment-filter/thc-payment-filter.component";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-thc-payments",
@@ -11,7 +12,7 @@ export class ThcPaymentsComponent implements OnInit {
     {
       title: "THC Payments",
       items: ["Home"],
-      active: "List",
+      active: "THC Payments",
     },
   ];
   linkArray = [];
@@ -104,18 +105,21 @@ export class ThcPaymentsComponent implements OnInit {
 
   ];
   isTableLode = true;
-  constructor(private matDialog: MatDialog,) { }
+  constructor(private matDialog: MatDialog, private router: Router,) { }
 
   ngOnInit(): void {
-    this.filterFunction()
+    //this.filterFunction()
   }
 
   AdvancePendingFunction(event) {
     console.log('AdvancePendingFunction', event)
+    this.router.navigate(['/Finance/VendorPayment/AdvancePayment']);
   }
 
   BalanceUnbilledFunction(event) {
     console.log('BalanceUnbilledFunction', event)
+    this.router.navigate(['/Finance/VendorPayment/BalancePayment']);
+
   }
 
   functionCallHandler($event) {

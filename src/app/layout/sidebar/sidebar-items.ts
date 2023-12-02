@@ -99,9 +99,9 @@ export const ROUTES: RouteInfo[] =
               "submenu": []
             },
             {
-              "path": "Masters/AccountMaster/ListBank",
-              "title": "Bank Master",
-              "moduleName": "Bank Master",
+              "path": "Masters/AccountMaster/BankAccountMasterList",
+              "title": "Bank Account Master",
+              "moduleName": "Bank Account Master",
               "icon": "",
               "class": "ml-menu",
               "groupTitle": false,
@@ -373,6 +373,16 @@ export const ROUTES: RouteInfo[] =
           "class": "ml-menu",
           "groupTitle": false,
           "submenu": [
+            {
+              "path": "Masters/CustomerContract/CustomerContractList",
+              "title": "Customer Contract",
+              "moduleName": "Customer Contract",
+              "icon": "",
+              "class": "ml-menu",
+              "groupTitle": false,
+              "submenu": [
+              ]
+            },
             {
               "path": "Masters/VendorContract/VendorQueryPage",
               "title": "Vendor Contract",

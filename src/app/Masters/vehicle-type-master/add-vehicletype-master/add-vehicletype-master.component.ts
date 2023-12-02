@@ -8,22 +8,20 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { VehicleTypeMaster } from "src/app/core/models/Masters/vehicle-type-master/vehicle-type-master";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
-import { calculateVolume } from "../../vehicle-master/vehicle-utility";
-import { HttpErrorResponse } from "@angular/common/http";
+import { firstValueFrom } from "rxjs";
 @Component({
   selector: 'app-add-vehicletype-master',
   templateUrl: './add-vehicletype-master.component.html',
 })
 export class AddVehicletypeMasterComponent implements OnInit {
-  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean;}[];
+  breadScrums: { title: string; items: string[]; active: string; generatecontrol: true; toggle: boolean; }[];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   action: string;
   isUpdate = false;
   vehicleTypeTableData: VehicleTypeMaster;
   vehicleTypeTableForm: UntypedFormGroup;
   vehicleTypeControl: VehicleTypeControl;
-  backPath:string;
+  backPath: string;
   jsonControlVehicleTypeArray: any;
   vehicleCategory: any;
   vehicleCategoryStatus: any;
@@ -51,7 +49,6 @@ export class AddVehicletypeMasterComponent implements OnInit {
     public ObjSnackBarUtility: SnackBarUtilityService,
     private route: Router,
     private fb: UntypedFormBuilder,
-    private filter: FilterUtils,
   ) {
     const navigationState = this.route.getCurrentNavigation()?.extras?.state;
     if (navigationState != null) {
@@ -102,7 +99,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
       "collectionName": "vehicleType_detail",
       "filter": {}
     };
-    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req))
     const vehicleTypeExists = res.data.some((res) => res.vehicleTypeName === this.vehicleTypeTableForm.value.vehicleTypeName);
     if (vehicleTypeExists) {
       // Show the popup indicating that the state already exists
@@ -135,7 +132,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
       "collectionName": "vehicleType_detail",
       "filter": {}
     }
-    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     if (res) {
       // Generate srno for each object in the array
       const lastUsedVehicleTypeCode = res.data[res.data.length - 1];
@@ -164,7 +161,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
           filter: { _id: id },
           update: this.vehicleTypeTableForm.value
         };
-        const res = await this.masterService.masterPut("generic/update", req).toPromise()
+        const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
         if (res) {
           // Display success message
           Swal.fire({
@@ -185,7 +182,7 @@ export class AddVehicletypeMasterComponent implements OnInit {
           collectionName: "vehicleType_detail",
           data: mergedObject
         };
-        const res = await this.masterService.masterPost("generic/create", req).toPromise()
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
         if (res) {
           // Display success message
           Swal.fire({
@@ -202,6 +199,6 @@ export class AddVehicletypeMasterComponent implements OnInit {
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component
     this.vehicleTypeTableForm.controls['isActive'].setValue(event);
-    console.log("Toggle value :", event);
+    // console.log("Toggle value :", event);
   }
 }

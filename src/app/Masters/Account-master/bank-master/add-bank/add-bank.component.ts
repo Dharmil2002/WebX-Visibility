@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { UntypedFormBuilder } from "@angular/forms";
 import { Router } from "@angular/router";
-import { Subject, take, takeUntil } from "rxjs";
+import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -16,7 +16,7 @@ import Swal from "sweetalert2";
 export class AddBankComponent implements OnInit {
   breadScrums = [
     {
-      title: "Bank Master",
+      title: "Bank Account Master",
       items: ["Home"],
       active: "Account",
     },
@@ -76,16 +76,62 @@ export class AddBankComponent implements OnInit {
       }
     });
   }
+  async checkValueExists(fieldName, errorMessage) {
+    try {
+      // Get the field value from the form controls
+      const fieldValue = this.BankForm.controls[fieldName].value;
 
+      // Create a request object with the filter criteria
+      const req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "Bank_detail",
+        filter: { [fieldName]: fieldValue },
+      };
+
+      // Send the request to fetch user data
+      const userlist = await firstValueFrom (this.masterService.masterPost("generic/get", req));
+
+      // Check if data exists for the given filter criteria
+      if (userlist.data.length > 0) {
+        // Show an error message using Swal (SweetAlert)
+        Swal.fire({
+          title: `${errorMessage} already exists! Please try with another !`,
+          toast: true,
+          icon: "error",
+          showCloseButton: false,
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: "OK"
+        });
+
+        // Reset the input field
+        this.BankForm.controls[fieldName].reset();
+      }
+    } catch (error) {
+      // Handle errors that may occur during the operation
+      console.error(`An error occurred while fetching ${fieldName} details:`, error);
+    }
+  }
+  async CheckAccountnumber() {
+    await this.checkValueExists("Accountnumber", "Account number");
+  }
+  async CheckIFSCcode() {
+    await this.checkValueExists("IFSCcode", "IFSC code");
+  }
+  async CheckMICRcode() {
+    await this.checkValueExists("MICRcode", "MICR code");
+  }
+  async CheckSWIFTcode() {
+    await this.checkValueExists("SWIFTcode", "SWIFT code");
+  }
   async getBanknameDropdown() {
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "General_master",
       filter: { codeType: "BNK", activeFlag: true },
     };
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
+    const res = await firstValueFrom (this.masterService
+      .masterPost("generic/get", Body));
 
     if (res.success && res.data.length > 0) {
       const Banknamedata = res.data.map((x) => {
@@ -118,9 +164,8 @@ export class AddBankComponent implements OnInit {
       filter: {},
     };
 
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
+    const res = await firstValueFrom (this.masterService
+      .masterPost("generic/get", Body));
 
     if (res.success && res.data.length > 0) {
       let LocationsData = [];
@@ -168,13 +213,11 @@ export class AddBankComponent implements OnInit {
       };
       await this.handleRequest(req);
     } else {
-      const tabledata = await this.masterService
-        .masterPost("generic/get", {
+      const tabledata = await firstValueFrom (this.masterService.masterPost("generic/get", {
           companyCode: this.CompanyCode,
           collectionName: "Bank_detail",
           filter: {},
-        })
-        .toPromise();
+        }));
       const body = {
         Bankcode:
           tabledata.data.length === 0
@@ -196,11 +239,11 @@ export class AddBankComponent implements OnInit {
 
   async handleRequest(req: any) {
     const res = this.isUpdate
-      ? await this.masterService.masterPut("generic/update", req).toPromise()
-      : await this.masterService.masterPost("generic/create", req).toPromise();
+      ? await firstValueFrom (this.masterService.masterPut("generic/update", req))
+      : await firstValueFrom (this.masterService.masterPost("generic/create", req))
 
     if (res.success) {
-      this.Route.navigateByUrl("/Masters/AccountMaster/ListBank");
+      this.Route.navigateByUrl("/Masters/AccountMaster/BankAccountMasterList");
       Swal.fire({
         icon: "success",
         title: "Successful",
@@ -211,7 +254,7 @@ export class AddBankComponent implements OnInit {
   }
 
   cancel() {
-    this.Route.navigateByUrl("/Masters/AccountMaster/ListBank");
+    this.Route.navigateByUrl("/Masters/AccountMaster/BankAccountMasterList");
   }
 
   toggleSelectAll(argData: any) {

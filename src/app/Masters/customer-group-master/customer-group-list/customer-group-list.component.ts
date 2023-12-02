@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 
@@ -52,21 +53,24 @@ export class CustomerGroupListComponent implements OnInit {
       "collectionName": "customerGroup_detail",
       "filter": {}
     }
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Generate srno for each object in the array
-          const dataWithSrno = res.data.map((obj, index) => {
-            return {
-              ...obj,
-              srNo: index + 1
-            };
-          });
-          this.csv = dataWithSrno
-          this.tableLoad = false;
-        }
+    firstValueFrom(this.masterService.masterPost('generic/get', req))
+    .then((res: any) => {
+      if (res) {
+        // Generate srno for each object in the array
+        const dataWithSrno = res.data.map((obj, index) => {
+          return {
+            ...obj,
+            srNo: index + 1
+          };
+        });
+        this.csv = dataWithSrno
+        this.tableLoad = false;
       }
     })
+    .catch((error) => {
+      // Handle errors here
+      console.error("Error fetching data:", error);
+    });
   }
 
   IsActiveFuntion(det) {
@@ -80,19 +84,22 @@ export class CustomerGroupListComponent implements OnInit {
       filter: { _id: id },
       update: det
     };
-    this.masterService.masterPut('generic/update', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-          this.getCustomerDetails();
-        }
+    firstValueFrom(this.masterService.masterPut('generic/update', req))
+    .then((res: any) => {
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.getCustomerDetails();
       }
+    })
+    .catch((error) => {
+      // Handle errors here
+      console.error("Error updating data:", error);
     });
   }
 

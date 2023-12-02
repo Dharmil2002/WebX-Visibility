@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import { convertNumericalStringsToInteger } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-add-container-master',
   templateUrl: './add-container-master.component.html',
@@ -97,7 +98,7 @@ export class AddContainerMasterComponent implements OnInit {
 
   //#region Save Function
   async save() {
-    
+
     this.containerTableForm.controls.containerType.setValue(this.containerTableForm.value.containerType.name);
     this.containerTableForm.controls.containerName.setValue(this.containerTableForm.value.containerType);
     // Remove all form errors
@@ -113,7 +114,7 @@ export class AddContainerMasterComponent implements OnInit {
         },
         update: this.containerTableForm.value
       };
-      const res = await this.masterService.masterPut('generic/update', req).toPromise()
+      const res = await firstValueFrom(this.masterService.masterPut('generic/update', req));
       if (res) {
         Swal.fire({
           icon: "success",
@@ -140,7 +141,7 @@ export class AddContainerMasterComponent implements OnInit {
         collectionName: "container_detail",
         data: this.containerTableForm.value
       };
-      const res = await this.masterService.masterPost("generic/create", req).toPromise();
+      const res = await firstValueFrom (this.masterService.masterPost("generic/create", req));
       if (res) {
         // Display success message
         Swal.fire({
@@ -168,14 +169,14 @@ export class AddContainerMasterComponent implements OnInit {
 
   //#region to get Container Type List
   getContainerTypeData() {
-    this.masterService.getJsonFileDetails("containerTypeUrl").subscribe((res) => {
+    firstValueFrom(this.masterService.getJsonFileDetails("containerTypeUrl")).then((res) => {
       const containerTypeList = res;
-
       if (this.isUpdate) {
         const updatedContainerType = containerTypeList.find((x) => x.value == this.containerTypeId);
         this.containerTableForm.controls['containerType'].setValue(updatedContainerType);
       }
-      //calling filter function and passing required data
+
+      // calling filter function and passing required data
       this.filter.Filter(
         this.jsonControlArray,
         this.containerTableForm,
@@ -183,10 +184,11 @@ export class AddContainerMasterComponent implements OnInit {
         this.containerType,
         this.containerTypeStatus
       );
-
-    })
+    }).catch((error) => {
+      // handle error here
+      console.error("Error fetching container type data:", error);
+    });
   }
-
   //#endregion
 
   //#region to check Container Type Exists or not
@@ -199,28 +201,32 @@ export class AddContainerMasterComponent implements OnInit {
     }
 
     // Make an HTTP request to fetch container details
-    this.masterService.masterPost('generic/get', req).subscribe({
-      next: (res: any) => {
-        // Check if a response was received
-        if (res) {
-          // Find if the selected container type exists in the fetched data
-          const existingContainer = res.data.find(item => item.containerType === this.containerTableForm.controls.containerType.value.name);
+    firstValueFrom(this.masterService.masterPost('generic/get', req))
+    .then((res: any) => {
+      // Check if a response was received
+      if (res) {
+        // Find if the selected container type exists in the fetched data
+        const existingContainer = res.data.find(item => item.containerType === this.containerTableForm.controls.containerType.value.name);
 
-          // If the container type exists, display an info message
-          if (existingContainer) {
-            Swal.fire({
-              icon: "info",
-              title: "Container Type Exists",
-              text: `Container Type : ${existingContainer.containerType} is already exist!`,
-              showConfirmButton: true,
-            });
+        // If the container type exists, display an info message
+        if (existingContainer) {
+          Swal.fire({
+            icon: "info",
+            title: "Container Type Exists",
+            text: `Container Type : ${existingContainer.containerType} is already exist!`,
+            showConfirmButton: true,
+          });
 
-            // Reset the container type form control
-            this.containerTableForm.controls['containerType'].setValue({ name: "", value: "" });
-          }
+          // Reset the container type form control
+          this.containerTableForm.controls['containerType'].setValue({ name: "", value: "" });
         }
       }
+    })
+    .catch((error) => {
+      // Handle errors here
+      console.error("Error fetching container type data:", error);
     });
+
   }
   //#endregion
   onToggleChange(event: boolean) {

@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { MatDialog } from '@angular/material/dialog';
 import { BeneficiaryModalComponent } from './beneficiary-modal/beneficiary-modal.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-add-beneficiary-master',
@@ -127,7 +128,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.beneficiaryTabledata = this.route.getCurrentNavigation().extras.state.data;
-      // console.log(this.beneficiaryTabledata);   
+      // console.log(this.beneficiaryTabledata);
 
       this.action = 'edit';
       this.isUpdate = true;
@@ -232,7 +233,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         filter: { _id: id },
         update: data
       };
-      const res = await this.masterService.masterPut("generic/update", req).toPromise()
+      const res = await firstValueFrom (this.masterService.masterPut("generic/update", req));
       if (res) {
         // Display success message
         Swal.fire({
@@ -250,7 +251,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
         collectionName: "beneficiary_detail",
         filter: {},
       }
-      const response = await this.masterService.masterPost("generic/get", req).toPromise()
+      const response = await firstValueFrom (this.masterService.masterPost("generic/get", req));
       if (response) {
         // Generate srno for each object in the array
         const lastCode = response.data[response.data.length - 1];
@@ -270,7 +271,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
           collectionName: "beneficiary_detail",
           data: data
         };
-        const res = await this.masterService.masterPost("generic/create", req).toPromise()
+        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
         if (res) {
           // Display success message
           Swal.fire({
@@ -300,7 +301,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
     };
 
     // Make an asynchronous call to retrieve data from the master service
-    const result = await this.masterService.masterPost("generic/get", request).toPromise();
+    const result = await firstValueFrom(this.masterService.masterPost("generic/get", request));
     // Initialize an array to hold the dropdown data
     let dropdownData = [];
 
@@ -412,7 +413,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
   //     //this.beneficiaryDetailForm.reset();
   //     this.initialize('', false)
 
-  //     //setting isFileSelected  
+  //     //setting isFileSelected
   //     const control = this.jsonDetailControl.find(x => x.name === 'uploadKYC');
   //     control.additionalData.isFileSelected = true;
   //     this.isLoad = false;
@@ -438,7 +439,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       this.addDetails(beneficiaryDetails)
     }
   }
-  //#endregion 
+  //#endregion
   //#region to Add a new item to the table or edit
   addDetails(event) {
     const EditableId = event?.id
@@ -499,7 +500,7 @@ export class AddBeneficiaryMasterComponent implements OnInit {
       };
 
       // Make the API call and await the response
-      const res = await this.masterService.masterPost('generic/get', req).toPromise();
+      const res = await firstValueFrom (this.masterService.masterPost('generic/get', req));
       const newBeneficiary = this.beneficiaryHeaderForm.value.beneficiary.value;
       const isDuplicate = res.data.some((item) => item.beneficiary === newBeneficiary);
       if (isDuplicate) {

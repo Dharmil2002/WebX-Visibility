@@ -7,6 +7,7 @@ import { DashboardComponent } from './Vendor Payment/dashboard/dashboard.compone
 import { ThcPaymentsComponent } from './Vendor Payment/thc-payments/thc-payments.component';
 import { InvoiceCollectionComponent } from './invoice-collection/invoice-collection.component';
 import { DeductionsComponent } from './deductions/deductions.component';
+import { AdvancePaymentsComponent } from './Vendor Payment/advance-payments/advance-payments.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
@@ -15,7 +16,9 @@ const routes: Routes = [
   { path: 'VendorPayment/Dashboard', component: DashboardComponent },
   { path: 'VendorPayment/THC-Payment', component: ThcPaymentsComponent },
   { path: 'InvoiceCollection', component: InvoiceCollectionComponent },
-  { path: 'Deductions', component: DeductionsComponent }
+  { path: 'Deductions', component: DeductionsComponent },
+  { path: 'VendorPayment/AdvancePayment', component: AdvancePaymentsComponent }
+
 ];
 
 @NgModule({

@@ -50,6 +50,7 @@ import { ThcPaymentFilterComponent } from './Vendor Payment/Modal/thc-payment-fi
 import { InvoiceCollectionComponent } from './invoice-collection/invoice-collection.component';
 import { DeductionsComponent } from './deductions/deductions.component';
 import { THCAmountsDetailComponent } from './Vendor Payment/Modal/thcamounts-detail/thcamounts-detail.component';
+import { AdvancePaymentsComponent } from './Vendor Payment/advance-payments/advance-payments.component';
 
 @NgModule({
     declarations: [
@@ -65,8 +66,8 @@ import { THCAmountsDetailComponent } from './Vendor Payment/Modal/thcamounts-det
         ThcPaymentFilterComponent,
         InvoiceCollectionComponent,
         DeductionsComponent,
-        THCAmountsDetailComponent
-
+        THCAmountsDetailComponent,
+        AdvancePaymentsComponent
     ],
     imports: [
         CommonModule,

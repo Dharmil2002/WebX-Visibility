@@ -295,7 +295,7 @@ export class VehicleControls {
                     label: 'Active Flag',
                     placeholder: '',
                     type: 'toggle',
-                    value: vehicleTable.isActive,
+                    value: vehicleTable ? vehicleTable.isActive : false,
                     generatecontrol: false,
                     disable: false,
                     Validations: []

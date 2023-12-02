@@ -3,6 +3,8 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { VendorMasterViewComponent } from "../vendor-master-view/vendor-master-view.component";
 import Swal from "sweetalert2";
 import moment from "moment";
+import { firstValueFrom } from "rxjs";
+import { getVendorDetails } from "../vendor-utility";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -90,7 +92,7 @@ export class VendorMasterListComponent implements OnInit {
       "collectionName": "vendor_detail",
       "filter": {}
     }
-    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
     if (res) {
       // Generate srno for each object in the array
       const dataWithSrno = res.data
@@ -123,7 +125,7 @@ export class VendorMasterListComponent implements OnInit {
       filter: { _id: id },
       update: det
     };
-    const res = await this.masterService.masterPut("generic/update", req).toPromise()
+    const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
     if (res) {
       // Display success message
       Swal.fire({

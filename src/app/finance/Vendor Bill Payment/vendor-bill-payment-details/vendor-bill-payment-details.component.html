@@ -27,37 +27,15 @@
                     [FormTitle]="'Payment Summary'" [DisplaySaveButton]=true (SubmitButtonEvent)="save()">
                 </app-generic-table-v2>
                 <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="summaryColumnHeader"
-                    [tableData]="OthrTableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
-                    [menuItems]="menuItems" [Link]="linkArray" [staticField]="summaryStaticField"
-                    [FormTitle]="'Other options for payment'" >
+                    [tableData]="OthrTableData" (functionCallEmitter)="functionCallHandler($event)"
+                    [metaData]="metaData" [menuItems]="menuItems" [Link]="linkArray" [staticField]="summaryStaticField"
+                    [FormTitle]="'Other options for payment'">
                 </app-generic-table-v2>
                 <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="documentHeader"
                     [tableData]="documentData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
                     [menuItems]="menuItems" [Link]="linkArray" [staticField]="documentSaticField"
-                    [FormTitle]="'Document Generated'" >
+                    [FormTitle]="'Document Generated'">
                 </app-generic-table-v2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-6">
-                <!-- <form [formGroup]="PayableSummaryFilterForm">
-                    <app-form-webxpress [form]="PayableSummaryFilterForm" [FormTitle]="'Payable Summary'"
-                        [formData]="jsonControlPayableSummaryFilterArray"
-                        (functionCallEmitter)="functionCallHandler($event)"
-                        [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 '"
-                        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-                    </app-form-webxpress>
-                </form> -->
-            </div>
-            <div class="col-6">
-                <!-- <form [formGroup]="PaymentSummaryFilterForm">
-                    <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Payment Summary'"
-                        [formData]="jsonControlPaymentSummaryFilterArray"
-                        (functionCallEmitter)="functionCallHandler($event)"
-                        [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 '"
-                        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
-                    </app-form-webxpress>
-                </form> -->
             </div>
         </div>
     </div>

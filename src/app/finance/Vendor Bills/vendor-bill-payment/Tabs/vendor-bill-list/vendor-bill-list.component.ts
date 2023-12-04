@@ -71,10 +71,10 @@ export class VendorBillListComponent implements OnInit {
   ];
   addFlag = true;
   menuItemflag = true;
-  
+
   staticField = ['Status', 'pendingAmount', 'billAmount', 'billNo', 'Date', 'billType', 'vendor']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
- 
+
   EventButton = {
     functionName: "filterFunction",
     name: "Filter",
@@ -112,8 +112,9 @@ export class VendorBillListComponent implements OnInit {
         "V0006", "V0007"
       ],
       StartDate: "2023-11-21T18:30:00.000Z",
-      EndDate: "2023-11-23T18:30:00.000Z"
-
+      EndDate: "2023-11-23T18:30:00.000Z",
+      billtypeList: ["1"],
+      statusList: ["1"]
     }
     const dialogRef = this.matDialog.open(VendorBillFilterComponent, {
       data: { DefaultData: RequestData },

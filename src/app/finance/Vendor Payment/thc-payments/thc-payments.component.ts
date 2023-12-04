@@ -32,7 +32,7 @@ export class ThcPaymentsComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    vendorName: {
+    Vendor: {
       Title: "Vendor",
       class: "matcolumncenter",
       Style: "min-width:30%",
@@ -67,7 +67,7 @@ export class ThcPaymentsComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: Object.keys(this.columnHeader),
   };
-  staticField = ["SrNo", "vendorName", "THCamount"];
+  staticField = ["SrNo", "Vendor", "THCamount"];
   companyCode = parseInt(localStorage.getItem("companyCode"));
   isTableLode = true;
   constructor(private matDialog: MatDialog, private router: Router, private masterService: MasterService,) { }
@@ -77,6 +77,7 @@ export class ThcPaymentsComponent implements OnInit {
   }
   async GetTHCData() {
     const GetTHCData = await GetTHCListFromApi(this.masterService)
+    console.log(GetTHCData)
     this.tableData = GetTHCData
   }
 

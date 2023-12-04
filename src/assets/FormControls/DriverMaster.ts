@@ -31,7 +31,7 @@ export class DriverControls {
           {
             name: "pattern",
             message: "Please Enter only text of length 3 to 200 characters",
-            pattern: "^[a-zA-Z]{3,200}$",
+            pattern: "^[a-z A-Z]{3,200}$",
           },
         ],
         functions: {

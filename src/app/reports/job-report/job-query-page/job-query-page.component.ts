@@ -13,7 +13,7 @@ import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoi
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 
 import { jobQueryControl } from 'src/assets/FormControls/job-reports/job-query';
-import { getJobregisterReportDetail } from 'src/app/Reports/job-report/job-query-page/job-register-utlity';
+import { convertToCSV, getJobregisterReportDetail } from 'src/app/Reports/job-report/job-query-page/job-register-utlity';
 
 @Component({
   selector: 'app-job-query-page',
@@ -507,11 +507,8 @@ export class JobQueryPageComponent implements OnInit {
       });
   }
 
-  // Asynchronous method to filter and save job data based on user input
   async save() {
-    // Fetch job data from the API
     let data = await getJobregisterReportDetail(this.masterService);
-    // Extract selected values from form controls
     const Location = Array.isArray(this.jobQueryTableForm.value.LocationsHandler)
       ? this.jobQueryTableForm.value.LocationsHandler.map(x => x.value)
       : [];
@@ -530,17 +527,40 @@ export class JobQueryPageComponent implements OnInit {
       // Check if CNote number is empty or matches the record's CNote number
       const cnoteno = cNoteNum.length === 0 || cNoteNum.includes(record.cNoteNumber);
       // Convert and check if the record's entry time is within the specified date range
-      const startDate = this.datePipe.transform(this.jobQueryTableForm.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      const endDate = this.datePipe.transform(this.jobQueryTableForm.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      const entryTime = record.ojobDate;
-      const isDateRangeValid = startDate <= entryTime && entryTime < endDate;
+      // const startDate = this.datePipe.transform(this.jobQueryTableForm.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+      // const endDate = this.datePipe.transform(this.jobQueryTableForm.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+      // const entryTime = record.ojobDate;
+      // const isDateRangeValid = startDate <= entryTime && entryTime < endDate;
       // Return true if all conditions are met, indicating the record should be included in the result
-      return jobDet && locDet && cnoteno && isDateRangeValid;
+      return jobDet && locDet && cnoteno;
     });
-    // Update the component's tableData with the filtered records
-    this.tableData = filteredRecords;
-    // Set the tableLoad flag to false to indicate that the data has been loaded
-    this.tableLoad = false;
+
+    // Assuming you have your selected data in a variable called 'selectedData'
+    const selectedData = filteredRecords;
+
+    // Convert the selected data to a CSV string
+    const csvString = convertToCSV(selectedData, ['srNo', 'ojobDate', 'vehicleSize', 'transportedBy', 'entryDate', 'createdOn', 'Action', 'jobLocation']);
+
+    // Create a Blob (Binary Large Object) from the CSV string
+    const blob = new Blob([csvString], { type: 'text/csv' });
+
+    // Create a link element
+    const a = document.createElement('a');
+
+    // Set the href attribute of the link to the Blob URL
+    a.href = URL.createObjectURL(blob);
+
+    // Set the download attribute with the desired file name
+    a.download = 'Job_Register_Report.csv';
+
+    // Append the link to the body
+    document.body.appendChild(a);
+
+    // Trigger a click on the link to start the download
+    a.click();
+
+    // Remove the link from the body
+    document.body.removeChild(a);
   }
 
   cancel() {

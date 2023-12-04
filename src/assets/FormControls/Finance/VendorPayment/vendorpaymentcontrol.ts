@@ -1,10 +1,28 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class VendorPaymentControl {
+  PaymentHeaderFilterArray: FormControls[];
   THCPaymentFilterArray: FormControls[];
   PayableSummaryFilterArray: FormControls[];
   PaymentSummaryFilterArray: FormControls[];
   constructor(FormValues) {
     this.THCPaymentFilterArray = [
+
+      {
+        name: "StartDate",
+        label: "SelectDateRange",
+        placeholder: "Select Date",
+        type: "daterangpicker",
+        value: FormValues?.StartDate,
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          support: "EndDate",
+        },
+      },
       {
         name: "vendorName",
         label: "Vendor Name",
@@ -28,23 +46,6 @@ export class VendorPaymentControl {
         generatecontrol: true,
         disable: false,
       },
-      {
-        name: "StartDate",
-        label: "SelectDateRange",
-        placeholder: "Select Date",
-        type: "daterangpicker",
-        value: FormValues?.StartDate,
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-        additionalData: {
-          support: "EndDate",
-        },
-      },
-
       {
         name: "vendorNamesupport",
         label: "Vendor",
@@ -185,6 +186,68 @@ export class VendorPaymentControl {
 
 
     ]
+    this.PaymentHeaderFilterArray = [
+      {
+        name: "VendorPANNumber",
+        label: "Vendor PAN Number",
+        placeholder: "Vendor PAN Number",
+        type: "text",
+        value: FormValues?.VendorPANNumber,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "VendorPANNumberVerify",
+        label: "Verify",
+        placeholder: "Verify",
+        type: "filelink",
+        value: FormValues?.VendorPANNumberVerify,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "Beneficiarydetails",
+        label: "Beneficiary details",
+        placeholder: "Beneficiary details",
+        type: "text",
+        value: FormValues?.Beneficiarydetails,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "BeneficiarydetailsView",
+        label: "View",
+        placeholder: "View",
+        type: "filelink",
+        value: FormValues?.BeneficiarydetailsView,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "Numberofvehiclesregistered",
+        label: "Number of vehicles registered",
+        placeholder: "Number of vehicles registered",
+        type: "text",
+        value: FormValues?.Numberofvehiclesregistered,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "NumberofvehiclesregisteredView",
+        label: "View",
+        placeholder: "View",
+        type: "filelink",
+        value: FormValues?.NumberofvehiclesregisteredView,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+    ]
   }
 
 
@@ -196,5 +259,8 @@ export class VendorPaymentControl {
   }
   getTPaymentSummaryFilterArrayControls() {
     return this.PaymentSummaryFilterArray;
+  }
+  getTPaymentHeaderFilterArrayControls() {
+    return this.PaymentHeaderFilterArray;
   }
 }

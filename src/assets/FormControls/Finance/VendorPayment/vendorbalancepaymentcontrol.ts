@@ -1,5 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class VendorBalancePaymentControl {
+  PaymenBalanceFilterArray: FormControls[];
   VendorBalanceTaxationTDSArray: FormControls[];
   VendorBalanceTaxationGSTArray: FormControls[];
   VendorBalanceSummaryArray: FormControls[];
@@ -505,6 +506,68 @@ export class VendorBalancePaymentControl {
 
 
     ];
+    this.PaymenBalanceFilterArray = [
+      {
+        name: "VendorPANNumber",
+        label: "Vendor PAN Number",
+        placeholder: "Vendor PAN Number",
+        type: "text",
+        value: FormValues?.VendorPANNumber,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "VendorPANNumberVerify",
+        label: "Verify",
+        placeholder: "Verify",
+        type: "filelink",
+        value: FormValues?.VendorPANNumberVerify,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "Beneficiarydetails",
+        label: "Beneficiary details",
+        placeholder: "Beneficiary details",
+        type: "text",
+        value: FormValues?.Beneficiarydetails,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "BeneficiarydetailsView",
+        label: "View",
+        placeholder: "View",
+        type: "filelink",
+        value: FormValues?.BeneficiarydetailsView,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "Numberofvehiclesregistered",
+        label: "Number of vehicles registered",
+        placeholder: "Number of vehicles registered",
+        type: "text",
+        value: FormValues?.Numberofvehiclesregistered,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "NumberofvehiclesregisteredView",
+        label: "View",
+        placeholder: "View",
+        type: "filelink",
+        value: FormValues?.NumberofvehiclesregisteredView,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+      },
+    ]
   }
   getVendorBalanceTaxationTDSArrayControls() {
     return this.VendorBalanceTaxationTDSArray;
@@ -517,5 +580,8 @@ export class VendorBalancePaymentControl {
   }
   getVendorBalanceTaxationPaymentDetailsArrayControls() {
     return this.VendorBalanceTaxationPaymentDetailsArray;
+  }
+  getTPaymentHeaderFilterArrayControls() {
+    return this.PaymenBalanceFilterArray;
   }
 }

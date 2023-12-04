@@ -2,12 +2,15 @@ import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ThcPaymentFilterComponent } from "../Modal/thc-payment-filter/thc-payment-filter.component";
 import { Router } from "@angular/router";
+import { GetTHCListFromApi } from "../VendorPaymentAPIUtitlity";
+import { MasterService } from "src/app/core/service/Masters/master.service";
 
 @Component({
   selector: "app-thc-payments",
   templateUrl: "./thc-payments.component.html",
 })
 export class ThcPaymentsComponent implements OnInit {
+  tableData: any;
   breadScrums = [
     {
       title: "THC Payments",
@@ -29,7 +32,7 @@ export class ThcPaymentsComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:10%",
     },
-    Vendor: {
+    vendorName: {
       Title: "Vendor",
       class: "matcolumncenter",
       Style: "min-width:30%",
@@ -64,51 +67,17 @@ export class ThcPaymentsComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: Object.keys(this.columnHeader),
   };
-  staticField = ["SrNo", "Vendor", "THCamount"];
+  staticField = ["SrNo", "vendorName", "THCamount"];
   companyCode = parseInt(localStorage.getItem("companyCode"));
-  tableData: any = [
-    {
-      SrNo: "1",
-      Vendor: "V001: Adarsh Roadlines",
-      THCamount: "234500.45",
-      AdvancePending: "126400.00",
-      BalanceUnbilled: "108100.00",
-    },
-    {
-      SrNo: "2",
-      Vendor: "V003: KJ Transport",
-      THCamount: "210980.00",
-      AdvancePending: "178900.50",
-      BalanceUnbilled: "178900.50",
-    },
-    {
-      SrNo: "3",
-      Vendor: "V0223: Kanishka Roadlines",
-      THCamount: "178650.60",
-      AdvancePending: "87600.50",
-      BalanceUnbilled: "87600.50",
-    },
-    {
-      SrNo: "4",
-      Vendor: "V0223: Kanishka Roadlines",
-      THCamount: "178650.60",
-      AdvancePending: "87600.50",
-      BalanceUnbilled: "87600.50",
-    },
-    {
-      SrNo: "5",
-      Vendor: "V0223: Kanishka Roadlines",
-      THCamount: "178650.60",
-      AdvancePending: "87600.50",
-      BalanceUnbilled: "87600.50",
-    },
-
-  ];
   isTableLode = true;
-  constructor(private matDialog: MatDialog, private router: Router,) { }
+  constructor(private matDialog: MatDialog, private router: Router, private masterService: MasterService,) { }
 
   ngOnInit(): void {
-    //this.filterFunction()
+    this.GetTHCData()
+  }
+  async GetTHCData() {
+    const GetTHCData = await GetTHCListFromApi(this.masterService)
+    this.tableData = GetTHCData
   }
 
   AdvancePendingFunction(event) {

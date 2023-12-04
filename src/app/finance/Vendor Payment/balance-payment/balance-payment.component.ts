@@ -126,6 +126,9 @@ export class BalancePaymentComponent implements OnInit {
   VendorBalancePaymentFilterForm: UntypedFormGroup;
   jsonControlVendorBalancePaymentFilterArray: any;
 
+  PaymentHeaderFilterForm: UntypedFormGroup;
+  jsonControlPaymentHeaderFilterArray: any;
+
 
   constructor(private filter: FilterUtils,
     private fb: UntypedFormBuilder,
@@ -137,7 +140,7 @@ export class BalancePaymentComponent implements OnInit {
       {
         count: "15000.00",
         title: "Total Advance Amount",
-        class: `color-Ocean-danger`,
+        class: `color-Success-light`,
       },
       {
         count: "6000.00",
@@ -148,7 +151,11 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   initializeFormControl(): void {
-    this.vendorBalancePaymentControl = new VendorBalancePaymentControl("");
+    let RequestObj = {
+      VendorPANNumber: "AACCG464648ZS",
+      Numberofvehiclesregistered: "20"
+    }
+    this.vendorBalancePaymentControl = new VendorBalancePaymentControl(RequestObj);
     this.jsonControlVendorBalanceTaxationTDSFilterArray = this.vendorBalancePaymentControl.getVendorBalanceTaxationTDSArrayControls();
     this.VendorBalanceTaxationTDSFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalanceTaxationTDSFilterArray]);
 
@@ -160,6 +167,10 @@ export class BalancePaymentComponent implements OnInit {
 
     this.jsonControlVendorBalancePaymentFilterArray = this.vendorBalancePaymentControl.getVendorBalanceTaxationPaymentDetailsArrayControls();
     this.VendorBalancePaymentFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalancePaymentFilterArray]);
+
+    this.jsonControlPaymentHeaderFilterArray = this.vendorBalancePaymentControl.getTPaymentHeaderFilterArrayControls();
+    this.PaymentHeaderFilterForm = formGroupBuilder(this.fb, [this.jsonControlPaymentHeaderFilterArray]);
+
   }
 
   AdvancePendingFunction(event) {

@@ -111,21 +111,44 @@ export class AdvancePaymentsComponent implements OnInit {
   PaymentSummaryFilterForm: UntypedFormGroup;
   jsonControlPaymentSummaryFilterArray: any;
 
+  PaymentHeaderFilterForm: UntypedFormGroup;
+  jsonControlPaymentHeaderFilterArray: any;
+
+  TotalAmountList: { count: any; title: string; class: string }[];
   constructor(private filter: FilterUtils,
     private fb: UntypedFormBuilder,
     private matDialog: MatDialog,) { }
 
   ngOnInit(): void {
     this.initializeFormControl();
+    this.TotalAmountList = [
+      {
+        count: "15000.00",
+        title: "Total THC Amount",
+        class: `color-Success-light`,
+      },
+      {
+        count: "6000.00",
+        title: "Total Advance",
+        class: `color-Success-light`,
+      }
+    ]
   }
 
   initializeFormControl(): void {
-    this.vendorPaymentControl = new VendorPaymentControl("");
+    let RequestObj = {
+      VendorPANNumber: "AACCG464648ZS",
+      Numberofvehiclesregistered: "20"
+    }
+    this.vendorPaymentControl = new VendorPaymentControl(RequestObj);
     this.jsonControlPayableSummaryFilterArray = this.vendorPaymentControl.getTPayableSummaryFilterArrayControls();
     this.PayableSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPayableSummaryFilterArray]);
 
     this.jsonControlPaymentSummaryFilterArray = this.vendorPaymentControl.getTPaymentSummaryFilterArrayControls();
     this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPaymentSummaryFilterArray]);
+
+    this.jsonControlPaymentHeaderFilterArray = this.vendorPaymentControl.getTPaymentHeaderFilterArrayControls();
+    this.PaymentHeaderFilterForm = formGroupBuilder(this.fb, [this.jsonControlPaymentHeaderFilterArray]);
   }
 
   AdvancePendingFunction(event) {

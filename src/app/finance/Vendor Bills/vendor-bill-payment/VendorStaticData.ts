@@ -22,3 +22,35 @@ export const status = [
     { value: "3", name: 'Partial Paid' },
     { value: "4", name: 'On Hold' },
 ]
+export const VendorBillPayment = [
+    {
+        billNo: "BEMUMB232400131", Date: '10/16/2023', billAmount: "124500.00", debitNote: "0.00", paid: "0.00", pending: "124500.00", payment: "124500.00"
+    },
+    {
+        billNo: "BEMUMB232400132", Date: '10/18/2023', billAmount: "119800.00", debitNote: "0.00", paid: "0.00", pending: "119800.00", payment: "119800.00"
+    },
+    {
+        billNo: "BEMUMB232400133", Date: '10/20/2023', billAmount: "87500.00", debitNote: "10000.00", paid: "0.00", pending: "7500.00", payment: "7500.00"
+    },
+]
+export const PaymentSummary = [
+    {
+        paymentMethod: "Cheque", institute: "ICICI", ref: "667353", amt: "251800.00"
+    }
+]
+export const OthrPaymentSummary = [
+    {
+        paymentMethod: "Bank Transfer", institute: "HDFC", ref: "RTGS83833939", amt: "3500"
+    },
+    {
+        paymentMethod: "Fuel Card", institute: "IOCL", ref: "IOC003933", amt: "4000"
+    },
+    {
+        paymentMethod: "Cash", institute: "Cash", ref: " ", amt: "0"
+    },
+]
+export const DocumentGenerated = [
+    {
+        document: "Payment Voucher", docNo: "VRMUMB003340", date: "11/13/2023"
+    }
+]

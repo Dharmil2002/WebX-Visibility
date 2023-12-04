@@ -136,7 +136,7 @@ export class VendorBalancePaymentControl {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
           metaData: "Basic"
         },
       },
@@ -188,7 +188,7 @@ export class VendorBalancePaymentControl {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
           metaData: "Basic"
         },
       },

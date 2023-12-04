@@ -32,12 +32,12 @@ export class VendorBillListComponent implements OnInit {
     },
     billNo: {
       Title: "Bill No",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       //Style: "max-width:100px",
     },
     Date: {
       Title: "Date",
-      class: "matcolumnright",
+      class: "matcolumncenter",
       //Style: "max-width:100px",
     },
     billAmount: {

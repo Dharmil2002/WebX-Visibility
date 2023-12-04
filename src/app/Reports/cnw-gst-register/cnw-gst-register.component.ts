@@ -10,6 +10,7 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { CnwGstService, convertToCSV } from 'src/app/Utility/module/reports/cnw.gst.service';
 import { DatePipe } from '@angular/common';
+import { timeString } from 'src/app/Utility/date/date-utils';
 
 @Component({
   selector: 'app-cnw-gst-register',
@@ -320,52 +321,52 @@ export class CnwGstRegisterComponent implements OnInit {
     "TotAmt"
   ]
 
-  // headerForCsv = {
-  //   "docketNumber": "Consignment Note No",
-  //   "docketDate": "Consignment Note Date",
-  //   "billingParty": "Billing Party",
-  //   "movementType": "Movement Type",
-  //   "payType": "Payment Mode",
-  //   "origin": "Origin",
-  //   "fromCity": "From City",
-  //   "toCity": "To City",
-  //   "destination": "Destination",
-  //   "prqNo": "PRQ No",
-  //   "transMode": "Transport Mode",
-  //   "vendorType": "Vendor Type",
-  //   "vendorName": "Vendor Name",
-  //   "pAddress": "Pickup Address",
-  //   "dAddress": "Delivery Address",
-  //   "prLrNo": "PR LR No",
-  //   "pck_type": "Packaging Type",
-  //   "wt_in": "Weight In",
-  //   "gpChDel": "GP/CH/Del",
-  //   "risk": "Risk",
-  //   "deltype": "Delivery Type",
-  //   "issuingFrom": "Issuing From",
-  //   "vehicleNo": " Lorry No",
-  //   "consignorName": " Consignor Name",
-  //   "consignorCntNo": " Consignor Contact Number",
-  //   "consigneeName": "Consignee Name",
-  //   "consigneeCntNo": "Consignee Contact Number",
-  //   "ewayBill": "EWay Bill",
-  //   "expDt": "Expiry Date",
-  //   "invoiceNo": "Invoice Number",
-  //   "invoiceAmt": "Invoice Amount (₹)",
-  //   "NoofPck": "No of Package",
-  //   "materialNm": " Material Number",
-  //   "actualWt": "Actual Weight",
-  //   "charWt": "Charged Wight",
-  //   "freightRt": "Freight Rate",
-  //   "freightRtTp": "Freight Rate Type",
-  //   "freightAmt": "Freight Amount (₹)",
-  //   "otherAmt": "Other Amount (₹)",
-  //   "grossAmt": "Gross Amount (₹)",
-  //   "rcm": "RCM",
-  //   "gstAmt": "GST Amount (₹)",
-  //   "gstcharAmt": "GST Charged Amount (₹)",
-  //   "TotAmt": "Total Amount (₹)"
-  // }
+  headerForCsv = {
+    "docketNumber": "Consignment Note No",
+    "docketDate": "Consignment Note Date",
+    "billingParty": "Billing Party",
+    "movementType": "Movement Type",
+    "payType": "Payment Mode",
+    "origin": "Origin",
+    "fromCity": "From City",
+    "toCity": "To City",
+    "destination": "Destination",
+    "prqNo": "PRQ No",
+    "transMode": "Transport Mode",
+    "vendorType": "Vendor Type",
+    "vendorName": "Vendor Name",
+    "pAddress": "Pickup Address",
+    "dAddress": "Delivery Address",
+    "prLrNo": "PR LR No",
+    "pck_type": "Packaging Type",
+    "wt_in": "Weight In",
+    "gpChDel": "GP/CH/Del",
+    "risk": "Risk",
+    "deltype": "Delivery Type",
+    "issuingFrom": "Issuing From",
+    "vehicleNo": " Lorry No",
+    "consignorName": " Consignor Name",
+    "consignorCntNo": " Consignor Contact Number",
+    "consigneeName": "Consignee Name",
+    "consigneeCntNo": "Consignee Contact Number",
+    "ewayBill": "EWay Bill",
+    "expDt": "Expiry Date",
+    "invoiceNo": "Invoice Number",
+    "invoiceAmt": "Invoice Amount (₹)",
+    "NoofPck": "No of Package",
+    "materialNm": " Material Number",
+    "actualWt": "Actual Weight",
+    "charWt": "Charged Wight",
+    "freightRt": "Freight Rate",
+    "freightRtTp": "Freight Rate Type",
+    "freightAmt": "Freight Amount (₹)",
+    "otherAmt": "Other Amount (₹)",
+    "grossAmt": "Gross Amount (₹)",
+    "rcm": "RCM",
+    "gstAmt": "GST Amount (₹)",
+    "gstcharAmt": "GST Charged Amount (₹)",
+    "TotAmt": "Total Amount (₹)"
+  }
 
   payName: any;
   payStatus: any;
@@ -382,7 +383,7 @@ export class CnwGstRegisterComponent implements OnInit {
   ) {
     this.initializeFormControl();
     this.allColumnFilter = this.columnHeader;
-    this.csvFileName = "CNote GST Wise Register.csv"
+    this.csvFileName = `Cnote_GST_Wise_Register_Report-${timeString}.csv`;
   }
 
   initializeFormControl() {
@@ -525,7 +526,7 @@ export class CnwGstRegisterComponent implements OnInit {
     const selectedData = filteredRecords;
 
     // Convert the selected data to a CSV string
-    const csvString = convertToCSV(selectedData);
+    const csvString = convertToCSV(selectedData, this.headerForCsv);
 
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv' });
@@ -537,7 +538,7 @@ export class CnwGstRegisterComponent implements OnInit {
     a.href = URL.createObjectURL(blob);
 
     // Set the download attribute with the desired file name
-    a.download = 'Cnote_GST_Wise_Register_Report.csv';
+    a.download = this.csvFileName;
 
     // Append the link to the body
     document.body.appendChild(a);

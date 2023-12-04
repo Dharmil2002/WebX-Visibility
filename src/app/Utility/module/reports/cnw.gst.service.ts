@@ -68,16 +68,16 @@ export class CnwGstService {
                     "NoofPck": element.invoiceDetails && element.invoiceDetails.length > 0 ? element.invoiceDetails[0].noofPkts : "",
                     "materialNm": element.invoiceDetails && element.invoiceDetails.length > 0 ? element.invoiceDetails[0].materialName : "",
                     "actualWt": element.invoiceDetails && element.invoiceDetails.length > 0 ? element.invoiceDetails[0].actualWeight : "",
-                    "charWt":  element.invoiceDetails && element.invoiceDetails.length > 0 ? element.invoiceDetails[0].chargedWeight : "",
-                    "freightRt": element?.freight_rate || "" ,
+                    "charWt": element.invoiceDetails && element.invoiceDetails.length > 0 ? element.invoiceDetails[0].chargedWeight : "",
+                    "freightRt": element?.freight_rate || "",
                     "freightRtTp": element?.freightRatetype || "",
-                    "freightAmt" : element?.freight_amount|| "",
-                    "otherAmt": element?.otherAmount||"",
-                    "grossAmt":element?.grossAmount||"",
-                    "rcm": element?.rcm||"",
-                    "gstAmt":element?.gstAmount||"",
-                    "gstcharAmt":element?.gstChargedAmount||"",
-                    "TotAmt":element?.totalAmount||""
+                    "freightAmt": element?.freight_amount || "",
+                    "otherAmt": element?.otherAmount || "",
+                    "grossAmt": element?.grossAmount || "",
+                    "rcm": element?.rcm || "",
+                    "gstAmt": element?.gstAmount || "",
+                    "gstcharAmt": element?.gstChargedAmount || "",
+                    "TotAmt": element?.totalAmount || ""
                }
                jobList.push(jobData)
           })
@@ -85,20 +85,23 @@ export class CnwGstService {
      }
 }
 
-export function convertToCSV(data: any[]): string {
+export function convertToCSV(data: any[], headers: { [key: string]: string }): string {
      const replaceCommaAndWhitespace = (value: any): string => {
-       // Check if value is null or undefined before calling toString
-       if (value == null) {
-         return '';
-       }
-       // Replace commas with another character or an empty string
-       return value.toString().replace(/,/g, '');
+          // Check if value is null or undefined before calling toString
+          if (value == null) {
+               return '';
+          }
+          // Replace commas with another character or an empty string
+          return value.toString().replace(/,/g, '');
      };
- 
-     const header = Object.keys(data[0]).map(replaceCommaAndWhitespace).join(',') + '\n';
+
+     // Generate header row using custom headers
+     const header = Object.keys(headers).map(key => replaceCommaAndWhitespace(headers[key])).join(',') + '\n';
+
+     // Generate data rows using custom headers
      const rows = data.map(row =>
-       Object.values(row).map(replaceCommaAndWhitespace).join(',') + '\n'
+          Object.keys(headers).map(key => replaceCommaAndWhitespace(row[key])).join(',') + '\n'
      );
- 
+
      return header + rows.join('');
-   }
+}

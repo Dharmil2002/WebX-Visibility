@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, take, takeUntil } from 'rxjs';
@@ -11,7 +11,6 @@ import { OperationService } from 'src/app/core/service/operations/operation.serv
 import { getJobDetailFromApi } from 'src/app/dashboard/tabs/job-summary-page/job-summary-utlity';
 import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
-
 import { jobQueryControl } from 'src/assets/FormControls/job-reports/job-query';
 import { convertToCSV, getJobregisterReportDetail } from 'src/app/Reports/job-report/job-query-page/job-register-utlity';
 
@@ -418,7 +417,7 @@ export class JobQueryPageComponent implements OnInit {
     this.jobQueryTableForm.controls["start"].setValue(lastweek);
     this.jobQueryTableForm.controls["end"].setValue(now);
     // Generate a CSV file name with a timestamp
-    this.csvFileName = `Job-Summary-Reports-${timeString}.csv`;
+    this.csvFileName = `Job-Summary-Report-${timeString}.csv`;
     // Call a method to get dropdown list data
     this.getDropDownList();
   }
@@ -518,6 +517,7 @@ export class JobQueryPageComponent implements OnInit {
     const cNoteNum = Array.isArray(this.jobQueryTableForm.value.cnoteHandler)
       ? this.jobQueryTableForm.value.cnoteHandler.map(x => x.name)
       : [];
+
     // Filter records based on user-selected criteria
     const filteredRecords = data.filter(record => {
       // Check if job number is empty or matches the record's job number
@@ -539,7 +539,7 @@ export class JobQueryPageComponent implements OnInit {
     const selectedData = filteredRecords;
 
     // Convert the selected data to a CSV string
-    const csvString = convertToCSV(selectedData, ['srNo', 'ojobDate', 'vehicleSize', 'transportedBy', 'entryDate', 'createdOn', 'Action', 'jobLocation']);
+    const csvString = convertToCSV(selectedData, ['srNo', 'ojobDate', 'vehicleSize', 'transportedBy', 'entryDate', 'createdOn', 'Action', 'jobLocation'], this.headerForCsv);
 
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv' });
@@ -551,7 +551,7 @@ export class JobQueryPageComponent implements OnInit {
     a.href = URL.createObjectURL(blob);
 
     // Set the download attribute with the desired file name
-    a.download = 'Job_Register_Report.csv';
+    a.download = this.csvFileName;
 
     // Append the link to the body
     document.body.appendChild(a);

@@ -51,7 +51,7 @@ export async function getJobregisterReportDetail(masterServices) {
             "cNoteNumber": element.containorDetails && Array.isArray(element.containorDetails) && element.containorDetails.length > 0
                 ? element.containorDetails.map(detail => detail.cnoteNo).join(',')
                 : "",
-            "cNoteDate": formatDocketDate(element.containorDetails && element.containorDetails.length > 0 ? element.containorDetails[0].dktDt : ""),
+            "cNoteDate": formatDocketDate(element.containorDetails && element.containorDetails.length > 0 ? element.containorDetails[0].cnoteDate : ""),
             "containerNumber": element?.nOOFCONT || 0,
             "billingParty": element?.billingParty || '',
             "bookingFrom": element?.fromCity || "",
@@ -119,16 +119,34 @@ function countContainers(blChallan, containerType) {
     }, 0);
 }
 
-export function convertToCSV(data: any[], excludedColumns: string[]): string {
-    const header = Object.keys(data[0])
-      .filter(column => !excludedColumns.includes(column))
-      .join(',') + '\n';
+export function convertToCSV(data: any[], excludedColumns: string[] = [], headerMapping: Record<string, string>): string {
+    const escapeCommas = (value: any): string => {
+        // Check if value is null or undefined before calling toString
+        if (value == null) {
+            return '';
+        }
 
-    const rows = data.map(row =>
-      Object.values(row)
-        .filter((_, index) => !excludedColumns.includes(Object.keys(row)[index]))
-        .join(',') + '\n'
-    );
+        // If the value contains a comma, wrap it in double quotes
+        const strValue = value.toString();
+        return strValue.includes(',') ? `"${strValue}"` : strValue;
+    };
+
+    // Map the original column names to the desired header names
+    const header = Object.keys(data[0])
+        .filter(column => !excludedColumns.includes(column))
+        .map(column => escapeCommas(headerMapping[column] || column))
+        .join(',') + '\n';
+
+    // Filter out excluded columns from rows
+    const rows = data.map(row => {
+        const filteredRow = Object.entries(row)
+            .filter(([key]) => !excludedColumns.includes(key))
+            .map(([key, value]) => escapeCommas(value))
+            .join(',');
+        return filteredRow + '\n';
+    });
 
     return header + rows.join('');
-  }
+}
+
+

@@ -21,6 +21,28 @@ export class cNoteGSTControl {
                     },
                },
                {
+                    name: "payType",
+                    label: "Payment Mode",
+                    placeholder: "Payment Mode",
+                    type: "multiselect",
+                    value: '',
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [],
+                    additionalData: {
+                         isIndeterminate: false,
+                         isChecked: false,
+                         support: "payTypeHandler",
+                         showNameAndValue: false,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll"
+                    },
+               },
+               {
                     name: 'origin',
                     label: 'From Location',
                     placeholder: 'Search and Select From Location',
@@ -97,28 +119,6 @@ export class cNoteGSTControl {
                          onModel: "getPincodeDetail"
                     },
                     generatecontrol: true, disable: false
-               },
-               {
-                    name: "payType",
-                    label: "Payment Mode",
-                    placeholder: "Payment Mode",
-                    type: "multiselect",
-                    value: '',
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [],
-                    additionalData: {
-                         isIndeterminate: false,
-                         isChecked: false,
-                         support: "payTypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll"
-                    },
                },
                {
                     name: "transMode",

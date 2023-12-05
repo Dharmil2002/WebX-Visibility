@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
      <form [formGroup]="cnoteTableForm">
-          <app-form-webxpress [form]="cnoteTableForm" [FormTitle]="'Job Query'" [formData]="jsoncnoteFormArray"
+          <app-form-webxpress [form]="cnoteTableForm" [FormTitle]="'CNote wise GST Register'" [formData]="jsoncnoteFormArray"
                (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
                [showSaveAndCancelButton]="true" [submit]="'Filter'">
           </app-form-webxpress>

@@ -200,7 +200,9 @@ export class CnwGstRegisterComponent implements OnInit {
   }
 
   async save() {
+    // Fetch data from the service
     let data = await this.cnwGstService.getCNoteGSTregisterReportDetail();
+    // Extract selected values from the form
     const payment = Array.isArray(this.cnoteTableForm.value.payTypeHandler)
       ? this.cnoteTableForm.value.payTypeHandler.map(x => x.name)
       : [];
@@ -219,6 +221,7 @@ export class CnwGstRegisterComponent implements OnInit {
     const toLocation = Array.isArray(this.cnoteTableForm.value.tolocHandler)
       ? this.cnoteTableForm.value.tolocHandler.map(x => x.value)
       : [];
+    // Filter records based on form values
     const filteredRecords = data.filter(record => {
       const paytpDet = payment.length === 0 || payment.includes(record.payType);
       const modeDet = tranMode.length === 0 || tranMode.includes(record.transMode);
@@ -236,27 +239,20 @@ export class CnwGstRegisterComponent implements OnInit {
     });
     // Assuming you have your selected data in a variable called 'selectedData'
     const selectedData = filteredRecords;
-    // Convert the selected data to a CSV string
+    // Convert the selected data to a CSV string 
     const csvString = convertToCSV(selectedData, this.CSVHeader);
-
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-
     // Create a link element
     const a = document.createElement('a');
-
     // Set the href attribute of the link to the Blob URL
     a.href = URL.createObjectURL(blob);
-
     // Set the download attribute with the desired file name
     a.download = `Cnote_GST_Wise_Register_Report-${timeString}.csv`;
-
     // Append the link to the body
     document.body.appendChild(a);
-
     // Trigger a click on the link to start the download
     a.click();
-
     // Remove the link from the body
     document.body.removeChild(a);
   }

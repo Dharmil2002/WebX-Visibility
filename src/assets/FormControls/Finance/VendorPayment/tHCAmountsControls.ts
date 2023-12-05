@@ -10,7 +10,7 @@ export class THCAmountsControl {
                 label: "Contract Amount",
                 placeholder: "Contract Amount",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -19,7 +19,10 @@ export class THCAmountsControl {
                         message: "Please Enter only positive numbers with up to two decimal places",
                         pattern: '^\\d+(\\.\\d{1,2})?$'
                     }],
-                additionalData: { op: "+", }
+                additionalData: { op: "+", },
+                functions: {
+                    onChange: "OnChangePlusAmounts"
+                },
             },
 
             {
@@ -27,7 +30,7 @@ export class THCAmountsControl {
                 label: "Loading",
                 placeholder: "Loading ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -36,6 +39,10 @@ export class THCAmountsControl {
                         message: "Please Enter only positive numbers with up to two decimal places",
                         pattern: '^\\d+(\\.\\d{1,2})?$'
                     }],
+
+                functions: {
+                    onChange: "OnChangePlusAmounts"
+                },
 
             },
 
@@ -44,7 +51,7 @@ export class THCAmountsControl {
                 label: "Unloading",
                 placeholder: "Unloading ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -53,6 +60,10 @@ export class THCAmountsControl {
                         message: "Please Enter only positive numbers with up to two decimal places",
                         pattern: '^\\d+(\\.\\d{1,2})?$'
                     }],
+
+                functions: {
+                    onChange: "OnChangePlusAmounts"
+                },
 
             },
 
@@ -61,7 +72,7 @@ export class THCAmountsControl {
                 label: "Mamul",
                 placeholder: "Mamul ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -70,7 +81,9 @@ export class THCAmountsControl {
                         message: "Please Enter only positive numbers with up to two decimal places",
                         pattern: '^\\d+(\\.\\d{1,2})?$'
                     }],
-
+                functions: {
+                    onChange: "OnChangePlusAmounts"
+                },
             },
 
             {
@@ -78,7 +91,7 @@ export class THCAmountsControl {
                 label: "Incentive",
                 placeholder: "Incentive ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -87,7 +100,9 @@ export class THCAmountsControl {
                         message: "Please Enter only positive numbers with up to two decimal places",
                         pattern: '^\\d+(\\.\\d{1,2})?$'
                     }],
-
+                functions: {
+                    onChange: "OnChangePlusAmounts"
+                },
             },
 
             {
@@ -95,7 +110,7 @@ export class THCAmountsControl {
                 label: "Handling",
                 placeholder: "Handling ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -104,22 +119,20 @@ export class THCAmountsControl {
                         message: "Please Enter only positive numbers with up to two decimal places",
                         pattern: '^\\d+(\\.\\d{1,2})?$'
                     }],
-
+                functions: {
+                    onChange: "OnChangePlusAmounts"
+                },
             },
             {
                 name: "THCTotal",
                 label: "THC Total",
                 placeholder: "Handling ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: [
-                    {
-                        name: "pattern",
-                        message: "Please Enter only positive numbers with up to two decimal places",
-                        pattern: '^\\d+(\\.\\d{1,2})?$'
-                    }],
+                ],
 
             },
 
@@ -133,7 +146,7 @@ export class THCAmountsControl {
                 label: "Freight deduction",
                 placeholder: "Freight deduction",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -150,7 +163,7 @@ export class THCAmountsControl {
                 label: "Penalty",
                 placeholder: "Penalty ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -167,7 +180,7 @@ export class THCAmountsControl {
                 label: "Claim",
                 placeholder: "Claim ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -184,7 +197,7 @@ export class THCAmountsControl {
                 label: "Late Arrival",
                 placeholder: "Late Arrival ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -202,7 +215,7 @@ export class THCAmountsControl {
                 label: "Detention",
                 placeholder: "Detention ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -221,7 +234,7 @@ export class THCAmountsControl {
                 label: "Advance",
                 placeholder: "Handling ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -230,6 +243,9 @@ export class THCAmountsControl {
                         message: "Please Enter only positive numbers with up to two decimal places",
                         pattern: '^\\d+(\\.\\d{1,2})?$'
                     }],
+                functions: {
+                    onChange: "OnChangeAdvanceAmount"
+                },
 
             },
             {
@@ -239,7 +255,7 @@ export class THCAmountsControl {
                 type: "text",
                 value: "",
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: [],
             },
             {
@@ -247,7 +263,7 @@ export class THCAmountsControl {
                 label: "Balance",
                 placeholder: "Handling ",
                 type: "number",
-                value: "",
+                value: 0.00,
                 generatecontrol: true,
                 disable: false,
                 Validations: [
@@ -256,6 +272,9 @@ export class THCAmountsControl {
                         message: "Please Enter only positive numbers with up to two decimal places",
                         pattern: '^\\d+(\\.\\d{1,2})?$'
                     }],
+                // functions: {
+                //     onChange: "OnChangeBalanceAmount"
+                // },
 
             },
 
@@ -267,7 +286,7 @@ export class THCAmountsControl {
                 type: "text",
                 value: "",
                 generatecontrol: true,
-                disable: false,
+                disable: true,
                 Validations: [],
             },
 

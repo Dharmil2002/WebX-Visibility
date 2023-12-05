@@ -144,46 +144,144 @@ export class VendorPaymentControl {
     ]
     this.PaymentSummaryFilterArray = [
       {
-        name: "Paymentmethod",
-        label: "Payment method",
-        placeholder: "Payment method",
-        type: "text",
-        value: "",
+        name: "PaymentMode",
+        label: "Payment Mode",
+        placeholder: "Payment Mode",
+        type: "Staticdropdown",
+        value: [
+          {
+            value: "Cheque",
+            name: "Cheque",
+          },
+          {
+            value: "Cash",
+            name: "Cash",
+          },
+          {
+            value: "RTGS/UTR",
+            name: "RTGS/UTR",
+          },
+
+        ],
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
         generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
-      {
-        name: "Paymentinstitute",
-        label: "Payment institute",
-        placeholder: "Payment institute",
-        type: "text",
-        value: "",
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
-      {
-        name: "ReferenceNo",
-        label: "Reference No.",
-        placeholder: "Reference No.",
-        type: "text",
-        value: "",
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
-      {
-        name: "Amount",
-        label: "Amount ₹",
-        placeholder: "Amount ₹",
-        type: "number",
-        value: FormValues?.Amount,
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Payment Mode is required",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        functions: {
+          onSelection: "OnPaymentModeChange"
+        },
       },
 
+      {
+        name: "ChequeOrRefNo",
+        label: "Cheque/Ref No.",
+        placeholder: "Cheque/Ref No.",
+        type: "text",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Cheque/Ref No is required"
+          },],
+      },
+      {
+        name: "Bank",
+        label: "Select Bank",
+        placeholder: "Select Bank",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Bank is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+
+      {
+        name: "CashAccount",
+        label: "Cash Account",
+        placeholder: "Cash Account",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Account is required"
+          },
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic"
+        },
+      },
+      {
+        name: "Date",
+        label: "Date",
+        placeholder: "Date",
+        type: "date",
+        value: new Date(),
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          minDate: new Date(),
+        },
+      },
+      {
+        name: "ScanSupportingdocument",
+        label: "Scan Supporting document",
+        placeholder: "",
+        type: "file",
+        value: "",
+        Validations: [],
+        additionalData: {
+          isFileSelected: true
+        },
+        functions: {
+          onChange: "selectFileScanDocument",
+        },
+        generatecontrol: true,
+        disable: false,
+      },
 
     ]
     this.PaymentHeaderFilterArray = [
@@ -194,7 +292,7 @@ export class VendorPaymentControl {
         type: "text",
         value: FormValues?.VendorPANNumber,
         generatecontrol: true,
-        disable: true,
+        disable: false,
         Validations: [],
       },
       {
@@ -207,20 +305,20 @@ export class VendorPaymentControl {
         disable: false,
         Validations: [],
       },
-      {
-        name: "Beneficiarydetails",
-        label: "Beneficiary details",
-        placeholder: "Beneficiary details",
-        type: "text",
-        value: FormValues?.Beneficiarydetails,
-        generatecontrol: true,
-        disable: true,
-        Validations: [],
-      },
+      // {
+      //   name: "Beneficiarydetails",
+      //   label: "Beneficiary details",
+      //   placeholder: "Beneficiary details",
+      //   type: "text",
+      //   value: FormValues?.Beneficiarydetails,
+      //   generatecontrol: true,
+      //   disable: true,
+      //   Validations: [],
+      // },
       {
         name: "BeneficiarydetailsView",
-        label: "View",
-        placeholder: "View",
+        label: "View Beneficiary details",
+        placeholder: "View Beneficiary details",
         type: "filelink",
         value: FormValues?.BeneficiarydetailsView,
         generatecontrol: true,

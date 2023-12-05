@@ -14,11 +14,11 @@
                         <div class="col-md-6 col-sm-6" style="margin-bottom: 0px;border-right: 2px solid gainsboro;">
                             <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
                                 <div class="col-5">Vendor</div>
-                                <div class="col-5">V001: Adarsh Roadlines</div>
+                                <div class="col-5">{{PaymentData.Vendor}}</div>
                             </div>
                             <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
                                 <div class="col-5">Date</div>
-                                <div class="col-5">12-Oct-23</div>
+                                <div class="col-5">{{THCData.GenerationDate}}</div>
 
                             </div>
                             <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
@@ -32,13 +32,13 @@
                             <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
                                 <div class="col-5">THC Number
                                 </div>
-                                <div class="col-5">VHMUM00383
+                                <div class="col-5">{{THCData.THC}}
                                 </div>
                             </div>
                             <div class="row" style="padding: 5px 5px; border-bottom: 2px solid gainsboro;">
                                 <div class="col-5">Vehicle
                                 </div>
-                                <div class="col-5">MH02CB6655
+                                <div class="col-5">{{THCData.VehicleNumber}}
                                 </div>
 
                             </div>
@@ -52,7 +52,7 @@
 
         <div class="col-6">
             <form [formGroup]=" THCAmountsADDForm">
-                <app-form-webxpress [form]="THCAmountsADDForm" [FormTitle]="'THC Amounts LESS (-)'"
+                <app-form-webxpress [form]="THCAmountsADDForm" [FormTitle]="'THC Amounts ADD (+)'"
                     [formData]="THCAmountsADDArray" (functionCallEmitter)="functionCallHandler($event)"
                     [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'"
                     (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
@@ -62,7 +62,7 @@
         <div class="col-6">
             <form [formGroup]="THCAmountsLESSForm">
                 <app-form-webxpress [form]="THCAmountsLESSForm" [formData]="THCAmountsLESSArray"
-                    (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'THC Amounts ADD (+)'"
+                    (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'THC Amounts LESS (-)'"
                     [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'"
                     (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
                 </app-form-webxpress>

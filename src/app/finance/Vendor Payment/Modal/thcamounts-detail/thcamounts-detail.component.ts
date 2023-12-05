@@ -19,6 +19,8 @@ export class THCAmountsDetailComponent implements OnInit {
 
   THCAmountsArray: any
   THCAmountsForm: UntypedFormGroup;
+  PaymentData;
+  THCData;
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private dialog: MatDialog,
@@ -26,6 +28,9 @@ export class THCAmountsDetailComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public objResult: any) { }
 
   ngOnInit(): void {
+    this.PaymentData = this.objResult?.PaymentData;
+    this.THCData = this.objResult?.THCData;
+    console.log(this.THCData)
     this.initializeFormControl();
   }
   initializeFormControl() {
@@ -38,6 +43,38 @@ export class THCAmountsDetailComponent implements OnInit {
 
     this.THCAmountsArray = thcAmountsFormControls.getTHCAmountsControls();
     this.THCAmountsForm = formGroupBuilder(this.fb, [this.THCAmountsArray]);
+
+    this.THCAmountsForm.get("Balancelocation").setValue(this.THCData?.OthersData?.balAmtAt);
+    this.THCAmountsForm.get("AdvanceLocation").setValue(this.THCData?.OthersData?.advPdAt);
+    this.OnChangePlusAmounts("")
+  }
+  OnChangePlusAmounts(event) {
+
+    this.THCAmountsADDForm.get("ContractAmount").setValue(this.THCData?.THCamount);
+
+    let THCTotal = 0;
+    this.THCAmountsADDArray.forEach(item => {
+      if (item.name != "THCTotal") {
+        const value = parseFloat(this.THCAmountsADDForm.get(item.name).value);
+        THCTotal += isNaN(value) ? 0 : value;
+      }
+    });
+    this.THCAmountsADDForm.get("THCTotal").setValue(THCTotal);
+    this.THCAmountsForm.get("Advance").setValue(this.THCData?.Advance);
+    this.THCAmountsForm.get("Balance").setValue(THCTotal - this.THCData?.Advance);
+  }
+  OnChangeAdvanceAmount(event) {
+    let THCTotal = 0;
+    this.THCAmountsADDArray.forEach(item => {
+      if (item.name != "THCTotal") {
+        const value = parseFloat(this.THCAmountsADDForm.get(item.name).value);
+        THCTotal += isNaN(value) ? 0 : value;
+      }
+    });
+    this.THCAmountsForm.get("Balance").setValue(THCTotal - this.THCData?.Advance);
+  }
+  OnChangeBalanceAmount(event) {
+    // this.THCAmountsForm.get("Balance").setValue(THCTotal - this.THCData?.Advance);
   }
 
   Close(): void {

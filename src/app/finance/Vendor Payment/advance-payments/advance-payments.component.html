@@ -8,13 +8,13 @@
             </app-form-webxpress>
         </form>
         <div>
-            <div *ngIf="!isTableLode" class="d-flex justify-content-center align-items-center">
+            <div *ngIf="!tableData" class="d-flex justify-content-center align-items-center">
                 <!-- Bootstrap loader -->
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            <div *ngIf="isTableLode">
+            <div *ngIf="tableData">
                 <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
                     [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
                     [FormTitle]="'THC List'" [menuItems]="menuItems" [Link]="linkArray" [staticField]="staticField"
@@ -43,6 +43,16 @@
                         (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
                     </app-form-webxpress>
                 </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+            <div class="example-button-row  d-flex justify-content-end">
+                <button [disabled]="!PaymentSummaryFilterForm.valid || 
+                    tableData.length==0" class="msr-3" mat-raised-button color="primary"
+                    (click)="Submit()">Submit</button>
+                <button mat-button (click)="RedirectToTHCPayment()">Back</button>
             </div>
         </div>
     </div>

@@ -77,13 +77,17 @@ export class ThcPaymentsComponent implements OnInit {
   }
   async GetTHCData() {
     const GetTHCData = await GetTHCListFromApi(this.masterService)
-    console.log(GetTHCData)
     this.tableData = GetTHCData
   }
 
   AdvancePendingFunction(event) {
     console.log('AdvancePendingFunction', event)
-    this.router.navigate(['/Finance/VendorPayment/AdvancePayment']);
+
+    this.router.navigate(['/Finance/VendorPayment/AdvancePayment'], {
+      state: {
+        data: event.data
+      },
+    });
   }
 
   BalanceUnbilledFunction(event) {

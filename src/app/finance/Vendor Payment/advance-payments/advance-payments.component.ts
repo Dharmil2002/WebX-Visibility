@@ -137,7 +137,7 @@ export class AdvancePaymentsComponent implements OnInit {
   async GetAdvancePaymentList() {
     const Filters = {
       "vendorName": this.PaymentData.Vendor,
-      "branch": localStorage.getItem('Branch')
+      "advPdAt": localStorage.getItem('Branch')
     }
     const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(this.masterService, Filters)
     this.tableData = GetAdvancePaymentData

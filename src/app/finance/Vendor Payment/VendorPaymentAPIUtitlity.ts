@@ -1,11 +1,11 @@
 import { formatDate } from "src/app/Utility/date/date-utils";
 
-export async function GetTHCListFromApi(masterService) {
+export async function GetTHCListFromApi(masterService, RequestBody) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
-        startdate: "2023-1-1",
-        enddate: "2024-1-1",
-        vendorNames: []
+        startdate: RequestBody.StartDate,
+        enddate: RequestBody.EndDate,
+        vendorNames: RequestBody.vendorList,
     }
 
     try {

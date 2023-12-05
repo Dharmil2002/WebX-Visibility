@@ -18,6 +18,13 @@ export class ThcPaymentsComponent implements OnInit {
       active: "THC Payments",
     },
   ];
+  RequestData = {
+    vendorList: [
+
+    ],
+    StartDate: new Date(-30),
+    EndDate: new Date()
+  }
   linkArray = [];
   menuItems = [];
 
@@ -76,7 +83,7 @@ export class ThcPaymentsComponent implements OnInit {
     this.GetTHCData()
   }
   async GetTHCData() {
-    const GetTHCData = await GetTHCListFromApi(this.masterService)
+    const GetTHCData = await GetTHCListFromApi(this.masterService, this.RequestData)
     this.tableData = GetTHCData
   }
 
@@ -107,16 +114,8 @@ export class ThcPaymentsComponent implements OnInit {
     }
   }
   filterFunction() {
-    let RequestData = {
-      vendorList: [
-        "V0006", "V0007"
-      ],
-      StartDate: "2023-11-21T18:30:00.000Z",
-      EndDate: "2023-11-23T18:30:00.000Z"
-
-    }
     const dialogRef = this.matDialog.open(ThcPaymentFilterComponent, {
-      data: { DefaultData: RequestData },
+      data: { DefaultData: this.RequestData },
       width: "30%",
       disableClose: true,
       position: {
@@ -125,7 +124,10 @@ export class ThcPaymentsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log(result)
+        this.RequestData.StartDate = result.StartDate;
+        this.RequestData.EndDate = result.EndDate;
+        this.RequestData.vendorList = result.vendorNamesupport.map(item => item.value)
+        this.GetTHCData()
       }
     });
   }

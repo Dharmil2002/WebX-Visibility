@@ -130,7 +130,7 @@ export class BalancePaymentComponent implements OnInit {
   AdvanceTotle: number;
   BalancePending: number;
   THCamount: number;
-  AlljsonControlVendorBalanceTaxationTDSFilterArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  AlljsonControlVendorBalanceTaxationTDSFilterArray: any;
 
   constructor(
     private filter: FilterUtils,
@@ -338,7 +338,7 @@ export class BalancePaymentComponent implements OnInit {
     );
   }
 
-  GSTSACcodeFieldChanged() {}
+  GSTSACcodeFieldChanged() { }
 
   toggleTDSExempted() {
     const TDSExemptedValue =
@@ -364,7 +364,7 @@ export class BalancePaymentComponent implements OnInit {
         this.AlljsonControlVendorBalanceTaxationTDSFilterArray.filter(
           (x) => x.name == "TDSExempted"
         );
-      const TDSSection =this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
+      const TDSSection = this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
       TDSSection.setValue("");
       TDSSection.clearValidators();
       const TDSRate = this.VendorBalanceTaxationTDSFilterForm.get("TDSRate");
@@ -401,9 +401,8 @@ export class BalancePaymentComponent implements OnInit {
       DocNo: event.data.THC,
       templateName: "thc",
     };
-    const url = `${
-      window.location.origin
-    }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, "", "width=1500,height=800");
   }
   THCAmountFunction(event) {
@@ -476,5 +475,5 @@ export class BalancePaymentComponent implements OnInit {
       }
     });
   }
-  BookVendorBill() {}
+  BookVendorBill() { }
 }

@@ -2,7 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { DocumentGenerated, OthrPaymentSummary, PaymentSummary, VendorBillPayment } from '../../Vendor Bills/vendor-bill-payment/VendorStaticData';
 import { vendorBillPaymentControl } from 'src/assets/FormControls/Finance/VendorPayment/vendorBillPaymentControl';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
+import { GetAccountDetailFromApi } from '../../Vendor Payment/VendorPaymentAPIUtitlity';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
+import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-vendor-bill-payment-details',
@@ -137,7 +144,16 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   jsonVendorBillPaymentArray: any;
   vendorbillPaymentForm: UntypedFormGroup;
   TotalAmountList: { count: string; title: string; class: string; }[];
-  constructor(private fb: UntypedFormBuilder,) { }
+  PaymentSummaryFilterForm: UntypedFormGroup;
+  jsonPaymentSummaryArray: any;
+  AlljsonControlPaymentSummaryFilterArray: any;
+  imageData: any = {};
+  constructor(private fb: UntypedFormBuilder,
+    private filter: FilterUtils,
+    private masterService: MasterService,
+    private objImageHandling: ImageHandling,
+    private dialog: MatDialog,
+  ) { }
 
   ngOnInit(): void {
     this.initializeVendorBillPayment();
@@ -201,6 +217,11 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     // Retrieve the bill payment header array from the control
     this.jsonVendorBillPaymentArray = this.vendorBillPaymentControl.getbillPaymentHeaderArrayControl();
     this.vendorbillPaymentForm = formGroupBuilder(this.fb, [this.jsonVendorBillPaymentArray]);
+
+    this.jsonPaymentSummaryArray = this.vendorBillPaymentControl.getPaymentSummaryControl();
+    this.AlljsonControlPaymentSummaryFilterArray = this.jsonPaymentSummaryArray;
+    this.PaymentSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonPaymentSummaryArray]);
+    this.jsonPaymentSummaryArray = this.jsonPaymentSummaryArray.slice(0, 1);
   }
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
@@ -212,8 +233,99 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       console.log("failed", error);
     }
   }
-  save(event) {
+  save() {
     console.log(this.summaryData);
 
   }
+  // Payment Modes Changes 
+  async OnPaymentModeChange(event) {
+    const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
+    let filterFunction;
+    switch (PaymentMode) {
+      case 'Cheque':
+        filterFunction = (x) => x.name !== 'CashAccount';
+
+        break;
+      case 'Cash':
+        filterFunction = (x) => x.name !== 'ChequeOrRefNo' && x.name !== 'Bank';
+        break;
+      case 'RTGS/UTR':
+        filterFunction = (x) => x.name !== 'CashAccount';
+        break;
+    }
+
+    this.jsonPaymentSummaryArray = this.AlljsonControlPaymentSummaryFilterArray.filter(filterFunction);
+    const Accountinglocation = this.PaymentSummaryFilterForm.value.BalancePaymentlocation?.name
+    switch (PaymentMode) {
+      case 'Cheque':
+        const responseFromAPIBank = await GetAccountDetailFromApi(this.masterService, "BANK", Accountinglocation)
+        this.filter.Filter(
+          this.jsonPaymentSummaryArray,
+          this.PaymentSummaryFilterForm,
+          responseFromAPIBank,
+          "Bank",
+          false
+        );
+        const Bank = this.PaymentSummaryFilterForm.get('Bank');
+        Bank.setValidators([Validators.required, autocompleteObjectValidator()]);
+        Bank.updateValueAndValidity();
+
+        const ChequeOrRefNo = this.PaymentSummaryFilterForm.get('ChequeOrRefNo');
+        ChequeOrRefNo.setValidators([Validators.required]);
+        ChequeOrRefNo.updateValueAndValidity();
+
+
+
+        const CashAccount = this.PaymentSummaryFilterForm.get('CashAccount');
+        CashAccount.setValue("");
+        CashAccount.clearValidators();
+        CashAccount.updateValueAndValidity();
+
+        break;
+      case 'Cash':
+        const responseFromAPICash = await GetAccountDetailFromApi(this.masterService, "CASH", Accountinglocation)
+        this.filter.Filter(
+          this.jsonPaymentSummaryArray,
+          this.PaymentSummaryFilterForm,
+          responseFromAPICash,
+          "CashAccount",
+          false
+        );
+
+        const CashAccountS = this.PaymentSummaryFilterForm.get('CashAccount');
+        CashAccountS.setValidators([Validators.required, autocompleteObjectValidator()]);
+        CashAccountS.updateValueAndValidity();
+
+        const BankS = this.PaymentSummaryFilterForm.get('Bank');
+        BankS.setValue("");
+        BankS.clearValidators();
+        BankS.updateValueAndValidity();
+
+        const ChequeOrRefNoS = this.PaymentSummaryFilterForm.get('ChequeOrRefNo');
+        ChequeOrRefNoS.setValue("");
+        ChequeOrRefNoS.clearValidators();
+        ChequeOrRefNoS.updateValueAndValidity();
+
+        break;
+      case 'RTGS/UTR':
+        break;
+    }
+
+  }
+  async selectFileScanDocument(data) {
+    const allowedFormats = ["jpeg", "png", "jpg"];
+    // Call the uploadFile method from the service
+    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "ScanSupportingdocument", this.
+      PaymentSummaryFilterForm, this.imageData, "VendorBillPayment", 'Finance', this.jsonPaymentSummaryArray, allowedFormats);
+  }
+  //#region to preview image
+  openImageDialog(control) {
+    const file = this.objImageHandling.getFileByKey(control.imageName, this.imageData);
+    this.dialog.open(ImagePreviewComponent, {
+      data: { imageUrl: file },
+      width: '30%',
+      height: '50%',
+    });
+  }
+  //#endregion
 }

@@ -9,7 +9,6 @@ import { cNoteGSTControl } from 'src/assets/FormControls/CNote-GST-Wise-Register
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { CnwGstService, convertToCSV } from 'src/app/Utility/module/reports/cnw.gst.service';
-import { DatePipe } from '@angular/common';
 import { timeString } from 'src/app/Utility/date/date-utils';
 
 @Component({
@@ -37,291 +36,8 @@ export class CnwGstRegisterComponent implements OnInit {
   tocityName: any;
   tocityStatus: any;
   tableLoad = true;
-  tableData: any[];
-  METADATA = {
-    checkBoxRequired: true,
-    noColumnSort: ["checkBoxRequired"],
-  };
-  allColumnFilter: any;
-  filterColumn: boolean = true;
 
-  dynamicControls = {
-    add: false,
-    edit: true,
-    csv: true,
-  };
-
-  columnHeader = {
-    docketNumber: {
-      Title: "CNote No",
-      class: "matcolumncenter",
-      Style: "max-width:200px",
-    },
-    docketDate: {
-      Title: "CNote Date",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    billingParty: {
-      Title: "Billing Party",
-      class: "matcolumncenter",
-      Style: "min-width:150px",
-    },
-    movementType: {
-      Title: "Movement Type",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    payType: {
-      Title: "Payment Mode",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    origin: {
-      Title: "Origin",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    destination: {
-      Title: "Destination",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    fromCity: {
-      Title: "From City",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    toCity: {
-      Title: "To City",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    prqNo: {
-      Title: "PRQ No",
-      class: "matcolumncenter",
-      Style: "max-width:200px",
-    },
-    transMode: {
-      Title: "Transport Mode",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    vendorType: {
-      Title: "Vendor Type",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    vendorName: {
-      Title: "Vendor Name",
-      class: "matcolumncenter",
-      Style: "min-width:100px",
-    },
-    pAddress: {
-      Title: "Pickup Address",
-      class: "matcolumncenter",
-      Style: "min-width:100px",
-    },
-    dAddress: {
-      Title: "Delivery Address",
-      class: "matcolumncenter",
-      Style: "min-width:100px",
-    },
-    prLrNo: {
-      Title: "PR LR No",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    pck_type: {
-      Title: "Packing Type",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    wt_in: {
-      Title: "Wt In",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    gpChDel: {
-      Title: "GP/CH/Del",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    risk: {
-      Title: "Risk",
-      class: "matcolumncenter",
-      Style: "min-width:100px",
-    },
-    deltype: {
-      Title: "Delivery Type",
-      class: "matcolumncenter",
-      Style: "min-width:100px",
-    },
-    issuingFrom: {
-      Title: "Issuing From",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    vehicleNo: {
-      Title: "Lorry No",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    consignorName: {
-      Title: "Consignor Name",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    consignorCntNo: {
-      Title: "Consignor Cnt No",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    consigneeName: {
-      Title: "Consignee Name",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    consigneeCntNo: {
-      Title: "Consignee Cnt No",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    ewayBill: {
-      Title: "EWay Bill No",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    expDt: {
-      Title: "Expiry Date",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    invoiceNo: {
-      Title: "Invoice No",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    invoiceAmt: {
-      Title: "Invoice Amt (₹)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    NoofPck: {
-      Title: "No of Package",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    materialNm: {
-      Title: "Material Name",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    actualWt: {
-      Title: "Actual Wt (MT)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    charWt: {
-      Title: "Charged Wt (MT)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    freightRt: {
-      Title: "Freight Rt (₹)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    freightRtTp: {
-      Title: "Freight Rt Type",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    freightAmt: {
-      Title: "Freight Amt (₹)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    otherAmt: {
-      Title: "Other Amt (₹)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    grossAmt: {
-      Title: "Gross Amt (₹)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    rcm: {
-      Title: "RCM",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    gstAmt: {
-      Title: "GST Amt (₹)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    gstcharAmt: {
-      Title: "GST Charged Amt (₹)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    TotAmt: {
-      Title: "Total Amt (₹)",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-  }
-
-  staticField = [
-    "docketNumber",
-    "docketDate",
-    "billingParty",
-    "movementType",
-    "payType",
-    "origin",
-    "fromCity",
-    "toCity",
-    "destination",
-    "prqNo",
-    "transMode",
-    "vendorType",
-    "vendorName",
-    "pAddress",
-    "dAddress",
-    "prLrNo",
-    "pck_type",
-    "wt_in",
-    "gpChDel",
-    "risk",
-    "deltype",
-    "issuingFrom",
-    "vehicleNo",
-    "consignorName",
-    "consignorCntNo",
-    "consigneeName",
-    "consigneeCntNo",
-    "ewayBill",
-    "expDt",
-    "invoiceNo",
-    "invoiceAmt",
-    "NoofPck",
-    "materialNm",
-    "actualWt",
-    "charWt",
-    "freightRt",
-    "freightRtTp",
-    "freightAmt",
-    "otherAmt",
-    "grossAmt",
-    "rcm",
-    "gstAmt",
-    "gstcharAmt",
-    "TotAmt"
-  ]
-
-  headerForCsv = {
+  CSVHeader = {
     "docketNumber": "Consignment Note No",
     "docketDate": "Consignment Note Date",
     "billingParty": "Billing Party",
@@ -372,7 +88,6 @@ export class CnwGstRegisterComponent implements OnInit {
   payStatus: any;
   tranModeName: any;
   transModeStatus: any;
-  csvFileName: string;
   constructor(
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
@@ -382,8 +97,6 @@ export class CnwGstRegisterComponent implements OnInit {
     private cnwGstService: CnwGstService
   ) {
     this.initializeFormControl();
-    this.allColumnFilter = this.columnHeader;
-    this.csvFileName = `Cnote_GST_Wise_Register_Report-${timeString}.csv`;
   }
 
   initializeFormControl() {
@@ -516,7 +229,7 @@ export class CnwGstRegisterComponent implements OnInit {
 
       // const startDate = this.datePipe.transform(this.cnoteTableForm.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
       // const endDate = this.datePipe.transform(this.cnoteTableForm.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      // const entryTime = record.odocketDate;
+      // const entryTime = record.docketDate;
       // const isDateRangeValid = startDate <= entryTime && entryTime < endDate;
 
       return paytpDet && modeDet && toCityDet && fromcityDet && fromLocDet && toLocDet;
@@ -526,7 +239,7 @@ export class CnwGstRegisterComponent implements OnInit {
     const selectedData = filteredRecords;
 
     // Convert the selected data to a CSV string
-    const csvString = convertToCSV(selectedData, this.headerForCsv);
+    const csvString = convertToCSV(selectedData, this.CSVHeader);
 
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv' });
@@ -538,7 +251,7 @@ export class CnwGstRegisterComponent implements OnInit {
     a.href = URL.createObjectURL(blob);
 
     // Set the download attribute with the desired file name
-    a.download = this.csvFileName;
+    a.download = `Cnote_GST_Wise_Register_Report-${timeString}.csv`;
 
     // Append the link to the body
     document.body.appendChild(a);
@@ -576,7 +289,4 @@ export class CnwGstRegisterComponent implements OnInit {
       console.log("failed");
     }
   }
-
-
-
 }

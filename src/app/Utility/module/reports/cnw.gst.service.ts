@@ -34,8 +34,8 @@ export class CnwGstService {
           res.data.map((element) => {
                let jobData = {
                     "docketNumber": element?.docketNumber || "",
+                    "odocketDate": element.docketDate,
                     "docketDate": formatDocketDate(element?.docketDate || ""),
-                    // "odocketDate": element?.docketDate || "",
                     "billingParty": element?.billingParty || "",
                     "movementType": element?.movementType || "",
                     "payType": element?.payType || "",
@@ -96,7 +96,7 @@ export function convertToCSV(data: any[], headers: { [key: string]: string }): s
      };
 
      // Generate header row using custom headers
-     const header = Object.keys(headers).map(key => replaceCommaAndWhitespace(headers[key])).join(',') + '\n';
+     const header = '\uFEFF' + Object.keys(headers).map(key => replaceCommaAndWhitespace(headers[key])).join(',') + '\n';
 
      // Generate data rows using custom headers
      const rows = data.map(row =>

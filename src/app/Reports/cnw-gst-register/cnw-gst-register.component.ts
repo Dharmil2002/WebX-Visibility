@@ -20,7 +20,7 @@ export class CnwGstRegisterComponent implements OnInit {
     {
       title: "CNote wise GST Register Report",
       items: ["Home"],
-      active: "Job Register Report",
+      active: "CNote wise GST Register Report",
     },
   ];
   cnoteTableForm: UntypedFormGroup;
@@ -36,6 +36,10 @@ export class CnwGstRegisterComponent implements OnInit {
   tocityName: any;
   tocityStatus: any;
   tableLoad = true;
+  payName: any;
+  payStatus: any;
+  tranModeName: any;
+  transModeStatus: any;
 
   CSVHeader = {
     "docketNumber": "Consignment Note No",
@@ -84,10 +88,6 @@ export class CnwGstRegisterComponent implements OnInit {
     "TotAmt": "Total Amount (₹)"
   }
 
-  payName: any;
-  payStatus: any;
-  tranModeName: any;
-  transModeStatus: any;
   constructor(
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
@@ -227,22 +227,20 @@ export class CnwGstRegisterComponent implements OnInit {
       const fromLocDet = fromLocation.length === 0 || fromLocation.includes(record.origin);
       const toLocDet = toLocation.length === 0 || toLocation.includes(record.destination);
 
-      // const startDate = this.datePipe.transform(this.cnoteTableForm.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      // const endDate = this.datePipe.transform(this.cnoteTableForm.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      // const entryTime = record.docketDate;
-      // const isDateRangeValid = startDate <= entryTime && entryTime < endDate;
+      const startValue = new Date(this.cnoteTableForm.controls.start.value);
+      const endValue = new Date(this.cnoteTableForm.controls.end.value);
+      const entryTime = new Date(record.odocketDate);
+      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return paytpDet && modeDet && toCityDet && fromcityDet && fromLocDet && toLocDet;
+      return paytpDet && modeDet && toCityDet && fromcityDet && fromLocDet && toLocDet && isDateRangeValid;
     });
-
     // Assuming you have your selected data in a variable called 'selectedData'
     const selectedData = filteredRecords;
-
     // Convert the selected data to a CSV string
     const csvString = convertToCSV(selectedData, this.CSVHeader);
 
     // Create a Blob (Binary Large Object) from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv' });
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
 
     // Create a link element
     const a = document.createElement('a');

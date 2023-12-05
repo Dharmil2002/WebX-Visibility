@@ -37,7 +37,7 @@ export class JobQueryPageComponent implements OnInit {
   jobNoStatus: any;
   cnoteName: any;
   cnoteStatus: any;
- 
+
   CSVHeader = {
     "jobNo": "Job No",
     "jobDate": "Job Date",
@@ -92,8 +92,7 @@ export class JobQueryPageComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
-    private operationService: OperationService,
-    private datePipe: DatePipe
+    private operationService: OperationService
   ) {
     this.initializeFormControl();
   }
@@ -218,21 +217,22 @@ export class JobQueryPageComponent implements OnInit {
       const locDet = Location.length === 0 || Location.includes(record.jobLocation);
       // Check if CNote number is empty or matches the record's CNote number
       const cnoteno = cNoteNum.length === 0 || cNoteNum.includes(record.cNoteNumber);
-    
+
       // Convert and check if the record's entry time is within the specified date range
-      // const startDate = this.datePipe.transform(this.jobQueryTableForm.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      // const endDate = this.datePipe.transform(this.jobQueryTableForm.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      // const entryTime = record.ojobDate;
-      // const isDateRangeValid = startDate <= entryTime && entryTime < endDate;
+      const startValue = new Date(this.jobQueryTableForm.controls.start.value);
+      const endValue = new Date(this.jobQueryTableForm.controls.end.value);
+      const entryTime = new Date(record.ojobDate);
+      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
+
       // Return true if all conditions are met, indicating the record should be included in the result
-      return jobDet && locDet && cnoteno;
+      return jobDet && locDet && cnoteno && isDateRangeValid;
     });
 
     // Assuming you have your selected data in a variable called 'selectedData'
     const selectedData = filteredRecords;
 
     // Convert the selected data to a CSV string
-    const csvString = convertToCSV(selectedData, ['srNo', 'ojobDate', 'vehicleSize', 'transportedBy', 'entryDate', 'createdOn', 'Action', 'jobLocation'], this.CSVHeader);
+    const csvString = convertToCSV(selectedData, ['ojobDate', 'jobLocation'], this.CSVHeader);
 
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv' });

@@ -51,6 +51,6 @@ export const OthrPaymentSummary = [
 ]
 export const DocumentGenerated = [
     {
-        document: "Payment Voucher", docNo: "VRMUMB003340", date: "11/13/2023"
+        document: "Payment Voucher", docNo: "VRMUMB003340", date: "11/13/2023", v: "View | Print"
     }
 ]

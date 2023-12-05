@@ -77,7 +77,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       // Style: "min-width:200px",
     },
     institute: {
-      Title: "Payment institute",
+      Title: "Payment Institute",
       class: "matcolumncenter",
       //Style: "max-width:100px",
     },
@@ -97,19 +97,27 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     document: {
       Title: "Document",
       class: "matcolumncenter",
-      //Style: "max-width:100px",
+      //Style: "max-width:200px",
     },
     docNo: {
       Title: "Document Number",
       class: "matcolumncenter",
-      //Style: "max-width:100px",
+      //Style: "max-width:250px",
     },
     date: {
       Title: "Document Date",
       class: "matcolumncenter",
-      //Style: "max-width:100px",
+      //Style: "max-width:150px",
+    },
+    v: {
+      Title: "",
+      class: "matcolumncenter",
+      //Style: "max-width:150px",
+      type: "Link",
+      functionName: "billNoFunction"
     },
   }
+  TableStyle = "width:60%"
   dynamicControls = {
     add: false,
     edit: false,

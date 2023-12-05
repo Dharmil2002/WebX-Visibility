@@ -24,17 +24,19 @@
                 <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="summaryColumnHeader"
                     [tableData]="summaryData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
                     [menuItems]="menuItems" [Link]="linkArray" [staticField]="summaryStaticField"
-                    [FormTitle]="'Payment Summary'" [DisplaySaveButton]=true (SubmitButtonEvent)="save()">
+                    [FormTitle]="'Payment Summary'" [DisplaySaveButton]=true (SubmitButtonEvent)="save()"
+                    [TableStyle]="TableStyle">
                 </app-generic-table-v2>
                 <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="summaryColumnHeader"
                     [tableData]="OthrTableData" (functionCallEmitter)="functionCallHandler($event)"
                     [metaData]="metaData" [menuItems]="menuItems" [Link]="linkArray" [staticField]="summaryStaticField"
-                    [FormTitle]="'Other options for payment'">
+                    [FormTitle]="'Other Options For Payment'" [TableStyle]="TableStyle">
                 </app-generic-table-v2>
+
                 <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="documentHeader"
                     [tableData]="documentData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
                     [menuItems]="menuItems" [Link]="linkArray" [staticField]="documentSaticField"
-                    [FormTitle]="'Document Generated'">
+                    [FormTitle]="'Document Generated'" [TableStyle]="TableStyle">
                 </app-generic-table-v2>
             </div>
         </div>

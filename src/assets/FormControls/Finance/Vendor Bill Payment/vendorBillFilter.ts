@@ -4,6 +4,22 @@ export class vendorBillFilterControl {
     constructor(FormValues) {
         this.vendorBillFilterArray = [
             {
+                name: "StartDate",
+                label: "SelectDateRange",
+                placeholder: "Select Date",
+                type: "daterangpicker",
+                value: FormValues?.StartDate,
+                filterOptions: "",
+                autocomplete: "",
+                displaywith: "",
+                generatecontrol: true,
+                disable: false,
+                Validations: [],
+                additionalData: {
+                    support: "EndDate",
+                },
+            },
+            {
                 name: "vendorName",
                 label: "Vendor Name",
                 placeholder: "Vendor Name",
@@ -48,23 +64,6 @@ export class vendorBillFilterControl {
                 },
                 generatecontrol: true,
                 disable: false,
-            },
-           
-            {
-                name: "StartDate",
-                label: "SelectDateRange",
-                placeholder: "Select Date",
-                type: "daterangpicker",
-                value: FormValues?.StartDate,
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                generatecontrol: true,
-                disable: false,
-                Validations: [],
-                additionalData: {
-                    support: "EndDate",
-                },
             },
             {
                 name: "status",

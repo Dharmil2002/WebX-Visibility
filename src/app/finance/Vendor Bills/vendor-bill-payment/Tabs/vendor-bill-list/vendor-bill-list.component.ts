@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { VendorTableData } from '../../VendorStaticData';
 import { VendorBillFilterComponent } from './vendor-bill-filter/vendor-bill-filter.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vendor-bill-list',
@@ -16,50 +17,52 @@ export class VendorBillListComponent implements OnInit {
   tableData = VendorTableData
   columnHeader = {
     checkBoxRequired: {
-      Title: "",
+      Title: "Select",
       class: "matcolumncenter",
-      Style: "max-width:80px",
+      Style: "min-width:8%",
     },
     vendor: {
       Title: "Vendor",
       class: "matcolumnleft",
-      Style: "min-width:250px",
+      Style: "min-width:20%",
     },
     billType: {
       Title: "Bill Type",
       class: "matcolumncenter",
-      //Style: "max-width:100px",
+      Style: "min-width:12%",
     },
     billNo: {
       Title: "Bill No",
       class: "matcolumncenter",
-      //Style: "max-width:100px",
+      Style: "min-width:14%",
+      type: "Link",
+      functionName: "BalanceFunction"
     },
     Date: {
       Title: "Date",
       class: "matcolumncenter",
-      //Style: "max-width:100px",
+      Style: "min-width:10%",
     },
     billAmount: {
-      Title: "Bill Amount",
+      Title: "Bill Amount(₹)",
       class: "matcolumnright",
-      //Style: "max-width:115px",
+      Style: "min-width:9%",
     },
     pendingAmount: {
-      Title: "Pending Amount",
+      Title: "Pending Amount(₹)",
       class: "matcolumnright",
-      //Style: "max-width:100px",
+      Style: "min-width:9%",
     },
     Status: {
       Title: "Status",
       class: "matcolumncenter",
-      //Style: "max-width:100px",
+      Style: "min-width:10",
     },
 
     actionsItems: {
       Title: "Action",
       class: "matcolumnleft",
-      Style: "max-width:80px",
+      Style: "min-width:8%",
     }
   }
   dynamicControls = {
@@ -72,7 +75,7 @@ export class VendorBillListComponent implements OnInit {
   addFlag = true;
   menuItemflag = true;
 
-  staticField = ['Status', 'pendingAmount', 'billAmount', 'billNo', 'Date', 'billType', 'vendor']
+  staticField = ['Status', 'pendingAmount', 'billAmount', 'Date', 'billType', 'vendor']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
   EventButton = {
@@ -80,7 +83,16 @@ export class VendorBillListComponent implements OnInit {
     name: "Filter",
     iconName: "filter_alt",
   };
-  constructor(private matDialog: MatDialog) { }
+  menuItems = [
+    { label: 'Approve Bill' },
+    { label: 'Bill Payment' },
+    { label: 'Hold Payment' },
+    { label: 'Unhold Payment' },
+    { label: 'Cancel Bill' },
+    { label: 'Modify' },
+  ]
+  constructor(private matDialog: MatDialog,
+    private router: Router) { }
 
   ngOnInit(): void {
   }
@@ -118,7 +130,7 @@ export class VendorBillListComponent implements OnInit {
     }
     const dialogRef = this.matDialog.open(VendorBillFilterComponent, {
       data: { DefaultData: RequestData },
-      width: "30%",
+      width: "60%",
       disableClose: true,
       position: {
         top: "20px",
@@ -129,5 +141,14 @@ export class VendorBillListComponent implements OnInit {
         console.log(result)
       }
     });
+  }
+  BalanceFunction(event) {
+    console.log('BalanceFunction', event)
+    this.router.navigate(['/Finance/VendorPayment/VendorBillPaymentDetails'], {
+      state: {
+        data: event.data
+      },
+    });
+
   }
 }

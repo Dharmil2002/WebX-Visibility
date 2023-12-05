@@ -3,7 +3,7 @@
         <form [formGroup]="vendorbillPaymentForm">
             <app-form-webxpress [form]="vendorbillPaymentForm" [FormTitle]="'Vendor : V001:Adarsh Roadlines'"
                 [formData]="jsonVendorBillPaymentArray" (functionCallEmitter)="functionCallHandler($event)"
-                [className]="'col-xl-2 col-lg-2 col-md-2 col-sm-2 mb-1 '" (callFunction)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1 '" (callFunction)="functionCallHandler($event)"
                 [showSaveAndCancelButton]="false">
             </app-form-webxpress>
         </form>
@@ -21,48 +21,14 @@
                     (onFlagChange)="selectCheckBox($event)" [onFlagChangeGetAll]="true" [FormTitle]="'Bill List'"
                     [TitleBoxData]="TotalAmountList">
                 </app-generic-table-v2>
-                <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="summaryColumnHeader"
-                    [tableData]="summaryData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
-                    [menuItems]="menuItems" [Link]="linkArray" [staticField]="summaryStaticField"
-                    [FormTitle]="'Payment Summary'" [DisplaySaveButton]=true (SubmitButtonEvent)="save()"
-                    [TableStyle]="TableStyle">
-                </app-generic-table-v2>
-                <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="summaryColumnHeader"
-                    [tableData]="OthrTableData" (functionCallEmitter)="functionCallHandler($event)"
-                    [metaData]="metaData" [menuItems]="menuItems" [Link]="linkArray" [staticField]="summaryStaticField"
-                    [FormTitle]="'Other Options For Payment'" [TableStyle]="TableStyle">
-                </app-generic-table-v2>
-
-                <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="documentHeader"
-                    [tableData]="documentData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
-                    [menuItems]="menuItems" [Link]="linkArray" [staticField]="documentSaticField"
-                    [FormTitle]="'Document Generated'" [TableStyle]="TableStyle">
-                </app-generic-table-v2>
+                <form [formGroup]="PaymentSummaryFilterForm">
+                    <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Payment Summary'"
+                        [formData]="jsonPaymentSummaryArray" (functionCallEmitter)="functionCallHandler($event)"
+                        [className]="'col-xl-4 col-lg-4 col-md-6 col-sm-6 '"
+                        (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+                    </app-form-webxpress>
+                </form>
             </div>
         </div>
     </div>
 </app-common-wrapper-webxpress>
-
-
-<style>
-    .hover {
-        text-decoration: underline;
-        font-weight: 700;
-        color: blue;
-        transition-duration: 0.5s;
-        border-radius: 50px;
-        cursor: pointer;
-    }
-
-    .hover:hover {
-        text-decoration: none;
-        color: white;
-        background-color: blue;
-    }
-
-    .flex-center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-</style>

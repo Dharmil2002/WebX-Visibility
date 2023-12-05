@@ -1,1 +1,18 @@
-<p>blance-payment-popup works!</p>
+<div>
+    <div style="margin: 5px; display: flex; justify-content: flex-end; align-items: center; padding-bottom: 5px;">
+        <button style="box-shadow: none; margin-right: 15px;background: rgba(0, 0, 0 , 0.1); color:black"
+            (click)="close()" mat-mini-fab>
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div>
+        <form [formGroup]="VendorBalancePaymentFilterForm">
+            <app-form-webxpress [form]="VendorBalancePaymentFilterForm" [FormTitle]="'Payment'"
+                [formData]="jsonControlVendorBalancePaymentFilterArray"
+                (functionCallEmitter)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1'"
+                (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+            </app-form-webxpress>
+        </form>
+    </div>
+</div>

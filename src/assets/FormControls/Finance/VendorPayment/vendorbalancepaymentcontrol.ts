@@ -362,7 +362,7 @@ export class VendorBalancePaymentControl {
       },
 
     ];
-    this.VendorBalanceTaxationPaymentDetailsArray = [
+    this.VendorBalanceTaxationPaymentDetailsArray =  [
       {
         name: "PaymentMode",
         label: "Payment Mode",
@@ -473,7 +473,16 @@ export class VendorBalancePaymentControl {
           metaData: "Basic"
         },
       },
-
+      // {
+      //   name: "ReceivedFromBank",
+      //   label: "Received From Bank",
+      //   placeholder: "Received From Bank",
+      //   type: "text",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
       {
         name: "Date",
         label: "Date",
@@ -503,7 +512,19 @@ export class VendorBalancePaymentControl {
         generatecontrol: true,
         disable: false,
       },
-
+      // {
+      //   name: "ScanSupportingdocument",
+      //   label: "Scan Supporting document",
+      //   placeholder: "Scan Supporting document",
+      //   type: "file",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      //   functions: {
+      //     onChange: "onFileSelected",
+      //   },
+      // },
 
     ];
     this.PaymenBalanceFilterArray = [

@@ -9,6 +9,7 @@ import { THCAmountsDetailComponent } from "../Modal/thcamounts-detail/thcamounts
 import { VendorBalancePaymentControl } from "src/assets/FormControls/Finance/VendorPayment/vendorbalancepaymentcontrol";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
+import { BlancePaymentPopupComponent } from "../blance-payment-popup/blance-payment-popup.component";
 
 @Component({
   selector: "app-balance-payment",
@@ -150,7 +151,8 @@ export class BalancePaymentComponent implements OnInit {
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    // public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -370,7 +372,18 @@ export class BalancePaymentComponent implements OnInit {
     });
   }
   MakePayment() {
-    this.MakePaymentVisible = true;
+    // this.MakePaymentVisible = true;
+    const dialogRef = this.matDialog.open(BlancePaymentPopupComponent, {
+      data: "",
+      width: "90%",
+      height: "95%",
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+        console.log(result);
+      }
+    });
   }
   BookVendorBill() {}
 }

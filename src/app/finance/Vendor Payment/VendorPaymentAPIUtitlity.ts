@@ -106,3 +106,17 @@ export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
     }
     return []; // Return an empty array in case of an error or missing data
 }
+export async function GetStateListFromAPI(masterService) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = {};
+        const req = { companyCode, collectionName: 'state_detail', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+
+        return res
+
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}

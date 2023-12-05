@@ -15,7 +15,7 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
 import { BlancePaymentPopupComponent } from "../blance-payment-popup/blance-payment-popup.component";
 import { Router } from "@angular/router";
-import { GetAdvancePaymentListFromApi } from "../VendorPaymentAPIUtitlity";
+import { GetAdvancePaymentListFromApi, GetStateListFromAPI } from "../VendorPaymentAPIUtitlity";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 
 @Component({
@@ -108,7 +108,10 @@ export class BalancePaymentComponent implements OnInit {
 
   VendorBalanceTaxationGSTFilterForm: UntypedFormGroup;
   jsonControlVendorBalanceTaxationGSTFilterArray: any;
+  AlljsonControlVendorBalanceTaxationGSTFilterArray: any;
 
+  AllStateList: any;
+  StateList: any;
   VendorBalanceSummaryFilterForm: UntypedFormGroup;
   jsonControlVendorBalanceSummaryFilterArray: any;
 
@@ -211,6 +214,7 @@ export class BalancePaymentComponent implements OnInit {
 
     this.jsonControlVendorBalanceTaxationGSTFilterArray =
       this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
+    this.AlljsonControlVendorBalanceTaxationGSTFilterArray = this.jsonControlVendorBalanceTaxationGSTFilterArray
     this.VendorBalanceTaxationGSTFilterForm = formGroupBuilder(this.fb, [
       this.jsonControlVendorBalanceTaxationGSTFilterArray,
     ]);
@@ -289,36 +293,30 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   async getStateDropdown() {
-    let req = {
-      companyCode: this.companyCode,
-      collectionName: "state_detail",
-      filter: {},
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
+    const resState = await GetStateListFromAPI(this.masterService)
+    this.AllStateList = resState?.data;
+    this.StateList = resState?.data
+      .map(x => ({
+        value: x.stateCode, name: x.stateName
+      }))
+      .filter(x => x != null)
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    this.filter.Filter(
+      this.jsonControlVendorBalanceTaxationGSTFilterArray,
+      this.VendorBalanceTaxationGSTFilterForm,
+      this.StateList,
+      this.BillbookingstateCode,
+      this.BillbookingstateStatus
     );
-    if (res.success) {
-      const StateData = res.data.map((x) => {
-        return {
-          name: x.stateName,
-          value: x.stateCode,
-        };
-      });
-      this.filter.Filter(
-        this.jsonControlVendorBalanceTaxationGSTFilterArray,
-        this.VendorBalanceTaxationGSTFilterForm,
-        StateData,
-        this.BillbookingstateCode,
-        this.BillbookingstateStatus
-      );
-      this.filter.Filter(
-        this.jsonControlVendorBalanceTaxationGSTFilterArray,
-        this.VendorBalanceTaxationGSTFilterForm,
-        StateData,
-        this.VendorbillstateCode,
-        this.VendorbillstateStatus
-      );
-    }
+    this.filter.Filter(
+      this.jsonControlVendorBalanceTaxationGSTFilterArray,
+      this.VendorBalanceTaxationGSTFilterForm,
+      this.StateList,
+      this.VendorbillstateCode,
+      this.VendorbillstateStatus
+    );
+
   }
 
   async getTDSSectionDropdown() {
@@ -476,4 +474,51 @@ export class BalancePaymentComponent implements OnInit {
     });
   }
   BookVendorBill() { }
+
+  StateChange(event) {
+    const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.value.Billbookingstate;
+    const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.value.Vendorbillstate;
+    if (Billbookingstate && Vendorbillstate) {
+      const IsStateTypeUT = this.AllStateList.find(item => item.stateName == Vendorbillstate.name).stateType == "UT";
+      const GSTAmount = this.tableData.reduce((accumulator, currentValue) => {
+        return accumulator + parseFloat(currentValue['BalancePending']);
+      }, 0);
+
+      if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate) {
+        this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTAmount)
+      }
+      else if (IsStateTypeUT) {
+        this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTAmount)
+      }
+      else if (!IsStateTypeUT && Billbookingstate.name != Vendorbillstate) {
+        this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTAmount)
+      }
+
+    }
+  }
+  ShowOrHideBasedOnSameOrDifferentState(Check, GSTAmount) {
+    let filterFunction;
+    switch (Check) {
+      case 'UT':
+        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'SGST';
+        break;
+      case 'SAME':
+        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'UGST';
+        break;
+      case 'DIFF':
+        filterFunction = (x) => x.name !== 'SGST' && x.name !== 'UGST' && x.name !== 'CGST';
+        break;
+    }
+    this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter(filterFunction);
+    this.jsonControlVendorBalanceTaxationGSTFilterArray.forEach(item => {
+      if (!["VendorGSTRegistered",
+        "GSTSACcode",
+        "Billbookingstate",
+        "GSTNumber",
+        "Vendorbillstate", "VGSTNumber",
+      ].includes(item.name)) {
+        this.VendorBalanceTaxationGSTFilterForm.get(item.name).setValue((GSTAmount / this.jsonControlVendorBalanceTaxationGSTFilterArray.length).toFixed(2));
+      }
+    });
+  }
 }

@@ -18,7 +18,7 @@ export class VendorBalancePaymentControl {
         Validations: [],
         functions: {
           onChange: 'toggleTDSExempted',
-      },
+        },
       },
       {
         name: "TDSSection",
@@ -138,6 +138,9 @@ export class VendorBalancePaymentControl {
           showNameAndValue: true,
           metaData: "Basic",
         },
+        functions: {
+          onOptionSelect: "StateChange"
+        },
       },
       {
         name: "GSTNumber",
@@ -189,6 +192,9 @@ export class VendorBalancePaymentControl {
         additionalData: {
           showNameAndValue: true,
           metaData: "Basic",
+        },
+        functions: {
+          onOptionSelect: "StateChange"
         },
       },
       {

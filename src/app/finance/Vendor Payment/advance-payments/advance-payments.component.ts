@@ -9,7 +9,7 @@ import { THCAmountsDetailComponent } from '../Modal/thcamounts-detail/thcamounts
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
-import { GetAccountDetailFromApi, GetAdvancePaymentListFromApi, GetLocationDetailFromApi } from '../VendorPaymentAPIUtitlity';
+import { GetAccountDetailFromApi, GetAdvancePaymentListFromApi, GetLocationDetailFromApi, GetSingleVendorDetailsFromApi } from '../VendorPaymentAPIUtitlity';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from 'src/app/Models/Finance/Finance';
@@ -103,6 +103,7 @@ export class AdvancePaymentsComponent implements OnInit {
 
   TotalAmountList: { count: any; title: string; class: string }[];
   PaymentData;
+  VendorDetails;
 
   debitVoucherRequestModel = new DebitVoucherRequestModel();
   debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
@@ -141,8 +142,16 @@ export class AdvancePaymentsComponent implements OnInit {
         class: `color-Success-light`,
       }
     ]
+    this.GetVendorInformation();
     this.GetAdvancePaymentList()
     this.SetMastersData();
+  }
+  async GetVendorInformation() {
+    this.VendorDetails = await GetSingleVendorDetailsFromApi(this.masterService, this.PaymentData.Vendor)
+    this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(this.VendorDetails?.panNo)
+    this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0)
+
+
   }
   async GetAdvancePaymentList() {
     const Filters = {
@@ -165,11 +174,8 @@ export class AdvancePaymentsComponent implements OnInit {
     this.PayableSummaryFilterForm.get('BalancePaymentlocation').setValue(paymentstate);
   }
   initializeFormControl(): void {
-    let RequestObj = {
-      VendorPANNumber: "AACCG464648ZS",
-      Numberofvehiclesregistered: "20"
-    }
-    this.vendorPaymentControl = new VendorPaymentControl(RequestObj);
+
+    this.vendorPaymentControl = new VendorPaymentControl("");
     this.jsonControlPayableSummaryFilterArray = this.vendorPaymentControl.getTPayableSummaryFilterArrayControls();
     this.PayableSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlPayableSummaryFilterArray]);
 
@@ -284,8 +290,6 @@ export class AdvancePaymentsComponent implements OnInit {
         ChequeOrRefNo.setValidators([Validators.required]);
         ChequeOrRefNo.updateValueAndValidity();
 
-
-
         const CashAccount = this.PaymentSummaryFilterForm.get('CashAccount');
         CashAccount.setValue("");
         CashAccount.clearValidators();
@@ -348,10 +352,10 @@ export class AdvancePaymentsComponent implements OnInit {
         this.debitVoucherDataRequestModel.preperedFor = "Vendor"
         this.debitVoucherDataRequestModel.partyCode = this.tableData[0].OthersData?.vendorCode
         this.debitVoucherDataRequestModel.partyName = this.tableData[0].OthersData?.vendorName
-        this.debitVoucherDataRequestModel.partyState = "VendorState";
+        this.debitVoucherDataRequestModel.partyState = this.VendorDetails?.vendorState;
         this.debitVoucherDataRequestModel.entryBy = localStorage.getItem("UserName");
         this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString()
-        this.debitVoucherDataRequestModel.panNo = ""
+        this.debitVoucherDataRequestModel.panNo = this.PaymentHeaderFilterForm.get("VendorPANNumber").value
 
         this.debitVoucherDataRequestModel.tdsSectionCode = "tdsSectionCode";
         this.debitVoucherDataRequestModel.tdsSectionName = "tdsSectionName";

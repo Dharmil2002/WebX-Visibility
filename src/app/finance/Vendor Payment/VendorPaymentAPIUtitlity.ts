@@ -91,3 +91,18 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
     }
     return []; // Return an empty array in case of an error or missing data
 }
+export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
+    try {
+        const companyCode = localStorage.getItem('companyCode');
+        const filter = { vendorName: vendorCode };
+        const req = { companyCode, collectionName: 'vendor_detail', filter };
+        const res = await masterService.masterPost('generic/get', req).toPromise();
+
+        if (res && res.data && res.data[0]) {
+            return res.data[0];
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+    return []; // Return an empty array in case of an error or missing data
+}

@@ -266,22 +266,22 @@ export class VendorPaymentControl {
           minDate: new Date(),
         },
       },
-      {
-        name: "ScanSupportingdocument",
-        label: "Scan Supporting document",
-        placeholder: "",
-        type: "file",
-        value: "",
-        Validations: [],
-        additionalData: {
-          isFileSelected: true
-        },
-        functions: {
-          onChange: "selectFileScanDocument",
-        },
-        generatecontrol: true,
-        disable: false,
-      },
+      // {
+      //   name: "ScanSupportingdocument",
+      //   label: "Scan Supporting document",
+      //   placeholder: "",
+      //   type: "file",
+      //   value: "",
+      //   Validations: [],
+      //   additionalData: {
+      //     isFileSelected: true
+      //   },
+      //   functions: {
+      //     onChange: "selectFileScanDocument",
+      //   },
+      //   generatecontrol: true,
+      //   disable: false,
+      // },
 
     ]
     this.PaymentHeaderFilterArray = [

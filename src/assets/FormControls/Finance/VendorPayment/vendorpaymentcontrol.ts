@@ -289,61 +289,46 @@ export class VendorPaymentControl {
         name: "VendorPANNumber",
         label: "Vendor PAN Number",
         placeholder: "Vendor PAN Number",
-        type: "text",
+        type: "textwithbutton",
         value: FormValues?.VendorPANNumber,
         generatecontrol: true,
         disable: false,
         Validations: [],
+        additionalData: {
+          buttonIcon: "check",
+          functionName: 'VendorPANNumberview'
+        },
       },
-      {
-        name: "VendorPANNumberVerify",
-        label: "Verify",
-        placeholder: "Verify",
-        type: "filelink",
-        value: FormValues?.VendorPANNumberVerify,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
-      // {
-      //   name: "Beneficiarydetails",
-      //   label: "Beneficiary details",
-      //   placeholder: "Beneficiary details",
-      //   type: "text",
-      //   value: FormValues?.Beneficiarydetails,
-      //   generatecontrol: true,
-      //   disable: true,
-      //   Validations: [],
-      // },
       {
         name: "BeneficiarydetailsView",
-        label: "View Beneficiary details",
-        placeholder: "View Beneficiary details",
-        type: "filelink",
-        value: FormValues?.BeneficiarydetailsView,
+        label: "Beneficiary details View",
+        placeholder: "",
+        type: "button",
+        value: "",
         generatecontrol: true,
         disable: false,
         Validations: [],
+        additionalData: {
+          buttonIcon: "book-open"
+        },
+        functions: {
+          onClick: "BeneficiarydetailsViewFunctions",
+        },
       },
+
       {
         name: "Numberofvehiclesregistered",
         label: "Number of vehicles registered",
         placeholder: "Number of vehicles registered",
-        type: "text",
+        type: "textwithbutton",
         value: FormValues?.Numberofvehiclesregistered,
         generatecontrol: true,
         disable: true,
         Validations: [],
-      },
-      {
-        name: "NumberofvehiclesregisteredView",
-        label: "View",
-        placeholder: "View",
-        type: "filelink",
-        value: FormValues?.NumberofvehiclesregisteredView,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
+        additionalData: {
+          buttonIcon: "visibility",
+          functionName: 'vehiclesregisteredview'
+        },
       },
     ]
   }

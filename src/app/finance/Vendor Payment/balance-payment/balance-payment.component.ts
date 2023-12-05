@@ -162,16 +162,16 @@ export class BalancePaymentComponent implements OnInit {
       "balAmtAt": localStorage.getItem('Branch')
     }
     const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(this.masterService, Filters)
-    console.log('GetAdvancePaymentData',GetAdvancePaymentData)
-    const Data = GetAdvancePaymentData.map((x,index)=>{
+    console.log('GetAdvancePaymentData', GetAdvancePaymentData)
+    const Data = GetAdvancePaymentData.map((x, index) => {
       return {
-        GenerationDate:x.GenerationDate,
-        VehicleNumber:x.VehicleNumber,
-        Advance:x.Advance,
-        BalancePending:x.OthersData.balAmt,
-        THC:x.THC,
-        THCamount:x.THCamount,
-        isSelected:false,
+        GenerationDate: x.GenerationDate,
+        VehicleNumber: x.VehicleNumber,
+        Advance: x.Advance,
+        BalancePending: x.OthersData.balAmt,
+        THC: x.THC,
+        THCamount: x.THCamount,
+        isSelected: false,
       }
     })
     this.tableData = Data
@@ -232,11 +232,11 @@ export class BalancePaymentComponent implements OnInit {
         this.GSTSACcodeStatus = data.additionalData.showNameAndValue;
         this.getSACcodeDropdown();
       }
-      if(data.name == "Billbookingstate"){
+      if (data.name == "Billbookingstate") {
         this.BillbookingstateCode = data.name;
         this.BillbookingstateStatus = data.additionalData.showNameAndValue;
       }
-      if(data.name == "Vendorbillstate"){
+      if (data.name == "Vendorbillstate") {
         this.VendorbillstateCode = data.name;
         this.VendorbillstateStatus = data.additionalData.showNameAndValue;
         this.getStateDropdown()
@@ -255,10 +255,10 @@ export class BalancePaymentComponent implements OnInit {
     );
     console.log(res)
     if (res.success) {
-      const GSTSACcodeData = res.data.map((x)=>{
+      const GSTSACcodeData = res.data.map((x) => {
         return {
-          name:x.SNM,
-          value:x.SID,
+          name: x.SNM,
+          value: x.SID,
         }
       })
       this.filter.Filter(
@@ -282,10 +282,10 @@ export class BalancePaymentComponent implements OnInit {
     );
     console.log(res)
     if (res.success) {
-      const StateData = res.data.map((x)=>{
+      const StateData = res.data.map((x) => {
         return {
-          name:x.stateName,
-          value:x.stateCode,
+          name: x.stateName,
+          value: x.stateCode,
         }
       })
       this.filter.Filter(
@@ -331,11 +331,20 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   BalanceUnbilledFunction(event) {
-    console.log("BalanceUnbilledFunction", event);
+    const templateBody = {
+      DocNo: event.data.THC,
+      templateName: 'thc'
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, '', 'width=1500,height=800');
   }
   THCAmountFunction(event) {
+    const RequestBody = {
+      PaymentData: this.PaymentData,
+      THCData: event?.data
+    }
     const dialogRef = this.matDialog.open(THCAmountsDetailComponent, {
-      data: "",
+      data: RequestBody,
       width: "90%",
       height: "95%",
       disableClose: true,
@@ -345,7 +354,7 @@ export class BalancePaymentComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log(result);
+        console.log(result)
       }
     });
   }
@@ -379,7 +388,7 @@ export class BalancePaymentComponent implements OnInit {
     });
   }
 
-  BeneficiarydetailsViewFunctions(event){
+  BeneficiarydetailsViewFunctions(event) {
     console.log("BeneficiarydetailsViewFunctions")
   }
   MakePayment() {
@@ -396,5 +405,5 @@ export class BalancePaymentComponent implements OnInit {
       }
     });
   }
-  BookVendorBill() {}
+  BookVendorBill() { }
 }

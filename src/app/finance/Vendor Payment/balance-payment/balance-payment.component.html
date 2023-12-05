@@ -1,9 +1,9 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
     <div class="row">
         <form [formGroup]="PaymentHeaderFilterForm">
-            <app-form-webxpress [form]="PaymentHeaderFilterForm" [FormTitle]="'Vendor : V001:Adarsh Roadlines'"
+            <app-form-webxpress [form]="PaymentHeaderFilterForm" [FormTitle]="'Vendor: ' + PaymentData.Vendor"
                 [formData]="jsonControlPaymentHeaderFilterArray" (functionCallEmitter)="functionCallHandler($event)"
-                 (callFunction)="functionCallHandler($event)"
+                [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1 '" (callFunction)="functionCallHandler($event)"
                 [showSaveAndCancelButton]="false">
             </app-form-webxpress>
         </form>

@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { THCAmountsControl } from 'src/assets/FormControls/Finance/VendorPayment/tHCAmountsControls';
@@ -24,6 +25,7 @@ export class THCAmountsDetailComponent implements OnInit {
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private dialog: MatDialog,
+    public snackBarUtilityService: SnackBarUtilityService,
     public dialogRef: MatDialogRef<THCAmountsDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public objResult: any) { }
 
@@ -65,14 +67,28 @@ export class THCAmountsDetailComponent implements OnInit {
   }
   OnChangeAdvanceAmount(event) {
     let THCTotal = 0;
+
     this.THCAmountsADDArray.forEach(item => {
-      if (item.name != "THCTotal") {
+      if (item.name !== "THCTotal") {
         const value = parseFloat(this.THCAmountsADDForm.get(item.name).value);
         THCTotal += isNaN(value) ? 0 : value;
       }
     });
-    this.THCAmountsForm.get("Balance").setValue(THCTotal - this.THCData?.Advance);
+
+    const advance = parseFloat(this.THCAmountsForm.get("Advance").value) || 0;
+    const balance = THCTotal - advance;
+
+    if (balance < 0) {
+      // Display an error message or handle the negative balance scenario
+      this.THCAmountsForm.get("Advance").setValue(this.THCData?.Advance);
+      this.snackBarUtilityService.ShowCommonSwal("error", "Advance Payment cannot be more than Balance...!");
+
+      // You can throw an error if needed: throw new Error("Balance cannot be negative.");
+    } else {
+      this.THCAmountsForm.get("Balance").setValue(balance.toFixed(2));
+    }
   }
+
   OnChangeBalanceAmount(event) {
     // this.THCAmountsForm.get("Balance").setValue(THCTotal - this.THCData?.Advance);
   }

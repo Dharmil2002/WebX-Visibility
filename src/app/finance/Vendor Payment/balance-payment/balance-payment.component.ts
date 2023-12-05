@@ -10,6 +10,8 @@ import { VendorBalancePaymentControl } from "src/assets/FormControls/Finance/Ven
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
 import { BlancePaymentPopupComponent } from "../blance-payment-popup/blance-payment-popup.component";
+import { Router } from "@angular/router";
+import { GetAdvancePaymentListFromApi } from "../VendorPaymentAPIUtitlity";
 
 @Component({
   selector: "app-balance-payment",
@@ -41,19 +43,19 @@ export class BalancePaymentComponent implements OnInit {
     THC: {
       Title: "THC",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:20%",
       type: "Link",
       functionName: "BalanceUnbilledFunction",
     },
     GenerationDate: {
       Title: "Generation date",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:12%",
     },
     VehicleNumber: {
       Title: "Vehicle No.",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:13%",
     },
     THCamount: {
       Title: "THC Amount",
@@ -90,36 +92,8 @@ export class BalancePaymentComponent implements OnInit {
     "BalancePending",
   ];
   companyCode = parseInt(localStorage.getItem("companyCode"));
-  tableData: any = [
-    {
-      THC: "VHMUM00383",
-      GenerationDate: "12-10-2023",
-      VehicleNumber: "MH02CB6655",
-      THCamount: "23450.45",
-      Advance: "5000.00",
-      BalancePending: "2000.00",
-      isSelected: false,
-    },
-    {
-      THC: "VHMUM00383",
-      GenerationDate: "12-10-2023",
-      VehicleNumber: "MH02CB6655",
-      THCamount: "23450.45",
-      Advance: "5000.00",
-      BalancePending: "2000.00",
-      isSelected: false,
-    },
-    {
-      THC: "VHMUM00383",
-      GenerationDate: "12-10-2023",
-      VehicleNumber: "MH02CB6655",
-      THCamount: "23450.45",
-      Advance: "5000.00",
-      BalancePending: "2000.00",
-      isSelected: false,
-    },
-  ];
-  isTableLode = true;
+  tableData: any;
+  isTableLode = false;
   TotalAmountList: { count: any; title: string; class: string }[];
   vendorBalancePaymentControl: VendorBalancePaymentControl;
   protected _onDestroy = new Subject<void>();
@@ -146,17 +120,27 @@ export class BalancePaymentComponent implements OnInit {
   BillbookingstateStatus: any;
   VendorbillstateCode: any;
   VendorbillstateStatus: any;
+  PaymentData: any;
 
   constructor(
     private filter: FilterUtils,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private matDialog: MatDialog,
+    private route: Router,
     // public dialog: MatDialog
-  ) {}
+  ) {
+    this.PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
+    console.log(this.PaymentData);
+    if (this.PaymentData) {
+    } else {
+      this.route.navigate(['/Finance/VendorPayment/THC-Payment']);
+    }
+  }
 
   ngOnInit(): void {
     this.initializeFormControl();
+    this.GetAdvancePaymentList();
     this.TotalAmountList = [
       {
         count: "0.00",
@@ -169,6 +153,29 @@ export class BalancePaymentComponent implements OnInit {
         class: `color-Success-light`,
       },
     ];
+  }
+
+  async GetAdvancePaymentList() {
+    this.isTableLode = false
+    const Filters = {
+      "vendorName": this.PaymentData.Vendor,
+      "balAmtAt": localStorage.getItem('Branch')
+    }
+    const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(this.masterService, Filters)
+    console.log('GetAdvancePaymentData',GetAdvancePaymentData)
+    const Data = GetAdvancePaymentData.map((x,index)=>{
+      return {
+        GenerationDate:x.GenerationDate,
+        VehicleNumber:x.VehicleNumber,
+        Advance:x.Advance,
+        BalancePending:x.OthersData.balAmt,
+        THC:x.THC,
+        THCamount:x.THCamount,
+        isSelected:false,
+      }
+    })
+    this.tableData = Data
+    this.isTableLode = true
   }
 
   initializeFormControl(): void {
@@ -371,12 +378,16 @@ export class BalancePaymentComponent implements OnInit {
       }
     });
   }
+
+  BeneficiarydetailsViewFunctions(event){
+    console.log("BeneficiarydetailsViewFunctions")
+  }
   MakePayment() {
     // this.MakePaymentVisible = true;
     const dialogRef = this.matDialog.open(BlancePaymentPopupComponent, {
       data: "",
-      width: "90%",
-      height: "95%",
+      width: "70%",
+      height: "60%",
       disableClose: true,
     });
     dialogRef.afterClosed().subscribe((result) => {

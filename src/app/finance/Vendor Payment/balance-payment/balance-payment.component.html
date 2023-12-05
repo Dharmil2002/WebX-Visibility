@@ -3,7 +3,7 @@
         <form [formGroup]="PaymentHeaderFilterForm">
             <app-form-webxpress [form]="PaymentHeaderFilterForm" [FormTitle]="'Vendor : V001:Adarsh Roadlines'"
                 [formData]="jsonControlPaymentHeaderFilterArray" (functionCallEmitter)="functionCallHandler($event)"
-                [className]="'col-xl-2 col-lg-2 col-md-2 col-sm-2 mb-1 '" (callFunction)="functionCallHandler($event)"
+                 (callFunction)="functionCallHandler($event)"
                 [showSaveAndCancelButton]="false">
             </app-form-webxpress>
         </form>

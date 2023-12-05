@@ -160,4 +160,10 @@ export class FormComponent {
     this.functionCallEmitter.emit(context);
   }
   //#endregion
+
+  buttonClick(functionName) {
+    let context = {};
+    context["functionName"] = functionName;
+    this.functionCallEmitter.emit(context);
+  }
 }

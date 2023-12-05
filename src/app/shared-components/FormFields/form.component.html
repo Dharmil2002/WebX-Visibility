@@ -28,8 +28,8 @@
                 Add New
               </button>
               <div *ngIf="EventButton">
-                <button mat-raised-button [disabled]="!form.valid" (click)="EventButtonfunctionCalled(EventButton.functionName , {})"
-                  color="primary"
+                <button mat-raised-button [disabled]="!form.valid"
+                  (click)="EventButtonfunctionCalled(EventButton.functionName , {})" color="primary"
                   style="margin-top:10px;margin-bottom: 10px; margin-right:10px;">{{EventButton.name}}</button>
               </div>
               <button type="button" (click)="toggleSection()" class="btn btn-border-radius waves-effect msl-2  mb-2"
@@ -367,6 +367,35 @@
                   <div style="text-align: center; padding-top: 21px;" *ngIf="formItem.type=='OR'">
                     <span class="label l-bg-purple shadow-style">OR</span>
                   </div>
+
+                  <div *ngIf="formItem.type === 'button' && formItem.generatecontrol"
+                    style="margin-top: 20px; display: flex; align-items: center; justify-content: center;">
+                    <button mat-stroked-button [disable]="formItem.disable"
+                      (click)="buttonClick(formItem.functions?.onClick)">
+                      <mat-icon>{{formItem.additionalData.buttonIcon}}</mat-icon>
+                      {{formItem.label}}
+                    </button>
+                  </div>
+
+                  <div *ngIf="formItem.type === 'textwithbutton' && formItem.generatecontrol">
+                    <mat-form-field appearance="outline" style="width: 100%;">
+                      <mat-label class="fontbold">{{formItem.label}}</mat-label>
+                      <input matInput type="text" [formControlName]="formItem.name"
+                        placeholder="{{formItem.placeholder}}" [readonly]="formItem.disable">
+                      <button mat-icon-button style="color: rgb(2, 166, 242);background-color: rgba(2, 166, 242, 0.12);" matSuffix class="example-full-width" type="button">
+                        <ng-container>
+                          <mat-icon  (click)="buttonClick(formItem.additionalData?.functionsName)">{{formItem.additionalData.buttonIcon}}</mat-icon>
+                        </ng-container>
+                      </button>
+                      <mat-error *ngFor="let error of formItem.Validations">
+                        <ng-container *ngIf="form.get(formItem.name).hasError(error.name)">
+                          {{error.message}}
+                        </ng-container>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+
+
 
                   <!--textbox (input) Date Timer Picker controls---------------------------------------------------------->
                   <mat-form-field class="example-full-width" appearance="outline"

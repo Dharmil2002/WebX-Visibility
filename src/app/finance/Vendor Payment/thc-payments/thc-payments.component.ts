@@ -99,7 +99,11 @@ export class ThcPaymentsComponent implements OnInit {
 
   BalanceUnbilledFunction(event) {
     console.log('BalanceUnbilledFunction', event)
-    this.router.navigate(['/Finance/VendorPayment/BalancePayment']);
+    this.router.navigate(['/Finance/VendorPayment/BalancePayment'],{
+      state: {
+        data: event.data
+      },
+    });
 
   }
 

@@ -291,7 +291,7 @@ export class AddVendorMasterComponent implements OnInit {
       "vendorPinCode",
     ];
     controlNames.forEach(controlName => {
-      const controlValue = formValue[controlName]?.name;
+      const controlValue = formValue[controlName]?.value;
       this.vendorTableForm.controls[controlName].setValue(controlValue);
     });
     const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.value);
@@ -330,7 +330,7 @@ export class AddVendorMasterComponent implements OnInit {
         update: data
       };
       // console.log(data);
-      
+
       const res = await this.masterService.masterPut("generic/update", req).toPromise()
       if (res) {
         // Display success message
@@ -377,7 +377,7 @@ export class AddVendorMasterComponent implements OnInit {
           collectionName: "vendor_detail",
           data: data
         };
-           
+
         const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
         if (res) {
           // Display success message

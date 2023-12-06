@@ -39,11 +39,11 @@ import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { EncryptionService } from '../core/service/encryptionService.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { ReportsRoutingModule } from 'src/app/Reports/reports-routing.module';
-import { CnwGstRegisterComponent } from 'src/app/Reports/cnw-gst-register/cnw-gst-register.component';
 import { PinCodeService } from '../Utility/module/masters/pincode/pincode.service';
-import { JobQueryPageComponent } from 'src/app/Reports/job-report/job-query-page/job-query-page.component';
 import { GeneralService } from '../Utility/module/masters/general-master/general-master.service';
+import { JobQueryPageComponent } from './job-report/job-query-page/job-query-page.component';
+import { CnwGstRegisterComponent } from './cnw-gst-register/cnw-gst-register.component';
+import { ReportsRoutingModule } from './reports-routing.module';
 @NgModule({
   imports: [
     CommonModule,

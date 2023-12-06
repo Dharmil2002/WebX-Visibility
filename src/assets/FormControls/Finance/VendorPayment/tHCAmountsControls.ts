@@ -3,7 +3,7 @@ export class THCAmountsControl {
     THCAmountsADDArray: FormControls[];
     THCAmountsLESSArray: FormControls[];
     THCAmountsArray: FormControls[];
-    constructor(FormValues) {
+    constructor(Type) {
         this.THCAmountsADDArray = [
             {
                 name: "ContractAmount",
@@ -236,7 +236,7 @@ export class THCAmountsControl {
                 type: "number",
                 value: 0.00,
                 generatecontrol: true,
-                disable: false,
+                disable: Type == "balance"?true:false,
                 Validations: [
                     {
                         name: "pattern",
@@ -265,7 +265,7 @@ export class THCAmountsControl {
                 type: "number",
                 value: 0.00,
                 generatecontrol: true,
-                disable: false,
+                disable: Type == "Advance"?true:false,
                 Validations: [
                     {
                         name: "pattern",

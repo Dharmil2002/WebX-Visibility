@@ -407,6 +407,8 @@ export class BalancePaymentComponent implements OnInit {
     const RequestBody = {
       PaymentData: this.PaymentData,
       THCData: event?.data,
+      Type:"balance"
+
     };
     const dialogRef = this.matDialog.open(THCAmountsDetailComponent, {
       data: RequestBody,
@@ -419,6 +421,7 @@ export class BalancePaymentComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
+        console.log('result' ,result)
       }
     });
   }

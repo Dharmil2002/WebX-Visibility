@@ -205,7 +205,8 @@ export class AdvancePaymentsComponent implements OnInit {
   THCAmountFunction(event) {
     const RequestBody = {
       PaymentData: this.PaymentData,
-      THCData: event?.data
+      THCData: event?.data,
+      Type:"Advance"
     }
     const dialogRef = this.matDialog.open(THCAmountsDetailComponent, {
       data: RequestBody,
@@ -217,6 +218,8 @@ export class AdvancePaymentsComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
+      console.log('result' , result)
+
       if (result != undefined) {
         console.log(result)
       }

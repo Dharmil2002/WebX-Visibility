@@ -22,6 +22,7 @@ export class THCAmountsDetailComponent implements OnInit {
   THCAmountsForm: UntypedFormGroup;
   PaymentData;
   THCData;
+  Type: any;
   constructor(private fb: UntypedFormBuilder,
     private masterService: MasterService,
     private dialog: MatDialog,
@@ -32,11 +33,13 @@ export class THCAmountsDetailComponent implements OnInit {
   ngOnInit(): void {
     this.PaymentData = this.objResult?.PaymentData;
     this.THCData = this.objResult?.THCData;
+    this.Type = this.objResult?.Type;
+
     console.log(this.THCData)
     this.initializeFormControl();
   }
   initializeFormControl() {
-    const thcAmountsFormControls = new THCAmountsControl('');
+    const thcAmountsFormControls = new THCAmountsControl(this.Type);
     this.THCAmountsADDArray = thcAmountsFormControls.getTHCAmountsADDControls();
     this.THCAmountsADDForm = formGroupBuilder(this.fb, [this.THCAmountsADDArray]);
 
@@ -96,6 +99,15 @@ export class THCAmountsDetailComponent implements OnInit {
   Close(): void {
     this.dialogRef.close();
   }
+  submit(){
+    const body = {
+      THCAmountsForm:this.THCAmountsForm.value,
+      THCAmountsLESSForm:this.THCAmountsLESSForm.value,
+      THCAmountsADDForm:this.THCAmountsADDForm.value,
+      THCData: this.THCData
+    }
+    this.dialogRef.close({data:body});
+  }
   cancel() {
     this.dialogRef.close()
   }
@@ -108,5 +120,5 @@ export class THCAmountsDetailComponent implements OnInit {
       console.log('Failed');
     }
   }
-
+  
 }

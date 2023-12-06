@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, take, takeUntil } from 'rxjs';
@@ -8,12 +8,11 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
-import { getJobDetailFromApi } from 'src/app/dashboard/tabs/job-summary-page/job-summary-utlity';
 import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
-
 import { jobQueryControl } from 'src/assets/FormControls/job-reports/job-query';
-import { getJobregisterReportDetail } from 'src/app/Reports/job-report/job-query-page/job-register-utlity';
+
+import { convertToCSV, getJobregisterReportDetail } from 'src/app/Utility/module/reports/job-register.service';
 
 @Component({
   selector: 'app-job-query-page',
@@ -38,311 +37,8 @@ export class JobQueryPageComponent implements OnInit {
   jobNoStatus: any;
   cnoteName: any;
   cnoteStatus: any;
-  allColumnFilter: any;
-  filterColumn: boolean = true;
-  /*below the data which is for the report*/
 
-  //#region 
-  columnHeader = {
-    jobNo: {
-      Title: "Job No",
-      class: "matcolumncenter",
-      Style: "min-width:200px",
-    },
-    jobDate: {
-      Title: "Job Date",
-      class: "matcolumncenter",
-      Style: "min-width:120px",
-    },
-    cNoteNumber: {
-      Title: "Consignment Note Number",
-      class: "matcolumncenter",
-      Style: "min-width:350px",
-    },
-    cNoteDate: {
-      Title: "Consignment Note Date",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    containerNumber: {
-      Title: "Container Number",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    billingParty: {
-      Title: "Billing Party",
-      class: "matcolumncenter",
-      Style: "min-width:180px",
-    },
-    bookingFrom: {
-      Title: "Booking From",
-      class: "matcolumncenter",
-      Style: "min-width:145px",
-    },
-    toCity: {
-      Title: "Destination",
-      class: "matcolumncenter",
-      Style: "min-width:130px",
-    },
-    pkgs: {
-      Title: "Pkgs",
-      class: "matcolumncenter",
-      Style: "max-width:70px",
-    },
-    weight: {
-      Title: "Gross Weight",
-      class: "matcolumncenter",
-      Style: "max-width:70px",
-    },
-    transportMode: {
-      Title: "Job Mode",
-      class: "matcolumncenter",
-      Style: "max-width:70px",
-    },
-    noof20ftStd: {
-      Title: "No of 20 ft Standard",
-      class: "matcolumncenter",
-      Style: "min-width:150px",
-    },
-    noof40ftStd: {
-      Title: "No of 40 ft Standard",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof40ftHC: {
-      Title: "No of 40 ft High Cube",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof45ftHC: {
-      Title: "No of 45 ft High Cube",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftRf: {
-      Title: "No of 20 ft Reefer",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof40ftRf: {
-      Title: "No of 40 ft Reefer",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof40ftHCR: {
-      Title: "No of 40 ft High Cube Reefer",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftOT: {
-      Title: "No of 20 ft Open Top",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof40ftOT: {
-      Title: "No of 40 ft Open Top",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftFR: {
-      Title: "No of 20 ft Flat Rack",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof40ftFR: {
-      Title: "No of 40 ft Flat Rack",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftPf: {
-      Title: "No of 20 ft Platform",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof40ftPf: {
-      Title: "No of 40 ft Platform",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftTk: {
-      Title: "No of 20 ft Tank",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftSO: {
-      Title: "No of 20 ft Side Open",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof40ftSO: {
-      Title: "No of 40 ft Side Open",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftI: {
-      Title: "No of 20 ft Insulated",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftH: {
-      Title: "No of 20 ft Hardtop",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof40ftH: {
-      Title: "No of 40 ft Hardtop",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftV: {
-      Title: "No of 20 ft Ventilated",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof20ftT: {
-      Title: "No of 20 ft Tunnel",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noof40ftT: {
-      Title: "No of 40 ft Tunnel",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noofBul: {
-      Title: "No of Bulktainers",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    noofSB: {
-      Title: "No of Swap Bodies",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    totalNoofcontainer: {
-      Title: "Total No of Container",
-      class: "matcolumncenter",
-      Style: "max-width:150px",
-    },
-    jobType: {
-      Title: "Job Type",
-      class: "matcolumncenter",
-      Style: "max-width:70px",
-    },
-    chargWt: {
-      Title: "Charged Weight",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    DespatchQty: {
-      Title: "Despatch Qty",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    despatchWt: {
-      Title: "Despatched Weight",
-      class: "matcolumncenter",
-      Style: "max-width:100px",
-    },
-    poNumber: {
-      Title: "PO Number",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    totalChaAmt: {
-      Title: "CHA Amount",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    voucherAmt: {
-      Title: "Voucher Amount",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    vendorBillAmt: {
-      Title: "Vendor Bill Amount",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    customerBillAmt: {
-      Title: "Customer Bill Amount",
-      class: "matcolumncenter",
-      Style: "max-width:90px",
-    },
-    status: {
-      Title: "Current Status",
-      class: "matcolumncenter",
-      Style: "min-width:100px",
-    },
-  };
-  //#endregion
-
-  //#region 
-  staticField = [
-    "noof20ftRf",
-    "noof20ftStd",
-    "noof40ftStd",
-    "noof40ftHC",
-    "noof45ftHC",
-    "noof40ftRf",
-    "noof40ftHCR",
-    "noof20ftOT",
-    "noof40ftOT",
-    "noof20ftFR",
-    "noof40ftFR",
-    "noof20ftPf",
-    "noof40ftPf",
-    "noof20ftTk",
-    "noof20ftSO",
-    "noof40ftSO",
-    "noof20ftI",
-    "noof20ftH",
-    "noof40ftH",
-    "noof20ftV",
-    "noof20ftT",
-    "noof40ftT",
-    "noofBul",
-    "noofSB",
-    "jobNo",
-    "jobDate",
-    "cNoteNumber",
-    "cNoteDate",
-    "containerNumber",
-    "billingParty",
-    "bookingFrom",
-    "toCity",
-    "pkgs",
-    "weight",
-    "transportMode",
-    "totalNoofcontainer",
-    "jobType",
-    "chargWt",
-    "DespatchQty",
-    "despatchWt",
-    "poNumber",
-    "totalChaAmt",
-    "voucherAmt",
-    "vendorBillAmt",
-    "customerBillAmt",
-    "status",
-  ];
-  //#endregion
-
-  addAndEditPath: string;
-  linkArray = [];
-  tableData: any[];
-  tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
-  METADATA = {
-    checkBoxRequired: true,
-    noColumnSort: ["checkBoxRequired"],
-  };
-  dynamicControls = {
-    add: false,
-    edit: true,
-    csv: true,
-  };
-
-  headerForCsv = {
+  CSVHeader = {
     "jobNo": "Job No",
     "jobDate": "Job Date",
     "cNoteNumber": "Consignment Note Number",
@@ -390,35 +86,30 @@ export class JobQueryPageComponent implements OnInit {
     "noof45ftHC": "45 ft High Cube",
     "totalNoofcontainer": "Total No of Container",
   }
-  csvFileName: string;
 
   constructor(
     private router: Router,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
-    private operationService: OperationService,
-    private datePipe: DatePipe
+    private operationService: OperationService
   ) {
     this.initializeFormControl();
-    this.allColumnFilter = this.columnHeader;
   }
 
   // Lifecycle hook called after Angular has initialized the component
   ngOnInit(): void {
-    // Get the current date
     const now = new Date();
-    // Calculate the date of the last week
     const lastweek = new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate() - 10
     );
     // Set the 'start' and 'end' controls in the form to the last week and current date, respectively
+    // this.jobQueryTableForm.controls["start"].setValue(lastweek);
+    // this.jobQueryTableForm.controls["end"].setValue(now);
     this.jobQueryTableForm.controls["start"].setValue(lastweek);
     this.jobQueryTableForm.controls["end"].setValue(now);
-    // Generate a CSV file name with a timestamp
-    this.csvFileName = `Job-Summary-Reports-${timeString}.csv`;
     // Call a method to get dropdown list data
     this.getDropDownList();
   }
@@ -507,11 +198,8 @@ export class JobQueryPageComponent implements OnInit {
       });
   }
 
-  // Asynchronous method to filter and save job data based on user input
   async save() {
-    // Fetch job data from the API
     let data = await getJobregisterReportDetail(this.masterService);
-    // Extract selected values from form controls
     const Location = Array.isArray(this.jobQueryTableForm.value.LocationsHandler)
       ? this.jobQueryTableForm.value.LocationsHandler.map(x => x.value)
       : [];
@@ -529,18 +217,43 @@ export class JobQueryPageComponent implements OnInit {
       const locDet = Location.length === 0 || Location.includes(record.jobLocation);
       // Check if CNote number is empty or matches the record's CNote number
       const cnoteno = cNoteNum.length === 0 || cNoteNum.includes(record.cNoteNumber);
+
       // Convert and check if the record's entry time is within the specified date range
-      const startDate = this.datePipe.transform(this.jobQueryTableForm.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      const endDate = this.datePipe.transform(this.jobQueryTableForm.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      const entryTime = record.ojobDate;
-      const isDateRangeValid = startDate <= entryTime && entryTime < endDate;
+      const startValue = new Date(this.jobQueryTableForm.controls.start.value);
+      const endValue = new Date(this.jobQueryTableForm.controls.end.value);
+      const entryTime = new Date(record.ojobDate);
+      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
+
       // Return true if all conditions are met, indicating the record should be included in the result
       return jobDet && locDet && cnoteno && isDateRangeValid;
     });
-    // Update the component's tableData with the filtered records
-    this.tableData = filteredRecords;
-    // Set the tableLoad flag to false to indicate that the data has been loaded
-    this.tableLoad = false;
+
+    // Assuming you have your selected data in a variable called 'selectedData'
+    const selectedData = filteredRecords;
+
+    // Convert the selected data to a CSV string
+    const csvString = convertToCSV(selectedData, ['ojobDate', 'jobLocation'], this.CSVHeader);
+
+    // Create a Blob (Binary Large Object) from the CSV string
+    const blob = new Blob([csvString], { type: 'text/csv' });
+
+    // Create a link element
+    const a = document.createElement('a');
+
+    // Set the href attribute of the link to the Blob URL
+    a.href = URL.createObjectURL(blob);
+
+    // Set the download attribute with the desired file name
+    a.download = `Job-Summary-Report-${timeString}.csv`;
+
+    // Append the link to the body
+    document.body.appendChild(a);
+
+    // Trigger a click on the link to start the download
+    a.click();
+
+    // Remove the link from the body
+    document.body.removeChild(a);
   }
 
   cancel() {
@@ -557,5 +270,6 @@ export class JobQueryPageComponent implements OnInit {
       console.log("failed");
     }
   }
+
 
 }

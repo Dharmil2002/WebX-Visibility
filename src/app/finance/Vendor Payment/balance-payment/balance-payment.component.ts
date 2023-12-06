@@ -1,16 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { Subject } from 'rxjs';
-import { FilterUtils } from 'src/app/Utility/dropdownFilter';
-import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { VendorPaymentControl } from 'src/assets/FormControls/Finance/VendorPayment/vendorpaymentcontrol';
-import { THCAmountsDetailComponent } from '../Modal/thcamounts-detail/thcamounts-detail.component';
-import { VendorBalancePaymentControl } from 'src/assets/FormControls/Finance/VendorPayment/vendorbalancepaymentcontrol';
+import { Component, OnInit } from "@angular/core";
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+} from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
+import { Subject, firstValueFrom } from "rxjs";
+import { FilterUtils } from "src/app/Utility/dropdownFilter";
+import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
+import { VendorPaymentControl } from "src/assets/FormControls/Finance/VendorPayment/vendorpaymentcontrol";
+import { THCAmountsDetailComponent } from "../Modal/thcamounts-detail/thcamounts-detail.component";
+import { VendorBalancePaymentControl } from "src/assets/FormControls/Finance/VendorPayment/vendorbalancepaymentcontrol";
+import { MasterService } from "src/app/core/service/Masters/master.service";
+import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
+import { BlancePaymentPopupComponent } from "../blance-payment-popup/blance-payment-popup.component";
+import { Router } from "@angular/router";
+import { GetAdvancePaymentListFromApi, GetStateListFromAPI } from "../VendorPaymentAPIUtitlity";
+import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 
 @Component({
-  selector: 'app-balance-payment',
-  templateUrl: './balance-payment.component.html',
+  selector: "app-balance-payment",
+  templateUrl: "./balance-payment.component.html",
 })
 export class BalancePaymentComponent implements OnInit {
   breadScrums = [
@@ -38,26 +48,26 @@ export class BalancePaymentComponent implements OnInit {
     THC: {
       Title: "THC",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:20%",
       type: "Link",
-      functionName: "BalanceUnbilledFunction"
+      functionName: "BalanceUnbilledFunction",
     },
     GenerationDate: {
       Title: "Generation date",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:12%",
     },
     VehicleNumber: {
       Title: "Vehicle No.",
       class: "matcolumncenter",
-      Style: "min-width:15%",
+      Style: "min-width:13%",
     },
     THCamount: {
       Title: "THC Amount",
       class: "matcolumncenter",
       Style: "min-width:15%",
       type: "Link",
-      functionName: "THCAmountFunction"
+      functionName: "THCAmountFunction",
     },
     Advance: {
       Title: "Advance",
@@ -80,36 +90,15 @@ export class BalancePaymentComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: Object.keys(this.columnHeader),
   };
-  staticField = ["GenerationDate", "VehicleNumber", "Advance", "BalancePending"];
-  companyCode = parseInt(localStorage.getItem("companyCode"));
-  tableData: any = [
-    {
-      THC: "VHMUM00383",
-      GenerationDate: "12-10-2023",
-      VehicleNumber: "MH02CB6655",
-      THCamount: "23450.45",
-      Advance: "5000.00",
-      BalancePending: "2000.00",
-    },
-    {
-      THC: "VHMUM00383",
-      GenerationDate: "12-10-2023",
-      VehicleNumber: "MH02CB6655",
-      THCamount: "23450.45",
-      Advance: "5000.00",
-      BalancePending: "2000.00",
-    },
-    {
-      THC: "VHMUM00383",
-      GenerationDate: "12-10-2023",
-      VehicleNumber: "MH02CB6655",
-      THCamount: "23450.45",
-      Advance: "5000.00",
-      BalancePending: "2000.00",
-    },
-
+  staticField = [
+    "GenerationDate",
+    "VehicleNumber",
+    "Advance",
+    "BalancePending",
   ];
-  isTableLode = true;
+  companyCode = parseInt(localStorage.getItem("companyCode"));
+  tableData: any;
+  isTableLode = false;
   TotalAmountList: { count: any; title: string; class: string }[];
   vendorBalancePaymentControl: VendorBalancePaymentControl;
   protected _onDestroy = new Subject<void>();
@@ -119,60 +108,310 @@ export class BalancePaymentComponent implements OnInit {
 
   VendorBalanceTaxationGSTFilterForm: UntypedFormGroup;
   jsonControlVendorBalanceTaxationGSTFilterArray: any;
+  AlljsonControlVendorBalanceTaxationGSTFilterArray: any;
 
+  AllStateList: any;
+  StateList: any;
   VendorBalanceSummaryFilterForm: UntypedFormGroup;
   jsonControlVendorBalanceSummaryFilterArray: any;
 
   VendorBalancePaymentFilterForm: UntypedFormGroup;
   jsonControlVendorBalancePaymentFilterArray: any;
 
+  PaymentHeaderFilterForm: UntypedFormGroup;
+  jsonControlPaymentHeaderFilterArray: any;
+  TDSSectionCodeCode: any;
+  TDSSectionCodeStatus: any;
+  GSTSACcodeCode: any;
+  GSTSACcodeStatus: any;
+  BillbookingstateCode: any;
+  BillbookingstateStatus: any;
+  VendorbillstateCode: any;
+  VendorbillstateStatus: any;
+  PaymentData: any;
+  TDSdata: any;
+  AdvanceTotle: number;
+  BalancePending: number;
+  THCamount: number;
+  AlljsonControlVendorBalanceTaxationTDSFilterArray: any;
 
-  constructor(private filter: FilterUtils,
+  constructor(
+    private filter: FilterUtils,
     private fb: UntypedFormBuilder,
-    private matDialog: MatDialog,) { }
+    private masterService: MasterService,
+    private matDialog: MatDialog,
+    private route: Router // public dialog: MatDialog
+  ) {
+    this.PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
+    if (this.PaymentData) {
+    } else {
+      this.route.navigate(["/Finance/VendorPayment/THC-Payment"]);
+    }
+  }
 
   ngOnInit(): void {
     this.initializeFormControl();
+    this.GetAdvancePaymentList();
     this.TotalAmountList = [
       {
-        count: "15000.00",
-        title: "Total Advance Amount",
-        class: `color-Ocean-danger`,
+        count: "0.00",
+        title: "Total THC Amount",
+        class: `color-Success-light`,
       },
       {
-        count: "6000.00",
+        count: "0.00",
+        title: "Total Advance Amount",
+        class: `color-Success-light`,
+      },
+      {
+        count: "0.00",
         title: "Total Balance Pending",
         class: `color-Success-light`,
-      }
-    ]
+      },
+    ];
+  }
+
+  async GetAdvancePaymentList() {
+    this.isTableLode = false;
+    const Filters = {
+      vendorName: this.PaymentData.Vendor,
+      balAmtAt: localStorage.getItem("Branch"),
+    };
+    const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(
+      this.masterService,
+      Filters
+    );
+    const Data = GetAdvancePaymentData.map((x, index) => {
+      return {
+        GenerationDate: x.GenerationDate,
+        VehicleNumber: x.VehicleNumber,
+        Advance: x.Advance,
+        BalancePending: x.OthersData.balAmt,
+        THC: x.THC,
+        THCamount: x.THCamount,
+        isSelected: false,
+      };
+    });
+    this.tableData = Data;
+    this.isTableLode = true;
   }
 
   initializeFormControl(): void {
-    this.vendorBalancePaymentControl = new VendorBalancePaymentControl("");
-    this.jsonControlVendorBalanceTaxationTDSFilterArray = this.vendorBalancePaymentControl.getVendorBalanceTaxationTDSArrayControls();
-    this.VendorBalanceTaxationTDSFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalanceTaxationTDSFilterArray]);
+    let RequestObj = {
+      VendorPANNumber: "AACCG464648ZS",
+      Numberofvehiclesregistered: "20",
+    };
+    this.vendorBalancePaymentControl = new VendorBalancePaymentControl(
+      RequestObj
+    );
+    this.jsonControlVendorBalanceTaxationTDSFilterArray =
+      this.vendorBalancePaymentControl.getVendorBalanceTaxationTDSArrayControls();
+    this.AlljsonControlVendorBalanceTaxationTDSFilterArray =
+      this.jsonControlVendorBalanceTaxationTDSFilterArray;
+    this.VendorBalanceTaxationTDSFilterForm = formGroupBuilder(this.fb, [
+      this.jsonControlVendorBalanceTaxationTDSFilterArray,
+    ]);
 
-    this.jsonControlVendorBalanceTaxationGSTFilterArray = this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
-    this.VendorBalanceTaxationGSTFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalanceTaxationGSTFilterArray]);
+    this.jsonControlVendorBalanceTaxationGSTFilterArray =
+      this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
+    this.AlljsonControlVendorBalanceTaxationGSTFilterArray = this.jsonControlVendorBalanceTaxationGSTFilterArray
+    this.VendorBalanceTaxationGSTFilterForm = formGroupBuilder(this.fb, [
+      this.jsonControlVendorBalanceTaxationGSTFilterArray,
+    ]);
 
-    this.jsonControlVendorBalanceSummaryFilterArray = this.vendorBalancePaymentControl.getVendorBalanceSummaryArrayControls();
-    this.VendorBalanceSummaryFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalanceSummaryFilterArray]);
+    this.jsonControlVendorBalanceSummaryFilterArray =
+      this.vendorBalancePaymentControl.getVendorBalanceSummaryArrayControls();
+    this.VendorBalanceSummaryFilterForm = formGroupBuilder(this.fb, [
+      this.jsonControlVendorBalanceSummaryFilterArray,
+    ]);
 
-    this.jsonControlVendorBalancePaymentFilterArray = this.vendorBalancePaymentControl.getVendorBalanceTaxationPaymentDetailsArrayControls();
-    this.VendorBalancePaymentFilterForm = formGroupBuilder(this.fb, [this.jsonControlVendorBalancePaymentFilterArray]);
+    this.jsonControlVendorBalancePaymentFilterArray =
+      this.vendorBalancePaymentControl.getVendorBalanceTaxationPaymentDetailsArrayControls();
+    this.VendorBalancePaymentFilterForm = formGroupBuilder(this.fb, [
+      this.jsonControlVendorBalancePaymentFilterArray,
+    ]);
+
+    this.jsonControlPaymentHeaderFilterArray =
+      this.vendorBalancePaymentControl.getTPaymentHeaderFilterArrayControls();
+    this.PaymentHeaderFilterForm = formGroupBuilder(this.fb, [
+      this.jsonControlPaymentHeaderFilterArray,
+    ]);
+    this.bindDropDwon();
+  }
+  bindDropDwon() {
+    this.jsonControlVendorBalanceTaxationTDSFilterArray.forEach((data) => {
+      if (data.name == "TDSSection") {
+        this.TDSSectionCodeCode = data.name;
+        this.TDSSectionCodeStatus = data.additionalData.showNameAndValue;
+        this.getTDSSectionDropdown();
+      }
+    });
+
+    this.jsonControlVendorBalanceTaxationGSTFilterArray.forEach((data) => {
+      if (data.name == "GSTSACcode") {
+        this.GSTSACcodeCode = data.name;
+        this.GSTSACcodeStatus = data.additionalData.showNameAndValue;
+        this.getSACcodeDropdown();
+      }
+      if (data.name == "Billbookingstate") {
+        this.BillbookingstateCode = data.name;
+        this.BillbookingstateStatus = data.additionalData.showNameAndValue;
+      }
+      if (data.name == "Vendorbillstate") {
+        this.VendorbillstateCode = data.name;
+        this.VendorbillstateStatus = data.additionalData.showNameAndValue;
+        this.getStateDropdown();
+      }
+    });
+  }
+
+  async getSACcodeDropdown() {
+    let req = {
+      companyCode: this.companyCode,
+      collectionName: "sachsn_master",
+      filter: {},
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPost("generic/get", req)
+    );
+    console.log(res);
+    if (res.success) {
+      const GSTSACcodeData = res.data.map((x) => {
+        return {
+          name: x.SNM,
+          value: x.SID,
+        };
+      });
+      this.filter.Filter(
+        this.jsonControlVendorBalanceTaxationGSTFilterArray,
+        this.VendorBalanceTaxationGSTFilterForm,
+        GSTSACcodeData,
+        this.GSTSACcodeCode,
+        this.GSTSACcodeStatus
+      );
+    }
+  }
+
+  async getStateDropdown() {
+    const resState = await GetStateListFromAPI(this.masterService)
+    this.AllStateList = resState?.data;
+    this.StateList = resState?.data
+      .map(x => ({
+        value: x.stateCode, name: x.stateName
+      }))
+      .filter(x => x != null)
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    this.filter.Filter(
+      this.jsonControlVendorBalanceTaxationGSTFilterArray,
+      this.VendorBalanceTaxationGSTFilterForm,
+      this.StateList,
+      this.BillbookingstateCode,
+      this.BillbookingstateStatus
+    );
+    this.filter.Filter(
+      this.jsonControlVendorBalanceTaxationGSTFilterArray,
+      this.VendorBalanceTaxationGSTFilterForm,
+      this.StateList,
+      this.VendorbillstateCode,
+      this.VendorbillstateStatus
+    );
+
+  }
+
+  async getTDSSectionDropdown() {
+    let Accountinglocation = localStorage.getItem("CurrentBranchCode");
+    let responseFromAPITDS = await GetAccountDetailFromApi(
+      this.masterService,
+      "TDS",
+      Accountinglocation
+    );
+    this.TDSdata = responseFromAPITDS;
+    this.filter.Filter(
+      this.jsonControlVendorBalanceTaxationTDSFilterArray,
+      this.VendorBalanceTaxationTDSFilterForm,
+      responseFromAPITDS,
+      this.TDSSectionCodeCode,
+      this.TDSSectionCodeStatus
+    );
+  }
+
+  GSTSACcodeFieldChanged() { }
+
+  toggleTDSExempted() {
+    const TDSExemptedValue =
+      this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted;
+
+    if (TDSExemptedValue) {
+      this.jsonControlVendorBalanceTaxationTDSFilterArray =
+        this.AlljsonControlVendorBalanceTaxationTDSFilterArray;
+      const TDSSection =
+        this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
+      TDSSection.setValidators([
+        Validators.required,
+        autocompleteObjectValidator(),
+      ]);
+      const TDSRate = this.VendorBalanceTaxationTDSFilterForm.get("TDSRate");
+      TDSRate.setValidators([Validators.required]);
+      const TDSAmount = this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+      TDSAmount.setValidators([Validators.required]);
+      TDSAmount.updateValueAndValidity();
+      this.getTDSSectionDropdown();
+    } else {
+      this.jsonControlVendorBalanceTaxationTDSFilterArray =
+        this.AlljsonControlVendorBalanceTaxationTDSFilterArray.filter(
+          (x) => x.name == "TDSExempted"
+        );
+      const TDSSection = this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
+      TDSSection.setValue("");
+      TDSSection.clearValidators();
+      const TDSRate = this.VendorBalanceTaxationTDSFilterForm.get("TDSRate");
+      TDSRate.setValue("");
+      TDSRate.clearValidators();
+      const TDSAmount = this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+      TDSAmount.setValue("");
+      TDSAmount.clearValidators();
+    }
+  }
+
+  TDSSectionFieldChanged() {
+    const FindData = this.TDSdata.find(
+      (x) =>
+        x.value ==
+        this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value
+    );
+    const TDSrate = FindData.ACdetail.CorporateTDS.toFixed(2);
+    const TDSamount = ((TDSrate * this.THCamount) / 100 || 0).toFixed(2);
+    this.VendorBalanceTaxationTDSFilterForm.controls["TDSRate"].setValue(
+      TDSrate
+    );
+    this.VendorBalanceTaxationTDSFilterForm.controls["TDSAmount"].setValue(
+      TDSamount
+    );
   }
 
   AdvancePendingFunction(event) {
-    console.log('AdvancePendingFunction', event)
+    console.log("AdvancePendingFunction", event);
   }
 
   BalanceUnbilledFunction(event) {
-    console.log('BalanceUnbilledFunction', event)
+    const templateBody = {
+      DocNo: event.data.THC,
+      templateName: "thc",
+    };
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, "", "width=1500,height=800");
   }
   THCAmountFunction(event) {
+    const RequestBody = {
+      PaymentData: this.PaymentData,
+      THCData: event?.data,
+      Type:"balance"
 
+    };
     const dialogRef = this.matDialog.open(THCAmountsDetailComponent, {
-      data: "",
+      data: RequestBody,
       width: "90%",
       height: "95%",
       disableClose: true,
@@ -182,10 +421,9 @@ export class BalancePaymentComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log(result)
+        console.log('result' ,result)
       }
     });
-
   }
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
@@ -198,14 +436,92 @@ export class BalancePaymentComponent implements OnInit {
     }
   }
   selectCheckBox(event) {
-    console.log(event)
+    this.AdvanceTotle = 0;
+    this.BalancePending = 0;
+    this.THCamount = 0;
+
+    const SelectedData = event.filter((x) => x.isSelected);
+    // if(SelectedData)
+    SelectedData.forEach((x) => {
+      this.AdvanceTotle = this.AdvanceTotle + parseInt(x.Advance);
+      this.BalancePending = this.BalancePending + parseInt(x.BalancePending);
+      this.THCamount = this.THCamount + parseInt(x.THCamount);
+    });
+    this.TotalAmountList.forEach((x) => {
+      if (x.title == "Total Advance Amount") {
+        x.count = this.AdvanceTotle.toFixed(2);
+      }
+      if (x.title == "Total Balance Pending") {
+        x.count = this.BalancePending.toFixed(2);
+      }
+      if (x.title == "Total THC Amount") {
+        x.count = this.THCamount.toFixed(2);
+      }
+    });
+    this.TDSSectionFieldChanged();
+  }
+
+  BeneficiarydetailsViewFunctions(event) {
+    console.log("BeneficiarydetailsViewFunctions");
   }
   MakePayment() {
-    this.MakePaymentVisible = true
-
+    const dialogRef = this.matDialog.open(BlancePaymentPopupComponent, {
+      data: "",
+      width: "70%",
+      height: "60%",
+      disableClose: true,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result != undefined) {
+      }
+    });
   }
-  BookVendorBill() {
+  BookVendorBill() { }
 
+  StateChange(event) {
+    const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.value.Billbookingstate;
+    const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.value.Vendorbillstate;
+    if (Billbookingstate && Vendorbillstate) {
+      const IsStateTypeUT = this.AllStateList.find(item => item.stateName == Vendorbillstate.name).stateType == "UT";
+      const GSTAmount = this.tableData.reduce((accumulator, currentValue) => {
+        return accumulator + parseFloat(currentValue['BalancePending']);
+      }, 0);
+
+      if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate) {
+        this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTAmount)
+      }
+      else if (IsStateTypeUT) {
+        this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTAmount)
+      }
+      else if (!IsStateTypeUT && Billbookingstate.name != Vendorbillstate) {
+        this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTAmount)
+      }
+
+    }
   }
-
+  ShowOrHideBasedOnSameOrDifferentState(Check, GSTAmount) {
+    let filterFunction;
+    switch (Check) {
+      case 'UT':
+        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'SGST';
+        break;
+      case 'SAME':
+        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'UGST';
+        break;
+      case 'DIFF':
+        filterFunction = (x) => x.name !== 'SGST' && x.name !== 'UGST' && x.name !== 'CGST';
+        break;
+    }
+    this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter(filterFunction);
+    this.jsonControlVendorBalanceTaxationGSTFilterArray.forEach(item => {
+      if (!["VendorGSTRegistered",
+        "GSTSACcode",
+        "Billbookingstate",
+        "GSTNumber",
+        "Vendorbillstate", "VGSTNumber",
+      ].includes(item.name)) {
+        this.VendorBalanceTaxationGSTFilterForm.get(item.name).setValue((GSTAmount / this.jsonControlVendorBalanceTaxationGSTFilterArray.length).toFixed(2));
+      }
+    });
+  }
 }

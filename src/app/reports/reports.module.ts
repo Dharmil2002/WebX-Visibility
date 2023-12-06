@@ -39,8 +39,11 @@ import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { EncryptionService } from '../core/service/encryptionService.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { JobQueryPageComponent } from './job-report/job-query-page/job-query-page.component';
-import { ReportsRoutingModule } from './reports-routing.module';
+import { ReportsRoutingModule } from 'src/app/Reports/reports-routing.module';
+import { CnwGstRegisterComponent } from 'src/app/Reports/cnw-gst-register/cnw-gst-register.component';
+import { PinCodeService } from '../Utility/module/masters/pincode/pincode.service';
+import { JobQueryPageComponent } from 'src/app/Reports/job-report/job-query-page/job-query-page.component';
+import { GeneralService } from '../Utility/module/masters/general-master/general-master.service';
 @NgModule({
   imports: [
     CommonModule,
@@ -87,11 +90,12 @@ import { ReportsRoutingModule } from './reports-routing.module';
   ],
 
   declarations: [
-    JobQueryPageComponent
+    JobQueryPageComponent,
+    CnwGstRegisterComponent
   ],
   exports:[],
 
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService, SessionService, EncryptionService]
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService, SessionService, EncryptionService, PinCodeService,GeneralService]
 })
 
 export class ReportsModule { }

@@ -1,5 +1,6 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class VendorBalancePaymentControl {
+  PaymenBalanceFilterArray: FormControls[];
   VendorBalanceTaxationTDSArray: FormControls[];
   VendorBalanceTaxationGSTArray: FormControls[];
   VendorBalanceSummaryArray: FormControls[];
@@ -11,10 +12,13 @@ export class VendorBalancePaymentControl {
         label: "TDS Exempted",
         placeholder: "TDS Exempted",
         type: "toggle",
-        value: FormValues?.TDSExempted == "Yes" ? true : false,
+        value: true,
         generatecontrol: true,
         disable: false,
         Validations: [],
+        functions: {
+          onChange: 'toggleTDSExempted',
+        },
       },
       {
         name: "TDSSection",
@@ -28,6 +32,10 @@ export class VendorBalancePaymentControl {
         disable: false,
         Validations: [
           {
+            name: "required",
+            message: "TDS Section is required",
+          },
+          {
             name: "invalidAutocompleteObject",
             message: "Choose proper value",
           },
@@ -37,27 +45,23 @@ export class VendorBalancePaymentControl {
         ],
         additionalData: {
           showNameAndValue: true,
-          metaData: "Basic"
+          metaData: "Basic",
         },
         functions: {
-          onOptionSelect: "TDSSectionFieldChanged"
+          onOptionSelect: "TDSSectionFieldChanged",
         },
       },
       {
-        name: 'TDSRate', label: 'TDS Rate %', placeholder: 'TDS Rate', type: 'number',
+        name: "TDSRate",
+        label: "TDS Rate %",
+        placeholder: "TDS Rate",
+        type: "number",
         value: "",
-        Validations: [
-          {
-            name: "pattern",
-            message: "Please Enter Valid TDS Rate",
-            pattern: '^(100|[0-9]{1,2})$'
-          },
-        ],
+        Validations: [],
 
         generatecontrol: true,
         disable: true,
       },
-
       {
         name: "TDSAmount",
         label: "TDS Amount ₹",
@@ -68,10 +72,6 @@ export class VendorBalancePaymentControl {
         disable: true,
         Validations: [],
       },
-
-
-
-
     ];
     this.VendorBalanceTaxationGSTArray = [
       {
@@ -104,11 +104,11 @@ export class VendorBalancePaymentControl {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
-          metaData: "Basic"
+          showNameAndValue: false,
+          metaData: "Basic",
         },
         functions: {
-          onOptionSelect: "GSTSACcodeFieldChanged"
+          onOptionSelect: "GSTSACcodeFieldChanged",
         },
       },
       {
@@ -124,7 +124,7 @@ export class VendorBalancePaymentControl {
         Validations: [
           {
             name: "required",
-            message: "Bill booking state is required"
+            message: "Bill booking state is required",
           },
           {
             name: "invalidAutocompleteObject",
@@ -135,8 +135,11 @@ export class VendorBalancePaymentControl {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
-          metaData: "Basic"
+          showNameAndValue: true,
+          metaData: "Basic",
+        },
+        functions: {
+          onOptionSelect: "StateChange"
         },
       },
       {
@@ -176,7 +179,7 @@ export class VendorBalancePaymentControl {
         Validations: [
           {
             name: "required",
-            message: "Vendor bill state is required"
+            message: "Vendor bill state is required",
           },
           {
             name: "invalidAutocompleteObject",
@@ -187,8 +190,11 @@ export class VendorBalancePaymentControl {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
-          metaData: "Basic"
+          showNameAndValue: true,
+          metaData: "Basic",
+        },
+        functions: {
+          onOptionSelect: "StateChange"
         },
       },
       {
@@ -214,13 +220,16 @@ export class VendorBalancePaymentControl {
       },
 
       {
-        name: 'CGSTRate', label: 'CGST Rate %', placeholder: 'CGST Rate', type: 'dayhour',
+        name: "CGSTRate",
+        label: "CGST Rate %",
+        placeholder: "CGST Rate",
+        type: "dayhour",
         value: "",
         Validations: [
           {
             name: "pattern",
             message: "Please Enter Valid CGST Rate",
-            pattern: '^(100|[0-9]{1,2})$'
+            pattern: "^(100|[0-9]{1,2})$",
           },
         ],
 
@@ -228,19 +237,22 @@ export class VendorBalancePaymentControl {
         disable: true,
         additionalData: {
           metaData: "Basic",
-          label: 'CGS Amount ₹',
+          label: "CGS Amount ₹",
           fieldName: "CGSTAmount",
           disable: true,
         },
       },
       {
-        name: 'SGSTRate', label: 'SGST Rate %', placeholder: 'SGST Rate', type: 'dayhour',
+        name: "SGSTRate",
+        label: "SGST Rate %",
+        placeholder: "SGST Rate",
+        type: "dayhour",
         value: "",
         Validations: [
           {
             name: "pattern",
             message: "Please Enter Valid SGST Rate",
-            pattern: '^(100|[0-9]{1,2})$'
+            pattern: "^(100|[0-9]{1,2})$",
           },
         ],
 
@@ -248,21 +260,23 @@ export class VendorBalancePaymentControl {
         disable: true,
         additionalData: {
           metaData: "Basic",
-          label: 'SGST Amount ₹',
+          label: "SGST Amount ₹",
           fieldName: "SGSTAmount",
           disable: true,
         },
       },
       {
-        name: 'TotalGSTRate', label: 'Total GST %', placeholder: 'Total GST', type: 'dayhour',
+        name: "TotalGSTRate",
+        label: "Total GST %",
+        placeholder: "Total GST",
+        type: "dayhour",
         value: "",
-        Validations: [
-        ],
+        Validations: [],
         generatecontrol: true,
         disable: true,
         additionalData: {
           metaData: "Basic",
-          label: 'GST Amount ₹',
+          label: "GST Amount ₹",
           fieldName: "GSTAmount",
           disable: true,
         },
@@ -359,7 +373,6 @@ export class VendorBalancePaymentControl {
         disable: true,
         Validations: [],
       },
-
     ];
     this.VendorBalanceTaxationPaymentDetailsArray = [
       {
@@ -380,7 +393,6 @@ export class VendorBalancePaymentControl {
             value: "RTGS/UTR",
             name: "RTGS/UTR",
           },
-
         ],
         filterOptions: "",
         autocomplete: "",
@@ -397,7 +409,7 @@ export class VendorBalancePaymentControl {
           showNameAndValue: true,
         },
         functions: {
-          onSelection: "OnPaymentModeChange"
+          onSelection: "OnPaymentModeChange",
         },
       },
 
@@ -412,8 +424,9 @@ export class VendorBalancePaymentControl {
         Validations: [
           {
             name: "required",
-            message: "Cheque/Ref No is required"
-          },],
+            message: "Cheque/Ref No is required",
+          },
+        ],
       },
       {
         name: "Bank",
@@ -428,7 +441,7 @@ export class VendorBalancePaymentControl {
         Validations: [
           {
             name: "required",
-            message: "Bank is required"
+            message: "Bank is required",
           },
           {
             name: "invalidAutocompleteObject",
@@ -440,7 +453,7 @@ export class VendorBalancePaymentControl {
         ],
         additionalData: {
           showNameAndValue: true,
-          metaData: "Basic"
+          metaData: "Basic",
         },
       },
 
@@ -457,7 +470,7 @@ export class VendorBalancePaymentControl {
         Validations: [
           {
             name: "required",
-            message: "Account is required"
+            message: "Account is required",
           },
           {
             name: "invalidAutocompleteObject",
@@ -469,10 +482,19 @@ export class VendorBalancePaymentControl {
         ],
         additionalData: {
           showNameAndValue: true,
-          metaData: "Basic"
+          metaData: "Basic",
         },
       },
-
+      // {
+      //   name: "ReceivedFromBank",
+      //   label: "Received From Bank",
+      //   placeholder: "Received From Bank",
+      //   type: "text",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // },
       {
         name: "Date",
         label: "Date",
@@ -494,7 +516,7 @@ export class VendorBalancePaymentControl {
         value: "",
         Validations: [],
         additionalData: {
-          isFileSelected: true
+          isFileSelected: true,
         },
         functions: {
           onChange: "selectFileScanDocument",
@@ -502,8 +524,66 @@ export class VendorBalancePaymentControl {
         generatecontrol: true,
         disable: false,
       },
+      // {
+      //   name: "ScanSupportingdocument",
+      //   label: "Scan Supporting document",
+      //   placeholder: "Scan Supporting document",
+      //   type: "file",
+      //   value: "",
+      //   generatecontrol: true,
+      //   disable: false,
+      //   Validations: [],
+      // functions: {
+      //   onChange: "onFileSelected",
+      // },
+      // },
+    ];
+    this.PaymenBalanceFilterArray = [
+      {
+        name: "VendorPANNumber",
+        label: "Vendor PAN Number",
+        placeholder: "Vendor PAN Number",
+        type: "textwithbutton",
+        value: FormValues?.VendorPANNumber,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          buttonIcon: "check",
+          functionName: "VendorPANNumberview",
+        },
+      },
+      {
+        name: "BeneficiarydetailsView",
+        label: "Beneficiary details View",
+        placeholder: "",
+        type: "button",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          buttonIcon: "book-open",
+        },
+        functions: {
+          onClick: "BeneficiarydetailsViewFunctions",
+        },
+      },
 
-
+      {
+        name: "Numberofvehiclesregistered",
+        label: "Number of vehicles registered",
+        placeholder: "Number of vehicles registered",
+        type: "textwithbutton",
+        value: FormValues?.Numberofvehiclesregistered,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+        additionalData: {
+          buttonIcon: "visibility",
+          functionName: "vehiclesregisteredview",
+        },
+      },
     ];
   }
   getVendorBalanceTaxationTDSArrayControls() {
@@ -517,5 +597,8 @@ export class VendorBalancePaymentControl {
   }
   getVendorBalanceTaxationPaymentDetailsArrayControls() {
     return this.VendorBalanceTaxationPaymentDetailsArray;
+  }
+  getTPaymentHeaderFilterArrayControls() {
+    return this.PaymenBalanceFilterArray;
   }
 }

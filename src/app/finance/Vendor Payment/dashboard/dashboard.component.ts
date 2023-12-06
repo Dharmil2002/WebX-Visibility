@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
   Transactions: any;
+  TransactionsMore: any;
   OnlinePaymentApprovals: any;
   jsonUrl = '../../../assets/data/dashboard-data.json'
   breadscrums = [
@@ -18,8 +19,9 @@ export class DashboardComponent implements OnInit {
     }
   ]
   constructor(private http: HttpClient, private router: Router,) {
-    this.Transactions = Transactions
+    this.Transactions = Transactions;
     this.OnlinePaymentApprovals = OnlinePaymentApprovals;
+    this.TransactionsMore = TransactionsMore;
   }
 
   ngOnInit(): void {
@@ -66,6 +68,11 @@ const Transactions = {
       title: "Pick up and Delivery Payments",
       class: "info-box7 bg-c-Daisy-light order-info-box7",
     },
+
+  ],
+};
+const TransactionsMore = {
+  Items: [
     {
       id: 4,
       title: "Payment against PO",

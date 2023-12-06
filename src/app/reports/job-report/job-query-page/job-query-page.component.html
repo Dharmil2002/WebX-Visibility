@@ -5,10 +5,4 @@
             [showSaveAndCancelButton]="true" [submit]="'Filter'">
         </app-form-webxpress>
     </form>
-    <app-generic-table-v2 *ngIf="!tableLoad" [csvHeaders]="headerForCsv" [dynamicControls]="dynamicControls"
-        [columnHeader]="columnHeader" [tableData]="tableData" [metaData]="metaData"
-        (selectAllClicked)="onSelectAllClicked($event)" [menuItems]="menuItems" [staticField]="staticField"
-        [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth" [csvFileName]="csvFileName"
-        [addAndEditPath]="addAndEditPath" [allColumnFilter]="allColumnFilter" [filterColumn]="filterColumn">
-    </app-generic-table-v2>
 </app-common-wrapper-webxpress>

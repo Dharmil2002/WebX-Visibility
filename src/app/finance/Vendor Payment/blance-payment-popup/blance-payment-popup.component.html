@@ -1,0 +1,17 @@
+<div>
+    <div style=" display: flex; justify-content: flex-end; align-items: center; padding-bottom: 5px;">
+        <button style="box-shadow: none; background: rgba(0, 0, 0 , 0.1); color:black"
+            (click)="close()" mat-mini-fab>
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div>
+        <form [formGroup]="VendorBalancePaymentFilterForm">
+            <app-form-webxpress [form]="VendorBalancePaymentFilterForm" [FormTitle]="'Payment'"
+                [formData]="jsonControlVendorBalancePaymentFilterArray"
+                (functionCallEmitter)="functionCallHandler($event)"
+                (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="true">
+            </app-form-webxpress>
+        </form>
+    </div>
+</div>

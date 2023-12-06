@@ -44,10 +44,10 @@ export async function getJobregisterReportDetail(masterServices) {
 
         // Create a modified job data object
         let jobData = {
-            "srNo": element.srNo = index + 1,
+            // "srNo": element.srNo = index + 1,
             "jobNo": element?.jobId || '',
+            "ojobDate": element.jobDate,
             "jobDate": formatDocketDate(element?.jobDate || new Date()),
-            "ojobDate": element?.jobDate || new Date(),
             "cNoteNumber": element.containorDetails && Array.isArray(element.containorDetails) && element.containorDetails.length > 0
                 ? element.containorDetails.map(detail => detail.cnoteNo).join(',')
                 : "",
@@ -94,11 +94,6 @@ export async function getJobregisterReportDetail(masterServices) {
             //"vendorBillAmt"
             //"customerBillAmt"
             "status": element?.status === "0" ? "Awaiting CHA Entry" : element.status === "1" ? "Awaiting Rake Entry" : "Awaiting Advance Payment",
-            "vehicleSize": element?.vehicleSize || "",
-            "transportedBy": element?.transportedBy || "",
-            "createdOn": formatDocketDate(element?.entryDate || new Date()),
-            "entryDate": element?.entryDate || new Date(),
-            "Action": element?.status === "0" ? "CHA Entry" : element.status === "1" ? "Rake Entry" : "CHA Entry",
             "jobLocation": element?.jobLocation || "",
         }
         // Push the modified job data to the array
@@ -148,5 +143,3 @@ export function convertToCSV(data: any[], excludedColumns: string[] = [], header
 
     return header + rows.join('');
 }
-
-

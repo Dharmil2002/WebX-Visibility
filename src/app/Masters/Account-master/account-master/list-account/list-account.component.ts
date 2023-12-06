@@ -26,24 +26,23 @@ export class ListAccountComponent implements OnInit {
     iconName: "add",
   };
   columnHeader = {
-    
-    AcGroupName: {
-      Title: "Account Group Name",
-      class: "matcolumncenter",
-      Style: "min-width:15%",
-    },
     AcGroupCategoryName: {
       Title: "Account Category",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
-    BalanceSheetName: {
-      Title: "Balance Sheet Name",
+    AcGroupName: {
+      Title: "Account Group Name",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
     AcLedger: {
       Title: "Account Name",
+      class: "matcolumncenter",
+      Style: "min-width:15%",
+    },
+    BalanceSheetName: {
+      Title: "Balance Sheet Name",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },

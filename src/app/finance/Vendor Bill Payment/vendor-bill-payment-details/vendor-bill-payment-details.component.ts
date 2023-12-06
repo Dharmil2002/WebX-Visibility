@@ -29,9 +29,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     noColumnSort: ["checkBoxRequired"],
   };
   tableData = VendorBillPayment
-  summaryData = PaymentSummary
-  OthrTableData = OthrPaymentSummary
-  documentData = DocumentGenerated
+
   columnHeader = {
     checkBoxRequired: {
       Title: "Select",
@@ -51,79 +49,32 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       //Style: "max-width:100px",
     },
     billAmount: {
-      Title: "Bill Amount",
+      Title: "Bill Amount (₹)",
       class: "matcolumnright",
       //Style: "max-width:100px",
     },
     debitNote: {
-      Title: "Debit Note",
+      Title: "Debit Note (₹)",
       class: "matcolumnright",
       //Style: "max-width:100px",
     },
     paid: {
-      Title: "Paid Amount",
+      Title: "Paid Amount (₹)",
       class: "matcolumnright",
       //Style: "max-width:115px",
     },
     pending: {
-      Title: "Pending Amount",
+      Title: "Pending Amount(₹)",
       class: "matcolumnright",
       //Style: "max-width:100px",
     },
     payment: {
-      Title: "Payment Amount",
+      Title: "Payment Amount (₹)",
       class: "matcolumnright",
       //Style: "max-width:100px",
     },
   }
-  summaryColumnHeader = {
 
-    paymentMethod: {
-      Title: "Payment Method",
-      class: "matcolumncenter",
-      // Style: "min-width:200px",
-    },
-    institute: {
-      Title: "Payment Institute",
-      class: "matcolumncenter",
-      //Style: "max-width:100px",
-    },
-    ref: {
-      Title: "Reference No.",
-      class: "matcolumnright",
-      //Style: "max-width:100px",
-    },
-    amt: {
-      Title: "Amount",
-      class: "matcolumnright",
-      //Style: "max-width:100px",
-    },
-
-  }
-  documentHeader = {
-    document: {
-      Title: "Document",
-      class: "matcolumncenter",
-      //Style: "max-width:200px",
-    },
-    docNo: {
-      Title: "Document Number",
-      class: "matcolumncenter",
-      //Style: "max-width:250px",
-    },
-    date: {
-      Title: "Document Date",
-      class: "matcolumncenter",
-      //Style: "max-width:150px",
-    },
-    v: {
-      Title: "",
-      class: "matcolumncenter",
-      //Style: "max-width:150px",
-      type: "Link",
-      functionName: "billNoFunction"
-    },
-  }
   TableStyle = "width:60%"
   dynamicControls = {
     add: false,
@@ -234,7 +185,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     }
   }
   save() {
-    console.log(this.summaryData);
+    console.log(this.PaymentSummaryFilterForm.value);
 
   }
   // Payment Modes Changes 

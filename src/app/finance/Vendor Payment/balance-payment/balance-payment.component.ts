@@ -15,7 +15,10 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
 import { BlancePaymentPopupComponent } from "../blance-payment-popup/blance-payment-popup.component";
 import { Router } from "@angular/router";
-import { GetAdvancePaymentListFromApi, GetStateListFromAPI } from "../VendorPaymentAPIUtitlity";
+import {
+  GetAdvancePaymentListFromApi,
+  GetStateListFromAPI,
+} from "../VendorPaymentAPIUtitlity";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 
 @Component({
@@ -214,7 +217,8 @@ export class BalancePaymentComponent implements OnInit {
 
     this.jsonControlVendorBalanceTaxationGSTFilterArray =
       this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
-    this.AlljsonControlVendorBalanceTaxationGSTFilterArray = this.jsonControlVendorBalanceTaxationGSTFilterArray
+    this.AlljsonControlVendorBalanceTaxationGSTFilterArray =
+      this.jsonControlVendorBalanceTaxationGSTFilterArray;
     this.VendorBalanceTaxationGSTFilterForm = formGroupBuilder(this.fb, [
       this.jsonControlVendorBalanceTaxationGSTFilterArray,
     ]);
@@ -274,10 +278,10 @@ export class BalancePaymentComponent implements OnInit {
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
     );
-    console.log(res);
     if (res.success) {
       const GSTSACcodeData = res.data.map((x) => {
         return {
+          ...x,
           name: x.SNM,
           value: x.SID,
         };
@@ -293,13 +297,14 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   async getStateDropdown() {
-    const resState = await GetStateListFromAPI(this.masterService)
+    const resState = await GetStateListFromAPI(this.masterService);
     this.AllStateList = resState?.data;
     this.StateList = resState?.data
-      .map(x => ({
-        value: x.stateCode, name: x.stateName
+      .map((x) => ({
+        value: x.stateCode,
+        name: x.stateName,
       }))
-      .filter(x => x != null)
+      .filter((x) => x != null)
       .sort((a, b) => a.name.localeCompare(b.name));
 
     this.filter.Filter(
@@ -316,7 +321,6 @@ export class BalancePaymentComponent implements OnInit {
       this.VendorbillstateCode,
       this.VendorbillstateStatus
     );
-
   }
 
   async getTDSSectionDropdown() {
@@ -336,7 +340,7 @@ export class BalancePaymentComponent implements OnInit {
     );
   }
 
-  GSTSACcodeFieldChanged() { }
+  GSTSACcodeFieldChanged() {}
 
   toggleTDSExempted() {
     const TDSExemptedValue =
@@ -353,7 +357,8 @@ export class BalancePaymentComponent implements OnInit {
       ]);
       const TDSRate = this.VendorBalanceTaxationTDSFilterForm.get("TDSRate");
       TDSRate.setValidators([Validators.required]);
-      const TDSAmount = this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+      const TDSAmount =
+        this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
       TDSAmount.setValidators([Validators.required]);
       TDSAmount.updateValueAndValidity();
       this.getTDSSectionDropdown();
@@ -362,32 +367,36 @@ export class BalancePaymentComponent implements OnInit {
         this.AlljsonControlVendorBalanceTaxationTDSFilterArray.filter(
           (x) => x.name == "TDSExempted"
         );
-      const TDSSection = this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
+      const TDSSection =
+        this.VendorBalanceTaxationTDSFilterForm.get("TDSSection");
       TDSSection.setValue("");
       TDSSection.clearValidators();
       const TDSRate = this.VendorBalanceTaxationTDSFilterForm.get("TDSRate");
       TDSRate.setValue("");
       TDSRate.clearValidators();
-      const TDSAmount = this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
+      const TDSAmount =
+        this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
       TDSAmount.setValue("");
       TDSAmount.clearValidators();
     }
   }
 
   TDSSectionFieldChanged() {
-    const FindData = this.TDSdata.find(
-      (x) =>
-        x.value ==
-        this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value
-    );
-    const TDSrate = FindData.ACdetail.CorporateTDS.toFixed(2);
-    const TDSamount = ((TDSrate * this.THCamount) / 100 || 0).toFixed(2);
-    this.VendorBalanceTaxationTDSFilterForm.controls["TDSRate"].setValue(
-      TDSrate
-    );
-    this.VendorBalanceTaxationTDSFilterForm.controls["TDSAmount"].setValue(
-      TDSamount
-    );
+    if (this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value) {
+      const FindData = this.TDSdata.find(
+        (x) =>
+          x.value ==
+          this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value
+      );
+      const TDSrate = FindData.ACdetail.CorporateTDS.toFixed(2);
+      const TDSamount = ((TDSrate * this.THCamount) / 100 || 0).toFixed(2);
+      this.VendorBalanceTaxationTDSFilterForm.controls["TDSRate"].setValue(
+        TDSrate
+      );
+      this.VendorBalanceTaxationTDSFilterForm.controls["TDSAmount"].setValue(
+        TDSamount
+      );
+    }
   }
 
   AdvancePendingFunction(event) {
@@ -399,16 +408,16 @@ export class BalancePaymentComponent implements OnInit {
       DocNo: event.data.THC,
       templateName: "thc",
     };
-    const url = `${window.location.origin
-      }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    const url = `${
+      window.location.origin
+    }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, "", "width=1500,height=800");
   }
   THCAmountFunction(event) {
     const RequestBody = {
       PaymentData: this.PaymentData,
       THCData: event?.data,
-      Type:"balance"
-
+      Type: "balance",
     };
     const dialogRef = this.matDialog.open(THCAmountsDetailComponent, {
       data: RequestBody,
@@ -421,7 +430,7 @@ export class BalancePaymentComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log('result' ,result)
+        console.log("result", result);
       }
     });
   }
@@ -441,7 +450,6 @@ export class BalancePaymentComponent implements OnInit {
     this.THCamount = 0;
 
     const SelectedData = event.filter((x) => x.isSelected);
-    // if(SelectedData)
     SelectedData.forEach((x) => {
       this.AdvanceTotle = this.AdvanceTotle + parseInt(x.Advance);
       this.BalancePending = this.BalancePending + parseInt(x.BalancePending);
@@ -459,6 +467,7 @@ export class BalancePaymentComponent implements OnInit {
       }
     });
     this.TDSSectionFieldChanged();
+    this.StateChange()
   }
 
   BeneficiarydetailsViewFunctions(event) {
@@ -476,52 +485,54 @@ export class BalancePaymentComponent implements OnInit {
       }
     });
   }
-  BookVendorBill() { }
+  BookVendorBill() {}
 
-  StateChange(event) {
-    const Billbookingstate = this.VendorBalanceTaxationGSTFilterForm.value.Billbookingstate;
-    const Vendorbillstate = this.VendorBalanceTaxationGSTFilterForm.value.Vendorbillstate;
-    if (Billbookingstate && Vendorbillstate) {
-      const IsStateTypeUT = this.AllStateList.find(item => item.stateName == Vendorbillstate.name).stateType == "UT";
-      const GSTAmount = this.tableData.reduce((accumulator, currentValue) => {
-        return accumulator + parseFloat(currentValue['BalancePending']);
-      }, 0);
+  StateChange() {
+    const formValues = this.VendorBalanceTaxationGSTFilterForm.value;
+    const Billbookingstate = formValues.Billbookingstate;
+    const Vendorbillstate = formValues.Vendorbillstate;
+    const SACcode = formValues.GSTSACcode;
 
-      if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate) {
-        this.ShowOrHideBasedOnSameOrDifferentState("SAME", GSTAmount)
-      }
-      else if (IsStateTypeUT) {
-        this.ShowOrHideBasedOnSameOrDifferentState("UT", GSTAmount)
-      }
-      else if (!IsStateTypeUT && Billbookingstate.name != Vendorbillstate) {
-        this.ShowOrHideBasedOnSameOrDifferentState("DIFF", GSTAmount)
-      }
+    if (Billbookingstate && Vendorbillstate && SACcode) {
+        const IsStateTypeUT = this.AllStateList.find(item => item.stateName === Vendorbillstate.name).stateType === 'UT';
+        const GSTAmount = this.tableData.filter(item => item.isSelected).reduce((acc, curr) => acc + parseFloat(curr['BalancePending']), 0);
+        const GSTdata = { GSTAmount, GSTRate: SACcode.GSTRT };
 
+        if (!IsStateTypeUT && Billbookingstate.name == Vendorbillstate.name) {
+            this.ShowOrHideBasedOnSameOrDifferentState('SAME', GSTdata);
+        } else if (IsStateTypeUT) {
+            this.ShowOrHideBasedOnSameOrDifferentState('UT', GSTdata);
+        } else if (!IsStateTypeUT && Billbookingstate.name != Vendorbillstate.name) {
+            this.ShowOrHideBasedOnSameOrDifferentState('DIFF', GSTdata);
+        }
     }
   }
-  ShowOrHideBasedOnSameOrDifferentState(Check, GSTAmount) {
-    let filterFunction;
-    switch (Check) {
-      case 'UT':
-        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'SGST';
-        break;
-      case 'SAME':
-        filterFunction = (x) => x.name !== 'IGST' && x.name !== 'UGST';
-        break;
-      case 'DIFF':
-        filterFunction = (x) => x.name !== 'SGST' && x.name !== 'UGST' && x.name !== 'CGST';
-        break;
-    }
-    this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter(filterFunction);
-    this.jsonControlVendorBalanceTaxationGSTFilterArray.forEach(item => {
-      if (!["VendorGSTRegistered",
-        "GSTSACcode",
-        "Billbookingstate",
-        "GSTNumber",
-        "Vendorbillstate", "VGSTNumber",
-      ].includes(item.name)) {
-        this.VendorBalanceTaxationGSTFilterForm.get(item.name).setValue((GSTAmount / this.jsonControlVendorBalanceTaxationGSTFilterArray.length).toFixed(2));
-      }
-    });
+
+  ShowOrHideBasedOnSameOrDifferentState(Check, GSTdata) {
+    const filterFunctions = {
+        'UT': x => x.name !== 'IGSTRate' && x.name !== 'SGSTRate',
+        'SAME': x => x.name !== 'IGSTRate' && x.name !== 'UGSTRate',
+        'DIFF': x => x.name !== 'SGSTRate' && x.name !== 'UGSTRate' && x.name !== 'CGSTRate'
+    };
+
+    const GSTinputType = ['SGSTRate', 'UGSTRate', 'CGSTRate', 'IGSTRate'];
+
+    this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray.filter(filterFunctions[Check]);
+
+    const GSTinput = this.jsonControlVendorBalanceTaxationGSTFilterArray
+        .filter(item => GSTinputType.includes(item.name))
+        .map(item => item.name);
+
+    const GSTCalculateAmount = ((GSTdata.GSTAmount * GSTdata.GSTRate) / (100 * GSTinput.length)).toFixed(2);
+    const GSTCalculateRate = (GSTdata.GSTRate / GSTinput.length).toFixed(2);
+
+    const calculateValues = (rateKey, amountKey) => {
+      this.VendorBalanceTaxationGSTFilterForm.get(rateKey).setValue(GSTCalculateRate);
+      this.VendorBalanceTaxationGSTFilterForm.get(amountKey).setValue(GSTCalculateAmount);
+    };
+    GSTinput.forEach(x => calculateValues(x, x.substring(0,4) + 'Amount'));
+
+    this.VendorBalanceTaxationGSTFilterForm.get('TotalGSTRate').setValue((+GSTCalculateRate * GSTinput.length).toFixed(2));
+    this.VendorBalanceTaxationGSTFilterForm.get('GSTAmount').setValue((+GSTCalculateAmount * GSTinput.length).toFixed(2));
   }
 }

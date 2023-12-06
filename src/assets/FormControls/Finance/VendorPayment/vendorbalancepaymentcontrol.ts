@@ -108,7 +108,7 @@ export class VendorBalancePaymentControl {
           metaData: "Basic",
         },
         functions: {
-          onOptionSelect: "GSTSACcodeFieldChanged",
+          onOptionSelect: "StateChange"
         },
       },
       {
@@ -151,10 +151,6 @@ export class VendorBalancePaymentControl {
         generatecontrol: true,
         disable: false,
         Validations: [
-          // {
-          //   name: "required",
-          //   message: "GST Number is required",
-          // },
           {
             name: "pattern",
             pattern:
@@ -232,7 +228,6 @@ export class VendorBalancePaymentControl {
             pattern: "^(100|[0-9]{1,2})$",
           },
         ],
-
         generatecontrol: true,
         disable: true,
         additionalData: {
@@ -266,6 +261,52 @@ export class VendorBalancePaymentControl {
         },
       },
       {
+        name: "UGSTRate",
+        label: "UGST Rate %",
+        placeholder: "UGST Rate",
+        type: "dayhour",
+        value: "",
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter Valid UGST Rate",
+            pattern: "^(100|[0-9]{1,2})$",
+          },
+        ],
+
+        generatecontrol: true,
+        disable: true,
+        additionalData: {
+          metaData: "Basic",
+          label: "UGST Amount ₹",
+          fieldName: "UGSTAmount",
+          disable: true,
+        },
+      },
+      {
+        name: "IGSTRate",
+        label: "IGST Rate %",
+        placeholder: "IGST Rate",
+        type: "dayhour",
+        value: "",
+        Validations: [
+          {
+            name: "pattern",
+            message: "Please Enter Valid IGST Rate",
+            pattern: "^(100|[0-9]{1,2})$",
+          },
+        ],
+
+        generatecontrol: true,
+        disable: true,
+        additionalData: {
+          metaData: "Basic",
+          label: "IGST Amount ₹",
+          fieldName: "IGSTAmount",
+          disable: true,
+        },
+      },
+      {
         name: "TotalGSTRate",
         label: "Total GST %",
         placeholder: "Total GST",
@@ -295,6 +336,26 @@ export class VendorBalancePaymentControl {
         name: "SGSTAmount",
         label: "SGST Amount ₹",
         placeholder: "SGST Amount ₹",
+        type: "number",
+        value: "",
+        generatecontrol: false,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "UGSTAmount",
+        label: "UGST Amount ₹",
+        placeholder: "UGST Amount ₹",
+        type: "number",
+        value: "",
+        generatecontrol: false,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "IGSTAmount",
+        label: "IGST Amount ₹",
+        placeholder: "IGST Amount ₹",
         type: "number",
         value: "",
         generatecontrol: false,

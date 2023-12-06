@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 
@@ -14,43 +15,18 @@ export class AddressMasterListComponent implements OnInit {
   toggleArray = ["activeFlag"];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   linkArray = []
-  columnHeader = {
-    updatedDate: {
-      Title: "Created Date",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    addressCode: {
-      Title: "Address Code",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    manualCode: {
-      Title: "Manual Code",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    cityName: {
-      Title: "City Name",
-      class: "matcolumnleft",
-      Style: "max-width:150px",
-    },
-    address: {
-      Title: "Address",
-      class: "matcolumnleft",
-      Style: "max-width:480px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-y: auto; max-height: 3em;",
-    },
-    activeFlag: {
-      Title: "Active Status",
-      class: "matcolumnleft",
-      Style: "max-width:100px",
-    },
-    actions: {
-      Title: "Active Status",
-      class: "matcolumnleft",
-      Style: "max-width:100px",
-    },
-  };
+
+  columnHeader =
+    {
+      // "srNo": "Sr No",
+      "updatedDate": "Created Date",
+      "addressCode": "Address Code",
+      "manualCode": "Manual Code",
+      "cityName": "City Name",
+      "address": "Address",
+      "activeFlag": "Active Flag",
+      "actions": "Actions",
+    }
   staticField = [
     "updatedDate",
     "addressCode",
@@ -77,67 +53,59 @@ export class AddressMasterListComponent implements OnInit {
   ngOnInit(): void {
     this.getAddressDetails();
   }
-  getAddressDetails() {
-    const request = {
-      companyCode: this.companyCode,
-      collectionName: "address_detail",
-      filter: {}
-    };
-    this.masterService.masterPost('generic/get', request).subscribe({
-      next: (response: any) => {
-        if (response) {
-          // Sort the data by updatedDate in descending order (most recent first)
-          const sortedData = response.data.sort((a, b) => {
-            return new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime();
-          });
-          // Generate srno for each object in the array and format the updatedDate
-          const dataWithFormattedDate = sortedData.map((item, index) => {
-            const formattedDate = formatDate(item.updatedDate);
-            return {
-              ...item,
-              updatedDate: formattedDate,
-            };
-          });
-          // Extract the updatedDate from the first element (latest record)
-          const latestUpdatedDate = sortedData.length > 0 ? sortedData[0].updatedDate : null;
-          this.csv = dataWithFormattedDate;
-          this.tableLoad = false;
-        }
+
+
+  async getAddressDetails() {
+    try {
+      const req = {
+        "companyCode": this.companyCode,
+        "filter": {},
+        "collectionName": "address_detail"
+      };
+      const res: any = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+      if (res && res.data) {
+        const data = res.data;
+        // Sort the data based on updatedDate in descending order
+        const dataWithDate = data.sort((a, b) => new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime());
+        // Extract the updatedDate from the first element (latest record)
+        const latestUpdatedDate = dataWithDate.length > 0 ? dataWithDate[0].updatedDate : null;
+        // Use latestUpdatedDate as needed
+        this.csv = dataWithDate;
+        this.tableData = dataWithDate;
       }
-    });
-    function formatDate(dateString) {
-      const formattedDate = new Date(dateString);
-      const formatDatePart = (value) => (value < 10 ? '0' : '') + value;
-      const formattedDateStr = `${formatDatePart(formattedDate.getDate())}-${formatDatePart(formattedDate.getMonth() + 1)}-${formattedDate.getFullYear()}`;
-      const formattedTimeStr = `${formatDatePart(formattedDate.getHours())}:${formatDatePart(formattedDate.getMinutes())}`;
-      return `${formattedDateStr} ${formattedTimeStr}`;
+      this.tableLoad = false;
+    } catch (error) {
+      // Handle errors here
+      console.error("Error fetching driver details:", error);
     }
   }
 
-  IsActiveFuntion(det) {
-    let id = det._id;
-    // Remove the "id" field from the form controls
-    delete det._id;
-    // delete det.srNo;
-    let req = {
-      companyCode: parseInt(localStorage.getItem("companyCode")),
-      collectionName: "address_detail",
-      filter: { _id: id },
-      update: det
-    };
-    this.masterService.masterPut('generic/update', req).subscribe({
-      next: (res: any) => {
-        if (res) {
-          // Display success message
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-          this.getAddressDetails();
-        }
+  async isActiveFuntion(det) {
+    try {
+      let id = det._id;
+      // Remove the "id" field from the form controls
+      delete det._id;
+      delete det.srNo;
+      let req = {
+        companyCode: parseInt(localStorage.getItem("companyCode")),
+        collectionName: "address_detail",
+        filter: { _id: id },
+        update: det
+      };
+      const res: any = await firstValueFrom(this.masterService.masterPut('generic/update', req))
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: res.message,
+          showConfirmButton: true,
+        });
+        this.getAddressDetails();
       }
-    });
+    } catch (error) {
+      // Handle errors here
+      console.error("Error updating driver details:", error);
+    }
   }
 }

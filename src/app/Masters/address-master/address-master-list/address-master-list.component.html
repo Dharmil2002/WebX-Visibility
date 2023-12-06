@@ -1,13 +1,21 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
-    <!-- <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
+<!-- <app-common-wrapper-webxpress [breadscrums]="breadScrums">
+     <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
         [csvFileName]="csvFileName" [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
           [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
         [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" (onFlagChange)="IsActiveFuntion($event)"
         [TableStyle]="TableStyle">
     </generic-table-webxpress> -->
-    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    <!--<app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
       [tableData]="csv" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
       [menuItems]="menuItems" [staticField]="staticField"  [Link]="linkArray" [height]="height" [width]="width"
       [maxWidth]="maxWidth" (onFlagChange)="IsActiveFuntion($event)" [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag">
     </app-generic-table-v2>
+</app-common-wrapper-webxpress> -->
+
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
+  <generic-table-webxpress *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
+      [csvFileName]="csvFileName" [csvHeaders]="headerForCsv" [addAndEditPath]="addAndEditPath" [metaData]="METADATA" [Link]="linkArray"
+      [toggleArray]="toggleArray" [menuItems]="menuItems" (menuItemClicked)="handleMenuItemClick($event)"
+      [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls" (onFlagChange)="isActiveFuntion($event)">
+  </generic-table-webxpress>
 </app-common-wrapper-webxpress>

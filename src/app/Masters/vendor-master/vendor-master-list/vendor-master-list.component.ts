@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { VendorMasterViewComponent } from "../vendor-master-view/vendor-master-view.component";
 import Swal from "sweetalert2";
 import moment from "moment";
-import { firstValueFrom } from "rxjs";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -81,29 +81,25 @@ export class VendorMasterListComponent implements OnInit {
   }
   ngOnInit(): void {
     this.getVendorDetails();
+    // this.viewComponent = VendorMasterViewComponent
     this.csvFileName = "Vendor Details"  //setting csv file Name so file will be saved as per this name
   }
-  //#region to get vendor list
   async getVendorDetails() {
-    try {
-      const req = {
-        "companyCode": this.companyCode,
-        "collectionName": "vendor_detail",
-        "filter": {}
-      };
-
-      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-      const vendorTypeData = await this.fetchData();
-
+    let req = {
+      "companyCode": this.companyCode,
+      "collectionName": "vendor_detail",
+      "filter": {}
+    }
+    const res = await this.masterService.masterPost("generic/get", req).toPromise()
+    if (res) {
       // Generate srno for each object in the array
       const dataWithSrno = res.data
         .map((obj) => {
-          const vendorType = vendorTypeData.find(x => parseInt(x.value) === obj.vendorType);
-
           return {
             ...obj,
+            // srNo: index + 1,
             vendorName: obj.vendorName.toUpperCase(),
-            vendorType: vendorType ? vendorType.name.toUpperCase() : '',
+            vendorType: obj.vendorType.toUpperCase(),
             eNTDT: moment(obj.eNTDT).format('DD-MM-YYYY HH:mm')
           };
         })
@@ -111,18 +107,8 @@ export class VendorMasterListComponent implements OnInit {
 
       this.csv = dataWithSrno;
       this.tableLoad = false;
-
-    } catch (error) {
-      console.error("Error in getVendorDetails:", error);
     }
   }
-  async fetchData() {
-    const { vendorTypeDropdown }: any = await this.masterService.getJsonFileDetails('dropDownUrl').toPromise();
-    // Use vendorTypeDropdown here or return it
-    return vendorTypeDropdown;
-  }
-  //#endregion
-  //#region to manage active flag
   async isActiveFuntion(det) {
     let id = det._id;
     // Remove the "_id" field from the form controls
@@ -137,7 +123,7 @@ export class VendorMasterListComponent implements OnInit {
       filter: { _id: id },
       update: det
     };
-    const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+    const res = await this.masterService.masterPut("generic/update", req).toPromise()
     if (res) {
       // Display success message
       Swal.fire({
@@ -149,5 +135,4 @@ export class VendorMasterListComponent implements OnInit {
       this.getVendorDetails();
     }
   }
-  //#endregion
 }

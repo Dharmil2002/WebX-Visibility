@@ -75,6 +75,7 @@ export class PrqSummaryPageComponent implements OnInit {
           });
           return null;
         } else {
+          debugger;
           this.router.navigate([data.label.route], {
             state: {
               data: data.data

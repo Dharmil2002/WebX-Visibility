@@ -26,19 +26,19 @@ export class ListGroupComponent implements OnInit {
     iconName: "add",
   };
   columnHeader = {
-
+    
     Groupcode: {
       Title: "Group Code",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    AcGroupCatName: {
-      Title: "Account Group Cat.",
+    GroupName: {
+      Title: "Group Name",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    GroupName: {
-      Title: "Group Name",
+    AcGroupCatName: {
+      Title: "Account Group Cat.",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },

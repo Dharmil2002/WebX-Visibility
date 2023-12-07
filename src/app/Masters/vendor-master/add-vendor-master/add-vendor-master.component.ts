@@ -8,7 +8,7 @@ import { VendorControl } from "src/assets/FormControls/vendor-control";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
 import { convertNumericalStringsToInteger } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
-import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
+import { Subject, take, takeUntil } from "rxjs";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
@@ -249,8 +249,8 @@ export class AddVendorMasterComponent implements OnInit {
         "collectionName": "pincode_master",
         "filter": {}
       }
-      const locationBranchResponse = await firstValueFrom(this.masterService.masterPost("generic/get", reqBody));
-      this.pincodeResponse = await firstValueFrom(this.masterService.masterPost("generic/get", pincodeBody));
+      const locationBranchResponse = await this.masterService.masterPost("generic/get", reqBody).toPromise();
+      this.pincodeResponse = await this.masterService.masterPost("generic/get", pincodeBody).toPromise();
       const locationBranchList = locationBranchResponse.data.map((x) => { { return { name: x.locName, value: x.locCode } } })
       this.pincodeData = this.pincodeResponse.data
         .map((element) => ({
@@ -291,7 +291,7 @@ export class AddVendorMasterComponent implements OnInit {
       "vendorPinCode",
     ];
     controlNames.forEach(controlName => {
-      const controlValue = formValue[controlName]?.value;
+      const controlValue = formValue[controlName]?.name;
       this.vendorTableForm.controls[controlName].setValue(controlValue);
     });
     const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.value);
@@ -329,8 +329,8 @@ export class AddVendorMasterComponent implements OnInit {
         filter: { _id: id },
         update: data
       };
-      // console.log(data);
-
+      console.log(data);
+      
       const res = await this.masterService.masterPut("generic/update", req).toPromise()
       if (res) {
         // Display success message
@@ -349,7 +349,7 @@ export class AddVendorMasterComponent implements OnInit {
         collectionName: "vendor_detail",
         filter: {},
       }
-      const resVendor = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+      const resVendor = await this.masterService.masterPost("generic/get", req).toPromise()
       if (resVendor) {
         // Generate srno for each object in the array
         const lastCode = resVendor.data[resVendor.data.length - 1];
@@ -377,8 +377,7 @@ export class AddVendorMasterComponent implements OnInit {
           collectionName: "vendor_detail",
           data: data
         };
-
-        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req));
+        const res = await this.masterService.masterPost("generic/create", req).toPromise()
         if (res) {
           // Display success message
           Swal.fire({
@@ -480,7 +479,7 @@ export class AddVendorMasterComponent implements OnInit {
       };
 
       // Send the request to fetch user data
-      const userlist = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+      const userlist = await this.masterService.masterPost("generic/get", req).toPromise();
 
       // Check if data exists for the given filter criteria
       if (userlist.data.length > 0) {

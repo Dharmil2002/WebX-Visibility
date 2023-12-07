@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 import { filterAndUnique } from "src/app/Utility/Form Utilities/filter-utils";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -96,52 +97,109 @@ export class PinCodeService {
   }
   //#endregion 
   /*get city on pinCode based*/
-  async getCity(form, jsondata, cityControlName, citycodeStatus) {
+  async getCity(form, jsondata, controlName, codeStatus) {
     try {
-      const cityValue = form.controls[cityControlName].value;
-
+      const cValue = form.controls[controlName].value;
+      
       // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
-      if (cityValue.length >= 3) {
-        const filter = {}
+      if (cValue.length >= 3) {        
+        const filter = { CT: {'D$regex' : `^${cValue}`, 'D$options' : 'i'} }
 
         // Prepare the pincodeBody with the companyCode and the determined filter
         const cityBody = {
-          companyCode: this.companyCode,
+          companyCode: localStorage.getItem("companyCode"), 
           collectionName: "pincode_master",
           filter,
         };
 
         // Fetch pincode data from the masterService asynchronously
-        const cityResponse = await this.masterService.masterPost("generic/get", cityBody).toPromise();
-        // Extract the cityCodeData from the response
-       const cityCodeData = filterAndUnique(
-          cityResponse.data,
-          (element: { CT: string }) => element.CT.toLowerCase().includes(cityValue.toLowerCase()),
+        const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+        
+         // Extract data from the response
+        const codeData = filterAndUnique(
+          cResponse.data,
+          (element: { CT: string }) => element.CT.toLowerCase().startsWith(cValue.toLowerCase()),
           (ct: { CT: string }) => ({ name: ct.CT, value: ct.CT })
         );
+        
         // Filter cityCodeData for partial matches
-        if (cityCodeData.length === 0) {
+        if (codeData.length === 0) {
           // Show a popup indicating no data found for the given pincode
-          Swal.fire({
-            icon: "info",
-            title: "No Data Found",
-            text: `No data found for City ${cityValue}`,
-            showConfirmButton: true,
-          });
+          console.log(`No data found for City ${cValue}`);
+          // Swal.fire({
+          //   icon: "info",
+          //   title: "No Data Found",
+          //   text: `No data found for City ${cValue}`,
+          //   showConfirmButton: true,
+          // });
         } else {
           // Call the filter function with the filtered data
           this.filter.Filter(
             jsondata,
             form,
-            cityCodeData,
-            cityControlName,
-            citycodeStatus
+            codeData,
+            controlName,
+            codeStatus
           );
         }
       }
     } catch (error) {
       // Handle any errors that may occur during the asynchronous operation
-      console.error("Error fetching city data:", error);
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  async getPincodes(form, jsondata, controlName, codeStatus, city, stateCode) {
+    try {
+      const cValue = form.controls[controlName].value;
+      
+      // Check if filterValue is provided and pincodeValue is a valid number with at least 3 characters
+      if (cValue.length >= 3) {
+        let gte = parseInt(`${cValue}00000`.slice(0, 6));
+        let lte = parseInt(`${cValue}99999`.slice(0, 6));
+        const filter = { PIN: {'D$gte' : gte, 'D$lte' : lte} }
+        if(city)
+          filter["CT"] = city;
+        if(stateCode)
+          filter["ST"] = stateCode;
+
+        // Prepare the pincodeBody with the companyCode and the determined filter
+        const cityBody = {
+          companyCode: localStorage.getItem("companyCode"), 
+          collectionName: "pincode_master",
+          filter,
+        };
+
+        // Fetch pincode data from the masterService asynchronously
+        const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+        
+         // Extract data from the response
+        const codeData = cResponse.data.map((x) => { return { name: x.PIN, value: x.PIN } });
+        
+        // Filter cityCodeData for partial matches
+        if (codeData.length === 0) {
+          // Show a popup indicating no data found for the given pincode
+          console.log(`No data found for City ${cValue}`);
+          // Swal.fire({
+          //   icon: "info",
+          //   title: "No Data Found",
+          //   text: `No data found for City ${cValue}`,
+          //   showConfirmButton: true,
+          // });
+        } else {
+          // Call the filter function with the filtered data
+          this.filter.Filter(
+            jsondata,
+            form,
+            codeData,
+            controlName,
+            codeStatus
+          );
+        }
+      }
+    } catch (error) {
+      // Handle any errors that may occur during the asynchronous operation
+      console.error("Error fetching data:", error);
     }
   }
 }

@@ -4,7 +4,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 120px;
     }
 
     .clickable-grid:hover {
@@ -15,10 +14,10 @@
 <div>
     <h4 class="m-b-10">{{boxData?.Title}}</h4>
     <div *ngIf="boxData?.Items" class="row clearfix dashboardcard">
-        <div class="col-lg-3 col-md-3 col-sm-4 clickable-grid" *ngFor="let box of boxData?.Items" [style]="style"
+        <div class="col-lg-2 col-sm-2 clickable-grid" *ngFor="let box of boxData?.Items" [style]="style"
             [matMenuTriggerFor]="box.Menu ? menu : null" (click)="handleItemClick(box)">
-            <div [class]="box.class" style="height:90%;width:90%">
-                <div class="info-box7-block" style="text-align:center;">
+            <div [class]="box.class">
+                <div class="info-box7-block" style="text-align:center;min-height: 120px;">
                     <h5 class="m-b-10 m-t-20 white">{{box.title}}</h5>
                 </div>
             </div>

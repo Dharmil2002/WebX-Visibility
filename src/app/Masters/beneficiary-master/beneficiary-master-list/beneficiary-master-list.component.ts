@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
 @Component({
@@ -58,7 +57,7 @@ export class BeneficiaryMasterListComponent implements OnInit {
       };
 
       // Make the API call and await the response
-      const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+      const res = await this.masterService.masterPost('generic/get', req).toPromise();
 
       if (res) {
         // Enrich the data with beneficiary names
@@ -153,7 +152,7 @@ export class BeneficiaryMasterListComponent implements OnInit {
       collectionName,
     };
     try {
-      const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+      const res = await this.masterService.masterPost('generic/get', req).toPromise();
       return res;
     } catch (error) {
       console.error(error);

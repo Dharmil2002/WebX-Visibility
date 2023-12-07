@@ -41,7 +41,34 @@ export async function getVendorDetails(masterService) {
     
       return vendorDetail;
     }
-    
+}
+
+// This function retrieves vendor details from a MongoDB collection using a master service.
+export async function getVendorsForAutoComplete(masterService, vendor, vendorType) {
+  // Prepare the request object with company code, collection name, and an empty filter.
+  let req = {
+    "companyCode": parseInt(localStorage.getItem("companyCode")),
+    "collectionName": "vendor_detail",
+    "filter": { 'D$or': [
+                  { 'vendorName': { 'D$regex': `^${vendor}`, 'D$options': 'i' } },
+                  { 'vendorCode': { 'D$regex': `^${vendor}`, 'D$options': 'i'} }
+                ],
+                'vendorLocation': { 'D$elemMatch': { 'D$eq': branch } },                
+                'isActive': true,
+                'vendorType': vendorType
+              }
+  }
+  // Send a POST request to retrieve vendor details from the MongoDB collection.
+  const res = await masterService.masterPost("generic/get", req).toPromise()
+  if (res) {
+    // Filter and map the array to generate 'vendorDetail'
+    return res.data
+      .map((obj) => ({
+        name: obj?.vendorName || "",
+        value: obj?.vendorCode || "",
+        type: obj?.vendorType||"",
+      }));
+  }
 }
 
 // This function gets the next sequential number, formats it, and updates it in localStorage.

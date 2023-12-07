@@ -1,30 +1,19 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ThcPaymentFilterComponent } from "../Modal/thc-payment-filter/thc-payment-filter.component";
-import { Router } from "@angular/router";
-import { GetTHCListFromApi } from "../VendorPaymentAPIUtitlity";
-import { MasterService } from "src/app/core/service/Masters/master.service";
 
 @Component({
   selector: "app-thc-payments",
   templateUrl: "./thc-payments.component.html",
 })
 export class ThcPaymentsComponent implements OnInit {
-  tableData: any;
   breadScrums = [
     {
       title: "THC Payments",
       items: ["Home"],
-      active: "THC Payments",
+      active: "List",
     },
   ];
-  RequestData = {
-    vendorList: [
-
-    ],
-    StartDate: new Date(-30),
-    EndDate: new Date()
-  }
   linkArray = [];
   menuItems = [];
 
@@ -76,35 +65,57 @@ export class ThcPaymentsComponent implements OnInit {
   };
   staticField = ["SrNo", "Vendor", "THCamount"];
   companyCode = parseInt(localStorage.getItem("companyCode"));
+  tableData: any = [
+    {
+      SrNo: "1",
+      Vendor: "V001: Adarsh Roadlines",
+      THCamount: "234500.45",
+      AdvancePending: "126400.00",
+      BalanceUnbilled: "108100.00",
+    },
+    {
+      SrNo: "2",
+      Vendor: "V003: KJ Transport",
+      THCamount: "210980.00",
+      AdvancePending: "178900.50",
+      BalanceUnbilled: "178900.50",
+    },
+    {
+      SrNo: "3",
+      Vendor: "V0223: Kanishka Roadlines",
+      THCamount: "178650.60",
+      AdvancePending: "87600.50",
+      BalanceUnbilled: "87600.50",
+    },
+    {
+      SrNo: "4",
+      Vendor: "V0223: Kanishka Roadlines",
+      THCamount: "178650.60",
+      AdvancePending: "87600.50",
+      BalanceUnbilled: "87600.50",
+    },
+    {
+      SrNo: "5",
+      Vendor: "V0223: Kanishka Roadlines",
+      THCamount: "178650.60",
+      AdvancePending: "87600.50",
+      BalanceUnbilled: "87600.50",
+    },
+
+  ];
   isTableLode = true;
-  constructor(private matDialog: MatDialog, private router: Router, private masterService: MasterService,) { }
+  constructor(private matDialog: MatDialog,) { }
 
   ngOnInit(): void {
-    this.GetTHCData()
-  }
-  async GetTHCData() {
-    const GetTHCData = await GetTHCListFromApi(this.masterService, this.RequestData)
-    this.tableData = GetTHCData
+    this.filterFunction()
   }
 
   AdvancePendingFunction(event) {
     console.log('AdvancePendingFunction', event)
-
-    this.router.navigate(['/Finance/VendorPayment/AdvancePayment'], {
-      state: {
-        data: event.data
-      },
-    });
   }
 
   BalanceUnbilledFunction(event) {
     console.log('BalanceUnbilledFunction', event)
-    this.router.navigate(['/Finance/VendorPayment/BalancePayment'],{
-      state: {
-        data: event.data
-      },
-    });
-
   }
 
   functionCallHandler($event) {
@@ -118,8 +129,16 @@ export class ThcPaymentsComponent implements OnInit {
     }
   }
   filterFunction() {
+    let RequestData = {
+      vendorList: [
+        "V0006", "V0007"
+      ],
+      StartDate: "2023-11-21T18:30:00.000Z",
+      EndDate: "2023-11-23T18:30:00.000Z"
+
+    }
     const dialogRef = this.matDialog.open(ThcPaymentFilterComponent, {
-      data: { DefaultData: this.RequestData },
+      data: { DefaultData: RequestData },
       width: "30%",
       disableClose: true,
       position: {
@@ -128,10 +147,7 @@ export class ThcPaymentsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        this.RequestData.StartDate = result.StartDate;
-        this.RequestData.EndDate = result.EndDate;
-        this.RequestData.vendorList = result.vendorNamesupport.map(item => item.value)
-        this.GetTHCData()
+        console.log(result)
       }
     });
   }

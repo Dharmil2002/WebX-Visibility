@@ -350,7 +350,7 @@ export class VendorControl {
                 generatecontrol: false, disable: false
             },
             {
-                name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable ? vendorMasterTable.isActive : false, Validations: [],
+                name: 'isActive', label: 'Active Flag', placeholder: 'Active Flag', type: 'toggle', value: vendorMasterTable.isActive, Validations: [],
                 generatecontrol: false, disable: false
             },
             {
@@ -375,12 +375,12 @@ export class VendorControl {
                 Validations: [],
                 generatecontrol: false,
                 disable: false
-            },
+            },            
             {
                 name: 'eNTBY', label: 'Entry By', placeholder: 'Entry By', type: 'text', value: localStorage.getItem("UserName"), Validations: [],
                 generatecontrol: false, disable: false
             },
-
+           
         ];
         this.vendorOtherInfoArray = [
             {

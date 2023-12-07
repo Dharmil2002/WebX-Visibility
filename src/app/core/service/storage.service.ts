@@ -23,6 +23,10 @@ export class StorageService {
     return this.getItem("UserName");
   }
 
+  get mode(): string {
+    return this.getItem("Mode");
+  }
+
   setItem(key: string, value: any, useSessionStorage = false): void {
     this.storage = useSessionStorage ? sessionStorage : localStorage;
     this.storage.setItem(key, value);

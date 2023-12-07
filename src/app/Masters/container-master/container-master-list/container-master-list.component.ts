@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 
@@ -58,34 +57,37 @@ export class ContainerMasterListComponent implements OnInit {
       "collectionName": "container_detail",
       "filter": {}
     };
-
-    firstValueFrom(this.masterService.masterPost('generic/get', req))
-  .then((res: any) => {
-    if (res && res.data && res.data.length > 0) {
-      // Sort the data based on entryDate in descending order
-      const sortedData = res.data.sort((a, b) => {
-        return new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime();
-      });
-      // Display the latest record
-      const latestRecord = sortedData[0];
-      const latestEntryDate = latestRecord.entryDate;
-      // If you want to add srNo to each object in the array, you can still do that
-      const dataWithSrno = sortedData.map((obj, index) => {
-        return {
-          ...obj,
-          // srNo: index + 1
-        };
-      });
-      this.csv = dataWithSrno;
-      this.tableLoad = false;
-    }
-  })
-  .catch((error) => {
-    // Handle errors here
-    console.error("Error fetching data:", error);
-  });
+  
+    this.masterService.masterPost('generic/get', req).subscribe({
+      next: (res: any) => {
+        
+        if (res && res.data && res.data.length > 0) {
+          // Sort the data based on entryDate in descending order
+          const sortedData = res.data.sort((a, b) => {
+            return new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime();
+          });
+  
+          // Display the latest record
+          const latestRecord = sortedData[0];
+          const latestEntryDate = latestRecord.entryDate;
+  
+          // You can use the latestRecord object or latestEntryDate as needed for display.
+  
+          // If you want to add srNo to each object in the array, you can still do that
+          const dataWithSrno = sortedData.map((obj, index) => {
+            return {
+              ...obj,
+              // srNo: index + 1
+            };
+          });
+  
+          this.csv = dataWithSrno;
+          this.tableLoad = false;
+        }
+      }
+    });
   }
-
+  
   isActiveFuntion(det) {
     let id = det._id;
     // Remove the "id" field from the form controls
@@ -97,8 +99,8 @@ export class ContainerMasterListComponent implements OnInit {
       filter: { _id: id },
       update: det
     };
-    firstValueFrom(this.masterService.masterPut('generic/update', req))
-      .then((res: any) => {
+    this.masterService.masterPut('generic/update', req).subscribe({
+      next: (res: any) => {
         if (res) {
           // Display success message
           Swal.fire({
@@ -109,10 +111,7 @@ export class ContainerMasterListComponent implements OnInit {
           });
           this.getContainerDetails();
         }
-      })
-      .catch((error) => {
-        // Handle errors here
-        console.error("Error updating data:", error);
-      });
+      }
+    });
   }
 }

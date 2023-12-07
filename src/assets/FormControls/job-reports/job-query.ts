@@ -6,10 +6,11 @@ export class jobQueryControl {
         this.jobControlArray = [
             {
                 name: 'locations',
-                label: 'Locations',
+                label: 'Select Locations',
                 placeholder: 'Search and select Location',
                 type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-                Validations: [],
+                Validations: [
+                ],
                 additionalData: {
                     isIndeterminate: false,
                     isChecked: false,
@@ -27,7 +28,7 @@ export class jobQueryControl {
             },
             {
                 name: "start",
-                label: "Select Date Range",
+                label: "SelectDateRange",
                 placeholder: "Select Date",
                 type: "daterangpicker",
                 value: "",
@@ -43,10 +44,11 @@ export class jobQueryControl {
             },
             {
                 name: 'jobNo',
-                label: 'Job Number',
-                placeholder: 'Search and Select job Number',
+                label: 'Select jobNo',
+                placeholder: 'Search and select jobNo',
                 type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-                Validations: [],
+                Validations: [
+                ],
                 additionalData: {
                     isIndeterminate: false,
                     isChecked: false,
@@ -74,10 +76,11 @@ export class jobQueryControl {
             // },
             {
                 name: 'cnote',
-                label: 'Consignment Note Number',
+                label: 'Select Consignment Note Number',
                 placeholder: 'Select Consignment Note Number',
                 type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
-                Validations: [],
+                Validations: [
+                ],
                 additionalData: {
                     isIndeterminate: false,
                     isChecked: false,
@@ -103,7 +106,15 @@ export class jobQueryControl {
                 autocomplete: "",
                 generatecontrol: false,
                 disable: true,
-                Validations: [],
+                Validations: [
+                    {
+                        name: "Select Data Range",
+                    },
+                    {
+                        name: "required",
+                        message: "StartDateRange is Required...!",
+                    },
+                ],
             },
             {
                 name: 'LocationsHandler',

@@ -1,7 +1,11 @@
+import { Injectable } from "@angular/core";
 import { UntypedFormGroup } from "@angular/forms";
 import { map, startWith } from "rxjs";
 import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 
+@Injectable({
+  providedIn: "root",
+})
 export class FilterUtils {
   /**
    * Filter function to set filter options for a specific field.

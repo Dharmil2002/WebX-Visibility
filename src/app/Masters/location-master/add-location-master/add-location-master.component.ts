@@ -336,7 +336,6 @@ export class AddLocationMasterComponent implements OnInit {
       const request = {
         "companyCode": this.companyCode,
         "collectionName": "state_master",
-        filter: {},
       };
 
       this.StateList = await this.masterService.masterPost('generic/get', request).toPromise();

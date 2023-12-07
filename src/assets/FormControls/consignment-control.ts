@@ -69,6 +69,10 @@ export class ConsignmentControl {
             name: "autocomplete",
           },
         ],
+        functions: {
+          onModel: "getCustomer",
+          onOptionSelect: 'getPrqDetails'
+        },
         additionalData: {
           showNameAndValue: true,
           metaData: "Basic"
@@ -76,11 +80,8 @@ export class ConsignmentControl {
       },
       {
         name: 'movementType', label: 'Movement Type', placeholder: 'Movement Type', type: 'Staticdropdown',
-        value: [
-          { "name": "Import", "value": "I" },
-          { "name": "Export", "value": "E" },
-          { "name": "Domestic", "value": "D" }
-        ], Validations: [], generatecontrol: true, disable: false,
+        value: [], 
+        Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
         },
@@ -90,24 +91,7 @@ export class ConsignmentControl {
         label: "Payment Mode",
         placeholder: "Payment Mode",
         type: "Staticdropdown",
-        value: [
-          {
-            value: "PAID",
-            name: "PAID",
-          },
-          {
-            value: "TBB",
-            name: "TBB",
-          },
-          {
-            value: "TO PAY",
-            name: "TO PAY",
-          },
-          {
-            value: "FOC",
-            name: "FOC",
-          },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -119,6 +103,9 @@ export class ConsignmentControl {
             message: "Payment Type is required",
           },
         ],
+        functions : {
+          onOptionSelect: 'getPrqDetails'
+        },
         additionalData: {
           showNameAndValue: true,
           metaData: "Basic"
@@ -262,11 +249,7 @@ export class ConsignmentControl {
         label: "Transport Mode",
         placeholder: "Transport Mode",
         type: "Staticdropdown",
-        value: [
-          { value: "Air", name: "Air" },
-          { value: "Road", name: "Road" },
-          { value: "Rail", name: "Rail" },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -283,14 +266,7 @@ export class ConsignmentControl {
       },
       {
         name: 'vendorType', label: 'Vendor Type', placeholder: 'Vendor Type', type: "Staticdropdown",
-
-        value: [
-          { value: "Own", name: "Own" },
-          { value: "Attached", name: "Attached" },
-          { value: "Rail", name: "Rail" },
-          { value: "Market", name: "Market" },
-          { value: "Service Provider", name: "Service Provider" }
-        ], Validations: [], functions: {
+        value: [], Validations: [], functions: {
           onSelection: "vendorFieldChanged"
         },
         additionalData: {
@@ -317,6 +293,9 @@ export class ConsignmentControl {
         {
           name: "autocomplete",
         }],
+        functions: {
+          onModel: 'getVendors'
+        },
         additionalData: {
           showNameAndValue: true,
           metaData: "Basic",
@@ -362,9 +341,7 @@ export class ConsignmentControl {
       },
       {
         name: 'weight_in', label: 'Weight In', placeholder: 'Weight In', type: 'Staticdropdown',
-        value: [{ "name": "Tons", "value": "Tons" },
-        { "name": "Kgs", "value": "Kgs" },
-        { "name": "Fixed", "value": "Fixed" }], Validations: [], generatecontrol: true, disable: false,
+        value: [], Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
         },
@@ -388,22 +365,14 @@ export class ConsignmentControl {
       },
       {
         name: 'risk', label: 'Risk', placeholder: 'Risk', type: 'Staticdropdown',
-        value: [
-          { "name": "Carrier", "value": "carrier" },
-          { "name": " Owner Risk", "value": "owner_risk," }
-        ], Validations: [], generatecontrol: true, disable: false,
+        value: [], Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
         },
       },
       {
         name: 'delivery_type', label: 'Delivery Type', placeholder: 'Delivery Type', type: 'Staticdropdown',
-        value: [
-          { "name": "Godown Pickup - Godown Delivery", "value": "Godown Pickup - Godown Delivery" },
-          { "name": "Godown Pickup - Door Delivery", "value": "Godown Pickup - Door Delivery" },
-          { "name": "Door Pickup - Godown Delivery", "value": "Door Pickup - Godown Delivery" },
-          { "name": "Door Pickup - Door Delivery", "value": "Door Pickup - Door Delivery" }
-        ]
+        value: []
         , Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
@@ -418,11 +387,7 @@ export class ConsignmentControl {
       // },
       {
         name: 'issuing_from', label: 'Issuing From', placeholder: 'Rake No', type: 'Staticdropdown',
-        value: [
-          { "name": "None", "value": "None" },
-          { "name": "Rail Head", "value": "Rail Head" },
-          { "name": "Godown", "value": "Godown" }
-        ], Validations: [], generatecontrol: true, disable: false,
+        value: [], Validations: [], generatecontrol: true, disable: false,
         additionalData: {
           metaData: "Basic",
         },
@@ -502,6 +467,7 @@ export class ConsignmentControl {
 
         ],
         functions: {
+          onModel: "getCustomer",
           onOptionSelect: 'getConsignor'
         },
         additionalData: {
@@ -540,6 +506,7 @@ export class ConsignmentControl {
 
         ],
         functions: {
+          onModel: "getCustomer",
           onOptionSelect: 'getConsignee'
         },
         additionalData: {
@@ -1100,7 +1067,6 @@ export class FreightControl {
           name: "required",
           message: "Freight Rate is required",
         }
-
         ],
         functions: {
           onModel: "calculateFreight"
@@ -1110,24 +1076,7 @@ export class FreightControl {
 
       {
         name: 'freightRatetype', label: 'Freight Rate type', placeholder: 'Freight Rate type', type: 'Staticdropdown',
-        value: [
-          {
-            "value": "F",
-            "name": "Flat"
-          },
-          {
-            "value": "P",
-            "name": "Per PKG"
-          },
-          {
-            "value": "T",
-            "name": "Per TON"
-          },
-          {
-            "value": "W",
-            "name": "Per KG"
-          }
-        ], Validations: [],
+        value: [], Validations: [],
         functions: {
           onSelection: "calculateFreight"
         },

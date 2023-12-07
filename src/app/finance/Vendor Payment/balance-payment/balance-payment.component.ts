@@ -211,6 +211,7 @@ export class BalancePaymentComponent implements OnInit {
         BalancePending: x.OthersData.balAmt,
         THC: x.THC,
         THCamount: x.THCamount,
+        OthersData:x,
         isSelected: false,
       };
     });
@@ -449,8 +450,24 @@ export class BalancePaymentComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
         console.log("result", result);
+        this.setTHCamountData(result.data)
       }
     });
+  }
+
+  setTHCamountData(result) {
+    this.isTableLode = false
+    const THCdata = result.THCData;
+    const THCAmountsForm = result.THCAmountsForm;
+    this.tableData.forEach((x)=>{
+      if(x.THC == THCdata.THC){
+        x.Advance= +THCAmountsForm.Advance;
+        x.THCamount = (+THCAmountsForm.Advance) + (+THCAmountsForm.Balance);
+        x.BalancePending = +THCAmountsForm.Balance;
+      }
+    })
+    this.selectCheckBox()
+    this.isTableLode = true
   }
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
@@ -462,12 +479,12 @@ export class BalancePaymentComponent implements OnInit {
       console.log("failed", error);
     }
   }
-  selectCheckBox(event) {
+  selectCheckBox() {
     this.AdvanceTotle = 0;
     this.BalancePending = 0;
     this.THCamount = 0;
 
-    const SelectedData = event.filter((x) => x.isSelected);
+    const SelectedData = this.tableData.filter((x) => x.isSelected);
     SelectedData.forEach((x) => {
       this.AdvanceTotle = this.AdvanceTotle + parseInt(x.Advance);
       this.BalancePending = this.BalancePending + parseInt(x.BalancePending);

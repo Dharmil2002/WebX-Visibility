@@ -44,7 +44,7 @@ export class THCAmountsDetailComponent implements OnInit {
     this.THCData = this.objResult?.THCData;
     this.Type = this.objResult?.Type;
 
-    console.log(this.THCData);
+    console.log('this.THCData' ,this.THCData);
 
     this.initializeFormControl();
   }
@@ -178,10 +178,10 @@ export class THCAmountsDetailComponent implements OnInit {
     const THCTotal = AddTHCTotal - LessAmount;
     this.THCAmountsADDForm.get("THCTotal").setValue(THCTotal.toFixed(2));
     this.THCAmountsForm.get("Advance").setValue(
-      this.THCData?.Advance.toFixed(2)
+      (+this.THCData?.Advance).toFixed(2)
     );
     this.THCAmountsForm.get("Balance").setValue(
-      (THCTotal - this.THCData?.Advance).toFixed(2)
+      (THCTotal - (+this.THCData?.Advance)).toFixed(2)
     );
   }
   OnChangeAdvanceAmount(event) {

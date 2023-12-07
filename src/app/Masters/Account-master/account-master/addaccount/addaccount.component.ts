@@ -37,7 +37,7 @@ export class AddaccountComponent implements OnInit {
   TDSsectionStatus: any;
   CompanyCode: any = parseInt(localStorage.getItem("companyCode"));
   FirstUpdate: any = false;
-  AlljsonControlArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  AlljsonControlArray: any;
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,

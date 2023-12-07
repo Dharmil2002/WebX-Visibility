@@ -76,7 +76,7 @@ export class AddressMasterListComponent implements OnInit {
       this.tableLoad = false;
     } catch (error) {
       // Handle errors here
-      console.error("Error fetching driver details:", error);
+      console.error("Error fetching address details:", error);
     }
   }
 
@@ -105,7 +105,7 @@ export class AddressMasterListComponent implements OnInit {
       }
     } catch (error) {
       // Handle errors here
-      console.error("Error updating driver details:", error);
+      console.error("Error updating address details:", error);
     }
   }
 }

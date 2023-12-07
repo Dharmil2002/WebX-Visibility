@@ -78,6 +78,28 @@ export class Vendbilldetails {
   mODBY?: string;
 }
 
+export class Vendbillpayment {
+  _id: string;
+  cID: number;
+  bILLNO?: string;
+  vUCHNO?: string;
+  lOC?: string;
+  dTM?: Date;
+  bILLAMT?: number;
+  pAYAMT?: number;
+  aMT?: number;
+  mOD?: string;
+  bANK?: string;
+  tRNO?: string;
+  bY?: string;
+  eNTDT?: Date;
+  eNTLOC?: string;
+  eNTBY?: string;
+  mODDT?: string;
+  mODLOC?: string;
+  mODBY?: string;
+}
+
 // Example usage
 const vendorBillEntry: VendorBillEntry = {
   companyCode: 123,

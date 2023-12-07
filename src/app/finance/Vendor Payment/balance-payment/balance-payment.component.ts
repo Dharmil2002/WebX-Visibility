@@ -23,7 +23,7 @@ import {
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { DebitVoucherDataRequestModel, DebitVoucherRequestModel } from "src/app/Models/Finance/Finance";
-import { Vendbilldetails, VendorBillEntry } from "src/app/Models/Finance/VendorPayment";
+import { Vendbilldetails, Vendbillpayment, VendorBillEntry } from "src/app/Models/Finance/VendorPayment";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import Swal from "sweetalert2";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
@@ -36,6 +36,8 @@ import { filter } from 'rxjs/operators';
 export class BalancePaymentComponent implements OnInit {
   vendorBillEntryModel = new VendorBillEntry();
   VendorDetails;
+  debitVoucherRequestModel = new DebitVoucherRequestModel();
+  debitVoucherDataRequestModel = new DebitVoucherDataRequestModel();
   breadScrums = [
     {
       title: "Balance Payments",
@@ -211,7 +213,7 @@ export class BalancePaymentComponent implements OnInit {
         BalancePending: x.OthersData.balAmt,
         THC: x.THC,
         THCamount: x.THCamount,
-        OthersData:x,
+        OthersData: x,
         isSelected: false,
       };
     });
@@ -238,7 +240,7 @@ export class BalancePaymentComponent implements OnInit {
     // this.jsonControlVendorBalanceTaxationGSTFilterArray =
     // const GSTinputType = ['SGSTRate', 'UGSTRate', 'CGSTRate', 'IGSTRate'];
     this.AlljsonControlVendorBalanceTaxationGSTFilterArray =
-    this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
+      this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
     this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray;
     this.VendorBalanceTaxationGSTFilterForm = formGroupBuilder(this.fb, [
       this.jsonControlVendorBalanceTaxationGSTFilterArray,
@@ -461,9 +463,9 @@ export class BalancePaymentComponent implements OnInit {
     this.isTableLode = false
     const THCdata = result.THCData;
     const THCAmountsForm = result.THCAmountsForm;
-    this.tableData.forEach((x)=>{
-      if(x.THC == THCdata.THC){
-        x.Advance= +THCAmountsForm.Advance;
+    this.tableData.forEach((x) => {
+      if (x.THC == THCdata.THC) {
+        x.Advance = +THCAmountsForm.Advance;
         x.THCamount = (+THCAmountsForm.Advance) + (+THCAmountsForm.Balance);
         x.BalancePending = +THCAmountsForm.Balance;
       }
@@ -519,6 +521,7 @@ export class BalancePaymentComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
+        this.PerformMakePaymentSection(result, true);
       }
     });
   }
@@ -572,7 +575,7 @@ export class BalancePaymentComponent implements OnInit {
     this.VendorBalanceTaxationGSTFilterForm.get('TotalGSTRate').setValue((+GSTCalculateRate * GSTinput.length).toFixed(2));
     this.VendorBalanceTaxationGSTFilterForm.get('GSTAmount').setValue((+GSTCalculateAmount * GSTinput.length).toFixed(2));
   }
-  BookVendorBill() {
+  BookVendorBill(PaymenDetails, generateVoucher) {
     this.snackBarUtilityService.commonToast(async () => {
       try {
         const vendorBillEntry: VendorBillEntry = {
@@ -618,10 +621,10 @@ export class BalancePaymentComponent implements OnInit {
             },
             tDS: {
               eXMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted,
-              sEC: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? "" : this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value,
-              sECD: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? "" : this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name,
-              rATE: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? 0 : this.VendorBalanceTaxationTDSFilterForm.value.TDSRate,
-              aMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? 0 : this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount,
+              sEC: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value : "",
+              sECD: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name : "",
+              rATE: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSRate : 0,
+              aMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount : 0,
             },
             gST: {
               sAC: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value.toString(),
@@ -640,7 +643,7 @@ export class BalancePaymentComponent implements OnInit {
         };
         firstValueFrom(this.voucherServicesService
           .FinancePost("finance/bill/vendor/create", vendorBillEntry)).then((res: any) => {
-            this.SetVendorBillEntry(res?.data?.insertedId)
+            this.SetVendorBillEntry(res?.data?.insertedId, PaymenDetails, generateVoucher)
           }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
           .finally(() => {
 
@@ -651,7 +654,7 @@ export class BalancePaymentComponent implements OnInit {
     }, "Balance Payment Generating..!");
 
   }
-  SetVendorBillEntry(BillNo) {
+  SetVendorBillEntry(BillNo, PaymenDetails, generateVoucher) {
     this.tableData.filter((x) => x.isSelected == true).forEach((item) => {
 
       const vendbilldet: Vendbilldetails = {
@@ -680,9 +683,194 @@ export class BalancePaymentComponent implements OnInit {
         .finally(() => {
         });
     })
+    if (generateVoucher) {
+      this.SubmitVoucherData(PaymenDetails, BillNo)
+    } else {
+      Swal.fire({
+        icon: "success",
+        title: "Bill Generated Successfully",
+        text: "Bill No: " + BillNo,
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.hideLoading();
+          setTimeout(() => {
+            Swal.close();
+          }, 2000);
+        }
+      });
+    }
+
+  }
+  SubmitVoucherData(PaymenDetails, BillNo) {
+    this.snackBarUtilityService.commonToast(async () => {
+      try {
+        if (!PaymenDetails) {
+          return this.snackBarUtilityService.ShowCommonSwal("error", "Please Fill Payment Details");
+        }
+
+        const PaymentAmount = parseFloat(
+          this.THCamount.toFixed(2)
+        );
+        const NetPayable = parseFloat(
+          this.THCamount.toFixed(2)
+        );
+
+        this.debitVoucherRequestModel.companyCode = this.companyCode;
+        this.debitVoucherRequestModel.docType = "VR";
+        this.debitVoucherRequestModel.branch = localStorage.getItem("CurrentBranchCode");
+        this.debitVoucherRequestModel.finYear = financialYear;
+
+        this.debitVoucherDataRequestModel.companyCode = this.companyCode;
+        this.debitVoucherDataRequestModel.voucherNo = "";
+        this.debitVoucherDataRequestModel.transType = "DebitVoucher";
+        this.debitVoucherDataRequestModel.transDate = new Date().toUTCString();
+        this.debitVoucherDataRequestModel.docType = "VR";
+        this.debitVoucherDataRequestModel.branch =
+          localStorage.getItem("CurrentBranchCode");
+        this.debitVoucherDataRequestModel.finYear = financialYear;
+
+        this.debitVoucherDataRequestModel.accLocation =
+          localStorage.getItem("CurrentBranchCode");
+        this.debitVoucherDataRequestModel.preperedFor = "Vendor";
+        this.debitVoucherDataRequestModel.partyCode =
+          this.tableData[0].OthersData?.vendorCode;
+        this.debitVoucherDataRequestModel.partyName =
+          this.tableData[0].OthersData?.vendorName;
+        this.debitVoucherDataRequestModel.partyState =
+          this.VendorDetails?.vendorState;
+        this.debitVoucherDataRequestModel.entryBy =
+          localStorage.getItem("UserName");
+        this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString();
+        this.debitVoucherDataRequestModel.panNo =
+          this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
+        console.log(this.VendorBalanceTaxationTDSFilterForm.value)
+        this.debitVoucherDataRequestModel.tdsSectionCode = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.value : "";
+        this.debitVoucherDataRequestModel.tdsSectionName = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSSection.name : ""
+        this.debitVoucherDataRequestModel.tdsRate = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSRate : 0;
+        this.debitVoucherDataRequestModel.tdsAmount = this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount : 0;
+        this.debitVoucherDataRequestModel.tdsAtlineitem = false;
+        this.debitVoucherDataRequestModel.tcsSectionCode = "tcsSectionCode";
+        this.debitVoucherDataRequestModel.tcsSectionName = "tcsSectionName";
+        this.debitVoucherDataRequestModel.tcsRate = 0;
+        this.debitVoucherDataRequestModel.tcsAmount = 0;
+
+        this.debitVoucherDataRequestModel.IGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTAmount) || 0,
+          this.debitVoucherDataRequestModel.SGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.SGSTAmount) || 0,
+          this.debitVoucherDataRequestModel.CGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.CGSTAmount) || 0,
+          this.debitVoucherDataRequestModel.UGST = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.UGSTAmount) || 0,
+          this.debitVoucherDataRequestModel.GSTTotal = parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.GSTAmount) || 0;
+
+        this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
+        this.debitVoucherDataRequestModel.netPayable = NetPayable;
+        this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount;
+        this.debitVoucherDataRequestModel.voucherCanceled = false;
+
+        this.debitVoucherDataRequestModel.paymentMode =
+          PaymenDetails.PaymentMode;
+        this.debitVoucherDataRequestModel.refNo =
+          PaymenDetails?.ChequeOrRefNo || "";
+        this.debitVoucherDataRequestModel.accountName =
+          PaymenDetails?.Bank?.name || "";
+        this.debitVoucherDataRequestModel.date =
+          PaymenDetails.Date.toUTCString();
+        this.debitVoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
+        this.debitVoucherDataRequestModel.paymentAmtount = NetPayable;
+
+        const companyCode = this.companyCode;
+        const CurrentBranchCode = localStorage.getItem("CurrentBranchCode");
+        console.log(this.tableData)
+        var VoucherlineitemList = this.tableData.filter((x) => x.isSelected == true).map((item) => {
+          return {
+            companyCode: companyCode,
+            voucherNo: "",
+            transType: "DebitVoucher",
+            transDate: new Date(),
+            finYear: financialYear,
+            branch: CurrentBranchCode,
+            accCode: "TEST",
+            accName: "TEST",
+            sacCode: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value.toString(),
+            sacName: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.name.toString(),
+            debit: parseFloat(item.THCamount).toFixed(2),
+            credit: 0,
+            GSTRate: 0,
+            GSTAmount: 0,
+            Total: parseFloat(item.THCamount).toFixed(2),
+            TDSApplicable: false,
+            narration: "",
+          };
+        });
+
+        this.debitVoucherRequestModel.details = VoucherlineitemList;
+        this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
+        this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+
+        firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+          this.vendbillpayment(BillNo, res?.data?.mainData?.ops[0].vNO, PaymenDetails)
+
+          Swal.fire({
+            icon: "success",
+            title: "Voucher Created Successfully",
+            text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.hideLoading();
+              setTimeout(() => {
+                Swal.close();
+              }, 2000);
+            }
+          });
+        }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+          .finally(() => {
+          });
+
+      } catch (error) {
+        this.snackBarUtilityService.ShowCommonSwal(
+          "error",
+          "Fail To Submit Data..!"
+        );
+      }
+    }, "Advance Payment Voucher Generating..!");
+  }
+  vendbillpayment(BillNo, voucherno, PaymenDetails) {
+    this.tableData.filter((x) => x.isSelected == true).forEach((item) => {
+
+      const vendbillpayment: Vendbillpayment = {
+        _id: BillNo + "-" + item.THC,
+        cID: this.companyCode,
+        bILLNO: BillNo,
+        vUCHNO: voucherno,
+        lOC: localStorage.getItem("CurrentBranchCode"),
+        dTM: PaymenDetails.Date.toUTCString(),
+        bILLAMT: item.Advance,
+        pAYAMT: item.BalancePending,
+        aMT: item.THCamount,
+        mOD: PaymenDetails.PaymentMode,
+        bANK: PaymenDetails?.Bank?.name || "",
+        tRNO: PaymenDetails?.ChequeOrRefNo || "",
+        bY: localStorage.getItem("UserName"),
+        eNTDT: new Date(),
+        eNTLOC: localStorage.getItem("CurrentBranchCode"),
+        eNTBY: localStorage.getItem("UserName"),
+      };
+
+      const RequestData = {
+        companyCode: this.companyCode,
+        collectionName: "vend_bill_payment",
+        data: vendbillpayment,
+      };
+
+      firstValueFrom(this.masterService.masterPost("generic/create", RequestData)).then((res: any) => {
+
+      }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+        .finally(() => {
+        });
+    })
     Swal.fire({
       icon: "success",
-      title: "Bill Generated Successfully",
+      title: "Vendor Bill Payment Generated Successfully",
       text: "Bill No: " + BillNo,
       showConfirmButton: true,
     }).then((result) => {
@@ -693,5 +881,8 @@ export class BalancePaymentComponent implements OnInit {
         }, 2000);
       }
     });
+  }
+  PerformMakePaymentSection(PaymenDetails, generateVoucher) {
+    this.BookVendorBill(PaymenDetails, generateVoucher)
   }
 }

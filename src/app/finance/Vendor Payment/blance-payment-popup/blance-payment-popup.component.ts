@@ -31,11 +31,15 @@ export class BlancePaymentPopupComponent implements OnInit {
     private objImageHandling: ImageHandling,
     private matDialog: MatDialog,
 
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initializeFormControl();
   }
+  save(event) {
+    this.dialogRef.close(this.VendorBalancePaymentFilterForm.value);
+  }
+
   initializeFormControl(): void {
     let RequestObj = {
       VendorPANNumber: "AACCG464648ZS",
@@ -152,7 +156,7 @@ export class BlancePaymentPopupComponent implements OnInit {
   async selectFileScanDocument(data) {
     // Call the uploadFile method from the service
     this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "ScanSupportingdocument", this.
-    VendorBalancePaymentFilterForm, this.imageData, "Voucher", 'Finance', this.jsonControlVendorBalancePaymentFilterArray,
+      VendorBalancePaymentFilterForm, this.imageData, "Voucher", 'Finance', this.jsonControlVendorBalancePaymentFilterArray,
       ["jpg", "png", "jpeg", "pdf"]);
 
   }

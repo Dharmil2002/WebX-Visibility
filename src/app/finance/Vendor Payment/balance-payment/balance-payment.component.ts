@@ -235,10 +235,11 @@ export class BalancePaymentComponent implements OnInit {
       this.jsonControlVendorBalanceTaxationTDSFilterArray,
     ]);
 
-    this.jsonControlVendorBalanceTaxationGSTFilterArray =
-      this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
+    // this.jsonControlVendorBalanceTaxationGSTFilterArray =
+    // const GSTinputType = ['SGSTRate', 'UGSTRate', 'CGSTRate', 'IGSTRate'];
     this.AlljsonControlVendorBalanceTaxationGSTFilterArray =
-      this.jsonControlVendorBalanceTaxationGSTFilterArray;
+    this.vendorBalancePaymentControl.getVendorBalanceTaxationGSTArrayControls();
+    this.jsonControlVendorBalanceTaxationGSTFilterArray = this.AlljsonControlVendorBalanceTaxationGSTFilterArray;
     this.VendorBalanceTaxationGSTFilterForm = formGroupBuilder(this.fb, [
       this.jsonControlVendorBalanceTaxationGSTFilterArray,
     ]);
@@ -398,6 +399,7 @@ export class BalancePaymentComponent implements OnInit {
         this.VendorBalanceTaxationTDSFilterForm.get("TDSAmount");
       TDSAmount.setValue("");
       TDSAmount.clearValidators();
+      TDSAmount.updateValueAndValidity();
     }
   }
 

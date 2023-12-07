@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
-import { UntypedFormBuilder } from "@angular/forms";
+import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
+import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -36,6 +37,7 @@ export class AddaccountComponent implements OnInit {
   TDSsectionStatus: any;
   CompanyCode: any = parseInt(localStorage.getItem("companyCode"));
   FirstUpdate: any = false;
+  AlljsonControlArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
   constructor(
     private Route: Router,
     private fb: UntypedFormBuilder,
@@ -60,6 +62,8 @@ export class AddaccountComponent implements OnInit {
       this.UpdateData
     );
     this.jsonControlArray = BankFormControls.getAccountArray();
+    this.AlljsonControlArray = BankFormControls.getAccountArray();
+
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.AccountForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
@@ -87,9 +91,36 @@ export class AddaccountComponent implements OnInit {
         // Set TDSsection variables
         this.TDSsectionCode = data.name;
         this.TDSsectionStatus = data.additionalData.showNameAndValue;
-        this.getTDSsectionDropdown();
+        this.toggleTDSExempted("")
       }
     });
+  }
+
+  toggleTDSExempted(event) {
+    const TDSExemptedValue = this.AccountForm.value.isTDSapplicable;
+    if (TDSExemptedValue) {
+      this.jsonControlArray =
+        this.AlljsonControlArray;
+      const TDSSection =
+        this.AccountForm.get("TDSsection");
+      TDSSection.setValidators([
+        Validators.required,
+        autocompleteObjectValidator(),
+      ]);
+      TDSSection.updateValueAndValidity();
+
+      this.getTDSsectionDropdown();
+    } else {
+      this.jsonControlArray =
+        this.AlljsonControlArray.filter(
+          (x) => x.name != "TDSsection"
+        );
+      const TDSSection =
+        this.AccountForm.get("TDSsection");
+      TDSSection.setValue("");
+      TDSSection.clearValidators();
+      TDSSection.updateValueAndValidity();
+    }
   }
 
   async getAcGroupCategoryDropdown() {
@@ -226,6 +257,7 @@ export class AddaccountComponent implements OnInit {
         this.TDSsectionCode,
         this.TDSsectionStatus
       );
+
     }
   }
   async save() {
@@ -234,10 +266,10 @@ export class AddaccountComponent implements OnInit {
       AcGroupCode: this.AccountForm.value.AcGroup.value,
       AcGroupCategoryName: this.AccountForm.value.AcGroupCategory.name,
       BalanceSheetName: this.AccountForm.value.BalanceSheet.name,
-      TDSsection: this.AccountForm.value.TDSsection.name,
       AcLedger: this.AccountForm.value.AcLedger,
       isSystemledger: this.AccountForm.value.isSystemledger,
       isTDSapplicable: this.AccountForm.value.isTDSapplicable,
+      TDSsection:this.AccountForm.value.isTDSapplicable?this.AccountForm.value.TDSsection.name:"",
     };
     if (this.isUpdate) {
       const req = {

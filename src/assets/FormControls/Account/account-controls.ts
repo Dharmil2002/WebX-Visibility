@@ -139,6 +139,9 @@ export class AccountControls {
         generatecontrol: true,
         disable: false,
         Validations: [],
+        functions: {
+          onChange: "toggleTDSExempted",
+        },
       },
       {
         name: "TDSsection",

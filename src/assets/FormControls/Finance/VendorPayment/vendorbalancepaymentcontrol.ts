@@ -17,7 +17,7 @@ export class VendorBalancePaymentControl {
         disable: false,
         Validations: [],
         functions: {
-          onChange: 'toggleTDSExempted',
+          onChange: "toggleTDSExempted",
         },
       },
       {
@@ -108,7 +108,7 @@ export class VendorBalancePaymentControl {
           metaData: "Basic",
         },
         functions: {
-          onOptionSelect: "StateChange"
+          onOptionSelect: "StateChange",
         },
       },
       {
@@ -139,7 +139,7 @@ export class VendorBalancePaymentControl {
           metaData: "Basic",
         },
         functions: {
-          onOptionSelect: "StateChange"
+          onOptionSelect: "StateChange",
         },
       },
       {
@@ -190,7 +190,7 @@ export class VendorBalancePaymentControl {
           metaData: "Basic",
         },
         functions: {
-          onOptionSelect: "StateChange"
+          onOptionSelect: "StateChange",
         },
       },
       {
@@ -221,13 +221,7 @@ export class VendorBalancePaymentControl {
         placeholder: "CGST Rate",
         type: "dayhour",
         value: "",
-        Validations: [
-          {
-            name: "pattern",
-            message: "Please Enter Valid CGST Rate",
-            pattern: "^(100|[0-9]{1,2})$",
-          },
-        ],
+        Validations: [],
         generatecontrol: true,
         disable: true,
         additionalData: {
@@ -243,13 +237,7 @@ export class VendorBalancePaymentControl {
         placeholder: "SGST Rate",
         type: "dayhour",
         value: "",
-        Validations: [
-          {
-            name: "pattern",
-            message: "Please Enter Valid SGST Rate",
-            pattern: "^(100|[0-9]{1,2})$",
-          },
-        ],
+        Validations: [],
 
         generatecontrol: true,
         disable: true,
@@ -266,13 +254,7 @@ export class VendorBalancePaymentControl {
         placeholder: "UGST Rate",
         type: "dayhour",
         value: "",
-        Validations: [
-          {
-            name: "pattern",
-            message: "Please Enter Valid UGST Rate",
-            pattern: "^(100|[0-9]{1,2})$",
-          },
-        ],
+        Validations: [],
 
         generatecontrol: true,
         disable: true,
@@ -289,13 +271,7 @@ export class VendorBalancePaymentControl {
         placeholder: "IGST Rate",
         type: "dayhour",
         value: "",
-        Validations: [
-          {
-            name: "pattern",
-            message: "Please Enter Valid IGST Rate",
-            pattern: "^(100|[0-9]{1,2})$",
-          },
-        ],
+        Validations: [],
 
         generatecontrol: true,
         disable: true,

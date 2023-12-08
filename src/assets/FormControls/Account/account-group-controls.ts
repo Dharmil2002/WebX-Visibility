@@ -93,6 +93,88 @@ export class AccountGroupControls {
         functions: {
         },
       },
+      {
+        name: 'activeFlag',
+        label: 'Active Flag',
+        placeholder: 'Active',
+        type: 'toggle',
+        value: isUpdate ? UpdateData.activeFlag : "",
+        generatecontrol: false,
+        disable: false,
+        Validations: []
+      },
+      {
+        name: "eNTBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: 'eNTDT',
+        label: ' ',
+        placeholder: ' ',
+        type: 'date',
+        value: new Date(), // Set the value to the current date
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: false,
+        disable: false
+      },
+      {
+        name: 'eNTLOC',
+        label: ' ',
+        placeholder: ' ',
+        type: 'date',
+        value: localStorage.getItem("Branch"), // Set the value to the current date
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: false,
+        disable: false
+      },
+      {
+        name: 'mODDT',
+        label: ' ',
+        placeholder: ' ',
+        type: 'date',
+        value: new Date(), // Set the value to the current date
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: false,
+        disable: false
+      },
+      {
+        name: "mODBY",
+        label: "",
+        placeholder: "",
+        type: "text",
+        value: localStorage.getItem("UserName"),
+        Validations: [],
+        generatecontrol: false,
+        disable: false,
+      },
+      {
+        name: 'mODLOC',
+        label: ' ',
+        placeholder: ' ',
+        type: 'date',
+        value: localStorage.getItem("Branch"), // Set the value to the current date
+        filterOptions: '',
+        autocomplete: '',
+        displaywith: '',
+        Validations: [],
+        generatecontrol: false,
+        disable: false
+      },
     ];
   }
 

@@ -50,7 +50,7 @@
     </div>
     <div class="row">
 
-        <div class="col-6">
+        <div class="col-6" *ngIf="isAddForm">
             <form [formGroup]=" THCAmountsADDForm">
                 <app-form-webxpress [form]="THCAmountsADDForm" [FormTitle]="'THC Amounts ADD (+)'"
                     [formData]="THCAmountsADDArray" (functionCallEmitter)="functionCallHandler($event)"
@@ -59,8 +59,8 @@
                 </app-form-webxpress>
             </form>
         </div>
-        <div class="col-6">
-            <form [formGroup]="THCAmountsLESSForm">
+        <div class="col-6" *ngIf="isLessForm">
+            <form  [formGroup]="THCAmountsLESSForm">
                 <app-form-webxpress [form]="THCAmountsLESSForm" [formData]="THCAmountsLESSArray"
                     (functionCallEmitter)="functionCallHandler($event)" [FormTitle]="'THC Amounts LESS (-)'"
                     [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'"

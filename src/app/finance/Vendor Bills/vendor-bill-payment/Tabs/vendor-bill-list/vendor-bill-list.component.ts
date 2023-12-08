@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { VendorTableData } from '../../VendorStaticData';
 import { VendorBillFilterComponent } from './vendor-bill-filter/vendor-bill-filter.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { VendorBillService } from '../../../vendor-bill.service';
 
 @Component({
   selector: 'app-vendor-bill-list',
@@ -14,7 +15,7 @@ export class VendorBillListComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
-  tableData = VendorTableData
+  tableData: any[]
   columnHeader = {
     checkBoxRequired: {
       Title: "Select",
@@ -45,12 +46,12 @@ export class VendorBillListComponent implements OnInit {
     },
     billAmount: {
       Title: "Bill Amount(₹)",
-      class: "matcolumnright",
+      class: "matcolumncenter",
       Style: "min-width:9%",
     },
     pendingAmount: {
       Title: "Pending Amount(₹)",
-      class: "matcolumnright",
+      class: "matcolumncenter",
       Style: "min-width:9%",
     },
     Status: {
@@ -91,10 +92,14 @@ export class VendorBillListComponent implements OnInit {
     { label: 'Cancel Bill' },
     { label: 'Modify' },
   ]
+  filterRequest: any;
   constructor(private matDialog: MatDialog,
-    private router: Router) { }
+    private router: Router,
+    private masterService: MasterService,
+    private objVendorBillService: VendorBillService) { }
 
   ngOnInit(): void {
+    this.getVendorBill()
   }
   functionCallHandler(event) {
     console.log(event);
@@ -119,14 +124,23 @@ export class VendorBillListComponent implements OnInit {
   }
   //#endregion
   filterFunction() {
+    const now = new Date();
+    const Datesdata = {
+      start: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 10),
+      end: now
+    };
     let RequestData = {
       vendorList: [
-        "V0006", "V0007"
+        // "V0006", "V0007"
       ],
-      StartDate: "2023-11-21T18:30:00.000Z",
-      EndDate: "2023-11-23T18:30:00.000Z",
-      billtypeList: ["1"],
-      statusList: ["1"]
+      StartDate: Datesdata.start,
+      EndDate: Datesdata.end,
+      billtypeList: [
+        // "1"
+      ],
+      statusList: [
+        // "1"
+      ]
     }
     const dialogRef = this.matDialog.open(VendorBillFilterComponent, {
       data: { DefaultData: RequestData },
@@ -138,7 +152,18 @@ export class VendorBillListComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log(result)
+        let vndData = []
+        let stsData = []
+        result.vendorNamesupport.forEach(data => {
+          vndData.push(data.name);
+        });
+        result.statussupport.forEach(data => {
+          stsData.push(data.name);
+        });
+        result.vndData = vndData;
+        result.stsData = stsData;
+        this.filterRequest = result;
+        this.getVendorBill()
       }
     });
   }
@@ -146,9 +171,44 @@ export class VendorBillListComponent implements OnInit {
     console.log('BalanceFunction', event)
     this.router.navigate(['/Finance/VendorPayment/VendorBillPaymentDetails'], {
       state: {
-        data: event.data
+        data: event
       },
     });
 
   }
+  // #region to retrieve vendor bill data
+  async getVendorBill() {
+    // Get the current date
+    const now = new Date();
+
+    // Set up date range for the last 10 days
+    const Datesdata = {
+      start: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 10),
+      end: now
+    };
+
+    // Prepare the request object with default values and filterRequest overrides
+    const req = {
+      companyCode: this.companyCode,
+      startdate: this.filterRequest?.StartDate || Datesdata.start,
+      enddate: this.filterRequest?.EndDate || Datesdata.end,
+      StatusNames: this.filterRequest?.stsData || [],
+      vendorNames: this.filterRequest?.vndData || []
+    };
+
+    try {
+      // Call the vendor bill service to get the data
+      const data = await this.objVendorBillService.getVendorBillList(req);
+
+      // Set the retrieved data to the tableData property
+      this.tableData = data;
+
+      // Set tableLoad to false to indicate that the table has finished loading
+      this.tableLoad = false;
+    } catch (error) {
+      // Log the error to the console
+      console.error('Error fetching vendor bill:', error);
+    }
+  }
+  //#endregion
 }

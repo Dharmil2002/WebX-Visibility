@@ -14,7 +14,7 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            <div *ngIf="tableData">
+            <div *ngIf="isTableLode">
                 <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
                     [tableData]="tableData" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
                     [FormTitle]="'THC List'" [menuItems]="menuItems" [Link]="linkArray" [staticField]="staticField"

@@ -4,6 +4,7 @@ import { ThcPaymentFilterComponent } from "../Modal/thc-payment-filter/thc-payme
 import { Router } from "@angular/router";
 import { GetTHCListFromApi } from "../VendorPaymentAPIUtitlity";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-thc-payments",
@@ -18,11 +19,12 @@ export class ThcPaymentsComponent implements OnInit {
       active: "THC Payments",
     },
   ];
+
   RequestData = {
     vendorList: [
 
     ],
-    StartDate: new Date(-30),
+    StartDate: new Date(),
     EndDate: new Date()
   }
   linkArray = [];
@@ -77,7 +79,9 @@ export class ThcPaymentsComponent implements OnInit {
   staticField = ["SrNo", "Vendor", "THCamount"];
   companyCode = parseInt(localStorage.getItem("companyCode"));
   isTableLode = true;
-  constructor(private matDialog: MatDialog, private router: Router, private masterService: MasterService,) { }
+  constructor(private matDialog: MatDialog, private router: Router, private masterService: MasterService,) {
+    this.RequestData.StartDate.setDate(new Date().getDate() - 30);
+  }
 
   ngOnInit(): void {
     this.GetTHCData()
@@ -88,22 +92,58 @@ export class ThcPaymentsComponent implements OnInit {
   }
 
   AdvancePendingFunction(event) {
-    console.log('AdvancePendingFunction', event)
+    // Check if TotaladvAmt is greater than 0
+    const isTotaladvAmtValid = event?.data?.AdvancePending > 0;
 
-    this.router.navigate(['/Finance/VendorPayment/AdvancePayment'], {
-      state: {
-        data: event.data
-      },
-    });
+    // Check if there is any entry with advPdAt equal to "Branch"
+    const isExist = event?.data?.data?.some(entry => entry.advPdAt === localStorage.getItem('Branch'));
+    if (isExist && isTotaladvAmtValid) {
+      this.router.navigate(['/Finance/VendorPayment/AdvancePayment'], {
+        state: {
+          data: event.data
+        },
+      });
+    } else {
+      Swal.fire({
+        icon: "info",
+        title: "Data Does Not exist for Advance Payment on current branch",
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.close();
+        }
+      });
+    }
+
   }
 
   BalanceUnbilledFunction(event) {
-    console.log('BalanceUnbilledFunction', event)
-    this.router.navigate(['/Finance/VendorPayment/BalancePayment'],{
-      state: {
-        data: event.data
-      },
-    });
+    // Check if TotaladvAmt is greater than 0
+    const isTotaladvAmtValid = event?.data?.BalanceUnbilled > 0;
+
+    // Check if there is any entry with balAmtAt equal to "Branch"
+    const isExist = event?.data?.data?.some(entry => entry.balAmtAt === localStorage.getItem('Branch'));
+    if (isExist && isTotaladvAmtValid) {
+      this.router.navigate(['/Finance/VendorPayment/BalancePayment'], {
+        state: {
+          data: event.data
+        },
+      });
+    } else {
+      Swal.fire({
+        icon: "info",
+        title: "Data Does Not exist for Balance Payment on current branch",
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.close();
+        }
+      });
+    }
+
+    //BalanceUnbilled
+
+
 
   }
 

@@ -3,6 +3,8 @@ import { VendorTableData } from '../../VendorStaticData';
 import { VendorBillFilterComponent } from './vendor-bill-filter/vendor-bill-filter.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-vendor-bill-list',
@@ -91,8 +93,10 @@ export class VendorBillListComponent implements OnInit {
     { label: 'Cancel Bill' },
     { label: 'Modify' },
   ]
+  filterRequest: any;
   constructor(private matDialog: MatDialog,
-    private router: Router) { }
+    private router: Router,
+    private masterService: MasterService) { }
 
   ngOnInit(): void {
   }
@@ -123,8 +127,8 @@ export class VendorBillListComponent implements OnInit {
       vendorList: [
         "V0006", "V0007"
       ],
-      StartDate: "2023-11-21T18:30:00.000Z",
-      EndDate: "2023-11-23T18:30:00.000Z",
+      StartDate: new Date(-30),
+      EndDate: new Date(),
       billtypeList: ["1"],
       statusList: ["1"]
     }
@@ -139,6 +143,7 @@ export class VendorBillListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
         console.log(result)
+        this.filterRequest = result;
       }
     });
   }
@@ -146,7 +151,7 @@ export class VendorBillListComponent implements OnInit {
     console.log('BalanceFunction', event)
     this.router.navigate(['/Finance/VendorPayment/VendorBillPaymentDetails'], {
       state: {
-        data: event.data
+        data: event
       },
     });
 

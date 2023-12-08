@@ -10,6 +10,8 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/image-preview.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { VendorBillService } from '../../Vendor Bills/vendor-bill.service';
 
 @Component({
   selector: 'app-vendor-bill-payment-details',
@@ -99,15 +101,35 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   jsonPaymentSummaryArray: any;
   AlljsonControlPaymentSummaryFilterArray: any;
   imageData: any = {};
+  billNo: any;
   constructor(private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
     private objImageHandling: ImageHandling,
     private dialog: MatDialog,
-  ) { }
+    private route: Router,
+    private objVendorBillService: VendorBillService
+
+  ) {
+    // const PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
+    if (this.route.getCurrentNavigation()?.extras?.state != null) {
+      const PaymentData = route.getCurrentNavigation().extras.state.data;
+      this.billNo = PaymentData.billNo;
+
+    }
+    // if (PaymentData) {
+    //   //this.GetAdvancePaymentList()
+    // } else {
+    //   this.RedirectToTHCPayment()
+    // }
+  }
+  RedirectToTHCPayment() {
+    this.route.navigate(['/Finance/VendorPayment/VendorBillPayment']);
+  }
 
   ngOnInit(): void {
     this.initializeVendorBillPayment();
+    this.getBillDetail();
     this.TotalAmountList = [
       {
         count: "331800.00",
@@ -135,6 +157,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         class: `color-Success-light`,
       },
     ]
+
   }
   selectCheckBox(event) {
     console.log(event)
@@ -279,4 +302,9 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     });
   }
   //#endregion
+  async getBillDetail() {
+    const data = await this.objVendorBillService.getVendorBillDetails(this.billNo)
+    console.log(data);
+
+  }
 }

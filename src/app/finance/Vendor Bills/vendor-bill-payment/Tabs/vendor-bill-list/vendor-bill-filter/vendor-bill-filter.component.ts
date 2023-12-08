@@ -38,12 +38,12 @@ export class VendorBillFilterComponent implements OnInit {
   Close(): void {
     this.dialogRef.close();
   }
-  functionCallHandler(event) {
-    console.log(event);
+  functionCallHandler($event: any): void {
+    const functionName = $event.functionName;
     try {
-      this[event.functionName](event.data);
+      this[functionName]($event);
     } catch (error) {
-      console.log("failed");
+      console.log('Failed');
     }
   }
   initializeFormControl(): void {

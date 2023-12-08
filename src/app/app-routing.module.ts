@@ -40,20 +40,20 @@ const routes: Routes = [
         loadChildren: () =>
           import("./operation/operation.module").then((m) => m.OperationModule),
       }
-      , {
+      ,{
         path: "Finance",
         loadChildren: () =>
           import("./finance/finance.module").then((m) => m.FinanceModule),
       },
       {
-        path: "configuration",
-        loadChildren: () =>
-          import("./view-print-configuration/view-print-configuration.module").then((m) => m.ViewPrintConfigurationModule)
-      },
-      {
         path: "Reports",
         loadChildren: () =>
           import("./reports/reports.module").then((m) => m.ReportsModule),
+      },
+      {
+        path: "configuration",
+        loadChildren: () =>
+          import("./view-print-configuration/view-print-configuration.module").then((m) => m.ViewPrintConfigurationModule)
       }
     ],
   },

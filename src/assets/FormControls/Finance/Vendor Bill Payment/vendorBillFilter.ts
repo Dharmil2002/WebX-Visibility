@@ -25,19 +25,16 @@ export class vendorBillFilterControl {
                 placeholder: "Vendor Name",
                 type: "multiselect",
                 value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
                 Validations: [],
+                functions: {
+                    onToggleAll: "toggleSelectAll",
+                },
                 additionalData: {
                     isIndeterminate: false,
                     isChecked: false,
                     support: "vendorNamesupport",
                     showNameAndValue: true,
                     Validations: [],
-                },
-                functions: {
-                    onToggleAll: "toggleSelectAll",
                 },
                 generatecontrol: true,
                 disable: false,
@@ -71,19 +68,16 @@ export class vendorBillFilterControl {
                 placeholder: "Bill Type",
                 type: "multiselect",
                 value: "",
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
                 Validations: [],
+                functions: {
+                    onToggleAll: "toggleSelectAll",
+                },
                 additionalData: {
                     isIndeterminate: false,
                     isChecked: false,
                     support: "statussupport",
                     showNameAndValue: true,
                     Validations: [],
-                },
-                functions: {
-                    onToggleAll: "toggleSelectAll",
                 },
                 generatecontrol: true,
                 disable: false,
@@ -95,7 +89,15 @@ export class vendorBillFilterControl {
                 placeholder: "Select Vendor",
                 type: '',
                 value: "",// FormValues?.vendorNameList,
-                Validations: [],
+                Validations: [
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                ],
                 generatecontrol: false,
                 disable: false,
             },
@@ -105,7 +107,15 @@ export class vendorBillFilterControl {
                 placeholder: "Select Bill Type",
                 type: '',
                 value: "",// FormValues?.vendorNameList,
-                Validations: [],
+                Validations: [
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                ],
                 generatecontrol: false,
                 disable: false,
             },
@@ -115,7 +125,15 @@ export class vendorBillFilterControl {
                 placeholder: "Select Status",
                 type: '',
                 value: "",// FormValues?.vendorNameList,
-                Validations: [],
+                Validations: [
+                    {
+                        name: "invalidAutocompleteObject",
+                        message: "Choose proper value",
+                    },
+                    {
+                        name: "autocomplete",
+                    },
+                ],
                 generatecontrol: false,
                 disable: false,
             },

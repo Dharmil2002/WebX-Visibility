@@ -34,7 +34,7 @@ export class VendorBillService {
       ]
       }));
   
-      console.log(tableDataArray);
+     // console.log(tableDataArray);
       return tableDataArray;
     } catch (error) {
       // Handle errors gracefully
@@ -60,7 +60,7 @@ export class VendorBillService {
       debitNote: billDetail.aDVAMT,
       paid: billDetail.tHCAMT
     }
-    console.log(billDetail);
+    //console.log(billDetail);
     return data;
   }
 // Helper function to format the date using moment

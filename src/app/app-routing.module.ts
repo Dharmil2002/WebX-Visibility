@@ -40,10 +40,15 @@ const routes: Routes = [
         loadChildren: () =>
           import("./operation/operation.module").then((m) => m.OperationModule),
       }
-      , {
+      ,{
         path: "Finance",
         loadChildren: () =>
           import("./finance/finance.module").then((m) => m.FinanceModule),
+      },
+      {
+        path: "Reports",
+        loadChildren: () =>
+          import("./reports/reports.module").then((m) => m.ReportsModule),
       },
       {
         path: "configuration",

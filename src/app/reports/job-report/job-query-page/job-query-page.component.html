@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+    <form [formGroup]="jobQueryTableForm">
+        <app-form-webxpress [form]="jobQueryTableForm" [FormTitle]="'Job Query'" [formData]="jsonFormArray"
+            (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true" [submit]="'Filter'">
+        </app-form-webxpress>
+    </form>
+</app-common-wrapper-webxpress>

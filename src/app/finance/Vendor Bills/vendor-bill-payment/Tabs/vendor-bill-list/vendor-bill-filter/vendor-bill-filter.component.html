@@ -9,7 +9,7 @@
         <app-form-webxpress [form]="VendorBillFilterForm" [FormTitle]="'Filter Vendor Bill Payment'"
             [formData]="jsonControlArray" (functionCallEmitter)="functionCallHandler($event)"
             [className]="'col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-1'" (callFunction)="functionCallHandler($event)"
-            [showSaveAndCancelButton]="true">
+            [showSaveAndCancelButton]="true" [submit]="submit">
         </app-form-webxpress>
     </form>
 </div>

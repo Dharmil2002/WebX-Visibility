@@ -49,11 +49,6 @@ const routes: Routes = [
         path: "configuration",
         loadChildren: () =>
           import("./view-print-configuration/view-print-configuration.module").then((m) => m.ViewPrintConfigurationModule)
-      },
-      {
-        path: "Reports",
-        loadChildren: () =>
-          import("./reports/reports.module").then((m) => m.ReportsModule),
       }
     ],
   },

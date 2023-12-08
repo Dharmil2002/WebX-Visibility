@@ -4,7 +4,7 @@ import {
   UntypedFormGroup,
   Validators,
 } from "@angular/forms";
-import { Subject } from "rxjs";
+import { Subject, firstValueFrom } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -239,9 +239,8 @@ export class AdvancePaymentsComponent implements OnInit {
       DocNo: event.data.THC,
       templateName: "thc",
     };
-    const url = `${
-      window.location.origin
-    }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, "", "width=1500,height=800");
   }
   THCAmountFunction(event) {
@@ -416,7 +415,6 @@ export class AdvancePaymentsComponent implements OnInit {
   Submit() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
-        let GSTAmount = 0;
 
         const PaymentAmount = parseFloat(
           this.PayableSummaryFilterForm.get("TotalTHCAmount").value
@@ -444,7 +442,7 @@ export class AdvancePaymentsComponent implements OnInit {
           localStorage.getItem("CurrentBranchCode");
         this.debitVoucherDataRequestModel.preperedFor = "Vendor";
         this.debitVoucherDataRequestModel.partyCode =
-          this.tableData[0].OthersData?.vendorCode;
+          this.tableData[0].OthersData?.vendorCode.toString();
         this.debitVoucherDataRequestModel.partyName =
           this.tableData[0].OthersData?.vendorName;
         this.debitVoucherDataRequestModel.partyState =
@@ -469,7 +467,7 @@ export class AdvancePaymentsComponent implements OnInit {
         this.debitVoucherDataRequestModel.SGST = 0;
         this.debitVoucherDataRequestModel.CGST = 0;
         this.debitVoucherDataRequestModel.UGST = 0;
-        this.debitVoucherDataRequestModel.GSTTotal = GSTAmount;
+        this.debitVoucherDataRequestModel.GSTTotal = 0;
 
         this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
         this.debitVoucherDataRequestModel.netPayable = NetPayable;
@@ -515,75 +513,72 @@ export class AdvancePaymentsComponent implements OnInit {
         this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
         this.debitVoucherRequestModel.debitAgainstDocumentList = [];
 
-        this.voucherServicesService
-          .FinancePost(
-            "fin/account/voucherentry",
-            this.debitVoucherRequestModel
-          )
-          .subscribe({
-            next: (res: any) => {
-              console.log("res", res);
-              if (res.success) {
-                this.UpdateTHCamout();
-              }
-              // Swal.fire({
-              //   icon: "success",
-              //   title: "Voucher Created Successfully",
-              //   text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
-              //   showConfirmButton: true,
-              // }).then((result) => {
-              //   if (result.isConfirmed) {
-              //     Swal.hideLoading();
-              //     setTimeout(() => {
-              //       Swal.close();
-              //     }, 2000);
-              //     this.RedirectToTHCPayment();
-              //   }
-              // });
-            },
-            error: (err: any) => {
-              this.snackBarUtilityService.ShowCommonSwal("error", err);
-            },
+        firstValueFrom(this.voucherServicesService
+          .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+            if (res.success) {
+              this.UpdateTHCamout(res?.data?.mainData?.ops[0].vNO);
+            }
+          }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+          .finally(() => {
+
           });
+
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",
-          "Fail To Submit Data..!"
+          error.message
         );
       }
     }, "Advance Payment Voucher Generating..!");
   }
 
-  UpdateTHCamout() {
+  UpdateTHCamout(vno) {
     const isSelectedData = this.tableData.filter((x) => x.isSelected);
     console.log("isSelectedData", isSelectedData);
-    const ForkJoinArray = []
-    isSelectedData.forEach((x)=>{
+    isSelectedData.forEach((x) => {
       const UpdateAmount = x?.UpdateAmount
-      let commonBody= {
-        advAmt:x.Advance,
-        balAmt:x.THCamount - x.Advance,
-        contAmt:x.THCamount,
+      let commonBody = {
+        advAmt: x.Advance,
+        balAmt: x.THCamount - x.Advance,
+        contAmt: x.THCamount,
       }
-      if(UpdateAmount!=undefined){
-        commonBody["addedCharges"] = this.setaddedCharges(UpdateAmount.THCAmountsADDForm)
-        commonBody["deductedCharges"] = this.setdeductedCharges(UpdateAmount.THCAmountsLESSForm)
+      if (UpdateAmount != undefined) {
+        commonBody["addedCharges"] = this.convertFieldsToNumbers(UpdateAmount.THCAmountsADDForm)
+        commonBody["deductedCharges"] = this.convertFieldsToNumbers(UpdateAmount.THCAmountsLESSForm)
       }
-
-      console.log('commonBody',commonBody)
-      const req = {
+      const reqBody = {
         companyCode: this.companyCode,
         collectionName: "thc_detail",
-        filter: { thc_detail: x.THC},
+        filter: { _id: this.companyCode + "-" + x.THC },
         update: commonBody,
       };
+      firstValueFrom(this.masterService.masterPut('generic/update', reqBody)).then((res: any) => {
+        if (res.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Voucher Created Successfully And THC Updated Successfully",
+            text: "Voucher No: " + vno,
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.hideLoading();
+              setTimeout(() => {
+                Swal.close();
+              }, 2000);
+              this.RedirectToTHCPayment();
+            }
+          });
+        }
+      }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+        .finally(() => {
+        });
     })
   }
-  setaddedCharges(FormValue){
-    return {}
+  convertFieldsToNumbers(formValue) {
+    return Object.keys(formValue).reduce((acc, key) => {
+      acc[key] = parseFloat(formValue[key]);
+      return acc;
+    }, {});
   }
-  setdeductedCharges(FormValue){
-    let Object = {}
-    // Object.Keys()
-  }
+
 }

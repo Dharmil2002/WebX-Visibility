@@ -460,7 +460,7 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   setTHCamountData(result) {
-    console.log('result' ,result)
+    console.log('result', result)
     this.isTableLode = false
     const THCdata = result.THCData;
     const THCAmountsForm = result.THCAmountsForm;
@@ -470,8 +470,8 @@ export class BalancePaymentComponent implements OnInit {
         x.THCamount = (+THCAmountsForm.Advance) + (+THCAmountsForm.Balance);
         x.BalancePending = +THCAmountsForm.Balance;
         x["UpdateAmount"] = {
-          THCAmountsADDForm:result.THCAmountsADDForm,
-          THCAmountsLESSForm:result.THCAmountsLESSForm,
+          THCAmountsADDForm: result.THCAmountsADDForm,
+          THCAmountsLESSForm: result.THCAmountsLESSForm,
         }
       }
     })
@@ -648,7 +648,7 @@ export class BalancePaymentComponent implements OnInit {
         };
         firstValueFrom(this.voucherServicesService
           .FinancePost("finance/bill/vendor/create", vendorBillEntry)).then((res: any) => {
-            this.SetVendorBillEntry(res?.data?.insertedId, PaymenDetails, generateVoucher)
+            this.SetVendorBillEntry(res?.data.ops[0].docNo, PaymenDetails, generateVoucher)
           }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
           .finally(() => {
 

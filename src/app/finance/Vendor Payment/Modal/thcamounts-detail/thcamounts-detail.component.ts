@@ -38,25 +38,26 @@ export class THCAmountsDetailComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     public dialogRef: MatDialogRef<THCAmountsDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public objResult: any
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.PaymentData = this.objResult?.PaymentData;
     this.THCData = this.objResult?.THCData;
     this.Type = this.objResult?.Type;
-    this.UpdateAmount = this.THCData?.UpdateAmount
-
-    console.log('this.UpdateAmount' ,this.UpdateAmount);
-
+    if (this.THCData?.UpdateAmount == undefined) {
+      const GeneratedData = {
+        THCAmountsADDForm: this.objResult?.THCData?.OthersData?.addedCharges,
+        THCAmountsLESSForm: this.objResult?.THCData?.OthersData?.deductedCharges
+      }
+      this.UpdateAmount = GeneratedData;
+    } else {
+      this.UpdateAmount = this.THCData?.UpdateAmount
+    }
     this.initializeFormControl();
   }
   initializeFormControl() {
     const thcAmountsFormControls = new THCAmountsControl(this.Type);
     this.THCAmountsADDArray = thcAmountsFormControls.getTHCAmountsADDControls();
-    // this.THCAmountsADDForm = formGroupBuilder(this.fb, [this.THCAmountsADDArray]);
-
-    // this.THCAmountsLESSArray = thcAmountsFormControls.getTHCAmountsLESSControls();
-    // this.THCAmountsLESSForm = formGroupBuilder(this.fb, [this.THCAmountsLESSArray]);
 
     this.THCAmountsArray = thcAmountsFormControls.getTHCAmountsControls();
     this.THCAmountsForm = formGroupBuilder(this.fb, [this.THCAmountsArray]);
@@ -103,15 +104,15 @@ export class THCAmountsDetailComponent implements OnInit {
     this.isAddForm = true;
     this.isLessForm = lessCharges.length > 0;
 
-    if(this.UpdateAmount != undefined){
-      Object.keys(this.UpdateAmount.THCAmountsLESSForm).forEach((x)=>{
+    if (this.UpdateAmount != undefined) {
+      Object.keys(this.UpdateAmount.THCAmountsLESSForm).forEach((x) => {
         this.THCAmountsLESSForm.get(x).setValue(
           this.UpdateAmount.THCAmountsLESSForm[x]
         );
       })
 
-      Object.keys(this.UpdateAmount.THCAmountsADDForm).forEach((x)=>{
-        if(x != "ContractAmount" && x != "THCTotal"){
+      Object.keys(this.UpdateAmount.THCAmountsADDForm).forEach((x) => {
+        if (x != "ContractAmount" && x != "THCTotal") {
           this.THCAmountsADDForm.get(x).setValue(
             this.UpdateAmount.THCAmountsADDForm[x]
           );
@@ -130,7 +131,7 @@ export class THCAmountsDetailComponent implements OnInit {
       charges
         .filter((x) => x.Add_Deduct === operator)
         .map((x) => ({
-          name: x.SelectCharges.replaceAll(/\s/g,''),
+          name: x.SelectCharges.replaceAll(/\s/g, ''),
           label: x.SelectCharges,
           placeholder: x.SelectCharges,
           type: "number",

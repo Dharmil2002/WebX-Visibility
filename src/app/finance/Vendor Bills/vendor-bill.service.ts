@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import moment from 'moment';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 
@@ -12,27 +13,36 @@ export class VendorBillService {
   async getVendorBillList(filter) {
     try {
       // Make the asynchronous call to fetch data
-      const res = await firstValueFrom(this.masterService.masterPost('finance/getVendorBillList', filter));
-
-      // Extract relevant data and format the response
-      const tableData = {
-        vendor: `${res.vND.cD}:${res.vND.nM}`,
+      const responseArray = await firstValueFrom(this.masterService.masterPost('finance/getVendorBillList', filter));
+  
+      // Map each response object to the desired format
+      const tableDataArray = responseArray.map(res => ({
+        vendor: `${res.vND.cD} : ${res.vND.nM}`,
         billType: "Transaction Bill",
         billNo: res.docNo,
-        date: res.bDT,  // Consider using camelCase for consistency
+        Date: this.formatDate(res.bDT),
         billAmount: res.bALAMT,
         pendingAmount: res.bALPBAMT,
-        status: res.bSTATNM  // Consider using camelCase for consistency
-      };
-
-      console.log(tableData);
-      return tableData;
+        Status: res.bSTATNM,
+        actions: [
+          'Approve Bill',
+          'Bill Payment',
+          'Hold Payment',
+          'Unhold Payment',
+          'Cancel Bill',
+          'Modify'
+      ]
+      }));
+  
+      console.log(tableDataArray);
+      return tableDataArray;
     } catch (error) {
       // Handle errors gracefully
       console.error("Error fetching vendor bill list:", error);
       throw error;  // Rethrow the error to indicate that the operation failed
     }
   }
+  
 
   async getVendorBillDetails(billNo) {
     let req = {
@@ -53,5 +63,9 @@ export class VendorBillService {
     console.log(billDetail);
     return data;
   }
-
+// Helper function to format the date using moment
+ formatDate(dateString) {
+  let dt = new Date(dateString);
+  return moment(dt).format("DD/MM/YYYY");
+}
 }

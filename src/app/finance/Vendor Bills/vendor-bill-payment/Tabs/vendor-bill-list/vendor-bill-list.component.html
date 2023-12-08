@@ -1,6 +1,6 @@
 <div class="paddingdiv">
 
-    <app-generic-table-v2 *ngIf="tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
         [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
         [staticField]="staticField" [Link]="linkArray" (functionCallEmitter)="functionCallHandler($event)"
         (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [selectAllRequired]="false"

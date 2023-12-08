@@ -46,12 +46,12 @@ export class VendorBillListComponent implements OnInit {
     },
     billAmount: {
       Title: "Bill Amount(₹)",
-      class: "matcolumnright",
+      class: "matcolumncenter",
       Style: "min-width:9%",
     },
     pendingAmount: {
       Title: "Pending Amount(₹)",
-      class: "matcolumnright",
+      class: "matcolumncenter",
       Style: "min-width:9%",
     },
     Status: {

@@ -25,6 +25,7 @@ export class VendorBillFilterComponent implements OnInit {
   VendorBillFilterForm: UntypedFormGroup
   protected _onDestroy = new Subject<void>()
   companyCode = localStorage.getItem('companyCode')
+  submit = "Filter"
   constructor(private filter: FilterUtils,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,

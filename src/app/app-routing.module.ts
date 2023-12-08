@@ -53,7 +53,7 @@ const routes: Routes = [
       {
         path: "Reports",
         loadChildren: () =>
-          import("./Reports/reports.module").then((m) => m.ReportsModule),
+          import("./reports/reports.module").then((m) => m.ReportsModule),
       }
     ],
   },

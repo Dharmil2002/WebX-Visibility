@@ -18,6 +18,7 @@ import { convertToCSV, getJobregisterReportDetail } from 'src/app/Utility/module
   selector: 'app-job-query-page',
   templateUrl: './job-query-page.component.html'
 })
+
 export class JobQueryPageComponent implements OnInit {
   /*Above all are used for the Job table*/
   jobQueryTableForm: UntypedFormGroup;

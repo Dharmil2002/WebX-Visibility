@@ -7,6 +7,7 @@ export async function getJobregisterReportDetail(masterServices) {
         collectionName: "job_detail",
         filter: {}
     }
+    
     // Fetch job details from the API for "job_detail" collection
     const res = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
     // Update collection name for additional data

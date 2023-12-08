@@ -44,6 +44,7 @@ import { GeneralService } from '../Utility/module/masters/general-master/general
 import { JobQueryPageComponent } from './job-report/job-query-page/job-query-page.component';
 import { CnwGstRegisterComponent } from './cnw-gst-register/cnw-gst-register.component';
 import { ReportsRoutingModule } from './reports-routing.module';
+
 @NgModule({
   imports: [
     CommonModule,

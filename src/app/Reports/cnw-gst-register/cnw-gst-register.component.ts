@@ -10,11 +10,11 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { CnwGstService, convertToCSV } from 'src/app/Utility/module/reports/cnw.gst.service';
 import { timeString } from 'src/app/Utility/date/date-utils';
-
 @Component({
   selector: 'app-cnw-gst-register',
   templateUrl: './cnw-gst-register.component.html'
 })
+
 export class CnwGstRegisterComponent implements OnInit {
   breadScrums = [
     {

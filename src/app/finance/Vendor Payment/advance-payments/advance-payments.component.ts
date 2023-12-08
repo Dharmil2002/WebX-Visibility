@@ -171,7 +171,7 @@ export class AdvancePaymentsComponent implements OnInit {
     this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0);
   }
   async GetAdvancePaymentList() {
-    this.isTableLode = false
+    this.isTableLode = false;
     const Filters = {
       vendorName: this.PaymentData.Vendor,
       advPdAt: localStorage.getItem("Branch"),
@@ -180,8 +180,13 @@ export class AdvancePaymentsComponent implements OnInit {
       this.masterService,
       Filters
     );
-    this.tableData = GetAdvancePaymentData;
-    this.isTableLode = true
+    this.tableData = GetAdvancePaymentData.map((x) => {
+      return {
+        isSelected: false,
+        ...x,
+      };
+    });
+    this.isTableLode = true;
   }
   async SetMastersData() {
     this.AllLocationsList = await GetLocationDetailFromApi(this.masterService);
@@ -262,16 +267,20 @@ export class AdvancePaymentsComponent implements OnInit {
   }
 
   setTHCamountData(result) {
-    this.isTableLode = false
+    this.isTableLode = false;
     const THCdata = result.THCData;
     const THCAmountsForm = result.THCAmountsForm;
-    this.tableData.forEach((x)=>{
-      if(x.THC == THCdata.THC){
-        x.Advance= +THCAmountsForm.Advance;
-        x.THCamount = (+THCAmountsForm.Advance) + (+THCAmountsForm.Balance)
+    this.tableData.forEach((x) => {
+      if (x.THC == THCdata.THC) {
+        x.Advance = +THCAmountsForm.Advance;
+        x.THCamount = +THCAmountsForm.Advance + +THCAmountsForm.Balance;
+        x["UpdateAmount"] = {
+          THCAmountsADDForm: result.THCAmountsADDForm,
+          THCAmountsLESSForm: result.THCAmountsLESSForm,
+        };
       }
-    })
-    this.isTableLode = true
+    });
+    this.isTableLode = true;
   }
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
@@ -513,20 +522,24 @@ export class AdvancePaymentsComponent implements OnInit {
           )
           .subscribe({
             next: (res: any) => {
-              Swal.fire({
-                icon: "success",
-                title: "Voucher Created Successfully",
-                text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
-                showConfirmButton: true,
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  Swal.hideLoading();
-                  setTimeout(() => {
-                    Swal.close();
-                  }, 2000);
-                  this.RedirectToTHCPayment();
-                }
-              });
+              console.log("res", res);
+              if (res.success) {
+                this.UpdateTHCamout();
+              }
+              // Swal.fire({
+              //   icon: "success",
+              //   title: "Voucher Created Successfully",
+              //   text: "Voucher No: " + res?.data?.mainData?.ops[0].vNO,
+              //   showConfirmButton: true,
+              // }).then((result) => {
+              //   if (result.isConfirmed) {
+              //     Swal.hideLoading();
+              //     setTimeout(() => {
+              //       Swal.close();
+              //     }, 2000);
+              //     this.RedirectToTHCPayment();
+              //   }
+              // });
             },
             error: (err: any) => {
               this.snackBarUtilityService.ShowCommonSwal("error", err);
@@ -539,5 +552,38 @@ export class AdvancePaymentsComponent implements OnInit {
         );
       }
     }, "Advance Payment Voucher Generating..!");
+  }
+
+  UpdateTHCamout() {
+    const isSelectedData = this.tableData.filter((x) => x.isSelected);
+    console.log("isSelectedData", isSelectedData);
+    const ForkJoinArray = []
+    isSelectedData.forEach((x)=>{
+      const UpdateAmount = x?.UpdateAmount
+      let commonBody= {
+        advAmt:x.Advance,
+        balAmt:x.THCamount - x.Advance,
+        contAmt:x.THCamount,
+      }
+      if(UpdateAmount!=undefined){
+        commonBody["addedCharges"] = this.setaddedCharges(UpdateAmount.THCAmountsADDForm)
+        commonBody["deductedCharges"] = this.setdeductedCharges(UpdateAmount.THCAmountsLESSForm)
+      }
+
+      console.log('commonBody',commonBody)
+      const req = {
+        companyCode: this.companyCode,
+        collectionName: "thc_detail",
+        filter: { thc_detail: x.THC},
+        update: commonBody,
+      };
+    })
+  }
+  setaddedCharges(FormValue){
+    return {}
+  }
+  setdeductedCharges(FormValue){
+    let Object = {}
+    // Object.Keys()
   }
 }

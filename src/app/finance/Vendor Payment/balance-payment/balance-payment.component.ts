@@ -460,6 +460,7 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   setTHCamountData(result) {
+    console.log('result' ,result)
     this.isTableLode = false
     const THCdata = result.THCData;
     const THCAmountsForm = result.THCAmountsForm;
@@ -468,6 +469,10 @@ export class BalancePaymentComponent implements OnInit {
         x.Advance = +THCAmountsForm.Advance;
         x.THCamount = (+THCAmountsForm.Advance) + (+THCAmountsForm.Balance);
         x.BalancePending = +THCAmountsForm.Balance;
+        x["UpdateAmount"] = {
+          THCAmountsADDForm:result.THCAmountsADDForm,
+          THCAmountsLESSForm:result.THCAmountsLESSForm,
+        }
       }
     })
     this.selectCheckBox()

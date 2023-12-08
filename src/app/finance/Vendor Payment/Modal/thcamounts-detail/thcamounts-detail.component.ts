@@ -30,6 +30,7 @@ export class THCAmountsDetailComponent implements OnInit {
   isLessForm = false;
   companyCode: any = localStorage.getItem("companyCode");
   isAddForm: boolean = false;
+  UpdateAmount: any;
   constructor(
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
@@ -43,8 +44,9 @@ export class THCAmountsDetailComponent implements OnInit {
     this.PaymentData = this.objResult?.PaymentData;
     this.THCData = this.objResult?.THCData;
     this.Type = this.objResult?.Type;
+    this.UpdateAmount = this.THCData?.UpdateAmount
 
-    console.log('this.THCData' ,this.THCData);
+    console.log('this.UpdateAmount' ,this.UpdateAmount);
 
     this.initializeFormControl();
   }
@@ -101,6 +103,22 @@ export class THCAmountsDetailComponent implements OnInit {
     this.isAddForm = true;
     this.isLessForm = lessCharges.length > 0;
 
+    if(this.UpdateAmount != undefined){
+      Object.keys(this.UpdateAmount.THCAmountsLESSForm).forEach((x)=>{
+        this.THCAmountsLESSForm.get(x).setValue(
+          this.UpdateAmount.THCAmountsLESSForm[x]
+        );
+      })
+
+      Object.keys(this.UpdateAmount.THCAmountsADDForm).forEach((x)=>{
+        if(x != "ContractAmount" && x != "THCTotal"){
+          this.THCAmountsADDForm.get(x).setValue(
+            this.UpdateAmount.THCAmountsADDForm[x]
+          );
+        }
+      })
+    }
+
     // Trigger the onChange event for plus amounts
     this.OnChangePlusAmounts("");
   }
@@ -112,7 +130,7 @@ export class THCAmountsDetailComponent implements OnInit {
       charges
         .filter((x) => x.Add_Deduct === operator)
         .map((x) => ({
-          name: x.SelectCharges.trim(),
+          name: x.SelectCharges.replaceAll(/\s/g,''),
           label: x.SelectCharges,
           placeholder: x.SelectCharges,
           type: "number",

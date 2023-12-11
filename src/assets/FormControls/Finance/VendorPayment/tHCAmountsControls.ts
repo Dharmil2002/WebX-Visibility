@@ -1,361 +1,224 @@
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class THCAmountsControl {
-    THCAmountsArray: FormControls[];
-    THCAmountHeaderArray: FormControls[];
-    constructor(FormValues) {
-        this.THCAmountHeaderArray =
-            [
-                {
-                    name: "min",
-                    label: "Vendor",
-                    placeholder: "Contract Amount",
-                    type: "text",
-                    value: "",
-                    generatecontrol: true,
-                    disable: true,
-                    Validations: []
-                },
-                {
-                    name: "min",
-                    label: "THC Number",
-                    placeholder: "Contract Amount",
-                    type: "text",
-                    value: "",
-                    generatecontrol: true,
-                    disable: true,
-                    Validations: []
-                },
-                {
-                    name: "min",
-                    label: "Date",
-                    placeholder: "Contract Amount",
-                    type: "text",
-                    value: "",
-                    generatecontrol: true,
-                    disable: true,
-                    Validations: []
-                },
-                {
-                    name: "min",
-                    label: "Vehicle",
-                    placeholder: "Contract Amount",
-                    type: "text",
-                    value: "",
-                    generatecontrol: true,
-                    disable: true,
-                    Validations: []
-                },
-                {
-                    name: "min",
-                    label: "Contract",
-                    placeholder: "Contract ",
-                    type: "text",
-                    value: "",
-                    generatecontrol: true,
-                    disable: true,
-                    Validations: []
-                },
-            ],
-            this.THCAmountsArray = [
-                {
-                    name: "or",
-                    label: "ADD (+)",
-                    placeholder: "  ",
-                    type: "or",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                    ],
+  THCAmountsADDArray: FormControls[];
+  THCAmountsLESSArray: FormControls[];
+  THCAmountsArray: FormControls[];
+  constructor(Type) {
+    this.THCAmountsADDArray = [
+      {
+        name: "ContractAmount",
+        label: "Contract Amount",
+        placeholder: "Contract Amount",
+        type: "number",
+        value: 0.0,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        additionalData: { op: "+" },
+        functions: {
+          onChange: "OnChangePlusAmounts",
+        },
+      },
+      {
+        name: "THCTotal",
+        label: "THC Total",
+        placeholder: "Handling ",
+        type: "number",
+        value: 0.0,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+    ];
+    this.THCAmountsLESSArray = [
+      {
+        name: "Freightdeduction",
+        label: "Freight deduction",
+        placeholder: "Freight deduction",
+        type: "number",
+        value: 0.0,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        additionalData: { op: "-" },
+        functions: {
+          onChange: "OnChangePlusAmounts",
+        },
+      },
 
-                },
-                {
-                    name: "or",
-                    label: "LESS (-)",
-                    placeholder: "  ",
-                    type: "or",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                    ],
+      {
+        name: "Penalty",
+        label: "Penalty",
+        placeholder: "Penalty ",
+        type: "number",
+        value: 0.0,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        additionalData: { op: "-" },
+        functions: {
+          onChange: "OnChangePlusAmounts",
+        },
+      },
 
-                },
-                {
-                    name: "min",
-                    label: "Contract Amount",
-                    placeholder: "Contract Amount",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "+", }
-                },
-                {
-                    name: "min",
-                    label: "Freight deduction",
-                    placeholder: "Freight deduction",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "-", }
-                },
-                {
-                    name: "min",
-                    label: "Loading",
-                    placeholder: "Loading ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "+", },
-                },
-                {
-                    name: "min",
-                    label: "Penalty",
-                    placeholder: "Penalty ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "-", },
-                },
-                {
-                    name: "min",
-                    label: "Unloading",
-                    placeholder: "Unloading ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "+", },
-                },
-                {
-                    name: "min",
-                    label: "Claim",
-                    placeholder: "Claim ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "-", },
-                },
-                {
-                    name: "min",
-                    label: "Mamul",
-                    placeholder: "Mamul ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "+", },
-                },
-                {
-                    name: "min",
-                    label: "Late Arrival",
-                    placeholder: "Late Arrival ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "-" },
-                },
-                {
-                    name: "min",
-                    label: "Incentive",
-                    placeholder: "Incentive ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "+", },
-                },
-                {
-                    name: "min",
-                    label: "Incentive",
-                    placeholder: "Incentive ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "-", },
-                },
-                {
-                    name: "min",
-                    label: "Handling",
-                    placeholder: "Handling ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "+", },
-                },
-                {
-                    name: "or",
-                    label: "ADD (+)",
-                    placeholder: "  ",
-                    type: "text",
-                    value: "",
-                    generatecontrol: false,
-                    disable: false,
-                    Validations: [
-                    ],
+      {
+        name: "Claim",
+        label: "Claim",
+        placeholder: "Claim ",
+        type: "number",
+        value: 0.0,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        additionalData: { op: "-" },
+        functions: {
+          onChange: "OnChangePlusAmounts",
+        },
+      },
 
-                },
-                {
-                    name: "min",
-                    label: "THC Total",
-                    placeholder: "Handling ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "+", },
-                },
-                {
-                    name: "or",
-                    label: "ADD (+)",
-                    placeholder: "  ",
-                    type: "text",
-                    value: "",
-                    generatecontrol: false,
-                    disable: false,
-                    Validations: [
-                    ],
-                },
-                {
-                    name: "min",
-                    label: "Advance",
-                    placeholder: "Handling ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "+", },
-                },
+      {
+        name: "LateArrival",
+        label: "Late Arrival",
+        placeholder: "Late Arrival ",
+        type: "number",
+        value: 0.0,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        additionalData: { op: "-" },
+        functions: {
+          onChange: "OnChangePlusAmounts",
+        },
+      },
 
-                {
-                    name: "min",
-                    label: "Advance Location",
-                    placeholder: "Handling ",
-                    type: "text",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [],
-                },
+      {
+        name: "Detention",
+        label: "Detention",
+        placeholder: "Detention ",
+        type: "number",
+        value: 0.0,
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        functions: {
+          onChange: "OnChangePlusAmounts",
+        },
+      },
+    ];
 
-                {
-                    name: "min",
-                    label: "Balance",
-                    placeholder: "Handling ",
-                    type: "number",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [
-                        {
-                            name: "pattern",
-                            message: "Please Enter only positive numbers with up to two decimal places",
-                            pattern: '^\\d+(\\.\\d{1,2})?$'
-                        }],
-                    additionalData: { op: "+", },
-                },
-                {
-                    name: "min",
-                    label: "Balance location",
-                    placeholder: "Handling ",
-                    type: "text",
-                    value: "",
-                    generatecontrol: true,
-                    disable: false,
-                    Validations: [],
-                },
-            ]
-    }
-    getTHCHeaderControls() {
-        return this.THCAmountHeaderArray;
-    }
-    getTHCDetailsControls() {
-        return this.THCAmountsArray;
-    }
+    this.THCAmountsArray = [
+      {
+        name: "Advance",
+        label: "Advance",
+        placeholder: "Handling ",
+        type: "number",
+        value: 0.0,
+        generatecontrol: true,
+        disable: Type == "balance" ? true : false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        functions: {
+          onChange: "OnChangeAdvanceAmount",
+        },
+      },
+      {
+        name: "AdvanceLocation",
+        label: "Advance Location",
+        placeholder: "Handling ",
+        type: "text",
+        value: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+      {
+        name: "Balance",
+        label: "Balance",
+        placeholder: "Handling ",
+        type: "number",
+        value: 0.0,
+        generatecontrol: true,
+        disable: Type == "Advance" ? true : false,
+        Validations: [
+          {
+            name: "pattern",
+            message:
+              "Please Enter only positive numbers with up to two decimal places",
+            pattern: "^\\d+(\\.\\d{1,2})?$",
+          },
+        ],
+        // functions: {
+        //     onChange: "OnChangeBalanceAmount"
+        // },
+      },
+
+      {
+        name: "Balancelocation",
+        label: "Balance location",
+        placeholder: "Handling ",
+        type: "text",
+        value: "",
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
+    ];
+  }
+  getTHCAmountsADDControls() {
+    return this.THCAmountsADDArray;
+  }
+  getTHCAmountsLESSControls() {
+    return this.THCAmountsLESSArray;
+  }
+  getTHCAmountsControls() {
+    return this.THCAmountsArray;
+  }
 }

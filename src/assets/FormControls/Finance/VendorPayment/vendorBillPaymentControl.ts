@@ -156,26 +156,9 @@ export class vendorBillPaymentControl {
               disable: false,
               Validations: [],
               additionalData: {
-                minDate: new Date(),
+                // minDate: new Date(),
               },
             },
-            {
-              name: "ScanSupportingdocument",
-              label: "Scan Supporting document",
-              placeholder: "",
-              type: "file",
-              value: "",
-              Validations: [],
-              additionalData: {
-                isFileSelected: true
-              },
-              functions: {
-                onChange: "selectFileScanDocument",
-              },
-              generatecontrol: true,
-              disable: false,
-            },
-      
           ]
     }
     getbillPaymentHeaderArrayControl() {

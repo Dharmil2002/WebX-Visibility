@@ -1,7 +1,7 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
     <div class="row">
-        <form [formGroup]="vendorbillPaymentForm">
-            <app-form-webxpress [form]="vendorbillPaymentForm" [FormTitle]="'Vendor : V001:Adarsh Roadlines'"
+        <form *ngIf="isFormLode" [formGroup]="vendorbillPaymentForm">
+            <app-form-webxpress [form]="vendorbillPaymentForm" [FormTitle]="vendor"
                 [formData]="jsonVendorBillPaymentArray" (functionCallEmitter)="functionCallHandler($event)"
                 [className]="'col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-1 '" (callFunction)="functionCallHandler($event)"
                 [showSaveAndCancelButton]="false">
@@ -21,6 +21,8 @@
                     (onFlagChange)="selectCheckBox($event)" [onFlagChangeGetAll]="true" [FormTitle]="'Bill List'"
                     [TitleBoxData]="TotalAmountList">
                 </app-generic-table-v2>
+            </div>
+            <div *ngIf="isFormLode">
                 <form [formGroup]="PaymentSummaryFilterForm">
                     <app-form-webxpress [form]="PaymentSummaryFilterForm" [FormTitle]="'Payment Summary'"
                         [formData]="jsonPaymentSummaryArray" (functionCallEmitter)="functionCallHandler($event)"

@@ -3,6 +3,7 @@ import { formatDate } from "src/app/Utility/date/date-utils";
 export async function GetTHCListFromApi(masterService, RequestBody) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
+        branch: localStorage.getItem('Branch'),
         startdate: RequestBody.StartDate,
         enddate: RequestBody.EndDate,
         vendorNames: RequestBody.vendorList,
@@ -17,6 +18,7 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
             THCamount: x.THCAmount,
             AdvancePending: x.TotaladvAmt,
             BalanceUnbilled: x.TotalcontAmt,
+            data: x.data
         })) ?? null;
         return result
 

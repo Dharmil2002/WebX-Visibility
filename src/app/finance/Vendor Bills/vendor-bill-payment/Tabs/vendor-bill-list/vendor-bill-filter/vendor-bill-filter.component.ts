@@ -25,6 +25,7 @@ export class VendorBillFilterComponent implements OnInit {
   VendorBillFilterForm: UntypedFormGroup
   protected _onDestroy = new Subject<void>()
   companyCode = localStorage.getItem('companyCode')
+  submit = "Filter"
   constructor(private filter: FilterUtils,
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
@@ -37,12 +38,12 @@ export class VendorBillFilterComponent implements OnInit {
   Close(): void {
     this.dialogRef.close();
   }
-  functionCallHandler(event) {
-    console.log(event);
+  functionCallHandler($event: any): void {
+    const functionName = $event.functionName;
     try {
-      this[event.functionName](event.data);
+      this[functionName]($event);
     } catch (error) {
-      console.log("failed");
+      console.log('Failed');
     }
   }
   initializeFormControl(): void {
@@ -59,23 +60,23 @@ export class VendorBillFilterComponent implements OnInit {
     const statusList = status
 
     if (this.objResult.DefaultData) {
-      const vendorNames = this.objResult?.DefaultData?.vendorList;
+      const vendorNames = this.objResult?.DefaultData?.vendorNames;
       const selectedData = vendordetailList.filter((x) =>
-        vendorNames.includes(x.value)
+        vendorNames.includes(x.name)
       );
       this.VendorBillFilterForm.controls['vendorNamesupport'].setValue(selectedData);
 
-      const status = this.objResult?.DefaultData?.statusList;
+      const status = this.objResult?.DefaultData?.StatusNames;
       const selectedStatusData = statusList.filter((x) =>
-        status.includes(x.value)
+        status.includes(x.name)
       );
       this.VendorBillFilterForm.controls['statussupport'].setValue(selectedStatusData);
 
-      const billtype = this.objResult?.DefaultData?.billtypeList;
-      const selectedbilltypeData = billTypeList.filter((x) =>
-        billtype.includes(x.value)
-      );
-      this.VendorBillFilterForm.controls['billTypesupport'].setValue(selectedbilltypeData);
+      // const billtype = this.objResult?.DefaultData?.billtypeList;
+      // const selectedbilltypeData = billTypeList.filter((x) =>
+      //   billtype.includes(x.value)
+      // );
+      // this.VendorBillFilterForm.controls['billTypesupport'].setValue(selectedbilltypeData);
     }
 
     this.filter.Filter(

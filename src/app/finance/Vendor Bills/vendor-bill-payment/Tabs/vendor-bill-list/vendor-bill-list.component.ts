@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { VendorTableData } from '../../VendorStaticData';
 import { VendorBillFilterComponent } from './vendor-bill-filter/vendor-bill-filter.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { MasterService } from 'src/app/core/service/Masters/master.service';
+import { VendorBillService } from '../../../vendor-bill.service';
+import { firstValueFrom } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vendor-bill-list',
@@ -14,7 +17,7 @@ export class VendorBillListComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
-  tableData = VendorTableData
+  tableData: any[]
   columnHeader = {
     checkBoxRequired: {
       Title: "Select",
@@ -45,12 +48,12 @@ export class VendorBillListComponent implements OnInit {
     },
     billAmount: {
       Title: "Bill Amount(₹)",
-      class: "matcolumnright",
+      class: "matcolumncenter",
       Style: "min-width:9%",
     },
     pendingAmount: {
       Title: "Pending Amount(₹)",
-      class: "matcolumnright",
+      class: "matcolumncenter",
       Style: "min-width:9%",
     },
     Status: {
@@ -91,11 +94,24 @@ export class VendorBillListComponent implements OnInit {
     { label: 'Cancel Bill' },
     { label: 'Modify' },
   ]
+  filterRequest = {
+    companyCode: this.companyCode,
+    vendorNames: [],
+    StatusNames: [],
+    startdate: new Date(),
+    enddate: new Date()
+  }
   constructor(private matDialog: MatDialog,
-    private router: Router) { }
+    private route: Router,
+    private objVendorBillService: VendorBillService,
+    private masterService: MasterService) {
+    this.filterRequest.startdate.setDate(new Date().getDate() - 30);
+  }
 
   ngOnInit(): void {
+    this.getVendorBill()
   }
+
   functionCallHandler(event) {
     console.log(event);
     try {
@@ -104,32 +120,52 @@ export class VendorBillListComponent implements OnInit {
       console.log("failed");
     }
   }
-  async handleMenuItemClick(data) { }
+  //#region to approve bill
+  async handleMenuItemClick(data) {
+    const id = data.data._id;
+    if (data.label.label === 'Approve Bill') {
+
+      const updateData = {
+        bSTATNM: "Approved",
+        bSTAT: 2,
+        mODDT: new Date(),
+        mODBY: localStorage.getItem("UserName"),
+        mODLOC: localStorage.getItem("Branch")
+      };
+      let req = {
+        companyCode: this.companyCode,
+        filter: { _id: id },
+        collectionName: "vend_bill_summary",
+        update: updateData
+      }
+
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Status is Approved",
+          showConfirmButton: true,
+        });
+
+      }
+      this.getVendorBill();
+
+    };
+
+  }
+  //#endregion
   //#region to call function on change of service selection
   async selectCheckBox(event) {
     console.log(event);
 
-    //  Update the selected contract types
-    // this.selectedContractType = event
-    //   .filter(item => item.isSelected)
-    //   .map(item => item.typeName);
-
-    // this.objContractService.setContractType(this.selectedContractType);
-    // this.save(this.selectedContractType);
   }
   //#endregion
   filterFunction() {
-    let RequestData = {
-      vendorList: [
-        "V0006", "V0007"
-      ],
-      StartDate: "2023-11-21T18:30:00.000Z",
-      EndDate: "2023-11-23T18:30:00.000Z",
-      billtypeList: ["1"],
-      statusList: ["1"]
-    }
+
     const dialogRef = this.matDialog.open(VendorBillFilterComponent, {
-      data: { DefaultData: RequestData },
+      data: { DefaultData: this.filterRequest },
       width: "60%",
       disableClose: true,
       position: {
@@ -138,17 +174,47 @@ export class VendorBillListComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log(result)
+        this.filterRequest.StatusNames = result.statussupport.map(item => item.name)
+        this.filterRequest.vendorNames = result.vendorNamesupport.map(item => item.name)
+        this.filterRequest.startdate = result.StartDate,
+          this.filterRequest.enddate = result.EndDate,
+          this.getVendorBill()
       }
     });
   }
   BalanceFunction(event) {
     console.log('BalanceFunction', event)
-    this.router.navigate(['/Finance/VendorPayment/VendorBillPaymentDetails'], {
+    this.route.navigate(['/Finance/VendorPayment/VendorBillPaymentDetails'], {
       state: {
-        data: event.data
+        data: event
       },
     });
 
   }
+  // #region to retrieve vendor bill data
+  async getVendorBill() {
+    try {
+      // Call the vendor bill service to get the data
+      let data = await this.objVendorBillService.getVendorBillList(this.filterRequest);
+
+      data.forEach(element => {
+        if (element.Status === 'Approved') {
+          // Remove 'Approve Bill' from the actions array
+          const index = element.actions.indexOf('Approve Bill');
+          if (index !== -1) {
+            element.actions.splice(index, 1);
+          }
+        }
+      });
+      // Set the retrieved data to the tableData property
+      this.tableData = data;
+
+      // Set tableLoad to false to indicate that the table has finished loading
+      this.tableLoad = false;
+    } catch (error) {
+      // Log the error to the console
+      console.error('Error fetching vendor bill:', error);
+    }
+  }
+  //#endregion 
 }

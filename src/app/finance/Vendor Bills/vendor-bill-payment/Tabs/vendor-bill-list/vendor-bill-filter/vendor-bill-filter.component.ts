@@ -54,7 +54,7 @@ export class VendorBillFilterComponent implements OnInit {
   }
   async getVendorList(): Promise<void> {
 
-    const vendordetailList = await getVendorDetails(this.masterService, this.companyCode);
+    const vendordetailList = await getVendorDetails(this.masterService);
 
     const billTypeList = billType
     const statusList = status

@@ -1,0 +1,8 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath" (toggleChange)="onToggleChange($event)">
+  <form [formGroup]="tenantTableForm">
+    <app-form-webxpress [form]="tenantTableForm" [formData]="jsonControlTenantArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+      (callFunction)="functionCallHandler($event)" [submit]="submit" [FormTitle]="'Tenant Details'">
+    </app-form-webxpress>
+  </form>
+</app-common-wrapper-webxpress>

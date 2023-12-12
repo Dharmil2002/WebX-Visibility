@@ -160,6 +160,8 @@ import { AddaccountComponent } from './Account-master/account-master/addaccount/
 import { AddGroupComponent } from './Account-master/group-master/add-group/add-group.component';
 import { ListGroupComponent } from './Account-master/group-master/list-group/list-group.component';
 import { CustomerContractNonFreightChargesPopupComponent } from './Customer Contract/CustomerContractTabs/customer-contract-non-freight-charges-popup/customer-contract-non-freight-charges-popup.component';
+import { AddTenantComponent } from './Tenant Setup/add-tenant/add-tenant.component';
+import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -335,6 +337,8 @@ import { CustomerContractNonFreightChargesPopupComponent } from './Customer Cont
     AddGroupComponent,
     ListGroupComponent,
     CustomerContractNonFreightChargesPopupComponent,
+    AddTenantComponent,
+    TenantListComponent,
   ],
 
   providers: [

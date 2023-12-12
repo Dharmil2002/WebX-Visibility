@@ -177,6 +177,14 @@
       "router": "Masters/CompanyMaster/AddCompany"
     },
     {
+      "title": "TenantMaster/TenantMasterList",
+      "tag": [
+        "TenantMaster",
+        "AddCTenant"
+      ],
+      "router": "Masters/TenantMaster/TenantMasterList"
+    },
+    {
       "title": "CustomerMaster/CustomerMasterList",
       "tag": [
         "CustomerMaster",

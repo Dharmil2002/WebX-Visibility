@@ -86,9 +86,13 @@ import { ListTdsComponent } from './Account-master/tds-master/list-tds/list-tds.
 import { AddAccountComponent } from './Account/Account Master/add-account/add-account.component';
 import { AddNewCustomerContractComponent } from './Customer Contract/add-new-customer-contract/add-new-customer-contract.component';
 import { AddNewVendorContractComponent } from './vendor-contract/add-new-vendor-contract/add-new-vendor-contract.component';
+import { AddTenantComponent } from './Tenant Setup/add-tenant/add-tenant.component';
+import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.component';
 
 
 const routes: Routes = [
+  { path: "TenantMaster/TenantMasterList", component: TenantListComponent },
+  { path: "TenantMaster/AddTenantMaster", component: AddTenantComponent },
   { path: "SAC-HSNMaster/SAC-HSNView", component: SacMasterListComponent },
   { path: "SAC-HSNMaster/AddSAC-HSN", component: AddSacMasterComponent },
   { path: 'Docket/Create', component: CNoteGenerationComponent },

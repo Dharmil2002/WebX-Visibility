@@ -2,14 +2,14 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class vendorBillPaymentControl {
     billPaymentHeaderArray: FormControls[];
     PaymentSummaryFilterArray: FormControls[];
-    constructor(FormValues) {
+    constructor() {
         this.billPaymentHeaderArray = [
             {
                 name: "VendorPANNumber",
                 label: "Vendor PAN Number",
                 placeholder: "Vendor PAN Number",
                 type: "textwithbutton",
-                value: FormValues?.VendorPANNumber,
+                value: '',
                 generatecontrol: true,
                 disable: false,
                 Validations: [],

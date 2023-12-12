@@ -1,10 +1,4 @@
 import { Component, OnInit } from "@angular/core";
-import {
-  DocumentGenerated,
-  OthrPaymentSummary,
-  PaymentSummary,
-  VendorBillPayment,
-} from "../../Vendor Bills/vendor-bill-payment/VendorStaticData";
 import { vendorBillPaymentControl } from "src/assets/FormControls/Finance/VendorPayment/vendorBillPaymentControl";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import {
@@ -19,11 +13,7 @@ import {
 } from "../../Vendor Payment/VendorPaymentAPIUtitlity";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
-import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
-import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
-import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { firstValueFrom } from "rxjs";
 import moment from "moment";
 
@@ -44,7 +34,6 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
-  // tableData = VendorBillPayment
   tableData: any;
 
   columnHeader = {
@@ -56,9 +45,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     bILLNO: {
       Title: "Bill No",
       class: "matcolumncenter",
-      Style: "min-width:200px",
-      type: "Link",
-      functionName: "billNoFunction",
+      Style: "min-width:200px"
     },
     eNTDT: {
       Title: "Generation Date",
@@ -102,7 +89,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   addFlag = true;
   menuItemflag = true;
 
-  staticField = ["bALAMT", "tHCAMT", "debitNote", "eNTDT", "aDVAMT", "payment"];
+  staticField = ["bALAMT", "tHCAMT", "debitNote", "eNTDT", "aDVAMT", "payment", "bILLNO"];
   summaryStaticField = ["amt", "institute", "ref", "paymentMethod"];
   documentSaticField = ["docNo", "document", "date"];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
@@ -145,21 +132,20 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   billNo: any;
   billData: any;
   BillPaymentData: any;
-  vendor: any ;
+  vendor: any;
+  backPath: string;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
-    private objImageHandling: ImageHandling,
-    private dialog: MatDialog,
     private route: Router,
-    private objVendorBillService: VendorBillService
   ) {
     this.billData = this.route.getCurrentNavigation()?.extras?.state?.data;
     console.log("this.billData", this.billData);
   }
 
   ngOnInit(): void {
+    this.backPath = "/Finance/VendorPayment/VendorBillPayment"
     if (this.billData) {
       this.vendor = this.billData.vendor;
       this.initializeVendorBillPayment();
@@ -229,16 +215,12 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       }
     });
   }
-  billNoFunction(event) {}
+
   // Initialize the vendor bill payment module
   initializeVendorBillPayment() {
-    // Create a request object with vendor details
-    const RequestObj = {
-      VendorPANNumber: "AACCG464648ZS",
-    };
 
     // Initialize the vendor bill payment control with the request object
-    this.vendorBillPaymentControl = new vendorBillPaymentControl(RequestObj);
+    this.vendorBillPaymentControl = new vendorBillPaymentControl();
 
     // Retrieve the bill payment header array from the control
     this.jsonVendorBillPaymentArray =
@@ -256,19 +238,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     this.jsonPaymentSummaryArray = this.jsonPaymentSummaryArray.slice(0, 1);
     this.isFormLode = true;
     this.getBillPayment();
-    this.GetVendorInformation();
+    this.vendorbillPaymentForm.controls["VendorPANNumber"].setValue(this.billData?.vPan)
   }
-
-  async GetVendorInformation() {
-    const VendorDetails = await GetSingleVendorDetailsFromApi(
-      this.masterService,
-      this.billData.Vendor
-    );
-    this.vendorbillPaymentForm
-      .get("VendorPANNumber")
-      .setValue(VendorDetails?.panNo);
-  }
-
   async getBillPayment() {
     let req = {
       companyCode: this.companyCode,

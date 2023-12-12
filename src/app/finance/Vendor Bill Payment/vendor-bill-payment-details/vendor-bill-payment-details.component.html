@@ -1,4 +1,4 @@
-<app-common-wrapper-webxpress [breadscrums]="breadScrums">
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
     <div class="row">
         <form *ngIf="isFormLode" [formGroup]="vendorbillPaymentForm">
             <app-form-webxpress [form]="vendorbillPaymentForm" [FormTitle]="vendor"

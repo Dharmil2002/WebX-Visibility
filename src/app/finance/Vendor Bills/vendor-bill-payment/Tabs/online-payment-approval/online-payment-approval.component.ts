@@ -96,7 +96,7 @@ export class OnlinePaymentApprovalComponent implements OnInit {
 
   // #region to retrieve vendor bill data
   async getVendorBill() {
-    this.tableLoad = true
+    //this.tableLoad = true
     try {
       // Call the vendor bill service to get the data
       const data = await this.objVendorBillService.getVendorBillList(this.filterRequest);

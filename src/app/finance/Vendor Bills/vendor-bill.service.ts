@@ -25,6 +25,7 @@ export class VendorBillService {
         billAmount: res.bALAMT,
         pendingAmount: res.bALPBAMT,
         Status: res.bSTATNM,
+        vPan:res.vND.pAN,
         actions: [
           'Approve Bill',
           'Bill Payment',

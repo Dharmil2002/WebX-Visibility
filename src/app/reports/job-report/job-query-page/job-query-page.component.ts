@@ -6,6 +6,7 @@ import { Subject, take, takeUntil } from 'rxjs';
 import { FilterUtils } from 'src/app/Utility/Form Utilities/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { timeString } from 'src/app/Utility/date/date-utils';
+import { getJobregisterReportDetail } from 'src/app/Utility/module/reports/job-register.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getJobDetailFromApi } from 'src/app/dashboard/tabs/job-summary-page/job-summary-utlity';
@@ -13,7 +14,6 @@ import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoi
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 
 import { jobQueryControl } from 'src/assets/FormControls/job-reports/job-query';
-import { getJobregisterReportDetail } from 'src/app/Reports/job-report/job-query-page/job-register-utlity';
 
 @Component({
   selector: 'app-job-query-page',

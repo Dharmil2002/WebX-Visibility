@@ -167,8 +167,17 @@ export class CnwGstRegisterComponent implements OnInit {
 
   async getDropDownList() {
     const locationList = await this.locationService.getLocationList();
-    const paymentType: AutoComplateCommon[] = await this.generalService.getGeneralMaster('PAYTYP');
-    const transMode: AutoComplateCommon[] = await this.generalService.getGeneralMaster('tran_mode');
+    const paymentType: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "PAYTYP" }, "codeDesc", "codeId");
+    const transMode: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "tran_mode" }, "codeDesc", "codeId");
+    // const paymentType: AutoComplateCommon[] = await this.generalService.getGeneralMaster('PAYTYP');
+    // const transMode: AutoComplateCommon[] = await this.generalService.getGeneralMaster('tran_mode');
+    this.filter.Filter(
+      this.jsoncnoteFormArray,
+      this.cnoteTableForm,
+      paymentType,
+      this.payName,
+      this.payStatus
+    );
     this.filter.Filter(
       this.jsoncnoteFormArray,
       this.cnoteTableForm,
@@ -186,19 +195,11 @@ export class CnwGstRegisterComponent implements OnInit {
     this.filter.Filter(
       this.jsoncnoteFormArray,
       this.cnoteTableForm,
-      paymentType,
-      this.payName,
-      this.payStatus
-    );
-    this.filter.Filter(
-      this.jsoncnoteFormArray,
-      this.cnoteTableForm,
       transMode,
       this.tranModeName,
       this.transModeStatus
     );
   }
-
   async save() {
     // Fetch data from the service
     let data = await this.cnwGstService.getCNoteGSTregisterReportDetail();

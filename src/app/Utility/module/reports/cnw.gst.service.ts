@@ -30,9 +30,9 @@ export class CnwGstService {
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          let jobList = [];
+          let cnotegstList = [];
           res.data.map((element) => {
-               let jobData = {
+               let jobgstData = {
                     "docketNumber": element?.docketNumber || "",
                     "odocketDate": element.docketDate,
                     "docketDate": formatDocketDate(element?.docketDate || ""),
@@ -79,9 +79,9 @@ export class CnwGstService {
                     "gstcharAmt": element?.gstChargedAmount || "",
                     "TotAmt": element?.totalAmount || ""
                }
-               jobList.push(jobData)
+               cnotegstList.push(jobgstData)
           })
-          return jobList
+          return cnotegstList
      }
 }
 
@@ -105,3 +105,4 @@ export function convertToCSV(data: any[], headers: { [key: string]: string }): s
 
      return header + rows.join('');
 }
+

@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { GeneralMaster } from "src/app/Models/general-master/general-master";
+import { AutoComplateCommon } from "src/app/core/models/AutoComplateCommon";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 
 @Injectable({
@@ -47,5 +48,20 @@ async getDataForAutoComplete(containerName, filter, nameField, valueField ): Pro
     // Map the GeneralMaster objects to AutoComplete objects and return the strongly typed result.
     return res.data.map((x) => { return { name: x[nameField], value: x[valueField] } });
 }
+/*here below the function for the repelica of above function beacuase above the function is return the AutoComplate and i want AutoComplateCommon*/
+async getDataForMultiAutoComplete(containerName, filter, nameField, valueField ): Promise<AutoComplateCommon[]> {
+    // Construct the request body with the companyCode, collectionName, and filter.
+    const reqBody = {
+        companyCode: localStorage.getItem("companyCode"),
+        collectionName: containerName,
+        filter: filter
+    };
 
+    // Send a POST request to the masterService to retrieve data and await the response.
+    const res = await firstValueFrom(this.masterService.masterPost("generic/get", reqBody));
+
+    // Map the GeneralMaster objects to AutoComplete objects and return the strongly typed result.
+    return res.data.map((x) => { return { name: x[nameField], value: x[valueField] } });
+}
+/*End*/
 }

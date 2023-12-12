@@ -820,6 +820,22 @@
         "job-query"
       ],
       "router": "Reports/job-query"
+    },
+    {
+      "title": "Reports/CNote-GST-Register Report",
+      "tag": [
+        "cnote-register",
+        "cnote-register"
+      ],
+      "router": "Reports/cnote-GST-register"
+    },
+    {
+      "title": "Reports/CNote-Bill-MR-Report",
+      "tag": [
+        "cnote-bill-mr",
+        "cnote-bill-mr"
+      ],
+      "router": "Reports/cnote-Bill-MR-Report"
     }
   ]
 }

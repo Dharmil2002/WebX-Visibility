@@ -54,7 +54,7 @@ export class ProductChargesComponent implements OnInit {
       Style: "min-width:20%",
     },
     actionDelete: {
-      Title: "Delete",  
+      Title: "Delete",
       class: "matcolumncenter",
       Style: "min-width:10%;",
     },
@@ -120,7 +120,7 @@ export class ProductChargesComponent implements OnInit {
   initializeFormControl() {
     const customerFormControls = new ProductControls();
     this.jsonControlArray = customerFormControls.getChargesControlsArray();
-    console.log('this.jsonControlArray' ,this.jsonControlArray)
+    console.log("this.jsonControlArray", this.jsonControlArray);
     // Build the form group using formGroupBuilder function and the values of accordionData
     this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
@@ -147,7 +147,7 @@ export class ProductChargesComponent implements OnInit {
     const Res = await this.masterService
       .masterPost("generic/get", req)
       .toPromise();
-    console.log('Res' ,Res)
+    console.log("Res", Res);
     if (Res.success && Res.data.length > 0) {
       this.ChargesList = Res.data.map((x) => {
         return {
@@ -224,7 +224,24 @@ export class ProductChargesComponent implements OnInit {
     }
   }
   async save() {
+    let Tablereq = {
+      companyCode: this.companyCode,
+      filter: { ProductId: this.ProductId, ChargesType: this.selectedValue },
+      collectionName: "product_charges_detail",
+    };
+
+    const tableRes = await this.masterService
+      .masterPost("generic/get", Tablereq)
+      .toPromise();
+    const length = tableRes.data.length;
+    const index =
+      length == 0
+        ? 0
+        : parseInt(tableRes.data[length - 1].ChargesCode.substring(3));
+    const padding = index < 9 ? "00" : index < 99 ? "0" : "";
     const Body = {
+      _id:`${this.companyCode}-${this.ProductId}-CHA${padding}${index + 1}`,
+      ChargesCode: `CHA${padding}${index + 1}`,
       ProductName: this.ProductName,
       ProductId: this.ProductId,
       SelectCharges: this.customerTableForm.value.SelectCharges.name,

@@ -31,6 +31,7 @@ export class THCAmountsDetailComponent implements OnInit {
   companyCode: any = localStorage.getItem("companyCode");
   isAddForm: boolean = false;
   UpdateAmount: any;
+  ChargesData: any;
   constructor(
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
@@ -41,10 +42,11 @@ export class THCAmountsDetailComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    console.log('objResult' ,this.objResult)
     this.PaymentData = this.objResult?.PaymentData;
     this.THCData = this.objResult?.THCData;
     this.Type = this.objResult?.Type;
-    if (this.THCData?.UpdateAmount == undefined) {
+    if (this.THCData?.cRGLST) {
       const GeneratedData = {
         THCAmountsADDForm: this.objResult?.THCData?.OthersData?.addedCharges,
         THCAmountsLESSForm: this.objResult?.THCData?.OthersData?.deductedCharges
@@ -103,8 +105,8 @@ export class THCAmountsDetailComponent implements OnInit {
     // Set flags indicating whether add and less charges exist
     this.isAddForm = true;
     this.isLessForm = lessCharges.length > 0;
-
-    if (this.UpdateAmount != undefined) {
+    console.log("this.UpdateAmount" ,this.UpdateAmount)
+    if (this.UpdateAmount.THCAmountsADDForm != undefined && this.UpdateAmount.THCAmountsLESSForm != undefined) {
       Object.keys(this.UpdateAmount.THCAmountsLESSForm).forEach((x) => {
         this.THCAmountsLESSForm.get(x).setValue(
           this.UpdateAmount.THCAmountsLESSForm[x]
@@ -165,9 +167,10 @@ export class THCAmountsDetailComponent implements OnInit {
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
     );
-
+      console.log('res' , res)
     // Check if the request was successful and data is available
     if (res.success && res.data.length > 0) {
+      this.ChargesData = res.data
       // Filter and map charges based on the specified operator
       return filterCharges(res.data, operator);
     }
@@ -195,6 +198,7 @@ export class THCAmountsDetailComponent implements OnInit {
         : +this.THCAmountsLESSForm.value[x.name];
     });
     const THCTotal = AddTHCTotal - LessAmount;
+    console.log('THCTotal' ,THCTotal)
     this.THCAmountsADDForm.get("THCTotal").setValue(THCTotal.toFixed(2));
     this.THCAmountsForm.get("Advance").setValue(
       (+this.THCData?.Advance).toFixed(2)
@@ -230,14 +234,28 @@ export class THCAmountsDetailComponent implements OnInit {
     this.dialogRef.close();
   }
   submit() {
+    const Charges = []
+    this.ChargesData.forEach((x)=>{
+      const FieldName = x.SelectCharges.replaceAll(/\s/g, '')
+      const Amount =  parseInt(x.Add_Deduct == "+"?this.THCAmountsADDForm.value[FieldName]:this.THCAmountsLESSForm.value[FieldName]) 
+      Charges.push({
+        cRGCD:x.ChargesCode,
+        cRGNM:x.SelectCharges,
+        cRGTYP:x.Add_Deduct,
+        cRGAMT:Amount
+      })
+    })
     const body = {
       THCAmountsForm: this.THCAmountsForm.value,
       THCAmountsLESSForm: this.THCAmountsLESSForm.value,
       THCAmountsADDForm: this.THCAmountsADDForm.value,
       THCData: this.THCData,
+      Charges:Charges
     };
     this.dialogRef.close({ data: body });
   }
+
+  
   cancel() {
     this.dialogRef.close();
   }

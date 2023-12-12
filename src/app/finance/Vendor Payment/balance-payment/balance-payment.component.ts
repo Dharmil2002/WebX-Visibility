@@ -469,10 +469,7 @@ export class BalancePaymentComponent implements OnInit {
         x.Advance = +THCAmountsForm.Advance;
         x.THCamount = (+THCAmountsForm.Advance) + (+THCAmountsForm.Balance);
         x.BalancePending = +THCAmountsForm.Balance;
-        x["UpdateAmount"] = {
-          THCAmountsADDForm: result.THCAmountsADDForm,
-          THCAmountsLESSForm: result.THCAmountsLESSForm,
-        }
+        x["cRGLST"] = result.Charges
       }
     })
     this.selectCheckBox()

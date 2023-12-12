@@ -53,10 +53,13 @@ export class ProductChargesComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    actionDelete: {
-      Title: "Delete",
+    EditAction: {
+      type: "iconClick",
+      Title: "Action",
       class: "matcolumncenter",
-      Style: "min-width:10%;",
+      Style: "min-width:10%",
+      functionName: "EditFunction",
+      iconName: "edit",
     },
   };
   ChargesList: any;
@@ -85,6 +88,8 @@ export class ProductChargesComponent implements OnInit {
   ChargesBehaviourStatus: any;
   companyCode = parseInt(localStorage.getItem("companyCode"));
   ChargesData: any[] = [];
+  UpdatedData: any;
+  isUpdate: boolean = false;
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder,
@@ -106,17 +111,6 @@ export class ProductChargesComponent implements OnInit {
     this.ChargesBehaviourDropdown();
     this.ChargesListDropdown();
   }
-  // async DeleteFunction(event){
-  //   console.log('event' , event)
-  //   let req = {
-  //     companyCode: this.companyCode,
-  //     filter: { _id: event.element._id },
-  //     collectionName: "product_charges_detail",
-  //   };
-  //   console.log('req', req);
-  //   const Res = await this.masterService.masterDelete("generic/remove", req).toPromise();
-  //     console.log('Res' ,Res)
-  // }
   initializeFormControl() {
     const customerFormControls = new ProductControls();
     this.jsonControlArray = customerFormControls.getChargesControlsArray();
@@ -151,8 +145,8 @@ export class ProductChargesComponent implements OnInit {
     if (Res.success && Res.data.length > 0) {
       this.ChargesList = Res.data.map((x) => {
         return {
-          name: x.charge_name,
-          value: x.charge_id,
+          name: x.cHNM,
+          value: x.cHCD,
         };
       });
       this.ChargesData = [];
@@ -226,7 +220,7 @@ export class ProductChargesComponent implements OnInit {
   async save() {
     let Tablereq = {
       companyCode: this.companyCode,
-      filter: { ProductId: this.ProductId, ChargesType: this.selectedValue },
+      filter: {},
       collectionName: "product_charges_detail",
     };
 
@@ -236,12 +230,12 @@ export class ProductChargesComponent implements OnInit {
     const length = tableRes.data.length;
     const index =
       length == 0
-        ? 0
-        : parseInt(tableRes.data[length - 1].ChargesCode.substring(3));
+        ? 1
+        : parseInt(tableRes.data[length - 1].ChargesCode.substring(3))+1;
     const padding = index < 9 ? "00" : index < 99 ? "0" : "";
     const Body = {
-      _id:`${this.companyCode}-${this.ProductId}-CHA${padding}${index + 1}`,
-      ChargesCode: `CHA${padding}${index + 1}`,
+      _id:`${this.companyCode}-${this.ProductId}-CHA${padding}${index}`,
+      ChargesCode: `CHA${padding}${index}`,
       ProductName: this.ProductName,
       ProductId: this.ProductId,
       SelectCharges: this.customerTableForm.value.SelectCharges.name,
@@ -253,17 +247,22 @@ export class ProductChargesComponent implements OnInit {
       Add_Deduct: this.customerTableForm.value.Add_Deduct,
       ChargesType: this.selectedValue,
       companyCode: this.companyCode,
-      updatedDate: new Date(),
-      updatedBy: localStorage.getItem("UserName"),
+      UpdatedDate: new Date(),
+      UpdatedBy: localStorage.getItem("UserName"),
     };
+
+    console.log('Body' ,Body)
     let req = {
       companyCode: this.companyCode,
       collectionName: "product_charges_detail",
       data: Body,
     };
+    console.log('req' , req)
+
     const res = await this.masterService
       .masterPost("generic/create", req)
       .toPromise();
+      console.log('res' , res)
     if (res?.success) {
       this.GetTableData();
       this.Tabletab = !this.Tabletab;
@@ -307,5 +306,12 @@ export class ProductChargesComponent implements OnInit {
     } catch (error) {
       console.log("failed");
     }
+  }
+
+  EditFunction(event){
+    console.log("event",event)
+    this.UpdatedData = event.data
+    this.isUpdate = true
+
   }
 }

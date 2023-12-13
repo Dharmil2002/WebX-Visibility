@@ -58,6 +58,7 @@ import { VendorBillFilterComponent } from './Vendor Bills/vendor-bill-payment/Ta
 import { BlancePaymentPopupComponent } from './Vendor Payment/blance-payment-popup/blance-payment-popup.component';
 import { VendorBillPaymentDetailsComponent } from './Vendor Bill Payment/vendor-bill-payment-details/vendor-bill-payment-details.component';
 import { OnlinePaymentApprovalComponent } from './Vendor Bills/vendor-bill-payment/Tabs/online-payment-approval/online-payment-approval.component';
+import { BeneficiaryDetailComponent } from './Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component';
 
 @NgModule({
     declarations: [
@@ -81,7 +82,8 @@ import { OnlinePaymentApprovalComponent } from './Vendor Bills/vendor-bill-payme
         VendorBillFilterComponent,
         BlancePaymentPopupComponent,
         VendorBillPaymentDetailsComponent,
-        OnlinePaymentApprovalComponent
+        OnlinePaymentApprovalComponent,
+        BeneficiaryDetailComponent
     ],
     imports: [
         CommonModule,

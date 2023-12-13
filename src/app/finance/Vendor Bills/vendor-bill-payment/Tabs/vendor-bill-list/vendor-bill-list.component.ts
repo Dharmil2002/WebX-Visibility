@@ -193,6 +193,7 @@ export class VendorBillListComponent implements OnInit {
   }
   // #region to retrieve vendor bill data
   async getVendorBill() {
+    this.tableLoad = true;
     try {
       // Call the vendor bill service to get the data
       let data = await this.objVendorBillService.getVendorBillList(this.filterRequest);

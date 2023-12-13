@@ -8,14 +8,17 @@ import {
 } from "@angular/forms";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
 import {
-  GetAccountDetailFromApi,
-  GetSingleVendorDetailsFromApi,
+  GetAccountDetailFromApi
 } from "../../Vendor Payment/VendorPaymentAPIUtitlity";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import moment from "moment";
+import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
+import { BeneficiaryDetailComponent } from "../beneficiary-detail/beneficiary-detail.component";
+import { MatDialog } from "@angular/material/dialog";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-vendor-bill-payment-details",
@@ -79,7 +82,6 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     },
   };
 
-  TableStyle = "width:60%";
   dynamicControls = {
     add: false,
     edit: false,
@@ -139,6 +141,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private route: Router,
+    private objVendorBillService: VendorBillService,
+    private dialog: MatDialog
   ) {
     this.billData = this.route.getCurrentNavigation()?.extras?.state?.data;
     console.log("this.billData", this.billData);
@@ -367,7 +371,54 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     }
   }
   save() {
-    console.log("this.PaymentSummaryFilterForm",this.PaymentSummaryFilterForm.value);
-    console.log("this.tableData" ,this.tableData);
+    console.log("this.PaymentSummaryFilterForm", this.PaymentSummaryFilterForm.value);
+    console.log("this.tableData", this.tableData);
   }
+  async getBeneficiaryData() {
+    try {
+      // Get vendor code from bill data
+      const vnCode = this.billData.vnCode;
+  
+      // Fetch beneficiary details from API
+      const beneficiaryModalData = await this.objVendorBillService.getBeneficiaryDetailsFromApi(vnCode);
+  
+      // Check if beneficiary data is available
+      if (beneficiaryModalData.length > 0) {
+        // Prepare request object for the dialog
+        const request = {
+          Details: beneficiaryModalData,
+        };
+  
+        // Set tableLoad flag to false to indicate loading
+        this.tableLoad = false;
+  
+        // Open the BeneficiaryDetailComponent dialog
+        const dialogRef = this.dialog.open(BeneficiaryDetailComponent, {
+          data: request,
+          width: "100%",
+          disableClose: true,
+          position: {
+            top: "20px",
+          },
+        });
+  
+        // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
+        dialogRef.afterClosed().subscribe(() => {
+          this.tableLoad = true;
+        });
+      } else {
+        // Display a warning if no beneficiary data is available
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Please Add Beneficiary Details To View",
+          showConfirmButton: true,
+        });
+      }
+    } catch (error) {
+      // Log any errors that occur during the process
+      console.error('An error occurred:', error);
+    }
+  }
+  
 }

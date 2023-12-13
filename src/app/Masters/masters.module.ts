@@ -162,6 +162,7 @@ import { ListGroupComponent } from './Account-master/group-master/list-group/lis
 import { CustomerContractNonFreightChargesPopupComponent } from './Customer Contract/CustomerContractTabs/customer-contract-non-freight-charges-popup/customer-contract-non-freight-charges-popup.component';
 import { AddTenantComponent } from './Tenant Setup/add-tenant/add-tenant.component';
 import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.component';
+import { UploadFileComponent } from './vendor-contract/vendorContractTabs/upload/upload-file/upload-file.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -339,6 +340,7 @@ import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.comp
     CustomerContractNonFreightChargesPopupComponent,
     AddTenantComponent,
     TenantListComponent,
+    UploadFileComponent,
   ],
 
   providers: [

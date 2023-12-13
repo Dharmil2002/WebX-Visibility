@@ -33,17 +33,17 @@ export class AccountMasterComponent implements OnInit {
     csv: false,
   };
   columnHeader = {
-    Account: {
+    aCNM: {
       Title: "Account",
       class: "matcolumncenter",
       Style: "min-width:25%",
     },
-    AccountGroup: {
+    gRPNM: {
       Title: "Account Group",
       class: "matcolumncenter",
       Style: "min-width:25%",
     },
-    AccountCategoryName: {
+    cATNM: {
       Title: "Account Category",
       class: "matcolumncenter",
       Style: "min-width:25%",
@@ -62,9 +62,9 @@ export class AccountMasterComponent implements OnInit {
     functionName: "FilterList",
   };
   staticField = [
-    "Account",
-    "AccountCategoryName",
-    "AccountGroup",
+    "aCNM",
+    "gRPNM",
+    "cATNM",
   ];
   TableData: any;
   isTableLode = false;
@@ -122,7 +122,7 @@ export class AccountMasterComponent implements OnInit {
         return {
           ...x,
           SrNo: index + 1,
-          Account:x.AccountCode+' : '+ x.AccountDescription,
+          Account:x.aCCD+' : '+ x.aCNM,
           AccountGroup:x.SubCategoryCode=="" && x.SubCategoryName==""?"":x.SubCategoryCode+' : '+ x.SubCategoryName,
         };
       });
@@ -137,5 +137,5 @@ export class AccountMasterComponent implements OnInit {
   AddFunction(event){
     this.Route.navigate(["/Masters/AccountMaster/AddAccountMaster"]);
   }
-  
+
 }

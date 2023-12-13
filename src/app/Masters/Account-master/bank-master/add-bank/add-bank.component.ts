@@ -199,7 +199,7 @@ export class AddBankComponent implements OnInit {
       Accountnumber: this.BankForm.value.Accountnumber,
       IFSCcode: this.BankForm.value.IFSCcode,
       MICRcode: this.BankForm.value.MICRcode,
-      SWIFTcode: this.BankForm.value.SWIFTcode,
+      SWIFTcode: this.BankForm.value.SWIFTcode === 0 ? "":this.BankForm.value.SWIFTcode,
       ApplicationLocations: this.BankForm.value.LocationsDrop.map(
         (x) => x.value
       ),
@@ -218,11 +218,11 @@ export class AddBankComponent implements OnInit {
           collectionName: "Bank_detail",
           filter: {},
         }));
+        const index= parseInt(tabledata.data.length === 0 ? 0 : tabledata.data[tabledata.data.length-1].Bankcode.substring(3))+1
+          const bankcode=`BAN${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
       const body = {
-        Bankcode:
-          tabledata.data.length === 0
-            ? 1
-            : tabledata.data[tabledata.data.length - 1].Bankcode + 1,
+        _id:`${this.CompanyCode}-${bankcode}`,
+        Bankcode:bankcode,
         entryBy: localStorage.getItem("UserName"),
         entryDate: new Date(),
         companyCode: this.CompanyCode,

@@ -154,13 +154,13 @@ export class AddTdsComponent implements OnInit {
           collectionName: "tds_detail",
           filter: {},
         }));
+        const index= parseInt(tabledata.data.length === 0 ? 0 : tabledata.data[tabledata.data.length-1].TDScode.substring(3))+1
+        const Tdscode=`TDS${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
       const body = {
-        TDScode:
-          tabledata.data.length === 0
-            ? 1
-            : tabledata.data[tabledata.data.length - 1].TDScode + 1,
-        entryBy: localStorage.getItem("UserName"),
-        entryDate: new Date(),
+        _id:`${this.CompanyCode}-${Tdscode}`,
+        TDScode:Tdscode,
+        eNTBY: localStorage.getItem("UserName"),
+        eNTDT: new Date(),
         companyCode: this.CompanyCode,
         ...commonBody,
       };

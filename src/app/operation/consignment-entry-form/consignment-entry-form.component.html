@@ -3,7 +3,7 @@
   <div *ngIf="ewayBill">
     <form [formGroup]="model.invoiceTableForm">
       <app-form-webxpress [form]="model.invoiceTableForm" [formData]="jsonEwayBill"
-        (functionCallEmitter)="functionCallHandler($event)" [submit]="model.ewayBillButton" [showSaveAndCancelButton]="true"
+        (functionCallEmitter)="functionCallHandler($event)" [submit]="model.buttons.ewayBillButton" [showSaveAndCancelButton]="true"
         (callFunction)="functionCallHandler($event)">
       </app-form-webxpress>
       <div class="paddingdiv">

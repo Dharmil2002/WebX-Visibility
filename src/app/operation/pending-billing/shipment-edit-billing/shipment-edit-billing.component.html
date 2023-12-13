@@ -1,0 +1,19 @@
+<!-- Your MatDialog content -->
+<mat-dialog-content>
+    <app-generic-table-v2
+    *ngIf="!isLoad"
+      [dynamicControls]="dynamicControls"
+      [columnHeader]="definition.columnShipmentDetail"
+      [tableData]="tableData"
+      [metaData]="metaData"
+      (selectAllClicked)="onSelectAllClicked($event)"
+      [menuItems]="menuItems"
+      [menuItemFlag]="menuItemflag"
+      (menuItemClicked)="handleMenuItemClick($event)"
+      [staticField]="definition.staticField">
+    </app-generic-table-v2>
+  </mat-dialog-content>
+  <!-- Close button -->
+  <mat-dialog-actions>
+    <button mat-button (click)="onCloseButtonClick()">Close</button>
+  </mat-dialog-actions>

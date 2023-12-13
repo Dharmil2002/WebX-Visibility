@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { groupAndSummarize, invoiceDetail } from './invoice-utlity';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { CustomeDatePickerComponent } from 'src/app/shared/components/custome-date-picker/custome-date-picker.component';
-import { DatePipe } from '@angular/common';
+import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 @Component({
   selector: 'app-invoice-management',
   templateUrl: './invoice-management.component.html'
@@ -18,7 +16,10 @@ export class InvoiceManagementComponent implements OnInit {
   menuItemflag: boolean = true;
   orgBranch: string = localStorage.getItem("Branch");
   companyCode: number = parseInt(localStorage.getItem("companyCode"));
-
+  linkArray = [
+    { Row: "pendCol", Path: "Finance/InvoiceCollection" },
+    { Row: "penAp", Path: "Finance/bill-approval" },
+]
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   isTouchUIActivated = false;
   range: FormGroup;
@@ -27,7 +28,7 @@ export class InvoiceManagementComponent implements OnInit {
     edit: false,
     csv: false,
   };
-  TableStyle = "width:60%"
+  boxData: { count: number; title: string; class: string; }[];
   /*Below is Link Array it will Used When We Want a DrillDown
  Table it's Jst for set A Hyper Link on same You jst add row Name Which You
  want hyper link and add Path which you want to redirect*/
@@ -35,67 +36,71 @@ export class InvoiceManagementComponent implements OnInit {
   ];
   toggleArray = [];
   columnHeader = {
-    customerName: {
+    billingParty: {
       Title: "Customer",
       class: "matcolumnleft",
-      Style: "max-width: 220px",
+      Style: "max-width: 300px",
     },
-    count: {
+    genCnt: {
       Title: "Invoice Generated​",
       class: "matcolumnleft",
       Style: "max-width: 100px",
     },
-    billingAmount: {
+    valueBl: {
       Title: "Value",
       class: "matcolumncenter",
-      Style: "max-width: 100px",
+      Style: "min-width: 100px",
     },
-    pendingSubmission: {
-      Title: "Pending Submission​",
+    penAp: {
+      Title: "Pending Approval",
       class: "matcolumncenter",
       Style: "max-width: 220px",
     },
-    pValue: {
+    penApAmt: {
       Title: "Value​",
       class: "matcolumncenter",
       Style: "max-width: 90px",
     },
-    pendingCollection: {
+    pendCol: {
       Title: "Pending Collection​",
       class: "matcolumncenter",
       Style: "max-width: 90px",
     },
-    pcValue: {
+    pendColAmt: {
       Title: "Value​",
       class: "matcolumncenter",
-      Style: "max-width: 90px",
+      Style: "min-width: 90px",
     }
 
   }
   staticField = [
-    "customerName",
-    "count",
-    "billingAmount",
-    "pendingSubmission",
-    "pValue",
-    "pendingCollection",
-    "pcValue"
+    "billingParty",
+    "genCnt",
+    "valueBl",
+    "pendColAmt",
+    "penApAmt"
   ]
   METADATA = {
     checkBoxRequired: true,
     // selectAllorRenderedData : false,
     noColumnSort: ["checkBoxRequired"],
   };
+  EventButton = {
+    functionName: "openFilterDialog",
+    name: "Filter",
+    iconName: "filter_alt",
+  };
   constructor(
-    private masterService: MasterService,
-    private datePipe: DatePipe,
+    private InvoiceService: InvoiceServiceService,
     private DashboardFilterPage: FormBuilder
   ) {
-    this.get();
+    ;
     this.range = this.DashboardFilterPage.group({
       start: new FormControl(),  // Create a form control for start date
       end: new FormControl(),    // Create a form control for end date
     });
+    this.getKpiCount();
+
   }
 
   ngOnInit(): void {
@@ -108,35 +113,49 @@ export class InvoiceManagementComponent implements OnInit {
     // Set default start and end dates when the component initializes
     this.range.controls["start"].setValue(lastweek);
     this.range.controls["end"].setValue(now);
+    this.get();
   }
 
   async get() {
     this.tableLoad = true;  // Set tableLoad to true while fetching data
     // Fetch billing details asynchronously
-    const detail = await invoiceDetail(this.masterService);
+    const requestData={
+       startDate:this.range.controls.start.value,
+       endDate :this.range.controls.end.value,
+       customerName:[],
+       locationNames:[]
+
+    }
+    const detail = await this.InvoiceService.getinvoiceDetailBill(requestData);
     // Format the start and end dates using DatePipe
-    const startDate = this.datePipe.transform(this.range.controls.start.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    const endDate = this.datePipe.transform(this.range.controls.end.value, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
-    // Filter billingDetail based on date range
-    const filteredRecords = detail.filter(record => {
-      const invoiceDate = new Date(record.invoiceDate);
-      return startDate <= invoiceDate.toISOString() && invoiceDate.toISOString() < endDate;
-    });
-
-    // Group and calculate data for the filtered records
-    const additionalFields = {
-      pendingSubmission: 0,
-      pValue: 0,
-      pendingCollection: 0,
-      pcValue: 0
-
-    };
-    const groupedData = await groupAndSummarize(filteredRecords, "customerName", "billingAmount", additionalFields);
-    // Convert the groupedData object into an array of objects
-    const groupedArray = Object.values(groupedData);
-    this.tableData = groupedArray;
+   this.tableData = detail;
     this.tableLoad = false;
   }
 
+  functionCallHandler(event) {
+    console.log(event);
+    try {
+      this[event.functionName](event.data);
+    } catch (error) {
+      console.log("failed");
+    }
+  }
+   getKpiCount() {
+    const createShipDataObject = (
+      count: number,
+      title: string,
+      className: string
+    ) => ({
+      count,
+      title,
+      class: `info-box7 ${className} order-info-box7`,
+    });
+    const pendingBilling = [
+      createShipDataObject(3, "Invoice Generated", "bg-c-Bottle-light"),
+      createShipDataObject(1000, "Unbilled Amount", "bg-c-Grape-light"),
+      createShipDataObject(1400, "Pending Approval", "bg-c-Daisy-light"),
+      createShipDataObject(250, "Pending PODs", "bg-c-Grape-light"),
+    ];
+    this.boxData = pendingBilling
+  }
 }

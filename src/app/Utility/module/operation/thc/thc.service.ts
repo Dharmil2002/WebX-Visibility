@@ -15,6 +15,7 @@ export class ThcService {
     ) { }
 
     async getShipment(vehicle = false) {
+        debugger
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.Dockets,

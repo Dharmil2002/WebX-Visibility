@@ -26,7 +26,7 @@ export class DocketListComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width:300px",
     },
-    docketNumber: {
+    docNo: {
       Title: "Shipment",
       class: "matcolumnleft",
       Style: "min-width:300px",
@@ -38,26 +38,26 @@ export class DocketListComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
-    actualWeight: {
+    aCTWT: {
       Title: "Act Wt(Kg)",
       class: "matcolumncenter",
       Style: "max-width:70px",
     },
-    totalPkg: {
+    pKGS: {
       Title: "Pkg Count",
       class: "matcolumncenter",
       Style: "max-width:70px",
     },
-    totalAmount: {
+    fRTAMT: {
       Title: "FV(₹)",
       class: "matcolumncenter",
       Style: "max-width:70px",
     },
-     invoiceCount: {
-      Title: "Inv Count",
-      class: "matcolumncenter",
-      Style: "max-width:70px",
-    },
+    //  invoiceCount: {
+    //   Title: "Inv Count",
+    //   class: "matcolumncenter",
+    //   Style: "max-width:70px",
+    // },
     status:{
       Title: "Status",
       class: "matcolumncenter",
@@ -76,9 +76,10 @@ export class DocketListComponent implements OnInit {
     "billingParty",
     "ftCity",
     "actualWeight",
-    "totalPkg",
-    "totalAmount",
-    "invoiceCount",
+    "aCTWT",
+    "pKGS",
+    "tOTAMT",
+    "fRTAMT",
     "status",
     "createOn"
   ];

@@ -118,11 +118,11 @@ export class ThcPaymentsComponent implements OnInit {
   }
 
   BalanceUnbilledFunction(event) {
+    debugger
     // Check if TotaladvAmt is greater than 0
     const isTotaladvAmtValid = event?.data?.BalanceUnbilled > 0;
-
     // Check if there is any entry with balAmtAt equal to "Branch"
-    const isExist = event?.data?.data?.some(entry => entry.balAmtAt === localStorage.getItem('Branch'));
+    const isExist = event?.data?.data?.some(entry => entry.bLPAYAT === localStorage.getItem('Branch'));
     if (isExist && isTotaladvAmtValid) {
       this.router.navigate(['/Finance/VendorPayment/BalancePayment'], {
         state: {

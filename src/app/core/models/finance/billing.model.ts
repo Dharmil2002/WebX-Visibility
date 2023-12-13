@@ -1,0 +1,30 @@
+export interface ReqJsonBilling {
+    _id: string;
+    bILLNO: string;
+    dKTNO: string;
+    oRGN: string;
+    rSDSTCD: string;
+    dKTDT: string;
+    cHRGWT: string;
+    dKTAMT: string;
+    dKTTOT: string;
+    sUBTOT: string;
+    gSTTOT: string;
+    gSTRT: string;
+    tOTAMT: string;
+    pAMT: string;
+    fCHRG: string;
+    fLSCHRG: number;
+    sGST: number;
+    sGSTRT: number;
+    cGST: number;
+    cGSTRT: number;
+    iGST: number;
+    iGSTRT: number;
+    eNTDT: Date;
+    eNTLOC: string;
+    eNTBY: string;
+    mODDT: string;
+    mODLOC: string;
+    mODBY: string;
+  }

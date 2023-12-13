@@ -77,28 +77,25 @@ export class DocketService {
     /* below the function  was generated for the mapping of data */
     // Define a common service function
     async processShipmentList(shipmentList, orgBranch) {
+        debugger
         const res = shipmentList.map((x) => {
-            if (x.origin === orgBranch || (x.destination==orgBranch && x.status=="2")) {
+            if (x.oRGN === orgBranch || (x.dEST==orgBranch && x.status=="2")) {
 
                 // Assuming x.status is a string (e.g., "0", "1", "2", etc.)
-                const statusInfo = this.statusMapping[x.status] || this.statusMapping.default;
-                const actualWeights = x.invoiceDetails.map((item) => calculateTotalField([item], 'actualWeight')).reduce((acc, weight) => acc + weight, 0);
-                const noofPkts = x.invoiceDetails.map((item) => calculateTotalField([item], 'noofPkts')).reduce((acc, pkg) => acc + pkg, 0);
-                x.actualWeight = actualWeights;
-                x.totalPkg = noofPkts;
-                x.ftCity = `${x.fromCity}-${x.toCity}`;
-                x.invoiceCount = x.invoiceDetails.length || 0;
+                const statusInfo = this.statusMapping[x.fSTS] || this.statusMapping.default;
+                x.ftCity = `${x.fCT}-${x.tCT}`;
                 x.status = statusInfo.status || "";
                 x.actions = statusInfo.actions;
-                x.createOn = formatDocketDate(x?.entryDate || new Date())
+                x.billingParty = `${x.bPARTY}:${x.bPARTYNM}`//x.billingParty || "";
+                x.createOn = formatDocketDate(x?.eNTDT || new Date())
                 return x;
             }
             return null;
         }).filter((x) => x !== null);
         // Sort the PRQ list by pickupDate in descending order
         const sortedData = res.sort((a, b) => {
-            const dateA: Date | any = new Date(a.entryDate);
-            const dateB: Date | any = new Date(b.entryDate);
+            const dateA: Date | any = new Date(a.eNTDT);
+            const dateB: Date | any = new Date(b.eNTDT);
 
             // Compare the date objects
             return dateB - dateA; // Sort in descending order
@@ -117,6 +114,7 @@ export class DocketService {
         const res = await this.operation.operationMongoPost('generic/get', req).toPromise();
         return res.data;
     }
+
     async addDktDetail(data){
         
         const req = {
@@ -128,6 +126,7 @@ export class DocketService {
         const res = await this.operation.operationMongoPost('generic/create', req).toPromise();
         return res.data;
     }
+
     async updateSelectedData(selectedData: any[],tripId="") {
         for (const element of selectedData) {
           const data = {
@@ -173,5 +172,16 @@ export class DocketService {
           await this.addDktDetail(DktNew);
         
       }
+    }
+    /*added docket billing details*/
+    async addBilldkt(data){
+        
+        const req = {
+            "companyCode": this.storage.companyCode,
+            "collectionName": "dockets_bill_details",
+            "data":data
+        }
+        const res = await this.operation.operationMongoPost('generic/create', req).toPromise();
+        return res.data;
     }
 }

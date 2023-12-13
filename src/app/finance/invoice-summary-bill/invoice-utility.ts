@@ -72,7 +72,7 @@ export async function getApiCustomerDetail(masterService, data) {
         companyCode: companyCode,
         collectionName: "customer_detail",
         filter: {
-            "customerName": data.columnData?.billingparty || ""
+            "customerCode": data?.billingParty[0].split("-")[0].trim() || ""
         }
     };
     try {
@@ -90,9 +90,7 @@ export async function getApiCompanyDetail(masterService) {
     const req = {
         companyCode: companyCode,
         collectionName: "company_master",
-        filter: {
-            "companyCode": companyCode
-        }
+        filter: {}
     };
     try {
         const resCompany = await masterService.masterPost("generic/get", req).toPromise();
@@ -161,17 +159,15 @@ export async function getThcDetail(masterService, billingParty) {
 /*End*/
 
 /*Filtering the shipment invoice Data*/
-export async function getInvoiceDetail(prqDetail, locDetail, shipment) {
-    
+export async function getInvoiceDetail(locDetail, shipment) {
     // Create a map to store the state-wise invoice details
     const stateInvoiceMap = new Map();
 
     // Iterate through prqDetail
-    for (const element of prqDetail) {
+    for (const element of shipment) {
         // Find the matching location detail
-        const matchingLocDetail = locDetail.find((loc) => loc.locCode === element.prqBranch);
+        const matchingLocDetail = locDetail.find((loc) => loc.locCode === element.origin);
 
-        // Initialize variables
         let totalChargedWeight = 0;
         let totalgstAmount=0;
         let subTotalAmount=0;

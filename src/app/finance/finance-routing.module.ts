@@ -11,6 +11,7 @@ import { AdvancePaymentsComponent } from './Vendor Payment/advance-payments/adva
 import { BalancePaymentComponent } from './Vendor Payment/balance-payment/balance-payment.component';
 import { VendorBillPaymentComponent } from './Vendor Bills/vendor-bill-payment/vendor-bill-payment.component';
 import { VendorBillPaymentDetailsComponent } from './Vendor Bill Payment/vendor-bill-payment-details/vendor-bill-payment-details.component';
+import { BillApprovalComponent } from '../operation/pending-billing/bill-approval/bill-approval.component';
 
 const routes: Routes = [
   { path: 'InvoiceSummaryBill', component: InvoiceSummaryBillComponent },
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: 'VendorPayment/VendorBillPaymentDetails', component: VendorBillPaymentDetailsComponent },
   { path: 'InvoiceCollection', component: InvoiceCollectionComponent },
   { path: 'Deductions', component: DeductionsComponent },
+  { path: "bill-approval", component: BillApprovalComponent }
 ];
 
 @NgModule({

@@ -1,4 +1,4 @@
-<div class="paddingdiv">
+<!-- <div class="paddingdiv">
     <div class="col-lg-4 col-md-4 col-sm-6 align-left" style="margin-bottom: 0px;">
         <form [formGroup]='range'>
                 <div class="row mt-2">
@@ -26,11 +26,13 @@
                         </div>
                 </div>
         </form>
-</div>
-    <div class="verticalScrollbar">
+</div> -->
+<div class="paddingdiv">
+        <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
         <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
             [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
-            [menuItems]="menuItems" [staticField]="staticField" [TableStyle]="TableStyle"[Link]="linkArray">
+            [menuItems]="menuItems"  [FormTitle]="'Pending Invoice'" [staticField]="staticField"(dialogClosed)="reloadData()" [TableStyle]="TableStyle"[Link]="linkArray" [height]="height"
+            [width]="width" [maxWidth]="maxWidth"  (functionCallEmitter)="functionCallHandler($event)"[EventButton]="EventButton">
         </app-generic-table-v2>
     </div>
-</div>
+<!-- </div> -->

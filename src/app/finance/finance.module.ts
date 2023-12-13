@@ -59,6 +59,7 @@ import { BlancePaymentPopupComponent } from './Vendor Payment/blance-payment-pop
 import { VendorBillPaymentDetailsComponent } from './Vendor Bill Payment/vendor-bill-payment-details/vendor-bill-payment-details.component';
 import { OnlinePaymentApprovalComponent } from './Vendor Bills/vendor-bill-payment/Tabs/online-payment-approval/online-payment-approval.component';
 import { BeneficiaryDetailComponent } from './Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component';
+import { DeductionChargesComponent } from './invoice-collection/deduction-charges/deduction-charges.component';
 
 @NgModule({
     declarations: [
@@ -83,7 +84,8 @@ import { BeneficiaryDetailComponent } from './Vendor Bill Payment/beneficiary-de
         BlancePaymentPopupComponent,
         VendorBillPaymentDetailsComponent,
         OnlinePaymentApprovalComponent,
-        BeneficiaryDetailComponent
+        BeneficiaryDetailComponent,
+        DeductionChargesComponent
     ],
     imports: [
         CommonModule,
@@ -125,6 +127,8 @@ import { BeneficiaryDetailComponent } from './Vendor Bill Payment/beneficiary-de
         MatStepperModule,
         NgxMaterialTimepickerModule,
         ReactiveFormsModule
+    ],
+    exports:[
     ],
     providers: [SnackBarUtilityService, utilityService, OperationService,
         NavigationService, DatePipe, MatDialogModule,

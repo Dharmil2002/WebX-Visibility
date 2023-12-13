@@ -102,8 +102,8 @@
                     <ng-template mat-tab-label>
                         Dashboard
                     </ng-template>
-                    <app-pending-billing (CurrentIndex)="GetSelectedIndex($event)"
-                        [selectedIndex]="12"></app-pending-billing>
+                    <app-invoice-dashboard (CurrentIndex)="GetSelectedIndex($event)"
+                        [selectedIndex]="12"></app-invoice-dashboard>
                 </mat-tab>
                 <mat-tab *ngIf=" hasPermission('pending')" label="Billing​">
                     <ng-template mat-tab-label>

@@ -1,0 +1,10 @@
+<app-common-wrapper-webxpress [breadscrums]="breadScrums" [backPath]="backPath">
+
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="billApproval.columnBillDetail"
+    [tableData]="tableData" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
+    [menuItems]="billApproval.menuItems" [menuItemFlag]="billApproval.menuItemflag" [staticField]="billApproval.staticField" [Link]="linkArray" [height]="height" [width]="width"
+    [maxWidth]="maxWidth"(menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath">
+    </app-generic-table-v2>
+  </app-common-wrapper-webxpress>
+  
+  

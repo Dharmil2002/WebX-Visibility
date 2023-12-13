@@ -1,13 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Route, Router } from '@angular/router';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
-import { pendingbilling } from 'src/app/operation/pending-billing/pending-billing-utlity';
 import { calculateTotalField } from 'src/app/operation/unbilled-prq/unbilled-utlity';
 import { StateWiseSummaryControl } from 'src/assets/FormControls/state-wise-summary-control';
-import { UpdateDetail, addInvoiceDetail, getApiCompanyDetail, getApiCustomerDetail, getInvoiceDetail, getLocationApiDetail, getPrqApiDetail, shipmentDetail } from './invoice-utility';
+import { getApiCompanyDetail, getApiCustomerDetail } from './invoice-utility';
 import Swal from 'sweetalert2';
+import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
+import { total } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
+import { FilterUtils } from 'src/app/Utility/dropdownFilter';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-invoice-summary-bill',
@@ -40,7 +44,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
   };
   columnHeader = {
     checkBoxRequired: {
-      Title: "Select",
+      Title: "",
       class: "matcolumncenter",
       Style: "max-width:100px",
     },
@@ -60,131 +64,72 @@ export class InvoiceSummaryBillComponent implements OnInit {
       Style: "",
     },
     subTotalAmount: {
-      Title: "Sub-total",
+      Title: "Sub-total(₹)",
       class: "matcolumncenter",
       Style: "",
     },
     gstCharged: {
-      Title: "GST",
+      Title: "GST(₹)",
       class: "matcolumncenter",
       Style: "",
     },
     totalBillingAmount: {
-      Title: "Shipment Total",
+      Title: "Shipment Total(₹)",
       class: "matcolumncenter",
       Style: "",
     }
-  };
-  columnHeader1 = {
-    count: {
-      Title: "Count",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    subTotal: {
-      Title: "Sub Total",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    billTimeCharges: {
-      Title: "Bill Time Charges",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    totalAmount: {
-      Title: "Total Amount",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    gstRate: {
-      Title: "GST Rate",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    sgst: {
-      Title: "SGST",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    utgst: {
-      Title: "UTGST",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    cgst: {
-      Title: "CGST",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    igst: {
-      Title: "IGST",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    gstTotal: {
-      Title: "GST Total",
-      class: "matcolumncenter",
-      Style: "",
-    },
-    total: {
-      Title: "Total",
-      class: "matcolumncenter",
-      Style: "",
-    },
   };
   tableData = []
-  tableData1 = [
-    {
-      count: 0,
-      subTotal: 0.00,
-      billTimeCharges: 0.00,
-      totalAmount: 0,
-      gstRate: 12,
-      sgst: 0.00,
-      utgst: 0.00,
-      cgst: 0.00,
-      igst: 0.00,
-      gstTotal: 0,
-      total: 0.00,
-    }
-  ];
-  staticField = ["sr", "select", "stateName", "cnoteCount", "countSelected", "subTotalAmount", "gstCharged", "totalBillingAmount"];
-  staticField1 = ["count", "subTotal", "billTimeCharges", "totalAmount", "gstRate", "sgst", "utgst", "cgst", "igst", "gstTotal", "total"];
+  staticField = [ "stateName", "cnoteCount", "countSelected", "subTotalAmount", "gstCharged", "totalBillingAmount"];
   navigateExtra: any;
   prqNo: any;
   invoiceSummaryJsonArray: any;
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private invoiceServiceService: InvoiceServiceService,
+    private locationService:LocationService,
+    private filter: FilterUtils,
+    private storage:StorageService
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
-      this.navigateExtra = this.router.getCurrentNavigation()?.extras?.state.data || "";
-
+      
+      this.navigateExtra = this.router.getCurrentNavigation()?.extras?.state.data.columnData || "";
     }
 
     this.tableLoad = false;
     //#region fist table count
-  
+
     //#endregion
   }
 
   ngOnInit(): void {
     this.initializeFormControl();
-    this.getPrqDetail();
+    //this.getPrqDetail();
+    this.getLocation();
+    
   }
+  async getLocation() {
+    const location= await this.locationService.locationFromApi();
+    this.filter.Filter(this.jsonControlArray, this.invoiceTableForm, location, 'submissionOffice',true);
+    this.filter.Filter(this.jsonControlArray, this.invoiceTableForm, location, 'collectionOffice',true);
+    const findLoc=location.find((x)=>x.value==this.storage.branch);
+    this.invoiceTableForm.controls['submissionOffice'].setValue(findLoc);
+    this.invoiceTableForm.controls['collectionOffice'].setValue(findLoc);
+  }
+
 
   initializeFormControl() {
     this.invoiceFormControls = new StateWiseSummaryControl();
-    // Get form controls for job Entry form section
     this.jsonControlArray = this.invoiceFormControls.getstateWiseSummaryArrayControls();
     this.invoiceSummaryJsonArray = this.invoiceFormControls.getInvoiceSummaryArrayControls();
-    // Build the form group using formGroupBuilder function
     this.invoiceTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.invoiceSummaryTableForm = formGroupBuilder(this.fb, [this.invoiceSummaryJsonArray])
-    this.invoiceTableForm.controls['customerName'].setValue(this.navigateExtra.columnData.billingparty || "")
-    this.invoiceTableForm.controls['unbilledAmount'].setValue(this.navigateExtra.columnData.sum || 0)
+   this.invoiceTableForm.controls['customerName'].setValue(this.navigateExtra.billingParty || "")
+    this.invoiceTableForm.controls['unbilledAmount'].setValue(this.navigateExtra.sum || 0);
     this.getCustomerDetail();
+    
   }
 
 
@@ -199,77 +144,73 @@ export class InvoiceSummaryBillComponent implements OnInit {
       console.log("failed");
     }
   }
-  async getPrqDetail() {
-    const prqDetail = await pendingbilling(this.masterService);
-    this.prqNo = prqDetail
-      .filter((x) => x.billingParty === this.navigateExtra.columnData.billingparty)
-      .map((x) => x.prqNo)
-      .join(', ');
 
-  }
-  
   async save() {
-    if (this.invoiceTableForm.value?.MIN) {
-      this.invoiceTableForm.controls['invoiceNo'].setValue(this.invoiceTableForm.value?.MIN || "");
-    }
-    else {
-      const thisYear = new Date().getFullYear();
-      const financialYear = `${thisYear.toString().slice(-2)}${(thisYear + 1).toString().slice(-2)}`;
-      const dynamicValue = localStorage.getItem("Branch"); // Replace with your dynamic value
-      const dynamicNumber = Math.floor(Math.random() * 10000); // Generate a random number between 0 and 9999
-      const paddedNumber = dynamicNumber.toString().padStart(4, "0");
-      let invoice = `BL/${dynamicValue}/${financialYear}/${paddedNumber}`;
-      this.invoiceTableForm.controls['invoiceNo'].setValue(invoice);
-    }
-    this.invoiceTableForm.controls['_id'].setValue(this.invoiceTableForm.controls['invoiceNo'].value);
-    this.invoiceTableForm.controls['prqNo'].setValue(this.prqNo);
-    this.invoiceTableForm.controls['billingAmount'].setValue(this.invoiceTableForm.controls['unbilledAmount'].value);
-    const addRes = await addInvoiceDetail(this.masterService, this.invoiceTableForm.value);
+    
+      this.setControlValue(this.invoiceTableForm.controls['submissionOffice']);
+      this.setControlValue(this.invoiceTableForm.controls['collectionOffice']);
+      const shipments=this.tableData.filter((x)=>x.isSelected);
+      this.invoiceTableForm.controls['billingAmount'].setValue(this.invoiceTableForm.controls['unbilledAmount'].value);
+     const addRes = await this.invoiceServiceService.addBillDetails(this.invoiceTableForm.value,shipments);
     if (addRes) {
-      const update = await UpdateDetail(this.masterService, this.invoiceTableForm.value);
-      if (update) {
+      //const update = await UpdateDetail(this.masterService, this.invoiceTableForm.value);
         Swal.fire({
           icon: "success",
           title: "Successfully Generated",
-          text: `Invoice Successfully Generated Invoice number is ${this.invoiceTableForm.controls['invoiceNo'].value}`,
+          text: `Invoice Successfully Generated Invoice number is ${addRes}`,
           showConfirmButton: true,
         });
         this.cancel('Billing​');
-      }
     }
 
   }
   cancel(tabIndex: string): void {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
   }
-
+  /*Below function is for the bind the dropdown value*/
+  setControlValue(control: AbstractControl): void {
+    control.setValue(control.value?.value ?? "");
+  }
   async getCustomerDetail() {
+     
     const custDetail = await getApiCustomerDetail(this.masterService, this.navigateExtra);
     const tranDetail = await getApiCompanyDetail(this.masterService);
-    this.invoiceTableForm.controls['cGstin'].setValue(custDetail.data[0].GSTdetails.find((x)=>x.gstState===custDetail.data[0].state).gstState);
-    this.invoiceTableForm.controls['cState'].setValue(custDetail.data[0].state);
-    this.invoiceTableForm.controls['tState'].setValue(tranDetail.data[0].state);
-    this.invoiceTableForm.controls['tGstin'].setValue(tranDetail.data[0].gstNo);
-    const prqDetail = await getPrqApiDetail(this.masterService, this.navigateExtra.columnData.billingparty);
-    if (prqDetail) {
-      const locDetail = await getLocationApiDetail(this.masterService);
-      const shipment =  await shipmentDetail(this.masterService);
-      const invoiceDetail = await getInvoiceDetail(prqDetail, locDetail,shipment);
-      this.tableData = invoiceDetail;
-      this.IsActiveFuntion("")
-    }
-
- 
-  }
-
-  IsActiveFuntion($event) {
+    this.invoiceTableForm.controls['cGstin'].setValue(custDetail?.data[0].GSTdetails[0].gstState||"");
+    this.invoiceTableForm.controls['cState'].setValue(custDetail?.data[0].state||"");
+    this.invoiceTableForm.controls['tState'].setValue(tranDetail?.data[0].state||"");
+    this.invoiceTableForm.controls['tGstin'].setValue(tranDetail?.data[0].gstNo||"");
+    // Check if custDetail and tranDetail have data
+    // Helper function to get lowercase state from detail object
+    const getLowercaseState = (detail) => detail?.data?.[0]?.state.toLowerCase();
+    // Extract lowercase states from custDetail and tranDetail
+    const custState = getLowercaseState(custDetail);
+    const tranState = getLowercaseState(tranDetail);
+    // Set 'gstType' value based on the equality of lowercase states
+    this.invoiceTableForm.controls['gstType'].setValue(custState === tranState ? 'SGST' : 'IGST');
+    // const prqDetail = await getPrqApiDetail(this.masterService, this.navigateExtra.columnData.billingparty);
+    const invoice = await this.invoiceServiceService.getInvoice(this.navigateExtra.dKTNO);
+    const shipments = await this.invoiceServiceService.filterShipment(invoice);
+    const invoiceDetail = await this.invoiceServiceService.getInvoiceDetail(shipments);
+    this.tableData = invoiceDetail;
+    const cnoteCount=await total(invoiceDetail, 'cnoteCount');
+    this.invoiceSummaryTableForm.controls['shipmentCount'].setValue(cnoteCount);
+    const shipmentTot=await total(invoiceDetail, 'totalBillingAmount');
+    this.invoiceSummaryTableForm.controls['shipmentTotal'].setValue(shipmentTot);
+    const gstType=custState === tranState ? 'SGST' : 'IGST';
+    this.invoiceSummaryTableForm.controls['IGST'].setValue(gstType=="IGST"?shipmentTot:0);
+    this.invoiceSummaryTableForm.controls['SGST'].setValue(gstType=="SGST"?parseFloat(shipmentTot)/2:0);
     
-    const invoice=$event?$event:"";
-    const cnoteCount =this.tableData.length;
-    const countSelected = invoice?invoice.length:0;
-    const subTotalAmount = invoice?calculateTotalField(invoice, 'subTotalAmount'):0;
-    const gstCharged = invoice?calculateTotalField(invoice, 'gstCharged'):0;
-    const totalBillingAmount =invoice? calculateTotalField(invoice, 'totalBillingAmount'):0;
+    //this.invoiceSummaryTableForm.controls['shipmentTotal'].setValue(custState === tranState ? shipmentTot : parseFloat(shipmentTot)/2);
+
+
+  }
+  getCalucationDetails($event){
+    const invoice = $event ? $event : "";
+    const cnoteCount = this.tableData.length;
+    const countSelected = invoice ? invoice.length : 0;
+    const subTotalAmount = invoice ? calculateTotalField(invoice, 'subTotalAmount') : 0;
+    const gstCharged = invoice ? calculateTotalField(invoice, 'gstCharged') : 0;
+    const totalBillingAmount = invoice ? calculateTotalField(invoice, 'totalBillingAmount') : 0;
     //#endregion
 
     //#region fist table KPICountData
@@ -301,4 +242,6 @@ export class InvoiceSummaryBillComponent implements OnInit {
       },
     ]
   }
+
+
 }

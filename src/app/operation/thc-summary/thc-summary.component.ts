@@ -11,7 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class ThcSummaryComponent implements OnInit {
   //here the declare the flag
   tableLoad: boolean;
-  filterColumn:boolean=true;
+  filterColumn: boolean = true;
   METADATA = {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
@@ -33,19 +33,21 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:250px",
     },
-    tripId: {
+    docNo: {
       Title: "THC No",
       class: "matcolumncenter",
       Style: "min-width:210px",
-      functionName:'openExternalWindow',
-      type:'windowLink',
+      functionName: 'openExternalWindow',
+      type: 'windowLink',
     },
-    route: {
+
+    rUTNM: {
       Title: "Route",
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
-    vehicle: {
+
+    vEHNO: {
       Title: "Vehicle No",
       class: "matcolumncenter",
       Style: "max-width:130px",
@@ -55,8 +57,8 @@ export class ThcSummaryComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:100px",
     },
-    statusAction:{
-      Title:"Status",
+    statusAction: {
+      Title: "Status",
       class: "matcolumncenter",
       Style: "max-width:100px",
     },
@@ -66,11 +68,11 @@ export class ThcSummaryComponent implements OnInit {
       Style: "max-width:100px",
     }
   };
-allColumnFilter:any;
+  allColumnFilter: any;
   //#endregion
   staticField = [
-    "route",
-    "vehicle",
+    "rUTNM",
+    "vEHNO",
     "loadedKg",
     "statusAction",
     "createOn"
@@ -80,66 +82,67 @@ allColumnFilter:any;
   // ]
   addAndEditPath: string;
   menuItemflag: boolean = true;
-  menuItems = [{label:"Update THC"},{label:"Delivered"},{label:"View"}];
+  menuItems = [{ label: "Update THC" }, { label: "Delivered" }, { label: "View" }];
 
   //here declare varible for the KPi
   boxData: { count: number; title: string; class: string; }[];
-  constructor(    
+  constructor(
     private router: Router,
     public dialog: MatDialog,
     private thcService: ThcService
-    ) {
-      this.getThcDetails();
-      this.addAndEditPath = "Operation/thc-create";
-      this.allColumnFilter=this.columnHeader;
-    }
+  ) {
+    this.getThcDetails();
+    this.addAndEditPath = "Operation/thc-create";
+    this.allColumnFilter = this.columnHeader;
+  }
 
-    
 
-    //here the code which is get details of Thc Which is Display in Fron-end
+
+  //here the code which is get details of Thc Which is Display in Fron-end
   async getThcDetails() {
 
     const thcList = await this.thcService.getThcDetail();
-    const branch=localStorage.getItem("Branch");
-    const thcDetail= thcList.data.filter((x)=>x.branch==branch || x.closingBranch.toLowerCase() === branch.toLowerCase())
-    .map((item) => {
-      const action= item.closingBranch.toLowerCase() === branch.toLowerCase();
-      if (item.updateDate) {
-        item.createOn = formatDate(item.updateDate, 'dd-MM-yy HH:mm');
-        item.statusAction=item?.status === "1" ? "In Transit" :"Delivered",
-        item.actions =item.status === "1" && action?  ["Update THC","View"] :item.status === "1"?["View"]:["Delivered","View"];
-      }
-      return item;
-    });
-       // Sort the PRQ list by pickupDate in descending order
-       const sortedData = thcDetail.sort((a, b) => {
-        const dateA: Date | any = new Date(a.updateDate);
-        const dateB: Date | any = new Date(b.updateDate);
-  
-        // Compare the date objects
-        return dateB - dateA; // Sort in descending order
+    const branch = localStorage.getItem("Branch");
+    const thcDetail = thcList.data.filter((x) => x.cLOC == branch || x.dEST.toLowerCase() === branch.toLowerCase())
+      .map((item) => {
+        const action = item.dEST.toLowerCase() === branch.toLowerCase();
+        if (item.eNTDT) {
+          item.createOn = formatDate(item.eNTDT, 'dd-MM-yy HH:mm');
+          item.statusAction = item?.oPSSTNM
+          item.loadedKg = item?.uTI?.wT
+          item.actions = item.oPSST === 1 && action ? ["Update THC", "View"] : item.oPSST === 1 ? ["View"] : ["Delivered", "View"];
+        }
+        return item;
       });
-  
-    this.tableData =sortedData;
+    // Sort the PRQ list by pickupDate in descending order
+    const sortedData = thcDetail.sort((a, b) => {
+      const dateA: Date | any = new Date(a.eNTDT);
+      const dateB: Date | any = new Date(b.eNTDT);
 
-   this.tableLoad=false;
+      // Compare the date objects
+      return dateB - dateA; // Sort in descending order
+    });
+
+    this.tableData = sortedData;
+
+    this.tableLoad = false;
   }
 
   ngOnInit(): void {
   }
   async handleMenuItemClick(data) {
-    const thcDetail=this.tableData.find((x)=>x._id===data.data._id);
+    const thcDetail = this.tableData.find((x) => x._id === data.data._id);
     if (data.label.label === "Update THC") {
       this.router.navigate([this.addAndEditPath], {
         state: {
-          data: {data:thcDetail,isUpdate:true, viewType: 'update'},
+          data: { data: thcDetail, isUpdate: true, viewType: 'update' },
         },
       });
     }
     if (data.label.label === "View") {
       this.router.navigate([this.addAndEditPath], {
         state: {
-          data: {data:thcDetail, isView:true, viewType: 'view'},
+          data: { data: thcDetail, isView: true, viewType: 'view' },
         },
       });
       // const dialogref = this.dialog.open(ThcViewComponent, {
@@ -166,12 +169,12 @@ allColumnFilter:any;
   //   const url = `${window.location.origin}/#/Operation/thc-view`;
   //   window.open(url,'','width=1000,height=800');
   // }
-  openExternalWindow(data){
+  openExternalWindow(data) {
     const templateBody = {
-      DocNo:data.tripId,
-      templateName:'thc'
+      DocNo: data.tripId,
+      templateName: 'thc'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
-    window.open(url,'','width=1500,height=800');
+    window.open(url, '', 'width=1500,height=800');
   }
 }

@@ -28,7 +28,7 @@ export class ThcService {
         // and return it; otherwise, return the 'result' array as is
         return vehicle ? result.data.map(x => ({ name: x.vehicleNo, value: x.vehicleNo })) : result.data;
     }
-    async prqDetail(isDropDown,filter={}) {
+    async prqDetail(isDropDown, filter = {}) {
         //Need to default max date range, and 
         // const startDate = new Date();
         // startDate.setMonth(startDate.getMonth() - 1);
@@ -37,7 +37,7 @@ export class ThcService {
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.PrqDetails,
-            filter:filter
+            filter: filter
         };
 
         // Perform an asynchronous operation to fetch data from the operation service
@@ -82,7 +82,7 @@ export class ThcService {
 
         const reqBody = {
             companyCode: this.storage.companyCode,
-            collectionName: Collections.ThcDetails,
+            collectionName: Collections.thcsummary,
             filter: {} //{ tripDate: { $gte: startDate, $lte: endDate } }
         };
 
@@ -90,53 +90,58 @@ export class ThcService {
         const result = await this.operationService.operationMongoPost(GenericActions.Get, reqBody).toPromise();
         return result;
     }
-    async getNestedDockDetail(shipments,isUpdate) {
+    async getNestedDockDetail(shipments, isUpdate) {
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.docketOp,
             filter: {}
         };
-       if(!isUpdate){
-        const promises = shipments.map(async (element) => {
-            reqBody.filter = { dKTNO: element.docketNumber, sFX: 0 };
-            let nestedDetail = await this.operationService.operationPost(GenericActions.Get, reqBody).toPromise();
-            element.noOfPkg = nestedDetail.data[0]?.tOTPKG || 0;
-            element.totWeight = nestedDetail.data[0]?.tOTWT || 0;
-            element.orgNoOfPkg = nestedDetail.data[0]?.tOTPKG || 0;
-            element.orgTotWeight = nestedDetail.data[0]?.tOTWT || 0;
-            element.sFX = nestedDetail.data[0]?.sFX || 0;
-            return element;
-        });
+        if (!isUpdate) {
+            const promises = shipments.map(async (element) => {
+                reqBody.filter = { dKTNO: element.docketNumber, sFX: 0 };
+                let nestedDetail = await this.operationService.operationPost(GenericActions.Get, reqBody).toPromise();
+                element.noOfPkg = nestedDetail.data[0]?.tOTPKG || 0;
+                element.totWeight = nestedDetail.data[0]?.tOTWT || 0;
+                element.orgNoOfPkg = nestedDetail.data[0]?.tOTPKG || 0;
+                element.orgTotWeight = nestedDetail.data[0]?.tOTWT || 0;
+                element.sFX = nestedDetail.data[0]?.sFX || 0;
+                return element;
+            });
 
-        // Wait for all promises to resolve
-        const updatedShipments = await Promise.all(promises);
-        return updatedShipments;
-    }
-    else{
-        const promises = shipments.map(async (element) => {
-            reqBody.filter = { dKTNO: element.docketNumber};
-            let nestedDetail = await this.operationService.operationPost(GenericActions.Get, reqBody).toPromise();
-            const length=nestedDetail.data.length-1;
-            element.noOfPkg = nestedDetail.data[length]?.tOTPKG || 0;
-            element.totWeight = nestedDetail.data[length]?.tOTWT || 0;
-            element.orgNoOfPkg = nestedDetail.data[length]?.tOTPKG || 0;
-            element.orgTotWeight = nestedDetail.data[length]?.tOTWT || 0;
-            element.sFX = nestedDetail.data[length]?.sFX || 0;
-            return element;
-        });
+            // Wait for all promises to resolve
+            const updatedShipments = await Promise.all(promises);
+            return updatedShipments;
+        }
+        else {
+            const promises = shipments.map(async (element) => {
+                reqBody.filter = { dKTNO: element.docketNumber };
+                let nestedDetail = await this.operationService.operationPost(GenericActions.Get, reqBody).toPromise();
+                const length = nestedDetail.data.length - 1;
+                element.noOfPkg = nestedDetail.data[length]?.tOTPKG || 0;
+                element.totWeight = nestedDetail.data[length]?.tOTWT || 0;
+                element.orgNoOfPkg = nestedDetail.data[length]?.tOTPKG || 0;
+                element.orgTotWeight = nestedDetail.data[length]?.tOTWT || 0;
+                element.sFX = nestedDetail.data[length]?.sFX || 0;
+                return element;
+            });
 
-        // Wait for all promises to resolve
-        const updatedShipments = await Promise.all(promises);
-        return updatedShipments;
+            // Wait for all promises to resolve
+            const updatedShipments = await Promise.all(promises);
+            return updatedShipments;
+        }
     }
+    async getThcDetails(tripId) {
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: Collections.thcsummary,
+            filter: { docNo: tripId }
+        };
+        let nestedDetail = await firstValueFrom(this.operationService.operationPost(OperationActions.getThc, reqBody));
+        return nestedDetail;
     }
-   async getThcDetails(tripId){
-    const reqBody = {
-        companyCode: this.storage.companyCode,
-        collectionName: Collections.ThcDetails,
-        filter: {tripId:tripId}
-    };
-    let nestedDetail = await firstValueFrom(this.operationService.operationPost(OperationActions.getThc, reqBody));
-    return nestedDetail;
-   }
+    async newsthcGeneration(request) {
+        // Perform an asynchronous operation to fetch data from the operation service
+        const result = await this.operationService.operationMongoPost(OperationActions.CreateThc, request).toPromise();
+        return result;
+    }
 }

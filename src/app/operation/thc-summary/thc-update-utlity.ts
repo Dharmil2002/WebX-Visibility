@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 
-export async function showConfirmationDialogThc(data, operationService) {
+export async function showConfirmationDialogThc(data, tripId, operationService, podDetails) {
     const confirmationResult = await Swal.fire({
         icon: "success",
         title: "Confirmation",
@@ -11,19 +11,40 @@ export async function showConfirmationDialogThc(data, operationService) {
     });
 
     if (confirmationResult.isConfirmed) {
-        const res = await updateThcStatus(data, operationService);
+        const res = await updateThcStatus(data, tripId, operationService, podDetails);
         return res
     }
 
 }
-async function updateThcStatus(data, operationService) {
+async function updateThcStatus(data, tripId, operationService, podDetails) {
+    const updatePromises = podDetails.map(async (element) => {
+        const reqBody = {
+            "companyCode": localStorage.getItem('companyCode'),
+            "collectionName": "docket_operation_details",
+            "filter": {
+                dKTNO: element.docketNumber, tId: tripId
+            },
+            "update": {
+                "rMRK": element.remarks,
+                "pOD": element.pod,
+                "aRVTM": element.arrivalTime,
+                "rBY": element.receiveBy,
+            }
+        };
+        return operationService.operationMongoPut("generic/update", reqBody).toPromise();
+    });
+    // Wait for all pod updates to complete
+    await Promise.all(updatePromises);
 
-    const reqBody = {
+    const thcReqBody = {
         "companyCode": localStorage.getItem('companyCode'),
-        "collectionName": "thc_detail",
-        "filter": { tripId: data.tripId },
+        "collectionName": "thc_summary",
+        "filter": { docNo: tripId },
         "update": data
-    }
-    const res = await operationService.operationMongoPut("generic/update", reqBody).toPromise();
-    return res
+    };
+
+    // Update THC summary
+    const thcResult = await operationService.operationMongoPut("generic/update", thcReqBody).toPromise();
+
+    return thcResult;
 }

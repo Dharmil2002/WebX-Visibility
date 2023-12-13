@@ -3,64 +3,64 @@
   <div *ngIf="thcLoad" class="d-flex justify-content-center align-items-center">
     <!-- Bootstrap loader -->
     <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+      <span class="visually-hidden">Loading...</span>
     </div>
-</div>
-<div *ngIf="!thcLoad">
-  <form [formGroup]="thcTableForm">
-    <app-form-webxpress [form]="thcTableForm"  [FormTitle]="'Basic Detail'" [formData]="jsonControlBasicArray"
-      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-      (callFunction)="functionCallHandler($event)">
-    </app-form-webxpress>
-  </form>
-  <!-- End -->
+  </div>
+  <div *ngIf="!thcLoad">
+    <form [formGroup]="thcTableForm">
+      <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Basic Detail'" [formData]="jsonControlBasicArray"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)">
+      </app-form-webxpress>
+    </form>
+    <!-- End -->
     <!-- fleet Detail -->
     <div *ngIf="marketVendor">
       <form [formGroup]="marketVehicleTableForm">
-        <app-form-webxpress [form]="marketVehicleTableForm"  [FormTitle]="'Market Vehicle'" [formData]="jsonMarketVehicle"
+        <app-form-webxpress [form]="marketVehicleTableForm" [FormTitle]="'Market Vehicle'"
+          [formData]="jsonMarketVehicle" (functionCallEmitter)="functionCallHandler($event)"
+          [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+        </app-form-webxpress>
+      </form>
+    </div>
+    <!-- Driver Detail -->
+
+    <form [formGroup]="thcTableForm">
+      <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Driver Detail'" [formData]="jsonControlDriverArray"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)">
+      </app-form-webxpress>
+    </form>
+
+    <!-- End -->
+    <!-- Docket Detail -->
+    <div *ngIf="addThc">
+      <form [formGroup]="thcTableForm">
+        <app-form-webxpress [form]="thcTableForm" [FormTitle]="' Docket Detail'" [formData]="jsonControlDocketArray"
           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
           (callFunction)="functionCallHandler($event)">
         </app-form-webxpress>
       </form>
     </div>
-  <!-- Driver Detail -->
+    <!-- End -->
+    <form [formGroup]="thcTableForm">
+      <app-form-webxpress [form]="thcTableForm" [FormTitle]="'Vehicle Loading Detail'"
+        [formData]="jsonControlVehLoadArray" (functionCallEmitter)="functionCallHandler($event)"
+        [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+      </app-form-webxpress>
+    </form>
+    <!-- End -->
 
-  <form [formGroup]="thcTableForm">
-    <app-form-webxpress [form]="thcTableForm"  [FormTitle]="'Driver Detail'" [formData]="jsonControlDriverArray"
-      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-      (callFunction)="functionCallHandler($event)">
-    </app-form-webxpress>
-  </form>
-
-  <!-- End -->
-  <!-- Docket Detail -->
-  <div *ngIf="addThc">
-  <form [formGroup]="thcTableForm">
-    <app-form-webxpress [form]="thcTableForm"  [FormTitle]="' Docket Detail'" [formData]="jsonControlDocketArray"
-      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-      (callFunction)="functionCallHandler($event)">
-    </app-form-webxpress>
-  </form>
-</div>
-  <!-- End -->
-  <form [formGroup]="thcTableForm">
-    <app-form-webxpress [form]="thcTableForm"  [FormTitle]="'Vehicle Loading Detail'" [formData]="jsonControlVehLoadArray"
-    (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
-    (callFunction)="functionCallHandler($event)">
-  </app-form-webxpress>
-  </form>
-  <!-- End -->
-
-  <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
-    <!-- Bootstrap loader -->
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
+    <div *ngIf="tableLoad" class="d-flex justify-content-center align-items-center">
+      <!-- Bootstrap loader -->
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
-  </div>
     <app-generic-table-v2 *ngIf="!tableLoad&&!addThc" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-      [tableData]="tableData" [metaData]="metaData"[disbleCheckbox]="disbleCheckbox" [menuItems]="menuItems" [staticField]="staticField"
-      [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width" [maxWidth]="maxWidth"
-      (menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"
+      [tableData]="tableData" [metaData]="metaData" [disbleCheckbox]="disbleCheckbox" [menuItems]="menuItems"
+      [staticField]="staticField" [TableStyle]="TableStyle" [Link]="linkArray" [height]="height" [width]="width"
+      [maxWidth]="maxWidth" (menuItemClicked)="handleMenuItemClick($event)" (onFlagChange)="selectCheckBox($event)"
       [addAndEditPath]="addAndEditPath" [menuItemFlag]="menuItemflag" [uploadedFiles]="uploadedFiles">
     </app-generic-table-v2>
     <div class="row">
@@ -72,5 +72,5 @@
         </div>
       </div>
     </div>
-</div>
+  </div>
 </app-common-wrapper-webxpress>

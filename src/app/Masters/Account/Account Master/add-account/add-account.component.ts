@@ -284,7 +284,7 @@ export class AddAccountComponent implements OnInit {
       });
       if (this.isUpdate && !this.FirstUpdate) {
         const element = GroupCodeData.find(
-          (x) => x.value == this.UpdateData.SubCategoryCode
+          (x) => x.value == this.UpdateData.gRPCD
         );
         this.AccountForm.controls["GroupCode"].setValue(element);
         this.FirstUpdate = true;
@@ -383,7 +383,7 @@ export class AddAccountComponent implements OnInit {
       });
       if (this.isUpdate) {
         const element = PartySelectionData.find(
-          (x) => x.name == this.UpdateData.PartySelection
+          (x) => x.name == this.UpdateData.pARTNM
         );
         this.AccountForm.controls["PartySelection"].setValue(element);
       }
@@ -504,6 +504,7 @@ export class AddAccountComponent implements OnInit {
       isTDS:this.AccountForm.value.isTDSapplicable,
       tSEC:this.AccountForm.value.isTDSapplicable?this.AccountForm.value.TDSsection.name:"",
       iSSYS: this.AccountForm.value.ActiveFlag,
+      pARTNM:this.AccountForm.value.PartySelection.name,
       eNTDT: new Date(),
       eNTLOC: this.storage.branch,
       eNTBY: this.storage.userName,

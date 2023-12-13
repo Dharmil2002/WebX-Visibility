@@ -468,6 +468,32 @@ export class AccountMasterControls {
           onChange: "GetGroupName",
         },
       },
+      {
+        name: "BalanceSheet",
+        label: "Balance Sheet category",
+        placeholder: "Balance Sheet category",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Balance Sheet category is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {},
+      },
     ];
 
     this.BankFormArray = [];

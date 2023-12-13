@@ -852,6 +852,14 @@
         "sales-register"
       ],
       "router": "Reports/sales-register-report"
+    },
+    {
+      "title": "ProductMaster/shardProductList",
+      "tag": [
+        "shard-Product",
+        "shard-Product"
+      ],
+      "router": "Masters/ProductMaster/shardProductList"
     }
   ]
 }

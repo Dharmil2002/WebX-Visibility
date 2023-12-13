@@ -84,6 +84,8 @@ export class AccountGroupComponent implements OnInit {
     name: "Add Account Group",
     iconName:'add'
   }
+  BalanceSheetCode: string;
+  BalanceSheetStatus: any;
   constructor(
     public dialogRef: MatDialogRef<AccountGroupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -169,6 +171,11 @@ export class AccountGroupComponent implements OnInit {
         this.GroupCodeTypeCode = data.name;
         this.GroupCodeTypeStatus = data.additionalData.showNameAndValue;
       }
+      if (data.name === "BalanceSheet") {
+        this.BalanceSheetCode = data.name;
+        this.BalanceSheetStatus = data.additionalData.showNameAndValue;
+        // this.getBalanceSheetcategoryDropdown();
+      }
     });
   }
 
@@ -188,6 +195,37 @@ export class AccountGroupComponent implements OnInit {
           value: x.codeId,
         };
       });
+    }
+  }
+
+  async getBalanceSheetcategoryDropdown() {
+    const Body = {
+      companyCode: this.CompanyCode,
+      collectionName: "General_master",
+      filter: { codeType: "BLC", activeFlag: true },
+    };
+    const res = await  firstValueFrom(this.masterService
+      .masterPost("generic/get", Body));
+    if (res.success && res.data.length > 0) {
+      const BalanceSheetcategory = res.data.map((x) => {
+        return {
+          name: x.codeDesc,
+          value: x.codeId,
+        };
+      });
+      if (this.isUpdate) {
+        const element = BalanceSheetcategory.find(
+          (x) => x.name == this.updateData.bCATNM
+        );
+        this.AccountGroupForm.controls["BalanceSheet"].setValue(element);
+      }
+      this.filter.Filter(
+        this.jsonControlAccountGroupArray,
+        this.AccountGroupForm,
+        BalanceSheetcategory,
+        this.BalanceSheetCode,
+        this.BalanceSheetStatus
+      );
     }
   }
 
@@ -321,6 +359,8 @@ export class AccountGroupComponent implements OnInit {
         gLEVEL:`${parseInt(this.AccountGroupForm.value.GroupCodeType.level)+1}`,
         cATNM: this.AccountGroupForm.value.CategoryCode.name,
         cATCD: this.AccountGroupForm.value.CategoryCode.value,
+        bCATNM:this.AccountGroupForm.value.BalanceSheet.name,
+        bCATCD:this.AccountGroupForm.value.BalanceSheet.value,
         eNTDT: new Date(),
         eNTLOC: this.storage.branch,
         eNTBY: this.storage.userName,

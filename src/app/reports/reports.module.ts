@@ -42,6 +42,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { JobQueryPageComponent } from './job-report/job-query-page/job-query-page.component';
 import { ReportsRoutingModule } from './reports-routing.module';
 import { CnwGstRegisterComponent } from './cnw-gst-register/cnw-gst-register.component';
+import { CnoteBillMrReportComponent } from './cnote-bill-mr-report/cnote-bill-mr-report.component';
+import { SalesRegisterAdvancedComponent } from './sales-register-advanced/sales-register-advanced.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -90,6 +92,8 @@ import { CnwGstRegisterComponent } from './cnw-gst-register/cnw-gst-register.com
   declarations: [
     JobQueryPageComponent,
     CnwGstRegisterComponent,
+    CnoteBillMrReportComponent,
+    SalesRegisterAdvancedComponent
   ],
   exports:[],
 

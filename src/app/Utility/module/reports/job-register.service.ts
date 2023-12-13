@@ -14,9 +14,9 @@ export async function getJobregisterReportDetail(masterServices) {
     // Fetch data for "cha_detail" collection
     const resChaEntry = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
     // Update collection name for another set of data
-    reqBody.collectionName = "docket_temp"
-    // Fetch data for "docket_temp" collection
-    const resDocketTemp = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
+    // reqBody.collectionName = "docket_temp"
+    // // Fetch data for "docket_temp" collection
+    // const resDocketTemp = await masterServices.masterMongoPost("generic/get", reqBody).toPromise();
     // Initialize an array to store modified job data
     let jobList = [];
     // Process each element in the response data
@@ -26,21 +26,21 @@ export async function getJobregisterReportDetail(masterServices) {
         const chaDet = resChaEntry.data ? resChaEntry.data.find((entry) => entry.jobNo === element?.jobId) : null;
 
         // Find corresponding entry in "docket_temp" using job ID
-        const docDet = resDocketTemp.data ? resDocketTemp.data.find((entry) => entry.jobNo === element?.jobId) : null;
+        // const docDet = resDocketTemp.data ? resDocketTemp.data.find((entry) => entry.jobNo === element?.jobId) : null;
 
         // Initialize variables for calculations and data extraction
         let totalCHAamt = 0;
-        let containerNo = 0;
+        // let containerNo = 0;
 
         // Calculate total amount from "cha_detail" if available
         if (chaDet) {
             totalCHAamt = chaDet.containorDetail.reduce((total, amt) => total + parseFloat(amt.totalAmt), 0);
         }
 
-        // Extract container details from "docket_temp" if available
-        if (docDet) {
-            containerNo = docDet.containerDetail.map((num) => parseFloat(num.containerNumber), 0);
-        }
+        // // Extract container details from "docket_temp" if available
+        // if (docDet) {
+        //     containerNo = docDet.containerDetail.map((num) => parseFloat(num.containerNumber), 0);
+        // }
 
         // Create a modified job data object
         let jobData = {

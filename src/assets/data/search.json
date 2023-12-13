@@ -844,6 +844,14 @@
         "cnote-bill-mr"
       ],
       "router": "Reports/cnote-Bill-MR-Report"
+    },
+    {
+      "title": "Reports/Sales-Register-Report",
+      "tag": [
+        "sales-register",
+        "sales-register"
+      ],
+      "router": "Reports/sales-register-report"
     }
   ]
 }

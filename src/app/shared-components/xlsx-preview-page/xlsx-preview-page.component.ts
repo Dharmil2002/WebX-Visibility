@@ -8,7 +8,7 @@ import { fromEvent } from "rxjs";
 import { UnsubscribeOnDestroyAdapter } from "src/app/shared/UnsubscribeOnDestroyAdapter";
 import { SelectionModel } from "@angular/cdk/collections";
 import { ModifyTableCollumnsComponent } from "src/app/shared-components/modify-table-collumns/modify-table-collumns.component";
-
+import { CsvDataServiceService } from "src/app/core/service/Utility/csv-data-service.service";
 @Component({
   selector: 'app-xlsx-preview-page',
   templateUrl: './xlsx-preview-page.component.html',
@@ -136,6 +136,15 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
       }
     });
   }
+  //#region to download uploaded list
+  exportTable(): void {
+    const dataToExport = this.dataSource.data.map(row => {
+      const { select, ...rest } = row; // Exclude the 'select' property
+      return rest;
+    });
+    CsvDataServiceService.exportToCsv('Upload List.csv', dataToExport);
+  }
+  //#endregion
 }
 
 export interface MyObject {

@@ -1,7 +1,32 @@
-<form [formGroup]="fileUploadForm">
-    <app-form-webxpress [form]="fileUploadForm" [formData]="jsonControlArray"
-        [FormTitle]="'Upload '"
+<!-- <form [formGroup]="fileUploadForm">
+    <app-form-webxpress [form]="fileUploadForm" [formData]="jsonControlArray" [FormTitle]="'Upload '"
         (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
-        (callFunction)="functionCallHandler($event)" >
+        (callFunction)="functionCallHandler($event)">
     </app-form-webxpress>
-</form>
+</form> -->
+<div class="body">
+    <div class="example-container">
+        <form [formGroup]="fileUploadForm">
+            <div class="row">
+                <div class="col">
+                    <mat-label>Upload File</mat-label>
+                    <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)">
+                    </app-file-upload>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- <div class="d-flex justify-content-between mb-2">
+    <div class="m-1 ">
+        <button (click)="Download()" mat-button color="primary">
+            <mat-icon>get_app</mat-icon>
+            Download Driver Upload template file
+        </button>
+         <a class="left" title="" data-placement="left" data-toggle="tooltip"
+            data-original-title="Please enter date in dd MMM yyyy format">
+            <i class="fa fa-exclamation-circle">
+            </i>(Please enter date in dd MMM yyyy format)</a> -->
+    <!-- </div>
+</div> --> 

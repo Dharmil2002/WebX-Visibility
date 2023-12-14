@@ -99,6 +99,8 @@ export class InvoiceServiceService {
   }
   /*Below function call while bill No is generated*/
   async addBillDetails(data,bill) {
+    const customerName = (data?.customerName?.[0] || "").split('-')[1]?.trim() || "";
+    const customerCode= (data?.customerName?.[0] || "").split('-')[0]?.trim() || "";
     const billData = {
       "_id": `${this.storage.companyCode}-${data?.invoiceNo}` || "",
       "cID": this.storage.companyCode,
@@ -131,8 +133,8 @@ export class InvoiceServiceService {
         "bALAMT": 0.00
       },
       "cUST": {
-        "cD": "",
-        "nM": data?.customerName||"",
+        "cD":customerCode,
+        "nM":customerName||"",
         "tEL": "",
         "aDD": "",
         "eML": "",
@@ -156,7 +158,7 @@ export class InvoiceServiceService {
       "gROSSAMT": data?.shipmentTotal || 0.00,
       "aDDCHRG": 0.00,
       "rOUNOFFAMT": 0.00,
-      "aMT": 0.00,
+      "aMT": data?.shipmentTotal || 0.00,
       "cNL": false,
       "cNLDT": "",
       "cNBY": "",
@@ -174,7 +176,7 @@ export class InvoiceServiceService {
       docType: "BILL",
       branch: this.storage.branch,
       finYear: financialYear,
-      party:data?.customerName.toUpperCase()||"",
+      party:customerName.toUpperCase(),
       collectionName: "Cust_bills_headers",
       data: billData,
     };

@@ -58,17 +58,16 @@ export class THCAmountsDetailComponent implements OnInit {
     this.initializeFormControl();
   }
   initializeFormControl() {
+    
     const thcAmountsFormControls = new THCAmountsControl(this.Type);
     this.THCAmountsADDArray = thcAmountsFormControls.getTHCAmountsADDControls();
-
     this.THCAmountsArray = thcAmountsFormControls.getTHCAmountsControls();
     this.THCAmountsForm = formGroupBuilder(this.fb, [this.THCAmountsArray]);
-
     this.THCAmountsForm.get("Balancelocation").setValue(
-      this.THCData?.OthersData?.balAmtAt
+      this.THCData?.OthersData.OthersData.bLPAYAT
     );
     this.THCAmountsForm.get("AdvanceLocation").setValue(
-      this.THCData?.OthersData?.advPdAt
+      this.THCData?.OthersData.OthersData.aDPAYAT
     );
     this.initializeAddLess();
   }

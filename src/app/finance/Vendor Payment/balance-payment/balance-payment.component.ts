@@ -198,8 +198,8 @@ export class BalancePaymentComponent implements OnInit {
   async GetAdvancePaymentList() {
     this.isTableLode = false;
     const Filters = {
-      vendorName: this.PaymentData.Vendor,
-      balAmtAt: localStorage.getItem("Branch"),
+      "vND.nM": this.PaymentData.Vendor,
+      bLPAYAT: localStorage.getItem("Branch"),
     };
     const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(
       this.masterService,
@@ -210,7 +210,7 @@ export class BalancePaymentComponent implements OnInit {
         GenerationDate: x.GenerationDate,
         VehicleNumber: x.VehicleNumber,
         Advance: x.Advance,
-        BalancePending: x.OthersData.balAmt,
+        BalancePending: x.OthersData.bALAMT,
         THC: x.THC,
         THCamount: x.THCamount,
         OthersData: x,

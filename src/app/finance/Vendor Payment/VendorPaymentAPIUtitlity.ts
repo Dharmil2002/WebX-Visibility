@@ -31,20 +31,20 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
 export async function GetAdvancePaymentListFromApi(masterService, Filters) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
-        collectionName: "thc_detail",
+        collectionName: "thc_summary",
         filter: Filters
     }
     try {
         const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
         const result = res.data.map((x, index) => ({
             isSelected: false,
-            THC: x.tripId,
-            GenerationDate: x.tripDate
-                ? formatDate(x.tripDate, "dd-MM-yy")
+            THC: x.docNo,
+            GenerationDate: x.eNTDT
+                ? formatDate(x.eNTDT, "dd-MM-yy")
                 : formatDate(new Date().toUTCString(), "dd-MM-yy"),
-            VehicleNumber: x.vehicle,
-            THCamount: x.contAmt,
-            Advance: x.advAmt,
+            VehicleNumber: x.vEHNO,
+            THCamount: x.cONTAMT,
+            Advance: x.aDVAMT,
             OthersData: x
         })) ?? null;
         return result

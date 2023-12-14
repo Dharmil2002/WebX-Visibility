@@ -67,7 +67,7 @@ export class BillSubmissionComponent implements OnInit {
         sDoc:pod
       }
     }
-   const res = await this.invoiceService.updateInvoiceStatus(filter,status);
+     await this.invoiceService.updateInvoiceStatus(filter,status);
     this.dialogRef.close();
   }
   cancel(){

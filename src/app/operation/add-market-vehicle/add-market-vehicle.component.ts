@@ -16,6 +16,7 @@ export class AddMarketVehicleComponent implements OnInit {
 
   jsonControlVehicleArray: any;
   marketVehicleTableForm: UntypedFormGroup;
+ 
   companyCode = parseInt(localStorage.getItem("companyCode"));
   breadScrums = [
     {
@@ -42,6 +43,7 @@ export class AddMarketVehicleComponent implements OnInit {
 
   ngOnInit(): void {
     this.marketVehicleTableForm.controls['vehicleSize']?.setValue(this.prqDetail?.vehicleSize || this.prqDetail?.containerSize || "")
+    
   }
 
   functionCallHandler($event) {
@@ -68,6 +70,7 @@ export class AddMarketVehicleComponent implements OnInit {
     var data = {
       vID: this.marketVehicleTableForm.value.vehicelNo,
       vndNM: this.marketVehicleTableForm.value.vendor,
+      vndCD: this.marketVehicleTableForm.value.vendor,
       vndPH: this.marketVehicleTableForm.value.vMobileNo,
       pANNO: this.marketVehicleTableForm.value.driverPan,
       wTCAP: this.marketVehicleTableForm.value.vehicleSize,

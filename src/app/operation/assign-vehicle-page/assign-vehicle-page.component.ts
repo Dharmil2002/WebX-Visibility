@@ -13,6 +13,7 @@ import { AddMarketVehicleComponent } from "../add-market-vehicle/add-market-vehi
 import { formatDate } from "src/app/Utility/date/date-utils";
 import { VehicleStatusService } from "src/app/Utility/module/operation/vehicleStatus/vehicle.service";
 import { MarkerVehicleService } from "src/app/Utility/module/operation/market-vehicle/marker-vehicle.service";
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 
 @Component({
   selector: "app-assign-vehicle-page",
@@ -44,6 +45,7 @@ export class AssignVehiclePageComponent implements OnInit {
   menuItems = [{ label: "action", componentDetails: ViewPrintComponent }];
   tableData: any = [];
   NavData: any;
+  vendorTypes: AutoComplete[];
 
   constructor(
     private Route: Router,

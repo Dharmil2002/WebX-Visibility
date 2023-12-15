@@ -76,6 +76,17 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   jsonEwayBill: any;
   jsonControlArrayBasic: any;
   jsonContainerDetail: any;
+
+  packagingTypes: AutoComplete[];
+  paymentBases: AutoComplete[];
+  movementTypes: AutoComplete[];
+  vendorTypes: AutoComplete[];
+  deliveryTypes: AutoComplete[];
+  rateTypes: AutoComplete[];
+  wtUnits: AutoComplete[];
+  riskTypes: AutoComplete[];
+  issueFrom: AutoComplete[];
+  products: AutoComplete[];
  
   linkArray = [];
   
@@ -105,7 +116,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     
     this.model.docketDetail = new DocketDetail({});
     if (navigationState != null) {
-      console.log(navigationState)
+      
       this.isUpdate =
         navigationState.hasOwnProperty("actions") &&
         navigationState.actions[0] === "Edit Docket";
@@ -120,42 +131,42 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         this.breadscrums[0].title = "Consignment Entry";
       }
     }
-    this.initializeFormControl();
-    this.getGeneralmasterData();
+    this.initializeFormControl();    
   }
 
   ngOnInit(): void {
-    this.bindDataFromDropdown();
-    this.isTableLoad = false;
+    this.getGeneralmasterData().then(() => {
+      this.bindDataFromDropdown();
+      this.isTableLoad = false;
+    });
     this.backPath = "/dashboard/Index?tab=6";
-
   }
 
   /*Here the function which is used for the bind staticDropdown Value*/
   async getGeneralmasterData() {
-    const packagingType: AutoComplete[] = await this.generalService.getGeneralMasterData("PKGS");
-    const paymentBase: AutoComplete[] = await this.generalService.getGeneralMasterData("PAYTYP");
-    const movementType: AutoComplete[] = await this.generalService.getGeneralMasterData("MOVTYP");
-    const vendorType: AutoComplete[] = await this.generalService.getGeneralMasterData("VENDTYPE");
-    const deliveryType: AutoComplete[] = await this.generalService.getGeneralMasterData("DELTYP");
-    const rateType: AutoComplete[] = await this.generalService.getGeneralMasterData("RTTYP");
-    const wtUnits: AutoComplete[] = await this.generalService.getGeneralMasterData("WTUNIT");
-    const riskType: AutoComplete[] = await this.generalService.getGeneralMasterData("RISKTYP");
-    const issueFrom: AutoComplete[] = await this.generalService.getGeneralMasterData("ISSFRM");
-    
-    const products: AutoComplete[] = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+    this.packagingTypes = await this.generalService.getGeneralMasterData("PKGS");
+    this.paymentBases = await this.generalService.getGeneralMasterData("PAYTYP");
+    this.movementTypes = await this.generalService.getGeneralMasterData("MOVTYP");
+    this.vendorTypes = await this.generalService.getGeneralMasterData("VENDTYPE");
+    this.deliveryTypes = await this.generalService.getGeneralMasterData("DELTYP");
+    this.rateTypes = await this.generalService.getGeneralMasterData("RTTYP");
+    this.wtUnits = await this.generalService.getGeneralMasterData("WTUNIT");
+    this.riskTypes = await this.generalService.getGeneralMasterData("RISKTYP");
+    this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
+
+    this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
 
     // Find the form control with the name 'packaging_type'
-    this.setGeneralMasterData(this.model.allformControl, packagingType, "packaging_type");
-    this.setGeneralMasterData(this.model.allformControl,paymentBase, "payType");
-    this.setGeneralMasterData(this.model.allformControl,movementType, "movementType");
-    this.setGeneralMasterData(this.model.allformControl,products, "transMode");
-    this.setGeneralMasterData(this.model.allformControl,vendorType, "vendorType");
-    this.setGeneralMasterData(this.model.allformControl,deliveryType, "delivery_type");
-    this.setGeneralMasterData(this.model.allformControl,wtUnits, "weight_in");
-    this.setGeneralMasterData(this.model.allformControl,riskType, "risk");
-    this.setGeneralMasterData(this.model.allformControl,issueFrom, "issuing_from");
-    this.setGeneralMasterData(this.jsonControlArray,rateType, "freightRatetype");
+    this.setGeneralMasterData(this.model.allformControl, this.packagingTypes, "packaging_type");
+    this.setGeneralMasterData(this.model.allformControl, this.paymentBases, "payType");
+    this.setGeneralMasterData(this.model.allformControl, this.movementTypes, "movementType");
+    this.setGeneralMasterData(this.model.allformControl, this.products, "transMode");
+    this.setGeneralMasterData(this.model.allformControl, this.vendorTypes, "vendorType");
+    this.setGeneralMasterData(this.model.allformControl, this.deliveryTypes, "delivery_type");
+    this.setGeneralMasterData(this.model.allformControl, this.wtUnits, "weight_in");
+    this.setGeneralMasterData(this.model.allformControl, this.riskTypes, "risk");
+    this.setGeneralMasterData(this.model.allformControl, this.issueFrom, "issuing_from");
+    this.setGeneralMasterData(this.jsonControlArray, this.rateTypes, "freightRatetype");
     
   }
 
@@ -252,25 +263,30 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //#endregion
   async prqDetail() {
-    
-    let billingParty = this.model.billingParty.find(
-      (x) => x.name === this.model.prqData?.billingParty
-    );
+    debugger;
+    console.log(this.model.prqData);
+
+    let billingParty = { name: this.model.prqData?.billingParty, value:  this.model.prqData?.billingPartyCode };
+    //await this.customerService.getCustomerByCodeOrName(undefined, this.model.prqData?.billingParty);
+
     let vehicleDetail = await this.vehicleStatusService.vehiclList(
       this.model.prqData.prqNo
     );
+    
+    let vehType = this.vendorTypes.find(f => f.name == vehicleDetail?.vendorType);
 
     this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fromCity", "fromCity");
     this.setFormValue(this.model.consignmentTableForm, "toCity", this.model.prqData, true, "toCity", "toCity");
     await this.getLocBasedOnCity();
     this.setFormValue(this.model.consignmentTableForm, "billingParty", billingParty);
-    this.setFormValue(this.model.consignmentTableForm, "payType", this.model.prqData?.payType);
+    this.setFormValue(this.model.consignmentTableForm, "payType", this.model.prqData?.payTypeCode);
     this.setFormValue(this.model.consignmentTableForm, "docketDate", this.model.prqData?.pickupDate);
-    this.setFormValue(this.model.consignmentTableForm, "transMode", "Road");
+    this.setFormValue(this.model.consignmentTableForm, "transMode", "1");
     this.setFormValue(this.model.consignmentTableForm, "pAddress", this.model.prqData?.pAddress);
     this.setFormValue(this.model.consignmentTableForm, "cnebp", false);
     this.setFormValue(this.model.consignmentTableForm, "cnbp", true);
-    this.setFormValue(this.model.consignmentTableForm, "vendorType", vehicleDetail?.vendorType, false, "", "");
+    
+    this.setFormValue(this.model.consignmentTableForm, "vendorType", vehType.value, false, "", "");
 
     // Done By Harikesh 
     const autoBillingConfigs = [
@@ -287,17 +303,28 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     });
 
     await this.vendorFieldChanged()
-    debugger
-    if (vehicleDetail?.vendorType == "Market" || vehicleDetail?.vendorType == "4") {
+    
+    if (vehType.value == "4")
+    {
       this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail.vendor);
       this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, false);
-    } else {
-      this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
-      this.model.consignmentTableForm.controls['vehicleNo'].setValue({name:this.model.prqData?.vehicleNo||"",value:this.model.prqData?.vehicleNo||""});
-     
-    //  this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, true,"vehicleNo","vehicleNo");
+    } 
+    else 
+    {
+      let vendors = await getVendorsForAutoComplete(this.masterService, vehicleDetail.vendor, parseInt(vehType.value));
+      const vendor = vendors[0];
+      this.setFormValue(this.model.consignmentTableForm, "vendorName", vendor);
+      this.model.consignmentTableForm.controls['vehicleNo'].setValue( { name:this.model.prqData?.vehicleNo||"",value:this.model.prqData?.vehicleNo||"" } );     
+
+      //this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
+      //this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, true,"vehicleNo","vehicleNo");
     }
     this.getLocBasedOnCity();
+
+    if (this.model.prqData.carrierTypeCode == "3") {
+      this.model.containerTableForm.controls["containerType"].setValue( { name:this.model.prqData?.typeContainer||"", value:this.model.prqData?.typeContainerCode||"" } );
+      this.model.containerTableForm.controls["containerCapacity"].setValue( this.model.prqData?.size || 0);
+    }
   }
 
   setFormValue(
@@ -321,6 +348,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async bindDataFromDropdown() {   
+    
     const vehicleList = await getVehicleStatusFromApi(
       this.storage.companyCode,
       this.operationService
@@ -342,13 +370,13 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
 
     this.filter.Filter(this.jsonControlArrayBasic, this.model.consignmentTableForm, vehFieldMap, this.model.vehicleNo, this.model.vehicleNoStatus);
 
-    if (this.prqFlag && this.model.prqData.transMode == "trailer") {
+    if (this.prqFlag && this.model.prqData.carrierTypeCode == "3") {
       this.model.consignmentTableForm.controls["cd"].setValue(true);
       this.contFlag = true;
       this.containerDetail();
     }
     this.isUpdate && this.autofillDropDown();
-    this.prqFlag && this.prqDetail();
+    this.prqFlag && await this.prqDetail();
 
   }
 
@@ -1024,6 +1052,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
             controls: [{ controlName: 'freightRatetype', name: 'freightRatetypeName', value: 'freightRatetype' }]
         }
       ];
+    
 
       controlNames.forEach((g) => {
         const data = (g.dataArray === "F" ? this.jsonControlArray : this.model.allformControl);

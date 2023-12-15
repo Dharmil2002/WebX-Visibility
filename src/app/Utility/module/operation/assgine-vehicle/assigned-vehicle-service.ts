@@ -27,8 +27,20 @@ export class AssignedVehicleService {
       prqDetail.vendorName = item.vendor;
       prqDetail.vendorType = item.vendorType;
 
+      let updateData = {
+          cID: prqDetail.cID || localStorage.getItem('companyCode'),
+          pRQNO: prqDetail.prqNo || prqDetail.pRQNO,
+          sTS: "2",
+          sTSNM: "Awaiting For Docket",
+          vEHINO: item.vehNo,
+          vENDTY: item.vendorTypeCode || ( item.vendorType == "Market" ? "4" : undefined ),
+          vENDTYNM: item.vendorType,
+          vNDCD: item.vendorCode || ( item.vendorType == "Market" ? "8888" : undefined ),
+          vNDNM: item.vendor,
+      }
+
       delete prqDetail.actions
-      const res = await updatePrqStatus(prqDetail, masterService);
+      const res = await updatePrqStatus(updateData, masterService);
       const result = await this.vehicleStatusService.SaveVehicleData(item, prqDetail);
       if (res && result) {
         const confirmationResult = await Swal.fire({

@@ -96,7 +96,7 @@ export class VehicleStatusService {
       collectionName: "vehicle_status",
       filter: { tripId: tripId }
     }
-    const res = await this.operation.operationMongoPost('generic/get', request).toPromise();
+    const res = await firstValueFrom(this.operation.operationMongoPost('generic/get', request));
     return res.data[0]
   }
 
@@ -157,33 +157,94 @@ export class VehicleStatusService {
     return mergedData;
   }
 
+  async getVehicleList(vehicleNo: string[]) {
+    // Get the company code from local storage
+    const companyCode = localStorage.getItem("companyCode");
+
+    // Create a request object to fetch vehicle details
+    const vehicleRequest = {
+      companyCode,
+      collectionName: "vehicle_detail",
+      filter: { vehicleNo: { D$in: vehicleNo } },
+    };
+
+    // Fetch vehicle details from the database
+    const vehicleResult = await firstValueFrom(this.operation.operationMongoPost('generic/get', vehicleRequest));
+    return vehicleResult;
+  }
+
+  async getAvailableVehicles() {
+    // Get the company code from local storage
+    const companyCode = localStorage.getItem("companyCode");
+
+    // Create a request object to fetch vehicle details
+    const request = {
+      companyCode,
+      collectionName: "vehicle_status",
+      filter: { currentLocation: localStorage.getItem("Branch"), status: "Available" },
+    };
+
+    // Fetch vehicle details from the database
+    const result = await firstValueFrom(this.operation.operationMongoPost('generic/get', request));
+    return result.data;
+  }
+
 
   async createTableData(NavData, vehicleStatusData) {
     const [fromCity, toCity] = NavData.fromToCity.split('-');
+debugger;
+    let vehicles = await this.getAvailableVehicles();
 
-    const results = await Promise.all(vehicleStatusData.map(async item => {
-      const { vendorName, vendorPhoneNo, vendorType, driverName, telno } = await this.vehicleListFromMaster(item.vehNo);
+    // Fetch Vendor Types
+    const gmRequest = {
+      companyCode: localStorage.getItem("companyCode"),
+      collectionName: 'General_master',
+      filter: { codeType: 'VENDTYPE', activeFlag: true },
+    };    
+    const vendTypes = await firstValueFrom(this.operation.operationMongoPost('generic/get', gmRequest));
 
+    // Fetch Vendors
+    const vendorNames = vehicles.map(v => v.vendor);
+    const vndRequest = {
+      companyCode: localStorage.getItem("companyCode"),
+      collectionName: 'vendor_detail',
+      filter: { 
+          companyCode:  localStorage.getItem("companyCode"),
+          vendorName: { D$in: vendorNames }
+      },
+    };    
+    const vendors = await firstValueFrom(this.operation.operationMongoPost('generic/get', vndRequest));
+    
+    let results = vehicles.map((x) => { 
+      const vendType = vendTypes.data.find(v => v.codeId == x.vendorType || v.codeDesc == x.vendorType);
+      const vendor = vendors.data.find(v => v.vendorCode == x.vendor || v.vendorName == x.vendor);
+      let vendorInfo = {
+        vendor: vendor?.vendorName || x.vendor,
+        vendorCode: vendor?.vendorCode || (vendType?.codeId == 4 ? "8888" : undefined),
+        vMobNo: vendor?.vendorPhoneNo || x.vMobNo,
+        isMarket: vendType?.codeId == 4 
+      }
       return {
-        ...item,
+        ...x,
         action: 'Assign',
         fromCity,
         toCity,
-        capacity: `${item.capacity} MT`,
-        vendorType,
-        driver_info: `${driverName}-${telno}`,
-        vendor_info: `${vendorName}-${vendorPhoneNo}`,
+        capacity: `${x.capacity} MT`,
+        vendorType: vendType?.codeDesc || x.vendorType,
+        vendorTypeCode: vendType?.codeId,
+        driver_info: `${x.driver}-${x.dMobNo}`,
+        vendor_info: `${vendorInfo.vendor}-${vendorInfo.vMobNo}`,
         fromToCitySplit: `${fromCity}-${toCity}`,
         distance: 0,
-        vendor: vendorName,
-        vMobNo: vendorPhoneNo,
-        driver: driverName,
-        dMobNo: telno,
-        isMarket: false,
+        vendor: vendorInfo.vendor,
+        vendorCode: vendorInfo.vendorCode,
+        vMobNo: x.vMobNo,
+        driver: x.driver,
+        dMobNo: x.dMobNo,
+        isMarket: vendorInfo.isMarket,
         eta: formatDate(new Date().toUTCString(), 'dd/MM/yyyy HH:mm')
-      };
-    }));
-
+      }
+    });
     return results;
   }
 

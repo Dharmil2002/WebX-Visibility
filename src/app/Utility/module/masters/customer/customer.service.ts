@@ -39,6 +39,40 @@ export class CustomerService {
     }
   }
 
+  async getCustomerByCodeOrName(code, name) {
+    try {
+      
+      const filter = (code && name) ? { 'customerCode': code, 'customerName': name }
+                    : code ? { 'customerCode': code }
+                    : name ? { 'customerName': name }
+                    : undefined;
+
+        if(!filter) return undefined;
+        
+        const cityBody = {
+          companyCode: localStorage.getItem("companyCode"), 
+          collectionName: "customer_detail",
+          filter,
+        };
+
+        // Fetch pincode data from the masterService asynchronously
+        const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
+        
+        // Extract the cityCodeData from the response
+        const codeData =  cResponse.data.map((x) => { return { name: x.customerName, value: x.customerCode } });
+        
+        if (codeData.length > 0) {
+          return codeData[0];
+        } else {
+         return undefined;
+        }
+    } catch (error) {
+      // Handle any errors that may occur during the asynchronous operation
+      console.error("Error fetching data:", error);
+      return undefined;
+    }
+  }
+
   async getCustomerForAutoComplete(form, jsondata, controlName, codeStatus) {
     try {
       const cValue = form.controls[controlName].value;

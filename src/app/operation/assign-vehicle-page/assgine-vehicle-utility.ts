@@ -1,5 +1,7 @@
 import Swal from "sweetalert2";
 import { updatePrqStatus, vehicleStatusUpdate } from "../prq-entry-page/prq-utitlity";
+import { firstValueFrom } from "rxjs";
+import { debug } from "console";
 const branch = localStorage.getItem("Branch");
 export async function showVehicleConfirmationDialog(prqDetail, masterService, goBack, tabIndex, dialogRef, item) {
     const confirmationResult = await Swal.fire({
@@ -14,9 +16,19 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
     if (confirmationResult.isConfirmed) {
         prqDetail.status = "2";
         delete prqDetail.actions
-        const res = await updatePrqStatus(prqDetail, masterService);
+
+        let updateData = {
+            cID: prqDetail.cID || localStorage.getItem('companyCode'),
+            pRQNO: prqDetail.prqNo || prqDetail.pRQNO,
+            sTS: "2",
+            sTSNM: "Awaiting For Docket",
+            vEHINO: item.vehNo
+        }
+
+        const res = await updatePrqStatus(updateData, masterService);
         let currentBranch = localStorage.getItem("Branch") || '';
         let companyCode = parseInt(localStorage.getItem('companyCode'));
+
         const result = await vehicleStatusUpdate(currentBranch, companyCode, item, prqDetail, masterService, true);
         if (res && result) {
             const confirmationResult = await Swal.fire({
@@ -51,6 +63,7 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
  *              to the calling code. The error message will be logged to the console as well.
  */
 export async function getVehicleStatusFromApi(companyCode, operationService) {
+   
     const reqbody = {
         companyCode: companyCode,
         collectionName: "vehicle_status",
@@ -61,7 +74,7 @@ export async function getVehicleStatusFromApi(companyCode, operationService) {
     };
 
     try {
-        const vehicleDetail = await operationService.operationMongoPost("generic/get", reqbody).toPromise();
+        const vehicleDetail: any = await firstValueFrom(operationService.operationMongoPost("generic/get", reqbody));
         // Do something with the vehicleDetail data here
         return vehicleDetail.data; // Optionally, return the vehicleDetail data
     } catch (error) {

@@ -70,6 +70,7 @@ export class thcsummaryData {
   mODLOC: string
   mODBY: string
   tMODE: string
+  pRQNO: string
 }
 
 export class ThcmovementDetails {

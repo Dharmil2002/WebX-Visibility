@@ -15,11 +15,10 @@ export class ThcService {
     ) { }
 
     async getShipment(vehicle = false) {
-        debugger
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.Dockets,
-            filter: {}
+            filter: { oSTS: 1 }
         };
 
         // Perform an asynchronous operation to fetch data from the operation service
@@ -48,10 +47,10 @@ export class ThcService {
             // Filter out entries with empty or falsy values in the 'prqNo' property
             const excludedStatusValues = [3];
 
-            const filteredData = result.data.filter(x => x.prqNo && excludedStatusValues.includes(Number(x.status)));
+            const filteredData = result.data.filter(x => x.docNo && excludedStatusValues.includes(Number(x.sTS)));
 
             // Map the filtered data to the desired format
-            const mappedData = filteredData.map(x => ({ name: x.prqNo.toString(), value: x.prqNo.toString() }));
+            const mappedData = filteredData.map(x => ({ name: x.docNo.toString(), value: x.docNo.toString() }));
 
             return mappedData;
         }

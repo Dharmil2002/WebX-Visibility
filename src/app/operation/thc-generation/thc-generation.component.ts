@@ -283,7 +283,6 @@ export class ThcGenerationComponent implements OnInit {
     if (!this.isUpdate && !this.isView) {
       const shipmentList = await this.thcService.getShipment(false);
       const branchWise = shipmentList.filter((x) => x.oRGN === this.orgBranch);
-      debugger
       //let nestedDetail = await this.thcService.getNestedDockDetail(branchWise, this.isUpdate)
       this.allShipment = branchWise;
       if (this.addThc) {
@@ -366,7 +365,7 @@ export class ThcGenerationComponent implements OnInit {
 
     const locationList = await getLocationApiDetail(this.masterService);
 
-    this.prqlist = await this.thcService.prqDetail(true, { prqBranch: this.storage.branch });
+    this.prqlist = await this.thcService.prqDetail(true, { bRCD: this.storage.branch });
     this.locationData = locationList.map((x) => ({
       value: x.locCode,
       name: x.locName,
@@ -553,7 +552,10 @@ export class ThcGenerationComponent implements OnInit {
     const prq = this.thcTableForm.controls["prqNo"].value?.value || "";
     this.tableLoad = true;
     if (!this.prqFlag && prq) {
-      const prqData = await this.thcService.prqDetail(false);
+      const filter = {
+        docNo: prq
+      }
+      const prqData = await this.thcService.prqDetail(false, filter);
       this.prqDetail = prqData.find((x) => {
         const prqNoWithoutSpaces = x.prqNo.replace(/\s/g, '');
         const prqNoWithoutSpacesAndNonAlphanumeric = prqNoWithoutSpaces.replace(/[^a-zA-Z0-9]/g, '');
@@ -899,7 +901,7 @@ export class ThcGenerationComponent implements OnInit {
 
       const filteredShipments = this.allShipment.filter((x) =>
         (x.fCT.toLowerCase() === fromCity.toLowerCase() &&
-          x.tCT.toLowerCase() === toCity.toLowerCase()) || x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value
+          x.tCT.toLowerCase() === toCity.toLowerCase()) || (x.vEHNO == this.thcTableForm.controls['vehicle'].value.value)
       );
       const addEditAction = (shipments) => {
         return shipments.map((shipment) => {
@@ -973,7 +975,6 @@ export class ThcGenerationComponent implements OnInit {
       this.thcTableForm.controls['docketNumber'].setValue(this.thcDetail?.docketNumber);
     }
     if (this.isView || this.isUpdate) {
-      debugger
       this.tableData = thcNestedDetails.shipment.map((x) => {
         x.isSelected = true;
         if (this.isView) {
@@ -1108,6 +1109,8 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.mODBY = "";
     //New Added By Harikesh
     this.thcsummaryData.tMODE = this.thcTableForm.controls['transMode'].value || "";
+    this.thcsummaryData.pRQNO = this.thcTableForm.controls['prqNo'].value || "";
+
 
     //#endregion
 

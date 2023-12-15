@@ -4,7 +4,7 @@ export const Collections = {
     MarketVehicles: 'market_vehicles',
     vehicleStatus: 'vehicle_status',
     Dockets: 'dockets',
-    PrqDetails: 'prq_detail',
+    PrqDetails: 'prq_summary',
     ThcDetails: 'thc_detail',
     docketOp: 'docket_operation_details',
     thcsummary: 'thc_summary'

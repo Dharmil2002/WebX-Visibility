@@ -4,6 +4,7 @@ import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { BillSubmissionComponent } from './submission/bill-submission/bill-submission.component';
 import { BillApproval } from 'src/app/Models/bill-approval/bill-approval';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-bill-approval',
@@ -14,6 +15,7 @@ export class BillApprovalComponent implements OnInit {
   shipments: any;
   tableData: any;
   headerColumn: any;
+  navigateExtra:any;
   tableLoad: boolean = true;
   breadScrums = [
     {
@@ -35,9 +37,14 @@ export class BillApprovalComponent implements OnInit {
   };
   constructor(
     private invoiceService: InvoiceServiceService,
-    private billApproval: BillApproval,
-    public dialog: MatDialog
+    private billApproval: BillApproval,/*this is a model object here so please dont remove bcz this model object is used in html page*/
+    public dialog: MatDialog,
+    private router: Router
   ) {
+    if (this.router.getCurrentNavigation()?.extras?.state != null) {
+      
+      this.navigateExtra = this.router.getCurrentNavigation()?.extras?.state.data.columnData || "";
+    }
     this.backPath = "/dashboard/Index?tab=Management​";
   }
 
@@ -45,7 +52,8 @@ export class BillApprovalComponent implements OnInit {
     this.getApprovalData();
   }
   async getApprovalData() {
-    const res = await this.invoiceService.getBillingData();
+    const customer=this.navigateExtra.billingParty[0].split('-')[0].trim();
+    const res = await this.invoiceService.getBillingData(customer);
     const filterData = await this.invoiceService.filterData(res);
     this.tableData = filterData;
     this.tableLoad = false;
@@ -74,8 +82,10 @@ export class BillApprovalComponent implements OnInit {
        data: data.data,
      });
      dialogref.afterClosed().subscribe((result) => {
+      if(result){
       this.getApprovalData();
       SwalerrorMessage ("success","Success", "The invoice has been successfully Submission.",true)
+      }
      });
    }
 

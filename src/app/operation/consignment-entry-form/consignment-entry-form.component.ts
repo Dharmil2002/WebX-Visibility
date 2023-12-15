@@ -1189,7 +1189,11 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
           prqId: this.model.consignmentTableForm.value?.prqNo || "",
           dktNo: this.model.consignmentTableForm.controls["docketNumber"].value,
         };
-        await this.consigmentUtility.updatePrq(prqData, "3");
+        const update={
+          sTS: "3",
+          sTSNM:"Ready For THC"
+        }
+        await this.consigmentUtility.updatePrq(prqData,update);
       }
       firstValueFrom(this.operationService.operationMongoPost("operation/docket/create", reqBody))
       .then((res: any) => {

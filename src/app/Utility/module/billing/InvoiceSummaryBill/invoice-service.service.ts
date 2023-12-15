@@ -398,12 +398,20 @@ async getContractCharges(filter={}) {
 }
 /*end*/
 /*Below function is for getting billing data*/
-async getBillingData() {
+async getBillingData(custCode) {
   
   const req={
     companyCode: this.storage.companyCode,
     collectionName:"Cust_bills_headers",
-    filter:{bLOC:this.storage.branch,bSTS:{D$in:[1,2]}}
+    filter:{
+      bLOC:this.storage.branch,
+      bSTS:{D$in:[1,2]},
+      D$expr: {
+        D$eq: [
+           "$cUST.cD",custCode
+         ]
+       },
+    }
   }
   const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
   return res.data;
@@ -424,6 +432,7 @@ async filterData(data: any) {
   return filteredData;
 }
 async updateInvoiceStatus(filter,data){
+  debugger
   const req ={
     companyCode:this.storage.companyCode,
     collectionName:"Cust_bills_headers",

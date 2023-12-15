@@ -47,14 +47,17 @@ export class BillSubmissionComponent implements OnInit {
     this.billSubmition = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
   
-  async getFilePod(data) {
-    this.imageData = await this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
+  GetFileList(data) {
+    debugger
+    this.imageData =  this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
     billSubmition, this.imageData, "BillSubmit", 'Finance', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
+    console.log(this.imageData);
 
   }
   async save(){
+    debugger
     const filter={
-      bILLNO:this.shipmentDetails?.data?.bILLNO
+      docNo:this.shipmentDetails?.data?.docNo
     }
     const pod = this.imageData?.Upload || ""
     const status={
@@ -68,7 +71,7 @@ export class BillSubmissionComponent implements OnInit {
       }
     }
      await this.invoiceService.updateInvoiceStatus(filter,status);
-    this.dialogRef.close();
+    this.dialogRef.close('Success');
   }
   cancel(){
     this.dialogRef.close();

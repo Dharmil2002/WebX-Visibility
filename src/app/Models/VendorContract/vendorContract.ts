@@ -14,5 +14,10 @@ export class vendorContractUpload {
     eNTBY: string;
     eNTLOC: string;
     eNTDT: Date;
-    
+    constructor() {
+        this.eNTBY = localStorage.getItem("UserName");
+        this.eNTLOC = localStorage.getItem("Branch");
+        this.eNTDT = new Date();
+    }
+
 }

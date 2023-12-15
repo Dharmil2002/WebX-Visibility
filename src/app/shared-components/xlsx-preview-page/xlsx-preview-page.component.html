@@ -23,6 +23,11 @@
             <div class="col-8">
                 <ul class="header-buttons">
                     <li>
+                        <div class="export-button m-l-10" matTooltip="CSV">
+                            <img src="assets/images/icons/csv.png" alt="" (click)="exportTable()" />
+                        </div>
+                    </li>&nbsp;&nbsp;
+                    <li>
                         <button type="button" (click)="openDialog()"
                             class="btn btn-warning btn-border-radius waves-effect msr-2">
                             <i-feather style="width: 24px;height: 24px;color:white" name="filter"></i-feather>

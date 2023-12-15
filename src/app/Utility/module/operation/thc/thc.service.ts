@@ -14,7 +14,27 @@ export class ThcService {
         private storage: StorageService
     ) { }
 
+    async getShipmentFiltered(branch, prqNo = null) {
+    
+        let filter = { oRGN: branch, oSTS: 1}
+        if( (prqNo && prqNo !== "")) {
+            filter["pRQNO"] = prqNo;
+        }
+
+        const reqBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: Collections.Dockets,
+            filter: filter
+        };
+
+        // Perform an asynchronous operation to fetch data from the operation service
+        const result = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get, reqBody));
+
+        return result.data;
+    }
+
     async getShipment(vehicle = false) {
+    
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.Dockets,

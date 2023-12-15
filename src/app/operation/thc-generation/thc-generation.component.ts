@@ -34,6 +34,7 @@ import { ShipmentEditComponent } from "../shipment-edit/shipment-edit.component"
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
 import { ARr, CAp, DPt, LOad, MfdetailsList, MfheaderDetails, THCGenerationModel, ThcmovementDetails, UNload, UTi, thcsummaryData } from '../../Models/THC/THCModel';
 import { filter } from 'rxjs/operators';
+import { debug } from "console";
 
 @Component({
   selector: "app-thc-generation",
@@ -259,7 +260,7 @@ export class ThcGenerationComponent implements OnInit {
           delete this.columnHeader.actionsItems;
           delete this.columnHeader.arrivalTime;
           delete this.columnHeader.remarks;
-          if (navigationState) {
+          if (navigationState) {           
             this.prqDetail = navigationState;
             this.prqFlag = true;
           }
@@ -281,13 +282,14 @@ export class ThcGenerationComponent implements OnInit {
   async getShipmentDetail() {
 
     if (!this.isUpdate && !this.isView) {
-      const shipmentList = await this.thcService.getShipment(false);
-      const branchWise = shipmentList.filter((x) => x.oRGN === this.orgBranch);
-      //let nestedDetail = await this.thcService.getNestedDockDetail(branchWise, this.isUpdate)
-      this.allShipment = branchWise;
-      if (this.addThc) {
+      let prqNo = this.prqDetail?.prqNo || "";
+      const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
 
-        this.tableData = branchWise
+      //const branchWise = shipmentList.filter((x) => x.oRGN === this.orgBranch);
+      //let nestedDetail = await this.thcService.getNestedDockDetail(branchWise, this.isUpdate)
+      this.allShipment = shipmentList;
+      if (this.addThc) {
+        this.tableData = shipmentList
         this.tableLoad = false;
       }
     }
@@ -555,26 +557,19 @@ export class ThcGenerationComponent implements OnInit {
       const filter = {
         docNo: prq
       }
-      const prqData = await this.thcService.prqDetail(false, filter);
-      this.prqDetail = prqData.find((x) => {
-        const prqNoWithoutSpaces = x.prqNo.replace(/\s/g, '');
-        const prqNoWithoutSpacesAndNonAlphanumeric = prqNoWithoutSpaces.replace(/[^a-zA-Z0-9]/g, '');
-
-        return prqNoWithoutSpacesAndNonAlphanumeric === prq;
-      });
-      const prqDataDetails = this.prqDetail;
+      
+      this.prqDetail = await this.thcService.prqDetail(false, filter);
+      
       this.bindPrqData();
     }
+
     const prqNo = this.thcTableForm.controls["prqNo"].value.value;
     // Set the delay duration in milliseconds (e.g., 2000 milliseconds for 2 seconds)
-    const delayDuration = 1000;
-    // Create a promise that resolves after the specified delay
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    // Use async/await to introduce the delay
-    await delay(delayDuration);
+    
+    const shipment = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
+
     // Now, update the tableData and set tableLoad to false
     this.tableLoad = false;
-    const shipment = this.prqFlag ? this.allShipment.filter((x) => x.prqNo === prqNo) : this.allShipment
     this.tableData = shipment.map((x) => {
       if (!prq) {
         x.actions = ["Update"];
@@ -590,7 +585,7 @@ export class ThcGenerationComponent implements OnInit {
       this.tableData.forEach((item) => {
         if (thcDetail.docket.includes(item.docketNumber)) {
           item.isSelected = true;
-          includedDocketNumbers.push(item);
+          includedDocketNumbers.push(item); 
         }
 
       });

@@ -279,7 +279,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.setFormValue(this.model.consignmentTableForm, "billingParty", billingParty);
     this.setFormValue(this.model.consignmentTableForm, "payType", this.model.prqData?.payTypeCode);
     this.setFormValue(this.model.consignmentTableForm, "docketDate", this.model.prqData?.pickupDate);
-    this.setFormValue(this.model.consignmentTableForm, "transMode", "1");
+    this.setFormValue(this.model.consignmentTableForm, "transMode", "P1");
     this.setFormValue(this.model.consignmentTableForm, "pAddress", this.model.prqData?.pAddress);
     this.setFormValue(this.model.consignmentTableForm, "cnebp", false);
     this.setFormValue(this.model.consignmentTableForm, "cnbp", true);

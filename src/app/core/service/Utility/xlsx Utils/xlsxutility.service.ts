@@ -70,7 +70,28 @@ export class xlsxutilityService {
       validationObservables.push(of(null));
     }
 
-    // Use forkJoin to combine all validation observables into a single observable
+    // Filter out data without errors
+    const filteredDataWithoutErrors = validatedData.filter((x) => !x.error);
+
+    // Check if there is at least one element without errors and rules are provided
+    if (filteredDataWithoutErrors.length > 0 && rules.length > 0) {
+      rules.forEach((rule) => {
+        const itemsName = rule.ItemsName;
+        const duplicateValidation = rule.Validations.find(
+          (validation) => "DuplicateFromList" in validation
+        );
+
+        if (duplicateValidation) {
+          // Add "Duplicate entry" error to the remaining items using forEach
+          filteredDataWithoutErrors.forEach((item, index) => {
+            if (index > 0 && item[itemsName] !== undefined) {
+              item.error = item.error || []; // Ensure error array exists
+              item.error.push(`Duplicate Entry for ${itemsName}.`);
+            }
+          });
+        }
+      });
+    }
     return forkJoin(validationObservables).pipe(
       map(() => validatedData)
     );

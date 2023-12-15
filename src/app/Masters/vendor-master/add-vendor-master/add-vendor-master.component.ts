@@ -291,7 +291,7 @@ export class AddVendorMasterComponent implements OnInit {
       "vendorPinCode",
     ];
     controlNames.forEach(controlName => {
-      const controlValue = formValue[controlName]?.name;
+      const controlValue = formValue[controlName]?.value;
       this.vendorTableForm.controls[controlName].setValue(controlValue);
     });
     const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.value);

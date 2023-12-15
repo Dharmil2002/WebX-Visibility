@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import moment from "moment";
 import { firstValueFrom } from "rxjs";
+import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 @Component({
   selector: 'app-vendor-master-list',
   templateUrl: './vendor-master-list.component.html',
@@ -103,7 +103,7 @@ export class VendorMasterListComponent implements OnInit {
             // srNo: index + 1,
             vendorName: obj.vendorName.toUpperCase(),
             vendorType: vendorType ? vendorType.name.toUpperCase() : '',
-            eNTDT: moment(obj.eNTDT).format('DD-MM-YYYY HH:mm')
+            eNTDT: obj.eNTDT ? formatDocketDate(obj.eNTDT) : ''
           };
         })
         .sort((a, b) => b._id.localeCompare(a._id));
@@ -119,12 +119,16 @@ export class VendorMasterListComponent implements OnInit {
     return vendorTypeDropdown;
   }
   //#endregion
-  
+
   async isActiveFuntion(det) {
     let id = det._id;
+    const vendorTypeData = await this.fetchData();
+    const vendorType = vendorTypeData.find(x => (x.name).toLowerCase() === det.vendorType.toLowerCase());
     // Remove the "_id" field from the form controls
     delete det._id;
     delete det.srNo;
+    delete det.eNTDT
+    det["vendorType"] = parseInt(vendorType.value)
     det['mODDT'] = new Date()
     det['mODBY'] = localStorage.getItem("UserName")
     det['mODLOC'] = localStorage.getItem("Branch")

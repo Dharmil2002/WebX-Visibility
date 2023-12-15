@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { vendorContractUpload } from 'src/app/Models/VendorContract/vendorContract';
-import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
 import { RouteLocationService } from 'src/app/Utility/module/masters/route-location/route-location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
@@ -14,14 +13,13 @@ import { EncryptionService } from 'src/app/core/service/encryptionService.servic
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
 import { fileUpload } from 'src/assets/FormControls/VendorContractControls/fileUpload';
 import Swal from 'sweetalert2';
+import { VendorTERDetailComponent } from '../../vendor-terdetail/vendor-terdetail.component';
 
 @Component({
   selector: 'app-upload-file',
   templateUrl: './upload-file.component.html'
 })
 export class UploadFileComponent implements OnInit {
-  fileUpload: fileUpload;
-  jsonControlArray: any;
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   fileUploadForm: UntypedFormGroup;
   excelDataList: any;
@@ -31,6 +29,8 @@ export class UploadFileComponent implements OnInit {
   rateTypeDropDown: any;
   mergedCapacity: any[];
   existingData: any;
+  IsUploaded: boolean;
+  //@ViewChild(VendorTERDetailComponent) tableComponent: VendorTERDetailComponent
   // vendorContractData: vendorContractUpload;
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
@@ -40,6 +40,7 @@ export class UploadFileComponent implements OnInit {
     private masterService: MasterService,
     private objRouteLocationService: RouteLocationService,
     private objContainerService: ContainerService,
+    private dialogRef: MatDialogRef<UploadFileComponent>,
   ) {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
@@ -52,9 +53,9 @@ export class UploadFileComponent implements OnInit {
       singleUpload: [""],
     });
   }
-
   ngOnInit(): void {
   }
+
   //#region to handle functionCallHandler
   functionCallHandler($event) {
     let functionName = $event.functionName;
@@ -83,9 +84,6 @@ export class UploadFileComponent implements OnInit {
         const containerData = await this.objContainerService.getContainerList();
         const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VC');
 
-        console.log("TakeFromList:", this.rateTypeDropDown.map((x) => {
-          return x.name;
-        }),);
         // Process vehicle data to create a merged list
         const containerDataWithPrefix = vehicleData.map(item => ({
           name: item.name,
@@ -95,6 +93,7 @@ export class UploadFileComponent implements OnInit {
         const validationRules = [{
           ItemsName: "Route",
           Validations: [{ Required: true },
+          { DuplicateFromList: true },
           {
             TakeFromList: this.routeList.map((x) => {
               return x.name;
@@ -152,7 +151,6 @@ export class UploadFileComponent implements OnInit {
 
         var rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
         rPromise.then(response => {
-
           this.OpenPreview(response);
         })
       });
@@ -181,67 +179,21 @@ export class UploadFileComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
         this.previewResult = result;
-        // this.containorCsvDetail();
-        this.setDropdownData()
+        this.setDropdownData(result)
       }
     });
   }
-  containorCsvDetail() {
-    if (this.previewResult.length > 0) {
-      // this.tableLoad = true;
-      // this.isLoad = true;
-      let containerNo = [];
-      // console.log(this.previewResult);
-    
-      const containerDetail = this.previewResult.map((x, index) => {
-        // console.log(x, index);
 
-        // if (x) {
-        //   const detail = containerNo.includes(x.containerNumber);
-        //   const match = this.containerTypeList.find(
-        //     (y) => y.name === x.containerType
-        //   );
-        //   if (match) {
-        //     x.containerCapacity = match?.loadCapacity || "";
-        //   }
-        //   if (detail) {
-        //     Swal.fire({
-        //       icon: "error",
-        //       title: "Error",
-        //       text: `Container Id '${x.containerNumber}' is Already exist`,
-        //     });
-        //     return null; // Returning null to indicate that this element should be removed
-        //   }
-        //   if (!x.isEmpty) {
-        //     Swal.fire({
-        //       icon: "error",
-        //       title: "Error",
-        //       text: `IsEmpty is Required`,
-        //     });
-        //     return null; // Returning null to indicate that this element should be removed
-        //   }
-        //   // Modify 'x' if needed
-        //   // For example, you can add the index to the element
-        //   containerNo.push(x.containerNumber);
-        //   x.id = index + 1;
-        //   x.actions = ["Edit", "Remove"];
-        //   return x;
-        // }
-        // return x; // Return the original element if no modification is needed
-      });
-      // Filter out the null values if necessary
-      const filteredContainerDetail = containerDetail.filter((x) => x !== null);
-      // this.tableData = filteredContainerDetail;
-      // this.tableLoad = false;
-      // this.isLoad = false;
-    }
-  }
-  async setDropdownData() {
+  async setDropdownData(previewResult) {
     try {
+      this.IsUploaded = true;
+      const vendorContractData: vendorContractUpload[] = [];
+
       // Process preview data to create vendor contract data
-      const vendorContractData = this.previewResult.forEach(element =>
-        this.processData(element, this.routeList, this.rateTypeDropDown, this.mergedCapacity)
-      );
+      previewResult.forEach(element => {
+        const processedData = this.processData(element, this.routeList, this.rateTypeDropDown, this.mergedCapacity)
+        vendorContractData.push(processedData);
+      });
 
       // Generate a new ID based on existing data
       const newId = this.generateNewId(this.existingData);
@@ -251,6 +203,22 @@ export class UploadFileComponent implements OnInit {
 
       // Log the formatted data
       console.log(formattedData);
+      const createRequest = {
+        companyCode: this.companyCode,
+        collectionName: "vendor_contract_xprs_rt",
+        data: formattedData,
+      };
+
+      const createResponse = await firstValueFrom(this.masterService.masterPost("generic/create", createRequest));
+
+      // Display success message
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Valid Data Uploaded",
+        showConfirmButton: true,
+      });
+      this.IsUploaded = false;
     } catch (error) {
       // Handle any errors that occurred during the process
       console.error("Error:", error);
@@ -302,16 +270,38 @@ export class UploadFileComponent implements OnInit {
 
   // Function to generate a new ID based on existing data
   generateNewId(existingData) {
+    let newId;
+  
+    // Find the contract with the specified cNID
     const existingContract = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
-
-    // If an existing contract is found, generate a new ID based on the last ID in the sorted data
+  
     if (existingContract) {
-      const sortedData = existingData.sort((a, b) => a._id.localeCompare(b._id));
-      const lastId = sortedData.length > 0 ? parseInt(sortedData[sortedData.length - 1]._id.split('-')[2], 10) : 0;
-      return lastId + 1;
+      // Extract the last vendor code from the existing contract
+      const lastId = parseInt(existingContract._id.split('-')[2], 10);
+  
+      // Check if the extraction was successful
+      if (!isNaN(lastId)) {
+        // Increment the last vendor code
+        newId = lastId + 1;
+      } else {
+        // If extraction was not successful, set newId to 0
+        newId = 0;
+      }
     } else {
-      // If no existing contract is found, start with ID 0
-      return 0;
+      newId = 0;
     }
+  
+    return newId;
+  }
+  
+  Download(): void {
+    let link = document.createElement("a");
+    link.download = "ExpressRoutebasedTemplate";
+    link.href = "assets/Download/ExpressRoutebasedTemplate.xlsx";
+    link.click();
+  }
+  Close() {
+    this.dialogRef.close()
+
   }
 }

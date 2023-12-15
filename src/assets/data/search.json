@@ -860,6 +860,46 @@
         "shard-Product"
       ],
       "router": "Masters/ProductMaster/shardProductList"
+    },
+    {
+      "title": "Reports/Vendor-Wise-GST-Invoice-Register-Report",
+      "tag": [
+        "vengstregreport",
+        "vengstregreport"
+      ],
+      "router": "Reports/vendor-wise-gst-invoice-register-report"
+    },
+    {
+      "title": "Reports/Customer-Wise-GST-Invoice-Register-Report",
+      "tag": [
+        "custgstregreport",
+        "custgstregreport"
+      ],
+      "router": "Reports/customer-wise-gst-invoice-register-report"
+    },
+    {
+      "title": "Reports/Unbilled-Register-Report",
+      "tag": [
+        "unbillregreport",
+        "unbillregreport"
+      ],
+      "router": "Reports/unbilled-register-report"
+    },
+    {
+      "title": "Reports/Customer-Outstanding-Report",
+      "tag": [
+        "custoutstandingreport",
+        "custoutstandingreport"
+      ],
+      "router": "Reports/customer-outstanding-report"
+    },
+    {
+      "title": "Reports/Vendor-Wise-Outstanding-Report",
+      "tag": [
+        "vendoutstandingreport",
+        "vendoutstandingreport"
+      ],
+      "router": "Reports/vendor-wise-outstanding-report"
     }
   ]
 }

@@ -11,6 +11,7 @@ import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { CnwGstService, convertToCSV } from 'src/app/Utility/module/reports/cnw.gst.service';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cnw-gst-register',
@@ -146,7 +147,6 @@ export class CnwGstRegisterComponent implements OnInit {
     "chaamt": "CHA Amount",
   }
 
-
   custName: any;
   custStatus: any;
 
@@ -277,6 +277,7 @@ export class CnwGstRegisterComponent implements OnInit {
       this.custStatus
     );
   }
+
   async save() {
     // Fetch data from the service
     let data = await this.cnwGstService.getCNoteGSTregisterReportDetail();
@@ -315,14 +316,27 @@ export class CnwGstRegisterComponent implements OnInit {
       const startValue = new Date(this.cnoteTableForm.controls.start.value);
       const endValue = new Date(this.cnoteTableForm.controls.end.value);
       const entryTime = new Date(record.odocketDate);
+      endValue.setHours(23, 59, 59, 999);
       const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
       return paytpDet && modeDet && toCityDet && fromcityDet && fromLocDet && toLocDet && isDateRangeValid && custDet;
     });
     // Assuming you have your selected data in a variable called 'selectedData'
-    const selectedData = filteredRecords;
+    // const selectedData = filteredRecords;
+    if (filteredRecords.length === 0) {
+      // Display a message or take appropriate action when no records are found
+      if (filteredRecords) {
+        Swal.fire({
+          icon: "error",
+          title: "No Records Found",
+          text: "Cannot Download CSV",
+          showConfirmButton: true,
+        });
+      }
+      return;
+    }
     // Convert the selected data to a CSV string 
-    const csvString = convertToCSV(selectedData, this.CSVHeader);
+    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     // Create a link element

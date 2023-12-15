@@ -11,6 +11,7 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { convertToCSV, SalesRegisterService } from 'src/app/Utility/module/reports/sales-register';
 import { salesRegisterControl } from 'src/assets/FormControls/sales-register/sales-register-advance';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sales-register-advanced',
@@ -52,7 +53,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     private generalService: GeneralService,
     private operationService: OperationService,
     private customerService: CustomerService,
-    private salesRegisterService:SalesRegisterService
+    private salesRegisterService: SalesRegisterService
   ) {
     this.initializeFormControl();
   }
@@ -389,12 +390,55 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     );
   }
 
- async save() {
-  let data = await this.salesRegisterService.getsalesRegisterReportDetail();
-  console.log("data",data);
-  const selectedData = data;
+  async save() {
+    let data = await this.salesRegisterService.getsalesRegisterReportDetail();
+    const fromloc = Array.isArray(this.salesregisterTableForm.value.fromlocHandler)
+      ? this.salesregisterTableForm.value.fromlocHandler.map(x => x.value)
+      : [];
+    const toloc = Array.isArray(this.salesregisterTableForm.value.tolocHandler)
+      ? this.salesregisterTableForm.value.tolocHandler.map(x => x.value)
+      : [];
+    const payment = Array.isArray(this.salesregisterTableForm.value.payTypeHandler)
+      ? this.salesregisterTableForm.value.payTypeHandler.map(x => x.value)
+      : [];
+    const bookingtype = Array.isArray(this.salesregisterTableForm.value.bookTypeHandler)
+      ? this.salesregisterTableForm.value.bookTypeHandler.map(x => x.name)
+      : [];
+    const cnote = Array.isArray(this.salesregisterTableForm.value.cnoteHandler)
+      ? this.salesregisterTableForm.value.cnoteHandler.map(x => x.name)
+      : [];
+    const transitmode = Array.isArray(this.salesregisterTableForm.value.transitHandler)
+      ? this.salesregisterTableForm.value.transitHandler.map(x => x.name)
+      : [];
+    const filteredRecords = data.filter(record => {
+      const origin = fromloc.length === 0 || fromloc.includes(record.origin);
+      const dest = toloc.length === 0 || toloc.includes(record.destin);
+      const paytpDet = payment.length === 0 || payment.includes(record.pAYTY);
+      const booktpDet = bookingtype.length === 0 || bookingtype.includes(record.booktp);
+      const cnoteDet = cnote.length === 0 || cnote.includes(record.cNOTENO);
+      const tranmodeDet = transitmode.length === 0 || transitmode.includes(record.tRANMODE);
+      const startValue = new Date(this.salesregisterTableForm.controls.start.value);
+      const endValue = new Date(this.salesregisterTableForm.controls.end.value);
+      const entryTime = new Date(record.ocNOTEDT);
+      const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
+
+      return origin && dest && paytpDet && booktpDet && cnoteDet && tranmodeDet && isDateRangeValid;
+    })
+    // const selectedData = filteredRecords;
+    if (filteredRecords.length === 0) {
+      // Display a message or take appropriate action when no records are found
+      if (filteredRecords) {
+        Swal.fire({
+          icon: "error",
+          title: "No Records Found",
+          text: "Cannot Download CSV",
+          showConfirmButton: true,
+        });
+      }
+      return;
+    }
     // Convert the selected data to a CSV string 
-    const csvString = convertToCSV(selectedData, this.CSVHeader);
+    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     // Create a link element
@@ -402,7 +446,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     // Set the href attribute of the link to the Blob URL
     a.href = URL.createObjectURL(blob);
     // Set the download attribute with the desired file name
-    a.download = `Cnote_Bill_MR_Report-${timeString}.csv`;
+    a.download = `Sales_Register_Report-${timeString}.csv`;
     // Append the link to the body
     document.body.appendChild(a);
     // Trigger a click on the link to start the download

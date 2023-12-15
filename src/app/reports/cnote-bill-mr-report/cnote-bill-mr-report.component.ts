@@ -12,6 +12,7 @@ import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 import { cNoteBillMRControl } from 'src/assets/FormControls/cnote-bill-mr-report/cnote-bill-mr-report';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cnote-bill-mr-report',
@@ -347,7 +348,6 @@ export class CnoteBillMrReportComponent implements OnInit {
   async save() {
     // Fetch data from the service
     let data = await this.cnoteBillMRService.getCNoteBillMRReportDetail();
-    console.log("data", data);
     // Extract selected values from the form
     const payment = Array.isArray(this.cnoteBillMRTableForm.value.payTypeHandler)
       ? this.cnoteBillMRTableForm.value.payTypeHandler.map(x => x.name)
@@ -355,37 +355,50 @@ export class CnoteBillMrReportComponent implements OnInit {
     const bookingtype = Array.isArray(this.cnoteBillMRTableForm.value.bookTypeHandler)
       ? this.cnoteBillMRTableForm.value.bookTypeHandler.map(x => x.name)
       : [];
-      const transitmode = Array.isArray(this.cnoteBillMRTableForm.value.transitHandler)
+    const transitmode = Array.isArray(this.cnoteBillMRTableForm.value.transitHandler)
       ? this.cnoteBillMRTableForm.value.transitHandler.map(x => x.name)
       : [];
-      const fromloc = Array.isArray(this.cnoteBillMRTableForm.value.tolocHandler)
+    const toloc = Array.isArray(this.cnoteBillMRTableForm.value.tolocHandler)
       ? this.cnoteBillMRTableForm.value.tolocHandler.map(x => x.value)
       : [];
-      const toloc = Array.isArray(this.cnoteBillMRTableForm.value.fromlocHandler)
+    const fromloc = Array.isArray(this.cnoteBillMRTableForm.value.fromlocHandler)
       ? this.cnoteBillMRTableForm.value.fromlocHandler.map(x => x.value)
       : [];
-      const movetype = Array.isArray(this.cnoteBillMRTableForm.value.movTypeHandler)
+    const movetype = Array.isArray(this.cnoteBillMRTableForm.value.movTypeHandler)
       ? this.cnoteBillMRTableForm.value.movTypeHandler.map(x => x.name)
       : [];
     // Filter records based on form values
     const filteredRecords = data.filter(record => {
-      const origin = toloc.length === 0 || toloc.includes(record.oRGN);
+      const origin = fromloc.length === 0 || fromloc.includes(record.oRGN);
       const movtype = movetype.length === 0 || movetype.includes(record.mOVTYPE);
       const paytpDet = payment.length === 0 || payment.includes(record.pAYTYPE);
-      const des = fromloc.length === 0 || fromloc.includes(record.dEST);
+      const des = toloc.length === 0 || toloc.includes(record.dEST);
       const booktpDet = bookingtype.length === 0 || bookingtype.includes(record.bOOKINGTPE);
       const tranmodeDet = transitmode.length === 0 || transitmode.includes(record.tRANMODE);
       const startValue = new Date(this.cnoteBillMRTableForm.controls.start.value);
       const endValue = new Date(this.cnoteBillMRTableForm.controls.end.value);
       const entryTime = new Date(record.oeNTDT);
+      endValue.setHours(23, 59, 59, 999);
       const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
       return isDateRangeValid && paytpDet && booktpDet && tranmodeDet && des && origin && movtype;
     });
     // Assuming you have your selected data in a variable called 'selectedData'
-    const selectedData = filteredRecords;
+    // const selectedData = filteredRecords;
+    if (filteredRecords.length === 0) {
+      // Display a message or take appropriate action when no records are found
+      if (filteredRecords) {
+        Swal.fire({
+          icon: "error",
+          title: "No Records Found",
+          text: "Cannot Download CSV",
+          showConfirmButton: true,
+        });
+      }
+      return;
+    }
     // Convert the selected data to a CSV string 
-    const csvString = convertToCSV(selectedData, this.CSVHeader);
+    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     // Create a link element

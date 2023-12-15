@@ -44,6 +44,11 @@ import { ReportsRoutingModule } from './reports-routing.module';
 import { CnwGstRegisterComponent } from './cnw-gst-register/cnw-gst-register.component';
 import { CnoteBillMrReportComponent } from './cnote-bill-mr-report/cnote-bill-mr-report.component';
 import { SalesRegisterAdvancedComponent } from './sales-register-advanced/sales-register-advanced.component';
+import { VendorWiseGstInvoiceRegisterComponent } from './vendor-wise-gst-invoice-register/vendor-wise-gst-invoice-register.component';
+import { CustomerWiseGstInvoiceComponent } from './customer-wise-gst-invoice/customer-wise-gst-invoice.component';
+import { UnbillRegisterComponent } from './unbill-register/unbill-register.component';
+import { CustomerOutstandingReportComponent } from './customer-outstanding-report/customer-outstanding-report.component';
+import { VendorOutstandingReportComponent } from './vendor-outstanding-report/vendor-outstanding-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -93,7 +98,12 @@ import { SalesRegisterAdvancedComponent } from './sales-register-advanced/sales-
     JobQueryPageComponent,
     CnwGstRegisterComponent,
     CnoteBillMrReportComponent,
-    SalesRegisterAdvancedComponent
+    SalesRegisterAdvancedComponent,
+    VendorWiseGstInvoiceRegisterComponent,
+    CustomerWiseGstInvoiceComponent,
+    UnbillRegisterComponent,
+    CustomerOutstandingReportComponent,
+    VendorOutstandingReportComponent
   ],
   exports:[],
 

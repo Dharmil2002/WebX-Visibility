@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { formatDocketDate } from "../../commonFunction/arrayCommonFunction/uniqArray";
 @Injectable({
      providedIn: "root",
 })
@@ -18,12 +19,43 @@ export class SalesRegisterService {
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          console.log("res", res);
-
+          
           let salesList = [];
           res.data.map((element) => {
                let salesData = {
-                    "cNOTENO":element?.docNo||''
+                    "ocNOTEDT": element?.dKTDT,
+                    "cNOTENO": element?.docNo || '',
+                    "cNOTEDT": formatDocketDate(element?.dKTDT || ''),
+                    "pAYTY": element?.pAYTYPNM || '',
+                    "vEHNO": element?.vEHNO || '',
+                    "bILLPARTYNM": element?.bPARTY || '',
+                    "mOVTY": element?.mODNM || '',
+                    "tRANMODE": element?.tRNMODNM || '',
+                    "sTAT": element?.oSTSN || '',
+                    "fROMCITY": element?.fCT || '',
+                    "tOCITY": element?.tCT || "",
+                    "VendorName": element?.vNDNM || '',
+                    "NoofPkgs": element?.pKGS || '',
+                    "ActualWeight": element?.aCTWT || '',
+                    "ChargedWeight": element?.cHRWT || '',
+                    "PackagingType": element?.pKGTY || '',
+                    "GSTAmount": element?.gSTAMT || '',
+                    "RiskType": element?.rSKTYN || '',
+                    "EntryDate": formatDocketDate(element?.eNTDT || ''),
+                    "EntryBy": element?.eNTBY || '',
+                    "ConsignorId": element?.cSGNCD || '',
+                    "ConsignorName": element?.cSGNNM || '',
+                    "ConsignorMobileNo": element?.cSGNPH || '',
+                    "ConsigneeId": element?.cSGECD || '',
+                    "ConsigneeName": element?.cSGENM || '',
+                    "ConsigneeMobileNo": element?.cSGEPH || '',
+                    "JobNumber": element?.jOBNO || '',
+                    "Weight": element?.wTIN || '',
+                    "origin": element?.oRGN || '',
+                    "destin": element?.dEST || '',
+                    "booktp": element?.dELTYN || ""
+
+
                }
                salesList.push(salesData)
           })

@@ -99,7 +99,6 @@ export async function getJobregisterReportDetail(masterServices) {
         // Push the modified job data to the array
         jobList.push(jobData)
     });
-
     // Return the array of modified job data
     return jobList
 }

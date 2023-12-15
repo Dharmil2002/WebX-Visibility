@@ -14,6 +14,7 @@ import { getLocationApiDetail } from 'src/app/finance/invoice-summary-bill/invoi
 import { getShipment } from 'src/app/operation/thc-generation/thc-utlity';
 
 import { jobQueryControl } from 'src/assets/FormControls/job-reports/job-query';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-job-query-page',
@@ -441,7 +442,7 @@ export class JobQueryPageComponent implements OnInit {
   //   "totalNoofcontainer": "Total No of Container",
   // }
 
-   CSVHeader = {
+  CSVHeader = {
     "jobNo": "Job Number",
     "jobDate": "Job Date",
     "cNoteNumber": "Consignment Note Number",
@@ -489,7 +490,7 @@ export class JobQueryPageComponent implements OnInit {
     "noof45ftHC": "45 ft High Cube",
     "totalNoofcontainer": "Total No of Container",
   }
-  
+
   constructor(
     private router: Router,
     private fb: UntypedFormBuilder,
@@ -530,7 +531,7 @@ export class JobQueryPageComponent implements OnInit {
     const shipmentList = await getShipment(this.operationService, false);
     // Map location data to a format suitable for dropdowns
     const locationDetail = locationList.map((x) => {
-      return { value: x.locCode, name: x.locCode };
+      return { value: x.locCode, name: x.locName };
     });
     // Map job data to a format suitable for dropdowns
     const jobDetail = dataJob.map((x) => {
@@ -670,12 +671,22 @@ export class JobQueryPageComponent implements OnInit {
       // Return true if all conditions are met, indicating the record should be included in the result
       return jobDet && locDet && cnoteno && isDateRangeValid;
     });
-
     // Assuming you have your selected data in a variable called 'selectedData'
-    const selectedData = filteredRecords;
-
+    // const selectedData = filteredRecords;
+    if (filteredRecords.length === 0) {
+      // Display a message or take appropriate action when no records are found
+      if (filteredRecords) {
+        Swal.fire({
+          icon: "error",
+          title: "No Records Found",
+          text: "Cannot Download CSV",
+          showConfirmButton: true,
+        });
+      }
+      return;
+    }
     // Convert the selected data to a CSV string
-    const csvString = convertToCSV(selectedData, ['ojobDate', 'jobLocation'], this.CSVHeader);
+    const csvString = convertToCSV(filteredRecords, ['ojobDate', 'jobLocation'], this.CSVHeader);
 
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv' });

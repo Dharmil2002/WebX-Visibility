@@ -131,8 +131,8 @@ export class PrqEntryPageComponent implements OnInit {
         value: this.prqDetail.toCity,
       });
       this.prqEntryTableForm.controls["bPARTY"].setValue({
-        name: this.prqDetail.billingPartyCode,
-        value: this.prqDetail.billingParty
+        name: this.prqDetail.billingParty,
+        value: this.prqDetail.billingPartyCode
       });
       this.prqEntryTableForm.controls["cNTSIZE"].setValue(
         this.prqDetail.containerSize
@@ -282,14 +282,16 @@ export class PrqEntryPageComponent implements OnInit {
     });
     
     if(prqDetails.cARTYP == "3") {
+      prqDetails['cNTSIZE'] = this.prqEntryTableForm.value.cNTSIZE;
       prqDetails['cNTYP'] = this.prqEntryTableForm.value.cNTYP.value;
       prqDetails['cNTYPNM'] = this.prqEntryTableForm.value.cNTYP.name;
-      delete prqDetails.vEHSIZE;
-      delete prqDetails.vEHSIZENM;
+      prqDetails['vEHSIZE'] = 0;
+      prqDetails['vEHSIZENM'] = "";
     }
     else {
-      delete prqDetails.cNTYP;
-      delete prqDetails.cNTYPNM;
+      prqDetails['cNTSIZE'] = 0;
+      prqDetails['cNTYP'] = 0;
+      prqDetails['cNTYPNM'] = "";
     }
 
     prqDetails['sTS'] = 0;
@@ -483,7 +485,8 @@ export class PrqEntryPageComponent implements OnInit {
   }
   //#endregion
   async setVehicleSize() {
-    const vehcileSize = this.prqEntryTableForm.value.vEHSIZE.value;
+    
+    const vehcileSize = this.prqEntryTableForm.value.vEHSIZE;
     this.prqEntryTableForm.controls["sIZE"].setValue(vehcileSize);
   }
   

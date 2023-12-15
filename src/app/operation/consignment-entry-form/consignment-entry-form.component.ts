@@ -263,9 +263,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
   //#endregion
   async prqDetail() {
-    debugger;
-    console.log(this.model.prqData);
-
+    
     let billingParty = { name: this.model.prqData?.billingParty, value:  this.model.prqData?.billingPartyCode };
     //await this.customerService.getCustomerByCodeOrName(undefined, this.model.prqData?.billingParty);
 
@@ -702,7 +700,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   vendorFieldChanged() {
-    debugger
+    
     const vendorType = this.model.consignmentTableForm.value.vendorType !== undefined
       ? this.model.consignmentTableForm.value.vendorType
       : '4';

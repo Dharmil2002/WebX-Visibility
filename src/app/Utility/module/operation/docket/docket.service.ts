@@ -77,7 +77,7 @@ export class DocketService {
     /* below the function  was generated for the mapping of data */
     // Define a common service function
     async processShipmentList(shipmentList, orgBranch) {
-        debugger
+        
         const res = shipmentList.map((x) => {
             if (x.oRGN === orgBranch || (x.dEST==orgBranch && x.status=="2")) {
 

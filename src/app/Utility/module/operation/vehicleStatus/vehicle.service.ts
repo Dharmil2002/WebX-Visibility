@@ -192,7 +192,7 @@ export class VehicleStatusService {
 
   async createTableData(NavData, vehicleStatusData) {
     const [fromCity, toCity] = NavData.fromToCity.split('-');
-debugger;
+
     let vehicles = await this.getAvailableVehicles();
 
     // Fetch Vendor Types

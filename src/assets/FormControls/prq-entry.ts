@@ -147,7 +147,7 @@ export class PrqEntryControls {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect: "setVehicleSize"
+          onSelection: "setVehicleSize"
         },
       },
       {
@@ -312,7 +312,7 @@ export class PrqEntryControls {
       {
         name: "sIZE",
         label: "Size",
-        placeholder: "Contract Amount",
+        placeholder: "Size",
         type: "",
         value: prqDetail.size,
         generatecontrol: true,

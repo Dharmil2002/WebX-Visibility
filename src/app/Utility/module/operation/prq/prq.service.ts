@@ -77,20 +77,28 @@ export class PrqService {
 
   //here the code to update prq status
   async updatePrqStatus(prqData) {
+    
     delete prqData.srNo;
     delete prqData.Action;
 
     prqData.statusCode = prqData.status;
     prqData.status = this.status[prqData.status];
-    
-    var model = { 
-      ...this.preparePrqDataModel({...prqData})
-    };
+    let model;
+    if(prqData.statusCode && prqData.prqNo) {
+      model = { 
+        ...this.preparePrqDataModel({...prqData})
+      };
+    }
+    else {
+      model = { 
+        ...prqData
+      };
+    }
 
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"),
       collectionName: "prq_summary",
-      filter: { cID: localStorage.getItem("companyCode"), pRQNO: prqData.prqNo || prqData.prqId || "" },
+      filter: { cID: localStorage.getItem("companyCode"), pRQNO: prqData.pRQNO || prqData.prqNo || "" },
       update: {
         ...model,
       },
@@ -110,7 +118,6 @@ export class PrqService {
       confirmButtonText: "Yes, proceed",
       cancelButtonText: "Cancel",
     });
-    debugger;
     
     if (confirmationResult.isConfirmed) {
       prqDetail.statusCode = status;
@@ -123,7 +130,6 @@ export class PrqService {
         //...this.preparePrqDataModel({...prqDetail})
         cID: localStorage.getItem("companyCode"),
         pRQNO: prqDetail.prqNo || prqDetail.docNo || "",
-        dOCNO: prqDetail.docNo || "",
         sTS: prqDetail.statusCode,
         sTSNM: prqDetail.status,
       };
@@ -185,6 +191,7 @@ export class PrqService {
 
   // This async function retrieves PRQ (Purchase Request) detail data from an API using the masterService.
   async getPrqDetailFromApi() {
+    
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage

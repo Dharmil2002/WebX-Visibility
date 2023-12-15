@@ -29,7 +29,7 @@ export async function updatePrqStatus(prqData, masterService) {
             mODDT: new Date()
         }
     }
-    debugger;
+    
     const res = await masterService.masterMongoPut("generic/update", reqBody).toPromise();
     return res
 }

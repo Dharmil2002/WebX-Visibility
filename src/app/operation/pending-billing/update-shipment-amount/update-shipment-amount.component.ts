@@ -23,6 +23,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
   className = "col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2";
   isChagesValid: boolean;
   chargeDetails: any[];
+  extraCharges: InvoiceModel[];
   constructor(
     public dialogRef: MatDialogRef<GenericViewTableComponent>,
     private storage: StorageService,
@@ -68,27 +69,47 @@ export class UpdateShipmentAmountComponent implements OnInit {
     const eFreight = this.accountDetail.controls['eDFreight']?.value || 0;
     const eRate = this.accountDetail.controls['eDRate']?.value || 0;
     const tot = parseFloat(eFreight) + parseFloat(eRate);
-    this.accountDetail.controls['edited']?.setValue(tot);
+    this.shipmentTableForm.controls['edited']?.setValue(tot);
   }
   /*Below the function are mainly for the edit the shipment*/
   async updateShipment() {
+    debugger
     const { eDWeight, eDRate, eDInvoiceAmt, eDNoOfPackage, eDFreight } = this.accountDetail.controls;
     const { shipment } = this.shipmentTableForm.controls;
-
-    const partialPackageInfo: PackageInfo = {
-      eDWeight: eDWeight.value || 0,
-      eDRate: parseFloat(eDRate?.value || 0),
-      eDInvoiceAmt: parseFloat(eDInvoiceAmt?.value || 0),
-      shipment: shipment.value || 0,
-      datetime: new Date(),
-      editBy: this.storage.userName,
-      location: this.storage.branch,
-      eDNoOfPackage: parseInt(eDNoOfPackage?.value || 0),
-      eDFreight: parseFloat(eDFreight?.value || 0)
-    };
-
+      const bindBiillingData = {
+      pKGS:parseInt(eDNoOfPackage.value),
+      fRTRT: parseFloat(eDRate.value),
+      fRTAMT:parseFloat(eDFreight.value),
+      cHRWT: parseFloat(eDWeight.value),
+      tOTAMT: parseFloat(eDInvoiceAmt.value),
+      mODBY: this.storage.userName,
+      mODLOC: this.storage.branch,
+      mODDT: new Date()
+    }
+    let charges = {};
+    let otherAmount: number[] = [];
+    this.extraCharges.forEach(element => {
+      charges[element.name] = this.accountDetail.controls[element.name].value;
+      otherAmount.push(this.accountDetail.controls[element.name].value);
+    });
+    const sumOfOtherAmount = otherAmount.reduce((a, b) => a + b, 0);
+    
+    const financeData ={
+      fRTAMT: parseFloat(eDFreight.value),
+      oTHAMT: sumOfOtherAmount,
+      cHG: charges,
+      tOTAMT: parseFloat(eDInvoiceAmt.value),
+      mODDT:new Date(),
+      mODLOC:this.storage.branch,
+      mODBY:this.storage.userName
+    }
+    const reqData={
+      dockets:bindBiillingData,
+      finance:financeData,
+      dktNo:shipment
+    }
     try {
-      await this.invoiceService.updateBillingInvoice(partialPackageInfo);
+     await this.invoiceService.updateBillingInvoice(reqData);
       await showSuccessMessage('Shipment Updated Successfully!');
       this.dialogRef.close();
     } catch (error) {
@@ -96,7 +117,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
     }
   }
   async getCharges() {
-    
+
     const result = await this.invoiceService.getContractCharges({"cHTY":{"D$in":['C','B']}});
     if (result && result.length > 0) {
       const invoiceList: InvoiceModel[] = [];
@@ -131,13 +152,14 @@ export class UpdateShipmentAmountComponent implements OnInit {
         name:`${x.name}Ed`,
         disable: false
       }));
+      this.extraCharges=invoiceList;
       this.chargeDetails=[...invoiceList,...enable];
       const combinedArray = [...invoiceList, ...enable].sort((a,b)=>a.name.localeCompare(b.name));
       this.jsonControlsEdit.push(...combinedArray);
     }
     this.accountDetail = formGroupBuilder(this.fb, [this.jsonControlsEdit]);
-    this.accountDetail.controls['eDFreightType'].setValue(this.shipmentDetails?.extraData.fRTYPE || "")
-    this.accountDetail.controls['eFreightType'].setValue(this.shipmentDetails?.extraData.fRTYPE || "")
+    this.accountDetail.controls['eDFreightType'].setValue(this.shipmentDetails?.extraData.fRTRTY || "")
+    this.accountDetail.controls['eFreightType'].setValue(this.shipmentDetails?.extraData.fRTRTY || "")
     this.isChagesValid = true;
 
   }
@@ -145,7 +167,12 @@ export class UpdateShipmentAmountComponent implements OnInit {
   calucatedCharges(data){
     const fieldData=this.accountDetail.controls[data.field.name]?.value||"";
     this.accountDetail.controls[data.field.name.split("Ed")[0]].setValue(fieldData); 
-
+    let enterAmt=this.accountDetail.controls['Entered'];
+    let editedAmt=this.accountDetail.controls['edited'];
+    let invoiceAmt=this.accountDetail.controls['eInvoiceAmt']
+    enterAmt.setValue(parseFloat(fieldData)+parseFloat(enterAmt.value||0));
+    editedAmt.setValue(parseFloat(fieldData)+parseFloat(editedAmt.value||0));
+    invoiceAmt.setValue(parseFloat(fieldData)+parseFloat(invoiceAmt.value||0));
   }
 
 }

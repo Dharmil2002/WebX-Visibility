@@ -25,14 +25,13 @@ export async function getVendorDetails(masterService) {
     let req = {
       "companyCode": parseInt(localStorage.getItem("companyCode")),
       "collectionName": "vendor_detail",
-      "filter": {isActive:true}
+      "filter":{isActive:true, vendorLocation:{"D$in":["DELB"]}}
     }
     // Send a POST request to retrieve vendor details from the MongoDB collection.
     const res = await masterService.masterPost("generic/get", req).toPromise()
     if (res) {
       // Filter and map the array to generate 'vendorDetail'
       const vendorDetail = res.data
-        .filter((x) => x.vendorLocation.includes(branch))
         .map((obj) => ({
           name: obj?.vendorName || "",
           value: obj?.vendorCode || "",

@@ -29,7 +29,6 @@ export class ThcService {
 
         // Perform an asynchronous operation to fetch data from the operation service
         const result = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get, reqBody));
-
         return result.data;
     }
 
@@ -151,6 +150,7 @@ export class ThcService {
         }
     }
     async getThcDetails(tripId) {
+        debugger
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.thcsummary,

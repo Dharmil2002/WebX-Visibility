@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 import { OperationService } from "src/app/core/service/operations/operation.service";
 
 @Injectable({
@@ -11,7 +12,7 @@ export class ConsigmentUtility {
     private operationService: OperationService
   ){}
 
-  async updatePrq(data, update) {
+  async updatePrq(data,update) {
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"),
       collectionName: "prq_summary",
@@ -20,7 +21,7 @@ export class ConsigmentUtility {
       },
       update:update,
     };
-    const res = await this.operationService.operationPut("generic/update", reqBody).toPromise();
+    const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqBody));
     return res;
   }
 

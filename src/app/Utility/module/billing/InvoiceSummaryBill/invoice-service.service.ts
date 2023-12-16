@@ -240,26 +240,22 @@ export class InvoiceServiceService {
   }
   /*End*/
   /*below function is for update the billing data*/
-  async updateBillingInvoice(data: PackageInfo) {
-
-    const bindBiillingData = {
-      tOTPKG: data.eDNoOfPackage,
-      fRATE: data.eDRate,
-      fREIGHT: data.eDFreight,
-      tOTWT: data.eDWeight,
-      sUBTOT: data.eDInvoiceAmt,
-      dkTTOT: data.eDInvoiceAmt,
-      mODBY: data.editBy,
-      mODLOC: data.location,
-      mODDT: data.datetime
-    }
+  async updateBillingInvoice(data) {
+    debugger
     const reqbody = {
       companyCode: this.storage.companyCode,
-      collectionName: "Cust_bills_details",
-      filter: { dKTNO: data.shipment },
-      update: bindBiillingData
+      collectionName: "dockets",
+      filter: { dKTNO: data.dktNo },
+      update: data.dockets
     }
     await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqbody));
+    const reqFin = {
+      companyCode: this.storage.companyCode,
+      collectionName: "docket_fin_det",
+      filter: { dKTNO: data.dktNo },
+      update:data.finance
+    }
+    await firstValueFrom(this.operationService.operationMongoPut("generic/update",reqFin));
     return true
     /*End*/
   }

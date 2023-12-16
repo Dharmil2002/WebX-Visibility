@@ -385,6 +385,11 @@ export class PrqService {
       payType: element?.pAYTYPNM|| "",
       payTypeCode: element?.pAYTYP || "",
       contractAmt: element?.cONTRAMT || "",
+      vENDTY:element?.vENDTY || "",
+      vENDTYNM:element?.vENDTYNM || "",
+      vNDCD: element?.vNDCD || "",
+      vNDNM: element?.vNDNM || "",
+      vEHINO:  element?.vEHINO || "",
       createdDate: formatDocketDate(element?.eNTDT || new Date()),
       createDateOrg: element?.eNTDT
     };

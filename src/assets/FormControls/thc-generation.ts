@@ -157,14 +157,8 @@ export class thcControl {
                     name: "vendorType",
                     label: "Vendor Type",
                     placeholder: "Vendor Type",
-                    type: view ? 'text' : 'Staticdropdown',
-                    value: [
-                        { value: "Own", name: "Own" },
-                        { value: "Attached", name: "Attached" },
-                        { value: "Rail", name: "Rail" },
-                        { value: "Market", name: "Market" },
-                        { value: "Service Provider", name: "Service Provider" }
-                    ],
+                    type:'Staticdropdown',
+                    value:[],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",
@@ -281,11 +275,7 @@ export class thcControl {
                     label: "Transport Mode",
                     placeholder: "Transport Mode",
                     type: "Staticdropdown",
-                    value: [
-                        { value: "Air", name: "Air" },
-                        { value: "Road", name: "Road" },
-                        { value: "Rail", name: "Rail" }
-                    ],
+                    value: [],
                     filterOptions: "",
                     autocomplete: "",
                     displaywith: "",

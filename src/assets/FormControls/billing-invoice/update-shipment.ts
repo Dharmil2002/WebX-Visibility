@@ -157,7 +157,7 @@ export class UpdateShipmentsControl {
             label: "Number of packages",
             placeholder:"Number of packages",
             type: "text",
-            value:shipmentDetails?.noOfpkg||0,
+            value:shipmentDetails?.pKGS||0,
             generatecontrol: true,
             disable: true,
             Validations: [],
@@ -165,9 +165,9 @@ export class UpdateShipmentsControl {
           {
             name: "eDNoOfPackage",
             label: "Number of packages",
-            placeholder: shipmentDetails?.noOfpkg||0,
+            placeholder: shipmentDetails?.extraData.pKGS||0,
             type: "text",
-            value:shipmentDetails?.noOfpkg||0,
+            value:shipmentDetails?.extraData.pKGS||0,
             generatecontrol: true,
             disable: false,
             Validations: [],
@@ -199,24 +199,7 @@ export class UpdateShipmentsControl {
             label: "Freight Rate Type",
             placeholder: "Freight Rate  Type",
             type: "Staticdropdown",
-            value: [
-                {
-                  "value": "F",
-                  "name": "Flat"
-                },
-                {
-                  "value": "P",
-                  "name": "Per PKG"
-                },
-                {
-                  "value": "T",
-                  "name": "Per TON"
-                },
-                {
-                  "value": "W",
-                  "name": "Per KG"
-                }
-              ],
+            value: [],
             generatecontrol: true,
             disable: true,
             Validations: [],
@@ -226,24 +209,7 @@ export class UpdateShipmentsControl {
             label: "Freight Rate Type",
             placeholder: "Freight Rate  Type",
             type: "Staticdropdown",
-            value: [
-                {
-                  "value": "F",
-                  "name": "Flat"
-                },
-                {
-                  "value": "P",
-                  "name": "Per PKG"
-                },
-                {
-                  "value": "T",
-                  "name": "Per TON"
-                },
-                {
-                  "value": "W",
-                  "name": "Per KG"
-                }
-              ],
+            value: [],
             generatecontrol: true,
             disable: true,
             Validations: [],
@@ -321,7 +287,7 @@ export class UpdateShipmentsControl {
             label: "Entered Total(₹)",
             placeholder: "Discount(₹)",
             type: "text",
-            value:parseFloat(shipmentDetails?.extraData.fREIGHT||0)+parseFloat(shipmentDetails?.extraData.fRATE||0),
+            value:parseFloat(shipmentDetails?.extraData.fRTAMT||0)+parseFloat(shipmentDetails?.extraData.fRTRT||0),
             generatecontrol: true,
             disable: true,
             Validations: []
@@ -331,7 +297,7 @@ export class UpdateShipmentsControl {
             label: "Edited Total(₹)",
             placeholder: "Edited Total(₹)",
             type: "text",
-            value:parseFloat(shipmentDetails?.extraData.fREIGHT||0)+parseFloat(shipmentDetails?.extraData.fRATE||0),
+            value:parseFloat(shipmentDetails?.extraData.fRTAMT||0)+parseFloat(shipmentDetails?.extraData.fRTRT||0),
             generatecontrol: true,
             disable: true,
             Validations: []

@@ -4,10 +4,9 @@ import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilde
 import { NavigationService } from "src/app/Utility/commonFunction/route/route";
 import { ConsignmentControl, FreightControl, } from "src/assets/FormControls/consignment-control";
 import Swal from "sweetalert2";
-import { customerFromApi } from "../prq-entry-page/prq-utitlity";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { FilterUtils } from "src/app/Utility/Form Utilities/dropdownFilter";
-import { getVendorDetails, getVendorsForAutoComplete } from "../job-entry-page/job-entry-utility";
+import { getVendorsForAutoComplete } from "../job-entry-page/job-entry-utility";
 import { Router } from "@angular/router";
 import { clearValidatorsAndValidate } from "src/app/Utility/Form Utilities/remove-validation";
 import { OperationService } from "src/app/core/service/operations/operation.service";
@@ -153,7 +152,6 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.wtUnits = await this.generalService.getGeneralMasterData("WTUNIT");
     this.riskTypes = await this.generalService.getGeneralMasterData("RISKTYP");
     this.issueFrom = await this.generalService.getGeneralMasterData("ISSFRM");
-
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
 
     // Find the form control with the name 'packaging_type'

@@ -20,7 +20,7 @@ async function updateThcStatus(data, tripId, operationService, podDetails) {
     const updatePromises = podDetails.map(async (element) => {
         const reqBody = {
             "companyCode": localStorage.getItem('companyCode'),
-            "collectionName": "docket_operation_details",
+            "collectionName": "docket_ops_det",
             "filter": {
                 dKTNO: element.docketNumber, tId: tripId
             },

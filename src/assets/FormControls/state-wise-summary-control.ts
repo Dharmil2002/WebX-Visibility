@@ -386,7 +386,7 @@ export class StateWiseSummaryControl {
         Validations: [],
       },
       {
-        name: "IGST",
+        name: "igst",
         label: "IGST(₹)",
         placeholder: "IGST(₹)",
         type: "number",
@@ -406,7 +406,7 @@ export class StateWiseSummaryControl {
         Validations: [],
       },
       {
-        name: "CGST",
+        name: "cgst",
         label: "CGST(₹)",
         placeholder: "CGST(₹)",
         type: "number",
@@ -416,7 +416,7 @@ export class StateWiseSummaryControl {
         Validations: [],
       },
       {
-        name: "GST",
+        name: "gst",
         label: "GST(₹)",
         placeholder: "GST(₹)",
         type: "number",
@@ -426,7 +426,7 @@ export class StateWiseSummaryControl {
         Validations: [],
       },
       {
-        name: "SGST",
+        name: "sgst",
         label: "SGST(₹)",
         placeholder: "SGST(₹)",
         type: "number",

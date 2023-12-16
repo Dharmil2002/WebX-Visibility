@@ -48,14 +48,14 @@ export class BillSubmissionComponent implements OnInit {
   }
   
   GetFileList(data) {
-    debugger
+    
     this.imageData =  this.objImageHandling.uploadFile(data.eventArgs, "Upload", this.
     billSubmition, this.imageData, "BillSubmit", 'Finance', this.jsonControlArray, ["jpeg", "png", "jpg", "pdf"]);
     console.log(this.imageData);
 
   }
   async save(){
-    debugger
+    
     const filter={
       docNo:this.shipmentDetails?.data?.docNo
     }

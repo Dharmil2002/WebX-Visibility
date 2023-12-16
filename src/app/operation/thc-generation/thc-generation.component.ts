@@ -342,7 +342,7 @@ export class ThcGenerationComponent implements OnInit {
 
   /*here the function which is getting a docket from the Api for the create THC*/
   async getShipmentDetail() {
-
+     
     if (!this.isUpdate && !this.isView) {
       let prqNo = this.prqDetail?.prqNo || "";
       const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
@@ -378,7 +378,7 @@ export class ThcGenerationComponent implements OnInit {
  /*End*/
 
   async getDropDownDetail() {
-debugger
+
     const locationList = await getLocationApiDetail(this.masterService);
 
     this.prqlist = await this.thcService.prqDetail(true, { bRCD: this.storage.branch });
@@ -461,7 +461,7 @@ debugger
       const jsonData = {
         vehicle: { name: this.prqDetail?.vEHINO, value: this.prqDetail?.vEHINO },
         vendorType: `${this.prqDetail?.vENDTY}` || "",
-        vendorName: { name: this.prqDetail?.vNDCD || '', value: this.prqDetail?.vNDNM || '' },
+        vendorName: { name: this.prqDetail?.vNDNM || '', value: this.prqDetail?.vNDCD || '' },
         transMode: transMode,
         route: this.prqDetail?.fromToCity || '',
         fromCity: { name: fromToCityParts[0], value: fromToCityParts[0] },
@@ -647,9 +647,9 @@ debugger
         if (result) {
           const { shipment, actualWeight, noofPkts } = result;
           this.tableData.forEach((x) => {
-            if (x.docketNumber === shipment) {
-              x.totWeight = actualWeight || 0;
-              x.noOfPkg = noofPkts || 0;
+            if (x.docNo === shipment) {
+              x.aCTWT = actualWeight || 0;
+              x.pKGS = noofPkts || 0;
               x.isSelected = false
             }
           });
@@ -698,7 +698,7 @@ debugger
     });
 
     const vendorType = this.thcTableForm.get('vendorType').value;
-    const isMarket = vendorType === 'Market';
+    const isMarket = vendorType === "4";
     this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");
 
     if (isMarket) {

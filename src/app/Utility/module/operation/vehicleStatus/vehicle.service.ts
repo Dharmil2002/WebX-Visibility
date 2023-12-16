@@ -191,6 +191,7 @@ export class VehicleStatusService {
 
 
   async createTableData(NavData, vehicleStatusData) {
+    
     const [fromCity, toCity] = NavData.fromToCity.split('-');
 
     let vehicles = await this.getAvailableVehicles();

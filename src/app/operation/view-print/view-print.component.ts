@@ -21,7 +21,6 @@ export class ViewPrintComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public item: any, 
     public dialogRef: MatDialogRef<GenericTableComponent>) {
     if (item) {
-       
       this.prqDetail = this.prqService.getAssigneVehicleDetail();
       this.prqDetail.vehicleNo = item?.vehicleNo||item.vehNo;
       const tabIndex = 6; // Adjust the tab index as needed

@@ -32,6 +32,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private invoiceService: InvoiceServiceService
   ) {
+    
     this.shipmentDetails = this.data;
   }
 
@@ -58,6 +59,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
   }
 
   IntializeFormControl() {
+    
     const loadingControlForm = new UpdateShipmentsControl(this.storage, this.shipmentDetails);
     this.jsonControlArray = loadingControlForm.getShipmentControls();
     this.jsonControlsEdit = loadingControlForm.getEditDocket();
@@ -73,7 +75,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
   }
   /*Below the function are mainly for the edit the shipment*/
   async updateShipment() {
-    debugger
+    
     const { eDWeight, eDRate, eDInvoiceAmt, eDNoOfPackage, eDFreight } = this.accountDetail.controls;
     const { shipment } = this.shipmentTableForm.controls;
       const bindBiillingData = {
@@ -86,13 +88,16 @@ export class UpdateShipmentAmountComponent implements OnInit {
       mODLOC: this.storage.branch,
       mODDT: new Date()
     }
-    let charges = {};
+    let charges = [];
     let otherAmount: number[] = [];
     this.extraCharges.forEach(element => {
-      charges[element.name] = this.accountDetail.controls[element.name].value;
-      otherAmount.push(this.accountDetail.controls[element.name].value);
+      let chg={};
+      chg['cHGID']=element.name; 
+      chg['cHGNM']=element.label; 
+      chg['aMT']=this.accountDetail.controls[element.name].value;
+      charges.push(chg);
     });
-    const sumOfOtherAmount = otherAmount.reduce((a, b) => a + b, 0);
+    const sumOfOtherAmount = charges.reduce((a, b) => a.aMT + b.aMT, 0);
     
     const financeData ={
       fRTAMT: parseFloat(eDFreight.value),
@@ -106,7 +111,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
     const reqData={
       dockets:bindBiillingData,
       finance:financeData,
-      dktNo:shipment
+      dktNo:shipment.value
     }
     try {
      await this.invoiceService.updateBillingInvoice(reqData);
@@ -158,8 +163,6 @@ export class UpdateShipmentAmountComponent implements OnInit {
       this.jsonControlsEdit.push(...combinedArray);
     }
     this.accountDetail = formGroupBuilder(this.fb, [this.jsonControlsEdit]);
-    this.accountDetail.controls['eDFreightType'].setValue(this.shipmentDetails?.extraData.fRTRTY || "")
-    this.accountDetail.controls['eFreightType'].setValue(this.shipmentDetails?.extraData.fRTRTY || "")
     this.isChagesValid = true;
 
   }

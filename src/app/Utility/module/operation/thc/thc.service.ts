@@ -15,21 +15,47 @@ export class ThcService {
     ) { }
 
     async getShipmentFiltered(branch, prqNo = null) {
-    
+       
         let filter = { oRGN: branch, oSTS: 1}
         if( (prqNo && prqNo !== "")) {
             filter["pRQNO"] = prqNo;
         }
-
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.Dockets,
             filter: filter
         };
-
         // Perform an asynchronous operation to fetch data from the operation service
-        const result = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get, reqBody));
-        return result.data;
+        const result = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get,reqBody));
+        const dockets=result.data.map((x)=>x.dKTNO);
+        const reqOpBody = {
+            companyCode: this.storage.companyCode,
+            collectionName: Collections.docketOp,
+            filter: { dKTNO: { D$in: dockets },sFX:0, D$or: [
+                { tOTPKG: { D$gt: 0 } },
+                { tOTWT: { D$gt: 0 } }
+              ]}
+        };
+        const dktDetail = await firstValueFrom(this.operationService.operationMongoPost(GenericActions.Get,reqOpBody));
+        const createShipmentObject = (element, dkt) => {
+            return {
+                bPARTYNM: element.bPARTYNM,
+                docNo: element.dKTNO,
+                fCT: element.fCT,
+                tCT: element.tCT,
+                aCTWT: dkt?.tOTWT || 0,
+                pKGS: dkt?.tOTPKG || 0,
+                pod: element?.pOD || "",
+                receiveBy: element?.rCVBY || "",
+                arrivalTime: element?.aRRTM || "",
+                remarks: element?.rEMARKS || ""
+            };
+        };
+        const docketList = result.data.map((element) => {
+            const dkt = dktDetail.data.find((x) => x.dKTNO === element.dKTNO);
+            return createShipmentObject(element, dkt);
+        });
+        return docketList;
     }
 
     async getShipment(vehicle = false) {
@@ -150,7 +176,7 @@ export class ThcService {
         }
     }
     async getThcDetails(tripId) {
-        debugger
+        
         const reqBody = {
             companyCode: this.storage.companyCode,
             collectionName: Collections.thcsummary,

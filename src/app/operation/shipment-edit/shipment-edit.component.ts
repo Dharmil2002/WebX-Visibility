@@ -33,9 +33,9 @@ export class ShipmentEditComponent implements OnInit {
     const shipMentEditFormControls = new ShipmentEditControls();
     this.jsonControlArray = shipMentEditFormControls.getShipmentFormControls();
     this.shipmentTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.shipmentTableForm.controls['shipment'].setValue(this.shipmentDetail?.docketNumber||"");
-    this.shipmentTableForm.controls['noofPkts'].setValue(this.shipmentDetail?.noOfPkg||0);
-    this.shipmentTableForm.controls['actualWeight'].setValue(this.shipmentDetail?.totWeight||0);
+    this.shipmentTableForm.controls['shipment'].setValue(this.shipmentDetail?.docNo||"");
+    this.shipmentTableForm.controls['noofPkts'].setValue(this.shipmentDetail?.pKGS||0);
+    this.shipmentTableForm.controls['actualWeight'].setValue(this.shipmentDetail?.aCTWT||0);
   } 
   
 
@@ -52,7 +52,7 @@ export class ShipmentEditComponent implements OnInit {
   }
   /*Validation on Shipments*/
   getValidate() {
-    const { totWeight = 0, noOfPkg = 0 } = this.shipmentDetail || {};
+    const { aCTWT = 0, pKGS = 0 } = this.shipmentDetail || {};
     const fWeight = parseInt(this.shipmentTableForm.controls['actualWeight']?.value || 0);
     const fNoofPkts = parseInt(this.shipmentTableForm.controls['noofPkts']?.value || 0);
   
@@ -66,9 +66,8 @@ export class ShipmentEditComponent implements OnInit {
         control?.setValue(0);
       }
     };
-  
-    handleExceededLimit(fWeight > totWeight, 'Weight Limit Exceeded', 'Weight exceeds docket limit. Please adjust.', this.shipmentTableForm.controls['actualWeight']);
-    handleExceededLimit(fNoofPkts > noOfPkg, 'Package Exceeded', 'The package exceeds the specified limit. Please adjust accordingly.', this.shipmentTableForm.controls['noofPkts']);
+    handleExceededLimit(fWeight > aCTWT, 'Weight Limit Exceeded', 'Weight exceeds docket limit. Please adjust.', this.shipmentTableForm.controls['actualWeight']);
+    handleExceededLimit(fNoofPkts > pKGS, 'Package Exceeded', 'The package exceeds the specified limit. Please adjust accordingly.', this.shipmentTableForm.controls['noofPkts']);
   }
   
   /*End*/

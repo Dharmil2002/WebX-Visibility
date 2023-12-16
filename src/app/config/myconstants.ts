@@ -6,7 +6,7 @@ export const Collections = {
     Dockets: 'dockets',
     PrqDetails: 'prq_summary',
     ThcDetails: 'thc_detail',
-    docketOp: 'docket_operation_details',
+    docketOp: 'docket_ops_det',
     thcsummary: 'thc_summary'
 };
 

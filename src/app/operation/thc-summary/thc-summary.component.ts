@@ -40,13 +40,11 @@ export class ThcSummaryComponent implements OnInit {
       functionName: 'openExternalWindow',
       type: 'windowLink',
     },
-
     rUTNM: {
       Title: "Route",
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
-
     vEHNO: {
       Title: "Vehicle No",
       class: "matcolumncenter",
@@ -100,7 +98,6 @@ export class ThcSummaryComponent implements OnInit {
 
   //here the code which is get details of Thc Which is Display in Fron-end
   async getThcDetails() {
-
     const thcList = await this.thcService.getThcDetail();
     const branch = localStorage.getItem("Branch");
     const thcDetail = thcList.data.filter((x) => x.cLOC == branch || x.dEST.toLowerCase() === branch.toLowerCase())

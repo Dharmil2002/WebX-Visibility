@@ -145,10 +145,10 @@ export class InvoiceServiceService {
       "gST": {
         "tYP": data?.gstType || "", // SGST, UTGST, IGST
         "rATE": data?.gstRate || "",
-        "iGST": data?.IGST || 0.00,
-        "cGST": data?.IGST || 0.00,
-        "sGST": data?.sGST || 0.00,
-        "aMT": data?.GST || 0.00
+        "iGST": data?.igst || 0.00,
+        "cGST": data?.cgst || 0.00,
+        "sGST": data?.sgst || 0.00,
+        "aMT": data?.gst || 0.00
       },
       "sUPDOC": "",
       "pRODID": 1, //From Product Master
@@ -241,7 +241,7 @@ export class InvoiceServiceService {
   /*End*/
   /*below function is for update the billing data*/
   async updateBillingInvoice(data) {
-    debugger
+    
     const reqbody = {
       companyCode: this.storage.companyCode,
       collectionName: "dockets",
@@ -428,7 +428,7 @@ async filterData(data: any) {
   return filteredData;
 }
 async updateInvoiceStatus(filter,data){
-  debugger
+  
   const req ={
     companyCode:this.storage.companyCode,
     collectionName:"Cust_bills_headers",

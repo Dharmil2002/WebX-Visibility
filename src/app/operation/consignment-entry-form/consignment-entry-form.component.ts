@@ -310,7 +310,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       let vendors = await getVendorsForAutoComplete(this.masterService, vehicleDetail.vendor, parseInt(vehType.value));
       const vendor = vendors[0];
       this.setFormValue(this.model.consignmentTableForm, "vendorName", vendor);
-      this.model.consignmentTableForm.controls['vehicleNo'].setValue( { name:this.model.prqData?.vehicleNo||"",value:this.model.prqData?.vehicleNo||"" } );     
+      this.model.consignmentTableForm.controls['vehicleNo'].setValue( { name:this.model.prqData?.vEHINO||"",value:this.model.prqData?.vEHINO||"" } );     
 
       //this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
       //this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, true,"vehicleNo","vehicleNo");
@@ -916,7 +916,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   }
 
   async save() {
-    
+     
     this.isSubmit =true;
     // Remove all form errors
     const tabcontrols = this.model.consignmentTableForm;
@@ -1027,7 +1027,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       docketDetails["tran_hour"] = (tDay*24) + tHour;
       docketDetails["tran_day"] = 0;
       docketDetails["cURR"] = 'INR';
-
+      delete docketDetails.tran_day;
       const controlNames = 
       [ 
         {
@@ -1048,12 +1048,12 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
             controls: [{ controlName: 'freightRatetype', name: 'freightRatetypeName', value: 'freightRatetype' }]
         }
       ];
-    
 
       controlNames.forEach((g) => {
         const data = (g.dataArray === "F" ? this.jsonControlArray : this.model.allformControl);
+        const formGrop= (g.dataArray === "F" ? this.model.FreightTableForm : this.model.consignmentTableForm);
         g.controls.forEach((c) => { 
-          let ctrl = this.model.consignmentTableForm.controls[c.controlName];
+          let ctrl = formGrop.controls[c.controlName];
           if (ctrl && ctrl.value) {
             docketDetails[c.value] = ctrl.value;
             let cData = data.find(f => f.name == c.controlName).value.find(f => f.value == ctrl.value);

@@ -193,24 +193,32 @@ export class InvoiceSummaryBillComponent implements OnInit {
     const invoiceDetail = await this.invoiceServiceService.getInvoiceDetail(shipments);
     this.tableData = invoiceDetail;
     this.getGstCharged();
-    const cnoteCount = await total(invoiceDetail, 'cnoteCount');
-    this.invoiceSummaryTableForm.controls['shipmentCount'].setValue(cnoteCount);
-    const shipmentTot = await total(invoiceDetail, 'totalBillingAmount');
-    this.invoiceSummaryTableForm.controls['shipmentTotal'].setValue(shipmentTot);
+   // const cnoteCount = await total(invoiceDetail, 'cnoteCount');
+    //this.invoiceSummaryTableForm.controls['shipmentCount'].setValue(cnoteCount);
+    //const shipmentTot = await total(invoiceDetail, 'totalBillingAmount');
+    //this.invoiceSummaryTableForm.controls['shipmentTotal'].setValue(shipmentTot);
     const gstType = custState === tranState ? 'SGST' : 'IGST';
-    this.invoiceSummaryTableForm.controls['IGST'].setValue(gstType == "IGST" ? shipmentTot : 0);
-    this.invoiceSummaryTableForm.controls['SGST'].setValue(gstType == "SGST" ? parseFloat(shipmentTot) / 2 : 0);
+    //this.invoiceSummaryTableForm.controls['IGST'].setValue(gstType == "IGST" ? shipmentTot : 0);
+    //this.invoiceSummaryTableForm.controls['SGST'].setValue(gstType == "SGST" ? parseFloat(shipmentTot) / 2 : 0);
 
     //this.invoiceSummaryTableForm.controls['shipmentTotal'].setValue(custState === tranState ? shipmentTot : parseFloat(shipmentTot)/2);
 
 
   }
   getCalucationDetails($event) {
-    const invoice = $event ? $event : "";
+    const formGroup = this.invoiceSummaryTableForm.controls;
+    const falseInvoice = $event ? $event.filter(x=>!x.isSelected) :[];
+    const invoice = $event ? $event.filter(x=>x.isSelected) : [];
+    if(invoice.length>0){
+    // Assuming shipmentTotal is a FormControl
+    // Make sure to use setValue to update the FormControl
     const cnoteCount = this.tableData.length;
+    formGroup.shipmentCount.setValue(invoice.length);
     const countSelected = invoice ? invoice.length : 0;
     const subTotalAmount = invoice ? calculateTotalField(invoice, 'subTotalAmount') : 0;
+    formGroup.shipmentTotal.setValue(subTotalAmount);
     const gstCharged = invoice ? calculateTotalField(invoice, 'gstCharged') : 0;
+    formGroup.gst.setValue(gstCharged);
     const totalBillingAmount = invoice ? calculateTotalField(invoice, 'totalBillingAmount') : 0;
     //#endregion
 
@@ -242,10 +250,26 @@ export class InvoiceSummaryBillComponent implements OnInit {
         class: `color-Grape-light`,
       },
     ]
+    }
+    else{
+      const subTotalAmount = falseInvoice ? calculateTotalField(falseInvoice, 'subTotalAmount') : 0;
+      const gstCharged = falseInvoice ? calculateTotalField(invoice, 'gstCharged') : 0;
+      const currentShipmentTotal = parseFloat(formGroup.shipmentTotal.value || '0');
+      // Perform the subtraction
+      let newShipmentTotal = currentShipmentTotal - parseFloat(subTotalAmount);
+      const gst=parseFloat(formGroup.gst.value || '0');
+      let newGst=parseFloat(gstCharged)-gst;
+      // Ensure the result is not less than zero
+      newShipmentTotal = Math.max(newShipmentTotal, 0);
+      newGst = Math.max(newGst, 0);
+      // Set the new value to the formGroup
+      formGroup.shipmentTotal.setValue(newShipmentTotal);
+      formGroup.gst.setValue(newGst);
+      formGroup.shipmentCount.setValue(invoice.length);
+    }
   }
   /*here i write code for the calulcate the gst */
   getGstCharged() {
-    debugger;
     const gstRateString = this.invoiceTableForm.controls['gstRate'].value;
     // Extract numeric value from the string (assuming it's always a valid percentage string)
     const gstRate = parseFloat(gstRateString.replace('%', '')) / 100;

@@ -81,7 +81,6 @@ export class InvoiceServiceService {
           countSelected: 0,
           subTotalAmount: element.amount,
           gstCharged: element.gst,
-          totalBillingAmount: parseFloat(element.amount) + parseFloat(element.gst),
           extraData: [element],
         });
       } else {

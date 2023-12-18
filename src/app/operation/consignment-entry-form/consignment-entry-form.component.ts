@@ -310,7 +310,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       let vendors = await getVendorsForAutoComplete(this.masterService, vehicleDetail.vendor, parseInt(vehType.value));
       const vendor = vendors[0];
       this.setFormValue(this.model.consignmentTableForm, "vendorName", vendor);
-      this.model.consignmentTableForm.controls['vehicleNo'].setValue( { name:this.model.prqData?.vEHINO||"",value:this.model.prqData?.vEHINO||"" } );     
+      this.model.consignmentTableForm.controls['vehicleNo'].setValue( { name:this.model.prqData?.vEHNO||"",value:this.model.prqData?.vEHNO||"" } );     
 
       //this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
       //this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, true,"vehicleNo","vehicleNo");

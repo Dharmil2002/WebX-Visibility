@@ -32,7 +32,7 @@ export class AssignedVehicleService {
           pRQNO: prqDetail.prqNo || prqDetail.pRQNO,
           sTS: "2",
           sTSNM: "Awaiting For Docket",
-          vEHINO: item.vehNo,
+          vEHNO: item.vehNo,
           vENDTY: item.vendorTypeCode || ( item.vendorType == "Market" ? "4" : undefined ),
           vENDTYNM: item.vendorType,
           vNDCD: item.vendorCode || ( item.vendorType == "Market" ? "8888" : undefined ),

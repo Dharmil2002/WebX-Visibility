@@ -384,7 +384,7 @@ export class ThcGenerationComponent implements OnInit {
 
     const locationList = await getLocationApiDetail(this.masterService);
 
-    this.prqlist = await this.thcService.prqDetail(true, { bRCD: this.storage.branch });
+    this.prqlist = await this.thcService.prqDetail(true, { bRCD: this.storage.branch,sTS:3});
     this.locationData = locationList.map((x) => ({
       value: x.locCode,
       name: x.locName,
@@ -463,7 +463,7 @@ export class ThcGenerationComponent implements OnInit {
       const validTransModes = ['Truck', 'Trailor', 'Container'];
       const transMode = validTransModes.includes(this.prqDetail?.carrierType) ? 'P1' : '';
       const jsonData = {
-        vehicle: { name: this.prqDetail?.vEHINO, value: this.prqDetail?.vEHINO },
+        vehicle: { name: this.prqDetail?.vEHNO, value: this.prqDetail?.vEHNO },
         vendorType: `${this.prqDetail?.vENDTY}` || "",
         vendorName: { name: this.prqDetail?.vNDNM || '', value: this.prqDetail?.vNDCD || '' },
         transMode: transMode,
@@ -485,8 +485,14 @@ export class ThcGenerationComponent implements OnInit {
           this.thcTableForm.controls[controlName].setValue(jsonData[controlName]);
         }
       }
-
-      if (vehicleDetail?.vendorType == "4") {
+      // /*here i set in both name value is vNDNM the blow condition only applye when the vendor type is market 
+      // after this autofill it is going to the vendotype changes function then after it set vendorname as textbox and vendor code set as 8888 in submit time
+      // */
+      // if(this.prqDetail?.vENDTY=="4"){
+      //   this.thcTableForm.controls['vendorName'].setValue({name:this.prqDetail?.vNDNM,value:this.prqDetail?.vNDNM})
+      // }
+      // /*End*/
+      if (this.prqDetail?.vENDTY == "4") {
         let vehData = await this.markerVehicleService.GetVehicleData(this.prqDetail?.vehicleNo || "");
         if (vehData) {
           const vehJson = {
@@ -515,6 +521,7 @@ export class ThcGenerationComponent implements OnInit {
               // }
             }
           }
+          this.thcTableForm.controls['vendorName'].setValue({name:this.prqDetail?.vNDNM,value:this.prqDetail?.vNDNM})
         }
       }
     }
@@ -566,7 +573,7 @@ export class ThcGenerationComponent implements OnInit {
   }
 
   async getShipmentDetails() {
-
+    
     const prq = this.thcTableForm.controls["prqNo"].value?.value || "";
     this.tableLoad = true;
     if (!this.prqFlag && prq) {
@@ -574,10 +581,8 @@ export class ThcGenerationComponent implements OnInit {
       const filter = {
         docNo: prq
       }
-      
        let prqData= await this.thcService.prqDetail(false, filter);
        let prqList = [];
-    
        // Map and transform the PRQ data
        prqData.map((element, index) => {
          let pqrData = this.prqService.preparePrqDetailObject(element, index);     

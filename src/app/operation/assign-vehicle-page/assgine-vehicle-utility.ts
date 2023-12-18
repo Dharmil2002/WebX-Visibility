@@ -22,7 +22,7 @@ export async function showVehicleConfirmationDialog(prqDetail, masterService, go
             pRQNO: prqDetail.prqNo || prqDetail.pRQNO,
             sTS: "2",
             sTSNM: "Awaiting For Docket",
-            vEHINO: item.vehNo
+            vEHNO: item.vehNo
         }
 
         const res = await updatePrqStatus(updateData, masterService);

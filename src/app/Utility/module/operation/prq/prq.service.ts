@@ -389,7 +389,7 @@ export class PrqService {
       vENDTYNM:element?.vENDTYNM || "",
       vNDCD: element?.vNDCD || "",
       vNDNM: element?.vNDNM || "",
-      vEHINO:  element?.vEHINO || "",
+      vEHNO:  element?.vEHNO || "",
       createdDate: formatDocketDate(element?.eNTDT || new Date()),
       createDateOrg: element?.eNTDT
     };

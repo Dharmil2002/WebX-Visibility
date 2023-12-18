@@ -167,10 +167,18 @@ dialogClosed($event) {
     }
    })
   }
+  this.tableData.map((x)=>{
+    const extraData=x.extraData.filter((x)=>x.isSelected);
+    x.subTotalAmount=calculateTotalField(extraData,'amount');
+    x.gstCharged=calculateTotalField(extraData,'gst');
+    x.totalBillingAmount=parseFloat(x.subTotalAmount)+parseFloat(x.gstCharged);
+    return x
+  })
+  this.getGstCharged();
   const selectedShipmentSum = this.tableData
   .filter(x => x.isSelected)
   .reduce((sum, item) => sum + item.countSelected, 0);
-  this.invoiceTableForm.controls['shipmentCount'].setValue(selectedShipmentSum);
+  this.invoiceSummaryTableForm.controls['shipmentCount'].setValue(selectedShipmentSum);
 }
 /*End*/
   async save() {

@@ -70,6 +70,7 @@ export class InvoiceServiceService {
   }
 
   getInvoiceDetail(shipment) {
+    
     const stateInvoiceMap = new Map();
     for (const element of shipment) {
       // Create or update the state-wise invoice details
@@ -79,16 +80,16 @@ export class InvoiceServiceService {
           stateName,
           cnoteCount: 1,
           countSelected: 0,
-          subTotalAmount:element.amount,
-          gstCharged: element.gst,
+          subTotalAmount:0,
+          gstCharged: 0,
           extraData: [element],
         });
       } else {
         const stateInvoice = stateInvoiceMap.get(stateName);
         stateInvoice.cnoteCount += 1;
-        stateInvoice.subTotalAmount += element.amount;
-        stateInvoice.gstCharged += element.gst;
-        stateInvoice.totalBillingAmount += parseFloat(element.amount) + parseFloat(element.gst);
+      //  stateInvoice.subTotalAmount += element.amount;
+        //stateInvoice.gstCharged += element.gst;
+        //stateInvoice.totalBillingAmount += parseFloat(element.amount) + parseFloat(element.gst);
         stateInvoice.extraData.push(element); // Add the element to the extraData array
       }
     }

@@ -208,6 +208,7 @@ export class ThcGenerationComponent implements OnInit {
   viewType: string = '';
   vendorTypes:AutoComplete[];
   products: AutoComplete[];
+  directPrq: boolean;
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -455,8 +456,8 @@ export class ThcGenerationComponent implements OnInit {
   }
  /*here the function for the bind prq data*/
   async bindPrqData() {
+   
     if (this.thcTableForm.controls["prqNo"].value.value) {
-      this.prqFlag=true;
       const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
       const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
       const validTransModes = ['Truck', 'Trailor', 'Container'];
@@ -517,9 +518,7 @@ export class ThcGenerationComponent implements OnInit {
         }
       }
     }
-    else{
-      this.prqFlag=false;
-    }
+   
     if (!this.isView && !this.isUpdate) {
       this.vendorFieldChanged();
     }
@@ -571,6 +570,7 @@ export class ThcGenerationComponent implements OnInit {
     const prq = this.thcTableForm.controls["prqNo"].value?.value || "";
     this.tableLoad = true;
     if (!this.prqFlag && prq) {
+      this.directPrq=true
       const filter = {
         docNo: prq
       }
@@ -879,7 +879,7 @@ export class ThcGenerationComponent implements OnInit {
         x.type = vendorType === "4" ? "text" : "dropdown";
       }
     });
-    if (!this.prqFlag) {
+    if (!this.prqFlag && !this.directPrq) {
       this.thcTableForm.controls['vendorName'].setValue("");
     }
     if (vendorType !== 'Market') {

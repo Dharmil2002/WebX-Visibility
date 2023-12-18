@@ -35,6 +35,7 @@ import { ARr, CAp, DPt, LOad, MfdetailsList, MfheaderDetails, THCGenerationModel
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { PrqService } from "src/app/Utility/module/operation/prq/prq.service";
 
 @Component({
   selector: "app-thc-generation",
@@ -225,6 +226,7 @@ export class ThcGenerationComponent implements OnInit {
     private thcService: ThcService,
     private storage: StorageService,
     private generalService: GeneralService,
+    private prqService:PrqService
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -452,7 +454,6 @@ export class ThcGenerationComponent implements OnInit {
   }
  /*here the function for the bind prq data*/
   async bindPrqData() {
-    
     if (this.thcTableForm.controls["prqNo"].value.value) {
       const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
       const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
@@ -569,8 +570,16 @@ export class ThcGenerationComponent implements OnInit {
         docNo: prq
       }
       
-      this.prqDetail = await this.thcService.prqDetail(false, filter);
-      
+       let prqData= await this.thcService.prqDetail(false, filter);
+       let prqList = [];
+    
+       // Map and transform the PRQ data
+       prqData.map((element, index) => {
+         let pqrData = this.prqService.preparePrqDetailObject(element, index);     
+         prqList.push(pqrData)
+         // You need to return the modified element
+       });
+       this.prqDetail=prqList[0];
       this.bindPrqData();
     }
 

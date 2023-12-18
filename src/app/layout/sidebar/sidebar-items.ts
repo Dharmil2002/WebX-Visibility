@@ -384,7 +384,7 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
-              "path": "Masters/VendorContract/VendorQueryPage",
+              "path": "Masters/VendorContract/VendorContractList",
               "title": "Vendor Contract",
               "moduleName": "Vendor Contract",
               "icon": "",

@@ -449,12 +449,14 @@ export class ThcGenerationComponent implements OnInit {
       value: this.prqDetail?.prqNo || "",
     };
     this.thcTableForm.controls["prqNo"].setValue(prq);
+    
     this.bindPrqData();
     this.getShipmentDetails();
   }
  /*here the function for the bind prq data*/
   async bindPrqData() {
     if (this.thcTableForm.controls["prqNo"].value.value) {
+      this.prqFlag=true;
       const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
       const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
       const validTransModes = ['Truck', 'Trailor', 'Container'];
@@ -514,6 +516,9 @@ export class ThcGenerationComponent implements OnInit {
           }
         }
       }
+    }
+    else{
+      this.prqFlag=false;
     }
     if (!this.isView && !this.isUpdate) {
       this.vendorFieldChanged();

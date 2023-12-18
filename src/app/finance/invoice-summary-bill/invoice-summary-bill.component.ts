@@ -8,10 +8,10 @@ import { StateWiseSummaryControl } from 'src/assets/FormControls/state-wise-summ
 import { getApiCompanyDetail, getApiCustomerDetail } from './invoice-utility';
 import Swal from 'sweetalert2';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
-import { total } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { ShipmentSelectionComponent } from './shipment-selection/shipment-selection.component';
 
 @Component({
   selector: 'app-invoice-summary-bill',
@@ -30,13 +30,18 @@ export class InvoiceSummaryBillComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
+  linkArray = [
+    { Row: 'countSelected', Path: '', componentDetails: ShipmentSelectionComponent,title:{"shipment":"TotalDkt"} },
+  ]
   tableLoad: boolean = true;
   invoiceTableForm: UntypedFormGroup;
   invoiceSummaryTableForm: UntypedFormGroup;
   invoiceFormControls: StateWiseSummaryControl;
   jsonControlArray: any;
   KPICountData: { count: any; title: string; class: string }[];
-
+  height = '100vw';
+  width = '100vw';
+  maxWidth: '232vw'
   dynamicControls = {
     add: false,
     edit: false,
@@ -80,10 +85,11 @@ export class InvoiceSummaryBillComponent implements OnInit {
     }
   };
   tableData = []
-  staticField = ["stateName", "cnoteCount", "countSelected", "subTotalAmount", "gstCharged", "totalBillingAmount"];
+  staticField = ["stateName", "cnoteCount", "subTotalAmount", "gstCharged", "totalBillingAmount"];
   navigateExtra: any;
   prqNo: any;
   invoiceSummaryJsonArray: any;
+  status: number;
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -94,8 +100,8 @@ export class InvoiceSummaryBillComponent implements OnInit {
     private storage: StorageService
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
-
       this.navigateExtra = this.router.getCurrentNavigation()?.extras?.state.data.columnData || "";
+      this.status=this.router.getCurrentNavigation()?.extras?.state.data.title.status;
     }
 
     this.tableLoad = false;
@@ -131,8 +137,6 @@ export class InvoiceSummaryBillComponent implements OnInit {
     this.getCustomerDetail();
 
   }
-
-
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call
 
@@ -144,7 +148,31 @@ export class InvoiceSummaryBillComponent implements OnInit {
       console.log("failed");
     }
   }
-
+/*here the function call when the user select a shipments*/
+dialogClosed($event) {
+  
+  if($event){
+   this.tableData.map((x)=>{
+    if(x.stateName==$event.stateName){
+      x.extraData.map((y)=>{
+        const findShipment=$event.selectedData.find((z)=>z.shipment==y.shipment);
+        if(findShipment){
+          y.isSelected=true;
+        }
+        else{
+          y.isSelected=false;
+        }
+        x.countSelected=x.extraData.filter((z)=>z.isSelected).length;
+      });
+    }
+   })
+  }
+  const selectedShipmentSum = this.tableData
+  .filter(x => x.isSelected)
+  .reduce((sum, item) => sum + item.countSelected, 0);
+  this.invoiceTableForm.controls['shipmentCount'].setValue(selectedShipmentSum);
+}
+/*End*/
   async save() {
 
     this.setControlValue(this.invoiceTableForm.controls['submissionOffice']);
@@ -172,7 +200,6 @@ export class InvoiceSummaryBillComponent implements OnInit {
     control.setValue(control.value?.value ?? "");
   }
   async getCustomerDetail() {
-
     const custDetail = await getApiCustomerDetail(this.masterService, this.navigateExtra);
     const tranDetail = await getApiCompanyDetail(this.masterService);
     this.invoiceTableForm.controls['cGstin'].setValue(custDetail?.data[0].GSTdetails[0].gstNo || "");
@@ -188,7 +215,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
     // Set 'gstType' value based on the equality of lowercase states
     this.invoiceTableForm.controls['gstType'].setValue(custState === tranState ? 'SGST' : 'IGST');
     // const prqDetail = await getPrqApiDetail(this.masterService, this.navigateExtra.columnData.billingparty);
-    const invoice = await this.invoiceServiceService.getInvoice(this.navigateExtra.dKTNO);
+    const invoice = await this.invoiceServiceService.getInvoice(this.navigateExtra.dKTNO,this.status);
     const shipments = await this.invoiceServiceService.filterShipment(invoice);
     const invoiceDetail = await this.invoiceServiceService.getInvoiceDetail(shipments);
     this.tableData = invoiceDetail;
@@ -213,7 +240,6 @@ export class InvoiceSummaryBillComponent implements OnInit {
     // Assuming shipmentTotal is a FormControl
     // Make sure to use setValue to update the FormControl
     const cnoteCount = this.tableData.length;
-    formGroup.shipmentCount.setValue(invoice.length);
     const countSelected = invoice ? invoice.length : 0;
     const subTotalAmount = invoice ? calculateTotalField(invoice, 'subTotalAmount') : 0;
     formGroup.shipmentTotal.setValue(subTotalAmount);
@@ -265,8 +291,12 @@ export class InvoiceSummaryBillComponent implements OnInit {
       // Set the new value to the formGroup
       formGroup.shipmentTotal.setValue(newShipmentTotal);
       formGroup.gst.setValue(newGst);
-      formGroup.shipmentCount.setValue(invoice.length);
+      
     }
+   const selectedShipmentSum = this.tableData
+  .filter(x => x.isSelected)
+  .reduce((sum, item) => sum + item.countSelected, 0);
+    formGroup.shipmentCount.setValue(selectedShipmentSum);
   }
   /*here i write code for the calulcate the gst */
   getGstCharged() {

@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { FilterBillingComponent } from './filter-billing/filter-billing.component';
 import { ShipmentEditBillingComponent } from './shipment-edit-billing/shipment-edit-billing.component';
 import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
+import { GenericService } from 'src/app/core/service/generic-services/generic-services';
 
 @Component({
   selector: 'app-pending-billing',
@@ -27,8 +28,9 @@ export class PendingBillingComponent implements OnInit {
   menuItemflag: boolean = true;
   boxData: { count: number; title: string; class: string; }[];
   linkArray = [
-    { Row: "action", Path: "Finance/InvoiceSummaryBill" },
-    { Row: 'dockets', Path: '', componentDetails: ShipmentEditBillingComponent },
+    { Row: "action", Path: "Finance/InvoiceSummaryBill",title:{"status":1} },
+    { Row: 'dockets', Path: '', componentDetails: ShipmentEditBillingComponent,title:{"shipment":"apDkt"} },
+    { Row: 'pendShipment', Path: '', componentDetails: ShipmentEditBillingComponent,title:{"shipment":"penDkt"}  },
   ]
   readonly CustomeDatePickerComponent = CustomeDatePickerComponent;
   public filteredMultiLocation: ReplaySubject<menuAccesDropdown[]> =
@@ -55,8 +57,8 @@ export class PendingBillingComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width: 100px",
     },
-    pod: {
-      Title: "Pod Received",
+    pendShipment: {
+      Title: "Pending Approval",
       class: "matcolumncenter",
       Style: "max-width: 100px",
     },
@@ -73,7 +75,6 @@ export class PendingBillingComponent implements OnInit {
   }
   staticField = [
     "billingParty",
-    "pod",
     "sum"
   ]
   METADATA = {
@@ -91,8 +92,13 @@ export class PendingBillingComponent implements OnInit {
   constructor(
     private invoiceService: InvoiceServiceService,
     private matDialog: MatDialog,
+    private genericService:GenericService
   ) {
     this.getKpiCount();
+    this.getFilterData();
+  
+  }
+  getFilterData() {
     const now = new Date();
     const data = {
       start: new Date(
@@ -105,7 +111,6 @@ export class PendingBillingComponent implements OnInit {
     }
     this.get(data);
   }
-
   functionCallHandler(event) {
     console.log(event);
     try {
@@ -145,6 +150,10 @@ export class PendingBillingComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
         this.get(result);
+      }
+      else{
+        this.getFilterData() 
+        this.genericService.clearSharedData();
       }
     });
   }

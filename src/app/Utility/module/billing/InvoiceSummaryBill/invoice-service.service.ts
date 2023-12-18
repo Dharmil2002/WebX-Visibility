@@ -7,6 +7,7 @@ import {ReqJsonBilling} from 'src/app/core/models/finance/billing.model';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { XAxisComponent } from '@swimlane/ngx-charts';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -18,18 +19,17 @@ export class InvoiceServiceService {
     private operationService: OperationService
   ) { }
 
-  async getInvoice(shipment: string[]) {
+  async getInvoice(shipment: string[],status:number=0) {
       const req = {
         companyCode: this.storage.companyCode,
         collectionName: "dockets",
-        filter: {"docNo": { "D$in": shipment }, "fSTS": 0}
+        filter: {"docNo": { "D$in": shipment }, "fSTS": status}
       };
       const res = await firstValueFrom(this.operationService.operationPost('generic/get', req));
     return  res.data;
   }
 
   async filterShipment(shipments) {
-    
     const filterShipmentList = [];
     const req = {
       companyCode: this.storage.companyCode,
@@ -52,8 +52,9 @@ export class InvoiceServiceService {
           gst: element?.gSTAMT || "",
           gstChrgAmt: element?.gSTCHAMT || "",
           total: element.tOTAMT,
-          noOfpkg: element?.tOTPKG || 0,
-          weight: element?.tOTWT || 0,
+          noOfpkg: element?.pKGS|| 0,
+          weight: element?.aCTWT || 0,
+          isSelected:false,
           actions: ["Approve", "Hold", "Edit"],
           extraData: element,
         };
@@ -69,7 +70,6 @@ export class InvoiceServiceService {
   }
 
   getInvoiceDetail(shipment) {
-    
     const stateInvoiceMap = new Map();
     for (const element of shipment) {
       // Create or update the state-wise invoice details
@@ -79,7 +79,7 @@ export class InvoiceServiceService {
           stateName,
           cnoteCount: 1,
           countSelected: 0,
-          subTotalAmount: element.amount,
+          subTotalAmount:element.amount,
           gstCharged: element.gst,
           extraData: [element],
         });
@@ -280,7 +280,8 @@ export class InvoiceServiceService {
       startdate:data.startDate,
       enddate:data.endDate,
       customerName:data.customerName,
-      locationNames:data.locationNames
+      locationNames:data.locationNames,
+      branch: this.storage.branch
     }
     const res =await firstValueFrom(this.operationService.operationPost("finance/bill/cust/getInvoiceDetails",req));
     return res.data;
@@ -334,6 +335,7 @@ async  getPendingDetails(startdate, enddate, customer): Promise<any> {
       companyCode: this.storage.companyCode,
       startdate,
       enddate,
+      branch: this.storage.branch,
       customerNames: customer
     };
     // Perform an asynchronous operation to get pending billing details
@@ -438,4 +440,53 @@ async updateInvoiceStatus(filter,data){
   return res
 }
 /*end */
+/*here the code which is writen for Shipment Approval*/
+async updateShipmentStatus(item) {
+  
+  const  dKTNO  = item;
+  const dockets = { fSTS: 1, fSTSN: "Approved"};
+  const finance = { sTS: 1, sTSNM: "Approved", sTSTM: new Date() };
+  const reqDockets = {
+    companyCode: this.storage.companyCode,
+    collectionName: "dockets",
+    filter:{ docNo: dKTNO },
+    update: dockets,
+  };
+  const reqFinance = {
+    companyCode: this.storage.companyCode,
+    collectionName: "docket_fin_det",
+    filter: { dKTNO: dKTNO },
+    update: finance,
+  };
+  await Promise.all([
+    firstValueFrom(this.operationService.operationMongoPut("generic/update", reqDockets)),
+    firstValueFrom(this.operationService.operationMongoPut("generic/update", reqFinance))
+  ]);
+  
+  return true;
+}
+/*End*/
+/*Below code is for Confirm a Approval*/
+async confirmApprove(data) {
+  const result = await Swal.fire({
+      title: "Are you sure you want to Approve a Docket?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, proceed!',
+      cancelButtonText: 'Cancel'
+  });
+
+  if (result.isConfirmed) {
+      await this.handleApprove(data);
+  } else {
+      Swal.fire('Cancelled', 'Your Approve was cancelled', 'info');
+  }
+}
+/*End*/
+async handleApprove(data) {
+  const res = await this.updateShipmentStatus(data.data.shipment);
+  if (res) {
+      Swal.fire('Success!', 'Your Approve was successful!', 'success');
+  }
+}
 }

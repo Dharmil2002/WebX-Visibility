@@ -60,6 +60,7 @@ import { VendorBillPaymentDetailsComponent } from './Vendor Bill Payment/vendor-
 import { OnlinePaymentApprovalComponent } from './Vendor Bills/vendor-bill-payment/Tabs/online-payment-approval/online-payment-approval.component';
 import { BeneficiaryDetailComponent } from './Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component';
 import { DeductionChargesComponent } from './invoice-collection/deduction-charges/deduction-charges.component';
+import { ShipmentSelectionComponent } from './invoice-summary-bill/shipment-selection/shipment-selection.component';
 
 @NgModule({
     declarations: [
@@ -85,7 +86,8 @@ import { DeductionChargesComponent } from './invoice-collection/deduction-charge
         VendorBillPaymentDetailsComponent,
         OnlinePaymentApprovalComponent,
         BeneficiaryDetailComponent,
-        DeductionChargesComponent
+        DeductionChargesComponent,
+        ShipmentSelectionComponent
     ],
     imports: [
         CommonModule,

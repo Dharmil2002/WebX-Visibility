@@ -27,7 +27,11 @@ export class CustGSTInvoiceService {
                let custgstinvData = {
                     "obGNDT":element.bGNDT,
                     "BILLNO":element?.bILLNO||'',
-                    "BILLDT":formatDocketDate(element?.bGNDT||'')
+                    "BILLDT":formatDocketDate(element?.bGNDT||''),
+                    "BILLSTATUS":element?.bSTSNM||'',
+                    "BillBanch":element?.bLOC||'',
+                    "GSTRATE":element?.gST.rATE||'',
+                    "PayBasis":element?.pAYBAS||'',
                }
                custstinvList.push(custgstinvData)
           })

@@ -312,7 +312,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     "BillingParty": "Billing Party",
     "PortofDischarge": "Port of Discharge",
     "DestinationCountry": "Destination Country",
-    "NoofPkts ": "No of Pkts ",
+    "NoofPkts": "No of Pkts ",
     "VehicleSize": "Vehicle Size",
     "Weight": "Weight (MT)",
     "TransportedBy": "Transported By",

@@ -40,7 +40,10 @@ export class UnbillRegisterService {
                     "DocketStatus": element?.oSTSN || '',
                     "PackagingType": element?.pKGTY || '',
                     "PickupDelivery": element?.pADD || '',
-                    "JobNumber": element?.jOBNO || ''
+                    "JobNumber": element?.jOBNO || '',
+                    "SubTotal": element?.tOTAMT || '',
+                    "DocketTotal": element?.tOTAMT || '',
+                    "FRTType":element?.fRTRTYNM||''
                }
                unbillList.push(unbillData)
           })

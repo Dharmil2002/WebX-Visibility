@@ -18,16 +18,19 @@ export class VendorGSTInvoiceService {
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-        
 
           let vengstinvList = [];
 
           res.data.map((element) => {
                
                let vengstinvData = {
-                    "sac":element.gST.sACNM,
-                    "entrydt": element.eNTDT,
+                    "SAC":element.gST.sACNM,
+                    "oentrydt": element.eNTDT,
                     "DocumentType": element?.docNo || '',
+                    "TCS_Amount":element?.tHCAMT||'',
+                    "GSTRATE":element.gST.rATE||'',
+                    "TDS_Rate":element.tDS.rATE||'',
+                    "TDS_Amount":element.tDS.aMT||'',
                }
                vengstinvList.push(vengstinvData)
           })

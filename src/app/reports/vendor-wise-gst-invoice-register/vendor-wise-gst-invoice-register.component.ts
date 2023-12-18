@@ -191,7 +191,7 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
       const sacDet = sacData.length === 0 || sacData.includes(record.sac);
       const startValue = new Date(this.vendorgstregisTableForm.controls.start.value);
       const endValue = new Date(this.vendorgstregisTableForm.controls.end.value);
-      const entryTime = new Date(record.entrydt);
+      const entryTime = new Date(record.oentrydt);
       endValue.setHours(23, 59, 59, 999);
       const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 

@@ -24,9 +24,10 @@ export class CustOutstandingService {
           res.data.map((element) => {
 
                let custoutData = {
-                    "obGNDT":element.bGNDT,
-                    "CustomerCode":element.cUST.cD||'',
-                    "Customer":element.cUST.nM||'',
+                    "oloc": element.bLOC,
+                    "obGNDT": element.bGNDT,
+                    "CustomerCode": element.cUST.cD || '',
+                    "Customer": element.cUST.nM || '',
                }
                custoutstandList.push(custoutData)
           })

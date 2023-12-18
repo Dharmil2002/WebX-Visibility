@@ -19,13 +19,21 @@ export class SalesRegisterService {
                filter: {}
           }
           const res = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", reqBody));
-          
+
           let salesList = [];
           res.data.map((element) => {
                let salesData = {
                     "ocNOTEDT": element?.dKTDT,
                     "cNOTENO": element?.docNo || '',
-                    "cNOTEDT": formatDocketDate(element?.dKTDT || ''),
+                    // "cNOTEDT": formatDocketDate(element?.dKTDT || ''),
+                    "cNOTEDT": element?.dKTDT ? new Date(element.dKTDT).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-') : "",
+                    "tIME": element.dKTDT ? new Date(element.dKTDT).toLocaleTimeString('en-US', { hour12: false }) : "", // Extract time from dKTDT
+                    // "eDD":"",
+                    "bOOGBRANCH": element?.eNTLOC || '',
+                    "lOADTY": "FTL",
+                    "dELIVERYBRANCH": element?.dEST || '',
+                    "lASTEDITBY": element?.eNTBY || '',
+                    "cNOTEDITDT": formatDocketDate(element?.eNTDT || ''),
                     "pAYTY": element?.pAYTYPNM || '',
                     "vEHNO": element?.vEHNO || '',
                     "bILLPARTYNM": element?.bPARTY || '',
@@ -35,7 +43,11 @@ export class SalesRegisterService {
                     "fROMCITY": element?.fCT || '',
                     "tOCITY": element?.tCT || "",
                     "VendorName": element?.vNDNM || '',
+                    "VendorCode": element?.vNDCD || '',
+                    "FRRate": element?.fRTRT || '',
+                    "FRTType": element?.fRTRTYNM || '',
                     "NoofPkgs": element?.pKGS || '',
+                    "SubTotal": element?.tOTAMT || '',
                     "ActualWeight": element?.aCTWT || '',
                     "ChargedWeight": element?.cHRWT || '',
                     "PackagingType": element?.pKGTY || '',
@@ -53,9 +65,10 @@ export class SalesRegisterService {
                     "Weight": element?.wTIN || '',
                     "origin": element?.oRGN || '',
                     "destin": element?.dEST || '',
-                    "booktp": element?.dELTYN || ""
-
-
+                    "booktp": element?.dELTYN || "",
+                    "NoofPkts": element?.pKGS || '',
+                    "CurrentLocation": element?.oRGN || '',
+                    "BillingParty": element?.bPARTY || ''
                }
                salesList.push(salesData)
           })

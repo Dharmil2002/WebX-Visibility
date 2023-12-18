@@ -10,6 +10,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { custOutControl } from 'src/assets/FormControls/Customer-Outstanding-report/customer-outstanding-report';
 import Swal from 'sweetalert2';
+import { log } from 'util';
 
 @Component({
   selector: 'app-customer-outstanding-report',
@@ -138,18 +139,22 @@ export class CustomerOutstandingReportComponent implements OnInit {
 
   async save() {
     let data = await this.custOutstandingService.getcustomerOutstandingReportDetail()
-    // const cust = Array.isArray(this.CustOutTableForm.value.custnmcdHandler)
-    //   ? this.CustOutTableForm.value.custnmcdHandler.map(x => x.name)
-    //   : [];
+    const loct = Array.isArray(this.CustOutTableForm.value.locHandler)
+      ? this.CustOutTableForm.value.locHandler.map(x => x.value)
+      : [];
+      const cust = Array.isArray(this.CustOutTableForm.value.custnmcdHandler)
+      ? this.CustOutTableForm.value.custnmcdHandler.map(x => x.value)
+      : [];
     const filteredRecords = data.filter(record => {
-      // const custDet = cust.length === 0 || cust.includes(record.Customer);
+      const locDet = loct.length === 0 || loct.includes(record.oloc);
+      const custDet = cust.length === 0 || cust.includes(record.Customer);
       const startValue = new Date(this.CustOutTableForm.controls.start.value);
       const endValue = new Date(this.CustOutTableForm.controls.end.value);
       const entryTime = new Date(record.obGNDT);
       endValue.setHours(23, 59, 59, 999);
       const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return isDateRangeValid;
+      return isDateRangeValid && locDet && custDet;
     });
     // const selectedData = filteredRecords;
     if (filteredRecords.length === 0) {

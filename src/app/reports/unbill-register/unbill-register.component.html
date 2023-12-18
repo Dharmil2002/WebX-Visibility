@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
      <form [formGroup]="unbillRegisTableForm">
-          <app-form-webxpress [form]="unbillRegisTableForm" [FormTitle]="'Billed Register'" [formData]="jsonunBillRegisFormArray"
+          <app-form-webxpress [form]="unbillRegisTableForm" [FormTitle]="'UnBilled Register'" [formData]="jsonunBillRegisFormArray"
                (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)"
                [showSaveAndCancelButton]="true" [submit]="'Filter'">
           </app-form-webxpress>

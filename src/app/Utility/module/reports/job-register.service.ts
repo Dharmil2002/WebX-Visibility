@@ -2,6 +2,7 @@ import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunc
 
 export async function getJobregisterReportDetail(masterServices) {
     // Prepare the request body with company code and collection name
+    // filter needs to be added
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         collectionName: "job_detail",

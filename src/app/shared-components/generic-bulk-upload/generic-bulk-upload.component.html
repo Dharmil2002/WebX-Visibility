@@ -31,7 +31,7 @@
             <mat-icon>get_app</mat-icon>
             Download {{ fileName }} Template File
         </button>
-        <a class="left" title="" data-placement="left" data-toggle="tooltip"
+        <a *ngIf="isDateMsg" class="left" title="" data-placement="left" data-toggle="tooltip"
             data-original-title="Please enter date in dd MMM yyyy format">
             <i class="fa fa-exclamation-circle"> </i>(Please enter date in dd MMM yyyy format)
         </a>

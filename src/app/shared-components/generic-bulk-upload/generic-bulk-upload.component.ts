@@ -6,6 +6,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 })
 export class GenericBulkUploadComponent implements OnInit {
   @Input() title: string = '';
+  @Input() isDateMsg: boolean = false;
   @Input() isUploaded: boolean = false;
   @Input() downloadFunction: () => void = () => { };
   @Input() fileName: string = '';

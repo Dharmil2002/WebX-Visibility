@@ -162,7 +162,11 @@ import { ListGroupComponent } from './Account-master/group-master/list-group/lis
 import { CustomerContractNonFreightChargesPopupComponent } from './Customer Contract/CustomerContractTabs/customer-contract-non-freight-charges-popup/customer-contract-non-freight-charges-popup.component';
 import { AddTenantComponent } from './Tenant Setup/add-tenant/add-tenant.component';
 import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.component';
-import { UploadFileComponent } from './vendor-contract/vendorContractTabs/upload/upload-file/upload-file.component';
+import { ExpressRouteBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-terdetail/express-route-bulk-upload/express-route-bulk-upload.component';
+import { FullTruckRouteBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-lhftrdetail/full-truck-route-bulk-upload/full-truck-route-bulk-upload.component';
+import { LongHaulLaneBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-lhldetail/long-haul-lane-bulk-upload/long-haul-lane-bulk-upload.component';
+import { LastMileDeliveryBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-lmddetail/last-mile-delivery-bulk-upload/last-mile-delivery-bulk-upload.component';
+import { BusinessAssociateBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-busi-assoc-detail/business-associate-bulk-upload/business-associate-bulk-upload.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -340,7 +344,11 @@ import { UploadFileComponent } from './vendor-contract/vendorContractTabs/upload
     CustomerContractNonFreightChargesPopupComponent,
     AddTenantComponent,
     TenantListComponent,
-    UploadFileComponent,
+    ExpressRouteBulkUploadComponent,
+    FullTruckRouteBulkUploadComponent,
+    LongHaulLaneBulkUploadComponent,
+    LastMileDeliveryBulkUploadComponent,
+    BusinessAssociateBulkUploadComponent,
   ],
 
   providers: [

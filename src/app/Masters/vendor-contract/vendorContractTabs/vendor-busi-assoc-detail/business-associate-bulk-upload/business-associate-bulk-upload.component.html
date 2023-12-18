@@ -1,0 +1,15 @@
+<app-generic-bulk-upload 
+    [title]="'Business Associate'" 
+    [isUploaded]="IsUploaded"
+    [downloadFunction]="Download" 
+    [fileName]="'Business Associate'"
+    (closeDialog)="Close()">
+    <div class="row">
+        <form [formGroup]="fileUploadForm">
+            <div class="col">
+                <!-- <mat-label>Upload File</mat-label> -->
+                <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
+            </div>
+        </form>
+    </div>
+</app-generic-bulk-upload>

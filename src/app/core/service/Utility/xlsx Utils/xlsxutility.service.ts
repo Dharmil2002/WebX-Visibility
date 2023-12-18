@@ -44,6 +44,14 @@ export class xlsxutilityService {
             String(listItem).toLowerCase() === String(value).toLowerCase())) {
             errors.push(`${rule.ItemsName} already exists. Please enter another ${rule.ItemsName}.`);
           }
+          if ("CompareMinMaxValue" in validation && validation.CompareMinMaxValue) {
+            const minValue = validation.MinValue;
+            const maxValue = validation.MaxValue;
+
+            if (minValue > maxValue) {
+              errors.push(`${rule.ItemsName} MinValue must be less than or equal to MaxValue.`);
+            }
+          }
           if ("ApiValidation" in validation && validation.ApiValidation) {
             const apiEndpoint = `YOUR_API_ENDPOINT?pincode=${encodeURIComponent(value)}`;
             const validationObservable = this.http.get(apiEndpoint).pipe(
@@ -72,28 +80,47 @@ export class xlsxutilityService {
 
     // Filter out data without errors
     const filteredDataWithoutErrors = validatedData.filter((x) => !x.error);
+    console.log(rules);
 
     // Check if there is at least one element without errors and rules are provided
+    // Check if there is at least one element without errors and rules are provided
     if (filteredDataWithoutErrors.length > 0 && rules.length > 0) {
-      rules.forEach((rule) => {
-        const itemsName = rule.ItemsName;
-        const duplicateValidation = rule.Validations.find(
-          (validation) => "DuplicateFromList" in validation
-        );
+      const existingItems = new Map();
 
-        if (duplicateValidation) {
-          // Add "Duplicate entry" error to the remaining items using forEach
-          filteredDataWithoutErrors.forEach((item, index) => {
-            if (index > 0 && item[itemsName] !== undefined) {
-              item.error = item.error || []; // Ensure error array exists
-              item.error.push(`Duplicate Entry for ${itemsName}.`);
-            }
-          });
-        }
-      });
+      // Find the rule that has "DuplicateFromList" validation for the "Location" field
+      const duplicateRule = rules.find(rule => rule.Validations.some(validation => 'DuplicateFromList' in validation));
+
+      if (duplicateRule) {
+        const existingLocations = new Set();
+
+        // Iterate through filteredDataWithoutErrors to find duplicates in the "Location" field
+        filteredDataWithoutErrors.forEach((item) => {
+          const location = item.Location;
+
+          if (existingLocations.has(location)) {
+            item.error = item.error || [];
+            item.error.push(`Duplicate Entry for Location.`);
+          } else {
+            existingLocations.add(location);
+          }
+        });
+      }
     }
+
+
     return forkJoin(validationObservables).pipe(
-      map(() => validatedData)
+      map(() => {
+        // Filter out objects with error as null
+        const objectsWithErrors = validatedData.filter(obj => obj.error !== null);
+
+        // Filter out objects with error not null
+        const objectsWithoutErrors = validatedData.filter(obj => obj.error === null);
+
+        // Concatenate the two arrays, putting objects without errors first
+        const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];
+
+        return sortedValidatedData;
+      })
     );
   }
   async readFile(file: File): Promise<any> {

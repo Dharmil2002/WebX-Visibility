@@ -763,13 +763,15 @@ export class ThcGenerationComponent implements OnInit {
     } else {
       //this.thcTableForm.get("docket").setValue(docket.map(x => x.docketNumber));
 
-      if (this.prqFlag) {
+      if (this.prqFlag||this.directPrq) {
+        if(this.thcTableForm.get("prqNo").value){
         const prqData = { prqNo: this.thcTableForm.get("prqNo").value };
         const update={
           sTS:7,
           sTSNM:'THC Generated'
         }
         await this.consigmentUtility.updatePrq(prqData,update);
+      }
       }
 
       // for (const element of docket) {

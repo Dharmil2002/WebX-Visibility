@@ -456,7 +456,6 @@ export class ThcGenerationComponent implements OnInit {
   }
  /*here the function for the bind prq data*/
   async bindPrqData() {
-   
     if (this.thcTableForm.controls["prqNo"].value.value) {
       const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
       const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
@@ -470,7 +469,7 @@ export class ThcGenerationComponent implements OnInit {
         route: this.prqDetail?.fromToCity || '',
         fromCity: { name: fromToCityParts[0], value: fromToCityParts[0] },
         toCity: { name: fromToCityParts[1], value: fromToCityParts[1] },
-        capacity: this.prqDetail?.vehicleSize || this.prqDetail?.containerSize || '',
+        capacity: this.prqDetail?.size||0,
         driverName: vehicleDetail?.driver || '',
         driverMno: vehicleDetail?.dMobNo || '',
         driverLno: vehicleDetail?.lcNo || '',
@@ -707,7 +706,6 @@ export class ThcGenerationComponent implements OnInit {
       "fromCity",
       "toCity",
       "vehicle",
-      "vendorName",
       "vendorType"
     ];
 
@@ -1058,11 +1056,8 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['panNo'].setValue(this.marketVehicleTableForm.value?.driverPan || "");
   }
   GenerateTHCgenerationRequestBody() {
-
     const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
     // this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");
-
-
     //#region MainModel
     this.tHCGenerationModel.companyCode = this.storage.companyCode;
     this.tHCGenerationModel.branch = this.storage.branch;
@@ -1081,8 +1076,8 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.vehicle = this.thcTableForm.controls['vehicle'].value || "";
     this.thcsummaryData.Vendor_type = VendorDetails.value || "";
     this.thcsummaryData.Vendor_typetName = VendorDetails.name || "";
-    this.thcsummaryData.Vendor_Code = this.thcTableForm.controls['vendorCode'].value || "";
-    this.thcsummaryData.Vendor_Name = this.thcTableForm.controls['vendorName'].value || "";
+    this.thcsummaryData.Vendor_Code = this.thcTableForm.controls['vendorCode'].value|| "";
+    this.thcsummaryData.Vendor_Name = this.thcTableForm.controls['vendorName'].value?.name ||this.thcTableForm.controls['vendorName'].value;
     this.thcsummaryData.Vendor_pAN = this.thcTableForm.controls['panNo'].value || "";
     this.thcsummaryData.status = "1";
     this.thcsummaryData.statusName = "Generated";

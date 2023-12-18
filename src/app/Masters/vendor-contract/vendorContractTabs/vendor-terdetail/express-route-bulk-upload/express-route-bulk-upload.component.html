@@ -1,0 +1,15 @@
+<app-generic-bulk-upload 
+    [title]="'Transportation- Express Route Based'" 
+    [isUploaded]="IsUploaded"
+    [downloadFunction]="Download" 
+    [fileName]="'Express Route Based'"
+    (closeDialog)="Close()">
+    <div class="row">
+        <form [formGroup]="fileUploadForm">
+            <div class="col">
+                <!-- <mat-label>Upload File</mat-label> -->
+                <app-file-upload formControlName="singleUpload" (change)="selectedFile($event)"></app-file-upload>
+            </div>
+        </form>
+    </div>
+</app-generic-bulk-upload>

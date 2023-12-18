@@ -6,6 +6,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
+import { LastMileDeliveryBulkUploadComponent } from './last-mile-delivery-bulk-upload/last-mile-delivery-bulk-upload.component';
 
 @Component({
   selector: 'app-vendor-lmddetail',
@@ -77,6 +78,7 @@ export class VendorLMDDetailComponent implements OnInit {
   staticFieldTErouteBased = ['lOCNM', 'rTTNM', 'tMFRMNM', 'cPCTNM', 'mIN', 'cMTKM', 'aDDKM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
+  uploadComponent: any;
 
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
@@ -94,6 +96,7 @@ export class VendorLMDDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTableDetail();
+    this.uploadComponent = LastMileDeliveryBulkUploadComponent
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {

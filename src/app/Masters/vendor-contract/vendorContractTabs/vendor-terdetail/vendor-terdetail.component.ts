@@ -6,10 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
-import { firstValueFrom } from 'rxjs';
-import Swal from 'sweetalert2';
-import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
-import { UploadFileComponent } from '../upload/upload-file/upload-file.component';
+import { ExpressRouteBulkUploadComponent } from './express-route-bulk-upload/express-route-bulk-upload.component';
 
 @Component({
   selector: 'app-vendor-terdetail',
@@ -98,7 +95,7 @@ export class VendorTERDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.getXpressDetail()
-    this.uploadComponent = UploadFileComponent
+    this.uploadComponent = ExpressRouteBulkUploadComponent
   }
   ngOnChanges(changes: SimpleChanges) {
     // console.log(changes);

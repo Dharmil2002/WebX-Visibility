@@ -1,35 +1,33 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
-import { vendorContractUpload } from 'src/app/Models/VendorContract/vendorContract';
+import { LastMileDelivery } from 'src/app/Models/VendorContract/vendorContract';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
-import { RouteLocationService } from 'src/app/Utility/module/masters/route-location/route-location.service';
+import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { XlsxPreviewPageComponent } from 'src/app/shared-components/xlsx-preview-page/xlsx-preview-page.component';
-import { fileUpload } from 'src/assets/FormControls/VendorContractControls/fileUpload';
 import Swal from 'sweetalert2';
-import { VendorTERDetailComponent } from '../../vendor-terdetail/vendor-terdetail.component';
-
 @Component({
-  selector: 'app-upload-file',
-  templateUrl: './upload-file.component.html'
+  selector: 'app-last-mile-delivery-bulk-upload',
+  templateUrl: './last-mile-delivery-bulk-upload.component.html'
 })
-export class UploadFileComponent implements OnInit {
+export class LastMileDeliveryBulkUploadComponent implements OnInit {
+
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   fileUploadForm: UntypedFormGroup;
-  excelDataList: any;
-  previewResult: any;
   CurrentContractDetails: any;
   routeList: any[];
   rateTypeDropDown: any;
   mergedCapacity: any[];
   existingData: any;
   IsUploaded: boolean;
+  locationList: any[];
+  timeFrameList: any;
   //@ViewChild(VendorTERDetailComponent) tableComponent: VendorTERDetailComponent
   // vendorContractData: vendorContractUpload;
   constructor(private route: ActivatedRoute,
@@ -38,9 +36,9 @@ export class UploadFileComponent implements OnInit {
     private xlsxUtils: xlsxutilityService,
     private dialog: MatDialog,
     private masterService: MasterService,
-    private objRouteLocationService: RouteLocationService,
+    private objLocationService: LocationService,
     private objContainerService: ContainerService,
-    private dialogRef: MatDialogRef<UploadFileComponent>,
+    private dialogRef: MatDialogRef<LastMileDeliveryBulkUploadComponent>,
   ) {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
@@ -66,7 +64,7 @@ export class UploadFileComponent implements OnInit {
     }
   }
   //#endregion
-
+  //#region to select file
   selectedFile(event) {
     let fileList: FileList = event.target.files;
     if (fileList.length !== 1) {
@@ -79,10 +77,11 @@ export class UploadFileComponent implements OnInit {
 
         // Fetch data from various services
         this.existingData = await this.fetchExistingData();
-        this.routeList = await this.objRouteLocationService.getRouteLocationDetail();
         this.rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP');
         const containerData = await this.objContainerService.getContainerList();
         const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VC');
+        this.locationList = await this.objLocationService.getLocationList();
+        this.timeFrameList = await PayBasisdetailFromApi(this.masterService, 'TMFRM')
 
         // Process vehicle data to create a merged list
         const containerDataWithPrefix = vehicleData.map(item => ({
@@ -91,18 +90,18 @@ export class UploadFileComponent implements OnInit {
         }));
         this.mergedCapacity = [...containerData, ...containerDataWithPrefix];
         const validationRules = [{
-          ItemsName: "Route",
+          ItemsName: "Location",
           Validations: [{ Required: true },
           { DuplicateFromList: true },
           {
-            TakeFromList: this.routeList.map((x) => {
+            TakeFromList: this.locationList.map((x) => {
               return x.name;
             }),
           },
           {
             Exists: this.existingData
               .filter(item => item.cNID === this.CurrentContractDetails.cNID)
-              .map(item => item.rTNM)
+              .map(item => item.lOCNM)
           }],
         },
         {
@@ -110,6 +109,15 @@ export class UploadFileComponent implements OnInit {
           Validations: [{ Required: true },
           {
             TakeFromList: this.rateTypeDropDown.map((x) => {
+              return x.name;
+            }),
+          },],
+        },
+        {
+          ItemsName: "TimeFrame",
+          Validations: [{ Required: true },
+          {
+            TakeFromList: this.timeFrameList.map((x) => {
               return x.name;
             }),
           },],
@@ -124,7 +132,7 @@ export class UploadFileComponent implements OnInit {
           ],
         },
         {
-          ItemsName: "Rate",
+          ItemsName: "MinCharge",
           Validations: [
             { Required: true },
             { Numeric: true },
@@ -132,7 +140,7 @@ export class UploadFileComponent implements OnInit {
           ],
         },
         {
-          ItemsName: "MinAmount",
+          ItemsName: "CommittedKM",
           Validations: [
             { Required: true },
             { Numeric: true },
@@ -140,14 +148,24 @@ export class UploadFileComponent implements OnInit {
           ],
         },
         {
-          ItemsName: "MaxAmount",
+          ItemsName: "AdditionalKM",
           Validations: [
             { Required: true },
             { Numeric: true },
             { MinValue: 1 }
+          ],
+        },
+        {
+          ItemsName: "MaxCharge",
+          Validations: [
+            { Required: true },
+            { Numeric: true },
+            { MinValue: 1 },
+            { CompareMinMaxValue: true }
           ],
         }
         ];
+console.log(validationRules);
 
         var rPromise = firstValueFrom(this.xlsxUtils.validateDataWithApiCall(jsonData, validationRules));
         rPromise.then(response => {
@@ -156,17 +174,20 @@ export class UploadFileComponent implements OnInit {
       });
     }
   }
+  //#endregion
+  //#region to get Existing Data from collection
   async fetchExistingData() {
-    // Fetch existing data for creating a new contract
     const request = {
       companyCode: this.companyCode,
-      collectionName: "vendor_contract_xprs_rt",
+      collectionName: "vendor_contract_lmd_rt",
       filter: {},
     };
 
     const response = await this.masterService.masterPost("generic/get", request).toPromise();
     return response.data;
   }
+  //#endregion
+  //#region to open modal to show validated data
   OpenPreview(results) {
     const dialogRef = this.dialog.open(XlsxPreviewPageComponent, {
       data: results,
@@ -177,21 +198,21 @@ export class UploadFileComponent implements OnInit {
       },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      if (result != undefined) {
-        this.previewResult = result;
+      if (result) {
         this.setDropdownData(result)
       }
     });
   }
-
+  //#endregion
+  //#region to set dropdown's value
   async setDropdownData(previewResult) {
     try {
       this.IsUploaded = true;
-      const vendorContractData: vendorContractUpload[] = [];
+      const vendorContractData: LastMileDelivery[] = [];
 
       // Process preview data to create vendor contract data
       previewResult.forEach(element => {
-        const processedData = this.processData(element, this.routeList, this.rateTypeDropDown, this.mergedCapacity)
+        const processedData = this.processData(element, this.locationList, this.rateTypeDropDown, this.mergedCapacity, this.timeFrameList)
         vendorContractData.push(processedData);
       });
 
@@ -200,12 +221,12 @@ export class UploadFileComponent implements OnInit {
 
       // Format the final data with additional information
       const formattedData = vendorContractData.map(x => this.formatContractData(x, newId));
-
       // Log the formatted data
       console.log(formattedData);
+      debugger
       const createRequest = {
         companyCode: this.companyCode,
-        collectionName: "vendor_contract_xprs_rt",
+        collectionName: "vendor_contract_lmd_rt",
         data: formattedData,
       };
 
@@ -224,25 +245,27 @@ export class UploadFileComponent implements OnInit {
       console.error("Error:", error);
     }
   }
+  //#endregion
 
-  // Function to process individual preview data
-  processData(element, routeList, rateTypeDropDown, mergedData) {
-    const updaterateType = rateTypeDropDown.find(item => item.name === element["RateType"]);
-    const updatedRoute = routeList.find(TERForm => TERForm.name === element["Route"]);
-    const updatedCapacity = mergedData.find(TERForm => TERForm.name === element["Capacity"]);
+  //#region  to process individual preview data
+  processData(element, locationList, rateType, mergedData, timeFrame) {
+    const updatedLocation = locationList.find(item => item.name.toUpperCase() === element["Location"].toUpperCase());
+    const updatedRateType = rateType.find(item => item.name.toUpperCase() === element["RateType"].toUpperCase());
+    const updatedTimeFrame = timeFrame.find(item => item.name.toUpperCase() === element["TimeFrame"].toUpperCase())
+    const updatedCapacity = mergedData.find(item => item.name.toUpperCase() === element["Capacity"].toUpperCase());
 
-    const processedData = new vendorContractUpload();
+    const processedData = new LastMileDelivery();
 
-    // Add processed route information if available
-    if (updatedRoute) {
-      processedData.rTID = updatedRoute.value;
-      processedData.rTNM = updatedRoute.name;
+    // Add processed location information if available
+    if (updatedLocation) {
+      processedData.lOCID = updatedLocation.value;
+      processedData.lOCNM = updatedLocation.name;
     }
 
     // Add processed rate type information if available
-    if (updaterateType) {
-      processedData.rTTID = updaterateType.value;
-      processedData.rTTNM = updaterateType.name;
+    if (updatedRateType) {
+      processedData.rTTID = updatedRateType.value;
+      processedData.rTTNM = updatedRateType.name;
     }
 
     // Add processed capacity information if available
@@ -250,10 +273,16 @@ export class UploadFileComponent implements OnInit {
       processedData.cPCTID = updatedCapacity.value;
       processedData.cPCTNM = updatedCapacity.name;
     }
+    // Add processed timeFrame information if available
+    if (updatedTimeFrame) {
+      processedData.tMFRMID = updatedTimeFrame.value;
+      processedData.tMFRMNM = updatedTimeFrame.name;
+    }
 
-    processedData.rT = element["Rate"];
-    processedData.mIN = element["MinAmount"];
-    processedData.mAX = element["MaxAmount"];
+    processedData.mIN = element["MinCharge"];
+    processedData.mAX = element["MaxCharge"];
+    processedData.aDDKM = element["AdditionalKM"];
+    processedData.cMTKM = element["CommittedKM"];
 
     return processedData;
   }
@@ -271,14 +300,14 @@ export class UploadFileComponent implements OnInit {
   // Function to generate a new ID based on existing data
   generateNewId(existingData) {
     let newId;
-  
+
     // Find the contract with the specified cNID
     const existingContract = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
-  
+
     if (existingContract) {
       // Extract the last vendor code from the existing contract
       const lastId = parseInt(existingContract._id.split('-')[2], 10);
-  
+
       // Check if the extraction was successful
       if (!isNaN(lastId)) {
         // Increment the last vendor code
@@ -290,18 +319,22 @@ export class UploadFileComponent implements OnInit {
     } else {
       newId = 0;
     }
-  
+
     return newId;
   }
-  
+  //#endregion
+  //#region to download template file
   Download(): void {
     let link = document.createElement("a");
-    link.download = "ExpressRoutebasedTemplate";
-    link.href = "assets/Download/ExpressRoutebasedTemplate.xlsx";
+    link.download = "LastMileDeliveryTemplate";
+    link.href = "assets/Download/LastMileDeliveryTemplate.xlsx";
     link.click();
   }
+  //#endregion
+  //#region to call close function
   Close() {
     this.dialogRef.close()
 
   }
+  //#endregion
 }

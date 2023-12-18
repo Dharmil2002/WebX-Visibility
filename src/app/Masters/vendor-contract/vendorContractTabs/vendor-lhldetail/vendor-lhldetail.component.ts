@@ -5,6 +5,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
+import { LongHaulLaneBulkUploadComponent } from './long-haul-lane-bulk-upload/long-haul-lane-bulk-upload.component';
 
 @Component({
   selector: 'app-vendor-lhldetail',
@@ -68,6 +69,7 @@ export class VendorLHLDetailComponent implements OnInit {
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
+  uploadComponent: any;
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private dialog: MatDialog,
@@ -85,6 +87,7 @@ export class VendorLHLDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTableDetail();
+    this.uploadComponent = LongHaulLaneBulkUploadComponent
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {

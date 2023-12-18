@@ -42,7 +42,7 @@ export class THCAmountsDetailComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log('objResult' ,this.objResult)
+    console.log('objResult', this.objResult)
     this.PaymentData = this.objResult?.PaymentData;
     this.THCData = this.objResult?.THCData;
     this.Type = this.objResult?.Type;
@@ -58,16 +58,16 @@ export class THCAmountsDetailComponent implements OnInit {
     this.initializeFormControl();
   }
   initializeFormControl() {
-    
+
     const thcAmountsFormControls = new THCAmountsControl(this.Type);
     this.THCAmountsADDArray = thcAmountsFormControls.getTHCAmountsADDControls();
     this.THCAmountsArray = thcAmountsFormControls.getTHCAmountsControls();
     this.THCAmountsForm = formGroupBuilder(this.fb, [this.THCAmountsArray]);
     this.THCAmountsForm.get("Balancelocation").setValue(
-      this.THCData?.OthersData.OthersData.bLPAYAT
+      this.THCData?.OthersData.bLPAYAT
     );
     this.THCAmountsForm.get("AdvanceLocation").setValue(
-      this.THCData?.OthersData.OthersData.aDPAYAT
+      this.THCData?.OthersData.aDPAYAT
     );
     this.initializeAddLess();
   }
@@ -104,7 +104,7 @@ export class THCAmountsDetailComponent implements OnInit {
     // Set flags indicating whether add and less charges exist
     this.isAddForm = true;
     this.isLessForm = lessCharges.length > 0;
-    console.log("this.UpdateAmount" ,this.UpdateAmount)
+    console.log("this.UpdateAmount", this.UpdateAmount)
     if (this.UpdateAmount.THCAmountsADDForm != undefined && this.UpdateAmount.THCAmountsLESSForm != undefined) {
       Object.keys(this.UpdateAmount.THCAmountsLESSForm).forEach((x) => {
         this.THCAmountsLESSForm.get(x).setValue(
@@ -166,7 +166,7 @@ export class THCAmountsDetailComponent implements OnInit {
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
     );
-      console.log('res' , res)
+    console.log('res', res)
     // Check if the request was successful and data is available
     if (res.success && res.data.length > 0) {
       this.ChargesData = res.data
@@ -197,7 +197,7 @@ export class THCAmountsDetailComponent implements OnInit {
         : +this.THCAmountsLESSForm.value[x.name];
     });
     const THCTotal = AddTHCTotal - LessAmount;
-    console.log('THCTotal' ,THCTotal)
+    console.log('THCTotal', THCTotal)
     this.THCAmountsADDForm.get("THCTotal").setValue(THCTotal.toFixed(2));
     this.THCAmountsForm.get("Advance").setValue(
       (+this.THCData?.Advance).toFixed(2)
@@ -234,14 +234,14 @@ export class THCAmountsDetailComponent implements OnInit {
   }
   submit() {
     const Charges = []
-    this.ChargesData.forEach((x)=>{
+    this.ChargesData.forEach((x) => {
       const FieldName = x.SelectCharges.replaceAll(/\s/g, '')
-      const Amount =  parseInt(x.Add_Deduct == "+"?this.THCAmountsADDForm.value[FieldName]:this.THCAmountsLESSForm.value[FieldName]) 
+      const Amount = parseInt(x.Add_Deduct == "+" ? this.THCAmountsADDForm.value[FieldName] : this.THCAmountsLESSForm.value[FieldName])
       Charges.push({
-        cRGCD:x.ChargesCode,
-        cRGNM:x.SelectCharges,
-        cRGTYP:x.Add_Deduct,
-        cRGAMT:Amount
+        cRGCD: x.ChargesCode,
+        cRGNM: x.SelectCharges,
+        cRGTYP: x.Add_Deduct,
+        cRGAMT: Amount
       })
     })
     const body = {
@@ -249,12 +249,12 @@ export class THCAmountsDetailComponent implements OnInit {
       THCAmountsLESSForm: this.THCAmountsLESSForm.value,
       THCAmountsADDForm: this.THCAmountsADDForm.value,
       THCData: this.THCData,
-      Charges:Charges
+      Charges: Charges
     };
     this.dialogRef.close({ data: body });
   }
 
-  
+
   cancel() {
     this.dialogRef.close();
   }

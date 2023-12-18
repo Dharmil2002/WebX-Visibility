@@ -28,6 +28,8 @@ import { financialYear } from "src/app/Utility/date/date-utils";
 import Swal from "sweetalert2";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import { filter } from 'rxjs/operators';
+import { BeneficiaryDetailComponent } from "../../Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component";
+import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 
 @Component({
   selector: "app-balance-payment",
@@ -157,6 +159,7 @@ export class BalancePaymentComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private masterService: MasterService,
     private matDialog: MatDialog,
+    private objVendorBillService: VendorBillService,
     private route: Router // public dialog: MatDialog
   ) {
     this.PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -189,22 +192,32 @@ export class BalancePaymentComponent implements OnInit {
     this.GetVendorInformation();
   }
   async GetVendorInformation() {
-    this.VendorDetails = await GetSingleVendorDetailsFromApi(this.masterService, this.PaymentData.Vendor)
-    this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(this.VendorDetails?.panNo)
-    this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0)
-
-
+    this.VendorDetails = await GetSingleVendorDetailsFromApi(this.masterService, this.PaymentData?.VendorInfo?.cD)
+    // this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(this.VendorDetails?.panNo)
+    // this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0)
   }
   async GetAdvancePaymentList() {
     this.isTableLode = false;
     const Filters = {
-      "vND.nM": this.PaymentData.Vendor,
+      'D$expr': {
+        'D$and': [
+          { 'D$eq': ["$vND.cD", this.PaymentData?.VendorInfo?.cD] },
+          { 'D$eq': ["$vND.nM", this.PaymentData?.VendorInfo?.nM] },
+        ],
+      },
+      //"vND.nM": this.PaymentData.Vendor,
       bLPAYAT: localStorage.getItem("Branch"),
     };
     const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(
       this.masterService,
       Filters
     );
+    // if (GetAdvancePaymentData) {
+    //   this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(GetAdvancePaymentData[0]?.OthersData?.vND?.pAN)
+    //   this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0)
+
+    // }
+
     const Data = GetAdvancePaymentData.map((x, index) => {
       return {
         GenerationDate: x.GenerationDate,
@@ -222,9 +235,10 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   initializeFormControl(): void {
+    console.log(this.PaymentData)
     let RequestObj = {
-      VendorPANNumber: "AACCG464648ZS",
-      Numberofvehiclesregistered: "20",
+      VendorPANNumber: this.PaymentData?.VendorInfo?.pAN || "",
+      Numberofvehiclesregistered: "0",
     };
     this.vendorBalancePaymentControl = new VendorBalancePaymentControl(
       RequestObj
@@ -886,5 +900,45 @@ export class BalancePaymentComponent implements OnInit {
   }
   PerformMakePaymentSection(PaymenDetails, generateVoucher) {
     this.BookVendorBill(PaymenDetails, generateVoucher)
+  }
+  async getBeneficiaryData() {
+    try {
+      // Fetch beneficiary details from API
+      const beneficiaryModalData = await this.objVendorBillService.getBeneficiaryDetailsFromApi(this.PaymentData.Vendor);
+
+      // Check if beneficiary data is available
+      if (beneficiaryModalData.length > 0) {
+        // Prepare request object for the dialog
+        const request = {
+          Details: beneficiaryModalData,
+        };
+
+
+        // Open the BeneficiaryDetailComponent dialog
+        const dialogRef = this.matDialog.open(BeneficiaryDetailComponent, {
+          data: request,
+          width: "100%",
+          disableClose: true,
+          position: {
+            top: "20px",
+          },
+        });
+
+        // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
+        dialogRef.afterClosed().subscribe(() => {
+        });
+      } else {
+        // Display a warning if no beneficiary data is available
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Please Add Beneficiary Details To View",
+          showConfirmButton: true,
+        });
+      }
+    } catch (error) {
+      // Log any errors that occur during the process
+      console.error('An error occurred:', error);
+    }
   }
 }

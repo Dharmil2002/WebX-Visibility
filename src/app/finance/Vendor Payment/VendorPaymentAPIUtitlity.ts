@@ -11,14 +11,15 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
 
     try {
         const res = await masterService.masterMongoPost("finance/getVendorTHCList", reqBody).toPromise();
-        const SortData = res.sort((a, b) => a._id.localeCompare(b._id));
+        const SortData = res.sort((a, b) => a.VendorName.localeCompare(b.VendorName));
         const result = SortData.map((x, index) => ({
             SrNo: index + 1,
-            Vendor: x._id,
-            THCamount: x.THCAmount,
+            Vendor: x._id?.Vendor,
+            THCamount: (x.TotaladvAmt || 0) + (x.TotalcontAmt || 0),
             AdvancePending: x.TotaladvAmt,
             BalanceUnbilled: x.TotalcontAmt,
-            data: x.data
+            data: x.data,
+            VendorInfo: x.VendorInfo
         })) ?? null;
         return result
 
@@ -96,7 +97,7 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
 export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
     try {
         const companyCode = localStorage.getItem('companyCode');
-        const filter = { vendorName: vendorCode };
+        const filter = { vendorCode: vendorCode };
         const req = { companyCode, collectionName: 'vendor_detail', filter };
         const res = await masterService.masterPost('generic/get', req).toPromise();
 

@@ -312,7 +312,7 @@ export class VendorPaymentControl {
           buttonIcon: "book-open"
         },
         functions: {
-          onClick: "BeneficiarydetailsViewFunctions",
+          onClick: "getBeneficiaryData",
         },
       },
 

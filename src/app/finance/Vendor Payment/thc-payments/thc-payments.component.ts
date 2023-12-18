@@ -95,8 +95,8 @@ export class ThcPaymentsComponent implements OnInit {
     // Check if TotaladvAmt is greater than 0
     const isTotaladvAmtValid = event?.data?.AdvancePending > 0;
 
-    // Check if there is any entry with advPdAt equal to "Branch"
-    const isExist = event?.data?.data?.some(entry => entry.advPdAt === localStorage.getItem('Branch'));
+    // Check if there is any entry with aDPAYAT equal to "Branch"
+    const isExist = event?.data?.data?.some(entry => entry.aDPAYAT === localStorage.getItem('Branch'));
     if (isExist && isTotaladvAmtValid) {
       this.router.navigate(['/Finance/VendorPayment/AdvancePayment'], {
         state: {
@@ -118,7 +118,6 @@ export class ThcPaymentsComponent implements OnInit {
   }
 
   BalanceUnbilledFunction(event) {
-    debugger
     // Check if TotaladvAmt is greater than 0
     const isTotaladvAmtValid = event?.data?.BalanceUnbilled > 0;
     // Check if there is any entry with balAmtAt equal to "Branch"

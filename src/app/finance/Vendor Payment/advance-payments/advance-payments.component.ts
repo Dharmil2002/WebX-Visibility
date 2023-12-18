@@ -131,7 +131,6 @@ export class AdvancePaymentsComponent implements OnInit {
     // Retrieve the passed data from the state
 
     this.PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
-    console.log(this.PaymentData);
 
     if (this.PaymentData) {
       this.GetAdvancePaymentList();
@@ -157,7 +156,6 @@ export class AdvancePaymentsComponent implements OnInit {
       },
     ];
     this.GetVendorInformation();
-    this.GetAdvancePaymentList();
     this.SetMastersData();
   }
   async GetVendorInformation() {
@@ -173,8 +171,22 @@ export class AdvancePaymentsComponent implements OnInit {
   async GetAdvancePaymentList() {
     this.isTableLode = false;
     const Filters = {
-      vendorName: this.PaymentData.Vendor,
-      advPdAt: localStorage.getItem("Branch"),
+      // 'D$expr': {
+      //   'D$eq': [
+      //     '$vND.cD', this.PaymentData?.VendorInfo?.cD,
+      //   ],
+      //   'D$eq': [
+      //     '$vND.nM', this.PaymentData?.VendorInfo?.nM,
+      //   ]
+      // },
+      'D$expr': {
+        'D$and': [
+          { 'D$eq': ["$vND.cD", this.PaymentData?.VendorInfo?.cD] },
+          { 'D$eq': ["$vND.nM", this.PaymentData?.VendorInfo?.nM] },
+        ],
+      },
+
+      aDPAYAT: localStorage.getItem("Branch"),
     };
     const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(
       this.masterService,

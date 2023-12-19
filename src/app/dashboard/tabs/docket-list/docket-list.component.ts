@@ -103,7 +103,7 @@ export class DocketListComponent implements OnInit {
   addAndEditPath='Operation/ConsignmentEntry';
   // menuItems = [{label:"Edit Docket"},{label:"View"}];
 
-  constructor(    
+  constructor(
     private router: Router,
     private docketService:DocketService,
     private thcService: ThcService
@@ -125,7 +125,7 @@ export class DocketListComponent implements OnInit {
 
   async handleMenuItemClick(data) {
     const { label } = data.label;
-  
+
     switch (label) {
       case "Edit Docket":
         this.router.navigate(['/Operation/ConsignmentEntry'], {
@@ -145,7 +145,7 @@ export class DocketListComponent implements OnInit {
         break;
     }
   }
-  
+
   goBack(tabIndex: string): void {
     this.router.navigate(["/dashboard/Index"], {
       queryParams: { tab: tabIndex },
@@ -162,7 +162,7 @@ export class DocketListComponent implements OnInit {
   }
   OpenCnote(data){
     const templateBody = {
-      DocNo:data.docketNumber,
+      DocNo:data.docNo,
       templateName:'docket'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

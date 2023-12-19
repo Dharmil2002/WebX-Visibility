@@ -133,7 +133,8 @@ export class ExpressRouteBulkUploadComponent implements OnInit {
           Validations: [
             { Required: true },
             { Numeric: true },
-            { MinValue: 1 }
+            { MinValue: 1 },
+            { CompareMinMaxValue: true }
           ],
         },
         {
@@ -141,7 +142,9 @@ export class ExpressRouteBulkUploadComponent implements OnInit {
           Validations: [
             { Required: true },
             { Numeric: true },
-            { MinValue: 1 }
+            { MinValue: 1 },
+            { CompareMinMaxValue: true }
+
           ],
         }
         ];
@@ -199,8 +202,8 @@ export class ExpressRouteBulkUploadComponent implements OnInit {
       const newId = this.generateNewId(this.existingData);
 
       // Format the final data with additional information
-      const formattedData = vendorContractData.map(x => this.formatContractData(x, newId));
-      // Log the formatted data
+      const formattedData = this.formatContractData(vendorContractData, newId);
+      // Log the formatted dat
       console.log(formattedData);
       const createRequest = {
         companyCode: this.companyCode,
@@ -260,12 +263,17 @@ export class ExpressRouteBulkUploadComponent implements OnInit {
 
   // Function to format contract data
   formatContractData(processedData, newId) {
-    return {
-      ...processedData,
-      _id: `${this.companyCode}-${this.CurrentContractDetails.cNID}-${newId}`,
-      cID: this.companyCode,
-      cNID: this.CurrentContractDetails.cNID,
-    };
+
+    return processedData.map((item, index) => {
+      const formattedItem = {
+        ...item,
+        _id: `${this.companyCode}-${this.CurrentContractDetails.cNID}-${newId + index}`,
+        cID: this.companyCode,
+        cNID: this.CurrentContractDetails.cNID,
+      };
+
+      return formattedItem;
+    });
   }
 
   // Function to generate a new ID based on existing data
@@ -273,11 +281,12 @@ export class ExpressRouteBulkUploadComponent implements OnInit {
     let newId;
 
     // Find the contract with the specified cNID
-    const existingContract = existingData.find(x => x.cNID === this.CurrentContractDetails.cNID);
+    const existingContract = existingData.filter(x => x.cNID === this.CurrentContractDetails.cNID);
 
     if (existingContract) {
       // Extract the last vendor code from the existing contract
-      const lastId = parseInt(existingContract._id.split('-')[2], 10);
+      const sortedData = existingContract.sort((a, b) => a._id.localeCompare(b._id));
+      const lastId = sortedData.length > 0 ? parseInt(sortedData[sortedData.length - 1]._id.split('-')[2], 10) : 0;
 
       // Check if the extraction was successful
       if (!isNaN(lastId)) {

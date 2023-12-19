@@ -16,7 +16,7 @@ export class xlsxutilityService {
     const validationObservables: Observable<void>[] = [];
     for (const item of validatedData) {
       const errors = [];
-
+      let preValue, nextValue
       for (const rule of rules) {
         const value = item[rule.ItemsName];
         for (const validation of rule.Validations) {
@@ -45,12 +45,11 @@ export class xlsxutilityService {
             errors.push(`${rule.ItemsName} already exists. Please enter another ${rule.ItemsName}.`);
           }
           if ("CompareMinMaxValue" in validation && validation.CompareMinMaxValue) {
-            const minValue = validation.MinValue;
-            const maxValue = validation.MaxValue;
-
-            if (minValue > maxValue) {
-              errors.push(`${rule.ItemsName} MinValue must be less than or equal to MaxValue.`);
+            preValue = item[rule.ItemsName];
+            if (preValue && nextValue && nextValue > preValue) {
+              errors.push(`MinValue must be less than or equal to MaxValue.`);
             }
+            nextValue = preValue;
           }
           if ("ApiValidation" in validation && validation.ApiValidation) {
             const apiEndpoint = `YOUR_API_ENDPOINT?pincode=${encodeURIComponent(value)}`;
@@ -80,12 +79,9 @@ export class xlsxutilityService {
 
     // Filter out data without errors
     const filteredDataWithoutErrors = validatedData.filter((x) => !x.error);
-    console.log(rules);
 
     // Check if there is at least one element without errors and rules are provided
-    // Check if there is at least one element without errors and rules are provided
     if (filteredDataWithoutErrors.length > 0 && rules.length > 0) {
-      const existingItems = new Map();
 
       // Find the rule that has "DuplicateFromList" validation for the "Location" field
       const duplicateRule = rules.find(rule => rule.Validations.some(validation => 'DuplicateFromList' in validation));
@@ -95,7 +91,7 @@ export class xlsxutilityService {
 
         // Iterate through filteredDataWithoutErrors to find duplicates in the "Location" field
         filteredDataWithoutErrors.forEach((item) => {
-          const location = item.Location;
+          const location = item[duplicateRule.ItemsName];
 
           if (existingLocations.has(location)) {
             item.error = item.error || [];
@@ -106,7 +102,6 @@ export class xlsxutilityService {
         });
       }
     }
-
 
     return forkJoin(validationObservables).pipe(
       map(() => {

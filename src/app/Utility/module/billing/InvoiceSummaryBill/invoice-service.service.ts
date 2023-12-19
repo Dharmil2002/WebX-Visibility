@@ -420,7 +420,7 @@ export class InvoiceServiceService {
       x.bGNDT = formatDate(x.bGNDT, 'dd-MM-yy hh:mm');
       x.customerName = `${x.cUST.cD}:${x.cUST.nM}`;
       x.status = x.bSTSNM;
-      x.pendingAmt = x.cOL.bALAMT;
+      x.pendingAmt = x.cOL?x.cOL.bALAMT:0;
       x.actions = x.bSTS == 1 ? ['Approve Bill', 'Cancel Bill'] : ['Submission Bill'];
       return x;
     });

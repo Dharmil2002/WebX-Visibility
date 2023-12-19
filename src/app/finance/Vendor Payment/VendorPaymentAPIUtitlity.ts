@@ -5,23 +5,42 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
         companyCode: localStorage.getItem('companyCode'),
         branch: localStorage.getItem('Branch'),
         startdate: RequestBody.StartDate,
+        PaymentMode: "Advance",
         enddate: RequestBody.EndDate,
         vendorNames: RequestBody.vendorList,
     }
 
     try {
-        const res = await masterService.masterMongoPost("finance/getVendorTHCList", reqBody).toPromise();
-        const SortData = res.sort((a, b) => a.VendorName.localeCompare(b.VendorName));
-        const result = SortData.map((x, index) => ({
+        const resAdvance = await masterService.masterMongoPost("finance/getVendorTHCList", reqBody).toPromise();
+        reqBody.PaymentMode = "Balance";
+        const resbalance = await masterService.masterMongoPost("finance/getVendorTHCList", reqBody).toPromise();
+
+        const resAdvanceresult = resAdvance.map((x, index) => ({
             SrNo: index + 1,
             Vendor: x._id?.Vendor,
-            THCamount: (x.TotaladvAmt || 0) + (x.TotalcontAmt || 0),
-            AdvancePending: x.TotaladvAmt,
-            BalanceUnbilled: x.TotalcontAmt,
+            THCamount: x.THCAmount,
+            AdvancePending: x.TotalPendingAmount,
             data: x.data,
             VendorInfo: x.VendorInfo
         })) ?? null;
-        return result
+
+        const resbalanceresult = resbalance.map((x, index) => ({
+            SrNo: index + 1,
+            Vendor: x._id?.Vendor,
+            THCamount: x.THCAmount,
+            BalanceUnbilled: x.TotalPendingAmount,
+            data: x.data,
+            VendorInfo: x.VendorInfo
+        })) ?? null;
+        console.log(resAdvanceresult)
+        console.log(resbalanceresult)
+
+        // Merge the lists
+        const mergedList = mergeJsonLists(resAdvanceresult, resbalanceresult);
+
+        // Display the result
+        console.log(mergedList);
+        return resAdvanceresult
 
     } catch (error) {
         console.error("An error occurred:", error);
@@ -123,3 +142,45 @@ export async function GetStateListFromAPI(masterService) {
     }
     return []; // Return an empty array in case of an error or missing data
 }
+function mergeJsonLists(list1, list2) {
+    // Create a map to store vendors and their details
+    const vendorMap = new Map();
+
+    // Function to update the vendor details in the map
+    function updateVendorDetails(vendorDetails, isList1) {
+        const vendorKey = vendorDetails["Vendor"];
+        if (vendorMap.has(vendorKey)) {
+            const existingDetails = vendorMap.get(vendorKey);
+            if (isList1) {
+                existingDetails["AdvancePending"] += vendorDetails["AdvancePending"];
+            } else {
+                existingDetails["BalanceUnbilled"] += vendorDetails["BalanceUnbilled"];
+            }
+        } else {
+            // Vendor not found, add to the map
+            const defaultDetails = {
+                "Vendor": vendorKey,
+                "AdvancePending": isList1 ? vendorDetails["AdvancePending"] : 0,
+                "BalanceUnbilled": isList1 ? 0 : vendorDetails["BalanceUnbilled"],
+            };
+            vendorMap.set(vendorKey, defaultDetails);
+        }
+    }
+
+    // Process the first list
+    list1.forEach(item => {
+        updateVendorDetails(item, true);
+    });
+
+    // Process the second list
+    list2.forEach(item => {
+        updateVendorDetails(item, false);
+    });
+
+    // Convert map values to an array
+    const mergedList = Array.from(vendorMap.values());
+
+    return mergedList;
+}
+
+

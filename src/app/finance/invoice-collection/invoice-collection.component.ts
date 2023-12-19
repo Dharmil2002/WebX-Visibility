@@ -9,6 +9,7 @@ import { AutoComplete } from 'src/app/Models/drop-down/dropdown';
 import { setGeneralMasterData } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
 import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-invoice-collection',
@@ -150,5 +151,26 @@ export class InvoiceCollectionComponent implements OnInit {
     setGeneralMasterData(this.CollectionSummaryjsonControlArray, mode, "collectionMode");
     setGeneralMasterData(this.CollectionSummaryjsonControlArray, bank, "bank");
   }
-
+  cancel() {
+    this.tab('Management​');
+  }
+  tab(tabIndex: string): void {
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
+  }
+  async save() {
+    const data=await this.invoiceService.getCollectionJson(this.CollectionSummaryTableForm.value,this.tableData);
+    const res=this.invoiceService.saveCollection(data);
+    if(res){
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Invoice collection saved successfully',
+        timer: 2000,
+        showCancelButton: false,
+        showConfirmButton: false
+      });
+      this.tab('Management​');
+    }
+  }
+ 
 }

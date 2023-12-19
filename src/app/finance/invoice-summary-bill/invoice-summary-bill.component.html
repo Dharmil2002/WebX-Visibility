@@ -16,7 +16,7 @@
   </app-generic-table-v2> -->
   <form [formGroup]="invoiceSummaryTableForm">
     <app-form-webxpress [form]="invoiceSummaryTableForm" [FormTitle]="'Invoice Summary'" [formData]="invoiceSummaryJsonArray"
-      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+      (functionCallEmitter)="functionCallHandler($event)"  (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
     </app-form-webxpress>
   </form>
   <div class="row">

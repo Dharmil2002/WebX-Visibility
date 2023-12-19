@@ -5,6 +5,7 @@ import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSum
 import { BillSubmissionComponent } from './submission/bill-submission/bill-submission.component';
 import { BillApproval } from 'src/app/Models/bill-approval/bill-approval';
 import { Router } from '@angular/router';
+import { StorageService } from 'src/app/core/service/storage.service';
 
 @Component({
   selector: 'app-bill-approval',
@@ -39,6 +40,7 @@ export class BillApprovalComponent implements OnInit {
     private invoiceService: InvoiceServiceService,
     private billApproval: BillApproval,/*this is a model object here so please dont remove bcz this model object is used in html page*/
     public dialog: MatDialog,
+    private storage:StorageService,
     private router: Router
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
@@ -66,7 +68,12 @@ export class BillApprovalComponent implements OnInit {
       }
       const status={
         bSTS:2,
-        bSTSNM:"Bill Approved"
+        bSTSNM:"Bill Approved",
+        aPR:{
+          loc:this.storage.branch,
+          aDT:new Date(),
+          aBY:this.storage.userName
+        }
       }
      const res = await this.invoiceService.updateInvoiceStatus(filter,status);
      if (res) {

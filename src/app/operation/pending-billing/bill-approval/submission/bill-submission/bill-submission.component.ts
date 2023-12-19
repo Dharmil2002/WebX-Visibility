@@ -55,9 +55,8 @@ export class BillSubmissionComponent implements OnInit {
 
   }
   async save(){
-    
     const filter={
-      docNo:this.shipmentDetails?.data?.docNo
+      bILLNO:this.shipmentDetails?.bILLNO
     }
     const pod = this.imageData?.Upload || ""
     const status={
@@ -66,7 +65,7 @@ export class BillSubmissionComponent implements OnInit {
       sUB:{
         loc:this.storage.branch,
         sDT:this.billSubmition.controls['submitDate'].value,
-        sBY:this.billSubmition.controls['submissionBy'].value,
+        sBY:this.billSubmition.controls['submissionTo'].value,
         sDoc:pod
       }
     }

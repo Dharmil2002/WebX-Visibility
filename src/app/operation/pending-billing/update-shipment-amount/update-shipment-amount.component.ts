@@ -75,7 +75,6 @@ export class UpdateShipmentAmountComponent implements OnInit {
   }
   /*Below the function are mainly for the edit the shipment*/
   async updateShipment() {
-    
     const { eDWeight, eDRate, eDInvoiceAmt, eDNoOfPackage, eDFreight } = this.accountDetail.controls;
     const { shipment } = this.shipmentTableForm.controls;
       const bindBiillingData = {
@@ -89,7 +88,6 @@ export class UpdateShipmentAmountComponent implements OnInit {
       mODDT: new Date()
     }
     let charges = [];
-    let otherAmount: number[] = [];
     this.extraCharges.forEach(element => {
       let chg={};
       chg['cHGID']=element.name; 
@@ -97,7 +95,7 @@ export class UpdateShipmentAmountComponent implements OnInit {
       chg['aMT']=this.accountDetail.controls[element.name].value;
       charges.push(chg);
     });
-    const sumOfOtherAmount = charges.reduce((a, b) => a.aMT + b.aMT, 0);
+    const sumOfOtherAmount = charges.reduce((a, b) => a + parseFloat(b.aMT), 0);
     
     const financeData ={
       fRTAMT: parseFloat(eDFreight.value),

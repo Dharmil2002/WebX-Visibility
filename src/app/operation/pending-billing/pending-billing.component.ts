@@ -148,6 +148,7 @@ export class PendingBillingComponent implements OnInit {
       data: "",
     });
     dialogRef.afterClosed().subscribe((result) => {
+      
       if (result != undefined) {
         this.get(result);
       }
@@ -158,7 +159,13 @@ export class PendingBillingComponent implements OnInit {
     });
   }
   reloadData(result) {
-      result && this.get("");
+    if (result != undefined) {
+      this.get(result);
+    }
+    else{
+      this.getFilterData() 
+      this.genericService.clearSharedData();
+    }
   }
   getKpiCount() {
     const createShipDataObject = (

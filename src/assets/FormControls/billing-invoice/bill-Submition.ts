@@ -27,9 +27,9 @@ export class SubmitionControl {
                 },
             },
             {
-                name: "submissionBy",
-                label: "Submission By",
-                placeholder: "Submission By",
+                name: "submissionTo",
+                label: "Submission To",
+                placeholder: "Submission TO",
                 type: "text",
                 value: "",
                 filterOptions: "",
@@ -52,7 +52,7 @@ export class SubmitionControl {
             },
             {
                 name: 'Upload',
-                label: 'POD Upload',
+                label: 'Submission Document',
                 placeholder: '',
                 type: 'file',
                 value: '',

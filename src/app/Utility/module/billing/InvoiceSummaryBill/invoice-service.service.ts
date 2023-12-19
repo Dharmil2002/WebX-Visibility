@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { SwalerrorMessage } from 'src/app/Utility/Validation/Message/Message';
 import { financialYear, formatDate } from 'src/app/Utility/date/date-utils';
 import { BillingInfo, PackageInfo } from 'src/app/core/models/finance/update.shipmet';
-import {ReqJsonBilling} from 'src/app/core/models/finance/billing.model';
+import { ReqJsonBilling } from 'src/app/core/models/finance/billing.model';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { XAxisComponent } from '@swimlane/ngx-charts';
@@ -19,14 +19,14 @@ export class InvoiceServiceService {
     private operationService: OperationService
   ) { }
 
-  async getInvoice(shipment: string[],status:number=0) {
-      const req = {
-        companyCode: this.storage.companyCode,
-        collectionName: "dockets",
-        filter: {"docNo": { "D$in": shipment }, "fSTS": status}
-      };
-      const res = await firstValueFrom(this.operationService.operationPost('generic/get', req));
-    return  res.data;
+  async getInvoice(shipment: string[], status: number = 0) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "dockets",
+      filter: { "docNo": { "D$in": shipment }, "fSTS": status }
+    };
+    const res = await firstValueFrom(this.operationService.operationPost('generic/get', req));
+    return res.data;
   }
 
   async filterShipment(shipments) {
@@ -52,9 +52,9 @@ export class InvoiceServiceService {
           gst: element?.gSTAMT || "",
           gstChrgAmt: element?.gSTCHAMT || "",
           total: element.tOTAMT,
-          noOfpkg: element?.pKGS|| 0,
+          noOfpkg: element?.pKGS || 0,
           weight: element?.aCTWT || 0,
-          isSelected:false,
+          isSelected: false,
           actions: ["Approve", "Hold", "Edit"],
           extraData: element,
         };
@@ -70,7 +70,7 @@ export class InvoiceServiceService {
   }
 
   getInvoiceDetail(shipment) {
-    
+
     const stateInvoiceMap = new Map();
     for (const element of shipment) {
       // Create or update the state-wise invoice details
@@ -80,14 +80,14 @@ export class InvoiceServiceService {
           stateName,
           cnoteCount: 1,
           countSelected: 0,
-          subTotalAmount:0,
+          subTotalAmount: 0,
           gstCharged: 0,
           extraData: [element],
         });
       } else {
         const stateInvoice = stateInvoiceMap.get(stateName);
         stateInvoice.cnoteCount += 1;
-      //  stateInvoice.subTotalAmount += element.amount;
+        //  stateInvoice.subTotalAmount += element.amount;
         //stateInvoice.gstCharged += element.gst;
         //stateInvoice.totalBillingAmount += parseFloat(element.amount) + parseFloat(element.gst);
         stateInvoice.extraData.push(element); // Add the element to the extraData array
@@ -98,9 +98,9 @@ export class InvoiceServiceService {
     return result;
   }
   /*Below function call while bill No is generated*/
-  async addBillDetails(data,bill) {
+  async addBillDetails(data, bill) {
     const customerName = (data?.customerName?.[0] || "").split('-')[1]?.trim() || "";
-    const customerCode= (data?.customerName?.[0] || "").split('-')[0]?.trim() || "";
+    const customerCode = (data?.customerName?.[0] || "").split('-')[0]?.trim() || "";
     const billData = {
       "_id": `${this.storage.companyCode}-${data?.invoiceNo}` || "",
       "cID": this.storage.companyCode,
@@ -110,7 +110,7 @@ export class InvoiceServiceService {
       "bGNDT": data?.invoiceDate || new Date(),
       "bDUEDT": data?.dueDate || new Date(),
       "bLOC": this.storage.branch,
-      "pAYBAS": data?.pAYBAS||"",
+      "pAYBAS": data?.pAYBAS || "",
       "bSTS": 1,
       "bSTSNM": "Generated",
       "bSTSDT": new Date(),
@@ -122,19 +122,19 @@ export class InvoiceServiceService {
         "sT": "",
         "gSTIN": data?.cGstin || false,
       },
-      "sUB": {
-        "lOC": "",
-        "tO": "",
-        "tOMOB": "",
-        "dTM": ""
-      },
-      "cOL": {
-        "aMT": 0.00,
-        "bALAMT": 0.00
-      },
+      // "sUB": {
+      //   "lOC": "",
+      //   "tO": "",
+      //   "tOMOB": "",
+      //   "dTM": ""
+      // },
+      // "cOL": {
+      //   "aMT": 0.00,
+      //   "bALAMT": 0.00
+      // },
       "cUST": {
-        "cD":customerCode,
-        "nM":customerName||"",
+        "cD": customerCode,
+        "nM": customerName || "",
         "tEL": "",
         "aDD": "",
         "eML": "",
@@ -152,41 +152,40 @@ export class InvoiceServiceService {
       },
       "sUPDOC": "",
       "pRODID": 1, //From Product Master
-      "dKTCNT": data?.shipmentCount || 0.00,
+      "dKTCNT": data?.countSelected || 0.00,
       "CURR": "INR",
-      "dKTTOT": data?.shipmentTotal || 0.00,
+      "dKTTOT": data?.subTotalAmount || 0.00,
       "gROSSAMT": data?.shipmentTotal || 0.00,
-      "aDDCHRG": 0.00,
-      "rOUNOFFAMT": 0.00,
-      "aMT": data?.shipmentTotal || 0.00,
-      "cNL": false,
-      "cNLDT": "",
-      "cNBY": "",
-      "cNRES": "",
-      "custDetails":bill,
-      "eNTDT": new Date(),
+      //"aDDCHRG": 0.00,
+      "rOUNOFFAMT": data?.roundOff||0,
+      "aMT": data?.finalInvoice || 0.00,
+      //"cNL": false,
+      //"cNLDT": "",
+      //"cNBY": "",
+      //"cNRES": "",
+      "custDetails": bill,
+      "eNTDT": new Date().toISOString(),
       "eNTLOC": this.storage.branch,
       "eNTBY": this.storage.userName,
-      "mODDT": new Date(),
-      "mODLOC": this.storage.branch,
-      "mODBY": this.storage.userName
+      //"mODDT": new Date(),
+      //"mODLOC": this.storage.branch,
+      //"mODBY": this.storage.userName
     }
     const req = {
       companyCode: this.storage.companyCode,
       docType: "BILL",
       branch: this.storage.branch,
       finYear: financialYear,
-      party:customerName.toUpperCase(),
+      party: customerName.toUpperCase(),
       collectionName: "Cust_bills_headers",
-      data: billData,
+      data: billData
     };
     const res = await firstValueFrom(this.operationService.operationPost("finance/bill/cust/create", req));
     return res.data.ops[0].docNo
 
   }
-
   async addNestedBillShipment(data: BillingInfo[], billNo: string = '') {
-    
+
     let jsonBillingList = [];
 
     await Promise.all(
@@ -222,7 +221,7 @@ export class InvoiceServiceService {
           "mODBY": "",
         };
         // Start the API call and wait for its response
-         await this.updateShipments(element.extraData?.extraData?.dKTNO);
+        await this.updateShipments(element.extraData?.extraData?.dKTNO);
         // Include the result in the jsonBillingList
         jsonBillingList.push(jsonBilling);
       })
@@ -241,7 +240,7 @@ export class InvoiceServiceService {
   /*End*/
   /*below function is for update the billing data*/
   async updateBillingInvoice(data) {
-    
+
     const reqbody = {
       companyCode: this.storage.companyCode,
       collectionName: "dockets",
@@ -253,16 +252,16 @@ export class InvoiceServiceService {
       companyCode: this.storage.companyCode,
       collectionName: "docket_fin_det",
       filter: { dKTNO: data.dktNo },
-      update:data.finance
+      update: data.finance
     }
-    await firstValueFrom(this.operationService.operationMongoPut("generic/update",reqFin));
+    await firstValueFrom(this.operationService.operationMongoPut("generic/update", reqFin));
     return true
     /*End*/
   }
   /*End*/
   /*below code add is for update Update shipment indivisualy*/
   async updateShipments(shipment: string) {
-    const data={ bILED: true ,mODDT:new Date(),mODLOC:this.storage.branch,mODBY:this.storage.userName}
+    const data = { bILED: true, mODDT: new Date(), mODLOC: this.storage.branch, mODBY: this.storage.userName }
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"),
       collectionName: "dockets_bill_details",
@@ -275,18 +274,18 @@ export class InvoiceServiceService {
   }
   /*End*/
   /*below code is for getting a list of invoice for invoice managed*/
-   async getinvoiceDetailBill(data){
-    const req={
+  async getinvoiceDetailBill(data) {
+    const req = {
       companyCode: this.storage.companyCode,
-      startdate:data.startDate,
-      enddate:data.endDate,
-      customerName:data.customerName,
-      locationNames:data.locationNames,
+      startdate: data.startDate,
+      enddate: data.endDate,
+      customerName: data.customerName,
+      locationNames: data.locationNames,
       branch: this.storage.branch
     }
-    const res =await firstValueFrom(this.operationService.operationPost("finance/bill/cust/getInvoiceDetails",req));
+    const res = await firstValueFrom(this.operationService.operationPost("finance/bill/cust/getInvoiceDetails", req));
     return res.data;
-   }
+  }
   /*End*/
   groupAndCalculateMetrics(data: any[]): any[] {
     const groupedData = {};
@@ -324,170 +323,220 @@ export class InvoiceServiceService {
 
     return Object.values(groupedData);
   }
-/**
- * Asynchronously fetches pending billing details based on the provided parameters.
- * @param {Object} data - The input data object containing startdate, enddate, and customer.
- * @returns {Promise<any>} - A Promise that resolves to the pending billing details.
- */
-async  getPendingDetails(startdate, enddate, customer): Promise<any> {
-  try {
-    // Construct the request object with necessary parameters
-    const req = {
-      companyCode: this.storage.companyCode,
-      startdate,
-      enddate,
-      branch: this.storage.branch,
-      customerNames: customer
-    };
-    // Perform an asynchronous operation to get pending billing details
-    const res = await firstValueFrom(this.operationService.operationPost("finance/bill/cust/getCustomerDetails", req));
-    // Return the data from the response
-    return res.data;
-  } catch (error) {
-    // Handle errors that may occur during the asynchronous operation
-    SwalerrorMessage("error", "Error", "There was an issue retrieving data. Please check your input and try again.", true);
-    // Re-throw the error to propagate it or handle it as needed
-    throw error;
-  }
-}
-/*
-*below the function is for the getting collection invoice details using Billno
-*/
-async getCollectionInvoiceDetails(billNo: string[]) {
-  const req = {
-    companyCode: this.storage.companyCode,
-    collectionName: "Cust_bills_headers",
-    filter: { "bILLNO": { "D$in": billNo }, "bSTS": 3}
-  };
-  const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
-  const filterData = res.data.map((element) => {
-    element.collected=element.cOL.aMT;
-    element.deductions=element.cOL.bALAMT;
-    element.bDUEDT=formatDate(element.bDUEDT,'dd-MM-yy hh:mm');
-    element.bGNDT=formatDate(element.bGNDT,'dd-MM-yy hh:mm');
-    element.collectionAmount=parseFloat(element.aMT)-parseFloat(element.cOL.aMT);
-    element.pendingAmount=parseFloat(element.aMT)-parseFloat(element.cOL.aMT);
-    return element;
-
-  });
-  return filterData;
-}
-/*End*/
-/*get Charges are come from product Charged master*/
-async getCharges(prodType: string) {
-  const req = {
-    companyCode: this.storage.companyCode,
-    collectionName: "product_charges_detail",
-    filter: { "ProductName": prodType }
-  };
-  const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
-  return res.data;
-}
-/*end*/
-/*get Charges are come from product Charged master*/
-async getContractCharges(filter={}) {
-  const req = {
-    companyCode: this.storage.companyCode,
-    collectionName: "charges",
-    filter:filter
-  };
-  const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
-  return res.data;
-}
-/*end*/
-/*Below function is for getting billing data*/
-async getBillingData(custCode) {
-  
-  const req={
-    companyCode: this.storage.companyCode,
-    collectionName:"Cust_bills_headers",
-    filter:{
-      bLOC:this.storage.branch,
-      bSTS:{D$in:[1,2]},
-      D$expr: {
-        D$eq: [
-           "$cUST.cD",custCode
-         ]
-       },
+  /**
+   * Asynchronously fetches pending billing details based on the provided parameters.
+   * @param {Object} data - The input data object containing startdate, enddate, and customer.
+   * @returns {Promise<any>} - A Promise that resolves to the pending billing details.
+   */
+  async getPendingDetails(startdate, enddate, customer): Promise<any> {
+    try {
+      // Construct the request object with necessary parameters
+      const req = {
+        companyCode: this.storage.companyCode,
+        startdate,
+        enddate,
+        branch: this.storage.branch,
+        customerNames: customer
+      };
+      // Perform an asynchronous operation to get pending billing details
+      const res = await firstValueFrom(this.operationService.operationPost("finance/bill/cust/getCustomerDetails", req));
+      // Return the data from the response
+      return res.data;
+    } catch (error) {
+      // Handle errors that may occur during the asynchronous operation
+      SwalerrorMessage("error", "Error", "There was an issue retrieving data. Please check your input and try again.", true);
+      // Re-throw the error to propagate it or handle it as needed
+      throw error;
     }
   }
-  const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
-  return res.data;
-}
-async filterData(data: any) {
-  // Assuming formatDate is defined somewhere
-  const status=[1,2];
-  const filteredData = data.filter((x)=>status.includes(x.bSTS)).map((x) => {
-    x.bGNDT = formatDate(x.bGNDT, 'dd-MM-yy hh:mm');
-    x.customerName = `${x.cUST.cD}:${x.cUST.nM}`;
-    x.status = x.bSTSNM;
-    x.pendingAmt=x.cOL.bALAMT;
-    x.actions =x.bSTS==1? ['Approve Bill','Cancel Bill']:['Submission Bill'];
-    return x;
-  });
+  /*
+  *below the function is for the getting collection invoice details using Billno
+  */
+  async getCollectionInvoiceDetails(billNo: string[]) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "Cust_bills_headers",
+      filter: { "bILLNO": { "D$in": billNo }, "bSTS": 3 }
+    };
+    const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
+    const filterData = res.data.map((element) => {
+      element.collected = element.cOL.aMT;
+      element.deductions = element.cOL.bALAMT;
+      element.bDUEDT = formatDate(element.bDUEDT, 'dd-MM-yy hh:mm');
+      element.bGNDT = formatDate(element.bGNDT, 'dd-MM-yy hh:mm');
+      element.collectionAmount = parseFloat(element.aMT) - parseFloat(element.cOL.aMT);
+      element.pendingAmount = parseFloat(element.aMT) - parseFloat(element.cOL.aMT);
+      return element;
 
-  // Assuming you want to return the filtered data
-  return filteredData;
-}
-async updateInvoiceStatus(filter,data){
-  
-  const req ={
-    companyCode:this.storage.companyCode,
-    collectionName:"Cust_bills_headers",
-    filter:filter,
-    update:data
+    });
+    return filterData;
   }
-  const res= await firstValueFrom(this.operationService.operationMongoPut("generic/update",req));
-  return res
-}
-/*end */
-/*here the code which is writen for Shipment Approval*/
-async updateShipmentStatus(item) {
-  
-  const  dKTNO  = item;
-  const dockets = { fSTS: 1, fSTSN: "Approved"};
-  const finance = { sTS: 1, sTSNM: "Approved", sTSTM: new Date() };
-  const reqDockets = {
-    companyCode: this.storage.companyCode,
-    collectionName: "dockets",
-    filter:{ docNo: dKTNO },
-    update: dockets,
-  };
-  const reqFinance = {
-    companyCode: this.storage.companyCode,
-    collectionName: "docket_fin_det",
-    filter: { dKTNO: dKTNO },
-    update: finance,
-  };
-  await Promise.all([
-    firstValueFrom(this.operationService.operationMongoPut("generic/update", reqDockets)),
-    firstValueFrom(this.operationService.operationMongoPut("generic/update", reqFinance))
-  ]);
-  
-  return true;
-}
-/*End*/
-/*Below code is for Confirm a Approval*/
-async confirmApprove(data) {
-  const result = await Swal.fire({
+  /*End*/
+  /*get Charges are come from product Charged master*/
+  async getCharges(prodType: string) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "product_charges_detail",
+      filter: { "ProductName": prodType }
+    };
+    const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
+    return res.data;
+  }
+  /*end*/
+  /*get Charges are come from product Charged master*/
+  async getContractCharges(filter = {}) {
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "charges",
+      filter: filter
+    };
+    const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
+    return res.data;
+  }
+  /*end*/
+  /*Below function is for getting billing data*/
+  async getBillingData(custCode) {
+
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "Cust_bills_headers",
+      filter: {
+        bLOC: this.storage.branch,
+        bSTS: { D$in: [1, 2] },
+        D$expr: {
+          D$eq: [
+            "$cUST.cD", custCode
+          ]
+        },
+      }
+    }
+    const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
+    return res.data;
+  }
+  async filterData(data: any) {
+    // Assuming formatDate is defined somewhere
+    const status = [1, 2];
+    const filteredData = data.filter((x) => status.includes(x.bSTS)).map((x) => {
+      x.bGNDT = formatDate(x.bGNDT, 'dd-MM-yy hh:mm');
+      x.customerName = `${x.cUST.cD}:${x.cUST.nM}`;
+      x.status = x.bSTSNM;
+      x.pendingAmt = x.cOL.bALAMT;
+      x.actions = x.bSTS == 1 ? ['Approve Bill', 'Cancel Bill'] : ['Submission Bill'];
+      return x;
+    });
+
+    // Assuming you want to return the filtered data
+    return filteredData;
+  }
+  async updateInvoiceStatus(filter, data) {
+
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "Cust_bills_headers",
+      filter: filter,
+      update: data
+    }
+    const res = await firstValueFrom(this.operationService.operationMongoPut("generic/update", req));
+    return res
+  }
+  /*end */
+  /*here the code which is writen for Shipment Approval*/
+  async updateShipmentStatus(item) {
+
+    const dKTNO = item;
+    const dockets = { fSTS: 1, fSTSN: "Approved" };
+    const finance = { sTS: 1, sTSNM: "Approved", sTSTM: new Date() };
+    const reqDockets = {
+      companyCode: this.storage.companyCode,
+      collectionName: "dockets",
+      filter: { docNo: dKTNO },
+      update: dockets,
+    };
+    const reqFinance = {
+      companyCode: this.storage.companyCode,
+      collectionName: "docket_fin_det",
+      filter: { dKTNO: dKTNO },
+      update: finance,
+    };
+    await Promise.all([
+      firstValueFrom(this.operationService.operationMongoPut("generic/update", reqDockets)),
+      firstValueFrom(this.operationService.operationMongoPut("generic/update", reqFinance))
+    ]);
+
+    return true;
+  }
+  /*End*/
+  /*Below code is for Confirm a Approval*/
+  async confirmApprove(data) {
+    const result = await Swal.fire({
       title: "Are you sure you want to Approve a Docket?",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, proceed!',
       cancelButtonText: 'Cancel'
-  });
+    });
 
-  if (result.isConfirmed) {
+    if (result.isConfirmed) {
       await this.handleApprove(data);
-  } else {
+    } else {
       Swal.fire('Cancelled', 'Your Approve was cancelled', 'info');
+    }
   }
+  /*End*/
+  async handleApprove(data) {
+    const res = await this.updateShipmentStatus(data.data.shipment);
+    if (res) {
+      Swal.fire('Success!', 'Your Approve was successful!', 'success');
+    }
+  }
+  /*here the function for the collection*/
+  async getCollectionJson(formGroup, data) {
+    const commonProperties = {
+      cID: this.storage.companyCode,
+      lOC: this.storage.branch,
+      dTM: new Date(),
+      mOD: formGroup?.collectionMode || 0,
+      bANK: formGroup?.bank || "",
+      bY: this.storage.userName,
+      eNTDT: new Date(),
+      eNTLOC: this.storage?.branch || "",
+      eNTBY: this.storage?.userName || "",
+    };
+  
+    const collectedData = data.map((item) => ({
+      _id: "",
+      bILLNO: item?.bILLNO || 0,
+      mRNO: "",
+      aMT: item?.collectionAmount || 0,
+      tRNO: "",
+      vUCHNO: "",
+      ...commonProperties,
+    }));
+  
+    const colData = {
+      formData: formGroup,
+      collectedData: collectedData,
+      tabledata:data
+    };
+  
+    return colData;
+  }
+  
+/*End*/
+/*Save CollectionData*/
+saveCollection(data){
+  
+  const req={
+    companyCode:this.storage.companyCode,
+    collectionName:"Cust_bill_collection",
+    data:data,
+    docType: "MR",
+    branch: this.storage.branch,
+    finYear: financialYear
+  }
+  const res=firstValueFrom(this.operationService.operationMongoPost("finance/bill/cust/addCustomerCollection",req));
+  return res;
 }
 /*End*/
-async handleApprove(data) {
-  const res = await this.updateShipmentStatus(data.data.shipment);
-  if (res) {
-      Swal.fire('Success!', 'Your Approve was successful!', 'success');
-  }
-}
+
 }

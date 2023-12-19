@@ -36,6 +36,7 @@ import { GeneralService } from "src/app/Utility/module/masters/general-master/ge
 import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
 import { PrqService } from "src/app/Utility/module/operation/prq/prq.service";
+import moment from "moment";
 
 @Component({
   selector: "app-thc-generation",
@@ -953,8 +954,7 @@ export class ThcGenerationComponent implements OnInit {
       { Key: 'balAmtAt', Name: 'bLPAYAT' },
       { Key: 'status', Name: 'oPSST' },
       { Key: 'panNo', Name: 'vND.pAN' },
-      { Key: 'transMode', Name: 'tMODE' }
-
+      //{ Key: 'transMode', Name: 'tMODE' }
     ];
 
     propertiesToSet.forEach((property) => {
@@ -1057,21 +1057,27 @@ export class ThcGenerationComponent implements OnInit {
   }
   GenerateTHCgenerationRequestBody() {
     const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
+    const transitHours = Math.max(...this.tableData.filter(item => item.isSelected == true).map(o => o.transitHours));
+
+    const deptDate = this.thcTableForm.controls['tripDate'].value || new Date();
+    const schArrDate =  moment(deptDate).add(transitHours, 'hours').toDate();
     // this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");
+    
     //#region MainModel
     this.tHCGenerationModel.companyCode = this.storage.companyCode;
     this.tHCGenerationModel.branch = this.storage.branch;
     this.tHCGenerationModel.docType = "TH";
-    this.tHCGenerationModel.finYear = financialYear;
+    this.tHCGenerationModel.finYear = financialYear;    
     //#endregion
 
     //#region THC Summary
-    this.thcsummaryData.companyCode = this.companyCode;
-    this.thcsummaryData.branch = this.branchCode;
+    this.thcsummaryData.companyCode = this.storage.companyCode;
+    this.thcsummaryData.branch = this.storage.branch;
+    this.thcsummaryData.tHCDT = deptDate;
     this.thcsummaryData.closingBranch = this.thcTableForm.controls['closingBranch'].value || "";
     this.thcsummaryData.fromCity = this.thcTableForm.controls['fromCity'].value || "";
     this.thcsummaryData.toCity = this.thcTableForm.controls['toCity'].value || "";
-    this.thcsummaryData.routecode = "8888";
+    this.thcsummaryData.routecode = "9888";
     this.thcsummaryData.route = this.thcTableForm.controls['route'].value || "";
     this.thcsummaryData.vehicle = this.thcTableForm.controls['vehicle'].value || "";
     this.thcsummaryData.Vendor_type = VendorDetails.value || "";
@@ -1079,57 +1085,57 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.Vendor_Code = this.thcTableForm.controls['vendorCode'].value || "";
     this.thcsummaryData.Vendor_Name = this.thcTableForm.controls['vendorName'].value?.name || this.thcTableForm.controls['vendorName'].value;
     this.thcsummaryData.Vendor_pAN = this.thcTableForm.controls['panNo'].value || "";
-    this.thcsummaryData.status = "1";
+    this.thcsummaryData.status = 1
     this.thcsummaryData.statusName = "Generated";
-    this.thcsummaryData.financialStatus = "0";
+    this.thcsummaryData.financialStatus = 0;
     this.thcsummaryData.financialStatusName = "";
     this.thcsummaryData.contAmt = this.thcTableForm.controls['contAmt'].value || 0;
     this.thcsummaryData.advAmt = this.thcTableForm.controls['advAmt'].value || 0;
+    this.thcsummaryData.aDVPENAMT = this.thcsummaryData.advAmt;
     this.thcsummaryData.balAmt = this.thcTableForm.controls['balAmt'].value || 0;
-    this.thcsummaryData.advPdAt = this.thcTableForm.controls['advPdAt'].value || "";
-    this.thcsummaryData.balAmtAt = this.thcTableForm.controls['balAmtAt'].value || "";
+    this.thcsummaryData.advPdAt = this.thcTableForm.controls['advPdAt'].value || this.storage.branch;
+    this.thcsummaryData.balAmtAt = this.thcTableForm.controls['balAmtAt'].value || this.storage.branch;
     this.thcsummaryData.vouchersList = [];
     this.thcsummaryData.iSBILLED = false;
     this.thcsummaryData.bILLNO = "";
     this.thcsummaryData.Driver_name = this.thcTableForm.controls['driverName'].value || "";
     this.thcsummaryData.Driver_mobile = this.thcTableForm.controls['driverMno'].value || "";
     this.thcsummaryData.Driver_lc = this.thcTableForm.controls['driverLno'].value || "";
-    this.thcsummaryData.Driver_exd = this.thcTableForm.controls['driverLexd'].value || "";
-    this.thcsummaryData.Capacity_ActualWeight = this.tableData.filter(item => item.isSelected == true).reduce((acc, weight) => acc + weight.aCTWT, 0);
-    this.thcsummaryData.Capacity_volume = "";
-    this.thcsummaryData.Capacity_volumetricWeight = this.thcTableForm.controls['capacity'].value || 0;
-    this.thcsummaryData.Utilization_ActualWeight = this.thcTableForm.controls['loadedKg'].value || 0;
-    this.thcsummaryData.Utilization_volume = "";
-    this.thcsummaryData.Utilization_volumetricWeight = this.thcTableForm.controls['weightUtilization'].value || 0;
-    this.thcsummaryData.departed_sCHDT = "";
-    this.thcsummaryData.departed_eXPDT = "";
-    this.thcsummaryData.departed_aCTDT = new Date();
-    this.thcsummaryData.departed_gPSDT = "";
-    this.thcsummaryData.departed_oDOMT = "";
-    this.thcsummaryData.arrived_sCHDT = "";
-    this.thcsummaryData.arrived_eXPDT = "";
-    this.thcsummaryData.arrived_aCTDT = "";
-    this.thcsummaryData.arrived_gPSDT = "";
-    this.thcsummaryData.arrived_oDOMT = "";
-    this.thcsummaryData.sCHDIST = "";
-    this.thcsummaryData.aCTDIST = "";
-    this.thcsummaryData.gPSDIST = "";
-    this.thcsummaryData.cNL = "";
-    this.thcsummaryData.cNLDT = "";
-    this.thcsummaryData.cNLBY = "";
-    this.thcsummaryData.cNBY = "";
-    this.thcsummaryData.cNRES = "";
+    this.thcsummaryData.Driver_exd = this.thcTableForm.controls['driverLexd'].value || undefined;
+    this.thcsummaryData.Capacity_ActualWeight =  this.thcTableForm.controls['capacity'].value || 0;
+    this.thcsummaryData.Capacity_volume = 0;
+    this.thcsummaryData.Capacity_volumetricWeight = 0;
+    this.thcsummaryData.Utilization_ActualWeight = this.thcTableForm.controls['weightUtilization'].value;
+    this.thcsummaryData.Utilization_volume = 0;
+    this.thcsummaryData.Utilization_volumetricWeight = 0;
+    this.thcsummaryData.departed_sCHDT = deptDate;
+    this.thcsummaryData.departed_eXPDT = deptDate;
+    this.thcsummaryData.departed_aCTDT = deptDate;
+    //this.thcsummaryData.departed_gPSDT = undefined;
+    this.thcsummaryData.departed_oDOMT = 0;
+    this.thcsummaryData.arrived_sCHDT = schArrDate;
+    this.thcsummaryData.arrived_eXPDT = schArrDate;
+    //this.thcsummaryData.arrived_aCTDT = undefined;
+    //this.thcsummaryData.arrived_gPSDT = undefined;
+    //this.thcsummaryData.arrived_oDOMT = undefined;
+    this.thcsummaryData.sCHDIST = 0;
+    this.thcsummaryData.aCTDIST = 0;
+    this.thcsummaryData.gPSDIST = 0;
+    this.thcsummaryData.cNL = false;
+    //this.thcsummaryData.cNDT = undefined;
+    //this.thcsummaryData.cNBY = undefined;
+    //this.thcsummaryData.cNRES = undefined;
     this.thcsummaryData.eNTDT = new Date();
     this.thcsummaryData.eNTLOC = this.storage.branch;
     this.thcsummaryData.eNTBY = this.storage.userName;
-    this.thcsummaryData.mODDT = "";
-    this.thcsummaryData.mODLOC = "";
-    this.thcsummaryData.mODBY = "";
+    //this.thcsummaryData.mODDT = undefined;
+    //this.thcsummaryData.mODLOC = undefined;
+    //this.thcsummaryData.mODBY = undefined;
+    
     //New Added By Harikesh
-    this.thcsummaryData.tMODE = this.thcTableForm.controls['transMode'].value || "";
+    this.thcsummaryData.tMODE = this.thcTableForm.controls['transMode']?.value?.value || "";
+    this.thcsummaryData.tMODENM = this.thcTableForm.controls['transMode']?.value?.name || "";
     this.thcsummaryData.pRQNO = this.thcTableForm.controls['prqNo'].value || "";
-
-
     //#endregion
 
     //#region Load
@@ -1149,25 +1155,25 @@ export class ThcGenerationComponent implements OnInit {
     //#endregion
 
     //#region UTi
-    this.UTi.wT = this.thcTableForm.controls['loadedKg'].value || 0;
+    this.UTi.wT = this.thcTableForm.controls['weightUtilization'].value || 0;
     this.UTi.vOL = 0;
-    this.UTi.vWT = this.thcTableForm.controls['weightUtilization'].value || 0;
+    this.UTi.vWT = 0;
     //#endregion
 
     //#region DPt
-    this.DPt.sCHDT = "";
-    this.DPt.eXPDT = "";
-    this.DPt.aCTDT = new Date();
-    this.DPt.gPSDT = "";
+    this.DPt.sCHDT = deptDate;
+    this.DPt.eXPDT = deptDate;
+    this.DPt.aCTDT = deptDate;
+    //this.DPt.gPSDT = undefined;
     this.DPt.oDOMT = 0;
     //#endregion
 
     //#region ARr
-    this.ARr.sCHDT = "";
-    this.ARr.eXPDT = "";
-    this.ARr.aCTDT = "";
-    this.ARr.gPSDT = "";
-    this.ARr.oDOMT = 0;
+    this.ARr.sCHDT = schArrDate;
+    this.ARr.eXPDT = schArrDate;
+    //this.ARr.aCTDT = undefined;
+    //this.ARr.gPSDT = undefined;
+    //this.ARr.oDOMT = 0;
     //#endregion
 
     //#region UNload
@@ -1197,29 +1203,30 @@ export class ThcGenerationComponent implements OnInit {
     this.thcmovementDetails.eNTDT = new Date()
     this.thcmovementDetails.eNTLOC = this.storage.branch;
     this.thcmovementDetails.eNTBY = this.storage.userName;
-    this.thcmovementDetails.mODDT = "";
-    this.thcmovementDetails.mODLOC = "";
-    this.thcmovementDetails.mODBY = "";
+    //this.thcmovementDetails.mODDT = undefined;
+    //this.thcmovementDetails.mODLOC = undefined;
+    //this.thcmovementDetails.mODBY = undefined;
     //#endregion
 
     //#region THC Movement Details
     this.mfheaderDetails.cID = this.storage.companyCode
-    this.mfheaderDetails.companyCode = this.storage.companyCode
-    this.mfheaderDetails.mDT = "";
+    this.mfheaderDetails.mDT = this.thcDetail.deptDate;
     this.mfheaderDetails.oRGN = this.thcTableForm.controls['branch'].value || "";
     this.mfheaderDetails.dEST = this.thcTableForm.controls['closingBranch'].value || "";
     this.mfheaderDetails.dKTS = this.tableData.filter(item => item.isSelected == true).length;
     this.mfheaderDetails.pKGS = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.pKGS, 0);
     this.mfheaderDetails.wT = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.aCTWT, 0);
-    this.mfheaderDetails.vOL = "";
+    this.mfheaderDetails.vOL = 0;
     this.mfheaderDetails.tHC = "";
     this.mfheaderDetails.iSARR = true;
-    this.mfheaderDetails.ARRDT = "";
+    //this.mfheaderDetails.aRRDT = undefined;
     this.mfheaderDetails.eNTDT = new Date()
     this.mfheaderDetails.eNTLOC = this.storage.branch;
     this.mfheaderDetails.eNTBY = this.storage.userName;
-    this.mfheaderDetails.mODDT = "";
-    this.mfheaderDetails.mODLOC = "";
+    //this.mfheaderDetails.mODDT = undefined;
+    //this.mfheaderDetails.mODLOC = undefined;
+    //this.mfheaderDetails.mODBY = undefined;
+
     //#endregion
 
     this.tableData.filter(item => item.isSelected == true).forEach((res) => {
@@ -1227,28 +1234,28 @@ export class ThcGenerationComponent implements OnInit {
       //#region mfdetailsList
       mfdetailsList.cID = this.storage.companyCode
       mfdetailsList.dKTNO = res.docNo;
-      mfdetailsList.sFX = 0;
-      mfdetailsList.cNID = "";
+      mfdetailsList.sFX = res.sFX;
+      mfdetailsList.cNID = res.cNO;
       mfdetailsList.oRGN = this.thcTableForm.controls['branch'].value || "";
       mfdetailsList.dEST = this.thcTableForm.controls['closingBranch'].value || "";
       mfdetailsList.pKGS = res.pKGS;
-      mfdetailsList.vOL = 0;
       mfdetailsList.wT = res.aCTWT;
-      mfdetailsList.lDPKG = res.pKGS;
-      mfdetailsList.lDVOL = 0;
+      mfdetailsList.vOL = 0;
+      mfdetailsList.lDPKG = res.pKGS;      
       mfdetailsList.lDWT = res.aCTWT;
+      mfdetailsList.lDVOL = 0;
       mfdetailsList.aRRPKG = 0;
       mfdetailsList.aRRPWT = 0;
       mfdetailsList.aRRVOL = 0;
       mfdetailsList.aRRLOC = "";
       mfdetailsList.iSARR = false;
-      mfdetailsList.ARRDT = "";
+      //mfdetailsList.aRRDT = undefined;
       mfdetailsList.eNTDT = new Date()
       mfdetailsList.eNTLOC = this.storage.branch;
       mfdetailsList.eNTBY = this.storage.userName;
-      mfdetailsList.mODDT = "";
-      mfdetailsList.mODLOC = "";
-      mfdetailsList.mODBY = "";
+      //mfdetailsList.mODDT = undefined;
+      //mfdetailsList.mODLOC = undefined;
+      //mfdetailsList.mODBY = undefined;
       //#endregion
       this.mfdetailsList.push(mfdetailsList);
     });

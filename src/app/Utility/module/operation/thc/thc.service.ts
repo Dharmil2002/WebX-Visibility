@@ -16,7 +16,7 @@ export class ThcService {
 
     async getShipmentFiltered(branch, prqNo = null) {
        
-        let filter = { oRGN: branch, oSTS: 1}
+        let filter = { oRGN: branch, oSTS: 1 }
         if( (prqNo && prqNo !== "")) {
             filter["pRQNO"] = prqNo;
         }
@@ -41,6 +41,8 @@ export class ThcService {
             return {
                 bPARTYNM: element.bPARTYNM,
                 docNo: element.dKTNO,
+                sFX: element?.sFX || 0,
+                cNO: element?.cNO || "",
                 fCT: element.fCT,
                 tCT: element.tCT,
                 aCTWT: dkt?.tOTWT || 0,
@@ -48,7 +50,8 @@ export class ThcService {
                 pod: element?.pOD || "",
                 receiveBy: element?.rCVBY || "",
                 arrivalTime: element?.aRRTM || "",
-                remarks: element?.rEMARKS || ""
+                remarks: element?.rEMARKS || "",
+                transitHours: element?.tRNHR || 0,
             };
         };
         const docketList = result.data.map((element) => {

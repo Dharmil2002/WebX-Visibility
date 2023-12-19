@@ -1,45 +1,29 @@
+import { firstValueFrom } from "rxjs";
 import { formatDate } from "src/app/Utility/date/date-utils";
 
 export async function GetTHCListFromApi(masterService, RequestBody) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         branch: localStorage.getItem('Branch'),
-        startdate: RequestBody.StartDate,
-        PaymentMode: "Advance",
+        startdate: RequestBody.StartDate,        
         enddate: RequestBody.EndDate,
         vendorNames: RequestBody.vendorList,
     }
 
     try {
-        const resAdvance = await masterService.masterMongoPost("finance/getVendorTHCList", reqBody).toPromise();
-        reqBody.PaymentMode = "Balance";
-        const resbalance = await masterService.masterMongoPost("finance/getVendorTHCList", reqBody).toPromise();
-
+        const resAdvance: any[] = await firstValueFrom(masterService.masterMongoPost("finance/vp/getPendingSummary", reqBody));
+        
         const resAdvanceresult = resAdvance.map((x, index) => ({
             SrNo: index + 1,
-            Vendor: x._id?.Vendor,
-            THCamount: x.THCAmount,
-            AdvancePending: x.TotalPendingAmount,
-            data: x.data,
-            VendorInfo: x.VendorInfo
+            Vendor: x._id || "",
+            THCamount: x.tHCAMT || 0,
+            AdvancePending: x.aDVAMT || 0,
+            BalanceUnbilled: x.bALAMT || 0,
+            VendorInfo: x.vND,
         })) ?? null;
 
-        const resbalanceresult = resbalance.map((x, index) => ({
-            SrNo: index + 1,
-            Vendor: x._id?.Vendor,
-            THCamount: x.THCAmount,
-            BalanceUnbilled: x.TotalPendingAmount,
-            data: x.data,
-            VendorInfo: x.VendorInfo
-        })) ?? null;
-        console.log(resAdvanceresult)
-        console.log(resbalanceresult)
+        console.log(resAdvanceresult);
 
-        // Merge the lists
-        const mergedList = mergeJsonLists(resAdvanceresult, resbalanceresult);
-
-        // Display the result
-        console.log(mergedList);
         return resAdvanceresult
 
     } catch (error) {
@@ -48,20 +32,22 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
     }
 }
 
-export async function GetAdvancePaymentListFromApi(masterService, Filters) {
-    const reqBody = {
-        companyCode: localStorage.getItem('companyCode'),
-        collectionName: "thc_summary",
-        filter: Filters
-    }
+export async function GetAdvancePaymentListFromApi(masterService, Filters) {    
     try {
-        const res = await masterService.masterMongoPost("generic/get", reqBody).toPromise();
-        const result = res.data.map((x, index) => ({
+        const reqBody = {
+            companyCode: localStorage.getItem('companyCode'),
+            branch: localStorage.getItem('Branch'),
+            startdate: Filters.StartDate,        
+            enddate: Filters.EndDate,
+            paymentType: Filters.PaymentType,
+            vendorNames: [ `${Filters.VendorInfo.cD}:${Filters.VendorInfo.nM}` ],
+        }
+
+        const res: any[] = await firstValueFrom(masterService.masterMongoPost("finance/vp/getTHCList", reqBody));
+        const result = res.map((x, index) => ({
             isSelected: false,
             THC: x.docNo,
-            GenerationDate: x.eNTDT
-                ? formatDate(x.eNTDT, "dd-MM-yy")
-                : formatDate(new Date().toUTCString(), "dd-MM-yy"),
+            GenerationDate: formatDate(x.tHCDT || new Date().toUTCString(),  "dd-MM-yy"),
             VehicleNumber: x.vEHNO,
             THCamount: x.cONTAMT,
             Advance: x.aDVAMT,

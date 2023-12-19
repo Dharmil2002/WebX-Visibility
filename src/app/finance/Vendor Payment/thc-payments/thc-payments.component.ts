@@ -95,12 +95,14 @@ export class ThcPaymentsComponent implements OnInit {
     // Check if TotaladvAmt is greater than 0
     const isTotaladvAmtValid = event?.data?.AdvancePending > 0;
 
-    // Check if there is any entry with aDPAYAT equal to "Branch"
-    const isExist = event?.data?.data?.some(entry => entry.aDPAYAT === localStorage.getItem('Branch'));
-    if (isExist && isTotaladvAmtValid) {
+    if (isTotaladvAmtValid) {
       this.router.navigate(['/Finance/VendorPayment/AdvancePayment'], {
         state: {
-          data: event.data
+          data: { 
+            ...event.data,
+            StartDate: this.RequestData.StartDate,
+            EndDate: this.RequestData.EndDate,
+          }
         },
       });
     } else {

@@ -171,22 +171,10 @@ export class AdvancePaymentsComponent implements OnInit {
   async GetAdvancePaymentList() {
     this.isTableLode = false;
     const Filters = {
-      // 'D$expr': {
-      //   'D$eq': [
-      //     '$vND.cD', this.PaymentData?.VendorInfo?.cD,
-      //   ],
-      //   'D$eq': [
-      //     '$vND.nM', this.PaymentData?.VendorInfo?.nM,
-      //   ]
-      // },
-      'D$expr': {
-        'D$and': [
-          { 'D$eq': ["$vND.cD", this.PaymentData?.VendorInfo?.cD] },
-          { 'D$eq': ["$vND.nM", this.PaymentData?.VendorInfo?.nM] },
-        ],
-      },
-
-      aDPAYAT: localStorage.getItem("Branch"),
+      PaymentType: "Advance",
+      StartDate: this.PaymentData?.StartDate,
+      EndDate: this.PaymentData?.EndDate,
+      VendorInfo: this.PaymentData?.VendorInfo,
     };
     const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(
       this.masterService,
@@ -454,7 +442,7 @@ export class AdvancePaymentsComponent implements OnInit {
           localStorage.getItem("CurrentBranchCode");
         this.debitVoucherDataRequestModel.preperedFor = "Vendor";
         this.debitVoucherDataRequestModel.partyCode =
-          this.tableData[0].OthersData?.vendorCode.toString();
+          this.tableData[0].OthersData?.vendorCode?.toString();
         this.debitVoucherDataRequestModel.partyName =
           this.tableData[0].OthersData?.vendorName;
         this.debitVoucherDataRequestModel.partyState =

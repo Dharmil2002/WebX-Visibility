@@ -280,10 +280,7 @@ export class thcControl {
                     autocomplete: "",
                     displaywith: "",
                     generatecontrol: true,
-                    disable: view ? view : prq ? prq : update,
-                    functions: {
-                        onSelection: ""
-                    },
+                    disable: view ? view : prq ? prq : update,                    
                     Validations: [],
                     additionalData: {
                         showNameAndValue: false,

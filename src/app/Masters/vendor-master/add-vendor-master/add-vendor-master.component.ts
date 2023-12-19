@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { Component, OnInit } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Router } from "@angular/router";
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
@@ -283,101 +283,57 @@ export class AddVendorMasterComponent implements OnInit {
   //#endregion
 
   async save() {
-    clearValidatorsAndValidate(this.otherDetailForm)
-    clearValidatorsAndValidate(this.vendorTableForm)
-    const formValue = this.vendorTableForm.value;
-    const controlNames = [
-      "vendorType",
-      "vendorPinCode",
-    ];
-    controlNames.forEach(controlName => {
-      const controlValue = formValue[controlName]?.value;
-      this.vendorTableForm.controls[controlName].setValue(controlValue);
-    });
-    const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.value);
-    this.vendorTableForm.controls["vendorLocation"].setValue(vendorLocationDropdown1);
-    this.vendorTableForm.removeControl('vendorLocationDropdown');
-    this.vendorTableForm.removeControl('');
-    Object.values(this.vendorTableForm.controls).forEach(control => control.setErrors(null));
+    if (this.tableData.length > 0) {
 
-    const newData = this.tableData.map(x => {
-      const { actions, id, ...rest } = x;
-      return rest;
-    });
-    this.vendorTableForm.value.otherdetails = newData;
-    let data = convertNumericalStringsToInteger(this.vendorTableForm.value)
-    // Define an array of control names
-    const imageControlNames = ['msmeScan', 'panCardScan'];
-    imageControlNames.forEach(controlName => {
-      const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
-      // Set the URL in the corresponding control name
-      data[controlName] = file;
-    });
+      clearValidatorsAndValidate(this.otherDetailForm)
+      clearValidatorsAndValidate(this.vendorTableForm)
+      const formValue = this.vendorTableForm.value;
+      const controlNames = [
+        "vendorType",
+        "vendorPinCode",
+      ];
+      controlNames.forEach(controlName => {
+        const controlValue = formValue[controlName]?.value;
+        this.vendorTableForm.controls[controlName].setValue(controlValue);
+      });
+      const vendorLocationDropdown1 = this.vendorTableForm.value.vendorLocationDropdown.map((item: any) => item.value);
+      this.vendorTableForm.controls["vendorLocation"].setValue(vendorLocationDropdown1);
+      this.vendorTableForm.removeControl('vendorLocationDropdown');
+      this.vendorTableForm.removeControl('');
+      Object.values(this.vendorTableForm.controls).forEach(control => control.setErrors(null));
 
-    if (this.isUpdate) {
-      let id = data._id;
-      delete data._id;
-      data['mODDT'] = new Date()
-      data['mODBY'] = this.vendorTableForm.value.eNTBY
-      delete data.eNTBY;
-      delete data.eNTLOC;
-      delete data.eNTDT;
-      data['mODLOC'] = localStorage.getItem("Branch")
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "vendor_detail",
-        filter: { _id: id },
-        update: data
-      };
-      console.log(data);
-      
-      const res = await this.masterService.masterPut("generic/update", req).toPromise()
-      if (res) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: res.message,
-          showConfirmButton: true,
-        });
-        this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
-      }
-    }
-    else {
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "vendor_detail",
-        filter: {},
-      }
-      const resVendor = await this.masterService.masterPost("generic/get", req).toPromise()
-      if (resVendor) {
-        // Generate srno for each object in the array
-        const lastCode = resVendor.data[resVendor.data.length - 1];
-        const lastVendorCode = lastCode ? parseInt(lastCode.vendorCode.substring(1)) : 0;
-        // Function to generate a new route code
-        function generateVendorCode(initialCode: number = 0) {
-          const nextVendorCode = initialCode + 1;
-          const vendorNumber = nextVendorCode.toString().padStart(4, '0');
-          const vendorCode = `V${vendorNumber}`;
-          return vendorCode;
-        }
-        this.newVendorCode = generateVendorCode(lastVendorCode);
-        data.vendorCode = this.newVendorCode;
-        data._id = this.newVendorCode;
-        data['eNTDT'] = new Date()
-        data['eNTLOC'] = localStorage.getItem("Branch")
-        const newData = this.tableData.map(x => {
-          const { actions, id, ...rest } = x;
-          return rest;
-        });
+      const newData = this.tableData.map(x => {
+        const { actions, id, ...rest } = x;
+        return rest;
+      });
+      this.vendorTableForm.value.otherdetails = newData;
+      let data = convertNumericalStringsToInteger(this.vendorTableForm.value)
+      // Define an array of control names
+      const imageControlNames = ['msmeScan', 'panCardScan'];
+      imageControlNames.forEach(controlName => {
+        const file = this.objImageHandling.getFileByKey(controlName, this.imageData);
+        // Set the URL in the corresponding control name
+        data[controlName] = file;
+      });
 
-        data.otherdetails = newData;
+      if (this.isUpdate) {
+        let id = data._id;
+        delete data._id;
+        data['mODDT'] = new Date()
+        data['mODBY'] = this.vendorTableForm.value.eNTBY
+        delete data.eNTBY;
+        delete data.eNTLOC;
+        delete data.eNTDT;
+        data['mODLOC'] = localStorage.getItem("Branch")
         let req = {
           companyCode: this.companyCode,
           collectionName: "vendor_detail",
-          data: data
+          filter: { _id: id },
+          update: data
         };
-        const res = await this.masterService.masterPost("generic/create", req).toPromise()
+        console.log(data);
+
+        const res = await this.masterService.masterPut("generic/update", req).toPromise()
         if (res) {
           // Display success message
           Swal.fire({
@@ -389,6 +345,61 @@ export class AddVendorMasterComponent implements OnInit {
           this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
         }
       }
+      else {
+        let req = {
+          companyCode: this.companyCode,
+          collectionName: "vendor_detail",
+          filter: {},
+        }
+        const resVendor = await this.masterService.masterPost("generic/get", req).toPromise()
+        if (resVendor) {
+          // Generate srno for each object in the array
+          const lastCode = resVendor.data[resVendor.data.length - 1];
+          const lastVendorCode = lastCode ? parseInt(lastCode.vendorCode.substring(1)) : 0;
+          // Function to generate a new route code
+          function generateVendorCode(initialCode: number = 0) {
+            const nextVendorCode = initialCode + 1;
+            const vendorNumber = nextVendorCode.toString().padStart(4, '0');
+            const vendorCode = `V${vendorNumber}`;
+            return vendorCode;
+          }
+          this.newVendorCode = generateVendorCode(lastVendorCode);
+          data.vendorCode = this.newVendorCode;
+          data._id = this.newVendorCode;
+          data['eNTDT'] = new Date()
+          data['eNTLOC'] = localStorage.getItem("Branch")
+          const newData = this.tableData.map(x => {
+            const { actions, id, ...rest } = x;
+            return rest;
+          });
+
+          data.otherdetails = newData;
+          let req = {
+            companyCode: this.companyCode,
+            collectionName: "vendor_detail",
+            data: data
+          };
+          const res = await this.masterService.masterPost("generic/create", req).toPromise()
+          if (res) {
+            // Display success message
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+            this.route.navigateByUrl('/Masters/VendorMaster/VendorMasterList');
+          }
+        }
+      }
+    } else {
+      Swal.fire({
+        text: 'Please Fill Vendor Other Details',
+        icon: "warning",
+        title: 'Warning',
+        showConfirmButton: true,
+      });
+      return false
     }
   }
   cancel() {

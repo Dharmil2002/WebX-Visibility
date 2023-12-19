@@ -398,7 +398,7 @@ export class AddVehicleMasterComponent implements OnInit {
     // Reset the vendorName value
     this.vehicleTableForm.controls.vendorName.setValue("");
 
-    if (vendorType.toLowerCase() === 'own') {
+    if (vendorType === 3) {
       controls.generatecontrol = false;
     } else {
       //control.setValidators([Validators.required]);
@@ -407,7 +407,7 @@ export class AddVehicleMasterComponent implements OnInit {
     }
 
     const vendorDetail = this.vendorDetailList.filter((x) =>
-      x.type.toLowerCase() == vendorType.toLowerCase()
+      parseInt(x.type) === parseInt(vendorType)
     );
     this.filter.Filter(
       this.jsonControlVehicleArray,

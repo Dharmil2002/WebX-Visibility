@@ -97,9 +97,9 @@ export class VehicleControls {
                     placeholder: "VehicleType",
                     type: 'Staticdropdown',
                     value: [
-                        { value: "Own", name: "Own" },
-                        { value: "Attached", name: "Attached" },
-                        { value: "Service Provider", name: "Service Provider" }
+                        { value: 1, name: "Attached" },
+                        { value: 2, name: "Service Provider" },
+                        { value: 3, name: "Own" },
                     ],
                     filterOptions: "",
                     autocomplete: "",

@@ -168,9 +168,12 @@ export class ThcSummaryComponent implements OnInit {
   // }
   openExternalWindow(data) {
     const templateBody = {
-      DocNo: data.tripId,
+      DocNo: data.docNo,
       templateName: 'thc'
     }
+    console.log('templateBody', templateBody)
+    console.log('data', data)
+
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, '', 'width=1500,height=800');
   }

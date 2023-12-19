@@ -88,6 +88,8 @@ import { AddNewCustomerContractComponent } from './Customer Contract/add-new-cus
 import { AddNewVendorContractComponent } from './vendor-contract/add-new-vendor-contract/add-new-vendor-contract.component';
 import { AddTenantComponent } from './Tenant Setup/add-tenant/add-tenant.component';
 import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.component';
+import { ListContainerComponent } from './Container Master/list-container/list-container.component';
+import { AddContainerComponent } from './Container Master/add-container/add-container.component';
 
 
 const routes: Routes = [
@@ -192,6 +194,11 @@ const routes: Routes = [
   { path: "VendorContract/VendorContractList", component: VendorContractListComponent },
   { path: "VendorContract/VendorContractIndex", component: VendorIndexComponent },
   { path: "VendorContract/AddNewVendorContract", component: AddNewVendorContractComponent },
+
+
+  { path: "ContainerMaster/AddContainer", component: AddContainerComponent },
+  { path: "ContainerMaster/ListContainer", component: ListContainerComponent },
+
 
 ];
 

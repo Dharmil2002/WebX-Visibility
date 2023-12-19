@@ -167,6 +167,8 @@ import { FullTruckRouteBulkUploadComponent } from './vendor-contract/vendorContr
 import { LongHaulLaneBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-lhldetail/long-haul-lane-bulk-upload/long-haul-lane-bulk-upload.component';
 import { LastMileDeliveryBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-lmddetail/last-mile-delivery-bulk-upload/last-mile-delivery-bulk-upload.component';
 import { BusinessAssociateBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-busi-assoc-detail/business-associate-bulk-upload/business-associate-bulk-upload.component';
+import { AddContainerComponent } from './Container Master/add-container/add-container.component';
+import { ListContainerComponent } from './Container Master/list-container/list-container.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -349,6 +351,8 @@ import { BusinessAssociateBulkUploadComponent } from './vendor-contract/vendorCo
     LongHaulLaneBulkUploadComponent,
     LastMileDeliveryBulkUploadComponent,
     BusinessAssociateBulkUploadComponent,
+    AddContainerComponent,
+    ListContainerComponent,
   ],
 
   providers: [

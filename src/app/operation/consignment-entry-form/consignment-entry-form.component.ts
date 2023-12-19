@@ -1118,7 +1118,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
         contDet.push({
           cID: this.storage.companyCode,
           //dKTNO:  //To be set from service
-          cNID: i.containerNo,
+          cNID: i.containerNumber,
           cNTYP: container?.value || i.containerType,
           cNTYPN: container?.name || "",
           cNCPT: parseInt(i.containerCapacity),

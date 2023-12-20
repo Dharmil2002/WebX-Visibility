@@ -12,8 +12,13 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
 
     try {
         const resAdvance: any[] = await firstValueFrom(masterService.masterMongoPost("finance/vp/getPendingSummary", reqBody));
+        const result = resAdvance.sort((a, b) => {
+            const aValue = a._id.split(':')[1].trim();
+            const bValue = b._id.split(':')[1].trim();
 
-        const resAdvanceresult = resAdvance.map((x, index) => ({
+            return aValue.localeCompare(bValue);
+        });
+        const resAdvanceresult = result.map((x, index) => ({
             SrNo: index + 1,
             Vendor: x._id || "",
             THCamount: x.tHCAMT || 0,
@@ -21,8 +26,6 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
             BalanceUnbilled: x.bALAMT || 0,
             VendorInfo: x.vND,
         })) ?? null;
-
-        console.log(resAdvanceresult);
 
         return resAdvanceresult
 

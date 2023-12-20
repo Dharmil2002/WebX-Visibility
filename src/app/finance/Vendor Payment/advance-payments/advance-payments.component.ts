@@ -75,14 +75,14 @@ export class AdvancePaymentsComponent implements OnInit {
       Style: "min-width:20%",
     },
     THCamount: {
-      Title: "THC Amount",
+      Title: "THC Amount ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:20%",
       type: "Link",
       functionName: "THCAmountFunction",
     },
     Advance: {
-      Title: "Advance",
+      Title: "Advance ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
@@ -166,7 +166,7 @@ export class AdvancePaymentsComponent implements OnInit {
   async GetVendorInformation() {
     this.VendorDetails = await GetSingleVendorDetailsFromApi(
       this.masterService,
-      this.PaymentData.Vendor
+      this.PaymentData?.VendorInfo?.cD
     );
     // Set Existing Vendor Data 
 
@@ -548,7 +548,10 @@ export class AdvancePaymentsComponent implements OnInit {
       } else {
         commonBody = {
           aDVPENAMT: 0,
-          aDVVUCH: [vno]
+          aDVVUCH: [vno],
+          mODDT: new Date(),
+          mODLOC: this.storage.branch,
+          mODBY: this.storage.userName,
         }
       }
       const reqBody = {

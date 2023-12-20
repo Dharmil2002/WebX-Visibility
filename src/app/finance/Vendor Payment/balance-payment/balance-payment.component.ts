@@ -30,6 +30,7 @@ import { filter } from 'rxjs/operators';
 import { BeneficiaryDetailComponent } from "../../Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component";
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { BlancePaymentPopupComponent } from "../Modal/blance-payment-popup/blance-payment-popup.component";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-balance-payment",
@@ -80,19 +81,19 @@ export class BalancePaymentComponent implements OnInit {
       Style: "min-width:13%",
     },
     THCamount: {
-      Title: "THC Amount",
+      Title: "THC Amount ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:15%",
       type: "Link",
       functionName: "THCAmountFunction",
     },
     Advance: {
-      Title: "Advance",
+      Title: "Advance ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
     BalancePending: {
-      Title: "Balance Pending",
+      Title: "Balance Pending ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
@@ -160,6 +161,7 @@ export class BalancePaymentComponent implements OnInit {
     private masterService: MasterService,
     private matDialog: MatDialog,
     private objVendorBillService: VendorBillService,
+    private storage: StorageService,
     private route: Router // public dialog: MatDialog
   ) {
     this.PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -193,8 +195,6 @@ export class BalancePaymentComponent implements OnInit {
   }
   async GetVendorInformation() {
     this.VendorDetails = await GetSingleVendorDetailsFromApi(this.masterService, this.PaymentData?.VendorInfo?.cD)
-    // this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(this.VendorDetails?.panNo)
-    // this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0)
   }
   async GetABalancePaymentList() {
     this.isTableLode = false;
@@ -209,11 +209,7 @@ export class BalancePaymentComponent implements OnInit {
       this.masterService,
       Filters
     );
-    // if (GetAdvancePaymentData) {
-    //   this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(GetAdvancePaymentData[0]?.OthersData?.vND?.pAN)
-    //   this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0)
 
-    // }
 
     const Data = GetAdvancePaymentData.map((x, index) => {
       return {
@@ -232,7 +228,6 @@ export class BalancePaymentComponent implements OnInit {
   }
 
   initializeFormControl(): void {
-    console.log(this.PaymentData)
     let RequestObj = {
       VendorPANNumber: this.PaymentData?.VendorInfo?.pAN || "",
       Numberofvehiclesregistered: "0",
@@ -434,9 +429,7 @@ export class BalancePaymentComponent implements OnInit {
     }
   }
 
-  AdvancePendingFunction(event) {
-    console.log("AdvancePendingFunction", event);
-  }
+
 
   BalanceUnbilledFunction(event) {
     const templateBody = {
@@ -464,7 +457,7 @@ export class BalancePaymentComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        if(result.success){
+        if (result.success) {
           this.GetABalancePaymentList()
         }
       }
@@ -653,7 +646,7 @@ export class BalancePaymentComponent implements OnInit {
 
   }
   SetVendorBillEntry(BillNo, PaymenDetails, generateVoucher) {
-    this.tableData.filter((x) => x.isSelected == true).forEach((item) => {
+    this.tableData.filter((x) => x.isSelected == true).forEach(async (item) => {
 
       const vendbilldet: Vendbilldetails = {
         _id: BillNo + "-" + item.THC,
@@ -675,11 +668,27 @@ export class BalancePaymentComponent implements OnInit {
         data: vendbilldet,
       };
 
-      firstValueFrom(this.masterService.masterPost("generic/create", RequestData)).then((res: any) => {
+      const commonBody = {
+        bILLNO: BillNo,
+        iSBILLED: true,
+        mODDT: new Date(),
+        mODLOC: this.storage.branch,
+        mODBY: this.storage.userName,
+      }
+      const RequestDataForTHC = {
+        companyCode: this.companyCode,
+        collectionName: "thc_summary",
+        filter: {
+          cID: this.storage.companyCode,
+          docNo: item.THC
+        },
+        update: commonBody,
+      };
 
-      }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-        .finally(() => {
-        });
+
+      await firstValueFrom(this.masterService.masterPost("generic/create", RequestData));
+      await firstValueFrom(this.masterService.masterPut("generic/update", RequestDataForTHC));
+
     })
     if (generateVoucher) {
       this.SubmitVoucherData(PaymenDetails, BillNo)

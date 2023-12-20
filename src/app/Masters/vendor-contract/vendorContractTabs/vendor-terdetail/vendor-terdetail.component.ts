@@ -75,7 +75,7 @@ export class VendorTERDetailComponent implements OnInit {
   isLoad: boolean;
   excelDataList: any;
   previewResult: any;
-  uploadComponent: any;
+  uploadComponent = ExpressRouteBulkUploadComponent;
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private dialog: MatDialog,
@@ -89,20 +89,13 @@ export class VendorTERDetailComponent implements OnInit {
       this.CurrentContractDetails = JSON.parse(decryptedData)
 
       //console.log(this.CurrentContractDetails);
-
     });
   }
 
   ngOnInit(): void {
     this.getXpressDetail()
-    this.uploadComponent = ExpressRouteBulkUploadComponent
   }
-  ngOnChanges(changes: SimpleChanges) {
-    // console.log(changes);
 
-    const data = changes.contractData?.currentValue
-    //this.initializeFormControl(data);
-  }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
     const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
@@ -165,4 +158,15 @@ export class VendorTERDetailComponent implements OnInit {
     this.getXpressDetail()
   }
   //#endregion 
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getXpressDetail();
+    });
+  }
+  //#endregion
 }

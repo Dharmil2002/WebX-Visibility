@@ -78,7 +78,7 @@ export class VendorLMDDetailComponent implements OnInit {
   staticFieldTErouteBased = ['lOCNM', 'rTTNM', 'tMFRMNM', 'cPCTNM', 'mIN', 'cMTKM', 'aDDKM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
-  uploadComponent: any;
+  uploadComponent = LastMileDeliveryBulkUploadComponent;
 
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
@@ -96,7 +96,6 @@ export class VendorLMDDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTableDetail();
-    this.uploadComponent = LastMileDeliveryBulkUploadComponent
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
@@ -159,4 +158,15 @@ export class VendorLMDDetailComponent implements OnInit {
     this.getTableDetail()
   }
   //#endregion 
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getTableDetail();
+    });
+  }
+  //#endregion
 }

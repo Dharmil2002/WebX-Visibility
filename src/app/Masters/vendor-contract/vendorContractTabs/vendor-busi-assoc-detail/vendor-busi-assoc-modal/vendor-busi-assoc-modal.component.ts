@@ -80,7 +80,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
           filter: { _id: id },
           update: updateData,
         };
-        console.log(updateRequest);
+        // console.log(updateRequest);
 
         const updateResponse = await this.masterService.masterPut("generic/update", updateRequest).toPromise();
         // Display success message
@@ -107,7 +107,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
           // Generate a new _id
           newId = lastId + 1;
         }
-        newId = existingContract ? newId : 0
+        newId = existingContract ? newId : 1
         const newContractData = this.prepareContractData(newId);
 
         const createRequest = {
@@ -115,7 +115,7 @@ export class VendorBusiAssocModalComponent implements OnInit {
           collectionName: collectionName,
           data: newContractData,
         };
-        console.log(createRequest);
+        // console.log(createRequest);
 
         const createResponse = await this.masterService.masterPost("generic/create", createRequest).toPromise();
 

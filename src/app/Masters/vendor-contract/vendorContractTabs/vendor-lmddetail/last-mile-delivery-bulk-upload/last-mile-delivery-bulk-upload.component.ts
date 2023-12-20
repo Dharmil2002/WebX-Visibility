@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { LastMileDelivery } from 'src/app/Models/VendorContract/vendorContract';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
@@ -39,6 +40,7 @@ export class LastMileDeliveryBulkUploadComponent implements OnInit {
     private objLocationService: LocationService,
     private objContainerService: ContainerService,
     private dialogRef: MatDialogRef<LastMileDeliveryBulkUploadComponent>,
+    private objGeneralService: GeneralService
   ) {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
@@ -79,16 +81,11 @@ export class LastMileDeliveryBulkUploadComponent implements OnInit {
         this.existingData = await this.fetchExistingData();
         this.rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP');
         const containerData = await this.objContainerService.getContainerList();
-        const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VC');
         this.locationList = await this.objLocationService.getLocationList();
         this.timeFrameList = await PayBasisdetailFromApi(this.masterService, 'TMFRM')
+        const vehicleData = await this.objGeneralService.getGeneralMasterData("VEHSIZE");
 
-        // Process vehicle data to create a merged list
-        const containerDataWithPrefix = vehicleData.map(item => ({
-          name: item.name,
-          value: item.value,
-        }));
-        this.mergedCapacity = [...containerData, ...containerDataWithPrefix];
+        this.mergedCapacity = [...containerData, ...vehicleData];
         const validationRules = [{
           ItemsName: "Location",
           Validations: [{ Required: true },

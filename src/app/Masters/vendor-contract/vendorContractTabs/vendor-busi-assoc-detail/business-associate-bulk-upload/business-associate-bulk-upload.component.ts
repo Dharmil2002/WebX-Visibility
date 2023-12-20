@@ -217,7 +217,7 @@ export class BusinessAssociateBulkUploadComponent implements OnInit {
       // Format the final data with additional information
       const formattedData = this.formatContractData(vendorContractData, newId);
       // Log the formatted data
-      console.log(formattedData);
+      //console.log(formattedData);
 
       const createRequest = {
         companyCode: this.companyCode,

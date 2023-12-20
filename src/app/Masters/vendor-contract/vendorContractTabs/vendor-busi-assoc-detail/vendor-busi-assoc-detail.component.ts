@@ -79,7 +79,7 @@ export class VendorBusiAssocDetailComponent implements OnInit {
   staticFieldTErouteBased = ['cT', 'oPNM', 'rTNM', 'mDNM', , 'rT', 'mIN', 'mAX', "pBSNM", "lOCNM"]
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
-  uploadComponent: any;
+  uploadComponent = BusinessAssociateBulkUploadComponent;
 
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private dialog: MatDialog,
@@ -89,13 +89,12 @@ export class VendorBusiAssocDetailComponent implements OnInit {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
-      console.log(this.CurrentContractDetails);
+      //console.log(this.CurrentContractDetails);
 
     });
   }
   ngOnInit(): void {
     this.getTableDetail();
-    this.uploadComponent = BusinessAssociateBulkUploadComponent;
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
@@ -159,4 +158,15 @@ export class VendorBusiAssocDetailComponent implements OnInit {
     this.getTableDetail()
   }
   //#endregion 
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getTableDetail();
+    });
+  }
+  //#endregion
 }

@@ -69,7 +69,7 @@ export class VendorLHLDetailComponent implements OnInit {
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
-  uploadComponent: any;
+  uploadComponent = LongHaulLaneBulkUploadComponent;
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private dialog: MatDialog,
@@ -80,14 +80,13 @@ export class VendorLHLDetailComponent implements OnInit {
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
 
-      console.log(this.CurrentContractDetails);
+      //console.log(this.CurrentContractDetails);
 
     });
   }
 
   ngOnInit(): void {
     this.getTableDetail();
-    this.uploadComponent = LongHaulLaneBulkUploadComponent
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
@@ -152,6 +151,17 @@ export class VendorLHLDetailComponent implements OnInit {
   async removeTableData(id) {
     await removeData(this.masterService, id, 'vendor_contract_lhl_rt');
     this.getTableDetail()
+  }
+  //#endregion
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getTableDetail();
+    });
   }
   //#endregion
 }

@@ -70,7 +70,7 @@ export class VendorLHFTRDetailComponent implements OnInit {
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
-  uploadComponent: any;
+  uploadComponent = FullTruckRouteBulkUploadComponent;
 
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
@@ -89,7 +89,6 @@ export class VendorLHFTRDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.getXpressDetail();
-    this.uploadComponent = FullTruckRouteBulkUploadComponent
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
@@ -155,4 +154,15 @@ export class VendorLHFTRDetailComponent implements OnInit {
     this.getXpressDetail()
   }
   //#endregion 
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getXpressDetail();
+    });
+  }
+  //#endregion
 }

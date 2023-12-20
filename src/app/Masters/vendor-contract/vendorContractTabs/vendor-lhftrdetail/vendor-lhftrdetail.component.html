@@ -2,5 +2,5 @@
     [FormTitle]="'Transportation- Long Haul Full Truck- Route Based'" [tableData]="TErouteBasedTableData"
     [menuItems]="menuItems" [staticField]="staticFieldTErouteBased" [Link]="linkArray" [menuItemFlag]="menuItemflag"
     (menuItemClicked)="handleMenuItemClick($event)" [addFlag]="addFlag" [DisplayAddNewButton]=true
-    (AddNewButtonEvent)="addDetails()" [uploadComponent]= uploadComponent>
+    (AddNewButtonEvent)="addDetails()" [uploadComponent]=true (uploadEvent)="upload()">
 </app-generic-table-v2>

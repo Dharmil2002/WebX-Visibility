@@ -12,7 +12,6 @@ import { MatCheckboxChange } from "@angular/material/checkbox";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { ModifyTableCollumnsComponent } from "../../modify-table-collumns/modify-table-collumns.component";
 import { ImagePreviewComponent } from "../../image-preview/image-preview.component";
-import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { GenericService } from "src/app/core/service/generic-services/generic-services";
 
 @Component({
@@ -50,6 +49,7 @@ export class GenericTableV2Component
   @Output() selectAllClicked = new EventEmitter<any>();
   @Output() DeleteFunction = new EventEmitter<any>();
   @Output() functionCallEmitter = new EventEmitter();
+  @Output() uploadEvent = new EventEmitter<any>();
   @Input() height;
   @Input() FilterButton;
   @Input() width;
@@ -104,7 +104,6 @@ export class GenericTableV2Component
     private router: Router,
     public dialog: MatDialog,
     private genericService:GenericService,
-    private objImageHandling: ImageHandling,
   ) {
     super();
   }
@@ -195,12 +194,11 @@ export class GenericTableV2Component
   }
   //#endregion
 
-  //#region Funtion to open Dialog for bulkUpload
+  //#region to emit function to open Dialog for bulkUpload
   onUploadClick() {
-    this.dialog.open(this.uploadComponent, {
-      width: "800px",
-      height: "500px",
-    });
+    if (this.uploadComponent) {
+      this.uploadEvent.emit()
+    }
   }
   //#endregion
 

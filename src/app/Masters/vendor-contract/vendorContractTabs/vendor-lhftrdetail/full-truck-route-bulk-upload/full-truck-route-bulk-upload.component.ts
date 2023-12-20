@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/CustomerContractAPIUtitlity';
 import { vendorContractUpload } from 'src/app/Models/VendorContract/vendorContract';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { RouteLocationService } from 'src/app/Utility/module/masters/route-location/route-location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
@@ -38,6 +39,7 @@ export class FullTruckRouteBulkUploadComponent implements OnInit {
     private objRouteLocationService: RouteLocationService,
     private objContainerService: ContainerService,
     private dialogRef: MatDialogRef<FullTruckRouteBulkUploadComponent>,
+    private objGeneralService: GeneralService
   ) {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
@@ -79,14 +81,9 @@ export class FullTruckRouteBulkUploadComponent implements OnInit {
         this.routeList = await this.objRouteLocationService.getRouteLocationDetail();
         this.rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP');
         const containerData = await this.objContainerService.getContainerList();
-        const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VC');
+        const vehicleData = await this.objGeneralService.getGeneralMasterData("VEHSIZE");
 
-        // Process vehicle data to create a merged list
-        const containerDataWithPrefix = vehicleData.map(item => ({
-          name: item.name,
-          value: item.value,
-        }));
-        this.mergedCapacity = [...containerData, ...containerDataWithPrefix];
+        this.mergedCapacity = [...containerData, ...vehicleData];
         const validationRules = [{
           ItemsName: "Route",
           Validations: [{ Required: true },
@@ -203,7 +200,7 @@ export class FullTruckRouteBulkUploadComponent implements OnInit {
       // Format the final data with additional information
       const formattedData = this.formatContractData(vendorContractData, newId);
       // Log the formatted data
-      console.log(formattedData);
+      //console.log(formattedData);
       const createRequest = {
         companyCode: this.companyCode,
         collectionName: "vendor_contract_lhft_rt",

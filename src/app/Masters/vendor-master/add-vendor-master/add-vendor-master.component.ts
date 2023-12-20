@@ -331,7 +331,7 @@ export class AddVendorMasterComponent implements OnInit {
           filter: { _id: id },
           update: data
         };
-        console.log(data);
+        //console.log(data);
 
         const res = await this.masterService.masterPut("generic/update", req).toPromise()
         if (res) {

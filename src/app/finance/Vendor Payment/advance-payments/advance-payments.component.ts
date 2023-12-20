@@ -268,27 +268,13 @@ export class AdvancePaymentsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        this.setTHCamountData(result.data);
+        if(result.success){
+          this.GetAdvancePaymentList();
+        }
       }
     });
   }
 
-  setTHCamountData(result) {
-    this.isTableLode = false;
-    const THCdata = result.THCData;
-    const THCAmountsForm = result.THCAmountsForm;
-    this.tableData.forEach((x) => {
-      if (x.THC == THCdata.THC) {
-        x.Advance = +THCAmountsForm.Advance;
-        x.THCamount = +THCAmountsForm.Advance + +THCAmountsForm.Balance;
-        x["UpdateAmount"] = {
-          THCAmountsADDForm: result.THCAmountsADDForm,
-          THCAmountsLESSForm: result.THCAmountsLESSForm,
-        };
-      }
-    });
-    this.isTableLode = true;
-  }
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
     let functionName = $event.functionName; // name of the function , we have to call

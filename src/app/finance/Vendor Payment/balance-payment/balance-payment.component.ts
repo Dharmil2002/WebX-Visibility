@@ -464,28 +464,13 @@ export class BalancePaymentComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log("result", result);
-        this.setTHCamountData(result.data)
+        if(result.success){
+          this.GetABalancePaymentList()
+        }
       }
     });
   }
 
-  setTHCamountData(result) {
-    console.log('result', result)
-    this.isTableLode = false
-    const THCdata = result.THCData;
-    const THCAmountsForm = result.THCAmountsForm;
-    this.tableData.forEach((x) => {
-      if (x.THC == THCdata.THC) {
-        x.Advance = +THCAmountsForm.Advance;
-        x.THCamount = (+THCAmountsForm.Advance) + (+THCAmountsForm.Balance);
-        x.BalancePending = +THCAmountsForm.Balance;
-        x["cRGLST"] = result.Charges
-      }
-    })
-    this.selectCheckBox()
-    this.isTableLode = true
-  }
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
     let functionName = $event.functionName; // name of the function , we have to call

@@ -5,14 +5,14 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
         branch: localStorage.getItem('Branch'),
-        startdate: RequestBody.StartDate,        
+        startdate: RequestBody.StartDate,
         enddate: RequestBody.EndDate,
         vendorNames: RequestBody.vendorList,
     }
 
     try {
         const resAdvance: any[] = await firstValueFrom(masterService.masterMongoPost("finance/vp/getPendingSummary", reqBody));
-        
+
         const resAdvanceresult = resAdvance.map((x, index) => ({
             SrNo: index + 1,
             Vendor: x._id || "",
@@ -32,22 +32,22 @@ export async function GetTHCListFromApi(masterService, RequestBody) {
     }
 }
 
-export async function GetAdvancePaymentListFromApi(masterService, Filters) {    
+export async function GetAdvancePaymentListFromApi(masterService, Filters) {
     try {
         const reqBody = {
             companyCode: localStorage.getItem('companyCode'),
             branch: localStorage.getItem('Branch'),
-            startdate: Filters.StartDate,        
+            startdate: Filters.StartDate,
             enddate: Filters.EndDate,
-            paymentType: Filters.PaymentType,
-            vendorNames: [ `${Filters.VendorInfo.cD}:${Filters.VendorInfo.nM}` ],
+            PaymentType: Filters.PaymentType,
+            vendorNames: [`${Filters.VendorInfo.cD}:${Filters.VendorInfo.nM}`],
         }
 
         const res: any[] = await firstValueFrom(masterService.masterMongoPost("finance/vp/getTHCList", reqBody));
         const result = res.map((x, index) => ({
             isSelected: false,
             THC: x.docNo,
-            GenerationDate: formatDate(x.tHCDT || new Date().toUTCString(),  "dd-MM-yy"),
+            GenerationDate: formatDate(x.tHCDT || new Date().toUTCString(), "dd-MM-yy"),
             VehicleNumber: x.vEHNO,
             THCamount: x.cONTAMT,
             Advance: x.aDVAMT,

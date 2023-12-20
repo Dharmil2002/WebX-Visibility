@@ -13,7 +13,6 @@ import { THCAmountsDetailComponent } from "../Modal/thcamounts-detail/thcamounts
 import { VendorBalancePaymentControl } from "src/assets/FormControls/Finance/VendorPayment/vendorbalancepaymentcontrol";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
-import { BlancePaymentPopupComponent } from "../blance-payment-popup/blance-payment-popup.component";
 import { Router } from "@angular/router";
 import {
   GetAdvancePaymentListFromApi,
@@ -30,6 +29,7 @@ import { VoucherServicesService } from "src/app/core/service/Finance/voucher-ser
 import { filter } from 'rxjs/operators';
 import { BeneficiaryDetailComponent } from "../../Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component";
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
+import { BlancePaymentPopupComponent } from "../Modal/blance-payment-popup/blance-payment-popup.component";
 
 @Component({
   selector: "app-balance-payment",
@@ -199,15 +199,12 @@ export class BalancePaymentComponent implements OnInit {
   async GetAdvancePaymentList() {
     this.isTableLode = false;
     const Filters = {
-      'D$expr': {
-        'D$and': [
-          { 'D$eq': ["$vND.cD", this.PaymentData?.VendorInfo?.cD] },
-          { 'D$eq': ["$vND.nM", this.PaymentData?.VendorInfo?.nM] },
-        ],
-      },
-      //"vND.nM": this.PaymentData.Vendor,
-      bLPAYAT: localStorage.getItem("Branch"),
+      PaymentType: "Balance",
+      StartDate: this.PaymentData?.StartDate,
+      EndDate: this.PaymentData?.EndDate,
+      VendorInfo: this.PaymentData?.VendorInfo,
     };
+
     const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(
       this.masterService,
       Filters

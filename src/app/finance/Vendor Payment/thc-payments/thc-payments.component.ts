@@ -98,7 +98,7 @@ export class ThcPaymentsComponent implements OnInit {
     if (isTotaladvAmtValid) {
       this.router.navigate(['/Finance/VendorPayment/AdvancePayment'], {
         state: {
-          data: { 
+          data: {
             ...event.data,
             StartDate: this.RequestData.StartDate,
             EndDate: this.RequestData.EndDate,
@@ -123,11 +123,14 @@ export class ThcPaymentsComponent implements OnInit {
     // Check if TotaladvAmt is greater than 0
     const isTotaladvAmtValid = event?.data?.BalanceUnbilled > 0;
     // Check if there is any entry with balAmtAt equal to "Branch"
-    const isExist = event?.data?.data?.some(entry => entry.bLPAYAT === localStorage.getItem('Branch'));
-    if (isExist && isTotaladvAmtValid) {
+    if (isTotaladvAmtValid) {
       this.router.navigate(['/Finance/VendorPayment/BalancePayment'], {
         state: {
-          data: event.data
+          data: {
+            ...event.data,
+            StartDate: this.RequestData.StartDate,
+            EndDate: this.RequestData.EndDate,
+          }
         },
       });
     } else {

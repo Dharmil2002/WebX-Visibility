@@ -7,9 +7,9 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { VendorBalancePaymentControl } from "src/assets/FormControls/Finance/VendorPayment/vendorbalancepaymentcontrol";
-import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
 import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
 import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
+import { GetAccountDetailFromApi } from "../../VendorPaymentAPIUtitlity";
 
 @Component({
   selector: "app-blance-payment-popup",

@@ -55,12 +55,12 @@ import { BalancePaymentComponent } from './Vendor Payment/balance-payment/balanc
 import { VendorBillPaymentComponent } from './Vendor Bills/vendor-bill-payment/vendor-bill-payment.component';
 import { VendorBillListComponent } from './Vendor Bills/vendor-bill-payment/Tabs/vendor-bill-list/vendor-bill-list.component';
 import { VendorBillFilterComponent } from './Vendor Bills/vendor-bill-payment/Tabs/vendor-bill-list/vendor-bill-filter/vendor-bill-filter.component';
-import { BlancePaymentPopupComponent } from './Vendor Payment/blance-payment-popup/blance-payment-popup.component';
 import { VendorBillPaymentDetailsComponent } from './Vendor Bill Payment/vendor-bill-payment-details/vendor-bill-payment-details.component';
 import { OnlinePaymentApprovalComponent } from './Vendor Bills/vendor-bill-payment/Tabs/online-payment-approval/online-payment-approval.component';
 import { BeneficiaryDetailComponent } from './Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component';
 import { DeductionChargesComponent } from './invoice-collection/deduction-charges/deduction-charges.component';
 import { ShipmentSelectionComponent } from './invoice-summary-bill/shipment-selection/shipment-selection.component';
+import { BlancePaymentPopupComponent } from './Vendor Payment/Modal/blance-payment-popup/blance-payment-popup.component';
 
 @NgModule({
     declarations: [
@@ -130,7 +130,7 @@ import { ShipmentSelectionComponent } from './invoice-summary-bill/shipment-sele
         NgxMaterialTimepickerModule,
         ReactiveFormsModule
     ],
-    exports:[
+    exports: [
     ],
     providers: [SnackBarUtilityService, utilityService, OperationService,
         NavigationService, DatePipe, MatDialogModule,

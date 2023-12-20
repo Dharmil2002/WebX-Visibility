@@ -66,7 +66,7 @@ export async function GetLocationDetailFromApi(masterService) {
         const companyCode = localStorage.getItem('companyCode');
         const filter = {};
         const req = { companyCode, collectionName: 'location_detail', filter };
-        const res = await masterService.masterPost('generic/get', req).toPromise();
+        const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
 
         if (res && res.data) {
             return res.data.map(x => ({
@@ -88,7 +88,7 @@ export async function GetAccountDetailFromApi(masterService, AccountCategoryName
             AccountingLocations: AccountingLocations
         };
         const req = { companyCode, collectionName: 'account_detail', filter };
-        const res = await masterService.masterPost('generic/get', req).toPromise();
+        const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
         if (res && res.data) {
             return res.data.map(x => ({
                 name: x.AccountDescription, value: x.AccountCode, ...x
@@ -104,7 +104,7 @@ export async function GetSingleVendorDetailsFromApi(masterService, vendorCode) {
         const companyCode = localStorage.getItem('companyCode');
         const filter = { vendorCode: vendorCode };
         const req = { companyCode, collectionName: 'vendor_detail', filter };
-        const res = await masterService.masterPost('generic/get', req).toPromise();
+        const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
 
         if (res && res.data && res.data[0]) {
             return res.data[0];
@@ -119,7 +119,7 @@ export async function GetStateListFromAPI(masterService) {
         const companyCode = localStorage.getItem('companyCode');
         const filter = {};
         const req = { companyCode, collectionName: 'state_detail', filter };
-        const res = await masterService.masterPost('generic/get', req).toPromise();
+        const res: any = await firstValueFrom(masterService.masterPost('generic/get', req));
 
         return res
 

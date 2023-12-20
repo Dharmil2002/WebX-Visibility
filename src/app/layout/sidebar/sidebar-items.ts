@@ -558,8 +558,8 @@ export const ROUTES: RouteInfo[] =
       },
       {
         path: "Finance/VendorPayment/Dashboard",
-        title: "Vendor Payment Dashboard",
-        moduleName: "Vendor Payment Dashboard",
+        title: "Vendor Payment",
+        moduleName: "Vendor Payment",
         icon: "star",
         class: "",
         groupTitle: false,

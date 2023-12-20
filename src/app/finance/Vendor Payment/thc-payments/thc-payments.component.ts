@@ -47,19 +47,19 @@ export class ThcPaymentsComponent implements OnInit {
       Style: "min-width:30%",
     },
     THCamount: {
-      Title: "THC Amount",
+      Title: "THC Amount ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
     AdvancePending: {
-      Title: "Advance Pending",
+      Title: "Advance Pending ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:20%",
       type: "Link",
       functionName: "AdvancePendingFunction"
     },
     BalanceUnbilled: {
-      Title: "Balance Unbilled",
+      Title: "Balance Unbilled ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:20%",
       type: "Link",

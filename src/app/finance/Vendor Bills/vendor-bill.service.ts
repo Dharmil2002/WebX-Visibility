@@ -17,7 +17,7 @@ export class VendorBillService {
 
       // Map each response object to the desired format
       const tableDataArray = responseArray.map(res => ({
-        vendor: `${res.vND.cD} : ${res.vND.nM}`,
+        vendor: (res && res.vND && res.vND.cD ? `${res.vND.cD} : ${res.vND.nM}` : ''),
         _id: res._id,
         vnCode: res.vND.cD,
         billType: "Transaction Bill",

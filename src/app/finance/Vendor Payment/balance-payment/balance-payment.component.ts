@@ -195,6 +195,7 @@ export class BalancePaymentComponent implements OnInit {
   }
   async GetVendorInformation() {
     this.VendorDetails = await GetSingleVendorDetailsFromApi(this.masterService, this.PaymentData?.VendorInfo?.cD)
+    console.log(this.VendorDetails)
   }
   async GetABalancePaymentList() {
     this.isTableLode = false;
@@ -572,7 +573,7 @@ export class BalancePaymentComponent implements OnInit {
         const vendorBillEntry: VendorBillEntry = {
           companyCode: this.companyCode,
           docType: "VB",
-          branch: localStorage.getItem("CurrentBranchCode"),
+          branch: this.storage.branch,
           finYear: financialYear,
           data: {
             companyCode: this.companyCode,
@@ -590,13 +591,13 @@ export class BalancePaymentComponent implements OnInit {
             bSTAT: 1,
             bSTATNM: "Generated",
             cNL: false,
-            cNLDT: new Date(),
-            cNBY: localStorage.getItem("UserName"),
+            cNLDT: undefined,
+            cNBY: "",
             cNRES: "",
             eNTDT: new Date(),
-            eNTLOC: localStorage.getItem("CurrentBranchCode"),
-            eNTBY: localStorage.getItem("UserName"),
-            mODDT: new Date(),
+            eNTLOC: this.storage.branch,
+            eNTBY: this.storage.userName,
+            mODDT: undefined,
             mODLOC: "",
             mODBY: "",
             vND: {

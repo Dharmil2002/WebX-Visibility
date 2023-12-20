@@ -888,7 +888,7 @@ export class ThcGenerationComponent implements OnInit {
     if (!this.prqFlag && !this.directPrq) {
       this.thcTableForm.controls['vendorName'].setValue("");
     }
-    if (vendorType !== 'Market') {
+    if (vendorType !== '4') {
       const vendorDetail = this.vendorDetail.filter((x) => x.type == parseInt(vendorType));
       this.filter.Filter(
         this.jsonControlArray,
@@ -1210,7 +1210,7 @@ export class ThcGenerationComponent implements OnInit {
 
     //#region THC Movement Details
     this.mfheaderDetails.cID = this.storage.companyCode
-    this.mfheaderDetails.mDT = this.thcDetail.deptDate;
+    this.mfheaderDetails.mDT = deptDate;
     this.mfheaderDetails.oRGN = this.thcTableForm.controls['branch'].value || "";
     this.mfheaderDetails.dEST = this.thcTableForm.controls['closingBranch'].value || "";
     this.mfheaderDetails.dKTS = this.tableData.filter(item => item.isSelected == true).length;

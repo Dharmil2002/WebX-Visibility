@@ -498,18 +498,18 @@
       "router": "Masters/CityLocationMapping/CityLocationIndex"
     },
     {
-      "title": "ContainerMaster/ContainerMasterList",
+      "title": "ContainerMaster/ContainerMasterTypeList",
       "tag": [
         "ContainerMaster",
-        "ContainerMasterList"
+        "ContainerMasterTypeList"
       ],
       "router": "Masters/ContainerMaster/ContainerMasterList"
     },
     {
-      "title": "ContainerMaster/AddContainerMaster",
+      "title": "ContainerMaster/AddContainerType",
       "tag": [
         "ContainerMaster",
-        "AddContainerMaster"
+        "AddContainerType"
       ],
       "router": "Masters/ContainerMaster/AddContainerMaster"
     },
@@ -900,6 +900,21 @@
         "vendoutstandingreport"
       ],
       "router": "Reports/vendor-wise-outstanding-report"
+    },
+
+    {
+      "title": "AddContainerMaster",
+      "tag": [
+        "Add Container"
+      ],
+      "router": "Masters/ContainerMaster/AddContainer"
+    },
+    {
+      "title": "ListContainerMaster",
+      "tag": [
+        "List Container"
+      ],
+      "router": "Masters/ContainerMaster/ListContainer"
     }
   ]
 }

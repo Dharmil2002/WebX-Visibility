@@ -7,15 +7,17 @@ import {
   Validators,
 } from "@angular/forms";
 import { autocompleteObjectValidator } from "src/app/Utility/Validation/AutoComplateValidation";
-import { GetAccountDetailFromApi } from "../../Vendor Payment/VendorPaymentAPIUtitlity";
+import {
+  GetAccountDetailFromApi
+} from "../../Vendor Payment/VendorPaymentAPIUtitlity";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
-import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
-import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
+import { firstValueFrom } from "rxjs";
+import moment from "moment";
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { BeneficiaryDetailComponent } from "../beneficiary-detail/beneficiary-detail.component";
+import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
 
 @Component({
@@ -25,6 +27,7 @@ import Swal from "sweetalert2";
 export class VendorBillPaymentDetailsComponent implements OnInit {
   breadScrums = [
     {
+      title: "Vendor Bill Payment",
       items: ["Home"],
       active: "Vendor Bill Payment",
     },
@@ -81,6 +84,10 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
 
   dynamicControls = {
     add: false,
+    edit: false,
+    csv: false,
+  };
+  linkArray = [];
   addFlag = true;
   menuItemflag = true;
 
@@ -115,7 +122,10 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     },
     {
       count: "0.00",
+      title: "Total Payment Amount",
+      class: `color-Success-light`,
     },
+  ];
   isFormLode = false;
   PaymentSummaryFilterForm: UntypedFormGroup;
   jsonPaymentSummaryArray: any;
@@ -301,6 +311,10 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         Bank.setValue(SelectOpt);
         Bank.updateValueAndValidity();
 
+        const ChequeOrRefNo =
+          this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
+        ChequeOrRefNo.setValidators([Validators.required]);
+        ChequeOrRefNo.setValue(this.BillPaymentData.tRNO);
         ChequeOrRefNo.updateValueAndValidity();
 
         const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount");

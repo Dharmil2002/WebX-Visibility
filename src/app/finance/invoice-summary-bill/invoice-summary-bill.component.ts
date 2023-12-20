@@ -216,6 +216,8 @@ dialogClosed($event) {
     const tranDetail = await getApiCompanyDetail(this.masterService);
     this.invoiceTableForm.controls['cGstin'].setValue(custDetail?.data[0].GSTdetails[0].gstNo || "");
     this.invoiceTableForm.controls['cState'].setValue(custDetail?.data[0].GSTdetails[0].gstState || "");
+    this.invoiceTableForm.controls['gstSt'].setValue(custDetail?.data[0].GSTdetails[0].gstNo.substring(0,2) || "");
+    this.invoiceTableForm.controls['gstCt'].setValue(custDetail?.data[0].GSTdetails[0].gstCity || "");
     this.invoiceTableForm.controls['tState'].setValue(tranDetail?.data[0].state || "");
     this.invoiceTableForm.controls['tGstin'].setValue(tranDetail?.data[0].gstNo || "");
     // Check if custDetail and tranDetail have data

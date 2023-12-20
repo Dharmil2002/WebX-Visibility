@@ -363,6 +363,26 @@ export class StateWiseSummaryControl {
         disable: false,
         Validations: [],
       },
+      {
+        name: "gstCt",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      },
+      {
+        name: "gstSt",
+        label: "",
+        placeholder: "",
+        type: "",
+        value: "",
+        generatecontrol: false,
+        disable: false,
+        Validations: [],
+      }
       // {
       //   name: "_id",
       //   label: "",

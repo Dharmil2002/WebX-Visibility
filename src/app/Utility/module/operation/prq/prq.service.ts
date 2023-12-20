@@ -236,7 +236,7 @@ export class PrqService {
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "prq_summary",
-      filter: { bRCD: barnch,  pAYTYP: payType, bPARTY: billingParty,  sTS: { D$in: [4, 5] } },
+      filter: { bRCD: barnch,  pAYTYP: payType, bPARTY: billingParty,sTS: 2},
     };
 
     // Make an asynchronous request to the API using masterMongoPost method

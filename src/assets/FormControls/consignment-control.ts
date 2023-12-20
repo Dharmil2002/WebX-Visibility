@@ -294,7 +294,8 @@ export class ConsignmentControl {
           name: "autocomplete",
         }],
         functions: {
-          onModel: 'getVendors'
+          onModel: 'getVendors',
+          onOptionSelect: 'getVehicleFilter'
         },
         additionalData: {
           showNameAndValue: true,

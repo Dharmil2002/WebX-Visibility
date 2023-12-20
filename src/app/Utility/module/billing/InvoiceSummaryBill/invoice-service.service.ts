@@ -6,8 +6,8 @@ import { BillingInfo, PackageInfo } from 'src/app/core/models/finance/update.shi
 import { ReqJsonBilling } from 'src/app/core/models/finance/billing.model';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { XAxisComponent } from '@swimlane/ngx-charts';
 import Swal from 'sweetalert2';
+import { CustomerService } from '../../masters/customer/customer.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,8 @@ export class InvoiceServiceService {
 
   constructor(
     private storage: StorageService,
-    private operationService: OperationService
+    private operationService: OperationService,
+    private customerService:CustomerService
   ) { }
 
   async getInvoice(shipment: string[], status: number = 0) {
@@ -101,6 +102,42 @@ export class InvoiceServiceService {
   async addBillDetails(data, bill) {
     const customerName = (data?.customerName?.[0] || "").split('-')[1]?.trim() || "";
     const customerCode = (data?.customerName?.[0] || "").split('-')[0]?.trim() || "";
+    const  custList=await this.customerService.customerFromFilter({customerCode:customerCode},false);
+    let jsonBillingList = [];
+    bill.forEach((element) => {
+      element?.extraData.forEach(nested => {
+      const gstType=['SGST', 'CGST', 'UTGST']
+      let jsonBilling = {
+        _id: "",
+        bILLNO: "",
+        dKTNO: nested?.shipment || "",
+        cID: this.storage.companyCode,
+        oRGN: nested?.extraData?.oRGN || "",
+        dEST: nested?.extraData?.dEST || "",
+        dKTDT: nested?.extraData?.dKTDT,
+        cHRGWT:nested?.extraData.cHRWT,
+        dKTAMT: nested?.amount || 0.00,
+        dKTTOT: nested?.total || 0.00,
+        sUBTOT: nested?.amount || 0.00,
+        gSTTOT: nested?.gstChrgAmt || 0.00,
+        gSTRT: nested?.gst || 0.00,
+        tOTAMT: nested?.total || 0.00,
+        //pAMT: 0.00,
+        fCHRG: nested.extraData?.fRATE || 0.00,
+        //fLSCHRG: 0.00,
+        sGST:gstType.includes(data?.gstType)?parseFloat(element.gstCharged) / 2:0,
+        sGSTRT:gstType.includes(data?.gstType)?parseFloat(data.gstRate) / 2:0,
+        cGST:gstType.includes(data?.gstType)?parseFloat(element.gstCharged) / 2:0,
+        cGSTRT:gstType.includes(data?.gstType)?parseFloat(data.gstRate) / 2:0,
+        iGST:data?.gstType == "IGST" ? element.gstCharged:0,
+        iGSTRT: data?.gstType == "IGST"?data.gstRate:0,
+        eNTDT: new Date(),
+        eNTLOC:element.extraData?.oRGN || "",
+        eNTBY:this.storage?.userName|| "",
+      }
+      jsonBillingList.push(jsonBilling);
+    });
+    })
     const billData = {
       "_id": `${this.storage.companyCode}-${data?.invoiceNo}` || "",
       "cID": this.storage.companyCode,
@@ -118,8 +155,8 @@ export class InvoiceServiceService {
       "eXMTRES": data?.ExemptionReason || false,
       "gEN": {
         "lOC": this.storage.branch,
-        "cT": "",
-        "sT": "",
+        "cT":data?.gstCt||"",
+        "sT":data?.gstState||"",
         "gSTIN": data?.cGstin || false,
       },
       // "sUB": {
@@ -134,13 +171,13 @@ export class InvoiceServiceService {
       // },
       "cUST": {
         "cD": customerCode,
-        "nM": customerName || "",
-        "tEL": "",
-        "aDD": "",
-        "eML": "",
-        "cT": "",
-        "sT": "",
-        "gSTIN": ""
+        "nM": customerName,
+        "tEL":custList[0]?.customer_mobile||"",
+        "aDD":custList[0]?.RegisteredAddress||"",
+        "eML":custList[0]?.Customer_Emails||"",
+        "cT":custList[0]?.city||"",
+        "sT": custList[0]?.state||"",
+        "gSTIN":data?.cGstin||"",
       },
       "gST": {
         "tYP": data?.gstType || "", // SGST, UTGST, IGST
@@ -152,9 +189,9 @@ export class InvoiceServiceService {
       },
       "sUPDOC": "",
       "pRODID": 1, //From Product Master
-      "dKTCNT": data?.countSelected || 0.00,
+      "dKTCNT": data?.shipmentCount || 0.00,
       "CURR": "INR",
-      "dKTTOT": data?.subTotalAmount || 0.00,
+      "dKTTOT": data?.shipmentTotal || 0.00,
       "gROSSAMT": data?.shipmentTotal || 0.00,
       //"aDDCHRG": 0.00,
       "rOUNOFFAMT": data?.roundOff||0,
@@ -163,7 +200,7 @@ export class InvoiceServiceService {
       //"cNLDT": "",
       //"cNBY": "",
       //"cNRES": "",
-      "custDetails": bill,
+      "custDetails": jsonBillingList,
       "eNTDT": new Date().toISOString(),
       "eNTLOC": this.storage.branch,
       "eNTBY": this.storage.userName,
@@ -171,6 +208,7 @@ export class InvoiceServiceService {
       //"mODLOC": this.storage.branch,
       //"mODBY": this.storage.userName
     }
+
     const req = {
       companyCode: this.storage.companyCode,
       docType: "BILL",
@@ -182,7 +220,6 @@ export class InvoiceServiceService {
     };
     const res = await firstValueFrom(this.operationService.operationPost("finance/bill/cust/create", req));
     return res.data.ops[0].docNo
-
   }
   async addNestedBillShipment(data: BillingInfo[], billNo: string = '') {
 

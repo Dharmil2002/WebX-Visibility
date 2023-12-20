@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 
 @Injectable({
@@ -18,9 +19,8 @@ export class LocationService {
 
     try {
       // Make an asynchronous request to the API using masterMongoPost method
-      const res = await this.masterService
-        .masterMongoPost("generic/get", reqBody)
-        .toPromise();
+      const res = await firstValueFrom(this.masterService
+        .masterMongoPost("generic/get", reqBody));
 
       // Map the response data to a more usable format
       const filterMap =

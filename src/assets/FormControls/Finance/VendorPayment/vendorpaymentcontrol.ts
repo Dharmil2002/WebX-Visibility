@@ -87,7 +87,10 @@ export class VendorPaymentControl {
         value: FormValues?.TotalTHCAmount,
         generatecontrol: true,
         disable: true,
-        Validations: [],
+        Validations: [{
+          name: "required",
+          message: "Total THC Amount ₹ is required"
+        },],
       },
       {
         name: "AdvanceAmount",
@@ -97,7 +100,10 @@ export class VendorPaymentControl {
         value: FormValues?.AdvanceAmount,
         generatecontrol: true,
         disable: true,
-        Validations: [],
+        Validations: [{
+          name: "required",
+          message: "Advance Amount ₹ is required"
+        },],
       },
       {
         name: "BalancePayable",
@@ -107,7 +113,10 @@ export class VendorPaymentControl {
         value: FormValues?.BalancePayable,
         generatecontrol: true,
         disable: true,
-        Validations: [],
+        Validations: [{
+          name: "required",
+          message: "Balance Payable ₹ is required"
+        },],
       },
 
       {

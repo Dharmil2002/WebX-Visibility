@@ -204,6 +204,7 @@ export class AdvancePaymentsComponent implements OnInit {
       "BalancePaymentlocation",
       false
     );
+
     const paymentstate = this.AllLocationsList.find(
       (item) => item.name == this.storage.branch
     );
@@ -420,123 +421,127 @@ export class AdvancePaymentsComponent implements OnInit {
     }
   }
   Submit() {
-    this.snackBarUtilityService.commonToast(async () => {
-      try {
+    if (this.tableData.filter(x => x.isSelected).length == 0) {
+      this.snackBarUtilityService.ShowCommonSwal(
+        "info",
+        "Please Select Atleast One THC"
+      );
+    } else {
+      this.snackBarUtilityService.commonToast(async () => {
+        try {
 
-        const PaymentAmount = parseFloat(
-          this.PayableSummaryFilterForm.get("TotalTHCAmount").value
-        );
-        const NetPayable = parseFloat(
-          this.PayableSummaryFilterForm.get("BalancePayable").value
-        );
+          const PaymentAmount = parseFloat(
+            this.PayableSummaryFilterForm.get("TotalTHCAmount").value
+          );
+          const NetPayable = parseFloat(
+            this.PayableSummaryFilterForm.get("BalancePayable").value
+          );
 
-        this.debitVoucherRequestModel.companyCode = this.companyCode;
-        this.debitVoucherRequestModel.docType = "VR";
-        this.debitVoucherRequestModel.branch =
-          this.PayableSummaryFilterForm.value.BalancePaymentlocation?.name;
-        this.debitVoucherRequestModel.finYear = financialYear;
+          this.debitVoucherRequestModel.companyCode = this.companyCode;
+          this.debitVoucherRequestModel.docType = "VR";
+          this.debitVoucherRequestModel.branch =
+            this.PayableSummaryFilterForm.value.BalancePaymentlocation?.name;
+          this.debitVoucherRequestModel.finYear = financialYear;
 
-        this.debitVoucherDataRequestModel.companyCode = this.companyCode;
-        this.debitVoucherDataRequestModel.voucherNo = "";
-        this.debitVoucherDataRequestModel.transType = "AdvancePayment";
-        this.debitVoucherDataRequestModel.transDate = new Date().toUTCString();
-        this.debitVoucherDataRequestModel.docType = "VR";
-        this.debitVoucherDataRequestModel.branch =
-          this.storage.branch;
-        this.debitVoucherDataRequestModel.finYear = financialYear;
+          this.debitVoucherDataRequestModel.companyCode = this.companyCode;
+          this.debitVoucherDataRequestModel.voucherNo = "";
+          this.debitVoucherDataRequestModel.transType = "AdvancePayment";
+          this.debitVoucherDataRequestModel.transDate = new Date().toUTCString();
+          this.debitVoucherDataRequestModel.docType = "VR";
+          this.debitVoucherDataRequestModel.branch =
+            this.storage.branch;
+          this.debitVoucherDataRequestModel.finYear = financialYear;
 
-        this.debitVoucherDataRequestModel.accLocation =
-          this.storage.branch;
-        this.debitVoucherDataRequestModel.preperedFor = "Vendor";
-        this.debitVoucherDataRequestModel.partyCode =
-          this.tableData[0].OthersData?.vendorCode?.toString();
-        this.debitVoucherDataRequestModel.partyName =
-          this.tableData[0].OthersData?.vendorName;
-        this.debitVoucherDataRequestModel.partyState =
-          this.VendorDetails?.vendorState;
-        this.debitVoucherDataRequestModel.entryBy =
-          localStorage.getItem("UserName");
-        this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString();
-        this.debitVoucherDataRequestModel.panNo =
-          this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
+          this.debitVoucherDataRequestModel.accLocation =
+            this.storage.branch;
+          this.debitVoucherDataRequestModel.preperedFor = "Vendor";
+          this.debitVoucherDataRequestModel.partyCode = this.PaymentData?.VendorInfo?.cD;
+          this.debitVoucherDataRequestModel.partyName = this.PaymentData?.VendorInfo?.nM;
+          this.debitVoucherDataRequestModel.partyState =
+            this.VendorDetails?.vendorState;
+          this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
+          this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString();
+          this.debitVoucherDataRequestModel.panNo =
+            this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
 
-        this.debitVoucherDataRequestModel.tdsSectionCode = "tdsSectionCode";
-        this.debitVoucherDataRequestModel.tdsSectionName = "tdsSectionName";
-        this.debitVoucherDataRequestModel.tdsRate = 0;
-        this.debitVoucherDataRequestModel.tdsAmount = 0;
-        this.debitVoucherDataRequestModel.tdsAtlineitem = false;
-        this.debitVoucherDataRequestModel.tcsSectionCode = "tcsSectionCode";
-        this.debitVoucherDataRequestModel.tcsSectionName = "tcsSectionName";
-        this.debitVoucherDataRequestModel.tcsRate = 0;
-        this.debitVoucherDataRequestModel.tcsAmount = 0;
+          this.debitVoucherDataRequestModel.tdsSectionCode = "tdsSectionCode";
+          this.debitVoucherDataRequestModel.tdsSectionName = "tdsSectionName";
+          this.debitVoucherDataRequestModel.tdsRate = 0;
+          this.debitVoucherDataRequestModel.tdsAmount = 0;
+          this.debitVoucherDataRequestModel.tdsAtlineitem = false;
+          this.debitVoucherDataRequestModel.tcsSectionCode = "tcsSectionCode";
+          this.debitVoucherDataRequestModel.tcsSectionName = "tcsSectionName";
+          this.debitVoucherDataRequestModel.tcsRate = 0;
+          this.debitVoucherDataRequestModel.tcsAmount = 0;
 
-        this.debitVoucherDataRequestModel.IGST = 0;
-        this.debitVoucherDataRequestModel.SGST = 0;
-        this.debitVoucherDataRequestModel.CGST = 0;
-        this.debitVoucherDataRequestModel.UGST = 0;
-        this.debitVoucherDataRequestModel.GSTTotal = 0;
+          this.debitVoucherDataRequestModel.IGST = 0;
+          this.debitVoucherDataRequestModel.SGST = 0;
+          this.debitVoucherDataRequestModel.CGST = 0;
+          this.debitVoucherDataRequestModel.UGST = 0;
+          this.debitVoucherDataRequestModel.GSTTotal = 0;
 
-        this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
-        this.debitVoucherDataRequestModel.netPayable = NetPayable;
-        this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount;
-        this.debitVoucherDataRequestModel.voucherCanceled = false;
+          this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
+          this.debitVoucherDataRequestModel.netPayable = NetPayable;
+          this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount;
+          this.debitVoucherDataRequestModel.voucherCanceled = false;
 
-        this.debitVoucherDataRequestModel.paymentMode =
-          this.PaymentSummaryFilterForm.value.PaymentMode;
-        this.debitVoucherDataRequestModel.refNo =
-          this.PaymentSummaryFilterForm.value.ChequeOrRefNo;
-        this.debitVoucherDataRequestModel.accountName =
-          this.PaymentSummaryFilterForm.value.Bank.name;
-        this.debitVoucherDataRequestModel.date =
-          this.PaymentSummaryFilterForm.value.Date;
-        this.debitVoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
-        this.debitVoucherDataRequestModel.paymentAmtount = NetPayable;
+          this.debitVoucherDataRequestModel.paymentMode =
+            this.PaymentSummaryFilterForm.value.PaymentMode;
+          this.debitVoucherDataRequestModel.refNo =
+            this.PaymentSummaryFilterForm.value.ChequeOrRefNo;
+          this.debitVoucherDataRequestModel.accountName =
+            this.PaymentSummaryFilterForm.value.Bank.name;
+          this.debitVoucherDataRequestModel.date =
+            this.PaymentSummaryFilterForm.value.Date;
+          this.debitVoucherDataRequestModel.scanSupportingDocument = ""; //this.imageData?.ScanSupportingdocument
+          this.debitVoucherDataRequestModel.paymentAmtount = NetPayable;
 
-        const companyCode = this.companyCode;
-        const CurrentBranchCode = localStorage.getItem("CurrentBranchCode");
-        var VoucherlineitemList = this.tableData.map(function (item) {
-          return {
-            companyCode: companyCode,
-            voucherNo: "",
-            transType: "AdvancePayment",
-            transDate: new Date(),
-            finYear: financialYear,
-            branch: CurrentBranchCode,
-            accCode: "TEST",
-            accName: "TEST",
-            sacCode: "TEST",
-            sacName: "TEST",
-            debit: parseFloat(item.THCamount).toFixed(2),
-            credit: 0,
-            GSTRate: 0,
-            GSTAmount: 0,
-            Total: parseFloat(item.THCamount).toFixed(2),
-            TDSApplicable: false,
-            narration: "",
-          };
-        });
-
-        this.debitVoucherRequestModel.details = VoucherlineitemList;
-        this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
-        this.debitVoucherRequestModel.debitAgainstDocumentList = [];
-
-        firstValueFrom(this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
-            if (res.success) {
-              this.UpdateTHCAmount(res?.data?.mainData?.ops[0].vNO);
-            }
-          }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-          .finally(() => {
-
+          const companyCode = this.companyCode;
+          const CurrentBranchCode = this.storage.branch;
+          var VoucherlineitemList = this.tableData.map(function (item) {
+            return {
+              companyCode: companyCode,
+              voucherNo: "",
+              transType: "AdvancePayment",
+              transDate: new Date(),
+              finYear: financialYear,
+              branch: CurrentBranchCode,
+              accCode: "TEST",
+              accName: "TEST",
+              sacCode: "TEST",
+              sacName: "TEST",
+              debit: parseFloat(item.THCamount).toFixed(2),
+              credit: 0,
+              GSTRate: 0,
+              GSTAmount: 0,
+              Total: parseFloat(item.THCamount).toFixed(2),
+              TDSApplicable: false,
+              narration: "",
+            };
           });
 
-      } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal(
-          "error",
-          error.message
-        );
-      }
-    }, "Advance Payment Voucher Generating..!");
+          this.debitVoucherRequestModel.details = VoucherlineitemList;
+          this.debitVoucherRequestModel.data = this.debitVoucherDataRequestModel;
+          this.debitVoucherRequestModel.debitAgainstDocumentList = [];
+
+          firstValueFrom(this.voucherServicesService
+            .FinancePost("fin/account/voucherentry", this.debitVoucherRequestModel)).then((res: any) => {
+              if (res.success) {
+                this.UpdateTHCAmount(res?.data?.mainData?.ops[0].vNO);
+              }
+            }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
+            .finally(() => {
+
+            });
+
+        } catch (error) {
+          this.snackBarUtilityService.ShowCommonSwal(
+            "error",
+            error.message
+          );
+        }
+      }, "Advance Payment Voucher Generating..!");
+    }
   }
 
   UpdateTHCAmount(vno) {
@@ -637,5 +642,9 @@ export class AdvancePaymentsComponent implements OnInit {
       // Log any errors that occur during the process
       console.error('An error occurred:', error);
     }
+  }
+  BalancePaymentlocationFieldChanged(event) {
+    console.log(event)
+    this.OnPaymentModeChange(event);
   }
 }

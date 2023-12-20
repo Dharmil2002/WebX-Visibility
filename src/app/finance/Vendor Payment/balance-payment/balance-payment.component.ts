@@ -171,7 +171,7 @@ export class BalancePaymentComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeFormControl();
-    this.GetAdvancePaymentList();
+    this.GetABalancePaymentList();
     this.TotalAmountList = [
       {
         count: "0.00",
@@ -196,7 +196,7 @@ export class BalancePaymentComponent implements OnInit {
     // this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(this.VendorDetails?.panNo)
     // this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0)
   }
-  async GetAdvancePaymentList() {
+  async GetABalancePaymentList() {
     this.isTableLode = false;
     const Filters = {
       PaymentType: "Balance",
@@ -709,11 +709,15 @@ export class BalancePaymentComponent implements OnInit {
           Swal.hideLoading();
           setTimeout(() => {
             Swal.close();
+            this.RedirectToTHCPayment()
           }, 2000);
         }
       });
     }
 
+  }
+  RedirectToTHCPayment() {
+    this.route.navigate(["/Finance/VendorPayment/THC-Payment"]);
   }
   SubmitVoucherData(PaymenDetails, BillNo) {
     this.snackBarUtilityService.commonToast(async () => {
@@ -832,6 +836,7 @@ export class BalancePaymentComponent implements OnInit {
               Swal.hideLoading();
               setTimeout(() => {
                 Swal.close();
+                this.RedirectToTHCPayment()
               }, 2000);
             }
           });
@@ -891,6 +896,7 @@ export class BalancePaymentComponent implements OnInit {
         Swal.hideLoading();
         setTimeout(() => {
           Swal.close();
+          this.RedirectToTHCPayment()
         }, 2000);
       }
     });

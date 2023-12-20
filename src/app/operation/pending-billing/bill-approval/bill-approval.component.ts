@@ -16,7 +16,7 @@ export class BillApprovalComponent implements OnInit {
   shipments: any;
   tableData: any;
   headerColumn: any;
-  navigateExtra:any;
+  navigateExtra: any;
   tableLoad: boolean = true;
   breadScrums = [
     {
@@ -40,11 +40,11 @@ export class BillApprovalComponent implements OnInit {
     private invoiceService: InvoiceServiceService,
     private billApproval: BillApproval,/*this is a model object here so please dont remove bcz this model object is used in html page*/
     public dialog: MatDialog,
-    private storage:StorageService,
+    private storage: StorageService,
     private router: Router
   ) {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
-      
+
       this.navigateExtra = this.router.getCurrentNavigation()?.extras?.state.data.columnData || "";
     }
     this.backPath = "/dashboard/Index?tab=Management​";
@@ -54,47 +54,68 @@ export class BillApprovalComponent implements OnInit {
     this.getApprovalData();
   }
   async getApprovalData() {
-    const customer=this.navigateExtra.billingParty[0].split('-')[0].trim();
+    const customer = this.navigateExtra.billingParty[0].split('-')[0].trim();
     const res = await this.invoiceService.getBillingData(customer);
     const filterData = await this.invoiceService.filterData(res);
     this.tableData = filterData;
     this.tableLoad = false;
   }
   async handleMenuItemClick(data) {
-    
-    if (data.label.label === "Approve Bill") {
-      const filter={
-        bILLNO:data?.data?.bILLNO
+
+    if (data.label.label == "Approve Bill") {
+      const filter = {
+        bILLNO: data?.data?.bILLNO
       }
-      const status={
-        bSTS:2,
-        bSTSNM:"Bill Approved",
-        aPR:{
-          loc:this.storage.branch,
-          aDT:new Date(),
-          aBY:this.storage.userName
+      const status = {
+        bSTS: 2,
+        bSTSNM: "Bill Approved",
+        aPR: {
+          loc: this.storage.branch,
+          aDT: new Date(),
+          aBY: this.storage.userName
         }
       }
-     const res = await this.invoiceService.updateInvoiceStatus(filter,status);
-     if (res) {
-      this.getApprovalData();
-       SwalerrorMessage ("success","Success", "The invoice has been successfully approved.",true)
-     }
-    }
-   else if (data.label.label === "Submission Bill") {
-      const dialogref = this.dialog.open(BillSubmissionComponent, {
-       width: '100vw',
-       height: '100vw',
-       maxWidth: '232vw',
-       data: data.data,
-     });
-     dialogref.afterClosed().subscribe((result) => {
-      if(result){
-      this.getApprovalData();
-      SwalerrorMessage ("success","Success", "The invoice has been successfully Submission.",true)
+      const res = await this.invoiceService.updateInvoiceStatus(filter, status);
+      if (res) {
+        this.getApprovalData();
+        SwalerrorMessage("success", "Success", "The invoice has been successfully approved.", true)
       }
-     });
-   }
+    }
+    else if (data.label.label == "Cancel Bill") {
+      const filter = {
+        bILLNO: data?.data?.bILLNO
+      }
+      const status = {
+        cNL: true,
+        cNLDT:new Date(),
+        cNBY: this.storage.userName,
+        cNRES:""//required cancel reason in popup
+      }
+      const res = await this.invoiceService.updateInvoiceStatus(filter, status);
+      const filteDkt = {
+        cID: this.storage.companyCode,
+        bILLNO: data.data.bILLNO
+      }
+      await this.invoiceService.updateDocketStatus(filteDkt);
+      if (res) {
+        this.getApprovalData();
+        SwalerrorMessage("success", "Success", "The invoice has been successfully Cancelled.", true)
+      }
+    }
+    else if (data.label.label === "Submission Bill") {
+      const dialogref = this.dialog.open(BillSubmissionComponent, {
+        width: '100vw',
+        height: '100vw',
+        maxWidth: '232vw',
+        data: data.data,
+      });
+      dialogref.afterClosed().subscribe((result) => {
+        if (result) {
+          this.getApprovalData();
+          SwalerrorMessage("success", "Success", "The invoice has been successfully Submission.", true)
+        }
+      });
+    }
 
   }
 

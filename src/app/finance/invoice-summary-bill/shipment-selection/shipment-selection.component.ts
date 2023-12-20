@@ -29,7 +29,6 @@ dynamicControls = {
    this.stateName=this.data.stateName;
    this.tableData=this.data.extraData;
    this.isLoad=false;
-
   }
 
   ngOnInit(): void {
@@ -40,5 +39,21 @@ dynamicControls = {
   }
   onSubmitButtonClick(){
     this.dialogRef.close({stateName:this.stateName,selectedData:this.tableData.filter((x)=>x.isSelected==true)});
+  }
+  getCalucationDetails($event){    
+    const gstRate = parseFloat(this.data.gstRate.replace('%', '')) / 100;
+    
+    $event.filter((x)=>x.isSelected==true);
+    $event = $event.map((item) => {
+      if(item.isSelected) {
+        item.gst = parseFloat((item.amount * (gstRate)).toFixed(2));
+        item.total = parseFloat(item.amount) + parseFloat(item.gst)      
+      }
+      else {
+        item.gst = 0.00;
+        item.total= parseFloat(item.amount); 
+      }
+      return item;
+    });
   }
 }

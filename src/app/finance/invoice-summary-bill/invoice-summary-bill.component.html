@@ -1,7 +1,7 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
   <form [formGroup]="invoiceTableForm">
     <app-form-webxpress [form]="invoiceTableForm" [FormTitle]="'Customer and GST Details'"[formData]="jsonControlArray"
-      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
+      (functionCallEmitter)="functionCallHandler($event)" (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
     </app-form-webxpress>
   </form>
   <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"

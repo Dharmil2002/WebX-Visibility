@@ -9,6 +9,8 @@
       [menuItems]="menuItems"
       [menuItemFlag]="menuItemflag"
       [selectAllRequired]="true"
+      (selectAllClicked)="getCalucationDetails($event)"
+      (onFlagChange)="getCalucationDetails($event)"
       (menuItemClicked)="handleMenuItemClick($event)"
       [staticField]="definition.staticSelectField">
     </app-generic-table-v2>

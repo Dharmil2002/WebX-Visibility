@@ -157,8 +157,7 @@ dialogClosed($event) {
       x.extraData.map((y)=>{
         const findShipment=$event.selectedData.find((z)=>z.shipment==y.shipment);
         if(findShipment){
-          y.isSelected=true;
-          this.getGstCharged();
+          y.isSelected=true;          
         }
         else{
           y.isSelected=false;
@@ -233,12 +232,13 @@ dialogClosed($event) {
     // const tranState = getLowercaseState(tranDetail);
     // // Set 'gstType' value based on the equality of lowercase states
     this.invoiceTableForm.controls['gstType'].setValue(Object.keys(gstTypes).join());
+
     // const prqDetail = await getPrqApiDetail(this.masterService, this.navigateExtra.columnData.billingparty);
     const invoice = await this.invoiceServiceService.getInvoice(this.navigateExtra.dKTNO,this.status);
     const shipments = await this.invoiceServiceService.filterShipment(invoice);
-    const invoiceDetail = await this.invoiceServiceService.getInvoiceDetail(shipments);
+    const invoiceDetail = await this.invoiceServiceService.getInvoiceDetail(shipments,this.invoiceTableForm.controls['gstRate'].value);
     this.tableData = invoiceDetail;
-    this.getGstCharged();
+    
    // const cnoteCount = await total(invoiceDetail, 'cnoteCount');
     //this.invoiceSummaryTableForm.controls['shipmentCount'].setValue(cnoteCount);
     //const shipmentTot = await total(invoiceDetail, 'totalBillingAmount');
@@ -303,13 +303,8 @@ dialogClosed($event) {
     const gstCharged=this.tableData.filter((x)=>x.isSelected).reduce((sum, item) => sum + item.gstCharged, 0);
     this.KPICountData = [
       {
-        count: this.tableData.length,
-        title: "Total Cnote Count",
-        class: `color-Grape-light`,
-      },
-      {
-        count: this.tableData.filter((x) => x.isSelected).length,
-        title: "Total Count Selected",
+        count:this.tableData.filter((x)=>x.isSelected).reduce((sum, item) => sum + item.countSelected, 0),
+        title: "Total Selected",
         class: `color-Bottle-light`,
       },
       {
@@ -342,19 +337,7 @@ dialogClosed($event) {
   this.invoiceSummaryTableForm.controls['finalInvoice'].setValue(totBillingAmt);
 
   }
-  /*here i write code for the calulcate the gst */
-  getGstCharged() {
-    const gstRateString = this.invoiceTableForm.controls['gstRate'].value;
-    // Extract numeric value from the string (assuming it's always a valid percentage string)
-    const gstRate = parseFloat(gstRateString.replace('%', '')) / 100;
-    const result = this.tableData.map((item) => {
-      item.gstCharged = (item.gstCharged * (1 + gstRate)).toFixed(2);
-      item.totalBillingAmount= parseFloat(item.subTotalAmount) + parseFloat(item.gstCharged)
-      return item;
-    });
-    this.tableData = result;
-  }
-
+ 
   async checkGst(supplierGstNo: string, consumerGstNo: string): Promise<{ CGST: boolean, IGST: boolean, SGST: boolean, UTGST: boolean }> {
     const sGstNo = supplierGstNo.trim().substring(0, 2);
     const cGstNo = consumerGstNo.trim().substring(0, 2);
@@ -368,9 +351,64 @@ dialogClosed($event) {
       return { CGST: true, IGST: false, SGST: true, UTGST: false };
     }
   }
+  /*below function is fire when we add values in roundOff*/
   roundOffChange(){
-    const roundOff=parseFloat(this.invoiceSummaryTableForm.controls['roundOff'].value);
+    const roundOff=parseFloat(this.invoiceSummaryTableForm.controls['roundOff'].value || 0);
     const invoiceTotal=parseFloat(this.invoiceSummaryTableForm.controls['invoiceTotal'].value);
     this.invoiceSummaryTableForm.controls['finalInvoice'].setValue(roundOff+invoiceTotal);
+  }
+  /*End*/
+  /*below the function is for the gst Exempted Changen*/
+  gstExemptedChange(){
+    let charges: string[] = [
+      "gst",
+      "igst",
+      "cgst",
+      "sgst",
+      "utgst",
+    ];
+    const gstType = Object.keys(this.gstTypeValue);
+    const shipmentTotal = parseFloat(this.invoiceSummaryTableForm.controls['shipmentTotal'].value);
+    
+    if(this.invoiceTableForm.controls['gstExempted'].value) {  
+      
+      charges.map((x) => {
+        this.invoiceSummaryTableForm.controls[x].setValue(0);
+      });
+      
+      this.tableData.filter((x)=>x.isSelected).map((x)=>{
+        x.extraData.filter((y)=>y.isSelected).map((y)=>{ 
+          y.gst = 0;
+          y.total = y.amount;
+        });
+        x.gstCharged = 0;
+        x.totalBillingAmount = x.subTotalAmount;
+      })
+    }
+    else{
+      const gstRate = parseFloat(this.invoiceTableForm.controls['gstRate'].value.replace('%', '')) / 100;
+      
+      this.tableData.filter((x)=>x.isSelected).map((x)=>{
+        x.extraData.filter((y)=>y.isSelected).map((y)=>{ 
+          y.gst = parseFloat((y.amount * (gstRate)).toFixed(2));
+          y.total = parseFloat(y.amount) + parseFloat(y.gst)      
+        });
+        x.gstCharged = parseFloat(x.extraData.filter((y)=>y.isSelected).reduce((sum, item) => sum + item.gst, 0).toFixed(2));
+        x.totalBillingAmount = parseFloat(x.subTotalAmount) + parseFloat(x.gstCharged);
+      });    
+    }
+
+    const gstCharged = this.tableData.filter((x)=>x.isSelected).reduce((sum, item) => sum + item.gstCharged, 0);
+    const totBillingAmt = shipmentTotal + gstCharged;
+
+    // Set IGST, SGST, CGST, and UTGST based on gstType
+    this.invoiceSummaryTableForm.controls['igst'].setValue(gstType.includes("IGST") ? gstCharged : 0);
+    ['SGST', 'CGST', 'UTGST'].forEach(type => {
+      this.invoiceSummaryTableForm.controls[type.toLowerCase()].setValue(gstType.includes(type) ? parseFloat(gstCharged) / 2 : 0);
+    });
+    this.invoiceSummaryTableForm.controls['gst'].setValue(gstCharged || 0);
+    
+    this.invoiceSummaryTableForm.controls['invoiceTotal'].setValue(totBillingAmt);
+    this.roundOffChange();
   }
 }

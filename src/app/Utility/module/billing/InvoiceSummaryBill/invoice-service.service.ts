@@ -50,9 +50,9 @@ export class InvoiceServiceService {
           state: locDetails.data[0].locState || "", // Assuming locState is the state you want to assign
           vehicleNo: element?.vEHNO || "",
           amount: element?.gROAMT || "",
-          gst: element?.gSTAMT || "",
+          gst: 0 || "",
           gstChrgAmt: element?.gSTCHAMT || "",
-          total: element.tOTAMT,
+          total: element.gROAMT,
           noOfpkg: element?.pKGS || 0,
           weight: element?.aCTWT || 0,
           isSelected: false,
@@ -70,7 +70,7 @@ export class InvoiceServiceService {
     return filterShipmentList;
   }
 
-  getInvoiceDetail(shipment) {
+  getInvoiceDetail(shipment,gstRate) {
 
     const stateInvoiceMap = new Map();
     for (const element of shipment) {
@@ -83,6 +83,7 @@ export class InvoiceServiceService {
           countSelected: 0,
           subTotalAmount: 0,
           gstCharged: 0,
+          gstRate:gstRate,
           extraData: [element],
         });
       } else {
@@ -119,8 +120,8 @@ export class InvoiceServiceService {
         dKTAMT: nested?.amount || 0.00,
         dKTTOT: nested?.total || 0.00,
         sUBTOT: nested?.amount || 0.00,
-        gSTTOT: nested?.gstChrgAmt || 0.00,
-        gSTRT: nested?.gst || 0.00,
+        gSTTOT:data?.gstExempted==false?nested?.gstChrgAmt:0.00,
+        gSTRT:data?.gstExempted==false?nested?.gst:0.00,
         tOTAMT: nested?.total || 0.00,
         //pAMT: 0.00,
         fCHRG: nested.extraData?.fRATE || 0.00,
@@ -156,7 +157,7 @@ export class InvoiceServiceService {
       "gEN": {
         "lOC": this.storage.branch,
         "cT":data?.gstCt||"",
-        "sT":data?.gstState||"",
+        "sT":data?.gstSt||"",
         "gSTIN": data?.cGstin || false,
       },
       // "sUB": {
@@ -215,7 +216,7 @@ export class InvoiceServiceService {
       branch: this.storage.branch,
       finYear: financialYear,
       party: customerName.toUpperCase(),
-      collectionName: "Cust_bills_headers",
+      collectionName: "cust_bill_headers",
       data: billData
     };
     const res = await firstValueFrom(this.operationService.operationPost("finance/bill/cust/create", req));
@@ -266,7 +267,7 @@ export class InvoiceServiceService {
 
     const reqbody = {
       companyCode: this.storage.companyCode,
-      collectionName: 'Cust_bills_details',
+      collectionName: 'cust_bill_details',
       data: jsonBillingList,
     };
 
@@ -392,17 +393,19 @@ export class InvoiceServiceService {
   async getCollectionInvoiceDetails(billNo: string[]) {
     const req = {
       companyCode: this.storage.companyCode,
-      collectionName: "Cust_bills_headers",
+      collectionName: "cust_bill_headers",
       filter: { "bILLNO": { "D$in": billNo }, "bSTS": 3 }
     };
     const res = await firstValueFrom(this.operationService.operationPost("generic/get", req));
     const filterData = res.data.map((element) => {
-      element.collected = element.cOL.aMT;
-      element.deductions = element.cOL.bALAMT;
+      console.log(element);
+      const cOL= element.hasOwnProperty('cOL')?element.cOL.bALAMT:0;
+      element.collected =cOL;
+      element.deductions = element?.bALAMT||0;
       element.bDUEDT = formatDate(element.bDUEDT, 'dd-MM-yy hh:mm');
       element.bGNDT = formatDate(element.bGNDT, 'dd-MM-yy hh:mm');
-      element.collectionAmount = parseFloat(element.aMT) - parseFloat(element.cOL.aMT);
-      element.pendingAmount = parseFloat(element.aMT) - parseFloat(element.cOL.aMT);
+      element.collectionAmount = parseFloat(element.aMT) - parseFloat(cOL);
+      element.pendingAmount = parseFloat(element.aMT) - parseFloat(cOL);
       return element;
 
     });
@@ -436,10 +439,11 @@ export class InvoiceServiceService {
 
     const req = {
       companyCode: this.storage.companyCode,
-      collectionName: "Cust_bills_headers",
+      collectionName: "cust_bill_headers",
       filter: {
         bLOC: this.storage.branch,
         bSTS: { D$in: [1, 2] },
+        D$or: [{ cNL: false }, { cNL: { D$exists: false } }],
         D$expr: {
           D$eq: [
             "$cUST.cD", custCode
@@ -469,7 +473,7 @@ export class InvoiceServiceService {
 
     const req = {
       companyCode: this.storage.companyCode,
-      collectionName: "Cust_bills_headers",
+      collectionName: "cust_bill_headers",
       filter: filter,
       update: data
     }
@@ -477,6 +481,18 @@ export class InvoiceServiceService {
     return res
   }
   /*end */
+  /*below method for Update docket*/
+  async updateDocketStatus(filter) {
+
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "docket_fin_det",
+      filter: filter,
+      update: {isBILLED:false,bILLNO:""}
+    }
+    const res = await firstValueFrom(this.operationService.operationMongoPut("generic/updateAll", req));
+    return res
+  }
   /*here the code which is writen for Shipment Approval*/
   async updateShipmentStatus(item) {
 

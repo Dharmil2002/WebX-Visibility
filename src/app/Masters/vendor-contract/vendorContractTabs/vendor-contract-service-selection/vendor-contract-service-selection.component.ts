@@ -43,7 +43,7 @@ export class VendorContractServiceSelectionComponent implements OnInit {
   };
   columnHeader = {
     checkBoxRequired: {
-      Title: "Select",
+      Title: "",
       class: "matcolumncenter",
       Style: "max-width:80px",
     },

@@ -384,7 +384,7 @@ export const ROUTES: RouteInfo[] =
               ]
             },
             {
-              "path": "Masters/VendorContract/VendorQueryPage",
+              "path": "Masters/VendorContract/VendorContractList",
               "title": "Vendor Contract",
               "moduleName": "Vendor Contract",
               "icon": "",
@@ -558,8 +558,8 @@ export const ROUTES: RouteInfo[] =
       },
       {
         path: "Finance/VendorPayment/Dashboard",
-        title: "Vendor Payment Dashboard",
-        moduleName: "Vendor Payment Dashboard",
+        title: "Vendor Payment",
+        moduleName: "Vendor Payment",
         icon: "star",
         class: "",
         groupTitle: false,

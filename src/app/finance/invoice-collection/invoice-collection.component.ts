@@ -2,14 +2,21 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
+import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service';
 import { InvoiceCollectionControl } from 'src/assets/FormControls/Finance/InvoiceCollection/invoice-collection-control';
+import { DeductionChargesComponent } from './deduction-charges/deduction-charges.component';
+import { AutoComplete } from 'src/app/Models/drop-down/dropdown';
+import { setGeneralMasterData } from 'src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
+import { StorageService } from 'src/app/core/service/storage.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-invoice-collection',
   templateUrl: './invoice-collection.component.html',
 })
 export class InvoiceCollectionComponent implements OnInit {
-
+  backPath: string;
   breadScrums = [
     {
       title: "Customer and GST Details",
@@ -17,46 +24,18 @@ export class InvoiceCollectionComponent implements OnInit {
       active: "Customer and GST Details",
     },
   ];
+  height = '100vw';
+  width = '100vw';
+  maxWidth: '232vw'
   CustomerGSTTableForm: UntypedFormGroup;
-  CollectionSummaryTableForm:UntypedFormGroup;
+  CollectionSummaryTableForm: UntypedFormGroup;
   jsonControlArray: any;
   CollectionSummaryjsonControlArray: any;
   invocieCollectionFormControls: InvoiceCollectionControl;
   tableLoad: boolean = true;
-  tableData = [
-    {
-      invoiceNumber:"BLMUMB232400098",
-      invoiceDate:"10-Aug-23",
-      dueDate:"22-Sep-23",
-      invoiceAmount:23500.00,
-      collected:2000.00,
-      deductions:0.00,
-      collectionAmount:21500.00,
-      pendingAmount:0.00
-    },
-    {
-      invoiceNumber:"BLMUMB232400112",
-      invoiceDate:"12-Aug-23",
-      dueDate:"20-Sep-23",
-      invoiceAmount:34600.00,
-      collected:0.00,
-      deductions:1600.00,
-      collectionAmount:32000.00,
-      pendingAmount:1000.00
-    },
-    {
-      invoiceNumber:"BLPUNB232400043",
-      invoiceDate:"26-Aug-23",
-      dueDate:"21-Sep-23",
-      invoiceAmount:54000.00,
-      collected:0.00,
-      deductions:3200.00,
-      collectionAmount:24500.00,
-      pendingAmount:26300.00
-    }
-  ];
+  tableData = [];
   menuItems = [];
-  linkArray = [ { Row: 'deductions', Path: '',componentDetails: ""}];
+  linkArray = [{ Row: 'deductions', Path: '', componentDetails: DeductionChargesComponent }];
   menuItemflag = true;
   addFlag = true;
 
@@ -67,22 +46,22 @@ export class InvoiceCollectionComponent implements OnInit {
   };
 
   InvoiceDetailscolumnHeader = {
-    invoiceNumber: {
+    bILLNO: {
       Title: "Invoice number",
       class: "matcolumnfirst",
-      Style: "min-width:80px",
+      Style: "min-width:200px",
     },
-    invoiceDate: {
+    bGNDT: {
       Title: "Invoice date",
       class: "matcolumncenter",
       Style: "min-width:80px",
     },
-    dueDate: {
+    bDUEDT: {
       Title: "Due date",
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    invoiceAmount: {
+    aMT: {
       Title: "Invoice Amount(₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
@@ -102,32 +81,42 @@ export class InvoiceCollectionComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:2px",
     },
-    pendingAmount : {
+    pendingAmount: {
       Title: "Pending Amount(₹)",
       class: "matcolumncenter",
       Style: "min-width:2px",
     }
   };
   staticField = [
-    "invoiceNumber",
-    "invoiceDate",
-    "dueDate",
-    "invoiceAmount",
+    "bILLNO",
+    "bGNDT",
+    "bDUEDT",
+    "aMT",
     "collected",
     "collectionAmount",
     "pendingAmount",
   ];
+  invoiceDetail: any;
 
-  constructor(private fb: UntypedFormBuilder, private router: Router) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    private router: Router,
+    private invoiceService: InvoiceServiceService,
+    private generalService: GeneralService,
+    private storage: StorageService
+  ) {
+
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
-      const data =
-        this.router.getCurrentNavigation()?.extras?.state.data.columnData;
+
+      this.invoiceDetail = this.router.getCurrentNavigation()?.extras?.state.data.columnData;
     }
-    this.tableLoad = false;
+    this.backPath = "/dashboard/Index?tab=Management​";
+
     this.initializeFormControl();
   }
 
   ngOnInit(): void {
+    this.getBilligDetails();
   }
 
   functionCallHandler($event) {
@@ -143,11 +132,45 @@ export class InvoiceCollectionComponent implements OnInit {
   }
   initializeFormControl() {
     this.invocieCollectionFormControls = new InvoiceCollectionControl();
-    // Get form controls for job Entry form section
     this.jsonControlArray = this.invocieCollectionFormControls.getCustomerGSTArrayControls();
     this.CollectionSummaryjsonControlArray = this.invocieCollectionFormControls.getCollectionSummaryArrayControls();
-    // Build the form group using formGroupBuilder function
     this.CustomerGSTTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.CollectionSummaryTableForm = formGroupBuilder(this.fb, [this.CollectionSummaryjsonControlArray]);
+    this.CustomerGSTTableForm.controls['customer'].setValue(this.invoiceDetail?.billingParty || "");
+
   }
+  async getBilligDetails() {
+    const result = await this.invoiceService.getCollectionInvoiceDetails(this.invoiceDetail?.bILLNO || "");
+    this.tableData = result;
+    this.tableLoad = false;
+    this.getDropdown()
+  }
+  async getDropdown() {
+    const mode: AutoComplete[] = await this.generalService.getDataForAutoComplete("General_master", {codeType: "ACT" }, "codeDesc", "codeId");
+    const bank: AutoComplete[] = await this.generalService.getDataForAutoComplete("General_master", {codeType: "BNK" }, "codeDesc", "codeId");
+    setGeneralMasterData(this.CollectionSummaryjsonControlArray, mode, "collectionMode");
+    setGeneralMasterData(this.CollectionSummaryjsonControlArray, bank, "bank");
+  }
+  cancel() {
+    this.tab('Management​');
+  }
+  tab(tabIndex: string): void {
+    this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex }, state: [] });
+  }
+  async save() {
+    const data=await this.invoiceService.getCollectionJson(this.CollectionSummaryTableForm.value,this.tableData);
+    const res=this.invoiceService.saveCollection(data);
+    if(res){
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Invoice collection saved successfully',
+        timer: 2000,
+        showCancelButton: false,
+        showConfirmButton: false
+      });
+      this.tab('Management​');
+    }
+  }
+ 
 }

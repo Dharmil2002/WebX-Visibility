@@ -31,7 +31,7 @@ export class DriverControls {
           {
             name: "pattern",
             message: "Please Enter only text of length 3 to 200 characters",
-            pattern: "^[a-z A-Z]{3,200}$",
+            pattern: "^[a-zA-Z]{3,200}$",
           },
         ],
         functions: {
@@ -76,8 +76,8 @@ export class DriverControls {
           {
             name: "pattern",
             message:
-              "Please Enter alphanumeric License No of length 15 (eg. AZ1234567890123)",
-            pattern: "^[A-Z]{2}[0-9]{13}$",
+              "Please Enter alphanumeric License No of length 8 (eg. AZ-125487)",
+            pattern: "^[A-Z]{2}-[0-9]{6}$",
           },
         ],
         functions: {

@@ -1,0 +1,31 @@
+<!-- Your MatDialog content -->
+<mat-dialog-content>
+  <h1>Shipment Edit</h1>
+ </mat-dialog-content>
+ <!-- Close button -->
+ <mat-dialog-actions>
+   <div>
+       <form [formGroup]="shipmentTableForm">
+         <app-form-webxpress [form]="shipmentTableForm"  [FormTitle]="'Update Detail'" [formData]="jsonControlArray"
+           (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+           (callFunction)="functionCallHandler($event)">
+         </app-form-webxpress>
+       </form>
+       <ng-container *ngIf="isChagesValid">
+       <form [formGroup]="accountDetail">
+           <app-form-webxpress [form]="accountDetail"  [FormTitle]="'Account Detail'" [formData]="jsonControlsEdit"
+             (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+             (callFunction)="functionCallHandler($event)" [className]="className">
+           </app-form-webxpress>
+         </form>
+       </ng-container>
+     </div>
+     <div class="row">
+       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
+         <div class="example-button-row d-flex justify-content-start">
+           <button class="msr-3" mat-raised-button color="primary"(click)="updateShipment()">Submit</button>
+           <button class="msr-3" mat-raised-button color="primary" (click)="onCloseButtonClick()">Close</button>
+         </div>
+       </div>
+     </div>
+ </mat-dialog-actions>

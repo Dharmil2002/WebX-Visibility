@@ -85,9 +85,9 @@ export class AddLocationMasterComponent implements OnInit {
       this.locationTable = router.getCurrentNavigation().extras.state.data;
       this.locationTable = {
         ...this.locationTable,
-        mappedPinCode: this.locationTable?.mappedPinCode.join(', '),
-        mappedCity: this.locationTable?.mappedCity.join(', '),
-        mappedState: this.locationTable?.mappedState.join(', '),
+        mappedPinCode: this.locationTable?.mappedPinCode ? this.locationTable.mappedPinCode.join(', ') : '',
+        mappedCity: this.locationTable?.mappedCity ? this.locationTable.mappedCity.join(', ') : '',
+        mappedState: this.locationTable?.mappedState ? this.locationTable.mappedState.join(', ') : '',
       };
 
       this.isUpdate = true;
@@ -336,7 +336,6 @@ export class AddLocationMasterComponent implements OnInit {
       const request = {
         "companyCode": this.companyCode,
         "collectionName": "state_master",
-        filter: {},
       };
 
       this.StateList = await this.masterService.masterPost('generic/get', request).toPromise();

@@ -199,6 +199,15 @@ export class marketVehicleControls {
         generatecontrol: false, disable: false
       },
       {
+        name: 'vendTypeCode',
+        label: 'vendTypeCode',
+        placeholder: 'vendTypeCode',
+        type: '',
+        value: "4",
+        Validations: [],
+        generatecontrol: false, disable: false
+      },
+      {
         name: 'companyCode', label: "Company Code", placeholder: "Company Code", type: '',
         value: localStorage.getItem("companyCode"), filterOptions: "", autocomplete: "", displaywith: "", generatecontrol: false, disable: false,
         Validations: [

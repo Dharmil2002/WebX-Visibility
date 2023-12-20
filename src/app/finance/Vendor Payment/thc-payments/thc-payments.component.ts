@@ -47,19 +47,19 @@ export class ThcPaymentsComponent implements OnInit {
       Style: "min-width:30%",
     },
     THCamount: {
-      Title: "THC Amount",
+      Title: "THC Amount ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
     AdvancePending: {
-      Title: "Advance Pending",
+      Title: "Advance Pending ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:20%",
       type: "Link",
       functionName: "AdvancePendingFunction"
     },
     BalanceUnbilled: {
-      Title: "Balance Unbilled",
+      Title: "Balance Unbilled ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:20%",
       type: "Link",
@@ -95,12 +95,14 @@ export class ThcPaymentsComponent implements OnInit {
     // Check if TotaladvAmt is greater than 0
     const isTotaladvAmtValid = event?.data?.AdvancePending > 0;
 
-    // Check if there is any entry with advPdAt equal to "Branch"
-    const isExist = event?.data?.data?.some(entry => entry.advPdAt === localStorage.getItem('Branch'));
-    if (isExist && isTotaladvAmtValid) {
+    if (isTotaladvAmtValid) {
       this.router.navigate(['/Finance/VendorPayment/AdvancePayment'], {
         state: {
-          data: event.data
+          data: {
+            ...event.data,
+            StartDate: this.RequestData.StartDate,
+            EndDate: this.RequestData.EndDate,
+          }
         },
       });
     } else {
@@ -120,13 +122,15 @@ export class ThcPaymentsComponent implements OnInit {
   BalanceUnbilledFunction(event) {
     // Check if TotaladvAmt is greater than 0
     const isTotaladvAmtValid = event?.data?.BalanceUnbilled > 0;
-
     // Check if there is any entry with balAmtAt equal to "Branch"
-    const isExist = event?.data?.data?.some(entry => entry.balAmtAt === localStorage.getItem('Branch'));
-    if (isExist && isTotaladvAmtValid) {
+    if (isTotaladvAmtValid) {
       this.router.navigate(['/Finance/VendorPayment/BalancePayment'], {
         state: {
-          data: event.data
+          data: {
+            ...event.data,
+            StartDate: this.RequestData.StartDate,
+            EndDate: this.RequestData.EndDate,
+          }
         },
       });
     } else {

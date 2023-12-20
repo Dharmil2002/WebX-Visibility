@@ -2,7 +2,6 @@ import { Component, Input, OnInit, SimpleChanges, ViewChild } from '@angular/cor
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
 import { ImageHandling } from 'src/app/Utility/Form Utilities/imageHandling';
 import { clearValidatorsAndValidate } from 'src/app/Utility/Form Utilities/remove-validation';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -177,7 +176,7 @@ export class AddFleetMasterComponent implements OnInit {
       "filter": {},
       "collectionName": collectionName,
     };
-    const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+    const res = await this.masterService.masterPost('generic/get', req).toPromise();
     return res?.data || [];
   }
 
@@ -255,8 +254,9 @@ export class AddFleetMasterComponent implements OnInit {
       };
 
       //API FOR UPDATE
-      const res = await firstValueFrom(this.masterService
-        .masterPut("generic/update", req));
+      const res = await this.masterService
+        .masterPut("generic/update", req)
+        .toPromise();
       if (res) {
         // Display success message
         Swal.fire({
@@ -279,8 +279,9 @@ export class AddFleetMasterComponent implements OnInit {
         collectionName: "fleet_master",
         data: data,
       };
-      const res = await firstValueFrom(this.masterService
-        .masterPost("generic/create", req));
+      const res = await this.masterService
+        .masterPost("generic/create", req)
+        .toPromise();
       if (res) {
         Swal.fire({
           icon: "success",
@@ -334,7 +335,7 @@ export class AddFleetMasterComponent implements OnInit {
       };
 
       // Fetch the fleet collection from the server
-      const fleetCollection = await firstValueFrom(this.masterService.masterPost('generic/get', request));
+      const fleetCollection = await this.masterService.masterPost('generic/get', request).toPromise();
 
       // Check if the vehicle number already exists in the fleet collection
       if (fleetCollection.data.length > 0) {

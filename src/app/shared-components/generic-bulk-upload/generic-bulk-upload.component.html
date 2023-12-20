@@ -1,0 +1,39 @@
+<div mat-dialog-title style="display: flex; justify-content: space-between; margin: 0 0 0px; align-items: center;">
+    <h3>{{ title }}</h3>
+    <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<div class="row">
+    <!-- <div class="header">
+        <div style="float: right;" class="preloader pl-size-sm" *ngIf="isUploaded">
+            <div class="spinner-layer pl-purple">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div class="body">
+        <div class="example-container">
+            <ng-content></ng-content>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mb-2">
+    <div class="m-1">
+        <button (click)="downloadFunction()" mat-button color="primary" class="download-button">
+            <mat-icon>get_app</mat-icon>
+            Download {{ fileName }} Template File
+        </button>
+        <a *ngIf="isDateMsg" class="left" title="" data-placement="left" data-toggle="tooltip"
+            data-original-title="Please enter date in dd MMM yyyy format">
+            <i class="fa fa-exclamation-circle"> </i>(Please enter date in dd MMM yyyy format)
+        </a>
+    </div>
+</div>

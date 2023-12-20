@@ -5,6 +5,8 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
+import { xlsxutilityService } from 'src/app/core/service/Utility/xlsx Utils/xlsxutility.service';
+import { ExpressRouteBulkUploadComponent } from './express-route-bulk-upload/express-route-bulk-upload.component';
 
 @Component({
   selector: 'app-vendor-terdetail',
@@ -70,10 +72,16 @@ export class VendorTERDetailComponent implements OnInit {
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
+  isLoad: boolean;
+  excelDataList: any;
+  previewResult: any;
+  uploadComponent = ExpressRouteBulkUploadComponent;
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
     private dialog: MatDialog,
     private masterService: MasterService,
+    public xlsxUtils: xlsxutilityService,
+
   ) {
     this.route.queryParams.subscribe((params) => {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
@@ -81,19 +89,13 @@ export class VendorTERDetailComponent implements OnInit {
       this.CurrentContractDetails = JSON.parse(decryptedData)
 
       //console.log(this.CurrentContractDetails);
-
     });
   }
 
   ngOnInit(): void {
     this.getXpressDetail()
   }
-  ngOnChanges(changes: SimpleChanges) {
-    // console.log(changes);
 
-    const data = changes.contractData?.currentValue
-    //this.initializeFormControl(data);
-  }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
     const terDetails = this.TErouteBasedTableData.find(x => x._id == data.data._id);
@@ -156,4 +158,15 @@ export class VendorTERDetailComponent implements OnInit {
     this.getXpressDetail()
   }
   //#endregion 
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getXpressDetail();
+    });
+  }
+  //#endregion
 }

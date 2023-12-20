@@ -1,3 +1,5 @@
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+
 /**
  * Removes duplicate objects from an array based on all key-value pairs.
  * @param {Array} objects - The array of objects.
@@ -88,3 +90,17 @@ export function updateProperty(arr, propertyToUpdate, propertyToUpdateFrom) {
     [propertyToUpdate]: item[propertyToUpdateFrom]
   }));
 }
+
+export async function   total(round,field){
+  let count= round.reduce((total, invoice) => {
+     return total + parseInt(invoice[field], 10);
+   }, 0);
+   return count
+  }
+  export function setGeneralMasterData(controls: any[], data: AutoComplete[], controlName: string)
+  {
+    const control = controls.find((x) => x.name === controlName);
+    if (control) {
+      control.value = data;
+    }
+  }

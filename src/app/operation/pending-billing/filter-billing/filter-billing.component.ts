@@ -96,7 +96,7 @@ export class FilterBillingComponent implements OnInit {
   }
 
   close() {
-    this.dialogRef.close();
+    this.dialogRef.close("");
   }
 
   apply() {

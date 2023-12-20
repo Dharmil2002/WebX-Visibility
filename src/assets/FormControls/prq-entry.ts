@@ -7,7 +7,7 @@ export class PrqEntryControls {
   constructor(prqDetail: prqDetail, isUpdate) {
     this.fieldMapping = [
       {
-        name: "prqNo",
+        name: "pRQNO",
         label: "Request ID",
         placeholder: "Request ID",
         type: "text",
@@ -17,7 +17,7 @@ export class PrqEntryControls {
         Validations: [],
       },
       {
-        name: "billingParty",
+        name: "bPARTY",
         label: "Billing Party & Code",
         placeholder: "Billing Party",
         type: "dropdown",
@@ -41,6 +41,7 @@ export class PrqEntryControls {
           },
         ],
         functions: {
+          onModel: "getCustomer",
           onOptionSelect: "bilingChanged"
         },
         additionalData: {
@@ -48,7 +49,7 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "pickUpTime",
+        name: "pICKDT",
         label: "Pickup Date & Time",
         placeholder: "",
         type: "datetimerpicker",
@@ -72,15 +73,11 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "transMode",
-        label: "Transport Mode",
-        placeholder: "Transport Mode",
+        name: "cARTYP",
+        label: "Carrier Type",
+        placeholder: "Carrier Type",
         type: "Staticdropdown",
-        value: [
-          { value: "truck", name: "Truck" },
-          { value: "trailer", name: "Trailer" },
-          { value: "container", name: "Container" },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -95,7 +92,7 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "typeContainer",
+        name: "cNTYP",
         label: "Type of Container",
         placeholder: "Type of Container",
         type: "dropdown",
@@ -122,7 +119,7 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "containerSize",
+        name: "cNTSIZE",
         label: "Container Capacity(Tons)",
         placeholder: "Container Capacity",
         type: "text",
@@ -135,16 +132,11 @@ export class PrqEntryControls {
         Validations: [],
       },
       {
-        name: "vehicleSize",
+        name: "vEHSIZE",
         label: "Truck Capacity",
         placeholder: "Truck Capacity",
         type: "Staticdropdown",
-        value: [
-          { value: "1", name: "1-MT" },
-          { value: "9", name: "9-MT" },
-          { value: "16", name: "16-MT" },
-          { value: "32", name: "32-MT" },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -154,9 +146,12 @@ export class PrqEntryControls {
         additionalData: {
           showNameAndValue: false,
         },
+        functions: {
+          onSelection: "setVehicleSize"
+        },
       },
       {
-        name: "contactNo",
+        name: "pHNO",
         label: "Contact Number",
         placeholder: "Contact Number",
         type: "mobile-number",
@@ -182,7 +177,7 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "pAddress",
+        name: "pADD",
         label: "Pick Up Address",
         placeholder: "Pick Up Address",
         type: "text",
@@ -203,7 +198,7 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "fromCity",
+        name: "fCITY",
         label: "From City",
         placeholder: "From City",
         type: "dropdown",
@@ -234,7 +229,7 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "toCity",
+        name: "tCITY",
         label: "To City",
         placeholder: "To City",
         type: "dropdown",
@@ -267,7 +262,7 @@ export class PrqEntryControls {
       },
 
       {
-        name: "prqBranch",
+        name: "bRCD",
         label: "PRQ Branch",
         placeholder: "PRQ Branch",
         type: "text",
@@ -284,28 +279,11 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "payType",
+        name: "pAYTYP",
         label: "Payment Mode",
         placeholder: "Payment Mode",
         type: "Staticdropdown",
-        value: [
-          {
-            value: "PAID",
-            name: "PAID",
-          },
-          {
-            value: "TBB",
-            name: "TBB",
-          },
-          {
-            value: "TO PAY",
-            name: "TO PAY",
-          },
-          {
-            value: "FOC",
-            name: "FOC",
-          },
-        ],
+        value: [],
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -322,7 +300,7 @@ export class PrqEntryControls {
         },
       },
       {
-        name: "contractAmt",
+        name: "cONTRAMT",
         label: "Contract Amount(₹)",
         placeholder: "Contract Amount",
         type: "number",
@@ -331,78 +309,16 @@ export class PrqEntryControls {
         disable: false,
         Validations: [],
       },
-
-      // Additional hidden or metadata form controls.
       {
-        name: "status",
-        label: "",
-        placeholder: "",
+        name: "sIZE",
+        label: "Size",
+        placeholder: "Size",
         type: "",
-        value: "0",
-        Validations: [],
+        value: prqDetail.size,
         generatecontrol: true,
         disable: false,
-      },
-      {
-        name: "companyCode",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: localStorage.getItem("companyCode"),
         Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
-      {
-        name: "entryBy",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: localStorage.getItem("UserName"),
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
-      {
-        name: "entryDate",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: new Date(),
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
-      {
-        name: "vehicleNo",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: "",
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
-      {
-        name: "dktNo",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: "",
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
-      {
-        name: "invoiceNo",
-        label: "",
-        placeholder: "",
-        type: "",
-        value: "",
-        Validations: [],
-        generatecontrol: true,
-        disable: false,
-      },
+      }
     ];
   }
   getPrqEntryFieldControls() {

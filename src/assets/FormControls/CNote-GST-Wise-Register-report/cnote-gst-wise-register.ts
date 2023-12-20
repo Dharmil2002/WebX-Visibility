@@ -21,9 +21,32 @@ export class cNoteGSTControl {
                     },
                },
                {
+                    name: 'flowType',
+                    label: 'Flow Type',
+                    placeholder: 'Flow Type',
+                    type: 'Staticdropdown',
+                    value: [
+                         { value: "Incoming", name: "Incoming" },
+                         { value: "Outgoing", name: "Outgoing", }
+                    ],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [
+                    ],
+                    additionalData: {
+                         support: "flowTypeHandler",
+                         showNameAndValue: false,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
                     name: "payType",
-                    label: "Payment Mode",
-                    placeholder: "Payment Mode",
+                    label: "Payment Basic",
+                    placeholder: "Payment Basic",
                     type: "multiselect",
                     value: '',
                     filterOptions: "",
@@ -45,7 +68,7 @@ export class cNoteGSTControl {
                {
                     name: 'origin',
                     label: 'From Location',
-                    placeholder: 'Search and Select From Location',
+                    placeholder: 'From Location',
                     type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                     Validations: [
                     ],
@@ -63,7 +86,7 @@ export class cNoteGSTControl {
                {
                     name: 'destination',
                     label: 'To Location',
-                    placeholder: 'Search and Select To Location',
+                    placeholder: 'To Location',
                     type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                     Validations: [
                     ],
@@ -85,7 +108,7 @@ export class cNoteGSTControl {
                {
                     name: 'fromCity',
                     label: 'From City',
-                    placeholder: 'Search and Select From City',
+                    placeholder: 'From City',
                     type: 'multiselect', value: '', filterOptions: "", autocomplete: "", displaywith: "",
                     Validations: [
                     ],
@@ -122,8 +145,8 @@ export class cNoteGSTControl {
                },
                {
                     name: "transMode",
-                    label: "Transport Mode",
-                    placeholder: "Transport Mode",
+                    label: "Transit Mode",
+                    placeholder: "Transit Mode",
                     type: "multiselect",
                     value: '',
                     filterOptions: "",
@@ -141,6 +164,98 @@ export class cNoteGSTControl {
                     functions: {
                          onToggleAll: "toggleSelectAll"
                     },
+               },
+               {
+                    name: 'busType',
+                    label: 'Business Type',
+                    placeholder: '',
+                    type: 'Staticdropdown',
+                    value: [],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [
+                    ],
+                    additionalData: {
+                         support: "busiTypeHandler",
+                         showNameAndValue: false,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
+                    name: 'loadType',
+                    label: 'Load Type',
+                    placeholder: '',
+                    type: 'Staticdropdown',
+                    value: [
+                         { value: "LTL", name: "LTL" },
+                         { value: "FTL", name: "FTL" }
+                    ],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [
+                    ],
+                    additionalData: {
+                         support: "loadTypeHandler",
+                         showNameAndValue: false,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
+                    name: 'status',
+                    label: 'Status',
+                    placeholder: '',
+                    type: 'Staticdropdown',
+                    value: [],
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    Validations: [
+                    ],
+                    additionalData: {
+                         support: "statusHandler",
+                         showNameAndValue: false,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll",
+                    },
+                    generatecontrol: true, disable: false
+               },
+               {
+                    name: "cust",
+                    label: "Customer",
+                    placeholder: "",
+                    type: "multiselect",
+                    value: '',
+                    filterOptions: "",
+                    autocomplete: "",
+                    displaywith: "",
+                    generatecontrol: true,
+                    disable: false,
+                    Validations: [],
+                    additionalData: {
+                         support: "custHandler",
+                         showNameAndValue: false,
+                    },
+                    functions: {
+                         onToggleAll: "toggleSelectAll"
+                    },
+               },
+               {
+                    name: 'custHandler',
+                    label: 'custHandler',
+                    placeholder: 'custHandler',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
                },
                {
                     name: 'tolocHandler',
@@ -207,6 +322,42 @@ export class cNoteGSTControl {
                     generatecontrol: false,
                     disable: true,
                     Validations: [],
+               },
+               {
+                    name: 'flowTypeHandler',
+                    label: 'flowTypeHandler',
+                    placeholder: 'flowTypeHandler',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+               },
+               {
+                    name: 'busiTypeHandler',
+                    label: 'busiTypeHandler',
+                    placeholder: 'busiTypeHandler',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+               },
+               {
+                    name: 'Load Type',
+                    label: 'Load Type',
+                    placeholder: 'Load Type',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
+               },
+               {
+                    name: 'statusHandler',
+                    label: 'statusHandler',
+                    placeholder: 'statusHandler',
+                    type: '',
+                    value: '',
+                    Validations: [],
+                    generatecontrol: false, disable: false
                },
           ]
      }

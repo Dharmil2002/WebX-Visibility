@@ -8,6 +8,6 @@ export class ThcUpdate {
     capacity: string
     loadedKg: number
     loadaddedKg: number
-    docketNumber:string
+    docNo:string
   }
   

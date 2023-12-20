@@ -1,10 +1,4 @@
 import { Component, OnInit } from "@angular/core";
-import {
-  DocumentGenerated,
-  OthrPaymentSummary,
-  PaymentSummary,
-  VendorBillPayment,
-} from "../../Vendor Bills/vendor-bill-payment/VendorStaticData";
 import { vendorBillPaymentControl } from "src/assets/FormControls/Finance/VendorPayment/vendorBillPaymentControl";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import {
@@ -21,8 +15,8 @@ import { ImagePreviewComponent } from "src/app/shared-components/image-preview/i
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
-import { firstValueFrom } from "rxjs";
-import moment from "moment";
+import { BeneficiaryDetailComponent } from "../beneficiary-detail/beneficiary-detail.component";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-vendor-bill-payment-details",
@@ -31,7 +25,6 @@ import moment from "moment";
 export class VendorBillPaymentDetailsComponent implements OnInit {
   breadScrums = [
     {
-      title: "Vendor Bill Payment",
       items: ["Home"],
       active: "Vendor Bill Payment",
     },
@@ -41,9 +34,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: ["checkBoxRequired"],
   };
-  // tableData = VendorBillPayment
-  tableData:any
-
+  tableData: any;
 
   columnHeader = {
     checkBoxRequired: {
@@ -54,9 +45,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     bILLNO: {
       Title: "Bill No",
       class: "matcolumncenter",
-      Style: "min-width:200px",
-      type: "Link",
-      functionName: "billNoFunction",
+      Style: "min-width:200px"
     },
     eNTDT: {
       Title: "Generation Date",
@@ -90,24 +79,12 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     },
   };
 
-  TableStyle = "width:60%";
   dynamicControls = {
     add: false,
-    edit: false,
-    csv: false,
-  };
-  linkArray = [];
   addFlag = true;
   menuItemflag = true;
 
-  staticField = [
-    "bALAMT",
-    "tHCAMT",
-    "debitNote",
-    "eNTDT",
-    "aDVAMT",
-    "payment",
-  ];
+  staticField = ["bALAMT", "tHCAMT", "debitNote", "eNTDT", "aDVAMT", "payment", "bILLNO"];
   summaryStaticField = ["amt", "institute", "ref", "paymentMethod"];
   documentSaticField = ["docNo", "document", "date"];
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
@@ -117,12 +94,12 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   vendorbillPaymentForm: UntypedFormGroup;
   TotalAmountList = [
     {
-      count: "331800.00",
+      count: "0.00",
       title: "Total Bill Amount",
       class: `color-Success-light`,
     },
     {
-      count: "10000.00",
+      count: "0.00",
       title: "Total Debit Note",
       class: `color-Success-light`,
     },
@@ -132,17 +109,14 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       class: `color-Success-light`,
     },
     {
-      count: "251800.00",
+      count: "0.00",
       title: "Total Pending Amount",
       class: `color-Success-light`,
     },
     {
-      count: "251800.00",
-      title: "Total Payment Amount",
-      class: `color-Success-light`,
+      count: "0.00",
     },
-  ];
-  isFormLode = false
+  isFormLode = false;
   PaymentSummaryFilterForm: UntypedFormGroup;
   jsonPaymentSummaryArray: any;
   AlljsonControlPaymentSummaryFilterArray: any;
@@ -150,27 +124,31 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
   billNo: any;
   billData: any;
   BillPaymentData: any;
+  vendor: any;
+  backPath: string;
   constructor(
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
-    private objImageHandling: ImageHandling,
-    private dialog: MatDialog,
     private route: Router,
-    private objVendorBillService: VendorBillService
+    private objVendorBillService: VendorBillService,
+    private dialog: MatDialog
   ) {
     this.billData = this.route.getCurrentNavigation()?.extras?.state?.data;
+    console.log("this.billData", this.billData);
   }
 
   ngOnInit(): void {
+    this.backPath = "/Finance/VendorPayment/VendorBillPayment"
     if (this.billData) {
+      this.vendor = this.billData.vendor;
       this.initializeVendorBillPayment();
-    this.getBillDetail();
+      this.getBillDetail();
     } else {
       this.route.navigate(["/Finance/VendorPayment/VendorBillPayment"]);
     }
-    
   }
+
   async getBillDetail() {
     this.isTableLode = false;
     let req = {
@@ -182,32 +160,61 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       this.masterService.masterPost("generic/get", req)
     );
     if (res.success) {
-      this.tableData = res.data.map((x)=>{
-        return{
+      this.tableData = res.data.map((x) => {
+        return {
           ...x,
-          debitNote:0,
-          payment:0,
-          eNTDT:moment(x.eNTDT).format("DD/MM/YYYY")
-        }
+          debitNote: 0,
+          payment: 0,
+          isSelected: false,
+          eNTDT: moment(x.eNTDT).format("DD/MM/YYYY"),
+        };
       });
       this.isTableLode = true;
     }
   }
 
-  
   selectCheckBox(event) {
-    console.log(event);
+    // console.log(event);
+    console.log("this.tableData", this.tableData);
+    const SelectedData = this.tableData.filter((x) => x.isSelected == true);
+    let TotalBillAmount = 0;
+    let TotalDebitNote = 0;
+    let TotalPaidAmount = 0;
+    let TotalPendingAmount = 0;
+    let TotalPaymentAmount = 0;
+
+    SelectedData.forEach((element) => {
+      TotalBillAmount = TotalBillAmount + +element.tHCAMT;
+      TotalDebitNote = TotalDebitNote + +element.debitNote;
+      TotalPaidAmount = TotalPaidAmount + +element.aDVAMT;
+      TotalPendingAmount = TotalPendingAmount + +element.bALAMT;
+      TotalPaymentAmount = TotalPaymentAmount + +element.payment;
+    });
+
+    this.TotalAmountList.forEach((x) => {
+      if (x.title == "Total Bill Amount") {
+        x.count = TotalBillAmount.toFixed(2);
+      }
+      if (x.title == "Total Debit Note") {
+        x.count = TotalDebitNote.toFixed(2);
+      }
+      if (x.title == "Total Paid Amount") {
+        x.count = TotalPaidAmount.toFixed(2);
+      }
+      if (x.title == "Total Pending Amount") {
+        x.count = TotalPendingAmount.toFixed(2);
+      }
+      if (x.title == "Total Payment Amount") {
+        x.count = TotalPaymentAmount.toFixed(2);
+      }
+    });
   }
-  billNoFunction(event) {}
+
   // Initialize the vendor bill payment module
   initializeVendorBillPayment() {
-    // Create a request object with vendor details
-    const RequestObj = {
-      VendorPANNumber: "AACCG464648ZS",
-    };
 
     // Initialize the vendor bill payment control with the request object
-    this.vendorBillPaymentControl = new vendorBillPaymentControl(RequestObj);
+    this.vendorBillPaymentControl = new vendorBillPaymentControl();
 
     // Retrieve the bill payment header array from the control
     this.jsonVendorBillPaymentArray =
@@ -223,10 +230,10 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       this.jsonPaymentSummaryArray,
     ]);
     this.jsonPaymentSummaryArray = this.jsonPaymentSummaryArray.slice(0, 1);
-    this.isFormLode = true
-    this.getBillPayment()
+    this.isFormLode = true;
+    this.getBillPayment();
+    this.vendorbillPaymentForm.controls["VendorPANNumber"].setValue(this.billData?.vPan)
   }
-
   async getBillPayment() {
     let req = {
       companyCode: this.companyCode,
@@ -238,16 +245,16 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     );
     console.log(res);
     if (res.success && res.data.length != 0) {
-      this.BillPaymentData = res.data[0]
+      this.BillPaymentData = res.data[0];
       const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode");
       PaymentMode.setValue(this.BillPaymentData.mOD);
       var selectDate = new Date(this.BillPaymentData.dTM);
       const FormDate = this.PaymentSummaryFilterForm.get("Date");
       FormDate.setValue(selectDate);
-      this.OnPaymentModeChange("")
+      this.OnPaymentModeChange("");
     }
   }
- 
+
   // Payment Modes Changes
   async OnPaymentModeChange(event) {
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
@@ -283,7 +290,9 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
           "Bank",
           false
         );
-        const SelectOpt = responseFromAPIBank.find(x => x.name == this.BillPaymentData.bANK) 
+        const SelectOpt = responseFromAPIBank.find(
+          (x) => x.name == this.BillPaymentData.bANK
+        );
         const Bank = this.PaymentSummaryFilterForm.get("Bank");
         Bank.setValidators([
           Validators.required,
@@ -292,13 +301,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         Bank.setValue(SelectOpt);
         Bank.updateValueAndValidity();
 
-
-        const ChequeOrRefNo =
-          this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
-        ChequeOrRefNo.setValidators([Validators.required]);
-        ChequeOrRefNo.setValue(this.BillPaymentData.tRNO);
         ChequeOrRefNo.updateValueAndValidity();
-
 
         const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount");
         CashAccount.setValue("");
@@ -354,6 +357,54 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     }
   }
   save() {
-    console.log(this.PaymentSummaryFilterForm.value);
+    console.log("this.PaymentSummaryFilterForm", this.PaymentSummaryFilterForm.value);
+    console.log("this.tableData", this.tableData);
   }
+  async getBeneficiaryData() {
+    try {
+      // Get vendor code from bill data
+      const vnCode = this.billData.vnCode;
+  
+      // Fetch beneficiary details from API
+      const beneficiaryModalData = await this.objVendorBillService.getBeneficiaryDetailsFromApi(vnCode);
+  
+      // Check if beneficiary data is available
+      if (beneficiaryModalData.length > 0) {
+        // Prepare request object for the dialog
+        const request = {
+          Details: beneficiaryModalData,
+        };
+  
+        // Set tableLoad flag to false to indicate loading
+        this.tableLoad = false;
+  
+        // Open the BeneficiaryDetailComponent dialog
+        const dialogRef = this.dialog.open(BeneficiaryDetailComponent, {
+          data: request,
+          width: "100%",
+          disableClose: true,
+          position: {
+            top: "20px",
+          },
+        });
+  
+        // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
+        dialogRef.afterClosed().subscribe(() => {
+          this.tableLoad = true;
+        });
+      } else {
+        // Display a warning if no beneficiary data is available
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Please Add Beneficiary Details To View",
+          showConfirmButton: true,
+        });
+      }
+    } catch (error) {
+      // Log any errors that occur during the process
+      console.error('An error occurred:', error);
+    }
+  }
+  
 }

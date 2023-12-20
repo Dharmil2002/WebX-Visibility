@@ -3,10 +3,11 @@ export const Collections = {
     VehicleMaster: 'vehicle_master',
     MarketVehicles: 'market_vehicles',
     vehicleStatus: 'vehicle_status',
-    Dockets: 'docket_temp',
-    PrqDetails: 'prq_detail',
+    Dockets: 'dockets',
+    PrqDetails: 'prq_summary',
     ThcDetails: 'thc_detail',
-    docketOp: 'docket_operation_details'
+    docketOp: 'docket_ops_det',
+    thcsummary: 'thc_summary'
 };
 
 export const GenericActions = {

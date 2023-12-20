@@ -28,12 +28,12 @@ export class AddShardProductComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    ProductID: {
+    pRCD: {
       Title: "Product ID",
       class: "matcolumncenter",
       Style: "min-width:40%",
     },
-    ProductName: {
+    pRNM: {
       Title: "Product Name",
       class: "matcolumncenter",
       Style: "min-width:40%",
@@ -44,7 +44,7 @@ export class AddShardProductComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: Object.keys(this.columnHeader),
   };
-  staticField = ["SrNo", "ProductID", "ProductName"];
+  staticField = ["SrNo", "pRCD", "pRNM"];
   companyCode = parseInt(localStorage.getItem("companyCode"));
   productNameList: any = [];
   tableData: any;
@@ -82,8 +82,6 @@ export class AddShardProductComponent implements OnInit {
       this.tableData = Res?.data.map((x, index) => {
         return {
           ...x,
-          ProductName: x.product_name,
-          ProductID: x.product_id,
           SrNo: index + 1,
         };
       });
@@ -94,14 +92,16 @@ export class AddShardProductComponent implements OnInit {
     }
   }
   async save() {
-    const element = this.tableData[this.tableData.length-1];
+    const length = this.tableData.length
+    const index = length == 0? 1 : parseInt(this.tableData[length-1].pRCD.substring(3))+ 1
+    const ProductCode = `PRO${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
     const Body = {
-      product_name: this.customerTableForm.value.ProductName,
-      product_id: this.customerTableForm.value.ProductID,
-      _id: parseInt(element._id) + 1,
-      updatedDate: new Date(),
-      updatedBy: localStorage.getItem("UserName"),
-      active: true,
+      _id: `${this.companyCode}-${ProductCode}`,
+      pRNM: this.customerTableForm.value.ProductName,
+      pRCD: ProductCode,
+      mODDT: new Date(),
+      mODBY: localStorage.getItem("UserName"),
+      aCTV: true,
     };
     const req = {
       companyCode: this.companyCode,
@@ -127,6 +127,7 @@ export class AddShardProductComponent implements OnInit {
         showConfirmButton: true,
       });
     }
+    this.initializeFormControl();
   }
   initializeFormControl() {
     const customerFormControls = new ProductControls();
@@ -161,12 +162,6 @@ export class AddShardProductComponent implements OnInit {
     }
   }
 
-  handleProductId() {
-    this.customerTableForm.controls.ProductID.setValue(
-      "P" + this.customerTableForm.value.ProductName.value
-    );
-  }
-
   async handleProductName() {
     const element = this.tableData[this.tableData.length-1];
     let req = {
@@ -180,7 +175,7 @@ export class AddShardProductComponent implements OnInit {
     if (Res?.success && Res.data.length > 0) {
       const FilterData = Res.data.filter(
         (x) =>
-          x.product_name.toLowerCase() ==
+          x.pRNM.toLowerCase() ==
           this.customerTableForm.value.ProductName.toLowerCase()
       );
       if (FilterData.length != 0) {
@@ -191,13 +186,6 @@ export class AddShardProductComponent implements OnInit {
           text: "Product name exist!",
           showConfirmButton: true,
         });
-      }else{
-        this.customerTableForm.controls.ProductID.setValue(`${
-          parseInt(element._id) + 1
-        }-${this.customerTableForm.value.ProductName.toUpperCase().substring(
-          0,
-          3
-        )}`);
       }
     }
   }

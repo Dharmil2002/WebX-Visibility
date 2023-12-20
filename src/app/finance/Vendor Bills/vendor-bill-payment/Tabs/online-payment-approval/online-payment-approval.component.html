@@ -1,0 +1,9 @@
+<div class="paddingdiv">
+
+    <app-generic-table-v2 *ngIf="!tableLoad" [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
+        [tableData]="tableData" [metaData]="metaData" [staticField]="staticField" [Link]="linkArray"
+        (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)"
+        [menuItemFlag]="menuItemflag" [selectAllRequired]="false" (onFlagChange)="selectCheckBox($event)"
+        [FormTitle]="'Online Payment Approval'" [EventButton]="EventButton" [menuItems]="menuItems">
+    </app-generic-table-v2>
+</div>

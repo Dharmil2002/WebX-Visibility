@@ -12,7 +12,7 @@ import { MatCheckboxChange } from "@angular/material/checkbox";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { ModifyTableCollumnsComponent } from "../../modify-table-collumns/modify-table-collumns.component";
 import { ImagePreviewComponent } from "../../image-preview/image-preview.component";
-import { ImageHandling } from "src/app/Utility/Form Utilities/imageHandling";
+import { GenericService } from "src/app/core/service/generic-services/generic-services";
 
 @Component({
   selector: "app-generic-table-v2",
@@ -49,6 +49,7 @@ export class GenericTableV2Component
   @Output() selectAllClicked = new EventEmitter<any>();
   @Output() DeleteFunction = new EventEmitter<any>();
   @Output() functionCallEmitter = new EventEmitter();
+  @Output() uploadEvent = new EventEmitter<any>();
   @Input() height;
   @Input() FilterButton;
   @Input() width;
@@ -102,7 +103,7 @@ export class GenericTableV2Component
     public ObjSnackBarUtility: SnackBarUtilityService,
     private router: Router,
     public dialog: MatDialog,
-    private objImageHandling: ImageHandling,
+    private genericService:GenericService,
   ) {
     super();
   }
@@ -193,12 +194,11 @@ export class GenericTableV2Component
   }
   //#endregion
 
-  //#region Funtion to open Dialog for bulkUpload
+  //#region to emit function to open Dialog for bulkUpload
   onUploadClick() {
-    this.dialog.open(this.uploadComponent, {
-      width: "800px",
-      height: "500px",
-    });
+    if (this.uploadComponent) {
+      this.uploadEvent.emit()
+    }
   }
   //#endregion
 
@@ -253,17 +253,17 @@ export class GenericTableV2Component
   }
 
   //#region Funtion to send data for edit
-  drillDownData(item, tableData) {
+  drillDownData(item, tableData,title="") {
     let drillDownLink = this.Link.find((x) => x.Row == tableData);
     if (drillDownLink.Path) {
       this.router.navigate([drillDownLink.Path], {
         state: {
-          data: { columnData: item, extraData: this.extraData },
+          data: { columnData: item, extraData: this.extraData,title:drillDownLink?.title||""},
         },
       });
     }
     else if(!drillDownLink.Path && drillDownLink.componentDetails){
-      this.GeneralMultipleView(item,drillDownLink.componentDetails);
+      this.GeneralMultipleView(item,drillDownLink.componentDetails,drillDownLink.title);
     }
      else {
       if (this.menuItems) {
@@ -352,12 +352,14 @@ export class GenericTableV2Component
       this[functionName](element, item.componentDetails);
     }
   }
-  GeneralMultipleView(item, viewComponent) {
+  GeneralMultipleView(item, viewComponent,title="") {
+    //this.s
+    this.genericService.setSharedData({title:title});
     const dialogref = this.dialog.open(viewComponent, {
       width: this.width,
       height: this.height,
       maxWidth: this.maxWidth,
-      data: item,
+      data: item
     });
     dialogref.afterClosed().subscribe((result) => {
       this.dialogClosed.emit(result);

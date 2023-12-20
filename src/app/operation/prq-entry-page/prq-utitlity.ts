@@ -1,9 +1,10 @@
+import { debug } from 'console';
 import Swal from 'sweetalert2';
 
 export async function addPrqData(prqData, masterService) {
     const reqBody = {
         companyCode: localStorage.getItem('companyCode'),
-        collectionName: "prq_detail",
+        collectionName: "prq_summary",
         data: prqData
     }
     const res = await masterService.masterMongoPost("generic/create", reqBody).toPromise();
@@ -11,17 +12,24 @@ export async function addPrqData(prqData, masterService) {
 }
 
 export async function updatePrqStatus(prqData, masterService) {
-
     delete prqData.srNo
     delete prqData.Action
+
     const reqBody = {
         "companyCode": localStorage.getItem('companyCode'),
-        "collectionName": "prq_detail",
-        "filter": { prqNo: prqData.prqNo || prqData.prqId || "" },
+        "collectionName": "prq_summary",
+        "filter": { 
+            cID: prqData.cID || localStorage.getItem('companyCode'),
+            pRQNO:  prqData.pRQNO || prqData.docNo || ""
+        },
         "update": {
             ...prqData,
+            mODBY: localStorage.getItem('UserName'),
+            mODLOC: localStorage.getItem('Branch'),
+            mODDT: new Date()
         }
     }
+    
     const res = await masterService.masterMongoPut("generic/update", reqBody).toPromise();
     return res
 }

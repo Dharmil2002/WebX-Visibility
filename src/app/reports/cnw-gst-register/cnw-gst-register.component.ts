@@ -10,11 +10,13 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
 import { CnwGstService, convertToCSV } from 'src/app/Utility/module/reports/cnw.gst.service';
 import { timeString } from 'src/app/Utility/date/date-utils';
+import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-cnw-gst-register',
   templateUrl: './cnw-gst-register.component.html'
 })
-
 export class CnwGstRegisterComponent implements OnInit {
   breadScrums = [
     {
@@ -41,52 +43,112 @@ export class CnwGstRegisterComponent implements OnInit {
   tranModeName: any;
   transModeStatus: any;
 
+  // CSVHeader = {
+  //   "docketNumber": "Consignment Note No",
+  //   "docketDate": "Consignment Note Date",
+  //   "billingParty": "Billing Party",
+  //   "movementType": "Movement Type",
+  //   "payType": "Payment Mode",
+  //   "origin": "Origin",
+  //   "fromCity": "From City",
+  //   "toCity": "To City",
+  //   "destination": "Destination",
+  //   "prqNo": "PRQ No",
+  //   "transMode": "Transport Mode",
+  //   "vendorType": "Vendor Type",
+  //   "vendorName": "Vendor Name",
+  //   "pAddress": "Pickup Address",
+  //   "dAddress": "Delivery Address",
+  //   "prLrNo": "PR LR No",
+  //   "pck_type": "Packaging Type",
+  //   "wt_in": "Weight In",
+  //   "gpChDel": "GP/CH/Del",
+  //   "risk": "Risk",
+  //   "deltype": "Delivery Type",
+  //   "issuingFrom": "Issuing From",
+  //   "vehicleNo": " Lorry No",
+  //   "consignorName": " Consignor Name",
+  //   "consignorCntNo": " Consignor Contact Number",
+  //   "consigneeName": "Consignee Name",
+  //   "consigneeCntNo": "Consignee Contact Number",
+  //   "ewayBill": "EWay Bill",
+  //   "expDt": "Expiry Date",
+  //   "invoiceNo": "Invoice Number",
+  //   "invoiceAmt": "Invoice Amount (₹)",
+  //   "NoofPck": "No of Package",
+  //   "materialNm": " Material Number",
+  //   "actualWt": "Actual Weight",
+  //   "charWt": "Charged Wight",
+  //   "freightRt": "Freight Rate",
+  //   "freightRtTp": "Freight Rate Type",
+  //   "freightAmt": "Freight Amount (₹)",
+  //   "otherAmt": "Other Amount (₹)",
+  //   "grossAmt": "Gross Amount (₹)",
+  //   "rcm": "RCM",
+  //   "gstAmt": "GST Amount (₹)",
+  //   "gstcharAmt": "GST Charged Amount (₹)",
+  //   "TotAmt": "Total Amount (₹)"
+  // }
+
   CSVHeader = {
     "docketNumber": "Consignment Note No",
     "docketDate": "Consignment Note Date",
-    "billingParty": "Billing Party",
-    "movementType": "Movement Type",
-    "payType": "Payment Mode",
-    "origin": "Origin",
-    "fromCity": "From City",
-    "toCity": "To City",
-    "destination": "Destination",
-    "prqNo": "PRQ No",
-    "transMode": "Transport Mode",
-    "vendorType": "Vendor Type",
-    "vendorName": "Vendor Name",
-    "pAddress": "Pickup Address",
-    "dAddress": "Delivery Address",
-    "prLrNo": "PR LR No",
-    "pck_type": "Packaging Type",
-    "wt_in": "Weight In",
-    "gpChDel": "GP/CH/Del",
-    "risk": "Risk",
-    "deltype": "Delivery Type",
-    "issuingFrom": "Issuing From",
-    "vehicleNo": " Lorry No",
-    "consignorName": " Consignor Name",
-    "consignorCntNo": " Consignor Contact Number",
-    "consigneeName": "Consignee Name",
-    "consigneeCntNo": "Consignee Contact Number",
-    "ewayBill": "EWay Bill",
-    "expDt": "Expiry Date",
-    "invoiceNo": "Invoice Number",
-    "invoiceAmt": "Invoice Amount (₹)",
-    "NoofPck": "No of Package",
-    "materialNm": " Material Number",
-    "actualWt": "Actual Weight",
-    "charWt": "Charged Wight",
-    "freightRt": "Freight Rate",
-    "freightRtTp": "Freight Rate Type",
-    "freightAmt": "Freight Amount (₹)",
-    "otherAmt": "Other Amount (₹)",
-    "grossAmt": "Gross Amount (₹)",
-    "rcm": "RCM",
-    "gstAmt": "GST Amount (₹)",
-    "gstcharAmt": "GST Charged Amount (₹)",
-    "TotAmt": "Total Amount (₹)"
+    "time": "Time",
+    "edd": "EDD",
+    "bbrnch": "Booking Branch",
+    "dbranch": "Delivery Branch",
+    "payty": "Payment Type",
+    "busity": "Business Type",
+    "prod": "Product",
+    "contID": "Contract ID",
+    "conpar": "Contract party",
+    "sertp": "Service Type",
+    "vehno": "Vehicle No",
+    "billparnm": "Billing Party Name",
+    "bacode": "BA Code",
+    "lastmodby": "Last Modified By",
+    "cnotemoddt": "CNote Modified Date",
+    "cusrefno": "Customer Ref No",
+    "movty": "Type of Movement",
+    "tranmode": "Transport Mode",
+    "status": "Status",
+    "loadty": "Load Type",
+    "subtot": "Sub Total",
+    "doctot": "Docket Total",
+    "gstrt": "GST Rate",
+    "gstamt": "GST Amount",
+    "frtrt": "FRT Rate",
+    "frttp": "FRT Type",
+    "frichar": "Freight Charge",
+    "otherchar": "Other Charges",
+    "greentax": "Green tax",
+    "dropchar": "Drop Charges",
+    "docchar": "Document Charges",
+    "warchar": "Warehouse Charges",
+    "deduc": "Deduction",
+    "unloadchar": "Unloading Charges",
+    "holiserchar": "Holiday Service Charges",
+    "focchar": "FOV Charges",
+    "codchar": "COD/DOD Charges",
+    "appchar": "Appointment Charges",
+    "odachar": "ODA Charges",
+    "fuelchar": "FuelSurcharge Charges",
+    "loadchar": "Loading Charges",
+    "gstchar": "GST Charge",
+    "advremark": "Advance Remark",
+    "dphrt": "DPH Rate",
+    "dphamt": "DPH Amount",
+    "disrt": "Disc Rate",
+    "discamt": "Disc Amount",
+    "jobno": "Job Number",
+    "jobdt": "Job Date ",
+    "chano": "CHA Number ",
+    "chadt": "CHA Date",
+    "chaamt": "CHA Amount",
   }
+
+  custName: any;
+  custStatus: any;
 
   constructor(
     private filter: FilterUtils,
@@ -94,7 +156,8 @@ export class CnwGstRegisterComponent implements OnInit {
     private locationService: LocationService,
     private generalService: GeneralService,
     private pinCodeService: PinCodeService,
-    private cnwGstService: CnwGstService
+    private cnwGstService: CnwGstService,
+    private customerService: CustomerService,
   ) {
     this.initializeFormControl();
   }
@@ -138,6 +201,12 @@ export class CnwGstRegisterComponent implements OnInit {
     this.transModeStatus = this.jsoncnoteFormArray.find(
       (data) => data.name === "transMode"
     )?.additionalData.showNameAndValue;
+    this.custName = this.jsoncnoteFormArray.find(
+      (data) => data.name === "cust"
+    )?.name;
+    this.custStatus = this.jsoncnoteFormArray.find(
+      (data) => data.name === "cust"
+    )?.additionalData.showNameAndValue;
     this.cnoteTableForm = formGroupBuilder(this.fb, [this.jsoncnoteFormArray]);
   }
 
@@ -167,8 +236,18 @@ export class CnwGstRegisterComponent implements OnInit {
 
   async getDropDownList() {
     const locationList = await this.locationService.getLocationList();
-    const paymentType: AutoComplateCommon[] = await this.generalService.getGeneralMaster('PAYTYP');
-    const transMode: AutoComplateCommon[] = await this.generalService.getGeneralMaster('tran_mode');
+    const paymentType: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "PAYTYP" }, "codeDesc", "codeId");
+    const transMode: AutoComplateCommon[] = await this.generalService.getDataForMultiAutoComplete("General_master", { codeType: "tran_mode" }, "codeDesc", "codeId");
+    const customer = await this.customerService.customerFromApi();
+    // const paymentType: AutoComplateCommon[] = await this.generalService.getGeneralMaster('PAYTYP');
+    // const transMode: AutoComplateCommon[] = await this.generalService.getGeneralMaster('tran_mode');
+    this.filter.Filter(
+      this.jsoncnoteFormArray,
+      this.cnoteTableForm,
+      paymentType,
+      this.payName,
+      this.payStatus
+    );
     this.filter.Filter(
       this.jsoncnoteFormArray,
       this.cnoteTableForm,
@@ -186,16 +265,16 @@ export class CnwGstRegisterComponent implements OnInit {
     this.filter.Filter(
       this.jsoncnoteFormArray,
       this.cnoteTableForm,
-      paymentType,
-      this.payName,
-      this.payStatus
+      transMode,
+      this.tranModeName,
+      this.transModeStatus
     );
     this.filter.Filter(
       this.jsoncnoteFormArray,
       this.cnoteTableForm,
-      transMode,
-      this.tranModeName,
-      this.transModeStatus
+      customer,
+      this.custName,
+      this.custStatus
     );
   }
 
@@ -221,26 +300,43 @@ export class CnwGstRegisterComponent implements OnInit {
     const toLocation = Array.isArray(this.cnoteTableForm.value.tolocHandler)
       ? this.cnoteTableForm.value.tolocHandler.map(x => x.value)
       : [];
+    const cust = Array.isArray(this.cnoteTableForm.value.custHandler)
+      ? this.cnoteTableForm.value.custHandler.map(x => x.name)
+      : [];
     // Filter records based on form values
     const filteredRecords = data.filter(record => {
-      const paytpDet = payment.length === 0 || payment.includes(record.payType);
-      const modeDet = tranMode.length === 0 || tranMode.includes(record.transMode);
-      const toCityDet = tocity.length === 0 || tocity.includes(record.toCity);
-      const fromcityDet = fromcity.length === 0 || fromcity.includes(record.fromCity);
-      const fromLocDet = fromLocation.length === 0 || fromLocation.includes(record.origin);
-      const toLocDet = toLocation.length === 0 || toLocation.includes(record.destination);
+      const paytpDet = payment.length === 0 || payment.includes(record.payty);
+      const custDet = cust.length === 0 || cust.includes(record.cSGNNM);
+      const modeDet = tranMode.length === 0 || tranMode.includes(record.tranmode);
+      const toCityDet = tocity.length === 0 || tocity.includes(record.tCT);
+      const fromcityDet = fromcity.length === 0 || fromcity.includes(record.fCT);
+      const fromLocDet = fromLocation.length === 0 || fromLocation.includes(record.oRGN);
+      const toLocDet = toLocation.length === 0 || toLocation.includes(record.dEST);
 
       const startValue = new Date(this.cnoteTableForm.controls.start.value);
       const endValue = new Date(this.cnoteTableForm.controls.end.value);
       const entryTime = new Date(record.odocketDate);
+      endValue.setHours(23, 59, 59, 999);
       const isDateRangeValid = entryTime >= startValue && entryTime <= endValue;
 
-      return paytpDet && modeDet && toCityDet && fromcityDet && fromLocDet && toLocDet && isDateRangeValid;
+      return paytpDet && modeDet && toCityDet && fromcityDet && fromLocDet && toLocDet && isDateRangeValid && custDet;
     });
     // Assuming you have your selected data in a variable called 'selectedData'
-    const selectedData = filteredRecords;
+    // const selectedData = filteredRecords;
+    if (filteredRecords.length === 0) {
+      // Display a message or take appropriate action when no records are found
+      if (filteredRecords) {
+        Swal.fire({
+          icon: "error",
+          title: "No Records Found",
+          text: "Cannot Download CSV",
+          showConfirmButton: true,
+        });
+      }
+      return;
+    }
     // Convert the selected data to a CSV string 
-    const csvString = convertToCSV(selectedData, this.CSVHeader);
+    const csvString = convertToCSV(filteredRecords, this.CSVHeader);
     // Create a Blob (Binary Large Object) from the CSV string
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     // Create a link element

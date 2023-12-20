@@ -8,6 +8,8 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { AccountMasterControls } from "src/assets/FormControls/AccountMasterControls";
 import Swal from "sweetalert2";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
+import { StorageService } from "src/app/core/service/storage.service";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: "app-account-group",
@@ -25,23 +27,23 @@ export class AccountGroupComponent implements OnInit {
     csv: false,
   };
   columnHeader = {
-   
-    GroupCode: {
+
+    gRPCD: {
       Title: "Account Group Code",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    CategoryCode: {
+    cATNM: {
       Title: "Category",
       class: "matcolumncenter",
       Style: "min-width:25%",
     },
-    GroupCodeType: {
+    pGNM: {
       Title: "Perent Group Code",
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    GroupName: {
+    gRPNM: {
       Title: "Group Name",
       class: "matcolumncenter",
       Style: "min-width:20%",
@@ -57,10 +59,10 @@ export class AccountGroupComponent implements OnInit {
   };
   staticField = [
     "SrNo",
-    "GroupName",
-    "GroupCodeType",
-    "CategoryCode",
-    "GroupCode",
+    "gRPNM",
+    "pGNM",
+    "cATNM",
+    "gRPCD",
   ];
   TableData: any = [];
   jsonControlAccountGroupArray:FormControls[];
@@ -82,12 +84,15 @@ export class AccountGroupComponent implements OnInit {
     name: "Add Account Group",
     iconName:'add'
   }
+  BalanceSheetCode: string;
+  BalanceSheetStatus: any;
   constructor(
     public dialogRef: MatDialogRef<AccountGroupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private storage: StorageService
   ) {}
 
   ngOnInit(): void {
@@ -100,11 +105,10 @@ export class AccountGroupComponent implements OnInit {
       const Body = {
         companyCode: this.CompanyCode,
         collectionName: "account_group_detail",
-        filter: { CategoryCode: this.SelectAccountCategory.name },
+        filter: { cATCD: this.SelectAccountCategory.value },
       };
-      const res = await this.masterService
-        .masterPost("generic/get", Body)
-        .toPromise();
+      const res = await firstValueFrom(this.masterService
+        .masterPost("generic/get", Body));
 
       if (res.success) {
         this.TableData = res.data.map((x, index) => {
@@ -149,8 +153,8 @@ export class AccountGroupComponent implements OnInit {
       this.jsonControlAccountGroupArray,
     ]);
     if (this.isUpdate) {
-      this.AccountGroupForm.controls["GroupName"].setValue(this.updateData.GroupName);
-      this.AccountGroupForm.controls["GroupCode"].setValue(this.updateData.GroupCode);
+      this.AccountGroupForm.controls["GroupName"].setValue(this.updateData.gRPNM);
+      this.AccountGroupForm.controls["GroupCode"].setValue(this.updateData.gRPCD);
     }
   }
 
@@ -167,6 +171,11 @@ export class AccountGroupComponent implements OnInit {
         this.GroupCodeTypeCode = data.name;
         this.GroupCodeTypeStatus = data.additionalData.showNameAndValue;
       }
+      if (data.name === "BalanceSheet") {
+        this.BalanceSheetCode = data.name;
+        this.BalanceSheetStatus = data.additionalData.showNameAndValue;
+        // this.getBalanceSheetcategoryDropdown();
+      }
     });
   }
 
@@ -174,12 +183,11 @@ export class AccountGroupComponent implements OnInit {
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "General_master",
-      filter: { codeType: "ACT", activeFlag: true },
+      filter: { codeType: "MCT", activeFlag: true },
     };
 
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService
+      .masterPost("generic/get", Body))
     if (res.success && res.data.length > 0) {
       this.SelectAccountCategoryData = res.data.map((x) => {
         return {
@@ -190,16 +198,46 @@ export class AccountGroupComponent implements OnInit {
     }
   }
 
+  async getBalanceSheetcategoryDropdown() {
+    const Body = {
+      companyCode: this.CompanyCode,
+      collectionName: "General_master",
+      filter: { codeType: "BLC", activeFlag: true },
+    };
+    const res = await  firstValueFrom(this.masterService
+      .masterPost("generic/get", Body));
+    if (res.success && res.data.length > 0) {
+      const BalanceSheetcategory = res.data.map((x) => {
+        return {
+          name: x.codeDesc,
+          value: x.codeId,
+        };
+      });
+      if (this.isUpdate) {
+        const element = BalanceSheetcategory.find(
+          (x) => x.name == this.updateData.bCATNM
+        );
+        this.AccountGroupForm.controls["BalanceSheet"].setValue(element);
+      }
+      this.filter.Filter(
+        this.jsonControlAccountGroupArray,
+        this.AccountGroupForm,
+        BalanceSheetcategory,
+        this.BalanceSheetCode,
+        this.BalanceSheetStatus
+      );
+    }
+  }
+
   async getCategoryCodeDropdown() {
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "General_master",
-      filter: { codeType: "ACT", activeFlag: true },
+      filter: { codeType: "MCT", activeFlag: true },
     };
 
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService
+      .masterPost("generic/get", Body));
     if (res.success && res.data.length > 0) {
       const CategoryCodeData = res.data.map((x) => {
         return {
@@ -209,7 +247,7 @@ export class AccountGroupComponent implements OnInit {
       });
       if (this.isUpdate) {
         const element = CategoryCodeData.find(
-          (x) => x.name == this.updateData.CategoryCode
+          (x) => x.value == this.updateData.cATCD
         );
         this.AccountGroupForm.controls["CategoryCode"].setValue(element);
         this.getGroupCodeTypeDropdown()
@@ -230,24 +268,23 @@ export class AccountGroupComponent implements OnInit {
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "account_group_detail",
-      filter: { CategoryCode: Value },
+      filter: { cATNM: Value },
     };
 
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
-
+    const res = await firstValueFrom(this.masterService
+      .masterPost("generic/get", Body));
     if (res.success && res.data.length > 0) {
       this.GroupCodeTableData = res.data;
       const GroupCodeType = res.data.map((x) => {
         return {
-          name: x.GroupName,
-          value: x.GroupCode,
+          name: x.gRPNM,
+          value: x.gRPCD,
+          level:x.gLEVEL
         };
       });
       if (this.isUpdate && !this.FirstUpdate) {
         const element = GroupCodeType.find(
-          (x) => x.name == this.updateData.GroupCodeType
+          (x) => x.name == this.updateData.pGNM
         );
         this.AccountGroupForm.controls["GroupCodeType"].setValue(element);
         this.FirstUpdate = true
@@ -259,13 +296,12 @@ export class AccountGroupComponent implements OnInit {
         this.GroupCodeTypeCode,
         this.GroupCodeTypeStatus
       );
-      // this.GetGroupName()
     }
   }
 
   GetGroupName(event){
-    const filterData = this.GroupCodeTableData.filter((x)=> x.GroupName == this.AccountGroupForm.value.GroupName)
-    if(this.isUpdate && this.AccountGroupForm.value.GroupName != this.updateData.GroupName ){
+    const filterData = this.GroupCodeTableData.filter((x)=> x.gRPNM == this.AccountGroupForm.value.gRPNM)
+    if(this.isUpdate && this.AccountGroupForm.value.gRPNM != this.updateData.gRPNM ){
       if(filterData.length > 0){
         this.AccountGroupForm.controls["GroupName"].setValue("");
       }
@@ -276,22 +312,25 @@ export class AccountGroupComponent implements OnInit {
   }
 
   async Save() {
-
     if(this.isUpdate){
       const Body = {
-        GroupName: this.AccountGroupForm.value.GroupName,
-        GroupCodeType: this.AccountGroupForm.value.GroupCodeType.name,
+        gRPNM: this.AccountGroupForm.value.GroupName,
+        pGCD: this.AccountGroupForm.value.GroupCodeType.value,
+        pGNM: this.AccountGroupForm.value.GroupCodeType.name,
+        gLEVEL:`${parseInt(this.AccountGroupForm.value.GroupCodeType.level)+1}`,
+        mODDT: new Date(),
+        mODLOC: this.storage.branch,
+        mODBY: this.storage.userName,
       };
 
       const req = {
         companyCode: this.CompanyCode,
         collectionName: "account_group_detail",
-        filter: { GroupCode: this.updateData.GroupCode },
+        filter: { gRPCD: this.updateData.gRPCD },
         update: Body,
       };
-      const res = await this.masterService
-        .masterPut("generic/update", req)
-        .toPromise();
+      const res = await firstValueFrom(this.masterService
+        .masterPut("generic/update", req));
       if (res.success) {
         this.Cancle();
         Swal.fire({
@@ -305,27 +344,37 @@ export class AccountGroupComponent implements OnInit {
       const index = parseInt(
         this.GroupCodeTableData[
           this.GroupCodeTableData.length - 1
-        ].GroupCode.substring(3)
-      );
+        ].gRPCD.substring(3)
+      )+1;
+      const groupcode = `${this.AccountGroupForm.value.CategoryCode.name.substr(0, 3)}${
+        index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""
+      }${index}`;
       const Body = {
-        GroupCode:this.AccountGroupForm.value.CategoryCode.name.substr(0, 3)+
-          (index < 9 ? "00" : index > 9 && index < 99 ? "0" : "") +
-          (index + 1),
-        GroupName: this.AccountGroupForm.value.GroupName,
-        GroupCodeType: this.AccountGroupForm.value.GroupCodeType.name,
-        CategoryCode: this.AccountGroupForm.value.CategoryCode.name,
-        companyCode: this.CompanyCode,
-        updatedDate: new Date(),
-        updatedBy: localStorage.getItem("UserName"),
+        _id:`${this.CompanyCode}-${groupcode}`,
+        cID: this.CompanyCode,
+        gRPCD:groupcode,
+        gRPNM: this.AccountGroupForm.value.GroupName,
+        pGCD: this.AccountGroupForm.value.GroupCodeType.value,
+        pGNM: this.AccountGroupForm.value.GroupCodeType.name,
+        gLEVEL:`${parseInt(this.AccountGroupForm.value.GroupCodeType.level)+1}`,
+        cATNM: this.AccountGroupForm.value.CategoryCode.name,
+        cATCD: this.AccountGroupForm.value.CategoryCode.value,
+        bCATNM:this.AccountGroupForm.value.BalanceSheet.name,
+        bCATCD:this.AccountGroupForm.value.BalanceSheet.value,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        eNTBY: this.storage.userName,
+        mODDT: new Date(),
+        mODLOC: this.storage.branch,
+        mODBY: this.storage.userName,
       };
       let req = {
         companyCode: this.CompanyCode,
         collectionName: "account_group_detail",
         data: Body,
       };
-      const res = await this.masterService
-        .masterPost("generic/create", req)
-        .toPromise();
+      const res = await firstValueFrom(this.masterService
+        .masterPost("generic/create", req));
       if (res.success) {
         this.Cancle();
         Swal.fire({

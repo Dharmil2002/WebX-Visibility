@@ -170,7 +170,6 @@ export class AccountMasterControls {
           onOptionSelect: "getGroupCodeDropdown",
         },
       },
-
       {
         name: "GroupCode",
         label: "Group Code",
@@ -193,31 +192,6 @@ export class AccountMasterControls {
         },
         functions: {},
       },
-
-      {
-        name: "Locations",
-        label: "Applicable Accounting Locations",
-        placeholder: "Search and select Locations",
-        type: "multiselect",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        Validations: [],
-        additionalData: {
-          isIndeterminate: false,
-          isChecked: false,
-          support: "LocationsDrop",
-          showNameAndValue: true,
-          Validations: [],
-        },
-        functions: {
-          onToggleAll: "toggleSelectAll",
-        },
-        generatecontrol: true,
-        disable: false,
-      },
-
       {
         name: "AccountDescription",
         label: "Account Description",
@@ -239,7 +213,6 @@ export class AccountMasterControls {
           onChange: "getAccountDescription",
         },
       },
-
       {
         name: "AccountCategory",
         label: "Account Category",
@@ -268,7 +241,6 @@ export class AccountMasterControls {
           onOptionSelect: "HandlAccountCategory",
         },
       },
-
       {
         name: "PartySelection",
         label: "Party Selection",
@@ -296,6 +268,101 @@ export class AccountMasterControls {
         functions: {},
       },
       {
+        name: "BalanceSheet",
+        label: "Balance Sheet category",
+        placeholder: "Balance Sheet category",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Balance Sheet category is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: false,
+        },
+        functions: {},
+      },
+      {
+        name: "bank",
+        label: "Bank Details",
+        placeholder: "Select Bank",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable:false,//isUpdate ? true : false,
+        Validations: [
+          {
+            name: "required",
+            message: "Bank Details is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        // functions: {
+        //   onOptionSelect: "getGroupCodeDropdown",
+        // },
+      },
+      {
+        name: "isTDSapplicable",
+        label: "TDS applicable",
+        placeholder: "",
+        type: "toggle",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        functions: {
+          onChange: "toggleTDSExempted",
+        },
+      },
+      {
+        name: "TDSsection",
+        label: "TDS Details",
+        placeholder: "Select TDS Details",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable:false,//isUpdate ? true : false,
+        Validations: [
+          {
+            name: "required",
+            message: "TDS Details is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        // functions: {
+        //   onOptionSelect: "getGroupCodeDropdown",
+        // },
+      },
+      {
         name: "ActiveFlag",
         label: "Active Flag",
         placeholder: "",
@@ -305,16 +372,16 @@ export class AccountMasterControls {
         disable: false,
         Validations: [],
       },
-      {
-        name: "LocationsDrop",
-        label: "Locations",
-        placeholder: "Select CustomerLocations",
-        type: "",
-        value: "",
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
+      // {
+      //   name: "LocationsDrop",
+      //   label: "Locations",
+      //   placeholder: "Select CustomerLocations",
+      //   type: "",
+      //   value: "",
+      //   Validations: [],
+      //   generatecontrol: false,
+      //   disable: false,
+      // },
     ];
 
     this.AccountGroupAddArray = [
@@ -401,97 +468,19 @@ export class AccountMasterControls {
           onChange: "GetGroupName",
         },
       },
-    ];
-
-    this.BankFormArray = [
       {
-        name: "AccountNumber",
-        label: "Account Number",
-        placeholder: "Account Number",
-        type: "text",
+        name: "BalanceSheet",
+        label: "Balance Sheet category",
+        placeholder: "Balance Sheet category",
+        type: "dropdown",
         value: "",
         generatecontrol: true,
         disable: false,
         Validations: [
           {
             name: "required",
-            message: "Account Number is required",
+            message: "Balance Sheet category is required",
           },
-          {
-            name: "pattern",
-            message: "Please Enter alphanumeric length 8",
-            pattern: '^[0-9]{8}$',
-        }
-        ],
-        functions: {},
-      },
-      {
-        name: "AccountLocations",
-        label: "Applicable to Locations",
-        placeholder: "Applicable to Locations",
-        type: "multiselect",
-        value: "",
-        filterOptions: "",
-        autocomplete: "",
-        displaywith: "",
-        Validations: [],
-        additionalData: {
-          isIndeterminate: false,
-          isChecked: false,
-          support: "AccountLocationsDrop",
-          showNameAndValue: true,
-          Validations: [],
-        },
-        functions: {
-          onToggleAll: "toggleSelectAccountLocationsAll",
-        },
-        generatecontrol: true,
-        disable: false,
-      },
-      {
-        name: "AccountLocationsDrop",
-        label: "AccountLocations",
-        placeholder: "Select CustomerLocations",
-        type: "",
-        value: "",
-        Validations: [],
-        generatecontrol: false,
-        disable: false,
-      },
-    ];
-    this.ExpenseFormArray = [
-      {
-        name: "isTDSApplicable",
-        label: "TDS Applicable",
-        placeholder: "",
-        type: "toggle",
-        value: false,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
-      {
-        name: "isTDSMapping",
-        label: "TDSLedger Mapping",
-        placeholder: "",
-        type: "toggle",
-        value: false,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-        functions: {
-          onChange: "HandleisTDSMapping",
-      },
-      },
-      {
-        name: "Ddl_TDS_Mapping",
-        label: "DdlTDS Ledger Mapping",
-        placeholder: "DdlTDS Ledger Mapping",
-        type: "dropdown",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
           {
             name: "autocomplete",
           },
@@ -501,102 +490,19 @@ export class AccountMasterControls {
           },
         ],
         additionalData: {
-          showNameAndValue: true,
+          showNameAndValue: false,
         },
+        functions: {},
       },
     ];
-    this.TCSFormArray = [
-      {
-        name: "NonCorporateTCS",
-        label: "Non Corporate TCS Rate",
-        placeholder: "Non Corporate TCS Rate",
-        type: "number",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Non Corporate TCS Rate is required",
-          },
-          {
-            name: "pattern",
-            message: "Please Enter alphanumeric Ex: 00.00",
-            pattern: "^[0-9]{1,2}(.[0-9]{2})?$",
-          },
-        ],
-        functions: {
-        },
-      },
-      {
-        name: "CorporateTCS",
-        label: "Corporate TCS Rate",
-        placeholder: "Corporate TCS Rate",
-        type: "number",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Corporate TCS Rate is required",
-          },
-          {
-            name: "pattern",
-            message: "Please Enter alphanumeric Ex: 00.00",
-            pattern: "^[0-9]{1,2}(.[0-9]{2})?$",
-          },
-        ],
-        functions: {
-        },
-      },
-    ];
-    this.TDSFormArray = [
-      {
-        name: "NonCorporateTDS",
-        label: "Non Corporate TDS Rate",
-        placeholder: "Non Corporate TDS Rate",
-        type: "number",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Non Corporate TDS Rate is required",
-          },
-          {
-            name: "pattern",
-            message: "Please Enter alphanumeric Ex: 00.00",
-            pattern: "^[0-9]{1,2}(.[0-9]{2})?$",
-          },
-        ],
-        functions: {
-        },
-      },
-      {
-        name: "CorporateTDS",
-        label: "Corporate TDS Rate",
-        placeholder: "Corporate TDS Rate",
-        type: "number",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [
-          {
-            name: "required",
-            message: "Corporate TDS Rate is required",
-          },
-          {
-            name: "pattern",
-            message: "Please Enter alphanumeric Ex: 00.00",
-            pattern: "^[0-9]{1,2}(.[0-9]{2})?$",
-          },
-        ],
-        functions: {
-        },
-      },
-    ];
+
+    this.BankFormArray = [];
+
+    this.ExpenseFormArray = [];
+
+    this.TCSFormArray = [];
+
+    this.TDSFormArray = [];
   }
   getAccountQureyArray() {
     return this.AccountQureyArray;
@@ -608,15 +514,5 @@ export class AccountMasterControls {
     return this.AccountGroupAddArray;
   }
 
-  getAccountCategoryArray(name) {
-    if (name == "BANK") {
-      return this.BankFormArray;
-    } else if (name == "EXPENSE") {
-      return this.ExpenseFormArray;
-    } else if (name == "TCS") {
-      return this.TCSFormArray;
-    } else if (name == "TDS") {
-      return this.TDSFormArray;
-    }
-  }
+
 }

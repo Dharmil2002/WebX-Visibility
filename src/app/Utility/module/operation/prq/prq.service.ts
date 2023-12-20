@@ -1,4 +1,6 @@
 import { Injectable } from "@angular/core";
+import moment from "moment";
+import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { financialYear } from "src/app/Utility/date/date-utils";
 import { MasterService } from "src/app/core/service/Masters/master.service";
@@ -24,9 +26,9 @@ export class PrqService {
     "1": "Awaiting Assign Vehicle",
     "2": "Awaiting For Docket",
     "3": "Ready For THC",
+    "5": "Rejected",
     "default": "THC Generated"
   }
-
   constructor(
     private masterService: MasterService,
     private operation: OperationService
@@ -47,11 +49,11 @@ export class PrqService {
 
     // Ensure prqData is not undefined and set party to uppercase if it exists
     prqData = prqData || {};
-    const party = prqData.billingParty ? prqData.billingParty.toUpperCase() : '';
+    const party = prqData.bPARTYNM ? prqData.bPARTYNM.toUpperCase() : '';
     // Construct the request body
     const reqBody = {
       companyCode: companyCode,
-      collectionName: "prq_detail",
+      collectionName: "prq_summary",
       data: prqData,
       docType: "PRQ",
       branch: branch,
@@ -61,7 +63,7 @@ export class PrqService {
 
     try {
       // Make an API request to create the PRQ
-      const res = await this.masterService.masterMongoPost("operation/prq/create", reqBody).toPromise();
+      const res = await firstValueFrom(this.masterService.masterMongoPost("operation/prq/create", reqBody));
       return res;
     } catch (error) {
       // Handle errors gracefully and log them
@@ -75,19 +77,33 @@ export class PrqService {
 
   //here the code to update prq status
   async updatePrqStatus(prqData) {
+    
     delete prqData.srNo;
     delete prqData.Action;
+
+    prqData.statusCode = prqData.status;
+    prqData.status = this.status[prqData.status];
+    let model;
+    if(prqData.statusCode && prqData.prqNo) {
+      model = { 
+        ...this.preparePrqDataModel({...prqData})
+      };
+    }
+    else {
+      model = { 
+        ...prqData
+      };
+    }
+
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"),
-      collectionName: "prq_detail",
-      filter: { prqNo: prqData.prqNo || prqData.prqId || "" },
+      collectionName: "prq_summary",
+      filter: { cID: localStorage.getItem("companyCode"), pRQNO: prqData.pRQNO || prqData.prqNo || "" },
       update: {
-        ...prqData,
+        ...model,
       },
     };
-    const res = await this.masterService
-      .masterMongoPut("generic/update", reqBody)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService.masterMongoPut("generic/update", reqBody));
     return res;
   }
   //................end.............//
@@ -102,14 +118,22 @@ export class PrqService {
       confirmButtonText: "Yes, proceed",
       cancelButtonText: "Cancel",
     });
-
+    
     if (confirmationResult.isConfirmed) {
-      prqDetail.status = status;
+      prqDetail.statusCode = status;
+      prqDetail.status = this.status[status];
       delete prqDetail._id;
       delete prqDetail.srNo;
       delete prqDetail.actions;
 
-      const res = await updatePrqStatus(prqDetail, this.masterService);
+      var model = { 
+        //...this.preparePrqDataModel({...prqDetail})
+        cID: localStorage.getItem("companyCode"),
+        pRQNO: prqDetail.prqNo || prqDetail.docNo || "",
+        sTS: prqDetail.statusCode,
+        sTSNM: prqDetail.status,
+      };
+      const res = await updatePrqStatus(model, this.masterService);
       if (res) {
         goBack(tabIndex);
       }
@@ -156,9 +180,8 @@ export class PrqService {
         update: { ...vehicleDetails },
       };
 
-      const vehicleUpdate = await this.operation
-        .operationMongoPut("generic/update", reqBody)
-        .toPromise();
+      const vehicleUpdate = await firstValueFrom(this.operation.operationMongoPut("generic/update", reqBody));
+      
       return vehicleUpdate; // Optionally, you can return the updated vehicle data.
     } catch (error) {
       throw error; // Re-throw the error to be handled at a higher level or log it.
@@ -168,62 +191,72 @@ export class PrqService {
 
   // This async function retrieves PRQ (Purchase Request) detail data from an API using the masterService.
   async getPrqDetailFromApi() {
+    
     // Prepare the request body with necessary parameters
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
-      collectionName: "prq_detail",
-      filter: { prqBranch: this.branchCode },
+      collectionName: "prq_summary",
+      filter: { bRCD: this.branchCode },
     };
 
     // Make an asynchronous request to the API using masterMongoPost method
-    const res = await this.masterService
-      .masterMongoPost("generic/get", reqBody)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBody));
 
     // Filter out PRQ data with status "4" or "5"
-    const prqData = res.data.filter(
-      (x) => x.status.trim() !== "4" && x.status.trim() !== "5"
-    );
+    const prqData = res.data.filter( (x) => x.sTS !== 4 && x.sTS !== 5 );
 
     let prqList = [];
-
+    
     // Map and transform the PRQ data
     prqData.map((element, index) => {
-      let pqrData = {
-        "srNo": element.srNo = index + 1,
-        "prqNo": element?.prqNo || '',
-        "vehicleSize": element?.vehicleSize || "",
-        "size": element.vehicleSize ? element.vehicleSize : element.containerSize ? element.containerSize : "",
-        "billingParty": element?.billingParty || '',
-        "fromToCity": element?.fromCity + "-" + element?.toCity,
-        "fromCity": element?.fromCity || "",
-        "contactNo": element?.contactNo || '',
-        "toCity": element?.toCity || "",
-        "transMode": element?.transMode || "",
-        "vehicleNo": element?.vehicleNo || "",
-        "prqBranch": element?.prqBranch || "",
-        "pickUpDate": formatDocketDate(element?.pickUpTime || new Date()),
-        "pickupDate": element?.pickUpTime || new Date(),
-        "status": element?.status === "0" ? "Awaiting Confirmation" : element.status === "1" ? "Awaiting Assign Vehicle" : element.status == "2" ? "Awaiting For Docket" : element.status == "3" ? "Ready For THC" : "THC Generated",
-        "actions": element?.status === "0" ? ["Confirm", "Reject", "Modify"] : element.status === "1" ? ["Assign Vehicle"] : element.status == "2" ? ["Add Docket"] : element.status == "3" ? ["Add Docket", "Create THC"] : [""],
-        "containerSize": element?.containerSize || "",
-        "typeContainer": element?.typeContainer || "",
-        "pAddress": element?.pAddress || "",
-        "payType": element?.payType || "",
-        "contractAmt": element?.contractAmt || "",
-        "createdDate": formatDocketDate(element?.entryDate || new Date()),
-        "entryDate": element?.entryDate,
-        // added by harikesh
-        "vendorName": element?.vendorName || '',
-        "vendorType": element?.vendorType || '',
-      }
+      let pqrData = this.preparePrqDetailObject(element, index);     
       prqList.push(pqrData)
       // You need to return the modified element
     });
     // Sort the PRQ list by pickupDate in descending order
     const sortedData = prqList.sort((a, b) => {
-      const dateA: Date | any = new Date(a.entryDate);
-      const dateB: Date | any = new Date(b.entryDate);
+      const dateA: Date | any = new Date(a.createDateOrg);
+      const dateB: Date | any = new Date(b.createDateOrg);
+
+      // Compare the date objects
+      return dateB - dateA; // Sort in descending order
+    });
+
+    // Create an object with sorted PRQ data and all PRQ details
+    const prqDetail = {
+      tableData: sortedData,
+      allPrqDetail: res.data,
+    };
+
+    return prqDetail;
+  }
+
+  async getPrqForBooking(barnch, billingParty, payType) {
+    // Prepare the request body with necessary parameters
+    const reqBody = {
+      companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
+      collectionName: "prq_summary",
+      filter: { bRCD: barnch,  pAYTYP: payType, bPARTY: billingParty,sTS: 2},
+    };
+
+    // Make an asynchronous request to the API using masterMongoPost method
+    const res = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBody));
+
+    // Filter out PRQ data with status "4" or "5"
+    const prqData = res.data;
+
+    let prqList = [];
+
+    // Map and transform the PRQ data
+    prqData.map((element, index) => {
+      let pqrData = this.preparePrqDetailObject(element, index);
+      prqList.push(pqrData)
+      // You need to return the modified element
+    });
+    // Sort the PRQ list by pickupDate in descending order
+    const sortedData = prqList.sort((a, b) => {
+      const dateA: Date | any = new Date(a.createDateOrg);
+      const dateB: Date | any = new Date(b.createDateOrg);
 
       // Compare the date objects
       return dateB - dateA; // Sort in descending order
@@ -241,47 +274,18 @@ export class PrqService {
   async getAllPrqDetail() {
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
-      collectionName: "prq_detail",
-      filter: {},
+      collectionName: "prq_summary",
+      filter: { bRCD: this.branchCode }
     };
 
     // Make an asynchronous request to the API using masterMongoPost method
-    const res = await this.masterService
-      .masterMongoPost("generic/get", reqBody)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBody));
+    
     let prqList = [];
-    const prqDetails = res.data.filter((x) => x.prqBranch.toLowerCase() === this.branchCode.toLowerCase());
+    const prqDetails = res.data;
     // Map and transform the PRQ data
     prqDetails.map((element, index) => {
-      let prqDataItem = {
-        srNo: (element.srNo = index + 1),
-        prqNo: element?.prqNo || "",
-        vehicleSize: element?.vehicleSize || "",
-        size: element.vehicleSize
-          ? element.vehicleSize + " " + "MT"
-          : element.containerSize
-            ? element.containerSize
-            : "",
-        billingParty: element?.billingParty || "",
-        fromToCity: element?.fromCity + "-" + element?.toCity,
-        fromCity: element?.fromCity || "",
-        contactNo: element?.contactNo || "",
-        toCity: element?.toCity || "",
-        transMode: element?.transMode || "",
-        vehicleNo: element?.vehicleNo || "",
-        prqBranch: element?.prqBranch || "",
-        pickUpDate: formatDocketDate(element?.pickUpTime || new Date()),
-        pickupDate: element?.pickUpTime || new Date(),
-        status: this.status[element.status] || this.status.default,
-        actions: this.statusActions[element.status] || this.statusActions.default,
-        containerSize: element?.containerSize || "",
-        typeContainer: element?.typeContainer || "",
-        pAddress: element?.pAddress || "",
-        payType: element?.payType || "",
-        contractAmt: element?.contractAmt || "",
-        createdDate: formatDocketDate(element?.entryDate || new Date()),
-        createDateOrg: element?.entryDate
-      };
+      let prqDataItem = this.preparePrqDetailObject(element, index);
       prqList.push(prqDataItem);
     });
 
@@ -304,52 +308,32 @@ export class PrqService {
 
   }
   async getAllPrqDetailWithFilters(billingParty: any) {
+
+    const startDate = moment(new Date()).add(-15, 'days').toDate();
+    const endDate = new Date();
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
-      collectionName: "prq_detail",
+      collectionName: "prq_summary",
       filter: {
-        prqBranch: this.branchCode,
-        billingParty: billingParty
-      },
+        cID: localStorage.getItem("companyCode"),
+        bRCD: this.branchCode,
+        bPARTY: billingParty,
+        pICKDT: {
+          D$gte: startDate,
+          D$lt: endDate
+        }
+      }
     };
 
     // Make an asynchronous request to the API using masterMongoPost method
-    const res = await this.masterService
-      .masterMongoPost("generic/get", reqBody)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBody));
+
     let prqList = [];
-    const prqDetails = res.data.filter((x) => x.prqBranch.toLowerCase() === this.branchCode.toLowerCase());
+    const prqDetails = res.data;
+
     // Map and transform the PRQ data
     prqDetails.map((element, index) => {
-      let prqDataItem = {
-        srNo: (element.srNo = index + 1),
-        prqNo: element?.prqNo || "",
-        vehicleSize: element?.vehicleSize || "",
-        size: element.vehicleSize
-          ? element.vehicleSize + " " + "MT"
-          : element.containerSize
-            ? element.containerSize
-            : "",
-        billingParty: element?.billingParty || "",
-        fromToCity: element?.fromCity + "-" + element?.toCity,
-        fromCity: element?.fromCity || "",
-        contactNo: element?.contactNo || "",
-        toCity: element?.toCity || "",
-        transMode: element?.transMode || "",
-        vehicleNo: element?.vehicleNo || "",
-        prqBranch: element?.prqBranch || "",
-        pickUpDate: formatDocketDate(element?.pickUpTime || new Date()),
-        pickupDate: element?.pickUpTime || new Date(),
-        status: this.status[element.status] || this.status.default,
-        actions: this.statusActions[element.status] || this.statusActions.default,
-        containerSize: element?.containerSize || "",
-        typeContainer: element?.typeContainer || "",
-        pAddress: element?.pAddress || "",
-        payType: element?.payType || "",
-        contractAmt: element?.contractAmt || "",
-        createdDate: formatDocketDate(element?.entryDate || new Date()),
-        createDateOrg: element?.entryDate
-      };
+      let prqDataItem = this.preparePrqDetailObject(element, index);
       prqList.push(prqDataItem);
     });
 
@@ -371,6 +355,77 @@ export class PrqService {
     return prqDetail;
 
   }
+
+  preparePrqDetailObject(element, index) {
+    let prqDataItem = {
+      srNo: (element.srNo = index + 1),
+      prqNo: element?.pRQNO || "",
+      vehicleSize: element?.vEHSIZENM || "",
+      vehicleSizeCode: element?.vEHSIZE || "",
+      size: element.sIZE || 0,
+      billingParty: element?.bPARTYNM || "",
+      billingPartyCode: element?.bPARTY || "",
+      fromToCity: element?.fCITY + "-" + element?.tCITY,
+      fromCity: element?.fCITY || "",
+      toCity: element?.tCITY || "",
+      contactNo: element?.pHNO || "",
+      carrierType: element?.cARTYPNM || "",
+      carrierTypeCode: element?.cARTYP || "",
+      vehicleNo: element?.vEHNO || "",
+      prqBranch: element?.bRCD || "",
+      pickUpDate: formatDocketDate(element?.pICKDT || new Date()),
+      pickupDate: element?.pICKDT || new Date(),
+      status: this.status[element.sTS] || this.status.default,
+      statusCode: element.sTS,
+      actions: this.statusActions[element.sTS] || this.statusActions.default,
+      containerSize: element?.cNTSIZE || "",
+      typeContainer: element?.cNTYPNM || "",
+      typeContainerCode: element?.cNTYP || "",
+      pAddress: element?.pADD || "",
+      payType: element?.pAYTYPNM|| "",
+      payTypeCode: element?.pAYTYP || "",
+      contractAmt: element?.cONTRAMT || "",
+      vENDTY:element?.vENDTY || "",
+      vENDTYNM:element?.vENDTYNM || "",
+      vNDCD: element?.vNDCD || "",
+      vNDNM: element?.vNDNM || "",
+      vEHNO:  element?.vEHNO || "",
+      createdDate: formatDocketDate(element?.eNTDT || new Date()),
+      createDateOrg: element?.eNTDT
+    };
+
+    return prqDataItem;
+  }
+
+  preparePrqDataModel(element) {
+    let prqDataItem = {            
+      pRQNO: element?.prqNo || "",
+      vEHSIZENM: element?.vehicleSize || "",
+      vEHSIZE: element?.vehicleSizeCode || "",
+      sIZE: element.size || 0,
+      bPARTYNM: element?.billingParty || "",
+      bPARTY: element?.billingPartyCode || "",
+      fCITY: element?.fromCity || "",
+      tCITY: element?.toCity || "",
+      pHNO: element?.contactNo || "",
+      cARTYPNM: element?.carrierType || "",
+      cARTYP: element?.carrierTypeCode || "",
+      vEHNO: element?.vehicleNo || "",
+      bRCD: element?.prqBranch || "",
+      pICKDT: element?.pICKDT || new Date(),
+      sTS: element?.statusCode,
+      sTSNM: element?.status,
+      cNTSIZE: element?.containerSize || "",
+      cNTYPNM: element?.typeContainer || "",
+      cNTYP: element?.typeContainerCode || "",
+      pADD: element?.pAddress || "",
+      pAYTYPNM: element?.payType|| "",
+      pAYTYP: element?.payTypeCode || "",
+      cONTRAMT: element?.contractAmt || ""
+    };
+    return prqDataItem;
+  }
+  
   // This function sets the assigned vehicle details.
   setassignVehicleDetail(data: any) {
     this.vehicleDetail = data;

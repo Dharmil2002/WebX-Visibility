@@ -13,7 +13,6 @@ import { THCAmountsDetailComponent } from "../Modal/thcamounts-detail/thcamounts
 import { VendorBalancePaymentControl } from "src/assets/FormControls/Finance/VendorPayment/vendorbalancepaymentcontrol";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { GetAccountDetailFromApi } from "../../credit-debit-voucher/debitvoucherAPIUtitlity";
-import { BlancePaymentPopupComponent } from "../blance-payment-popup/blance-payment-popup.component";
 import { Router } from "@angular/router";
 import {
   GetAdvancePaymentListFromApi,
@@ -28,6 +27,10 @@ import { financialYear } from "src/app/Utility/date/date-utils";
 import Swal from "sweetalert2";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import { filter } from 'rxjs/operators';
+import { BeneficiaryDetailComponent } from "../../Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component";
+import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
+import { BlancePaymentPopupComponent } from "../Modal/blance-payment-popup/blance-payment-popup.component";
+import { StorageService } from "src/app/core/service/storage.service";
 
 @Component({
   selector: "app-balance-payment",
@@ -78,19 +81,19 @@ export class BalancePaymentComponent implements OnInit {
       Style: "min-width:13%",
     },
     THCamount: {
-      Title: "THC Amount",
+      Title: "THC Amount ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:15%",
       type: "Link",
       functionName: "THCAmountFunction",
     },
     Advance: {
-      Title: "Advance",
+      Title: "Advance ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
     BalancePending: {
-      Title: "Balance Pending",
+      Title: "Balance Pending ⟨₹⟩",
       class: "matcolumncenter",
       Style: "min-width:15%",
     },
@@ -157,6 +160,8 @@ export class BalancePaymentComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private masterService: MasterService,
     private matDialog: MatDialog,
+    private objVendorBillService: VendorBillService,
+    private storage: StorageService,
     private route: Router // public dialog: MatDialog
   ) {
     this.PaymentData = this.route.getCurrentNavigation()?.extras?.state?.data;
@@ -168,7 +173,7 @@ export class BalancePaymentComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeFormControl();
-    this.GetAdvancePaymentList();
+    this.GetABalancePaymentList();
     this.TotalAmountList = [
       {
         count: "0.00",
@@ -189,28 +194,30 @@ export class BalancePaymentComponent implements OnInit {
     this.GetVendorInformation();
   }
   async GetVendorInformation() {
-    this.VendorDetails = await GetSingleVendorDetailsFromApi(this.masterService, this.PaymentData.Vendor)
-    this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(this.VendorDetails?.panNo)
-    this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0)
-
-
+    this.VendorDetails = await GetSingleVendorDetailsFromApi(this.masterService, this.PaymentData?.VendorInfo?.cD)
+    console.log(this.VendorDetails)
   }
-  async GetAdvancePaymentList() {
+  async GetABalancePaymentList() {
     this.isTableLode = false;
     const Filters = {
-      vendorName: this.PaymentData.Vendor,
-      balAmtAt: localStorage.getItem("Branch"),
+      PaymentType: "Balance",
+      StartDate: this.PaymentData?.StartDate,
+      EndDate: this.PaymentData?.EndDate,
+      VendorInfo: this.PaymentData?.VendorInfo,
     };
+
     const GetAdvancePaymentData = await GetAdvancePaymentListFromApi(
       this.masterService,
       Filters
     );
+
+
     const Data = GetAdvancePaymentData.map((x, index) => {
       return {
         GenerationDate: x.GenerationDate,
         VehicleNumber: x.VehicleNumber,
         Advance: x.Advance,
-        BalancePending: x.OthersData.balAmt,
+        BalancePending: x.OthersData.bALAMT,
         THC: x.THC,
         THCamount: x.THCamount,
         OthersData: x,
@@ -223,8 +230,8 @@ export class BalancePaymentComponent implements OnInit {
 
   initializeFormControl(): void {
     let RequestObj = {
-      VendorPANNumber: "AACCG464648ZS",
-      Numberofvehiclesregistered: "20",
+      VendorPANNumber: this.PaymentData?.VendorInfo?.pAN || "",
+      Numberofvehiclesregistered: "0",
     };
     this.vendorBalancePaymentControl = new VendorBalancePaymentControl(
       RequestObj
@@ -423,9 +430,7 @@ export class BalancePaymentComponent implements OnInit {
     }
   }
 
-  AdvancePendingFunction(event) {
-    console.log("AdvancePendingFunction", event);
-  }
+
 
   BalanceUnbilledFunction(event) {
     const templateBody = {
@@ -453,31 +458,13 @@ export class BalancePaymentComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log("result", result);
-        this.setTHCamountData(result.data)
+        if (result.success) {
+          this.GetABalancePaymentList()
+        }
       }
     });
   }
 
-  setTHCamountData(result) {
-    console.log('result', result)
-    this.isTableLode = false
-    const THCdata = result.THCData;
-    const THCAmountsForm = result.THCAmountsForm;
-    this.tableData.forEach((x) => {
-      if (x.THC == THCdata.THC) {
-        x.Advance = +THCAmountsForm.Advance;
-        x.THCamount = (+THCAmountsForm.Advance) + (+THCAmountsForm.Balance);
-        x.BalancePending = +THCAmountsForm.Balance;
-        x["UpdateAmount"] = {
-          THCAmountsADDForm: result.THCAmountsADDForm,
-          THCAmountsLESSForm: result.THCAmountsLESSForm,
-        }
-      }
-    })
-    this.selectCheckBox()
-    this.isTableLode = true
-  }
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
     let functionName = $event.functionName; // name of the function , we have to call
@@ -586,7 +573,7 @@ export class BalancePaymentComponent implements OnInit {
         const vendorBillEntry: VendorBillEntry = {
           companyCode: this.companyCode,
           docType: "VB",
-          branch: localStorage.getItem("CurrentBranchCode"),
+          branch: this.storage.branch,
           finYear: financialYear,
           data: {
             companyCode: this.companyCode,
@@ -604,13 +591,13 @@ export class BalancePaymentComponent implements OnInit {
             bSTAT: 1,
             bSTATNM: "Generated",
             cNL: false,
-            cNLDT: new Date(),
-            cNBY: localStorage.getItem("UserName"),
+            cNLDT: undefined,
+            cNBY: "",
             cNRES: "",
             eNTDT: new Date(),
-            eNTLOC: localStorage.getItem("CurrentBranchCode"),
-            eNTBY: localStorage.getItem("UserName"),
-            mODDT: new Date(),
+            eNTLOC: this.storage.branch,
+            eNTBY: this.storage.userName,
+            mODDT: undefined,
             mODLOC: "",
             mODBY: "",
             vND: {
@@ -618,7 +605,7 @@ export class BalancePaymentComponent implements OnInit {
               nM: this.VendorDetails?.vendorName,
               pAN: this.VendorDetails?.panNo,
               aDD: this.VendorDetails?.vendorAddress,
-              mOB: this.VendorDetails?.vendorPhoneNo.toString(),
+              mOB: this.VendorDetails?.vendorPhoneNo ? this.VendorDetails?.vendorPhoneNo.toString() : "",
               eML: this.VendorDetails?.emailId,
               gSTREG: this.VendorDetails?.otherdetails?.[0].gstNumber ? true : false,
               sT: this.VendorDetails?.otherdetails?.[0].gstState,
@@ -632,8 +619,8 @@ export class BalancePaymentComponent implements OnInit {
               aMT: this.VendorBalanceTaxationTDSFilterForm.value.TDSExempted ? this.VendorBalanceTaxationTDSFilterForm.value.TDSAmount : 0,
             },
             gST: {
-              sAC: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value.toString(),
-              sACNM: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.name.toString(),
+              sAC: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value ? this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.value.toString() : "",
+              sACNM: this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.name ? this.VendorBalanceTaxationGSTFilterForm.value.GSTSACcode?.name.toString() : "",
               tYP: this.VendorBalanceTaxationGSTFilterForm.value.GSTType,
               rATE: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.TotalGSTRate) || 0,
               iGRT: parseFloat(this.VendorBalanceTaxationGSTFilterForm.value.IGSTRate) || 0,
@@ -660,7 +647,7 @@ export class BalancePaymentComponent implements OnInit {
 
   }
   SetVendorBillEntry(BillNo, PaymenDetails, generateVoucher) {
-    this.tableData.filter((x) => x.isSelected == true).forEach((item) => {
+    this.tableData.filter((x) => x.isSelected == true).forEach(async (item) => {
 
       const vendbilldet: Vendbilldetails = {
         _id: BillNo + "-" + item.THC,
@@ -682,11 +669,27 @@ export class BalancePaymentComponent implements OnInit {
         data: vendbilldet,
       };
 
-      firstValueFrom(this.masterService.masterPost("generic/create", RequestData)).then((res: any) => {
+      const commonBody = {
+        bILLNO: BillNo,
+        iSBILLED: true,
+        mODDT: new Date(),
+        mODLOC: this.storage.branch,
+        mODBY: this.storage.userName,
+      }
+      const RequestDataForTHC = {
+        companyCode: this.companyCode,
+        collectionName: "thc_summary",
+        filter: {
+          cID: this.storage.companyCode,
+          docNo: item.THC
+        },
+        update: commonBody,
+      };
 
-      }).catch((error) => { this.snackBarUtilityService.ShowCommonSwal("error", error); })
-        .finally(() => {
-        });
+
+      await firstValueFrom(this.masterService.masterPost("generic/create", RequestData));
+      await firstValueFrom(this.masterService.masterPut("generic/update", RequestDataForTHC));
+
     })
     if (generateVoucher) {
       this.SubmitVoucherData(PaymenDetails, BillNo)
@@ -701,11 +704,15 @@ export class BalancePaymentComponent implements OnInit {
           Swal.hideLoading();
           setTimeout(() => {
             Swal.close();
+            this.RedirectToTHCPayment()
           }, 2000);
         }
       });
     }
 
+  }
+  RedirectToTHCPayment() {
+    this.route.navigate(["/Finance/VendorPayment/THC-Payment"]);
   }
   SubmitVoucherData(PaymenDetails, BillNo) {
     this.snackBarUtilityService.commonToast(async () => {
@@ -824,6 +831,7 @@ export class BalancePaymentComponent implements OnInit {
               Swal.hideLoading();
               setTimeout(() => {
                 Swal.close();
+                this.RedirectToTHCPayment()
               }, 2000);
             }
           });
@@ -883,11 +891,52 @@ export class BalancePaymentComponent implements OnInit {
         Swal.hideLoading();
         setTimeout(() => {
           Swal.close();
+          this.RedirectToTHCPayment()
         }, 2000);
       }
     });
   }
   PerformMakePaymentSection(PaymenDetails, generateVoucher) {
     this.BookVendorBill(PaymenDetails, generateVoucher)
+  }
+  async getBeneficiaryData() {
+    try {
+      // Fetch beneficiary details from API
+      const beneficiaryModalData = await this.objVendorBillService.getBeneficiaryDetailsFromApi(this.PaymentData.Vendor);
+
+      // Check if beneficiary data is available
+      if (beneficiaryModalData.length > 0) {
+        // Prepare request object for the dialog
+        const request = {
+          Details: beneficiaryModalData,
+        };
+
+
+        // Open the BeneficiaryDetailComponent dialog
+        const dialogRef = this.matDialog.open(BeneficiaryDetailComponent, {
+          data: request,
+          width: "100%",
+          disableClose: true,
+          position: {
+            top: "20px",
+          },
+        });
+
+        // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
+        dialogRef.afterClosed().subscribe(() => {
+        });
+      } else {
+        // Display a warning if no beneficiary data is available
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Please Add Beneficiary Details To View",
+          showConfirmButton: true,
+        });
+      }
+    } catch (error) {
+      // Log any errors that occur during the process
+      console.error('An error occurred:', error);
+    }
   }
 }

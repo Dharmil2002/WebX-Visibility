@@ -160,6 +160,15 @@ import { AddaccountComponent } from './Account-master/account-master/addaccount/
 import { AddGroupComponent } from './Account-master/group-master/add-group/add-group.component';
 import { ListGroupComponent } from './Account-master/group-master/list-group/list-group.component';
 import { CustomerContractNonFreightChargesPopupComponent } from './Customer Contract/CustomerContractTabs/customer-contract-non-freight-charges-popup/customer-contract-non-freight-charges-popup.component';
+import { AddTenantComponent } from './Tenant Setup/add-tenant/add-tenant.component';
+import { TenantListComponent } from './Tenant Setup/tenant-list/tenant-list.component';
+import { ExpressRouteBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-terdetail/express-route-bulk-upload/express-route-bulk-upload.component';
+import { FullTruckRouteBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-lhftrdetail/full-truck-route-bulk-upload/full-truck-route-bulk-upload.component';
+import { LongHaulLaneBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-lhldetail/long-haul-lane-bulk-upload/long-haul-lane-bulk-upload.component';
+import { LastMileDeliveryBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-lmddetail/last-mile-delivery-bulk-upload/last-mile-delivery-bulk-upload.component';
+import { BusinessAssociateBulkUploadComponent } from './vendor-contract/vendorContractTabs/vendor-busi-assoc-detail/business-associate-bulk-upload/business-associate-bulk-upload.component';
+import { AddContainerComponent } from './Container Master/add-container/add-container.component';
+import { ListContainerComponent } from './Container Master/list-container/list-container.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -335,6 +344,15 @@ import { CustomerContractNonFreightChargesPopupComponent } from './Customer Cont
     AddGroupComponent,
     ListGroupComponent,
     CustomerContractNonFreightChargesPopupComponent,
+    AddTenantComponent,
+    TenantListComponent,
+    ExpressRouteBulkUploadComponent,
+    FullTruckRouteBulkUploadComponent,
+    LongHaulLaneBulkUploadComponent,
+    LastMileDeliveryBulkUploadComponent,
+    BusinessAssociateBulkUploadComponent,
+    AddContainerComponent,
+    ListContainerComponent,
   ],
 
   providers: [

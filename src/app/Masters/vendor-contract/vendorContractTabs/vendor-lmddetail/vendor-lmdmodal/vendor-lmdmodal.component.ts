@@ -6,6 +6,7 @@ import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/Custome
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
@@ -43,6 +44,7 @@ export class VendorLMDModalComponent implements OnInit {
     private sessionService: SessionService,
     private objContainerService: ContainerService,
     public dialogRef: MatDialogRef<VendorLMDModalComponent>,
+    private objGeneralService: GeneralService,
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
     this.companyCode = this.sessionService.getCompanyCode();
@@ -117,7 +119,7 @@ export class VendorLMDModalComponent implements OnInit {
           // Generate a new _id
           newId = lastId + 1;
         }
-        newId = existingContract ? newId : 0
+        newId = existingContract ? newId : 1
         const newContractData = this.prepareContractData(newId);
 
         const createRequest = {
@@ -256,13 +258,10 @@ export class VendorLMDModalComponent implements OnInit {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
     const timeFrameDropDown = await PayBasisdetailFromApi(this.masterService, 'TMFRM')
     const containerData = await this.objContainerService.getContainerList();
-    const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VC')
-    const containerDataWithPrefix = vehicleData.map((item) => ({
-      name: item.name,
-      value: item.value,
-    }));
+    const vehicleData = await this.objGeneralService.getGeneralMasterData("VEHSIZE");
+
     // Merge containerData and vehicleData into a single array
-    const mergedData = [...containerData, ...containerDataWithPrefix];
+    const mergedData = [...containerData, ...vehicleData];
 
     this.filter.Filter(this.jsonControlArray, this.TLMDForm, mergedData, this.capacityName, this.capacitystatus);
     if (this.objResult.Details) {

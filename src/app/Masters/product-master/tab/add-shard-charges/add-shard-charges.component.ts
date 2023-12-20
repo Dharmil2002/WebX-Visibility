@@ -26,15 +26,20 @@ export class AddShardChargesComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    charge_id: {
+    cHCD: {
       Title: "Charge ID",
       class: "matcolumncenter",
-      Style: "min-width:40%",
+      Style: "min-width:20%",
     },
-    charge_name: {
+    cHNM: {
       Title: "Charge Name",
       class: "matcolumncenter",
       Style: "min-width:40%",
+    },
+    cHTY: {
+      Title: "Charge Type",
+      class: "matcolumncenter",
+      Style: "min-width:20%",
     },
   };
 
@@ -42,7 +47,7 @@ export class AddShardChargesComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: Object.keys(this.columnHeader),
   };
-  staticField = ["SrNo", "charge_id", "charge_name"];
+  staticField = ["SrNo", "cHCD", "cHNM","cHTY"];
   companyCode = parseInt(localStorage.getItem("companyCode"));
   productNameList: any = [];
   tableData: any;
@@ -90,15 +95,25 @@ export class AddShardChargesComponent implements OnInit {
       this.isTableLode = true;
     }
   }
+  initializeFormControl() {
+    const customerFormControls = new ProductControls();
+    this.jsonControlArray = customerFormControls.getShardChargesControlsArray();
+    // Build the form group using formGroupBuilder function and the values of accordionData
+    this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
+  }
   async save() {
-    const element = this.tableData[this.tableData.length - 1];
+    const length = this.tableData.length
+    // const element = this.tableData[this.tableData.length - 1];
+    const index = length == 0? 1 : parseInt(this.tableData[length-1].cHCD.substring(3))+ 1
+    const ChargeCode = `CHA${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
     const Body = {
-      charge_name: this.customerTableForm.value.ChargeName,
-      charge_id: this.customerTableForm.value.ChargeID,
-      _id: parseInt(element._id) + 1,
-      updatedDate: new Date(),
-      updatedBy: localStorage.getItem("UserName"),
-      active: true,
+      _id: `${this.companyCode}-${ChargeCode}`,
+      cHNM: this.customerTableForm.value.ChargeName,
+      cHCD: ChargeCode,
+      cHTY:this.customerTableForm.value.ChargesType,
+      mODDT: new Date(),
+      mODBY: localStorage.getItem("UserName"),
+      aCTV: true,
     };
     const req = {
       companyCode: this.companyCode,
@@ -124,13 +139,9 @@ export class AddShardChargesComponent implements OnInit {
         showConfirmButton: true,
       });
     }
+    this.initializeFormControl();
   }
-  initializeFormControl() {
-    const customerFormControls = new ProductControls();
-    this.jsonControlArray = customerFormControls.getShardChargesControlsArray();
-    // Build the form group using formGroupBuilder function and the values of accordionData
-    this.customerTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-  }
+  
   functionCallHandler($event) {
     let functionName = $event.functionName;
     try {
@@ -140,7 +151,6 @@ export class AddShardChargesComponent implements OnInit {
     }
   }
   async handleChargesName() {
-    const element = this.tableData[this.tableData.length - 1];
     let req = {
       companyCode: this.companyCode,
       filter: {},
@@ -152,7 +162,7 @@ export class AddShardChargesComponent implements OnInit {
     if (Res?.success && Res.data.length > 0) {
       const FilterData = this.tableData.filter(
         (x) =>
-          x.charge_name.toLowerCase() ==
+          x.cHNM.toLowerCase() ==
           this.customerTableForm.value.ChargeName.toLowerCase()
       );
       if (FilterData.length != 0) {
@@ -163,16 +173,7 @@ export class AddShardChargesComponent implements OnInit {
           text: "Product name exist!",
           showConfirmButton: true,
         });
-      } else {
-        this.customerTableForm.controls.ChargeID.setValue(
-          `${
-            parseInt(element._id) + 1
-          }-${this.customerTableForm.value.ChargeName.toUpperCase().substring(
-            0,
-            3
-          )}`
-        );
-      }
+      } 
     }
   }
 }

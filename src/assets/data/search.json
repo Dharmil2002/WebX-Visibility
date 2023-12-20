@@ -177,6 +177,14 @@
       "router": "Masters/CompanyMaster/AddCompany"
     },
     {
+      "title": "TenantMaster/TenantMasterList",
+      "tag": [
+        "TenantMaster",
+        "AddCTenant"
+      ],
+      "router": "Masters/TenantMaster/TenantMasterList"
+    },
+    {
       "title": "CustomerMaster/CustomerMasterList",
       "tag": [
         "CustomerMaster",
@@ -490,18 +498,18 @@
       "router": "Masters/CityLocationMapping/CityLocationIndex"
     },
     {
-      "title": "ContainerMaster/ContainerMasterList",
+      "title": "ContainerMaster/ContainerMasterTypeList",
       "tag": [
         "ContainerMaster",
-        "ContainerMasterList"
+        "ContainerMasterTypeList"
       ],
       "router": "Masters/ContainerMaster/ContainerMasterList"
     },
     {
-      "title": "ContainerMaster/AddContainerMaster",
+      "title": "ContainerMaster/AddContainerType",
       "tag": [
         "ContainerMaster",
-        "AddContainerMaster"
+        "AddContainerType"
       ],
       "router": "Masters/ContainerMaster/AddContainerMaster"
     },
@@ -828,6 +836,85 @@
         "cnote-register"
       ],
       "router": "Reports/cnote-GST-register"
+    },
+    {
+      "title": "Reports/CNote-Bill-MR-Report",
+      "tag": [
+        "cnote-bill-mr",
+        "cnote-bill-mr"
+      ],
+      "router": "Reports/cnote-Bill-MR-Report"
+    },
+    {
+      "title": "Reports/Sales-Register-Report",
+      "tag": [
+        "sales-register",
+        "sales-register"
+      ],
+      "router": "Reports/sales-register-report"
+    },
+    {
+      "title": "ProductMaster/shardProductList",
+      "tag": [
+        "shard-Product",
+        "shard-Product"
+      ],
+      "router": "Masters/ProductMaster/shardProductList"
+    },
+    {
+      "title": "Reports/Vendor-Wise-GST-Invoice-Register-Report",
+      "tag": [
+        "vengstregreport",
+        "vengstregreport"
+      ],
+      "router": "Reports/vendor-wise-gst-invoice-register-report"
+    },
+    {
+      "title": "Reports/Customer-Wise-GST-Invoice-Register-Report",
+      "tag": [
+        "custgstregreport",
+        "custgstregreport"
+      ],
+      "router": "Reports/customer-wise-gst-invoice-register-report"
+    },
+    {
+      "title": "Reports/Unbilled-Register-Report",
+      "tag": [
+        "unbillregreport",
+        "unbillregreport"
+      ],
+      "router": "Reports/unbilled-register-report"
+    },
+    {
+      "title": "Reports/Customer-Outstanding-Report",
+      "tag": [
+        "custoutstandingreport",
+        "custoutstandingreport"
+      ],
+      "router": "Reports/customer-outstanding-report"
+    },
+    {
+      "title": "Reports/Vendor-Wise-Outstanding-Report",
+      "tag": [
+        "vendoutstandingreport",
+        "vendoutstandingreport"
+      ],
+      "router": "Reports/vendor-wise-outstanding-report"
+    },
+
+    {
+      "title": "AddContainerMaster",
+      "tag": [
+        "Add Container"
+      ],
+      "router": "Masters/ContainerMaster/AddContainer"
+    },
+    {
+      "title": "ListContainerMaster",
+      "tag": [
+        "List Container"
+      ],
+      "router": "Masters/ContainerMaster/ListContainer"
     }
   ]
 }

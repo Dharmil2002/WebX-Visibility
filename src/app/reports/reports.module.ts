@@ -39,12 +39,16 @@ import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { EncryptionService } from '../core/service/encryptionService.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { PinCodeService } from '../Utility/module/masters/pincode/pincode.service';
-import { GeneralService } from '../Utility/module/masters/general-master/general-master.service';
 import { JobQueryPageComponent } from './job-report/job-query-page/job-query-page.component';
-import { CnwGstRegisterComponent } from './cnw-gst-register/cnw-gst-register.component';
 import { ReportsRoutingModule } from './reports-routing.module';
-
+import { CnwGstRegisterComponent } from './cnw-gst-register/cnw-gst-register.component';
+import { CnoteBillMrReportComponent } from './cnote-bill-mr-report/cnote-bill-mr-report.component';
+import { SalesRegisterAdvancedComponent } from './sales-register-advanced/sales-register-advanced.component';
+import { VendorWiseGstInvoiceRegisterComponent } from './vendor-wise-gst-invoice-register/vendor-wise-gst-invoice-register.component';
+import { CustomerWiseGstInvoiceComponent } from './customer-wise-gst-invoice/customer-wise-gst-invoice.component';
+import { UnbillRegisterComponent } from './unbill-register/unbill-register.component';
+import { CustomerOutstandingReportComponent } from './customer-outstanding-report/customer-outstanding-report.component';
+import { VendorOutstandingReportComponent } from './vendor-outstanding-report/vendor-outstanding-report.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -92,11 +96,18 @@ import { ReportsRoutingModule } from './reports-routing.module';
 
   declarations: [
     JobQueryPageComponent,
-    CnwGstRegisterComponent
+    CnwGstRegisterComponent,
+    CnoteBillMrReportComponent,
+    SalesRegisterAdvancedComponent,
+    VendorWiseGstInvoiceRegisterComponent,
+    CustomerWiseGstInvoiceComponent,
+    UnbillRegisterComponent,
+    CustomerOutstandingReportComponent,
+    VendorOutstandingReportComponent
   ],
   exports:[],
 
-  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService, SessionService, EncryptionService, PinCodeService,GeneralService]
+  providers: [DatePipe, { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, { provide: MAT_DIALOG_DATA, useValue: {} }, jsonDataServiceService, FilterUtils, SnackBarUtilityService, utilityService, SessionService, EncryptionService]
 })
 
 export class ReportsModule { }

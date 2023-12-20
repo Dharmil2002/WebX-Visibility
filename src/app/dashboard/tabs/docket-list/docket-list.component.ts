@@ -26,7 +26,7 @@ export class DocketListComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width:300px",
     },
-    docketNumber: {
+    docNo: {
       Title: "Shipment",
       class: "matcolumnleft",
       Style: "min-width:300px",
@@ -38,26 +38,26 @@ export class DocketListComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:200px",
     },
-    actualWeight: {
+    aCTWT: {
       Title: "Act Wt(Kg)",
       class: "matcolumncenter",
       Style: "max-width:70px",
     },
-    totalPkg: {
+    pKGS: {
       Title: "Pkg Count",
       class: "matcolumncenter",
       Style: "max-width:70px",
     },
-    totalAmount: {
+    fRTAMT: {
       Title: "FV(₹)",
       class: "matcolumncenter",
       Style: "max-width:70px",
     },
-     invoiceCount: {
-      Title: "Inv Count",
-      class: "matcolumncenter",
-      Style: "max-width:70px",
-    },
+    //  invoiceCount: {
+    //   Title: "Inv Count",
+    //   class: "matcolumncenter",
+    //   Style: "max-width:70px",
+    // },
     status:{
       Title: "Status",
       class: "matcolumncenter",
@@ -76,9 +76,10 @@ export class DocketListComponent implements OnInit {
     "billingParty",
     "ftCity",
     "actualWeight",
-    "totalPkg",
-    "totalAmount",
-    "invoiceCount",
+    "aCTWT",
+    "pKGS",
+    "tOTAMT",
+    "fRTAMT",
     "status",
     "createOn"
   ];
@@ -102,7 +103,7 @@ export class DocketListComponent implements OnInit {
   addAndEditPath='Operation/ConsignmentEntry';
   // menuItems = [{label:"Edit Docket"},{label:"View"}];
 
-  constructor(    
+  constructor(
     private router: Router,
     private docketService:DocketService,
     private thcService: ThcService
@@ -124,7 +125,7 @@ export class DocketListComponent implements OnInit {
 
   async handleMenuItemClick(data) {
     const { label } = data.label;
-  
+
     switch (label) {
       case "Edit Docket":
         this.router.navigate(['/Operation/ConsignmentEntry'], {
@@ -144,7 +145,7 @@ export class DocketListComponent implements OnInit {
         break;
     }
   }
-  
+
   goBack(tabIndex: string): void {
     this.router.navigate(["/dashboard/Index"], {
       queryParams: { tab: tabIndex },
@@ -161,7 +162,7 @@ export class DocketListComponent implements OnInit {
   }
   OpenCnote(data){
     const templateBody = {
-      DocNo:data.docketNumber,
+      DocNo:data.docNo,
       templateName:'docket'
     }
     const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;

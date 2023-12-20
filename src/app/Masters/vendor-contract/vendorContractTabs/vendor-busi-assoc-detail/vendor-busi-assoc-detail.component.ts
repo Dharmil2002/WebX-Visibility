@@ -5,6 +5,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
+import { BusinessAssociateBulkUploadComponent } from './business-associate-bulk-upload/business-associate-bulk-upload.component';
 
 @Component({
   selector: 'app-vendor-busi-assoc-detail',
@@ -78,6 +79,7 @@ export class VendorBusiAssocDetailComponent implements OnInit {
   staticFieldTErouteBased = ['cT', 'oPNM', 'rTNM', 'mDNM', , 'rT', 'mIN', 'mAX', "pBSNM", "lOCNM"]
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
+  uploadComponent = BusinessAssociateBulkUploadComponent;
 
   constructor(private route: ActivatedRoute, private encryptionService: EncryptionService,
     private dialog: MatDialog,
@@ -87,7 +89,7 @@ export class VendorBusiAssocDetailComponent implements OnInit {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
-      console.log(this.CurrentContractDetails);
+      //console.log(this.CurrentContractDetails);
 
     });
   }
@@ -156,4 +158,15 @@ export class VendorBusiAssocDetailComponent implements OnInit {
     this.getTableDetail()
   }
   //#endregion 
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getTableDetail();
+    });
+  }
+  //#endregion
 }

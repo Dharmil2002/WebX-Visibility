@@ -6,6 +6,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
+import { FullTruckRouteBulkUploadComponent } from './full-truck-route-bulk-upload/full-truck-route-bulk-upload.component';
 
 @Component({
   selector: 'app-vendor-lhftrdetail',
@@ -69,6 +70,7 @@ export class VendorLHFTRDetailComponent implements OnInit {
   staticFieldTErouteBased = ['mIN', 'rT', 'cPCTNM', 'rTNM', 'rTTNM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
+  uploadComponent = FullTruckRouteBulkUploadComponent;
 
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
@@ -87,7 +89,6 @@ export class VendorLHFTRDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.getXpressDetail();
-
   }
   //#region  to fill or remove data form table to controls
   handleMenuItemClick(data) {
@@ -153,4 +154,15 @@ export class VendorLHFTRDetailComponent implements OnInit {
     this.getXpressDetail()
   }
   //#endregion 
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getXpressDetail();
+    });
+  }
+  //#endregion
 }

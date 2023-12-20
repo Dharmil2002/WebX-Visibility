@@ -2,14 +2,14 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 export class vendorBillPaymentControl {
     billPaymentHeaderArray: FormControls[];
     PaymentSummaryFilterArray: FormControls[];
-    constructor(FormValues) {
+    constructor() {
         this.billPaymentHeaderArray = [
             {
                 name: "VendorPANNumber",
                 label: "Vendor PAN Number",
                 placeholder: "Vendor PAN Number",
                 type: "textwithbutton",
-                value: FormValues?.VendorPANNumber,
+                value: '',
                 generatecontrol: true,
                 disable: false,
                 Validations: [],
@@ -31,7 +31,7 @@ export class vendorBillPaymentControl {
                     buttonIcon: "book-open"
                 },
                 functions: {
-                    onClick: "BeneficiarydetailsViewFunctions",
+                    onClick: "getBeneficiaryData",
                 },
             },
         ]
@@ -156,26 +156,9 @@ export class vendorBillPaymentControl {
               disable: false,
               Validations: [],
               additionalData: {
-                minDate: new Date(),
+                // minDate: new Date(),
               },
             },
-            // {
-            //   name: "ScanSupportingdocument",
-            //   label: "Scan Supporting document",
-            //   placeholder: "",
-            //   type: "file",
-            //   value: "",
-            //   Validations: [],
-            //   additionalData: {
-            //     isFileSelected: true
-            //   },
-            //   functions: {
-            //     onChange: "selectFileScanDocument",
-            //   },
-            //   generatecontrol: true,
-            //   disable: false,
-            // },
-      
           ]
     }
     getbillPaymentHeaderArrayControl() {

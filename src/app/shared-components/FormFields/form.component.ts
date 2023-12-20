@@ -42,6 +42,7 @@ export class FormComponent {
   @Input() uploadedFiles;
   @Input() AddNewButton;
   @Input() EventButton;
+  @Input() MatButton;
   @Input() className: string = "col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-2";
   @Input() FormTitle: string = "";
   @Input() DisplayCheckbox: boolean = false;

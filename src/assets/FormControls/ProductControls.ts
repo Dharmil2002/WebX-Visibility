@@ -53,6 +53,19 @@ export class ProductControls {
 
     this.ProductControlsArray = [
       {
+        name: "ProductID",
+        label: "Product ID",
+        placeholder: "System Genrated",
+        type: "text",
+        value: "System Genrated",
+        Validations: [{
+          name: "required",
+          message: "Required",
+        },],
+        generatecontrol: true,
+        disable: true,
+      },
+      {
         name: "ProductName",
         label: "Product Name",
         placeholder: "Product Name",
@@ -71,23 +84,21 @@ export class ProductControls {
             pattern: "^[a-zA-Z ]{3,20}$",
           },
         ],
-        functions: {
-          onChange: "handleProductName",
-        },
+        functions: {},
       },
-      {
-        name: "ProductID",
-        label: "Product ID",
-        placeholder: "System Genreted",
-        type: "text",
-        value: "",
-        Validations: [{
-          name: "required",
-          message: "Required",
-        },],
-        generatecontrol: true,
-        disable: true,
-      },
+      // {
+      //   name: "ProductID",
+      //   label: "Product ID",
+      //   placeholder: "System Genreted",
+      //   type: "text",
+      //   value: "",
+      //   Validations: [{
+      //     name: "required",
+      //     message: "Required",
+      //   },],
+      //   generatecontrol: true,
+      //   disable: true,
+      // },
     ];
 
     this.ChargesControlsArray = [
@@ -174,6 +185,19 @@ export class ProductControls {
 
     this.ShardChargesControlsArray = [
       {
+        name: "ChargeID",
+        label: "Charges ID",
+        placeholder: "System Genrated",
+        type: "text",
+        value: "System Genrated",
+        Validations: [{
+          name: "required",
+          message: "Required",
+        },],
+        generatecontrol: true,
+        disable: true,
+      },
+      {
         name: "ChargeName",
         label: "Charges Name",
         placeholder: "Charges Name",
@@ -187,22 +211,21 @@ export class ProductControls {
             message: "Select Charges is required",
           },
         ],
-        functions: {
-          onChange: "handleChargesName",
-        },
+        functions: {},
       },
       {
-        name: "ChargeID",
-        label: "Charges ID",
-        placeholder: "System Genreted",
-        type: "text",
-        value: "",
-        Validations: [{
-          name: "required",
-          message: "Required",
-        },],
+        name: "ChargesType",
+        label: "",
+        placeholder: "",
+        type: "radiobutton",
+        value: [
+          { value: "V", name: "Vendor", checked: true },
+          { value: "C", name: "Customer" },
+          { value: "B", name: "Both" },
+        ],
+        Validations: [],
         generatecontrol: true,
-        disable: true,
+        disable: false,
       },
     ];
 
@@ -286,6 +309,19 @@ export class ProductControls {
     ];
     this.ShardServicesControlsArray = [
       {
+        name: "ServicesID",
+        label: "Services ID",
+        placeholder: "System Genrated",
+        type: "text",
+        value: "System Genreted",
+        Validations: [{
+          name: "required",
+          message: "Required",
+        },],
+        generatecontrol: true,
+        disable: true,
+      },
+      {
         name: "ServicesName",
         label: "Services Name",
         placeholder: "Services Name",
@@ -306,19 +342,7 @@ export class ProductControls {
           onChange: "handleServicesName",
         },
       },
-      {
-        name: "ServicesID",
-        label: "Services ID",
-        placeholder: "System Genreted",
-        type: "text",
-        value: "",
-        Validations: [{
-          name: "required",
-          message: "Required",
-        },],
-        generatecontrol: true,
-        disable: true,
-      },
+      
     ];
   }
   getProductControlsArray(event) {

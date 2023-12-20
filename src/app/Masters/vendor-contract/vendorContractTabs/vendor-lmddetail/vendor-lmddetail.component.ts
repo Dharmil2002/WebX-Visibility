@@ -6,6 +6,7 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ActivatedRoute } from '@angular/router';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
 import { removeData } from '../../vendorContractApiUtility';
+import { LastMileDeliveryBulkUploadComponent } from './last-mile-delivery-bulk-upload/last-mile-delivery-bulk-upload.component';
 
 @Component({
   selector: 'app-vendor-lmddetail',
@@ -77,6 +78,7 @@ export class VendorLMDDetailComponent implements OnInit {
   staticFieldTErouteBased = ['lOCNM', 'rTTNM', 'tMFRMNM', 'cPCTNM', 'mIN', 'cMTKM', 'aDDKM', 'mAX']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
   CurrentContractDetails: any;
+  uploadComponent = LastMileDeliveryBulkUploadComponent;
 
   constructor(private route: ActivatedRoute,
     private encryptionService: EncryptionService,
@@ -156,4 +158,15 @@ export class VendorLMDDetailComponent implements OnInit {
     this.getTableDetail()
   }
   //#endregion 
+  //#region to call upload function
+  upload() {
+    const dialogRef = this.dialog.open(this.uploadComponent, {
+      width: "800px",
+      height: "500px",
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.getTableDetail();
+    });
+  }
+  //#endregion
 }

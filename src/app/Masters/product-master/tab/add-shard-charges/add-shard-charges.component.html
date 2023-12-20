@@ -36,13 +36,11 @@
                                 </app-form-webxpress>
                             </form>
                         </div>
-                        <div class="row" style="margin-top: 10px; margin-left: 20px;">
-                            <div class="col-3">
-                                <button type="button" [disabled]="!customerTableForm.valid" (click)="save()"
-                                    mat-raised-button color="primary">
-                                    Submit
-                                </button>
-                            </div>
+                        <div style="margin-top: 10px; ">
+                            <button type="button" style="margin-left: -5px;" [disabled]="!customerTableForm.valid"
+                                (click)="save()" mat-raised-button color="primary">
+                                Submit
+                            </button>
                         </div>
                     </div>
                 </div>

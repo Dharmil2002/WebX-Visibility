@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { VendorBillService } from '../../../vendor-bill.service';
+import { firstValueFrom } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vendor-bill-list',
@@ -92,15 +94,24 @@ export class VendorBillListComponent implements OnInit {
     { label: 'Cancel Bill' },
     { label: 'Modify' },
   ]
-  filterRequest: any;
+  filterRequest = {
+    companyCode: this.companyCode,
+    vendorNames: [],
+    StatusNames: [],
+    startdate: new Date(),
+    enddate: new Date()
+  }
   constructor(private matDialog: MatDialog,
-    private router: Router,
-    private masterService: MasterService,
-    private objVendorBillService: VendorBillService) { }
+    private route: Router,
+    private objVendorBillService: VendorBillService,
+    private masterService: MasterService) {
+    this.filterRequest.startdate.setDate(new Date().getDate() - 30);
+  }
 
   ngOnInit(): void {
     this.getVendorBill()
   }
+
   functionCallHandler(event) {
     console.log(event);
     try {
@@ -109,41 +120,51 @@ export class VendorBillListComponent implements OnInit {
       console.log("failed");
     }
   }
-  async handleMenuItemClick(data) { }
+  //#region to approve bill
+  async handleMenuItemClick(data) {
+    const id = data.data._id;
+    if (data.label.label === 'Approve Bill') {
+
+      const updateData = {
+        bSTATNM: "Approved",
+        bSTAT: 2,
+        mODDT: new Date(),
+        mODBY: localStorage.getItem("UserName"),
+        mODLOC: localStorage.getItem("Branch")
+      };
+      let req = {
+        companyCode: this.companyCode,
+        filter: { _id: id },
+        collectionName: "vend_bill_summary",
+        update: updateData
+      }
+
+      const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Status is Approved",
+          showConfirmButton: true,
+        });
+
+      }
+      this.getVendorBill();
+
+    };
+
+  }
+  //#endregion
   //#region to call function on change of service selection
   async selectCheckBox(event) {
     console.log(event);
 
-    //  Update the selected contract types
-    // this.selectedContractType = event
-    //   .filter(item => item.isSelected)
-    //   .map(item => item.typeName);
-
-    // this.objContractService.setContractType(this.selectedContractType);
-    // this.save(this.selectedContractType);
   }
   //#endregion
   filterFunction() {
-    const now = new Date();
-    const Datesdata = {
-      start: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 10),
-      end: now
-    };
-    let RequestData = {
-      vendorList: [
-        // "V0006", "V0007"
-      ],
-      StartDate: Datesdata.start,
-      EndDate: Datesdata.end,
-      billtypeList: [
-        // "1"
-      ],
-      statusList: [
-        // "1"
-      ]
-    }
     const dialogRef = this.matDialog.open(VendorBillFilterComponent, {
-      data: { DefaultData: RequestData },
+      data: { DefaultData: this.filterRequest },
       width: "60%",
       disableClose: true,
       position: {
@@ -152,24 +173,17 @@ export class VendorBillListComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        let vndData = []
-        let stsData = []
-        result.vendorNamesupport.forEach(data => {
-          vndData.push(data.name);
-        });
-        result.statussupport.forEach(data => {
-          stsData.push(data.name);
-        });
-        result.vndData = vndData;
-        result.stsData = stsData;
-        this.filterRequest = result;
-        this.getVendorBill()
+        this.filterRequest.StatusNames = result.statussupport.map(item => item.name)
+        this.filterRequest.vendorNames = result.vendorNamesupport.map(item => item.name)
+        this.filterRequest.startdate = result.StartDate,
+          this.filterRequest.enddate = result.EndDate,
+          this.getVendorBill()
       }
     });
   }
   BalanceFunction(event) {
     console.log('BalanceFunction', event)
-    this.router.navigate(['/Finance/VendorPayment/VendorBillPaymentDetails'], {
+    this.route.navigate(['/Finance/VendorPayment/VendorBillPaymentDetails'], {
       state: {
         data: event
       },
@@ -178,28 +192,20 @@ export class VendorBillListComponent implements OnInit {
   }
   // #region to retrieve vendor bill data
   async getVendorBill() {
-    // Get the current date
-    const now = new Date();
-
-    // Set up date range for the last 10 days
-    const Datesdata = {
-      start: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 10),
-      end: now
-    };
-
-    // Prepare the request object with default values and filterRequest overrides
-    const req = {
-      companyCode: this.companyCode,
-      startdate: this.filterRequest?.StartDate || Datesdata.start,
-      enddate: this.filterRequest?.EndDate || Datesdata.end,
-      StatusNames: this.filterRequest?.stsData || [],
-      vendorNames: this.filterRequest?.vndData || []
-    };
-
+    this.tableLoad = true;
     try {
       // Call the vendor bill service to get the data
-      const data = await this.objVendorBillService.getVendorBillList(req);
+      let data = await this.objVendorBillService.getVendorBillList(this.filterRequest);
 
+      data.forEach(element => {
+        if (element.Status === 'Approved') {
+          // Remove 'Approve Bill' from the actions array
+          const index = element.actions.indexOf('Approve Bill');
+          if (index !== -1) {
+            element.actions.splice(index, 1);
+          }
+        }
+      });
       // Set the retrieved data to the tableData property
       this.tableData = data;
 
@@ -210,5 +216,5 @@ export class VendorBillListComponent implements OnInit {
       console.error('Error fetching vendor bill:', error);
     }
   }
-  //#endregion
+  //#endregion 
 }

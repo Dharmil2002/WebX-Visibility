@@ -61,11 +61,10 @@ export class ThcUpdateComponent implements OnInit {
   }
 
   IntializeFormControl() {
-
     const thcFormControls = new ThcUpdateControls();
     this.jsonControlArray = thcFormControls.getThcFormControls();
     this.thcTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    this.thcTableForm.controls['shipment'].setValue(this.thcDetail.docketNumber);
+    this.thcTableForm.controls['shipment'].setValue(this.thcDetail.docNo);
   }
 
   cancel() {

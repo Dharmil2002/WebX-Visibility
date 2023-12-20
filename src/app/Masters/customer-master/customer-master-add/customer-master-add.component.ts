@@ -9,7 +9,7 @@ import { Router } from "@angular/router";
 import { customerModel } from "src/app/core/models/Masters/customerMaster";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
-import { Subject, firstValueFrom, take, takeUntil } from "rxjs";
+import { Subject, take, takeUntil } from "rxjs";
 import { PinCodeService } from "src/app/Utility/module/masters/pincode/pincode.service";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
@@ -232,21 +232,20 @@ export class CustomerMasterAddComponent implements OnInit {
     });
   }
 
-  async CustomerCodeIndex() {
-    try {
-      let req = {
-        companyCode: this.companyCode,
-        filter: {},
-        collectionName: "customer_detail",
-      };
-      const res: any = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-      if (res) {
-        this.customerIndex = res.data.length;
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error("Error fetching data:", error);
-    }
+  CustomerCodeIndex() {
+    let req = {
+      companyCode: this.companyCode,
+      filter: {},
+      collectionName: "customer_detail",
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.customerIndex = res.data.length;
+        }
+      },
+      error: (err) => { },
+    });
   }
 
   bindDropdown() {
@@ -268,81 +267,79 @@ export class CustomerMasterAddComponent implements OnInit {
       }
     });
   }
-  async getPinCode() {
-    try {
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "pincode_master",
-        filter: {},
-      };
-      const res: any = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-      if (res && res.success) {
-        this.pinCodeResData = res.data;
-        this.pinCodeData = res.data.map((x) => {
-          return {
-            name: `${x.PIN}`,
-            value: parseInt(x.PIN),
-          };
-        });
-        this.getPinCodeDropdown();
-        this.getGSTPinCodeDropdown();
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error("Error fetching data:", error);
-    }
-  }
+  getPinCode() {
+    let req = {
+      companyCode: this.companyCode,
+      collectionName: "pincode_master",
+      filter: {},
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
+      next: (res) => {
+        if (res && res.success) {
+          this.pinCodeResData = res.data;
+          this.pinCodeData = res.data.map((x) => {
+            return {
+              name: `${x.PIN}`,
+              value: parseInt(x.PIN),
+            };
+          });
 
-  // ******************************************************/Get ALL Dropdown/**********************************************
-  async getCustomerGroupDropdown() {
-    try {
-      let req = {
-        companyCode: this.companyCode,
-        collectionName: "customerGroup_detail",
-        filter: {},
-      };
-      const res: any = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-      if (res && res.success) {
-        const dropdownData = res.data.map((x) => {
-          return {
-            name: x.groupName,
-            value: x.groupCode,
-          };
-        });
-        if (this.isUpdate) {
-          res.data.forEach((x) => {
-            if (x.groupName == this.customerTable.customerGroup) {
-              this.customerTableForm.controls["customerGroup"].setValue({
-                name: x.groupName,
-                value: x.groupCode,
-              });
-            }
-          });
-          // For setting image data, assuming you have imageData defined
-          Object.keys(this.imageData).forEach((controlName) => {
-            const url = this.imageData[controlName];
-            const fileName = this.objImageHandling.extractFileName(url);
-            // Set the form control value using the control name
-            this.customerTableForm.controls[controlName].setValue(fileName);
-            //setting isFileSelected to true
-            const control = this.jsonControlCustomerArray.find(x => x.name === controlName);
-            control.additionalData.isFileSelected = false;
-          });
+          this.getPinCodeDropdown();
+          this.getGSTPinCodeDropdown();
         }
-        this.filter.Filter(
-          this.jsonControlCustomerArray,
-          this.customerTableForm,
-          dropdownData,
-          this.customerGroup,
-          this.customerGroupStatus
-        );
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error("Error fetching data:", error);
-    }
+      },
+      error: (err) => { },
+    });
   }
+  // ******************************************************/Get ALL Dropdown/**********************************************
+  getCustomerGroupDropdown() {
+    let req = {
+      companyCode: this.companyCode,
+      collectionName: "customerGroup_detail",
+      filter: {},
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
+      next: (res: any) => {
+        if (res && res.success) {
+          const dropdownData = res.data.map((x) => {
+            return {
+              name: x.groupName,
+              value: x.groupCode,
+            };
+          });
+          if (this.isUpdate) {
+            res.data.forEach((x) => {
+              if (x.groupName == this.customerTable.customerGroup) {
+                this.customerTableForm.controls["customerGroup"].setValue({
+                  name: x.groupName,
+                  value: x.groupCode,
+                });
+              }
+            });
 
+            // For setting image data, assuming you have imageData defined
+            Object.keys(this.imageData).forEach((controlName) => {
+              const url = this.imageData[controlName];
+              const fileName = this.objImageHandling.extractFileName(url);
+              // Set the form control value using the control name
+              this.customerTableForm.controls[controlName].setValue(fileName);
+
+              //setting isFileSelected to true
+              const control = this.jsonControlCustomerArray.find(x => x.name === controlName);
+              control.additionalData.isFileSelected = false
+            });
+          }
+          this.filter.Filter(
+            this.jsonControlCustomerArray,
+            this.customerTableForm,
+            dropdownData,
+            this.customerGroup,
+            this.customerGroupStatus
+          );
+        }
+      },
+    });
+  }
   getCustomerCategoryDropdown() {
     const dropdownData = [
       {
@@ -436,7 +433,7 @@ export class CustomerMasterAddComponent implements OnInit {
         "filter": {}
       };
 
-      const response = await firstValueFrom(this.masterService.masterPost("generic/get", reqBody));
+      const response = await this.masterService.masterPost("generic/get", reqBody).toPromise()
       const dataList = response.data.map(x => ({
         name: nameProperty == "locName" ? x[dataProperty] : x[nameProperty],
         value: x[dataProperty]
@@ -476,28 +473,26 @@ export class CustomerMasterAddComponent implements OnInit {
   }
 
   async setGSTState() {
-    try {
-      const gstNumber = this.GSTcustomerTableForm.value.gstNo;
-      const filterId = gstNumber.substring(0, 2);
-      const request = {
-        companyCode: this.companyCode,
-        collectionName: "state_master",
-        filter: { ST: parseInt(filterId) },
-      };
-      const res: any = await firstValueFrom(this.masterService.masterPost("generic/get", request))
-      if (res && res.success && res.data.length > 0) {
-        this.slectGstState = res.data[0];
-        this.GSTcustomerTableForm.controls.gstState.setValue(
-          this.slectGstState.STNM
-        );
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error("Error fetching data:", error);
-    }
+    const gstNumber = this.GSTcustomerTableForm.value.gstNo;
+    const filterId = gstNumber.substring(0, 2);
+    const request = {
+      companyCode: this.companyCode,
+      collectionName: "state_master",
+      filter: { ST: parseInt(filterId) },
+    };
+    this.masterService.masterPost("generic/get", request).subscribe({
+      next: (res) => {
+        if (res && res.success && res.data.length > 0) {
+          this.slectGstState = res.data[0];
+          this.GSTcustomerTableForm.controls.gstState.setValue(
+            this.slectGstState.STNM
+          );
+        }
+      },
+    });
   }
 
-  async onSelectPinCode() {
+  onSelectPinCode() {
     const fetchData = this.pinCodeResData.find(
       (x) => x.PIN == this.customerTableForm.value.PinCode.name
     );
@@ -508,23 +503,26 @@ export class CustomerMasterAddComponent implements OnInit {
       filter: { ST: fetchData.ST },
     };
 
-    try {
-      const stateRes: any = await firstValueFrom(this.masterService.masterPost("generic/get", request));
-      if (stateRes && stateRes.success) {
-        this.customerTableForm.controls.state.setValue(stateRes.data[0].STNM);
-        const countryListRes: any = await firstValueFrom(this.masterService.getJsonFileDetails("countryList"));
-        const countryName = countryListRes.find(
-          (x) => x.Code == stateRes.data[0].CNTR
-        );
-        this.customerTableForm.controls["Country"].setValue(countryName.Country);
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error("Error fetching data:", error);
-    }
+    // Fetch pincode data
+    this.masterService.masterPost("generic/get", request).subscribe({
+      next: (res) => {
+        if (res && res.success) {
+          this.customerTableForm.controls.state.setValue(res.data[0].STNM);
+          this.masterService
+            .getJsonFileDetails("countryList")
+            .subscribe((countryListres) => {
+              const countryName = countryListres.find(
+                (x) => x.Code == res.data[0].CNTR
+              );
+              this.customerTableForm.controls["Country"].setValue(
+                countryName.Country
+              );
+            });
+        }
+      },
+    });
   }
-
-  async onSelectGSTPinCode() {
+  onSelectGSTPinCode() {
     const fetchData = this.pinCodeResData.find(
       (x) => x.PIN == this.GSTcustomerTableForm.value.gstPinCode.name
     );
@@ -534,58 +532,65 @@ export class CustomerMasterAddComponent implements OnInit {
       collectionName: "address_detail",
       filter: { pincode: this.GSTcustomerTableForm.value.gstPinCode.name },
     };
-    try {
-      const res: any = await firstValueFrom(this.masterService.masterPost("generic/get", request));
-      if (res && res.success) {
-        if (res.data.length > 0) {
-          this.GSTcustomerTableForm.controls.gstAddres.setValue(res.data[0].address);
-        } else {
-          Swal.fire({
-            title: "Address does not exist! Please add manually",
-            toast: true,
-            icon: "error",
-            showCloseButton: false,
-            showCancelButton: false,
-            showConfirmButton: true,
-            confirmButtonText: "OK",
-          });
+
+    this.masterService.masterPost("generic/get", request).subscribe({
+      next: (res) => {
+        if (res && res.success) {
+          if (res.data.length > 0) {
+            this.GSTcustomerTableForm.controls.gstAddres.setValue(
+              res.data[0].address
+            );
+          } else {
+            Swal.fire({
+              title: "Address does not exist! Please add manually",
+              toast: true,
+              icon: "error",
+              showCloseButton: false,
+              showCancelButton: false,
+              showConfirmButton: true,
+              confirmButtonText: "OK",
+            });
+          }
         }
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error("Error fetching data:", error);
-    }
+      },
+    });
   }
 
-  async onChangeCustomerName() {
-    try {
-      let req = {
-        companyCode: this.companyCode,
-        filter: { customerName: this.customerTableForm.value.customerName },
-        collectionName: "customer_detail",
-      };
-      const res: any = await firstValueFrom(this.masterService.masterPost("generic/get", req))
-      if (res && res.data.length > 0 && !this.isUpdate && this.customerTableForm.value.customerName != this.customerTable.customerName) {
-        Swal.fire({
-          title: "CustomerName Already exists! Please try with another",
-          toast: true,
-          icon: "error",
-          showCloseButton: false,
-          showCancelButton: false,
-          showConfirmButton: true,
-          confirmButtonText: "OK",
-        });
-        this.customerTableForm.controls["customerName"].setErrors({
-          customerExist: true,
-        });
-        this.customerTableForm.controls["customerName"].setValue("");
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error("Error fetching data:", error);
-    }
+  onChangeCustomerName() {
+    let req = {
+      companyCode: this.companyCode,
+      filter: { customerName: this.customerTableForm.value.customerName },
+      collectionName: "customer_detail",
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          if (res.data.length > 0) {
+            if (
+              !this.isUpdate &&
+              this.customerTableForm.value.customerName !=
+              this.customerTable.customerName
+            ) {
+              Swal.fire({
+                title: "CustomerName Already exist! Please try with another",
+                toast: true,
+                icon: "error",
+                showCloseButton: false,
+                showCancelButton: false,
+                showConfirmButton: true,
+                confirmButtonText: "OK",
+              });
+              this.customerTableForm.controls["customerName"].setErrors({
+                customerExist: true,
+              });
+              this.customerTableForm.controls["customerName"].setValue("");
+            }
+          }
+        }
+      },
+      error: (err) => { },
+    });
   }
-
 
   onChangeEmail() {
     const input = this.customerTableForm.value.Customer_Emails.trim();
@@ -630,33 +635,39 @@ export class CustomerMasterAddComponent implements OnInit {
     }
   }
 
-  async onChangeERPcode() {
-    try {
-      let req = {
-        companyCode: this.companyCode,
-        filter: { ERPcode: this.customerTableForm.value.ERPcode },
-        collectionName: "customer_detail",
-      };
-      const res: any = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-      if (res && res.data.length > 0 && !this.isUpdate && this.customerTableForm.value.ERPcode != this.customerTable.ERPcode) {
-        Swal.fire({
-          title: "ERP code Already exists! Please try with another",
-          toast: true,
-          icon: "error",
-          showCloseButton: false,
-          showCancelButton: false,
-          showConfirmButton: true,
-          confirmButtonText: "OK",
-        });
-        this.customerTableForm.controls["ERPcode"].setErrors({
-          customerExist: true,
-        });
-        this.customerTableForm.controls["ERPcode"].setValue("");
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error("Error fetching data:", error);
-    }
+  onChangeERPcode() {
+    let req = {
+      companyCode: this.companyCode,
+      filter: { ERPcode: this.customerTableForm.value.ERPcode },
+      collectionName: "customer_detail",
+    };
+    this.masterService.masterPost("generic/get", req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          if (res.data.length > 0) {
+            if (
+              !this.isUpdate &&
+              this.customerTableForm.value.ERPcode != this.customerTable.ERPcode
+            ) {
+              Swal.fire({
+                title: "ERP code Already exist! Please try with another",
+                toast: true,
+                icon: "error",
+                showCloseButton: false,
+                showCancelButton: false,
+                showConfirmButton: true,
+                confirmButtonText: "OK",
+              });
+              this.customerTableForm.controls["ERPcode"].setErrors({
+                customerExist: true,
+              });
+              this.customerTableForm.controls["ERPcode"].setValue("");
+            }
+          }
+        }
+      },
+      error: (err) => { },
+    });
   }
 
   async ValidGSTNumber() {
@@ -738,22 +749,24 @@ export class CustomerMasterAddComponent implements OnInit {
         update: Body,
       };
       //API FOR UPDATE
-      firstValueFrom(this.masterService.masterPut("generic/update", req))
-      .then((res) => {
-        this.Route.navigateByUrl(
-          "/Masters/CustomerMaster/CustomerMasterList"
-        );
-        if (res.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
+      this.masterService.masterPut("generic/update", req).subscribe({
+        next: (res) => {
+          this.Route.navigateByUrl(
+            "/Masters/CustomerMaster/CustomerMasterList"
+          );
+          if (res.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+          }
+          //
+        },
+        error: (err) => {
+          console.log(err);
+        },
       });
     } else {
       let req = {
@@ -761,20 +774,24 @@ export class CustomerMasterAddComponent implements OnInit {
         collectionName: "customer_detail",
         data: Body,
       };
-      try {
-        const res = await firstValueFrom(this.masterService.masterPost("generic/create", req))
-        if (res.success) {
-          this.Route.navigateByUrl("/Masters/CustomerMaster/CustomerMasterList");
-          Swal.fire({
-            icon: "success",
-            title: "Successful",
-            text: res.message,
-            showConfirmButton: true,
-          });
-        }
-      } catch (err) {
-        console.error("err", err);
-      }
+      await this.masterService.masterPost("generic/create", req).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.Route.navigateByUrl(
+              "/Masters/CustomerMaster/CustomerMasterList"
+            );
+            Swal.fire({
+              icon: "success",
+              title: "Successful",
+              text: res.message,
+              showConfirmButton: true,
+            });
+          }
+        },
+        error: (err) => {
+          console.log("err", err);
+        },
+      });
     }
   }
 
@@ -870,7 +887,7 @@ export class CustomerMasterAddComponent implements OnInit {
       };
 
       // Send the request to fetch user data
-      const customerList = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+      const customerList = await this.masterService.masterPost("generic/get", req).toPromise();
 
       // Check if data exists for the given filter criteria
       if (customerList.data.length > 0) {
@@ -907,24 +924,22 @@ export class CustomerMasterAddComponent implements OnInit {
   //#endregion
 
   //#region
-  async toggleSelectAll(argData: any) {
-    try {
-      let fieldName = argData.field.name;
-      let autocompleteSupport = argData.field.additionalData.support;
-      let isSelectAll = argData.eventArgs;
-      const index = this.jsonControlCustomerArray.findIndex(
-        (obj) => obj.name === fieldName
-      );
-      const val = await firstValueFrom(this.jsonControlCustomerArray[index].filterOptions.pipe(take(1), takeUntil(this._onDestroy)));
-      this.customerTableForm.controls[autocompleteSupport].patchValue(
-        isSelectAll ? val : []
-      );
-    } catch (error) {
-      // Handle errors here
-      console.error("Error toggling selection:", error);
-    }
-  }
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
 
+    const index = this.jsonControlCustomerArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlCustomerArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.customerTableForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
   //#endregion
   onToggleChange(event: boolean) {
     // Handle the toggle change event in the parent component

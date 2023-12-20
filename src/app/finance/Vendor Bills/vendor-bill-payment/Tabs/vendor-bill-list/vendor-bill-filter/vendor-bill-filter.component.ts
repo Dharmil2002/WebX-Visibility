@@ -54,29 +54,29 @@ export class VendorBillFilterComponent implements OnInit {
   }
   async getVendorList(): Promise<void> {
 
-    const vendordetailList = await getVendorDetails(this.masterService, this.companyCode);
+    const vendordetailList = await getVendorDetails(this.masterService);
 
     const billTypeList = billType
     const statusList = status
 
     if (this.objResult.DefaultData) {
-      const vendorNames = this.objResult?.DefaultData?.vendorList;
+      const vendorNames = this.objResult?.DefaultData?.vendorNames;
       const selectedData = vendordetailList.filter((x) =>
-        vendorNames.includes(x.value)
+        vendorNames.includes(x.name)
       );
       this.VendorBillFilterForm.controls['vendorNamesupport'].setValue(selectedData);
 
-      const status = this.objResult?.DefaultData?.statusList;
+      const status = this.objResult?.DefaultData?.StatusNames;
       const selectedStatusData = statusList.filter((x) =>
-        status.includes(x.value)
+        status.includes(x.name)
       );
       this.VendorBillFilterForm.controls['statussupport'].setValue(selectedStatusData);
 
-      const billtype = this.objResult?.DefaultData?.billtypeList;
-      const selectedbilltypeData = billTypeList.filter((x) =>
-        billtype.includes(x.value)
-      );
-      this.VendorBillFilterForm.controls['billTypesupport'].setValue(selectedbilltypeData);
+      // const billtype = this.objResult?.DefaultData?.billtypeList;
+      // const selectedbilltypeData = billTypeList.filter((x) =>
+      //   billtype.includes(x.value)
+      // );
+      // this.VendorBillFilterForm.controls['billTypesupport'].setValue(selectedbilltypeData);
     }
 
     this.filter.Filter(

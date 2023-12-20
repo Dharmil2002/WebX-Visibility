@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
 @Component({
@@ -53,57 +52,57 @@ export class DriverMasterComponent implements OnInit {
     this.getDriverDetails();
   }
 
-  async getDriverDetails() {
-    try {
-      const req = {
-        "companyCode": this.companyCode,
-        "filter": {},
-        "collectionName": "driver_detail"
-      };
-      const res: any = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+  getDriverDetails() {
+    const req = {
+      "companyCode": this.companyCode,
+      "filter": {},
+      "collectionName": "driver_detail"
+    };
+  
+    this.masterService.masterPost('generic/get', req).subscribe((res: any) => {
       if (res && res.data) {
         const data = res.data;
+  
         // Sort the data based on updatedDate in descending order
         const dataWithDate = data.sort((a, b) => new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime());
+  
         // Extract the updatedDate from the first element (latest record)
         const latestUpdatedDate = dataWithDate.length > 0 ? dataWithDate[0].updatedDate : null;
+  
         // Use latestUpdatedDate as needed
+  
         this.csv = dataWithDate;
         this.tableData = dataWithDate;
       }
+  
       this.tableLoad = false;
-    } catch (error) {
-      // Handle errors here
-      console.error("Error fetching driver details:", error);
-    }
+    });
   }
 
-  async IsActiveFuntion(det) {
-    try {
-      let id = det._id;
-      // Remove the "id" field from the form controls
-      delete det._id;
-      delete det.srNo;
-      let req = {
-        companyCode: parseInt(localStorage.getItem("companyCode")),
-        collectionName: "driver_detail",
-        filter: { _id: id },
-        update: det
-      };
-      const res: any = await firstValueFrom(this.masterService.masterPut('generic/update', req))
-      if (res) {
-        // Display success message
-        Swal.fire({
-          icon: "success",
-          title: "Successful",
-          text: res.message,
-          showConfirmButton: true,
-        });
-        this.getDriverDetails();
+  IsActiveFuntion(det) {
+    let id = det._id;
+    // Remove the "id" field from the form controls
+    delete det._id;
+    delete det.srNo;
+    let req = {
+      companyCode: parseInt(localStorage.getItem("companyCode")),
+      collectionName: "driver_detail",
+      filter: { _id: id },
+      update: det
+    };
+    this.masterService.masterPut('generic/update', req).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Display success message
+          Swal.fire({
+            icon: "success",
+            title: "Successful",
+            text: res.message,
+            showConfirmButton: true,
+          });
+          this.getDriverDetails();
+        }
       }
-    } catch (error) {
-      // Handle errors here
-      console.error("Error updating driver details:", error);
-    }
+    });
   }
 }

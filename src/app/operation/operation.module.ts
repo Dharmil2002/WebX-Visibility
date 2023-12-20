@@ -61,6 +61,10 @@ import { MastersModule } from "../Masters/masters.module";
 import { NgxPrintModule } from "ngx-print";
 import { ShipmentEditComponent } from './shipment-edit/shipment-edit.component';
 import { CommonViewPrintComponent } from './ViewPrint/common-view-print/common-view-print.component';
+import { ShipmentEditBillingComponent } from "./pending-billing/shipment-edit-billing/shipment-edit-billing.component";
+import { UpdateShipmentAmountComponent } from "./pending-billing/update-shipment-amount/update-shipment-amount.component";
+import { BillSubmissionComponent } from "./pending-billing/bill-approval/submission/bill-submission/bill-submission.component";
+import { BillApprovalComponent } from "./pending-billing/bill-approval/bill-approval.component";
 @NgModule({
   declarations: [
     VehicleLoadingComponent,
@@ -100,7 +104,11 @@ import { CommonViewPrintComponent } from './ViewPrint/common-view-print/common-v
     // WESTERNCARRIERSComponent,
     // PrqViewComponent,
     ShipmentEditComponent,
-    CommonViewPrintComponent
+    CommonViewPrintComponent,
+    ShipmentEditBillingComponent,
+    UpdateShipmentAmountComponent,
+    BillSubmissionComponent,
+    BillApprovalComponent
     
     
   ],

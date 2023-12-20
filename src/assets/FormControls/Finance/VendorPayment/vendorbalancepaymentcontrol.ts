@@ -603,7 +603,7 @@ export class VendorBalancePaymentControl {
           buttonIcon: "book-open",
         },
         functions: {
-          onClick: "BeneficiarydetailsViewFunctions",
+          onClick: "getBeneficiaryData",
         },
       },
 

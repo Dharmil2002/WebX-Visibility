@@ -1,6 +1,5 @@
-import { firstValueFrom } from "rxjs";
 import Swal from "sweetalert2";
-const companyCode = localStorage.getItem("companyCode");
+const companyCode=localStorage.getItem("companyCode");
 /**
  * Handles the selection of a file and validates its format.
  *
@@ -46,28 +45,16 @@ export function handleFileSelection(data, formControlName, allowedFormats, vendo
     }
 }
 
-export async function getVendorDetails(masterService, companyCode) {
-    try {
-        const req = {
-            companyCode: companyCode,
-            collectionName: "vendor_detail",
-            filter: {}
-        };
-
-        // Make a request to the backend API using the masterService
-        const res = await firstValueFrom(masterService.masterPost("generic/get", req));
-
-        // Use type assertion to tell TypeScript that res is of type { data: SomeType } or undefined
-        if (res && (res as any).data) {
-            // Transform data into an array of objects with 'value' and 'name' properties
-            const resDetail = (res as any).data.map(({ vendorCode, vendorName }) => ({ value: vendorCode, name: vendorName }));
-            
-            return resDetail;
-        }
-    } catch (error) {
-        // Handle errors, log them, or show user-friendly messages
-        console.error("Error fetching vendor details:", error);
-        // Return an empty array or handle the error as needed
-        return [];
+export async function  getVendorDetails(masterService) {
+    let req = {
+      "companyCode": companyCode,
+      "collectionName": "vendor_detail",
+      "filter": {}
     }
-}
+    const res = await masterService.masterPost("generic/get", req).toPromise()
+    if (res) {
+      // Generate srno for each object in the array
+      const resDetail = res.data.map((x)=>{return{value:x.vendorCode,name:x.vendorName}});
+      return resDetail;
+    }
+  }

@@ -52,6 +52,7 @@ import { AnalyticsComponent } from "../finance/analytics/analytics.component";
 import { ThcSummaryComponent } from "../operation/thc-summary/thc-summary.component";
 import { ThcUpdateComponent } from './tabs/thc-update/thc-update.component';
 import { DocketListComponent } from './tabs/docket-list/docket-list.component';
+import { InvoiceDashboardComponent } from "../finance/invoice-summary-bill/invoice-dashboard/invoice-dashboard.component";
 @NgModule({
   declarations: [
     DocketDashboardComponent,
@@ -78,7 +79,9 @@ import { DocketListComponent } from './tabs/docket-list/docket-list.component';
     AnalyticsComponent,
     ThcSummaryComponent,
     ThcUpdateComponent,
-    DocketListComponent
+    DocketListComponent,
+    InvoiceDashboardComponent
+
 
 
   ],

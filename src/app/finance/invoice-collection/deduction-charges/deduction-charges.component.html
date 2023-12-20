@@ -1,0 +1,10 @@
+<form [formGroup]="deducationTableForm">
+    <app-form-webxpress [form]="deducationTableForm" [FormTitle]="'Deductions Detail'" [formData]="jsonControlArray"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+        (callFunction)="functionCallHandler($event)">
+    </app-form-webxpress>
+    <app-form-webxpress [form]="chargesTableForm" [FormTitle]="'Charges Detail'" [formData]="invoices"
+        (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="true"
+        (callFunction)="functionCallHandler($event)" [className]="className">
+    </app-form-webxpress>
+</form>

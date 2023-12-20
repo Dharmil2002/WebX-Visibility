@@ -14,27 +14,27 @@ export class VendorBillService {
     try {
       // Make the asynchronous call to fetch data
       const responseArray = await firstValueFrom(this.masterService.masterPost('finance/getVendorBillList', filter));
-  
+
       // Map each response object to the desired format
       const tableDataArray = responseArray.map(res => ({
-        vendor: `${res.vND.cD} : ${res.vND.nM}`,
+        vendor: (res && res.vND && res.vND.cD ? `${res.vND.cD} : ${res.vND.nM}` : ''),
+        _id: res._id,
+        vnCode: res.vND.cD,
         billType: "Transaction Bill",
         billNo: res.docNo,
         Date: this.formatDate(res.bDT),
         billAmount: res.bALAMT,
         pendingAmount: res.bALPBAMT,
         Status: res.bSTATNM,
+        vPan: res.vND.pAN,
         actions: [
           'Approve Bill',
           'Bill Payment',
-          'Hold Payment',
-          'Unhold Payment',
           'Cancel Bill',
-          'Modify'
-      ]
+        ]
       }));
-  
-     // console.log(tableDataArray);
+
+      // console.log(tableDataArray);
       return tableDataArray;
     } catch (error) {
       // Handle errors gracefully
@@ -42,30 +42,28 @@ export class VendorBillService {
       throw error;  // Rethrow the error to indicate that the operation failed
     }
   }
-  
 
-  async getVendorBillDetails(billNo) {
-    let req = {
-      "companyCode": this.companyCode,
-      "filter": { bILLNO: billNo },
-      "collectionName": "vend_bill_det"
+  async getBeneficiaryDetailsFromApi(vendorCode) {
+    try {
+      // Create filter and req objects using shorthand syntax
+      const filter = { beneficiary: vendorCode };
+      const req = { companyCode: this.companyCode, collectionName: 'beneficiary_detail', filter };
+
+      // Use await directly in the return statement and handle nested properties with optional chaining
+      const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+      return res ? res.data[0].otherdetails : []; // Return otherdetails or an empty array if undefined
+    } catch (error) {
+      // Log errors for debugging purposes
+      console.error('An error occurred:', error);
     }
-    const billDetail = await firstValueFrom(this.masterService
-      .masterPost("generic/get", req)
-    );
-    const data = {
-      billNo: billDetail.bILLNO,
-      Date: billDetail.eNTDT,
-      billAmount: billDetail.bALAMT,
-      debitNote: billDetail.aDVAMT,
-      paid: billDetail.tHCAMT
-    }
-    //console.log(billDetail);
-    return data;
+
+    // Return an empty array in case of an error or missing data
+    return [];
   }
-// Helper function to format the date using moment
- formatDate(dateString) {
-  let dt = new Date(dateString);
-  return moment(dt).format("DD/MM/YYYY");
-}
+
+  // Helper function to format the date using moment
+  formatDate(dateString) {
+    let dt = new Date(dateString);
+    return moment(dt).format("DD/MM/YYYY");
+  }
 }

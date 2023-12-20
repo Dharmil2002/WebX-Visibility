@@ -27,12 +27,12 @@ export class AddShardServicesComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    service_id: {
+    sRCD: {
       Title: "Service ID",
       class: "matcolumncenter",
       Style: "min-width:40%",
     },
-    service_name: {
+    sRNM: {
       Title: "Service Name",
       class: "matcolumncenter",
       Style: "min-width:40%",
@@ -43,7 +43,7 @@ export class AddShardServicesComponent implements OnInit {
     checkBoxRequired: true,
     noColumnSort: Object.keys(this.columnHeader),
   };
-  staticField = ["SrNo", "service_id", "service_name"];
+  staticField = ["SrNo", "sRCD", "sRNM"];
   companyCode = parseInt(localStorage.getItem("companyCode"));
   tableData: any;
   isTableLode = false;
@@ -87,14 +87,17 @@ export class AddShardServicesComponent implements OnInit {
     }
   }
   async save() {
-    const element = this.tableData[this.tableData.length-1];
+    const length = this.tableData.length
+    const index = length == 0? 1 : parseInt(this.tableData[length-1].sRCD.substring(3))+ 1
+    const ServicesCode = `SER${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""}${index}`
+    
     const Body = {
-      service_name: this.customerTableForm.value.ServicesName,
-      service_id: this.customerTableForm.value.ServicesID,
-      _id: parseInt(element._id) + 1,
-      updatedDate: new Date(),
-      updatedBy: localStorage.getItem("UserName"),
-      active: true,
+      _id: `${this.companyCode}-${ServicesCode}`,
+      sRNM: this.customerTableForm.value.ServicesName,
+      sRCD: ServicesCode,
+      mODDT: new Date(),
+      mODBY: localStorage.getItem("UserName"),
+      aCTV: true,
     };
     const req = {
       companyCode: this.companyCode,
@@ -120,6 +123,7 @@ export class AddShardServicesComponent implements OnInit {
         showConfirmButton: true,
       });
     }
+    this.initializeFormControl();
   }
   initializeFormControl() {
     const customerFormControls = new ProductControls();
@@ -150,7 +154,7 @@ export class AddShardServicesComponent implements OnInit {
     if (Res?.success && Res.data.length > 0) {
       const FilterData = Res.data.filter(
         (x) =>
-          x.service_name.toLowerCase() ==
+          x.sRNM.toLowerCase() ==
           this.customerTableForm.value.ServicesName.toLowerCase()
       );
       if (FilterData.length != 0) {
@@ -161,13 +165,6 @@ export class AddShardServicesComponent implements OnInit {
           text: "Services name exist!",
           showConfirmButton: true,
         });
-      }else{
-        this.customerTableForm.controls.ServicesID.setValue(`${
-          parseInt(element._id) + 1
-        }-${this.customerTableForm.value.ServicesName.toUpperCase().substring(
-          0,
-          3
-        )}`);
       }
     }
   }

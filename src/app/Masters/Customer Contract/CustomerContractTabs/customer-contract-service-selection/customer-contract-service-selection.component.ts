@@ -937,7 +937,7 @@ export class CustomerContractServiceSelectionComponent
   }
 
   async SaveServiceSelection(event) {
-    debugger;
+    
     let hasError = false; // Initialize the flag
     let contractDetails = {};
     const formValues = this.ServicesForm.value;

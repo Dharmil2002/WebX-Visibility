@@ -49,17 +49,29 @@ export async function getJobregisterReportDetail(masterServices) {
             "jobNo": element?.jobId || '',
             "jobDate": formatDocketDate(element?.jobDate || new Date()),
             "ojobDate": element?.jobDate || new Date(),
+            "jobType": element?.jobType == "I" ? "Import" : element?.jobType == "E" ? "Export" : "",
+            "billingParty": element?.billingParty || '',
+            "pkgs": element?.noOfPkg || "",
+            "vehicleSize": element?.vehicleSize || "",
+            "transportedBy": element?.transportedBy || "",
+            "status": element?.status === "0" ? "Awaiting CHA Entry" : element.status === "1" ? "Awaiting Rake Entry" : "Awaiting Advance Payment",
+            "createdOn": formatDocketDate(element?.entryDate || new Date()),
+            "entryDate": element?.entryDate || new Date(),
+            "totalChaAmt": totalCHAamt,
+            "Action": element?.status === "0" ? "CHA Entry" : element.status === "1" ? "Rake Entry" : "CHA Entry",
+            "bookingFrom": element?.fromCity || "",
+            "toCity": element?.toCity || "",
+            "weight": element?.weight || "",
+            "transportMode": element?.transportMode || "",
+            "chargWt": element?.weight || "",
+            "poNumber": element?.poNumber || "",
+            "containerNumber": element?.nOOFCONT || 0,
+            "totalNoofcontainer": element.blChallan ? element.blChallan.length : 0,
             "cNoteNumber": element.containorDetails && Array.isArray(element.containorDetails) && element.containorDetails.length > 0
                 ? element.containorDetails.map(detail => detail.cnoteNo).join(',')
                 : "",
-            "cNoteDate": formatDocketDate(element.containorDetails && element.containorDetails.length > 0 ? element.containorDetails[0].cnoteDate : ""),
-            "containerNumber": element?.nOOFCONT || 0,
-            "billingParty": element?.billingParty || '',
-            "bookingFrom": element?.fromCity || "",
-            "toCity": element?.toCity || "",
-            "pkgs": element?.noOfPkg || "",
-            "weight": element?.weight || "",
-            "transportMode": element?.transportMode || "",
+            "cNoteDate": formatDocketDate(element.containorDetails && element.containorDetails.length > 0 ? element.containorDetails[0].dktDt : ""),
+            "jobLocation": element?.jobLocation || "",
             "noof20ftStd": element.blChallan && element.blChallan.length > 0 ? countContainers(element.blChallan, "20 ft Standard") : 0,
             "noof40ftStd": element.blChallan && element.blChallan.length > 0 ? countContainers(element.blChallan, "40 ft Standard") : 0,
             "noof40ftHC": element.blChallan && element.blChallan.length > 0 ? countContainers(element.blChallan, "40 ft High Cube") : 0,
@@ -84,23 +96,6 @@ export async function getJobregisterReportDetail(masterServices) {
             "noof40ftT": element.blChallan && element.blChallan.length > 0 ? countContainers(element.blChallan, "40 ft Tunnel") : 0,
             "noofBul": element.blChallan && element.blChallan.length > 0 ? countContainers(element.blChallan, "Bulktainers") : 0,
             "noofSB": element.blChallan && element.blChallan.length > 0 ? countContainers(element.blChallan, "Swap Bodies") : 0,
-            "totalNoofcontainer": element.blChallan ? element.blChallan.length : 0,
-            "jobType": element?.jobType == "I" ? "Import" : element?.jobType == "E" ? "Export" : "",
-            "chargWt": element?.weight || "",
-            // "DespatchQty":
-            //"despatchWt":
-            "poNumber": element?.poNumber || "",
-            "totalChaAmt": totalCHAamt,
-            //"voucherAmt":
-            //"vendorBillAmt"
-            //"customerBillAmt"
-            "status": element?.status === "0" ? "Awaiting CHA Entry" : element.status === "1" ? "Awaiting Rake Entry" : "Awaiting Advance Payment",
-            "vehicleSize": element?.vehicleSize || "",
-            "transportedBy": element?.transportedBy || "",
-            "createdOn": formatDocketDate(element?.entryDate || new Date()),
-            "entryDate": element?.entryDate || new Date(),
-            "Action": element?.status === "0" ? "CHA Entry" : element.status === "1" ? "Rake Entry" : "CHA Entry",
-            "jobLocation": element?.jobLocation || "",
         }
         // Push the modified job data to the array
         jobList.push(jobData)
@@ -119,35 +114,3 @@ function countContainers(blChallan, containerType) {
         return count;
     }, 0);
 }
-
-export function convertToCSV(data: any[], excludedColumns: string[] = [], headerMapping: Record<string, string>): string {
-    const escapeCommas = (value: any): string => {
-        // Check if value is null or undefined before calling toString
-        if (value == null) {
-            return '';
-        }
-
-        // If the value contains a comma, wrap it in double quotes
-        const strValue = value.toString();
-        return strValue.includes(',') ? `"${strValue}"` : strValue;
-    };
-
-    // Map the original column names to the desired header names
-    const header = Object.keys(data[0])
-        .filter(column => !excludedColumns.includes(column))
-        .map(column => escapeCommas(headerMapping[column] || column))
-        .join(',') + '\n';
-
-    // Filter out excluded columns from rows
-    const rows = data.map(row => {
-        const filteredRow = Object.entries(row)
-            .filter(([key]) => !excludedColumns.includes(key))
-            .map(([key, value]) => escapeCommas(value))
-            .join(',');
-        return filteredRow + '\n';
-    });
-
-    return header + rows.join('');
-}
-
-

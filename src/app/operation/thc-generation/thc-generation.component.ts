@@ -14,7 +14,7 @@ import { DocketService } from "src/app/Utility/module/operation/docket/docket.se
 import { MatDialog } from "@angular/material/dialog";
 import { ThcUpdateComponent } from "src/app/dashboard/tabs/thc-update/thc-update.component";
 import { VehicleStatusService } from "src/app/Utility/module/operation/vehicleStatus/vehicle.service";
-import { formatDate } from "src/app/Utility/date/date-utils";
+import { financialYear, formatDate } from "src/app/Utility/date/date-utils";
 import { getVehicleStatusFromApi } from "../assign-vehicle-page/assgine-vehicle-utility";
 import { Vehicle } from "src/app/core/models/operations/vehicle-status/vehicle-status";
 import { VendorService } from "src/app/Utility/module/masters/vendor-master/vendor.service";
@@ -31,13 +31,32 @@ import { MarkerVehicleService } from "src/app/Utility/module/operation/market-ve
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { ShipmentEditComponent } from "../shipment-edit/shipment-edit.component";
-import { ImagePreviewComponent } from "src/app/shared-components/image-preview/image-preview.component";
+import { ARr, CAp, DPt, LOad, MfdetailsList, MfheaderDetails, THCGenerationModel, ThcmovementDetails, UNload, UTi, thcsummaryData } from '../../Models/THC/THCModel';
+import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
+import { setGeneralMasterData } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
+import { AutoComplete } from "src/app/Models/drop-down/dropdown";
+import { PrqService } from "src/app/Utility/module/operation/prq/prq.service";
+import moment from "moment";
 
 @Component({
   selector: "app-thc-generation",
   templateUrl: "./thc-generation.component.html",
 })
 export class ThcGenerationComponent implements OnInit {
+  // Added By Harikesh
+  tHCGenerationModel = new THCGenerationModel();
+  thcsummaryData = new thcsummaryData();
+  thcmovementDetails = new ThcmovementDetails();
+  LOad = new LOad();
+  CAp = new CAp();
+  UTi = new UTi();
+  DPt = new DPt();
+  ARr = new ARr();
+  UNload = new UNload();
+  mfheaderDetails = new MfheaderDetails();
+  mfdetailsList: MfdetailsList[] = [];
+
+  // End Code Of Harikesh
   //FormGrop
   companyCode = localStorage.getItem("companyCode");
   thcTableForm: UntypedFormGroup;
@@ -49,7 +68,7 @@ export class ThcGenerationComponent implements OnInit {
   thcLoad: boolean = true;
   isSubmit: boolean = false;
   disbleCheckbox: boolean;
-  
+
   linkArray = [];
   // Declaring breadcrumbs
   breadscrums = [
@@ -75,40 +94,40 @@ export class ThcGenerationComponent implements OnInit {
       class: "matcolumncenter",
       Style: "max-width:100px",
     },
-    billingParty: {
+    bPARTYNM: {
       Title: "Billing Party",
       class: "matcolumnleft",
       Style: "min-width:150px",
     },
-    docketNumber: {
+    docNo: {
       Title: "Shipment",
       class: "matcolumnleft",
       Style: "min-width:150px",
     },
-    fromCity: {
+    fCT: {
       Title: "From City",
       class: "matcolumncenter",
       Style: "min-width:150px",
     },
-    toCity: {
+    tCT: {
       Title: "To City",
       class: "matcolumnleft",
       Style: "min-width:160px",
     },
-    totWeight: {
+    aCTWT: {
       Title: "Actual Weight (Kg)",
       class: "matcolumncenter",
       Style: "max-width:100px",
     },
-    noOfPkg: {
+    pKGS: {
       Title: "No of Packets ",
       class: "matcolumncenter",
       Style: "max-width:100px",
     },
     pod: {
       Title: "Pod",
-      type:'view',
-      functionName:'view',
+      type: 'view',
+      functionName: 'view',
       class: "matcolumnleft",
       Style: "max-width:160px",
     },
@@ -135,12 +154,12 @@ export class ThcGenerationComponent implements OnInit {
   };
   //#endregion
   staticField = [
-    "billingParty",
-    "noOfPkg",
-    "docketNumber",
-    "fromCity",
-    "toCity",
-    "totWeight"
+    "bPARTYNM",
+    "pKGS",
+    "docNo",
+    "fCT",
+    "tCT",
+    "aCTWT"
   ];
   addAndEditPath: string;
   uploadedFiles: File[];
@@ -188,6 +207,9 @@ export class ThcGenerationComponent implements OnInit {
   vehicleList: Vehicle[];
   jsonMarketVehicle: any;
   viewType: string = '';
+  vendorTypes: AutoComplete[];
+  products: AutoComplete[];
+  directPrq: boolean;
   constructor(
     private fb: UntypedFormBuilder,
     public dialog: MatDialog,
@@ -204,7 +226,9 @@ export class ThcGenerationComponent implements OnInit {
     private consigmentUtility: ConsigmentUtility,
     private markerVehicleService: MarkerVehicleService,
     private thcService: ThcService,
-    private storage: StorageService
+    private storage: StorageService,
+    private generalService: GeneralService,
+    private prqService: PrqService
   ) {
     /* here the code which is used to bind data for add thc edit thc add thc based on
      docket or prq based on that we can declare condition*/
@@ -217,22 +241,20 @@ export class ThcGenerationComponent implements OnInit {
     if (navigationState) {
 
       this.viewType = navigationState.viewType?.toLowerCase() || '';
-
       switch (this.viewType) {
-        case 'update':
         case 'view':
           this.disbleCheckbox = true;
           this.thcDetail = navigationState.data;
           this.staticField.push('receiveBy', 'arrivalTime', 'remarks');
-          if (this.viewType === 'view') {
-            this.isView = true;
-            this.isSubmit = true;
-            delete this.columnHeader.actionsItems;
-          }
-          else {
-            this.isSubmit = true;
-            this.isUpdate = true;
-          }
+          this.isView = true;
+          this.isSubmit = true;
+          delete this.columnHeader.actionsItems;
+          break;
+        case 'update':
+          this.thcDetail = navigationState.data;
+          this.staticField.push('receiveBy', 'arrivalTime', 'remarks');
+          this.isSubmit = true;
+          this.isUpdate = true;
           break;
         case 'addthc':
           this.addThc = true;
@@ -263,50 +285,11 @@ export class ThcGenerationComponent implements OnInit {
     }
   }
 
-  async getShipmentDetail() {
-
-    if (!this.isUpdate && !this.isView) {
-      const shipmentList = await this.thcService.getShipment(false);
-      const branchWise = shipmentList.filter((x) => x.origin === this.orgBranch);
-      let nestedDetail = await this.thcService.getNestedDockDetail(branchWise, this.isUpdate)
-      this.allShipment = nestedDetail;
-      if (this.addThc) {
-
-        this.tableData = nestedDetail
-        //  branchWise.map((x) => {
-        //   const actualWeights = [x].map((item) => {
-        //     return item ? calculateTotalField(item.invoiceDetails, "actualWeight") : 0;
-        //   });
-        //   const noofPkts = [x].map((item) => {
-        //     return item ? calculateTotalField(item.invoiceDetails, "noofPkts") : 0;
-        //   });
-        //   // Sum all the calculated actualWeights
-        //   const totalActualWeight = actualWeights.reduce(
-        //     (acc, weight) => acc + weight,
-        //     0
-        //   );
-        //   // Sum all the calculated actualWeights
-        //   const totalnoofPkts = noofPkts.reduce(
-        //     (acc, noofPkts) => acc + noofPkts,
-        //     0
-        //   );
-
-        //   x.actualWeight = totalActualWeight;
-        //   x.noofPkts = totalnoofPkts
-        //   return x; // Make sure to return x to update the original object in the 'tableData' array.
-        // });
-        // //this.tableData= this.allShipment 
-        this.tableLoad = false;
-      }
-    }
-  }
-
   ngOnInit(): void {
     this.IntializeFormControl();
-    this.getDropDownDetail();
     this.backPath = "/dashboard/Index?tab=6";
   }
-
+  /*here the function which is use for the intialize a form for thc*/
   IntializeFormControl() {
     const loadingControlForm = new thcControl(
       this.isUpdate || false,
@@ -334,30 +317,58 @@ export class ThcGenerationComponent implements OnInit {
     if (this.addThc) {
       this.jsonControlArray.push(...this.jsonControlDocketArray);
     }
-
     this.setupControlProperties("vehicleName", "vehicleStatus", "vehicle");
     this.setupControlProperties("vendorName", "vendorNameStatus", "vendorName");
     this.setupControlProperties("prqName", "prqNoStatus", "prqNo");
     this.setupControlProperties("advanceName", "advanceStatus", "advPdAt");
     this.setupControlProperties("balanceName", "balanceStatus", "balAmtAt");
-    //this.setupControlProperties("unloadName", "unloadStatus", "closingBranch");
     this.setupControlProperties("fromCity", "fromCityStatus", "fromCity");
     this.setupControlProperties("toCity", "toCityStatus", "toCity");
-
     this.thcTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.marketVehicleTableForm = formGroupBuilder(this.fb, [this.jsonMarketVehicle]);
-   
+    this.getGeneralMasterData();
+    this.getDropDownDetail();
   }
+  /*End*/
 
+  /*here the function of the filterFormControls which is retive the additionData*/
   filterFormControls(formControls, metaData) {
     return formControls.filter((x) => x.additionalData && x.additionalData.metaData === metaData);
   }
+  /*End*/
 
+  /*here  the function which is mapping a dropdown flag*/
   setupControlProperties(controlName, statusName, fieldName) {
     this[controlName] = this.jsonControlArray.find((data) => data.name === fieldName)?.name;
     this[statusName] = this.jsonControlArray.find((data) => data.name === fieldName)?.additionalData.showNameAndValue;
   }
+  /*End*/
 
+  /*here the function which is getting a docket from the Api for the create THC*/
+  async getShipmentDetail() {
+
+    if (!this.isUpdate && !this.isView) {
+      let prqNo = this.prqDetail?.prqNo || "";
+      const shipmentList = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
+      this.allShipment = shipmentList;
+      if (this.addThc) {
+        this.tableData = shipmentList
+        this.tableLoad = false;
+      }
+    }
+  }
+  /*End*/
+
+  /*here the code which is write for the bind the dropdown using the thc generation*/
+  async getGeneralMasterData() {
+    this.vendorTypes = await this.generalService.getGeneralMasterData("VENDTYPE");
+    this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
+    setGeneralMasterData(this.jsonControlArray, this.products, "transMode");
+    setGeneralMasterData(this.jsonControlArray, this.vendorTypes, "vendorType");
+  }
+  /*End*/
+
+  /*below is the function form handler which is used when any event fire on any form*/
   async functionCallHandler($event) {
     const field = $event.field; //what is use of this variable
     const functionName = $event.functionName;
@@ -368,12 +379,13 @@ export class ThcGenerationComponent implements OnInit {
       console.log("failed");
     }
   }
+  /*End*/
 
   async getDropDownDetail() {
 
     const locationList = await getLocationApiDetail(this.masterService);
 
-    this.prqlist = await this.thcService.prqDetail(true, { prqBranch: this.storage.branch });
+    this.prqlist = await this.thcService.prqDetail(true, { bRCD: this.storage.branch, sTS: 3 });
     this.locationData = locationList.map((x) => ({
       value: x.locCode,
       name: x.locName,
@@ -389,10 +401,8 @@ export class ThcGenerationComponent implements OnInit {
     filterFields.forEach(({ name, data, status }) => {
       this.filter.Filter(this.jsonControlArray, this.thcTableForm, data, name, status);
     });
-
     const vendorDetail = await getVendorDetails(this.masterService);
     this.vendorDetail = vendorDetail;
-
     if (this.isUpdate || this.isView) {
       this.autoFillThc();
     } else {
@@ -441,28 +451,26 @@ export class ThcGenerationComponent implements OnInit {
       value: this.prqDetail?.prqNo || "",
     };
     this.thcTableForm.controls["prqNo"].setValue(prq);
+
     this.bindPrqData();
     this.getShipmentDetails();
   }
-
+  /*here the function for the bind prq data*/
   async bindPrqData() {
-    
     if (this.thcTableForm.controls["prqNo"].value.value) {
       const vehicleDetail = await this.vehicleStatusService.vehiclList(this.prqDetail?.prqNo);
-
       const fromToCityParts = (this.prqDetail?.fromToCity || '').split('-');
-
-      const validTransModes = ['truck', 'trailer','container'];
-      const transMode = validTransModes.includes(this.prqDetail?.transMode) ? 'Road' : '';
+      const validTransModes = ['Truck', 'Trailor', 'Container'];
+      const transMode = validTransModes.includes(this.prqDetail?.carrierType) ? 'P1' : '';
       const jsonData = {
-        vehicle: { name: this.prqDetail?.vehicleNo, value: this.prqDetail?.vehicleNo },
-        vendorType: vehicleDetail?.vendorType || "",
-        vendorName: { name: vehicleDetail?.vendor || '', value: vehicleDetail?.vendor || '' },
+        vehicle: { name: this.prqDetail?.vEHNO, value: this.prqDetail?.vEHNO },
+        vendorType: `${this.prqDetail?.vENDTY}` || "",
+        vendorName: { name: this.prqDetail?.vNDNM || '', value: this.prqDetail?.vNDCD || '' },
         transMode: transMode,
         route: this.prqDetail?.fromToCity || '',
         fromCity: { name: fromToCityParts[0], value: fromToCityParts[0] },
         toCity: { name: fromToCityParts[1], value: fromToCityParts[1] },
-        capacity: this.prqDetail?.vehicleSize || this.prqDetail?.containerSize || '',
+        capacity: this.prqDetail?.size || 0,
         driverName: vehicleDetail?.driver || '',
         driverMno: vehicleDetail?.dMobNo || '',
         driverLno: vehicleDetail?.lcNo || '',
@@ -477,8 +485,14 @@ export class ThcGenerationComponent implements OnInit {
           this.thcTableForm.controls[controlName].setValue(jsonData[controlName]);
         }
       }
-
-      if (vehicleDetail?.vendorType == "Market") {
+      // /*here i set in both name value is vNDNM the blow condition only applye when the vendor type is market 
+      // after this autofill it is going to the vendotype changes function then after it set vendorname as textbox and vendor code set as 8888 in submit time
+      // */
+      // if(this.prqDetail?.vENDTY=="4"){
+      //   this.thcTableForm.controls['vendorName'].setValue({name:this.prqDetail?.vNDNM,value:this.prqDetail?.vNDNM})
+      // }
+      // /*End*/
+      if (this.prqDetail?.vENDTY == "4") {
         let vehData = await this.markerVehicleService.GetVehicleData(this.prqDetail?.vehicleNo || "");
         if (vehData) {
           const vehJson = {
@@ -507,14 +521,17 @@ export class ThcGenerationComponent implements OnInit {
               // }
             }
           }
+          this.thcTableForm.controls['vendorName'].setValue({ name: this.prqDetail?.vNDNM, value: this.prqDetail?.vNDNM })
         }
       }
     }
-    if (!this.isView&&!this.isUpdate) {
+
+    if (!this.isView && !this.isUpdate) {
       this.vendorFieldChanged();
     }
 
   }
+  /*End*/
   async prqNoChangedEvent(event) {
     if (!this.isSubmit) {
       const CheckPRQExist = this.prqlist.some(item => item.name === event?.eventArgs?.name);
@@ -560,26 +577,29 @@ export class ThcGenerationComponent implements OnInit {
     const prq = this.thcTableForm.controls["prqNo"].value?.value || "";
     this.tableLoad = true;
     if (!this.prqFlag && prq) {
-      const prqData = await this.thcService.prqDetail(false);
-      this.prqDetail = prqData.find((x) => {
-        const prqNoWithoutSpaces = x.prqNo.replace(/\s/g, '');
-        const prqNoWithoutSpacesAndNonAlphanumeric = prqNoWithoutSpaces.replace(/[^a-zA-Z0-9]/g, '');
-
-        return prqNoWithoutSpacesAndNonAlphanumeric === prq;
+      this.directPrq = true
+      const filter = {
+        docNo: prq
+      }
+      let prqData = await this.thcService.prqDetail(false, filter);
+      let prqList = [];
+      // Map and transform the PRQ data
+      prqData.map((element, index) => {
+        let pqrData = this.prqService.preparePrqDetailObject(element, index);
+        prqList.push(pqrData)
+        // You need to return the modified element
       });
-      const prqDataDetails = this.prqDetail;
+      this.prqDetail = prqList[0];
       this.bindPrqData();
     }
+
     const prqNo = this.thcTableForm.controls["prqNo"].value.value;
     // Set the delay duration in milliseconds (e.g., 2000 milliseconds for 2 seconds)
-    const delayDuration = 1000;
-    // Create a promise that resolves after the specified delay
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    // Use async/await to introduce the delay
-    await delay(delayDuration);
+
+    const shipment = await this.thcService.getShipmentFiltered(this.orgBranch, prqNo);
+
     // Now, update the tableData and set tableLoad to false
     this.tableLoad = false;
-    const shipment = this.prqFlag ? this.allShipment.filter((x) => x.prqNo === prqNo) : this.allShipment
     this.tableData = shipment.map((x) => {
       if (!prq) {
         x.actions = ["Update"];
@@ -610,7 +630,7 @@ export class ThcGenerationComponent implements OnInit {
   selectCheckBox(event) {
     // Assuming event is an array of objects
     // Sum all the calculated actualWeights
-    const totalActualWeight = event.reduce((acc, weight) => acc + weight.totWeight, 0);
+    const totalActualWeight = event.reduce((acc, weight) => acc + weight.aCTWT, 0);
     let capacityTons = parseFloat(this.thcTableForm.controls["capacity"].value); // Get the capacity value in tons
     let loadedTons = totalActualWeight ? totalActualWeight / 1000 : 0;
     let percentage = loadedTons ? (loadedTons * 100) / capacityTons : 0;
@@ -625,9 +645,9 @@ export class ThcGenerationComponent implements OnInit {
       });
       dialogref.afterClosed().subscribe((result) => {
         if (result) {
-          const { shipment, remarks, podUpload, arrivalTime,receivedBy } = result;
+          const { shipment, remarks, podUpload, arrivalTime, receivedBy } = result;
           this.tableData.forEach((x) => {
-            if (x.docketNumber === shipment) {
+            if (x.docNo === shipment) {
               x.remarks = remarks || "";
               x.pod = podUpload || "";
               x.arrivalTime = arrivalTime ? formatDate(arrivalTime, 'HH:mm') : "";
@@ -646,9 +666,9 @@ export class ThcGenerationComponent implements OnInit {
         if (result) {
           const { shipment, actualWeight, noofPkts } = result;
           this.tableData.forEach((x) => {
-            if (x.docketNumber === shipment) {
-              x.totWeight = actualWeight || 0;
-              x.noOfPkg = noofPkts || 0;
+            if (x.docNo === shipment) {
+              x.aCTWT = actualWeight || 0;
+              x.pKGS = noofPkts || 0;
               x.isSelected = false
             }
           });
@@ -658,7 +678,7 @@ export class ThcGenerationComponent implements OnInit {
     }
   }
   async createThc() {
-    
+
     const selectedDkt = this.isUpdate ? this.tableData : this.selectedData ? this.selectedData : [];
     if (selectedDkt.length === 0 && !this.isUpdate) {
       Swal.fire({
@@ -679,7 +699,7 @@ export class ThcGenerationComponent implements OnInit {
       return;
     }
 
-    const docket = selectedDkt.map(({ docketNumber, remarks, pod, arrivalTime,receiveBy }) => ({ docketNumber, remarks, pod, arrivalTime,receiveBy }));
+    const docket = selectedDkt.map(({ dKTNO, remarks, pod, arrivalTime, receiveBy }) => ({ dKTNO, remarks, pod, arrivalTime, receiveBy }));
     const formControlNames = [
       "prqNo",
       "advPdAt",
@@ -687,7 +707,6 @@ export class ThcGenerationComponent implements OnInit {
       "fromCity",
       "toCity",
       "vehicle",
-      "vendorName",
       "vendorType"
     ];
 
@@ -697,7 +716,7 @@ export class ThcGenerationComponent implements OnInit {
     });
 
     const vendorType = this.thcTableForm.get('vendorType').value;
-    const isMarket = vendorType === 'Market';
+    const isMarket = vendorType === "4";
     this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");
 
     if (isMarket) {
@@ -720,20 +739,17 @@ export class ThcGenerationComponent implements OnInit {
 
       await this.markerVehicleService.SaveVehicleData(vehicleData);
     }
-
     const destinationMapping = await this.locationService.locationFromApi({ locCity: this.thcTableForm.controls['toCity'].value });
     this.thcTableForm.controls['closingBranch'].setValue(destinationMapping[0]?.value || "");
     if (this.isUpdate) {
-      for (const element of docket) {
-        await this.docketService.updateDocket(element.docketNumber, { "status": "2" });
-      }
-      
       const podDetails = typeof (docket) == "object" ? docket : ""
       this.thcTableForm.removeControl("docket");
       this.thcTableForm.get("podDetail").setValue(podDetails);
-      this.thcTableForm.get("status").setValue("2");
-      const res = await showConfirmationDialogThc(this.thcTableForm.value, this.operationService);
-
+      const requestBody = {
+        "oPSST": 2,
+        "oPSSTNM": "THC Update",
+      };
+      const res = await showConfirmationDialogThc(requestBody, this.thcTableForm.get("tripId").value, this.operationService, podDetails);
       if (res) {
         Swal.fire({
           icon: "success",
@@ -744,42 +760,40 @@ export class ThcGenerationComponent implements OnInit {
         this.goBack("THC");
       }
     } else {
-      this.thcTableForm.get("docket").setValue(docket.map(x => x.docketNumber));
+      //this.thcTableForm.get("docket").setValue(docket.map(x => x.docketNumber));
 
-      if (this.prqFlag) {
-        const prqData = { prqNo: this.thcTableForm.get("prqNo").value };
-        await this.consigmentUtility.updatePrq(prqData, "7");
+      if (this.prqFlag || this.directPrq) {
+        if (this.thcTableForm.get("prqNo").value) {
+          const prqData = { prqNo: this.thcTableForm.get("prqNo").value };
+          const update = {
+            sTS: 7,
+            sTSNM: 'THC Generated'
+          }
+          await this.consigmentUtility.updatePrq(prqData, update);
+        }
       }
 
-      for (const element of docket) {
-        await this.docketService.updateDocket(element.docketNumber, { "status": "1" });
-      }
-
-      const thcTableFormValue = this.thcTableForm.value;
-
-      // if (isMarket || !this.prqFlag) {
-      //   const vendorName = this.thcTableForm.get('vendorName').value || "";
-      //   const vehicleNoValue = this.thcTableForm.get('vehicle').value || "";
-      //   const _id = `${vendorName.substring(0, 3)}-${vehicleNoValue}`;
-      //   this.marketVehicleTableForm.get('vehNo').setValue(vehicleNoValue);
-      //   this.marketVehicleTableForm.get('vendor').setValue(vendorName);
-      //   this.marketVehicleTableForm.get('_id').setValue(_id);
-      //   //await this.vehicleService.addMarketVehicle(this.marketVehicleTableForm.value);
+      // for (const element of docket) {
+      //   await this.docketService.updateDocket(element.docketNumber, { "status": "1" });
       // }
 
-      const resThc = await this.thcService.thcGeneration(thcTableFormValue);
-      this.docketService.updateSelectedData(this.selectedData, resThc.data.ops[0].tripId)
-      if (resThc) {
-        Swal.fire({
-          icon: "success",
-          title: "THC Generated Successfully",
-          text: `THC Number is ${resThc.data.ops[0].tripId}`,
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.goBack("THC");
-          }
-        });
+      const tHCGenerationRequst = await this.GenerateTHCgenerationRequestBody();
+      if (tHCGenerationRequst) {
+        const resThc = await this.thcService.newsthcGeneration(tHCGenerationRequst);
+
+        this.docketService.updateSelectedData(this.selectedData, resThc.data?.mainData?.ops[0].docNo)
+        if (resThc) {
+          Swal.fire({
+            icon: "success",
+            title: "THC Generated Successfully",
+            text: `THC Number is ${resThc.data?.mainData?.ops[0].docNo}`,
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.goBack("THC");
+            }
+          });
+        }
       }
     }
   }
@@ -850,8 +864,6 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['driverLexd'].setValue(driverDetail[0].valdityDt);
     this.thcTableForm.controls['driverLno'].setValue(driverDetail[0].licenseNo);
     this.thcTableForm.controls['capacity'].setValue(vehDetail.capacity);
-    const vendorType = vendorTypeList.find((x) => x.value.toLowerCase() == vehDetail.vendorType.toLowerCase());
-    this.thcTableForm.controls['vendorType'].setValue(vendorType?.value);
     // if (vehDetail.value) {
     //   const filteredShipments = this.allShipment.filter((x) => x.vehicleNo == vehDetail.value && (x.orgTotWeight != "0" || x.orgNoOfPkg != "0"));
     //   this.tableData = filteredShipments.map((x) => {
@@ -867,17 +879,17 @@ export class ThcGenerationComponent implements OnInit {
     const vendorType = this.thcTableForm.value.vendorType;
     this.jsonControlArray.forEach((x) => {
       if (x.name === "vendorName") {
-        x.type = vendorType === "Market" ? "text" : "dropdown";
+        x.type = vendorType === "4" ? "text" : "dropdown";
       }
       if (x.name === "vehicle") {
-        x.type = vendorType === "Market" ? "text" : "dropdown";
+        x.type = vendorType === "4" ? "text" : "dropdown";
       }
     });
-    if(!this.prqFlag){
-    this.thcTableForm.controls['vendorName'].setValue("");
+    if (!this.prqFlag && !this.directPrq) {
+      this.thcTableForm.controls['vendorName'].setValue("");
     }
-    if (vendorType !== 'Market') {
-      const vendorDetail = this.vendorDetail.filter((x) => x.type.toLowerCase() == vendorType.toLowerCase());
+    if (vendorType !== '4') {
+      const vendorDetail = this.vendorDetail.filter((x) => x.type == parseInt(vendorType));
       this.filter.Filter(
         this.jsonControlArray,
         this.thcTableForm,
@@ -888,8 +900,9 @@ export class ThcGenerationComponent implements OnInit {
 
     }
     else {
-
-      this.marketVendor = true
+      if (!this.prqFlag) {
+        this.marketVendor = true;
+      }
     }
   }
   /*get pincode detail*/
@@ -907,10 +920,10 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['route'].setValue(fromTo)
     if (toCity) {
       console.log(this.allShipment)
-      
+
       const filteredShipments = this.allShipment.filter((x) =>
-        (x.fromCity.toLowerCase() === fromCity.toLowerCase() &&
-          x.toCity.toLowerCase() === toCity.toLowerCase()) && (x.orgTotWeight != "0" || x.orgNoOfPkg != "0" || x.vehicleNo == this.thcTableForm.controls['vehicle'].value.value)
+        (x.fCT.toLowerCase() === fromCity.toLowerCase() &&
+          x.tCT.toLowerCase() === toCity.toLowerCase()) || (x.vEHNO == this.thcTableForm.controls['vehicle'].value.value)
       );
       const addEditAction = (shipments) => {
         return shipments.map((shipment) => {
@@ -923,60 +936,61 @@ export class ThcGenerationComponent implements OnInit {
   /*below function call when user will try to view or
    edit Thc the function are create for autofill the value*/
   async autoFillThc() {
-    
-    const thcDetail = await this.thcService.getThcDetails(this.thcDetail.tripId);
+    const thcDetail = await this.thcService.getThcDetails(this.thcDetail.docNo);
     const thcNestedDetails = thcDetail.data;
     let propertiesToSet = [
-      "route",
-      "tripDate",
-      "vendorType",
-      "tripId",
-      "capacity",
-      "loadedKg",
-      "weightUtilization",
-      "driverName",
-      "driverMno",
-      "driverLno",
-      "driverLexd",
-      "advPdAt",
-      "balAmtAt",
-      "status",
-      "vendorType",
-      "panNo",
-      "transMode"
-    ];
-    if (this.prqFlag) {
-      propertiesToSet = propertiesToSet.filter((x) => x !== "tripId");
-    }
-    propertiesToSet.forEach((property) => {
-      this.thcTableForm.controls[property].setValue(
-        thcNestedDetails.thcDetails?.[property] || ""
-      );
 
+      { Key: 'route', Name: 'rUTNM' },
+      { Key: 'tripDate', Name: 'eNTDT' },
+      { Key: 'tripId', Name: 'docNo' },
+      { Key: 'capacity', Name: 'cAP.wT' },
+      { Key: 'loadedKg', Name: 'cAP.vWT' },
+      { Key: 'weightUtilization', Name: 'cAP.vWT' },
+      { Key: 'driverName', Name: 'dRV.nM' },
+      { Key: 'driverMno', Name: 'dRV.mNO' },
+      { Key: 'driverLno', Name: 'dRV.lNO' },
+      { Key: 'driverLexd', Name: 'dRV.lEDT' },
+      { Key: 'advPdAt', Name: 'aDPAYAT' },
+      { Key: 'balAmtAt', Name: 'bLPAYAT' },
+      { Key: 'status', Name: 'oPSST' },
+      { Key: 'panNo', Name: 'vND.pAN' },
+      //{ Key: 'transMode', Name: 'tMODE' }
+    ];
+
+    propertiesToSet.forEach((property) => {
+      // Split the nested property by dots and access the nested values
+      const nestedValues = property.Name.split('.').reduce((obj, key) => obj[key], thcNestedDetails.thcDetails);
+
+      // Set the value in the form control
+      this.thcTableForm.controls[property.Key].setValue(
+        nestedValues || ""
+      );
     });
 
-    if (thcNestedDetails.thcDetails.prqNo) {
+    if (thcNestedDetails.thcDetails.pRQNO) {
       const prqNo = {
-        name: thcNestedDetails.thcDetails?.prqNo || "",
-        value: thcNestedDetails.thcDetails?.prqNo || "",
+        name: thcNestedDetails.thcDetails?.pRQNO || "",
+        value: thcNestedDetails.thcDetails?.pRQNO || "",
       };
       this.thcTableForm.controls['prqNo'].setValue(prqNo);
     }
-    const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.advPdAt);
-    const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.balAmtAt);
+    const location = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.aDPAYAT);
+    const balAmtAt = this.locationData.find((x) => x.value === thcNestedDetails.thcDetails?.bLPAYAT);
     //  const closingBranch = this.locationData.find((x) => x.value === this.thcDetail?.closingBranch);
     this.thcTableForm.controls["advPdAt"].setValue(location);
     this.thcTableForm.controls["balAmtAt"].setValue(balAmtAt);
     this.thcTableForm.controls["tripDate"].disable();
-    this.thcTableForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.contAmt||0);
-    this.thcTableForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.advAmt||0);
-    this.thcTableForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.balAmt||0);
+    this.thcTableForm.controls["contAmt"].setValue(thcNestedDetails?.thcDetails.cONTAMT || 0);
+    this.thcTableForm.controls["advAmt"].setValue(thcNestedDetails?.thcDetails.aDVAMT || 0);
+    this.thcTableForm.controls["balAmt"].setValue(thcNestedDetails?.thcDetails.bALAMT || 0);
     //this.thcTableForm.controls["closingBranch"].setValue(closingBranch);    
-    this.thcTableForm.controls["fromCity"].setValue({ name: thcNestedDetails?.thcDetails.fromCity || "", value: thcNestedDetails?.thcDetails.fromCity || "" });
-    this.thcTableForm.controls["toCity"].setValue({ name: thcNestedDetails?.thcDetails.toCity || "", value: thcNestedDetails?.thcDetails.toCity || "" });
-    this.thcTableForm.controls["vehicle"].setValue({ name: thcNestedDetails?.thcDetails.vehicle, value: thcNestedDetails?.thcDetails.vehicle });
-    this.thcTableForm.controls["vendorName"].setValue({ name: thcNestedDetails?.thcDetails.vendorName, value: thcNestedDetails?.thcDetails.vendorName });
+    this.thcTableForm.controls["fromCity"].setValue({ name: thcNestedDetails?.thcDetails.fCT || "", value: thcNestedDetails?.thcDetails.fCT || "" });
+    this.thcTableForm.controls["toCity"].setValue({ name: thcNestedDetails?.thcDetails.tCT || "", value: thcNestedDetails?.thcDetails.tCT || "" });
+    this.thcTableForm.controls["vehicle"].setValue({ name: thcNestedDetails?.thcDetails.vEHNO, value: thcNestedDetails?.thcDetails.vEHNO });
+    this.thcTableForm.controls["vendorName"].setValue({ name: thcNestedDetails?.thcDetails.vND?.nM, value: thcNestedDetails?.thcDetails.vND?.nM });
     this.thcTableForm.controls["driverLexd"].disable();
+    this.thcTableForm.controls["vendorType"].setValue(`${thcNestedDetails?.thcDetails.vND?.tY
+      }`);
     if (this.addThc) {
       this.thcTableForm.controls['billingParty'].setValue(this.thcDetail?.billingParty);
       this.thcTableForm.controls['docketNumber'].setValue(this.thcDetail?.docketNumber);
@@ -1041,5 +1055,218 @@ export class ThcGenerationComponent implements OnInit {
     this.thcTableForm.controls['driverLexd'].setValue(this.marketVehicleTableForm.value?.lcExpireDate || "");
     this.thcTableForm.controls['panNo'].setValue(this.marketVehicleTableForm.value?.driverPan || "");
   }
+  GenerateTHCgenerationRequestBody() {
+    const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
+    const transitHours = Math.max(...this.tableData.filter(item => item.isSelected == true).map(o => o.transitHours));
 
+    const deptDate = this.thcTableForm.controls['tripDate'].value || new Date();
+    const schArrDate =  moment(deptDate).add(transitHours, 'hours').toDate();
+    // this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");
+    
+    //#region MainModel
+    this.tHCGenerationModel.companyCode = this.storage.companyCode;
+    this.tHCGenerationModel.branch = this.storage.branch;
+    this.tHCGenerationModel.docType = "TH";
+    this.tHCGenerationModel.finYear = financialYear;    
+    //#endregion
+
+    //#region THC Summary
+    this.thcsummaryData.companyCode = this.storage.companyCode;
+    this.thcsummaryData.branch = this.storage.branch;
+    this.thcsummaryData.tHCDT = deptDate;
+    this.thcsummaryData.closingBranch = this.thcTableForm.controls['closingBranch'].value || "";
+    this.thcsummaryData.fromCity = this.thcTableForm.controls['fromCity'].value || "";
+    this.thcsummaryData.toCity = this.thcTableForm.controls['toCity'].value || "";
+    this.thcsummaryData.routecode = "9888";
+    this.thcsummaryData.route = this.thcTableForm.controls['route'].value || "";
+    this.thcsummaryData.vehicle = this.thcTableForm.controls['vehicle'].value || "";
+    this.thcsummaryData.Vendor_type = VendorDetails.value || "";
+    this.thcsummaryData.Vendor_typetName = VendorDetails.name || "";
+    this.thcsummaryData.Vendor_Code = this.thcTableForm.controls['vendorCode'].value || "";
+    this.thcsummaryData.Vendor_Name = this.thcTableForm.controls['vendorName'].value?.name || this.thcTableForm.controls['vendorName'].value;
+    this.thcsummaryData.Vendor_pAN = this.thcTableForm.controls['panNo'].value || "";
+    this.thcsummaryData.status = 1
+    this.thcsummaryData.statusName = "Generated";
+    this.thcsummaryData.financialStatus = 0;
+    this.thcsummaryData.financialStatusName = "";
+    this.thcsummaryData.contAmt = this.thcTableForm.controls['contAmt'].value || 0;
+    this.thcsummaryData.advAmt = this.thcTableForm.controls['advAmt'].value || 0;
+    this.thcsummaryData.aDVPENAMT = this.thcsummaryData.advAmt;
+    this.thcsummaryData.balAmt = this.thcTableForm.controls['balAmt'].value || 0;
+    this.thcsummaryData.advPdAt = this.thcTableForm.controls['advPdAt'].value || this.storage.branch;
+    this.thcsummaryData.balAmtAt = this.thcTableForm.controls['balAmtAt'].value || this.storage.branch;
+    this.thcsummaryData.vouchersList = [];
+    this.thcsummaryData.iSBILLED = false;
+    this.thcsummaryData.bILLNO = "";
+    this.thcsummaryData.Driver_name = this.thcTableForm.controls['driverName'].value || "";
+    this.thcsummaryData.Driver_mobile = this.thcTableForm.controls['driverMno'].value || "";
+    this.thcsummaryData.Driver_lc = this.thcTableForm.controls['driverLno'].value || "";
+    this.thcsummaryData.Driver_exd = this.thcTableForm.controls['driverLexd'].value || undefined;
+    this.thcsummaryData.Capacity_ActualWeight =  this.thcTableForm.controls['capacity'].value || 0;
+    this.thcsummaryData.Capacity_volume = 0;
+    this.thcsummaryData.Capacity_volumetricWeight = 0;
+    this.thcsummaryData.Utilization_ActualWeight = this.thcTableForm.controls['weightUtilization'].value;
+    this.thcsummaryData.Utilization_volume = 0;
+    this.thcsummaryData.Utilization_volumetricWeight = 0;
+    this.thcsummaryData.departed_sCHDT = deptDate;
+    this.thcsummaryData.departed_eXPDT = deptDate;
+    this.thcsummaryData.departed_aCTDT = deptDate;
+    //this.thcsummaryData.departed_gPSDT = undefined;
+    this.thcsummaryData.departed_oDOMT = 0;
+    this.thcsummaryData.arrived_sCHDT = schArrDate;
+    this.thcsummaryData.arrived_eXPDT = schArrDate;
+    //this.thcsummaryData.arrived_aCTDT = undefined;
+    //this.thcsummaryData.arrived_gPSDT = undefined;
+    //this.thcsummaryData.arrived_oDOMT = undefined;
+    this.thcsummaryData.sCHDIST = 0;
+    this.thcsummaryData.aCTDIST = 0;
+    this.thcsummaryData.gPSDIST = 0;
+    this.thcsummaryData.cNL = false;
+    //this.thcsummaryData.cNDT = undefined;
+    //this.thcsummaryData.cNBY = undefined;
+    //this.thcsummaryData.cNRES = undefined;
+    this.thcsummaryData.eNTDT = new Date();
+    this.thcsummaryData.eNTLOC = this.storage.branch;
+    this.thcsummaryData.eNTBY = this.storage.userName;
+    //this.thcsummaryData.mODDT = undefined;
+    //this.thcsummaryData.mODLOC = undefined;
+    //this.thcsummaryData.mODBY = undefined;
+    
+    //New Added By Harikesh
+    this.thcsummaryData.tMODE = this.thcTableForm.controls['transMode']?.value?.value || "";
+    this.thcsummaryData.tMODENM = this.thcTableForm.controls['transMode']?.value?.name || "";
+    this.thcsummaryData.pRQNO = this.thcTableForm.controls['prqNo'].value || "";
+    //#endregion
+
+    //#region Load
+    this.LOad.dKTS = this.tableData.filter(item => item.isSelected == true).length;
+    this.LOad.pKGS = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.pKGS, 0);
+    this.LOad.wT = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.aCTWT, 0);
+    this.LOad.vOL = 0;
+    this.LOad.vWT = 0;
+    this.LOad.sEALNO = "";
+    this.LOad.rMK = "";
+    //#endregion
+
+    //#region CAp
+    this.CAp.wT = this.thcTableForm.controls['capacity'].value || 0;
+    this.CAp.vOL = 0;
+    this.CAp.vWT = 0;
+    //#endregion
+
+    //#region UTi
+    this.UTi.wT = this.thcTableForm.controls['weightUtilization'].value || 0;
+    this.UTi.vOL = 0;
+    this.UTi.vWT = 0;
+    //#endregion
+
+    //#region DPt
+    this.DPt.sCHDT = deptDate;
+    this.DPt.eXPDT = deptDate;
+    this.DPt.aCTDT = deptDate;
+    //this.DPt.gPSDT = undefined;
+    this.DPt.oDOMT = 0;
+    //#endregion
+
+    //#region ARr
+    this.ARr.sCHDT = schArrDate;
+    this.ARr.eXPDT = schArrDate;
+    //this.ARr.aCTDT = undefined;
+    //this.ARr.gPSDT = undefined;
+    //this.ARr.oDOMT = 0;
+    //#endregion
+
+    //#region UNload
+    this.UNload.dKTS = 0;
+    this.UNload.pKGS = 0;
+    this.UNload.wT = 0;
+    this.UNload.vOL = 0;
+    this.UNload.vWT = 0;
+    this.UNload.sEALNO = "";
+    this.UNload.rMK = "";
+    this.UNload.sEALRES = "";
+    //#endregion
+
+    //#region THC Movement Details
+    this.thcmovementDetails.cID = this.storage.companyCode
+    this.thcmovementDetails.fLOC = this.thcTableForm.controls['branch'].value || "";
+    this.thcmovementDetails.tLOC = this.thcTableForm.controls['closingBranch'].value || "";
+    this.thcmovementDetails.lOAD = this.LOad
+    this.thcmovementDetails.cAP = this.CAp;
+    this.thcmovementDetails.uTI = this.UTi;
+    this.thcmovementDetails.dPT = this.DPt;
+    this.thcmovementDetails.aRR = this.ARr;
+    this.thcmovementDetails.uNLOAD = this.UNload;
+    this.thcmovementDetails.sCHDIST = 0;
+    this.thcmovementDetails.aCTDIST = 0;
+    this.thcmovementDetails.gPSDIST = 0;
+    this.thcmovementDetails.eNTDT = new Date()
+    this.thcmovementDetails.eNTLOC = this.storage.branch;
+    this.thcmovementDetails.eNTBY = this.storage.userName;
+    //this.thcmovementDetails.mODDT = undefined;
+    //this.thcmovementDetails.mODLOC = undefined;
+    //this.thcmovementDetails.mODBY = undefined;
+    //#endregion
+
+    //#region THC Movement Details
+    this.mfheaderDetails.cID = this.storage.companyCode
+    this.mfheaderDetails.mDT = deptDate;
+    this.mfheaderDetails.oRGN = this.thcTableForm.controls['branch'].value || "";
+    this.mfheaderDetails.dEST = this.thcTableForm.controls['closingBranch'].value || "";
+    this.mfheaderDetails.dKTS = this.tableData.filter(item => item.isSelected == true).length;
+    this.mfheaderDetails.pKGS = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.pKGS, 0);
+    this.mfheaderDetails.wT = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.aCTWT, 0);
+    this.mfheaderDetails.vOL = 0;
+    this.mfheaderDetails.tHC = "";
+    this.mfheaderDetails.iSARR = true;
+    //this.mfheaderDetails.aRRDT = undefined;
+    this.mfheaderDetails.eNTDT = new Date()
+    this.mfheaderDetails.eNTLOC = this.storage.branch;
+    this.mfheaderDetails.eNTBY = this.storage.userName;
+    //this.mfheaderDetails.mODDT = undefined;
+    //this.mfheaderDetails.mODLOC = undefined;
+    //this.mfheaderDetails.mODBY = undefined;
+
+    //#endregion
+
+    this.tableData.filter(item => item.isSelected == true).forEach((res) => {
+      const mfdetailsList = new MfdetailsList();
+      //#region mfdetailsList
+      mfdetailsList.cID = this.storage.companyCode
+      mfdetailsList.dKTNO = res.docNo;
+      mfdetailsList.sFX = res.sFX;
+      mfdetailsList.cNID = res.cNO;
+      mfdetailsList.oRGN = this.thcTableForm.controls['branch'].value || "";
+      mfdetailsList.dEST = this.thcTableForm.controls['closingBranch'].value || "";
+      mfdetailsList.pKGS = res.pKGS;
+      mfdetailsList.wT = res.aCTWT;
+      mfdetailsList.vOL = 0;
+      mfdetailsList.lDPKG = res.pKGS;      
+      mfdetailsList.lDWT = res.aCTWT;
+      mfdetailsList.lDVOL = 0;
+      mfdetailsList.aRRPKG = 0;
+      mfdetailsList.aRRPWT = 0;
+      mfdetailsList.aRRVOL = 0;
+      mfdetailsList.aRRLOC = "";
+      mfdetailsList.iSARR = false;
+      //mfdetailsList.aRRDT = undefined;
+      mfdetailsList.eNTDT = new Date()
+      mfdetailsList.eNTLOC = this.storage.branch;
+      mfdetailsList.eNTBY = this.storage.userName;
+      //mfdetailsList.mODDT = undefined;
+      //mfdetailsList.mODLOC = undefined;
+      //mfdetailsList.mODBY = undefined;
+      //#endregion
+      this.mfdetailsList.push(mfdetailsList);
+    });
+
+
+    this.tHCGenerationModel.data = this.thcsummaryData;
+    this.tHCGenerationModel.mfdetailsList = this.mfdetailsList;
+    this.tHCGenerationModel.mfheaderDetails = this.mfheaderDetails;
+    this.tHCGenerationModel.thcmovementDetails = this.thcmovementDetails;
+    console.log(this.tHCGenerationModel)
+    return this.tHCGenerationModel;
+
+  }
 }

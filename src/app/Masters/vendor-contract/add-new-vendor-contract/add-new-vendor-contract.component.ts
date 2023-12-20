@@ -194,7 +194,7 @@ export class AddNewVendorContractComponent extends UnsubscribeOnDestroyAdapter i
 
     // Filter the vendor list based on the 'isActive' property
     const vendor = vendorList
-      .filter((item) => item.isActive && item.vendorType === 1) // Filter based on the isActive property
+      .filter((item) => item.isActive && parseInt(item.vendorType) === 1) // Filter based on the isActive property
       .map(e => ({
         name: e.vendorName, // Map the name to the specified nameKey
         value: e.vendorCode // Map the value to the specified valueKey

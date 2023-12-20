@@ -6,6 +6,7 @@ import { PayBasisdetailFromApi } from 'src/app/Masters/Customer Contract/Custome
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ContainerService } from 'src/app/Utility/module/masters/container/container.service';
+import { GeneralService } from 'src/app/Utility/module/masters/general-master/general-master.service';
 import { RouteLocationService } from 'src/app/Utility/module/masters/route-location/route-location.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { EncryptionService } from 'src/app/core/service/encryptionService.service';
@@ -42,6 +43,7 @@ export class VendorTERModalComponent implements OnInit {
     private sessionService: SessionService,
     private objRouteLocationService: RouteLocationService,
     private objContainerService: ContainerService,
+    private generalService: GeneralService,
     public dialogRef: MatDialogRef<VendorTERModalComponent>,
     @Inject(MAT_DIALOG_DATA)
     public objResult: any) {
@@ -50,7 +52,7 @@ export class VendorTERModalComponent implements OnInit {
       const encryptedData = params['data']; // Retrieve the encrypted data from the URL
       const decryptedData = this.encryptionService.decrypt(encryptedData); // Replace with your decryption method
       this.CurrentContractDetails = JSON.parse(decryptedData)
-      console.log(this.CurrentContractDetails.cNID);
+      //console.log(this.CurrentContractDetails.cNID);
     });
 
   }
@@ -136,7 +138,7 @@ export class VendorTERModalComponent implements OnInit {
           // Generate a new _id
           newId = lastId + 1;
         }
-        newId = existingContract ? newId : 0
+        newId = existingContract ? newId : 1
         const newContractData = this.prepareContractData(newId);
 
         const createRequest = {
@@ -239,13 +241,10 @@ export class VendorTERModalComponent implements OnInit {
   async getDropDownData() {
     const rateTypeDropDown = await PayBasisdetailFromApi(this.masterService, 'RTTYP')
     const containerData = await this.objContainerService.getContainerList();
-    const vehicleData = await PayBasisdetailFromApi(this.masterService, 'VC')
-    const containerDataWithPrefix = vehicleData.map((item) => ({
-      name: item.name,
-      value: item.value,
-    }));
+    const vehicleData = await this.generalService.getGeneralMasterData("VEHSIZE");
+
     // Merge containerData and vehicleData into a single array
-    const mergedData = [...containerData, ...containerDataWithPrefix];
+    const mergedData = [...containerData, ...vehicleData];
     if (this.objResult.Details) {
       const updaterateType = rateTypeDropDown.find(item => item.name === this.objResult.Details.rTTNM);
       this.TERForm.controls.rateType.setValue(updaterateType);

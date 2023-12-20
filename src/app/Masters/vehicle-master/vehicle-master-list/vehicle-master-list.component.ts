@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { firstValueFrom } from "rxjs";
+import moment from "moment";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
@@ -57,83 +57,60 @@ export class VehicleMasterListComponent implements OnInit {
     }
     //#region to get Vehicle list
     async getVehicleDetails() {
-        try {
-            // Prepare the request  
-            const req = {
-                "companyCode": parseInt(localStorage.getItem("companyCode")),
-                "collectionName": "vehicle_detail",
-                "filter": {}
-            };
-
-            // Make a request to the backend API using the masterService
-            const list = await firstValueFrom(this.masterService.masterPost("generic/get", req));
-
-            // Check if the response contains data
-            if (list.data) {
-                // Extract and sort data based on the 'eNTDT' property (assuming it's a date)
-                const data = list.data.sort((a, b) => new Date(b.eNTDT).getTime() - new Date(a.eNTDT).getTime());
-
-                // Format the 'eNTDT' property in each item using the formatDocketDate function
-                const dataWithDate = data.map(item => ({ ...item, eNTDT: formatDocketDate(item.eNTDT) }));
-
-                // Set 'csv' and 'tableData' properties with the formatted data
-                this.csv = this.tableData = dataWithDate;
-            }
-        } catch (error) {
-            // Handle errors, log them, or show user-friendly messages
-            console.error("Error fetching vehicle details:", error);
-        } finally {
-            // Set 'tableLoad' to false to indicate that data loading is complete
-            this.tableLoad = false;
+        // Prepare the request  
+        let req = {
+            "companyCode": parseInt(localStorage.getItem("companyCode")),
+            "collectionName": "vehicle_detail",
+            "filter": {}
         }
+        this.masterService.masterPost('generic/get', req).subscribe((res: any) => {
+            if (res && res.data) {
+                const data = res.data
+                const sortedData = data.sort((a, b) => {
+                    const dateA = new Date(a.eNTDT).getTime(); // Convert to a number
+                    const dateB = new Date(b.eNTDT).getTime(); // Convert to a number
+                    if (!isNaN(dateA) && !isNaN(dateB)) {
+                        return dateB - dateA;
+                    }
+                    return 0; // Handle invalid dates or NaN values
+                })
+                const dataWithDate = data.map(item => ({
+                    ...item,
+                    eNTDT: formatDocketDate(item.eNTDT)
+                  }));                  
+
+                this.csv = dataWithDate;
+                this.tableData = dataWithDate;
+            }
+
+            this.tableLoad = false;
+        });
     }
     //#endregion
-    //#region to manage flag
     async isActiveFuntion(det) {
-        // Extract the _id field from the det object
-        const id = det._id;
-
-        // Remove unnecessary fields from the det object
+        let id = det._id;
+        // Remove the "id" field from the form controls
         delete det._id;
         delete det.srNo;
-        delete det.eNTDT;
-        delete det.eNTBY;
-        delete det.eNTLOC;
-
-        // Add modification fields to the det object
-        det['mODDT'] = new Date();
-        det['mODBY'] = localStorage.getItem("UserName");
-        det['mODLOC'] = localStorage.getItem("Branch");
-
-        // Prepare the request for updating the document
-        const req = {
+        det['mODDT'] = new Date()
+        det['mODBY'] = localStorage.getItem("UserName")
+        det['mODLOC'] = localStorage.getItem("Branch")
+        let req = {
             companyCode: parseInt(localStorage.getItem("companyCode")),
             collectionName: "vehicle_detail",
             filter: { _id: id },
             update: det
         };
-
-        try {
-            // Make a request to update the document using the masterService
-            const res = await firstValueFrom(this.masterService.masterPut("generic/update", req));
-
-            // Check if the update was successful
-            if (res) {
-                // Display success message using Swal (assuming Swal is available)
-                Swal.fire({
-                    icon: "success",
-                    title: "Successful",
-                    text: res.message,
-                    showConfirmButton: true,
-                });
-
-                // Refresh the vehicle details after a successful update
-                this.getVehicleDetails();
-            }
-        } catch (error) {
-            // Handle errors, log them, or show user-friendly messages
-            console.error("Error updating document:", error);
+        const res = await this.masterService.masterPut("generic/update", req).toPromise()
+        if (res) {
+            // Display success message
+            Swal.fire({
+                icon: "success",
+                title: "Successful",
+                text: res.message,
+                showConfirmButton: true,
+            });
+            this.getVehicleDetails();
         }
     }
-    //#endregion 
 }

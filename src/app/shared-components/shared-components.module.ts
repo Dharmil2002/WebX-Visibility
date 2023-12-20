@@ -59,6 +59,7 @@ import { NgxPrintModule } from "ngx-print";
 import { MatDialogModule } from '@angular/material/dialog';
 import { GenericViewTableComponent } from './generic-view-table/generic-view-table.component';
 import { GenericCardWithMenuActionsComponent } from './generic-card-with-menu-actions/generic-card-with-menu-actions.component';
+import { GenericBulkUploadComponent } from './generic-bulk-upload/generic-bulk-upload.component';
 const MY_DATE_FORMAT = {
   parse: {
     dateInput: 'DD/MM/YYYY', // this is how your date will be parsed from Input
@@ -78,7 +79,8 @@ const MY_DATE_FORMAT = {
     , ExpandableTableComponent, ModifyTableCollumnsComponent, LazyloadingeditabletableComponent, XlsxPreviewPageComponent, GenericViewPrintComponent,
     ImagePreviewComponent,
     GenericViewTableComponent,
-    GenericCardWithMenuActionsComponent],
+    GenericCardWithMenuActionsComponent,
+    GenericBulkUploadComponent],
 
   imports: [
     CommonModule,
@@ -151,7 +153,8 @@ const MY_DATE_FORMAT = {
     GenericTableV2Component,
     GenericViewPrintComponent,
     LazyloadingeditabletableComponent,
-    ImagePreviewComponent
+    ImagePreviewComponent,
+    GenericBulkUploadComponent
   ],
 
 })

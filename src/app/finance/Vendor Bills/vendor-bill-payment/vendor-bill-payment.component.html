@@ -19,8 +19,8 @@
                     <ng-template mat-tab-label>
                         Online Payment Approval
                     </ng-template>
-                    <!-- <app-docket-list (CurrentIndex)="GetSelectedIndex($event)" [selectedIndex]="1"
-                        *ngIf="tabName === 'docket'"></app-docket-list> -->
+                    <app-online-payment-approval (CurrentIndex)="GetSelectedIndex($event)"
+                        *ngIf="tabName === 'OnlinePaymentApproval'" [selectedIndex]="1"></app-online-payment-approval>
                 </mat-tab>
 
             </mat-tab-group>

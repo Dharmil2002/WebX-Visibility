@@ -35,7 +35,7 @@ export class THCAmountsDetailComponent implements OnInit {
   UpdateAmount: any;
   ChargesData: any;
   THCsummary: any = [];
-  THCAmountsDetailsArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  THCAmountsDetailsArray: any[];
   THCAmountsDetailsForm: UntypedFormGroup;
   constructor(
     private fb: UntypedFormBuilder,
@@ -45,7 +45,7 @@ export class THCAmountsDetailComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     public dialogRef: MatDialogRef<THCAmountsDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public objResult: any
-  ) {}
+  ) { }
 
   ngOnInit() {
     console.log("objResult", this.objResult);
@@ -74,7 +74,7 @@ export class THCAmountsDetailComponent implements OnInit {
     }
   }
   initializeFormControl() {
-    const thcAmountsFormControls = new THCAmountsControl(this.Type , this.THCData);
+    const thcAmountsFormControls = new THCAmountsControl(this.Type, this.THCData);
     this.THCAmountsADDArray = thcAmountsFormControls.getTHCAmountsADDControls();
     this.THCAmountsArray = thcAmountsFormControls.getTHCAmountsControls();
     this.THCAmountsDetailsArray = thcAmountsFormControls.getTHCAmountsDetailsControls();
@@ -142,11 +142,11 @@ export class THCAmountsDetailComponent implements OnInit {
       this.THCAmountsLESSArray,
     ]);
     if (Array.isArray(this.THCsummary.cRGLST)) {
-      this.THCsummary.cRGLST.forEach((x) => { 
+      this.THCsummary.cRGLST.forEach((x) => {
         if (x.cRGTYP == "+") {
-            this.THCAmountsADDForm.controls[x.cRGNM]?.setValue(x.cRGAMT);
+          this.THCAmountsADDForm.controls[x.cRGNM]?.setValue(x.cRGAMT);
         } else {
-            this.THCAmountsLESSForm.controls[x.cRGNM]?.setValue(x.cRGAMT);
+          this.THCAmountsLESSForm.controls[x.cRGNM]?.setValue(x.cRGAMT);
         }
       });
     }
@@ -280,10 +280,10 @@ export class THCAmountsDetailComponent implements OnInit {
     });
     const commonBody = {
       cRGLST: Charges,
-      aDVAMT: this.THCAmountsForm.value.Advance,
+      aDVPENAMT: this.THCAmountsForm.value.Advance,
       bALAMT: this.THCAmountsForm.value.Balance,
-      bLPAYAT:this.THCAmountsForm.value.BalanceLocation.name,
-      aDPAYAT:this.THCAmountsForm.value.AdvanceLocation.name,
+      bLPAYAT: this.THCAmountsForm.value.BalanceLocation.name,
+      aDPAYAT: this.THCAmountsForm.value.AdvanceLocation.name,
     };
     console.log("commonBody", commonBody);
     const req = {

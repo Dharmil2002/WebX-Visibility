@@ -31,6 +31,7 @@ import { VoucherServicesService } from "src/app/core/service/Finance/voucher-ser
 import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { BeneficiaryDetailComponent } from "../../Vendor Bill Payment/beneficiary-detail/beneficiary-detail.component";
 import { StorageService } from "src/app/core/service/storage.service";
+import { VendorsVehicleDetailComponent } from "../Modal/vendors-vehicle-detail/vendors-vehicle-detail.component";
 @Component({
   selector: "app-advance-payments",
   templateUrl: "./advance-payments.component.html",
@@ -72,20 +73,25 @@ export class AdvancePaymentsComponent implements OnInit {
     VehicleNumber: {
       Title: "Vehicle No.",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
     },
     THCamount: {
       Title: "THC Amount ⟨₹⟩",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
       type: "Link",
       functionName: "THCAmountFunction",
     },
     Advance: {
       Title: "Advance ⟨₹⟩",
       class: "matcolumncenter",
-      Style: "min-width:20%",
+      Style: "min-width:15%",
     },
+    // AdvancePending: {
+    //   Title: "Advance Pending ⟨₹⟩",
+    //   class: "matcolumncenter",
+    //   Style: "min-width:15%",
+    // },
   };
   EventButton = {
     functionName: "filterFunction",
@@ -173,7 +179,8 @@ export class AdvancePaymentsComponent implements OnInit {
     this.PaymentHeaderFilterForm.get("VendorPANNumber").setValue(
       this.PaymentData?.VendorInfo?.pAN
     );
-    this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(0);
+    this.getVendorsVehicles(false);
+
   }
   async GetAdvancePaymentList() {
     this.isTableLode = false;
@@ -269,7 +276,7 @@ export class AdvancePaymentsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        if(result.success){
+        if (result.success) {
           this.GetAdvancePaymentList();
         }
       }
@@ -636,5 +643,43 @@ export class AdvancePaymentsComponent implements OnInit {
   BalancePaymentlocationFieldChanged(event) {
     console.log(event)
     this.OnPaymentModeChange(event);
+  }
+  async getVendorsVehicles(OpenAble = false) {
+    try {
+      // Fetch beneficiary details from API
+      const VendorWiseVehicleData = await this.objVendorBillService.getVendorsWiseVehicleList(this.PaymentData?.VendorInfo
+        ?.nM);
+      this.PaymentHeaderFilterForm.get("Numberofvehiclesregistered").setValue(VendorWiseVehicleData.length);
+
+      // Check if beneficiary data is available
+      if (VendorWiseVehicleData.length > 0 && OpenAble) {
+        // Prepare request object for the dialog
+        const request = {
+          Details: VendorWiseVehicleData,
+        };
+
+
+        // Open the BeneficiaryDetailComponent dialog
+        const dialogRef = this.matDialog.open(VendorsVehicleDetailComponent, {
+          data: request,
+          width: "100%",
+          disableClose: true,
+          position: {
+            top: "20px",
+          },
+        });
+
+        // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
+        dialogRef.afterClosed().subscribe(() => {
+        });
+      }
+    } catch (error) {
+      // Log any errors that occur during the process
+      console.error('An error occurred:', error);
+    }
+  }
+  vehiclesregisteredview(event) {
+    debugger
+    this.getVendorsVehicles(true);
   }
 }

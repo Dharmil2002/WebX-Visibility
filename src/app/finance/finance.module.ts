@@ -61,6 +61,7 @@ import { BeneficiaryDetailComponent } from './Vendor Bill Payment/beneficiary-de
 import { DeductionChargesComponent } from './invoice-collection/deduction-charges/deduction-charges.component';
 import { ShipmentSelectionComponent } from './invoice-summary-bill/shipment-selection/shipment-selection.component';
 import { BlancePaymentPopupComponent } from './Vendor Payment/Modal/blance-payment-popup/blance-payment-popup.component';
+import { VendorsVehicleDetailComponent } from './Vendor Payment/Modal/vendors-vehicle-detail/vendors-vehicle-detail.component';
 
 @NgModule({
     declarations: [
@@ -87,7 +88,8 @@ import { BlancePaymentPopupComponent } from './Vendor Payment/Modal/blance-payme
         OnlinePaymentApprovalComponent,
         BeneficiaryDetailComponent,
         DeductionChargesComponent,
-        ShipmentSelectionComponent
+        ShipmentSelectionComponent,
+        VendorsVehicleDetailComponent
     ],
     imports: [
         CommonModule,

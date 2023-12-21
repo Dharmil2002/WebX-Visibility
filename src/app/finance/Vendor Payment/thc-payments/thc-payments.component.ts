@@ -24,6 +24,7 @@ export class ThcPaymentsComponent implements OnInit {
     vendorList: [
 
     ],
+    vendorListWithKeys: [],
     StartDate: new Date(),
     EndDate: new Date()
   }
@@ -175,6 +176,7 @@ export class ThcPaymentsComponent implements OnInit {
         this.RequestData.StartDate = result.StartDate;
         this.RequestData.EndDate = result.EndDate;
         this.RequestData.vendorList = result.vendorNamesupport.map(item => item.value)
+        this.RequestData.vendorListWithKeys = result.vendorNamesupport.map(item => { return item.value + ":" + item.name });
         this.GetTHCData()
       }
     });

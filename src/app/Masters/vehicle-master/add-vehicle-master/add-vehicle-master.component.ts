@@ -92,7 +92,6 @@ export class AddVehicleMasterComponent implements OnInit {
   ) {
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
       this.vehicleTable = route.getCurrentNavigation().extras.state.data;
-      console.log(this.vehicleTable);
 
       this.isUpdate = true;
       this.submit = 'Modify';

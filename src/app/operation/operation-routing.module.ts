@@ -31,6 +31,7 @@ import { ThcGenerationComponent } from "./thc-generation/thc-generation.componen
 // import { WESTERNCARRIERSComponent } from "./ViewPrint/westerncarriers/westerncarriers.component";
 // import { PrqViewComponent } from "./ViewPrint/prq-view/prq-view.component";
 import { CommonViewPrintComponent } from "./ViewPrint/common-view-print/common-view-print.component";
+import { JobViewPrintComponent } from "./job-view-print/job-view-print.component";
 const routes: Routes = [
   {
     path: "LoadingSheetView",
@@ -155,7 +156,11 @@ const routes: Routes = [
   {
     path: "view-print",
     component: CommonViewPrintComponent
-  }
+  },
+  {
+    path: "jobviewprint",
+    component: JobViewPrintComponent
+  },
 ]
 
 @NgModule({

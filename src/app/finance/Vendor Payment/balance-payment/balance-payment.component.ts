@@ -148,7 +148,7 @@ export class BalancePaymentComponent implements OnInit {
   VendorbillstateStatus: any;
   PaymentData: any;
   TDSdata: any;
-  AdvanceTotle: number;
+  AdvanceTotal: number;
   BalancePending: number;
   THCamount: number;
   AlljsonControlVendorBalanceTaxationTDSFilterArray: any;
@@ -226,6 +226,7 @@ export class BalancePaymentComponent implements OnInit {
     });
     this.tableData = Data;
     this.isTableLode = true;
+    this.selectCheckBox()
   }
 
   initializeFormControl(): void {
@@ -476,19 +477,19 @@ export class BalancePaymentComponent implements OnInit {
     }
   }
   selectCheckBox() {
-    this.AdvanceTotle = 0;
+    this.AdvanceTotal = 0;
     this.BalancePending = 0;
     this.THCamount = 0;
 
     const SelectedData = this.tableData.filter((x) => x.isSelected);
     SelectedData.forEach((x) => {
-      this.AdvanceTotle = this.AdvanceTotle + parseInt(x.Advance);
+      this.AdvanceTotal = this.AdvanceTotal + parseInt(x.Advance);
       this.BalancePending = this.BalancePending + parseInt(x.BalancePending);
       this.THCamount = this.THCamount + parseInt(x.THCamount);
     });
     this.TotalAmountList.forEach((x) => {
       if (x.title == "Total Advance Amount") {
-        x.count = this.AdvanceTotle.toFixed(2);
+        x.count = this.AdvanceTotal.toFixed(2);
       }
       if (x.title == "Total Balance Pending") {
         x.count = this.BalancePending.toFixed(2);
@@ -584,7 +585,7 @@ export class BalancePaymentComponent implements OnInit {
             sT: this.VendorDetails?.vendorState,
             gSTIN: this.VendorDetails?.otherdetails?.[0].gstNumber,
             tHCAMT: this.THCamount,
-            aDVAMT: this.AdvanceTotle,
+            aDVAMT: this.AdvanceTotal,
             bALAMT: this.BalancePending,
             rOUNOFFAMT: 0,
             bALPBAMT: this.BalancePending,

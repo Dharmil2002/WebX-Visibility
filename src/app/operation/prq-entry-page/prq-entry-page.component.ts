@@ -22,7 +22,6 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { CustomerService } from "src/app/Utility/module/masters/customer/customer.service";
 import { GeneralService } from "src/app/Utility/module/masters/general-master/general-master.service";
 import { AutoComplete } from "src/app/Models/drop-down/dropdown";
-import { debug } from "console";
 
 @Component({
   selector: "app-prq-entry-page",

@@ -10,6 +10,7 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { THCAmountsControl } from "src/assets/FormControls/Finance/VendorPayment/tHCAmountsControls";
+import { GetLocationDetailFromApi } from "../../VendorPaymentAPIUtitlity";
 
 @Component({
   selector: "app-thcamounts-detail",
@@ -33,6 +34,7 @@ export class THCAmountsDetailComponent implements OnInit {
   UpdateAmount: any;
   ChargesData: any;
   THCsummary: any = [];
+  filter: any;
   constructor(
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
@@ -73,13 +75,45 @@ export class THCAmountsDetailComponent implements OnInit {
     this.THCAmountsADDArray = thcAmountsFormControls.getTHCAmountsADDControls();
     this.THCAmountsArray = thcAmountsFormControls.getTHCAmountsControls();
     this.THCAmountsForm = formGroupBuilder(this.fb, [this.THCAmountsArray]);
-    this.THCAmountsForm.controls.Balancelocation.setValue(
-      this.THCsummary?.bLPAYAT
-    );
-    this.THCAmountsForm.controls.AdvanceLocation.setValue(
-      this.THCsummary?.aDPAYAT
-    );
+    // this.THCAmountsForm.controls.Balancelocation.setValue(
+    //   this.THCsummary?.bLPAYAT
+    // );
+    // this.THCAmountsForm.controls.AdvanceLocation.setValue(
+    //   this.THCsummary?.aDPAYAT
+    // );
+    this.SetLocationData()
     this.initializeAddLess();
+  }
+
+  async SetLocationData() {
+    const AllLocationsList = await GetLocationDetailFromApi(this.masterService);
+    this.filter.Filter(
+      this.THCAmountsArray,
+      this.THCAmountsForm,
+      AllLocationsList,
+      "BalanceLocation",
+      false
+    );
+    this.filter.Filter(
+      this.THCAmountsArray,
+      this.THCAmountsForm,
+      AllLocationsList,
+      "AdvanceLocation",
+      false
+    );
+
+    // const BalanceLocation  = AllLocationsList.find(
+    //   (item) => item.name == this.THCsummary.bLPAYAT
+    // );
+    // this.THCAmountsForm.controls.BalanceLocation.setValue(
+    //   BalanceLocation
+    // );
+    // const AdvanceLocation  = AllLocationsList.find(
+    //   (item) => item.name == this.THCsummary.aDPAYAT
+    // );
+    // this.THCAmountsForm.controls.AdvanceLocation.setValue(
+    //   AdvanceLocation
+    // );
   }
   // Initialize the form and state variables for add and less charges
   async initializeAddLess() {

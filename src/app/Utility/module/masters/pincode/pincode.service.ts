@@ -116,12 +116,11 @@ export class PinCodeService {
         const cResponse = await firstValueFrom(this.masterService.masterPost("generic/get", cityBody));
         
          // Extract data from the response
-        const codeData = filterAndUnique(
-          cResponse.data,
-          (element: { CT: string }) => element.CT.toLowerCase().startsWith(cValue.toLowerCase()),
-          (ct: { CT: string }) => ({ name: ct.CT, value: ct.CT })
-        );
-        
+        const codeData = Array.from(new Set(cResponse.data.map(obj => obj.CT)))
+                              .map((ct: string) => {
+                                return { name: ct, value: ct }
+                              });
+      
         // Filter cityCodeData for partial matches
         if (codeData.length === 0) {
           // Show a popup indicating no data found for the given pincode

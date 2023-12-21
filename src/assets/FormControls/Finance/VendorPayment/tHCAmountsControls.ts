@@ -171,13 +171,29 @@ export class THCAmountsControl {
       },
       {
         name: "AdvanceLocation",
-        label: "Advance Location",
-        placeholder: "Handling ",
-        type: "text",
+        label: "Advance location",
+        placeholder: "Advance location",
+        type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: true,
-        Validations: [],
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Advance location is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        functions: {},
       },
       {
         name: "Balance",
@@ -195,20 +211,33 @@ export class THCAmountsControl {
             pattern: "^\\d+(\\.\\d{1,2})?$",
           },
         ],
-        // functions: {
-        //     onChange: "OnChangeBalanceAmount"
-        // },
       },
 
       {
-        name: "Balancelocation",
+        name: "BalanceLocation",
         label: "Balance location",
-        placeholder: "Handling ",
-        type: "text",
+        placeholder: "Balance location",
+        type: "dropdown",
         value: "",
         generatecontrol: true,
-        disable: true,
-        Validations: [],
+        disable: false,
+        Validations: [
+          {
+            name: "required",
+            message: "Balance location is required",
+          },
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        functions: {},
       },
     ];
   }

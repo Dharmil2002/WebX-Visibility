@@ -35,6 +35,8 @@ export class THCAmountsDetailComponent implements OnInit {
   UpdateAmount: any;
   ChargesData: any;
   THCsummary: any = [];
+  THCAmountsDetailsArray: import("d:/Anguler/velocity-docket/src/app/Models/FormControl/formcontrol").FormControls[];
+  THCAmountsDetailsForm: UntypedFormGroup;
   constructor(
     private fb: UntypedFormBuilder,
     private masterService: MasterService,
@@ -72,16 +74,12 @@ export class THCAmountsDetailComponent implements OnInit {
     }
   }
   initializeFormControl() {
-    const thcAmountsFormControls = new THCAmountsControl(this.Type);
+    const thcAmountsFormControls = new THCAmountsControl(this.Type , this.THCData);
     this.THCAmountsADDArray = thcAmountsFormControls.getTHCAmountsADDControls();
     this.THCAmountsArray = thcAmountsFormControls.getTHCAmountsControls();
+    this.THCAmountsDetailsArray = thcAmountsFormControls.getTHCAmountsDetailsControls();
     this.THCAmountsForm = formGroupBuilder(this.fb, [this.THCAmountsArray]);
-    // this.THCAmountsForm.controls.Balancelocation.setValue(
-    //   this.THCsummary?.bLPAYAT
-    // );
-    // this.THCAmountsForm.controls.AdvanceLocation.setValue(
-    //   this.THCsummary?.aDPAYAT
-    // );
+    this.THCAmountsDetailsForm = formGroupBuilder(this.fb, [this.THCAmountsDetailsArray]);
     this.SetLocationData()
     this.initializeAddLess();
   }

@@ -3,7 +3,8 @@ export class THCAmountsControl {
   THCAmountsADDArray: FormControls[];
   THCAmountsLESSArray: FormControls[];
   THCAmountsArray: FormControls[];
-  constructor(Type) {
+  THCAmountsDetailsArray: FormControls[];
+  constructor(Type ,THCData) {
     this.THCAmountsADDArray = [
       {
         name: "ContractAmount",
@@ -240,6 +241,68 @@ export class THCAmountsControl {
         functions: {},
       },
     ];
+    this.THCAmountsDetailsArray = [
+      {
+        name: "Date",
+        label: "Date",
+        placeholder: "Date",
+        type: "text",
+        value: THCData.GenerationDate,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          // buttonIcon: "check",
+          // functionName: "VendorPANNumberview",
+        },
+      },
+      {
+        name: "Contract",
+        label: "Contract View",
+        placeholder: "",
+        type: "button",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        additionalData: {
+          buttonIcon: "book-open",
+        },
+        functions: {
+          onClick: "getBeneficiaryData",
+        },
+      },
+
+      {
+        name: "THCNumber",
+        label: "THC Number",
+        placeholder: "THC Number",
+        type: "textwithbutton",
+        value: THCData.THC,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+        additionalData: {
+          buttonIcon: "visibility",
+          functionName: "THCNumberview",
+        },
+      },
+
+      {
+        name: "VehicleNumber",
+        label: "Vehicle Number",
+        placeholder: "Vehicle Number",
+        type: "textwithbutton",
+        value: THCData.VehicleNumber,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+        additionalData: {
+          buttonIcon: "check",
+          functionName: "VehicleNumbercheck",
+        },
+      },
+    ]
   }
   getTHCAmountsADDControls() {
     return this.THCAmountsADDArray;
@@ -249,5 +312,8 @@ export class THCAmountsControl {
   }
   getTHCAmountsControls() {
     return this.THCAmountsArray;
+  }
+  getTHCAmountsDetailsControls() {
+    return this.THCAmountsDetailsArray;
   }
 }

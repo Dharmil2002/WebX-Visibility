@@ -236,23 +236,16 @@ export class PrqService {
     const reqBody = {
       companyCode: localStorage.getItem("companyCode"), // Get company code from local storage
       collectionName: "prq_summary",
-      filter: { bRCD: barnch,  pAYTYP: payType, bPARTY: billingParty,sTS: 2},
+      filter: { bRCD: barnch,  pAYTYP: payType, bPARTY: billingParty,sTS: { D$in: [2, 3] }},
     };
 
     // Make an asynchronous request to the API using masterMongoPost method
     const res = await firstValueFrom(this.masterService.masterMongoPost("generic/get", reqBody));
 
-    // Filter out PRQ data with status "4" or "5"
-    const prqData = res.data;
-
-    let prqList = [];
-
-    // Map and transform the PRQ data
-    prqData.map((element, index) => {
-      let pqrData = this.preparePrqDetailObject(element, index);
-      prqList.push(pqrData)
-      // You need to return the modified element
+    let prqList = res.data.map((element, index) => {
+      return this.preparePrqDetailObject(element, index);
     });
+
     // Sort the PRQ list by pickupDate in descending order
     const sortedData = prqList.sort((a, b) => {
       const dateA: Date | any = new Date(a.createDateOrg);
@@ -265,7 +258,7 @@ export class PrqService {
     // Create an object with sorted PRQ data and all PRQ details
     const prqDetail = {
       tableData: sortedData,
-      allPrqDetail: res.data,
+      allPrqDetail: prqList,
     };
 
     return prqDetail;

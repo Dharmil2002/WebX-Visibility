@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import moment from "moment";
+import { firstValueFrom } from "rxjs";
 import { formatDocketDate } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import Swal from "sweetalert2";
@@ -63,35 +64,36 @@ export class VehicleMasterListComponent implements OnInit {
             "collectionName": "vehicle_detail",
             "filter": {}
         }
-        this.masterService.masterPost('generic/get', req).subscribe((res: any) => {
-            if (res && res.data) {
-                const data = res.data
-                const sortedData = data.sort((a, b) => {
-                    const dateA = new Date(a.eNTDT).getTime(); // Convert to a number
-                    const dateB = new Date(b.eNTDT).getTime(); // Convert to a number
-                    if (!isNaN(dateA) && !isNaN(dateB)) {
-                        return dateB - dateA;
-                    }
-                    return 0; // Handle invalid dates or NaN values
-                })
-                const dataWithDate = data.map(item => ({
-                    ...item,
-                    eNTDT: formatDocketDate(item.eNTDT)
-                  }));                  
+        const res = await firstValueFrom(this.masterService.masterPost('generic/get', req))
+        if (res && res.data) {
+            const data = res.data
+            const sortedData = data.sort((a, b) => {
+                const dateA = new Date(a.eNTDT).getTime(); // Convert to a number
+                const dateB = new Date(b.eNTDT).getTime(); // Convert to a number
+                if (!isNaN(dateA) && !isNaN(dateB)) {
+                    return dateB - dateA;
+                }
+                return 0; // Handle invalid dates or NaN values
+            })
+            const dataWithDate = data.map(item => ({
+                ...item,
+                vendorName: item.vendorName ? item.vendorName : '',
+                eNTDT: formatDocketDate(item.eNTDT)
+            }));
 
-                this.csv = dataWithDate;
-                this.tableData = dataWithDate;
-            }
+            this.csv = dataWithDate;
+            this.tableData = dataWithDate;
+        }
 
-            this.tableLoad = false;
-        });
+        this.tableLoad = false;
+
     }
     //#endregion
     async isActiveFuntion(det) {
         let id = det._id;
         // Remove the "id" field from the form controls
         delete det._id;
-        delete det.srNo;
+        delete det.eNTDT;
         det['mODDT'] = new Date()
         det['mODBY'] = localStorage.getItem("UserName")
         det['mODLOC'] = localStorage.getItem("Branch")
@@ -101,7 +103,7 @@ export class VehicleMasterListComponent implements OnInit {
             filter: { _id: id },
             update: det
         };
-        const res = await this.masterService.masterPut("generic/update", req).toPromise()
+        const res = await firstValueFrom(this.masterService.masterPut("generic/update", req))
         if (res) {
             // Display success message
             Swal.fire({

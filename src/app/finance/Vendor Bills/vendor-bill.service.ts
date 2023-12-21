@@ -16,7 +16,8 @@ export class VendorBillService {
       const responseArray = await firstValueFrom(this.masterService.masterPost('finance/getVendorBillList', filter));
 
       // Map each response object to the desired format
-      const tableDataArray = responseArray.map(res => ({
+      const tableDataArray = responseArray.map((res, index) => ({
+        srno: index + 1, // Add 1 to start the serial number from 1
         vendor: (res && res.vND && res.vND.cD ? `${res.vND.cD} : ${res.vND.nM}` : ''),
         _id: res._id,
         vnCode: res.vND.cD,

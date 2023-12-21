@@ -145,7 +145,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     private dialog: MatDialog
   ) {
     this.billData = this.route.getCurrentNavigation()?.extras?.state?.data;
-    console.log("this.billData", this.billData);
+    // console.log("this.billData", this.billData);
   }
 
   ngOnInit(): void {
@@ -185,7 +185,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
 
   selectCheckBox(event) {
     // console.log(event);
-    console.log("this.tableData", this.tableData);
+    // console.log("this.tableData", this.tableData);
     const SelectedData = this.tableData.filter((x) => x.isSelected == true);
     let TotalBillAmount = 0;
     let TotalDebitNote = 0;
@@ -253,7 +253,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     const res = await firstValueFrom(
       this.masterService.masterPost("generic/get", req)
     );
-    console.log(res);
+    // console.log(res);
     if (res.success && res.data.length != 0) {
       this.BillPaymentData = res.data[0];
       const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode");
@@ -371,8 +371,8 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     }
   }
   save() {
-    console.log("this.PaymentSummaryFilterForm", this.PaymentSummaryFilterForm.value);
-    console.log("this.tableData", this.tableData);
+    // console.log("this.PaymentSummaryFilterForm", this.PaymentSummaryFilterForm.value);
+    // console.log("this.tableData", this.tableData);
   }
   async getBeneficiaryData() {
     try {

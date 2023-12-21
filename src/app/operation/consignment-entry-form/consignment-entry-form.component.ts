@@ -261,26 +261,26 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   //#endregion
   async prqDetail() {
     
-    let billingParty = { name: this.model.prqData?.bPARTYNM, value: this.model.prqData?.bPARTY };
+    let billingParty = { name: this.model.prqData?.billingParty, value:  this.model.prqData?.billingPartyCode };
     //await this.customerService.getCustomerByCodeOrName(undefined, this.model.prqData?.billingParty);
 
     let vehicleDetail = await this.vehicleStatusService.vehiclList(
       this.model.prqData.prqNo
     );
-
+    
     let vehType = this.vendorTypes.find(f => f.name == vehicleDetail?.vendorType);
 
-    this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fCITY", "fCITY");
-    this.setFormValue(this.model.consignmentTableForm, "toCity", this.model.prqData, true, "tCITY", "tCITY");
+    this.setFormValue(this.model.consignmentTableForm, "fromCity", this.model.prqData, true, "fromCity", "fromCity");
+    this.setFormValue(this.model.consignmentTableForm, "toCity", this.model.prqData, true, "toCity", "toCity");
     await this.getLocBasedOnCity();
     this.setFormValue(this.model.consignmentTableForm, "billingParty", billingParty);
-    this.setFormValue(this.model.consignmentTableForm, "payType", this.model.prqData?.pAYTYP);
-    this.setFormValue(this.model.consignmentTableForm, "docketDate", this.model.prqData?.pICKDT);
+    this.setFormValue(this.model.consignmentTableForm, "payType", this.model.prqData?.payTypeCode);
+    this.setFormValue(this.model.consignmentTableForm, "docketDate", this.model.prqData?.pickupDate);
     this.setFormValue(this.model.consignmentTableForm, "transMode", "P1");
-    this.setFormValue(this.model.consignmentTableForm, "pAddress", this.model.prqData?.pADD);
+    this.setFormValue(this.model.consignmentTableForm, "pAddress", this.model.prqData?.pAddress);
     this.setFormValue(this.model.consignmentTableForm, "cnebp", false);
     this.setFormValue(this.model.consignmentTableForm, "cnbp", true);
-
+    
     this.setFormValue(this.model.consignmentTableForm, "vendorType", vehType.value, false, "", "");
 
     // Done By Harikesh 
@@ -298,16 +298,18 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     });
 
     await this.vendorFieldChanged()
-
-    if (vehType.value == "4") {
-      this.setFormValue(this.model.consignmentTableForm, "vendorName",this.model.prqData?.vNDNM);
-      this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vEHNO, false);
-    }
-    else {
-    //  let vendors = await getVendorsForAutoComplete(this.masterService, vehicleDetail.vendor, parseInt(vehType.value));
-      //const vendor = vendors[0];
-      this.setFormValue(this.model.consignmentTableForm, "vendorName", {name:this.model.prqData?.vNDCD,value:this.model.prqData?.vNDNM});
-      this.model.consignmentTableForm.controls['vehicleNo'].setValue({ name: this.model.prqData?.vEHNO || "", value: this.model.prqData?.vEHNO || "" });
+    
+    if (vehType.value == "4")
+    {
+      this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail.vendor);
+      this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, false);
+    } 
+    else 
+    {
+      let vendors = await getVendorsForAutoComplete(this.masterService, vehicleDetail.vendor, parseInt(vehType.value));
+      const vendor = vendors[0];
+      this.setFormValue(this.model.consignmentTableForm, "vendorName", vendor);
+      this.model.consignmentTableForm.controls['vehicleNo'].setValue( { name:this.model.prqData?.vEHNO||"",value:this.model.prqData?.vEHNO||"" } );     
 
       //this.setFormValue(this.model.consignmentTableForm, "vendorName", vehicleDetail, true, "vendor", "vendor");
       //this.setFormValue(this.model.consignmentTableForm, "vehicleNo", this.model.prqData?.vehicleNo, true,"vehicleNo","vehicleNo");
@@ -315,8 +317,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.getLocBasedOnCity();
 
     if (this.model.prqData.carrierTypeCode == "3") {
-      this.model.containerTableForm.controls["containerType"].setValue({ name: this.model.prqData?.typeContainer || "", value: this.model.prqData?.typeContainerCode || "" });
-      this.model.containerTableForm.controls["containerCapacity"].setValue(this.model.prqData?.size || 0);
+      this.model.containerTableForm.controls["containerType"].setValue( { name:this.model.prqData?.typeContainer||"", value:this.model.prqData?.typeContainerCode||"" } );
+      this.model.containerTableForm.controls["containerCapacity"].setValue( this.model.prqData?.size || 0);
     }
   }
 
@@ -383,8 +385,8 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
     this.model.prqNoDetail = prqNo.allPrqDetail;
 
     const prqDetail = prqNo.allPrqDetail.map((x) => ({
-      name: x.pRQNO,
-      value: x.pRQNO,
+      name: x.prqNo,
+      value: x.prqNo,
     }));
 
     this.filter.Filter(this.jsonControlArrayBasic, this.model.consignmentTableForm, prqDetail, this.model.prqNo, this.model.prqNoStatus);
@@ -513,7 +515,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
   prqSelection() {
     
     this.model.prqData = this.model.prqNoDetail.find(
-      (x) => x.pRQNO == this.model.consignmentTableForm.controls["prqNo"].value.value
+      (x) => x.prqNo == this.model.consignmentTableForm.controls["prqNo"].value.value
     );
     this.prqDetail();
   }
@@ -970,7 +972,7 @@ export class ConsignmentEntryFormComponent extends UnsubscribeOnDestroyAdapter i
       invoiceDetails:
         this.model.invoiceData.length > 0 ? invoiceList : invoiceFromData,
     };
-    const container = containerFromData.value?.containerNo || false;
+    const container = containerFromData.value?.containerNumber || "";
     let containerDetail = {
       containerDetail: this.model.tableData.length > 0
         ? containerlist

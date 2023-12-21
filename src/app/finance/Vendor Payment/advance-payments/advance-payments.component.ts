@@ -194,6 +194,7 @@ export class AdvancePaymentsComponent implements OnInit {
       };
     });
     this.isTableLode = true;
+    this.selectCheckBox()
   }
   async SetMastersData() {
     this.AllLocationsList = await GetLocationDetailFromApi(this.masterService);
@@ -285,8 +286,8 @@ export class AdvancePaymentsComponent implements OnInit {
       console.log("failed", error);
     }
   }
-  selectCheckBox(event) {
-    const selectedData = event.filter((x) => x.isSelected);
+  selectCheckBox() {
+    const selectedData = this.tableData.filter((x) => x.isSelected);
 
     const totalTHCAmount = selectedData.reduce(
       (total, item) => total + parseInt(item.THCamount),

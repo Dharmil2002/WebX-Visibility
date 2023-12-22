@@ -19,6 +19,8 @@ import { VendorBillService } from "../../Vendor Bills/vendor-bill.service";
 import { BeneficiaryDetailComponent } from "../beneficiary-detail/beneficiary-detail.component";
 import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
+import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
+import { Vendbillpayment } from "src/app/Models/Finance/VendorPayment";
 
 @Component({
   selector: "app-vendor-bill-payment-details",
@@ -142,7 +144,9 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     private masterService: MasterService,
     private route: Router,
     private objVendorBillService: VendorBillService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public snackBarUtilityService: SnackBarUtilityService,
+
   ) {
     this.billData = this.route.getCurrentNavigation()?.extras?.state?.data;
     // console.log("this.billData", this.billData);
@@ -154,6 +158,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       this.vendor = this.billData.vendor;
       this.initializeVendorBillPayment();
       this.getBillDetail();
+      this.getBillPayment();
     } else {
       this.route.navigate(["/Finance/VendorPayment/VendorBillPayment"]);
     }
@@ -170,7 +175,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       this.masterService.masterPost("generic/get", req)
     );
     if (res.success) {
-      this.tableData = res.data.map((x) => {
+      let data = res.data.map((x) => {
         return {
           ...x,
           debitNote: 0,
@@ -179,8 +184,17 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
           eNTDT: moment(x.eNTDT).format("DD/MM/YYYY"),
         };
       });
+      this.tableData = data
       this.isTableLode = true;
+
+      data.forEach(element => {
+        if (element.Status === 'Cancel Bill') {
+          // Remove all values from the actions array
+          element.actions = [];
+        }
+      });
     }
+
   }
 
   selectCheckBox(event) {
@@ -241,7 +255,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     ]);
     this.jsonPaymentSummaryArray = this.jsonPaymentSummaryArray.slice(0, 1);
     this.isFormLode = true;
-    this.getBillPayment();
+
     this.vendorbillPaymentForm.controls["VendorPANNumber"].setValue(this.billData?.vPan)
   }
   async getBillPayment() {
@@ -300,21 +314,16 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
           "Bank",
           false
         );
-        const SelectOpt = responseFromAPIBank.find(
-          (x) => x.name == this.BillPaymentData.bANK
-        );
         const Bank = this.PaymentSummaryFilterForm.get("Bank");
         Bank.setValidators([
           Validators.required,
           autocompleteObjectValidator(),
         ]);
-        Bank.setValue(SelectOpt);
         Bank.updateValueAndValidity();
 
         const ChequeOrRefNo =
           this.PaymentSummaryFilterForm.get("ChequeOrRefNo");
         ChequeOrRefNo.setValidators([Validators.required]);
-        ChequeOrRefNo.setValue(this.BillPaymentData.tRNO);
         ChequeOrRefNo.updateValueAndValidity();
 
         const CashAccount = this.PaymentSummaryFilterForm.get("CashAccount");
@@ -371,27 +380,78 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
     }
   }
   save() {
-    // console.log("this.PaymentSummaryFilterForm", this.PaymentSummaryFilterForm.value);
-    // console.log("this.tableData", this.tableData);
+    const selectedItems = this.tableData.filter(x => x.isSelected);
+
+    if (selectedItems.length === 0) {
+      this.snackBarUtilityService.ShowCommonSwal("info", "Please Select At Least One Bill");
+      return;
+    }
+
+    selectedItems.forEach(item => {
+      const vendbillpayment: Vendbillpayment = {
+        _id: this.billData.billNo + "-" + item.tRIPNO,
+        cID: this.companyCode,
+        bILLNO: this.billData.billNo,
+        vUCHNO: this.BillPaymentData ? this.BillPaymentData.vUCHNO : '',
+        lOC: localStorage.getItem("CurrentBranchCode"),
+        dTM: this.PaymentSummaryFilterForm.value.Date.toUTCString(),
+        bILLAMT: item.bALAMT,
+        pAYAMT: item.payment,
+        aMT: item.tHCAMT,
+        mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
+        bANK: this.PaymentSummaryFilterForm.value?.Bank?.name || "",
+        tRNO: this.PaymentSummaryFilterForm.value?.ChequeOrRefNo || "",
+        bY: localStorage.getItem("UserName"),
+        eNTDT: new Date(),
+        eNTLOC: localStorage.getItem("CurrentBranchCode"),
+        eNTBY: localStorage.getItem("UserName"),
+      };
+
+      console.log(vendbillpayment);
+
+      const requestData = {
+        companyCode: this.companyCode,
+        collectionName: "vend_bill_payment",
+        data: vendbillpayment,
+      };
+      console.log(requestData);
+
+    //   firstValueFrom(this.masterService.masterPost("generic/create", requestData))
+    //     .then((res: any) => {
+    //       // Handle success if needed 
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: "Vendor Bill Payment Generated Successfully",
+    //         text: "Bill No: " + this.billData.billNo,
+    //         showConfirmButton: true,
+    //       });
+    //     })
+    //     .catch(error => {
+    //       this.snackBarUtilityService.ShowCommonSwal("error", error);
+    //     });
+    });
+
+
   }
+
   async getBeneficiaryData() {
     try {
       // Get vendor code from bill data
       const vnCode = this.billData.vnCode;
-  
+
       // Fetch beneficiary details from API
       const beneficiaryModalData = await this.objVendorBillService.getBeneficiaryDetailsFromApi(vnCode);
-  
+
       // Check if beneficiary data is available
       if (beneficiaryModalData.length > 0) {
         // Prepare request object for the dialog
         const request = {
           Details: beneficiaryModalData,
         };
-  
+
         // Set tableLoad flag to false to indicate loading
         this.tableLoad = false;
-  
+
         // Open the BeneficiaryDetailComponent dialog
         const dialogRef = this.dialog.open(BeneficiaryDetailComponent, {
           data: request,
@@ -401,7 +461,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
             top: "20px",
           },
         });
-  
+
         // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
         dialogRef.afterClosed().subscribe(() => {
           this.tableLoad = true;
@@ -420,5 +480,5 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       console.error('An error occurred:', error);
     }
   }
-  
+
 }

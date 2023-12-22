@@ -29,8 +29,8 @@ export class VendorBillListComponent implements OnInit {
       Title: "Bill No",
       class: "matcolumncenter",
       Style: "min-width:17%",
-      type: "Link",
-      functionName: "BalanceFunction"
+      // type: "Link",
+      // functionName: "BalanceFunction"
     },
     Date: {
       Title: "Date",
@@ -73,7 +73,7 @@ export class VendorBillListComponent implements OnInit {
   addFlag = true;
   menuItemflag = true;
 
-  staticField = ['Status', 'pendingAmount', 'billAmount', 'Date', 'billType', 'vendor', 'srno']
+  staticField = ['billNo', 'Status', 'pendingAmount', 'billAmount', 'Date', 'billType', 'vendor', 'srno']
   companyCode: any = parseInt(localStorage.getItem("companyCode"));
 
   EventButton = {
@@ -83,7 +83,7 @@ export class VendorBillListComponent implements OnInit {
   };
   menuItems = [
     { label: 'Approve Bill' },
-    { label: 'Bill Payment' },
+    // { label: 'Bill Payment' },
     { label: 'Hold Payment' },
     { label: 'Unhold Payment' },
     { label: 'Cancel Bill' },
@@ -108,7 +108,7 @@ export class VendorBillListComponent implements OnInit {
   }
 
   functionCallHandler(event) {
-    console.log(event);
+    // console.log(event);
     try {
       this[event.functionName](event.data);
     } catch (error) {
@@ -127,11 +127,11 @@ export class VendorBillListComponent implements OnInit {
       case 'Modify':
         this.route.navigateByUrl("/Finance/VendorPayment/BalancePayment");
         break;
-      case 'Bill Payment':
-        this.route.navigate(["/Finance/VendorPayment/VendorBillPaymentDetails"], {
-          state: { data: data.data },
-        });
-        break;
+      // case 'Bill Payment':
+      //   this.route.navigate(["/Finance/VendorPayment/VendorBillPaymentDetails"], {
+      //     state: { data: data.data },
+      //   });
+      //   break;
       case 'Hold Payment':
         updateData = this.createUpdateData("On Hold");
         break;
@@ -139,7 +139,7 @@ export class VendorBillListComponent implements OnInit {
         updateData = this.createUpdateData("Generated");
         break;
       case 'Cancel Bill':
-        updateData = this.createUpdateData("Cancel Bill");
+        updateData = this.createUpdateData("Cancelled");
         break;
     }
 
@@ -180,7 +180,7 @@ export class VendorBillListComponent implements OnInit {
       case "Generated":
         bSTAT = 1;
         break;
-      case "Cancel Bill":
+      case "Cancelled":
         bSTAT = 6;
         break;
       default:
@@ -235,7 +235,7 @@ export class VendorBillListComponent implements OnInit {
       // Call the vendor bill service to get the data
       let data = await this.objVendorBillService.getVendorBillList(this.filterRequest);
 
-      data.forEach(element => {
+      data.forEach((element, i) => {
         if (element.Status === 'Approved') {
           // Remove 'Approve Bill' from the actions array
           const index = element.actions.indexOf('Approve Bill');
@@ -249,14 +249,22 @@ export class VendorBillListComponent implements OnInit {
           if (index !== -1) {
             element.actions.splice(index, 1);
           }
+          // Add 'Unhold Payment' to the actions array
+          element.actions.push('Unhold Payment');
+         // console.log(element.actions);
+          
         }
         if (element.Status === 'Cancel Bill') {
           // Remove all values from the actions array
           element.actions = [];
         }
       });
+      data = data.filter(x => x.Status != 'Approved');
       // Set the retrieved data to the tableData property
-      this.tableData = data;
+      this.tableData = data.map((x, index) => ({
+        ...x,
+        srno: index + 1
+      }))
 
       // Set tableLoad to false to indicate that the table has finished loading
       this.tableLoad = false;

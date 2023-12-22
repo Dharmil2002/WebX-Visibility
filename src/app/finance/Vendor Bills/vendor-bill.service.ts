@@ -17,7 +17,7 @@ export class VendorBillService {
 
       // Map each response object to the desired format
       const tableDataArray = responseArray.map((res, index) => ({
-        srno: index + 1, // Add 1 to start the serial number from 1
+       // srno: index + 1, // Add 1 to start the serial number from 1
         vendor: (res && res.vND && res.vND.cD ? `${res.vND.cD} : ${res.vND.nM}` : ''),
         _id: res._id,
         vnCode: res.vND.cD,
@@ -32,7 +32,7 @@ export class VendorBillService {
           'Approve Bill',
           'Bill Payment',
           'Hold Payment',
-          'Unhold Payment',
+          // 'Unhold Payment',
           'Cancel Bill',
           'Modify'
         ]

@@ -49,16 +49,16 @@ export class VendorBillEntry {
       sGST?: number;
       aMT?: number;
     };
-    cNL?: boolean;
-    cNLDT?: Date;
-    cNBY?: string;
-    cNRES?: string;
+    // cNL?: boolean;
+    // cNLDT?: Date;
+    // cNBY?: string;
+    // cNRES?: string;
     eNTDT?: Date;
     eNTLOC?: string;
     eNTBY?: string;
-    mODDT?: Date;
-    mODLOC?: string;
-    mODBY?: string;
+    // mODDT?: Date;
+    // mODLOC?: string;
+    // mODBY?: string;
   };
 }
 export class Vendbilldetails {
@@ -152,16 +152,16 @@ const vendorBillEntry: VendorBillEntry = {
       sGST: 25.25,
       aMT: 50.50,
     },
-    cNL: false,
-    cNLDT: new Date("2023-01-25T04:05:29.012Z"),
-    cNBY: "CreatedByXYZ",
-    cNRES: "ReasonXYZ",
+    // cNL: false,
+    //  cNLDT: new Date("2023-01-25T04:05:29.012Z"),
+    // cNBY: "CreatedByXYZ",
+    // cNRES: "ReasonXYZ",
     eNTDT: new Date("2023-10-20T04:05:29.012Z"),
     eNTLOC: "DELB",
     eNTBY: "Dhaval",
-    mODDT: new Date("2023-10-20T04:05:29.012Z"),
-    mODLOC: "MUMB",
-    mODBY: "Dhaval",
+    // mODDT: new Date("2023-10-20T04:05:29.012Z"),
+    // mODLOC: "MUMB",
+    // mODBY: "Dhaval",
   },
 };
 

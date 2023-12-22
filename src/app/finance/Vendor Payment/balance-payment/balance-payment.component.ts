@@ -342,7 +342,7 @@ export class BalancePaymentComponent implements OnInit {
       }))
       .filter((x) => x != null)
       .sort((a, b) => a.name.localeCompare(b.name));
-    
+
     this.filter.Filter(
       this.jsonControlVendorBalanceTaxationGSTFilterArray,
       this.VendorBalanceTaxationGSTFilterForm,
@@ -379,7 +379,7 @@ export class BalancePaymentComponent implements OnInit {
         this.VendorBalanceTaxationGSTFilterForm.controls.GSTNumber.setValue(
           this.VendorDetails?.otherdetails[0]?.gstNumber
         );
-          console.log('this.StateList' ,this.StateList)
+        console.log("this.StateList", this.StateList);
         const getValue = this.StateList.find(
           (item) => item.name == this.VendorDetails?.otherdetails[0]?.gstState
         );
@@ -409,7 +409,7 @@ export class BalancePaymentComponent implements OnInit {
     );
   }
 
-  GSTSACcodeFieldChanged() {}
+  GSTSACcodeFieldChanged() { }
 
   toggleTDSExempted() {
     const TDSExemptedValue =
@@ -474,9 +474,8 @@ export class BalancePaymentComponent implements OnInit {
       DocNo: event.data.THC,
       templateName: "thc",
     };
-    const url = `${
-      window.location.origin
-    }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    const url = `${window.location.origin
+      }/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
     window.open(url, "", "width=1500,height=800");
   }
   THCAmountFunction(event) {
@@ -650,16 +649,16 @@ export class BalancePaymentComponent implements OnInit {
             bALPBAMT: this.BalancePending,
             bSTAT: 1,
             bSTATNM: "Generated",
-            cNL: false,
-            cNLDT: undefined,
-            cNBY: "",
-            cNRES: "",
+            // cNL: false,
+            // cNLDT: undefined,
+            // cNBY: "",
+            // cNRES: "",
             eNTDT: new Date(),
             eNTLOC: this.storage.branch,
             eNTBY: this.storage.userName,
-            mODDT: undefined,
-            mODLOC: "",
-            mODBY: "",
+            // mODDT: undefined,
+            // mODLOC: "",
+            // mODBY: "",
             vND: {
               cD: this.VendorDetails?.vendorCode,
               nM: this.VendorDetails?.vendorName,
@@ -751,7 +750,7 @@ export class BalancePaymentComponent implements OnInit {
           .catch((error) => {
             this.snackBarUtilityService.ShowCommonSwal("error", error);
           })
-          .finally(() => {});
+          .finally(() => { });
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", error);
       }
@@ -849,7 +848,7 @@ export class BalancePaymentComponent implements OnInit {
         this.debitVoucherDataRequestModel.companyCode = this.companyCode;
         this.debitVoucherDataRequestModel.voucherNo = "";
         this.debitVoucherDataRequestModel.transType = "DebitVoucher";
-        this.debitVoucherDataRequestModel.transDate = new Date().toUTCString();
+        this.debitVoucherDataRequestModel.transDate = new Date();
         this.debitVoucherDataRequestModel.docType = "VR";
         this.debitVoucherDataRequestModel.branch =
           localStorage.getItem("CurrentBranchCode");
@@ -866,7 +865,7 @@ export class BalancePaymentComponent implements OnInit {
           this.VendorDetails?.vendorState;
         this.debitVoucherDataRequestModel.entryBy =
           localStorage.getItem("UserName");
-        this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString();
+        this.debitVoucherDataRequestModel.entryDate = new Date();
         this.debitVoucherDataRequestModel.panNo =
           this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
         console.log(this.VendorBalanceTaxationTDSFilterForm.value);
@@ -993,7 +992,7 @@ export class BalancePaymentComponent implements OnInit {
           .catch((error) => {
             this.snackBarUtilityService.ShowCommonSwal("error", error);
           })
-          .finally(() => {});
+          .finally(() => { });
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",
@@ -1034,11 +1033,11 @@ export class BalancePaymentComponent implements OnInit {
         firstValueFrom(
           this.masterService.masterPost("generic/create", RequestData)
         )
-          .then((res: any) => {})
+          .then((res: any) => { })
           .catch((error) => {
             this.snackBarUtilityService.ShowCommonSwal("error", error);
           })
-          .finally(() => {});
+          .finally(() => { });
       });
     Swal.fire({
       icon: "success",
@@ -1084,7 +1083,7 @@ export class BalancePaymentComponent implements OnInit {
         });
 
         // Subscribe to dialog's afterClosed event to set tableLoad flag back to true
-        dialogRef.afterClosed().subscribe(() => {});
+        dialogRef.afterClosed().subscribe(() => { });
       } else {
         // Display a warning if no beneficiary data is available
         Swal.fire({

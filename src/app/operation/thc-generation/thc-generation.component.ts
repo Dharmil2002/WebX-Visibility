@@ -1058,16 +1058,16 @@ export class ThcGenerationComponent implements OnInit {
   GenerateTHCgenerationRequestBody() {
     const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
     const transitHours = Math.max(...this.tableData.filter(item => item.isSelected == true).map(o => o.transitHours));
-
+    debugger
     const deptDate = this.thcTableForm.controls['tripDate'].value || new Date();
-    const schArrDate =  moment(deptDate).add(transitHours, 'hours').toDate();
+    const schArrDate = moment(deptDate).add(transitHours, 'hours').toDate();
     // this.thcTableForm.get('vendorCode').setValue(isMarket ? "8888" : this.thcTableForm.get('vendorName').value?.value || "");
-    
+
     //#region MainModel
     this.tHCGenerationModel.companyCode = this.storage.companyCode;
     this.tHCGenerationModel.branch = this.storage.branch;
     this.tHCGenerationModel.docType = "TH";
-    this.tHCGenerationModel.finYear = financialYear;    
+    this.tHCGenerationModel.finYear = financialYear;
     //#endregion
 
     //#region THC Summary
@@ -1102,7 +1102,7 @@ export class ThcGenerationComponent implements OnInit {
     this.thcsummaryData.Driver_mobile = this.thcTableForm.controls['driverMno'].value || "";
     this.thcsummaryData.Driver_lc = this.thcTableForm.controls['driverLno'].value || "";
     this.thcsummaryData.Driver_exd = this.thcTableForm.controls['driverLexd'].value || undefined;
-    this.thcsummaryData.Capacity_ActualWeight =  this.thcTableForm.controls['capacity'].value || 0;
+    this.thcsummaryData.Capacity_ActualWeight = this.thcTableForm.controls['capacity'].value || 0;
     this.thcsummaryData.Capacity_volume = 0;
     this.thcsummaryData.Capacity_volumetricWeight = 0;
     this.thcsummaryData.Utilization_ActualWeight = this.thcTableForm.controls['weightUtilization'].value;
@@ -1131,10 +1131,10 @@ export class ThcGenerationComponent implements OnInit {
     //this.thcsummaryData.mODDT = undefined;
     //this.thcsummaryData.mODLOC = undefined;
     //this.thcsummaryData.mODBY = undefined;
-    
+
     //New Added By Harikesh
-    this.thcsummaryData.tMODE = this.thcTableForm.controls['transMode']?.value?.value || "";
-    this.thcsummaryData.tMODENM = this.thcTableForm.controls['transMode']?.value?.name || "";
+    this.thcsummaryData.tMODE = this.thcTableForm.controls['transMode']?.value || "";
+    this.thcsummaryData.tMODENM = this.products.find(item => item.value == this.thcTableForm.controls['transMode']?.value)?.name || "";
     this.thcsummaryData.pRQNO = this.thcTableForm.controls['prqNo'].value || "";
     //#endregion
 
@@ -1218,7 +1218,7 @@ export class ThcGenerationComponent implements OnInit {
     this.mfheaderDetails.wT = this.tableData.filter(item => item.isSelected == true).reduce((acc, item) => acc + item.aCTWT, 0);
     this.mfheaderDetails.vOL = 0;
     this.mfheaderDetails.tHC = "";
-    this.mfheaderDetails.iSARR = true;
+    this.mfheaderDetails.iSARR = false;
     //this.mfheaderDetails.aRRDT = undefined;
     this.mfheaderDetails.eNTDT = new Date()
     this.mfheaderDetails.eNTLOC = this.storage.branch;
@@ -1241,7 +1241,7 @@ export class ThcGenerationComponent implements OnInit {
       mfdetailsList.pKGS = res.pKGS;
       mfdetailsList.wT = res.aCTWT;
       mfdetailsList.vOL = 0;
-      mfdetailsList.lDPKG = res.pKGS;      
+      mfdetailsList.lDPKG = res.pKGS;
       mfdetailsList.lDWT = res.aCTWT;
       mfdetailsList.lDVOL = 0;
       mfdetailsList.aRRPKG = 0;

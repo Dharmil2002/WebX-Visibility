@@ -440,7 +440,7 @@ export class AdvancePaymentsComponent implements OnInit {
           this.debitVoucherDataRequestModel.companyCode = this.companyCode;
           this.debitVoucherDataRequestModel.voucherNo = "";
           this.debitVoucherDataRequestModel.transType = "AdvancePayment";
-          this.debitVoucherDataRequestModel.transDate = new Date().toUTCString();
+          this.debitVoucherDataRequestModel.transDate = new Date();
           this.debitVoucherDataRequestModel.docType = "VR";
           this.debitVoucherDataRequestModel.branch =
             this.storage.branch;
@@ -449,22 +449,22 @@ export class AdvancePaymentsComponent implements OnInit {
           this.debitVoucherDataRequestModel.accLocation =
             this.storage.branch;
           this.debitVoucherDataRequestModel.preperedFor = "Vendor";
-          this.debitVoucherDataRequestModel.partyCode = this.PaymentData?.VendorInfo?.cD;
+          this.debitVoucherDataRequestModel.partyCode = `${this.PaymentData?.VendorInfo?.cD || ""}`;
           this.debitVoucherDataRequestModel.partyName = this.PaymentData?.VendorInfo?.nM;
           this.debitVoucherDataRequestModel.partyState =
             this.VendorDetails?.vendorState;
           this.debitVoucherDataRequestModel.entryBy = this.storage.userName;
-          this.debitVoucherDataRequestModel.entryDate = new Date().toUTCString();
+          this.debitVoucherDataRequestModel.entryDate = new Date();
           this.debitVoucherDataRequestModel.panNo =
             this.PaymentHeaderFilterForm.get("VendorPANNumber").value;
 
-          this.debitVoucherDataRequestModel.tdsSectionCode = "tdsSectionCode";
-          this.debitVoucherDataRequestModel.tdsSectionName = "tdsSectionName";
+          this.debitVoucherDataRequestModel.tdsSectionCode = undefined
+          this.debitVoucherDataRequestModel.tdsSectionName = undefined
           this.debitVoucherDataRequestModel.tdsRate = 0;
           this.debitVoucherDataRequestModel.tdsAmount = 0;
           this.debitVoucherDataRequestModel.tdsAtlineitem = false;
-          this.debitVoucherDataRequestModel.tcsSectionCode = "tcsSectionCode";
-          this.debitVoucherDataRequestModel.tcsSectionName = "tcsSectionName";
+          this.debitVoucherDataRequestModel.tcsSectionCode = undefined
+          this.debitVoucherDataRequestModel.tcsSectionName = undefined
           this.debitVoucherDataRequestModel.tcsRate = 0;
           this.debitVoucherDataRequestModel.tcsAmount = 0;
 
@@ -476,7 +476,7 @@ export class AdvancePaymentsComponent implements OnInit {
 
           this.debitVoucherDataRequestModel.paymentAmt = PaymentAmount;
           this.debitVoucherDataRequestModel.netPayable = NetPayable;
-          this.debitVoucherDataRequestModel.roundOff = NetPayable - PaymentAmount;
+          this.debitVoucherDataRequestModel.roundOff = 0;
           this.debitVoucherDataRequestModel.voucherCanceled = false;
 
           this.debitVoucherDataRequestModel.paymentMode =

@@ -50,13 +50,13 @@ export class thcsummaryData {
   departed_sCHDT: Date
   departed_eXPDT: Date
   departed_aCTDT: Date
-  departed_gPSDT?: Date
+  //departed_gPSDT?: Date
   departed_oDOMT?: number
   arrived_sCHDT?: Date
   arrived_eXPDT?: Date
-  arrived_aCTDT?: Date
-  arrived_gPSDT?: Date
-  arrived_oDOMT?: number
+  // arrived_aCTDT?: Date
+  // arrived_gPSDT?: Date
+  // arrived_oDOMT?: number
   sCHDIST?: number
   aCTDIST?: number
   gPSDIST?: number
@@ -64,15 +64,15 @@ export class thcsummaryData {
   tMODENM: string
   pRQNO: string
   cNL: boolean
-  cNDT?: Date
-  cNBY?: string
-  cNRES?: string
+  // cNDT?: Date
+  // cNBY?: string
+  // cNRES?: string
   eNTDT: Date
   eNTLOC: string
   eNTBY: string
-  mODDT?: Date
-  mODLOC?: string
-  mODBY?: string  
+  // mODDT?: Date
+  // mODLOC?: string
+  // mODBY?: string  
 }
 
 export class ThcmovementDetails {
@@ -129,9 +129,9 @@ export class DPt {
 export class ARr {
   sCHDT?: Date
   eXPDT?: Date
-  aCTDT?: Date
-  gPSDT?: Date
-  oDOMT?: number
+  // aCTDT?: Date
+  // gPSDT?: Date
+  // oDOMT?: number
 }
 
 export class UNload {
@@ -156,13 +156,13 @@ export class MfheaderDetails {
   vOL: number
   tHC: string
   iSARR: boolean
-  aRRDT?: Date
+  // aRRDT?: Date
   eNTDT: Date
   eNTLOC: string
   eNTBY: string
-  mODDT?: Date
-  mODLOC?: string
-  mODBY?: string
+  // mODDT?: Date
+  // mODLOC?: string
+  // mODBY?: string
 }
 
 export class MfdetailsList {
@@ -183,11 +183,11 @@ export class MfdetailsList {
   aRRVOL: number
   aRRLOC: string
   iSARR?: boolean
-  aRRDT?: Date
+  // aRRDT?: Date
   eNTDT: Date
   eNTLOC: string
   eNTBY: string
-  mODDT?: Date
-  mODLOC?: string
-  mODBY?: string
+  // mODDT?: Date
+  // mODLOC?: string
+  // mODBY?: string
 }

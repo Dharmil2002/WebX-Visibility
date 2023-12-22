@@ -251,10 +251,7 @@ export class THCAmountsControl {
         generatecontrol: true,
         disable: false,
         Validations: [],
-        additionalData: {
-          // buttonIcon: "check",
-          // functionName: "VendorPANNumberview",
-        },
+        additionalData: {},
       },
       {
         name: "Contract",

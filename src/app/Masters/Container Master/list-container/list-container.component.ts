@@ -3,6 +3,8 @@ import { Router } from "@angular/router";
 import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
+import { StorageService } from "src/app/core/service/storage.service";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-list-container",
@@ -11,9 +13,9 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 export class ListContainerComponent implements OnInit {
   breadscrums = [
     {
-      title: "List Container",
-      items: ["Home"],
-      active: "List Container",
+      title: "Container Master",
+      items: ["Master"],
+      active: "Container Master",
     },
   ];
   isTableLode = true;
@@ -70,14 +72,16 @@ export class ListContainerComponent implements OnInit {
     },
     aCT: {
       Title: "Active ",
+      type: "Activetoggle",
       class: "matcolumncenter",
       Style: "",
+      functionName: "ActivetoggleFunction",
     },
-    Location: {
-      Title: "Available at Location",
-      class: "matcolumncenter",
-      Style: "",
-    },
+    // Location: {
+    //   Title: "Available at Location",
+    //   class: "matcolumncenter",
+    //   Style: "",
+    // },
     EditAction: {
       type: "iconClick",
       Title: "Action",
@@ -96,16 +100,19 @@ export class ListContainerComponent implements OnInit {
     "gRW",
     "tRW",
     "nETW",
-    "aCT",
+    // "aCT",
     "Location",
   ];
-  CompanyCode = parseInt(localStorage.getItem("companyCode"));
   TableData: any;
-  constructor(private Route: Router, private masterService: MasterService) {}
+  constructor(
+    private Route: Router,
+    private masterService: MasterService,
+    private storage: StorageService
+  ) {}
 
   async ngOnInit() {
     const req = {
-      companyCode: this.CompanyCode,
+      companyCode: this.storage.companyCode,
       collectionName: "container_detail_master",
       filter: {},
     };
@@ -139,6 +146,30 @@ export class ListContainerComponent implements OnInit {
       this[functionName]($event);
     } catch (error) {
       console.log("failed");
+    }
+  }
+
+  async ActivetoggleFunction(event) {
+    const UpdateData = event.data;
+    const body = {
+      aCT: UpdateData.aCT,
+    };
+    const req = {
+      companyCode: this.storage.companyCode,
+      collectionName: "container_detail_master",
+      filter: { cNCD: UpdateData.cNCD },
+      update: body,
+    };
+    const res = await firstValueFrom(
+      this.masterService.masterPut("generic/update", req)
+    );
+    if (res.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Successful",
+        text: res.message,
+        showConfirmButton: true,
+      });
     }
   }
 }

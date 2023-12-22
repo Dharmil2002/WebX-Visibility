@@ -4,11 +4,9 @@ import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilder";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
-import { ContainerService } from "src/app/Utility/module/masters/container/container.service";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { ContainerFormControls } from "src/assets/FormControls/container-controls";
-import { ContainerControl } from "src/assets/FormControls/container-master";
 import Swal from "sweetalert2";
 
 @Component({
@@ -19,7 +17,7 @@ export class AddContainerComponent implements OnInit {
   breadscrums = [
     {
       title: "Add Container",
-      items: ["Home"],
+      items: ["Master"],
       active: "Add Container",
     },
   ];
@@ -48,7 +46,7 @@ export class AddContainerComponent implements OnInit {
       this.UpdateData = this.Route.getCurrentNavigation().extras?.state.data;
       this.isUpdate = true;
       this.FormTitle = "Edit Account";
-      console.log('this.UpdateData' ,this.UpdateData)
+
     }
   }
 
@@ -217,9 +215,7 @@ export class AddContainerComponent implements OnInit {
       tRW: +this.containerTableForm.value.TareWeight,
       nETW: +this.containerTableForm.value.NetWeight,
       aCT:this.containerTableForm.value.isActive,
-      mODDT: new Date(),
-      mODLOC: this.storage.branch,
-      mODBY: this.storage.userName,
+      
     };
     if(!this.isUpdate){
       const tableReq = {
@@ -240,6 +236,10 @@ export class AddContainerComponent implements OnInit {
       body["eNTDT"]= new Date()
       body["eNTLOC"]= this.storage.branch
       body["eNTBY"]= this.storage.userName
+    }else{
+      body["mODDT"]= new Date()
+      body["mODLOC"]= this.storage.branch
+      body["mODBY"]= this.storage.userName
     }
     const req = {
       companyCode: this.CompanyCode,

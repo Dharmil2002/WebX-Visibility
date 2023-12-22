@@ -113,6 +113,7 @@ export class AddShardChargesComponent implements OnInit {
       cHTY:this.customerTableForm.value.ChargesType,
       mODDT: new Date(),
       mODBY: localStorage.getItem("UserName"),
+      cHBHV:this.customerTableForm.value.ChargesBehavior,
       aCTV: true,
     };
     const req = {

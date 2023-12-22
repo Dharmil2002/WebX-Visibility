@@ -80,7 +80,7 @@ export class THCAmountsDetailComponent implements OnInit {
     this.THCAmountsDetailsArray = thcAmountsFormControls.getTHCAmountsDetailsControls();
     this.THCAmountsForm = formGroupBuilder(this.fb, [this.THCAmountsArray]);
     this.THCAmountsDetailsForm = formGroupBuilder(this.fb, [this.THCAmountsDetailsArray]);
-    this.SetLocationData()
+    this.SetLocationData();
     this.initializeAddLess();
   }
 

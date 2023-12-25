@@ -32,6 +32,7 @@ export class PrqEntryPageComponent implements OnInit {
   prqControls: PrqEntryControls;
   prqEntryTableForm: UntypedFormGroup;
   jsonControlPrqArray: FormControls[];
+  iSShow:boolean = true;
   fromCity: string; //it's used in getCity() for the binding a fromCity
   fromCityStatus: boolean; //it's used in getCity() for binding fromCity
   toCity: string; //it's used in getCity() for binding ToCity
@@ -79,7 +80,6 @@ export class PrqEntryPageComponent implements OnInit {
     public dialog: MatDialog,
     private containerService: ContainerService,
     private locationService: LocationService,
-    private masterService: MasterService,
     private pinCodeService: PinCodeService,
     private prqService: PrqService,
     private storage: StorageService,
@@ -252,7 +252,7 @@ export class PrqEntryPageComponent implements OnInit {
   }
 
   async save() {
-    
+      this.iSShow=false;
     const tabcontrols = this.prqEntryTableForm;
     let prqDetails = { ...this.prqEntryTableForm.value };
 
@@ -368,6 +368,7 @@ export class PrqEntryPageComponent implements OnInit {
       // const tabIndex = 6; // Adjust the tab index as needed
       // showConfirmationDialog(this.prqEntryTableForm.value, this.masterService, this.goBack.bind(this), tabIndex);
     }
+    this.iSShow=true;
     // console.log(this.prqEntryTableForm.value);
   }
   goBack(tabIndex: number): void {

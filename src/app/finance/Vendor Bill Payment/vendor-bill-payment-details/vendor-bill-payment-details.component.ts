@@ -401,7 +401,7 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
         mOD: this.PaymentSummaryFilterForm.value.PaymentMode,
         bANK: this.PaymentSummaryFilterForm.value?.Bank?.name || "",
         tRNO: this.PaymentSummaryFilterForm.value?.ChequeOrRefNo || "",
-        bY: localStorage.getItem("UserName"),
+        //bY: localStorage.getItem("UserName"),
         eNTDT: new Date(),
         eNTLOC: localStorage.getItem("CurrentBranchCode"),
         eNTBY: localStorage.getItem("UserName"),
@@ -416,19 +416,19 @@ export class VendorBillPaymentDetailsComponent implements OnInit {
       };
       console.log(requestData);
 
-    //   firstValueFrom(this.masterService.masterPost("generic/create", requestData))
-    //     .then((res: any) => {
-    //       // Handle success if needed 
-    //       Swal.fire({
-    //         icon: "success",
-    //         title: "Vendor Bill Payment Generated Successfully",
-    //         text: "Bill No: " + this.billData.billNo,
-    //         showConfirmButton: true,
-    //       });
-    //     })
-    //     .catch(error => {
-    //       this.snackBarUtilityService.ShowCommonSwal("error", error);
-    //     });
+      //   firstValueFrom(this.masterService.masterPost("generic/create", requestData))
+      //     .then((res: any) => {
+      //       // Handle success if needed 
+      //       Swal.fire({
+      //         icon: "success",
+      //         title: "Vendor Bill Payment Generated Successfully",
+      //         text: "Bill No: " + this.billData.billNo,
+      //         showConfirmButton: true,
+      //       });
+      //     })
+      //     .catch(error => {
+      //       this.snackBarUtilityService.ShowCommonSwal("error", error);
+      //     });
     });
 
 

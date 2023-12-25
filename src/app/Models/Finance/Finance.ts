@@ -9,7 +9,7 @@ export class DebitVoucherRequestModel {
 }
 
 export class DebitVoucherDataRequestModel {
-  companyCode: number
+  //companyCode: number
   voucherNo: string
   transType: string
   transDate: Date

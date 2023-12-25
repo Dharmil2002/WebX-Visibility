@@ -437,7 +437,7 @@ export class AdvancePaymentsComponent implements OnInit {
             this.PayableSummaryFilterForm.value.BalancePaymentlocation?.name;
           this.debitVoucherRequestModel.finYear = financialYear;
 
-          this.debitVoucherDataRequestModel.companyCode = this.companyCode;
+          // this.debitVoucherDataRequestModel.companyCode = this.companyCode;
           this.debitVoucherDataRequestModel.voucherNo = "";
           this.debitVoucherDataRequestModel.transType = "AdvancePayment";
           this.debitVoucherDataRequestModel.transDate = new Date();

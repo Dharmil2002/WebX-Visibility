@@ -4,7 +4,7 @@ export class VendorBillEntry {
   branch?: string;
   finYear?: string;
   data: {
-    companyCode: number;
+    // companyCode: number;
     cID: number;
     docNo?: string;
     bDT?: Date;
@@ -91,7 +91,7 @@ export class Vendbillpayment {
   mOD?: string;
   bANK?: string;
   tRNO?: string;
-  bY?: string;
+  // bY?: string;
   eNTDT?: Date;
   eNTLOC?: string;
   eNTBY?: string;
@@ -107,7 +107,7 @@ const vendorBillEntry: VendorBillEntry = {
   branch: "Mumbai",
   finYear: "2024",
   data: {
-    companyCode: 123,
+    // companyCode: 123,
     cID: 10065,
     docNo: "VB/2024/MUMB/000001",
     bDT: new Date("2023-12-06T12:30:00.000Z"),

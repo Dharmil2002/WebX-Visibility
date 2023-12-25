@@ -774,7 +774,7 @@ export class DebitVoucherComponent implements OnInit {
         this.debitVoucherRequestModel.finYear = financialYear
 
 
-        this.debitVoucherDataRequestModel.companyCode = this.companyCode;
+        //this.debitVoucherDataRequestModel.companyCode = this.companyCode;
         this.debitVoucherDataRequestModel.voucherNo = "";
         this.debitVoucherDataRequestModel.transType = "DebitVoucher";
         this.debitVoucherDataRequestModel.transDate = this.DebitVoucherSummaryForm.value.TransactionDate
